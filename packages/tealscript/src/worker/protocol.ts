@@ -5,7 +5,8 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { IndicatorDeclarationMetadata, RuntimeErrorCode, RuntimeErrorPayload, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { Program } from '../parser/ast';
 import type { SemanticDiagnostic } from '../semantic';
 
 /**
@@ -28,6 +29,7 @@ export interface InitMessage {
   bars: Bar[];
   inputs: Record<string, unknown>;
   runtime?: TealscriptRuntimeOptions;
+  libraries?: Map<string, Program>;
   metadata?: WorkerOutputMetadata;
 }
 
@@ -182,8 +184,10 @@ export interface ErrorMessage {
   type: 'error';
   scriptId: string;
   message: string;
+  code?: RuntimeErrorCode;
   line?: number;
   column?: number;
+  runtimeError?: RuntimeErrorPayload;
   metadata?: WorkerOutputMetadata;
 }
 
@@ -198,6 +202,29 @@ export interface SemanticErrorMessage {
   line?: number;
   column?: number;
   metadata?: WorkerOutputMetadata;
+}
+
+/**
+ * Build a semantic error message while preserving the structured diagnostic
+ * payload expected by editor integrations.
+ */
+export function createSemanticErrorMessage(
+  scriptId: string,
+  diagnostics: SemanticDiagnostic[],
+  message: string,
+  metadata?: WorkerOutputMetadata
+): SemanticErrorMessage {
+  const firstDiagnostic = diagnostics[0];
+
+  return {
+    type: 'semanticError',
+    scriptId,
+    message,
+    diagnostics,
+    line: firstDiagnostic?.line,
+    column: firstDiagnostic?.column,
+    metadata,
+  };
 }
 
 /**

@@ -13,6 +13,7 @@ import {
   fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
   InMemoryStrategyIntrabarDatafeed,
+  markStrategyLedgerToMarket,
   selectStrategyIntrabarContext,
   strategyIntrabarContextKey,
   submitStrategyOrder,
@@ -283,6 +284,45 @@ describe('strategy ledger model', () => {
     });
   });
 
+  it('records and replaces equity curve points when marked with bar metadata', () => {
+    const ledger = createStrategyLedger({ initialCapital: 1_000 });
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 100,
+    });
+    fillStrategyMarketOrder(ledger, order, 100, 0, 100);
+
+    markStrategyLedgerToMarket(ledger, 105, 110, 95, { barIndex: 0, time: 100 });
+    markStrategyLedgerToMarket(ledger, 104, 108, 96, { barIndex: 0, time: 100 });
+    markStrategyLedgerToMarket(ledger, 98, 100, 97, { barIndex: 1, time: 200 });
+
+    expect(ledger.equityCurve).toEqual([
+      {
+        barIndex: 0,
+        time: 100,
+        equity: 1_004,
+        openProfit: 4,
+        netProfit: 0,
+        drawdown: 0,
+        runup: 4,
+      },
+      {
+        barIndex: 1,
+        time: 200,
+        equity: 998,
+        openProfit: -2,
+        netProfit: 0,
+        drawdown: 6,
+        runup: 0,
+      },
+    ]);
+  });
+
   it('creates, submits, and cancels pending orders', () => {
     const ledger = createStrategyLedger();
     const order = submitStrategyOrder(ledger, {
@@ -380,7 +420,7 @@ describe('strategy ledger model', () => {
       requestedQty: Number.NaN,
       barIndex: 0,
       time: 1,
-    })).toThrow('strategy order requestedQty must be a positive number');
+    })).toThrow('strategy order requestedQty must be a non-negative number');
   });
 
   it('fills market orders and updates position average price', () => {
@@ -422,6 +462,78 @@ describe('strategy ledger model', () => {
       direction: 'long',
       size: 3,
       avgPrice: 101,
+    });
+  });
+
+  it('applies configured slippage ticks to market fills in trade direction', () => {
+    const ledger = createStrategyLedger({ slippageTicks: 2 });
+    const long = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+    const short = submitStrategyOrder(ledger, {
+      id: 'Short',
+      direction: 'short',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 1,
+      time: 2,
+    });
+
+    expect(fillStrategyMarketOrder(ledger, long, 100, 0, 1, 0.25)).toMatchObject({
+      orderId: 'Long',
+      price: 100.5,
+      slippage: 0.5,
+    });
+    expect(fillStrategyMarketOrder(ledger, short, 103, 1, 2, 0.25)).toMatchObject({
+      orderId: 'Short',
+      price: 102.5,
+      slippage: -0.5,
+    });
+    expect(ledger.closedTrades[0]).toMatchObject({
+      entryPrice: 100.5,
+      exitPrice: 102.5,
+      profit: 2,
+    });
+  });
+
+  it('normalizes direct ledger slippage settings before fill math', () => {
+    const fractionalLedger = createStrategyLedger({ slippageTicks: 1.9 });
+    const fractionalOrder = submitStrategyOrder(fractionalLedger, {
+      id: 'Fractional',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillStrategyMarketOrder(fractionalLedger, fractionalOrder, 100, 0, 1, 0.25)).toMatchObject({
+      price: 100.25,
+      slippage: 0.25,
+    });
+
+    const negativeLedger = createStrategyLedger({ slippageTicks: -2 });
+    const negativeOrder = submitStrategyOrder(negativeLedger, {
+      id: 'Negative',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillStrategyMarketOrder(negativeLedger, negativeOrder, 100, 0, 1, 0.25)).toMatchObject({
+      price: 100,
+      slippage: 0,
     });
   });
 
@@ -484,6 +596,39 @@ describe('strategy ledger model', () => {
     expect(ledger.orders[0]?.status).toBe('filled');
     expect(ledger.openTrades[0]?.qty).toBe(1);
     expect(ledger.position.size).toBe(1);
+  });
+
+  it('applies slippage to stop fills but leaves limit fills unchanged', () => {
+    const ledger = createStrategyLedger({ slippageTicks: 2 });
+    const limit = submitStrategyOrder(ledger, {
+      id: 'Long limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      limitPrice: 100,
+      barIndex: 0,
+      time: 1,
+    });
+    const stop = submitStrategyOrder(ledger, {
+      id: 'Short stop',
+      direction: 'short',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 98,
+      barIndex: 0,
+      time: 1,
+    });
+
+    const fills = fillPendingStrategyOrders(ledger, 101, 97, 1, 2, 0.25);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, slippage: fill.slippage }))).toEqual([
+      { orderId: 'Long limit', price: 100, slippage: 0 },
+      { orderId: 'Short stop', price: 97.5, slippage: -0.5 },
+    ]);
+    expect(limit).toMatchObject({ status: 'filled', avgFillPrice: 100 });
+    expect(stop).toMatchObject({ status: 'filled', avgFillPrice: 97.5 });
   });
 
   it('fills eligible pending limit and stop orders after their creation bar', () => {
@@ -585,6 +730,68 @@ describe('strategy ledger model', () => {
     expect(order).toMatchObject({ status: 'filled', avgFillPrice: 98 });
   });
 
+  it('fills stop-limit orders after same-bar activation when the ordered path reaches the limit', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long stop-limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 102,
+      limitPrice: 99,
+      barIndex: 0,
+      time: 1,
+    });
+
+    const fills = fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 100, kind: 'open', sequence: 0 },
+      { time: 3, price: 103, kind: 'high', sequence: 1 },
+      { time: 4, price: 98, kind: 'low', sequence: 2 },
+      { time: 5, price: 100, kind: 'close', sequence: 3 },
+    ], 1);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
+      { orderId: 'Long stop-limit', price: 99, time: 4 },
+    ]);
+    expect(order).toMatchObject({
+      status: 'filled',
+      avgFillPrice: 99,
+      stopLimitActivated: true,
+      stopLimitActivatedBarIndex: 1,
+      stopLimitActivatedTime: 3,
+      updatedTime: 4,
+    });
+  });
+
+  it('waits after same-bar stop-limit activation when the limit was crossed earlier in the path', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long stop-limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 102,
+      limitPrice: 99,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 100, kind: 'open', sequence: 0 },
+      { time: 3, price: 98, kind: 'low', sequence: 1 },
+      { time: 4, price: 103, kind: 'high', sequence: 2 },
+      { time: 5, price: 100, kind: 'close', sequence: 3 },
+    ], 1)).toEqual([]);
+    expect(order).toMatchObject({
+      status: 'pending',
+      stopLimitActivated: true,
+      stopLimitActivatedBarIndex: 1,
+      stopLimitActivatedTime: 4,
+    });
+  });
+
   it('fills activated stop-limit opening gaps against the limit price', () => {
     const ledger = createStrategyLedger();
     const order = submitStrategyOrder(ledger, {
@@ -616,7 +823,7 @@ describe('strategy ledger model', () => {
       { time: 7, price: 101, kind: 'high', sequence: 1 },
       { time: 8, price: 97, kind: 'low', sequence: 2 },
       { time: 9, price: 99, kind: 'close', sequence: 3 },
-    ], 2);
+    ], 2, 0.25);
 
     expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
       { orderId: 'Stop limit', price: 98, time: 6 },

@@ -28,6 +28,7 @@ export interface VariableEntry {
   type?: string; // Type annotation
   initialized: boolean; // Has been initialized at least once
   series?: Series<unknown>; // For series variables
+  sourceSeries?: SourceSeriesAccessor;
 }
 
 /**
@@ -41,6 +42,11 @@ interface VariableSnapshot {
   value: unknown;
   initialized: boolean;
   seriesSnapshot?: SeriesSnapshot<unknown>;
+  sourceSeries?: SourceSeriesAccessor;
+}
+
+export interface SourceSeriesAccessor {
+  get(offset: number): number | undefined;
 }
 
 /**
@@ -64,7 +70,7 @@ export class Scope {
   /**
    * Declare a new variable
    */
-  declare(name: string, kind: VarKind, value: unknown, type?: string): void {
+  declare(name: string, kind: VarKind, value: unknown, type?: string, sourceSeries?: SourceSeriesAccessor): void {
     // For var/varip, only initialize if not already declared
     if (kind === 'var' || kind === 'varip') {
       const existing = this.getLocal(name);
@@ -80,6 +86,7 @@ export class Scope {
       existing.kind = kind;
       existing.type = type;
       existing.initialized = true;
+      existing.sourceSeries = sourceSeries;
 
       if (existing.series) {
         existing.series.set(value);
@@ -96,6 +103,7 @@ export class Scope {
       kind,
       type,
       initialized: true,
+      sourceSeries,
     };
 
     // Wrap in series if needed
@@ -187,6 +195,18 @@ export class Scope {
   }
 
   /**
+   * Get the backing chart/source series for a source alias.
+   */
+  getSourceSeries(name: string): SourceSeriesAccessor | undefined {
+    const entry = this.variables.get(name);
+    if (entry) {
+      return entry.sourceSeries;
+    }
+
+    return this.parent?.getSourceSeries(name);
+  }
+
+  /**
    * Check if variable exists
    */
   has(name: string): boolean {
@@ -214,7 +234,7 @@ export class Scope {
   /**
    * Set variable value (for := assignment)
    */
-  set(name: string, value: unknown): void {
+  set(name: string, value: unknown, sourceSeries?: SourceSeriesAccessor): void {
     const entry = this.findEntry(name);
     if (!entry) {
       throw new Error(`Variable '${name}' is not declared`);
@@ -224,6 +244,7 @@ export class Scope {
       entry.series.set(value);
     }
     entry.value = value;
+    entry.sourceSeries = sourceSeries;
   }
 
   /**
@@ -315,6 +336,7 @@ export class Scope {
         value: cloneSnapshotValue(entry.value, cloneContext),
         initialized: entry.initialized,
         seriesSnapshot: entry.series ? cloneSeriesSnapshot(entry.series.snapshot(), cloneContext) : undefined,
+        sourceSeries: entry.sourceSeries,
       });
     }
 
@@ -341,6 +363,7 @@ export class Scope {
         }
         entry.value = cloneSnapshotValue(snap.value, cloneContext);
         entry.initialized = snap.initialized;
+        entry.sourceSeries = snap.sourceSeries;
         if (entry.series && snap.seriesSnapshot) {
           entry.series.restore(cloneSeriesSnapshot(snap.seriesSnapshot, cloneContext));
         }

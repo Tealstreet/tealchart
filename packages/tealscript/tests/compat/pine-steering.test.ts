@@ -6,9 +6,11 @@ import {
   compatibilityStages,
   createCompatibilityRunOutcome,
   createPineScriptLedger,
+  createPineParseSemanticStageOutcomes,
   formatPineCompatibilityCorpusMarkdown,
   normalizeCompatibilityStageOutcomes,
   PINE_COMPATIBILITY_SCHEMA_VERSION,
+  parse,
   runPineCompatibilityCorpus,
   summarizeCompatibilityOutcome,
   validateCompatibilityStageSequence,
@@ -74,6 +76,10 @@ describe('Pine compatibility steering model', () => {
       firstFailureStage: 'runtime',
       firstFailureClass: 'runtime_gap',
     });
+    expect(summarizeCompatibilityOutcome([{ stage: 'parse', status: 'passed' }])).toEqual({
+      passed: false,
+      firstFailureStage: 'semantic',
+    });
     expect(normalizeCompatibilityStageOutcomes(stages)).toEqual(normalizedStages);
     expect(createCompatibilityRunOutcome({ scriptId: 'public-rsi-001', pineVersion: 'v6', stages })).toEqual({
       schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
@@ -85,6 +91,121 @@ describe('Pine compatibility steering model', () => {
         firstFailureStage: 'runtime',
         firstFailureClass: 'runtime_gap',
       },
+    });
+  });
+
+  it('classifies unsupported semantic diagnostics as planned compatibility gaps', () => {
+    const stages: CompatibilityStageOutcome[] = [
+      { stage: 'parse', status: 'passed' },
+      {
+        stage: 'semantic',
+        status: 'failed',
+        diagnostics: [{
+          code: 'unsupported-feature',
+          message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        }],
+      },
+    ];
+
+    expect(validateCompatibilityStageOutcome(stages[1]!)).toEqual([]);
+    expect(validateCompatibilityStageOutcome({
+      stage: 'semantic',
+      status: 'failed',
+      diagnostics: [{ code: 'unknown-function', message: 'Unknown function: ta.foo' }],
+    })).toEqual(['failed stage semantic must include a failureClass']);
+    expect(createCompatibilityRunOutcome({ scriptId: 'public-footprint-gap', pineVersion: 'v6', stages })).toEqual({
+      schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
+      scriptId: 'public-footprint-gap',
+      pineVersion: 'v6',
+      stages: [
+        { stage: 'parse', status: 'passed' },
+        {
+          stage: 'semantic',
+          status: 'failed',
+          failureClass: 'unsupported_planned',
+          diagnostics: [{
+            code: 'unsupported-feature',
+            message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+          }],
+        },
+        { stage: 'runtime', status: 'not_run' },
+        { stage: 'datafeed', status: 'not_run' },
+        { stage: 'output', status: 'not_run' },
+        { stage: 'render', status: 'not_run' },
+      ],
+      summary: {
+        passed: false,
+        firstFailureStage: 'semantic',
+        firstFailureClass: 'unsupported_planned',
+      },
+    });
+  });
+
+  it('creates parse and semantic compatibility stages from reduced source', () => {
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Pass")
+plot(close)
+`)).toEqual([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+    ]);
+
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Parse Gap"
+plot(close)
+`)[0]).toMatchObject({
+      stage: 'parse',
+      status: 'failed',
+      failureClass: 'parse_gap',
+      diagnostics: [expect.objectContaining({ code: 'parse.error' })],
+    });
+
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Semantic Gap")
+ta.mystery(close)
+plot(close)
+`)[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'semantic_gap',
+      diagnostics: [expect.objectContaining({ code: 'unknown-function', message: 'Unknown function: ta.mystery' })],
+    });
+
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Planned Gap")
+request.footprint(syminfo.tickerid)
+plot(close)
+`)[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'unsupported_planned',
+      diagnostics: [expect.objectContaining({ code: 'unsupported-feature' })],
+    });
+  });
+
+  it('passes semantic options through reduced source stage checks', () => {
+    const library = parse(`
+library("Signals", true)
+export const string period = "1D"
+`);
+    const source = `
+indicator("Imported Stage")
+import TestUser/Signals/1 as sig
+float badPeriod = sig.period
+plot(close)
+`;
+
+    expect(createPineParseSemanticStageOutcomes(source)).toEqual([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+    ]);
+    expect(createPineParseSemanticStageOutcomes(source, {
+      libraries: new Map([['TestUser/Signals/1', library]]),
+    })[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'semantic_gap',
+      diagnostics: [expect.objectContaining({ code: 'type-mismatch' })],
     });
   });
 
@@ -192,11 +313,7 @@ describe('Pine compatibility steering model', () => {
     const run = runPineCompatibilityCorpus([
       {
         ledgerEntry: passingEntry,
-        stages: [
-          { stage: 'parse', status: 'passed' },
-          { stage: 'semantic', status: 'passed' },
-          { stage: 'runtime', status: 'passed' },
-        ],
+        stages: passedThroughOutputStages(),
       },
       {
         ledgerEntry: runtimeGapEntry,
@@ -224,6 +341,46 @@ describe('Pine compatibility steering model', () => {
       request: { total: 1, passed: 0, failed: 1 },
       ta: { total: 1, passed: 1, failed: 0 },
       timeframe: { total: 1, passed: 0, failed: 1 },
+    });
+  });
+
+  it('summarizes planned unsupported diagnostics without validation errors', () => {
+    const unsupportedEntry = createLedgerEntry({
+      id: 'public-planned-unsupported',
+      featureTags: ['request', 'footprint'],
+      source: {
+        kind: 'public_script',
+        searchContext: 'Public TradingView examples using request.footprint',
+        licenseStatus: 'unknown',
+      },
+    });
+
+    const run = runPineCompatibilityCorpus([
+      {
+        ledgerEntry: unsupportedEntry,
+        stages: [
+          { stage: 'parse', status: 'passed' },
+          {
+            stage: 'semantic',
+            status: 'failed',
+            diagnostics: [{ code: 'unsupported-feature', message: 'request.footprint is not supported yet' }],
+          },
+        ],
+      },
+    ]);
+
+    expect(run.summary).toMatchObject({
+      total: 1,
+      passed: 0,
+      failed: 1,
+      byFirstFailureStage: { semantic: 1 },
+      byFirstFailureClass: { unsupported_planned: 1 },
+      validationErrors: {},
+    });
+    expect(run.outcomes[0]?.stages[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'unsupported_planned',
     });
   });
 
@@ -259,7 +416,7 @@ describe('Pine compatibility steering model', () => {
     const run = runPineCompatibilityCorpus([
       {
         ledgerEntry: createLedgerEntry({ id: 'manual-sma-pass', featureTags: ['plot', 'ta'] }),
-        stages: [{ stage: 'parse', status: 'passed' }],
+        stages: passedThroughOutputStages(),
       },
       {
         ledgerEntry: createLedgerEntry({ id: 'manual-parser-gap', featureTags: ['syntax'] }),
@@ -294,6 +451,17 @@ Pass rate: 50.0%
 `);
   });
 });
+
+function passedThroughOutputStages(): CompatibilityStageOutcome[] {
+  return [
+    { stage: 'parse', status: 'passed' },
+    { stage: 'semantic', status: 'passed' },
+    { stage: 'runtime', status: 'passed' },
+    { stage: 'datafeed', status: 'skipped', message: 'manual compatibility fixture uses local bars' },
+    { stage: 'output', status: 'passed' },
+    { stage: 'render', status: 'skipped', message: 'numeric fixture; render comparison is manual' },
+  ];
+}
 
 function createLedgerEntry(overrides: Partial<PineScriptLedgerEntry>): PineScriptLedgerEntry {
   return {

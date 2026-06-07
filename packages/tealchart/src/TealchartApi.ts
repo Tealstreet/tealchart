@@ -1176,7 +1176,6 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
-    const onStudyCreate = () => this._onStudyCreate;
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {

@@ -91,22 +91,32 @@ The current runtime already covers a useful common-script subset:
   visual outputs, drawing objects, tables, requests, tickers, alerts/logs, and
   strategies.
 - Compatibility fixtures for real Pine idioms including MTF filters,
-  divergence, session filters, bar coloring, alerts, request-limit reuse,
-  strategy entry/exit flows, and common drawing/table patterns.
+  divergence, session filters, exchange session-state gates, dynamic sessions,
+  timeframe comparisons, bar coloring, plot-style payloads, dashboard tables,
+  custom candles, drawing zones, multi-symbol screeners, currency conversion,
+  earnings event markers, financial dashboards, economic macro overlays,
+  seed dataset overlays, imported library helpers, alerts, request-limit reuse,
+  strategy entry/exit flows, default broker-emulator path and gap-fill
+  behavior, and common drawing/table patterns.
 
 Known structural gaps:
 
-- The harness does not yet have a real-script intake ledger, pass-rate
-  dashboard, or stable failure taxonomy across parse, semantic, runtime, data,
-  output, and render stages.
+- The harness has a real-script intake ledger, offline pass-rate summaries, and
+  a stable parse/semantic/runtime/data/output/render failure taxonomy. The
+  runner treats omitted canonical stages as `not_run` failures while preserving
+  explicitly `skipped` stages as pass-neutral evidence. The
+  checkpoint corpus dashboard can now be generated as JSON/Markdown artifacts
+  for CI; the remaining evidence gap is scaling the ledger with more
+  public-script metadata.
 - Layout parsing still needs a general indentation/continuation model that can
   scale to arbitrary nested pasted Pine code.
 - Pine's qualified type system (`const < input < simple < series`) is partially
   modeled but not yet a complete compiler/runtime contract.
-- Some runtime semantics remain approximate, especially source-series
-  inference, realtime `varip`, exchange calendar catalogs, full historical
-  `max_bars_back` behavior, strategy intrabar/recalculation semantics, and
-  live host metadata/data availability.
+- Some runtime semantics remain approximate, especially expression-level
+  source-series inference beyond equivalent pure arithmetic over known source series,
+  realtime `varip`, exchange calendar catalogs, full historical `max_bars_back`
+  behavior, strategy
+  intrabar/recalculation semantics, and live host metadata/data availability.
 - Renderer output is useful for many scripts, but TradingView-exact geometry,
   z-order, pixel sizing, and Strategy Tester UI parity are later work.
 
@@ -152,7 +162,27 @@ Phases:
    deterministic tests, where they live, and what output oracle is required.
 6. Add a checkpoint coverage index by public-script idiom: MTF filters,
    divergence, session filters, strategy brackets, drawing/table dashboards,
-   libraries, alerts, screeners, and synthetic tickers.
+   libraries, alerts, screeners, and synthetic tickers. The current checkpoint
+   corpus includes reduced public fixtures for configurable indicator inputs,
+   symbol metadata gates, MTF filters, divergence, session filters, exchange
+   session-state gates, dashboard tables, custom candles, drawing zones,
+   drawing-copy lifecycles, linefill channels, zigzag polylines, screeners,
+   currency conversion, earnings event markers, corporate-action overlays,
+   financial dashboards, economic macro overlays, seed dataset overlays,
+   volatility-band overlays, library helpers including source-preserving helper
+   wrappers and block `if` source wrappers, public strategy stats tables, UDT
+   object-method state, UDT state objects with wrapped field defaults, and
+   public `varip` intrabar array tick buffers.
+   Strategy-bracket coverage includes official broker examples plus a reduced
+   public fixed-bracket strategy fixture, and trailing-stop coverage includes
+   official and reduced public strategy fixtures.
+   Alert/log coverage includes official docs examples plus reduced public signal
+   fixtures with `alertcondition()` metadata, direct `alert()` emission, and
+   Pine Logs startup/signal/final-summary output.
+   Synthetic ticker coverage includes official docs examples plus a reduced
+   public Heikin-Ashi trend request fixture.
+   Public footprint request coverage is tracked as a planned unsupported
+   semantic blocker until a host footprint/intrabar volume data model exists.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic
    pass, runtime pass, usable-output pass, top failure classes, and regressions.
 
@@ -213,7 +243,9 @@ Phases:
 3. Prioritize curated overloads by public-script frequency before exact
    full-reference overload coverage.
 4. Surface parse/semantic/runtime diagnostic codes through worker/editor
-   result paths.
+   result paths. Semantic worker protocol coverage now preserves diagnostic
+   codes, messages, severities, source locations, and freshness metadata before
+   the wrapper forwards editor-facing callbacks.
 5. Connect diagnostics to the compatibility steering failure taxonomy.
 
 Done means call-shape issues are actionable and measurable across the real
@@ -233,8 +265,12 @@ Phases:
 3. Complete assignment and mutability semantics for identifiers, UDT fields,
    array/map/matrix indexes, compound assignments, and invalid targets.
 4. Complete historical series commitment and function-local series behavior.
-5. Enforce or accurately report `max_bars_back` and runtime buffer limits.
-6. Add stable runtime error payloads and `runtime.error()` coverage.
+5. Maintain explicit `max_bars_back` enforcement and broaden inferred runtime
+   buffer sizing beyond function hints, static literal, simple numeric, selected
+   pure `math.*`, selected numeric normalization helpers, and input-bool- or
+   comparison-gated conditional offsets when corpus evidence requires it.
+6. Maintain stable runtime error payloads and source-linked `runtime.error()`
+   guard coverage as new public-script halt patterns appear.
 7. Add focused fixtures for common public-script idioms that previously parsed
    but failed or drifted at runtime.
 
@@ -300,8 +336,8 @@ Phases:
    session routing.
 4. Add exchange calendar and closure catalog hooks without making CI depend on
    live exchange calendars.
-5. Add public-script fixtures for session filters, market-hours logic, and
-   timeframe comparisons.
+5. Maintain public-script fixtures for session filters, date/session input
+   gates, market-hours logic, and timeframe comparisons.
 
 Done means context/time/session gaps are not dominant runtime blockers for
 common public scripts.
@@ -324,9 +360,12 @@ Phases:
 4. Support point-series request families such as dividends, earnings, splits,
    financial, economic, currency rates, and seed where host data exists.
 5. Defer `request.footprint()` until host footprint/intrabar-volume data is
-   available.
-6. Add corpus-driven checkpoints for MTF trend filters, lower-timeframe arrays,
-   synthetic ticker IDs, and request-limit reuse.
+   available, while preserving an explicit planned-unsupported semantic
+   diagnostic for corpus/editor classification.
+6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
+   arrays, currency conversion, earnings events, corporate actions, financial
+   dashboards, economic macro overlays, seed datasets, synthetic ticker IDs,
+   planned unsupported ticker constructors, and request-limit reuse.
 
 Done means MTF and multi-symbol scripts can run against deterministic or
 host-provided data.
@@ -339,14 +378,26 @@ making rare matrix math dominate early work.
 Phases:
 
 1. Keep `array.*` core, method sugar, sorting, slicing, joining, statistical
-   helpers, and array history as the first collection priority.
+   helpers, and array history as the first collection priority. Source-linked
+   array signal checkpoint coverage now exercises persistent bounded signal
+   queues, shifted windows, copied sorted views, aggregate helpers, and table
+   output.
 2. Complete `map.*` constructors, mutation, lookup, iteration, key/value
-   arrays, history/reference behavior, and common diagnostics.
+   arrays, history/reference behavior, and common diagnostics. Source-linked
+   map signal checkpoint coverage now exercises persistent named state maps,
+   previous-value updates, copied snapshots, key-value iteration, missing-key
+   checks, and table output.
 3. Complete UDT constructors, defaults, field access, reference assignment,
    copy semantics, rollback, nested collection fields, and `varip` field rules.
+   Keep source-linked public checkpoint coverage for persistent UDT state
+   updated through user-defined methods. Source-linked public UDT array
+   checkpoint coverage now exercises bounded pivot-record arrays, copied
+   snapshot reads, method-derived scores, and dashboard table output.
 4. Complete matrix API breadth used by public scripts; defer rare numerical
    exactness such as repeated-eigenvalue basis parity unless corpus demand
-   justifies it.
+   justifies it. Source-linked matrix scoreboard checkpoint coverage now
+   exercises weighted factor matrices, row extraction, transpose reads,
+   aggregate scores, and table output.
 5. Keep library/module version lookup as later work unless corpus failures show
    it blocks many scripts.
 
@@ -368,9 +419,14 @@ Phases:
 3. Enforce object limits, plot limits, table-cell limits, handle validation,
    deletion/copy behavior, and realtime rollback.
 4. Keep table API work separate inside this epic because the setter surface is
-   broad and easy to let sprawl.
+   broad and easy to let sprawl. Source-linked public dashboard-table setter
+   checkpoint coverage now exercises table position/frame/border setters,
+   merged headers, cell dimensions, alignment, colors, and tooltips.
 5. Add output-oracle fixtures for public idioms that care about metadata more
-   than pixels.
+   than pixels. Source-linked public signal-label and trendline-signal
+   checkpoint coverage now exercises persistent last-bar label, line, and box
+   payloads with dynamic visual metadata, text layout, copy lifecycles, getters,
+   object-count arrays, plus custom `plotbar()` / `plotcandle()` OHLC overlays.
 
 Done means pasted scripts can produce usable, inspectable output payloads even
 when renderer fidelity is not final.
@@ -407,10 +463,13 @@ Phases:
    deterministic OHLC behavior.
 3. Add gap-crossing and path-order fixtures for Pine's default broker path.
 4. Add lower-timeframe path fills behind explicit host-provided intrabar data.
-5. Implement bounded `calc_on_order_fills` recalculation.
-6. Implement `calc_on_every_tick` realtime strategy behavior.
-7. Add reduced TradingView checkpoint fixtures for bar magnifier and
-   recalculation examples.
+5. Maintain bounded `calc_on_order_fills` recalculation coverage.
+6. Maintain `calc_on_every_tick` realtime strategy checkpoint coverage.
+7. Keep expanding reduced TradingView checkpoint fixtures for bar magnifier,
+   recalculation examples, and public strategy performance-table idioms.
+   Current coverage includes a combined bar-magnifier/recalculate-after-fill
+   fixture that locks recalc-created price exits against pre-fill intrabar
+   ticks.
 8. Defer Strategy Tester UI, exact report parity, synthetic backtest exactness,
    and performance polish until execution semantics are sound.
 
@@ -427,7 +486,9 @@ Phases:
    stable viewport setup, and manual visual comparison notes for milestone
    scripts.
 2. Improve plot and marker geometry, price-scale labels, z-order, line styles,
-   histogram/area edge cases, and offset/show-last behavior.
+   histogram/area edge cases, and offset/show-last behavior; the source-linked
+   public plot metadata checkpoint now locks projected-level `plot()` routing
+   with offset, `show_last`, `display.price_scale`, `trackprice`, and hidden helper output.
 3. Improve label, line, box, polyline, and table pixel geometry, sizing,
    wrapping, alignment, fonts, and theme behavior.
 4. Add renderer regression fixtures only when the behavior affects common
@@ -465,18 +526,31 @@ impact.
 
 1. Roadmap remap: replace stale subsystem-first planning docs with this
    copy-paste compatibility roadmap.
-2. Strategy tick fills: refactor broker fills to consume selected execution
-   ticks while preserving current OHLC behavior.
-3. Harness outcome model: define parse/semantic/runtime/data/output/render
-   result shape, canonical stage normalization, validation, and failure classes.
-4. Real-script intake ledger: add metadata-only corpus format, unique-id
-   validation, and provenance rules.
-5. Corpus runner MVP: run ledger-backed offline outcomes and emit JSON/Markdown
-   pass-rate summaries plus checkpoint coverage reports.
-6. Pine layout parser audit/failing fixtures: collect reduced layout shapes
-   for nested dedents, wrapped indented expressions, and shared library/type/
-   method blocks before changing parser architecture.
-7. Call-binding diagnostics sweep: use corpus failures to prioritize missing
-   named/positional overload diagnostics.
-8. Visual output payload audit: ensure runtime payloads are stable before
-   investing in renderer fidelity.
+2. Strategy broker path checkpoint: keep official default broker-emulator OHLC
+   path, opening-gap fill assumptions, stop-limit activation/fill behavior, and
+   selective immediate close/fill-alert/entry-direction behavior, plus
+   `strategy.exit()` profit/loss offset brackets and trailing exit
+   tick-distance offsets, covered in the source-linked corpus with a public
+   trailing-stop strategy checkpoint.
+3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
+   pass-rate summaries unless they are explicitly marked `skipped`; direct
+   checkpoint coverage now locks both sides of that contract.
+4. Pine layout parser audit fixtures: keep reduced coverage for top-level
+   nested dedents, ninth-level UDF branches, wrapped indented expressions,
+   wrapped function/method signatures, wrapped request calls with multiline
+   ternary arguments, and shared library/type/method blocks before deeper
+   parser architecture changes.
+5. Call-binding diagnostics sweep: keep signed built-in namespace typo
+   diagnostics, built-in duplicate/unknown/missing/order argument diagnostics,
+   visual output call signatures including `hline()`, `fill()` alias bindings,
+   and OHLC `plotbar()` / `plotcandle()` arguments, drawing constructor
+   argument signatures, marker `plotchar()` / `plotarrow()` missing, unknown,
+   and duplicate argument diagnostics, typed `input.*` default and literal
+   constraint diagnostics, and `input.int()` / `input.float()` range-vs-options
+   overload diagnostics, plus literal strategy order value and arity diagnostics and
+   declaration argument and boolean setting diagnostics, covered while using corpus
+   failures to prioritize remaining named/positional overload gaps.
+6. Visual output payload audit: keep marker dynamic text-color payloads,
+   hidden-marker style masking, the source-linked public marker signal and
+   volatility-band checkpoints, filled plot channels, background masks, and
+   other runtime visual metadata stable before investing in renderer fidelity.

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { TealscriptEngine, executeScript } from './engine';
 import { parse } from '../parser/parser';
+import { InMemoryRequestDatafeed } from './requestDatafeed';
 import { InMemoryStrategyIntrabarDatafeed } from './strategy';
 import type { Bar } from './context';
 
@@ -48,6 +49,141 @@ function stripSourceLocations<T>(node: T): T {
 
 describe('TealscriptEngine', () => {
   describe('runtime profile', () => {
+    it('exposes bid and ask on 1T host bars and supports history/source mapping', () => {
+      const script = `//@version=6
+indicator("Bid Ask")
+plot(bid, title="Bid")
+plot(ask, title="Ask")
+plot(bid[1], title="Previous Bid")
+plot(ta.sma(ask, 2), title="Ask SMA")`;
+
+      const bars = createBars(3).map((bar, index) => ({
+        ...bar,
+        bid: 100 + index,
+        ask: 100.25 + index,
+      }));
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: {
+          timeframe: {
+            period: '1T',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: true,
+          },
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Bid')?.values).toEqual([100, 101, 102]);
+      expect(result.plots.find((plot) => plot.title === 'Ask')?.values).toEqual([100.25, 101.25, 102.25]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Bid')?.values).toEqual([null, 100, 101]);
+      expect(result.plots.find((plot) => plot.title === 'Ask SMA')?.values).toEqual([null, 100.75, 101.75]);
+    });
+
+    it('returns na for bid and ask outside 1T or without host-provided quotes', () => {
+      const script = `//@version=6
+indicator("Bid Ask NA")
+plot(bid, title="Bid")
+plot(ask, title="Ask")`;
+
+      const nonTickResult = executeScript(parse(script), createBars(2).map((bar, index) => ({
+        ...bar,
+        bid: 100 + index,
+        ask: 100.25 + index,
+      })));
+      const missingQuoteResult = executeScript(parse(script), createBars(2), undefined, {
+        runtime: {
+          timeframe: {
+            period: '1T',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: true,
+          },
+        },
+      });
+
+      expect(nonTickResult.errors).toEqual([]);
+      expect(nonTickResult.plots.find((plot) => plot.title === 'Bid')?.values).toEqual([null, null]);
+      expect(nonTickResult.plots.find((plot) => plot.title === 'Ask')?.values).toEqual([null, null]);
+      expect(missingQuoteResult.errors).toEqual([]);
+      expect(missingQuoteResult.plots.find((plot) => plot.title === 'Bid')?.values).toEqual([null, null]);
+      expect(missingQuoteResult.plots.find((plot) => plot.title === 'Ask')?.values).toEqual([null, null]);
+    });
+
+    it('updates bid and ask on realtime tick replacement', () => {
+      const script = `//@version=6
+indicator("Bid Ask Realtime")
+plot(bid, title="Bid")
+plot(ask, title="Ask")`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        bid: 100 + index,
+        ask: 100.25 + index,
+      }));
+      const engine = new TealscriptEngine({
+        runtime: {
+          timeframe: {
+            period: '1T',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: true,
+          },
+        },
+      });
+      const ast = parse(script);
+
+      const initial = engine.execute(ast, bars);
+      const initialBidValues = [...initial.plots.find((plot) => plot.title === 'Bid')!.values];
+      const updated = engine.updateBar(ast, { ...bars[1], bid: 105, ask: 105.5 });
+
+      expect(initial.errors).toEqual([]);
+      expect(initialBidValues).toEqual([100, 101]);
+      expect(updated.find((plot) => plot.title === 'Bid')?.values).toEqual([100, 105]);
+      expect(updated.find((plot) => plot.title === 'Ask')?.values).toEqual([100.25, 105.5]);
+    });
+
+    it('evaluates bid and ask inside 1T request.security contexts', () => {
+      const script = `//@version=6
+indicator("Requested Quotes")
+requestedBid = request.security(syminfo.tickerid, "1T", bid, lookahead=barmerge.lookahead_on)
+requestedAsk = request.security(syminfo.tickerid, "1T", ask, lookahead=barmerge.lookahead_on)
+plot(requestedBid, title="Requested Bid")
+plot(requestedAsk, title="Requested Ask")`;
+      const bars = createBars(2);
+      const requestedBars = bars.map((bar, index) => ({
+        ...bar,
+        bid: 200 + index,
+        ask: 200.25 + index,
+      }));
+      const datafeed = new InMemoryRequestDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: '1T',
+        bars: requestedBars,
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { requestDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Requested Bid')?.values).toEqual([200, 201]);
+      expect(result.plots.find((plot) => plot.title === 'Requested Ask')?.values).toEqual([200.25, 201.25]);
+    });
+
     it('reports execution counters for compatibility profiling', () => {
       const script = `//@version=6
 indicator("Profile")
@@ -62,7 +198,7 @@ plot(basis, title="Basis")`;
       expect(result.profile.expressions).toBeGreaterThan(0);
       expect(result.profile.builtinCalls).toBeGreaterThan(0);
       expect(result.profile.requestContexts).toBe(0);
-      expect(result.profile.maxBarsBack).toBe(0);
+      expect(result.profile.maxBarsBack).toBe(1);
       expect(result.profile.errors).toBe(0);
       expect(result.profile.elapsedMs).toBeGreaterThanOrEqual(0);
     });
@@ -164,7 +300,8 @@ strategy("Test strategy",
     calc_on_order_fills=true,
     calc_on_every_tick=true,
     process_orders_on_close=true,
-    use_bar_magnifier=true)
+    use_bar_magnifier=true,
+    risk_free_rate=1.75)
 plot(strategy.equity)
 plot(strategy.position_size)`;
 
@@ -190,14 +327,55 @@ plot(strategy.position_size)`;
         calcOnEveryTick: true,
         processOrdersOnClose: true,
         useBarMagnifier: true,
+        riskFreeRate: 1.75,
+        backtestFillLimitsAssumptionTicks: 0,
+        closeEntriesRule: 'FIFO',
+        fillOrdersOnStandardOhlc: false,
       });
       expect(result.strategy.equity).toBe(25000);
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
     });
 
+    it('records strategy equity curve points during execution', () => {
+      const script = `//@version=6
+strategy("Equity curve", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+plot(strategy.equity)`;
+      const bars = [
+        { time: 100, open: 100, high: 102, low: 99, close: 100, volume: 100 },
+        { time: 200, open: 100, high: 106, low: 100, close: 105, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.equityCurve).toEqual([
+        {
+          barIndex: 0,
+          time: 100,
+          equity: 100_000,
+          openProfit: 0,
+          netProfit: 0,
+          drawdown: 0,
+          runup: 0,
+        },
+        {
+          barIndex: 1,
+          time: 200,
+          equity: 100_005,
+          openProfit: 5,
+          netProfit: 0,
+          drawdown: 0,
+          runup: 5,
+        },
+      ]);
+      expect(result.plots[0]?.values).toEqual([100_000, 100_005]);
+    });
+
     it('applies strategy named-prefix positional tail settings', () => {
       const script = `//@version=6
-strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true)
+strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3, "ANY", true)
 plot(strategy.equity)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -220,6 +398,10 @@ plot(strategy.equity)`;
         calcOnEveryTick: true,
         processOrdersOnClose: true,
         useBarMagnifier: true,
+        riskFreeRate: 1.75,
+        backtestFillLimitsAssumptionTicks: 3,
+        closeEntriesRule: 'ANY',
+        fillOrdersOnStandardOhlc: true,
       });
     });
 
@@ -236,7 +418,8 @@ strategy("Zero settings",
     calc_on_order_fills=false,
     calc_on_every_tick=false,
     process_orders_on_close=false,
-    use_bar_magnifier=false)
+    use_bar_magnifier=false,
+    risk_free_rate=0)
 plot(strategy.initial_capital)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -254,9 +437,104 @@ plot(strategy.initial_capital)`;
         calcOnEveryTick: false,
         processOrdersOnClose: false,
         useBarMagnifier: false,
+        riskFreeRate: 0,
+        backtestFillLimitsAssumptionTicks: 0,
+        closeEntriesRule: 'FIFO',
+        fillOrdersOnStandardOhlc: false,
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
+    });
+
+    it('uses close_entries_rule ANY to close the matching entry id before FIFO trades', () => {
+      const script = `//@version=6
+strategy("Close entries any", process_orders_on_close=true, pyramiding=2, close_entries_rule="ANY")
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("B", strategy.long, qty=1)
+if bar_index == 2
+    strategy.close("B")
+plot(strategy.position_size)`;
+      const bars = createBars(3);
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'B',
+        exitOrderId: 'Close B',
+        entryPrice: bars[1].close,
+        exitPrice: bars[2].close,
+      });
+      expect(result.strategy.openTrades.map((trade) => trade.entryOrderId)).toEqual(['A']);
+      expect(result.plots[0]?.values).toEqual([1, 2, 1]);
+    });
+
+    it('delays long limit fills until price exceeds the limit verification ticks', () => {
+      const script = `//@version=6
+strategy("Verified limit", process_orders_on_close=true, backtest_fill_limits_assumption=3)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=100.3)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 101, high: 102, low: 100.5, close: 101, volume: 100 },
+        { time: 1_700_000_060_000, open: 101, high: 102, low: 100.28, close: 101, volume: 100 },
+        { time: 1_700_000_120_000, open: 101, high: 102, low: 100.26, close: 101, volume: 100 },
+        { time: 1_700_000_180_000, open: 101, high: 102, low: 100.2, close: 101, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        type: 'limit',
+        status: 'filled',
+        avgFillPrice: 100.3,
+        updatedBarIndex: 2,
+      });
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Long', price: 100.3, barIndex: 2 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0, 1]);
+    });
+
+    it('delays short limit fills until price exceeds the limit verification ticks', () => {
+      const script = `//@version=6
+strategy("Verified short limit", process_orders_on_close=true, backtest_fill_limits_assumption=3)
+if bar_index == 0
+    strategy.entry("Short", strategy.short, qty=1, limit=100.3)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 100, high: 100.1, low: 99, close: 100, volume: 100 },
+        { time: 1_700_000_060_000, open: 100, high: 100.32, low: 99, close: 100, volume: 100 },
+        { time: 1_700_000_120_000, open: 100, high: 100.34, low: 99, close: 100, volume: 100 },
+        { time: 1_700_000_180_000, open: 100, high: 100.4, low: 99, close: 100, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Short',
+        type: 'limit',
+        status: 'filled',
+        avgFillPrice: 100.3,
+        updatedBarIndex: 2,
+      });
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Short', price: 100.3, barIndex: 2 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0, -1]);
+    });
+
+    it('uses the official default strategy risk-free rate', () => {
+      const result = executeScript(parse('//@version=6\nstrategy("Defaults")\nplot(strategy.equity)\n'), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.riskFreeRate).toBe(2);
     });
 
     it('records lower-timeframe strategy execution paths when bar magnifier data is available', () => {
@@ -423,6 +701,59 @@ plot(recalculations)`;
         },
       ]);
       expect(result.strategy.intrabarContexts).toHaveLength(2);
+    });
+
+    it('does not fill recalc-created bar magnifier orders on ticks before the triggering fill', () => {
+      const baseTime = Date.now() - 180000;
+      const bars: Bar[] = [
+        { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+        { time: baseTime + 60000, open: 100, high: 105, low: 96, close: 100, volume: 1000 },
+        { time: baseTime + 120000, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+      ];
+      const script = `//@version=6
+strategy("Magnifier fill recalc timeline", calc_on_order_fills=true, use_bar_magnifier=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=97)
+if strategy.position_size > 0
+    strategy.exit("Take", "Long", limit=104)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+      const datafeed = new InMemoryStrategyIntrabarDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: '60',
+        chartBarTime: bars[1].time,
+        chartBarIndex: 1,
+        chartBar: bars[1],
+        source: 'lower_timeframe',
+        ticks: [
+          { time: bars[1].time, price: 100, kind: 'intrabar_open', sequence: 0 },
+          { time: bars[1].time + 15_000, price: 105, kind: 'intrabar_high', sequence: 1 },
+          { time: bars[1].time + 30_000, price: 96, kind: 'intrabar_low', sequence: 2 },
+          { time: bars[1].time + 45_000, price: 100, kind: 'intrabar_close', sequence: 3 },
+        ],
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { strategyIntrabarDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map(({ orderId, price, barIndex, time }) => ({ orderId, price, barIndex, time }))).toEqual([
+        { orderId: 'Long', price: 97, barIndex: 1, time: bars[1].time + 30_000 },
+      ]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: 97, updatedBarIndex: 1 },
+        { id: 'Take', status: 'pending', avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.strategy.closedTrades).toEqual([]);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 1, 1],
+        [0, 0, 0],
+      ]);
     });
 
     it('does not record intrabar metadata when the strategy declaration fails', () => {
@@ -740,6 +1071,8 @@ plot(strategy.openprofit_percent, title="Open Profit Percent")
 plot(strategy.opentrades.commission(0), title="Commission")
 plot(strategy.opentrades.profit_percent(0), title="Profit Percent")
 plot(strategy.opentrades.capital_held, title="Capital Held")
+plot(strategy.account_currency == "USDT" ? 1 : 0, title="Account Currency")
+plot(strategy.position_entry_name == "Long" ? 1 : 0, title="Position Entry Name")
 plot(strategy.opentrades.max_runup(0), title="Max Runup")
 plot(strategy.opentrades.max_drawdown(0), title="Max Drawdown")
 plot(strategy.opentrades.max_runup_percent(0), title="Max Runup Percent")
@@ -767,6 +1100,8 @@ plot(strategy.opentrades.size(99), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Commission')?.values).toEqual([2, 2]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Profit Percent')?.values ?? [])).toEqual([0, 0.499002]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Capital Held')?.values ?? [])).toEqual([200.4, 301.1]);
+      expect(result.plots.find((plot) => plot.title === 'Account Currency')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Position Entry Name')?.values).toEqual([1, 1]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup')?.values ?? [])).toEqual([0, 1.6]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Drawdown')?.values ?? [])).toEqual([0, 0]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup Percent')?.values ?? [])).toEqual([0, 0.798403]);
@@ -1227,6 +1562,43 @@ plot(strategy.netprofit)`;
       ]);
     });
 
+    it('fills strategy.close immediately on the current bar when requested', () => {
+      const script = `//@version=6
+strategy("Close immediately", process_orders_on_close=false)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Long", immediately=true)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: bars[1].open, updatedBarIndex: 1 },
+        { id: 'Close Long', status: 'filled', avgFillPrice: bars[1].close, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Close Long',
+        entryBarIndex: 1,
+        exitBarIndex: 1,
+        entryPrice: bars[1].open,
+        exitPrice: bars[1].close,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 0, 0],
+        [0, 1, 1],
+      ]);
+    });
+
     it('emits strategy order-fill alerts from alert_message fields', () => {
       const script = `//@version=6
 strategy("Fill alerts", process_orders_on_close=true)
@@ -1252,6 +1624,29 @@ plot(strategy.closedtrades)`;
       }))).toEqual([
         { barIndex: 0, message: 'entry filled', frequency: 'all' },
         { barIndex: 1, message: 'close filled', frequency: 'all' },
+      ]);
+    });
+
+    it('suppresses strategy order-fill alerts when disable_alert is true', () => {
+      const script = `//@version=6
+strategy("Suppressed fill alerts", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, alert_message="entry suppressed", disable_alert=true)
+if bar_index == 1
+    strategy.close("Long", alert_message="close suppressed", disable_alert=true)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')).toBeUndefined();
+      expect(result.strategy.fills.map((fill) => ({
+        orderId: fill.orderId,
+        alertMessage: fill.alertMessage,
+        disableAlert: fill.disableAlert,
+      }))).toEqual([
+        { orderId: 'Long', alertMessage: 'entry suppressed', disableAlert: true },
+        { orderId: 'Close Long', alertMessage: 'close suppressed', disableAlert: true },
       ]);
     });
 
@@ -1292,6 +1687,43 @@ plot(strategy.closedtrades)`;
         [2, 0],
         [1, 0],
         [0, 1],
+      ]);
+    });
+
+    it('fills strategy.close_all immediately on the current bar when requested', () => {
+      const script = `//@version=6
+strategy("Close all immediately", process_orders_on_close=false)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close_all(immediately=true)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: bars[1].open, updatedBarIndex: 1 },
+        { id: 'Close All', status: 'filled', avgFillPrice: bars[1].close, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Close All',
+        qty: 2,
+        entryBarIndex: 1,
+        exitBarIndex: 1,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 0, 0],
+        [0, 1, 1],
       ]);
     });
 
@@ -1420,10 +1852,12 @@ strategy("Mixed trailing exit", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
-    strategy.exit(id="Trail", "Long", na, na, na, na, na, na, na, 0.5, 0.25, na, "base comment", na, na, "trail comment", "base alert", na, na, "trail alert")
+    strategy.exit(id="Trail", "Long", na, na, na, na, na, na, na, 2, 1, na, "base comment", na, na, "trail comment", "base alert", na, na, "trail alert")
 plot(strategy.opentrades)`;
 
-      const result = executeScript(parse(script), createBars(2));
+      const result = executeScript(parse(script), createBars(2), undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[1]).toMatchObject({
@@ -1501,6 +1935,214 @@ plot(strategy.closedtrades)`;
         [1, 1],
         [0, 0],
       ]);
+    });
+
+    it('cancels generated strategy.exit bracket orders by their source id', () => {
+      const script = `//@version=6
+strategy("Cancel exit brackets", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=101.4, stop=99)
+if bar_index == 2
+    strategy.cancel("Bracket")
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.3, volume: 1000 },
+        { time: 3, open: 100.3, high: 101.5, low: 98.5, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        sourceId: order.sourceId,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', sourceId: undefined, status: 'filled', avgFillPrice: 100.2, updatedBarIndex: 0 },
+        { id: 'Bracket Limit', sourceId: 'Bracket', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 2 },
+        { id: 'Bracket Stop', sourceId: 'Bracket', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.strategy.closedTrades).toEqual([]);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1],
+        [0, 0, 0],
+      ]);
+    });
+
+    it('records long strategy.exit profit and loss offsets as tick-based brackets', () => {
+      const script = `//@version=6
+strategy("Exit profit loss", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", profit=4, loss=2)
+plot(strategy.opentrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        type: order.type,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+        ocaType: order.ocaType,
+      }))).toEqual([
+        {
+          id: 'Long',
+          direction: 'long',
+          type: 'market',
+          status: 'filled',
+          limitPrice: undefined,
+          stopPrice: undefined,
+          ocaType: undefined,
+        },
+        {
+          id: 'Bracket Limit',
+          direction: 'short',
+          type: 'limit',
+          status: 'pending',
+          limitPrice: 101.2,
+          stopPrice: undefined,
+          ocaType: 'cancel',
+        },
+        {
+          id: 'Bracket Stop',
+          direction: 'short',
+          type: 'stop',
+          status: 'pending',
+          limitPrice: undefined,
+          stopPrice: 99.7,
+          ocaType: 'cancel',
+        },
+      ]);
+    });
+
+    it('records short strategy.exit profit and loss offsets as tick-based brackets', () => {
+      const script = `//@version=6
+strategy("Short exit profit loss", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Short", strategy.short, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Short", profit=4, loss=2)
+plot(strategy.opentrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.6, low: 99.4, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        type: order.type,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+      }))).toEqual([
+        {
+          id: 'Short',
+          direction: 'short',
+          type: 'market',
+          status: 'filled',
+          limitPrice: undefined,
+          stopPrice: undefined,
+        },
+        {
+          id: 'Bracket Limit',
+          direction: 'long',
+          type: 'limit',
+          status: 'pending',
+          limitPrice: 99.2,
+          stopPrice: undefined,
+        },
+        {
+          id: 'Bracket Stop',
+          direction: 'long',
+          type: 'stop',
+          status: 'pending',
+          limitPrice: undefined,
+          stopPrice: 100.7,
+        },
+      ]);
+    });
+
+    it('prefers absolute strategy.exit limit and stop prices over profit and loss offsets', () => {
+      const script = `//@version=6
+strategy("Exit absolute precedence", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", profit=4, limit=102, loss=2, stop=99)
+plot(strategy.opentrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[1]).toMatchObject({
+        id: 'Bracket Limit',
+        limitPrice: 102,
+      });
+      expect(result.strategy.orders[2]).toMatchObject({
+        id: 'Bracket Stop',
+        stopPrice: 99,
+      });
+    });
+
+    it('applies strategy slippage using syminfo mintick for market and stop fills', () => {
+      const script = `//@version=6
+strategy("Slippage fills", slippage=2, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Stop", "Long", stop=100.8)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(3), undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map((fill) => ({
+        orderId: fill.orderId,
+        price: fill.price,
+        slippage: fill.slippage,
+        barIndex: fill.barIndex,
+      }))).toEqual([
+        { orderId: 'Long', price: 100.7, slippage: 0.5, barIndex: 0 },
+        { orderId: 'Stop', price: 100.3, slippage: -0.5, barIndex: 2 },
+      ]);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryPrice: 100.7,
+        exitPrice: 100.3,
+      });
+      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(-0.4);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0]);
     });
 
     it('updates an existing pending strategy.exit order with the same id', () => {
@@ -1611,7 +2253,7 @@ plot(strategy.position_size)`;
       ]);
     });
 
-    it('activates and fills long stop-limit entry orders on later bars', () => {
+    it('activates and fills long stop-limit entry orders on later ticks in the same bar', () => {
       const script = `//@version=6
 strategy("Long stop-limit", process_orders_on_close=true)
 if bar_index == 0
@@ -1628,20 +2270,20 @@ plot(strategy.position_size)`;
         stopLimitActivated: true,
         stopLimitActivatedBarIndex: 1,
         avgFillPrice: 100.7,
-        updatedBarIndex: 2,
+        updatedBarIndex: 1,
       });
       expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
-        { orderId: 'Long', price: 100.7, barIndex: 2 },
+        { orderId: 'Long', price: 100.7, barIndex: 1 },
       ]);
       expect(result.strategy.position).toMatchObject({
         direction: 'long',
         size: 1,
         avgPrice: 100.7,
       });
-      expect(result.plots[0]?.values).toEqual([0, 0, 0, 1]);
+      expect(result.plots[0]?.values).toEqual([0, 0, 1, 1]);
     });
 
-    it('activates and fills short stop-limit strategy.order calls on later bars', () => {
+    it('activates and fills short stop-limit strategy.order calls on later ticks in the same bar', () => {
       const script = `//@version=6
 strategy("Short stop-limit", process_orders_on_close=true)
 if bar_index == 0
@@ -1658,17 +2300,17 @@ plot(strategy.position_size)`;
         stopLimitActivated: true,
         stopLimitActivatedBarIndex: 1,
         avgFillPrice: 101,
-        updatedBarIndex: 2,
+        updatedBarIndex: 1,
       });
       expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
-        { orderId: 'Short', price: 101, barIndex: 2 },
+        { orderId: 'Short', price: 101, barIndex: 1 },
       ]);
       expect(result.strategy.position).toMatchObject({
         direction: 'short',
         size: -1,
         avgPrice: 101,
       });
-      expect(result.plots[0]?.values).toEqual([0, 0, 0, -1]);
+      expect(result.plots[0]?.values).toEqual([0, 0, -1, -1]);
     });
 
     it('blocks same-direction strategy.entry calls above the pyramiding limit', () => {
@@ -1794,6 +2436,47 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('limits strategy.entry reversals with strategy.risk.allow_entry_in', () => {
+      const script = `//@version=6
+strategy("Entry direction risk", process_orders_on_close=true)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("Blocked Short", strategy.short, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.allowedEntryDirection).toBe('long');
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+        status: order.status,
+      }))).toEqual([
+        { id: 'Long', direction: 'long', qty: 2, requestedQty: 2, filledQty: 2, status: 'filled' },
+        { id: 'Blocked Short', direction: 'short', qty: 2, requestedQty: 0, filledQty: 2, status: 'filled' },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: null,
+        size: 0,
+        avgPrice: null,
+      });
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.strategy.openTrades).toHaveLength(0);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 0],
+        [1, 0],
+        [0, 1],
+      ]);
+    });
+
     it('does not auto-reverse raw strategy.order calls', () => {
       const script = `//@version=6
 strategy("Order no reversal", process_orders_on_close=true)
@@ -1812,6 +2495,401 @@ plot(strategy.position_size)`;
       ]);
       expect(result.strategy.position.size).toBe(1);
       expect(result.plots[0]?.values).toEqual([2, 1]);
+    });
+
+    it('does not apply strategy.risk.allow_entry_in to raw strategy.order calls', () => {
+      const script = `//@version=6
+strategy("Order ignores entry direction risk", process_orders_on_close=true)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.order("Short", strategy.short, qty=1)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'Long', qty: 2, requestedQty: 2, filledQty: 2 },
+        { id: 'Short', qty: 1, requestedQty: 1, filledQty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.plots[0]?.values).toEqual([2, 1]);
+    });
+
+    it('caps strategy.entry exposure with strategy.risk.max_position_size', () => {
+      const script = `//@version=6
+strategy("Max position risk", process_orders_on_close=true, pyramiding=2)
+strategy.risk.max_position_size(3)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("B", strategy.long, qty=2)
+if bar_index == 2
+    strategy.entry("C", strategy.long, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.maxPositionSize).toBe(3);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'A', qty: 2, requestedQty: 2, filledQty: 2 },
+        { id: 'B', qty: 1, requestedQty: 1, filledQty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 3, 3],
+        [1, 2, 2],
+      ]);
+    });
+
+    it('counts pending same-direction entries toward strategy.risk.max_position_size', () => {
+      const script = `//@version=6
+strategy("Pending max position risk", pyramiding=2)
+strategy.risk.max_position_size(3)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=2)
+    strategy.entry("B", strategy.long, qty=2)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'A', qty: 2, requestedQty: 2, filledQty: 2 },
+        { id: 'B', qty: 1, requestedQty: 1, filledQty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([0, 3]);
+    });
+
+    it('does not apply strategy.risk.max_position_size to raw strategy.order calls', () => {
+      const script = `//@version=6
+strategy("Raw order ignores max position", process_orders_on_close=true)
+strategy.risk.max_position_size(1)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.order("Add", strategy.long, qty=2)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'Long', qty: 1, requestedQty: 1, filledQty: 1 },
+        { id: 'Add', qty: 2, requestedQty: 2, filledQty: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([1, 3]);
+    });
+
+    it('captures common strategy.risk guard metadata', () => {
+      const script = `//@version=6
+strategy("Risk metadata")
+strategy.risk.max_drawdown(value=25, type=strategy.percent_of_equity, alert_message="drawdown")
+strategy.risk.max_intraday_loss(value=1000, type=strategy.cash, alert_message="loss")
+strategy.risk.max_intraday_filled_orders(10, "fills")
+strategy.risk.max_cons_loss_days(count=3, alert_message="days")
+plot(close)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.riskRules).toEqual({
+        maxDrawdown: { value: 25, type: 'percent_of_equity', alertMessage: 'drawdown' },
+        maxIntradayLoss: { value: 1000, type: 'cash', alertMessage: 'loss' },
+        maxIntradayFilledOrders: { count: 10, alertMessage: 'fills' },
+        maxConsLossDays: { count: 3, alertMessage: 'days' },
+      });
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_intraday_filled_orders is reached', () => {
+      const script = `//@version=6
+strategy("Intraday fill cap", process_orders_on_close=true)
+strategy.risk.max_intraday_filled_orders(count=1)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.order("Add", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        time: Date.UTC(2024, 0, 1, 9, index),
+      }));
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+      expect(result.plots[0]?.values).toEqual([0, 0]);
+    });
+
+    it('cancels excess pending non-exit fills after strategy.risk.max_intraday_filled_orders is reached', () => {
+      const script = `//@version=6
+strategy("Pending intraday fill cap", pyramiding=2)
+strategy.risk.max_intraday_filled_orders(count=1)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=1)
+    strategy.entry("B", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        time: Date.UTC(2024, 0, 1, 9, index),
+      }));
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'A', status: 'filled', filledQty: 1 },
+        { id: 'B', status: 'cancelled', filledQty: 0 },
+        { id: 'Risk Close All', status: 'filled', filledQty: 1 },
+      ]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['A', 'Risk Close All']);
+      expect(result.plots[0]?.values).toEqual([0, 0]);
+    });
+
+    it('force-closes before restricted close-only entries after strategy.risk.max_intraday_filled_orders is reached', () => {
+      const script = `//@version=6
+strategy("Close-only after intraday cap", process_orders_on_close=true)
+strategy.risk.max_intraday_filled_orders(count=1)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.order("RawLong", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("CloseOnlyShort", strategy.short, qty=1)
+plot(strategy.position_size)`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        time: Date.UTC(2024, 0, 1, 9, index),
+      }));
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['RawLong', 'Risk Close All']);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        requestedQty: order.requestedQty,
+      }))).toEqual([
+        { id: 'RawLong', status: 'filled', requestedQty: 1 },
+        { id: 'Risk Close All', status: 'filled', requestedQty: 1 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([0, 0]);
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_cons_loss_days is reached', () => {
+      const script = `//@version=6
+strategy("Consecutive loss day cap", process_orders_on_close=true)
+strategy.risk.max_cons_loss_days(count=2)
+if bar_index == 0
+    strategy.entry("Day 1", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Day 1")
+if bar_index == 2
+    strategy.entry("Day 2", strategy.long, qty=1)
+if bar_index == 3
+    strategy.close("Day 2")
+if bar_index == 4
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 98, close: 99, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 10), open: 100, high: 101, low: 97, close: 98, volume: 100 },
+        { time: Date.UTC(2024, 0, 3, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Day 1', 'Close Day 1', 'Day 2', 'Close Day 2']);
+      expect(result.strategy.closedTrades.map((trade) => ({
+        entryOrderId: trade.entryOrderId,
+        exitOrderId: trade.exitOrderId,
+        profit: trade.profit,
+        exitTime: trade.exitTime,
+      }))).toEqual([
+        { entryOrderId: 'Day 1', exitOrderId: 'Close Day 1', profit: -1, exitTime: Date.UTC(2024, 0, 1, 10) },
+        { entryOrderId: 'Day 2', exitOrderId: 'Close Day 2', profit: -2, exitTime: Date.UTC(2024, 0, 2, 10) },
+      ]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Day 1', 'Close Day 1', 'Day 2', 'Close Day 2']);
+      expect(result.plots[0]?.values).toEqual([1, 0, 1, 0, 0]);
+    });
+
+    it('cancels pending non-exit fills after strategy.risk.max_cons_loss_days is reached', () => {
+      const script = `//@version=6
+strategy("Pending consecutive loss day cap", pyramiding=2, process_orders_on_close=true)
+strategy.risk.max_cons_loss_days(count=1)
+if bar_index == 0
+    strategy.entry("Loss", strategy.long, qty=1)
+    strategy.entry("Pending", strategy.long, qty=1, limit=95)
+if bar_index == 1
+    strategy.close("Loss")
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 98, close: 99, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 9), open: 99, high: 100, low: 94, close: 96, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'Loss', status: 'filled', filledQty: 1 },
+        { id: 'Pending', status: 'cancelled', filledQty: 0 },
+        { id: 'Close Loss', status: 'filled', filledQty: 1 },
+      ]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Loss', 'Close Loss']);
+      expect(result.plots[0]?.values).toEqual([1, 0, 0]);
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_intraday_loss cash is reached', () => {
+      const script = `//@version=6
+strategy("Intraday loss cap", process_orders_on_close=true)
+strategy.risk.max_intraday_loss(value=5, type=strategy.cash)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 2
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 89, close: 90, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 11), open: 90, high: 92, low: 88, close: 91, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+        { equity: 100_000, drawdown: 0 },
+        { equity: 99_990, drawdown: 10 },
+        { equity: 99_990, drawdown: 10 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([1, 0, 0]);
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_intraday_loss percent is reached', () => {
+      const script = `//@version=6
+strategy("Intraday percent loss cap", initial_capital=1000, process_orders_on_close=true)
+strategy.risk.max_intraday_loss(value=1, type=strategy.percent_of_equity)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 2
+    strategy.order("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 94, close: 94, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 11), open: 94, high: 95, low: 93, close: 95, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+        { equity: 1000, drawdown: 0 },
+        { equity: 988, drawdown: 12 },
+        { equity: 988, drawdown: 12 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([2, 0, 0]);
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_drawdown cash is reached', () => {
+      const script = `//@version=6
+strategy("Max drawdown cash cap", process_orders_on_close=true)
+strategy.risk.max_drawdown(value=5, type=strategy.cash)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 2
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 9), open: 100, high: 101, low: 89, close: 90, volume: 100 },
+        { time: Date.UTC(2024, 0, 3, 9), open: 90, high: 92, low: 88, close: 91, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+        { equity: 100_000, drawdown: 0 },
+        { equity: 99_990, drawdown: 10 },
+        { equity: 99_990, drawdown: 10 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([1, 0, 0]);
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_drawdown percent is reached', () => {
+      const script = `//@version=6
+strategy("Max drawdown percent cap", initial_capital=1000, process_orders_on_close=true)
+strategy.risk.max_drawdown(value=1, type=strategy.percent_of_equity)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 2
+    strategy.order("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 9), open: 100, high: 101, low: 94, close: 94, volume: 100 },
+        { time: Date.UTC(2024, 0, 3, 9), open: 94, high: 95, low: 93, close: 95, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+        { equity: 1000, drawdown: 0 },
+        { equity: 988, drawdown: 12 },
+        { equity: 988, drawdown: 12 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([2, 0, 0]);
     });
 
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
@@ -1881,6 +2959,154 @@ plot(strategy.position_size)`;
       ]);
     });
 
+    it('cancels stale strategy.exit orders instead of reversing the position', () => {
+      const script = `//@version=6
+strategy("Exit overfill cap", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Take", "Long", qty=1, limit=101.4)
+    strategy.exit("Stop", "Long", qty=1, stop=98)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.3, volume: 1000 },
+        { time: 3, open: 100.3, high: 101.5, low: 97.5, close: 100.1, volume: 1000 },
+        { time: 4, open: 100.1, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        isExit: order.isExit,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', isExit: false, avgFillPrice: 100.2, updatedBarIndex: 0 },
+        { id: 'Take', status: 'filled', isExit: true, avgFillPrice: 101.4, updatedBarIndex: 2 },
+        { id: 'Stop', status: 'cancelled', isExit: true, avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.openTrades).toEqual([]);
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1, 0],
+        [0, 0, 0, 1],
+      ]);
+    });
+
+    it('keeps raw strategy.order fills able to reverse positions', () => {
+      const script = `//@version=6
+strategy("Raw order reversal", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.order("Reverse", strategy.short, qty=2, limit=101.4)
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.3, volume: 1000 },
+        { time: 3, open: 100.3, high: 101.5, low: 99.8, close: 101, volume: 1000 },
+        { time: 4, open: 101, high: 101.2, low: 100.5, close: 100.8, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        isExit: order.isExit,
+        avgFillPrice: order.avgFillPrice,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', isExit: false, avgFillPrice: 100.2 },
+        { id: 'Reverse', status: 'filled', isExit: false, avgFillPrice: 101.4 },
+      ]);
+      expect(result.strategy.position.size).toBe(-1);
+      expect(result.strategy.openTrades).toHaveLength(1);
+      expect(result.strategy.openTrades[0]).toMatchObject({
+        entryOrderId: 'Reverse',
+        direction: 'short',
+        qty: 1,
+      });
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1, -1],
+        [1, 1, 1, 1],
+        [0, 0, 0, 1],
+      ]);
+    });
+
+    it('reduces pending strategy.oca.reduce sibling quantities after a fill', () => {
+      const script = `//@version=6
+strategy("OCA reduce partial")
+if bar_index == 0
+    strategy.order("A", strategy.long, qty=3, limit=99, oca_name="grp", oca_type=strategy.oca.reduce)
+    strategy.order("B", strategy.long, qty=5, limit=95, oca_name="grp", oca_type=strategy.oca.reduce)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+        { time: 2, open: 100, high: 101, low: 98.5, close: 100, volume: 1000 },
+        { time: 3, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        qtyValue: order.qtyValue,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'A', status: 'filled', qty: 3, requestedQty: 3, qtyValue: 3, avgFillPrice: 99, updatedBarIndex: 1 },
+        { id: 'B', status: 'pending', qty: 2, requestedQty: 2, qtyValue: 2, avgFillPrice: null, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([0, 0, 3]);
+    });
+
+    it('cancels strategy.oca.reduce siblings when a fill consumes their quantity', () => {
+      const script = `//@version=6
+strategy("OCA reduce cancel")
+if bar_index == 0
+    strategy.order("A", strategy.long, qty=3, limit=99, oca_name="grp", oca_type=strategy.oca.reduce)
+    strategy.order("B", strategy.long, qty=2, limit=95, oca_name="grp", oca_type=strategy.oca.reduce)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+        { time: 2, open: 100, high: 101, low: 98.5, close: 100, volume: 1000 },
+        { time: 3, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        qtyValue: order.qtyValue,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'A', status: 'filled', qty: 3, requestedQty: 3, qtyValue: 3, avgFillPrice: 99, updatedBarIndex: 1 },
+        { id: 'B', status: 'cancelled', qty: 0, requestedQty: 0, qtyValue: 0, avgFillPrice: null, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([0, 0, 3]);
+    });
+
     it('does not fill updated strategy.exit prices until a later bar', () => {
       const script = `//@version=6
 strategy("Exit activation", process_orders_on_close=true)
@@ -1914,7 +3140,7 @@ strategy("Long trail", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
-    strategy.exit("Trail", "Long", trail_points=0.5, trail_offset=0.4)
+    strategy.exit("Trail", "Long", trail_points=5, trail_offset=4)
 plot(strategy.position_size)`;
       const baseTime = Date.now() - 240000;
       const bars: Bar[] = [
@@ -1924,7 +3150,9 @@ plot(strategy.position_size)`;
         { time: baseTime + 180000, open: 101, high: 101, low: 100.9, close: 101, volume: 1000 },
       ];
 
-      const result = executeScript(parse(script), bars);
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.1 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders.map((order) => ({
@@ -1970,7 +3198,7 @@ strategy("Short trail", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Short", strategy.short, qty=1)
 if bar_index == 1
-    strategy.exit("Trail", "Short", trail_points=0.5, trail_offset=0.25)
+    strategy.exit("Trail", "Short", trail_points=2, trail_offset=1)
 plot(strategy.position_size)`;
       const baseTime = Date.now() - 240000;
       const bars: Bar[] = [
@@ -1980,7 +3208,9 @@ plot(strategy.position_size)`;
         { time: baseTime + 180000, open: 98.7, high: 98.8, low: 98.6, close: 98.7, volume: 1000 },
       ];
 
-      const result = executeScript(parse(script), bars);
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[1]).toMatchObject({
@@ -2005,7 +3235,7 @@ if bar_index == 0
 if bar_index == 1
     strategy.entry("B", strategy.long, qty=3)
 if bar_index == 2
-    strategy.exit("Trail", trail_points=1, trail_offset=0.5)
+    strategy.exit("Trail", trail_points=2, trail_offset=1)
 plot(strategy.opentrades)`;
       const baseTime = Date.now() - 180000;
       const bars: Bar[] = [
@@ -2014,7 +3244,9 @@ plot(strategy.opentrades)`;
         { time: baseTime + 120000, open: 102, high: 102, low: 101, close: 101.5, volume: 1000 },
       ];
 
-      const result = executeScript(parse(script), bars);
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.5 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[2]).toMatchObject({
@@ -3009,6 +4241,8 @@ plot(timeframe.in_seconds(timeframe="45S"), title="Seconds")
 plot(timeframe.in_seconds("2W"), title="Weeks")
 plot(timeframe.in_seconds("3M"), title="Months")
 plot(timeframe.in_seconds("1T"), title="Ticks")
+plot(timeframe.to_seconds("1D"), title="Daily Alias")
+plot(timeframe.to_seconds(timeframe="45S"), title="Named Alias")
 plot(timeframe.from_seconds(seconds=44) == "45S" ? 1 : 0, title="From Seconds")
 plot(timeframe.from_seconds(3601) == "61" ? 1 : 0, title="From Minutes")
 plot(timeframe.change(timeframe="60") ? 1 : 0, title="Hourly Change")
@@ -3027,6 +4261,8 @@ plot(timeframe.in_seconds("15") < timeframe.in_seconds("1D") ? 1 : 0, title="Com
       expect(result.plots.find((plot) => plot.title === 'Weeks')?.values).toEqual([1_209_600, 1_209_600, 1_209_600]);
       expect(result.plots.find((plot) => plot.title === 'Months')?.values).toEqual([7_776_000, 7_776_000, 7_776_000]);
       expect(result.plots.find((plot) => plot.title === 'Ticks')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Daily Alias')?.values).toEqual([86_400, 86_400, 86_400]);
+      expect(result.plots.find((plot) => plot.title === 'Named Alias')?.values).toEqual([45, 45, 45]);
       expect(result.plots.find((plot) => plot.title === 'From Seconds')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'From Minutes')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Hourly Change')?.values).toEqual([1, 0, 1]);
@@ -4163,6 +5399,12 @@ plot(open, title="After")`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('stop here');
+      expect(result.errors[0]?.code).toBe('runtime.error');
+      expect(result.errors[0]?.runtimeError).toMatchObject({
+        code: 'runtime.error',
+        message: 'stop here',
+        line: 4,
+      });
       expect(result.plots.find((plot) => plot.title === 'Before')?.values).toEqual([100.2]);
       expect(result.plots.find((plot) => plot.title === 'After')).toBeUndefined();
     });
@@ -4178,6 +5420,7 @@ plot(close)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('named stop');
+      expect(result.errors[0]?.code).toBe('runtime.error');
       expect(result.plots).toHaveLength(0);
     });
 
@@ -4314,14 +5557,58 @@ plot(str.replace("a-b-a-b", "b", "x", 1) == "a-b-a-x", title="Replace Occurrence
       expect(result.plots.find((plot) => plot.title === 'Replace Occurrence')?.values).toEqual([true, true]);
     });
 
+    it('formats numeric placeholders with str.format', () => {
+      const script = `//@version=6
+indicator("String Format Numbers")
+plot(str.format("{0,number,#.#}", 1.34) == "1.3", title="Decimal Mask")
+plot(str.format("{0, number, integer}", 1.34) == "1", title="Integer Style")
+plot(str.format("{0,number,currency}", 1340000) == "$1,340,000.00", title="Currency Style")
+plot(str.format("{0,number,currency}", -12.5) == "-$12.50", title="Negative Currency Style")
+plot(str.format("{0, number, percent} - {1, number, percent}", 0.1, 0.2) == "10% - 20%", title="Percent Style")
+plot(str.format("{0} != {0, number, #.#}", 1.34) == "1.34 != 1.3", title="Repeated Argument")
+plot(str.format("{0,number,#.#}", na) == "NaN", title="NA Number Style")
+plot(str.format(format="value={0:#.0}", 100.2) == "value=100.2", title="Named Colon Mask")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Decimal Mask')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Integer Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Currency Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Negative Currency Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Percent Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Repeated Argument')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'NA Number Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Named Colon Mask')?.values).toEqual([true, true]);
+    });
+
     it('formats timestamps with str.format_time', () => {
       const script = `//@version=6
 indicator("String Format Time")
 stamp = timestamp("GMT+2", 2024, 1, 5, 9, 30, 15)
+pmStamp = timestamp("UTC", 2024, 1, 5, 15, 5, 0)
+midnight = timestamp("UTC", 2024, 1, 5, 0, 0, 0)
+noon = timestamp("UTC", 2024, 1, 5, 12, 0, 0)
+millis = timestamp("UTC", 2024, 1, 5, 7, 30, 15) + 123
+august = timestamp("UTC", 2024, 8, 20, 0, 0, 0)
 plot(str.format_time(stamp, "yyyy-MM-dd HH:mm:ss", "GMT+2") == "2024-01-05 09:30:15", title="Offset")
 plot(str.format_time(stamp, "yy/MM/dd HH:mm", "UTC") == "24/01/05 07:30", title="UTC")
 plot(str.format_time(time=stamp, timezone="GMT+2") == "2024-01-05T09:30:15+0200", title="Named Default")
 plot(str.format_time(stamp, "M/d/yyyy H:m:s 'UTC'Z", "UTC") == "1/5/2024 7:30:15 UTC+0000", title="Single Tokens")
+plot(str.format_time(stamp, "h:mm a", "UTC") == "7:30 AM", title="AM Tokens")
+plot(str.format_time(pmStamp, "hh:mm a", "UTC") == "03:05 PM", title="PM Tokens")
+plot(str.format_time(midnight, "h a", "UTC") == "12 AM", title="Midnight Token")
+plot(str.format_time(noon, "h a", "UTC") == "12 PM", title="Noon Token")
+plot(str.format_time(millis, "S SS SSS", "UTC") == "1 12 123", title="Fraction Tokens")
+plot(str.format_time(august, "MMM MMMM", "UTC") == "Aug August", title="Month Name Tokens")
+plot(str.format_time(august, "E EEEE", "UTC") == "Tue Tuesday", title="Weekday Name Tokens")
+plot(str.format_time(stamp, "D DD DDD", "UTC") == "5 05 005", title="Day Of Year Tokens")
+plot(str.format_time(august, "MMM-d-y", "UTC") == "Aug-20-2024", title="Single Year Token")
+plot(str.format_time(stamp, "z zzzz", "UTC") == "UTC Coordinated Universal Time", title="Timezone Name Tokens")
+plot(str.format_time(stamp, "w ww", "UTC") == "1 01", title="Week Of Year Tokens")
+plot(str.format_time(august, "W", "UTC") == "4", title="Week Of Month Token")
 plot(str.format_time(stamp, "yyyy'T''Z'HH", "UTC") == "2024T'Z07", title="Escaped Quote")
 plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 
@@ -4334,6 +5621,18 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'UTC')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Named Default')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Single Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'AM Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'PM Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Midnight Token')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Noon Token')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Fraction Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Month Name Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Weekday Name Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Day Of Year Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Single Year Token')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Timezone Name Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Week Of Year Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Week Of Month Token')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Escaped Quote')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
     });
@@ -5205,6 +6504,380 @@ plot(x)`;
       expect(plot.values[4]).not.toBeNull();
     });
 
+    it('preserves direct source identity for rolling helpers when current values collide', () => {
+      const script = `//@version=6
+indicator("Source identity")
+plot(ta.sma(open, 2), title="Open SMA")
+plot(math.sum(open, 2), title="Open Sum")
+plot(ta.change(open), title="Open Change")
+plot(ta.correlation(open, close, 2), title="Open Close Correlation")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 10, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 30, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Open SMA')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Open Sum')?.values).toEqual([null, 30, 50]);
+      expect(result.plots.find((plot) => plot.title === 'Open Change')?.values).toEqual([null, 10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Open Close Correlation')?.values).toEqual([null, null, 1]);
+    });
+
+    it('preserves source identity through simple source aliases when current values collide', () => {
+      const script = `//@version=6
+indicator("Source alias identity")
+src = open
+srcCopy = src
+reassigned = close
+reassigned := open
+plot(ta.sma(src, 2), title="Alias SMA")
+plot(math.sum(srcCopy, 2), title="Alias Copy Sum")
+plot(ta.change(reassigned), title="Reassigned Change")
+plot(src[1], title="Alias History")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 10, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 30, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Alias SMA')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Alias Copy Sum')?.values).toEqual([null, 30, 50]);
+      expect(result.plots.find((plot) => plot.title === 'Reassigned Change')?.values).toEqual([null, 10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Alias History')?.values).toEqual([null, 10, 20]);
+    });
+
+    it('preserves source identity through UDF and method parameters when current values collide', () => {
+      const script = `//@version=6
+indicator("Source parameter identity")
+delayedAverage(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+method delayedMethod(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+plot(delayedAverage(open), title="Function Average")
+plot(delayedAverage(src=open), title="Named Function Average")
+plot(open.delayedMethod(), title="Method Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Named Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Method Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through simple UDF and method return values', () => {
+      const script = `//@version=6
+indicator("Source return identity")
+passthrough(series float src) => src
+method passthroughMethod(series float src) => src
+selected = passthrough(open)
+selectedMethod = open.passthroughMethod()
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Function Return Average")
+plot(bar_index >= 1 ? ta.sma(selectedMethod, 2) : na, title="Method Return Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Function Return Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Method Return Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-source conditional UDF returns', () => {
+      const script = `//@version=6
+indicator("Conditional source return identity")
+passthrough(series float src) => bar_index >= 0 ? src : src
+plot(bar_index >= 1 ? ta.sma(passthrough(open), 2) : na, title="Conditional Return Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Conditional Return Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-source block if UDF and method returns', () => {
+      const script = `//@version=6
+indicator("Block if source return identity")
+passthrough(series float src) =>
+    if bar_index >= 0
+        src
+    else
+        src
+method passthroughMethod(series float src) =>
+    if bar_index >= 0
+        src
+    else
+        src
+selected = passthrough(open)
+selectedMethod = open.passthroughMethod()
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block Function Average")
+plot(bar_index >= 1 ? ta.sma(selectedMethod, 2) : na, title="Block Method Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Block Method Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-source if initializers', () => {
+      const script = `//@version=6
+indicator("If initializer source identity")
+selected = if bar_index >= 0
+    open
+else
+    open
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="If Initializer Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'If Initializer Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves derived source identity through same-identifier conditional UDF returns', () => {
+      const script = `//@version=6
+indicator("Conditional derived source return identity")
+passthrough() => bar_index >= 0 ? hl2 : hl2
+plot(bar_index >= 1 ? ta.sma(passthrough(), 2) : na, title="Conditional Derived Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Conditional Derived Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through arithmetic expression UDF returns', () => {
+      const script = `//@version=6
+indicator("Arithmetic source return identity")
+midpoint() => (high + low) / 2
+scaled(series float src) => src * 2
+plot(bar_index >= 1 ? ta.sma(midpoint(), 2) : na, title="Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(scaled(open), 2) : na, title="Scaled Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Arithmetic Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Scaled Average')?.values).toEqual([null, 30, 50]);
+    });
+
+    it('preserves source identity through same-arithmetic conditional and switch returns', () => {
+      const script = `//@version=6
+indicator("Arithmetic branch source return identity")
+conditionalMidpoint() => bar_index >= 0 ? (high + low) / 2 : (high + low) / 2
+switchScaled(series float src) => switch
+    bar_index >= 0 => src * 2
+    => src * 2
+plot(bar_index >= 1 ? ta.sma(conditionalMidpoint(), 2) : na, title="Conditional Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(switchScaled(open), 2) : na, title="Switch Arithmetic Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Conditional Arithmetic Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Switch Arithmetic Average')?.values).toEqual([null, 30, 50]);
+    });
+
+    it('preserves source identity through same-source switch UDF returns', () => {
+      const script = `//@version=6
+indicator("Switch source return identity")
+passthrough(series float src) => switch
+    bar_index >= 0 => src
+    => src
+plot(bar_index >= 1 ? ta.sma(passthrough(open), 2) : na, title="Switch Return Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Switch Return Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-source block switch builtin arguments', () => {
+      const script = `//@version=6
+indicator("Block switch argument source identity")
+plot(bar_index >= 1 ? ta.sma(switch
+    bar_index >= 0 =>
+        selected = open
+        selected
+    =>
+        fallback = open
+        fallback
+, 2) : na, title="Block Switch Argument Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block Switch Argument Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-source block switch UDF and method returns', () => {
+      const script = `//@version=6
+indicator("Block switch source return identity")
+passthrough(series float src) => switch
+    bar_index >= 0 =>
+        selected = src
+        selected
+    =>
+        fallback = src
+        fallback
+method passthroughMethod(series float src) => switch
+    bar_index >= 0 =>
+        selected = src
+        selected
+    =>
+        fallback = src
+        fallback
+selected = passthrough(open)
+selectedMethod = open.passthroughMethod()
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block Switch Function Average")
+plot(bar_index >= 1 ? ta.sma(selectedMethod, 2) : na, title="Block Switch Method Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block Switch Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Block Switch Method Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves derived source identity through same-identifier switch UDF returns', () => {
+      const script = `//@version=6
+indicator("Switch derived source return identity")
+passthrough() => switch
+    bar_index >= 0 => hl2
+    => hl2
+plot(bar_index >= 1 ? ta.sma(passthrough(), 2) : na, title="Switch Derived Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Switch Derived Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-arithmetic block if returns and initializers', () => {
+      const script = `//@version=6
+indicator("Block if arithmetic source return identity")
+blockMidpoint() =>
+    if bar_index >= 0
+        (high + low) / 2
+    else
+        (high + low) / 2
+selected = if bar_index >= 0
+    open * 2
+else
+    open * 2
+plot(bar_index >= 1 ? ta.sma(blockMidpoint(), 2) : na, title="Block If Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block If Initializer Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block If Arithmetic Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Block If Initializer Average')?.values).toEqual([null, 30, 50]);
+    });
+
+    it('keeps mixed named and positional source helper results numeric', () => {
+      const script = `//@version=6
+indicator("Mixed source binding")
+plot(ta.valuewhen(condition=bar_index == 2, open, 0) + 1, title="ValueWhen")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 10, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 30, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual([null, null, 31]);
+    });
+
     it('calculates ta.highest', () => {
       const script = `//@version=6
 indicator("Test")
@@ -5650,6 +7323,612 @@ plot(close[2], title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(2);
     });
+
+    it('accepts max_bars_back function hints in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Function Max Bars Back")
+max_bars_back(close, 9)
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(9);
+      expect(result.plots.find((plot) => plot.title === 'Close')?.values).toEqual([100.2, 100.7, 101.2]);
+    });
+
+    it('accepts named max_bars_back function hints', () => {
+      const script = `//@version=6
+indicator("Named Function Max Bars Back")
+hint = input.int(defval=7, title="Hint")
+max_bars_back(close, num=hint)
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(7);
+    });
+
+    it('reports math.sum lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Math Sum Profile")
+length = input.int(defval=5, title="Length")
+plot(math.sum(source=close, length=length), title="Sum")`;
+
+      const result = executeScript(parse(script), createBars(6, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
+    });
+
+    it('reports the largest dynamic math.sum lookback length in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Dynamic Math Sum Profile")
+length = bar_index < 3 ? 2 : 6
+plot(math.sum(close, length), title="Sum")`;
+
+      const result = executeScript(parse(script), createBars(7, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('reports shared TA window lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("TA Window Profile")
+plot(ta.sma(close, 3), title="SMA")
+plot(ta.highest(high, 5), title="Highest")
+plot(ta.stdev(close, 4), title="Stdev")`;
+
+      const result = executeScript(parse(script), createBars(6, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
+    });
+
+    it('reports recursive and retained TA lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Recursive TA Profile")
+plot(ta.ema(close, 7), title="EMA")
+plot(ta.rsi(close, 4), title="RSI")
+[macdLine, signalLine, histLine] = ta.macd(close, 3, 9, 5)
+plot(macdLine, title="MACD")
+plot(signalLine, title="Signal")
+plot(histLine, title="Hist")`;
+
+      const result = executeScript(parse(script), createBars(10, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('reports direct OHLC TA lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("OHLC Profile")
+length = bar_index < 3 ? 4 : 9
+plot(ta.wpr(length), title="WPR")
+plot(ta.tr(true), title="TR")`;
+
+      const result = executeScript(parse(script), createBars(12, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports unexecuted rolling helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Rolling Profile")
+length = input.int(defval=6, title="Length")
+if false
+    plot(math.sum(close, length), title="Sum")
+    plot(ta.sma(close, 5), title="SMA")
+    plot(ta.rsi(close, 4), title="RSI")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('statically reports unexecuted trend helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Trend Profile")
+length = input.int(defval=8, title="Length")
+if false
+    plot(ta.range(close, 5), title="Range")
+    plot(ta.rising(close, length), title="Rising")
+    plot(ta.falling(source=close, length=6), title="Falling")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports unexecuted statistical helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Statistics Profile")
+length = input.int(defval=9, title="Length")
+if false
+    plot(ta.dev(close, length), title="Deviation")
+    plot(ta.correlation(close, open, length=7), title="Correlation")
+    plot(ta.cog(source=close, length=6), title="COG")
+    plot(ta.median(close, 5), title="Median")
+    plot(ta.mode(source=close, 4), title="Mode")
+    plot(ta.percentile_nearest_rank(close, 8, 75), title="Nearest")
+    plot(ta.percentile_linear_interpolation(source=close, length=6, percentage=75), title="Linear")
+    plot(ta.percentrank(source=close, length=7), title="Percent Rank")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports unexecuted momentum helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Momentum Profile")
+length = input.int(defval=10, title="Length")
+if false
+    plot(ta.cmo(close, length), title="CMO")
+    plot(ta.mom(source=close, length=8), title="Momentum")
+    plot(ta.roc(close, 6), title="ROC")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(10);
+    });
+
+    it('statically reports unexecuted band and average helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Bands Profile")
+length = input.int(defval=9, title="Length")
+if false
+    plot(ta.vwma(close, length), title="VWMA")
+    plot(ta.cci(source=close, length=8), title="CCI")
+    plot(ta.wma(close, 7), title="WMA")
+    plot(ta.alma(series=close, length=6, offset=0.85, sigma=6), title="ALMA")
+    [middle, upper, lower] = ta.bb(close, length, 2)
+    plot(middle, title="BB")
+    plot(ta.bbw(series=close, length=8, mult=2), title="BBW")
+    plot(ta.linreg(source=close, length=7, offset=0), title="LinReg")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports unexecuted fixed and default helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Fixed Profile")
+if false
+    plot(ta.cross(close, open) ? 1 : 0, title="Cross")
+    plot(ta.crossover(source1=close, source2=open) ? 1 : 0, title="Crossover")
+    plot(ta.crossunder(source1=close, open) ? 1 : 0, title="Crossunder")
+    plot(ta.change(close), title="Change")
+    plot(ta.swma(close), title="SWMA")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(3);
+    });
+
+    it('statically reports unexecuted defaulted TA helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Default Helpers Profile")
+if false
+    plot(ta.cmo(close), title="CMO")
+    plot(ta.mom(close), title="Momentum")
+    plot(ta.roc(close), title="ROC")
+    plot(ta.cci(close), title="CCI")
+    [macdLine, signalLine, histLine] = ta.macd(close)
+    plot(macdLine, title="MACD")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(25);
+    });
+
+    it('statically reports unexecuted oscillator helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Oscillator Profile")
+if false
+    plot(ta.stoch(close, high, low), title="Stoch")
+    plot(ta.mfi(series=hlc3), title="MFI")
+    plot(ta.wpr(length=12), title="WPR")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(14);
+    });
+
+    it('statically reports unexecuted pivot helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Pivot Profile")
+left = input.int(defval=4, title="Left")
+if false
+    plot(ta.pivothigh(high, left, 3), title="Explicit High")
+    plot(ta.pivotlow(source=low, leftbars=2, rightbars=8), title="Named Low")
+    plot(ta.pivothigh(2, rightbars=5), title="Default High")
+    plot(ta.pivotlow(leftbars=3), title="Defaulted Right Low")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(10);
+    });
+
+    it('statically reports unexecuted remaining TA helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Remaining TA Profile")
+length = input.int(defval=13, title="Length")
+if false
+    plot(ta.atr(length), title="ATR")
+    plot(ta.hma(source=close, length=8), title="HMA")
+    [kcBasis, kcUpper, kcLower] = ta.kc(close, 9, 1.5)
+    plot(kcBasis, title="KC")
+    plot(ta.kcw(series=close, length=4, mult=1.5, useTrueRange=false), title="KCW")
+    plot(ta.tsi(close, 3, 7), title="TSI")
+    [supertrend, direction] = ta.supertrend(factor=2.0, atrPeriod=11)
+    plot(supertrend, title="Supertrend")
+    [diPlus, diMinus, adx] = ta.dmi(diLength=10, adxSmoothing=5)
+    plot(adx, title="ADX")
+    plot(ta.sar(0.02, 0.02, 0.2), title="SAR")
+    plot(ta.obv(close, volume), title="OBV")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(13);
+    });
+
+    it('reports direct TA variable and indexed OHLC lookbacks in the runtime profile', () => {
+      const script = `//@version=6
+indicator("TA Variable Profile")
+plot(ta.obv, title="OBV")
+plot(ta.nvi, title="NVI")
+plot(ta.pvi, title="PVI")
+plot(ta.pvt, title="PVT")
+plot(ta.wad, title="WAD")
+plot(ta.tr[3], title="TR")`;
+
+      const result = executeScript(parse(script), createBars(6, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
+    });
+
+    it('statically reports unexecuted true-range helper lookbacks in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static TR Profile")
+if false
+    plot(ta.tr(true), title="TR")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(1);
+    });
+
+    it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static MACD Profile")
+if false
+    [macdLine, signalLine, histLine] = ta.macd(close, 3, 9, 5)
+    plot(macdLine, title="MACD")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports unexecuted default-source TA lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Default Source Profile")
+length = input.int(defval=7, title="Length")
+if false
+    plot(ta.highest(length), title="Highest")
+    plot(ta.lowest(length=5), title="Lowest")
+    plot(ta.highestbars(6), title="Highest Offset")
+    plot(ta.lowestbars(length=4), title="Lowest Offset")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
+    it('reports invalid max_bars_back function hint values', () => {
+      const script = `//@version=6
+indicator("Invalid Function Max Bars Back")
+max_bars_back(close, -1)
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors[0]?.message).toBe('max_bars_back num must be a non-negative integer');
+    });
+
+    it('statically reports literal history offsets from unexecuted branches', () => {
+      const script = `//@version=6
+indicator("Static History")
+neverUsed(value) =>
+    if false
+        value[5]
+    else
+        value
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('keeps obvious array indexes out of static history inference', () => {
+      const script = `//@version=6
+indicator("Array Static History")
+values = array.from(10, 20, 30)
+alias = values
+literal = [40, 50, 60][2]
+plot(alias[2] + literal, title="Array Values")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(0);
+      expect(result.plots.find((plot) => plot.title === 'Array Values')?.values).toEqual([90, 90]);
+    });
+
+    it('keeps collection inference scoped when names are shadowed', () => {
+      const script = `//@version=6
+indicator("Scoped Static History")
+values = array.from(10, 20, 30)
+shadowed(values) =>
+    values[4]
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
+    });
+
+    it('statically reports input-derived history offsets from unexecuted branches', () => {
+      const script = `//@version=6
+indicator("Input Static History")
+length = input.int(defval=6, title="Length")
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
+    it('statically reports simple numeric alias history offsets', () => {
+      const script = `//@version=6
+indicator("Alias Static History")
+base = 2
+length = base + 3
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('statically reports input bool conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Conditional Static History")
+useLong = input.bool(defval=true, title="Use Long")
+length = useLong ? 8 : 3
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports boolean alias conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Boolean Alias Static History")
+useLong = input.bool(false, title="Use Long")
+enabled = not useLong
+length = enabled ? 7 : 2
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(7);
+    });
+
+    it('statically reports numeric comparison conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Comparison Static History")
+threshold = input.int(defval=21, title="Threshold")
+length = threshold > 20 ? 13 : 4
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(13);
+    });
+
+    it('statically reports boolean equality conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Boolean Equality Static History")
+useLong = input.bool(true, title="Use Long")
+same = useLong == true
+length = same ? 9 : 3
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(9);
+    });
+
+    it('statically reports math max history offsets', () => {
+      const script = `//@version=6
+indicator("Math Max Static History")
+shortLength = input.int(defval=5, title="Short")
+longLength = input.int(defval=12, title="Long")
+length = math.max(number0=shortLength, longLength, 8)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(12);
+    });
+
+    it('statically reports average math history offsets', () => {
+      const script = `//@version=6
+indicator("Math Avg Static History")
+shortLength = input.int(defval=4, title="Short")
+longLength = input.int(defval=12, title="Long")
+length = math.avg(number0=shortLength, longLength, 14)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(10);
+    });
+
+    it('does not statically infer sparse average math history offsets', () => {
+      const script = `//@version=6
+indicator("Sparse Math Avg Static History")
+length = math.avg(number0=4, number2=14)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors.map((error) => error.message)).toEqual([
+        'Missing variadic argument: number1',
+        'Missing variadic argument: number1',
+        'Missing variadic argument: number1',
+      ]);
+      expect(result.profile.maxBarsBack).toBe(0);
+    });
+
+    it('statically reports rounded math history offsets', () => {
+      const script = `//@version=6
+indicator("Rounded Math Static History")
+raw = input.float(defval=7.6, title="Raw")
+length = math.floor(math.round(number=raw, precision=0))
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports power math history offsets', () => {
+      const script = `//@version=6
+indicator("Power Math Static History")
+base = input.int(defval=4, title="Base")
+length = math.pow(base=base, exponent=2)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(16);
+    });
+
+    it('statically reports square root math history offsets', () => {
+      const script = `//@version=6
+indicator("Square Root Math Static History")
+raw = input.int(defval=36, title="Raw")
+length = math.sqrt(number=raw)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
+    it('statically reports cast-normalized history offsets', () => {
+      const script = `//@version=6
+indicator("Cast Static History")
+raw = input.float(defval=5.9, title="Raw")
+length = int(x=raw + 1)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
+    it('statically reports nz fallback history offsets', () => {
+      const script = `//@version=6
+indicator("NZ Static History")
+fallback = input.int(defval=11, title="Fallback")
+length = nz(source=na, replacement=fallback)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(11);
+    });
   });
 
   describe('inputs', () => {
@@ -5804,6 +8083,36 @@ plot(ta.sma(source, 2))`;
       const result = executeScript(ast, bars, new Map([['input_Source', 'hlcc4']]));
 
       expect(roundSeries(result.plots[0].values, 4)).toEqual([null, 100.4, 100.9]);
+    });
+
+    it('preserves input source identity when current source values collide', () => {
+      const script = `//@version=6
+indicator("Source Input Identity")
+source = input.source(defval=open, title="Source")
+plot(ta.sma(source, 2), title="Average")
+plot(bar_index >= 1 ? ta.sma(source, 2) : na, title="Delayed Average")
+plot(math.sum(source, 2), title="Sum")
+plot(ta.change(source), title="Change")`;
+
+      const bars = [
+        { time: 1_000_000, open: 10, high: 22, low: 9, close: 15, volume: 100 },
+        { time: 1_060_000, open: 20, high: 23, low: 18, close: 20, volume: 100 },
+        { time: 1_120_000, open: 30, high: 31, low: 24, close: 25, volume: 100 },
+      ];
+      const defaultResult = executeScript(parse(script), bars);
+      const closeOverrideResult = executeScript(parse(script), bars, new Map([['input_Source', 'close']]));
+
+      expect(defaultResult.errors).toEqual([]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Average')?.values).toEqual([null, 15, 25]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Delayed Average')?.values).toEqual([null, 15, 25]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Sum')?.values).toEqual([null, 30, 50]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Change')?.values).toEqual([null, 10, 10]);
+
+      expect(closeOverrideResult.errors).toEqual([]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Average')?.values).toEqual([null, 17.5, 22.5]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Delayed Average')?.values).toEqual([null, 17.5, 22.5]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Sum')?.values).toEqual([null, 35, 45]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Change')?.values).toEqual([null, 5, 5]);
     });
 
     it('reports invalid Pine input defaults', () => {

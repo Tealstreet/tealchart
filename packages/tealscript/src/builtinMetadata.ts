@@ -7,6 +7,8 @@ export interface BuiltinGlobalTypeMetadata {
 
 export const BUILTIN_GLOBALS = new Set([
   'bar_index',
+  'ask',
+  'bid',
   'close',
   'hl2',
   'hlc3',
@@ -33,7 +35,9 @@ export const BUILTIN_GLOBALS = new Set([
 ]);
 
 export const BUILTIN_GLOBAL_TYPES = new Map<string, BuiltinGlobalTypeMetadata>([
+  ['ask', { kind: 'float', qualifier: 'series' }],
   ['bar_index', { kind: 'int', qualifier: 'series' }],
+  ['bid', { kind: 'float', qualifier: 'series' }],
   ['close', { kind: 'float', qualifier: 'series' }],
   ['high', { kind: 'float', qualifier: 'series' }],
   ['hl2', { kind: 'float', qualifier: 'series' }],
@@ -216,6 +220,7 @@ export const EXPORTABLE_BUILTIN_CONSTANTS = new Set([
   'plot.style_line',
   'plot.style_linebr',
   'plot.style_stepline',
+  'plot.style_steplinebr',
   'plot.style_stepline_diamond',
   'splits.denominator',
   'splits.numerator',
@@ -232,6 +237,9 @@ export const EXPORTABLE_BUILTIN_CONSTANTS = new Set([
   'strategy.commission.cash_per_contract',
   'strategy.commission.cash_per_order',
   'strategy.commission.percent',
+  'strategy.direction.all',
+  'strategy.direction.long',
+  'strategy.direction.short',
   'strategy.fixed',
   'strategy.long',
   'strategy.oca.cancel',

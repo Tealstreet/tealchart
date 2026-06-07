@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createResultMessage, type Bar, type DrawingOutput, type PlotOutput, type WorkerError } from '@tealstreet/tealscript';
+import { createResultMessage, type Bar, type DrawingOutput, type PlotOutput, type Program, type WorkerError } from '@tealstreet/tealscript';
 
 import { TealscriptManager } from './TealscriptManager';
 
@@ -26,6 +26,7 @@ class FakeWorker {
 interface PostedWorkerMessage {
   type: string;
   runtime?: unknown;
+  libraries?: unknown;
   metadata?: {
     generation?: number;
     requestId?: number;
@@ -214,6 +215,50 @@ describe('TealscriptManager', () => {
     });
 
     expect(errors).toHaveLength(0);
+  });
+
+  it('surfaces runtime worker error payloads as runtime errors', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit({
+      type: 'error',
+      scriptId: 'study-1',
+      message: 'bad bar',
+      code: 'runtime.error',
+      runtimeError: {
+        code: 'runtime.error',
+        message: 'bad bar',
+      },
+      metadata: initMessage?.metadata,
+    });
+
+    expect(errors).toEqual([
+      {
+        scriptId: 'study-1',
+        error: {
+          type: 'runtime',
+          message: 'bad bar',
+          code: 'runtime.error',
+          line: undefined,
+          column: undefined,
+          runtimeError: {
+            code: 'runtime.error',
+            message: 'bad bar',
+          },
+        },
+      },
+    ]);
   });
 
   it('surfaces semantic worker diagnostics as semantic errors', async () => {
@@ -463,5 +508,22 @@ describe('TealscriptManager', () => {
         isticks: false,
       },
     });
+  });
+
+  it('passes host library registries into worker init messages', async () => {
+    const worker = new FakeWorker();
+    const libraries = new Map<string, Program>();
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      getLibraries: () => libraries,
+    });
+
+    const addScript = manager.addScript('study-1', 'import sig from "sig"\nindicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    expect(initMessage.type).toBe('init');
+    expect(initMessage.libraries).toBe(libraries);
   });
 });

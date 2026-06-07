@@ -8,12 +8,13 @@
  */
 
 import { parse, TealscriptParseError } from '../parser';
-import { TealscriptEngine } from '../runtime/engine';
+import { createRuntimeErrorPayload, TealscriptEngine } from '../runtime/engine';
 import type { TealscriptRuntimeOptions } from '../runtime/engine';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
-import { createResultMessage } from './protocol';
+import { createResultMessage, createSemanticErrorMessage } from './protocol';
+import { semanticOptionsFromLibraries } from './semanticOptions';
 import type {
   ToWorkerMessage,
   FromWorkerMessage,
@@ -33,6 +34,7 @@ interface ScriptState {
   bars: Bar[];
   inputs: Record<string, unknown>;
   runtime?: TealscriptRuntimeOptions;
+  libraries?: Map<string, Program>;
   lastInputs: InputDefinition[];
 }
 
@@ -56,7 +58,7 @@ self.onmessage = (event: MessageEvent<ToWorkerMessage>) => {
   try {
     switch (message.type) {
       case 'init':
-        handleInit(message.scriptId, message.script, message.bars, message.inputs, message.runtime, metadata);
+        handleInit(message.scriptId, message.script, message.bars, message.inputs, message.runtime, message.libraries, metadata);
         break;
 
       case 'updateBars':
@@ -93,29 +95,25 @@ function handleInit(
   bars: Bar[],
   inputs: Record<string, unknown>,
   runtime?: TealscriptRuntimeOptions,
+  libraries?: Map<string, Program>,
   metadata?: WorkerOutputMetadata
 ): void {
   try {
     // Parse the script
     const ast = parse(script);
-    const semanticResult = checkProgram(ast);
-    const firstDiagnostic = semanticResult.diagnostics[0];
-    if (firstDiagnostic) {
-      const semanticError: SemanticErrorMessage = {
-        type: 'semanticError',
+    const semanticResult = checkProgram(ast, semanticOptionsFromLibraries(libraries));
+    if (semanticResult.diagnostics[0]) {
+      postResult(createSemanticErrorMessage(
         scriptId,
-        message: formatSemanticError(semanticResult.diagnostics),
-        diagnostics: semanticResult.diagnostics,
-        line: firstDiagnostic.line,
-        column: firstDiagnostic.column,
-        metadata,
-      };
-      postResult(semanticError);
+        semanticResult.diagnostics,
+        formatSemanticError(semanticResult.diagnostics),
+        metadata
+      ));
       return;
     }
 
     // Create engine
-    const engine = new TealscriptEngine({ runtime });
+    const engine = new TealscriptEngine({ runtime, libraries });
 
     // Store state
     state = {
@@ -125,6 +123,7 @@ function handleInit(
       bars,
       inputs,
       runtime,
+      libraries,
       lastInputs: [],
     };
 
@@ -244,6 +243,11 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
 
     // Execute the script
     const result = state.engine.execute(state.ast, state.bars, inputsMap);
+    const runtimeError = result.errors.find((error) => error.runtimeError)?.runtimeError;
+    if (runtimeError) {
+      postResult(createRuntimeErrorMessage(state.scriptId, runtimeError, metadata));
+      return;
+    }
 
     // Convert result inputs to InputDefinition[]
     const inputs: InputDefinition[] = result.inputs.map((input) => ({
@@ -275,6 +279,12 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
  * Handle execution errors
  */
 function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
+  const runtimeError = createRuntimeErrorPayload(error);
+  if (runtimeError) {
+    postResult(createRuntimeErrorMessage(state?.scriptId ?? 'unknown', runtimeError, metadata));
+    return;
+  }
+
   const errorMessage: ErrorMessage = {
     type: 'error',
     scriptId: state?.scriptId ?? 'unknown',
@@ -282,6 +292,23 @@ function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
     metadata,
   };
   postResult(errorMessage);
+}
+
+function createRuntimeErrorMessage(
+  scriptId: string,
+  runtimeError: NonNullable<ErrorMessage['runtimeError']>,
+  metadata?: WorkerOutputMetadata,
+): ErrorMessage {
+  return {
+    type: 'error',
+    scriptId,
+    message: runtimeError.message,
+    code: runtimeError.code,
+    line: runtimeError.line,
+    column: runtimeError.column,
+    runtimeError,
+    metadata,
+  };
 }
 
 // Signal that worker is ready

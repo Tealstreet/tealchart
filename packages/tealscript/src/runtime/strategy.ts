@@ -152,6 +152,7 @@ export interface StrategyLedgerSettings {
   title: string;
   initialCapital: number;
   currency: string;
+  allowedEntryDirection: StrategyDirection | 'all';
   defaultQtyType: 'fixed' | 'cash' | 'percent_of_equity';
   defaultQtyValue: number;
   pyramiding: number;
@@ -164,10 +165,35 @@ export interface StrategyLedgerSettings {
   calcOnEveryTick: boolean;
   processOrdersOnClose: boolean;
   useBarMagnifier: boolean;
+  riskFreeRate: number;
+  backtestFillLimitsAssumptionTicks: number;
+  closeEntriesRule: 'FIFO' | 'ANY';
+  fillOrdersOnStandardOhlc: boolean;
+  maxPositionSize: number | null;
+  riskRules: StrategyRiskRules;
+}
+
+export interface StrategyCashOrPercentRiskRule {
+  value: number;
+  type: 'cash' | 'percent_of_equity';
+  alertMessage?: string;
+}
+
+export interface StrategyCountRiskRule {
+  count: number;
+  alertMessage?: string;
+}
+
+export interface StrategyRiskRules {
+  maxDrawdown: StrategyCashOrPercentRiskRule | null;
+  maxIntradayLoss: StrategyCashOrPercentRiskRule | null;
+  maxIntradayFilledOrders: StrategyCountRiskRule | null;
+  maxConsLossDays: StrategyCountRiskRule | null;
 }
 
 export interface StrategyOrder {
   id: string;
+  sourceId?: string;
   direction: StrategyDirection;
   type: StrategyOrderType;
   status: StrategyOrderStatus;
@@ -175,6 +201,7 @@ export interface StrategyOrder {
   qtyType: StrategyQuantityType;
   qtyValue: number;
   isEntry: boolean;
+  isExit: boolean;
   requestedQty: number | null;
   filledQty: number;
   avgFillPrice: number | null;
@@ -195,6 +222,7 @@ export interface StrategyOrder {
   ocaType?: StrategyOcaType;
   comment?: string;
   alertMessage?: string;
+  disableAlert?: boolean;
   createdBarIndex: number;
   createdTime: number;
   activationBarIndex: number;
@@ -205,11 +233,13 @@ export interface StrategyOrder {
 
 export interface StrategyOrderInput {
   id: string;
+  sourceId?: string;
   direction: StrategyDirection;
   qty: number | null;
   qtyType: StrategyQuantityType;
   qtyValue: number;
   isEntry?: boolean;
+  isExit?: boolean;
   requestedQty?: number | null;
   limitPrice?: number;
   stopPrice?: number;
@@ -220,6 +250,7 @@ export interface StrategyOrderInput {
   ocaType?: StrategyOcaType;
   comment?: string;
   alertMessage?: string;
+  disableAlert?: boolean;
   barIndex: number;
   time: number;
 }
@@ -237,6 +268,7 @@ export interface StrategyFill {
   time: number;
   comment?: string;
   alertMessage?: string;
+  disableAlert?: boolean;
 }
 
 export interface StrategyPosition {
@@ -301,6 +333,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     title: 'Untitled strategy',
     initialCapital: 100_000,
     currency: 'USD',
+    allowedEntryDirection: 'all',
     defaultQtyType: 'fixed',
     defaultQtyValue: 1,
     pyramiding: 0,
@@ -313,6 +346,17 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     calcOnEveryTick: false,
     processOrdersOnClose: false,
     useBarMagnifier: false,
+    riskFreeRate: 2,
+    backtestFillLimitsAssumptionTicks: 0,
+    closeEntriesRule: 'FIFO',
+    fillOrdersOnStandardOhlc: false,
+    maxPositionSize: null,
+    riskRules: {
+      maxDrawdown: null,
+      maxIntradayLoss: null,
+      maxIntradayFilledOrders: null,
+      maxConsLossDays: null,
+    },
     ...settings,
   };
 }
@@ -352,7 +396,7 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
 
 export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
   return {
-    settings: { ...ledger.settings },
+    settings: { ...ledger.settings, riskRules: { ...ledger.settings.riskRules } },
     orders: ledger.orders.map((order) => ({ ...order })),
     fills: ledger.fills.map((fill) => ({ ...fill })),
     openTrades: ledger.openTrades.map((trade) => ({ ...trade })),
@@ -375,6 +419,7 @@ export function markStrategyLedgerToMarket(
   close: number,
   high: number = close,
   low: number = close,
+  point?: { barIndex: number; time: number },
 ): void {
   let openProfit = 0;
   let maxRunup = ledger.maxRunup;
@@ -404,12 +449,45 @@ export function markStrategyLedgerToMarket(
   ledger.position.maxDrawdown = Math.max(ledger.position.maxDrawdown, maxDrawdown);
   ledger.maxRunup = maxRunup;
   ledger.maxDrawdown = maxDrawdown;
+  if (point) {
+    recordStrategyEquityPoint(ledger, point.barIndex, point.time, openProfit);
+  }
+}
+
+function recordStrategyEquityPoint(ledger: StrategyLedger, barIndex: number, time: number, openProfit: number): void {
+  if (!Number.isFinite(barIndex) || !Number.isFinite(time) || !Number.isFinite(ledger.equity)) {
+    return;
+  }
+
+  const existingIndex = ledger.equityCurve.findIndex((point) => point.barIndex === barIndex);
+  const priorPoints = existingIndex === -1
+    ? ledger.equityCurve
+    : ledger.equityCurve.slice(0, existingIndex);
+  const previousEquities = priorPoints.map((point) => point.equity);
+  const peakEquity = Math.max(ledger.initialCapital, ...previousEquities);
+  const troughEquity = Math.min(ledger.initialCapital, ...previousEquities);
+  const equityPoint: StrategyEquityPoint = {
+    barIndex,
+    time,
+    equity: ledger.equity,
+    openProfit,
+    netProfit: ledger.netProfit,
+    drawdown: Math.max(0, peakEquity - ledger.equity),
+    runup: Math.max(0, ledger.equity - troughEquity),
+  };
+
+  if (existingIndex === -1) {
+    ledger.equityCurve.push(equityPoint);
+  } else {
+    ledger.equityCurve[existingIndex] = equityPoint;
+  }
 }
 
 export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
   validateStrategyOrderInput(input);
   return {
     id: input.id,
+    sourceId: input.sourceId,
     direction: input.direction,
     type: inferStrategyOrderType(
       input.limitPrice,
@@ -422,6 +500,7 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     qtyType: input.qtyType,
     qtyValue: input.qtyValue,
     isEntry: input.isEntry ?? false,
+    isExit: input.isExit ?? false,
     requestedQty: input.requestedQty ?? input.qty,
     filledQty: 0,
     avgFillPrice: null,
@@ -442,6 +521,7 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     ocaType: input.ocaType,
     comment: input.comment,
     alertMessage: input.alertMessage,
+    disableAlert: input.disableAlert,
     createdBarIndex: input.barIndex,
     createdTime: input.time,
     activationBarIndex: input.barIndex,
@@ -457,17 +537,116 @@ export function submitStrategyOrder(ledger: StrategyLedger, input: StrategyOrder
   return order;
 }
 
+export function hasReachedStrategyIntradayFilledOrderLimit(ledger: StrategyLedger, time: number): boolean {
+  const rule = ledger.settings.riskRules.maxIntradayFilledOrders;
+  if (rule === null || !Number.isFinite(time)) {
+    return false;
+  }
+
+  return countStrategyFillsForUtcDay(ledger, time) >= rule.count;
+}
+
+export function hasReachedStrategyConsLossDaysLimit(ledger: StrategyLedger, time: number): boolean {
+  const rule = ledger.settings.riskRules.maxConsLossDays;
+  const currentDay = strategyUtcDayKey(time);
+  if (rule === null || currentDay === null) {
+    return false;
+  }
+
+  const dailyProfit = new Map<string, number>();
+  for (const trade of ledger.closedTrades) {
+    const exitTime = trade.exitTime;
+    if (exitTime === undefined) {
+      continue;
+    }
+    const day = strategyUtcDayKey(exitTime);
+    if (day === null || day > currentDay) {
+      continue;
+    }
+    dailyProfit.set(day, (dailyProfit.get(day) ?? 0) + trade.profit - trade.commission);
+  }
+
+  let consecutiveLossDays = 0;
+  for (const [, profit] of [...dailyProfit.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+    consecutiveLossDays = profit < 0 ? consecutiveLossDays + 1 : 0;
+    if (consecutiveLossDays >= rule.count) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function hasReachedStrategyIntradayLossLimit(ledger: StrategyLedger, time: number): boolean {
+  const rule = ledger.settings.riskRules.maxIntradayLoss;
+  const currentDay = strategyUtcDayKey(time);
+  if (rule === null || currentDay === null) {
+    return false;
+  }
+
+  const dayPoints = ledger.equityCurve.filter((point) => strategyUtcDayKey(point.time) === currentDay);
+  if (dayPoints.length === 0) {
+    return false;
+  }
+
+  const peakEquity = Math.max(ledger.initialCapital, ...dayPoints.map((point) => point.equity));
+  const currentEquity = dayPoints[dayPoints.length - 1]?.equity ?? ledger.equity;
+  const loss = peakEquity - currentEquity;
+  if (loss <= 0) {
+    return false;
+  }
+
+  if (rule.type === 'cash') {
+    return loss >= rule.value;
+  }
+
+  if (peakEquity <= 0) {
+    return false;
+  }
+  return (loss / peakEquity) * 100 >= rule.value;
+}
+
+export function hasReachedStrategyMaxDrawdownLimit(ledger: StrategyLedger): boolean {
+  const rule = ledger.settings.riskRules.maxDrawdown;
+  if (rule === null || ledger.equityCurve.length === 0) {
+    return false;
+  }
+
+  const peakEquity = Math.max(ledger.initialCapital, ...ledger.equityCurve.map((point) => point.equity));
+  const currentEquity = ledger.equityCurve[ledger.equityCurve.length - 1]?.equity ?? ledger.equity;
+  const drawdown = peakEquity - currentEquity;
+  if (drawdown <= 0) {
+    return false;
+  }
+
+  if (rule.type === 'cash') {
+    return drawdown >= rule.value;
+  }
+
+  if (peakEquity <= 0) {
+    return false;
+  }
+  return (drawdown / peakEquity) * 100 >= rule.value;
+}
+
+export function hasReachedStrategyOrderRiskLimit(ledger: StrategyLedger, time: number): boolean {
+  return hasReachedStrategyIntradayFilledOrderLimit(ledger, time)
+    || hasReachedStrategyConsLossDaysLimit(ledger, time)
+    || hasReachedStrategyIntradayLossLimit(ledger, time)
+    || hasReachedStrategyMaxDrawdownLimit(ledger);
+}
+
 export function fillStrategyMarketOrder(
   ledger: StrategyLedger,
   order: StrategyOrder,
   price: number,
   barIndex: number,
   time: number,
+  mintick: number = 0,
 ): StrategyFill | null {
   if (order.status !== 'pending' || order.type !== 'market' || order.qty === null) {
     return null;
   }
-  return fillStrategyOrder(ledger, order, price, barIndex, time);
+  return fillStrategyOrder(ledger, order, price, barIndex, time, mintick);
 }
 
 export function fillPendingStrategyMarketOrders(
@@ -475,16 +654,17 @@ export function fillPendingStrategyMarketOrders(
   open: number,
   barIndex: number,
   time: number,
+  mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
   for (const order of ledger.orders) {
     if (order.status !== 'pending' || order.type !== 'market' || order.activationBarIndex >= barIndex) {
       continue;
     }
-    const fill = fillStrategyMarketOrder(ledger, order, open, barIndex, time);
+    const fill = fillStrategyMarketOrder(ledger, order, open, barIndex, time, mintick);
     if (fill) {
       fills.push(fill);
-      cancelOcaOrders(ledger, order, barIndex, time);
+      applyOcaOrderEffects(ledger, order, fill.qty, barIndex, time);
     }
   }
   return fills;
@@ -496,18 +676,20 @@ export function fillPendingStrategyOrders(
   low: number,
   barIndex: number,
   time: number,
+  mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
+  const limitVerificationPrice = getLimitVerificationPrice(ledger.settings, mintick);
   for (const order of ledger.orders) {
-    const price = getPendingOrderFillPrice(order, high, low, barIndex, time);
+    const price = getPendingOrderFillPrice(order, high, low, barIndex, time, limitVerificationPrice);
     if (price === null) {
       continue;
     }
 
-    const fill = fillStrategyOrder(ledger, order, price, barIndex, time);
+    const fill = fillStrategyOrder(ledger, order, price, barIndex, time, mintick);
     if (fill) {
       fills.push(fill);
-      cancelOcaOrders(ledger, order, barIndex, time);
+      applyOcaOrderEffects(ledger, order, fill.qty, barIndex, time);
     }
   }
   return fills;
@@ -517,6 +699,7 @@ export function fillPendingStrategyOrdersOnTicks(
   ledger: StrategyLedger,
   ticks: StrategyExecutionTick[],
   barIndex: number,
+  mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
   const orderedTicks = ticks
@@ -524,20 +707,21 @@ export function fillPendingStrategyOrdersOnTicks(
     .sort((left, right) => left.sequence - right.sequence);
 
   let previousTick: StrategyExecutionTick | undefined;
+  const limitVerificationPrice = getLimitVerificationPrice(ledger.settings, mintick);
   for (const tick of orderedTicks) {
     const high = previousTick === undefined ? tick.price : Math.max(previousTick.price, tick.price);
     const low = previousTick === undefined ? tick.price : Math.min(previousTick.price, tick.price);
 
     for (const order of ledger.orders) {
-      const price = getPendingOrderFillPriceForTick(order, high, low, tick, barIndex, previousTick === undefined);
+      const price = getPendingOrderFillPriceForTick(order, high, low, tick, barIndex, previousTick === undefined, limitVerificationPrice);
       if (price === null) {
         continue;
       }
 
-      const fill = fillStrategyOrder(ledger, order, price, barIndex, tick.time);
+      const fill = fillStrategyOrder(ledger, order, price, barIndex, tick.time, mintick);
       if (fill) {
         fills.push(fill);
-        cancelOcaOrders(ledger, order, barIndex, tick.time);
+        applyOcaOrderEffects(ledger, order, fill.qty, barIndex, tick.time);
       }
     }
 
@@ -553,19 +737,40 @@ function fillStrategyOrder(
   price: number,
   barIndex: number,
   time: number,
+  mintick: number,
 ): StrategyFill | null {
   if (order.status !== 'pending' || order.qty === null) {
+    return null;
+  }
+  const isCloseOnlyEntry = order.isEntry && order.requestedQty === 0;
+  if (!order.isExit && !isCloseOnlyEntry && hasReachedStrategyOrderRiskLimit(ledger, time)) {
+    order.status = 'cancelled';
+    order.updatedBarIndex = barIndex;
+    order.updatedTime = time;
     return null;
   }
   if (!Number.isFinite(price)) {
     throw new Error('strategy fill price must be finite');
   }
+  const slippage = resolveStrategyFillSlippage(ledger.settings, order, mintick);
+  const fillPrice = price + slippage;
+  if (!Number.isFinite(fillPrice)) {
+    throw new Error('strategy fill price must be finite');
+  }
   const fillQty = resolveStrategyFillQty(ledger, order);
-  const commission = resolveStrategyFillCommission(ledger.settings, fillQty, price);
+  if (fillQty <= 0) {
+    if (order.isExit) {
+      order.status = 'cancelled';
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+    }
+    return null;
+  }
+  const commission = resolveStrategyFillCommission(ledger.settings, fillQty, fillPrice);
 
   order.status = 'filled';
   order.filledQty = fillQty;
-  order.avgFillPrice = price;
+  order.avgFillPrice = fillPrice;
   order.updatedBarIndex = barIndex;
   order.updatedTime = time;
 
@@ -575,19 +780,61 @@ function fillStrategyOrder(
     entryId: order.fromEntry,
     direction: order.direction,
     qty: fillQty,
-    price,
+    price: fillPrice,
     commission,
-    slippage: 0,
+    slippage,
     barIndex,
     time,
     comment: order.comment,
     alertMessage: order.alertMessage,
+    disableAlert: order.disableAlert,
   };
   ledger.fills.push(fill);
   applyStrategyCommission(ledger, commission);
   applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
+}
+
+function countStrategyFillsForUtcDay(ledger: StrategyLedger, time: number): number {
+  const day = strategyUtcDayKey(time);
+  if (day === null) {
+    return 0;
+  }
+
+  return ledger.fills.filter((fill) => strategyUtcDayKey(fill.time) === day).length;
+}
+
+function strategyUtcDayKey(time: number): string | null {
+  if (!Number.isFinite(time)) {
+    return null;
+  }
+
+  const date = new Date(time);
+  if (!Number.isFinite(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+function resolveStrategyFillSlippage(settings: StrategyLedgerSettings, order: StrategyOrder, mintick: number): number {
+  const slippageTicks = resolveStrategySlippageTicks(settings.slippageTicks);
+  if (slippageTicks === 0 || !Number.isFinite(mintick) || mintick <= 0) {
+    return 0;
+  }
+  if (order.type !== 'market' && order.type !== 'stop' && order.type !== 'trailing_stop') {
+    return 0;
+  }
+  const direction = order.direction === 'long' ? 1 : -1;
+  return slippageTicks * mintick * direction;
+}
+
+function resolveStrategySlippageTicks(slippageTicks: number): number {
+  if (!Number.isFinite(slippageTicks) || slippageTicks <= 0) {
+    return 0;
+  }
+  return Math.floor(slippageTicks);
 }
 
 function resolveStrategyFillCommission(settings: StrategyLedgerSettings, qty: number, price: number): number {
@@ -615,6 +862,9 @@ function applyStrategyCommission(ledger: StrategyLedger, commission: number): vo
 }
 
 function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): number {
+  if (order.isExit) {
+    return resolveStrategyExitFillQty(ledger, order);
+  }
   if (!order.isEntry) {
     return order.qty ?? 0;
   }
@@ -627,12 +877,32 @@ function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): n
   return Math.abs(position.size) + requestedQty;
 }
 
+function resolveStrategyExitFillQty(ledger: StrategyLedger, order: StrategyOrder): number {
+  if (order.qty === null) {
+    return 0;
+  }
+
+  const openDirection: StrategyDirection = order.direction === 'long' ? 'short' : 'long';
+  const openQty = ledger.openTrades.reduce((total, trade) => {
+    if (trade.direction !== openDirection) {
+      return total;
+    }
+    if (order.fromEntry !== undefined && trade.entryOrderId !== order.fromEntry) {
+      return total;
+    }
+    return total + trade.qty;
+  }, 0);
+
+  return Math.min(order.qty, openQty);
+}
+
 function getPendingOrderFillPrice(
   order: StrategyOrder,
   high: number,
   low: number,
   barIndex: number,
   time: number,
+  limitVerificationPrice: number,
 ): number | null {
   if (order.status !== 'pending' || order.qty === null || order.activationBarIndex >= barIndex) {
     return null;
@@ -642,7 +912,7 @@ function getPendingOrderFillPrice(
   }
 
   if (order.type === 'limit' && order.limitPrice !== undefined) {
-    return getLimitOrderFillPrice(order, high, low);
+    return getLimitOrderFillPrice(order, high, low, limitVerificationPrice);
   }
 
   if (order.type === 'stop' && order.stopPrice !== undefined) {
@@ -678,7 +948,7 @@ function getPendingOrderFillPrice(
     if (order.stopLimitActivatedBarIndex !== null && order.stopLimitActivatedBarIndex >= barIndex) {
       return null;
     }
-    return getLimitOrderFillPrice(order, high, low);
+    return getLimitOrderFillPrice(order, high, low, limitVerificationPrice);
   }
 
   return null;
@@ -691,8 +961,19 @@ function getPendingOrderFillPriceForTick(
   tick: StrategyExecutionTick,
   barIndex: number,
   isOpeningTick: boolean,
+  limitVerificationPrice: number,
 ): number | null {
-  const price = getPendingOrderFillPrice(order, high, low, barIndex, tick.time);
+  const wasStopLimitActivated = order.type === 'stop_limit' && order.stopLimitActivated;
+  const price = getPendingOrderFillPrice(order, high, low, barIndex, tick.time, limitVerificationPrice);
+  if (
+    price === null
+    && wasStopLimitActivated
+    && order.stopLimitActivated
+    && order.stopLimitActivatedBarIndex === barIndex
+    && order.createdBarIndex < barIndex
+  ) {
+    return getLimitOrderFillPrice(order, high, low, limitVerificationPrice);
+  }
   if (price === null || !isOpeningTick || order.type === 'trailing_stop') {
     return price;
   }
@@ -733,14 +1014,22 @@ function isOpeningGapFill(order: StrategyOrder, openPrice: number): boolean {
   return false;
 }
 
-function getLimitOrderFillPrice(order: StrategyOrder, high: number, low: number): number | null {
+function getLimitVerificationPrice(settings: StrategyLedgerSettings, mintick: number): number {
+  if (!Number.isFinite(mintick) || mintick <= 0) {
+    return 0;
+  }
+  const ticks = Math.max(0, Math.trunc(settings.backtestFillLimitsAssumptionTicks));
+  return ticks * mintick;
+}
+
+function getLimitOrderFillPrice(order: StrategyOrder, high: number, low: number, verificationPrice: number): number | null {
   if (order.limitPrice === undefined) {
     return null;
   }
-  if (order.direction === 'long' && low <= order.limitPrice) {
+  if (order.direction === 'long' && low <= order.limitPrice - verificationPrice) {
     return order.limitPrice;
   }
-  if (order.direction === 'short' && high >= order.limitPrice) {
+  if (order.direction === 'short' && high >= order.limitPrice + verificationPrice) {
     return order.limitPrice;
   }
   return null;
@@ -756,8 +1045,14 @@ function isStopLimitTriggered(order: StrategyOrder, high: number, low: number): 
   return low <= order.stopPrice;
 }
 
-function cancelOcaOrders(ledger: StrategyLedger, filledOrder: StrategyOrder, barIndex: number, time: number): void {
-  if (filledOrder.ocaName === undefined || filledOrder.ocaType !== 'cancel') {
+function applyOcaOrderEffects(
+  ledger: StrategyLedger,
+  filledOrder: StrategyOrder,
+  filledQty: number,
+  barIndex: number,
+  time: number,
+): void {
+  if (filledOrder.ocaName === undefined || filledOrder.ocaType === undefined) {
     return;
   }
 
@@ -766,22 +1061,56 @@ function cancelOcaOrders(ledger: StrategyLedger, filledOrder: StrategyOrder, bar
       order.status !== 'pending'
       || order === filledOrder
       || order.ocaName !== filledOrder.ocaName
-      || order.ocaType !== 'cancel'
+      || order.ocaType !== filledOrder.ocaType
     ) {
       continue;
     }
 
+    if (filledOrder.ocaType === 'cancel') {
+      order.status = 'cancelled';
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+      continue;
+    }
+
+    reduceOcaOrderQuantity(order, filledQty, barIndex, time);
+  }
+}
+
+function reduceOcaOrderQuantity(order: StrategyOrder, filledQty: number, barIndex: number, time: number): void {
+  if (order.ocaType !== 'reduce' || order.qty === null || !Number.isFinite(filledQty) || filledQty <= 0) {
+    return;
+  }
+
+  const nextQty = order.qty - filledQty;
+  if (nextQty <= 0) {
+    order.qty = 0;
+    order.requestedQty = order.requestedQty === null ? null : 0;
+    if (order.qtyType === 'fixed') {
+      order.qtyValue = 0;
+    }
     order.status = 'cancelled';
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
+    return;
   }
+
+  order.qty = nextQty;
+  if (order.requestedQty !== null && order.requestedQty !== undefined) {
+    order.requestedQty = Math.max(0, order.requestedQty - filledQty);
+  }
+  if (order.qtyType === 'fixed') {
+    order.qtyValue = nextQty;
+  }
+  order.updatedBarIndex = barIndex;
+  order.updatedTime = time;
 }
 
 export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex: number, time: number): boolean {
   let cancelled = false;
   for (let index = ledger.orders.length - 1; index >= 0; index--) {
     const order = ledger.orders[index];
-    if (!order || order.id !== id || order.status !== 'pending') {
+    if (!order || (order.id !== id && order.sourceId !== id) || order.status !== 'pending') {
       continue;
     }
 
@@ -900,9 +1229,9 @@ function validateStrategyOrderInput(input: StrategyOrderInput): void {
   if (
     input.requestedQty !== undefined
     && input.requestedQty !== null
-    && (!Number.isFinite(input.requestedQty) || input.requestedQty <= 0)
+    && (!Number.isFinite(input.requestedQty) || input.requestedQty < 0)
   ) {
-    throw new Error('strategy order requestedQty must be a positive number');
+    throw new Error('strategy order requestedQty must be a non-negative number');
   }
   if (!Number.isFinite(input.qtyValue) || input.qtyValue <= 0) {
     throw new Error('strategy order qtyValue must be a positive number');
@@ -950,7 +1279,7 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
   const oppositeDirection: StrategyDirection = fill.direction === 'long' ? 'short' : 'long';
 
   while (remainingQty > 0) {
-    const tradeIndex = ledger.openTrades.findIndex((trade) => trade.direction === oppositeDirection);
+    const tradeIndex = selectOpenTradeIndexForFill(ledger, fill, oppositeDirection);
     if (tradeIndex === -1) {
       break;
     }
@@ -1012,4 +1341,16 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
       maxDrawdown: 0,
     });
   }
+}
+
+function selectOpenTradeIndexForFill(ledger: StrategyLedger, fill: StrategyFill, direction: StrategyDirection): number {
+  if (ledger.settings.closeEntriesRule === 'ANY' && fill.entryId !== undefined) {
+    const matchingIndex = ledger.openTrades.findIndex((trade) => (
+      trade.direction === direction && trade.entryOrderId === fill.entryId
+    ));
+    if (matchingIndex !== -1) {
+      return matchingIndex;
+    }
+  }
+  return ledger.openTrades.findIndex((trade) => trade.direction === direction);
 }

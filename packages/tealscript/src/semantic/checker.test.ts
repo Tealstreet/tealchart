@@ -11,9 +11,11 @@ length = input.int(3)
 basis = ta.sma(close, length)
 spread(source) => source - basis
 plot(spread(high), title="Spread")
+plot(bid + ask, title="Quote Spread")
 plot(not na(time("1", "0930-1600")) ? 1 : 0, title="Session")
 plot(time_tradingday, title="Trading Day")
 plot(last_bar_time, title="Last Bar Time")
+max_bars_back(close, num=10)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -21,6 +23,41 @@ plot(last_bar_time, title="Last Bar Time")
       'variable:length',
       'variable:basis',
       'function:spread',
+    ]);
+  });
+
+  it('treats only ta.vwap stdev overload calls as tuple initializers', () => {
+    const valid = checkProgram(parse(`
+indicator("VWAP tuple OK")
+anchor = bar_index == 0
+[vwap, upper, lower] = ta.vwap(close, anchor, 1.5)
+plot(vwap + upper + lower)
+`));
+    const invalid = checkProgram(parse(`
+indicator("VWAP scalar tuple invalid")
+[vwap, upper, lower] = ta.vwap(close)
+plot(vwap)
+`));
+
+    expect(valid.diagnostics).toEqual([]);
+    expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toContain(
+      'Tuple declaration expects 3 values but initializer arm returns a non-tuple value',
+    );
+  });
+
+  it('infers scalar ta.vwap overloads as floats for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("VWAP scalar types")
+scalar = ta.vwap(close)
+anchored = ta.vwap(source=close, anchor=bar_index == 0)
+string badScalar = scalar
+string badAnchored = anchored
+plot(scalar + anchored)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign float value to string variable',
+      'Cannot assign float value to string variable',
     ]);
   });
 
@@ -57,6 +94,36 @@ plot(stamp + prefixStamp + dateStamp)
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid time helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Time Values")
+openTime = time(timeframe=60, session=true, timezone=1)
+closeTime = time_close("60", 123, true)
+changed = timeframe.change(60)
+seconds = timeframe.in_seconds(30)
+label = timeframe.to_seconds(true)
+frame = timeframe.from_seconds("60")
+yearValue = year(time="now", timezone=1)
+hourValue = hour(time=true, timezone=2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'time timeframe must be a string, got int',
+      'time session must be a string, got bool',
+      'time timezone must be a string, got int',
+      'time_close session must be a string, got int',
+      'time_close timezone must be a string, got bool',
+      'timeframe.change timeframe must be a string, got int',
+      'timeframe.in_seconds timeframe must be a string, got int',
+      'timeframe.to_seconds timeframe must be a string, got bool',
+      'timeframe.from_seconds seconds must be a number, got string',
+      'year timezone must be a string, got int',
+      'year time must be a number, got string',
+      'hour timezone must be a string, got int',
+      'hour time must be a number, got bool',
+    ]);
   });
 
   it('accepts session state helpers and session constants', () => {
@@ -123,9 +190,10 @@ isLower = timeframe.in_seconds(timeframe="15") < timeframe.in_seconds("1D")
 rounded = timeframe.from_seconds(seconds=44)
 changed = timeframe.change(timeframe="60")
 prefixedSeconds = timeframe.in_seconds(timeframe="1D")
+legacySeconds = timeframe.to_seconds(timeframe="1D")
 prefixedRounded = timeframe.from_seconds(seconds=30)
 prefixedChanged = timeframe.change(timeframe="3")
-plot(isLower and changed ? 1 : 0)
+plot(isLower and changed and legacySeconds > 0 ? 1 : 0)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -139,6 +207,7 @@ mainPeriod = timeframe.main_period
 multiplier = timeframe.multiplier
 intraday = timeframe.isintraday
 secondsValue = timeframe.in_seconds()
+legacySecondsValue = timeframe.to_seconds("1D")
 rounded = timeframe.from_seconds(seconds=60)
 changed = timeframe.change(timeframe="1D")
 sessionOpen = time(timeframe="60")
@@ -149,12 +218,13 @@ mainPeriod := 2
 multiplier := "bad"
 intraday := 1
 secondsValue := "bad"
+legacySecondsValue := "bad"
 rounded := 3
 changed := 1
 sessionOpen := "bad"
 sessionClose := "bad"
 stamp := "bad"
-plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday ? 1 : 0) + (changed ? 1 : 0))
+plot(multiplier + secondsValue + legacySecondsValue + sessionOpen + sessionClose + stamp + (intraday ? 1 : 0) + (changed ? 1 : 0))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -165,6 +235,7 @@ plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday 
       'Cannot assign string value to int variable multiplier',
       'Cannot assign int value to bool variable intraday',
       'Cannot assign string value to int variable secondsValue',
+      'Cannot assign string value to int variable legacySecondsValue',
       'Cannot assign int value to string variable rounded',
       'Cannot assign int value to bool variable changed',
       'Cannot assign string value to int variable sessionOpen',
@@ -176,6 +247,7 @@ plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday 
     expect(types.get('multiplier')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('intraday')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('secondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('legacySecondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('sessionOpen')).toMatchObject({ kind: 'int', qualifier: 'series' });
@@ -358,6 +430,94 @@ log.trace("unsupported")
     ]);
   });
 
+  it('reports unknown calls under signed Pine builtin namespaces', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Builtin Calls")
+request.securty(syminfo.tickerid, "1D", close)
+ta.smoothed(close, 14)
+array.fro(close)
+matrix.rota(matrix.new<float>())
+timeframe.to_second("1D")
+ticker.make("NASDAQ:AAPL")
+chart.point.later(close)
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown function: request.securty',
+      'Unknown function: ta.smoothed',
+      'Unknown function: array.fro',
+      'Unknown function: matrix.rota',
+      'Unknown function: timeframe.to_second',
+      'Unknown function: ticker.make',
+      'Unknown function: chart.point.later',
+    ]);
+  });
+
+  it('reports planned unsupported Pine builtin calls explicitly', () => {
+    const result = checkProgram(parse(`
+indicator("Planned Unsupported Calls")
+request.footprint(syminfo.tickerid)
+ticker.rangebar(syminfo.tickerid, 10)
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({
+        code: 'unsupported-feature',
+        message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      }),
+      expect.objectContaining({
+        code: 'unsupported-feature',
+        message: 'ticker.* functions are not supported yet: ticker.rangebar',
+      }),
+    ]);
+  });
+
+  it('keeps unknown ticker typos distinct from planned unsupported calls', () => {
+    const result = checkProgram(parse(`
+indicator("Unknown Ticker Calls")
+ticker.make("NASDAQ:AAPL")
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({
+        code: 'unknown-function',
+        message: 'Unknown function: ticker.make',
+      }),
+    ]);
+  });
+
+  it('does not report unknown builtin calls for user-defined methods', () => {
+    const result = checkProgram(parse(`
+indicator("User Methods")
+type Pivot
+    float price
+method smoothed(Pivot this, int length) => this.price
+pivot = Pivot.new(close)
+plot(pivot.smoothed(14))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid drawing constructor named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Constructors")
+left = chart.point.from_index(bar_index, low)
+right = chart.point.from_index(bar_index + 1, high)
+line.new(left, right, opacity=80)
+box.new(left, right, border_color=color.blue, opacity=80)
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for line.new()",
+      "Unknown argument 'opacity' for box.new()",
+    ]);
+  });
+
   it('accepts Pine alert calls and alertcondition declarations', () => {
     const result = checkProgram(parse(`
 indicator("Alerts")
@@ -389,9 +549,665 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
     ]);
   });
 
+  it('reports invalid literal Pine alert frequency values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Alert Frequency")
+alert("bad", "sometimes")
+alert(message="bad namespace", freq=alert.freq_never)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid alert frequency: sometimes',
+      'Invalid alert frequency: alert.freq_never',
+    ]);
+  });
+
+  it('reports invalid Pine alert and log argument value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Alert Types")
+alert(1, 2)
+alertcondition(1, title=2, message=3)
+log.info(1)
+log.warning(message=2)
+log.error(3)
+runtime.error(4)
+alert(1, message="ok")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'alert message must be a string, got int',
+      'alert freq must be a string, got int',
+      'alertcondition title must be a string, got int',
+      'alertcondition message must be a string, got int',
+      'alertcondition condition must be a boolean, got int',
+      'log.info message must be a string, got int',
+      'log.warning message must be a string, got int',
+      'log.error message must be a string, got int',
+      'runtime.error message must be a string, got int',
+      "Argument 'message' for alert() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid Pine built-in argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Built-in Bindings")
+plot(close, title="Close", title="Duplicate")
+plot(close, series=open)
+plot(close, typo=true)
+hline(100, price=200)
+hline(price=100, style=hline.style_dotted)
+fill(plot1=plot(close), hline1=plot(open), plot2=plot(high), color=color.red)
+fill(plot1=plot(high), color=color.blue)
+plotshape(series=close > open, caption="Bad")
+plot(ta.sma(source=close))
+plot(strategy.opentrades.entry_price(trade_num=0, 1))
+max_bars_back(close, 10, 20)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'title' for plot() was supplied multiple times",
+      "Argument 'series' for plot() was supplied multiple times",
+      "Unknown argument 'typo' for plot()",
+      "Argument 'price' for hline() was supplied multiple times",
+      "Unknown argument 'style' for hline()",
+      "Argument 'hline1' for fill() was supplied multiple times",
+      'fill() expects at least 3 arguments',
+      "fill() missing required argument 'plot2'",
+      "Unknown argument 'caption' for plotshape()",
+      'ta.sma() expects at least 2 arguments',
+      "ta.sma() missing required argument 'length'",
+      'strategy.opentrades.entry_price() cannot use positional arguments after named arguments',
+      'max_bars_back() expects at most 2 arguments',
+    ]);
+  });
+
+  it('reports invalid literal max_bars_back values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Max Bars Back", max_bars_back=-1)
+max_bars_back(close, num=-2)
+max_bars_back(open, 1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator max_bars_back must be a non-negative integer',
+      'max_bars_back num must be a non-negative integer',
+      'max_bars_back num must be a non-negative integer',
+    ]);
+  });
+
+  it('reports invalid literal declaration drawing limit values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Drawing Limits",
+  max_labels_count=-1,
+  max_lines_count=1.5,
+  max_boxes_count=-2,
+  max_polylines_count=2.5)
+strategy("Invalid Strategy Drawing Limits", max_labels_count=-3)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator max_labels_count must be a non-negative integer',
+      'indicator max_lines_count must be a non-negative integer',
+      'indicator max_boxes_count must be a non-negative integer',
+      'indicator max_polylines_count must be a non-negative integer',
+      'strategy max_labels_count must be a non-negative integer',
+    ]);
+  });
+
+  it('reports invalid literal declaration format and scale values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Format Scale", format="bad", scale=scale.top)
+strategy("Invalid Strategy Format Scale", format=format.bad, scale="center")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid indicator format: bad',
+      'Invalid indicator scale: scale.top',
+      'Invalid strategy format: format.bad',
+      'Invalid strategy scale: center',
+    ]);
+  });
+
+  it('reports invalid literal declaration precision values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Precision", precision=-1)
+strategy("Invalid Strategy Precision", precision=1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator precision must be a non-negative integer',
+      'strategy precision must be a non-negative integer',
+    ]);
+  });
+
+  it('reports invalid literal calc_bars_count values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Calc Bars Count", calc_bars_count=-1)
+strategy("Invalid Strategy Calc Bars Count", calc_bars_count=-1)
+request.security(syminfo.tickerid, "1D", close, calc_bars_count=0)
+request.security_lower_tf(syminfo.tickerid, "1", close, calc_bars_count=-2)
+request.seed("seed", "SYM", close, calc_bars_count=1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator calc_bars_count must be a non-negative integer',
+      'strategy calc_bars_count must be a non-negative integer',
+      'request.security calc_bars_count must be a positive integer',
+      'request.security_lower_tf calc_bars_count must be a positive integer',
+      'request.seed calc_bars_count must be a positive integer',
+    ]);
+  });
+
+  it('reports invalid literal request barmerge modes', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Request Barmerge Modes")
+request.security(syminfo.tickerid, "1D", close, gaps="bad_gaps")
+request.security(syminfo.tickerid, "1D", close, lookahead="bad_lookahead")
+request.dividends("NASDAQ:AAPL", dividends.gross, gaps="bad_gaps")
+request.earnings("NASDAQ:AAPL", earnings.actual, lookahead="bad_lookahead")
+request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps="bad_gaps")
+request.economic("US", "GDP", gaps="bad_gaps")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid request.security gaps mode: bad_gaps',
+      'Invalid request.security lookahead mode: bad_lookahead',
+      'Invalid request.dividends gaps mode: bad_gaps',
+      'Invalid request.earnings lookahead mode: bad_lookahead',
+      'Invalid request.financial gaps mode: bad_gaps',
+      'Invalid request.economic gaps mode: bad_gaps',
+    ]);
+  });
+
+  it('reports invalid OHLC visual output argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid OHLC Visual Bindings")
+plotbar(open=open, high=high, low=low)
+plotbar(open, high, low, close, candle_color=color.red)
+plotbar(open, high, low, close, open=open)
+plotcandle(open=open, high=high, low=low)
+plotcandle(open, high, low, close, wick_color=color.red)
+plotcandle(open, high, low, close, close=close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plotbar() expects at least 4 arguments',
+      "plotbar() missing required argument 'close'",
+      "Unknown argument 'candle_color' for plotbar()",
+      "Argument 'open' for plotbar() was supplied multiple times",
+      'plotcandle() expects at least 4 arguments',
+      "plotcandle() missing required argument 'close'",
+      "Unknown argument 'wick_color' for plotcandle()",
+      "Argument 'close' for plotcandle() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid visual line style values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Line Styles")
+plot(close, style="zigzag", linestyle=plot.linestyle_arrow)
+plot(open, "Bad Positional", color.blue, 1, plot.style_bad)
+hline(100, linestyle="dashdot")
+hline(200, "Bad Positional", color.red, hline.style_arrow)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plot style: zigzag',
+      'Invalid plot linestyle: plot.linestyle_arrow',
+      'Invalid plot style: plot.style_bad',
+      'Invalid hline linestyle: dashdot',
+      'Invalid hline linestyle: hline.style_arrow',
+    ]);
+  });
+
+  it('reports invalid visual format and precision values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Format Precision")
+plot(close, format="bad", precision=-1)
+plotbar(open, high, low, close, format=format.bad, precision=1.5)
+plotcandle(open, high, low, close, format="ticks", precision=-2)
+plotshape(close > open, format=format.bad, precision=2.5)
+plotchar(close < open, format="invalid", precision=-3)
+plotarrow(close - open, format=format.bad, precision=3.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plot format: bad',
+      'plot precision must be a non-negative integer',
+      'Invalid plotbar format: format.bad',
+      'plotbar precision must be a non-negative integer',
+      'Invalid plotcandle format: ticks',
+      'plotcandle precision must be a non-negative integer',
+      'Invalid plotshape format: format.bad',
+      'plotshape precision must be a non-negative integer',
+      'Invalid plotchar format: invalid',
+      'plotchar precision must be a non-negative integer',
+      'Invalid plotarrow format: format.bad',
+      'plotarrow precision must be a non-negative integer',
+    ]);
+  });
+
+  it('reports invalid marker style location and size values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Marker Styles")
+plotshape(close > open, style=shape.bad, location="middle", size=size.giant)
+plotchar(close < open, location=location.middle, size="giant")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plotshape style: shape.bad',
+      'Invalid plotshape location: middle',
+      'Invalid plotshape size: size.giant',
+      'Invalid plotchar location: location.middle',
+      'Invalid plotchar size: giant',
+    ]);
+  });
+
+  it('reports invalid visual numeric option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Numeric Options")
+plot(close, linewidth=0)
+plot(open, "Fractional Width", color.blue, 1.5)
+hline(100, linewidth=-1)
+hline(200, "Fractional HLine", color.red, hline.style_solid, 2.5)
+plotarrow(close - open, minheight=0, maxheight=1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot linewidth must be a positive integer',
+      'plot linewidth must be a positive integer',
+      'hline linewidth must be a positive integer',
+      'hline linewidth must be a positive integer',
+      'plotarrow minheight must be a positive integer',
+      'plotarrow maxheight must be a positive integer',
+    ]);
+  });
+
+  it('reports invalid visual numeric option value types', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Numeric Values")
+linePlot = plot(close)
+basePlot = plot(open)
+badPlot = plot(close, linewidth="2", histbase="0", offset="1", show_last="10", precision="2")
+hline(price="100", linewidth="2")
+fill(linePlot, basePlot, color.red, show_last="10")
+barcolor(color.red, offset="1", show_last=false)
+bgcolor(color.blue, offset=false, show_last="10")
+plotbar(open="o", high=true, low="l", close=false, show_last="10", precision="2")
+plotcandle(open="o", high=true, low="l", close=false, show_last="10", precision="2")
+plotshape(close > open, offset="1", show_last=false, precision="2")
+plotchar(close > open, offset=false, show_last="10", precision="2")
+plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_last="10", precision="2")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot linewidth must be a number, got string',
+      'plot histbase must be a number, got string',
+      'plot offset must be a number, got string',
+      'plot show_last must be a number, got string',
+      'plot precision must be a number, got string',
+      'hline price must be a number, got string',
+      'hline linewidth must be a number, got string',
+      'fill show_last must be a number, got string',
+      'barcolor offset must be a number, got string',
+      'barcolor show_last must be a number, got bool',
+      'bgcolor offset must be a number, got bool',
+      'bgcolor show_last must be a number, got string',
+      'plotbar open must be a number, got string',
+      'plotbar high must be a number, got bool',
+      'plotbar low must be a number, got string',
+      'plotbar close must be a number, got bool',
+      'plotbar show_last must be a number, got string',
+      'plotbar precision must be a number, got string',
+      'plotcandle open must be a number, got string',
+      'plotcandle high must be a number, got bool',
+      'plotcandle low must be a number, got string',
+      'plotcandle close must be a number, got bool',
+      'plotcandle show_last must be a number, got string',
+      'plotcandle precision must be a number, got string',
+      'plotshape offset must be a number, got string',
+      'plotshape show_last must be a number, got bool',
+      'plotshape precision must be a number, got string',
+      'plotchar offset must be a number, got bool',
+      'plotchar show_last must be a number, got string',
+      'plotchar precision must be a number, got string',
+      'plotarrow series must be a number, got string',
+      'plotarrow offset must be a number, got bool',
+      'plotarrow minheight must be a number, got string',
+      'plotarrow maxheight must be a number, got bool',
+      'plotarrow show_last must be a number, got string',
+      'plotarrow precision must be a number, got string',
+    ]);
+  });
+
+  it('reports invalid visual boolean option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Boolean Options")
+linePlot = plot(close, trackprice="yes", join=1, editable="no", force_overlay=1)
+basePlot = plot(open)
+hline(100, editable=1)
+fill(linePlot, basePlot, color.red, editable="yes", fillgaps=1)
+barcolor(color.red, editable="yes")
+bgcolor(color.blue, editable=1, force_overlay="yes")
+plotbar(open, high, low, close, editable=1, force_overlay="yes")
+plotcandle(open, high, low, close, editable="yes", force_overlay=1)
+plotshape(close > open, editable=1, force_overlay="yes")
+plotchar(close > open, editable="yes", force_overlay=1)
+plotarrow(close - open, editable=1, force_overlay="yes")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot trackprice must be a boolean, got string',
+      'plot join must be a boolean, got int',
+      'plot editable must be a boolean, got string',
+      'plot force_overlay must be a boolean, got int',
+      'hline editable must be a boolean, got int',
+      'fill editable must be a boolean, got string',
+      'fill fillgaps must be a boolean, got int',
+      'barcolor editable must be a boolean, got string',
+      'bgcolor editable must be a boolean, got int',
+      'bgcolor force_overlay must be a boolean, got string',
+      'plotbar editable must be a boolean, got int',
+      'plotbar force_overlay must be a boolean, got string',
+      'plotcandle editable must be a boolean, got string',
+      'plotcandle force_overlay must be a boolean, got int',
+      'plotshape editable must be a boolean, got int',
+      'plotshape force_overlay must be a boolean, got string',
+      'plotchar editable must be a boolean, got string',
+      'plotchar force_overlay must be a boolean, got int',
+      'plotarrow editable must be a boolean, got int',
+      'plotarrow force_overlay must be a boolean, got string',
+    ]);
+  });
+
+  it('reports invalid visual string option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual String Options")
+plot(close, title=1)
+hline(100, title=1)
+fill(plot(close), plot(open), color.red, title=1)
+barcolor(color.red, title=1)
+bgcolor(color.blue, title=1)
+plotbar(open, high, low, close, title=1)
+plotcandle(open, high, low, close, title=1)
+plotshape(close > open, title=1, text=2)
+plotchar(close > open, title=1, char=2, text=3)
+plotarrow(close - open, title=1)
+plot(close, 1, title="Duplicate")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot title must be a string, got int',
+      'hline title must be a string, got int',
+      'fill title must be a string, got int',
+      'barcolor title must be a string, got int',
+      'bgcolor title must be a string, got int',
+      'plotbar title must be a string, got int',
+      'plotcandle title must be a string, got int',
+      'plotshape title must be a string, got int',
+      'plotshape text must be a string, got int',
+      'plotchar title must be a string, got int',
+      'plotchar char must be a string, got int',
+      'plotchar text must be a string, got int',
+      'plotarrow title must be a string, got int',
+      "Argument 'title' for plot() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid visual color option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Color Options")
+linePlot = plot(close, color=1)
+basePlot = plot(open)
+zeroLine = hline(0, color=1)
+fill(linePlot, basePlot, color=1)
+bgcolor(color=1)
+barcolor(color=1)
+plotbar(open, high, low, close, color=1)
+plotcandle(open, high, low, close, color=1, wickcolor=2, bordercolor=3)
+plotshape(close > open, color=1, textcolor=2)
+plotchar(close > open, char="x", color=1, textcolor=2)
+plotarrow(close - open, colorup=1, colordown=2)
+plot(close, 1, color=color.red, title="ok")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot color must be a color, got int',
+      'hline color must be a color, got int',
+      'fill color must be a color, got int',
+      'bgcolor color must be a color, got int',
+      'barcolor color must be a color, got int',
+      'plotbar color must be a color, got int',
+      'plotcandle color must be a color, got int',
+      'plotcandle wickcolor must be a color, got int',
+      'plotcandle bordercolor must be a color, got int',
+      'plotshape color must be a color, got int',
+      'plotshape textcolor must be a color, got int',
+      'plotchar color must be a color, got int',
+      'plotchar textcolor must be a color, got int',
+      'plotarrow colorup must be a color, got int',
+      'plotarrow colordown must be a color, got int',
+      "Argument 'title' for plot() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid marker visual output argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Marker Visual Bindings")
+plotshape()
+plotshape(close > open, series=close < open)
+plotchar()
+plotchar(series=close > open, glyph="B")
+plotchar(close > open, series=close < open)
+plotarrow()
+plotarrow(series=close - open, color_up=color.green)
+plotarrow(close - open, series=open - close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plotshape() expects at least 1 argument',
+      "plotshape() missing required argument 'series'",
+      "Argument 'series' for plotshape() was supplied multiple times",
+      'plotchar() expects at least 1 argument',
+      "plotchar() missing required argument 'series'",
+      "Unknown argument 'glyph' for plotchar()",
+      "Argument 'series' for plotchar() was supplied multiple times",
+      'plotarrow() expects at least 1 argument',
+      "plotarrow() missing required argument 'series'",
+      "Unknown argument 'color_up' for plotarrow()",
+      "Argument 'series' for plotarrow() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid Pine declaration arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator", initial_capital=1000, risk_free_rate=2, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true, typo=true)
+strategy("Bad Strategy", initial_capital=1000, typo=true)
+library("Bad Library", precision=2, dynamic_requests=true)
+export f(float x) => x
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'initial_capital' for indicator()",
+      "Unknown argument 'risk_free_rate' for indicator()",
+      "Unknown argument 'backtest_fill_limits_assumption' for indicator()",
+      "Unknown argument 'close_entries_rule' for indicator()",
+      "Unknown argument 'fill_orders_on_standard_ohlc' for indicator()",
+      "Unknown argument 'typo' for indicator()",
+      "Unknown argument 'typo' for strategy()",
+      "Unknown argument 'precision' for library()",
+    ]);
+  });
+
+  it('checks Pine declaration visual option expressions', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator Visual Options", explicit_plot_zorder=missingOrder, behind_chart=missingBehind)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown identifier: missingOrder',
+      'Unknown identifier: missingBehind',
+    ]);
+  });
+
+  it('reports invalid Pine declaration boolean values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator Boolean Settings",
+    overlay="yes",
+    timeframe_gaps=1,
+    explicit_plot_zorder="true",
+    behind_chart=close,
+    dynamic_requests="no")
+library("Bad Library Boolean Settings", "yes", 1)
+export f(float x) => x
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator overlay must be a boolean, got string',
+      'indicator timeframe_gaps must be a boolean, got int',
+      'indicator explicit_plot_zorder must be a boolean, got string',
+      'indicator behind_chart must be a boolean, got float',
+      'indicator dynamic_requests must be a boolean, got string',
+      'library overlay must be a boolean, got string',
+      'library dynamic_requests must be a boolean, got int',
+    ]);
+  });
+
+  it('reports invalid Pine declaration numeric values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator Numeric Settings",
+    precision="two",
+    max_bars_back="bars",
+    max_labels_count="labels",
+    max_lines_count="lines",
+    max_boxes_count="boxes",
+    max_polylines_count="polylines",
+    calc_bars_count="calc")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator precision must be a number, got string',
+      'indicator max_bars_back must be a number, got string',
+      'indicator max_labels_count must be a number, got string',
+      'indicator max_lines_count must be a number, got string',
+      'indicator max_boxes_count must be a number, got string',
+      'indicator max_polylines_count must be a number, got string',
+      'indicator calc_bars_count must be a number, got string',
+    ]);
+  });
+
+  it('reports invalid literal Pine strategy declaration values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Settings",
+    initial_capital=-1,
+    default_qty_type="shares",
+    default_qty_value=-1,
+    pyramiding=-1,
+    commission_type="flat",
+    commission_value=-0.1,
+    slippage=-1,
+    margin_long=-1,
+    margin_short=-1,
+    backtest_fill_limits_assumption=-1,
+    close_entries_rule="LIFO")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy initial_capital must be a non-negative number',
+      'Invalid strategy default_qty_type: shares',
+      'strategy default_qty_value must be a non-negative number',
+      'strategy pyramiding must be a non-negative integer',
+      'Invalid strategy commission_type: flat',
+      'strategy commission_value must be a non-negative number',
+      'strategy slippage must be a non-negative integer',
+      'strategy margin_long must be a non-negative number',
+      'strategy margin_short must be a non-negative number',
+      'strategy backtest_fill_limits_assumption must be a non-negative integer',
+      'Invalid strategy close_entries_rule: LIFO',
+    ]);
+  });
+
+  it('reports invalid Pine strategy declaration boolean values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Boolean Settings",
+    calc_on_order_fills="yes",
+    calc_on_every_tick=1,
+    process_orders_on_close="no",
+    use_bar_magnifier=close,
+    fill_orders_on_standard_ohlc="true")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy calc_on_order_fills must be a boolean, got string',
+      'strategy calc_on_every_tick must be a boolean, got int',
+      'strategy process_orders_on_close must be a boolean, got string',
+      'strategy use_bar_magnifier must be a boolean, got float',
+      'strategy fill_orders_on_standard_ohlc must be a boolean, got string',
+    ]);
+  });
+
+  it('reports invalid Pine strategy declaration numeric values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Numeric Settings",
+    initial_capital="cash",
+    default_qty_value="size",
+    pyramiding="many",
+    commission_value="fee",
+    slippage="ticks",
+    margin_long="long",
+    margin_short="short",
+    risk_free_rate="rate",
+    backtest_fill_limits_assumption="fills")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy initial_capital must be a number, got string',
+      'strategy default_qty_value must be a number, got string',
+      'strategy pyramiding must be a number, got string',
+      'strategy commission_value must be a number, got string',
+      'strategy slippage must be a number, got string',
+      'strategy margin_long must be a number, got string',
+      'strategy margin_short must be a number, got string',
+      'strategy risk_free_rate must be a number, got string',
+      'strategy backtest_fill_limits_assumption must be a number, got string',
+    ]);
+  });
+
+  it('reports invalid Pine strategy declaration string values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy String Settings",
+    currency=1,
+    default_qty_type=2,
+    commission_type=3,
+    close_entries_rule=4)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy currency must be a string, got int',
+      'strategy default_qty_type must be a string, got int',
+      'strategy commission_type must be a string, got int',
+      'strategy close_entries_rule must be a string, got int',
+    ]);
+  });
+
+  it('accepts Pine library positional dynamic requests declarations', () => {
+    const result = checkProgram(parse(`
+library("Dynamic Library", true, false)
+export f(float x) => x
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('accepts Pine strategy order and trade accessor calls', () => {
     const result = checkProgram(parse(`
-strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1)
+strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1, risk_free_rate=1.75, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true)
+strategy.risk.allow_entry_in(strategy.direction.long)
+strategy.risk.max_position_size(3)
+strategy.risk.max_drawdown(value=25, type=strategy.percent_of_equity, alert_message="drawdown")
+strategy.risk.max_intraday_loss(value=1000, type=strategy.cash, alert_message="loss")
+strategy.risk.max_intraday_filled_orders(10, "fills")
+strategy.risk.max_cons_loss_days(count=3, alert_message="days")
 strategy.entry("Long", strategy.long, qty=1, limit=close, oca_type=strategy.oca.cancel, alert_message="entry")
 strategy.entry(id="PrefixLong", strategy.long, 1, close, na, "EntryOca", strategy.oca.cancel, "entry comment", "entry alert")
 strategy.order(id="Add", direction=strategy.long, qty=1)
@@ -434,6 +1250,8 @@ grossProfitPercent = strategy.grossprofit_percent
 grossLossPercent = strategy.grossloss_percent
 openProfitPercentState = strategy.openprofit_percent
 positionSize = strategy.position_size
+accountCurrency = strategy.account_currency
+positionEntryName = strategy.position_entry_name
 openTrades = strategy.opentrades
 capitalHeld = strategy.opentrades.capital_held
 closedTrades = strategy.closedtrades
@@ -466,6 +1284,8 @@ grossProfitPercent := "bad"
 grossLossPercent := "bad"
 openProfitPercentState := "bad"
 positionSize := "bad"
+accountCurrency := 1
+positionEntryName := 1
 openTrades := "bad"
 capitalHeld := "bad"
 closedTrades := "bad"
@@ -492,7 +1312,7 @@ closedRunup := "bad"
 closedDrawdown := "bad"
 closedRunupPercent := "bad"
 closedDrawdownPercent := "bad"
-plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openProfitPercentState + positionSize + openTrades + capitalHeld + closedTrades + winTrades + entryBar + entryTime + entryPrice + openProfitPercent + openRunup + openDrawdown + openRunupPercent + openDrawdownPercent + exitBar + exitTime + exitPrice + closedProfit + closedProfitPercent + closedRunup + closedDrawdown + closedRunupPercent + closedDrawdownPercent + str.length(entryId) + str.length(entryComment) + str.length(closedEntryComment) + str.length(exitId) + str.length(exitComment))
+plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openProfitPercentState + positionSize + openTrades + capitalHeld + closedTrades + winTrades + entryBar + entryTime + entryPrice + openProfitPercent + openRunup + openDrawdown + openRunupPercent + openDrawdownPercent + exitBar + exitTime + exitPrice + closedProfit + closedProfitPercent + closedRunup + closedDrawdown + closedRunupPercent + closedDrawdownPercent + str.length(accountCurrency) + str.length(positionEntryName) + str.length(entryId) + str.length(entryComment) + str.length(closedEntryComment) + str.length(exitId) + str.length(exitComment))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -504,6 +1324,8 @@ plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openPro
       'Cannot assign string value to float variable grossLossPercent',
       'Cannot assign string value to float variable openProfitPercentState',
       'Cannot assign string value to float variable positionSize',
+      'Cannot assign int value to string variable accountCurrency',
+      'Cannot assign int value to string variable positionEntryName',
       'Cannot assign string value to int variable openTrades',
       'Cannot assign string value to float variable capitalHeld',
       'Cannot assign string value to int variable closedTrades',
@@ -537,6 +1359,8 @@ plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openPro
     expect(types.get('grossLossPercent')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('openProfitPercentState')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('positionSize')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('accountCurrency')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('positionEntryName')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('openTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('capitalHeld')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('closedTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });
@@ -573,6 +1397,9 @@ strategy.cancel_all("unexpected")
 strategy.entri("Long", strategy.long)
 strategy.opentrades.entry_price()
 strategy.exit("Exit", from_entry="Long", unknown=1)
+strategy.entry("Long", strategy.long, 1, na, na, "Oca", strategy.oca.cancel, "comment", "alert", false, "extra")
+strategy.order("Add", strategy.short, 1, na, na, "Oca", strategy.oca.cancel, "comment", "alert", false, "extra")
+strategy.exit("Exit", "Long", 1, 100, 10, close + 1, 10, close - 1, na, na, na, na, "comment", "profit", "loss", "trail", "alert", "profit alert", "loss alert", "trail alert", false, "extra")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -583,6 +1410,168 @@ strategy.exit("Exit", from_entry="Long", unknown=1)
       'strategy.opentrades.entry_price() expects at least 1 argument',
       "strategy.opentrades.entry_price() missing required argument 'trade_num'",
       "Unknown argument 'unknown' for strategy.exit()",
+      'strategy.entry() expects at most 10 arguments',
+      'strategy.order() expects at most 10 arguments',
+      'strategy.exit() expects at most 21 arguments',
+    ]);
+  });
+
+  it('reports invalid literal Pine strategy order values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy")
+strategy.entry("", "up", qty=0, oca_type="bad")
+strategy.order(id="Add", direction="down", qty=-1, oca_type=strategy.oca.cancel)
+strategy.close("", qty=-1, qty_percent=0)
+strategy.exit("", qty=-1, qty_percent=0, profit=0, loss=-1, trail_points=-1, trail_offset=0)
+strategy.risk.allow_entry_in("sideways")
+strategy.risk.max_position_size(0)
+strategy.risk.max_drawdown(value=0, type=strategy.direction.long)
+strategy.risk.max_intraday_loss(value=-1, type="bad")
+strategy.risk.max_intraday_filled_orders(0)
+strategy.risk.max_cons_loss_days(-1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry id must not be empty',
+      'Invalid strategy direction for strategy.entry: up',
+      'strategy.entry qty must be a positive number',
+      'Invalid strategy oca_type for strategy.entry: bad',
+      'Invalid strategy direction for strategy.order: down',
+      'strategy.order qty must be a positive number',
+      'strategy.close id must not be empty',
+      'strategy.close qty must be a positive number',
+      'strategy.close qty_percent must be a positive number',
+      'strategy.exit id must not be empty',
+      'strategy.exit qty must be a positive number',
+      'strategy.exit qty_percent must be a positive number',
+      'strategy.exit profit must be a positive number',
+      'strategy.exit loss must be a positive number',
+      'strategy.exit trail_points must be a non-negative number',
+      'strategy.exit trailing stop offset must be positive',
+      'Invalid strategy entry direction: sideways',
+      'strategy.risk.max_position_size contracts must be a positive number',
+      'strategy.risk.max_drawdown value must be a positive number',
+      'Invalid strategy risk type for strategy.risk.max_drawdown: long',
+      'strategy.risk.max_intraday_loss value must be a positive number',
+      'Invalid strategy risk type for strategy.risk.max_intraday_loss: bad',
+      'strategy.risk.max_intraday_filled_orders count must be a positive number',
+      'strategy.risk.max_cons_loss_days count must be a positive number',
+    ]);
+  });
+
+  it('reports invalid Pine strategy order boolean option values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Order Booleans")
+strategy.entry("Long", strategy.long, disable_alert="yes")
+strategy.order("Add", strategy.long, disable_alert=1)
+strategy.exit("Exit", from_entry="Long", limit=close, disable_alert="no")
+strategy.close("Long", immediately="now", disable_alert=1)
+strategy.close_all(immediately=close, disable_alert="yes")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry disable_alert must be a boolean, got string',
+      'strategy.order disable_alert must be a boolean, got int',
+      'strategy.exit disable_alert must be a boolean, got string',
+      'strategy.close disable_alert must be a boolean, got int',
+      'strategy.close immediately must be a boolean, got string',
+      'strategy.close_all disable_alert must be a boolean, got string',
+      'strategy.close_all immediately must be a boolean, got float',
+    ]);
+  });
+
+  it('reports invalid Pine strategy order string option values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Order Strings")
+strategy.entry(1, strategy.long, comment=2, alert_message=3)
+strategy.order("Add", strategy.long, oca_name=4)
+strategy.exit(1, from_entry=2, limit=close, comment_profit=3, alert_trailing=4)
+strategy.close(1, comment=2, alert_message=3)
+strategy.close_all(comment=1, alert_message=2)
+strategy.cancel(1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry id must be a string, got int',
+      'strategy.entry comment must be a string, got int',
+      'strategy.entry alert_message must be a string, got int',
+      'strategy.order oca_name must be a string, got int',
+      'strategy.exit id must be a string, got int',
+      'strategy.exit from_entry must be a string, got int',
+      'strategy.exit comment_profit must be a string, got int',
+      'strategy.exit alert_trailing must be a string, got int',
+      'strategy.close id must be a string, got int',
+      'strategy.close comment must be a string, got int',
+      'strategy.close alert_message must be a string, got int',
+      'strategy.close_all comment must be a string, got int',
+      'strategy.close_all alert_message must be a string, got int',
+      'strategy.cancel id must be a string, got int',
+    ]);
+  });
+
+  it('reports invalid Pine strategy enum option value types', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Enums")
+strategy.entry("Long", 1, oca_type=2)
+strategy.order("Add", 1, oca_type=2)
+strategy.risk.allow_entry_in(1)
+strategy.risk.max_drawdown(value=10, type=1)
+strategy.risk.max_intraday_loss(10, 2)
+strategy.entry("Duplicate", 1, direction=strategy.short)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry direction must be a string, got int',
+      'strategy.entry oca_type must be a string, got int',
+      'strategy.order direction must be a string, got int',
+      'strategy.order oca_type must be a string, got int',
+      'strategy.risk.allow_entry_in value must be a string, got int',
+      'strategy.risk.max_drawdown type must be a string, got int',
+      'strategy.risk.max_intraday_loss type must be a string, got int',
+      "Argument 'direction' for strategy.entry() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid Pine strategy numeric option values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Numerics")
+strategy.entry("Long", strategy.long, qty="many", limit="high")
+strategy.order("Add", strategy.long, stop="low")
+strategy.exit("Exit", from_entry="Long", qty_percent="half", profit="win", trail_offset="offset")
+strategy.close("Long", qty="one")
+strategy.risk.max_position_size("three")
+strategy.risk.max_drawdown(value="ten", type=strategy.cash)
+strategy.risk.max_intraday_filled_orders(count="two")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry qty must be a number, got string',
+      'strategy.entry limit must be a number, got string',
+      'strategy.order stop must be a number, got string',
+      'strategy.exit qty_percent must be a number, got string',
+      'strategy.exit profit must be a number, got string',
+      'strategy.exit trail_offset must be a number, got string',
+      'strategy.close qty must be a number, got string',
+      'strategy.risk.max_position_size contracts must be a number, got string',
+      'strategy.risk.max_drawdown value must be a number, got string',
+      'strategy.risk.max_intraday_filled_orders count must be a number, got string',
+    ]);
+  });
+
+  it('reports invalid Pine strategy trade accessor index values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Trade Indexes")
+openProfit = strategy.opentrades.profit("0")
+openComment = strategy.opentrades.entry_comment(true)
+closedEntry = strategy.closedtrades.entry_price("0")
+closedExitId = strategy.closedtrades.exit_id(false)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.opentrades.profit trade_num must be a number, got string',
+      'strategy.opentrades.entry_comment trade_num must be a number, got bool',
+      'strategy.closedtrades.entry_price trade_num must be a number, got string',
+      'strategy.closedtrades.exit_id trade_num must be a number, got bool',
     ]);
   });
 
@@ -796,6 +1785,19 @@ export invalidNested(float value) => request.security(syminfo.tickerid, "1", ta.
     ]);
   });
 
+  it('reports exported library request calls when dynamic requests are disabled', () => {
+    const result = checkProgram(parse(`
+library("Static Export Requests", dynamic_requests=false)
+export requested(float value) => request.security(syminfo.tickerid, "1", close)
+export method requestedMethod(float this) => request.security(syminfo.tickerid, "1", close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported function requested cannot call request.*() functions when library dynamic_requests=false',
+      'Exported method requestedMethod cannot call request.*() functions when library dynamic_requests=false',
+    ]);
+  });
+
   it('allows nested scopes to shadow outer declarations', () => {
     const result = checkProgram(parse(`
 indicator("Shadow")
@@ -859,18 +1861,21 @@ plot(price)
 indicator("TA Tuple Types")
 [macdLine, signalLine, hist] = ta.macd(close, 12, 26, 9)
 [basis, upper, lower] = ta.bb(close, 20, 2)
+[kcBasis, kcUpper, kcLower] = ta.kc(close, 20, 1.5)
 [supertrend, direction] = ta.supertrend(3, 10)
 [diPlus, diMinus, adx] = ta.dmi(14, 14)
 macdLine := "bad"
 basis := "bad"
+kcUpper := "bad"
 direction := "up"
 adx := "bad"
-plot(signalLine + hist + upper + lower + supertrend + diPlus + diMinus)
+plot(signalLine + hist + upper + lower + kcBasis + kcLower + supertrend + diPlus + diMinus)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign string value to float variable macdLine',
       'Cannot assign string value to float variable basis',
+      'Cannot assign string value to float variable kcUpper',
       'Cannot assign string value to int variable direction',
       'Cannot assign string value to float variable adx',
     ]);
@@ -2944,6 +3949,27 @@ duplicateCopy = chart.point.copy(point, id=point)
     ]);
   });
 
+  it('reports invalid chart point helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Chart Point Values")
+badNew = chart.point.new(time="now", index=true, price="close")
+badNow = chart.point.now(price=false)
+badIndex = chart.point.from_index(index="0", price=true)
+badTime = chart.point.from_time(time="now", price="close")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'chart.point.new time must be a number, got string',
+      'chart.point.new index must be a number, got bool',
+      'chart.point.new price must be a number, got string',
+      'chart.point.now price must be a number, got bool',
+      'chart.point.from_index index must be a number, got string',
+      'chart.point.from_index price must be a number, got bool',
+      'chart.point.from_time time must be a number, got string',
+      'chart.point.from_time price must be a number, got string',
+    ]);
+  });
+
   it('resolves label.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Signatures")
@@ -2951,7 +3977,8 @@ first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color
 second = label.new(bar_index, high, text="High", color=color.orange, style=label.style_label_down)
 labelPoint = chart.point.from_index(bar_index, low)
 third = label.new(labelPoint, "Point", xloc.bar_index, yloc.price, color.blue)
-labels = array.from(first, second, third)
+fourth = label.new(point=labelPoint, text="Named Point", color=color.yellow)
+labels = array.from(first, second, third, fourth)
 plot(array.size(labels))
 `));
 
@@ -2980,6 +4007,309 @@ tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.gre
       "label.new() missing required argument 'y'",
       "Argument 'x' for label.new() was supplied multiple times",
       'label.new() expects at most 14 arguments',
+    ]);
+  });
+
+  it('reports invalid literal drawing coordinate option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Options")
+trend = line.new(bar_index, close, bar_index + 1, open, xloc=xloc.session, extend=extend.future)
+marker = label.new(bar_index, close, xloc=xloc.session, yloc=yloc.middle)
+region = box.new(bar_index, high, bar_index + 1, low, extend=extend.future, xloc=xloc.session)
+points = array.from(chart.point.from_index(bar_index, close))
+shape = polyline.new(points, xloc=xloc.session)
+line.set_xloc(trend, bar_index, bar_index + 1, xloc=xloc.session)
+line.set_extend(trend, extend=extend.future)
+label.set_yloc(marker, yloc=yloc.middle)
+box.set_xloc(region, bar_index, bar_index + 1, xloc=xloc.session)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid line.new xloc: xloc.session',
+      'Invalid line.new extend: extend.future',
+      'Invalid label.new xloc: xloc.session',
+      'Invalid label.new yloc: yloc.middle',
+      'Invalid box.new xloc: xloc.session',
+      'Invalid box.new extend: extend.future',
+      'Invalid polyline.new xloc: xloc.session',
+      'Invalid line.set_xloc xloc: xloc.session',
+      'Invalid line.set_extend extend: extend.future',
+      'Invalid label.set_yloc yloc: yloc.middle',
+      'Invalid box.set_xloc xloc: xloc.session',
+    ]);
+  });
+
+  it('reports invalid literal drawing style option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Styles")
+trend = line.new(bar_index, close, bar_index + 1, open, style=line.style_curve)
+marker = label.new(bar_index, close, style=label.style_pin)
+region = box.new(bar_index, high, bar_index + 1, low, border_style=line.style_curve)
+points = array.from(chart.point.from_index(bar_index, close))
+shape = polyline.new(points, line_style=line.style_curve)
+line.set_style(trend, style=line.style_curve)
+label.set_style(marker, style=label.style_pin)
+box.set_border_style(region, style=line.style_curve)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid line.new style: line.style_curve',
+      'Invalid label.new style: label.style_pin',
+      'Invalid box.new border_style: line.style_curve',
+      'Invalid polyline.new line_style: line.style_curve',
+      'Invalid line.set_style style: line.style_curve',
+      'Invalid label.set_style style: label.style_pin',
+      'Invalid box.set_border_style style: line.style_curve',
+    ]);
+  });
+
+  it('reports invalid literal drawing text option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Text Options")
+marker = label.new(bar_index, close, textalign=text.align_top, text_font_family=font.family_serif, text_formatting=text.format_underline)
+region = box.new(bar_index, high, bar_index + 1, low, text_halign=text.align_top, text_valign=text.align_left, text_wrap=text.wrap_clip, text_font_family=font.family_serif, text_formatting="underline")
+dashboard = table.new(position.top_right, 1, 1)
+label.set_textalign(marker, textalign=text.align_top)
+label.set_text_font_family(marker, text_font_family=font.family_serif)
+label.set_text_formatting(marker, text_formatting=text.format_underline)
+box.set_text_halign(region, text_halign=text.align_top)
+box.set_text_valign(region, text_valign=text.align_left)
+box.set_text_wrap(region, text_wrap=text.wrap_clip)
+box.set_text_font_family(region, text_font_family=font.family_serif)
+box.set_text_formatting(region, text_formatting="underline")
+table.cell_set_text_halign(dashboard, 0, 0, text_halign=text.align_top)
+table.cell_set_text_valign(dashboard, 0, 0, text_valign=text.align_left)
+table.cell_set_text_font_family(dashboard, 0, 0, text_font_family=font.family_serif)
+table.cell_set_text_formatting(dashboard, 0, 0, text_formatting=text.format_underline)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid label.new textalign: text.align_top',
+      'Invalid label.new text_font_family: font.family_serif',
+      'Invalid label.new text_formatting: text.format_underline',
+      'Invalid box.new text_halign: text.align_top',
+      'Invalid box.new text_valign: text.align_left',
+      'Invalid box.new text_wrap: text.wrap_clip',
+      'Invalid box.new text_font_family: font.family_serif',
+      'Invalid box.new text_formatting: underline',
+      'Invalid label.set_textalign textalign: text.align_top',
+      'Invalid label.set_text_font_family text_font_family: font.family_serif',
+      'Invalid label.set_text_formatting text_formatting: text.format_underline',
+      'Invalid box.set_text_halign text_halign: text.align_top',
+      'Invalid box.set_text_valign text_valign: text.align_left',
+      'Invalid box.set_text_wrap text_wrap: text.wrap_clip',
+      'Invalid box.set_text_font_family text_font_family: font.family_serif',
+      'Invalid box.set_text_formatting text_formatting: underline',
+      'Invalid table.cell_set_text_halign text_halign: text.align_top',
+      'Invalid table.cell_set_text_valign text_valign: text.align_left',
+      'Invalid table.cell_set_text_font_family text_font_family: font.family_serif',
+      'Invalid table.cell_set_text_formatting text_formatting: text.format_underline',
+    ]);
+  });
+
+  it('reports invalid drawing text string values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Text Values")
+marker = label.new(bar_index, close, text=1, tooltip=2)
+region = box.new(bar_index, high, bar_index + 1, low, text=1)
+dashboard = table.new(position.top_right, 1, 1)
+label.set_text(marker, text=1)
+label.set_tooltip(marker, tooltip=2)
+box.set_text(region, text=1)
+table.cell(dashboard, 0, 0, text=1, tooltip=2)
+table.cell_set_text(dashboard, 0, 0, text=1)
+table.cell_set_tooltip(dashboard, 0, 0, tooltip=2)
+label.set_text(marker, 1, id=marker)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new text must be a string, got int',
+      'label.new tooltip must be a string, got int',
+      'box.new text must be a string, got int',
+      'label.set_text text must be a string, got int',
+      'label.set_tooltip tooltip must be a string, got int',
+      'box.set_text text must be a string, got int',
+      'table.cell text must be a string, got int',
+      'table.cell tooltip must be a string, got int',
+      'table.cell_set_text text must be a string, got int',
+      'table.cell_set_tooltip tooltip must be a string, got int',
+      "Argument 'id' for label.set_text() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid drawing coordinate and width value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Numeric Values")
+marker = label.new(bar_index, close)
+trend = line.new(bar_index, high, bar_index + 1, low)
+region = box.new(bar_index, high, bar_index + 1, low)
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+badLabel = label.new(x="0", y=false)
+pointLabel = label.new(point=firstPoint, text="Point")
+badLabelX = label.set_x(marker, x="1")
+badLabelY = label.set_y(marker, y=false)
+badLabelXY = label.set_xy(marker, x="1", y=false)
+badLabelXloc = label.set_xloc(marker, x="1", xloc=xloc.bar_index)
+badLine = line.new(x1="0", y1=true, x2="1", y2=false, width="2")
+badLineXY = line.set_xy1(trend, x="0", y=true)
+badLineXloc = line.set_xloc(trend, x1="0", x2=false, xloc=xloc.bar_index)
+badLinePrice = line.get_price(trend, x="1")
+badLineWidth = line.set_width(trend, width=false)
+pointLine = line.new(firstPoint, secondPoint, width="2")
+badBox = box.new(left="0", top=true, right="1", bottom=false, border_width="2")
+badBoxSet = box.set_lefttop(region, left="0", top=true)
+badBoxRightBottom = box.set_rightbottom(region, right=false, bottom="2")
+badBoxXloc = box.set_xloc(region, left="0", right=false, xloc=xloc.bar_index)
+badBorderWidth = box.set_border_width(region, width="2")
+pointBox = box.new(firstPoint, secondPoint, border_width=false)
+badPolylineWidth = polyline.new(points, line_width="2")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new x must be a number, got string',
+      'label.new y must be a number, got bool',
+      'label.set_x x must be a number, got string',
+      'label.set_y y must be a number, got bool',
+      'label.set_xy x must be a number, got string',
+      'label.set_xy y must be a number, got bool',
+      'label.set_xloc x must be a number, got string',
+      'line.new x1 must be a number, got string',
+      'line.new y1 must be a number, got bool',
+      'line.new x2 must be a number, got string',
+      'line.new y2 must be a number, got bool',
+      'line.new width must be a number, got string',
+      'line.set_xy1 x must be a number, got string',
+      'line.set_xy1 y must be a number, got bool',
+      'line.set_xloc x1 must be a number, got string',
+      'line.set_xloc x2 must be a number, got bool',
+      'line.get_price x must be a number, got string',
+      'line.set_width width must be a number, got bool',
+      'line.new width must be a number, got string',
+      'box.new left must be a number, got string',
+      'box.new top must be a number, got bool',
+      'box.new right must be a number, got string',
+      'box.new bottom must be a number, got bool',
+      'box.new border_width must be a number, got string',
+      'box.set_lefttop left must be a number, got string',
+      'box.set_lefttop top must be a number, got bool',
+      'box.set_rightbottom right must be a number, got bool',
+      'box.set_rightbottom bottom must be a number, got string',
+      'box.set_xloc left must be a number, got string',
+      'box.set_xloc right must be a number, got bool',
+      'box.set_border_width width must be a number, got string',
+      'box.new border_width must be a number, got bool',
+      'polyline.new line_width must be a number, got string',
+    ]);
+  });
+
+  it('reports invalid drawing boolean option value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Boolean Values")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+badLabel = label.new(bar_index, close, force_overlay="yes")
+badPointLabel = label.new(point=firstPoint, text="Point", force_overlay=1)
+badLine = line.new(bar_index, high, bar_index + 1, low, force_overlay="yes")
+badPointLine = line.new(firstPoint, secondPoint, force_overlay=1)
+badBox = box.new(bar_index, high, bar_index + 1, low, force_overlay="yes")
+badPointBox = box.new(firstPoint, secondPoint, force_overlay=1)
+badPolyline = polyline.new(points, curved="yes", closed=1, force_overlay="no")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new force_overlay must be a boolean, got string',
+      'label.new force_overlay must be a boolean, got int',
+      'line.new force_overlay must be a boolean, got string',
+      'line.new force_overlay must be a boolean, got int',
+      'box.new force_overlay must be a boolean, got string',
+      'box.new force_overlay must be a boolean, got int',
+      'polyline.new curved must be a boolean, got string',
+      'polyline.new closed must be a boolean, got int',
+      'polyline.new force_overlay must be a boolean, got string',
+    ]);
+  });
+
+  it('reports invalid drawing color option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Color Values")
+marker = label.new(bar_index, close, color=1, textcolor=2)
+trend = line.new(bar_index, high, bar_index + 1, low, color=1)
+region = box.new(bar_index, high, bar_index + 1, low, border_color=1, bgcolor=2, text_color=3)
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+path = polyline.new(points, line_color=1, fill_color=2)
+channel = linefill.new(trend, trend, color=1)
+dashboard = table.new(position.top_right, 1, 1, bgcolor=1, frame_color=2, border_color=3)
+label.set_color(marker, color=1)
+label.set_textcolor(marker, textcolor=2)
+line.set_color(trend, color=1)
+box.set_bgcolor(region, color=1)
+box.set_border_color(region, color=2)
+box.set_text_color(region, text_color=3)
+linefill.set_color(channel, color=1)
+table.set_bgcolor(dashboard, bgcolor=1)
+table.set_frame_color(dashboard, frame_color=2)
+table.set_border_color(dashboard, border_color=3)
+table.cell(dashboard, 0, 0, text_color=1, bgcolor=2)
+table.cell_set_bgcolor(dashboard, 0, 0, bgcolor=1)
+table.cell_set_text_color(dashboard, 0, 0, text_color=2)
+label.set_color(marker, 1, id=marker)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new color must be a color, got int',
+      'label.new textcolor must be a color, got int',
+      'line.new color must be a color, got int',
+      'box.new border_color must be a color, got int',
+      'box.new bgcolor must be a color, got int',
+      'box.new text_color must be a color, got int',
+      'polyline.new line_color must be a color, got int',
+      'polyline.new fill_color must be a color, got int',
+      'linefill.new color must be a color, got int',
+      'table.new bgcolor must be a color, got int',
+      'table.new frame_color must be a color, got int',
+      'table.new border_color must be a color, got int',
+      'label.set_color color must be a color, got int',
+      'label.set_textcolor textcolor must be a color, got int',
+      'line.set_color color must be a color, got int',
+      'box.set_bgcolor color must be a color, got int',
+      'box.set_border_color color must be a color, got int',
+      'box.set_text_color text_color must be a color, got int',
+      'linefill.set_color color must be a color, got int',
+      'table.set_bgcolor bgcolor must be a color, got int',
+      'table.set_frame_color frame_color must be a color, got int',
+      'table.set_border_color border_color must be a color, got int',
+      'table.cell text_color must be a color, got int',
+      'table.cell bgcolor must be a color, got int',
+      'table.cell_set_bgcolor bgcolor must be a color, got int',
+      'table.cell_set_text_color text_color must be a color, got int',
+      "Argument 'id' for label.set_color() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid literal drawing size option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Sizes")
+marker = label.new(bar_index, close, size=size.giant)
+region = box.new(bar_index, high, bar_index + 1, low, text_size=size.giant)
+dashboard = table.new(position.top_right, 1, 1)
+table.cell(dashboard, 0, 0, text_size=size.giant)
+label.set_size(marker, size="giant")
+box.set_text_size(region, size=size.giant)
+table.cell_set_text_size(dashboard, 0, 0, text_size="giant")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid label.new size: size.giant',
+      'Invalid box.new text_size: size.giant',
+      'Invalid table.cell text_size: size.giant',
+      'Invalid label.set_size size: giant',
+      'Invalid box.set_text_size size: size.giant',
+      'Invalid table.cell_set_text_size text_size: giant',
     ]);
   });
 
@@ -3145,6 +4475,48 @@ plot(1)
     expect(types.get('clone')).toMatchObject({ kind: 'line' });
   });
 
+  it('resolves line.new chart point overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Line Constructor Point Signatures")
+firstPoint = chart.point.from_index(bar_index - 1, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+first = line.new(firstPoint, secondPoint, xloc.bar_index, extend.none, color.green)
+second = line.new(first_point=firstPoint, second_point=secondPoint, color=color.orange)
+third = line.new(first_point=firstPoint, secondPoint, color.blue)
+lines = array.from(first, second, third)
+plot(array.size(lines))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('first')).toMatchObject({ kind: 'line' });
+    expect(types.get('second')).toMatchObject({ kind: 'line' });
+    expect(types.get('third')).toMatchObject({ kind: 'line' });
+    expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
+  });
+
+  it('reports invalid line.new overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Line Constructor Signatures")
+firstPoint = chart.point.from_index(bar_index - 1, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+missingCoordinates = line.new(bar_index, close)
+duplicatePoint = line.new(firstPoint, secondPoint, first_point=firstPoint)
+tooManyPoint = line.new(firstPoint, secondPoint, xloc.bar_index, extend.none, color.green, line.style_solid, 2, true, color.red)
+unknownPoint = line.new(first_point=firstPoint, second_point=secondPoint, x1=bar_index)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'line.new() expects at least 4 arguments',
+      "line.new() missing required argument 'x2'",
+      "line.new() missing required argument 'y2'",
+      "Argument 'first_point' for line.new() was supplied multiple times",
+      'line.new() expects at most 8 arguments',
+      "Unknown argument 'x1' for line.new()",
+    ]);
+  });
+
   it('reports invalid line setter argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Line Setter Signatures")
@@ -3282,6 +4654,50 @@ plot(1)
 
     expect(result.diagnostics).toEqual([]);
     expect(types.get('clone')).toMatchObject({ kind: 'box' });
+  });
+
+  it('resolves box.new chart point overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Box Constructor Point Signatures")
+topLeft = chart.point.from_index(bar_index - 1, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
+first = box.new(topLeft, bottomRight, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone")
+second = box.new(top_left=topLeft, bottom_right=bottomRight, bgcolor=color.new(color.orange, 80))
+third = box.new(top_left=topLeft, bottomRight, color.green)
+boxes = array.from(first, second, third)
+plot(array.size(boxes))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('first')).toMatchObject({ kind: 'box' });
+    expect(types.get('second')).toMatchObject({ kind: 'box' });
+    expect(types.get('third')).toMatchObject({ kind: 'box' });
+    expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
+  });
+
+  it('reports invalid box.new overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Constructor Signatures")
+topLeft = chart.point.from_index(bar_index - 1, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
+missingCoordinates = box.new(bar_index, high)
+duplicatePoint = box.new(topLeft, bottomRight, top_left=topLeft)
+tooManyPoint = box.new(topLeft, bottomRight, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone", size.small, color.white, "center", "center", "wrap", "monospace", true, "bold", color.red)
+unknownPoint = box.new(top_left=topLeft, bottom_right=bottomRight, left=bar_index)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'box.new() expects at least 4 arguments',
+      "box.new() missing required argument 'right'",
+      "box.new() missing required argument 'bottom'",
+      "Argument 'top_left' for box.new() was supplied multiple times",
+      'box.new() expects at most 17 arguments',
+      'Invalid box.new text_valign: center',
+      'Invalid box.new text_wrap: wrap',
+      "Unknown argument 'left' for box.new()",
+    ]);
   });
 
   it('reports invalid box geometry argument bindings', () => {
@@ -3799,6 +5215,23 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
     ]);
   });
 
+  it('reports invalid literal table position values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Positions")
+dashboard = table.new(position=position.center, columns=2, rows=2)
+compact = table.new("center", 1, 1)
+table.set_position(dashboard, position=position.center)
+table.set_position(compact, position="center")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid table.new position: position.center',
+      'Invalid table.new position: center',
+      'Invalid table.set_position position: position.center',
+      'Invalid table.set_position position: center',
+    ]);
+  });
+
   it('resolves table management named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Management Signatures")
@@ -3858,6 +5291,47 @@ tooManyDelete = table.delete(dashboard, dashboard)
     ]);
   });
 
+  it('reports invalid table numeric value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Values")
+dashboard = table.new(columns="2", rows=true, frame_width="1", border_width=false)
+table.clear(table_id=dashboard, start_column="0", start_row=true, end_column="1", end_row=false)
+table.merge_cells(dashboard, "0", true, "1", false)
+table.set_frame_width(dashboard, frame_width="2")
+table.set_border_width(dashboard, border_width=false)
+table.cell(dashboard, column="0", row=true, text="Entry", width="10", height=false)
+table.cell_set_width(dashboard, column="0", row=true, width="10")
+table.cell_set_height(dashboard, column=true, row="0", height=false)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'table.new columns must be a number, got string',
+      'table.new rows must be a number, got bool',
+      'table.new frame_width must be a number, got string',
+      'table.new border_width must be a number, got bool',
+      'table.clear start_column must be a number, got string',
+      'table.clear start_row must be a number, got bool',
+      'table.clear end_column must be a number, got string',
+      'table.clear end_row must be a number, got bool',
+      'table.merge_cells start_column must be a number, got string',
+      'table.merge_cells start_row must be a number, got bool',
+      'table.merge_cells end_column must be a number, got string',
+      'table.merge_cells end_row must be a number, got bool',
+      'table.set_frame_width frame_width must be a number, got string',
+      'table.set_border_width border_width must be a number, got bool',
+      'table.cell column must be a number, got string',
+      'table.cell row must be a number, got bool',
+      'table.cell width must be a number, got string',
+      'table.cell height must be a number, got bool',
+      'table.cell_set_width column must be a number, got string',
+      'table.cell_set_width row must be a number, got bool',
+      'table.cell_set_width width must be a number, got string',
+      'table.cell_set_height column must be a number, got bool',
+      'table.cell_set_height row must be a number, got string',
+      'table.cell_set_height height must be a number, got bool',
+    ]);
+  });
+
   it('resolves table.cell named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Cell Signatures")
@@ -3886,6 +5360,7 @@ tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", siz
       "table.cell() missing required argument 'row'",
       "Argument 'table_id' for table.cell() was supplied multiple times",
       'table.cell() expects at most 14 arguments',
+      'Invalid table.cell text_font_family: mono',
     ]);
   });
 
@@ -4096,6 +5571,55 @@ fill(hline1=upper, hline2=lower, color=color.new(color.blue, 90))
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid literal display option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Display Values")
+displayTarget = display.all - display.status_line
+plot(close, display=displayTarget)
+plot(open, display=display.sidebar)
+plot(close, display="display.none")
+plotbar(open, high, low, close, display=display.sidebar)
+plotcandle(open, high, low, close, display=display.sidebar)
+plotshape(close > open, display=display.sidebar)
+hline(100, display="hidden")
+fill(plot(close), plot(open), color.red, display=display.typo)
+input.int(10, display=display.panel)
+bgcolor(color.red, display=display.panel)
+barcolor(color.red, display=display.none)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plot display: display.sidebar',
+      'Invalid plot display: display.none',
+      'Invalid plotbar display: display.sidebar',
+      'Invalid plotcandle display: display.sidebar',
+      'Invalid plotshape display: display.sidebar',
+      'Invalid hline display: hidden',
+      'Invalid fill display: display.typo',
+      'Invalid input.int display: display.panel',
+      'Invalid bgcolor display: display.panel',
+    ]);
+  });
+
+  it('infers visual output handle return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Visual Handle Types")
+upper = plot(close)
+level = hline(100)
+upper := hline(90)
+level := plot(open)
+plot badPlot = hline(80)
+hline badLine = plot(high)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign hline value to plot variable upper',
+      'Cannot assign plot value to hline variable level',
+      'Cannot assign hline value to plot variable',
+      'Cannot assign plot value to hline variable',
+    ]);
   });
 
   it('reports duplicate built-in bindings from positional and named arguments', () => {
@@ -4509,6 +6033,58 @@ unknownTr = ta.tr(handle_na=true, fallback=true)
     ]);
   });
 
+  it('reports invalid TA helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Values")
+badBarsSince = ta.barssince(condition=close)
+badValueWhen = ta.valuewhen(condition=1, source=close, occurrence="0")
+badCross = ta.cross(source1=close, source2=true)
+badHighest = ta.highest(source="high", length="3")
+badVariance = ta.variance(source=close, length="3", biased="yes")
+badAlma = ta.alma(series="close", length=true, offset="0.85", sigma=false, floor=1)
+badKc = ta.kc(series="close", length=true, mult="1", useTrueRange="no")
+badMacd = ta.macd(source="close", fastlen=true, slowlen="26", siglen=false)
+badStoch = ta.stoch(source=close, high="high", low=true, length="3")
+badPivot = ta.pivothigh(source="high", leftbars=true, rightbars="2")
+badTr = ta.tr(handle_na=1)
+badVwap = ta.vwap(source="close", anchor=1, stdev_mult="2")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'ta.barssince condition must be a boolean, got float',
+      'ta.valuewhen occurrence must be a number, got string',
+      'ta.valuewhen condition must be a boolean, got int',
+      'ta.cross source2 must be a number, got bool',
+      'ta.highest source must be a number, got string',
+      'ta.highest length must be a number, got string',
+      'ta.variance length must be a number, got string',
+      'ta.variance biased must be a boolean, got string',
+      'ta.alma series must be a number, got string',
+      'ta.alma length must be a number, got bool',
+      'ta.alma offset must be a number, got string',
+      'ta.alma sigma must be a number, got bool',
+      'ta.alma floor must be a boolean, got int',
+      'ta.kc series must be a number, got string',
+      'ta.kc length must be a number, got bool',
+      'ta.kc mult must be a number, got string',
+      'ta.kc useTrueRange must be a boolean, got string',
+      'ta.macd source must be a number, got string',
+      'ta.macd fastlen must be a number, got bool',
+      'ta.macd slowlen must be a number, got string',
+      'ta.macd siglen must be a number, got bool',
+      'ta.stoch high must be a number, got string',
+      'ta.stoch low must be a number, got bool',
+      'ta.stoch length must be a number, got string',
+      'ta.pivothigh source must be a number, got string',
+      'ta.pivothigh leftbars must be a number, got bool',
+      'ta.pivothigh rightbars must be a number, got string',
+      'ta.tr handle_na must be a boolean, got int',
+      'ta.vwap source must be a number, got string',
+      'ta.vwap stdev_mult must be a number, got string',
+      'ta.vwap anchor must be a boolean, got int',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")
@@ -4622,6 +6198,33 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
       "Unknown argument 'source' for color.r()",
       'color.from_gradient() expects at least 5 arguments',
       "color.from_gradient() missing required argument 'top_color'",
+    ]);
+  });
+
+  it('reports invalid color helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Color Values")
+badNew = color.new(1, "transparent")
+badRgb = color.rgb("1", true, "blue", "25")
+badChannel = color.r(1)
+badGradient = color.from_gradient("close", "zero", true, 1, 2)
+badDuplicate = color.new(1, 20, color=color.red)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'color.new color must be a color, got int',
+      'color.new transp must be a number, got string',
+      'color.rgb red must be a number, got string',
+      'color.rgb green must be a number, got bool',
+      'color.rgb blue must be a number, got string',
+      'color.rgb transp must be a number, got string',
+      'color.r color must be a color, got int',
+      'color.from_gradient bottom_color must be a color, got int',
+      'color.from_gradient top_color must be a color, got int',
+      'color.from_gradient value must be a number, got string',
+      'color.from_gradient bottom_value must be a number, got string',
+      'color.from_gradient top_value must be a number, got bool',
+      "Argument 'color' for color.new() was supplied multiple times",
     ]);
   });
 
@@ -4748,6 +6351,57 @@ shortReplace = str.replace(source="BTC", target="B")
     ]);
   });
 
+  it('reports invalid string helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad String Values")
+badTostring = str.tostring(close, format=1)
+badTonumber = str.tonumber(1)
+badTime = str.format_time(time="now", format=1, timezone=2)
+badFormat = str.format(1, close)
+badLength = str.length(1)
+badContains = str.contains(1, 2)
+badSubstring = str.substring(1, begin_pos="0", end_pos="3")
+badMatch = str.match(1, regex=2)
+badRepeat = str.repeat(1, repeat="3", separator=2)
+badSplit = str.split(1, separator=2)
+badUpper = str.upper(1)
+badReplace = str.replace(1, target=2, replacement=3, occurrence="1")
+badReplaceAll = str.replace_all(1, target=2, replacement=3)
+badDuplicate = str.contains("BTC", 1, source="ETH")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'str.tostring format must be a string, got int',
+      'str.tonumber string must be a string, got int',
+      'str.format_time format must be a string, got int',
+      'str.format_time timezone must be a string, got int',
+      'str.format_time time must be a number, got string',
+      'str.format format must be a string, got int',
+      'str.length source must be a string, got int',
+      'str.contains source must be a string, got int',
+      'str.contains str must be a string, got int',
+      'str.substring source must be a string, got int',
+      'str.substring begin_pos must be a number, got string',
+      'str.substring end_pos must be a number, got string',
+      'str.match source must be a string, got int',
+      'str.match regex must be a string, got int',
+      'str.repeat source must be a string, got int',
+      'str.repeat separator must be a string, got int',
+      'str.repeat repeat must be a number, got string',
+      'str.split source must be a string, got int',
+      'str.split separator must be a string, got int',
+      'str.upper source must be a string, got int',
+      'str.replace source must be a string, got int',
+      'str.replace target must be a string, got int',
+      'str.replace replacement must be a string, got int',
+      'str.replace occurrence must be a number, got string',
+      'str.replace_all source must be a string, got int',
+      'str.replace_all target must be a string, got int',
+      'str.replace_all replacement must be a string, got int',
+      "Argument 'source' for str.contains() was supplied multiple times",
+    ]);
+  });
+
   it('resolves math helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Math Signatures")
@@ -4858,6 +6512,38 @@ tooManyMintick = math.round_to_mintick(1.0, 2)
     ]);
   });
 
+  it('reports invalid math helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Math Values")
+badUnary = math.sqrt("16")
+badPow = math.pow("2", true)
+badRound = math.round("1", precision="2")
+badSum = math.sum("close", "3")
+badRandom = math.random(min="0", max=true, seed="7")
+badMax = math.max(1, "2", number2=true)
+badAvg = math.avg(number0="1", number1=2, number2="3")
+badDuplicate = math.round("1", number=2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'math.sqrt number must be a number, got string',
+      'math.pow base must be a number, got string',
+      'math.pow exponent must be a number, got bool',
+      'math.round number must be a number, got string',
+      'math.round precision must be a number, got string',
+      'math.sum source must be a number, got string',
+      'math.sum length must be a number, got string',
+      'math.random min must be a number, got string',
+      'math.random max must be a number, got bool',
+      'math.random seed must be a number, got string',
+      'math.max number1 must be a number, got string',
+      'math.max number2 must be a number, got bool',
+      'math.avg number0 must be a number, got string',
+      'math.avg number2 must be a number, got string',
+      "Argument 'number' for math.round() was supplied multiple times",
+    ]);
+  });
+
   it('resolves global helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Global Helper Signatures")
@@ -4873,6 +6559,21 @@ plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) 
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid global helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Global Values")
+badNzSource = nz(source=true)
+badNzReplacement = nz(source=close, replacement=false)
+badFixnan = fixnan(source=true)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'nz source cannot be a boolean',
+      'nz replacement cannot be a boolean',
+      'fixnan source cannot be a boolean',
+    ]);
   });
 
   it('infers global helper return types for downstream diagnostics', () => {
@@ -5007,6 +6708,26 @@ missingModifyTicker = ticker.modify(session=session.extended)
     ]);
   });
 
+  it('reports invalid literal ticker option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Ticker Options")
+badConstants = ticker.new("NASDAQ", "AAPL", session=session.premarket, adjustment=adjustment.all, backadjustment=backadjustment.auto, settlement_as_close=settlement_as_close.auto)
+badStrings = ticker.modify(badConstants, session="premarket", adjustment="all", backadjustment="auto", settlement_as_close="auto")
+plot(str.length(badConstants + badStrings))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid ticker.new session: session.premarket',
+      'Invalid ticker.new adjustment: adjustment.all',
+      'Invalid ticker.new backadjustment: backadjustment.auto',
+      'Invalid ticker.new settlement_as_close: settlement_as_close.auto',
+      'Invalid ticker.modify session: premarket',
+      'Invalid ticker.modify adjustment: all',
+      'Invalid ticker.modify backadjustment: auto',
+      'Invalid ticker.modify settlement_as_close: auto',
+    ]);
+  });
+
   it('resolves request helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Request Signatures")
@@ -5101,6 +6822,102 @@ econ = request.economic("US", "GDP", unexpected=1)
     ]);
   });
 
+  it('reports invalid literal request point-series field values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Fields")
+badDividendConstant = request.dividends("NASDAQ:AAPL", dividends.cash)
+badDividendString = request.dividends("NASDAQ:AAPL", "gross")
+badEarningsConstant = request.earnings("NASDAQ:AAPL", earnings.forecast)
+badEarningsString = request.earnings("NASDAQ:AAPL", "estimate")
+badSplitConstant = request.splits("NASDAQ:AAPL", splits.adjusted)
+badSplitString = request.splits("NASDAQ:AAPL", "numerator")
+duplicate = request.dividends("NASDAQ:AAPL", dividends.gross, ticker="NASDAQ:MSFT")
+plot(badDividendConstant + badDividendString + badEarningsConstant + badEarningsString + badSplitConstant + badSplitString + duplicate)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid request.dividends field: dividends.cash',
+      'Invalid request.dividends field: gross',
+      'Invalid request.earnings field: earnings.forecast',
+      'Invalid request.earnings field: estimate',
+      'Invalid request.splits field: splits.adjusted',
+      'Invalid request.splits field: numerator',
+      "Argument 'ticker' for request.dividends() was supplied multiple times",
+    ]);
+  });
+
+  it('reports non-boolean request option flags', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Flags")
+htf = request.security("NASDAQ:AAPL", "2", close, ignore_invalid_symbol=1)
+ltf = request.security_lower_tf("NASDAQ:AAPL", "1", close, ignore_invalid_symbol="yes", ignore_invalid_timeframe=0)
+rate = request.currency_rate("USD", "GBP", ignore_invalid_currency="yes")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, ignore_invalid_symbol=1)
+earning = request.earnings("NASDAQ:AAPL", earnings.actual, ignore_invalid_symbol="yes")
+split = request.splits("NASDAQ:AAPL", splits.denominator, ignore_invalid_symbol=1)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", ignore_invalid_symbol="yes")
+econ = request.economic("US", "GDP", ignore_invalid_symbol=1)
+seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol="yes")
+duplicate = request.security("NASDAQ:AAPL", "2", close, symbol="NASDAQ:MSFT", ignore_invalid_symbol=1)
+plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + seeded + duplicate)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'request.security ignore_invalid_symbol must be a boolean, got int',
+      'request.security_lower_tf ignore_invalid_symbol must be a boolean, got string',
+      'request.security_lower_tf ignore_invalid_timeframe must be a boolean, got int',
+      'request.currency_rate ignore_invalid_currency must be a boolean, got string',
+      'request.dividends ignore_invalid_symbol must be a boolean, got int',
+      'request.earnings ignore_invalid_symbol must be a boolean, got string',
+      'request.splits ignore_invalid_symbol must be a boolean, got int',
+      'request.financial ignore_invalid_symbol must be a boolean, got string',
+      'request.economic ignore_invalid_symbol must be a boolean, got int',
+      'request.seed ignore_invalid_symbol must be a boolean, got string',
+      "Argument 'symbol' for request.security() was supplied multiple times",
+    ]);
+  });
+
+  it('reports non-string request identifiers', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Strings")
+htf = request.security(1, 2, close, currency=3)
+ltf = request.security_lower_tf("NASDAQ:AAPL", 1, close, currency=2)
+rate = request.currency_rate(1, 2)
+dividend = request.dividends(1, dividends.gross, currency=2)
+earning = request.earnings(1, earnings.actual, currency=2)
+split = request.splits(1, splits.denominator)
+revenue = request.financial(1, 2, 3, currency=4)
+econ = request.economic(1, 2)
+seeded = request.seed(1, 2, close)
+duplicate = request.security(1, "2", close, symbol="NASDAQ:MSFT")
+plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + seeded + duplicate)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'request.security symbol must be a string, got int',
+      'request.security timeframe must be a string, got int',
+      'request.security currency must be a string, got int',
+      'request.security_lower_tf timeframe must be a string, got int',
+      'request.security_lower_tf currency must be a string, got int',
+      'request.currency_rate from must be a string, got int',
+      'request.currency_rate to must be a string, got int',
+      'request.dividends ticker must be a string, got int',
+      'request.dividends currency must be a string, got int',
+      'request.earnings ticker must be a string, got int',
+      'request.earnings currency must be a string, got int',
+      'request.splits ticker must be a string, got int',
+      'request.financial symbol must be a string, got int',
+      'request.financial financial_id must be a string, got int',
+      'request.financial period must be a string, got int',
+      'request.financial currency must be a string, got int',
+      'request.economic country_code must be a string, got int',
+      'request.economic field must be a string, got int',
+      'request.seed source must be a string, got int',
+      'request.seed symbol must be a string, got int',
+      "Argument 'symbol' for request.security() was supplied multiple times",
+    ]);
+  });
+
   it('resolves Pine input overload bindings for range and options calls', () => {
     const result = checkProgram(parse(`
 indicator("Input Overloads")
@@ -5121,6 +6938,11 @@ start = input.time(defval=1700000000000, "Mixed Start", "Start tooltip")
 symbol = input.symbol(defval="BINANCE:BTCUSDT", "Mixed Symbol", "Symbol tooltip")
 session = input.session(defval="0930-1600", "Mixed Session", "Session tooltip")
 memo = input.text_area(defval="notes", "Mixed Notes", "Notes tooltip")
+enum Direction
+    long = "Long"
+    short = "Short"
+direction = input.enum(Direction.long, "Direction", [Direction.long, Direction.short], "Direction tooltip")
+mixedDirection = input.enum(defval=Direction.short, "Mixed Direction", [Direction.long, Direction.short], "Mixed direction tooltip")
 source = input.source(defval=close, "Source", "Source tooltip", "src", "Data", true)
 price = input.price(101.25, "Level", "Drag level")
 mixedPrice = input.price(defval=101.25, "Mixed Level", "Drag mixed level")
@@ -5142,6 +6964,12 @@ tf = input.timeframe("60")
 symbol = input.symbol("BINANCE:BTCUSDT")
 session = input.session("0930-1600")
 memo = input.text_area("notes")
+enum Direction
+    long = "Long"
+    short = "Short"
+enum Mode
+    fast = "Fast"
+direction = input.enum(Direction.long)
 level = input.price(101.25)
 source = input.source(defval=close, "Source")
 length := "bad"
@@ -5154,6 +6982,7 @@ tf := 1
 symbol := 2
 session := 3
 memo := 4
+direction := Mode.fast
 level := "bad"
 source := "bad"
 plot(source + level + multiplier + length)
@@ -5172,6 +7001,7 @@ plot(source + level + multiplier + length)
       'Cannot assign int value to string variable symbol',
       'Cannot assign int value to string variable session',
       'Cannot assign int value to string variable memo',
+      'Cannot assign Mode value to Direction variable direction',
       'Cannot assign string value to float variable level',
       'Cannot assign string value to float variable source',
     ]);
@@ -5185,8 +7015,72 @@ plot(source + level + multiplier + length)
     expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
     expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'input' });
     expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('direction')).toMatchObject({ kind: 'udt', name: 'Direction', qualifier: 'input' });
     expect(types.get('level')).toMatchObject({ kind: 'float', qualifier: 'input' });
     expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
+  it('reports invalid Pine input default value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Defaults")
+length = input.int(3.5)
+count = input.int("3")
+multiplier = input.float("2")
+enabled = input.bool(1)
+mode = input.string(1)
+start = input.time("1700000000000")
+tf = input.timeframe(60)
+symbol = input.symbol(1)
+session = input.session(930)
+memo = input.text_area(1)
+enum Direction
+    long = "Long"
+    short = "Short"
+enum Mode
+    fast = "Fast"
+levelMode = input.enum("Long")
+mixedMode = input.enum(Direction.long, "Direction", [Direction.short, Mode.fast])
+level = input.price("101.25")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int defval must be an integer',
+      'input.int defval must be a number',
+      'input.float defval must be a number',
+      'input.bool defval must be a boolean',
+      'input.string defval must be a string',
+      'input.time defval must be a number',
+      'input.timeframe defval must be a string',
+      'input.symbol defval must be a string',
+      'input.session defval must be a string',
+      'input.text_area defval must be a string',
+      'input.enum defval must be an enum member',
+      'input.enum options must use the same enum type as defval',
+      'input.price defval must be a number',
+    ]);
+  });
+
+  it('reports invalid Pine input default range and options constraints', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Constraints")
+shortLength = input.int(0, "Short", minval=1)
+longLength = input.int(100, "Long", maxval=50)
+multiplier = input.float(5.5, "Multiplier", maxval=5.0)
+optionLength = input.int(14, "Length", options=[7, 21])
+optionFloat = input.float(2.5, "Multiplier", options=[1.0, 2.0])
+mode = input.string("VWAP", "Mode", options=["SMA", "EMA"])
+tf = input.timeframe("240", "Timeframe", ["15", "60"])
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int defval must be greater than or equal to minval',
+      'input.int defval must be less than or equal to maxval',
+      'input.float defval must be less than or equal to maxval',
+      'input.int defval must be one of options',
+      'input.float defval must be one of options',
+      'input.string defval must be one of options',
+      'input.timeframe defval must be one of options',
+    ]);
   });
 
   it('reports duplicate Pine input bindings against the selected overload', () => {
@@ -5447,6 +7341,261 @@ plot(str.length(stateLabel) + str.length(priceLabel) + shadowValue)
     expect(types.get('shadowValue')).toMatchObject({ kind: 'int' });
   });
 
+  it('reports imported library method argument diagnostics semantically', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+export enum Mode
+    fast = "Fast"
+    slow = "Slow"
+export method lifted(Pivot this, float amount, float factor=1) =>
+    this.value += amount * factor
+    this
+export method describe(Pivot this, Mode mode) => "enum"
+export method describe(Pivot this, float value) => value
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Method Diagnostics")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+valid = p.lifted(1)
+enumDescription = p.describe(pivots.Mode.fast)
+missing = p.lifted()
+unknown = p.lifted(source=1)
+duplicate = p.lifted(1, amount=2)
+tooMany = p.lifted(1, 2, 3)
+badOrder = p.lifted(amount=1, 2)
+plot(valid.value + str.length(enumDescription) + missing.value + unknown.value + duplicate.value + tooMany.value + badOrder.value)
+`), {
+      libraries: new Map([['TestUser/PivotTools/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "library method pivots.lifted missing required argument 'amount'",
+      "Unknown argument 'source' for library method pivots.lifted",
+      "Argument 'amount' for library method pivots.lifted was supplied multiple times",
+      'Too many arguments for library method pivots.lifted: expected 2, got 3',
+      'library method pivots.lifted cannot use positional arguments after named arguments',
+    ]);
+    expect(types.get('p')).toMatchObject({ kind: 'udt', name: 'pivots.Pivot' });
+    expect(types.get('valid')).toMatchObject({ kind: 'udt', name: 'pivots.Pivot' });
+    expect(types.get('enumDescription')).toMatchObject({ kind: 'string' });
+  });
+
+  it('reports imported library function argument diagnostics semantically', () => {
+    const library = parse(`
+library("RangeTools", true)
+export type Pivot
+    float value
+export enum Mode
+    fast = "Fast"
+    slow = "Slow"
+export spread(float highValue, float lowValue, float factor=1) => (highValue - lowValue) * factor
+export keep(Pivot pivot) => pivot
+export describe(Mode mode) => "enum"
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Function Diagnostics")
+import TestUser/RangeTools/1 as rt
+p = rt.Pivot.new(close)
+valid = rt.spread(high, low)
+kept = rt.keep(p)
+enumDescription = rt.describe(rt.Mode.fast)
+missing = rt.spread(high)
+unknown = rt.spread(source=close)
+duplicate = rt.spread(high, low, highValue=close)
+tooMany = rt.spread(high, low, 2, 3)
+badOrder = rt.spread(highValue=high, low)
+plot(valid + kept.value + str.length(enumDescription) + missing + unknown + duplicate + tooMany + badOrder)
+`), {
+      libraries: new Map([['TestUser/RangeTools/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "library function rt.spread missing required argument 'lowValue'",
+      "Unknown argument 'source' for library function rt.spread",
+      "Argument 'highValue' for library function rt.spread was supplied multiple times",
+      'Too many arguments for library function rt.spread: expected 3, got 4',
+      'library function rt.spread cannot use positional arguments after named arguments',
+    ]);
+    expect(types.get('valid')).toMatchObject({ kind: 'float' });
+    expect(types.get('kept')).toMatchObject({ kind: 'udt', name: 'rt.Pivot' });
+    expect(types.get('enumDescription')).toMatchObject({ kind: 'string' });
+  });
+
+  it('binds exported imported enum members semantically', () => {
+    const library = parse(`
+library("SignalTools", true)
+export enum State
+    long = "Long"
+    short = "Short"
+enum Hidden
+    private = "Private"
+export describe(State state) => "enum"
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Enum Binding")
+import TestUser/SignalTools/1 as sig
+method label(sig.State this) => "enum"
+shadow(int sig) => sig.State.sideways
+sig.State selected = sig.State.long
+validDescription = sig.describe(sig.State.short)
+validLabel = sig.State.long.label()
+missing = sig.State.sideways
+hidden = sig.Hidden.private
+missingEnum = sig.Missing.fast
+plot(str.length(validDescription) + str.length(validLabel) + str.length(str.tostring(shadow(1))))
+`), {
+      libraries: new Map([['TestUser/SignalTools/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown enum member 'sideways' on enum sig.State",
+      'Unknown imported enum namespace: sig.Hidden',
+      'Unknown imported enum namespace: sig.Missing',
+    ]);
+    expect(types.get('selected')).toMatchObject({ kind: 'udt', name: 'sig.State' });
+    expect(types.get('validDescription')).toMatchObject({ kind: 'string' });
+    expect(types.get('validLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
+  });
+
+  it('infers exported imported library constant types semantically', () => {
+    const library = parse(`
+library("Constants", true)
+export const int fast = 2
+export const float multiplier = 1.5
+export color bull = color.green
+export string period = timeframe.period
+export string ticker = syminfo.ticker
+const int hidden = 1
+export describe(int length, color shade, string timeframeValue) => "constant"
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Constant Types")
+import TestUser/Constants/1 as c
+fast = c.fast
+weighted = close * c.multiplier
+isBull = c.bull == color.green
+description = c.describe(c.fast, c.bull, c.period)
+float badPeriod = c.period
+hidden = c.hidden
+plot(weighted + fast + (isBull ? 1 : 0) + str.length(description))
+`), {
+      libraries: new Map([['TestUser/Constants/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable',
+    ]);
+    expect(types.get('fast')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('weighted')).toMatchObject({ kind: 'float' });
+    expect(types.get('isBull')).toMatchObject({ kind: 'bool' });
+    expect(types.get('description')).toMatchObject({ kind: 'string' });
+    expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
+  });
+
+  it('normalizes imported library function return qualifiers to simple or series', () => {
+    const library = parse(`
+library("Qualifiers", true)
+export type Pivot
+    float value
+export literal() => 2
+export method literalMethod(Pivot this) => 3
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Return Qualifiers")
+import TestUser/Qualifiers/1 as q
+p = q.Pivot.new(close)
+simple int literalValue = q.literal()
+simple int methodValue = p.literalMethod()
+const int badLiteral = q.literal()
+const int badMethod = p.literalMethod()
+plot(literalValue + methodValue + badLiteral + badMethod)
+`), {
+      libraries: new Map([['TestUser/Qualifiers/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign simple value to const int',
+      'Cannot assign simple value to const int',
+    ]);
+    expect(types.get('literalValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('methodValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+  });
+
+  it('validates imported library type constructors and fields semantically', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+    string title
+`);
+    const result = checkProgram(parse(`
+indicator("Imported UDT Diagnostics")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close, "pivot")
+badCtor = pivots.Pivot.new(value="bad", extra=1)
+missing = p.missing
+p.value := "bad"
+plot(p.value)
+`), {
+      libraries: new Map([['TestUser/PivotTools/1', library]]),
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float field pivots.Pivot.value',
+      "Unknown field 'extra' for pivots.Pivot.new()",
+      "Unknown field 'missing' on type pivots.Pivot",
+      'Cannot assign string value to float field pivots.Pivot.value',
+    ]);
+  });
+
+  it('reports unavailable imported library calls semantically', () => {
+    const library = parse(`
+library("HiddenTools", true)
+export type Pivot
+    float value
+type Hidden
+    float value
+export visible(float value) => value
+hidden(float value) => value
+method secret(Pivot this) => this
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Call Availability")
+import TestUser/HiddenTools/1 as tools
+p = tools.Pivot.new(close)
+method local(tools.Pivot this) => this.value
+validLocal = p.local()
+missingFunction = tools.missing(close)
+privateFunction = tools.hidden(close)
+missingConstructor = tools.Hidden.new(close)
+missingMethod = p.secret()
+plot(validLocal + missingFunction + privateFunction + missingConstructor.value + missingMethod.value)
+`), {
+      libraries: new Map([['TestUser/HiddenTools/1', library]]),
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown library function: tools.missing',
+      'Unknown library function: tools.hidden',
+      'Unknown library constructor: tools.Hidden.new',
+      'Unknown function: p.secret',
+    ]);
+  });
+
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
     const result = checkProgram(parse(`
 indicator("Builtin Method Names")
@@ -5685,12 +7834,14 @@ tags[0] += 1
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")
 length = input.int(14, "Length", options=[7, 14, 21], minval=1)
+capped = input.int(14, "Length", options=[7, 14, 21], maxval=50)
 multiplier = input.float(2.0, "Multiplier", options=[1.0, 2.0], step=0.5)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Unknown argument 'minval' for input.int()",
-      "Unknown argument 'step' for input.float()",
+      'input.int() cannot use options together with minval/maxval/step',
+      'input.int() cannot use options together with minval/maxval/step',
+      'input.float() cannot use options together with minval/maxval/step',
     ]);
   });
 });

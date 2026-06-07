@@ -19,19 +19,37 @@ real-script intake metadata or corpus summaries:
   and render stage results for a script.
 - `normalizeCompatibilityStageOutcomes()` expands partial stage lists into the
   canonical six-stage order, filling missing stages with `not_run`.
+- `createPineParseSemanticStageOutcomes()` runs a reduced source fixture
+  through the parser and semantic checker, returning parse/semantic stage
+  outcomes that can be combined with runtime, datafeed, output, and render
+  stages. Pass semantic checker options, such as deterministic library
+  registries, when a reduced fixture depends on host-provided Pine libraries.
+- `not_run` marks an incomplete outcome and does not count as passing; use
+  `skipped` with a message for an intentionally out-of-scope stage.
 - `CompatibilityFailureClass` keeps failure buckets stable across reports:
   `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
   `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
   `licensing_blocked`.
+- Failed stages with an `unsupported-feature` diagnostic code are normalized to
+  the `unsupported_planned` failure class, which keeps planned gaps separate
+  from generic parse, semantic, runtime, or output regressions.
 - `validateCompatibilityStageSequence()` rejects invalid stage statuses,
   duplicate stages, and failure classes on non-failed stages.
 - `runPineCompatibilityCorpus()` converts ledger entries plus deterministic
   stage outcomes into an offline report with pass/fail counts, first-failure
-  buckets, feature tag summaries, and validation errors.
+  buckets, feature tag summaries, and validation errors. Corpus cases may
+  provide either a static stage list or a deterministic stage factory when
+  parse or semantic stages should be recomputed from a reduced source fixture.
 - `runPineCompatibilityLedger()` builds that same report from a
   `PineScriptLedger` plus a deterministic stage provider.
 - `createPineCompatibilityCoverageIndex()` counts checkpoint metadata by
   category, source kind, Pine version, storage policy, and feature tag.
+- `yarn workspace @tealstreet/tealscript pine:compat:dashboard` writes the
+  checkpoint corpus and coverage dashboard artifacts to
+  `packages/tealscript/coverage/pine-compatibility` by default. Pass
+  `--outDir <path>` to target a CI artifact directory.
+- `formatPineCompatibilityCoverageJson()` renders the coverage index as a
+  stable JSON artifact.
 - `formatPineCompatibilityCoverageMarkdown()` renders that coverage index for
   PR notes or generated reports.
 - `formatPineCompatibilityCorpusMarkdown()` renders the report for PR notes or

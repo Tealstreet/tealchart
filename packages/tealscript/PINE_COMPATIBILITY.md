@@ -37,9 +37,31 @@ Status values:
 For each major compatibility epic, add deterministic golden fixtures for the
 new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
+The corpus harness treats omitted canonical stages as `not_run` failures in
+pass-rate summaries, while explicitly marked `skipped` stages are pass-neutral
+for cases that intentionally stop before datafeed or render comparison.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
-and public MTF, divergence, and session-filter idioms.
+explicit `max_bars_back` metadata, official lower-timeframe request arrays,
+official synthetic ticker requests, official dynamic sessions, official
+timeframe comparisons, official plot-style payloads, and public configurable
+input panels, MTF, divergence, volatility-band overlays, session-filter,
+session-state, dashboard-table, multi-symbol screener, currency conversion,
+earnings event markers, corporate-action overlays, financial dashboards,
+economic macro overlays, seed dataset overlays, array signal queues, map signal
+dashboards, matrix scoreboards, drawing-zone, drawing-copy, linefill-channel,
+custom-candle, and library-helper idioms.
+Public-source coverage also includes alert signal metadata, direct alert
+emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
+requests, public zigzag polylines, public strategy performance tables, public
+`varip` intrabar array buffers, planned footprint request diagnostics, plus UDT
+state objects updated through user-defined methods.
+Strategy coverage includes source-linked entry/exit flows, broker path behavior,
+bar magnifier, stop-limit orders, selective immediate closes, fill-alert
+suppression, entry-direction, max-position, intraday filled-order, and
+consecutive loss-day risk rules, intraday loss and drawdown caps, recalculation
+checkpoints, and a reduced public fixed-bracket strategy idiom, public
+trailing-stop strategy idiom, and public stats-table output.
 
 ## Current Matrix
 
@@ -61,19 +83,34 @@ Resolved in the scope/series hardening PR:
   written call site so separate calls to the same helper do not share
   function-local `var` variables. Function-local `if` and loop block scopes
   persist across bars for nested-block `var` values and regular series history.
+  The source-linked public `varip` array checkpoint locks the common realtime
+  tick-buffer idiom where an intrabar array accumulates same-bar update values
+  and resets on `barstate.isnew`.
 
 Covered behavior and remaining gaps:
 
 - Flat multiline user-defined functions return the last expression statement.
 - Pine-style wrapped delimiter syntax is supported for multiline
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
-  destructuring, index access, and parenthesized expressions.
+  destructuring, index access, and parenthesized expressions. Parser audit
+  fixtures also cover public-script-shaped wrapped `request.security()`
+  arguments with multiline ternary expressions inside nested UDF blocks, inline
+  comments on wrapped continuation lines, plus trailing commas in wrapped
+  user-defined function and method signatures.
+- Function and declaration calls support Pine named arguments, including the
+  reserved parameter key `type=` used by common strategy risk APIs.
+  Semantic diagnostics reject non-boolean declaration flags on common
+  `indicator()`, `strategy()`, and `library()` headers plus non-numeric
+  `indicator()` / `strategy()` count and precision settings before runtime coercion.
+- Top-level nested control blocks share the deeper block parser used by
+  function bodies, including nested `if` / `else` dedents with reassignment
+  statements.
 - Tuple destructuring preserves known positional types from literal tuple
   expressions, direct declaration `if`, `switch`, and loop initializers, direct
   and compatible if/else plus partial-if user-function tuple returns, direct
   user-function loop and defaulted or partial switch tuple returns, compatible
-  user-method tuple returns, and supported tuple-returning TA calls, so
-  downstream assignment diagnostics can use destructured names. Direct tuple
+  user-method tuple returns, and supported tuple-returning TA calls including
+  `ta.kc()`, so downstream assignment diagnostics can use destructured names. Direct tuple
   initializers, including known local user-call tuple returns and mixed-shape
   user-call control returns, and direct control initializer tuple arms,
   including arm-local user-call tuple returns, diagnose obvious non-tuple and
@@ -84,10 +121,15 @@ Covered behavior and remaining gaps:
   also supported.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
-  `else` when the present branch has an inferable value.
+  `else` when the present branch has an inferable value. Nested UDF `if`
+  branches are covered through ninth-level public-script layouts.
 - Variable declarations can use `if` / `else if` / `else` initializers, including
   typed declarations and partial `if` initializers that evaluate to `na` when no
   branch yields a value.
+- Declaration and reassignment initializers may start on an indented
+  continuation line after `=`, `:=`, and compound assignment operators,
+  including typed declarations, tuple declarations, UDF-local declarations, and
+  UDT field defaults.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
 - Direct user-defined function calls infer semantic return types and preserve
@@ -102,10 +144,30 @@ Covered behavior and remaining gaps:
   unknown named arguments, duplicate positional/named bindings, positional
   arguments after named arguments, excess positional arguments, missing required
   arguments, and duplicate named arguments.
+- Known built-in calls report clear diagnostics for unknown named arguments,
+  duplicate positional/named bindings, duplicate named arguments, missing
+  required arguments, and invalid positional arguments after named arguments on
+  strict signatures. Visual output diagnostics cover `plot()`, `hline()`,
+  `fill()` alias bindings, OHLC `plotbar()` / `plotcandle()` arguments, and
+  marker missing, unknown, and duplicate argument bindings, plus non-string
+  visual title/text arguments, while semantic analysis preserves `plot()` and
+  `hline()` handle return types for downstream
+  assignment diagnostics. Drawing
+  constructors distinguish coordinate and `chart.point` overload bindings for
+  `line.new()`
+  and `box.new()`. Worker protocol and wrapper coverage preserve structured
+  semantic diagnostic codes, messages, severities, locations, and freshness
+  metadata for editor-facing error callbacks.
+- `ta.vwap()` accepts Pine-style default-source calls plus `source`/`anchor`
+  positional, named, and named-prefix mixed argument forms. Runtime VWAP
+  accumulators are isolated per call site and reset when `anchor` is true.
+  Semantic analysis preserves scalar VWAP calls as `series float` while the
+  `stdev_mult` overload returns `[vwap, upper, lower]` band tuples with
+  weighted cumulative standard-deviation bands.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
-- Nested indented blocks inside user-defined functions expose limitations in the
-  simplified indentation grammar and need continued hardening.
+- Arbitrary nested indented blocks still use a simplified indentation grammar
+  and need continued hardening beyond the covered public-script layouts.
 - The parser wrapper rejects scripts larger than 1,000,000 UTF-16 code units
   and parsed ASTs deeper than 1,000 nodes. These are TealScript sandbox limits
   intended to keep generated or hostile scripts from exhausting parser
@@ -114,14 +176,40 @@ Covered behavior and remaining gaps:
   statements, expressions, built-in calls, unique request contexts, inferred
   history depth, and runtime errors. Worker result bundles carry the same
   profile so host charts can inspect expensive scripts without running them on
-  the main thread.
+  the main thread. Worker request freshness metadata keeps stale realtime
+  `updateBar()` tick results from replacing newer ticks.
 
 ## Common History Reference Coverage
 
 The history reference pass covers literal offsets such as `close[1]`, dynamic
 offsets such as `close[length]`, fractional offsets truncated toward zero,
 derived regular-series history, and unavailable or future offsets returning
-`na`/`null` plot values instead of throwing.
+`na`/`null` plot values instead of throwing. Runtime profile metadata reports
+literal, simple numeric-alias, `input.int()`/`input.float()` default-derived,
+selected pure `math.*` helper-derived offsets including min/max, rounding,
+averaging, power, and square-root helpers, selected numeric normalization
+helpers, and input-gated simple conditional history offsets, including static numeric
+comparisons, even when they sit behind unexecuted branches. Covered rolling
+window helper calls such as `math.sum()`, `ta.range()`, trend helpers
+`ta.rising()`/`ta.falling()`, statistical helpers such as `ta.dev()`,
+`ta.correlation()`, median/mode, percentile, and percent-rank helpers,
+momentum helpers such as `ta.cmo()`, `ta.mom()`, and `ta.roc()`, and common
+band, average, and regression helpers such as `ta.bb()`, `ta.bbw()`,
+`ta.vwma()`, `ta.wma()`, `ta.alma()`, `ta.cci()`, and `ta.linreg()`, plus
+fixed/default lookback helpers such as `ta.cross()`, `ta.crossover()`,
+`ta.crossunder()`, `ta.change(source)`, and `ta.swma()`, plus common `ta.*`
+source-window, retained-source, recursive, and selected default-argument helpers
+such as `ta.macd(close)`, `ta.cmo(source)`, `ta.mom(source)`, `ta.roc(source)`,
+and `ta.cci(source)`, plus oscillator helpers such as `ta.stoch()`, `ta.mfi()`,
+and `ta.wpr()`, plus common TA helpers such as `ta.atr()`, `ta.hma()`,
+`ta.kc()`, `ta.kcw()`, `ta.tsi()`, `ta.dmi()`,
+`ta.supertrend()`, `ta.sar()`, `ta.obv()`, and `ta.tr()` also contribute static
+lookback requirements when their length or direct source requirements are
+static, including default-source highest/lowest lookback forms and pivot
+left/right windows. Runtime-observed direct OHLC helper lookbacks such as
+`ta.wpr()`, `ta.tr()`, and TA variables that read prior close/volume bars are
+also profiled. Truly dynamic series offsets and dynamic helper
+lengths are still inferred from observed runtime access.
 
 ## Roadmaps
 
@@ -144,10 +232,45 @@ statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentrank`. Covered DMI, SAR, pivot, and linear regression helpers accept
 common Pine named arguments, and pivot helpers support default-source
 two-argument calls. Event and cross helpers accept named `condition`/`source`
-arguments and cross helper `source1`/`source2` arguments. These are covered in
-the golden compatibility harness. Semantic analysis preserves known scalar TA
-helper return types for downstream assignment diagnostics, including
-source-preserving `ta.change()` and `ta.valuewhen()` results.
+arguments and cross helper `source1`/`source2` arguments. Numeric `ta.change()`,
+`ta.rsi()`, `ta.atr()`, `ta.hma()`, pivot helpers, and cross helpers preserve
+per-call previous values for derived source expressions. These are covered in
+the golden compatibility harness. Common rolling helpers preserve direct
+OHLCV, quote, and derived OHLC source identity for calls such as
+`ta.sma(open, 2)`, `math.sum(open, 2)`, and `ta.correlation(open, close, 2)`,
+so equal current-bar source values no longer collapse to the wrong history
+series. Simple source aliases such as `src = open`, alias-to-alias
+declarations, and `:=` reassignment to a known source preserve the same
+identity for rolling helper windows while keeping normal alias history
+references such as `src[1]` numeric. `input.source()` defaults and source-name
+overrides preserve selected source identity for the same helpers, including
+delayed calls that first execute after warmup bars. UDF, imported library
+function, and method parameters also carry known source identity, so public
+helper wrappers around rolling helpers can use historical source bars on
+delayed calls, and simple UDF or method returns of those source parameters keep
+that identity for downstream delayed helper windows. Same-source ternary returns
+such as `condition ? src : src` preserve the same identity through local and
+imported helpers, as do `switch` returns whose expression or multiline block
+arms all return the same known source and multiline block `if` helper wrappers
+whose branches return the same source. Same-source `if` initializers also retain
+source identity for downstream delayed helper windows. Pure arithmetic
+expressions over known OHLCV, quote, derived OHLC, and source-parameter series
+also carry source identity through helper returns for downstream delayed rolling
+windows, including equivalent arithmetic ternary, `switch`, and multiline block
+`if` branch wrappers plus block-local `if` initializers.
+`ta.rma()`, `ta.rsi()`, and
+`ta.atr()` use
+Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
+as the RMA of `ta.tr(true)`.
+Recursive `ta.atr()` smoothing state, `ta.rsi()`
+smoothing state, `ta.dmi()` tuple smoothing state, `ta.supertrend()` tuple
+state, and `ta.sar()` trend state are isolated per call site so repeated
+same-parameter calls do not share accumulators. Semantic
+analysis preserves known scalar TA helper return types for downstream
+assignment diagnostics, including scalar `ta.vwap()` overloads and
+source-preserving `ta.change()` and `ta.valuewhen()` results, and rejects
+common non-numeric TA helper arguments plus non-boolean TA condition and option
+arguments before runtime.
 
 ## Common `str.*` Coverage
 
@@ -157,18 +280,32 @@ The common string helper pass covers `str.tostring`, `str.tonumber`,
 `str.substring`, `str.match`, `str.split`, `str.upper`, `str.lower`,
 `str.trim`, `str.replace`, `str.replace_all`, and `str.repeat`. These helpers
 support generated indicators that assemble labels, table text, and debug
-strings. Semantic analysis preserves known string helper return types for
-downstream assignment diagnostics, including `str.split()` array element types.
+strings. `str.format()` supports Pine-style numeric placeholder modifiers for
+decimal masks, integer, currency, and percent output, while
+`str.format_time()` supports year `y`/`yy`/`yyyy`, month-name `MMM`/`MMMM`,
+weekday-name `E`/`EEEE`, day-of-year `D`/`DD`/`DDD`, fractional-second
+`S`/`SS`/`SSS`, week-of-year `w`/`ww`, week-of-month `W`, 12-hour `h`/`hh`,
+AM/PM `a`, and timezone-name `z`/`zzzz` tokens. Semantic analysis preserves
+known string helper return types for downstream assignment diagnostics,
+including `str.split()` array element types, and rejects non-string string
+parameters plus non-numeric time, position, count, and occurrence parameters.
 
 ## Common `input.*` Coverage
 
 The common input helper pass covers generic `input()` inference, common typed
 helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.session`,
-`input.text_area`), and common metadata (`options`, `tooltip`, `group`,
+`input.text_area`, `input.enum`), and common metadata (`options`, `tooltip`, `group`,
 `inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
 definitions. Semantic analysis preserves known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
-types.
+types and `input.enum()` defval enum types. Source-linked public checkpoint
+coverage now locks grouped mode, length, source, toggle, and price-level inputs
+feeding plotted signal output, plus date/session/symbol/timeframe/color/notes
+inputs that gate a filtered public-style signal. It also reports Pine-style diagnostics for typed
+default-value mismatches, literal default `minval` / `maxval` / `options` constraint
+violations, invalid literal `display` option values, and `input.int()` /
+`input.float()` calls that mix `options` with range-only
+`minval`/`maxval`/`step` arguments.
 
 ## Common `array.*` Coverage
 
@@ -196,6 +333,9 @@ integer, float, and string helpers such as `includes`, `size`, `avg`, and `join`
 Homogeneous array literals and `array.from(...)` infer primitive, reference, and
 UDT element types, including `int` to `float` widening for numeric mixes; mixed
 arrays fall back to unknown element types.
+Source-linked public checkpoint coverage also exercises persistent bounded
+signal arrays, queue shifting, copied sorted views, aggregate helpers, and
+last-bar table output.
 
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,
@@ -273,6 +413,10 @@ same runtime built-ins for calls such as
 `values.pinv()`, `values.rank()`, `values.eigenvalues()`,
 `values.eigenvectors()`, `values.kron(other)`, `values.is_identity()`, and
 `values.avg()`.
+Source-linked public checkpoint coverage now also exercises a common matrix
+scoreboard idiom that builds weighted factor matrices, reads row arrays,
+transposes score matrices, aggregates scores, and renders the last-bar result
+through a table.
 
 ## Common `map.*` Coverage
 
@@ -287,6 +431,9 @@ Map built-ins accept named reference arguments (`id`, `key`, `value`, `id2`)
 for namespace and method forms, with the implicit method receiver taking
 precedence over any named `id`. Map variables participate in history references
 for documented idioms such as `previous = data[1]`.
+Source-linked public checkpoint coverage also exercises persistent named signal
+state maps, previous-value updates from `put()`, copied snapshots, key-value
+iteration, missing-key checks, and table output.
 
 The parser accepts Pine-style `map<key, value>` declarations and generic
 constructor calls such as `map.new<string, float>()`. Semantic diagnostics
@@ -327,6 +474,12 @@ Compatibility fixtures include a reduced pivot-object array idiom derived from
 TradingView's objects documentation, where scripts define a `pivotPoint` UDT,
 push `pivotPoint.new(...)` instances into an array, retrieve objects with array
 methods, and read fields from the resulting object references.
+The source-linked checkpoint corpus also includes a reduced public
+market-structure state idiom with wrapped UDT field defaults, first-bar
+constructor initialization, persistent object mutation, and method-dispatch
+state. Source-linked public UDT array checkpoint coverage now locks bounded
+arrays of pivot-record UDT instances, copied snapshot reads, method-derived
+scores, and last-bar dashboard table output.
 
 User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
@@ -334,6 +487,8 @@ references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
 method overloads by receiver type. Semantic diagnostics report calls where a
 known receiver type does not match any local method receiver annotation.
+Runtime evaluation of UDT method state is covered by a reduced public
+market-structure object idiom.
 Semantic coverage accepts local method overload declarations, and method return
 inference selects local overloads by receiver specificity and annotated argument
 signatures. Full and partial branch/switch plus loop control-flow method returns
@@ -368,9 +523,10 @@ planned in the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
-The library syntax MVP parses `library(...)` declarations, `export` on UDFs,
-typed and qualified exported parameters such as `simple string prefix`,
-exported enums, and `import publisher/Library/version as alias` declarations.
+The library syntax MVP parses `library(...)` declarations, including positional
+`overlay` and `dynamic_requests` metadata, `export` on UDFs, typed and
+qualified exported parameters such as `simple string prefix`, exported enums,
+and `import publisher/Library/version as alias` declarations.
 Local library-style scripts can execute exported helper functions in the same
 file, which supports deterministic compatibility fixtures based on TradingView's
 documented all-time-high/all-time-low library idiom.
@@ -393,13 +549,18 @@ Imported exported UDT constructors reject positional arguments after named
 arguments at runtime.
 Exported imported functions and methods report runtime call-shape diagnostics
 for unknown named arguments, missing required arguments, excess positional
-arguments, and invalid argument order. Exported imported methods dispatch on
-imported UDT instances. Non-exported library functions, methods, and types
-remain private to their source module, but exported library functions can call
-private helpers, construct library-local UDTs, and use library-local methods.
+arguments, and invalid argument order, with method calls labeled as library
+methods in semantic and runtime messages. Exported imported methods dispatch on
+imported UDT instances. Non-exported library functions, methods, and types remain
+private to their source module, but exported library functions can call private
+helpers, construct library-local UDTs, and use library-local methods.
 Semantic export diagnostics cover Pine's requirement that any UDT exposed
 through exported fields, callable parameters, or inferred callable return values
 is also exported by the library.
+The checkpoint corpus tracks reduced public library-helper import idioms that
+bind exported helpers through this deterministic registry, validate their series
+output, and cover source-preserving helper wrappers used before delayed rolling
+calls, including multiline block `if` wrappers.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit missing-registry diagnostic.
@@ -413,7 +574,8 @@ The common color helper pass covers `color.rgb`, `color.new`, `color.r`,
 fixture follows TradingView's documented calculated-color idioms by deriving a
 variant color from RGB channels and plotting an RSI gradient. Semantic analysis
 preserves known color constructor and channel return types for downstream
-assignment diagnostics.
+assignment diagnostics and rejects non-color color arguments plus non-numeric
+channel, transparency, and gradient threshold arguments before runtime.
 
 ## Common `math.*` Coverage
 
@@ -425,7 +587,8 @@ rounding to fixed precision, converting a right angle between radians and
 degrees, summing the latest non-`na` source values, and checking random bounds.
 Semantic analysis preserves known math constant and helper return types for
 downstream assignment diagnostics, including int/float overload distinctions for
-rounding helpers and series-only math helpers.
+rounding helpers and series-only math helpers, and rejects non-numeric math
+helper arguments before runtime.
 
 ## Common Global Helper Coverage
 
@@ -435,7 +598,8 @@ plotting or comparing them. `nz()` supports default-zero and explicit
 replacement forms, `fixnan()` carries forward the previous non-`na` value per
 call site, and both helpers reject bool arguments per Pine v6 behavior.
 Semantic analysis preserves known `nz()` and `fixnan()` return types for
-downstream assignment diagnostics.
+downstream assignment diagnostics and rejects bool `nz()` / `fixnan()`
+arguments before runtime.
 
 ## Pine Logs Coverage
 
@@ -443,10 +607,20 @@ The Pine Logs pass covers `log.info`, `log.warning`, and `log.error` with
 message-only and format-string forms. The runtime captures log level, bar
 index, bar time, and message in `ExecutionResult.logs` and forwards them
 through worker result bundles. The semantic checker recognizes the `log`
-namespace and validates the variadic `message` signature before runtime.
+namespace, validates the variadic `message` signature, and reports non-string
+message arguments before runtime.
 `log.error()` records an error-level log entry in `ExecutionResult.logs`
 without halting execution; use `runtime.error()` for Pine-compatible runtime
 halts.
+The source-linked public log signal checkpoint locks startup, signal-transition,
+and final-summary log output while plots continue to execute.
+`runtime.error()` halts execution with a stable `runtime.error` code in
+`ExecutionResult.errors`, worker runtime error messages, and Tealchart manager
+error callbacks while preserving the legacy message, line, and column fields.
+The source-linked public runtime error guard checkpoint locks the common public
+indicator pattern where a chart/configuration guard emits a stable runtime halt
+and stops subsequent plot evaluation.
+Semantic analysis reports non-string `runtime.error()` messages before runtime.
 
 ## Core `na` And Logical Semantics Coverage
 
@@ -472,16 +646,30 @@ The visual metadata pass captures common Pine v6 display/style fields on
 `plotchar()`, and `plotarrow()`, including display, format, precision,
 force-overlay, and plot line-style metadata where those parameters exist. The
 compatibility fixture covers named and positional argument forms plus the
-`plot.linestyle_*` constants used by Pine v6 line plots. Tealchart renderer
+common `format.*` constants and `plot.linestyle_*` constants used by Pine v6 line plots.
+The source-linked public plot metadata checkpoint also locks a projected-level
+idiom that combines `offset`, `show_last`, `display.price_scale`, `trackprice`,
+precision metadata, force-overlay routing, and a hidden helper plot.
+Semantic diagnostics reject invalid literal `display` option values while
+leaving dynamic display expressions available for Pine-style masks. Tealchart renderer
 coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
+Semantic diagnostics also reject non-string visual title/text arguments and
+non-color visual color arguments on common plot, hline, fill, color, OHLC,
+marker, and arrow outputs, plus non-boolean visual `editable`, `trackprice`,
+`join`, `fillgaps`, and `force_overlay` values, and non-numeric visual
+offset/count/size/OHLC values before runtime.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
-area plot rendering when supplied. Plot renderer coverage also draws
-`trackprice` lines at the latest finite rendered plot value, joins
+area plot rendering when supplied. Area-style plots now render filled regions
+in main, computed indicator, and legacy indicator panes. Plot renderer coverage
+also draws `trackprice` lines at the latest finite rendered plot value, joins
 circle/cross plot markers when `join=true`, and paints
-`plot.style_stepline_diamond` markers on stepped plots. Default line plots
-bridge `na` values, while `plot.style_linebr` preserves gaps.
+`plot.style_stepline_diamond` markers on stepped plots. Default line and
+`plot.style_stepline` plots bridge `na` values, while `plot.style_linebr`,
+`plot.style_steplinebr`, and `plot.style_areabr` preserve gaps.
+`plot.style_area` still bridges missing bars, but `plot.style_areabr` breaks
+both stroke and fill segments at `na` values.
 Trackprice rendering also adds a right-axis value label for the latest rendered
 plot value.
 When `indicator(..., explicit_plot_zorder=true)` is set, renderer coverage
@@ -489,14 +677,24 @@ preserves visual call order across plot, hline, and fill outputs.
 Renderer coverage also routes visual outputs with `force_overlay=true` back to
 the main pane when emitted by non-overlay scripts.
 Marker text rendering supports newline-separated labels on plotshape,
-plotchar, and plotarrow outputs.
+plotchar, and plotarrow outputs, and marker payloads preserve dynamic
+`textcolor` series for per-bar rendering. Hidden `plotshape()` and `plotchar()`
+bars now emit null body and text-color payloads so consumers do not render
+stale marker styling where Pine would show no marker. The source-linked
+checkpoint corpus tracks marker payloads, common `plot.style_*` payloads,
+filled plot channels, and background masks through official visual checkpoints
+plus reduced public buy/sell marker signal and volatility-band checkpoints.
+Renderer coverage applies marker `display.none` hiding and `show_last` windows
+through the public Tealscript plot rendering path.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
 
 Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling, per-bar fill colors, display hiding, and
-plot/hline handle fills.
+plot/hline handle fills. Semantic analysis now preserves `plot()` and `hline()`
+handle return types so mixed handle assignments report Pine-shaped diagnostics
+before runtime.
 
 Plotarrow renderer coverage scales arrows between Pine `minheight` and
 `maxheight` using the visible series magnitude and suppresses zero-value arrows.
@@ -509,6 +707,9 @@ The same renderer bar-window handling now applies to common `plot()`,
 `plotchar()`, and `plotarrow()` outputs. Background renderer coverage applies
 `display.none` hiding and routes `bgcolor()` through main and indicator pane
 coordinates.
+The checkpoint corpus tracks a reduced public Heikin-Ashi custom-candle overlay
+that renders recursive OHLC values through `plotcandle()` with dynamic body,
+wick, and border colors.
 Renderer-level command-trace coverage locks a common visual primitive mix in
 jsdom, where native screenshot/pixel buffers are not available without adding a
 heavier canvas dependency.
@@ -521,16 +722,18 @@ objects, `chart.point` constructors, and core `label`, `line`, `linefill`,
 `box`, `polyline`, and `table` lifecycles. Label renderer coverage now handles
 Pine text-only, directional label, and symbol label styles. Line renderer
 coverage now draws Pine `line.style_arrow_left`, `line.style_arrow_right`, and
-`line.style_arrow_both` arrowheads.
+`line.style_arrow_both` arrowheads. Semantic analysis preserves
+`chart.point` helper return types and rejects non-numeric point coordinate
+arguments before runtime.
 
 ## Common OHLC Plot Coverage
 
 The OHLC plot pass covers `plotbar()` and `plotcandle()` for custom bar and
 candle overlays. The runtime emits open, high, low, close, and per-bar color
 arrays with `na` gaps preserved as nulls; the Tealchart renderer draws those
-custom bars/candles in overlay and indicator panes. The checkpoint fixture is
-modeled on TradingView's documented custom bar plotting idiom using directional
-body colors, transparent wick colors, and skipped bars.
+custom bars/candles in overlay and indicator panes. Source-linked public custom
+bar and Heikin-Ashi candle checkpoints lock derived OHLC arrays, directional
+colors, overlay routing, and skipped bars.
 
 ## Common `switch` Coverage
 
@@ -571,9 +774,14 @@ multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
 `syminfo.expiration_date`, `syminfo.recommendations_date`, and
 `syminfo.target_price_*`,
 `timeframe.period`, `timeframe.main_period`, `timeframe.multiplier`,
-`timeframe.in_seconds()`, `timeframe.from_seconds()`, `timeframe.change()`,
+`timeframe.in_seconds()`/`timeframe.to_seconds()`,
+`timeframe.from_seconds()`, `timeframe.change()`,
 timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type
-flags such as `chart.is_heikinashi` and `chart.is_renko`.
+flags such as `chart.is_heikinashi` and `chart.is_renko`. The checkpoint corpus
+tracks the official timeframe-comparison idiom that converts chart and selected
+input timeframes to seconds before validating them, plus a source-linked public
+symbol-metadata checkpoint that derives labels, tick values, rounded closes,
+and metadata-gated signals from host-provided `syminfo.*` fields.
 `indicator(timeframe=...)` updates the exposed timeframe metadata for
 seconds/minutes/D/W/M and tick declaration values, including
 `timeframe.isticks`. Semantic analysis preserves known `syminfo.*` metadata,
@@ -589,7 +797,9 @@ and `second`), matching callable helpers such as `hour(time)`, common
 fixed-offset or IANA timezone arguments such as `"GMT+2"` and
 `"America/New_York"`. The checkpoint fixture follows TradingView's documented
 calendar-filter idioms by gating plots against a start timestamp, weekday,
-minute threshold, and named exchange timezone.
+minute threshold, and named exchange timezone. Semantic analysis rejects
+non-numeric calendar `time` arguments and non-string calendar `timezone`
+arguments before runtime.
 
 ## Common Session Time Coverage
 
@@ -604,8 +814,23 @@ session classification windows. Higher-timeframe `time()` / `time_close()`
 aggregation is covered for intraday, daily, and weekly buckets, including
 timezone-aware DST boundaries. Host-provided `closedDates` and closure entries
 can suppress session-filtered `time()` calls and session-state helpers for
-exchange calendar holidays or partial-session closures. Broader dynamic-session
-checkpoint coverage remains planned.
+exchange calendar holidays or partial-session closures. The checkpoint corpus
+tracks public session-filter gating, public date/session input gating, public
+exchange session-state helper gating, and the official dynamic-session string
+idiom. Semantic analysis
+rejects non-string `time()` / `time_close()` timeframe, session, and timezone
+arguments plus invalid `timeframe.*` string/numeric helper arguments before
+runtime.
+
+## Common Tick Quote Coverage
+
+The tick-quote pass covers Pine v6 `bid` and `ask` variables as `series float`
+values sourced from optional host bar fields on the `1T` timeframe. Missing
+host quote fields, and all non-`1T` chart or request contexts, return `na`.
+Direct reads, history references such as `bid[1]`, selected TA source-window
+helpers such as `ta.sma(ask, 2)`, realtime tick replacement, semantic known
+global analysis, and `request.security(..., "1T", bid/ask)` are covered by
+runtime tests.
 
 ## Request Data And Ticker Coverage
 
@@ -624,14 +849,29 @@ return types for downstream diagnostics, including expression-preserving
 security/seed calls, lower-timeframe arrays, and float point-data helpers.
 Runtime execution enforces a Pine-style limit of 40 unique `request.*`
 contexts per script pass so dynamic request scripts cannot create unbounded
-host datafeed work. Visual output registration enforces Pine's 64 plot-output
+host datafeed work. Obvious invalid literal declaration and request
+`calc_bars_count` values, request `gaps` / `lookahead` modes, and
+point-series request field selectors are reported by semantic diagnostics
+before runtime. Request `ignore_invalid_*` option flags also report non-boolean
+argument types before runtime, and request symbol, timeframe, currency, source,
+country, financial id, period, and economic field identifiers report non-string
+argument types before runtime.
+Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
+The checkpoint corpus tracks public MTF trend-filter, currency-conversion,
+earnings-event, corporate-action, financial-dashboard, economic-macro, and
+seed-dataset request idioms, an official lower-timeframe array idiom, plus a
+public multi-symbol screener idiom. It also tracks a public footprint request
+diagnostic as an `unsupported_planned` semantic blocker.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
 footprint/intrabar volume model described in
-[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md).
+[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md). Semantic
+analysis reports the planned `request.footprint()` gap with the same explicit
+unsupported-feature diagnostic used by runtime execution, and the source-linked
+footprint checkpoint keeps that gap visible in pass-rate reporting.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
@@ -639,10 +879,15 @@ The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 indicator request workflows. Session, adjustment, back-adjustment,
 settlement-as-close, and chart modifiers propagate as opaque request-datafeed
 keys. Semantic analysis preserves supported `ticker.*` helper return types for
-downstream assignment diagnostics. The in-memory test datafeed derives
+downstream assignment diagnostics, reports invalid literal session,
+adjustment, back-adjustment, and settlement-as-close modifier values before
+runtime, and planned unsupported ticker constructors such as
+`ticker.rangebar()` are reported explicitly instead of as generic unknown
+functions. The in-memory test datafeed derives
 Heikin-Ashi OHLC when matching base bars exist, with tests covering the
-`ticker.heikinashi()` modifier. Renko, Line Break, Kagi, and Point & Figure
-contexts must be supplied by the host.
+`ticker.heikinashi()` modifier. The checkpoint corpus tracks an official ticker
+request fixture for extended-session and Heikin-Ashi synthetic IDs. Renko, Line
+Break, Kagi, and Point & Figure contexts must be supplied by the host.
 Synthetic strategy/backtest execution remains deferred until the strategy
 intrabar execution contract is implemented. The current broker emulator is
 chart-OHLC based; lower-timeframe Bar Magnifier behavior and synthetic execution
@@ -651,9 +896,28 @@ feeds are tracked in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.
 ## `max_bars_back` Declaration Coverage
 
 `indicator(..., max_bars_back=N)` is parsed and recorded on execution results
-as `indicatorMaxBarsBack`. Values must be finite, non-negative integers. The
-runtime still keeps full loaded history and does not infer or enforce Pine's
-history buffer sizing rules yet.
+as `indicatorMaxBarsBack`. The `max_bars_back(var, num)` function is accepted as
+a Pine-compatible buffer/profile hint. Values must be finite, non-negative
+integers, and obvious invalid literal declaration or function hint values are
+reported by semantic diagnostics before runtime. Explicit history references
+that exceed the declared indicator bound produce runtime errors, while in-range
+references remain available over loaded history.
+Scripts without an explicit declaration report inferred history depth in the
+runtime profile from static literal/simple numeric offset inference,
+selected pure `math.*` helper offsets including averaging, power, and
+square-root helpers, selected numeric normalization helper offsets,
+input-controlled simple conditional offsets, observed dynamic access, and
+selected static or observed rolling-window helper lookbacks such as
+`math.sum()`, `ta.range()`, `ta.rising()`/`ta.falling()`, common statistical
+helpers, momentum helpers, band/average/regression helpers, and `ta.*`
+fixed/default, source-window, retained-source, recursive, and default-argument
+helpers, oscillator helpers, direct OHLC helper lookbacks, default-source
+highest/lowest and pivot left/right windows, and TA variables that read prior
+close/volume bars. Static unexecuted `ta.tr()` calls now contribute their direct
+true-range prior-close requirement to the same profile. Full Pine-style
+preallocation for arbitrary series offsets remains a compatibility target. The
+checkpoint corpus tracks an official `max_bars_back`
+bounded-history fixture.
 
 ## Common Drawing Object Coverage
 
@@ -672,14 +936,23 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 `get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Label
 mutators and getters accept Pine-style named `id` and value arguments. Semantic
 analysis preserves known label getter return types and `label.all` handle-array
-element types for downstream diagnostics. Rendering
-routes labels to the script pane: overlay scripts use the main pane, non-overlay
+element types for downstream diagnostics, and rejects invalid literal `xloc`
+and `yloc` option values plus invalid literal label `style`, `textalign`,
+`size`, `text_font_family`, and `text_formatting` values, plus non-string
+label text and tooltip values, non-color label color values, and non-numeric
+label constructor/setter coordinate values, plus non-boolean label
+`force_overlay` values. Rendering routes
+labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
 circle, square, diamond, cross, xcross, triangle, flag, arrow styles, label text
 alignment, default/monospace font-family metadata, and bold/italic text formatting. GC
 limits and realtime rollback parity are covered by the shared drawing store;
-remaining gaps are TradingView-exact pixel geometry and edge-case style parity.
+the source-linked public label signal and drawing-copy checkpoints lock
+persistent last-bar signal-label updates with multiline text, dynamic
+style/color/textcolor, text alignment, font-family, formatting, tooltip, getter
+plots, and copied label payloads. Remaining gaps are TradingView-exact pixel
+geometry and edge-case style parity.
 
 The line drawing pass covers common trendline/channel idioms. `line.new()`
 accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
@@ -691,22 +964,34 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_xloc()`, `line.set_extend()`, `line.set_color()`,
 `line.set_style()`, `line.set_width()`, scalar coordinate getters,
 `line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
-and getters accept Pine-style named `id`, value, and point arguments. Semantic analysis
-preserves known line getter return types and `line.all` handle-array element
-types for downstream diagnostics. Rendering routes line segments to the script
-pane with color/style/width, horizontal extension support, and Pine
+and getters accept Pine-style named `id`, value, and point arguments. Semantic
+analysis validates `line.new()` call-shape names, preserves known line getter
+return types, and preserves `line.all` handle-array element types for
+downstream diagnostics, while rejecting invalid literal `xloc` and `extend`
+option values plus invalid literal line `style` values and non-color line color
+values, non-numeric line coordinate and width values, and non-boolean line
+`force_overlay` values. Rendering routes line segments to the script pane with color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
+The source-linked public line signal and drawing-copy checkpoints lock
+persistent trendline endpoint, extension, color, style, width,
+`line.get_price()`, `line.all` output behavior, and copied line payloads for
+trendline-breakout and cloned-drawing idioms.
 `force_overlay` lines render in the main pane even when created by non-overlay
 scripts. `linefill.new()` records fills between two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,
 while `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()`
 support named `id` arguments. Semantic analysis preserves linefill getter line
 handle returns and `linefill.all` handle-array element types for downstream
-diagnostics. The renderer fills between resolved line segments in the routed
+diagnostics and rejects non-color linefill color values. The renderer fills between resolved line segments in the routed
 script pane. `linefill.new()` rejects missing or non-line handles without
 creating a drawing. `chart.point` overloads, GC limits, and full realtime
 rollback parity remain planned.
+The checkpoint corpus tracks a reduced public supply/demand-zone drawing idiom
+that updates a persistent `box` and right-extended midline from recent swing
+ranges, a reduced public drawing-copy idiom that clones configured label, line,
+and box handles, plus a reduced public channel idiom that updates persistent
+upper/lower `line` handles and fills the band with `linefill.new()`.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus
@@ -717,12 +1002,19 @@ common border, fill, text, `extend`, and `xloc` options, including
 `set_top_left_point`, `set_bottom_right_point`), style/text setters including
 `set_text_formatting`, coordinate/color/text getters, `box.copy()`, and
 `box.delete()`. Box mutators and getters accept Pine-style named `id`, value,
-and point arguments. Semantic analysis
-preserves known box getter return types and `box.all` handle-array element types
-for downstream diagnostics. Rendering routes filled rectangles to the script
-pane with borders, text alignment, `text_wrap=auto` wrapping,
-default/monospace font-family metadata, and bold/italic text formatting. Full
-TradingView text pixel parity and remaining edge-case
+and point arguments. Semantic analysis validates `box.new()` call-shape names,
+preserves known box getter return types, preserves `box.all` handle-array
+element types for downstream diagnostics, and rejects invalid literal `xloc`
+and `extend` option values plus invalid literal border-style values and
+non-string box text values plus non-color box border, background, and text
+color values, non-numeric box coordinate and border-width values, and
+non-boolean box `force_overlay` values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
+default/monospace font-family metadata, and bold/italic text formatting. Semantic
+analysis also rejects invalid literal `text_halign`, `text_valign`,
+`text_wrap`, `text_size`, `text_font_family`, and `text_formatting` values.
+The source-linked public box zone checkpoint locks last-bar supply/demand box
+bounds, extension, border, fill, multiline text, alignment, wrapping, font, and
+formatting payloads. Full TradingView text pixel parity and remaining edge-case
 styling remain planned.
 
 The `polyline.*` drawing pass supports `polyline.new()` with named point/style
@@ -730,8 +1022,13 @@ arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 `polyline.copy()` and `polyline.delete()` accept Pine-style named `id`
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
 handle return types and `polyline.all` handle-array element types for downstream
-diagnostics. Renderer coverage applies fixed path geometry, optional fill, line
-styling, and approximate curved paths when `curved=true`.
+diagnostics, and rejects invalid literal `xloc` and `line_style` option values.
+Semantic analysis also rejects non-color polyline line and fill color values,
+non-numeric polyline line-width values, and non-boolean polyline
+`curved`/`closed`/`force_overlay` values.
+Renderer coverage applies fixed path geometry, optional fill, line styling, and
+approximate curved paths when `curved=true`. The checkpoint corpus tracks a reduced public zigzag-polyline idiom that renders recent swing
+`chart.point` vertices as a last-bar path.
 
 ## Table Drawing Coverage
 
@@ -743,25 +1040,41 @@ color, background, size, width, height, text alignment, font family, and
 bold/italic text formatting, and tooltips. Table lifecycle helpers and setters accept
 Pine-style named `table_id`, coordinate, and value arguments where those
 parameters exist. Semantic analysis preserves `table.new()` handle return types
-and `table.all` handle-array element types for downstream diagnostics. Rendering
-lays out fixed tables in the script pane with measured automatic cell sizes,
+and `table.all` handle-array element types for downstream diagnostics, and
+rejects invalid literal table position values plus cell text alignment,
+text-size, font-family, and text-formatting values, plus non-string cell text
+and tooltip values, non-color table/cell color values, and non-numeric table
+dimension, coordinate, width, height, frame, and border values. Rendering lays out fixed tables in the script pane with measured automatic cell sizes,
 percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,
 and bold/italic font styling. Runtime coverage also
 guards persistent table handles and transient polylines across realtime
-rollback. Remaining gaps are TradingView-exact sizing and pixel parity.
+rollback. Source-linked public dashboard-table setter checkpoint coverage locks
+last-bar table position/frame/border updates, merged header spans, cell
+dimension setters, alignment, colors, and tooltip payloads. Remaining gaps are
+TradingView-exact sizing and pixel parity.
 
 ## Strategy Diagnostic Coverage
 
-The strategy pass accepts `strategy(...)` declarations and maps common settings
-into the exported ledger primitives for settings, orders, fills, trades,
-positions, and equity snapshots. Read-only `strategy.*` state variables such as
+The strategy pass accepts `strategy(...)` declarations and maps common settings,
+including risk-free-rate metadata, limit-fill verification ticks, close-entry selection rules, and standard-OHLC fill metadata, into the exported ledger primitives for settings, orders, fills, trades,
+positions, and per-bar equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.netprofit_percent`, `strategy.grossprofit_percent`,
-`strategy.grossloss_percent`, `strategy.openprofit_percent`,
-`strategy.position_size`, and trade counters are available for scripts. The
-semantic checker validates common strategy order, close/cancel,
-and trade-accessor call shapes before runtime, and preserves known strategy
-state/accessor return types for downstream assignment diagnostics. `strategy.entry()`,
+`strategy.grossloss_percent`, `strategy.openprofit_percent`, `strategy.account_currency`,
+`strategy.position_size`, `strategy.position_entry_name`, and trade counters are
+available for scripts.
+Source-linked public checkpoints cover strategy stats tables plus closed-trade
+list and open-position dashboard tables built from trade accessors.
+The semantic checker validates common strategy order, close/cancel,
+declaration argument, declaration literal value, and trade-accessor call shapes
+before runtime, reports literal declaration setting diagnostics plus order
+id/direction/OCA/quantity diagnostics, non-boolean, non-numeric, and non-string
+strategy declaration settings,
+non-boolean order alert/immediate flags, non-string order id/comment/alert
+arguments, non-string order/risk enum-like arguments, non-numeric order/risk sizing
+arguments, non-numeric trade accessor indexes, and excess positional order arguments,
+and preserves known strategy state/accessor return types for downstream
+assignment diagnostics. `strategy.entry()`,
 `strategy.order()`, `strategy.close()`,
 `strategy.close_all()`, `strategy.exit()`, `strategy.cancel()`, and
 `strategy.cancel_all()` record or cancel ledger orders. Fixed-size market orders
@@ -770,23 +1083,67 @@ fill at the next bar open by default, or at the signal bar close when
 Basic open/closed trade counters are maintained as fixed-size market fills
 change exposure. Open trades are marked to market from current OHLC, updating
 `strategy.openprofit`, `strategy.equity`, and trade-level maximum run-up and
-drawdown snapshots. Price-based `strategy.exit()` limit/stop brackets are
-recorded as pending exit orders. Pending limit/stop orders fill on later bars
-when OHLC crosses their trigger price, and bracket siblings cancel through OCA.
+drawdown snapshots, while the ledger records one equity-curve point per bar for
+downstream strategy analytics. Price-based `strategy.exit()` limit/stop brackets are
+recorded as pending exit orders. Profit/loss tick-distance exits are translated
+from the matching weighted entry price into limit/stop brackets, with absolute
+limit/stop prices taking precedence. Pending limit/stop orders fill on later
+bars when OHLC crosses their trigger price, cap fills to the remaining matching
+open trade quantity, and bracket siblings cancel through OCA.
+`strategy.oca.reduce` groups reduce pending sibling order quantities after a
+fill and cancel siblings whose remaining quantity reaches zero. Generated
+`strategy.exit()` bracket orders can be cancelled through the original exit id.
 `strategy.entry()` and `strategy.order()` stop-limit orders activate after their
-stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
-percent-of-equity sizing resolve to concrete order quantities at submission
-time, and `strategy.entry()` enforces same-direction pyramiding limits and
-expands opposite-direction entry transactions to reverse positions. This is a
-deterministic OHLC broker emulator: same-bar intrabar path modeling, bar
-magnifier, and lower-timeframe fill simulation remain deferred until the runtime
-has an explicit intrabar data model. The `use_bar_magnifier` strategy setting is
-stored in the ledger, and selected lower-timeframe/chart-OHLC execution paths
-are exported as strategy metadata, but order fills do not yet consume those
-paths.
+stop price is crossed, then fill as limit orders on later execution ticks when
+the ordered broker path reaches the limit price. Fixed, cash, and
+percent-of-equity sizing resolve to concrete order quantities at submission time,
+and `strategy.entry()` enforces same-direction pyramiding limits and expands
+opposite-direction entry transactions to reverse positions. The
+`strategy.risk.allow_entry_in(strategy.direction.*)` rule restricts
+`strategy.entry()` to the allowed direction, converting disallowed opposite
+entries into close-only market orders while leaving raw `strategy.order()` calls
+unrestricted. `strategy.risk.max_position_size()` caps `strategy.entry()`
+exposure while leaving raw `strategy.order()` calls unrestricted.
+`strategy.risk.max_intraday_filled_orders()` caps same-UTC-day non-exit
+strategy order fills by blocking new non-exit submissions and cancelling excess
+pending non-exit fills after the configured count is reached, then closing any
+open position with a market risk-exit order.
+`strategy.risk.max_cons_loss_days()` caps non-exit orders after the configured
+number of consecutive UTC losing days, based on closed-trade net PnL, and
+cancels pending non-exit fills after the cap is reached. If an open position
+remains when the guard trips, TealScript closes it with a market risk-exit
+order.
+`strategy.risk.max_intraday_loss()` caps non-exit orders after the same-UTC-day
+equity-curve loss from peak equity reaches the configured cash or
+percent-of-equity value. `strategy.risk.max_drawdown()` caps non-exit orders
+after the overall equity-curve drawdown from peak equity reaches the configured
+cash or percent-of-equity value. Both equity risk guards cancel pending orders
+and close open positions with a market risk-exit order after the cap is reached.
+TradingView-exact session halt semantics remain a fidelity target. The
+`strategy(..., slippage=...)` setting applies fixed tick slippage to market,
+stop, and trailing-stop fills in trade direction while preserving limit-fill
+prices. `strategy.close(..., immediately=true)` and
+`strategy.close_all(..., immediately=true)` fill on the current bar close even
+when `process_orders_on_close=false`. This is a deterministic broker emulator:
+chart-OHLC and host-provided
+lower-timeframe execution paths are consumed by pending order fills and exported
+as strategy metadata. The chart-OHLC fallback follows the official default
+broker-emulator path assumption, choosing open-high-low-close or
+open-low-high-close from the open's distance to the bar extremes, and fills
+price-based orders crossed in the previous-close/current-open gap at the current
+bar open. Bounded `calc_on_order_fills` reruns current-bar strategy logic after
+fills, including a lower-timeframe bar-magnifier checkpoint that prevents
+recalc-created price exits from filling against ticks before the triggering
+fill. `calc_on_every_tick=true` recalculates strategies on unconfirmed
+realtime ticks while default strategies wait for confirmed realtime closes.
+TradingView-exact same-bar intrabar/bar-magnifier behavior remains a fidelity
+target. The `use_bar_magnifier` strategy setting is stored in the ledger.
 Trailing stops submitted through
 `strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
-bars and ratchet against OHLC highs/lows using price-unit offsets. Fill
+bars and ratchet against OHLC highs/lows using tick-distance `trail_points` and
+`trail_offset` values. The checkpoint corpus tracks both the official trailing
+exit example and a reduced public trailing-stop strategy idiom with explicit
+order activation, ratchet, fill, and closed-trade assertions. Fill
 commissions are applied to fills and debited from strategy net profit/equity for
 `percent`, `cash_per_order`, and
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`
@@ -800,7 +1157,12 @@ ids, comments, prices, bars/times, signed size, gross profit, profit percent,
 commission, maximum run-up, and maximum drawdown with percent variants.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
 `strategy.eventrades` are available. Filled strategy orders with
-`alert_message` emit `strategy_order_fills` alert events.
+`alert_message` emit `strategy_order_fills` alert events unless their
+`disable_alert` argument is true. The checkpoint corpus also tracks reduced
+public strategy fixed-bracket and performance-table idioms that plot
+`strategy.closedtrades`,
+`strategy.wintrades`, and `strategy.netprofit` while rendering the same counters
+through a last-bar `table`.
 
 ## Common Alerts Coverage
 
@@ -815,7 +1177,10 @@ Pine's alert contract: `freq_all` emits every call, non-`all` alerts emit only
 the first eligible execution per call site per bar, and
 `freq_once_per_bar_close` emits only on confirmed bar executions. Direct alert
 events include an `isRealtime` marker so consumers can distinguish historical
-calculation events from live update events.
+calculation events from live update events. Semantic checks also reject invalid
+literal or namespace-constant `alert()` frequency values and non-string alert
+message/title/frequency arguments before runtime, and report non-boolean
+`alertcondition()` conditions before runtime.
 The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.

@@ -849,6 +849,168 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(75, pane), expect.any(Number), 0, Math.PI * 2);
     });
 
+    it('renders area fills in computed indicator panes', () => {
+      const fill = vi.fn();
+      const lineTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        lineTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'indicator',
+        type: 'indicator',
+        heightRatio: 1,
+        yMin: 0,
+        yMax: 100,
+        fixedRange: false,
+        top: 20,
+        height: 300,
+        bottom: 320,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneArea',
+        type: 'plot',
+        title: 'PaneArea',
+        values: [25, 75],
+        color: '#2196F3',
+        style: 'area',
+        histbase: 10,
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(fill).toHaveBeenCalled();
+      expect(lineTo).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(25, pane));
+      expect(lineTo).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(10, pane));
+      expect(ctx.globalAlpha).toBe(1);
+    });
+
+    it('breaks area fills on na values only for area-break plots', () => {
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[4]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_AreaGaps',
+        type: 'plot',
+        title: 'AreaGaps',
+        values: [100, 110, null, 120, 130],
+        color: '#2196F3',
+      };
+      const bridgedFill = vi.fn();
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        fill: bridgedFill,
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const brokenFill = vi.fn();
+      const brokenStroke = vi.fn();
+      const brokenRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        fill: brokenFill,
+        stroke: brokenStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'area' }, bars, viewport);
+      (brokenRenderer as any).renderLinePlot({ ...basePlot, style: 'areabr' }, bars, viewport);
+
+      expect(bridgedFill).toHaveBeenCalledTimes(1);
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(brokenFill).toHaveBeenCalledTimes(2);
+      expect(brokenStroke).toHaveBeenCalledTimes(2);
+    });
+
+    it('breaks area fills on na values in computed indicator panes', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[4]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'indicator',
+        type: 'indicator',
+        heightRatio: 1,
+        yMin: 0,
+        yMax: 100,
+        fixedRange: false,
+        top: 20,
+        height: 300,
+        bottom: 320,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneAreaBreak',
+        type: 'plot',
+        title: 'PaneAreaBreak',
+        values: [25, 35, null, 65, 75],
+        color: '#2196F3',
+        style: 'areabr',
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(fill).toHaveBeenCalledTimes(2);
+      expect(ctx.globalAlpha).toBe(1);
+    });
+
+    it('renders area-break fills in legacy indicator panes', () => {
+      const fill = vi.fn();
+      const moveTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        moveTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const paneOffset = {
+        top: 10,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_LegacyPaneAreaBreak',
+        type: 'plot',
+        title: 'LegacyPaneAreaBreak',
+        values: [25, null, 75],
+        color: '#4CAF50',
+        style: 'areabr',
+      };
+
+      (renderer as any).renderLinePlotInPane(plot, bars, viewport, paneOffset);
+
+      expect(fill).toHaveBeenCalledTimes(2);
+      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), paneOffset.top);
+      expect(ctx.globalAlpha).toBe(1);
+    });
+
     it('renders stepline diamond markers in computed panes with style overrides', () => {
       const fillColors: string[] = [];
       const closePath = vi.fn();
@@ -1558,6 +1720,73 @@ describe('TealchartRenderer coordinate transforms', () => {
   });
 
   describe('marker rendering', () => {
+    it('skips marker plots hidden with display.none through the public render path', () => {
+      const arc = vi.fn();
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotshape_Hidden',
+        type: 'plotshape',
+        title: 'Hidden',
+        values: [1, 1],
+        color: ['#2196F3', '#2196F3'],
+        text: 'Hidden',
+        textColor: '#FFEB3B',
+        location: 'abovebar',
+        shape: 'circle',
+        size: 'small',
+        display: 0,
+      };
+
+      renderer.renderPlots([plot], bars, viewport);
+
+      expect(arc).not.toHaveBeenCalled();
+      expect(fillText).not.toHaveBeenCalled();
+    });
+
+    it('limits marker plots to show_last bars through the public render path', () => {
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotshape_Recent',
+        type: 'plotshape',
+        title: 'Recent',
+        values: [1, 1, 1],
+        color: ['#2196F3', '#2196F3', '#2196F3'],
+        location: 'abovebar',
+        shape: 'circle',
+        size: 'small',
+        showLast: 1,
+      };
+
+      renderer.renderPlots([plot], bars, viewport);
+
+      expect(arc).toHaveBeenCalledTimes(1);
+    });
+
     it('renders plotchar glyphs and marker text', () => {
       const fillText = vi.fn();
       const ctx = {
@@ -1873,6 +2102,40 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(bridgedStroke).toHaveBeenCalledTimes(1);
       expect(linebrStroke).toHaveBeenCalledTimes(2);
+    });
+
+    it('breaks missing values for Pine steplinebr plots', () => {
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_StepLineGaps',
+        type: 'plot',
+        title: 'Step line gaps',
+        values: [95, null, 125],
+        color: '#2196F3',
+        linewidth: 2,
+      };
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const steplinebrStroke = vi.fn();
+      const steplinebrRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: steplinebrStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'stepline' }, bars, viewport);
+      (steplinebrRenderer as any).renderLinePlot({ ...basePlot, style: 'steplinebr' }, bars, viewport);
+
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(steplinebrStroke).toHaveBeenCalledTimes(2);
     });
 
     it('draws Pine flag marker shapes with a pole and banner', () => {

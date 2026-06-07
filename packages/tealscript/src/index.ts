@@ -12,6 +12,7 @@ export {
   createCompatibilityRunOutcome,
   createPineCompatibilityCoverageIndex,
   createPineScriptLedger,
+  formatPineCompatibilityCoverageJson,
   formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
@@ -33,6 +34,7 @@ export {
   type CompatibilityStageOutcome,
   type CompatibilityStageStatus,
   type PineCompatibilityCorpusCase,
+  type PineCompatibilityCorpusStages,
   type PineCompatibilityCorpusRun,
   type PineCompatibilityCorpusSummary,
   type PineCompatibilityCoverageIndex,
@@ -46,6 +48,10 @@ export {
   type PineScriptStoragePolicy,
   type PineVersion,
 } from './compat';
+
+export {
+  createPineParseSemanticStageOutcomes,
+} from './compat/sourceStages';
 
 export {
   // Parser functions
@@ -218,6 +224,7 @@ export {
 export {
   checkProgram,
   type SemanticCheckResult,
+  type SemanticCheckOptions,
   type SemanticDiagnostic,
   type SemanticDiagnosticSeverity,
   type SemanticQualifier,

@@ -65,6 +65,29 @@ describe('Tealscript Parser', () => {
       }));
     });
 
+    it('parses strategy risk-free-rate declaration arguments', () => {
+      const ast = parse('strategy("Risk", risk_free_rate=1.75, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true)\n');
+      const strategy = ast.body[0] as IndicatorDeclaration;
+
+      expect(strategy.declarationKind).toBe('strategy');
+      expect(strategy.risk_free_rate).toEqual(expect.objectContaining({
+        type: 'NumericLiteral',
+        value: 1.75,
+      }));
+      expect(strategy.backtest_fill_limits_assumption).toEqual(expect.objectContaining({
+        type: 'NumericLiteral',
+        value: 3,
+      }));
+      expect(strategy.close_entries_rule).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'ANY',
+      }));
+      expect(strategy.fill_orders_on_standard_ohlc).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: true,
+      }));
+    });
+
     it('parses multiline indicator declarations', () => {
       const ast = parse(`indicator(
     "Wrapped Indicator",
@@ -87,7 +110,7 @@ describe('Tealscript Parser', () => {
 
   describe('Library and import declarations', () => {
     it('parses library declarations', () => {
-      const ast = parse('library("AllTimeHighLow", true)\n');
+      const ast = parse('library("AllTimeHighLow", true, false)\n');
       const declaration = ast.body[0] as LibraryDeclaration;
       expect(declaration.type).toBe('LibraryDeclaration');
       expect(declaration.title).toEqual(expect.objectContaining({
@@ -97,6 +120,10 @@ describe('Tealscript Parser', () => {
       expect(declaration.overlay).toEqual(expect.objectContaining({
         type: 'BooleanLiteral',
         value: true,
+      }));
+      expect(declaration.dynamic_requests).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: false,
       }));
     });
 
@@ -417,6 +444,29 @@ map<string, sig.State> stateBySymbol = na
         defaultValue: expect.objectContaining({ name: 'close' }),
       }));
     });
+
+    it('parses user-defined type field defaults on continuation lines', () => {
+      const ast = parse(`type WrappedDefaults
+    float level =
+        close + open
+    varip int updates =
+        0
+    lastPrice =
+        close
+`);
+      const declaration = ast.body[0] as TypeDeclaration;
+
+      expect(declaration.type).toBe('TypeDeclaration');
+      expect(declaration.fields.map((field) => ({
+        name: field.name.name,
+        varip: field.varip,
+        defaultValue: field.defaultValue?.type,
+      }))).toEqual([
+        { name: 'level', varip: false, defaultValue: 'BinaryExpression' },
+        { name: 'updates', varip: true, defaultValue: 'NumericLiteral' },
+        { name: 'lastPrice', varip: false, defaultValue: 'Identifier' },
+      ]);
+    });
   });
 
   describe('Function declarations', () => {
@@ -678,6 +728,227 @@ plot(score(close))
       }
     });
 
+    it('parses top-level nested block dedents with reassignment statements', () => {
+      const ast = parse(`indicator("Top Level Nested Layout")
+value = 0
+if close > open
+    if high > high[1]
+        value := 1
+    else
+        value := 2
+plot(value)
+`);
+      const outer = ast.body.find((statement) => statement.type === 'IfStatement');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'IfStatement',
+        'ExpressionStatement',
+      ]);
+      expect(outer?.type === 'IfStatement' ? outer.consequent.map((statement) => statement.type) : []).toEqual(['IfStatement']);
+      const inner = outer?.type === 'IfStatement' ? outer.consequent[0] : null;
+      expect(inner?.type === 'IfStatement' ? inner.consequent.map((statement) => statement.type) : []).toEqual(['AssignmentStatement']);
+      expect(inner?.type === 'IfStatement' && Array.isArray(inner.alternate)
+        ? inner.alternate.map((statement) => statement.type)
+        : []).toEqual(['AssignmentStatement']);
+    });
+
+    it('parses fifth-level nested user-defined function branches', () => {
+      const ast = parse(`indicator("Fifth Level Nested Layout")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      let current = Array.isArray(fn?.body) ? fn.body[0] : null;
+      for (let depth = 0; depth < 5; depth += 1) {
+        expect(current?.type).toBe('IfStatement');
+        current = current?.type === 'IfStatement' ? current.consequent[0] : null;
+      }
+      expect(current?.type).toBe('ExpressionStatement');
+    });
+
+    it('parses sixth-level nested user-defined function branches', () => {
+      const ast = parse(`indicator("Sixth Level Nested Layout")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      let current = Array.isArray(fn?.body) ? fn.body[0] : null;
+      for (let depth = 0; depth < 6; depth += 1) {
+        expect(current?.type).toBe('IfStatement');
+        current = current?.type === 'IfStatement' ? current.consequent[0] : null;
+      }
+      expect(current?.type).toBe('ExpressionStatement');
+    });
+
+    it('parses seventh-level nested user-defined function branches', () => {
+      const ast = parse(`indicator("Seventh Level Nested Layout")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            if value > 6
+                                7
+                            else
+                                6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      let current = Array.isArray(fn?.body) ? fn.body[0] : null;
+      for (let depth = 0; depth < 7; depth += 1) {
+        expect(current?.type).toBe('IfStatement');
+        current = current?.type === 'IfStatement' ? current.consequent[0] : null;
+      }
+      expect(current?.type).toBe('ExpressionStatement');
+    });
+
+    it('parses eighth-level nested user-defined function branches', () => {
+      const ast = parse(`indicator("Eighth Level Nested Layout")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            if value > 6
+                                if value > 7
+                                    8
+                                else
+                                    7
+                            else
+                                6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      let current = Array.isArray(fn?.body) ? fn.body[0] : null;
+      for (let depth = 0; depth < 8; depth += 1) {
+        expect(current?.type).toBe('IfStatement');
+        current = current?.type === 'IfStatement' ? current.consequent[0] : null;
+      }
+      expect(current?.type).toBe('ExpressionStatement');
+    });
+
+    it('parses ninth-level nested user-defined function branches', () => {
+      const ast = parse(`indicator("Ninth Level Nested Layout")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            if value > 6
+                                if value > 7
+                                    if value > 8
+                                        9
+                                    else
+                                        8
+                                else
+                                    7
+                            else
+                                6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      let current = Array.isArray(fn?.body) ? fn.body[0] : null;
+      for (let depth = 0; depth < 9; depth += 1) {
+        expect(current?.type).toBe('IfStatement');
+        current = current?.type === 'IfStatement' ? current.consequent[0] : null;
+      }
+      expect(current?.type).toBe('ExpressionStatement');
+    });
+
     it('parses wrapped calls and member chains inside indented bodies', () => {
       const ast = parse(`wrapped(source) =>
     value = array.get(
@@ -737,6 +1008,249 @@ export method shifted(Pivot this, float amount) =>
         exported: true,
       }));
       expect(Array.isArray(method?.body)).toBe(true);
+    });
+
+    it('parses wrapped user-defined function and exported method signatures', () => {
+      const ast = parse(`library("WrappedSignatures", true)
+type Pivot
+    float level
+
+calc(
+    float source,
+    int length,
+) =>
+    ta.sma(source, length)
+
+export method shifted(
+    Pivot this,
+    float amount,
+) =>
+    this.level += amount
+    this
+`);
+      const declarations = ast.body.filter((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'LibraryDeclaration',
+        'TypeDeclaration',
+        'FunctionDeclaration',
+        'FunctionDeclaration',
+      ]);
+      expect(declarations.map((declaration) => ({
+        name: declaration.name.name,
+        exported: declaration.exported,
+        isMethod: declaration.isMethod === true,
+        parameterNames: declaration.params.map((param) => param.name),
+      }))).toEqual([
+        {
+          name: 'calc',
+          exported: false,
+          isMethod: false,
+          parameterNames: ['source', 'length'],
+        },
+        {
+          name: 'shifted',
+          exported: true,
+          isMethod: true,
+          parameterNames: ['this', 'amount'],
+        },
+      ]);
+    });
+
+    it('parses wrapped assignment expressions and member-chain continuations', () => {
+      const ast = parse(`indicator("Wrapped Expressions")
+method smooth(float this, int length) => ta.sma(this, length)
+
+value = close +
+    open + // public scripts often annotate wrapped operands
+    high
+smoothed = close
+    .smooth(
+        2
+    )
+plot(value)
+plot(smoothed)
+`);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'FunctionDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'ExpressionStatement',
+        'ExpressionStatement',
+      ]);
+      expect(declarations.map((declaration) => (
+        declaration.names.type === 'VariableDeclarator'
+          ? { name: declaration.names.name.name, init: declaration.init.type }
+          : null
+      ))).toEqual([
+        { name: 'value', init: 'BinaryExpression' },
+        { name: 'smoothed', init: 'CallExpression' },
+      ]);
+    });
+
+    it('parses inline comments on wrapped continuation lines', () => {
+      const ast = parse(`indicator("Wrapped Comments")
+float x = open +
+  high +           // Indented by 2 spaces.
+     low +         // Indented by 5 spaces.
+          close    // Indented by 10 spaces.
+colorLine = plot(
+    series = x, // comment after wrapped argument
+    title = "X",
+    color = color.blue
+)
+upDown(float s) =>
+    bool isGrowing = s > s[1]
+    int ud = isGrowing ?
+        1 : // comment after wrapped ternary consequent
+        -1
+    ud
+plot(upDown(close))
+`);
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'FunctionDeclaration',
+        'ExpressionStatement',
+      ]);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+      expect(declarations.map((declaration) => declaration.init.type)).toEqual([
+        'BinaryExpression',
+        'CallExpression',
+      ]);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'VariableDeclaration',
+          'ExpressionStatement',
+        ]);
+        expect(fn.body[1]?.type === 'VariableDeclaration' ? fn.body[1].init.type : null).toBe('ConditionalExpression');
+      }
+    });
+
+    it('parses declaration and assignment initializers on continuation lines', () => {
+      const ast = parse(`indicator("Continuation Initializers")
+value =
+    close + open
+float smoothed =
+    ta.sma(value, 3)
+[upper, lower] =
+    [high, low]
+value :=
+    value + high
+smoothed +=
+    1
+plot(value + smoothed + upper + lower)
+`);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+      const assignments = ast.body.filter((statement) => statement.type === 'AssignmentStatement');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'AssignmentStatement',
+        'AssignmentStatement',
+        'ExpressionStatement',
+      ]);
+      expect(declarations.map((declaration) => declaration.init.type)).toEqual([
+        'BinaryExpression',
+        'CallExpression',
+        'ArrayExpression',
+      ]);
+      expect(assignments.map((assignment) => (
+        assignment.type === 'AssignmentStatement'
+          ? { operator: assignment.operator, right: assignment.right.type }
+          : null
+      ))).toEqual([
+        { operator: ':=', right: 'BinaryExpression' },
+        { operator: '+=', right: 'NumericLiteral' },
+      ]);
+    });
+
+    it('parses continuation-line initializers inside user-defined function bodies', () => {
+      const ast = parse(`indicator("Function Continuation Initializers")
+score(source) =>
+    value =
+        source + open
+    float basis =
+        ta.sma(value, 3)
+    value :=
+        value + basis
+    value
+plot(score(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'VariableDeclaration',
+          'AssignmentStatement',
+          'ExpressionStatement',
+        ]);
+        expect(fn.body[0]?.type === 'VariableDeclaration' ? fn.body[0].init.type : null).toBe('BinaryExpression');
+        expect(fn.body[1]?.type === 'VariableDeclaration' ? fn.body[1].init.type : null).toBe('CallExpression');
+        expect(fn.body[2]?.type === 'AssignmentStatement' ? fn.body[2].right.type : null).toBe('BinaryExpression');
+      }
+    });
+
+    it('parses wrapped request and ternary expressions inside nested blocks', () => {
+      const ast = parse(`indicator("Wrapped Public Layout")
+fast = ta.sma(close, 3)
+score() =>
+    basis = request.security(
+        syminfo.tickerid,
+        "60",
+        close > open ?
+            ta.sma(close, 2) :
+            ta.ema(close, 2),
+        lookahead=barmerge.lookahead_off
+    )
+    if basis > fast
+        labelText = str.format(
+            "basis {0}",
+            basis
+        )
+        labelText
+    else
+        "flat"
+plot(str.length(score()))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'FunctionDeclaration',
+        'ExpressionStatement',
+      ]);
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'IfStatement',
+        ]);
+        const basis = fn.body[0];
+        expect(basis.type === 'VariableDeclaration' ? basis.init.type : null).toBe('CallExpression');
+        const branch = fn.body[1];
+        expect(branch.type === 'IfStatement' ? branch.consequent.map((statement) => statement.type) : []).toEqual([
+          'VariableDeclaration',
+          'ExpressionStatement',
+        ]);
+        expect(branch.type === 'IfStatement' && Array.isArray(branch.alternate)
+          ? branch.alternate.map((statement) => statement.type)
+          : []).toEqual(['ExpressionStatement']);
+      }
     });
   });
 

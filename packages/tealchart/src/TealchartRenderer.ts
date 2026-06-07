@@ -695,7 +695,7 @@ export class TealchartRenderer {
    * Handles different line types: 'price' (default), 'order', 'position', 'liquidation'
    */
   private drawPriceLines(bounds: PriceLineLabelBounds[], viewport: Viewport): void {
-    const { ctx, options, margins } = this;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
@@ -826,7 +826,7 @@ export class TealchartRenderer {
         const text = segment.textShort || segment.text;
         chartLabelWidth += ctx.measureText(text).width + 8; // padding only, no gap
       }
-      for (const button of chartLabel.buttons || []) {
+      for (const _button of chartLabel.buttons || []) {
         chartLabelWidth += 16; // button width, no gap
       }
 
@@ -1368,7 +1368,7 @@ export class TealchartRenderer {
     backgroundColor: string,
     textColor: string,
     viewport: Viewport,
-    priceHeight: number,
+    _priceHeight: number,
   ): void {
     const { ctx, options, margins } = this;
 
@@ -1584,12 +1584,11 @@ export class TealchartRenderer {
    * Draw crosshair vertical line, horizontal lines on all panes, and time label
    * Note: Price label for main pane is rendered through the unified PriceLine system
    */
-  drawCrosshair(crosshair: CrosshairState, viewport: Viewport, layout?: UnifiedPaneLayout): void {
+  drawCrosshair(crosshair: CrosshairState, viewport: Viewport, _layout?: UnifiedPaneLayout): void {
     if (!crosshair.visible) return;
 
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left - margins.right;
-    const chartHeight = options.height - margins.top - margins.bottom;
 
     const { x, y } = crosshair;
 
@@ -1844,7 +1843,7 @@ export class TealchartRenderer {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const isStepLine = this.plotStyleUsesStepLine(style);
     const breaksOnNa = this.plotStyleBreaksOnNa(style);
 
     // Set line style
@@ -1933,7 +1932,13 @@ export class TealchartRenderer {
   }
 
   private plotStyleBreaksOnNa(style: PlotStyle): boolean {
-    return style === 'linebr';
+    return style === 'linebr' || style === 'areabr' || style === 'steplinebr';
+  }
+
+  private plotStyleUsesStepLine(style: PlotStyle): boolean {
+    return style === 'stepline'
+      || style === 'steplinebr'
+      || style === 'stepline_diamond';
   }
 
   private renderStepLineDiamondMarkers(
@@ -2358,23 +2363,56 @@ export class TealchartRenderer {
    * Render area fill under/over a line
    */
   private renderAreaFill(plot: PlotOutput, bars: Bar[], viewport: Viewport, fillFromTop: boolean): void {
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
+    this.renderAreaFillWithY(
+      plot,
+      bars,
+      viewport,
+      (value) => this.priceToY(value, viewport, priceHeight),
+      this.getAreaFillBaselineY(
+        plot,
+        fillFromTop,
+        margins.top,
+        priceHeight,
+        (value) => this.priceToY(value, viewport, priceHeight),
+      ),
+      fillFromTop,
+    );
+  }
+
+  private getAreaFillBaselineY(
+    plot: PlotOutput,
+    fillFromTop: boolean,
+    top: number,
+    height: number,
+    valueToY: (value: number) => number,
+  ): number {
+    if (this.hasPlotHistbase(plot)) {
+      return valueToY(this.getPlotHistbase(plot));
+    }
+
+    return fillFromTop ? top : top + height;
+  }
+
+  private renderAreaFillWithY(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    valueToY: (value: number) => number,
+    baselineY: number,
+    breaksOnNa = false,
+  ): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
     const { values, color } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     ctx.fillStyle = baseColor;
     ctx.globalAlpha = 0.2;
-
-    const baselineY = this.hasPlotHistbase(plot)
-      ? this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight)
-      : fillFromTop
-        ? margins.top
-        : margins.top + priceHeight;
 
     ctx.beginPath();
     let started = false;
@@ -2392,11 +2430,15 @@ export class TealchartRenderer {
       }
 
       if (value === null || value === undefined || isNaN(value)) {
+        if (breaksOnNa && started) {
+          this.closeAreaFillPath(firstX, lastX, baselineY);
+          started = false;
+        }
         continue;
       }
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
-      const y = this.priceToY(value, viewport, priceHeight);
+      const y = valueToY(value);
 
       if (!started) {
         ctx.moveTo(x, baselineY);
@@ -2410,13 +2452,19 @@ export class TealchartRenderer {
     }
 
     if (started) {
-      ctx.lineTo(lastX, baselineY);
-      ctx.lineTo(firstX, baselineY);
-      ctx.closePath();
-      ctx.fill();
+      this.closeAreaFillPath(firstX, lastX, baselineY);
     }
 
     ctx.globalAlpha = 1;
+  }
+
+  private closeAreaFillPath(firstX: number, lastX: number, baselineY: number): void {
+    const { ctx } = this;
+
+    ctx.lineTo(lastX, baselineY);
+    ctx.lineTo(firstX, baselineY);
+    ctx.closePath();
+    ctx.fill();
   }
 
   private renderFill(
@@ -3036,7 +3084,7 @@ export class TealchartRenderer {
     priceLines: PriceLine[],
     viewport: Viewport,
     layout: UnifiedPaneLayout,
-    plots?: PlotOutput[],
+    _plots?: PlotOutput[],
     _crosshair?: { y: number; visible: boolean; color: string },
   ): PriceLineLabelBounds[] {
     const { ctx, options } = this;
@@ -3487,7 +3535,7 @@ export class TealchartRenderer {
     executionLines?: ExecutionLineRenderData[],
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { options } = this;
 
     // Compute pixel positions for all panes
     const computedPanes = this.computePanesLayout(layout, options.height);
@@ -3563,7 +3611,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { ctx, options } = this;
 
     // Clip to pane bounds for indicator panes only
     // Main pane is NOT clipped so candles can render under the top bar (transparent overlay)
@@ -3609,7 +3657,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { options } = this;
 
     // Draw grid for main pane
     this.renderPaneGrid(pane, viewport);
@@ -3850,7 +3898,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { ctx, options } = this;
 
     // Draw pane background first (same as main chart for consistency)
     ctx.fillStyle = options.backgroundColor;
@@ -4067,7 +4115,6 @@ export class TealchartRenderer {
     // Volume uses bottom 15% of main pane
     const volumeRatio = 0.15;
     const volumeHeight = pane.height * volumeRatio;
-    const volumeTop = pane.bottom - volumeHeight;
 
     const maxVolume = Math.max(...bars.map((b) => b.volume));
     if (maxVolume === 0) return;
@@ -4258,7 +4305,7 @@ export class TealchartRenderer {
     ctx.lineJoin = 'round';
     ctx.setLineDash(this.lineStyleToDashPattern(effectiveLineStyle));
 
-    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const isStepLine = this.plotStyleUsesStepLine(style);
 
     ctx.beginPath();
     let isDrawing = false;
@@ -4333,6 +4380,23 @@ export class TealchartRenderer {
       });
     }
 
+    if (style === 'area' || style === 'areabr') {
+      this.renderAreaFillWithY(
+        plot,
+        bars,
+        viewport,
+        (value) => this.valueToY(value, pane),
+        this.getAreaFillBaselineY(
+          plot,
+          style === 'areabr',
+          pane.top,
+          pane.height,
+          (value) => this.valueToY(value, pane),
+        ),
+        style === 'areabr',
+      );
+    }
+
     this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
 
     // Reset line dash
@@ -4353,7 +4417,7 @@ export class TealchartRenderer {
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
 
-    const { values, color, linewidth = 1 } = plot;
+    const { values, color } = plot;
     const plotBaseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     // Check for style overrides
@@ -4425,7 +4489,7 @@ export class TealchartRenderer {
     viewport: Viewport,
     pane: ComputedPane,
   ): PriceLineLabelBounds[] {
-    const { ctx, options, margins } = this;
+    const { ctx, margins } = this;
 
     // Calculate initial bounds for each label
     const labelFont = `11px ${this.font}`;
@@ -4650,7 +4714,7 @@ export class TealchartRenderer {
         const text = segment.textShort || segment.text;
         chartLabelWidth += ctx.measureText(text).width + 8; // padding only, no gap
       }
-      for (const button of chartLabel.buttons || []) {
+      for (const _button of chartLabel.buttons || []) {
         chartLabelWidth += 16; // button width, no gap
       }
 
@@ -4964,7 +5028,7 @@ export class TealchartRenderer {
     ctx.lineJoin = 'round';
     ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
 
-    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const isStepLine = this.plotStyleUsesStepLine(style);
 
     ctx.beginPath();
     let isDrawing = false;
@@ -5024,6 +5088,23 @@ export class TealchartRenderer {
 
     if (style === 'stepline_diamond') {
       this.renderStepLineDiamondMarkers(plot, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+    }
+
+    if (style === 'area' || style === 'areabr') {
+      this.renderAreaFillWithY(
+        plot,
+        bars,
+        viewport,
+        (value) => this.valueToPaneY(value, paneOffset),
+        this.getAreaFillBaselineY(
+          plot,
+          style === 'areabr',
+          paneOffset.top,
+          paneOffset.height,
+          (value) => this.valueToPaneY(value, paneOffset),
+        ),
+        style === 'areabr',
+      );
     }
 
     ctx.setLineDash([]);

@@ -175,7 +175,7 @@ import {
   removeMapValue,
   type PineMap,
 } from './maps';
-import { Scope, createRootScope, type ScopeSnapshot } from './scope';
+import { Scope, createRootScope, type ScopeSnapshot, type SourceSeriesAccessor } from './scope';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
@@ -193,6 +193,7 @@ import {
   fillPendingStrategyMarketOrders,
   fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
+  hasReachedStrategyOrderRiskLimit,
   markStrategyLedgerToMarket,
   selectStrategyIntrabarContext,
   submitStrategyOrder,
@@ -207,6 +208,23 @@ import {
   type StrategyQuantityType,
   type StrategyTrade,
 } from './strategy';
+
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
 
 /**
  * Execution result
@@ -314,6 +332,17 @@ export interface RuntimeProfile {
  */
 export interface ExecutionError {
   message: string;
+  code?: RuntimeErrorCode;
+  line?: number;
+  column?: number;
+  runtimeError?: RuntimeErrorPayload;
+}
+
+export type RuntimeErrorCode = 'runtime.error';
+
+export interface RuntimeErrorPayload {
+  code: RuntimeErrorCode;
+  message: string;
   line?: number;
   column?: number;
 }
@@ -345,6 +374,19 @@ interface ImportedLibrary {
   constants: Map<string, unknown>;
 }
 
+type SeriesAccessor = SourceSeriesAccessor;
+
+interface KnownSourceValue {
+  __tealscriptKnownSource: true;
+  value: number;
+  series: SeriesAccessor;
+}
+
+interface CallSourceBindings {
+  positional: Array<SeriesAccessor | undefined>;
+  named: Map<string, SeriesAccessor>;
+}
+
 type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
 type RuntimeSessionKind = Extract<SessionClosureKind, 'premarket' | 'regular' | 'postmarket' | 'extended'>;
 
@@ -373,6 +415,14 @@ interface ExpressionHistoryEntry {
   barIndex: number;
   values: unknown[];
 }
+
+interface StaticNameInfo {
+  isCollection: boolean;
+  numericValue: number | null;
+  booleanValue: boolean | null;
+}
+
+type StaticCollectionScopes = Array<Map<string, StaticNameInfo>>;
 
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
 
@@ -408,8 +458,10 @@ export class TealscriptEngine {
   private requestExpressionIds = new WeakMap<Expression, number>();
   private callExpressionIds = new WeakMap<CallExpression, number>();
   private expressionHistory = new WeakMap<Expression, ExpressionHistoryEntry>();
+  private sourceSeriesIds = new WeakMap<SeriesAccessor, number>();
   private nextRequestExpressionId = 0;
   private nextCallExpressionId = 0;
+  private nextSourceSeriesId = 0;
   private inferredMaxBarsBack = 0;
   private userFunctionCallStack: string[] = [];
   private importedLibraryCallStack: string[] = [];
@@ -503,7 +555,7 @@ export class TealscriptEngine {
     this.expressionHistory = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.nextCallExpressionId = 0;
-    this.inferredMaxBarsBack = 0;
+    this.inferredMaxBarsBack = this.inferStaticMaxBarsBack(ast);
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
@@ -574,11 +626,7 @@ export class TealscriptEngine {
       try {
         this.executeStatement(stmt);
       } catch (error) {
-        this.errors.push({
-          message: error instanceof Error ? error.message : String(error),
-          line: stmt.loc?.start.line,
-          column: stmt.loc?.start.column,
-        });
+        this.errors.push(createExecutionError(error, stmt.loc?.start.line, stmt.loc?.start.column));
         if (error instanceof RuntimeErrorException) {
           return true;
         }
@@ -664,6 +712,916 @@ export class TealscriptEngine {
     this.profileStatements = 0;
     this.profileExpressions = 0;
     this.profileBuiltinCalls = 0;
+  }
+
+  private inferStaticMaxBarsBack(ast: Program): number {
+    return this.inferStatementsMaxBarsBack(ast.body, [new Map()]);
+  }
+
+  private inferStatementsMaxBarsBack(statements: Statement[], collectionScopes: StaticCollectionScopes): number {
+    return statements.reduce((max, statement) => Math.max(max, this.inferStatementMaxBarsBack(statement, collectionScopes)), 0);
+  }
+
+  private inferStatementMaxBarsBack(statement: Statement, collectionScopes: StaticCollectionScopes): number {
+    switch (statement.type) {
+      case 'IndicatorDeclaration':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.title, collectionScopes),
+          this.inferOptionalExpressionsMaxBarsBack(collectionScopes, [
+            statement.shorttitle,
+            statement.overlay,
+            statement.format,
+            statement.precision,
+            statement.scale,
+            statement.max_bars_back,
+            statement.max_labels_count,
+            statement.max_lines_count,
+            statement.max_boxes_count,
+            statement.max_polylines_count,
+            statement.timeframe,
+            statement.timeframe_gaps,
+            statement.explicit_plot_zorder,
+            statement.behind_chart,
+            statement.calc_bars_count,
+            statement.dynamic_requests,
+            statement.initial_capital,
+            statement.currency,
+            statement.default_qty_type,
+            statement.default_qty_value,
+            statement.pyramiding,
+            statement.commission_type,
+            statement.commission_value,
+            statement.slippage,
+            statement.margin_long,
+            statement.margin_short,
+            statement.calc_on_order_fills,
+            statement.calc_on_every_tick,
+            statement.process_orders_on_close,
+            statement.use_bar_magnifier,
+            statement.risk_free_rate,
+            statement.backtest_fill_limits_assumption,
+            statement.close_entries_rule,
+            statement.fill_orders_on_standard_ohlc,
+          ]),
+        );
+      case 'LibraryDeclaration':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.title, collectionScopes),
+          this.inferOptionalExpressionsMaxBarsBack(collectionScopes, [
+            statement.overlay,
+            statement.dynamic_requests,
+          ]),
+        );
+      case 'TypeDeclaration':
+        return statement.fields.reduce(
+          (max, field) => Math.max(max, field.defaultValue ? this.inferExpressionMaxBarsBack(field.defaultValue, collectionScopes) : 0),
+          0,
+        );
+      case 'EnumDeclaration':
+        return 0;
+      case 'FunctionDeclaration':
+        return this.withStaticCollectionScope(collectionScopes, () => {
+          for (const param of statement.params) {
+            this.setStaticNameInfo(
+              param.name,
+              this.isCollectionTypeAnnotation(param.typeAnnotation),
+              param.defaultValue ? this.inferStaticNumericValue(param.defaultValue, collectionScopes) : null,
+              param.defaultValue ? this.inferStaticBooleanValue(param.defaultValue, collectionScopes) : null,
+              collectionScopes,
+            );
+          }
+          return Math.max(
+            this.inferOptionalExpressionsMaxBarsBack(
+              collectionScopes,
+              statement.params.map((param) => param.defaultValue),
+            ),
+            this.inferFunctionBodyMaxBarsBack(statement.body, collectionScopes),
+          );
+        });
+      case 'VariableDeclaration': {
+        const initMax = this.inferInitializerMaxBarsBack(statement.init, collectionScopes);
+        const isCollection = this.isCollectionTypeAnnotation(statement.typeAnnotation)
+          || (statement.init.type !== 'IfStatement' && this.expressionReturnsCollection(statement.init, collectionScopes));
+        const numericValue = statement.init.type === 'IfStatement'
+          ? null
+          : this.inferStaticNumericValue(statement.init, collectionScopes);
+        const booleanValue = statement.init.type === 'IfStatement'
+          ? null
+          : this.inferStaticBooleanValue(statement.init, collectionScopes);
+        if (statement.names.type === 'VariableDeclarator') {
+          this.setStaticNameInfo(statement.names.name.name, isCollection, numericValue, booleanValue, collectionScopes);
+        } else {
+          for (const name of statement.names.names) {
+            this.setStaticNameInfo(name.name, false, null, null, collectionScopes);
+          }
+        }
+        return initMax;
+      }
+      case 'AssignmentStatement': {
+        const rightMax = this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
+        if (statement.left.type === 'Identifier') {
+          this.assignStaticNameInfo(
+            statement.left.name,
+            this.expressionReturnsCollection(statement.right, collectionScopes),
+            this.inferStaticNumericValue(statement.right, collectionScopes),
+            this.inferStaticBooleanValue(statement.right, collectionScopes),
+            collectionScopes,
+          );
+        }
+        return Math.max(
+          this.inferAssignmentTargetMaxBarsBack(statement.left, collectionScopes),
+          rightMax,
+        );
+      }
+      case 'ExpressionStatement':
+        return this.inferExpressionMaxBarsBack(statement.expression, collectionScopes);
+      case 'IfStatement':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.test, collectionScopes),
+          this.withStaticCollectionScope(
+            collectionScopes,
+            () => this.inferStatementsMaxBarsBack(statement.consequent, collectionScopes),
+          ),
+          this.inferIfAlternateMaxBarsBack(statement.alternate, collectionScopes),
+        );
+      case 'ForStatement':
+        if (statement.kind === 'collection') {
+          return Math.max(
+            this.inferExpressionMaxBarsBack(statement.iterable, collectionScopes),
+            this.withStaticCollectionScope(collectionScopes, () => {
+              this.setStaticNameInfo(statement.counter.name, false, null, null, collectionScopes);
+              if (statement.indexCounter) this.setStaticNameInfo(statement.indexCounter.name, false, null, null, collectionScopes);
+              return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
+            }),
+          );
+        }
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.start, collectionScopes),
+          this.inferExpressionMaxBarsBack(statement.end, collectionScopes),
+          statement.step ? this.inferExpressionMaxBarsBack(statement.step, collectionScopes) : 0,
+          this.withStaticCollectionScope(collectionScopes, () => {
+            this.setStaticNameInfo(statement.counter.name, false, null, null, collectionScopes);
+            return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
+          }),
+        );
+      case 'WhileStatement':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.test, collectionScopes),
+          this.withStaticCollectionScope(
+            collectionScopes,
+            () => this.inferStatementsMaxBarsBack(statement.body, collectionScopes),
+          ),
+        );
+      case 'ImportDeclaration':
+      case 'BreakStatement':
+      case 'ContinueStatement':
+        return 0;
+    }
+  }
+
+  private inferExpressionMaxBarsBack(expression: Expression, collectionScopes: StaticCollectionScopes): number {
+    switch (expression.type) {
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+      case 'Identifier':
+      case 'NaExpression':
+        return 0;
+      case 'BinaryExpression':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(expression.left, collectionScopes),
+          this.inferExpressionMaxBarsBack(expression.right, collectionScopes),
+        );
+      case 'UnaryExpression':
+        return this.inferExpressionMaxBarsBack(expression.argument, collectionScopes);
+      case 'ConditionalExpression':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(expression.test, collectionScopes),
+          this.inferExpressionMaxBarsBack(expression.consequent, collectionScopes),
+          this.inferExpressionMaxBarsBack(expression.alternate, collectionScopes),
+        );
+      case 'SwitchExpression':
+        return Math.max(
+          expression.discriminant ? this.inferExpressionMaxBarsBack(expression.discriminant, collectionScopes) : 0,
+          expression.cases.reduce(
+            (max, switchCase) => Math.max(
+              max,
+              switchCase.test ? this.inferExpressionMaxBarsBack(switchCase.test, collectionScopes) : 0,
+              Array.isArray(switchCase.consequent)
+                ? this.withStaticCollectionScope(
+                  collectionScopes,
+                  () => this.inferStatementsMaxBarsBack(switchCase.consequent as Statement[], collectionScopes),
+                )
+                : this.inferExpressionMaxBarsBack(switchCase.consequent, collectionScopes),
+            ),
+            0,
+          ),
+        );
+      case 'ForStatement':
+      case 'WhileStatement':
+        return this.inferStatementMaxBarsBack(expression, collectionScopes);
+      case 'CallExpression':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(expression.callee, collectionScopes),
+          expression.arguments.reduce(
+            (max, argument) => Math.max(max, this.inferExpressionMaxBarsBack(argument.value, collectionScopes)),
+            0,
+          ),
+          this.inferMaxBarsBackHint(expression, collectionScopes),
+          this.inferStaticLookbackCallMaxBarsBack(expression, collectionScopes),
+        );
+      case 'MemberExpression':
+        return this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
+      case 'IndexExpression': {
+        const indexMax = this.inferExpressionMaxBarsBack(expression.index, collectionScopes);
+        const objectMax = this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
+        const offset = this.staticHistoryOffset(expression.index, collectionScopes);
+        if (offset === null || this.expressionReturnsCollection(expression.object, collectionScopes)) {
+          return Math.max(indexMax, objectMax);
+        }
+        return Math.max(indexMax, objectMax, offset);
+      }
+      case 'ArrayExpression':
+        return expression.elements.reduce(
+          (max, element) => Math.max(max, this.inferExpressionMaxBarsBack(element, collectionScopes)),
+          0,
+        );
+    }
+  }
+
+  private inferFunctionBodyMaxBarsBack(body: FunctionDeclaration['body'], collectionScopes: StaticCollectionScopes): number {
+    return Array.isArray(body)
+      ? this.inferStatementsMaxBarsBack(body, collectionScopes)
+      : this.inferExpressionMaxBarsBack(body, collectionScopes);
+  }
+
+  private inferInitializerMaxBarsBack(init: VariableDeclaration['init'], collectionScopes: StaticCollectionScopes): number {
+    return init.type === 'IfStatement'
+      ? this.inferStatementMaxBarsBack(init, collectionScopes)
+      : this.inferExpressionMaxBarsBack(init, collectionScopes);
+  }
+
+  private inferAssignmentTargetMaxBarsBack(target: AssignmentStatement['left'], collectionScopes: StaticCollectionScopes): number {
+    if (target.type === 'Identifier') return 0;
+    if (target.type === 'MemberExpression') return this.inferExpressionMaxBarsBack(target.object, collectionScopes);
+    return Math.max(
+      this.inferExpressionMaxBarsBack(target.object, collectionScopes),
+      this.inferExpressionMaxBarsBack(target.index, collectionScopes),
+    );
+  }
+
+  private inferOptionalExpressionsMaxBarsBack(
+    collectionScopes: StaticCollectionScopes,
+    expressions: Array<Expression | undefined>,
+  ): number {
+    return expressions.reduce(
+      (max, expression) => Math.max(max, expression ? this.inferExpressionMaxBarsBack(expression, collectionScopes) : 0),
+      0,
+    );
+  }
+
+  private inferMaxBarsBackHint(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    if (this.getCallExpressionName(expression) !== 'max_bars_back') return 0;
+
+    const value = this.getStaticOrderedCallArgument(expression, ['var', 'num'], 1);
+    if (!value) return 0;
+
+    const numericValue = this.inferStaticNumericValue(value, collectionScopes);
+    if (numericValue === null || !Number.isFinite(numericValue)) return 0;
+
+    const offset = this.normalizeIndexOffset(numericValue);
+    return offset ?? 0;
+  }
+
+  private inferStaticLookbackCallMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    const name = this.getCallExpressionName(expression);
+    switch (name) {
+      case 'math.sum':
+      case 'ta.sma':
+      case 'ta.ema':
+      case 'ta.rma':
+      case 'ta.stdev':
+      case 'ta.variance':
+      case 'ta.range':
+      case 'ta.dev':
+      case 'ta.cog':
+      case 'ta.median':
+      case 'ta.mode':
+      case 'ta.percentile_nearest_rank':
+      case 'ta.percentile_linear_interpolation':
+      case 'ta.percentrank':
+      case 'ta.vwma':
+      case 'ta.wma':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.cci':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 0, 20);
+      case 'ta.hma':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.alma':
+      case 'ta.bb':
+      case 'ta.bbw':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['series', 'length'], 1, collectionScopes);
+      case 'ta.atr':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['length'], 0, collectionScopes, 1);
+      case 'ta.correlation':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source1', 'source2', 'length'], 2, collectionScopes);
+      case 'ta.linreg':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length', 'offset'], 1, collectionScopes);
+      case 'ta.stoch':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'high', 'low', 'length'], 3, collectionScopes, 0, 14);
+      case 'ta.wpr':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['length'], 0, collectionScopes, 0, 14);
+      case 'ta.swma':
+        return 3;
+      case 'ta.highest':
+      case 'ta.lowest':
+      case 'ta.highestbars':
+      case 'ta.lowestbars':
+        return this.inferStaticTaSourceLengthMaxBarsBack(expression, collectionScopes);
+      case 'ta.pivothigh':
+      case 'ta.pivotlow':
+        return this.inferStaticPivotMaxBarsBack(expression, collectionScopes);
+      case 'ta.change':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 1);
+      case 'ta.rsi':
+      case 'ta.rising':
+      case 'ta.falling':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
+      case 'ta.cmo':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 14);
+      case 'ta.mom':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 10);
+      case 'ta.roc':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 1);
+      case 'ta.mfi':
+        if (expression.arguments.some((argument) => argument.name?.name === 'series') && !expression.arguments.some((argument) => argument.name?.name === 'source')) {
+          return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['series', 'length'], 1, collectionScopes, 1, 14);
+        }
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 14);
+      case 'ta.tsi':
+        return Math.max(
+          1,
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'short_length', 'long_length'], 1, collectionScopes),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'short_length', 'long_length'], 2, collectionScopes),
+        );
+      case 'ta.kc':
+      case 'ta.kcw':
+        return this.inferStaticKeltnerMaxBarsBack(expression, collectionScopes);
+      case 'ta.dmi':
+        return this.inferStaticDmiMaxBarsBack(expression, collectionScopes);
+      case 'ta.supertrend':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['factor', 'atrPeriod'], 1, collectionScopes, 1, 10);
+      case 'ta.sar':
+        return 2;
+      case 'ta.obv':
+      case 'ta.tr':
+        return 1;
+      case 'ta.crossover':
+      case 'ta.crossunder':
+      case 'ta.cross':
+        return 1;
+      case 'ta.macd':
+        return Math.max(
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 1, collectionScopes, 0, 12),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 2, collectionScopes, 0, 26),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 3, collectionScopes, 0, 9),
+        );
+      default:
+        return 0;
+    }
+  }
+
+  private inferStaticLookbackArgumentMaxBarsBack(
+    expression: CallExpression,
+    params: readonly string[],
+    index: number,
+    collectionScopes: StaticCollectionScopes,
+    extraPriorBars = 0,
+    defaultLength?: number,
+  ): number {
+    const argument = this.getStaticOrderedCallArgument(expression, params, index);
+    const value = argument ? this.inferStaticNumericValue(argument, collectionScopes) : defaultLength ?? null;
+    if (value === null || !Number.isFinite(value)) return 0;
+
+    const length = Math.max(0, Math.trunc(value));
+    return Math.max(0, length - 1 + extraPriorBars);
+  }
+
+  private inferStaticTaSourceLengthMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    if (!expression.arguments.some((argument) => argument.name?.name === 'source' || argument.name?.name === 'length')) {
+      const positionalArgs = expression.arguments.filter((argument) => !argument.name);
+      if (positionalArgs.length === 1) {
+        const value = this.inferStaticNumericValue(positionalArgs[0].value, collectionScopes);
+        if (value === null || !Number.isFinite(value)) return 0;
+
+        const length = Math.max(0, Math.trunc(value));
+        return Math.max(0, length - 1);
+      }
+    }
+
+    return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+  }
+
+  private inferStaticKeltnerMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    const lengthMaxBarsBack = this.inferStaticLookbackArgumentMaxBarsBack(
+      expression,
+      ['series', 'length', 'mult', 'useTrueRange'],
+      1,
+      collectionScopes,
+    );
+    const useTrueRangeArgument = this.getStaticOrderedCallArgument(expression, ['series', 'length', 'mult', 'useTrueRange'], 3);
+    const useTrueRange = useTrueRangeArgument ? this.inferStaticBooleanValue(useTrueRangeArgument, collectionScopes) : true;
+    return useTrueRange === false ? lengthMaxBarsBack : Math.max(lengthMaxBarsBack, 1);
+  }
+
+  private inferStaticDmiMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    return Math.max(
+      this.inferStaticLookbackArgumentMaxBarsBack(expression, ['diLength', 'adxSmoothing'], 0, collectionScopes, 1, 14),
+      this.inferStaticLookbackArgumentMaxBarsBack(expression, ['diLength', 'adxSmoothing'], 1, collectionScopes, 0, 14),
+    );
+  }
+
+  private inferStaticPivotMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    const usesExplicitSource = expression.arguments.some((argument) => argument.name?.name === 'source')
+      || expression.arguments.filter((argument) => !argument.name).length >= 3;
+    const params = usesExplicitSource ? ['source', 'leftbars', 'rightbars'] : ['leftbars', 'rightbars'];
+    const leftIndex = usesExplicitSource ? 1 : 0;
+    const rightIndex = usesExplicitSource ? 2 : 1;
+    const left = this.inferStaticPivotBarsArgument(expression, params, leftIndex, collectionScopes);
+    const right = this.inferStaticPivotBarsArgument(expression, params, rightIndex, collectionScopes);
+    return left + right;
+  }
+
+  private inferStaticPivotBarsArgument(
+    expression: CallExpression,
+    params: readonly string[],
+    index: number,
+    collectionScopes: StaticCollectionScopes,
+  ): number {
+    const argument = this.getStaticOrderedCallArgument(expression, params, index);
+    const value = argument ? this.inferStaticNumericValue(argument, collectionScopes) : 5;
+    if (value === null || !Number.isFinite(value)) return 0;
+    return Math.max(0, Math.trunc(value));
+  }
+
+  private inferIfAlternateMaxBarsBack(alternate: IfStatement['alternate'], collectionScopes: StaticCollectionScopes): number {
+    if (!alternate) return 0;
+    return Array.isArray(alternate)
+      ? this.withStaticCollectionScope(
+        collectionScopes,
+        () => this.inferStatementsMaxBarsBack(alternate, collectionScopes),
+      )
+      : this.inferStatementMaxBarsBack(alternate, collectionScopes);
+  }
+
+  private isCollectionTypeAnnotation(typeAnnotation: TypeAnnotation | null | undefined): boolean {
+    return typeAnnotation?.baseType === 'array' || typeAnnotation?.baseType === 'matrix' || typeAnnotation?.baseType === 'map';
+  }
+
+  private expressionReturnsCollection(expression: Expression, collectionScopes: StaticCollectionScopes): boolean {
+    if (expression.type === 'ArrayExpression') return true;
+    if (expression.type === 'Identifier') return this.isStaticCollectionName(expression.name, collectionScopes);
+    if (expression.type !== 'CallExpression') return false;
+
+    const name = this.getCallExpressionName(expression);
+    return !!name && (
+      name.startsWith('array.')
+      || name.startsWith('matrix.')
+      || name === 'str.split'
+      || name === 'request.security_lower_tf'
+    );
+  }
+
+  private withStaticCollectionScope<T>(collectionScopes: StaticCollectionScopes, callback: () => T): T {
+    collectionScopes.push(new Map());
+    try {
+      return callback();
+    } finally {
+      collectionScopes.pop();
+    }
+  }
+
+  private setStaticNameInfo(
+    name: string,
+    isCollection: boolean,
+    numericValue: number | null,
+    booleanValue: boolean | null,
+    collectionScopes: StaticCollectionScopes,
+  ): void {
+    collectionScopes[collectionScopes.length - 1].set(name, { isCollection, numericValue, booleanValue });
+  }
+
+  private assignStaticNameInfo(
+    name: string,
+    isCollection: boolean,
+    numericValue: number | null,
+    booleanValue: boolean | null,
+    collectionScopes: StaticCollectionScopes,
+  ): void {
+    for (let index = collectionScopes.length - 1; index >= 0; index--) {
+      if (collectionScopes[index].has(name)) {
+        collectionScopes[index].set(name, { isCollection, numericValue, booleanValue });
+        return;
+      }
+    }
+    this.setStaticNameInfo(name, isCollection, numericValue, booleanValue, collectionScopes);
+  }
+
+  private isStaticCollectionName(name: string, collectionScopes: StaticCollectionScopes): boolean {
+    return this.getStaticNameInfo(name, collectionScopes)?.isCollection ?? false;
+  }
+
+  private getStaticNumericName(name: string, collectionScopes: StaticCollectionScopes): number | null {
+    return this.getStaticNameInfo(name, collectionScopes)?.numericValue ?? null;
+  }
+
+  private getStaticBooleanName(name: string, collectionScopes: StaticCollectionScopes): boolean | null {
+    return this.getStaticNameInfo(name, collectionScopes)?.booleanValue ?? null;
+  }
+
+  private getStaticNameInfo(name: string, collectionScopes: StaticCollectionScopes): StaticNameInfo | null {
+    for (let index = collectionScopes.length - 1; index >= 0; index--) {
+      const nameInfo = collectionScopes[index].get(name);
+      if (nameInfo) return nameInfo;
+    }
+    return null;
+  }
+
+  private getCallExpressionName(expression: CallExpression): string | null {
+    if (expression.callee.type === 'Identifier') return expression.callee.name;
+    if (expression.callee.type === 'MemberExpression') {
+      return this.getMemberPath(expression.callee)?.join('.') ?? null;
+    }
+    return null;
+  }
+
+  private staticHistoryOffset(expression: Expression, collectionScopes: StaticCollectionScopes): number | null {
+    const value = this.inferStaticNumericValue(expression, collectionScopes);
+    return value === null ? null : this.normalizeIndexOffset(value);
+  }
+
+  private inferStaticNumericValue(expression: Expression, collectionScopes: StaticCollectionScopes): number | null {
+    switch (expression.type) {
+      case 'NumericLiteral':
+        return expression.value;
+      case 'Identifier':
+        return this.getStaticNumericName(expression.name, collectionScopes);
+      case 'UnaryExpression': {
+        const value = this.inferStaticNumericValue(expression.argument, collectionScopes);
+        if (value === null) return null;
+        if (expression.operator === '-') return -value;
+        if (expression.operator === '+') return value;
+        return null;
+      }
+      case 'BinaryExpression':
+        return this.inferStaticBinaryNumericValue(expression, collectionScopes);
+      case 'ConditionalExpression': {
+        const test = this.inferStaticBooleanValue(expression.test, collectionScopes);
+        if (test === null) return null;
+        return this.inferStaticNumericValue(
+          test ? expression.consequent : expression.alternate,
+          collectionScopes,
+        );
+      }
+      case 'CallExpression':
+        return this.inferStaticNumericCallValue(expression, collectionScopes);
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticBinaryNumericValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const left = this.inferStaticNumericValue(expression.left, collectionScopes);
+    const right = this.inferStaticNumericValue(expression.right, collectionScopes);
+    if (left === null || right === null) return null;
+
+    switch (expression.operator) {
+      case '+':
+        return left + right;
+      case '-':
+        return left - right;
+      case '*':
+        return left * right;
+      case '/':
+        return right === 0 ? null : left / right;
+      case '%':
+        return right === 0 ? null : left % right;
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticNumericCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const name = this.getCallExpressionName(expression);
+    if (name === 'input.int' || name === 'input.float') {
+      const defval = this.getStaticCallArgument(expression, ['defval'], 0);
+      return defval ? this.inferStaticNumericValue(defval, collectionScopes) : null;
+    }
+    if (name === 'int' || name === 'float') {
+      return this.inferStaticNumericCastValue(expression, name, collectionScopes);
+    }
+    if (name === 'nz') {
+      return this.inferStaticNzNumericValue(expression, collectionScopes);
+    }
+
+    return this.inferStaticMathCallValue(expression, name, collectionScopes);
+  }
+
+  private inferStaticNumericCastValue(
+    expression: CallExpression,
+    name: 'int' | 'float',
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const argument = this.getStaticOrderedCallArgument(expression, ['x'], 0);
+    if (!argument) return null;
+
+    const value = this.inferStaticNumericValue(argument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return null;
+    return name === 'int' ? Math.trunc(value) : value;
+  }
+
+  private inferStaticNzNumericValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const source = this.getStaticOrderedCallArgument(expression, ['source', 'replacement'], 0);
+    if (!source) return null;
+
+    const sourceValue = this.inferStaticNumericValue(source, collectionScopes);
+    if (sourceValue !== null && Number.isFinite(sourceValue)) return sourceValue;
+    if (source.type !== 'NaExpression') return null;
+
+    const replacement = this.getStaticOrderedCallArgument(expression, ['source', 'replacement'], 1);
+    if (!replacement) return 0;
+
+    const replacementValue = this.inferStaticNumericValue(replacement, collectionScopes);
+    return replacementValue !== null && Number.isFinite(replacementValue) ? replacementValue : null;
+  }
+
+  private inferStaticMathCallValue(
+    expression: CallExpression,
+    name: string | null,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    switch (name) {
+      case 'math.max':
+        return this.inferStaticVariadicMathCallValue(expression, Math.max, collectionScopes);
+      case 'math.min':
+        return this.inferStaticVariadicMathCallValue(expression, Math.min, collectionScopes);
+      case 'math.avg':
+        return this.inferStaticVariadicMathCallValue(
+          expression,
+          (...values) => values.reduce((sum, value) => sum + value, 0) / values.length,
+          collectionScopes,
+        );
+      case 'math.abs':
+        return this.inferStaticUnaryMathCallValue(expression, Math.abs, collectionScopes);
+      case 'math.sqrt':
+        return this.inferStaticUnaryMathCallValue(expression, Math.sqrt, collectionScopes);
+      case 'math.pow':
+        return this.inferStaticBinaryMathCallValue(expression, ['base', 'exponent'], Math.pow, collectionScopes);
+      case 'math.trunc':
+        return this.inferStaticUnaryMathCallValue(expression, Math.trunc, collectionScopes);
+      case 'math.floor':
+        return this.inferStaticUnaryMathCallValue(expression, Math.floor, collectionScopes);
+      case 'math.ceil':
+        return this.inferStaticUnaryMathCallValue(expression, Math.ceil, collectionScopes);
+      case 'math.round':
+        return this.inferStaticRoundCallValue(expression, collectionScopes);
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticVariadicMathCallValue(
+    expression: CallExpression,
+    fn: (...values: number[]) => number,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const args = this.getStaticVariadicCallArguments(expression, 'number');
+    if (args.length === 0) return null;
+
+    const values = args.map((argument) => this.inferStaticNumericValue(argument, collectionScopes));
+    if (values.some((value) => value === null || !Number.isFinite(value))) return null;
+
+    const result = fn(...(values as number[]));
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticUnaryMathCallValue(
+    expression: CallExpression,
+    fn: (value: number) => number,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const argument = this.getStaticOrderedCallArgument(expression, ['number'], 0);
+    if (!argument) return null;
+
+    const value = this.inferStaticNumericValue(argument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return null;
+
+    const result = fn(value);
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticBinaryMathCallValue(
+    expression: CallExpression,
+    params: readonly [string, string],
+    fn: (left: number, right: number) => number,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const leftArgument = this.getStaticOrderedCallArgument(expression, params, 0);
+    const rightArgument = this.getStaticOrderedCallArgument(expression, params, 1);
+    if (!leftArgument || !rightArgument) return null;
+
+    const left = this.inferStaticNumericValue(leftArgument, collectionScopes);
+    const right = this.inferStaticNumericValue(rightArgument, collectionScopes);
+    if (left === null || right === null || !Number.isFinite(left) || !Number.isFinite(right)) return null;
+
+    const result = fn(left, right);
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticRoundCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const valueArgument = this.getStaticOrderedCallArgument(expression, ['number', 'precision'], 0);
+    if (!valueArgument) return null;
+
+    const value = this.inferStaticNumericValue(valueArgument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return null;
+
+    const precisionArgument = this.getStaticOrderedCallArgument(expression, ['number', 'precision'], 1);
+    const rawPrecision = precisionArgument ? this.inferStaticNumericValue(precisionArgument, collectionScopes) : 0;
+    if (rawPrecision === null || !Number.isFinite(rawPrecision)) return null;
+
+    const factor = 10 ** Math.trunc(rawPrecision);
+    if (!Number.isFinite(factor)) return null;
+
+    const result = Math.round(value * factor) / factor;
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticBooleanValue(expression: Expression, collectionScopes: StaticCollectionScopes): boolean | null {
+    switch (expression.type) {
+      case 'BooleanLiteral':
+        return expression.value;
+      case 'Identifier':
+        return this.getStaticBooleanName(expression.name, collectionScopes);
+      case 'UnaryExpression': {
+        if (expression.operator !== 'not') return null;
+        const value = this.inferStaticBooleanValue(expression.argument, collectionScopes);
+        return value === null ? null : !value;
+      }
+      case 'BinaryExpression':
+        return this.inferStaticBinaryBooleanValue(expression, collectionScopes);
+      case 'ConditionalExpression': {
+        const test = this.inferStaticBooleanValue(expression.test, collectionScopes);
+        if (test === null) return null;
+        return this.inferStaticBooleanValue(test ? expression.consequent : expression.alternate, collectionScopes);
+      }
+      case 'CallExpression':
+        return this.inferStaticBooleanCallValue(expression, collectionScopes);
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticBinaryBooleanValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): boolean | null {
+    if (expression.operator !== 'and' && expression.operator !== 'or') {
+      return this.inferStaticComparisonBooleanValue(expression, collectionScopes);
+    }
+
+    const left = this.inferStaticBooleanValue(expression.left, collectionScopes);
+    const right = this.inferStaticBooleanValue(expression.right, collectionScopes);
+    if (expression.operator === 'and') {
+      if (left === false || right === false) return false;
+      if (left === true && right === true) return true;
+      return null;
+    }
+
+    if (left === true || right === true) return true;
+    if (left === false && right === false) return false;
+    return null;
+  }
+
+  private inferStaticComparisonBooleanValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): boolean | null {
+    if (
+      expression.operator !== '=='
+      && expression.operator !== '!='
+      && expression.operator !== '<'
+      && expression.operator !== '<='
+      && expression.operator !== '>'
+      && expression.operator !== '>='
+    ) {
+      return null;
+    }
+
+    const numericLeft = this.inferStaticNumericValue(expression.left, collectionScopes);
+    const numericRight = this.inferStaticNumericValue(expression.right, collectionScopes);
+    if (numericLeft !== null && numericRight !== null) {
+      switch (expression.operator) {
+        case '==':
+          return numericLeft === numericRight;
+        case '!=':
+          return numericLeft !== numericRight;
+        case '<':
+          return numericLeft < numericRight;
+        case '<=':
+          return numericLeft <= numericRight;
+        case '>':
+          return numericLeft > numericRight;
+        case '>=':
+          return numericLeft >= numericRight;
+      }
+    }
+
+    const booleanLeft = this.inferStaticBooleanValue(expression.left, collectionScopes);
+    const booleanRight = this.inferStaticBooleanValue(expression.right, collectionScopes);
+    if (booleanLeft === null || booleanRight === null) return null;
+
+    if (expression.operator === '==') return booleanLeft === booleanRight;
+    if (expression.operator === '!=') return booleanLeft !== booleanRight;
+    return null;
+  }
+
+  private inferStaticBooleanCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): boolean | null {
+    const name = this.getCallExpressionName(expression);
+    if (name !== 'input.bool') return null;
+
+    const defval = this.getStaticCallArgument(expression, ['defval'], 0);
+    return defval ? this.inferStaticBooleanValue(defval, collectionScopes) : null;
+  }
+
+  private getStaticCallArgument(
+    expression: CallExpression,
+    names: readonly string[],
+    position: number,
+  ): Expression | undefined {
+    for (const argument of expression.arguments) {
+      if (argument.name && names.includes(argument.name.name)) {
+        return argument.value;
+      }
+    }
+
+    let positionalIndex = 0;
+    for (const argument of expression.arguments) {
+      if (argument.name) continue;
+      if (positionalIndex === position) return argument.value;
+      positionalIndex += 1;
+    }
+
+    return undefined;
+  }
+
+  private getStaticOrderedCallArgument(
+    expression: CallExpression,
+    names: readonly string[],
+    position: number,
+  ): Expression | undefined {
+    const name = names[position];
+    if (name) {
+      for (const argument of expression.arguments) {
+        if (argument.name?.name === name) return argument.value;
+      }
+    }
+
+    const priorNamedCount = names
+      .slice(0, position)
+      .filter((priorName) => expression.arguments.some((argument) => argument.name?.name === priorName))
+      .length;
+    const positionalPosition = position - priorNamedCount;
+    let positionalIndex = 0;
+    for (const argument of expression.arguments) {
+      if (argument.name) continue;
+      if (positionalIndex === positionalPosition) return argument.value;
+      positionalIndex += 1;
+    }
+
+    return undefined;
+  }
+
+  private getStaticVariadicCallArguments(expression: CallExpression, prefix: string): Expression[] {
+    const args: Expression[] = [];
+    const assigned: boolean[] = [];
+    for (const argument of expression.arguments) {
+      const name = argument.name?.name;
+      if (!name?.startsWith(prefix)) continue;
+      const suffix = name.slice(prefix.length);
+      if (!/^\d+$/.test(suffix)) continue;
+      const index = Number(suffix);
+      if (!Number.isSafeInteger(index)) continue;
+      args[index] = argument.value;
+      assigned[index] = true;
+    }
+
+    for (const argument of expression.arguments) {
+      if (argument.name) continue;
+      let index = 0;
+      while (assigned[index]) index += 1;
+      args[index] = argument.value;
+      assigned[index] = true;
+    }
+
+    for (let index = 0; index < args.length; index += 1) {
+      if (!assigned[index]) return [];
+    }
+    return args;
   }
 
   /**
@@ -783,11 +1741,7 @@ export class TealscriptEngine {
       try {
         this.executeStatement(stmt);
       } catch (error) {
-        this.errors.push({
-          message: error instanceof Error ? error.message : String(error),
-          line: stmt.loc?.start.line,
-          column: stmt.loc?.start.column,
-        });
+        this.errors.push(createExecutionError(error, stmt.loc?.start.line, stmt.loc?.start.column));
         if (error instanceof RuntimeErrorException) {
           throw error;
         }
@@ -1150,6 +2104,21 @@ export class TealscriptEngine {
     if (stmt.use_bar_magnifier !== undefined) {
       settings.useBarMagnifier = this.isTruthy(this.evaluateExpression(stmt.use_bar_magnifier));
     }
+    if (stmt.risk_free_rate !== undefined) {
+      settings.riskFreeRate = this.normalizeFiniteNumber(this.evaluateExpression(stmt.risk_free_rate), 'strategy risk_free_rate');
+    }
+    if (stmt.backtest_fill_limits_assumption !== undefined) {
+      settings.backtestFillLimitsAssumptionTicks = this.normalizeNonNegativeInteger(
+        this.evaluateExpression(stmt.backtest_fill_limits_assumption),
+        'strategy backtest_fill_limits_assumption',
+      );
+    }
+    if (stmt.close_entries_rule !== undefined) {
+      settings.closeEntriesRule = this.normalizeStrategyCloseEntriesRule(this.evaluateExpression(stmt.close_entries_rule));
+    }
+    if (stmt.fill_orders_on_standard_ohlc !== undefined) {
+      settings.fillOrdersOnStandardOhlc = this.isTruthy(this.evaluateExpression(stmt.fill_orders_on_standard_ohlc));
+    }
 
     this.ctx.setStrategyLedger(settings);
   }
@@ -1178,9 +2147,9 @@ export class TealscriptEngine {
     throw new Error(`import not found in deterministic library registry: ${stmt.path} as ${stmt.alias.name}`);
   }
 
-  private normalizeMaxBarsBack(value: unknown): number {
+  private normalizeMaxBarsBack(value: unknown, label = 'indicator max_bars_back'): number {
     if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || !Number.isInteger(value)) {
-      throw new Error('indicator max_bars_back must be a non-negative integer');
+      throw new Error(`${label} must be a non-negative integer`);
     }
     return value;
   }
@@ -1189,6 +2158,22 @@ export class TealscriptEngine {
     const number = this.toNumber(value);
     if (!Number.isFinite(number) || number < 0) {
       throw new Error(`${name} must be a non-negative number`);
+    }
+    return number;
+  }
+
+  private normalizePositiveNumber(value: unknown, name: string): number {
+    const number = this.toNumber(value);
+    if (!Number.isFinite(number) || number <= 0) {
+      throw new Error(`${name} must be a positive number`);
+    }
+    return number;
+  }
+
+  private normalizeFiniteNumber(value: unknown, name: string): number {
+    const number = this.toNumber(value);
+    if (!Number.isFinite(number)) {
+      throw new Error(`${name} must be a finite number`);
     }
     return number;
   }
@@ -1208,11 +2193,26 @@ export class TealscriptEngine {
     throw new Error(`Invalid strategy default_qty_type: ${this.toStringValue(value)}`);
   }
 
+  private normalizeStrategyCashOrPercentRiskType(value: unknown): 'cash' | 'percent_of_equity' {
+    if (value === 'cash' || value === 'percent_of_equity') {
+      return value;
+    }
+    throw new Error(`Invalid strategy risk type: ${this.toStringValue(value)}`);
+  }
+
   private normalizeStrategyCommissionType(value: unknown): StrategyLedgerSettings['commissionType'] {
     if (value === 'percent' || value === 'cash_per_order' || value === 'cash_per_contract') {
       return value;
     }
     throw new Error(`Invalid strategy commission_type: ${this.toStringValue(value)}`);
+  }
+
+  private normalizeStrategyCloseEntriesRule(value: unknown): StrategyLedgerSettings['closeEntriesRule'] {
+    const rule = this.toStringValue(value).toUpperCase();
+    if (rule === 'FIFO' || rule === 'ANY') {
+      return rule;
+    }
+    throw new Error(`Invalid strategy close_entries_rule: ${this.toStringValue(value)}`);
   }
 
   private applyDrawingLimit(
@@ -1544,8 +2544,15 @@ export class TealscriptEngine {
         return;
       }
       const drawingCount = this.ctx.getDrawingCount();
-      const value = this.evaluateVariableInitializer(stmt.init);
-      this.scope.declare(name, kind, value, this.getTypeAnnotationName(stmt.typeAnnotation));
+      const rawValue = this.evaluateVariableInitializer(stmt.init);
+      const value = this.unwrapKnownSourceValue(rawValue);
+      this.scope.declare(
+        name,
+        kind,
+        value,
+        this.getTypeAnnotationName(stmt.typeAnnotation),
+        this.getSourceSeriesForInitializer(stmt.init, rawValue),
+      );
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
       const names = stmt.names.names.map((name) => name.name).filter((name) => name !== '_');
@@ -1586,7 +2593,8 @@ export class TealscriptEngine {
   }
 
   private executeAssignment(stmt: AssignmentStatement): void {
-    const value = this.evaluateExpression(stmt.right);
+    const rawValue = this.evaluateExpression(stmt.right);
+    const value = this.unwrapKnownSourceValue(rawValue);
 
     if (stmt.left.type === 'Identifier') {
       const name = stmt.left.name;
@@ -1594,7 +2602,11 @@ export class TealscriptEngine {
 
       const newValue = this.applyAssignmentOperator(currentValue, value, stmt.operator);
 
-      this.scope.set(name, newValue);
+      this.scope.set(
+        name,
+        newValue,
+        stmt.operator === ':=' ? this.getSourceSeriesForExpression(stmt.right, rawValue) : undefined,
+      );
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
     } else {
@@ -1829,6 +2841,12 @@ export class TealscriptEngine {
     }
   }
 
+  private getSourceSeriesForInitializer(init: Expression | IfStatement, value?: unknown): SeriesAccessor | undefined {
+    const valueSeries = this.getSourceSeriesForValue(value);
+    if (valueSeries) return valueSeries;
+    return init.type === 'IfStatement' ? undefined : this.getSourceSeriesForExpression(init);
+  }
+
   // ===========================================================================
   // Expression Evaluation
   // ===========================================================================
@@ -1904,6 +2922,10 @@ export class TealscriptEngine {
         return this.ctx.close.get(0);
       case 'volume':
         return this.ctx.volume.get(0);
+      case 'bid':
+        return this.ctx.bid.get(0);
+      case 'ask':
+        return this.ctx.ask.get(0);
       case 'time':
         return this.ctx.time.get(0);
       case 'time_tradingday':
@@ -1941,6 +2963,7 @@ export class TealscriptEngine {
       case 'ohlc4':
         return this.ctx.ohlc4;
       case 'ta.obv':
+        this.recordLookbackLength(2);
         return this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
       case 'ta.iii':
         return this.currentIntradayIntensityIndex();
@@ -2173,17 +3196,23 @@ export class TealscriptEngine {
     // Evaluate arguments
     const args: unknown[] = [];
     const namedArgs = new Map<string, unknown>();
+    const sourceBindings: CallSourceBindings = { positional: [], named: new Map() };
     const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
-
-    for (const arg of expr.arguments) {
-      const value = this.evaluateExpression(arg.value);
+    for (let argIndex = 0; argIndex < expr.arguments.length; argIndex++) {
+      const arg = expr.arguments[argIndex]!;
+      const value = this.shouldPreserveBuiltinSourceArgument(fullName, expr.arguments, argIndex)
+        ? this.evaluateBuiltinSourceArgument(arg.value)
+        : this.evaluateExpression(arg.value);
+      const sourceSeries = this.getSourceSeriesForExpression(arg.value, value);
       if (arg.name) {
         const argName = arg.name.name;
         if (namedArgs.has(argName)) {
           throw new Error(`Duplicate named argument: ${argName}`);
         }
         namedArgs.set(argName, value);
+        if (sourceSeries) sourceBindings.named.set(argName, sourceSeries);
       } else {
+        sourceBindings.positional[args.length] = sourceSeries;
         args.push(value);
       }
     }
@@ -2235,11 +3264,16 @@ export class TealscriptEngine {
     }
 
     if (namespace && this.importedLibraries.has(namespace)) {
-      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
+      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
     }
 
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
+      const receiverSource = this.getSourceSeriesForExpression(expr.callee.object, receiver);
+      const methodSourceBindings: CallSourceBindings = {
+        positional: [receiverSource, ...sourceBindings.positional],
+        named: sourceBindings.named,
+      };
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
         ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
@@ -2253,6 +3287,7 @@ export class TealscriptEngine {
           scopeKey,
           recursionKey,
           hasPositionalArgumentAfterNamed,
+          methodSourceBindings,
         );
       }
       const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs)
@@ -2265,6 +3300,7 @@ export class TealscriptEngine {
           namedArgs,
           hasPositionalArgumentAfterNamed,
           expr,
+          methodSourceBindings,
         );
       }
       if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
@@ -2299,6 +3335,11 @@ export class TealscriptEngine {
         }
         throw error;
       }
+      const receiverSource = this.getSourceSeriesForExpression(expr.callee.object, receiver);
+      const methodSourceBindings: CallSourceBindings = {
+        positional: [receiverSource, ...sourceBindings.positional],
+        named: sourceBindings.named,
+      };
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
         ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
@@ -2312,6 +3353,7 @@ export class TealscriptEngine {
           scopeKey,
           recursionKey,
           hasPositionalArgumentAfterNamed,
+          methodSourceBindings,
         );
       }
       const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs)
@@ -2324,6 +3366,7 @@ export class TealscriptEngine {
           namedArgs,
           hasPositionalArgumentAfterNamed,
           expr,
+          methodSourceBindings,
         );
       }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
@@ -2341,7 +3384,7 @@ export class TealscriptEngine {
       const importedLibrary = this.currentImportedLibrary();
       const libraryFunction = importedLibrary?.functions.get(funcName);
       if (importedLibrary && libraryFunction) {
-        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
       }
 
       const userFunction = this.userFunctions.get(funcName);
@@ -2356,6 +3399,7 @@ export class TealscriptEngine {
           scopeKey,
           recursionKey,
           hasPositionalArgumentAfterNamed,
+          sourceBindings,
         );
       }
     }
@@ -2385,6 +3429,261 @@ export class TealscriptEngine {
       }
     }
     return false;
+  }
+
+  private shouldPreserveBuiltinSourceArgument(fullName: string, args: CallArgument[], argIndex: number): boolean {
+    if (fullName !== 'input.source' && fullName !== 'math.sum' && !fullName.startsWith('ta.')) return false;
+
+    const parameterName = this.getBuiltinSourceArgumentParameterName(fullName, args, argIndex);
+    if (fullName === 'input.source') return parameterName === 'defval';
+    return parameterName !== undefined && ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(parameterName);
+  }
+
+  private getBuiltinSourceArgumentParameterName(fullName: string, args: CallArgument[], argIndex: number): string | undefined {
+    const arg = args[argIndex];
+    if (!arg) return undefined;
+
+    const name = arg.name?.name;
+    if (name) return name;
+
+    const parameters = this.getBuiltinSourcePreservationParameters(fullName);
+    if (!parameters) return undefined;
+
+    const namedParameters = new Set(args.map((candidate) => candidate.name?.name).filter((candidate): candidate is string => candidate !== undefined));
+    let positionalOrdinal = 0;
+    for (let index = 0; index < argIndex; index++) {
+      if (!args[index]!.name) positionalOrdinal++;
+    }
+
+    let currentOrdinal = 0;
+    for (const parameter of parameters) {
+      if (namedParameters.has(parameter)) continue;
+      if (currentOrdinal === positionalOrdinal) return parameter;
+      currentOrdinal++;
+    }
+    return undefined;
+  }
+
+  private getBuiltinSourcePreservationParameters(fullName: string): readonly string[] | undefined {
+    switch (fullName) {
+      case 'math.sum':
+        return ['source', 'length'];
+      case 'input.source':
+        return ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'];
+      case 'ta.cross':
+      case 'ta.crossover':
+      case 'ta.crossunder':
+      case 'ta.correlation':
+        return ['source1', 'source2', 'length'];
+      case 'ta.stoch':
+        return ['source', 'high', 'low', 'length'];
+      case 'ta.valuewhen':
+        return ['condition', 'source', 'occurrence'];
+      case 'ta.alma':
+        return ['series', 'length', 'offset', 'sigma', 'floor'];
+      case 'ta.bb':
+      case 'ta.bbw':
+        return ['series', 'length', 'mult'];
+      case 'ta.kc':
+      case 'ta.kcw':
+        return ['series', 'length', 'mult', 'useTrueRange'];
+      case 'ta.linreg':
+        return ['source', 'length', 'offset'];
+      default:
+        return fullName.startsWith('ta.') ? ['source', 'length'] : undefined;
+    }
+  }
+
+  private evaluateBuiltinSourceArgument(expr: Expression): unknown {
+    const value = this.evaluateExpression(expr);
+
+    const series = this.getSourceSeriesForExpression(expr);
+    return series ? this.toKnownSourceValue(value, series) : value;
+  }
+
+  private getSourceSeriesForExpression(expr: Expression, value?: unknown): SeriesAccessor | undefined {
+    const valueSeries = this.getSourceSeriesForValue(value);
+    if (valueSeries) return valueSeries;
+    if (expr.type === 'ConditionalExpression') {
+      if (
+        expr.consequent.type === 'Identifier'
+        && expr.alternate.type === 'Identifier'
+        && expr.consequent.name === expr.alternate.name
+      ) {
+        return this.getSourceSeriesForExpression(expr.consequent);
+      }
+
+      return this.getEquivalentSourceSeriesForExpressions([expr.consequent, expr.alternate]);
+    }
+    if (expr.type === 'SwitchExpression') {
+      if (expr.cases.length === 0) {
+        return undefined;
+      }
+
+      const expressions: Expression[] = [];
+      for (const switchCase of expr.cases) {
+        if (Array.isArray(switchCase.consequent)) return undefined;
+        expressions.push(switchCase.consequent);
+      }
+
+      const firstExpression = expressions[0]!;
+      if (
+        firstExpression.type === 'Identifier'
+        && expressions.every((switchCase) => (
+          switchCase.type === 'Identifier' && switchCase.name === firstExpression.name
+        ))
+      ) {
+        return this.getSourceSeriesForExpression(firstExpression);
+      }
+
+      return this.getEquivalentSourceSeriesForExpressions(expressions);
+    }
+    if (expr.type === 'BinaryExpression' || expr.type === 'UnaryExpression') {
+      return this.getArithmeticSourceSeriesForExpression(expr);
+    }
+    if (expr.type !== 'Identifier') return undefined;
+
+    return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
+  }
+
+  private getEquivalentSourceSeriesForExpressions(expressions: Expression[]): SeriesAccessor | undefined {
+    const firstExpression = expressions[0];
+    if (!firstExpression) return undefined;
+
+    const firstSource = this.getSourceSeriesForExpression(firstExpression);
+    if (!firstSource) return undefined;
+
+    const firstKey = this.getSourceExpressionKey(firstExpression);
+    for (const expression of expressions.slice(1)) {
+      const source = this.getSourceSeriesForExpression(expression);
+      if (!source) return undefined;
+      if (source === firstSource) continue;
+
+      const key = this.getSourceExpressionKey(expression);
+      if (!firstKey || key !== firstKey) return undefined;
+    }
+
+    return firstSource;
+  }
+
+  private getSourceExpressionKey(expr: Expression): string | undefined {
+    if (expr.type === 'NumericLiteral') return `number:${expr.value}`;
+    if (expr.type === 'NaExpression') return 'na';
+
+    if (expr.type === 'Identifier') {
+      const scopedSource = this.scope.getSourceSeries(expr.name);
+      if (scopedSource) return `series:${this.sourceSeriesId(scopedSource)}`;
+      return this.getKnownSeriesByName(expr.name, this.ctx) ? `known:${expr.name}` : undefined;
+    }
+
+    if (expr.type === 'UnaryExpression') {
+      if (expr.operator !== '-' && expr.operator !== '+') return undefined;
+      const operand = this.getSourceExpressionKey(expr.argument);
+      return operand ? `unary:${expr.operator}:${operand}` : undefined;
+    }
+
+    if (expr.type === 'BinaryExpression') {
+      if (!['+', '-', '*', '/', '%'].includes(expr.operator)) return undefined;
+      const left = this.getSourceExpressionKey(expr.left);
+      const right = this.getSourceExpressionKey(expr.right);
+      return left && right ? `binary:${expr.operator}:${left}:${right}` : undefined;
+    }
+
+    if (expr.type === 'ConditionalExpression') {
+      const consequent = this.getSourceExpressionKey(expr.consequent);
+      const alternate = this.getSourceExpressionKey(expr.alternate);
+      return consequent && consequent === alternate ? consequent : undefined;
+    }
+
+    if (expr.type === 'SwitchExpression') {
+      const keys = expr.cases.map((switchCase) => (
+        Array.isArray(switchCase.consequent) ? undefined : this.getSourceExpressionKey(switchCase.consequent)
+      ));
+      const firstKey = keys[0];
+      return firstKey && keys.every((key) => key === firstKey) ? firstKey : undefined;
+    }
+
+    return undefined;
+  }
+
+  private sourceSeriesId(series: SeriesAccessor): number {
+    const existing = this.sourceSeriesIds.get(series);
+    if (existing !== undefined) return existing;
+
+    const id = this.nextSourceSeriesId++;
+    this.sourceSeriesIds.set(series, id);
+    return id;
+  }
+
+  private getArithmeticSourceSeriesForExpression(expr: Expression): SeriesAccessor | undefined {
+    if (expr.type === 'NumericLiteral') {
+      return { get: () => expr.value };
+    }
+
+    if (expr.type === 'NaExpression') {
+      return { get: () => Number.NaN };
+    }
+
+    if (expr.type === 'Identifier') {
+      return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
+    }
+
+    if (expr.type === 'UnaryExpression') {
+      if (expr.operator !== '-' && expr.operator !== '+') return undefined;
+      const operand = this.getArithmeticSourceSeriesForExpression(expr.argument);
+      if (!operand) return undefined;
+      return {
+        get: (offset) => {
+          const value = operand.get(offset);
+          if (value === undefined) return undefined;
+          return expr.operator === '-' ? -value : value;
+        },
+      };
+    }
+
+    if (expr.type !== 'BinaryExpression') return undefined;
+    if (!['+', '-', '*', '/', '%'].includes(expr.operator)) return undefined;
+
+    const left = this.getArithmeticSourceSeriesForExpression(expr.left);
+    const right = this.getArithmeticSourceSeriesForExpression(expr.right);
+    if (!left || !right) return undefined;
+
+    return {
+      get: (offset) => {
+        const leftValue = left.get(offset);
+        const rightValue = right.get(offset);
+        if (leftValue === undefined || rightValue === undefined) return undefined;
+        if (isNaN(leftValue) || isNaN(rightValue)) return Number.NaN;
+        switch (expr.operator) {
+          case '+':
+            return leftValue + rightValue;
+          case '-':
+            return leftValue - rightValue;
+          case '*':
+            return leftValue * rightValue;
+          case '/':
+            return leftValue / rightValue;
+          case '%':
+            return leftValue % rightValue;
+          default:
+            return undefined;
+        }
+      },
+    };
+  }
+
+  private getSourceSeriesForValue(value: unknown): SeriesAccessor | undefined {
+    return this.isKnownSourceValue(value) ? value.series : undefined;
+  }
+
+  private toKnownSourceValue(value: unknown, series: SeriesAccessor): unknown {
+    const numericValue = this.toNumber(value);
+    if (isNaN(numericValue)) return value;
+    return {
+      __tealscriptKnownSource: true,
+      value: numericValue,
+      series,
+    } satisfies KnownSourceValue;
   }
 
   private userCallableScopeKey(fn: FunctionDeclaration): string {
@@ -2434,13 +3733,14 @@ export class TealscriptEngine {
     namedArgs: Map<string, unknown>,
     hasPositionalArgumentAfterNamed = false,
     expr?: CallExpression,
+    sourceBindings?: CallSourceBindings,
   ): unknown {
     const library = this.importedLibraries.get(alias);
     const fn = library?.functions.get(functionName);
     if (!library || !fn || !library.exportedFunctions.has(functionName)) {
       throw new Error(`Unknown library function: ${alias}.${functionName}`);
     }
-    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
   }
 
   private currentImportedLibrary(): ImportedLibrary | undefined {
@@ -2455,6 +3755,7 @@ export class TealscriptEngine {
     namedArgs: Map<string, unknown>,
     hasPositionalArgumentAfterNamed = false,
     expr?: CallExpression,
+    sourceBindings?: CallSourceBindings,
   ): unknown {
     const recursionKey = this.importedFunctionScopeKey(library.alias, fn);
     const scopeKey = expr ? this.importedCallSiteFunctionScopeKey(library.alias, fn, expr) : recursionKey;
@@ -2464,10 +3765,11 @@ export class TealscriptEngine {
         fn,
         args,
         namedArgs,
-        `library function ${library.alias}.${fn.name.name}`,
+        `library ${fn.isMethod ? 'method' : 'function'} ${library.alias}.${fn.name.name}`,
         scopeKey,
         recursionKey,
         hasPositionalArgumentAfterNamed,
+        sourceBindings,
       );
     } finally {
       this.importedLibraryCallStack.pop();
@@ -3449,6 +4751,7 @@ export class TealscriptEngine {
     scopeKey = this.userCallableScopeKey(fn),
     recursionKey = scopeKey,
     hasPositionalArgumentAfterNamed = false,
+    sourceBindings: CallSourceBindings = { positional: [], named: new Map() },
   ): unknown {
     const recursiveIndex = this.userFunctionCallStack.indexOf(recursionKey);
     if (recursiveIndex !== -1) {
@@ -3491,15 +4794,27 @@ export class TealscriptEngine {
             `Argument '${paramName}' for ${displayName} was supplied multiple times`,
           );
         }
-        return namedArgs.get(paramName);
+        const value = namedArgs.get(paramName);
+        return {
+          value,
+          sourceSeries: sourceBindings.named.get(paramName) ?? this.getSourceSeriesForValue(value),
+        };
       }
       if (index < args.length) {
-        return args[index];
+        const value = args[index];
+        return {
+          value,
+          sourceSeries: sourceBindings.positional[index] ?? this.getSourceSeriesForValue(value),
+        };
       }
       if (param.defaultValue) {
-        return this.evaluateExpression(param.defaultValue);
+        const value = this.evaluateExpression(param.defaultValue);
+        return {
+          value,
+          sourceSeries: this.getSourceSeriesForExpression(param.defaultValue, value),
+        };
       }
-      return undefined;
+      return { value: undefined, sourceSeries: undefined };
     });
 
     const savedScope = this.scope;
@@ -3510,8 +4825,14 @@ export class TealscriptEngine {
     try {
       for (let i = 0; i < fn.params.length; i++) {
         const paramName = fn.params[i].name;
-        const value = parameterValues[i];
-        this.scope.declare(paramName, 'none', value);
+        const parameterValue = parameterValues[i]!;
+        this.scope.declare(
+          paramName,
+          'none',
+          this.unwrapKnownSourceValue(parameterValue.value),
+          undefined,
+          parameterValue.sourceSeries,
+        );
       }
 
       if (Array.isArray(fn.body)) {
@@ -3525,7 +4846,7 @@ export class TealscriptEngine {
         return result;
       }
 
-      return this.evaluateExpression(fn.body);
+      return this.evaluateSourceAwareExpression(fn.body);
     } finally {
       this.userFunctionCallStack.pop();
       this.scope = savedScope;
@@ -3536,7 +4857,7 @@ export class TealscriptEngine {
     this.profileStatements += 1;
 
     if (stmt.type === 'ExpressionStatement') {
-      return { hasResult: true, value: this.evaluateExpression(stmt.expression) };
+      return { hasResult: true, value: this.evaluateSourceAwareExpression(stmt.expression) };
     }
 
     if (stmt.type === 'IfStatement') {
@@ -3553,6 +4874,12 @@ export class TealscriptEngine {
 
     this.executeStatementInternal(stmt, false);
     return { hasResult: false };
+  }
+
+  private evaluateSourceAwareExpression(expr: Expression): unknown {
+    const value = this.evaluateExpression(expr);
+    const sourceSeries = this.getSourceSeriesForExpression(expr, value);
+    return sourceSeries ? this.toKnownSourceValue(value, sourceSeries) : value;
   }
 
   private executeFunctionFor(stmt: ForStatement): { hasResult: boolean; value?: unknown } {
@@ -3940,6 +5267,8 @@ export class TealscriptEngine {
         return 'cash';
       case 'percent_of_equity':
         return 'percent_of_equity';
+      case 'account_currency':
+        return ledger.settings.currency;
       case 'equity':
         return ledger.equity;
       case 'initial_capital':
@@ -3964,6 +5293,8 @@ export class TealscriptEngine {
         return ledger.position.size;
       case 'position_avg_price':
         return ledger.position.avgPrice ?? Number.NaN;
+      case 'position_entry_name':
+        return ledger.openTrades[0]?.entryOrderId ?? '';
       case 'opentrades':
         return ledger.openTrades.length;
       case 'closedtrades':
@@ -4033,6 +5364,12 @@ export class TealscriptEngine {
         case 'volume':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.volume.get(offset));
+        case 'bid':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.ctx.bid.get(offset));
+        case 'ask':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.ctx.ask.get(offset));
         case 'time':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.time.get(offset));
@@ -4061,10 +5398,12 @@ export class TealscriptEngine {
           return this.naIfMissing(this.getOhlc4(offset));
         case 'ta.obv':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(2);
           this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
           return this.naIfMissing(this.scope.getWithOffset('_ta_obv_value', offset));
         case 'ta.tr':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(offset + 2);
           return this.naIfMissing(this.trueRange(offset, false));
       }
 
@@ -4089,6 +5428,7 @@ export class TealscriptEngine {
           return this.naIfMissing(this.scope.getWithOffset('_ta_nvi_value', offset));
         case 'ta.obv':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(2);
           this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
           return this.naIfMissing(this.scope.getWithOffset('_ta_obv_value', offset));
         case 'ta.pvi':
@@ -4101,6 +5441,7 @@ export class TealscriptEngine {
           return this.naIfMissing(this.scope.getWithOffset('_ta_pvt_value', offset));
         case 'ta.tr':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(offset + 2);
           return this.naIfMissing(this.trueRange(offset, false));
         case 'ta.wad':
           this.checkHistoryOffset(offset);
@@ -4128,6 +5469,10 @@ export class TealscriptEngine {
     if (maxBarsBack !== undefined && offset > maxBarsBack) {
       throw new Error(`History reference [${offset}] exceeds indicator max_bars_back ${maxBarsBack}`);
     }
+  }
+
+  private recordLookbackLength(length: number): void {
+    this.inferredMaxBarsBack = Math.max(this.inferredMaxBarsBack, Math.max(0, length - 1));
   }
 
   private readExpressionHistory(expression: Expression, currentValue: unknown, offset: number): unknown {
@@ -4168,6 +5513,7 @@ export class TealscriptEngine {
   }
 
   private currentTrueRange(handleNa: boolean): number {
+    this.recordLookbackLength(2);
     return this.trueRange(0, handleNa);
   }
 
@@ -4254,6 +5600,7 @@ export class TealscriptEngine {
   }
 
   private updateVolumeIndex(scope: Scope, key: string, shouldUpdate: (volume: number, previousVolume: number) => boolean): number {
+    this.recordLookbackLength(2);
     return this.updateBarCachedNumericState(scope, key, 1, (previous) => {
       const close = this.ctx.close.get(0);
       const previousClose = this.ctx.close.get(1);
@@ -4274,6 +5621,7 @@ export class TealscriptEngine {
   }
 
   private updatePriceVolumeTrend(scope: Scope, key: string): number {
+    this.recordLookbackLength(2);
     return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
       const close = this.ctx.close.get(0);
       const previousClose = this.ctx.close.get(1);
@@ -4286,6 +5634,7 @@ export class TealscriptEngine {
   }
 
   private updateWilliamsAccumulationDistribution(scope: Scope, key: string): number {
+    this.recordLookbackLength(2);
     return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
       const high = this.ctx.high.get(0);
       const low = this.ctx.low.get(0);
@@ -4333,6 +5682,7 @@ export class TealscriptEngine {
   // ===========================================================================
 
   private isTruthy(value: unknown): boolean {
+    if (this.isKnownSourceValue(value)) return this.isTruthy(value.value);
     if (this.isNa(value)) return false;
     if (typeof value === 'boolean') return value;
     if (typeof value === 'number') return value !== 0;
@@ -4341,7 +5691,18 @@ export class TealscriptEngine {
   }
 
   private isNa(value: unknown): boolean {
+    if (this.isKnownSourceValue(value)) return isNaN(value.value);
     return typeof value === 'number' && isNaN(value);
+  }
+
+  private isKnownSourceValue(value: unknown): value is KnownSourceValue {
+    return typeof value === 'object'
+      && value !== null
+      && (value as KnownSourceValue).__tealscriptKnownSource === true;
+  }
+
+  private unwrapKnownSourceValue(value: unknown): unknown {
+    return this.isKnownSourceValue(value) ? value.value : value;
   }
 
   private isComparisonOperator(operator: string): boolean {
@@ -4372,7 +5733,7 @@ export class TealscriptEngine {
     if (value === null || value === undefined || this.isNa(value)) {
       return null;
     }
-    return value as number;
+    return this.unwrapKnownSourceValue(value) as number;
   }
 
   private toPlotColor(value: unknown): string | null {
@@ -4442,7 +5803,34 @@ export class TealscriptEngine {
     }
   }
 
+  private setPlotTextColorValue(plot: PlotOutput | undefined, barIndex: number, color: string | null): void {
+    if (!plot || barIndex < 0) return;
+
+    if (Array.isArray(plot.textColor)) {
+      while (plot.textColor.length < barIndex) {
+        plot.textColor.push(null);
+      }
+      plot.textColor[barIndex] = color;
+      return;
+    }
+
+    if (plot.textColor === color) return;
+
+    const previousColor = plot.textColor ?? null;
+    if (barIndex === 0) {
+      plot.textColor = color ?? [];
+      if (Array.isArray(plot.textColor)) plot.textColor[0] = null;
+      return;
+    }
+
+    plot.textColor = Array.from({ length: barIndex }, () => previousColor);
+    plot.textColor[barIndex] = color;
+  }
+
   private toStringValue(value: unknown, format?: string): string {
+    if (this.isKnownSourceValue(value)) {
+      return this.toStringValue(value.value, format);
+    }
     if (value === null || value === undefined || this.isNa(value)) {
       return 'NaN';
     }
@@ -4603,14 +5991,53 @@ export class TealscriptEngine {
   }
 
   private formatNumber(value: number, format: string): string {
-    const decimalMatch = format.match(/\.([0#]+)/);
-    if (decimalMatch) {
-      return value.toFixed(decimalMatch[1].length);
-    }
-    if (/^[#0,]+$/.test(format)) {
+    const normalizedFormat = format.trim().toLowerCase();
+    if (normalizedFormat === 'integer') {
       return Math.round(value).toString();
     }
+    if (normalizedFormat === 'currency') {
+      return value < 0 ? `-$${this.formatGroupedNumber(Math.abs(value), 2)}` : `$${this.formatGroupedNumber(value, 2)}`;
+    }
+    if (normalizedFormat === 'percent') {
+      return `${Math.round(value * 100)}%`;
+    }
+
+    const decimalMatch = format.match(/\.([0#]+)/);
+    if (decimalMatch) {
+      const formatted = value.toFixed(decimalMatch[1].length);
+      return format.includes(',') ? this.addThousandsSeparators(formatted) : formatted;
+    }
+    if (/^[#0,]+$/.test(format)) {
+      const formatted = Math.round(value).toString();
+      return format.includes(',') ? this.addThousandsSeparators(formatted) : formatted;
+    }
     return String(value);
+  }
+
+  private formatGroupedNumber(value: number, precision: number): string {
+    return this.addThousandsSeparators(value.toFixed(precision));
+  }
+
+  private addThousandsSeparators(value: string): string {
+    const sign = value.startsWith('-') ? '-' : '';
+    const unsigned = sign ? value.slice(1) : value;
+    const [integerPart, decimalPart] = unsigned.split('.');
+    const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `${sign}${groupedInteger}${decimalPart === undefined ? '' : `.${decimalPart}`}`;
+  }
+
+  private formatStringPlaceholder(value: unknown, modifier?: string, format?: string): string {
+    const normalizedModifier = modifier?.trim().toLowerCase();
+    const normalizedFormat = format?.trim();
+
+    if (normalizedModifier === undefined) {
+      return this.toStringValue(value, normalizedFormat);
+    }
+    if (normalizedModifier === 'number') {
+      if (this.isNa(value)) return this.toStringValue(value);
+      return typeof value === 'number' ? this.formatNumber(value, normalizedFormat ?? '') : this.toStringValue(value);
+    }
+    return this.toStringValue(value);
   }
 
   private clampNumber(value: unknown, min: number, max: number): number {
@@ -4646,21 +6073,70 @@ export class TealscriptEngine {
       const absolute = Math.abs(offsetMinutes);
       return `${sign}${pad(Math.trunc(absolute / 60))}${pad(absolute % 60)}`;
     };
+    const formatTimezoneName = (style: 'short' | 'long'): string => {
+      const fixedOffset = this.parseFixedTimezoneOffsetMinutes(timezone);
+      if (fixedOffset !== null && fixedOffset !== 0) {
+        return `GMT${formatOffset()}`;
+      }
+
+      try {
+        const part = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezone,
+          timeZoneName: style,
+        }).formatToParts(new Date(value)).find((part) => part.type === 'timeZoneName');
+        return part?.value ?? (style === 'short' ? 'UTC' : timezone);
+      } catch {
+        return fixedOffset === 0
+          ? (style === 'short' ? 'UTC' : 'Coordinated Universal Time')
+          : `GMT${formatOffset()}`;
+      }
+    };
+    const hour24 = date.getUTCHours();
+    const hour12 = hour24 % 12 || 12;
+    const millisecond = pad(date.getUTCMilliseconds(), 3);
+    const monthName = MONTH_NAMES[date.getUTCMonth()];
+    const weekdayName = WEEKDAY_NAMES[date.getUTCDay()];
+    const yearStart = Date.UTC(date.getUTCFullYear(), 0, 1);
+    const currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    const dayOfYear = Math.floor((currentDate - yearStart) / 86_400_000) + 1;
+    const weekOfYear = this.getIsoWeek(date);
+    const firstDayOfMonth = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).getUTCDay();
+    const weekOfMonth = Math.ceil((date.getUTCDate() + firstDayOfMonth) / 7);
+    const timezoneNameLong = format.includes('zzzz') ? formatTimezoneName('long') : '';
+    const timezoneNameShort = format.includes('z') ? formatTimezoneName('short') : '';
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
+      ['y', String(date.getUTCFullYear())],
+      ['MMMM', monthName],
+      ['MMM', monthName.slice(0, 3)],
+      ['EEEE', weekdayName],
+      ['E', weekdayName.slice(0, 3)],
+      ['DDD', pad(dayOfYear, 3)],
+      ['DD', pad(dayOfYear)],
+      ['D', String(dayOfYear)],
+      ['ww', pad(weekOfYear)],
+      ['w', String(weekOfYear)],
+      ['W', String(weekOfMonth)],
       ['MM', pad(date.getUTCMonth() + 1)],
       ['M', String(date.getUTCMonth() + 1)],
       ['dd', pad(date.getUTCDate())],
       ['d', String(date.getUTCDate())],
-      ['HH', pad(date.getUTCHours())],
-      ['H', String(date.getUTCHours())],
+      ['HH', pad(hour24)],
+      ['H', String(hour24)],
+      ['hh', pad(hour12)],
+      ['h', String(hour12)],
       ['mm', pad(date.getUTCMinutes())],
       ['m', String(date.getUTCMinutes())],
       ['ss', pad(date.getUTCSeconds())],
       ['s', String(date.getUTCSeconds())],
-      ['SSS', pad(date.getUTCMilliseconds(), 3)],
+      ['SSS', millisecond],
+      ['SS', millisecond.slice(0, 2)],
+      ['S', millisecond.slice(0, 1)],
+      ['a', hour24 < 12 ? 'AM' : 'PM'],
       ['Z', formatOffset()],
+      ['zzzz', timezoneNameLong],
+      ['z', timezoneNameShort],
     ];
 
     let result = '';
@@ -4715,6 +6191,7 @@ export class TealscriptEngine {
   }
 
   private toNumber(value: unknown): number {
+    if (this.isKnownSourceValue(value)) return value.value;
     if (typeof value === 'number') return value;
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : Number.NaN;
@@ -4772,15 +6249,29 @@ export class TealscriptEngine {
     return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
   }
 
-  private updateBuiltinSourceHistory(scope: Scope, key: string, source: number, keep: number): number[] {
+  private updateBuiltinSourceHistory(
+    scope: Scope,
+    key: string,
+    source: number,
+    keep: number,
+    recordLookback = true,
+  ): number[] {
+    if (recordLookback) {
+      this.recordLookbackLength(keep);
+    }
     const history = (scope.get(key) as number[] | undefined) ?? [];
     this.prependBoundedHistory(history, source, keep);
     this.setBuiltinState(scope, key, history);
     return history;
   }
 
-  private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
-    if (isNaN(source) || length < 1) return null;
+  private getCompleteSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] | null {
+    this.recordLookbackLength(length);
+    const numericSource = this.toNumber(source);
+    if (isNaN(numericSource) || length < 1) return null;
+    const knownWindow = this.getKnownSourceWindow(source, length);
+    if (knownWindow) return knownWindow;
+
     const maxLengthKey = `${key}_max_length`;
     const previousMaxLength = scope.get(maxLengthKey) as number | undefined;
     const maxLength = Math.max(length, previousMaxLength ?? 0);
@@ -4790,28 +6281,59 @@ export class TealscriptEngine {
       Math.max(maxLength, this.ctx.bar_index + 1),
       TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
     );
-    const values = this.updateBuiltinSourceHistory(scope, key, source, keep);
+    const values = this.updateBuiltinSourceHistory(scope, key, numericSource, keep, false);
     const window = values.slice(0, length);
     if (window.length < length || window.some((value) => isNaN(value))) return null;
     return window;
   }
 
-  private getAvailableSourceWindow(scope: Scope, key: string, source: number, length: number): number[] {
-    if (isNaN(source) || length < 1) return [];
-    const values = this.updateBuiltinSourceHistory(scope, key, source, length);
+  private getAvailableSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] {
+    this.recordLookbackLength(length);
+    const numericSource = this.toNumber(source);
+    if (isNaN(numericSource) || length < 1) return [];
+    const knownWindow = this.getKnownSourceWindow(source, length);
+    if (knownWindow) return knownWindow;
+
+    const values = this.updateBuiltinSourceHistory(scope, key, numericSource, length, false);
     return values.slice(0, length).filter((value) => !isNaN(value));
   }
 
-  private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+  private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] | null {
+    this.recordLookbackLength(length);
     if (length < 1) return null;
+    const knownWindow = this.getKnownSourceWindow(source, length, true);
+    if (knownWindow) return knownWindow;
+
+    const numericSource = this.toNumber(source);
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    if (!isNaN(source)) {
-      this.prependBoundedHistory(history, source, length);
+    if (!isNaN(numericSource)) {
+      this.prependBoundedHistory(history, numericSource, length);
     } else if (history.length > length) {
       history.length = length;
     }
     this.setBuiltinState(scope, key, history);
     return history.length < length ? null : history;
+  }
+
+  private getKnownSourceWindow(source: unknown, length: number, skipNa = false): number[] | null {
+    if (!this.isKnownSourceValue(source)) return null;
+
+    const values: number[] = [];
+    const offsetLimit = Math.min(
+      length,
+      this.ctx.bar_index + 1,
+      TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
+    );
+    for (let offset = 0; offset < offsetLimit && values.length < length; offset++) {
+      const value = source.series.get(offset);
+      if (value === undefined) return null;
+      if (isNaN(value)) {
+        if (skipNa) continue;
+        return null;
+      }
+      values.push(value);
+    }
+    return values.length < length ? null : values;
   }
 
   private prependBoundedHistory<T>(history: T[], source: T, keep: number): void {
@@ -4829,9 +6351,30 @@ export class TealscriptEngine {
   }
 
   private updateBuiltinEmaState(scope: Scope, key: string, value: number, length: number): number {
+    this.recordLookbackLength(length);
     const alpha = 2 / (length + 1);
     const previous = scope.get(key) as number | undefined;
     const next = previous === undefined || isNaN(previous) ? value : alpha * value + (1 - alpha) * previous;
+    this.setBuiltinState(scope, key, next);
+    return next;
+  }
+
+  private updateBuiltinRmaState(
+    scope: Scope,
+    key: string,
+    sourceKey: string,
+    value: number,
+    length: number,
+  ): number {
+    if (isNaN(value) || length < 1) return NaN;
+    const seedValues = this.getCompleteSourceWindow(scope, sourceKey, value, length);
+    if (!seedValues) return NaN;
+
+    const alpha = 1 / length;
+    const previous = scope.get(key) as number | undefined;
+    const next = previous === undefined || isNaN(previous)
+      ? seedValues.reduce((sum, source) => sum + source, 0) / length
+      : alpha * value + (1 - alpha) * previous;
     this.setBuiltinState(scope, key, next);
     return next;
   }
@@ -4859,6 +6402,9 @@ export class TealscriptEngine {
     }
 
     const previousClose = this.ctx.close.get(1);
+    if (useTrueRange) {
+      this.recordLookbackLength(2);
+    }
     const trueRange = previousClose === undefined || isNaN(previousClose)
       ? high - low
       : Math.max(high - low, Math.abs(high - previousClose), Math.abs(low - previousClose));
@@ -4910,21 +6456,14 @@ export class TealscriptEngine {
     scope: Scope,
     leftKey: string,
     rightKey: string,
-    leftSource: number,
-    rightSource: number,
+    leftSource: unknown,
+    rightSource: unknown,
     length: number,
   ): [number[], number[]] | null {
-    if (length < 1 || isNaN(leftSource) || isNaN(rightSource)) return null;
-    const leftValues = this.updateBuiltinSourceHistory(scope, leftKey, leftSource, length);
-    const rightValues = this.updateBuiltinSourceHistory(scope, rightKey, rightSource, length);
-    if (
-      leftValues.length < length
-      || rightValues.length < length
-      || leftValues.some((value) => isNaN(value))
-      || rightValues.some((value) => isNaN(value))
-    ) {
-      return null;
-    }
+    if (length < 1 || isNaN(this.toNumber(leftSource)) || isNaN(this.toNumber(rightSource))) return null;
+    const leftValues = this.getCompleteSourceWindow(scope, leftKey, leftSource, length);
+    const rightValues = this.getCompleteSourceWindow(scope, rightKey, rightSource, length);
+    if (!leftValues || !rightValues) return null;
     return [leftValues, rightValues];
   }
 
@@ -5011,6 +6550,55 @@ export class TealscriptEngine {
     this.builtins.set('strategy.oca.cancel', () => 'cancel');
     this.builtins.set('strategy.oca.reduce', () => 'reduce');
     this.builtins.set('strategy.oca.none', () => 'none');
+    this.builtins.set('strategy.direction.all', () => 'all');
+    this.builtins.set('strategy.direction.long', () => 'long');
+    this.builtins.set('strategy.direction.short', () => 'short');
+    this.builtins.set('strategy.risk.allow_entry_in', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.allowedEntryDirection = this.normalizeStrategyAllowedEntryDirection(
+        this.getCallArg(args, namedArgs, 0, 'value', 'all'),
+      );
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_position_size', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.maxPositionSize = this.normalizePositiveNumber(
+        this.getCallArg(args, namedArgs, 0, 'contracts'),
+        'strategy.risk.max_position_size contracts',
+      );
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_drawdown', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxDrawdown = {
+        value: this.normalizePositiveNumber(this.getCallArg(args, namedArgs, 0, 'value'), 'strategy.risk.max_drawdown value'),
+        type: this.normalizeStrategyCashOrPercentRiskType(this.getCallArg(args, namedArgs, 1, 'type')),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 2, 'alert_message')),
+      };
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_intraday_loss', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxIntradayLoss = {
+        value: this.normalizePositiveNumber(this.getCallArg(args, namedArgs, 0, 'value'), 'strategy.risk.max_intraday_loss value'),
+        type: this.normalizeStrategyCashOrPercentRiskType(this.getCallArg(args, namedArgs, 1, 'type')),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 2, 'alert_message')),
+      };
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_intraday_filled_orders', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxIntradayFilledOrders = {
+        count: this.normalizePositiveNumber(
+          this.getCallArg(args, namedArgs, 0, 'count'),
+          'strategy.risk.max_intraday_filled_orders count',
+        ),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'alert_message')),
+      };
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_cons_loss_days', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxConsLossDays = {
+        count: this.normalizePositiveNumber(this.getCallArg(args, namedArgs, 0, 'count'), 'strategy.risk.max_cons_loss_days count'),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'alert_message')),
+      };
+      return undefined;
+    });
     this.builtins.set('strategy.opentrades.entry_id', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
@@ -5184,6 +6772,7 @@ export class TealscriptEngine {
     const ocaType = this.normalizeOptionalStrategyOcaType(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 6));
     const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 7));
     const alertMessage = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 8));
+    const disableAlert = this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 9, false));
 
     if (id === '') {
       throw new Error('strategy order id must not be empty');
@@ -5194,12 +6783,34 @@ export class TealscriptEngine {
     if (isEntry && !this.canSubmitStrategyEntry(direction)) {
       return undefined;
     }
-    const requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
+    const time = this.ctx.time.get(0) ?? 0;
+    if (!isEntry && hasReachedStrategyOrderRiskLimit(this.ctx.strategyLedger, time)) {
+      return undefined;
+    }
+    let requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
+    let orderQty = requestedQty;
+    if (isEntry && this.isStrategyEntryDirectionRestricted(direction)) {
+      const closeOnlyQty = this.resolveRestrictedStrategyEntryCloseQty(direction);
+      if (closeOnlyQty <= 0) {
+        return undefined;
+      }
+      requestedQty = 0;
+      orderQty = closeOnlyQty;
+    } else if (isEntry) {
+      if (hasReachedStrategyOrderRiskLimit(this.ctx.strategyLedger, time)) {
+        return undefined;
+      }
+      requestedQty = this.applyStrategyMaxPositionSize(direction, requestedQty);
+      if (requestedQty <= 0) {
+        return undefined;
+      }
+      orderQty = requestedQty;
+    }
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id,
       direction,
-      qty: requestedQty,
+      qty: orderQty,
       qtyType,
       qtyValue,
       isEntry,
@@ -5210,8 +6821,9 @@ export class TealscriptEngine {
       ocaType,
       comment,
       alertMessage,
+      disableAlert,
       barIndex: this.ctx.bar_index,
-      time: this.ctx.time.get(0) ?? 0,
+      time,
     });
     if (this.ctx.strategyLedger.settings.processOrdersOnClose) {
       const fill = fillStrategyMarketOrder(
@@ -5219,7 +6831,8 @@ export class TealscriptEngine {
         order,
         this.ctx.close.get(0) ?? Number.NaN,
         this.ctx.bar_index,
-        this.ctx.time.get(0) ?? 0,
+        time,
+        this.ctx.syminfo.mintick,
       );
       if (fill) {
         this.markStrategyLedgerToMarketAtCurrentClose();
@@ -5233,6 +6846,36 @@ export class TealscriptEngine {
   private canSubmitStrategyEntry(direction: StrategyDirection): boolean {
     const openEntries = this.ctx.strategyLedger.openTrades.filter((trade) => trade.direction === direction).length;
     return openEntries < this.ctx.strategyLedger.settings.pyramiding + 1;
+  }
+
+  private isStrategyEntryDirectionRestricted(direction: StrategyDirection): boolean {
+    const allowed = this.ctx.strategyLedger.settings.allowedEntryDirection;
+    return allowed !== 'all' && allowed !== direction;
+  }
+
+  private resolveRestrictedStrategyEntryCloseQty(direction: StrategyDirection): number {
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction === null || position.direction === direction) {
+      return 0;
+    }
+    return Math.abs(position.size);
+  }
+
+  private applyStrategyMaxPositionSize(direction: StrategyDirection, requestedQty: number): number {
+    const maxPositionSize = this.ctx.strategyLedger.settings.maxPositionSize;
+    if (maxPositionSize === null) {
+      return requestedQty;
+    }
+
+    const position = this.ctx.strategyLedger.position;
+    const sameDirectionSize = position.direction === direction ? Math.abs(position.size) : 0;
+    const pendingSameDirectionSize = this.ctx.strategyLedger.orders.reduce((total, order) => {
+      if (order.status !== 'pending' || !order.isEntry || order.direction !== direction) {
+        return total;
+      }
+      return total + (order.requestedQty ?? order.qty ?? 0);
+    }, 0);
+    return Math.min(requestedQty, Math.max(0, maxPositionSize - sameDirectionSize - pendingSameDirectionSize));
   }
 
   private resolveStrategyOrderQty(
@@ -5265,8 +6908,14 @@ export class TealscriptEngine {
       return;
     }
 
-    const fills = fillPendingStrategyOrdersOnTicks(this.ctx.strategyLedger, context.ticks, this.ctx.bar_index);
+    const fills = fillPendingStrategyOrdersOnTicks(
+      this.ctx.strategyLedger,
+      context.ticks,
+      this.ctx.bar_index,
+      this.ctx.syminfo.mintick,
+    );
     this.emitStrategyFillAlerts(fills);
+    this.enforceStrategyRiskStopForCurrentBar();
   }
 
   private fillPendingStrategyMarketOrdersForCurrentBar(): void {
@@ -5275,8 +6924,10 @@ export class TealscriptEngine {
       this.ctx.open.get(0) ?? Number.NaN,
       this.ctx.bar_index,
       this.ctx.time.get(0) ?? 0,
+      this.ctx.syminfo.mintick,
     );
     this.emitStrategyFillAlerts(fills);
+    this.enforceStrategyRiskStopForCurrentBar();
   }
 
   private markStrategyLedgerToMarketForCurrentBar(): void {
@@ -5284,13 +6935,42 @@ export class TealscriptEngine {
     const high = this.ctx.high.get(0) ?? close;
     const low = this.ctx.low.get(0) ?? close;
     if (!Number.isFinite(close)) return;
-    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, high, low);
+    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, high, low, {
+      barIndex: this.ctx.bar_index,
+      time: this.ctx.time.get(0) ?? 0,
+    });
+    this.enforceStrategyRiskStopForCurrentBar();
   }
 
   private markStrategyLedgerToMarketAtCurrentClose(): void {
     const close = this.ctx.close.get(0) ?? Number.NaN;
     if (!Number.isFinite(close)) return;
-    markStrategyLedgerToMarket(this.ctx.strategyLedger, close);
+    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, close, close, {
+      barIndex: this.ctx.bar_index,
+      time: this.ctx.time.get(0) ?? 0,
+    });
+    this.enforceStrategyRiskStopForCurrentBar();
+  }
+
+  private enforceStrategyRiskStopForCurrentBar(): void {
+    const time = this.ctx.time.get(0) ?? 0;
+    if (!hasReachedStrategyOrderRiskLimit(this.ctx.strategyLedger, time)) {
+      return;
+    }
+
+    cancelAllStrategyOrders(this.ctx.strategyLedger, this.ctx.bar_index, time);
+
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction === null || position.size === 0) {
+      return;
+    }
+
+    this.submitFilledStrategyCloseOrder({
+      id: 'Risk Close All',
+      direction: position.direction === 'long' ? 'short' : 'long',
+      qty: Math.abs(position.size),
+      immediately: true,
+    });
   }
 
   private markStrategyLedgerAfterPendingOrders(): void {
@@ -5307,7 +6987,7 @@ export class TealscriptEngine {
     }
 
     for (const fill of fills) {
-      if (fill.alertMessage === undefined || fill.alertMessage === '') {
+      if (fill.disableAlert === true || fill.alertMessage === undefined || fill.alertMessage === '') {
         continue;
       }
       this.ctx.addAlertEvent('strategy_order_fills', fill.alertMessage, 'all');
@@ -5345,18 +7025,25 @@ export class TealscriptEngine {
       return undefined;
     }
 
-    const limitPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 5));
-    const stopPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 7));
+    const profitTicks = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 4));
+    const lossTicks = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 6));
+    const limitPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 5))
+      ?? this.resolveStrategyExitOffsetPrice(direction, matchingTrades, profitTicks, 'profit');
+    const stopPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 7))
+      ?? this.resolveStrategyExitOffsetPrice(direction, matchingTrades, lossTicks, 'loss');
     const trailPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 8));
     const trailPoints = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 9));
-    const trailOffset = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 10));
+    const trailOffsetTicks = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 10));
     const trailActivationPrice = this.resolveStrategyTrailActivationPrice(direction, matchingTrades, trailPrice, trailPoints);
     if (limitPrice === undefined && stopPrice === undefined && trailActivationPrice === undefined) {
       throw new Error('strategy.exit requires a limit, stop, or trailing stop price');
     }
-    if (trailActivationPrice !== undefined && trailOffset === undefined) {
+    if (trailActivationPrice !== undefined && trailOffsetTicks === undefined) {
       throw new Error('strategy.exit trailing stop requires trail_offset');
     }
+    const trailOffset = trailActivationPrice === undefined
+      ? undefined
+      : this.resolveStrategyTrailOffsetPrice(trailOffsetTicks);
 
     const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 12));
     const commentProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 13));
@@ -5366,6 +7053,7 @@ export class TealscriptEngine {
     const alertProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 17));
     const alertLoss = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 18));
     const alertTrailing = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 19));
+    const disableAlert = this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 20, false));
     const exitOrderCount = [limitPrice, stopPrice, trailActivationPrice].filter((value) => value !== undefined).length;
     const suffixOrders = exitOrderCount > 1;
     const exitOcaName = suffixOrders ? this.strategyExitOcaName(id, fromEntry) : undefined;
@@ -5374,16 +7062,19 @@ export class TealscriptEngine {
     if (limitPrice !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
         id: suffixOrders ? `${id} Limit` : id,
+        sourceId: id,
         direction: exitDirection,
         qty,
         qtyType: 'fixed',
         qtyValue: qty,
+        isExit: true,
         limitPrice,
         fromEntry,
         ocaName: exitOcaName,
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentProfit ?? comment,
         alertMessage: alertProfit ?? alertMessage,
+        disableAlert,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -5392,16 +7083,19 @@ export class TealscriptEngine {
     if (stopPrice !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
         id: suffixOrders ? `${id} Stop` : id,
+        sourceId: id,
         direction: exitDirection,
         qty,
         qtyType: 'fixed',
         qtyValue: qty,
+        isExit: true,
         stopPrice,
         fromEntry,
         ocaName: exitOcaName,
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentLoss ?? comment,
         alertMessage: alertLoss ?? alertMessage,
+        disableAlert,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -5410,10 +7104,12 @@ export class TealscriptEngine {
     if (trailActivationPrice !== undefined && trailOffset !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
         id: suffixOrders ? `${id} Trail` : id,
+        sourceId: id,
         direction: exitDirection,
         qty,
         qtyType: 'fixed',
         qtyValue: qty,
+        isExit: true,
         trailActivationPrice,
         trailOffset,
         fromEntry,
@@ -5421,6 +7117,7 @@ export class TealscriptEngine {
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentTrailing ?? comment,
         alertMessage: alertTrailing ?? alertMessage,
+        disableAlert,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -5444,6 +7141,59 @@ export class TealscriptEngine {
     if (!Number.isFinite(trailPoints) || trailPoints < 0) {
       throw new Error('strategy.exit trail_points must be a non-negative number');
     }
+    const entryPrice = this.resolveStrategyWeightedEntryPrice(trades);
+    if (entryPrice === undefined) {
+      return undefined;
+    }
+    const offset = this.resolveStrategyTickDistance(trailPoints, 'trail_points', true);
+    return direction === 'long' ? entryPrice + offset : entryPrice - offset;
+  }
+
+  private resolveStrategyTrailOffsetPrice(ticks: number | undefined): number | undefined {
+    if (ticks === undefined) {
+      return undefined;
+    }
+    return this.resolveStrategyTickDistance(ticks, 'trail_offset', false);
+  }
+
+  private resolveStrategyTickDistance(ticks: number, kind: string, allowZero: boolean): number {
+    if (!Number.isFinite(ticks) || ticks < 0 || (!allowZero && ticks === 0)) {
+      throw new Error(`strategy.exit ${kind} must be ${allowZero ? 'a non-negative' : 'a positive'} number`);
+    }
+    const offset = ticks * this.ctx.syminfo.mintick;
+    if (!Number.isFinite(offset) || offset < 0 || (!allowZero && offset === 0)) {
+      throw new Error(`strategy.exit ${kind} offset must be ${allowZero ? 'non-negative' : 'positive'}`);
+    }
+    return offset;
+  }
+
+  private resolveStrategyExitOffsetPrice(
+    direction: StrategyDirection,
+    trades: Array<{ entryPrice: number; qty?: number }>,
+    ticks: number | undefined,
+    kind: 'profit' | 'loss',
+  ): number | undefined {
+    if (ticks === undefined) {
+      return undefined;
+    }
+    if (!Number.isFinite(ticks) || ticks <= 0) {
+      throw new Error(`strategy.exit ${kind} must be a positive number`);
+    }
+    const entryPrice = this.resolveStrategyWeightedEntryPrice(trades);
+    if (entryPrice === undefined) {
+      return undefined;
+    }
+    const offset = ticks * this.ctx.syminfo.mintick;
+    if (!Number.isFinite(offset) || offset <= 0) {
+      throw new Error(`strategy.exit ${kind} offset must be positive`);
+    }
+    if (kind === 'profit') {
+      return direction === 'long' ? entryPrice + offset : entryPrice - offset;
+    }
+    return direction === 'long' ? entryPrice - offset : entryPrice + offset;
+  }
+
+  private resolveStrategyWeightedEntryPrice(trades: Array<{ entryPrice: number; qty?: number }>): number | undefined {
     let weightedTotal = 0;
     let totalQty = 0;
     let unweightedTotal = 0;
@@ -5455,15 +7205,11 @@ export class TealscriptEngine {
         totalQty += qty;
       }
     }
-    const entryPrice = totalQty > 0
+    return totalQty > 0
       ? weightedTotal / totalQty
       : trades.length > 0
         ? unweightedTotal / trades.length
         : undefined;
-    if (entryPrice === undefined) {
-      return undefined;
-    }
-    return direction === 'long' ? entryPrice + trailPoints : entryPrice - trailPoints;
   }
 
   private strategyExitOcaName(id: string, fromEntry: string | undefined): string {
@@ -5508,6 +7254,8 @@ export class TealscriptEngine {
       || existingOrder.trailActivationPrice !== input.trailActivationPrice
       || existingOrder.trailOffset !== input.trailOffset;
     existingOrder.direction = input.direction;
+    existingOrder.sourceId = input.sourceId;
+    existingOrder.isExit = input.isExit ?? false;
     if (input.trailActivationPrice !== undefined || input.trailOffset !== undefined) {
       existingOrder.type = 'trailing_stop';
     } else if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
@@ -5531,6 +7279,7 @@ export class TealscriptEngine {
     existingOrder.ocaType = input.ocaType;
     existingOrder.comment = input.comment;
     existingOrder.alertMessage = input.alertMessage;
+    existingOrder.disableAlert = input.disableAlert;
     if (triggerChanged) {
       existingOrder.stopLimitActivated = false;
       existingOrder.stopLimitActivatedBarIndex = null;
@@ -5581,6 +7330,8 @@ export class TealscriptEngine {
       fromEntry: id,
       comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 1)),
       alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 4)),
+      immediately: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 5, false)),
+      disableAlert: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 6, false)),
     });
     return undefined;
   }
@@ -5597,6 +7348,8 @@ export class TealscriptEngine {
       qty: Math.abs(position.size),
       comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 0)),
       alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 1)),
+      immediately: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 2, false)),
+      disableAlert: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 3, false)),
     });
     return undefined;
   }
@@ -5624,6 +7377,8 @@ export class TealscriptEngine {
     fromEntry?: string;
     comment?: string;
     alertMessage?: string;
+    immediately?: boolean;
+    disableAlert?: boolean;
   }): void {
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id: input.id,
@@ -5631,19 +7386,22 @@ export class TealscriptEngine {
       qty: input.qty,
       qtyType: 'fixed',
       qtyValue: input.qty,
+      isExit: true,
       fromEntry: input.fromEntry,
       comment: input.comment,
       alertMessage: input.alertMessage,
+      disableAlert: input.disableAlert,
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
-    if (this.ctx.strategyLedger.settings.processOrdersOnClose) {
+    if (this.ctx.strategyLedger.settings.processOrdersOnClose || input.immediately === true) {
       const fill = fillStrategyMarketOrder(
         this.ctx.strategyLedger,
         order,
         this.ctx.close.get(0) ?? Number.NaN,
         this.ctx.bar_index,
         this.ctx.time.get(0) ?? 0,
+        this.ctx.syminfo.mintick,
       );
       if (fill) {
         this.markStrategyLedgerToMarketAtCurrentClose();
@@ -5657,6 +7415,13 @@ export class TealscriptEngine {
       return value;
     }
     throw new Error(`Invalid strategy direction: ${this.toStringValue(value)}`);
+  }
+
+  private normalizeStrategyAllowedEntryDirection(value: unknown): StrategyDirection | 'all' {
+    if (value === 'all' || value === 'long' || value === 'short') {
+      return value;
+    }
+    throw new Error(`Invalid strategy entry direction: ${this.toStringValue(value)}`);
   }
 
   private normalizeOptionalStrategyOcaType(value: unknown): StrategyOcaType | undefined {
@@ -5715,7 +7480,25 @@ export class TealscriptEngine {
   }
 
   private builtinCallId(name: string, expr: CallExpression): string {
-    if ((name === 'alert' || name === 'math.random' || name === 'ta.macd' || name === 'ta.obv') && expr.loc) {
+    if (
+      (
+        name === 'alert'
+        || name === 'math.random'
+        || name === 'ta.cross'
+        || name === 'ta.crossover'
+        || name === 'ta.crossunder'
+        || name === 'ta.atr'
+        || name === 'ta.dmi'
+        || name === 'ta.macd'
+        || name === 'ta.obv'
+        || name === 'ta.pivothigh'
+        || name === 'ta.pivotlow'
+        || name === 'ta.rma'
+        || name === 'ta.rsi'
+        || name === 'ta.sar'
+        || name === 'ta.supertrend'
+      ) && expr.loc
+    ) {
       this.profileBuiltinCalls += 1;
       return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
     }
@@ -5977,6 +7760,7 @@ export class TealscriptEngine {
     this.builtins.set('plot.style_line', () => 'line');
     this.builtins.set('plot.style_linebr', () => 'linebr');
     this.builtins.set('plot.style_stepline', () => 'stepline');
+    this.builtins.set('plot.style_steplinebr', () => 'steplinebr');
     this.builtins.set('plot.style_stepline_diamond', () => 'stepline_diamond');
     this.builtins.set('plot.style_histogram', () => 'histogram');
     this.builtins.set('plot.style_circles', () => 'circles');
@@ -6023,7 +7807,7 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
-          textColor: textColor ?? undefined,
+          textColor: textColor ?? [],
           offset,
           editable,
           showLast,
@@ -6034,12 +7818,6 @@ export class TealscriptEngine {
         });
       }
 
-      // Add color to array for this bar
-      const plot = ctx.plots.get(id);
-      if (plot && Array.isArray(plot.color)) {
-        plot.color.push(color);
-      }
-
       // Determine value - true/non-zero means show shape
       let value: number | null = null;
       if (typeof series === 'boolean') {
@@ -6047,6 +7825,13 @@ export class TealscriptEngine {
       } else if (typeof series === 'number') {
         value = !isNaN(series) && series !== 0 ? series : null;
       }
+
+      // Add style payloads only for visible marker bars.
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(value === null ? null : color);
+      }
+      this.setPlotTextColorValue(plot, ctx.bar_index, value === null ? null : textColor);
 
       ctx.addPlotValue(id, value);
       return series;
@@ -6084,7 +7869,7 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
-          textColor: textColor ?? undefined,
+          textColor: textColor ?? [],
           offset,
           editable,
           showLast,
@@ -6095,12 +7880,6 @@ export class TealscriptEngine {
         });
       }
 
-      // Add color to array for this bar
-      const plot = ctx.plots.get(id);
-      if (plot && Array.isArray(plot.color)) {
-        plot.color.push(color);
-      }
-
       // Determine value
       let value: number | null = null;
       if (typeof series === 'boolean') {
@@ -6108,6 +7887,13 @@ export class TealscriptEngine {
       } else if (typeof series === 'number') {
         value = !isNaN(series) && series !== 0 ? series : null;
       }
+
+      // Add style payloads only for visible marker bars.
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(value === null ? null : color);
+      }
+      this.setPlotTextColorValue(plot, ctx.bar_index, value === null ? null : textColor);
 
       ctx.addPlotValue(id, value);
       return series;
@@ -6300,6 +8086,10 @@ export class TealscriptEngine {
         return ctx.close.get(0);
       case 'volume':
         return ctx.volume.get(0);
+      case 'bid':
+        return ctx.bid.get(0);
+      case 'ask':
+        return ctx.ask.get(0);
       case 'ticker':
         return ctx.syminfo.ticker;
       case 'exchange':
@@ -6435,7 +8225,7 @@ export class TealscriptEngine {
       if (type === 'price') {
         return commonMetadata(args, namedArgs, inputSimpleArgs, 2);
       }
-      if (type === 'string' || type === 'timeframe') {
+      if (type === 'string' || type === 'timeframe' || type === 'enum') {
         return {
           options: optionsArg(args, namedArgs, inputOptionsArgs),
           ...commonMetadata(args, namedArgs, inputOptionsArgs, 3),
@@ -6454,7 +8244,7 @@ export class TealscriptEngine {
       if (type === 'bool' && typeof defval !== 'boolean') {
         throw new Error('input.bool defval must be a boolean');
       }
-      if ((type === 'string' || type === 'timeframe' || type === 'symbol' || type === 'session' || type === 'text_area') && typeof defval !== 'string') {
+      if ((type === 'string' || type === 'timeframe' || type === 'symbol' || type === 'session' || type === 'text_area' || type === 'enum') && typeof defval !== 'string') {
         throw new Error(`input.${type} defval must be a string`);
       }
       if (metadata.minval !== undefined && typeof defval === 'number' && defval < metadata.minval) {
@@ -6506,10 +8296,12 @@ export class TealscriptEngine {
     this.builtins.set('input.symbol', createInputFunc('symbol'));
     this.builtins.set('input.session', createInputFunc('session'));
     this.builtins.set('input.text_area', createInputFunc('text_area'));
+    this.builtins.set('input.enum', createInputFunc('enum'));
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, ctx) => {
-      const defval = inputArg(args, namedArgs, inputSimpleArgs, 0); // Should be a series like 'close'
+      const rawDefval = inputArg(args, namedArgs, inputSimpleArgs, 0); // Should be a series like 'close'
+      const defval = this.unwrapKnownSourceValue(rawDefval);
       const title = this.toStringValue(inputArg(args, namedArgs, inputSimpleArgs, 1, 'Source'));
       const id = `input_${title}`;
       const metadata = {
@@ -6534,7 +8326,7 @@ export class TealscriptEngine {
       const inputValue = ctx.getInput(id);
       const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
       if (inputValue === undefined || inputValue === registeredDefault) {
-        return defval;
+        return rawDefval;
       }
       return this.resolveInputSourceValue(inputValue, ctx);
     });
@@ -6545,21 +8337,25 @@ export class TealscriptEngine {
 
     switch (value) {
       case 'open':
-        return ctx.open.get(0);
+        return this.toKnownSourceValue(ctx.open.get(0), ctx.open);
       case 'high':
-        return ctx.high.get(0);
+        return this.toKnownSourceValue(ctx.high.get(0), ctx.high);
       case 'low':
-        return ctx.low.get(0);
+        return this.toKnownSourceValue(ctx.low.get(0), ctx.low);
       case 'close':
-        return ctx.close.get(0);
+        return this.toKnownSourceValue(ctx.close.get(0), ctx.close);
+      case 'bid':
+        return this.toKnownSourceValue(ctx.bid.get(0), ctx.bid);
+      case 'ask':
+        return this.toKnownSourceValue(ctx.ask.get(0), ctx.ask);
       case 'hl2':
-        return ctx.hl2;
+        return this.toKnownSourceValue(ctx.hl2, this.getKnownSeriesByName('hl2', ctx)!);
       case 'hlc3':
-        return ctx.hlc3;
+        return this.toKnownSourceValue(ctx.hlc3, this.getKnownSeriesByName('hlc3', ctx)!);
       case 'ohlc4':
-        return ctx.ohlc4;
+        return this.toKnownSourceValue(ctx.ohlc4, this.getKnownSeriesByName('ohlc4', ctx)!);
       case 'hlcc4':
-        return ctx.hlcc4;
+        return this.toKnownSourceValue(ctx.hlcc4, this.getKnownSeriesByName('hlcc4', ctx)!);
       default:
         return value;
     }
@@ -6590,7 +8386,7 @@ export class TealscriptEngine {
     });
     this.builtins.set('math.sum', (args, namedArgs, _ctx, scope, callId) => {
       const mathSumArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 1));
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
@@ -6648,6 +8444,11 @@ export class TealscriptEngine {
     unaryMath('math.atan', Math.atan);
     unaryMath('math.toradians', (number) => number * (Math.PI / 180));
     unaryMath('math.todegrees', (number) => number * (180 / Math.PI));
+
+    this.builtins.set('max_bars_back', (args, namedArgs) => {
+      this.normalizeMaxBarsBack(this.getOrderedCallArg(args, namedArgs, ['var', 'num'], 1), 'max_bars_back num');
+      return undefined;
+    });
 
     // nz - replace na with value
     this.builtins.set('nz', (args, namedArgs) => {
@@ -6745,9 +8546,11 @@ export class TealscriptEngine {
     this.builtins.set('str.format', (args, namedArgs) => {
       const template = this.toStringValue(namedArgs.get('format') ?? args[0]);
       const valueOffset = namedArgs.has('format') ? 0 : 1;
-      return template.replace(/\{(\d+)(?:,[^}:]+)?(?::([^}]+))?\}/g, (_match, index: string, format: string | undefined) => {
-        return this.toStringValue(args[Number(index) + valueOffset], format);
-      });
+      return template.replace(
+        /\{(\d+)(?::([^}]+)|\s*,\s*([^,{}]+)\s*(?:,\s*([^{}]+?)\s*)?)?\}/g,
+        (_match, index: string, colonFormat: string | undefined, modifier: string | undefined, commaFormat: string | undefined) =>
+          this.formatStringPlaceholder(args[Number(index) + valueOffset], modifier, colonFormat ?? commaFormat),
+      );
     });
 
     const stringSourceArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 0) =>
@@ -7501,6 +9304,7 @@ export class TealscriptEngine {
       'format.price': 'price',
       'format.volume': 'volume',
       'format.percent': 'percent',
+      'format.mintick': 'mintick',
     };
 
     for (const [name, value] of Object.entries(formatConstants)) {
@@ -7879,15 +9683,78 @@ export class TealscriptEngine {
    * Get a series accessor for a given source value.
    * Maps current bar values back to their source series.
    */
-  private getKnownSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } | undefined {
+  private getKnownSeriesByName(name: string, ctx: ExecutionContext): SeriesAccessor | undefined {
+    switch (name) {
+      case 'open':
+        return ctx.open;
+      case 'high':
+        return ctx.high;
+      case 'low':
+        return ctx.low;
+      case 'close':
+        return ctx.close;
+      case 'volume':
+        return ctx.volume;
+      case 'bid':
+        return ctx.bid;
+      case 'ask':
+        return ctx.ask;
+      case 'hl2':
+        return {
+          get: (i) => {
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
+          },
+        };
+      case 'hlc3':
+        return {
+          get: (i) => {
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            const c = ctx.close.get(i);
+            return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
+          },
+        };
+      case 'ohlc4':
+        return {
+          get: (i) => {
+            const o = ctx.open.get(i);
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            const c = ctx.close.get(i);
+            return o !== undefined && h !== undefined && l !== undefined && c !== undefined
+              ? (o + h + l + c) / 4
+              : undefined;
+          },
+        };
+      case 'hlcc4':
+        return {
+          get: (i) => {
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            const c = ctx.close.get(i);
+            return h !== undefined && l !== undefined && c !== undefined ? (h + l + c + c) / 4 : undefined;
+          },
+        };
+      default:
+        return undefined;
+    }
+  }
+
+  private getKnownSeriesForSource(source: unknown, ctx: ExecutionContext): SeriesAccessor | undefined {
+    if (this.isKnownSourceValue(source)) return source.series;
+    const sourceValue = this.toNumber(source);
     // Check if source matches any built-in series at offset 0
-    if (source === ctx.close.get(0)) return ctx.close;
-    if (source === ctx.high.get(0)) return ctx.high;
-    if (source === ctx.low.get(0)) return ctx.low;
-    if (source === ctx.open.get(0)) return ctx.open;
-    if (source === ctx.volume.get(0)) return ctx.volume;
+    if (sourceValue === ctx.close.get(0)) return ctx.close;
+    if (sourceValue === ctx.high.get(0)) return ctx.high;
+    if (sourceValue === ctx.low.get(0)) return ctx.low;
+    if (sourceValue === ctx.open.get(0)) return ctx.open;
+    if (sourceValue === ctx.volume.get(0)) return ctx.volume;
+    if (sourceValue === ctx.bid.get(0)) return ctx.bid;
+    if (sourceValue === ctx.ask.get(0)) return ctx.ask;
     // Check derived series
-    if (source === ctx.hl2)
+    if (sourceValue === ctx.hl2)
       return {
         get: (i) => {
           const h = ctx.high.get(i);
@@ -7895,7 +9762,7 @@ export class TealscriptEngine {
           return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
         },
       };
-    if (source === ctx.hlc3)
+    if (sourceValue === ctx.hlc3)
       return {
         get: (i) => {
           const h = ctx.high.get(i);
@@ -7904,7 +9771,7 @@ export class TealscriptEngine {
           return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
         },
       };
-    if (source === ctx.ohlc4)
+    if (sourceValue === ctx.ohlc4)
       return {
         get: (i) => {
           const o = ctx.open.get(i);
@@ -7916,7 +9783,7 @@ export class TealscriptEngine {
             : undefined;
         },
       };
-    if (source === ctx.hlcc4)
+    if (sourceValue === ctx.hlcc4)
       return {
         get: (i) => {
           const h = ctx.high.get(i);
@@ -7928,16 +9795,11 @@ export class TealscriptEngine {
     return undefined;
   }
 
-  private getSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } {
-    // Default: fallback to close (most common case)
-    return this.getKnownSeriesForSource(source, ctx) ?? ctx.close;
-  }
-
   private registerTaBuiltins(): void {
     // SMA - Simple Moving Average
     this.builtins.set('ta.sma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_sma_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -7962,54 +9824,29 @@ export class TealscriptEngine {
     });
 
     // RSI - Relative Strength Index
-    this.builtins.set('ta.rsi', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.rsi', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
+      if (isNaN(source) || length < 1) return NaN;
 
-      // Get previous values - use unique key based on source
-      const avgGainKey = `_rsi_gain_${length}_${source}`;
-      const avgLossKey = `_rsi_loss_${length}_${source}`;
+      const sourceHistory = this.updateBuiltinSourceHistory(scope, `_ta_rsi_source_${callId}_${length}`, source, length + 1);
 
-      const prevSource = series.get(1);
+      const avgGainKey = `_ta_rsi_gain_${callId}_${length}`;
+      const avgLossKey = `_ta_rsi_loss_${callId}_${length}`;
+
+      const prevSource = sourceHistory[1];
       if (prevSource === undefined) return NaN;
 
       const change = source - prevSource;
       const gain = change > 0 ? change : 0;
       const loss = change < 0 ? -change : 0;
 
-      let avgGain = scope.get(avgGainKey) as number | undefined;
-      let avgLoss = scope.get(avgLossKey) as number | undefined;
+      const avgGain = this.updateBuiltinRmaState(scope, avgGainKey, `_ta_rsi_gain_source_${callId}_${length}`, gain, length);
+      const avgLoss = this.updateBuiltinRmaState(scope, avgLossKey, `_ta_rsi_loss_source_${callId}_${length}`, loss, length);
 
-      if (avgGain === undefined || avgLoss === undefined) {
-        // Initialize
-        let totalGain = 0;
-        let totalLoss = 0;
-
-        for (let i = 0; i < length; i++) {
-          const curr = series.get(i);
-          const prev = series.get(i + 1);
-          if (curr === undefined || prev === undefined) continue;
-
-          const c = curr - prev;
-          if (c > 0) totalGain += c;
-          else totalLoss -= c;
-        }
-
-        avgGain = totalGain / length;
-        avgLoss = totalLoss / length;
-      } else {
-        // Smoothed average
-        avgGain = (avgGain * (length - 1) + gain) / length;
-        avgLoss = (avgLoss * (length - 1) + loss) / length;
-      }
-
-      scope.declare(avgGainKey, 'var', avgGain);
-      scope.declare(avgLossKey, 'var', avgLoss);
-
+      if (isNaN(avgGain) || isNaN(avgLoss)) return NaN;
       if (avgLoss === 0) return 100;
       const rs = avgGain / avgLoss;
       return 100 - 100 / (1 + rs);
@@ -8028,7 +9865,7 @@ export class TealscriptEngine {
     this.builtins.set('ta.valuewhen', (args, namedArgs, _ctx, scope, callId) => {
       const taValuewhenArgs = ['condition', 'source', 'occurrence'];
       const condition = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 0));
-      const source = this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 1) as number;
+      const source = this.unwrapKnownSourceValue(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 1));
       const occurrence = Math.max(0, Math.trunc(this.toNumber(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 2, 0))));
       const key = `_valuewhen_${callId}`;
       const values = (scope.get(key) as unknown[] | undefined) ?? [];
@@ -8042,7 +9879,7 @@ export class TealscriptEngine {
     });
 
     // Change - difference from N bars ago
-    this.builtins.set('ta.change', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.change', (args, namedArgs, _ctx, scope, callId) => {
       const taChangeArgs = ['source', 'length'];
       const rawSource = this.getOrderedCallArg(args, namedArgs, taChangeArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taChangeArgs, 1, 1));
@@ -8056,89 +9893,72 @@ export class TealscriptEngine {
         return previous === undefined ? false : rawSource !== previous;
       }
 
-      const source = rawSource as number;
+      const source = this.toNumber(rawSource);
+      const values = this.getCompleteSourceWindow(scope, `_change_num_${callId}`, rawSource, length + 1);
+      if (!values) return NaN;
 
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
-      const prev = series.get(length);
-      if (prev === undefined) return NaN;
-
-      return source - prev;
+      return source - values[length]!;
     });
 
     // Crossover - source1 crosses above source2
     // Uses scope to track previous values of both arguments
-    this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
-      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
-      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
+      const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
+      const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
+      const source1 = this.toNumber(rawSource1);
+      const source2 = this.toNumber(rawSource2);
+      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
+      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
+      const trackKey1 = `_cross_over_src1_${callId}`;
+      const trackKey2 = `_cross_over_src2_${callId}`;
+      const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
+      const previous2 = series2?.get(1) ?? (scope.get(trackKey2) as number | undefined);
 
-      // Try to get series for source1 (if it's a built-in series)
-      const series1 = this.getSeriesForSource(source1, ctx);
-      const series2 = this.getSeriesForSource(source2, ctx);
+      this.setBuiltinState(scope, trackKey1, source1);
+      this.setBuiltinState(scope, trackKey2, source2);
 
-      // Get previous values
-      const prev1 = series1.get(1);
-      const prev2 = series2.get(1);
-
-      // If we can't get historical values, use scope tracking
-      const trackKey1 = `_cross_src1_${source1}`;
-      const trackKey2 = `_cross_src2_${source2}`;
-
-      const trackedPrev1 = prev1 ?? (scope.get(trackKey1) as number | undefined);
-      const trackedPrev2 = prev2 ?? (scope.get(trackKey2) as number | undefined);
-
-      // Store current values for next bar
-      scope.declare(trackKey1, 'var', source1);
-      scope.declare(trackKey2, 'var', source2);
-
-      if (trackedPrev1 === undefined || trackedPrev2 === undefined) {
+      if (previous1 === undefined || previous2 === undefined || isNaN(source1) || isNaN(source2) || isNaN(previous1) || isNaN(previous2)) {
         return false; // Not enough data
       }
 
       // Crossover: current above, previous at or below
-      return source1 > source2 && trackedPrev1 <= trackedPrev2;
+      return source1 > source2 && previous1 <= previous2;
     });
 
     // Crossunder - source1 crosses below source2
-    this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
-      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
-      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
+      const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
+      const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
+      const source1 = this.toNumber(rawSource1);
+      const source2 = this.toNumber(rawSource2);
+      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
+      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
+      const trackKey1 = `_cross_under_src1_${callId}`;
+      const trackKey2 = `_cross_under_src2_${callId}`;
+      const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
+      const previous2 = series2?.get(1) ?? (scope.get(trackKey2) as number | undefined);
 
-      // Try to get series for source1 (if it's a built-in series)
-      const series1 = this.getSeriesForSource(source1, ctx);
-      const series2 = this.getSeriesForSource(source2, ctx);
+      this.setBuiltinState(scope, trackKey1, source1);
+      this.setBuiltinState(scope, trackKey2, source2);
 
-      // Get previous values
-      const prev1 = series1.get(1);
-      const prev2 = series2.get(1);
-
-      // If we can't get historical values, use scope tracking
-      const trackKey1 = `_crossu_src1_${source1}`;
-      const trackKey2 = `_crossu_src2_${source2}`;
-
-      const trackedPrev1 = prev1 ?? (scope.get(trackKey1) as number | undefined);
-      const trackedPrev2 = prev2 ?? (scope.get(trackKey2) as number | undefined);
-
-      // Store current values for next bar
-      scope.declare(trackKey1, 'var', source1);
-      scope.declare(trackKey2, 'var', source2);
-
-      if (trackedPrev1 === undefined || trackedPrev2 === undefined) {
+      if (previous1 === undefined || previous2 === undefined || isNaN(source1) || isNaN(source2) || isNaN(previous1) || isNaN(previous2)) {
         return false; // Not enough data
       }
 
       // Crossunder: current below, previous at or above
-      return source1 < source2 && trackedPrev1 >= trackedPrev2;
+      return source1 < source2 && previous1 >= previous2;
     });
 
     this.builtins.set('ta.cross', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
-      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
-      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
-      const series1 = this.getKnownSeriesForSource(source1, ctx);
-      const series2 = this.getKnownSeriesForSource(source2, ctx);
+      const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
+      const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
+      const source1 = this.toNumber(rawSource1);
+      const source2 = this.toNumber(rawSource2);
+      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
+      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
       const trackKey1 = `_cross_any_src1_${callId}`;
       const trackKey2 = `_cross_any_src2_${callId}`;
       const stored1 = scope.get(trackKey1) as number | undefined;
@@ -8190,7 +10010,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.range', (args, namedArgs, _ctx, scope, callId) => {
       const taRangeArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taRangeArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taRangeArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taRangeArgs, 1));
       const values = this.getAvailableSourceWindow(scope, `_ta_range_source_${callId}`, source, length);
 
@@ -8282,7 +10102,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.vwma', (args, namedArgs, ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_vwma_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -8302,49 +10122,16 @@ export class TealscriptEngine {
     });
 
     // ATR - Average True Range
-    this.builtins.set('ta.atr', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.atr', (args, namedArgs, _ctx, scope, callId) => {
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'length'));
-
-      // Calculate True Range
-      const high = ctx.high.get(0)!;
-      const low = ctx.low.get(0)!;
-      const prevClose = ctx.close.get(1);
-
-      let tr: number;
-      if (prevClose === undefined) {
-        tr = high - low;
-      } else {
-        tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
-      }
-
-      // Use RMA (Wilder's smoothing) for ATR
-      const atrKey = `_atr_${length}`;
-      let prevAtr = scope.get(atrKey) as number | undefined;
-
-      let atr: number;
-      if (prevAtr === undefined || isNaN(prevAtr)) {
-        // Initialize with simple average of TR
-        let sum = 0;
-        for (let i = 0; i < length; i++) {
-          const h = ctx.high.get(i);
-          const l = ctx.low.get(i);
-          const pc = ctx.close.get(i + 1);
-          if (h === undefined || l === undefined) continue;
-
-          let t = h - l;
-          if (pc !== undefined) {
-            t = Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc));
-          }
-          sum += t;
-        }
-        atr = sum / length;
-      } else {
-        // Wilder's smoothing
-        atr = (prevAtr * (length - 1) + tr) / length;
-      }
-
-      scope.declare(atrKey, 'var', atr);
-      return atr;
+      this.recordLookbackLength(length + 1);
+      return this.updateBuiltinRmaState(
+        scope,
+        `_ta_atr_${callId}_${length}`,
+        `_ta_atr_tr_source_${callId}_${length}`,
+        this.currentTrueRange(true),
+        length,
+      );
     });
 
     // MACD - returns [macdLine, signalLine, histogram]
@@ -8354,6 +10141,7 @@ export class TealscriptEngine {
       const fastLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 1, 12));
       const slowLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 2, 26));
       const signalLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 3, 9));
+      this.recordLookbackLength(Math.max(fastLen, slowLen, signalLen));
 
       // Calculate EMAs
       const fastAlpha = 2 / (fastLen + 1);
@@ -8387,7 +10175,7 @@ export class TealscriptEngine {
     // STDEV - Standard Deviation
     this.builtins.set('ta.stdev', (args, namedArgs, _ctx, scope, callId) => {
       const taStdevArgs = ['source', 'length', 'biased'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taStdevArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 1));
       const biased = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 2, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_stdev_source_${callId}`, source, length);
@@ -8407,7 +10195,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.variance', (args, namedArgs, _ctx, scope, callId) => {
       const taVarianceArgs = ['source', 'length', 'biased'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 1));
       const biased = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 2, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_variance_source_${callId}`, source, length);
@@ -8421,7 +10209,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.dev', (args, namedArgs, _ctx, scope, callId) => {
       const taDevArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taDevArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taDevArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDevArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_dev_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -8432,8 +10220,8 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.correlation', (args, namedArgs, _ctx, scope, callId) => {
       const taCorrelationArgs = ['source1', 'source2', 'length'];
-      const sourceA = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 0));
-      const sourceB = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 1));
+      const sourceA = this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 0);
+      const sourceB = this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 1);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 2));
       const windows = this.getCompletePairedSourceWindows(
         scope,
@@ -8466,7 +10254,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cog', (args, namedArgs, _ctx, scope, callId) => {
       const taCogArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCogArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taCogArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCogArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_cog_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -8480,7 +10268,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.median', (args, namedArgs, _ctx, scope, callId) => {
       const taMedianArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMedianArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taMedianArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMedianArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_median_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -8492,7 +10280,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.mode', (args, namedArgs, _ctx, scope, callId) => {
       const taModeArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taModeArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taModeArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taModeArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_mode_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -8515,7 +10303,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.percentile_nearest_rank', (args, namedArgs, _ctx, scope, callId) => {
       const taPercentileArgs = ['source', 'length', 'percentage'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 1));
       const percentage = Math.min(100, Math.max(0, this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 2))));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentile_nearest_source_${callId}`, source, length);
@@ -8528,7 +10316,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.percentile_linear_interpolation', (args, namedArgs, _ctx, scope, callId) => {
       const taPercentileArgs = ['source', 'length', 'percentage'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 1));
       const percentage = Math.min(100, Math.max(0, this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 2))));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentile_linear_source_${callId}`, source, length);
@@ -8546,9 +10334,10 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.percentrank', (args, namedArgs, _ctx, scope, callId) => {
       const taPercentrankArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 1));
-      const values = this.getCompleteSourceWindow(scope, `_ta_percentrank_source_${callId}`, source, length);
+      const values = this.getCompleteSourceWindow(scope, `_ta_percentrank_source_${callId}`, rawSource, length);
       if (!values) return NaN;
 
       const belowOrEqual = values.filter((value) => value <= source).length;
@@ -8574,41 +10363,51 @@ export class TealscriptEngine {
     this.builtins.set('ta.wad', (_args, _namedArgs, _ctx, scope) => this.updateWilliamsAccumulationDistribution(scope, '_ta_wad_value'));
     this.builtins.set('ta.wvad', (_args, _namedArgs, _ctx) => this.currentWilliamsVariableAccumulationDistribution());
 
-    // VWAP - Volume Weighted Average Price
-    // Note: Simplified version - doesn't reset at session boundaries
-    this.builtins.set('ta.vwap', (_args, _namedArgs, ctx, scope) => {
-      // VWAP = Σ(Typical Price × Volume) / Σ(Volume)
-      // Typical Price = (High + Low + Close) / 3
-
+    this.builtins.set('ta.vwap', (args, namedArgs, ctx, scope, callId) => {
+      const taVwapArgs = ['source', 'anchor', 'stdev_mult'];
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
       const close = ctx.close.get(0)!;
       const volume = ctx.volume.get(0)!;
-
       const typicalPrice = (high + low + close) / 3;
-      const tpv = typicalPrice * volume;
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taVwapArgs, 0, typicalPrice));
+      const anchor = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taVwapArgs, 1, false));
+      const rawStdevMult = this.getOrderedCallArg(args, namedArgs, taVwapArgs, 2);
+      if (isNaN(source) || isNaN(volume)) return NaN;
 
-      // Get cumulative values from scope
-      const cumTpvKey = '_vwap_cum_tpv';
-      const cumVolKey = '_vwap_cum_vol';
+      const tpv = source * volume;
+      const cumTpvKey = `_vwap_cum_tpv_${callId}`;
+      const cumVolKey = `_vwap_cum_vol_${callId}`;
+      const cumSourceSquaredVolKey = `_vwap_cum_source_squared_vol_${callId}`;
 
-      const prevCumTpv = (scope.get(cumTpvKey) as number) ?? 0;
-      const prevCumVol = (scope.get(cumVolKey) as number) ?? 0;
+      const prevCumTpv = anchor ? 0 : ((scope.get(cumTpvKey) as number) ?? 0);
+      const prevCumVol = anchor ? 0 : ((scope.get(cumVolKey) as number) ?? 0);
+      const prevCumSourceSquaredVol = anchor ? 0 : ((scope.get(cumSourceSquaredVolKey) as number) ?? 0);
 
       const cumTpv = prevCumTpv + tpv;
       const cumVol = prevCumVol + volume;
+      const cumSourceSquaredVol = prevCumSourceSquaredVol + source * source * volume;
 
-      scope.declare(cumTpvKey, 'var', cumTpv);
-      scope.declare(cumVolKey, 'var', cumVol);
+      this.setBuiltinState(scope, cumTpvKey, cumTpv);
+      this.setBuiltinState(scope, cumVolKey, cumVol);
+      this.setBuiltinState(scope, cumSourceSquaredVolKey, cumSourceSquaredVol);
 
-      return cumVol > 0 ? cumTpv / cumVol : NaN;
+      const vwap = cumVol > 0 ? cumTpv / cumVol : NaN;
+      if (rawStdevMult === undefined) return vwap;
+
+      const stdevMult = this.toNumber(rawStdevMult);
+      if (isNaN(vwap) || isNaN(stdevMult)) return [vwap, NaN, NaN];
+
+      const weightedVariance = Math.max(cumSourceSquaredVol / cumVol - vwap * vwap, 0);
+      const stdev = Math.sqrt(weightedVariance);
+      return [vwap, vwap + stdevMult * stdev, vwap - stdevMult * stdev];
     });
 
     this.builtins.set('ta.stoch', (args, namedArgs, _ctx, scope, callId) => {
       const taStochArgs = ['source', 'high', 'low', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 0));
-      const highSource = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 1));
-      const lowSource = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 2));
+      const highSource = this.getOrderedCallArg(args, namedArgs, taStochArgs, 1);
+      const lowSource = this.getOrderedCallArg(args, namedArgs, taStochArgs, 2);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taStochArgs, 3, 14));
       const windows = this.getCompletePairedSourceWindows(
         scope,
@@ -8664,6 +10463,7 @@ export class TealscriptEngine {
     this.builtins.set('ta.wpr', (args, namedArgs, ctx) => {
       const taWprArgs = ['length'];
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taWprArgs, 0, 14));
+      this.recordLookbackLength(length);
       const close = ctx.close.get(0);
       if (length < 1 || close === undefined || isNaN(close)) return NaN;
 
@@ -8683,7 +10483,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cmo', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 14));
       const values = this.getCompleteSourceWindow(scope, `_ta_cmo_source_${callId}`, source, length + 1);
       if (!values) return NaN;
@@ -8706,6 +10506,7 @@ export class TealscriptEngine {
       const shortLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 1));
       const longLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 2));
       if (isNaN(source) || shortLength < 1 || longLength < 1) return NaN;
+      this.recordLookbackLength(2);
 
       const sourceKey = `_ta_tsi_source_${callId}`;
       const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
@@ -8762,9 +10563,10 @@ export class TealscriptEngine {
     // MOM - Momentum
     this.builtins.set('ta.mom', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 10));
-      const values = this.getCompleteSourceWindow(scope, `_ta_mom_source_${callId}`, source, length + 1);
+      const values = this.getCompleteSourceWindow(scope, `_ta_mom_source_${callId}`, rawSource, length + 1);
       const prev = values?.[length];
 
       if (prev === undefined) return NaN;
@@ -8775,9 +10577,10 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cci', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 20));
-      const values = this.getCompleteSourceWindow(scope, `_ta_cci_source_${callId}`, source, length);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cci_source_${callId}`, rawSource, length);
       if (!values) return NaN;
 
       const basis = values.reduce((sum, value) => sum + value, 0) / length;
@@ -8804,21 +10607,20 @@ export class TealscriptEngine {
       const taSourceLengthArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
-      if (isNaN(source) || length < 1) return NaN;
-      const alpha = 1 / length;
-
-      const rmaKey = `_ta_rma_${callId}_${length}`;
-      const previous = scope.get(rmaKey) as number | undefined;
-      const rma = previous === undefined || isNaN(previous) ? source : alpha * source + (1 - alpha) * previous;
-      this.setBuiltinState(scope, rmaKey, rma);
-      return rma;
+      return this.updateBuiltinRmaState(
+        scope,
+        `_ta_rma_${callId}_${length}`,
+        `_ta_rma_source_${callId}_${length}`,
+        source,
+        length,
+      );
     });
 
     // WMA - Weighted Moving Average
     // Formula: wma = sum(source[i] * weight[i]) / sum(weights) where weight = length - i
     this.builtins.set('ta.wma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_wma_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -8839,7 +10641,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.swma', (args, namedArgs, _ctx, scope, callId) => {
       const taSwmaArgs = ['source'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSwmaArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSwmaArgs, 0);
       const values = this.getCompleteSourceWindow(scope, `_ta_swma_source_${callId}`, source, 4);
       if (!values) return NaN;
 
@@ -8848,7 +10650,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.alma', (args, namedArgs, _ctx, scope, callId) => {
       const taAlmaArgs = ['series', 'length', 'offset', 'sigma', 'floor'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 1));
       const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 2));
       const sigma = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 3));
@@ -8872,20 +10674,21 @@ export class TealscriptEngine {
 
     // HMA - Hull Moving Average
     // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
-    this.builtins.set('ta.hma', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.hma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getCompleteSourceWindow(scope, `_ta_hma_source_${callId}_${length}`, source, length);
+      if (!values) return NaN;
 
       // Helper to calculate WMA
-      const calcWma = (len: number, offset: number = 0): number => {
+      const calcWma = (len: number): number => {
         let weightedSum = 0;
         let weightSum = 0;
 
         for (let i = 0; i < len; i++) {
-          const val = series.get(i + offset);
+          const val = values[i];
           if (val === undefined || isNaN(val)) return NaN;
 
           const weight = len - i;
@@ -8912,7 +10715,7 @@ export class TealscriptEngine {
 
       hmaRawHistory.push(rawHma);
       if (hmaRawHistory.length > sqrtLen) hmaRawHistory.shift();
-      scope.declare(hmaRawKey, 'var', hmaRawHistory);
+      this.setBuiltinState(scope, hmaRawKey, hmaRawHistory);
 
       // WMA of the raw values
       if (hmaRawHistory.length < sqrtLen) return NaN;
@@ -8933,7 +10736,7 @@ export class TealscriptEngine {
     // Returns [middle, upper, lower]
     this.builtins.set('ta.bb', (args, namedArgs, _ctx, scope, callId) => {
       const taBbArgs = ['series', 'length', 'mult'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taBbArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taBbArgs, 1));
       const mult = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 2, 2.0));
       const values = this.getCompleteSourceWindow(scope, `_ta_bb_source_${callId}`, source, length);
@@ -8974,9 +10777,10 @@ export class TealscriptEngine {
     // Formula: (current - previous) / previous * 100
     this.builtins.set('ta.roc', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 1));
-      const values = this.getCompleteSourceWindow(scope, `_ta_roc_source_${callId}`, source, length + 1);
+      const values = this.getCompleteSourceWindow(scope, `_ta_roc_source_${callId}`, rawSource, length + 1);
       const prev = values?.[length];
 
       if (prev === undefined || prev === 0) return NaN;
@@ -8991,10 +10795,11 @@ export class TealscriptEngine {
 
     // SuperTrend - ATR-based trend indicator
     // Returns [supertrend value, direction (1 = up, -1 = down)]
-    this.builtins.set('ta.supertrend', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.supertrend', (args, namedArgs, ctx, scope, callId) => {
       const taSupertrendArgs = ['factor', 'atrPeriod'];
       const factor = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 0, 3.0));
       const atrLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 1, 10));
+      this.recordLookbackLength(atrLength + 1);
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -9009,7 +10814,7 @@ export class TealscriptEngine {
         tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
       }
 
-      const atrKey = `_st_atr_${atrLength}`;
+      const atrKey = `_ta_supertrend_atr_${callId}_${atrLength}`;
       let atr = scope.get(atrKey) as number | undefined;
 
       if (atr === undefined || isNaN(atr)) {
@@ -9030,7 +10835,7 @@ export class TealscriptEngine {
       } else {
         atr = (atr * (atrLength - 1) + tr) / atrLength;
       }
-      scope.declare(atrKey, 'var', atr);
+      this.setBuiltinState(scope, atrKey, atr);
 
       // Calculate basic upper and lower bands
       const hl2 = (high + low) / 2;
@@ -9038,9 +10843,9 @@ export class TealscriptEngine {
       const basicLowerBand = hl2 - factor * atr;
 
       // Get previous values
-      const prevUpperKey = `_st_upper_${factor}_${atrLength}`;
-      const prevLowerKey = `_st_lower_${factor}_${atrLength}`;
-      const prevDirKey = `_st_dir_${factor}_${atrLength}`;
+      const prevUpperKey = `_ta_supertrend_upper_${callId}_${factor}_${atrLength}`;
+      const prevLowerKey = `_ta_supertrend_lower_${callId}_${factor}_${atrLength}`;
+      const prevDirKey = `_ta_supertrend_dir_${callId}_${factor}_${atrLength}`;
 
       let prevUpper = scope.get(prevUpperKey) as number | undefined;
       let prevLower = scope.get(prevLowerKey) as number | undefined;
@@ -9080,22 +10885,23 @@ export class TealscriptEngine {
       // SuperTrend value
       const supertrend = direction === 1 ? finalLowerBand : finalUpperBand;
 
-      scope.declare(prevUpperKey, 'var', finalUpperBand);
-      scope.declare(prevLowerKey, 'var', finalLowerBand);
-      scope.declare(prevDirKey, 'var', direction);
+      this.setBuiltinState(scope, prevUpperKey, finalUpperBand);
+      this.setBuiltinState(scope, prevLowerKey, finalLowerBand);
+      this.setBuiltinState(scope, prevDirKey, direction);
 
       return [supertrend, direction];
     });
 
     // DMI - Directional Movement Index
     // Returns [diPlus, diMinus, adx]
-    this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope, callId) => {
       const taDmiArgs = ['diLength', 'adxSmoothing'];
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDmiArgs, 0, 14));
       const adxSmoothing = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDmiArgs, 1, 14));
       if (length < 1 || adxSmoothing < 1) {
         return [NaN, NaN, NaN];
       }
+      this.recordLookbackLength(length + 1);
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -9112,12 +10918,14 @@ export class TealscriptEngine {
       }
 
       // Calculate +DM and -DM
-      let plusDM = 0;
-      let minusDM = 0;
+      let plusDM = NaN;
+      let minusDM = NaN;
 
       if (prevHigh !== undefined && prevLow !== undefined) {
         const upMove = high - prevHigh;
         const downMove = prevLow - low;
+        plusDM = 0;
+        minusDM = 0;
 
         if (upMove > downMove && upMove > 0) {
           plusDM = upMove;
@@ -9127,25 +10935,31 @@ export class TealscriptEngine {
         }
       }
 
-      // Smooth with RMA (Wilder's smoothing)
-      const alpha = 1 / length;
-
-      const smoothTrKey = `_dmi_tr_${length}`;
-      const smoothPlusDmKey = `_dmi_plusdm_${length}`;
-      const smoothMinusDmKey = `_dmi_minusdm_${length}`;
-      const smoothAdxKey = `_dmi_adx_${length}_${adxSmoothing}`;
-
-      let smoothTr = (scope.get(smoothTrKey) as number) ?? tr;
-      let smoothPlusDm = (scope.get(smoothPlusDmKey) as number) ?? plusDM;
-      let smoothMinusDm = (scope.get(smoothMinusDmKey) as number) ?? minusDM;
-
-      smoothTr = alpha * tr + (1 - alpha) * smoothTr;
-      smoothPlusDm = alpha * plusDM + (1 - alpha) * smoothPlusDm;
-      smoothMinusDm = alpha * minusDM + (1 - alpha) * smoothMinusDm;
-
-      scope.declare(smoothTrKey, 'var', smoothTr);
-      scope.declare(smoothPlusDmKey, 'var', smoothPlusDm);
-      scope.declare(smoothMinusDmKey, 'var', smoothMinusDm);
+      const stateKey = `${callId}_${length}_${adxSmoothing}`;
+      const smoothTr = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_tr_${stateKey}`,
+        `_ta_dmi_tr_source_${stateKey}`,
+        tr,
+        length,
+      );
+      const smoothPlusDm = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_plusdm_${stateKey}`,
+        `_ta_dmi_plusdm_source_${stateKey}`,
+        plusDM,
+        length,
+      );
+      const smoothMinusDm = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_minusdm_${stateKey}`,
+        `_ta_dmi_minusdm_source_${stateKey}`,
+        minusDM,
+        length,
+      );
+      if (isNaN(smoothTr) || isNaN(smoothPlusDm) || isNaN(smoothMinusDm)) {
+        return [NaN, NaN, NaN];
+      }
 
       // Calculate DI+ and DI-
       const diPlus = smoothTr > 0 ? (smoothPlusDm / smoothTr) * 100 : 0;
@@ -9155,28 +10969,33 @@ export class TealscriptEngine {
       const diSum = diPlus + diMinus;
       const dx = diSum > 0 ? (Math.abs(diPlus - diMinus) / diSum) * 100 : 0;
 
-      let adx = (scope.get(smoothAdxKey) as number) ?? dx;
-      const adxAlpha = 1 / adxSmoothing;
-      adx = adxAlpha * dx + (1 - adxAlpha) * adx;
-      scope.declare(smoothAdxKey, 'var', adx);
+      const adx = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_adx_${stateKey}`,
+        `_ta_dmi_adx_source_${stateKey}`,
+        dx,
+        adxSmoothing,
+      );
 
       return [diPlus, diMinus, adx];
     });
 
     // SAR - Parabolic Stop and Reverse
-    this.builtins.set('ta.sar', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.sar', (args, namedArgs, ctx, scope, callId) => {
       const taSarArgs = ['start', 'inc', 'max'];
       const start = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 0, 0.02));
       const increment = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 1, 0.02));
       const maximum = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 2, 0.2));
+      this.recordLookbackLength(3);
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
 
-      const sarKey = '_sar_value';
-      const epKey = '_sar_ep'; // Extreme Point
-      const afKey = '_sar_af'; // Acceleration Factor
-      const trendKey = '_sar_trend'; // 1 = up, -1 = down
+      const stateKey = `${callId}_${start}_${increment}_${maximum}`;
+      const sarKey = `_ta_sar_value_${stateKey}`;
+      const epKey = `_ta_sar_ep_${stateKey}`; // Extreme Point
+      const afKey = `_ta_sar_af_${stateKey}`; // Acceleration Factor
+      const trendKey = `_ta_sar_trend_${stateKey}`; // 1 = up, -1 = down
 
       let sar = scope.get(sarKey) as number | undefined;
       let ep = scope.get(epKey) as number | undefined;
@@ -9236,36 +11055,42 @@ export class TealscriptEngine {
         }
       }
 
-      scope.declare(sarKey, 'var', sar);
-      scope.declare(epKey, 'var', ep);
-      scope.declare(afKey, 'var', af);
-      scope.declare(trendKey, 'var', trend);
+      this.setBuiltinState(scope, sarKey, sar);
+      this.setBuiltinState(scope, epKey, ep);
+      this.setBuiltinState(scope, afKey, af);
+      this.setBuiltinState(scope, trendKey, trend);
 
       return sar;
     });
 
     // PivotHigh - Detect pivot highs
     // Returns the pivot high price or na
-    this.builtins.set('ta.pivothigh', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.pivothigh', (args, namedArgs, ctx, scope, callId) => {
       const [source, leftBars, rightBars] = this.getTaPivotArgs(args, namedArgs, ctx, 'high');
-
-      const series = this.getSeriesForSource(source, ctx);
+      const windowLength = leftBars + rightBars + 1;
+      const values = this.updateBuiltinSourceHistory(
+        scope,
+        `_ta_pivothigh_source_${callId}_${leftBars}_${rightBars}`,
+        source,
+        windowLength,
+      );
+      if (values.length < windowLength) return NaN;
 
       // We need rightBars of data after the potential pivot
       // The pivot would be at offset = rightBars
-      const pivotValue = series.get(rightBars);
-      if (pivotValue === undefined) return NaN;
+      const pivotValue = values[rightBars];
+      if (pivotValue === undefined || isNaN(pivotValue)) return NaN;
 
       // Check left side (bars before the pivot, at higher offsets)
       for (let i = 1; i <= leftBars; i++) {
-        const val = series.get(rightBars + i);
-        if (val === undefined || val >= pivotValue) return NaN;
+        const val = values[rightBars + i];
+        if (val === undefined || isNaN(val) || val >= pivotValue) return NaN;
       }
 
       // Check right side (bars after the pivot, at lower offsets)
       for (let i = 1; i <= rightBars; i++) {
-        const val = series.get(rightBars - i);
-        if (val === undefined || val >= pivotValue) return NaN;
+        const val = values[rightBars - i];
+        if (val === undefined || isNaN(val) || val >= pivotValue) return NaN;
       }
 
       return pivotValue;
@@ -9273,25 +11098,31 @@ export class TealscriptEngine {
 
     // PivotLow - Detect pivot lows
     // Returns the pivot low price or na
-    this.builtins.set('ta.pivotlow', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.pivotlow', (args, namedArgs, ctx, scope, callId) => {
       const [source, leftBars, rightBars] = this.getTaPivotArgs(args, namedArgs, ctx, 'low');
-
-      const series = this.getSeriesForSource(source, ctx);
+      const windowLength = leftBars + rightBars + 1;
+      const values = this.updateBuiltinSourceHistory(
+        scope,
+        `_ta_pivotlow_source_${callId}_${leftBars}_${rightBars}`,
+        source,
+        windowLength,
+      );
+      if (values.length < windowLength) return NaN;
 
       // The pivot would be at offset = rightBars
-      const pivotValue = series.get(rightBars);
-      if (pivotValue === undefined) return NaN;
+      const pivotValue = values[rightBars];
+      if (pivotValue === undefined || isNaN(pivotValue)) return NaN;
 
       // Check left side (bars before the pivot, at higher offsets)
       for (let i = 1; i <= leftBars; i++) {
-        const val = series.get(rightBars + i);
-        if (val === undefined || val <= pivotValue) return NaN;
+        const val = values[rightBars + i];
+        if (val === undefined || isNaN(val) || val <= pivotValue) return NaN;
       }
 
       // Check right side (bars after the pivot, at lower offsets)
       for (let i = 1; i <= rightBars; i++) {
-        const val = series.get(rightBars - i);
-        if (val === undefined || val <= pivotValue) return NaN;
+        const val = values[rightBars - i];
+        if (val === undefined || isNaN(val) || val <= pivotValue) return NaN;
       }
 
       return pivotValue;
@@ -9299,7 +11130,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.linreg', (args, namedArgs, _ctx, scope, callId) => {
       const taLinregArgs = ['source', 'length', 'offset'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taLinregArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 1));
       const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 2, 0));
       const values = this.getCompleteSourceWindow(scope, `_ta_linreg_source_${callId}`, source, length);
@@ -9338,12 +11169,14 @@ export class TealscriptEngine {
     this.builtins.set('timestamp', (args, namedArgs) => this.evaluateTimestamp(args, namedArgs));
     this.builtins.set('time', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, false));
     this.builtins.set('time_close', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, true));
-    this.builtins.set('timeframe.in_seconds', (args, namedArgs) => {
+    const timeframeToSeconds = (args: unknown[], namedArgs: Map<string, unknown>) => {
       const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeframeArgs, 0, this.ctx.timeframe.period);
       const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       return duration === null ? Number.NaN : duration / 1000;
-    });
+    };
+    this.builtins.set('timeframe.in_seconds', timeframeToSeconds);
+    this.builtins.set('timeframe.to_seconds', timeframeToSeconds);
     this.builtins.set('timeframe.from_seconds', (args, namedArgs) => {
       return this.timeframeFromSeconds(this.toNumber(this.getOrderedCallArg(args, namedArgs, secondsArgs, 0)));
     });
@@ -9848,10 +11681,38 @@ class ContinueException extends Error {
  * Exception for runtime.error().
  */
 class RuntimeErrorException extends Error {
+  readonly runtimeErrorCode: RuntimeErrorCode;
+
   constructor(message: string) {
     super(message);
     this.name = 'RuntimeErrorException';
+    this.runtimeErrorCode = 'runtime.error';
   }
+}
+
+export function createRuntimeErrorPayload(
+  error: unknown,
+  line?: number,
+  column?: number,
+): RuntimeErrorPayload | undefined {
+  if (!(error instanceof RuntimeErrorException)) return undefined;
+  return {
+    code: error.runtimeErrorCode,
+    message: error.message,
+    line,
+    column,
+  };
+}
+
+function createExecutionError(error: unknown, line?: number, column?: number): ExecutionError {
+  const message = error instanceof Error ? error.message : String(error);
+  const runtimeError = createRuntimeErrorPayload(error, line, column);
+  return {
+    message,
+    line,
+    column,
+    ...(runtimeError ? { code: runtimeError.code, runtimeError } : {}),
+  };
 }
 
 /**

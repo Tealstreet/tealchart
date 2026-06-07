@@ -49,6 +49,263 @@ plot(rt.mid(high, low), title="Mid")
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
   });
 
+  it('preserves source identity through imported library function parameters', () => {
+    const library = parse(`
+library("SourceTools", true)
+export delayedAverage(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+`);
+
+    const result = runCompatScript(`
+indicator("Imported source identity")
+import TestUser/SourceTools/1 as st
+plot(st.delayedAverage(open), title="Imported Average")
+plot(st.delayedAverage(src=open), title="Named Imported Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Named Imported Average').values).toEqual([null, 15, 25]);
+  });
+
+  it('preserves source identity through imported same-source conditional returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export passthrough(series float src) => bar_index >= 0 ? src : src
+`);
+
+    const result = runCompatScript(`
+indicator("Imported conditional source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.passthrough(open), 2) : na, title="Imported Conditional Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Conditional Average').values).toEqual([null, 15, 25]);
+  });
+
+  it('preserves source identity through imported same-source block if returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export passthrough(series float src) =>
+    if bar_index >= 0
+        src
+    else
+        src
+`);
+
+    const result = runCompatScript(`
+indicator("Imported block if source identity")
+import TestUser/SourceTools/1 as st
+selected = st.passthrough(open)
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Imported Block If Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Block If Average').values).toEqual([null, 15, 25]);
+  });
+
+  it('preserves source identity through same-source if initializers', () => {
+    const result = runCompatScript(`
+indicator("If initializer source identity")
+selected = if bar_index >= 0
+    open
+else
+    open
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="If Initializer Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'If Initializer Average').values).toEqual([null, 15, 25]);
+  });
+
+  it('preserves source identity through imported same-source switch returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export passthrough(series float src) => switch
+    bar_index >= 0 => src
+    => src
+`);
+
+    const result = runCompatScript(`
+indicator("Imported switch source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.passthrough(open), 2) : na, title="Imported Switch Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Switch Average').values).toEqual([null, 15, 25]);
+  });
+
+  it('preserves source identity through imported same-source block switch returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export passthrough(series float src) => switch
+    bar_index >= 0 =>
+        selected = src
+        selected
+    =>
+        fallback = src
+        fallback
+`);
+
+    const result = runCompatScript(`
+indicator("Imported block switch source identity")
+import TestUser/SourceTools/1 as st
+selected = st.passthrough(open)
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Imported Block Switch Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Block Switch Average').values).toEqual([null, 15, 25]);
+  });
+
+  it('preserves source identity through imported arithmetic source returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export midpoint() => (high + low) / 2
+export scaled(series float src) => src * 2
+`);
+
+    const result = runCompatScript(`
+indicator("Imported arithmetic source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.midpoint(), 2) : na, title="Imported Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(st.scaled(open), 2) : na, title="Imported Scaled Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Arithmetic Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Scaled Average').values).toEqual([null, 30, 50]);
+  });
+
+  it('preserves source identity through imported same-arithmetic branch returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export conditionalMidpoint() => bar_index >= 0 ? (high + low) / 2 : (high + low) / 2
+export switchScaled(series float src) => switch
+    bar_index >= 0 => src * 2
+    => src * 2
+`);
+
+    const result = runCompatScript(`
+indicator("Imported arithmetic branch source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.conditionalMidpoint(), 2) : na, title="Imported Conditional Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(st.switchScaled(open), 2) : na, title="Imported Switch Arithmetic Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Conditional Arithmetic Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Switch Arithmetic Average').values).toEqual([null, 30, 50]);
+  });
+
+  it('preserves source identity through imported same-arithmetic block if returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export blockMidpoint() =>
+    if bar_index >= 0
+        (high + low) / 2
+    else
+        (high + low) / 2
+export blockScaled(series float src) =>
+    selected = if bar_index >= 0
+        src * 2
+    else
+        src * 2
+    selected
+`);
+
+    const result = runCompatScript(`
+indicator("Imported arithmetic block if source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.blockMidpoint(), 2) : na, title="Imported Block If Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(st.blockScaled(open), 2) : na, title="Imported Block If Initializer Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Block If Arithmetic Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Block If Initializer Average').values).toEqual([null, 30, 50]);
+  });
+
   it('keeps imported library function var state isolated per call site', () => {
     const library = parse(`
 library("Counters", true)
@@ -570,7 +827,7 @@ plot(q.value, title="Value")
         libraries: new Map([['TestUser/PivotTools/1', library]]),
       },
     });
-    expect(missingRequired.errors[0]?.message).toBe("library function pivots.lifted missing required argument 'amount'");
+    expect(missingRequired.errors[0]?.message).toBe("library method pivots.lifted missing required argument 'amount'");
 
     const tooMany = runCompatScript(`
 indicator("Imported library method too many args")
@@ -584,7 +841,7 @@ plot(q.value, title="Value")
         libraries: new Map([['TestUser/PivotTools/1', library]]),
       },
     });
-    expect(tooMany.errors[0]?.message).toBe('Too many arguments for library function pivots.lifted: expected 1, got 2');
+    expect(tooMany.errors[0]?.message).toBe('Too many arguments for library method pivots.lifted: expected 1, got 2');
   });
 
   it('keeps non-exported imported library methods private externally', () => {
@@ -983,6 +1240,171 @@ plot(classify(close - open), title="Nested Score")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Nested Score').values)).toEqual([3, 4, 3, 0, 0, 3, 4, 2, 0, 4, 0, 3]);
+  });
+
+  it('runs fifth-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF fifth-level branch")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open), title="Fifth Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Fifth Nested Score').values)).toEqual([2, 3, 2, 0, 0, 1, 4, 5, 0, 3, 0, 2]);
+  });
+
+  it('runs sixth-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF sixth-level branch")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open + 1), title="Sixth Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Sixth Nested Score').values)).toEqual([3, 4, 3, 0, 0, 2, 5, 6, 0, 4, 0, 3]);
+  });
+
+  it('runs seventh-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF seventh-level branch")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            if value > 6
+                                7
+                            else
+                                6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open + 1), title="Seventh Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Seventh Nested Score').values)).toEqual([3, 4, 3, 0, 0, 2, 5, 6, 0, 4, 0, 3]);
+  });
+
+  it('runs eighth-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF eighth-level branch")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            if value > 6
+                                if value > 7
+                                    8
+                                else
+                                    7
+                            else
+                                6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open + 2), title="Eighth Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Eighth Nested Score').values)).toEqual([4, 5, 4, 0, 0, 3, 6, 7, 1, 5, 1, 4]);
+  });
+
+  it('runs ninth-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF ninth-level branch")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            if value > 6
+                                if value > 7
+                                    if value > 8
+                                        9
+                                    else
+                                        8
+                                else
+                                    7
+                            else
+                                6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open + 3), title="Ninth Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Ninth Nested Score').values)).toEqual([5, 6, 5, 0, 0, 4, 7, 8, 2, 6, 2, 5]);
   });
 
   it('keeps function-local variables scoped to the function call', () => {

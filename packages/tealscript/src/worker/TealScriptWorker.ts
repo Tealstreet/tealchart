@@ -6,7 +6,8 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { IndicatorDeclarationMetadata, RuntimeErrorCode, RuntimeErrorPayload, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { Program } from '../parser/ast';
 import type { SemanticDiagnostic } from '../semantic';
 import { getResultOutput } from './protocol';
 import type {
@@ -38,8 +39,10 @@ export interface WorkerResult {
 export interface WorkerError {
   type: 'parse' | 'semantic' | 'runtime';
   message: string;
+  code?: RuntimeErrorCode;
   line?: number;
   column?: number;
+  runtimeError?: RuntimeErrorPayload;
   diagnostics?: SemanticDiagnostic[];
 }
 
@@ -217,6 +220,8 @@ export class TealscriptWorker {
       message: message.message,
       line: message.line,
       column: message.column,
+      ...(message.code ? { code: message.code } : {}),
+      ...(message.runtimeError ? { runtimeError: message.runtimeError } : {}),
     });
   }
 
@@ -302,6 +307,7 @@ export class TealscriptWorker {
     bars: Bar[],
     inputs: Record<string, unknown> = {},
     runtime?: TealscriptRuntimeOptions,
+    libraries?: Map<string, Program>,
   ): Promise<void> {
     await this.waitForReady();
 
@@ -313,6 +319,7 @@ export class TealscriptWorker {
       bars,
       inputs,
       runtime,
+      libraries,
       metadata: this.nextRequestMetadata(true),
     });
   }

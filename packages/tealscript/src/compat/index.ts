@@ -58,10 +58,17 @@ export interface CompatibilityRunOutcome {
   summary: CompatibilityRunSummary;
 }
 
+export type PineCompatibilityCorpusStages = CompatibilityStageOutcome[] | (() => CompatibilityStageOutcome[]);
+
 export interface PineCompatibilityCorpusCase {
   ledgerEntry: PineScriptLedgerEntry;
-  stages: CompatibilityStageOutcome[];
+  stages: PineCompatibilityCorpusStages;
 }
+
+type ResolvedPineCompatibilityCorpusCase = {
+  ledgerEntry: PineScriptLedgerEntry;
+  stages: CompatibilityStageOutcome[];
+};
 
 export interface PineCompatibilityCorpusSummary {
   total: number;
@@ -156,7 +163,9 @@ export function normalizeCompatibilityStageOutcomes(stages: CompatibilityStageOu
 }
 
 export function summarizeCompatibilityOutcome(stages: CompatibilityStageOutcome[]): CompatibilityRunSummary {
-  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find((stage) => stage.status === 'failed');
+  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find((stage) => (
+    stage.status !== 'passed' && stage.status !== 'skipped'
+  ));
   if (!firstFailure) {
     return { passed: true };
   }
@@ -185,20 +194,21 @@ export function createCompatibilityRunOutcome(input: {
 
 export function validateCompatibilityStageOutcome(stage: CompatibilityStageOutcome): string[] {
   const errors: string[] = [];
+  const failureClass = stage.failureClass ?? inferCompatibilityFailureClass(stage);
   if (!compatibilityStages.includes(stage.stage)) {
     errors.push(`unknown compatibility stage: ${stage.stage}`);
   }
   if (!compatibilityStageStatuses.includes(stage.status)) {
     errors.push(`unknown compatibility stage status: ${stage.status}`);
   }
-  if (stage.status === 'failed' && stage.failureClass === undefined) {
+  if (stage.status === 'failed' && failureClass === undefined) {
     errors.push(`failed stage ${stage.stage} must include a failureClass`);
   }
   if (stage.status !== 'failed' && stage.failureClass !== undefined) {
     errors.push(`stage ${stage.stage} must not include failureClass unless status is failed`);
   }
-  if (stage.failureClass !== undefined && !compatibilityFailureClasses.includes(stage.failureClass)) {
-    errors.push(`unknown compatibility failure class: ${stage.failureClass}`);
+  if (failureClass !== undefined && !compatibilityFailureClasses.includes(failureClass)) {
+    errors.push(`unknown compatibility failure class: ${failureClass}`);
   }
   return errors;
 }
@@ -262,7 +272,8 @@ export function validatePineScriptLedger(ledger: PineScriptLedger): Record<strin
 }
 
 export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[]): PineCompatibilityCorpusRun {
-  const outcomes = cases.map(({ ledgerEntry, stages }) => createCompatibilityRunOutcome({
+  const resolvedCases = cases.map(resolvePineCompatibilityCorpusCase);
+  const outcomes = resolvedCases.map(({ ledgerEntry, stages }) => createCompatibilityRunOutcome({
     scriptId: ledgerEntry.id,
     pineVersion: ledgerEntry.pineVersion,
     stages,
@@ -271,7 +282,7 @@ export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[])
   return {
     schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
     outcomes,
-    summary: summarizePineCompatibilityCorpus(cases, outcomes),
+    summary: summarizePineCompatibilityCorpus(resolvedCases, outcomes),
   };
 }
 
@@ -314,7 +325,7 @@ export function createPineCompatibilityCoverageIndex(ledger: PineScriptLedger): 
 }
 
 export function summarizePineCompatibilityCorpus(
-  cases: PineCompatibilityCorpusCase[],
+  cases: Array<{ ledgerEntry: PineScriptLedgerEntry; stages: CompatibilityStageOutcome[] }>,
   outcomes: CompatibilityRunOutcome[],
 ): PineCompatibilityCorpusSummary {
   const validationErrors: Record<string, string[]> = {
@@ -370,8 +381,19 @@ export function summarizePineCompatibilityCorpus(
   };
 }
 
+function resolvePineCompatibilityCorpusCase(corpusCase: PineCompatibilityCorpusCase): ResolvedPineCompatibilityCorpusCase {
+  return {
+    ledgerEntry: corpusCase.ledgerEntry,
+    stages: typeof corpusCase.stages === 'function' ? corpusCase.stages() : corpusCase.stages,
+  };
+}
+
 export function formatPineCompatibilityCorpusJson(run: PineCompatibilityCorpusRun): string {
   return `${JSON.stringify(run, null, 2)}\n`;
+}
+
+export function formatPineCompatibilityCoverageJson(index: PineCompatibilityCoverageIndex): string {
+  return `${JSON.stringify(index, null, 2)}\n`;
 }
 
 export function formatPineCompatibilityCoverageMarkdown(index: PineCompatibilityCoverageIndex): string {
@@ -399,10 +421,21 @@ export function formatPineCompatibilityCoverageMarkdown(index: PineCompatibility
 }
 
 function cloneCompatibilityStageOutcome(stage: CompatibilityStageOutcome): CompatibilityStageOutcome {
+  const failureClass = stage.failureClass ?? inferCompatibilityFailureClass(stage);
+
   return {
     ...stage,
+    ...(failureClass ? { failureClass } : {}),
     diagnostics: stage.diagnostics?.map((diagnostic) => ({ ...diagnostic })),
   };
+}
+
+function inferCompatibilityFailureClass(stage: CompatibilityStageOutcome): CompatibilityFailureClass | undefined {
+  if (stage.status !== 'failed') return undefined;
+  if (stage.diagnostics?.some((diagnostic) => diagnostic.code === 'unsupported-feature')) {
+    return 'unsupported_planned';
+  }
+  return undefined;
 }
 
 function clonePineScriptLedgerEntry(entry: PineScriptLedgerEntry): PineScriptLedgerEntry {

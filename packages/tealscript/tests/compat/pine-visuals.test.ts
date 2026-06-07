@@ -161,12 +161,13 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
     const result = runCompatScript(`
 indicator("Visual constants smoke", overlay=true, format=format.price, scale=scale.right, explicit_plot_zorder=true)
 displayTarget = display.all - display.status_line
-formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit"
+formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit" and format.mintick == "mintick"
 scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
 plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget, linestyle=plot.linestyle_dashed)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
+plot(close, title="Step Break", style=plot.style_steplinebr)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
-plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
+plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.mintick, 0, true)
 hline(50, "Midline", color=color.blue, linestyle=hline.style_dotted, linewidth=2, editable=false, display=display.price_scale)
 hline(75, "Solid Positional", color.red, hline.style_solid, 3, true, display.none)
 plot(formatMatches ? 1 : 0, title="Format Constants")
@@ -179,6 +180,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(result.indicatorExplicitPlotZOrder).toBe(true);
     const breakLine = getPlot(result, 'Break Line');
     const stepDiamonds = getPlot(result, 'Step Diamonds');
+    const stepBreak = getPlot(result, 'Step Break');
     const columns = getPlot(result, 'Columns');
     const positionalArea = getPlot(result, 'Positional Area');
     const midline = getPlot(result, 'Midline');
@@ -189,6 +191,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(breakLine.display).toBe(11);
     expect(stepDiamonds.style).toBe('stepline_diamond');
     expect(stepDiamonds.display).toBe(0);
+    expect(stepBreak.style).toBe('steplinebr');
     expect(columns.style).toBe('columns');
     expect(columns.histbase).toBe(100);
     expect(columns.trackprice).toBe(true);
@@ -203,7 +206,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
       editable: false,
       showLast: 4,
       display: 8,
-      format: 'volume',
+      format: 'mintick',
       precision: 0,
       forceOverlay: true,
     });
@@ -228,12 +231,13 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(result.plots.map((plot) => [plot.title, plot.zOrder])).toEqual([
       ['Break Line', 0],
       ['Step Diamonds', 1],
-      ['Columns', 2],
-      ['Positional Area', 3],
-      ['Midline', 4],
-      ['Solid Positional', 5],
-      ['Format Constants', 6],
-      ['Scale Constants', 7],
+      ['Step Break', 2],
+      ['Columns', 3],
+      ['Positional Area', 4],
+      ['Midline', 5],
+      ['Solid Positional', 6],
+      ['Format Constants', 7],
+      ['Scale Constants', 8],
     ]);
     expect(breakLine.values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'Format Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
@@ -306,7 +310,20 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       location: 'belowbar',
       size: 'large',
       text: 'L',
-      textColor: '#FFFFFF',
+      textColor: [
+        '#FFFFFF',
+        '#FFFFFF',
+        '#FFFFFF',
+        null,
+        null,
+        '#FFFFFF',
+        '#FFFFFF',
+        '#FFFFFF',
+        null,
+        '#FFFFFF',
+        null,
+        '#FFFFFF',
+      ],
       offset: 1,
       editable: false,
       showLast: 5,
@@ -321,7 +338,20 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       location: 'abovebar',
       size: 'small',
       text: 'Down',
-      textColor: '#FDD835',
+      textColor: [
+        null,
+        null,
+        null,
+        '#FDD835',
+        '#FDD835',
+        null,
+        null,
+        null,
+        '#FDD835',
+        null,
+        '#FDD835',
+        null,
+      ],
       offset: -1,
       editable: true,
       showLast: 6,
@@ -344,6 +374,79 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       precision: 2,
       forceOverlay: true,
     });
+  });
+
+  it('preserves dynamic marker text colors in visual payloads', () => {
+    const result = runCompatScript(`
+indicator("Marker text color smoke", overlay=true)
+shapeText = bar_index == 0 ? color.white : bar_index == 1 ? na : color.yellow
+charText = bar_index == 0 ? na : bar_index == 1 ? color.green : color.red
+plotshape(true, title="Dynamic Shape", text="S", textcolor=shapeText)
+plotchar(true, title="Dynamic Char", char="C", text="C", textcolor=charText)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dynamic Shape').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      ...Array(compatibilityBars.length - 2).fill('#FDD835'),
+    ]);
+    expect(getPlot(result, 'Dynamic Char').textColor).toEqual([
+      null,
+      '#4CAF50',
+      ...Array(compatibilityBars.length - 2).fill('#F23645'),
+    ]);
+  });
+
+  it('masks marker colors on hidden bars in visual payloads', () => {
+    const result = runCompatScript(`
+indicator("Marker color mask smoke", overlay=true)
+shapeVisible = bar_index == 0 ? true : bar_index == 1 ? false : bar_index == 2 ? na : true
+charValue = bar_index == 0 ? 2 : bar_index == 1 ? 0 : bar_index == 2 ? na : -1
+markerColor = bar_index == 0 ? color.green : color.red
+markerText = bar_index == 0 ? color.white : color.yellow
+plotshape(shapeVisible, title="Masked Shape", text="S", color=markerColor, textcolor=markerText)
+plotchar(charValue, title="Masked Char", char="C", text="C", color=markerColor, textcolor=markerText)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Masked Shape').values).toEqual([
+      1,
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill(1),
+    ]);
+    expect(getPlot(result, 'Masked Shape').color).toEqual([
+      '#4CAF50',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#F23645'),
+    ]);
+    expect(getPlot(result, 'Masked Shape').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#FDD835'),
+    ]);
+
+    expect(getPlot(result, 'Masked Char').values).toEqual([
+      2,
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill(-1),
+    ]);
+    expect(getPlot(result, 'Masked Char').color).toEqual([
+      '#4CAF50',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#F23645'),
+    ]);
+    expect(getPlot(result, 'Masked Char').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#FDD835'),
+    ]);
   });
 
   it('preserves legacy fill title references before plot registration', () => {
