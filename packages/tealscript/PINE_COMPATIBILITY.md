@@ -838,7 +838,9 @@ timezone-aware DST boundaries. `time()` / `time_close()` accept Pine v6
 `bars_back` and `timeframe_bars_back` offsets in named form, no-timezone
 positional form, and timezone positional form, and the runtime evaluates those
 offsets against known chart bars before applying timeframe aggregation and
-session filters.
+session filters. Negative `bars_back` offsets beyond known chart bars project
+future timestamps deterministically from the chart timeframe before the existing
+timeframe and session filters run.
 Host-provided `closedDates` and closure entries can suppress session-filtered
 `time()` calls and session-state helpers for exchange calendar holidays or
 partial-session closures. The checkpoint corpus
@@ -850,8 +852,9 @@ arguments, non-numeric `bars_back` / `timeframe_bars_back` values, plus invalid
 literal time offsets outside Pine's `-500..5000` window, missing explicit
 `timeframe` arguments for `timeframe_bars_back`, and invalid `timeframe.*`
 string/numeric helper arguments before runtime. Runtime returns `na` for
-dynamic time offsets that are non-integer or outside `-500..5000`. Full future
-timestamp projection beyond locally known chart bars remains planned.
+dynamic time offsets that are non-integer or outside `-500..5000`. Future
+exchange-calendar/session gap projection beyond deterministic chart-timeframe
+steps remains planned.
 
 ## Common Tick Quote Coverage
 
