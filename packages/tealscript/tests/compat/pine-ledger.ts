@@ -415,6 +415,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-range-trend-filter-checkpoint',
+      title: 'Public Range Trend Filter Checkpoint',
+      searchContext: 'TradingView public scripts search: range breakout trend filter',
+      featureTags: ['ta', 'signals', 'range', 'rising', 'falling', 'trend_filter', 'volatility', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-moving-average-ribbon-checkpoint',
       title: 'Public Moving Average Ribbon Checkpoint',
       searchContext: 'TradingView public scripts search: moving average ribbon',

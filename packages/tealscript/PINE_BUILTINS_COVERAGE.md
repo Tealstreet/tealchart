@@ -130,6 +130,9 @@ Current `ta.*` progress:
 - A source-linked public Donchian Channel signal checkpoint locks common
   `ta.highest()`/`ta.lowest()` bands plus `ta.highestbars()`/`ta.lowestbars()`
   offset-state routing over deterministic OHLC bars.
+- A source-linked public range trend-filter checkpoint locks common
+  `ta.range()`, `ta.rising()`, and `ta.falling()` breakout-filter routing over
+  deterministic close-series bars.
 - A source-linked public moving-average ribbon checkpoint locks common
   `ta.vwma()`, `ta.wma()`, `ta.alma()`, and `ta.hma()` overlay/ribbon routing
   over deterministic OHLCV bars.
