@@ -47,12 +47,13 @@ arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public configurable
-input panels, MTF, divergence, volatility-band overlays, session-filter,
-session-state, dashboard-table, multi-symbol screener, currency conversion,
-earnings event markers, corporate-action overlays, financial dashboards,
-economic macro overlays, seed dataset overlays, array signal queues, map signal
-dashboards, matrix scoreboards, drawing-zone, drawing-copy, linefill-channel,
-custom-candle, and library-helper idioms.
+input panels, legacy v4 study/input/helper copy-paste scripts, MTF, divergence,
+volatility-band overlays, session-filter, session-state, dashboard-table,
+multi-symbol screener, currency conversion, earnings event markers,
+corporate-action overlays, financial dashboards, economic macro overlays, seed
+dataset overlays, array signal queues, map signal dashboards, matrix
+scoreboards, drawing-zone, drawing-copy, linefill-channel, custom-candle, and
+library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public zigzag polylines, public strategy performance tables, public
@@ -108,8 +109,9 @@ Covered behavior and remaining gaps:
   declaration path for common public v3/v4 copy-paste scripts, including
   mapping named `resolution` / `resolution_gaps` arguments to the existing
   indicator `timeframe` / `timeframe_gaps` metadata. This is a declaration alias
-  only; selected legacy global built-in aliases are covered separately below,
-  while broader old-version built-in/API differences remain outside this
+  only; the reduced public legacy v4 checkpoint combines `study()`, generic
+  `input(..., type=input.*)`, global TA aliases, and `iff()` coverage, while
+  broader old-version built-in/API differences remain outside this
   compatibility point.
 - Top-level nested control blocks share the deeper block parser used by
   function bodies, including nested `if` / `else` dedents with reassignment
