@@ -2738,6 +2738,106 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-tp-sl-checkpoint',
+      title: 'Advanced Strategy TP SL Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy take profit stop loss exit',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'brackets', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-pyramiding-checkpoint',
+      title: 'Advanced Strategy Pyramiding Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy pyramiding scale in entries',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'pyramiding', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-bidirectional-checkpoint',
+      title: 'Advanced Strategy Bidirectional Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy long short bidirectional',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-closedtrades-accessors-checkpoint',
+      title: 'Advanced Strategy Closed Trades Accessors Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy closedtrades accessor entry exit profit',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'trade_accessors', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-opentrades-accessors-checkpoint',
+      title: 'Advanced Strategy Open Trades Accessors Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy opentrades entry price size dashboard',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'trade_accessors', 'open_trades', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-risk-max-position-checkpoint',
+      title: 'Advanced Strategy Risk Max Position Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy risk max position size',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'risk', 'fills', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-process-orders-on-close-checkpoint',
+      title: 'Advanced Strategy Process Orders On Close Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy process orders on close',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-equity-tracking-checkpoint',
+      title: 'Advanced Strategy Equity Tracking Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy equity netprofit tracker',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'performance', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-multi-exit-from-entry-checkpoint',
+      title: 'Advanced Strategy Multi Exit From Entry Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy exit from_entry multiple brackets',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'brackets', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-strategy-cancel-checkpoint',
+      title: 'Advanced Strategy Cancel Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy cancel pending order',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'cancel', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
