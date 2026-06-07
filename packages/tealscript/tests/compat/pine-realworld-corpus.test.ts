@@ -3664,3 +3664,217 @@ plot(isNa ? 1 : 0, title="IsNa")
     expect(getPlot(result, 'IsNa').values).toEqual([1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0]);
   });
 });
+
+// ===========================================================================================
+// String, time, and na edge cases
+// Targets str.*, timestamp(), calendar builtins, na propagation, nz(), fixnan(), and
+// color.new() with hex literals — all exercised heavily in real public scripts.
+// ===========================================================================================
+
+describe('String, time, and na edge cases', () => {
+  it('locks str.format with multiple numeric placeholder types idiom', () => {
+    // Public idiom: scripts build label strings using str.format with mixed
+    // placeholder types including numeric format patterns like #.## and percent.
+    // Source search: https://www.tradingview.com/scripts/search/str.format%20price%20pct%20change%20label/
+    const result = runCompatScript(`
+indicator("Str Format Multi Placeholder Checkpoint")
+pctChange = (close - close[1]) / close[1] * 100
+label_str = str.format("Price: {0,number,#.##} Change: {1,number,#.##}%", close, nz(pctChange))
+plot(close, title="Close")
+plot(nz(pctChange), title="PctChange")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Format Multi Placeholder Checkpoint');
+    // close is produced every bar; pctChange is na on bar 0 so nz gives 0
+    expect(getPlot(result, 'Close').values).toEqual([
+      102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112,
+    ]);
+    expect(roundSeries(getPlot(result, 'PctChange').values)).toEqual([
+      0, 2.941176, 1.904762, -3.738318, -3.883495, 1.010101,
+      4, 4.807692, -0.917431, 2.777778, -0.900901, 1.818182,
+    ]);
+  });
+
+  it('locks str.split and array iteration over delimited string idiom', () => {
+    // Public idiom: scripts split a comma-delimited string and iterate the
+    // result array with a for loop to aggregate parsed numeric values.
+    // Source search: https://www.tradingview.com/scripts/search/str.split%20iterate%20array%20values/
+    const result = runCompatScript(`
+indicator("Str Split Iteration Checkpoint")
+delimited = "10,20,30"
+parts = str.split(delimited, ",")
+total = 0.0
+for i = 0 to array.size(parts) - 1
+    total += str.tonumber(array.get(parts, i))
+plot(total, title="Total")
+plot(array.size(parts), title="Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Split Iteration Checkpoint');
+    // "10,20,30" splits into 3 elements; sum is 60 on every bar
+    expect(getPlot(result, 'Total').values).toEqual(Array(compatibilityBars.length).fill(60));
+    expect(getPlot(result, 'Count').values).toEqual(Array(compatibilityBars.length).fill(3));
+  });
+
+  it('locks str.match regex pattern on syminfo.ticker idiom', () => {
+    // Public idiom: scripts gate logic on whether the current symbol matches a
+    // regex pattern — most commonly to detect BTC or crypto pairs.
+    // Source search: https://www.tradingview.com/scripts/search/str.match%20ticker%20symbol%20regex/
+    const result = runCompatScript(`
+indicator("Str Match Regex Checkpoint")
+isBtc = str.match(syminfo.ticker, "^BTC") != ""
+isXyz = str.match(syminfo.ticker, "^XYZ") == ""
+plot(isBtc ? 1 : 0, title="IsBtc")
+plot(isXyz ? 1 : 0, title="NoXyz")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Match Regex Checkpoint');
+    // Default ticker is BTCUSDT: "^BTC" matches on every bar; "^XYZ" never matches
+    expect(getPlot(result, 'IsBtc').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'NoXyz').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks calendar-gated logic with dayofweek and hour session filter idiom', () => {
+    // Public idiom: scripts restrict signals to specific days of the week and
+    // session hours — e.g. Monday-only entry and 09:00-16:00 session gate.
+    // Source search: https://www.tradingview.com/scripts/search/dayofweek%20session%20hour%20filter%20signal/
+    const result = runCompatScript(`
+indicator("Calendar Gate Checkpoint")
+isMon = dayofweek == dayofweek.monday
+isTue = dayofweek == dayofweek.tuesday
+isSessionHour = hour >= 9 and hour < 16
+plot(isMon ? 1 : 0, title="IsMon")
+plot(isTue ? 1 : 0, title="IsTue")
+plot(isSessionHour ? 1 : 0, title="Session")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Calendar Gate Checkpoint');
+    // All bars are on 2023-11-14 (Tuesday, UTC) at hour 22 → not Monday, is Tuesday, not in session
+    expect(getPlot(result, 'IsMon').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'IsTue').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Session').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks timestamp() date filtering idiom', () => {
+    // Public idiom: scripts filter bar history using time >= timestamp(year, month, day)
+    // to restrict computation or plots to a date range.
+    // Source search: https://www.tradingview.com/scripts/search/timestamp%20date%20range%20filter%20indicator/
+    const result = runCompatScript(`
+indicator("Timestamp Filter Checkpoint")
+afterNov14 = time >= timestamp(2023, 11, 14)
+afterNov15 = time >= timestamp(2023, 11, 15)
+plot(afterNov14 ? 1 : 0, title="AfterNov14")
+plot(afterNov15 ? 1 : 0, title="AfterNov15")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Timestamp Filter Checkpoint');
+    // All 12 bars are on 2023-11-14 → all are after/on Nov14; none is after Nov15
+    expect(getPlot(result, 'AfterNov14').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'AfterNov15').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks na arithmetic propagation chain idiom', () => {
+    // Public idiom: na in any arithmetic operand must propagate through the chain
+    // — na + 1 is na, na * 0 is na, and any downstream expression using those is na.
+    // Source search: https://www.tradingview.com/scripts/search/na%20propagation%20arithmetic%20chain/
+    const result = runCompatScript(`
+indicator("NA Arithmetic Propagation Checkpoint")
+x = na + 1
+y = na * 0
+z = x + y
+plot(na(x) ? 1 : 0, title="XisNA")
+plot(na(y) ? 1 : 0, title="YisNA")
+plot(na(z) ? 1 : 0, title="ZisNA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('NA Arithmetic Propagation Checkpoint');
+    // na + anything = na, na * anything = na, na + na = na — all bars
+    expect(getPlot(result, 'XisNA').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'YisNA').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'ZisNA').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks nz() with zero default and explicit replacement value idiom', () => {
+    // Public idiom: nz(x) returns 0 when x is na; nz(x, replacement) returns the
+    // specified replacement. Both forms appear heavily in public scripts.
+    // Source search: https://www.tradingview.com/scripts/search/nz%20na%20replacement%20default%20value/
+    const result = runCompatScript(`
+indicator("NZ Replacement Checkpoint")
+floatNa = close > 999999.0 ? close : na
+plot(nz(floatNa), title="NzZero")
+plot(nz(floatNa, -1.0), title="NzMinus1")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('NZ Replacement Checkpoint');
+    // floatNa is always na (close never > 999999); nz returns 0 and -1 respectively
+    expect(getPlot(result, 'NzZero').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'NzMinus1').values).toEqual(Array(compatibilityBars.length).fill(-1));
+  });
+
+  it('locks fixnan() forward-fill of last non-na value idiom', () => {
+    // Public idiom: fixnan(series) forward-fills the most recent non-na value
+    // into subsequent na slots — widely used to keep a reference level stable.
+    // Source search: https://www.tradingview.com/scripts/search/fixnan%20forward%20fill%20series/
+    const result = runCompatScript(`
+indicator("Fixnan Forward Fill Checkpoint")
+src = close > 105 ? close : na
+fixed = fixnan(src)
+plot(src, title="Src")
+plot(fixed, title="Fixed")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Fixnan Forward Fill Checkpoint');
+    // close > 105: bars 2(107),7(109),8(108),9(111),10(110),11(112)
+    // bars 0-1 have no prior non-na value → fixed is null; then forward-fills
+    expect(getPlot(result, 'Src').values).toEqual([
+      null, null, 107, null, null, null, null, 109, 108, 111, 110, 112,
+    ]);
+    expect(getPlot(result, 'Fixed').values).toEqual([
+      null, null, 107, 107, 107, 107, 107, 109, 108, 111, 110, 112,
+    ]);
+  });
+
+  it('locks ta.barssince(na-condition) edge case idiom', () => {
+    // Public idiom: when the condition passed to ta.barssince() was never true,
+    // the result is na — an important edge case for scripts that gate on barssince.
+    // Source search: https://www.tradingview.com/scripts/search/ta.barssince%20never%20true%20na%20edge/
+    const result = runCompatScript(`
+indicator("Barssince Never True Checkpoint")
+neverTrue = close > 999999.0
+bs = ta.barssince(neverTrue)
+plot(na(bs) ? 1 : 0, title="IsNA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Barssince Never True Checkpoint');
+    // Condition never fires → barssince is always na
+    expect(getPlot(result, 'IsNA').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks color.new() with hex literal plus transparency idiom', () => {
+    // Public idiom: color.new(#RRGGBB, transparency) creates a color from a hex
+    // literal with a transparency level; 50% transparency maps to 0x80 alpha byte.
+    // Source search: https://www.tradingview.com/scripts/search/color.new%20hex%20literal%20transparency/
+    const result = runCompatScript(`
+indicator("Color New Hex Checkpoint")
+c = color.new(#FF0000, 50)
+plot(close, color=c, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Color New Hex Checkpoint');
+    // 50% transparency: hex alpha = round((100-50)/100 * 255) = 128 = 0x80
+    const colors = getPlot(result, 'Close').color as string[];
+    expect(colors).toHaveLength(compatibilityBars.length);
+    // Every bar gets the same #FF000080 color
+    expect(colors.every((c) => c === '#FF000080')).toBe(true);
+  });
+});

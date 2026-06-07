@@ -2197,6 +2197,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-strformat-multi-checkpoint',
+      title: 'Str Format Multi Placeholder Checkpoint',
+      searchContext: 'TradingView public scripts search: str.format price pct change label',
+      featureTags: ['strings', 'str_format', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-strsplit-iteration-checkpoint',
+      title: 'Str Split Iteration Checkpoint',
+      searchContext: 'TradingView public scripts search: str.split iterate array values',
+      featureTags: ['strings', 'str_split', 'arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-strmatch-regex-checkpoint',
+      title: 'Str Match Regex Checkpoint',
+      searchContext: 'TradingView public scripts search: str.match ticker symbol regex',
+      featureTags: ['strings', 'str_match', 'syminfo', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-calendar-gate-checkpoint',
+      title: 'Calendar Gate Checkpoint',
+      searchContext: 'TradingView public scripts search: dayofweek session hour filter signal',
+      featureTags: ['time', 'calendar', 'dayofweek', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-timestamp-filter-checkpoint',
+      title: 'Timestamp Filter Checkpoint',
+      searchContext: 'TradingView public scripts search: timestamp date range filter indicator',
+      featureTags: ['time', 'timestamp', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-na-arith-propagation-checkpoint',
+      title: 'NA Arithmetic Propagation Checkpoint',
+      searchContext: 'TradingView public scripts search: na propagation arithmetic chain',
+      featureTags: ['runtime', 'na', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-nz-replacement-checkpoint',
+      title: 'NZ Replacement Checkpoint',
+      searchContext: 'TradingView public scripts search: nz na replacement default value',
+      featureTags: ['runtime', 'na', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-fixnan-forwardfill-checkpoint',
+      title: 'Fixnan Forward Fill Checkpoint',
+      searchContext: 'TradingView public scripts search: fixnan forward fill series',
+      featureTags: ['runtime', 'na', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-barssince-never-true-checkpoint',
+      title: 'Barssince Never True Checkpoint',
+      searchContext: 'TradingView public scripts search: ta.barssince never true na edge',
+      featureTags: ['runtime', 'na', 'ta', 'barssince', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'string-time-na-color-new-hex-checkpoint',
+      title: 'Color New Hex Checkpoint',
+      searchContext: 'TradingView public scripts search: color.new hex literal transparency',
+      featureTags: ['runtime', 'visuals', 'color', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
