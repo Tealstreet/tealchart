@@ -6594,12 +6594,14 @@ plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) 
   it('reports invalid global helper value types', () => {
     const result = checkProgram(parse(`
 indicator("Bad Global Values")
+badNa = na(x=true)
 badNzSource = nz(source=true)
 badNzReplacement = nz(source=close, replacement=false)
 badFixnan = fixnan(source=true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'na x cannot be a boolean',
       'nz source cannot be a boolean',
       'nz replacement cannot be a boolean',
       'fixnan source cannot be a boolean',
