@@ -1006,8 +1006,8 @@ const BOX_NEW_POINT_SIGNATURE: BuiltinSignature = {
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'transp'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['bool', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['chart.point.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['chart.point.from_index', { params: ['index', 'price'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -1027,7 +1027,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'fill',
     {
-      params: ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'],
+      params: ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'],
       aliases: { hline1: 'plot1', hline2: 'plot2' },
       minArgs: 3,
       allowNamedPrefixWithPositional: true,
@@ -1203,6 +1203,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'precision',
         'force_overlay',
         'linestyle',
+        'transp',
       ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
@@ -1824,11 +1825,11 @@ const VISUAL_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['plotarrow', ['editable', 'force_overlay']],
 ]);
 const VISUAL_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
-  ['barcolor', ['offset', 'show_last']],
-  ['bgcolor', ['offset', 'show_last']],
-  ['fill', ['show_last']],
+  ['barcolor', ['offset', 'show_last', 'transp']],
+  ['bgcolor', ['offset', 'show_last', 'transp']],
+  ['fill', ['show_last', 'transp']],
   ['hline', ['price', 'linewidth']],
-  ['plot', ['linewidth', 'histbase', 'offset', 'show_last', 'precision']],
+  ['plot', ['linewidth', 'histbase', 'offset', 'show_last', 'precision', 'transp']],
   ['plotbar', ['open', 'high', 'low', 'close', 'show_last', 'precision']],
   ['plotcandle', ['open', 'high', 'low', 'close', 'show_last', 'precision']],
   ['plotshape', ['offset', 'show_last', 'precision']],

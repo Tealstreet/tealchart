@@ -987,16 +987,29 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
     ]);
   });
 
+  it('accepts legacy visual transp arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Legacy Visual Transparency", overlay=true)
+linePlot = plot(close, color=color.blue, transp=25)
+basePlot = plot(open, color=color.red)
+fill(linePlot, basePlot, color=color.green, transp=50)
+barcolor(color.red, transp=10)
+bgcolor(color.blue, transp=75)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports invalid visual numeric option value types', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Visual Numeric Values")
 linePlot = plot(close)
 basePlot = plot(open)
-badPlot = plot(close, linewidth="2", histbase="0", offset="1", show_last="10", precision="2")
+badPlot = plot(close, linewidth="2", histbase="0", offset="1", show_last="10", precision="2", transp="25")
 hline(price="100", linewidth="2")
-fill(linePlot, basePlot, color.red, show_last="10")
-barcolor(color.red, offset="1", show_last=false)
-bgcolor(color.blue, offset=false, show_last="10")
+fill(linePlot, basePlot, color.red, show_last="10", transp="50")
+barcolor(color.red, offset="1", show_last=false, transp="10")
+bgcolor(color.blue, offset=false, show_last="10", transp="75")
 plotbar(open="o", high=true, low="l", close=false, show_last="10", precision="2")
 plotcandle(open="o", high=true, low="l", close=false, show_last="10", precision="2")
 plotshape(close > open, offset="1", show_last=false, precision="2")
@@ -1010,13 +1023,17 @@ plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_la
       'plot offset must be a number, got string',
       'plot show_last must be a number, got string',
       'plot precision must be a number, got string',
+      'plot transp must be a number, got string',
       'hline price must be a number, got string',
       'hline linewidth must be a number, got string',
       'fill show_last must be a number, got string',
+      'fill transp must be a number, got string',
       'barcolor offset must be a number, got string',
       'barcolor show_last must be a number, got bool',
+      'barcolor transp must be a number, got string',
       'bgcolor offset must be a number, got bool',
       'bgcolor show_last must be a number, got string',
+      'bgcolor transp must be a number, got string',
       'plotbar open must be a number, got string',
       'plotbar high must be a number, got bool',
       'plotbar low must be a number, got string',
