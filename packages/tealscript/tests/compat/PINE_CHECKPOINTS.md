@@ -64,6 +64,7 @@ fixtures by default.
 | Fixture | Source Context | Reduced Contract | Expected Outputs |
 | --- | --- | --- | --- |
 | `Public Input Configuration Checkpoint` | https://www.tradingview.com/scripts/search/configurable%20indicator%20inputs/ | Grouped public indicator settings combine enum mode selection, length/source/level inputs, and signal toggles before deriving plotted output. | Input definition metadata plus basis, signal, and level plots over `compatibilityBars`. |
+| `Public Syminfo Metadata Checkpoint` | https://www.tradingview.com/scripts/search/syminfo%20metadata/ | Symbol-aware public indicators derive labels, routing gates, and tick-normalized values from host-provided `syminfo.*` metadata. | Symbol label length, tick value, rounded close, and metadata-gated signal over `compatibilityBars`. |
 | `Public MTF Trend Checkpoint` | https://www.tradingview.com/scripts/search/mtf%20trend%20filter/ | Local price filtered by a higher-timeframe moving average requested with `request.security()`. | HTF average merge series and local trend gate over local/request bars. |
 | `Public Divergence Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20divergence/ | Sequential price pivots compared with lower oscillator pivots to flag bearish divergence. | Pivot series and one bearish divergence signal over local bars. |
 | `Public Marker Signal Checkpoint` | https://www.tradingview.com/scripts/search/buy%20sell%20signal%20markers/ | Moving-average trend states drive `plotshape()`, `plotchar()`, and `plotarrow()` marker payloads. | Buy/sell marker values, body colors, text colors, and arrow sign/color payloads over `compatibilityBars`. |
@@ -121,6 +122,7 @@ idioms rather than isolated unit coverage.
 | --- | --- | --- |
 | Built-ins and series comparisons | `Official Built-ins Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Configurable public indicator inputs | `Public Input Configuration Checkpoint`; common input metadata fixtures in `pine-builtins.test.ts` | `pine-real-checkpoints.test.ts`; `pine-builtins.test.ts` |
+| Symbol metadata and chart context | `Public Syminfo Metadata Checkpoint`; syminfo/timeframe/chart fixtures in `pine-control-time.test.ts` | `pine-real-checkpoints.test.ts`; `pine-control-time.test.ts` |
 | Barstate, persistent arrays, first-bar initialization, and signal queues | `Official Array Checkpoint`; `Public Array Signal Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Runtime history bounds | `Official Max Bars Back Checkpoint`; max-bars-back error fixtures in `engine.test.ts` | `pine-real-checkpoints.test.ts`; `engine.test.ts` |
 | Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |

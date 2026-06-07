@@ -56,6 +56,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-syminfo-metadata-checkpoint',
+      title: 'Public Syminfo Metadata Checkpoint',
+      searchContext: 'TradingView public scripts search: syminfo metadata',
+      featureTags: ['syminfo', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-varip-array-checkpoint',
       title: 'Public Varip Array Checkpoint',
       searchContext: 'TradingView public scripts search: varip array',
