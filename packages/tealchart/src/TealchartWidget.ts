@@ -691,15 +691,12 @@ export class TealchartWidget {
         if (newBars.length > 0) {
           this._bars = [...newBars, ...this._bars];
 
-          // Notify Tealscript manager of updated bars
-          // Don't render yet - wait for onPlotsUpdated callback to ensure
-          // bars and plots are in sync (aligned by index)
-          if (this._tealScriptManager) {
-            this._tealScriptManager.setBars(this._bars);
-          } else {
-            // No indicator manager, mark bars dirty for immediate render
-            this._scheduler.markDirty(DIRTY.BARS);
-          }
+          // Render prepended bars immediately; Tealscript plots realign on the
+          // next worker callback. Gating the bar render on onPlotsUpdated means a
+          // chart with no active indicator (manager present, no scripts) never
+          // repaints after scrollback, so its callback never fires.
+          this._scheduler.markDirty(DIRTY.BARS);
+          this._tealScriptManager?.setBars(this._bars);
         }
       },
       (error) => {
