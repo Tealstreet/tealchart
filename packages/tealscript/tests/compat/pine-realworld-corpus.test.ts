@@ -3878,3 +3878,330 @@ plot(close, color=c, title="Close")
     expect(colors.every((c) => c === '#FF000080')).toBe(true);
   });
 });
+
+// ===========================================================================================
+// Advanced collection and matrix patterns
+// Exercises array.*  matrix.* and map.* operations that are common in advanced indicator code.
+// Expected values derived from compatibilityBars (12 bars) via probe runs.
+// ===========================================================================================
+
+describe('Advanced collection and matrix patterns', () => {
+  it('locks matrix.avg and matrix.col extraction idiom', () => {
+    // Advanced idiom: create a 1×2 matrix populated with close and volume,
+    // extract each column as an array, and verify matrix.avg equals (close+volume)/2.
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20column%20average%20indicator/
+    const result = runCompatScript(`
+indicator("Adv Matrix Avg Col Checkpoint")
+m = matrix.new<float>(1, 2, 0.0)
+m.set(0, 0, close)
+m.set(0, 1, volume)
+col0 = m.col(0)
+col1 = m.col(1)
+plot(m.avg(), title="MatAvg")
+plot(array.avg(col0), title="ColAvg0")
+plot(array.avg(col1), title="ColAvg1")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Matrix Avg Col Checkpoint');
+    // matrix.avg = (close + volume) / 2 per bar
+    expect(getPlot(result, 'MatAvg').values).toEqual([
+      551, 602.5, 503.5, 676.5, 749.5, 575, 702, 854.5, 654, 805.5, 730, 781,
+    ]);
+    // col(0) contains close; avg of a single-element column = close
+    expect(getPlot(result, 'ColAvg0').values).toEqual([
+      102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112,
+    ]);
+    // col(1) contains volume; avg of a single-element column = volume
+    expect(getPlot(result, 'ColAvg1').values).toEqual([
+      1000, 1100, 900, 1250, 1400, 1050, 1300, 1600, 1200, 1500, 1350, 1450,
+    ]);
+  });
+
+  it('locks matrix.transpose row/column swap idiom', () => {
+    // Advanced idiom: construct a static 2×3 matrix with known values, transpose it,
+    // and verify that rows/columns swap and individual element coordinates invert.
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20transpose%20indicator/
+    const result = runCompatScript(`
+indicator("Adv Matrix Transpose Checkpoint")
+m = matrix.new<float>(2, 3, 0.0)
+m.set(0, 0, 1.0)
+m.set(0, 1, 2.0)
+m.set(0, 2, 3.0)
+m.set(1, 0, 4.0)
+m.set(1, 1, 5.0)
+m.set(1, 2, 6.0)
+t = m.transpose()
+plot(m.rows(), title="Rows")
+plot(m.columns(), title="Cols")
+plot(t.rows(), title="TRows")
+plot(t.columns(), title="TCols")
+plot(t.get(0, 0), title="T00")
+plot(t.get(0, 1), title="T01")
+plot(t.get(1, 0), title="T10")
+plot(t.get(2, 0), title="T20")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Matrix Transpose Checkpoint');
+    // Original: 2 rows, 3 cols
+    expect(getPlot(result, 'Rows').values).toEqual(Array(compatibilityBars.length).fill(2));
+    expect(getPlot(result, 'Cols').values).toEqual(Array(compatibilityBars.length).fill(3));
+    // Transposed: 3 rows, 2 cols
+    expect(getPlot(result, 'TRows').values).toEqual(Array(compatibilityBars.length).fill(3));
+    expect(getPlot(result, 'TCols').values).toEqual(Array(compatibilityBars.length).fill(2));
+    // t[0,0]=m[0,0]=1, t[0,1]=m[1,0]=4, t[1,0]=m[0,1]=2, t[2,0]=m[0,2]=3
+    expect(getPlot(result, 'T00').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'T01').values).toEqual(Array(compatibilityBars.length).fill(4));
+    expect(getPlot(result, 'T10').values).toEqual(Array(compatibilityBars.length).fill(2));
+    expect(getPlot(result, 'T20').values).toEqual(Array(compatibilityBars.length).fill(3));
+  });
+
+  it('locks array statistical pipeline stdev/percentrank/percentile_nearest_rank idiom', () => {
+    // Advanced idiom: maintain a rolling 6-bar window, compute stdev, use
+    // array.percentrank to rank the last element, and extract the 75th percentile.
+    // Source search: https://www.tradingview.com/scripts/search/array%20stdev%20percentrank%20pipeline/
+    const result = runCompatScript(`
+indicator("Adv Array Stats Pipeline Checkpoint")
+var array<float> prices = array.new<float>()
+prices.push(close)
+if prices.size() > 6
+    prices.shift()
+sd = prices.size() >= 2 ? array.stdev(prices) : 0.0
+lastIdx = prices.size() - 1
+pr = array.percentrank(prices, lastIdx)
+pct75 = array.percentile_nearest_rank(prices, 75)
+plot(sd, title="Stdev")
+plot(pr, title="PctRank")
+plot(pct75, title="Pct75")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Array Stats Pipeline Checkpoint');
+    expect(roundSeries(getPlot(result, 'Stdev').values)).toEqual([
+      0, 1.5, 2.054805, 1.920286, 2.712932, 2.748737, 2.768875, 3.543382,
+      3.715583, 4.524624, 3.829708, 2.581989,
+    ]);
+    // percentrank of last element at each bar
+    expect(roundSeries(getPlot(result, 'PctRank').values)).toEqual([
+      100, 100, 100, 50, 20, 33.333333, 66.666667, 100,
+      83.333333, 100, 83.333333, 100,
+    ]);
+    // 75th-percentile nearest rank
+    expect(getPlot(result, 'Pct75').values).toEqual([
+      102, 105, 107, 105, 105, 105, 105, 107, 108, 109, 110, 111,
+    ]);
+  });
+
+  it('locks array.binary_search / leftmost / rightmost idiom', () => {
+    // Advanced idiom: keep a sorted growing array and use all three binary-search
+    // variants to locate the current close value within the sorted history.
+    // Source search: https://www.tradingview.com/scripts/search/array%20binary%20search%20sorted%20prices/
+    const result = runCompatScript(`
+indicator("Adv Array Binary Search Checkpoint")
+var array<float> sorted = array.new<float>()
+sorted.push(close)
+sorted.sort()
+idx = array.binary_search(sorted, close)
+idxL = array.binary_search_leftmost(sorted, close)
+idxR = array.binary_search_rightmost(sorted, close)
+plot(sorted.size(), title="Size")
+plot(idx, title="Idx")
+plot(idxL, title="IdxL")
+plot(idxR, title="IdxR")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Array Binary Search Checkpoint');
+    expect(getPlot(result, 'Size').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    // All three variants agree when no duplicates
+    expect(getPlot(result, 'Idx').values).toEqual([0, 1, 2, 1, 0, 1, 4, 7, 7, 9, 9, 11]);
+    expect(getPlot(result, 'IdxL').values).toEqual([0, 1, 2, 1, 0, 1, 4, 7, 7, 9, 9, 11]);
+    expect(getPlot(result, 'IdxR').values).toEqual([0, 1, 2, 1, 0, 1, 4, 7, 7, 9, 9, 11]);
+  });
+
+  it('locks map<string,float> category-aggregation idiom', () => {
+    // Advanced idiom: two maps accumulate bull/bear counts and gain totals by
+    // category — a pattern common in scanner and stat-dashboard scripts.
+    // Source search: https://www.tradingview.com/scripts/search/map%20category%20aggregation%20scanner/
+    const result = runCompatScript(`
+indicator("Adv Map Category Aggregation Checkpoint")
+var map<string, float> counts = map.new<string, float>()
+var map<string, float> totals = map.new<string, float>()
+isBull = close > open
+category = isBull ? "bull" : "bear"
+if not counts.contains(category)
+    counts.put(category, 0.0)
+    totals.put(category, 0.0)
+counts.put(category, nz(counts.get(category)) + 1.0)
+totals.put(category, nz(totals.get(category)) + (close - open))
+bullCount = nz(counts.get("bull"))
+bearCount = nz(counts.get("bear"))
+bullAvg = bullCount > 0 ? nz(totals.get("bull")) / bullCount : 0.0
+plot(bullCount, title="BullCount")
+plot(bearCount, title="BearCount")
+plot(bullAvg, title="BullAvg")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Map Category Aggregation Checkpoint');
+    // Bull bars (close > open): 0,1,2,5,6,7,9,11
+    expect(getPlot(result, 'BullCount').values).toEqual([1, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 8]);
+    // Bear bars: 3,4,8,10
+    expect(getPlot(result, 'BearCount').values).toEqual([0, 0, 0, 1, 2, 2, 2, 2, 3, 3, 4, 4]);
+    expect(roundSeries(getPlot(result, 'BullAvg').values)).toEqual([
+      2, 2.5, 2.333333, 2.333333, 2.333333, 2, 2.4, 2.833333,
+      2.833333, 2.857143, 2.857143, 2.75,
+    ]);
+  });
+
+  it('locks array.every / array.some multi-condition filter idiom', () => {
+    // Advanced idiom: maintain a rolling 4-bar boolean window, then use
+    // array.every to detect "all bull" and array.some to detect "any bull".
+    // Source search: https://www.tradingview.com/scripts/search/array%20every%20some%20condition%20filter/
+    const result = runCompatScript(`
+indicator("Adv Array Every Some Checkpoint")
+var array<bool> bullFlags = array.new<bool>()
+bullFlags.push(close > open)
+if bullFlags.size() > 4
+    bullFlags.shift()
+allBull = array.every(bullFlags)
+anyBull = array.some(bullFlags)
+plot(allBull ? 1 : 0, title="AllBull")
+plot(anyBull ? 1 : 0, title="AnyBull")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Array Every Some Checkpoint');
+    // First three bars are all bull (close>open); bear bar at index 3 breaks the streak
+    expect(getPlot(result, 'AllBull').values).toEqual([1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    // anyBull stays 1 as long as at least one bull bar is in the window
+    expect(getPlot(result, 'AnyBull').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks matrix.is_square / is_symmetric / is_identity idiom', () => {
+    // Advanced idiom: create known matrices and test the three structural predicates.
+    // An identity matrix is also square and symmetric; a non-square matrix fails all.
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20identity%20symmetric%20check/
+    const result = runCompatScript(`
+indicator("Adv Matrix Identity Check Checkpoint")
+identity = matrix.new<float>(3, 3, 0.0)
+identity.set(0, 0, 1.0)
+identity.set(1, 1, 1.0)
+identity.set(2, 2, 1.0)
+symm = matrix.new<float>(2, 2, 0.0)
+symm.set(0, 0, 1.0)
+symm.set(0, 1, 2.0)
+symm.set(1, 0, 2.0)
+symm.set(1, 1, 3.0)
+rect = matrix.new<float>(2, 3, 1.0)
+plot(identity.is_square() ? 1 : 0, title="IdentSq")
+plot(identity.is_identity() ? 1 : 0, title="IdentId")
+plot(identity.is_symmetric() ? 1 : 0, title="IdentSym")
+plot(symm.is_square() ? 1 : 0, title="SymmSq")
+plot(symm.is_symmetric() ? 1 : 0, title="SymmSym")
+plot(rect.is_square() ? 1 : 0, title="RectSq")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Matrix Identity Check Checkpoint');
+    // Identity 3×3: square, is_identity, and symmetric — all 1 on every bar
+    expect(getPlot(result, 'IdentSq').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'IdentId').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'IdentSym').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // Symmetric 2×2: square + symmetric but NOT identity
+    expect(getPlot(result, 'SymmSq').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'SymmSym').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // 2×3 rectangle: not square
+    expect(getPlot(result, 'RectSq').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks collection size growth, cap, and .size() tracking idiom', () => {
+    // Advanced idiom: a var array grows one element per bar, is capped at 5,
+    // and min/max are tracked — the canonical rolling-window size-management pattern.
+    // Source search: https://www.tradingview.com/scripts/search/array%20size%20cap%20rolling%20window/
+    const result = runCompatScript(`
+indicator("Adv Collection Size Tracking Checkpoint")
+var array<float> prices = array.new<float>()
+prices.push(close)
+if prices.size() > 5
+    prices.shift()
+plot(prices.size(), title="Size")
+plot(array.min(prices), title="Min")
+plot(array.max(prices), title="Max")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Collection Size Tracking Checkpoint');
+    // Grows 1→5 then stays at 5
+    expect(getPlot(result, 'Size').values).toEqual([1, 2, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(getPlot(result, 'Min').values).toEqual([
+      102, 102, 102, 102, 99, 99, 99, 99, 99, 100, 104, 108,
+    ]);
+    expect(getPlot(result, 'Max').values).toEqual([
+      102, 105, 107, 107, 107, 107, 107, 109, 109, 111, 111, 112,
+    ]);
+  });
+
+  it('locks array.standardize normalization idiom', () => {
+    // Advanced idiom: standardize a rolling window of closes so the output has
+    // mean≈0 and stdev≈1 — the core step of z-score based indicators.
+    // Source search: https://www.tradingview.com/scripts/search/array%20standardize%20zscore%20normalize/
+    const result = runCompatScript(`
+indicator("Adv Array Standardize Checkpoint")
+var array<float> prices = array.new<float>()
+prices.push(close)
+if prices.size() > 6
+    prices.shift()
+standardized = prices.size() >= 2 ? array.standardize(prices) : array.new<float>()
+szMean = standardized.size() > 0 ? array.avg(standardized) : 0.0
+szStdev = standardized.size() >= 2 ? array.stdev(standardized) : 0.0
+plot(prices.size(), title="InputSize")
+plot(standardized.size(), title="OutSize")
+plot(szMean, title="Mean")
+plot(szStdev, title="Stdev")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Array Standardize Checkpoint');
+    // Window grows 1→6 then caps
+    expect(getPlot(result, 'InputSize').values).toEqual([1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]);
+    // No output on bar 0 (size < 2)
+    expect(getPlot(result, 'OutSize').values).toEqual([0, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]);
+    // Mean of standardized values is numerically ≈0 (may be -0 due to floating point)
+    const means = getPlot(result, 'Mean').values as number[];
+    means.forEach((v) => expect(Math.abs(v)).toBeLessThan(1e-9));
+    // Stdev of standardized values is ≈1
+    const stdevs = getPlot(result, 'Stdev').values as number[];
+    stdevs.slice(1).forEach((v) => expect(Math.abs(v - 1)).toBeLessThan(1e-6));
+  });
+
+  it('locks map key iteration with conditional deletion idiom', () => {
+    // Advanced idiom: on each bar rebuild a 3-entry map, then iterate its keys
+    // and remove entries whose value is below 105 — modeling cleanup logic
+    // common in scanner and state-pruning scripts.
+    // Source search: https://www.tradingview.com/scripts/search/map%20keys%20iterate%20remove%20entries/
+    const result = runCompatScript(`
+indicator("Adv Map Key Delete Checkpoint")
+var map<string, float> m = map.new<string, float>()
+m.put("a", close)
+m.put("b", open)
+m.put("c", high)
+sizeBefore = m.size()
+keys = map.keys(m)
+for k in keys
+    if m.get(k) < 105.0
+        m.remove(k)
+sizeAfter = m.size()
+plot(sizeBefore, title="SizeBefore")
+plot(sizeAfter, title="SizeAfter")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Adv Map Key Delete Checkpoint');
+    // Map always starts with 3 entries
+    expect(getPlot(result, 'SizeBefore').values).toEqual(Array(compatibilityBars.length).fill(3));
+    // Entries with value < 105 are deleted; SizeAfter varies by bar
+    expect(getPlot(result, 'SizeAfter').values).toEqual([0, 2, 3, 2, 0, 0, 1, 2, 3, 3, 3, 3]);
+  });
+});

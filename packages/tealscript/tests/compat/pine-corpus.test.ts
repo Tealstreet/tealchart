@@ -55,7 +55,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       trend_filter: { total: 9, passed: 9, failed: 0 },
       visuals: { total: 41, passed: 41, failed: 0 },
       alerts: { total: 6, passed: 6, failed: 0 },
-      arrays: { total: 18, passed: 18, failed: 0 },
+      arrays: { total: 24, passed: 24, failed: 0 },
       strings: { total: 3, passed: 3, failed: 0 },
       str_format: { total: 1, passed: 1, failed: 0 },
       str_split: { total: 1, passed: 1, failed: 0 },
@@ -86,8 +86,9 @@ describe('Pine compatibility checkpoint corpus', () => {
       lines: { total: 5, passed: 5, failed: 0 },
       logs: { total: 1, passed: 1, failed: 0 },
       layout: { total: 10, passed: 10, failed: 0 },
-      map: { total: 4, passed: 4, failed: 0 },
-      matrix: { total: 2, passed: 2, failed: 0 },
+      map: { total: 6, passed: 6, failed: 0 },
+      matrix: { total: 5, passed: 5, failed: 0 },
+      collections: { total: 10, passed: 10, failed: 0 },
       methods: { total: 6, passed: 6, failed: 0 },
       multi_symbol: { total: 1, passed: 1, failed: 0 },
       objects: { total: 6, passed: 6, failed: 0 },
@@ -106,9 +107,9 @@ describe('Pine compatibility checkpoint corpus', () => {
       intrabar: { total: 5, passed: 3, failed: 2 },
       markers: { total: 3, passed: 3, failed: 0 },
       realtime: { total: 2, passed: 2, failed: 0 },
-      signals: { total: 153, passed: 153, failed: 0 },
+      signals: { total: 163, passed: 163, failed: 0 },
       declaration_metadata: { total: 1, passed: 1, failed: 0 },
-      output: { total: 173, passed: 173, failed: 0 },
+      output: { total: 183, passed: 183, failed: 0 },
       supertrend: { total: 1, passed: 1, failed: 0 },
       ta: { total: 71, passed: 71, failed: 0 },
       barcolor: { total: 4, passed: 4, failed: 0 },
@@ -130,9 +131,9 @@ describe('Pine compatibility checkpoint corpus', () => {
       wma: { total: 1, passed: 1, failed: 0 },
       alma: { total: 1, passed: 1, failed: 0 },
       hma: { total: 1, passed: 1, failed: 0 },
-      percentile: { total: 1, passed: 1, failed: 0 },
-      percentrank: { total: 1, passed: 1, failed: 0 },
-      statistics: { total: 1, passed: 1, failed: 0 },
+      percentile: { total: 2, passed: 2, failed: 0 },
+      percentrank: { total: 2, passed: 2, failed: 0 },
+      statistics: { total: 3, passed: 3, failed: 0 },
       range: { total: 1, passed: 1, failed: 0 },
       rising: { total: 1, passed: 1, failed: 0 },
       falling: { total: 1, passed: 1, failed: 0 },
@@ -142,7 +143,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       stoch: { total: 2, passed: 2, failed: 0 },
       tsi: { total: 1, passed: 1, failed: 0 },
       source_identity: { total: 6, passed: 6, failed: 0 },
-      state: { total: 25, passed: 25, failed: 0 },
+      state: { total: 28, passed: 28, failed: 0 },
       syminfo: { total: 2, passed: 2, failed: 0 },
       tables: { total: 20, passed: 20, failed: 0 },
       barstate: { total: 4, passed: 4, failed: 0 },
@@ -396,6 +397,16 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('string-time-na-fixnan-forwardfill-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('string-time-na-barssince-never-true-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('string-time-na-color-new-hex-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-matrix-avg-col-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-matrix-transpose-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-array-stats-pipeline-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-array-binary-search-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-map-category-aggregation-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-array-every-some-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-matrix-identity-check-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-size-tracking-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-array-standardize-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('coll-map-key-delete-checkpoint');
   });
 
   it('renders a stable checkpoint corpus report', () => {
@@ -422,7 +433,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| timeframes | 3 | 3 | 0 |');
     expect(markdown).toContain('| request | 16 | 14 | 2 |');
     expect(markdown).toContain('| alerts | 6 | 6 | 0 |');
-    expect(markdown).toContain('| arrays | 18 | 18 | 0 |');
+    expect(markdown).toContain('| arrays | 24 | 24 | 0 |');
     expect(markdown).toContain('| barcolor | 4 | 4 | 0 |');
     expect(markdown).toContain('| barstate | 4 | 4 | 0 |');
     expect(markdown).toContain('| brackets | 1 | 1 | 0 |');
@@ -448,8 +459,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| lines | 5 | 5 | 0 |');
     expect(markdown).toContain('| logs | 1 | 1 | 0 |');
     expect(markdown).toContain('| layout | 10 | 10 | 0 |');
-    expect(markdown).toContain('| map | 4 | 4 | 0 |');
-    expect(markdown).toContain('| matrix | 2 | 2 | 0 |');
+    expect(markdown).toContain('| map | 6 | 6 | 0 |');
+    expect(markdown).toContain('| matrix | 5 | 5 | 0 |');
+    expect(markdown).toContain('| collections | 10 | 10 | 0 |');
     expect(markdown).toContain('| methods | 6 | 6 | 0 |');
     expect(markdown).toContain('| objects | 6 | 6 | 0 |');
     expect(markdown).toContain('| momentum | 2 | 2 | 0 |');
@@ -466,9 +478,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| intrabar | 5 | 3 | 2 |');
     expect(markdown).toContain('| markers | 3 | 3 | 0 |');
     expect(markdown).toContain('| realtime | 2 | 2 | 0 |');
-    expect(markdown).toContain('| signals | 153 | 153 | 0 |');
+    expect(markdown).toContain('| signals | 163 | 163 | 0 |');
     expect(markdown).toContain('| declaration_metadata | 1 | 1 | 0 |');
-    expect(markdown).toContain('| output | 173 | 173 | 0 |');
+    expect(markdown).toContain('| output | 183 | 183 | 0 |');
     expect(markdown).toContain('| supertrend | 1 | 1 | 0 |');
     expect(markdown).toContain('| ta | 71 | 71 | 0 |');
     expect(markdown).toContain('| barssince | 2 | 2 | 0 |');
@@ -488,9 +500,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| wma | 1 | 1 | 0 |');
     expect(markdown).toContain('| alma | 1 | 1 | 0 |');
     expect(markdown).toContain('| hma | 1 | 1 | 0 |');
-    expect(markdown).toContain('| percentile | 1 | 1 | 0 |');
-    expect(markdown).toContain('| percentrank | 1 | 1 | 0 |');
-    expect(markdown).toContain('| statistics | 1 | 1 | 0 |');
+    expect(markdown).toContain('| percentile | 2 | 2 | 0 |');
+    expect(markdown).toContain('| percentrank | 2 | 2 | 0 |');
+    expect(markdown).toContain('| statistics | 3 | 3 | 0 |');
     expect(markdown).toContain('| range | 1 | 1 | 0 |');
     expect(markdown).toContain('| rising | 1 | 1 | 0 |');
     expect(markdown).toContain('| falling | 1 | 1 | 0 |');
@@ -501,7 +513,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| stoch | 2 | 2 | 0 |');
     expect(markdown).toContain('| tsi | 1 | 1 | 0 |');
     expect(markdown).toContain('| source_identity | 6 | 6 | 0 |');
-    expect(markdown).toContain('| state | 25 | 25 | 0 |');
+    expect(markdown).toContain('| state | 28 | 28 | 0 |');
     expect(markdown).toContain('| syminfo | 2 | 2 | 0 |');
     expect(markdown).toContain('| tables | 20 | 20 | 0 |');
     expect(markdown).toContain('| table_setters | 1 | 1 | 0 |');
@@ -686,9 +698,9 @@ plot(signals.fast(close, 2), title="Fast")
     expect(index).toMatchObject({
       schemaVersion: 1,
       total: EXPECTED_CHECKPOINT_TOTAL,
-      byCategory: { indicator: 212, strategy: 31 },
-      bySourceKind: { official_docs: 42, public_script: 201 },
-      byPineVersion: { v4: 4, v5: 10, v6: 229 },
+      byCategory: { indicator: 222, strategy: 31 },
+      bySourceKind: { official_docs: 42, public_script: 211 },
+      byPineVersion: { v4: 4, v5: 10, v6: 239 },
       byStoragePolicy: { reduced_fixture_only: EXPECTED_CHECKPOINT_TOTAL },
     });
     expect(index.byFeatureTag).toMatchObject({
@@ -708,7 +720,7 @@ plot(signals.fast(close, 2), title="Fast")
       trend_filter: 9,
       visuals: 41,
       alerts: 6,
-      arrays: 18,
+      arrays: 24,
       barcolor: 4,
       brackets: 1,
       boxes: 4,
@@ -735,8 +747,9 @@ plot(signals.fast(close, 2), title="Fast")
       lines: 5,
       logs: 1,
       layout: 10,
-      map: 4,
-      matrix: 2,
+      map: 6,
+      matrix: 5,
+      collections: 10,
       methods: 6,
       multi_symbol: 1,
       objects: 6,
@@ -754,8 +767,8 @@ plot(signals.fast(close, 2), title="Fast")
       intrabar: 5,
       markers: 3,
       realtime: 2,
-      signals: 153,
-      output: 173,
+      signals: 163,
+      output: 183,
       supertrend: 1,
       ta: 71,
       barssince: 2,
@@ -775,9 +788,9 @@ plot(signals.fast(close, 2), title="Fast")
       wma: 1,
       alma: 1,
       hma: 1,
-      percentile: 1,
-      percentrank: 1,
-      statistics: 1,
+      percentile: 2,
+      percentrank: 2,
+      statistics: 3,
       range: 1,
       rising: 1,
       falling: 1,
@@ -788,7 +801,7 @@ plot(signals.fast(close, 2), title="Fast")
       stoch: 2,
       tsi: 1,
       source_identity: 6,
-      state: 25,
+      state: 28,
       syminfo: 2,
       tables: 20,
       barstate: 4,
@@ -835,7 +848,7 @@ plot(signals.fast(close, 2), title="Fast")
     expect(markdown).toContain('# Pine Compatibility Coverage');
     expect(markdown).toContain(`Total checkpoints: ${EXPECTED_CHECKPOINT_TOTAL}`);
     expect(markdown).toContain('| official_docs | 42 |');
-    expect(markdown).toContain('| public_script | 201 |');
+    expect(markdown).toContain('| public_script | 211 |');
     expect(markdown).toContain(`| reduced_fixture_only | ${EXPECTED_CHECKPOINT_TOTAL} |`);
     expect(formatPineCompatibilityCoverageJson(index)).toContain(`"total": ${EXPECTED_CHECKPOINT_TOTAL}`);
   });

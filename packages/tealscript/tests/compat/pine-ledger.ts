@@ -2287,6 +2287,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-matrix-avg-col-checkpoint',
+      title: 'Adv Matrix Avg Col Checkpoint',
+      searchContext: 'TradingView public scripts search: matrix column average indicator',
+      featureTags: ['matrix', 'arrays', 'collections', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-matrix-transpose-checkpoint',
+      title: 'Adv Matrix Transpose Checkpoint',
+      searchContext: 'TradingView public scripts search: matrix transpose indicator',
+      featureTags: ['matrix', 'collections', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-array-stats-pipeline-checkpoint',
+      title: 'Adv Array Stats Pipeline Checkpoint',
+      searchContext: 'TradingView public scripts search: array stdev percentrank pipeline',
+      featureTags: ['arrays', 'collections', 'statistics', 'percentrank', 'percentile', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-array-binary-search-checkpoint',
+      title: 'Adv Array Binary Search Checkpoint',
+      searchContext: 'TradingView public scripts search: array binary search sorted prices',
+      featureTags: ['arrays', 'collections', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-map-category-aggregation-checkpoint',
+      title: 'Adv Map Category Aggregation Checkpoint',
+      searchContext: 'TradingView public scripts search: map category aggregation scanner',
+      featureTags: ['map', 'collections', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-array-every-some-checkpoint',
+      title: 'Adv Array Every Some Checkpoint',
+      searchContext: 'TradingView public scripts search: array every some condition filter',
+      featureTags: ['arrays', 'collections', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-matrix-identity-check-checkpoint',
+      title: 'Adv Matrix Identity Check Checkpoint',
+      searchContext: 'TradingView public scripts search: matrix identity symmetric check',
+      featureTags: ['matrix', 'collections', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-size-tracking-checkpoint',
+      title: 'Adv Collection Size Tracking Checkpoint',
+      searchContext: 'TradingView public scripts search: array size cap rolling window',
+      featureTags: ['arrays', 'collections', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-array-standardize-checkpoint',
+      title: 'Adv Array Standardize Checkpoint',
+      searchContext: 'TradingView public scripts search: array standardize zscore normalize',
+      featureTags: ['arrays', 'collections', 'statistics', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'coll-map-key-delete-checkpoint',
+      title: 'Adv Map Key Delete Checkpoint',
+      searchContext: 'TradingView public scripts search: map keys iterate remove entries',
+      featureTags: ['map', 'collections', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
