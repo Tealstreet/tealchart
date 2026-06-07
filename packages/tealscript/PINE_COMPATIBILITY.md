@@ -44,13 +44,13 @@ The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
-timeframe comparisons, official plot-style payloads, and public MTF,
-divergence, volatility-band overlays, session-filter, session-state,
-dashboard-table, multi-symbol screener, currency conversion, earnings event
-markers, corporate-action overlays, financial dashboards, economic macro
-overlays, seed dataset overlays, array signal queues, map signal dashboards,
-matrix scoreboards, drawing-zone, drawing-copy, linefill-channel, custom-candle,
-and library-helper idioms.
+timeframe comparisons, official plot-style payloads, and public configurable
+input panels, MTF, divergence, volatility-band overlays, session-filter,
+session-state, dashboard-table, multi-symbol screener, currency conversion,
+earnings event markers, corporate-action overlays, financial dashboards,
+economic macro overlays, seed dataset overlays, array signal queues, map signal
+dashboards, matrix scoreboards, drawing-zone, drawing-copy, linefill-channel,
+custom-candle, and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public zigzag polylines, public strategy performance tables, public
@@ -298,8 +298,10 @@ helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.
 `inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
 definitions. Semantic analysis preserves known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
-types and `input.enum()` defval enum types. It also reports Pine-style diagnostics for typed default-value
-mismatches, literal default `minval` / `maxval` / `options` constraint
+types and `input.enum()` defval enum types. Source-linked public checkpoint
+coverage now locks grouped mode, length, source, toggle, and price-level inputs
+feeding plotted signal output. It also reports Pine-style diagnostics for typed
+default-value mismatches, literal default `minval` / `maxval` / `options` constraint
 violations, invalid literal `display` option values, and `input.int()` /
 `input.float()` calls that mix `options` with range-only
 `minval`/`maxval`/`step` arguments.
