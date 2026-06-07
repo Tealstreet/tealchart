@@ -761,6 +761,20 @@ plot(request.currency_rate("USD", currency.USD), title="Same")
     expect(getPlot(result, 'Same').values).toEqual([1]);
   });
 
+  it('accepts the broader Pine currency constant namespace', () => {
+    const result = runCompatScript(`
+indicator("Broad currency constants")
+plot(request.currency_rate(currency.SGD, currency.SGD), title="SGD")
+plot(request.currency_rate(currency.BTC, currency.BTC), title="BTC")
+plot(request.currency_rate(currency.NONE, currency.NONE), title="None")
+`, { bars: [chartBars[0]!] });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'SGD').values).toEqual([1]);
+    expect(getPlot(result, 'BTC').values).toEqual([1]);
+    expect(getPlot(result, 'None').values).toEqual([1]);
+  });
+
   it('supports ignore_invalid_currency for missing conversion fixtures', () => {
     const result = runCompatScript(`
 indicator("Missing currency request")
