@@ -383,6 +383,45 @@ plot(strategy.equity)`;
 
       expect(result.errors).toEqual([]);
       expect(result.indicatorTitle).toBe('Mixed strategy');
+      expect(result.indicatorShortTitle).toBe('Mixed');
+      expect(result.indicatorOverlay).toBe(true);
+      expect(result.indicatorFormat).toBe('price');
+      expect(result.indicatorPrecision).toBe(3);
+      expect(result.indicatorScale).toBe('right');
+      expect(result.indicatorMaxBarsBack).toBe(100);
+      expect(result.indicatorTimeframe).toBe('60');
+      expect(result.indicatorTimeframeGaps).toBe(true);
+      expect(result.indicatorExplicitPlotZOrder).toBe(false);
+      expect(result.indicatorBehindChart).toBe(true);
+      expect(result.indicatorCalcBarsCount).toBe(40);
+      expect(result.indicatorDynamicRequests).toBe(true);
+      expect(result.indicatorDrawingLimits).toEqual({
+        line: 10,
+        label: 20,
+        box: 30,
+        polyline: 50,
+      });
+      expect(result.declaration).toMatchObject({
+        title: 'Mixed strategy',
+        shortTitle: 'Mixed',
+        overlay: true,
+        format: 'price',
+        precision: 3,
+        scale: 'right',
+        maxBarsBack: 100,
+        timeframe: '60',
+        timeframeGaps: true,
+        explicitPlotZOrder: false,
+        behindChart: true,
+        calcBarsCount: 40,
+        dynamicRequests: true,
+        drawingLimits: {
+          line: 10,
+          label: 20,
+          box: 30,
+          polyline: 50,
+        },
+      });
       expect(result.strategy.settings).toMatchObject({
         title: 'Mixed strategy',
         initialCapital: 25000,
