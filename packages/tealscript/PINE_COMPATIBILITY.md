@@ -192,7 +192,7 @@ helpers, and input-gated simple conditional history offsets, including static nu
 comparisons, even when they sit behind unexecuted branches. Covered rolling
 window helper calls such as `math.sum()`, `ta.range()`, trend helpers
 `ta.rising()`/`ta.falling()`, statistical helpers such as `ta.dev()`,
-`ta.correlation()`, median/mode, percentile, and percent-rank helpers,
+`ta.covariance()`, `ta.correlation()`, median/mode, percentile, and percent-rank helpers,
 momentum helpers such as `ta.cmo()`, `ta.mom()`, and `ta.roc()`, and common
 band, average, and regression helpers such as `ta.bb()`, `ta.bbw()`,
 `ta.vwma()`, `ta.wma()`, `ta.alma()`, `ta.cci()`, and `ta.linreg()`, plus
@@ -222,7 +222,7 @@ that supports the parity work.
 
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
-`ta.variance`, `ta.correlation`, `ta.cog`, `ta.kc`, `ta.kcw`, `ta.bb`, `ta.bbw`, `ta.linreg`, `ta.vwma`, `ta.swma`,
+`ta.variance`, `ta.covariance`, `ta.correlation`, `ta.cog`, `ta.kc`, `ta.kcw`, `ta.bb`, `ta.bbw`, `ta.linreg`, `ta.vwma`, `ta.swma`,
 `ta.alma`, `ta.highestbars`, `ta.lowestbars`), oscillator helpers (`ta.stoch`, `ta.mfi`,
 `ta.wpr`, `ta.cci`, `ta.cmo`, `ta.tsi`), and compatibility
 aliases/helpers (`ta.change` numeric and boolean forms, `ta.cross`, `ta.range`,
