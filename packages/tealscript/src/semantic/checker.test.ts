@@ -177,6 +177,32 @@ badDateString = timestamp(1700000000000, 1, 5, 9, timezone="UTC")
     ]);
   });
 
+  it('reports invalid literal time offset values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Time Offsets")
+badBarsHigh = time("60", bars_back=5001)
+badBarsLow = time("60", bars_back=-501)
+badBarsFloat = time("60", bars_back=1.5)
+badTfHigh = time("60", timeframe_bars_back=5001)
+badTfLow = time("60", timeframe_bars_back=-501)
+badTfFloat = time("60", timeframe_bars_back=1.5)
+missingTimeframe = time(timeframe_bars_back=1)
+missingCloseTimeframe = time_close(timeframe_bars_back=1)
+okCurrentFrame = time("", timeframe_bars_back=1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'time bars_back must be an integer between -500 and 5000',
+      'time bars_back must be an integer between -500 and 5000',
+      'time bars_back must be an integer between -500 and 5000',
+      'time timeframe_bars_back must be an integer between -500 and 5000',
+      'time timeframe_bars_back must be an integer between -500 and 5000',
+      'time timeframe_bars_back must be an integer between -500 and 5000',
+      'time timeframe_bars_back requires an explicit timeframe argument',
+      'time_close timeframe_bars_back requires an explicit timeframe argument',
+    ]);
+  });
+
   it('reports invalid timestamp date arity', () => {
     const result = checkProgram(parse(`
 indicator("Bad Timestamp Arity")
