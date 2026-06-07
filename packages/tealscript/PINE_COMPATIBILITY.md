@@ -49,8 +49,8 @@ divergence, volatility-band overlays, session-filter, session-state,
 dashboard-table, multi-symbol screener, currency conversion, earnings event
 markers, corporate-action overlays, financial dashboards, economic macro
 overlays, seed dataset overlays, array signal queues, map signal dashboards,
-matrix scoreboards, drawing-zone, linefill-channel, custom-candle, and
-library-helper idioms.
+matrix scoreboards, drawing-zone, drawing-copy, linefill-channel, custom-candle,
+and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
 public strategy performance tables, public `varip` intrabar array buffers, plus
@@ -931,10 +931,11 @@ scripts use their indicator pane. Renderer coverage handles text-only
 circle, square, diamond, cross, xcross, triangle, flag, arrow styles, label text
 alignment, default/monospace font-family metadata, and bold/italic text formatting. GC
 limits and realtime rollback parity are covered by the shared drawing store;
-the source-linked public label signal checkpoint locks persistent last-bar
-signal-label updates with multiline text, dynamic style/color/textcolor, text
-alignment, font-family, formatting, tooltip, and getter plots. Remaining gaps
-are TradingView-exact pixel geometry and edge-case style parity.
+the source-linked public label signal and drawing-copy checkpoints lock
+persistent last-bar signal-label updates with multiline text, dynamic
+style/color/textcolor, text alignment, font-family, formatting, tooltip, getter
+plots, and copied label payloads. Remaining gaps are TradingView-exact pixel
+geometry and edge-case style parity.
 
 The line drawing pass covers common trendline/channel idioms. `line.new()`
 accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
@@ -955,9 +956,10 @@ values, non-numeric line coordinate and width values, and non-boolean line
 `force_overlay` values. Rendering routes line segments to the script pane with color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
-The source-linked public line signal checkpoint locks persistent trendline
-endpoint, extension, color, style, width, `line.get_price()`, and `line.all`
-output behavior for trendline-breakout idioms.
+The source-linked public line signal and drawing-copy checkpoints lock
+persistent trendline endpoint, extension, color, style, width,
+`line.get_price()`, `line.all` output behavior, and copied line payloads for
+trendline-breakout and cloned-drawing idioms.
 `force_overlay` lines render in the main pane even when created by non-overlay
 scripts. `linefill.new()` records fills between two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,
@@ -970,8 +972,9 @@ creating a drawing. `chart.point` overloads, GC limits, and full realtime
 rollback parity remain planned.
 The checkpoint corpus tracks a reduced public supply/demand-zone drawing idiom
 that updates a persistent `box` and right-extended midline from recent swing
-ranges, plus a reduced public channel idiom that updates persistent upper/lower
-`line` handles and fills the band with `linefill.new()`.
+ranges, a reduced public drawing-copy idiom that clones configured label, line,
+and box handles, plus a reduced public channel idiom that updates persistent
+upper/lower `line` handles and fills the band with `linefill.new()`.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus

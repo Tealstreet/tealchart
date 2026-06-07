@@ -165,7 +165,7 @@ Phases:
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for MTF filters, divergence,
    session filters, exchange session-state gates, dashboard tables, custom
-   candles, drawing zones, linefill channels, zigzag polylines, screeners,
+   candles, drawing zones, drawing-copy lifecycles, linefill channels, zigzag polylines, screeners,
    currency conversion, earnings event markers, corporate-action overlays,
    financial dashboards, economic macro overlays, seed dataset overlays,
    volatility-band overlays, library helpers including source-preserving helper
@@ -420,8 +420,8 @@ Phases:
 5. Add output-oracle fixtures for public idioms that care about metadata more
    than pixels. Source-linked public signal-label and trendline-signal
    checkpoint coverage now exercises persistent last-bar label, line, and box
-   payloads with dynamic visual metadata, text layout, getters, and object-count
-   arrays.
+   payloads with dynamic visual metadata, text layout, copy lifecycles, getters,
+   and object-count arrays.
 
 Done means pasted scripts can produce usable, inspectable output payloads even
 when renderer fidelity is not final.
