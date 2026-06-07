@@ -788,6 +788,15 @@ for i = 0 to 3
         }
       }
     });
+
+    it('still rejects switch/na/true/false as variable names', () => {
+      // These are allowed as expression statements but must not be valid identifiers.
+      expect(() => parse(`//@version=6\nindicator("T")\nswitch = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\nna = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\ntrue = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\nfalse = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\nvar na = 1`)).toThrow(TealscriptParseError);
+    });
   });
 
   describe('error handling', () => {
