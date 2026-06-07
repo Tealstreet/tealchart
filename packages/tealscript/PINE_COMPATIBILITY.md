@@ -988,8 +988,10 @@ color values, non-numeric box coordinate and border-width values, and
 non-boolean box `force_overlay` values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
 default/monospace font-family metadata, and bold/italic text formatting. Semantic
 analysis also rejects invalid literal `text_halign`, `text_valign`,
-`text_wrap`, `text_size`, `text_font_family`, and `text_formatting` values. Full
-TradingView text pixel parity and remaining edge-case
+`text_wrap`, `text_size`, `text_font_family`, and `text_formatting` values.
+The source-linked public box zone checkpoint locks last-bar supply/demand box
+bounds, extension, border, fill, multiline text, alignment, wrapping, font, and
+formatting payloads. Full TradingView text pixel parity and remaining edge-case
 styling remain planned.
 
 The `polyline.*` drawing pass supports `polyline.new()` with named point/style

@@ -1206,6 +1206,70 @@ plot(zoneMid, title="Zone Mid")
     ]);
   });
 
+  it('locks a reduced public box zone text-layout idiom', () => {
+    // Source context: https://www.tradingview.com/scripts/search/supply%20demand%20box/
+    const result = runCompatScript(`
+indicator("Public Box Zone Checkpoint", overlay=true)
+zoneTop = ta.highest(high, 4)
+zoneBottom = ta.lowest(low, 4)
+var zone = box.new(na, na, na, na, bgcolor=color.new(color.blue, 90), border_color=color.blue)
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 3, zoneTop)
+    box.set_rightbottom(zone, bar_index, zoneBottom)
+    box.set_extend(zone, extend.right)
+    box.set_bgcolor(zone, color.new(color.red, 85))
+    box.set_border_color(zone, color.red)
+    box.set_border_width(zone, 2)
+    box.set_border_style(zone, line.style_dashed)
+    box.set_text(zone, "Supply\\nZone")
+    box.set_text_color(zone, color.white)
+    box.set_text_size(zone, size.small)
+    box.set_text_halign(zone, text.align_center)
+    box.set_text_valign(zone, text.align_bottom)
+    box.set_text_wrap(zone, text.wrap_auto)
+    box.set_text_font_family(zone, font.family_monospace)
+    box.set_text_formatting(zone, text.format_bold)
+plot(zoneTop - zoneBottom, title="Zone Height")
+plot(box.get_top(zone), title="Zone Top")
+plot(box.get_bottom(zone), title="Zone Bottom")
+plot(box.get_text_halign(zone) == "center" ? 1 : 0, title="Centered Text")
+plot(array.size(box.all), title="Box Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Zone Height').values).toEqual([4, 7, 9, 10, 11, 13, 13, 14, 15, 13, 11, 8]);
+    expect(getPlot(result, 'Zone Top').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 114]);
+    expect(getPlot(result, 'Zone Bottom').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 106]);
+    expect(getPlot(result, 'Centered Text').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Box Count').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toEqual([
+      {
+        id: 'box_box.new_0_0',
+        type: 'box',
+        barIndex: 11,
+        left: 8,
+        top: 114,
+        right: 11,
+        bottom: 106,
+        borderColor: '#F23645',
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        extend: 'right',
+        xloc: 'bar_index',
+        bgcolor: '#F2364526',
+        text: 'Supply\nZone',
+        textSize: 'small',
+        textColor: '#FFFFFF',
+        persistent: true,
+        textHalign: 'center',
+        textValign: 'bottom',
+        textWrap: 'auto',
+        textFontFamily: 'monospace',
+        textFormatting: 'bold',
+      },
+    ]);
+  });
+
   it('locks a reduced public linefill channel idiom', () => {
     // Public idiom reference: public channel indicators commonly draw upper
     // and lower line handles and fill the area between them.
