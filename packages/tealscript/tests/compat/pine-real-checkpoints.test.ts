@@ -1877,6 +1877,48 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0]);
   });
 
+  it('locks a reduced public ROC signal idiom', () => {
+    // Public idiom reference: Rate of Change scripts commonly expose length
+    // and threshold inputs before routing positive/negative momentum regimes.
+    // Source search: https://www.tradingview.com/scripts/search/rate%20of%20change%20signal/
+    const result = runCompatScript(`
+indicator("Public ROC Signal Checkpoint")
+length = input.int(3, "Length")
+upperThreshold = input.float(3.0, "Upper Threshold")
+lowerThreshold = input.float(-3.0, "Lower Threshold")
+roc = ta.roc(source=close, length=length)
+bullSignal = roc > upperThreshold
+bearSignal = roc < lowerThreshold
+plot(roc, title="ROC")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public ROC Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Upper Threshold', 'float'],
+      ['Lower Threshold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'ROC').values)).toEqual([
+      null,
+      null,
+      null,
+      0.980392,
+      -5.714286,
+      -6.542056,
+      0.970874,
+      10.10101,
+      8,
+      6.730769,
+      0.917431,
+      3.703704,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
