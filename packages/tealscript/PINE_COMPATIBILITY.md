@@ -628,9 +628,10 @@ The core semantics pass covers arithmetic `na` propagation, `na()` checks,
 explicit `bool(na)` conversion, Pine-compatible `false` results for comparison
 operators when either operand is `na`, and short-circuiting
 `and` / `or` guard expressions. Semantic diagnostics reject direct `na`
-comparisons such as `value == na` and `value > na`; use `na(value)` instead. Known numeric
-expressions in boolean contexts are also rejected, matching Pine v6's explicit
-boolean condition requirement; compare them explicitly or wrap them in `bool(...)`.
+comparisons such as `value == na` and `value > na`; use `na(value)` instead.
+Known numeric and literal `na` expressions in boolean contexts are also
+rejected, matching Pine v6's explicit boolean condition requirement; compare
+them explicitly or wrap them in `bool(...)`.
 
 ## Common Visual Coloring Coverage
 

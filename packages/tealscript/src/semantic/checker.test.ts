@@ -168,6 +168,27 @@ plot(na <= gap ? 1 : 0)
     ]);
   });
 
+  it('reports literal na expressions used as booleans', () => {
+    const result = checkProgram(parse(`
+indicator("NA Bool")
+if na
+    plot(close)
+while na
+    break
+plot(na ? 1 : 0)
+plot((close > open) and na ? 1 : 0)
+plot(na or close > open ? 1 : 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+    ]);
+  });
+
   it('reports numeric expressions used as booleans', () => {
     const result = checkProgram(parse(`
 indicator("Numeric Bool")
