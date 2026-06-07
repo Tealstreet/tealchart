@@ -170,8 +170,9 @@ Phases:
    drawing-copy lifecycles, linefill channels, zigzag polylines, screeners,
    currency conversion, earnings event markers, corporate-action overlays,
    financial dashboards, economic macro overlays, seed dataset overlays,
-   volatility-band overlays, library helpers including source-preserving helper
-   wrappers and block `if` source wrappers, public strategy stats tables, UDT
+   volatility-band and anchored VWAP band overlays, library helpers including
+   source-preserving helper wrappers and block `if` source wrappers, public
+   strategy stats tables, UDT
    object-method state, UDT state objects with wrapped field defaults, public
    loop-header continuation layouts, wrapped declaration/call layouts, and
    public `varip` intrabar array tick buffers.

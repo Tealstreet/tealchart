@@ -110,6 +110,9 @@ Current `ta.*` progress:
 - `ta.dmi`, `ta.sar`, `ta.pivothigh`, `ta.pivotlow`, and `ta.linreg`
   accept Pine-style named arguments; pivot helpers also support default-source
   two-argument forms.
+- `ta.vwap()` covers default-source, source, anchored, and `stdev_mult` band
+  tuple forms; a source-linked public anchored VWAP band checkpoint locks the
+  common channel-overlay idiom in the offline corpus.
 
 Current `str.*` progress:
 
