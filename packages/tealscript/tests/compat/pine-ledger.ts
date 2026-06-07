@@ -424,6 +424,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-event-memory-signal-checkpoint',
+      title: 'Public Event Memory Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: bars since signal valuewhen',
+      featureTags: ['ta', 'signals', 'event_memory', 'barssince', 'valuewhen', 'crossover', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-moving-average-ribbon-checkpoint',
       title: 'Public Moving Average Ribbon Checkpoint',
       searchContext: 'TradingView public scripts search: moving average ribbon',
