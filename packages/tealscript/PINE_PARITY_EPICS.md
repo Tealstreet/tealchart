@@ -215,8 +215,8 @@ Goal: accept the declaration and type shapes common public scripts use.
 
 Phases:
 
-1. Complete `indicator()`, `strategy()`, and `library()` declaration argument
-   syntax and metadata capture.
+1. Complete `indicator()`, legacy `study()`, `strategy()`, and `library()`
+   declaration argument syntax and metadata capture.
 2. Complete `import`, `export`, aliases, version syntax, and local deterministic
    registry hooks.
 3. Complete variable declarations, typed declarations, tuple declarations,

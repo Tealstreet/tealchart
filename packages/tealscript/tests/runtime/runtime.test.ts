@@ -326,6 +326,19 @@ indicator("My Test Indicator", overlay=true)
       expect(result.errors).toHaveLength(0);
     });
 
+    it('executes legacy study declarations as indicators', () => {
+      const code = `//@version=4
+study("Legacy Study", shorttitle="LS", overlay=true)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.indicatorTitle).toBe('Legacy Study');
+      expect(result.declaration.shortTitle).toBe('LS');
+      expect(result.declaration.overlay).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
     it('executes variable declarations', () => {
       const code = `//@version=6
 indicator("Test")

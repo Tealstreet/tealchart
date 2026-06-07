@@ -89,12 +89,12 @@ EmptyStatement
   = LineTerminator { return null; }
   / Comment { return null; }
 
-// indicator("title", ...) / strategy("title", ...)
+// indicator("title", ...) / strategy("title", ...) / legacy study("title", ...)
 IndicatorDeclaration
-  = declarationKind:("indicator" / "strategy") _ "(" __ args:ArgumentList __ ")" _ LineTerminator? {
+  = declarationKind:("indicator" / "strategy" / "study") _ "(" __ args:ArgumentList __ ")" _ LineTerminator? {
       const result = {
         type: 'IndicatorDeclaration',
-        declarationKind,
+        declarationKind: declarationKind === 'study' ? 'indicator' : declarationKind,
         loc: loc()
       };
 
