@@ -1116,11 +1116,7 @@ plot(sorted.size() > 0 ? sorted.get(0) : na, title="Min")
     ]);
   });
 
-  // Trailing comma in function call args is NOT supported by the grammar.
-  // ta.sma(close, 5,) throws a parse error because ParameterList does not accept
-  // a bare trailing comma in the ArgumentList rule.
-  // Skipped: gap documented in PINE_V6_REFERENCE_GAP.md under "Real-World Corpus Gaps — Edge Cases".
-  it.skip('trailing comma in function call args', () => {
+  it('trailing comma in function call args', () => {
     const result = runCompatScript(`
 indicator("Edge Trailing Comma Checkpoint")
 sma = ta.sma(close, 5,)

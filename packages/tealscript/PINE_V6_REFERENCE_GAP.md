@@ -123,7 +123,7 @@ No new failure classes were introduced.
 ### Edge-case corpus probe (12 scripts) — 2026-06-08
 
 12 edge-case scripts added to `tests/compat/pine-realworld-corpus.test.ts` targeting
-parser and runtime edge cases. 11 pass; 1 skipped (trailing comma in function calls).
+parser and runtime edge cases. All 12 now pass.
 
 | Script | Status | Pattern |
 | --- | --- | --- |
@@ -139,26 +139,20 @@ parser and runtime edge cases. 11 pass; 1 skipped (trailing comma in function ca
 | input.source UDF arg | pass | src = input.source(close); out = smoothed(src, 3) |
 | Strategy multi-exit | pass | strategy.exit with profit=, loss=, trail_offset= together |
 | Array copy + sort chain | pass | vals.copy(); sorted.sort(); sorted.get(0) |
-| **Trailing comma in call** | **skip** | `ta.sma(close, 5,)` → parse error; gap below |
+| Trailing comma in call | pass | `ta.sma(close, 5,)` — fixed by adding `(__ ",")?` to `ArgumentList` |
 
 ### Real-World Corpus Gaps — Edge Cases
 
-#### Parser gap: trailing comma in function call argument list
+#### ~~Parser gap: trailing comma in function call argument list~~ — CLOSED
 
 **Pattern:** `ta.sma(close, 5,)` — some editors/formatters emit a trailing comma
 after the last argument in a function call.
 
-**Status:** Parser rejects this with a parse error. The `ArgumentList` grammar rule
-requires each entry to be a valid `Argument` (positional or named), so a bare trailing
-comma is invalid.
+**Status:** Fixed. Added `(__ ",")?` to `ArgumentList` in `grammar.peggy` so a bare
+trailing comma is silently ignored. All positional and named arg variants pass.
 
-**Impact:** Low — almost no hand-written scripts use trailing commas; only machine-
-formatted code does. Not blocking for copy-paste parity.
-
-**Test:** `it.skip('trailing comma in function call args', ...)` in `pine-realworld-corpus.test.ts`.
-
-**Fix path:** Add `(__ ",")?` after the last argument in `ArgumentList` in `grammar.peggy`,
-rebuild the parser, and unskip the test.
+**Test:** `it('trailing comma in function call args', ...)` in `pine-realworld-corpus.test.ts`
+plus two focused cases in `src/parser/parser.test.ts`.
 
 ---
 
@@ -333,7 +327,7 @@ No new failure classes were introduced.
 | Deferred (host-dependent) | 9 | — |
 | **Real-world corpus probe (15 scripts)** | **0** | All pass |
 | **Advanced corpus probe (10 scripts)** | **0** | All pass |
-| **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
+| **Edge-case corpus probe (12 scripts)** | **0** | All 12 pass (trailing comma fixed) |
 | **Pine v5 compatibility probe (9 scripts)** | **1** | 8 pass, 1 skipped (security datafeed) |
 | **Parser stress probe (8 scripts)** | **0** | 8 pass |
 | **Deep parity probes (12 scripts)** | **1 (runtime)** | 11 pass, 1 skipped (request.security tuple) |
