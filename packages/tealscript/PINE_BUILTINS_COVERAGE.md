@@ -127,6 +127,8 @@ Current `ta.*` progress:
 - A source-linked public stochastic signal checkpoint locks the common
   `ta.stoch()` K/D smoothing and overbought/oversold signal-routing idiom over
   deterministic bars.
+- A source-linked public MFI signal checkpoint locks the common `ta.mfi()`
+  threshold-routing idiom over deterministic volume bars.
 
 Current `str.*` progress:
 

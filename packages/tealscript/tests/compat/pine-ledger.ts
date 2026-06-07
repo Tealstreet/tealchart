@@ -406,6 +406,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-mfi-signal-checkpoint',
+      title: 'Public MFI Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: money flow index signal',
+      featureTags: ['ta', 'signals', 'mfi', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',

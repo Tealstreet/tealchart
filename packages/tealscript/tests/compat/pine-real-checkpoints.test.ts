@@ -1693,6 +1693,48 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]);
   });
 
+  it('locks a reduced public MFI signal idiom', () => {
+    // Public idiom reference: Money Flow Index scripts commonly expose length
+    // and threshold inputs, then route oscillator overbought/oversold signals.
+    // Source search: https://www.tradingview.com/scripts/search/money%20flow%20index%20signal/
+    const result = runCompatScript(`
+indicator("Public MFI Signal Checkpoint")
+length = input.int(4, "Length")
+overbought = input.float(70.0, "Overbought")
+oversold = input.float(30.0, "Oversold")
+mfi = ta.mfi(source=hlc3, length=length)
+bullSignal = mfi < oversold
+bearSignal = mfi > overbought
+plot(mfi, title="MFI")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public MFI Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Overbought', 'float'],
+      ['Oversold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([
+      null,
+      null,
+      null,
+      61.624951,
+      43.64354,
+      20.320629,
+      26.235953,
+      55.529612,
+      80.719651,
+      100,
+      100,
+      100,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
