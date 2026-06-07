@@ -6081,6 +6081,36 @@ plot(bullish ? 1 : 0, title="Bullish")
     ]);
     expect(getPlot(result, 'Bullish').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
+
+  it('locks a reduced public ATR signal idiom', () => {
+    // Public idiom reference: ATR scripts commonly expose a length input, route
+    // the smoothed true range through an EMA signal line, and mark bars where
+    // volatility is expanding.
+    // Source search: https://www.tradingview.com/scripts/search/average%20true%20range%20signal/
+    const result = runCompatScript(`
+indicator("Public ATR Signal Checkpoint")
+length = input.int(3, "Length")
+atrValue = ta.atr(length)
+signal = ta.ema(atrValue, length)
+expanding = atrValue > atrValue[1]
+plot(atrValue, title="ATR")
+plot(signal, title="Signal")
+plot(expanding ? 1 : 0, title="Expanding")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public ATR Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'ATR').values)).toEqual([
+      null, null, 4.333333, 5.222222, 5.481481, 5.320988, 5.547325, 6.03155, 5.6877, 5.458467, 5.305644, 5.203763,
+    ]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      null, null, 4.333333, 4.777778, 5.12963, 5.225309, 5.386317, 5.708933, 5.698317, 5.578392, 5.442018, 5.322891,
+    ]);
+    expect(getPlot(result, 'Expanding').values).toEqual([0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
