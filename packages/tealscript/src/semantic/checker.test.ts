@@ -7059,6 +7059,10 @@ enum Mode
 direction = input.enum(Direction.long)
 level = input.price(101.25)
 source = input.source(defval=close, "Source")
+genericLength = input(14, "Generic Length")
+genericMultiplier = input(2.5, "Generic Multiplier")
+genericEnabled = input(true, "Generic Enabled")
+genericMode = input("EMA", "Generic Mode")
 length := "bad"
 multiplier := "bad"
 enabled := 1
@@ -7072,7 +7076,11 @@ memo := 4
 direction := Mode.fast
 level := "bad"
 source := "bad"
-plot(source + level + multiplier + length)
+genericLength := "bad"
+genericMultiplier := "bad"
+genericEnabled := 1
+genericMode := 1
+plot(source + level + multiplier + length + genericLength + genericMultiplier)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -7091,6 +7099,10 @@ plot(source + level + multiplier + length)
       'Cannot assign Mode value to Direction variable direction',
       'Cannot assign string value to float variable level',
       'Cannot assign string value to float variable source',
+      'Cannot assign string value to int variable genericLength',
+      'Cannot assign string value to float variable genericMultiplier',
+      'Cannot assign int value to bool variable genericEnabled',
+      'Cannot assign int value to string variable genericMode',
     ]);
     expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'input' });
     expect(types.get('multiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
@@ -7105,6 +7117,10 @@ plot(source + level + multiplier + length)
     expect(types.get('direction')).toMatchObject({ kind: 'udt', name: 'Direction', qualifier: 'input' });
     expect(types.get('level')).toMatchObject({ kind: 'float', qualifier: 'input' });
     expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('genericLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('genericMultiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('genericEnabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
+    expect(types.get('genericMode')).toMatchObject({ kind: 'string', qualifier: 'input' });
   });
 
   it('reports invalid Pine input default value types', () => {
@@ -7228,7 +7244,9 @@ badTooltip = input.float(2.0, "Multiplier", tooltip=true)
 badInline = input.enum(Direction.long, "Direction", inline=3)
 badGroup = input.source(close, "Source", group=false)
 okGroup = input.price(101.25, title="Level", tooltip=section, inline="levels", group=section)
-plot(badTitle + badTooltip + badGroup + okGroup)
+badGenericTitle = input(14, title=1)
+badGenericConfirm = input(true, "Enabled", confirm=1)
+plot(badTitle + badTooltip + badGroup + okGroup + badGenericTitle)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -7236,6 +7254,8 @@ plot(badTitle + badTooltip + badGroup + okGroup)
       'input.float tooltip must be a string, got bool',
       'input.enum inline must be a string, got int',
       'input.source group must be a string, got bool',
+      'input title must be a string, got int',
+      'input confirm must be a boolean, got int',
     ]);
   });
 

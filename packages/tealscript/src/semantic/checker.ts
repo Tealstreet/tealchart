@@ -185,6 +185,7 @@ const INPUT_OPTIONS_ELEMENT_REQUIREMENTS = new Map<string, 'int' | 'number' | 's
   ['input.string', 'string'],
   ['input.timeframe', 'string'],
 ]);
+const isInputCallName = (name: string): boolean => name === 'input' || name.startsWith('input.');
 const ALERT_FREQUENCY_VALUES = new Set(['all', 'once_per_bar', 'once_per_bar_close']);
 const ALERT_FREQUENCY_CONSTANT_VALUES = new Map([
   ['alert.freq_all', 'all'],
@@ -769,6 +770,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'float',
   'hline',
   'indicator',
+  'input',
   'int',
   'label',
   'line',
@@ -1326,6 +1328,14 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'dynamic_requests',
       ],
       minArgs: 1,
+    },
+  ],
+  [
+    'input',
+    {
+      params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      minArgs: 1,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
@@ -4634,7 +4644,7 @@ class SemanticChecker {
 
   private checkInputBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
     const displayName = this.memberPath(expression.callee).join('.');
-    if (!displayName.startsWith('input.')) return;
+    if (!isInputCallName(displayName)) return;
 
     const signature = BUILTIN_SIGNATURES.get(displayName);
     if (!signature) return;
@@ -4645,7 +4655,7 @@ class SemanticChecker {
 
   private checkInputStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
     const displayName = this.memberPath(expression.callee).join('.');
-    if (!displayName.startsWith('input.')) return;
+    if (!isInputCallName(displayName)) return;
 
     const signature = BUILTIN_SIGNATURES.get(displayName);
     if (!signature) return;
@@ -4657,7 +4667,7 @@ class SemanticChecker {
 
   private checkInputOptionsArgumentType(expression: CallExpression, scope: SemanticScope): void {
     const displayName = this.memberPath(expression.callee).join('.');
-    if (!displayName.startsWith('input.')) return;
+    if (!isInputCallName(displayName)) return;
 
     const signature = BUILTIN_SIGNATURES.get(displayName);
     if (!signature) return;
@@ -7503,6 +7513,14 @@ class SemanticChecker {
 
   private inferInputCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
     const calleeName = calleePath.join('.');
+    if (calleeName === 'input') {
+      const defval = this.inferCallArgumentType(expression, scope, ['defval'], 0);
+      if (!defval || defval.kind === 'unknown') return { kind: 'unknown', qualifier: 'input' };
+      if (defval.kind === 'bool' || defval.kind === 'float' || defval.kind === 'int' || defval.kind === 'string') {
+        return { ...defval, qualifier: 'input' };
+      }
+      return { ...defval, qualifier: defval.qualifier ?? 'series' };
+    }
     if (calleeName === 'input.source') {
       const source = this.inferCallArgumentType(expression, scope, ['defval'], 0);
       return source ? { ...source, qualifier: source.qualifier ?? 'series' } : { kind: 'unknown', qualifier: 'series' };
