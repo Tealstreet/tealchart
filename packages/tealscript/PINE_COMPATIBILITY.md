@@ -912,6 +912,9 @@ higher-timeframe merging, common `gaps` / `lookahead` behavior,
 `ignore_invalid_symbol`, `calc_bars_count`, tuple expressions, dynamic request
 guards, legacy global `security()` aliasing with the same call binding and
 diagnostics, `request.security_lower_tf()`, and `request.currency_rate()`.
+The v6 `currency.*` constant namespace is available for request currency
+parameters, including common regional fiat constants, crypto constants, and
+`currency.NONE`.
 Host-provided point-series contexts cover `request.dividends()`,
 `request.earnings()`, `request.splits()`, `request.financial()`, and
 `request.economic()`, including `lookahead_on` for timestamped corporate-action
@@ -1134,7 +1137,8 @@ positions, and per-bar equity snapshots. Read-only `strategy.*` state variables 
 `strategy.equity`, `strategy.netprofit_percent`, `strategy.grossprofit_percent`,
 `strategy.grossloss_percent`, `strategy.openprofit_percent`, `strategy.account_currency`,
 `strategy.position_size`, `strategy.position_entry_name`, and trade counters are
-available for scripts.
+available for scripts. Strategy account currency accepts the broad v6
+`currency.*` constant namespace.
 Strategy declarations also populate the shared declaration metadata payload for
 title, short title, overlay, format, precision, scale, timeframe, z-order,
 behind-chart, calculation-bar count, dynamic request, history-buffer, and drawing

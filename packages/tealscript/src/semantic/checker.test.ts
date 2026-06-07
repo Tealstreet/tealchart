@@ -3287,6 +3287,7 @@ float basis = 1.5
 bool enabled = true
 string labelText = "hi"
 color tint = color.red
+currencySymbol = currency.SGD
 array<float> values = array.new_float()
 genericValues = array.new<float>()
 genericGrid = matrix.new<float>(1, 1, 0)
@@ -3309,6 +3310,7 @@ pivotPoint pivot = na
     expect(types.get('enabled')).toMatchObject({ kind: 'bool' });
     expect(types.get('labelText')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
+    expect(types.get('currencySymbol')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericGrid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });

@@ -32,6 +32,7 @@ import {
   BUILTIN_GLOBAL_TYPES,
   BUILTIN_NAMESPACES,
   CALENDAR_FUNCTION_NAMES,
+  CURRENCY_CONSTANT_CODES,
   isExportableBuiltinConstantPath,
 } from '../builtinMetadata';
 
@@ -7589,6 +7590,10 @@ class SemanticChecker {
           const colorConstantType = this.inferColorConstantType(expression);
           if (colorConstantType) return colorConstantType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'currency') {
+          const currencyConstantType = this.inferCurrencyConstantType(expression);
+          if (currencyConstantType) return currencyConstantType;
+        }
         const drawingAllType = this.inferDrawingAllMemberType(expression);
         if (drawingAllType) return drawingAllType;
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
@@ -8036,6 +8041,14 @@ class SemanticChecker {
 
   private inferColorConstantType(expression: MemberExpression): SemanticType | undefined {
     return COLOR_CONSTANT_NAMES.has(this.memberPath(expression).join('.')) ? { kind: 'color', qualifier: 'const' } : undefined;
+  }
+
+  private inferCurrencyConstantType(expression: MemberExpression): SemanticType | undefined {
+    return expression.object.type === 'Identifier'
+      && expression.object.name === 'currency'
+      && CURRENCY_CONSTANT_CODES.includes(expression.property.name as typeof CURRENCY_CONSTANT_CODES[number])
+      ? { kind: 'string', qualifier: 'const' }
+      : undefined;
   }
 
   private inferColorCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {

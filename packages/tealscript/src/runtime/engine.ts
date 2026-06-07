@@ -33,6 +33,7 @@ import type {
   IndexExpression,
 } from '../parser/ast';
 import {
+  CURRENCY_CONSTANT_CODES,
   isExportableBuiltinConstantPath,
   VARIABLE_ONLY_BUILTIN_NAMES,
 } from '../builtinMetadata';
@@ -9566,19 +9567,8 @@ export class TealscriptEngine {
       this.builtins.set(name, () => value);
     }
 
-    const currencyConstants: Record<string, string> = {
-      'currency.AUD': 'AUD',
-      'currency.CAD': 'CAD',
-      'currency.CHF': 'CHF',
-      'currency.EUR': 'EUR',
-      'currency.GBP': 'GBP',
-      'currency.JPY': 'JPY',
-      'currency.USD': 'USD',
-      'currency.USDT': 'USDT',
-    };
-
-    for (const [name, value] of Object.entries(currencyConstants)) {
-      this.builtins.set(name, () => value);
+    for (const code of CURRENCY_CONSTANT_CODES) {
+      this.builtins.set(`currency.${code}`, () => code);
     }
   }
 
