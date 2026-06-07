@@ -6133,6 +6133,22 @@ plot(risingOBV ? 1 : 0, title="Rising OBV")
     ]);
     expect(getPlot(result, 'Rising OBV').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
   });
+
+  it('locks a reduced public recursive UDF idiom as planned-unsupported', () => {
+    // Pine parses recursive UDFs fine but the runtime detects the call cycle and
+    // throws. Tracked as planned-unsupported: recursive call stacks require a
+    // trampoline or depth limit that is not yet implemented.
+    // Source search: https://www.tradingview.com/scripts/search/recursive%20factorial/
+    const result = runCompatScript(`
+indicator("Public Recursive UDF Checkpoint")
+factorial(n) => n <= 1 ? 1 : n * factorial(n - 1)
+plot(factorial(3), title="Factorial")
+`, { bars: [compatibilityBars[0]!] });
+
+    const unsupportedMessage = 'Recursive user function calls are not supported: factorial -> factorial';
+    expect(result.errors.some((error) => error.message.includes('Recursive user function calls are not supported'))).toBe(true);
+    expect(result.errors[0]!.message).toContain(unsupportedMessage);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
