@@ -289,7 +289,7 @@ plot(basis, title="Basis")`;
 strategy("Test strategy",
     overlay=true,
     initial_capital=25000,
-    currency="EUR",
+    currency=currency.SGD,
     default_qty_type=strategy.percent_of_equity,
     default_qty_value=10,
     pyramiding=2,
@@ -315,7 +315,7 @@ plot(strategy.position_size)`;
       expect(result.strategy.settings).toMatchObject({
         title: 'Test strategy',
         initialCapital: 25000,
-        currency: 'EUR',
+        currency: 'SGD',
         defaultQtyType: 'percent_of_equity',
         defaultQtyValue: 10,
         pyramiding: 2,
