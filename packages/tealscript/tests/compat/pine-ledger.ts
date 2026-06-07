@@ -415,6 +415,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-cci-signal-checkpoint',
+      title: 'Public CCI Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: commodity channel index signal',
+      featureTags: ['ta', 'signals', 'cci', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',

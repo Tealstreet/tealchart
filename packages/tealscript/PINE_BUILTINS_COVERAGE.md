@@ -129,6 +129,8 @@ Current `ta.*` progress:
   deterministic bars.
 - A source-linked public MFI signal checkpoint locks the common `ta.mfi()`
   threshold-routing idiom over deterministic volume bars.
+- A source-linked public CCI signal checkpoint locks the common `ta.cci()`
+  threshold-routing idiom over deterministic typical-price bars.
 
 Current `str.*` progress:
 
