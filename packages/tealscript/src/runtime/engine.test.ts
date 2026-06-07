@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { TealscriptEngine, executeScript } from './engine';
 import { parse } from '../parser/parser';
+import { VARIABLE_ONLY_BUILTIN_NAMES } from '../builtinMetadata';
 import { InMemoryRequestDatafeed } from './requestDatafeed';
 import { InMemoryStrategyIntrabarDatafeed } from './strategy';
 import type { Bar } from './context';
@@ -6467,24 +6468,31 @@ plot(sum)`;
 
   describe('math functions', () => {
     it('keeps math constants as values, not callable functions', () => {
+      const mathConstants = [
+        ['PI', 'math.pi', Math.PI],
+        ['E', 'math.e', Math.E],
+        ['PHI', 'math.phi', (1 + Math.sqrt(5)) / 2],
+      ] as const;
       const valueScript = `//@version=6
 indicator("Math Constants")
-plot(math.pi, title="PI")
-plot(math.e, title="E")
-plot(math.phi, title="PHI")`;
+${mathConstants.map(([title, expression]) => `plot(${expression}, title="${title}")`).join('\n')}`;
       const valueResult = executeScript(parse(valueScript), createBars(1));
 
       expect(valueResult.errors).toEqual([]);
-      expect(valueResult.plots.find((plot) => plot.title === 'PI')?.values[0]).toBe(Math.PI);
-      expect(valueResult.plots.find((plot) => plot.title === 'E')?.values[0]).toBe(Math.E);
-      expect(valueResult.plots.find((plot) => plot.title === 'PHI')?.values[0]).toBe((1 + Math.sqrt(5)) / 2);
+      for (const [title, , expectedValue] of mathConstants) {
+        expect(valueResult.plots.find((plot) => plot.title === title)?.values[0]).toBe(expectedValue);
+      }
 
-      const callScript = `//@version=6
-indicator("Bad Math Constants")
-plot(math.pi())`;
-      const callResult = executeScript(parse(callScript), createBars(1));
+      const mathVariableOnlyNames = Array.from(VARIABLE_ONLY_BUILTIN_NAMES)
+        .filter((name) => name.startsWith('math.'));
+      for (const name of mathVariableOnlyNames) {
+        const callScript = `//@version=6
+indicator("Bad Math Constant")
+plot(${name}())`;
+        const callResult = executeScript(parse(callScript), createBars(1));
 
-      expect(callResult.errors.map((error) => error.message)).toEqual(['Unknown function: math.pi']);
+        expect(callResult.errors.map((error) => error.message)).toEqual([`Unknown function: ${name}`]);
+      }
     });
 
     it('evaluates math.abs', () => {
@@ -6561,24 +6569,26 @@ plot(math.sum(dynamicSource, dynamicLength), title="Dynamic Sparse Sum")`;
 
   describe('TA functions', () => {
     it('keeps TA series variables as values, not callable functions', () => {
+      const taVariableOnlyNames = Array.from(VARIABLE_ONLY_BUILTIN_NAMES)
+        .filter((name) => name.startsWith('ta.'));
       const valueScript = `//@version=6
 indicator("TA Variables")
-plot(ta.iii, title="III")
-plot(ta.nvi, title="NVI")
-plot(ta.pvt, title="PVT")`;
+${taVariableOnlyNames.map((name) => `plot(${name}, title="${name}")`).join('\n')}`;
       const valueResult = executeScript(parse(valueScript), createBars(3));
 
       expect(valueResult.errors).toEqual([]);
-      expect(valueResult.plots.find((plot) => plot.title === 'III')?.values).toHaveLength(3);
-      expect(valueResult.plots.find((plot) => plot.title === 'NVI')?.values).toHaveLength(3);
-      expect(valueResult.plots.find((plot) => plot.title === 'PVT')?.values).toHaveLength(3);
+      for (const name of taVariableOnlyNames) {
+        expect(valueResult.plots.find((plot) => plot.title === name)?.values).toHaveLength(3);
+      }
 
-      const callScript = `//@version=6
-indicator("Bad TA Variables")
-plot(ta.iii())`;
-      const callResult = executeScript(parse(callScript), createBars(1));
+      for (const name of taVariableOnlyNames) {
+        const callScript = `//@version=6
+indicator("Bad TA Variable")
+plot(${name}())`;
+        const callResult = executeScript(parse(callScript), createBars(1));
 
-      expect(callResult.errors.map((error) => error.message)).toEqual(['Unknown function: ta.iii']);
+        expect(callResult.errors.map((error) => error.message)).toEqual([`Unknown function: ${name}`]);
+      }
     });
 
     it('calculates ta.sma', () => {

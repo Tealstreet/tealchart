@@ -32,7 +32,10 @@ import type {
   MemberExpression,
   IndexExpression,
 } from '../parser/ast';
-import { isExportableBuiltinConstantPath } from '../builtinMetadata';
+import {
+  isExportableBuiltinConstantPath,
+  VARIABLE_ONLY_BUILTIN_NAMES,
+} from '../builtinMetadata';
 
 import {
   absArrayValue,
@@ -355,17 +358,6 @@ const LEGACY_GLOBAL_TA_ALIASES = [
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
-]);
-const VARIABLE_ONLY_BUILTIN_NAMES = new Set([
-  'math.e',
-  'math.phi',
-  'math.pi',
-  'ta.iii',
-  'ta.nvi',
-  'ta.pvi',
-  'ta.pvt',
-  'ta.wad',
-  'ta.wvad',
 ]);
 
 export interface IndicatorDeclarationMetadata {
