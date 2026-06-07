@@ -849,8 +849,9 @@ rejects non-string `time()` / `time_close()` timeframe, session, and timezone
 arguments, non-numeric `bars_back` / `timeframe_bars_back` values, plus invalid
 literal time offsets outside Pine's `-500..5000` window, missing explicit
 `timeframe` arguments for `timeframe_bars_back`, and invalid `timeframe.*`
-string/numeric helper arguments before runtime. Full future timestamp
-projection beyond locally known chart bars remains planned.
+string/numeric helper arguments before runtime. Runtime returns `na` for
+dynamic time offsets that are non-integer or outside `-500..5000`. Full future
+timestamp projection beyond locally known chart bars remains planned.
 
 ## Common Tick Quote Coverage
 
