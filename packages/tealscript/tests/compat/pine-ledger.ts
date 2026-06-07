@@ -2377,6 +2377,97 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'input-int-range-checkpoint',
+      title: 'Input Int Range Checkpoint',
+      searchContext: 'TradingView public scripts search: input.int minval maxval step',
+      featureTags: ['inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'input-string-options-checkpoint',
+      title: 'Input String Options Checkpoint',
+      searchContext: 'TradingView public scripts search: input.string options list MA type',
+      featureTags: ['inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'indicator-overlay-precision-format-checkpoint',
+      title: 'Indicator Meta Checkpoint',
+      searchContext: 'TradingView public scripts search: indicator overlay precision format price',
+      featureTags: ['declaration_metadata', 'inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'strategy-full-declaration-checkpoint',
+      title: 'Strategy Full Declaration Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy initial_capital currency default_qty_type',
+      category: 'strategy',
+      featureTags: ['strategy', 'declaration_metadata', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'runtime-error-specific-bar-checkpoint',
+      title: 'Runtime Error Specific Bar Checkpoint',
+      searchContext: 'TradingView public scripts search: runtime.error guard negative value',
+      featureTags: ['runtime', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'input-multi-type-checkpoint',
+      title: 'Multi Input Checkpoint',
+      searchContext: 'TradingView public scripts search: indicator all input types combined',
+      featureTags: ['inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'input-time-default-checkpoint',
+      title: 'Input Time Checkpoint',
+      searchContext: 'TradingView public scripts search: input.time start date filter',
+      featureTags: ['inputs', 'time', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'indicator-max-bars-back-checkpoint',
+      title: 'Indicator Max Bars Back Checkpoint',
+      searchContext: 'TradingView public scripts search: indicator max_bars_back history access',
+      featureTags: ['declaration_metadata', 'inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'input-driven-ta-rsi-checkpoint',
+      title: 'Input Driven RSI Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi input.int length parameter',
+      featureTags: ['inputs', 'ta', 'rsi', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'indicator-shorttitle-overlay-checkpoint',
+      title: 'Indicator Shorttitle Overlay Checkpoint',
+      searchContext: 'TradingView public scripts search: indicator shorttitle overlay legend',
+      featureTags: ['declaration_metadata', 'inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

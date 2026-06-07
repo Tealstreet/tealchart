@@ -4205,3 +4205,274 @@ plot(sizeAfter, title="SizeAfter")
     expect(getPlot(result, 'SizeAfter').values).toEqual([0, 2, 3, 2, 0, 0, 1, 2, 3, 3, 3, 3]);
   });
 });
+
+// ===========================================================================================
+// Input, declaration, and error patterns
+// Tests input parameter handling, indicator/strategy declaration options, and runtime error
+// behavior including minval/maxval/step constraints, options lists, declaration metadata
+// fields, and runtime.error halt semantics.
+// ===========================================================================================
+
+describe('Input, declaration, and error patterns', () => {
+  it('captures input.int minval/maxval/step range constraints in input metadata', () => {
+    // Public idiom reference: configurable-length indicators expose minval/maxval/step
+    // on their integer inputs so the chart UI can enforce valid ranges.
+    // Source search: https://www.tradingview.com/scripts/search/input.int%20minval%20maxval%20step/
+    const result = runCompatScript(`
+indicator("Input Int Range Checkpoint")
+length = input.int(14, "Length", minval=1, maxval=200, step=1)
+fast = input.int(5, "Fast", minval=1, maxval=50, step=1)
+plot(ta.sma(close, length > 0 ? length : 1), title="SMA")
+plot(ta.sma(close, fast > 0 ? fast : 1), title="Fast SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Input Int Range Checkpoint');
+    expect(result.inputs).toHaveLength(2);
+    expect(result.inputs[0]).toMatchObject({
+      id: 'input_Length',
+      type: 'int',
+      title: 'Length',
+      defval: 14,
+      minval: 1,
+      maxval: 200,
+      step: 1,
+    });
+    expect(result.inputs[1]).toMatchObject({
+      id: 'input_Fast',
+      type: 'int',
+      title: 'Fast',
+      defval: 5,
+      minval: 1,
+      maxval: 50,
+      step: 1,
+    });
+  });
+
+  it('captures input.string options list in input metadata', () => {
+    // Public idiom reference: MA-type selector inputs expose an options list so the
+    // chart UI renders a dropdown limited to valid string choices.
+    // Source search: https://www.tradingview.com/scripts/search/input.string%20options%20list%20MA%20type/
+    const result = runCompatScript(`
+indicator("Input String Options Checkpoint")
+maType = input.string("SMA", "Method", options=["SMA", "EMA", "WMA"])
+length = input.int(5, "Length")
+isSma = maType == "SMA"
+ma = isSma ? ta.sma(close, length) : ta.ema(close, length)
+plot(ma, title="MA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Input String Options Checkpoint');
+    expect(result.inputs).toHaveLength(2);
+    expect(result.inputs[0]).toMatchObject({
+      id: 'input_Method',
+      type: 'string',
+      title: 'Method',
+      defval: 'SMA',
+      options: ['SMA', 'EMA', 'WMA'],
+    });
+    expect(result.inputs[1]).toMatchObject({ id: 'input_Length', type: 'int', defval: 5 });
+    // Default is SMA with length=5 — same as ta.sma(close, 5)
+    const ma = getPlot(result, 'MA');
+    expect(roundSeries(ma.values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+  });
+
+  it('captures indicator() overlay, precision, and format declaration metadata', () => {
+    // Public idiom reference: price-overlay indicators declare overlay=true,
+    // precision=2, and format=format.price so the UI renders tick-accurate labels.
+    // Source search: https://www.tradingview.com/scripts/search/indicator%20overlay%20precision%20format%20price/
+    const result = runCompatScript(`
+indicator("Indicator Meta Checkpoint", overlay=true, precision=2, format=format.price)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Indicator Meta Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.indicatorPrecision).toBe(2);
+    expect(result.indicatorFormat).toBe('price');
+    expect(result.declaration).toMatchObject({
+      title: 'Indicator Meta Checkpoint',
+      overlay: true,
+      precision: 2,
+      format: 'price',
+    });
+  });
+
+  it('captures strategy() full declaration option metadata', () => {
+    // Public idiom reference: full-configuration strategy scripts declare
+    // initial_capital, currency, default_qty_type, default_qty_value, and pyramiding
+    // to control position sizing and broker emulator defaults.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20initial_capital%20currency%20default_qty_type/
+    const result = runCompatScript(`
+strategy("Strategy Full Declaration Checkpoint", initial_capital=50000, currency=currency.USD, default_qty_type=strategy.fixed, default_qty_value=2, pyramiding=0)
+longCondition = ta.crossover(ta.sma(close, 3), ta.sma(close, 5))
+if longCondition
+    strategy.entry("Long", strategy.long)
+plot(strategy.equity, title="Equity")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Strategy Full Declaration Checkpoint');
+    expect(result.strategy.settings).toMatchObject({
+      title: 'Strategy Full Declaration Checkpoint',
+      initialCapital: 50000,
+      currency: 'USD',
+      defaultQtyType: 'fixed',
+      defaultQtyValue: 2,
+      pyramiding: 0,
+    });
+  });
+
+  it('locks runtime.error on a specific bar halting execution while preserving prior computed values', () => {
+    // Public idiom reference: guard scripts call runtime.error() when a computed
+    // value violates a contract (e.g. negative ATR) and stop bar-by-bar execution.
+    // Prior bars' plots must be intact; no further bars should be processed.
+    // Source search: https://www.tradingview.com/scripts/search/runtime.error%20guard%20negative%20value/
+    const result = runCompatScript(`
+indicator("Runtime Error Specific Bar Checkpoint")
+atr5 = ta.atr(5)
+plot(close, title="Price")
+if bar_index == 5
+    runtime.error("Simulated guard at bar 5")
+plot(atr5, title="ATR5")
+`);
+
+    // Execution halts at bar 5; error is captured
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatchObject({
+      code: 'runtime.error',
+      message: 'Simulated guard at bar 5',
+    });
+    // Price plot has bars 0-5 (price emitted before error on bar 5)
+    expect(getPlot(result, 'Price').values).toEqual([102, 105, 107, 103, 99, 100]);
+    // ATR5 plot has bars 0-4 (statement after the error on bar 5 never runs)
+    expect(getPlot(result, 'ATR5').values).toEqual([null, null, null, null, 5.2]);
+  });
+
+  it('coexists multiple input types in a single indicator script', () => {
+    // Public idiom reference: multi-input configuration panels combine every
+    // input.* type so users can adjust length, threshold, toggle, MA type,
+    // source series, and accent color from a single settings dialog.
+    // Source search: https://www.tradingview.com/scripts/search/indicator%20all%20input%20types%20combined/
+    const result = runCompatScript(`
+indicator("Multi Input Checkpoint")
+len = input.int(5, "Length")
+thresh = input.float(0.5, "Threshold")
+show = input.bool(true, "Show")
+mode = input.string("SMA", "Mode")
+clr = input.color(color.blue, "Color")
+src = input.source(close, "Source")
+ma = ta.sma(src, len)
+plot(show ? ma : na, title="MA")
+plot(src > ma + thresh ? 1 : 0, title="Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toHaveLength(6);
+    expect(result.inputs.map((i) => i.type)).toEqual([
+      'int', 'float', 'bool', 'string', 'color', 'source',
+    ]);
+    expect(result.inputs[0]).toMatchObject({ id: 'input_Length', type: 'int', defval: 5 });
+    expect(result.inputs[1]).toMatchObject({ id: 'input_Threshold', type: 'float', defval: 0.5 });
+    expect(result.inputs[2]).toMatchObject({ id: 'input_Show', type: 'bool', defval: true });
+    expect(result.inputs[3]).toMatchObject({ id: 'input_Mode', type: 'string', defval: 'SMA' });
+    expect(result.inputs[4]).toMatchObject({ id: 'input_Color', type: 'color' });
+    expect(result.inputs[5]).toMatchObject({ id: 'input_Source', type: 'source' });
+  });
+
+  it('captures input.time default as a numeric timestamp', () => {
+    // Public idiom reference: date-range filter scripts use input.time() to let
+    // users pick a start timestamp from the chart UI.
+    // Source search: https://www.tradingview.com/scripts/search/input.time%20start%20date%20filter/
+    const result = runCompatScript(`
+indicator("Input Time Checkpoint")
+startTs = input.time(1700000000000, "Start Time")
+inRange = time >= startTs
+plot(inRange ? 1 : 0, title="InRange")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toHaveLength(1);
+    expect(result.inputs[0]).toMatchObject({
+      id: 'input_Start Time',
+      type: 'time',
+      title: 'Start Time',
+      defval: 1_700_000_000_000,
+    });
+    // All bars are at or after the start timestamp (1_700_000_000_000)
+    // compatibilityBars[0].time = 1_700_000_000_000 — exactly equal so all inRange
+    expect(getPlot(result, 'InRange').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('captures indicator() max_bars_back declaration metadata', () => {
+    // Public idiom reference: indicators that access deep history with the [] operator
+    // declare max_bars_back to avoid a runtime buffer error on startup.
+    // Source search: https://www.tradingview.com/scripts/search/indicator%20max_bars_back%20history%20access/
+    const result = runCompatScript(`
+indicator("Indicator Max Bars Back Checkpoint", max_bars_back=100)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Indicator Max Bars Back Checkpoint');
+    expect(result.indicatorMaxBarsBack).toBe(100);
+    expect(result.declaration).toMatchObject({
+      title: 'Indicator Max Bars Back Checkpoint',
+      maxBarsBack: 100,
+    });
+  });
+
+  it('feeds input.int default into ta.rsi as the length parameter', () => {
+    // Public idiom reference: RSI scripts expose the period length as an input.int
+    // so users can change it without editing code; the default value must flow
+    // through to the TA function on every bar.
+    // Source search: https://www.tradingview.com/scripts/search/rsi%20input.int%20length%20parameter/
+    const result = runCompatScript(`
+indicator("Input Driven RSI Checkpoint")
+length = input.int(14, "Length", minval=1, maxval=50)
+rsi14 = ta.rsi(close, length)
+plot(close, title="Close")
+plot(rsi14, title="RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toHaveLength(1);
+    expect(result.inputs[0]).toMatchObject({
+      id: 'input_Length',
+      type: 'int',
+      title: 'Length',
+      defval: 14,
+      minval: 1,
+      maxval: 50,
+    });
+    // RSI(14) on 12 bars — fewer bars than the period, so all values are null
+    expect(getPlot(result, 'Close').values).toHaveLength(compatibilityBars.length);
+    expect(getPlot(result, 'RSI').values.every((v) => v === null)).toBe(true);
+  });
+
+  it('captures indicator() shorttitle and overlay declaration fields on result', () => {
+    // Public idiom reference: overlay indicators declare a shorttitle for the
+    // chart legend and overlay=true to anchor plots on the price pane.
+    // Source search: https://www.tradingview.com/scripts/search/indicator%20shorttitle%20overlay%20legend/
+    const result = runCompatScript(`
+indicator("Indicator Shorttitle Overlay Checkpoint", shorttitle="ISO", overlay=true)
+sma5 = ta.sma(close, 5)
+plot(sma5, title="SMA5")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Indicator Shorttitle Overlay Checkpoint');
+    expect(result.indicatorShortTitle).toBe('ISO');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.declaration).toMatchObject({
+      title: 'Indicator Shorttitle Overlay Checkpoint',
+      shortTitle: 'ISO',
+      overlay: true,
+    });
+  });
+});
