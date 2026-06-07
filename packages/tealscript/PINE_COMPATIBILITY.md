@@ -298,7 +298,8 @@ The common input helper pass covers generic `input()` inference, common typed
 helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.session`,
 `input.text_area`, `input.enum`), and common metadata (`options`, `tooltip`, `group`,
 `inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
-definitions. Semantic analysis preserves known `input.*` return types for
+definitions. Semantic analysis preserves generic `input()` scalar defval-derived
+return types and known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
 types and `input.enum()` defval enum types. Source-linked public checkpoint
 coverage now locks grouped mode, length, source, toggle, and price-level inputs
@@ -310,7 +311,7 @@ argument shapes and element types, invalid literal `display` option values, and 
 `input.float()` calls that mix `options` with range-only
 `minval`/`maxval`/`step` arguments. Input metadata diagnostics also reject
 non-string `title`/`tooltip`/`inline`/`group` values and non-boolean `confirm`
-and `active` values before runtime.
+and `active` values for generic and typed inputs before runtime.
 
 ## Common `array.*` Coverage
 
