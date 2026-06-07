@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { parse } from '../../src/parser';
 import { InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures.ts';
 
@@ -2896,5 +2897,278 @@ plot(isTrans ? 1 : 0, title="Trans")
     expect(getPlot(result, 'Solid').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Half').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Trans').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+});
+
+// ===========================================================================================
+// Library, financial, and advanced strategy patterns
+// Targets areas with lower corpus coverage: library declarations, request.financial /
+// dividends / earnings without a live datafeed, strategy pyramiding and commission,
+// ta.vwap with anchor, str.format_time with timezone, conditional na inference, and
+// runtime.error guard.
+// ===========================================================================================
+
+describe('Library, financial, and advanced patterns', () => {
+  it('locks library export declaration metadata and imported function execution', () => {
+    // Public idiom reference: library scripts declare exported functions that
+    // callers import and invoke as if they were built-ins. The library declaration
+    // itself must parse cleanly and the export table must bind correctly.
+    // Source search: https://www.tradingview.com/scripts/search/library%20export%20functions/
+    const library = parse(`
+library("MathKit", true)
+export double(series float x) => x * 2
+export halve(series float x) => x / 2
+`);
+    const result = runCompatScript(`
+indicator("Library Export Checkpoint")
+import TestUser/MathKit/1 as mk
+doubled = mk.double(close)
+halved = mk.halve(close)
+plot(doubled, title="Doubled")
+plot(halved, title="Halved")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/MathKit/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Library Export Checkpoint');
+    // doubled = close * 2, halved = close / 2 over compatibilityBars closes:
+    // 102,105,107,103,99,100,104,109,108,111,110,112
+    expect(getPlot(result, 'Doubled').values).toEqual([204, 210, 214, 206, 198, 200, 208, 218, 216, 222, 220, 224]);
+    expect(getPlot(result, 'Halved').values).toEqual([51, 52.5, 53.5, 51.5, 49.5, 50, 52, 54.5, 54, 55.5, 55, 56]);
+  });
+
+  it('locks enum with switch driving barcolor and plotshape output', () => {
+    // Public idiom reference: trend-state scripts define an enum and use a
+    // switch expression to assign state, then drive barcolor and plotshape off
+    // the enum value — verifying enum member comparison across output builtins.
+    // Source search: https://www.tradingview.com/scripts/search/enum%20switch%20barcolor%20plotshape/
+    const result = runCompatScript(`
+indicator("Enum Switch Barcolor Checkpoint", overlay=true)
+enum TrendState
+    Long = "Long"
+    Short = "Short"
+    Flat = "Flat"
+
+sma5 = ta.sma(close, 5)
+TrendState state = switch
+    close > sma5 => TrendState.Long
+    close < sma5 => TrendState.Short
+    => TrendState.Flat
+
+barcolor(state == TrendState.Long ? color.green : state == TrendState.Short ? color.red : color.gray, title="Trend Color")
+plotshape(state == TrendState.Long, title="Long Signal", style=shape.triangleup, location=location.belowbar, color=color.green)
+plot(state == TrendState.Long ? 1 : 0, title="Long State")
+plot(state == TrendState.Short ? 1 : 0, title="Short State")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Enum Switch Barcolor Checkpoint');
+    // sma5 is null for bars 0-3; close vs sma5: null→Flat; bars 4-11 depend on sma
+    // sma5 values: null,null,null,null, 103.2,102.8,102.6,103,104,106.4,108.4,110
+    // close:                          102,105,107,103,  99,  100, 104,  109, 108, 111,110,112
+    // Long (close>sma5): bars 4→no(99<103.2), 5→no(100<102.8), 6→yes(104>102.6), 7→yes(109>103), 8→yes(108>104), 9→yes(111>106.4), 10→yes(110>108.4), 11→yes(112>110)
+    // Short: bars 4,5
+    // Flat: bars 0-3
+    expect(getPlot(result, 'Long State').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Short State').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+    // Long Signal plotshape: 1 where Long State is true, null otherwise
+    expect(getPlot(result, 'Long Signal').values).toEqual([null, null, null, null, null, null, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks request.financial parse and runtime resolution returning nan with empty datafeed', () => {
+    // Public idiom reference: fundamental scripts call request.financial() to
+    // overlay financial metrics. With ignore_invalid_symbol=true and an empty
+    // datafeed the call resolves to NaN which propagates as null in plots.
+    // Source search: https://www.tradingview.com/scripts/search/request.financial%20fundamental/
+    const emptyDatafeed = new InMemoryRequestDatafeed([], []);
+    const result = runCompatScript(`
+indicator("Req Financial Checkpoint")
+revenue = request.financial(syminfo.tickerid, "TOTAL_REVENUE", "FQ", ignore_invalid_symbol=true)
+margin = na(revenue) ? na : revenue / close * 100
+plot(revenue, title="Revenue")
+plot(margin, title="Margin")
+plot(close, title="Close")
+`, { engineOptions: { requestDatafeed: emptyDatafeed } });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Req Financial Checkpoint');
+    // With no series data, revenue is NaN → plot values are null
+    expect(getPlot(result, 'Revenue').values).toEqual(Array(compatibilityBars.length).fill(null));
+    expect(getPlot(result, 'Margin').values).toEqual(Array(compatibilityBars.length).fill(null));
+    // Close still plots normally
+    expect(getPlot(result, 'Close').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('locks request.dividends and request.earnings parse and runtime resolution with empty datafeed', () => {
+    // Public idiom reference: corporate-action scripts call request.dividends()
+    // and request.earnings() to mark payout events. With ignore_invalid_symbol=true
+    // and an empty datafeed both return NaN. The na() guard must work correctly.
+    // Source search: https://www.tradingview.com/scripts/search/request.dividends%20request.earnings%20event/
+    const emptyDatafeed = new InMemoryRequestDatafeed([], []);
+    const result = runCompatScript(`
+indicator("Req Dividends Earnings Checkpoint", overlay=true)
+div = request.dividends(syminfo.tickerid, dividends.gross, gaps=barmerge.gaps_on, ignore_invalid_symbol=true)
+eps = request.earnings(syminfo.tickerid, earnings.actual, gaps=barmerge.gaps_on, ignore_invalid_symbol=true)
+hasDividend = not na(div)
+hasEarnings = not na(eps)
+plot(hasDividend ? 1 : 0, title="Has Dividend")
+plot(hasEarnings ? 1 : 0, title="Has Earnings")
+plotshape(hasDividend, title="Div Marker", style=shape.triangleup, location=location.abovebar, color=color.blue)
+`, { engineOptions: { requestDatafeed: emptyDatafeed } });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Req Dividends Earnings Checkpoint');
+    // With no series data, div and eps are NaN on every bar → hasDividend and hasEarnings are false
+    expect(getPlot(result, 'Has Dividend').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'Has Earnings').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'Div Marker').values).toEqual(Array(compatibilityBars.length).fill(null));
+  });
+
+  it('locks strategy pyramiding allowing multiple same-direction entries', () => {
+    // Public idiom reference: pyramiding strategies enter the same direction
+    // multiple times to scale into a winning position.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20pyramiding%20scale%20in/
+    const result = runCompatScript(`
+strategy("Pyramiding Checkpoint", pyramiding=3, process_orders_on_close=true)
+if bar_index < 3
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 3
+    strategy.close_all()
+plot(strategy.position_size, title="Pos Size")
+plot(strategy.opentrades, title="Open Trades")
+plot(strategy.closedtrades, title="Closed Trades")
+`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    // Bar 0: entry qty=1 → pos=1; bar 1: entry qty=1 → pos=2; bar 2: entry qty=1 → pos=3; bar 3: close_all → pos=0
+    expect(getPlot(result, 'Pos Size').values).toEqual([1, 2, 3, 0]);
+    expect(getPlot(result, 'Open Trades').values).toEqual([1, 2, 3, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 3]);
+  });
+
+  it('locks strategy with percent commission reducing net profit', () => {
+    // Public idiom reference: commission-aware strategies declare
+    // commission_type=strategy.commission.percent and commission_value to model
+    // realistic round-trip costs.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20commission%20percent%20cost/
+    const result = runCompatScript(`
+strategy("Commission Checkpoint", commission_type=strategy.commission.percent, commission_value=0.1, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Long")
+plot(strategy.netprofit, title="Net Profit")
+plot(strategy.closedtrades, title="Closed Trades")
+`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    // Entry at bar 0 close (100), exit at bar 1 close (104), gross profit = 4
+    // Commission on entry: 100 * 1 * 0.001 = 0.1 (deducted at entry → netprofit = -0.1 on bar 0)
+    // Commission on exit:  104 * 1 * 0.001 = 0.104
+    // Net profit = 4 - 0.1 - 0.104 = 3.796
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Net Profit').values, 4)).toEqual([-0.1, 3.796, 3.796, 3.796]);
+  });
+
+  it('locks ta.vwap with anchor resetting accumulation mid-series', () => {
+    // Public idiom reference: anchored VWAP scripts reset the accumulation on a
+    // session or user-defined anchor. The no-stdev-mult form returns only the vwap
+    // scalar.
+    // Source search: https://www.tradingview.com/scripts/search/ta.vwap%20anchor%20reset%20session/
+    const result = runCompatScript(`
+indicator("VWAP Anchor Checkpoint", overlay=true)
+anchor = bar_index == 0 or bar_index == 6
+vwap = ta.vwap(anchor=anchor)
+plot(vwap, title="VWAP")
+plot(close > vwap ? 1 : 0, title="Above VWAP")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('VWAP Anchor Checkpoint');
+    // VWAP uses typical price (H+L+C)/3 * volume / cumulative volume.
+    // compatibilityBars: [h,l,c,vol] →
+    // bar0: tp=(103+99+102)/3=101.333, cumTpv=101333, cumVol=1000, vwap=101.333
+    // bar1: tp=(106+101+105)/3=104, cumTpv=101333+104*1100=215733.333, cumVol=2100, vwap≈102.73
+    // ...anchor resets at bar6
+    // bar6: tp=(105+99+104)/3=102.667, cumTpv=102.667*1300=133466.667, cumVol=1300, vwap=102.667 (reset)
+    const vwapVals = getPlot(result, 'VWAP').values as number[];
+    // Verify reset occurred: vwap at bar 6 should equal typical price of bar 6 alone
+    const bar6Tp = (105 + 99 + 104) / 3;
+    expect(Math.abs(vwapVals[6]! - bar6Tp)).toBeLessThan(0.001);
+    // Entire series should be valid (no nulls)
+    expect(vwapVals.every((v) => v !== null && !isNaN(v))).toBe(true);
+    // Above VWAP signal is 0 or 1 on each bar
+    const aboveVwap = getPlot(result, 'Above VWAP').values;
+    expect(aboveVwap.every((v) => v === 0 || v === 1)).toBe(true);
+  });
+
+  it('locks str.format_time with America/New_York timezone producing correct date string', () => {
+    // Public idiom reference: session-aware scripts format bar timestamps in a
+    // named timezone for display. str.format_time with a timezone argument must
+    // produce the correct date and hour for the offset.
+    // Source search: https://www.tradingview.com/scripts/search/str.format_time%20timezone%20display/
+    const result = runCompatScript(`
+indicator("Str Format Time Timezone Checkpoint")
+dateStr = str.format_time(time, "yyyy-MM-dd", "America/New_York")
+isNov14 = dateStr == "2023-11-14"
+plot(isNov14 ? 1 : 0, title="Is Nov 14")
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Format Time Timezone Checkpoint');
+    // compatibilityBars timestamps: 1_700_000_000_000 ... 1_700_000_660_000
+    // = Nov 14 2023 22:13:20 UTC ... 22:24:20 UTC → all map to Nov 14 2023 in America/New_York (UTC-5)
+    expect(getPlot(result, 'Is Nov 14').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Close').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('locks conditional type inference x = condition ? 1.0 : na', () => {
+    // Public idiom reference: scripts assign series values conditionally using
+    // na as the false branch, producing a sparse series. The runtime must infer
+    // the result as float/na without type error and propagate null to plots.
+    // Source search: https://www.tradingview.com/scripts/search/conditional%20na%20ternary%20sparse%20series/
+    const result = runCompatScript(`
+indicator("Conditional NA Inference Checkpoint")
+x = close > open ? 1.0 : na
+y = nz(x, -1.0)
+plot(x, title="Sparse")
+plot(y, title="With Default")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Conditional NA Inference Checkpoint');
+    // close > open: 1→yes, 2→yes, 3→yes, 4→no, 5→no, 6→yes, 7→yes, 8→yes, 9→no, 10→yes, 11→no, 12→yes
+    // (bars indexed 0-11, close/open from compatibilityBars)
+    expect(getPlot(result, 'Sparse').values).toEqual([1, 1, 1, null, null, 1, 1, 1, null, 1, null, 1]);
+    expect(getPlot(result, 'With Default').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+  });
+
+  it('locks runtime.error guard halting execution and leaving prior plots intact', () => {
+    // Public idiom reference: guard scripts call runtime.error() when an invariant
+    // is violated, halting bar-by-bar execution. Plots emitted before the guard bar
+    // must be present; the error must be catchable in the test harness.
+    // Source search: https://www.tradingview.com/scripts/search/runtime.error%20invariant%20guard/
+    const result = runCompatScript(`
+indicator("Runtime Error Guard Checkpoint")
+plot(close, title="Before")
+if bar_index == 3
+    runtime.error("Invariant violated at bar 3")
+plot(close > 100 ? 1 : 0, title="After")
+`);
+
+    // Execution stops mid-bar-3 after Before plot is emitted for bars 0-3
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatchObject({
+      code: 'runtime.error',
+      message: 'Invariant violated at bar 3',
+    });
+    // Before plot has values for bars 0, 1, 2, 3 (emitted before the guard triggers on bar 3)
+    expect(roundSeries(getPlot(result, 'Before').values)).toEqual([102, 105, 107, 103]);
+    // After plot only has values for bars emitted before bar 3's guard (bars 0, 1, 2)
+    expect(getPlot(result, 'After').values).toEqual([1, 1, 1]);
   });
 });
