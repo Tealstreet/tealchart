@@ -6201,6 +6201,8 @@ badVwap = ta.vwap(source="close", anchor=1, stdev_mult="2")
     const result = checkProgram(parse(`
 indicator("Color Signatures")
 base = color.rgb(red=1, green=2, blue=3, transp=25)
+aliasBase = color.rgb(red=10, green=20, blue=30, transparency=40)
+aliasNew = color.new(color=aliasBase, transparency=50)
 derived = color.rgb(color.r(color=base), color.g(color=base), color.b(color=base), color.t(color=base))
 gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
 prefixBase = color.rgb(red=4, 5, 6)
@@ -6299,6 +6301,7 @@ plot(leftVisible + rightVisible + (standard ? 1 : 0) + (renko ? 1 : 0) + (heikin
     const result = checkProgram(parse(`
 indicator("Bad Color Signatures")
 rgbDuplicate = color.rgb(1, 2, 3, red=4)
+rgbTransparencyDuplicate = color.rgb(1, 2, 3, transp=20, transparency=30)
 rgbUnknown = color.rgb(1, 2, 3, alpha=25)
 channelUnknown = color.r(color.red, source=color.blue)
 gradientShort = color.from_gradient(close, 0, 100, color.red)
@@ -6306,6 +6309,7 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Argument 'red' for color.rgb() was supplied multiple times",
+      "Argument 'transparency' for color.rgb() was supplied multiple times",
       "Unknown argument 'alpha' for color.rgb()",
       "Unknown argument 'source' for color.r()",
       'color.from_gradient() expects at least 5 arguments',
@@ -6317,7 +6321,9 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
     const result = checkProgram(parse(`
 indicator("Bad Color Values")
 badNew = color.new(1, "transparent")
+badNewAlias = color.new(color.red, transparency="transparent")
 badRgb = color.rgb("1", true, "blue", "25")
+badRgbAlias = color.rgb(1, 2, 3, transparency="25")
 badChannel = color.r(1)
 badGradient = color.from_gradient("close", "zero", true, 1, 2)
 badDuplicate = color.new(1, 20, color=color.red)
@@ -6326,9 +6332,11 @@ badDuplicate = color.new(1, 20, color=color.red)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'color.new color must be a color, got int',
       'color.new transp must be a number, got string',
+      'color.new transp must be a number, got string',
       'color.rgb red must be a number, got string',
       'color.rgb green must be a number, got bool',
       'color.rgb blue must be a number, got string',
+      'color.rgb transp must be a number, got string',
       'color.rgb transp must be a number, got string',
       'color.r color must be a color, got int',
       'color.from_gradient bottom_color must be a color, got int',
