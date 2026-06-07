@@ -417,9 +417,9 @@ Phases:
    checkpoint coverage now exercises table position/frame/border setters,
    merged headers, cell dimensions, alignment, colors, and tooltips.
 5. Add output-oracle fixtures for public idioms that care about metadata more
-   than pixels. Source-linked public signal-label checkpoint coverage now
-   exercises persistent last-bar label payloads with multiline text, dynamic
-   style/color/textcolor, alignment, font, formatting, tooltip, and getters.
+   than pixels. Source-linked public signal-label and trendline-signal
+   checkpoint coverage now exercises persistent last-bar label and line
+   payloads with dynamic visual metadata, getters, and object-count arrays.
 
 Done means pasted scripts can produce usable, inspectable output payloads even
 when renderer fidelity is not final.

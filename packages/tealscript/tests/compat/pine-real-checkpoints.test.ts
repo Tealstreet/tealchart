@@ -330,6 +330,56 @@ plot(array.size(label.all), title="Label Count")
     ]);
   });
 
+  it('locks a reduced public trendline signal payload idiom', () => {
+    // Source context: https://www.tradingview.com/scripts/search/trendline%20breakout/
+    const result = runCompatScript(`
+indicator("Public Line Signal Checkpoint", overlay=true)
+lookback = 5
+trendStart = close[lookback]
+trendEnd = close
+var trend = line.new(na, na, na, na, extend=extend.none, color=color.gray, style=line.style_dotted, width=1)
+if barstate.islast
+    line.set_xy1(trend, bar_index - lookback, trendStart)
+    line.set_xy2(trend, bar_index, trendEnd)
+    line.set_extend(trend, extend.right)
+    line.set_color(trend, close >= trendStart ? color.green : color.red)
+    line.set_style(trend, line.style_dashed)
+    line.set_width(trend, 3)
+trendPrice = line.get_price(trend, bar_index)
+breakout = close > trendPrice
+plot(trendPrice, title="Trend Price")
+plot(breakout ? 1 : 0, title="Breakout")
+plot(line.get_x1(trend), title="Trend X1")
+plot(line.get_y2(trend), title="Trend Y2")
+plot(array.size(line.all), title="Line Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Trend Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 112]);
+    expect(getPlot(result, 'Breakout').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'Trend X1').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 6]);
+    expect(getPlot(result, 'Trend Y2').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 112]);
+    expect(getPlot(result, 'Line Count').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_0',
+        type: 'line',
+        barIndex: 11,
+        x1: 6,
+        y1: 104,
+        x2: 11,
+        y2: 112,
+        xloc: 'bar_index',
+        extend: 'right',
+        color: '#4CAF50',
+        style: 'dashed',
+        width: 3,
+        forceOverlay: false,
+        persistent: true,
+      },
+    ]);
+  });
+
   it('locks a reduced public volatility band overlay idiom', () => {
     // Public idiom reference: volatility and squeeze public indicators
     // commonly render Bollinger-style bands, filled channels, background

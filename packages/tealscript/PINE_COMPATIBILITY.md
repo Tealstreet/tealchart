@@ -952,6 +952,9 @@ values, non-numeric line coordinate and width values, and non-boolean line
 `force_overlay` values. Rendering routes line segments to the script pane with color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
+The source-linked public line signal checkpoint locks persistent trendline
+endpoint, extension, color, style, width, `line.get_price()`, and `line.all`
+output behavior for trendline-breakout idioms.
 `force_overlay` lines render in the main pane even when created by non-overlay
 scripts. `linefill.new()` records fills between two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,

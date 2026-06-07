@@ -333,6 +333,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-line-signal-checkpoint',
+      title: 'Public Line Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: trendline breakout',
+      featureTags: ['drawings', 'lines', 'visuals', 'signals'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-volatility-band-checkpoint',
       title: 'Public Volatility Band Checkpoint',
       searchContext: 'TradingView public scripts search: bollinger band squeeze',
