@@ -569,7 +569,7 @@ plot(totalScore, title="Total Score")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Signal Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-    // Bars where close > 104: bars 2(107),3(103 no),... let's check: bars 1(105 yes), 2(107 yes), 3(103 no), 4(99 no), 5(100 no), 6(104 no), 7(109 yes), 8(108 yes), 9(111 yes), 10(110 yes), 11(112 yes)
+    // close > 104: bar0(102 no), bar1(105 yes), bar2(107 yes), bar3(103 no), bar4(99 no), bar5(100 no), bar6(104 no), bar7(109 yes), bar8(108 yes), bar9(111 yes), bar10(110 yes), bar11(112 yes)
     expect(getPlot(result, 'Active Count').values).toEqual([0, 1, 2, 2, 2, 2, 2, 3, 4, 5, 6, 7]);
     expect(roundSeries(getPlot(result, 'Total Score').values)).toEqual([
       0, 0.961538, 3.846154, 3.846154, 3.846154, 3.846154, 3.846154,
