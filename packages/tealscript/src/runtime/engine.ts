@@ -5743,6 +5743,19 @@ export class TealscriptEngine {
     return String(value);
   }
 
+  private applyPlotTransparency(color: string | null, transparency: unknown): string | null {
+    if (color === null || transparency === undefined || this.isNa(transparency)) {
+      return color;
+    }
+
+    const parsedColor = this.parseColor(color);
+    if (!parsedColor) {
+      return color;
+    }
+
+    return this.formatColor(parsedColor.red, parsedColor.green, parsedColor.blue, transparency);
+  }
+
   private setOhlcPlotBar(
     plot: PlotOutput | undefined,
     barIndex: number,
@@ -7507,16 +7520,16 @@ export class TealscriptEngine {
   }
 
   private registerPlotBuiltins(): void {
-    const plotArgs = ['series', 'title', 'color', 'linewidth', 'style', 'trackprice', 'histbase', 'offset', 'join', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'linestyle'] as const;
+    const plotArgs = ['series', 'title', 'color', 'linewidth', 'style', 'trackprice', 'histbase', 'offset', 'join', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'linestyle', 'transp'] as const;
     const hlineArgs = ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'] as const;
-    const bgcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'] as const;
-    const barcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display'] as const;
+    const bgcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'] as const;
+    const barcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'transp'] as const;
     const plotbarArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
     const plotcandleArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'format', 'precision', 'force_overlay'] as const;
     const plotshapeArgs = ['series', 'title', 'style', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
     const plotcharArgs = ['series', 'title', 'char', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
     const plotarrowArgs = ['series', 'title', 'colorup', 'colordown', 'offset', 'minheight', 'maxheight', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
-    const fillArgs = ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'] as const;
+    const fillArgs = ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'] as const;
 
     this.builtins.set('plot', (args, namedArgs, ctx) => {
       const value = this.getOrderedCallArg(args, namedArgs, plotArgs, 0) as number;
@@ -7525,7 +7538,10 @@ export class TealscriptEngine {
       const hasExplicitTitle = namedArgs.has('title') || titleArg !== undefined;
       const title = (titleArg ?? `Plot ${callIndex + 1}`) as string;
       const colorArg = this.getOrderedCallArg(args, namedArgs, plotArgs, 2, '#2196F3');
-      const color = this.toPlotColor(colorArg);
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(colorArg),
+        this.getOrderedCallArg(args, namedArgs, plotArgs, 16),
+      );
       const linewidth = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotArgs, 3, 1)) ?? 1;
       const style = (this.getOrderedCallArg(args, namedArgs, plotArgs, 4, 'line')) as string;
       const trackprice = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotArgs, 5));
@@ -7605,7 +7621,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('bgcolor', (args, namedArgs, ctx) => {
-      const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 0));
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 0)),
+        this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 7),
+      );
       const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 1)) ?? 0;
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 2));
       const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 3));
@@ -7636,7 +7655,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('barcolor', (args, namedArgs, ctx, _scope, callId) => {
-      const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 0));
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 0)),
+        this.getOrderedCallArg(args, namedArgs, barcolorArgs, 6),
+      );
       const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 1)) ?? 0;
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 2));
       const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 3));
@@ -7966,7 +7988,10 @@ export class TealscriptEngine {
 
       const plot1Id = this.resolveFillPlotId(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 0), ctx);
       const plot2Id = this.resolveFillPlotId(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 1), ctx);
-      const color = this.toPlotColor(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 2, 'rgba(33, 150, 243, 0.2)'));
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 2, 'rgba(33, 150, 243, 0.2)')),
+        this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 8),
+      );
       const titleArg = this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 3);
       const hasExplicitTitle = canonicalNamedArgs.has('title') || titleArg !== undefined;
       const title = (titleArg ?? 'Fill') as string;

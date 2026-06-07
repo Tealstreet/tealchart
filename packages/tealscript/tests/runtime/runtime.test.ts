@@ -582,6 +582,25 @@ plot(close, "None", color=color.none)
       expect(result.plots[6].color).toEqual(Array(bars.length).fill(null));
     });
 
+    it('applies legacy visual transp arguments to colors', () => {
+      const code = `//@version=4
+study("Legacy Transparency", overlay=true)
+lineA = plot(close, "A", color=color.blue, transp=25)
+lineB = plot(open, "B", color=color.red)
+fill(lineA, lineB, color=color.green, title="Band", transp=50)
+bgcolor(color=color.yellow, transp=75, title="Background")
+barcolor(color=color.purple, transp=10, title="Bars")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'A')?.color).toEqual(Array(bars.length).fill('#2196F3BF'));
+      expect(result.plots.find((plot) => plot.title === 'Band')?.color).toEqual(Array(bars.length).fill('#4CAF5080'));
+      expect(result.plots.find((plot) => plot.title === 'Background')?.color).toEqual(Array(bars.length).fill('#FDD83540'));
+      expect(result.plots.find((plot) => plot.title === 'Bars')?.color).toEqual(Array(bars.length).fill('#9C27B0E6'));
+    });
+
     it('extracts color channels and transparency', () => {
       const code = `//@version=6
 indicator("Test")
