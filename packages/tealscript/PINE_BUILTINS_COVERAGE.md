@@ -132,8 +132,8 @@ Current `color.*` progress:
 
 - Covered color constructors and channel helpers accept Pine-style named
   arguments.
-- `color.none` maps to the runtime's existing invisible/`na` plot color
-  representation.
+- Pine v6 named color constants infer as `const color`, and `color.none` maps to
+  the runtime's existing invisible/`na` plot color representation.
 - Gradient helpers support named value, bound, and color parameters for common
   public-script idioms.
 

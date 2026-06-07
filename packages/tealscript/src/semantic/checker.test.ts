@@ -6500,6 +6500,30 @@ plot(redChannel + inputTransparency + seriesBlue)
     expect(types.get('seriesBlue')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
+  it('infers named color constants for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Color Constant Return Types")
+accent = color.aqua
+trend = close > open ? color.lime : color.fuchsia
+hidden = color.none
+accent := 1
+trend := "bad"
+hidden := 2
+plot(close, color=color.teal)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to color variable accent',
+      'Cannot assign string value to color variable trend',
+      'Cannot assign int value to color variable hidden',
+    ]);
+    expect(types.get('accent')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('trend')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('hidden')).toMatchObject({ kind: 'color', qualifier: 'const' });
+  });
+
   it('infers chart member return types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Chart Return Types")
