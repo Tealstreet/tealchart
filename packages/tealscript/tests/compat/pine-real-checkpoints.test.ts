@@ -3218,6 +3218,41 @@ plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block If Average")
     expect(getPlot(result, 'Block If Average').values).toEqual([null, 15, 25]);
   });
 
+  it('locks a reduced public library block switch source-helper idiom', () => {
+    // Public idiom reference: public library helpers commonly use multiline
+    // block `switch` passthrough wrappers before callers apply delayed rolling
+    // windows.
+    // Source search: https://www.tradingview.com/scripts/search/library%20source%20helper%20switch%20wrapper/
+    const library = parse(`
+library("BlockSwitchSourceTools", true)
+export passthrough(series float src) => switch
+    bar_index >= 0 =>
+        selected = src
+        selected
+    =>
+        fallback = src
+        fallback
+`);
+    const result = runCompatScript(`
+indicator("Public Library Block Switch Source Helper Checkpoint")
+import PublicUser/BlockSwitchSourceTools/1 as bss
+selected = bss.passthrough(open)
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block Switch Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['PublicUser/BlockSwitchSourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Block Switch Average').values).toEqual([null, 15, 25]);
+  });
+
   it('locks a reduced public library arithmetic branch source-helper idiom', () => {
     // Public idiom reference: public library helpers commonly wrap source
     // calculations in equivalent ternary/switch branches before callers feed
