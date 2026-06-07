@@ -293,6 +293,17 @@ const REQUEST_SERIES_ARGS = ['ticker', 'field', 'gaps', 'lookahead', 'ignore_inv
 const REQUEST_FINANCIAL_ARGS = ['symbol', 'financial_id', 'period', 'gaps', 'ignore_invalid_symbol', 'currency'] as const;
 const REQUEST_ECONOMIC_ARGS = ['country_code', 'field', 'gaps', 'ignore_invalid_symbol'] as const;
 const REQUEST_SEED_ARGS = ['source', 'symbol', 'expression', 'ignore_invalid_symbol', 'calc_bars_count'] as const;
+const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
+  ['security', 'request.security'],
+  ['sma', 'ta.sma'],
+  ['ema', 'ta.ema'],
+  ['rsi', 'ta.rsi'],
+  ['highest', 'ta.highest'],
+  ['lowest', 'ta.lowest'],
+  ['cross', 'ta.cross'],
+  ['crossover', 'ta.crossover'],
+  ['crossunder', 'ta.crossunder'],
+]);
 
 export interface IndicatorDeclarationMetadata {
   title: string;
@@ -997,7 +1008,8 @@ export class TealscriptEngine {
   }
 
   private inferStaticLookbackCallMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
-    const name = this.getCallExpressionName(expression);
+    const rawName = this.getCallExpressionName(expression);
+    const name = rawName ? this.canonicalBuiltinName(rawName) : null;
     switch (name) {
       case 'math.sum':
       case 'ta.sma':
@@ -3144,20 +3156,21 @@ export class TealscriptEngine {
     }
 
     const fullName = namespace ? `${namespace}.${funcName}` : funcName;
+    const builtinName = this.canonicalBuiltinName(fullName);
 
-    if (namespace === 'strategy' && !this.isStrategyOrderFunction(fullName)) {
-      throw new Error(`strategy.* functions are not supported yet: ${fullName}`);
+    if (namespace === 'strategy' && !this.isStrategyOrderFunction(builtinName)) {
+      throw new Error(`strategy.* functions are not supported yet: ${builtinName}`);
     }
     if (namespace && this.isUnsupportedDrawingNamespace(namespace)) {
-      throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
+      throw new Error(`${namespace}.* functions are not supported yet: ${builtinName}`);
     }
-    if (fullName === 'request.security') {
-      this.assertCanEvaluateRequest(fullName);
-      return this.evaluateRequestSecurity(expr, this.nextBuiltinCallId(fullName));
+    if (builtinName === 'request.security') {
+      this.assertCanEvaluateRequest(builtinName);
+      return this.evaluateRequestSecurity(expr, this.nextBuiltinCallId(builtinName));
     }
-    if (fullName === 'request.security_lower_tf') {
-      this.assertCanEvaluateRequest(fullName);
-      return this.evaluateRequestSecurityLowerTf(expr, this.nextBuiltinCallId(fullName));
+    if (builtinName === 'request.security_lower_tf') {
+      this.assertCanEvaluateRequest(builtinName);
+      return this.evaluateRequestSecurityLowerTf(expr, this.nextBuiltinCallId(builtinName));
     }
     if (fullName === 'request.currency_rate') {
       this.assertCanEvaluateRequest(fullName);
@@ -3203,7 +3216,7 @@ export class TealscriptEngine {
     const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
     for (let argIndex = 0; argIndex < expr.arguments.length; argIndex++) {
       const arg = expr.arguments[argIndex]!;
-      const value = this.shouldPreserveBuiltinSourceArgument(fullName, expr.arguments, argIndex)
+      const value = this.shouldPreserveBuiltinSourceArgument(builtinName, expr.arguments, argIndex)
         ? this.evaluateBuiltinSourceArgument(arg.value)
         : this.evaluateExpression(arg.value);
       const sourceSeries = this.getSourceSeriesForExpression(arg.value, value);
@@ -3319,9 +3332,9 @@ export class TealscriptEngine {
       }
     }
 
-    const builtin = this.builtins.get(fullName);
+    const builtin = this.builtins.get(builtinName);
     if (builtin) {
-      return builtin(args, namedArgs, this.ctx, this.scope, this.builtinCallId(fullName, expr));
+      return builtin(args, namedArgs, this.ctx, this.scope, this.builtinCallId(builtinName, expr));
     }
 
     if (namespace && !this.scope.has(namespace) && this.isPlannedUnsupportedNamespace(namespace)) {
@@ -3435,10 +3448,11 @@ export class TealscriptEngine {
   }
 
   private shouldPreserveBuiltinSourceArgument(fullName: string, args: CallArgument[], argIndex: number): boolean {
-    if (fullName !== 'input.source' && fullName !== 'math.sum' && !fullName.startsWith('ta.')) return false;
+    const builtinName = this.canonicalBuiltinName(fullName);
+    if (builtinName !== 'input.source' && builtinName !== 'math.sum' && !builtinName.startsWith('ta.')) return false;
 
-    const parameterName = this.getBuiltinSourceArgumentParameterName(fullName, args, argIndex);
-    if (fullName === 'input.source') return parameterName === 'defval';
+    const parameterName = this.getBuiltinSourceArgumentParameterName(builtinName, args, argIndex);
+    if (builtinName === 'input.source') return parameterName === 'defval';
     return parameterName !== undefined && ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(parameterName);
   }
 
@@ -3468,7 +3482,8 @@ export class TealscriptEngine {
   }
 
   private getBuiltinSourcePreservationParameters(fullName: string): readonly string[] | undefined {
-    switch (fullName) {
+    const builtinName = this.canonicalBuiltinName(fullName);
+    switch (builtinName) {
       case 'math.sum':
         return ['source', 'length'];
       case 'input.source':
@@ -3493,8 +3508,12 @@ export class TealscriptEngine {
       case 'ta.linreg':
         return ['source', 'length', 'offset'];
       default:
-        return fullName.startsWith('ta.') ? ['source', 'length'] : undefined;
+        return builtinName.startsWith('ta.') ? ['source', 'length'] : undefined;
     }
+  }
+
+  private canonicalBuiltinName(name: string): string {
+    return LEGACY_GLOBAL_BUILTIN_ALIASES.get(name) ?? name;
   }
 
   private evaluateBuiltinSourceArgument(expr: Expression): unknown {

@@ -14,6 +14,39 @@ plot(close)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('accepts legacy global TA and security aliases', () => {
+    const result = checkProgram(parse(`
+//@version=4
+study("Legacy globals")
+fast = ema(close, 3)
+slow = sma(close, 5)
+rangeHigh = highest(2)
+rangeLow = lowest(2)
+isCross = cross(fast, slow) or crossover(fast, slow) or crossunder(fast, slow)
+momentum = rsi(close, 5)
+requested = security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on)
+plot(isCross ? requested + momentum + rangeHigh - rangeLow : fast + slow)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('validates legacy security alias arguments like request.security', () => {
+    const result = checkProgram(parse(`
+//@version=4
+study("Legacy security diagnostics")
+security(1, "2", close, lookahead="bad_lookahead", calc_bars_count=0)
+security(syminfo.tickerid, "2", close, ignore_invalid_symbol=1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'security calc_bars_count must be a positive integer',
+      'Invalid security lookahead mode: bad_lookahead',
+      'security symbol must be a string, got int',
+      'security ignore_invalid_symbol must be a boolean, got int',
+    ]);
+  });
+
   it('accepts known Pine globals, namespaces, and user declarations', () => {
     const result = checkProgram(parse(`
 indicator("Semantic OK")
