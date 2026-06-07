@@ -38,6 +38,9 @@ import { createTealchartWidget } from '@tealstreet/tealchart';
 import { SkiaTealchart } from '@tealstreet/tealchart/native';
 ```
 
+Vendoring tealchart into another repo (submodule + linking, bundler/typechecker
+setup, datafeed and indicator wiring): see [docs/consuming.md](docs/consuming.md).
+
 ## Contributing
 
 Branch off `master`, open a PR, and wait for a maintainer to review and merge.
