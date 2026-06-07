@@ -373,6 +373,18 @@ export const BUILTIN_COLLECTION_MEMBER_METHODS = new Map<string, Set<string>>([
   ])],
 ]);
 
+export const VARIABLE_ONLY_BUILTIN_NAMES = new Set([
+  'math.e',
+  'math.phi',
+  'math.pi',
+  'ta.iii',
+  'ta.nvi',
+  'ta.pvi',
+  'ta.pvt',
+  'ta.wad',
+  'ta.wvad',
+]);
+
 export function isExportableBuiltinConstantPath(path: string[]): boolean {
   if (path.length < 2) return false;
 
