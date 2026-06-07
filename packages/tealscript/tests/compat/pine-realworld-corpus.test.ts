@@ -2908,13 +2908,6 @@ plot(isTrans ? 1 : 0, title="Trans")
 // runtime.error guard.
 // ===========================================================================================
 
-const libStratBars: Bar[] = [
-  { time: 1_700_610_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
-  { time: 1_700_610_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
-  { time: 1_700_610_120_000, open: 104, high: 106, low: 103, close: 105, volume: 100 },
-  { time: 1_700_610_180_000, open: 105, high: 106, low: 104, close: 105, volume: 100 },
-];
-
 describe('Library, financial, and advanced patterns', () => {
   it('locks library export declaration metadata and imported function execution', () => {
     // Public idiom reference: library scripts declare exported functions that
@@ -3047,7 +3040,7 @@ if bar_index == 3
 plot(strategy.position_size, title="Pos Size")
 plot(strategy.opentrades, title="Open Trades")
 plot(strategy.closedtrades, title="Closed Trades")
-`, { bars: libStratBars });
+`, { bars: stratBars });
 
     expect(result.errors).toEqual([]);
     // Bar 0: entry qty=1 → pos=1; bar 1: entry qty=1 → pos=2; bar 2: entry qty=1 → pos=3; bar 3: close_all → pos=0
@@ -3069,7 +3062,7 @@ if bar_index == 1
     strategy.close("Long")
 plot(strategy.netprofit, title="Net Profit")
 plot(strategy.closedtrades, title="Closed Trades")
-`, { bars: libStratBars });
+`, { bars: stratBars });
 
     expect(result.errors).toEqual([]);
     // Entry at bar 0 close (100), exit at bar 1 close (104), gross profit = 4
