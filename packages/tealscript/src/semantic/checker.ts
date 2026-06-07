@@ -3128,6 +3128,7 @@ class SemanticChecker {
         type: this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
         loc: parameter.loc,
       });
+      this.checkParameterDefaultType(statement, parameter);
       if (parameter.defaultValue) this.checkExpression(parameter.defaultValue, scope);
     }
 
@@ -3136,6 +3137,23 @@ class SemanticChecker {
     } else {
       this.checkExpression(statement.body, functionScope);
     }
+  }
+
+  private checkParameterDefaultType(
+    declaration: FunctionDeclaration,
+    parameter: FunctionDeclaration['params'][number],
+  ): void {
+    if (!parameter.defaultValue) return;
+
+    const parameterType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+    if (parameterType?.kind !== 'bool' || !this.isNaLiteralExpression(parameter.defaultValue)) return;
+
+    const declarationKind = declaration.isMethod ? 'method' : 'function';
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign na value to bool parameter ${declarationKind} ${declaration.name.name}.${parameter.name}`,
+      parameter.defaultValue.loc,
+    );
   }
 
   private checkVariableDeclaration(statement: VariableDeclaration, scope: SemanticScope): void {
@@ -6298,6 +6316,7 @@ class SemanticChecker {
       callable.declaration.params.slice(callable.parameterOffset),
       callable.displayName,
     );
+    this.checkUserCallableBoolNaArguments(expression, callable);
   }
 
   private resolveLocalUserCallable(
@@ -6494,6 +6513,33 @@ class SemanticChecker {
       if (suppliedNames.has(param.name)) continue;
       if (param.defaultValue) continue;
       this.addDiagnostic('argument-count', `${displayName} missing required argument '${param.name}'`, args[0]?.loc);
+    }
+  }
+
+  private checkUserCallableBoolNaArguments(
+    expression: CallExpression,
+    callable: { declaration: FunctionDeclaration; displayName: string; parameterOffset: number; libraryAlias?: string },
+  ): void {
+    for (const [index, parameter] of callable.declaration.params.entries()) {
+      if (index < callable.parameterOffset) continue;
+
+      const parameterType = callable.libraryAlias
+        ? this.importedSemanticTypeFromAnnotation(callable.libraryAlias, parameter.typeAnnotation ?? undefined)
+        : this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+      if (parameterType?.kind !== 'bool') continue;
+
+      const argument = this.getCallArgument(
+        expression.arguments,
+        parameter.name,
+        index - callable.parameterOffset,
+      );
+      if (!argument || !this.isNaLiteralExpression(argument)) continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `Cannot pass na value to bool parameter ${parameter.name} for ${callable.displayName}`,
+        argument.loc,
+      );
     }
   }
 
