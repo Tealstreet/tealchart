@@ -58,8 +58,9 @@ Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public Supertrend signal routing, public ADX/DMI trend-strength
 filters, public Parabolic SAR reversal routing, public linear-regression and
-Keltner channels, public moving-average ribbons, public stochastic, MFI, CCI,
-CMO, TSI, and Williams %R oscillator signals, public ROC and Momentum signals, public zigzag polylines, public
+Keltner channels, public moving-average ribbons, public percentile/rank regimes,
+public stochastic, MFI, CCI, CMO, TSI, and Williams %R oscillator signals,
+public ROC and Momentum signals, public zigzag polylines, public
 strategy performance tables, public `varip` intrabar array buffers, public
 wrapped declaration/call layouts, planned footprint request diagnostics, plus
 UDT state objects updated through user-defined methods.
