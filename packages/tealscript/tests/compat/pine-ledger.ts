@@ -999,6 +999,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-obv-signal-checkpoint',
+      title: 'Public OBV Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: on balance volume signal',
+      featureTags: ['ta', 'signals', 'obv', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
