@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures.ts';
 
+const stratBars = [
+  { time: 1_700_610_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+  { time: 1_700_610_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
+  { time: 1_700_610_120_000, open: 104, high: 106, low: 103, close: 105, volume: 100 },
+  { time: 1_700_610_180_000, open: 105, high: 106, low: 104, close: 105, volume: 100 },
+];
+
 describe('Pine real-world corpus probe', () => {
   it('locks a reduced public RSI overbought/oversold signal idiom', () => {
     // Public idiom reference: RSI scripts expose overbought/oversold level
@@ -489,5 +496,349 @@ plot(swingLow, title="Support")
     ]);
     // At least one line drawing should be produced (swing high or low hit)
     expect(result.drawings.filter((d) => d.type === 'line').length).toBeGreaterThan(0);
+  });
+
+  it('locks a reduced advanced strategy stats table idiom', () => {
+    // Advanced idiom: strategy performance scripts build a stats table using
+    // strategy.netprofit, strategy.avg_trade, strategy.max_drawdown, and
+    // strategy.wintrades / strategy.closedtrades.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20performance%20stats%20table/
+    const result = runCompatScript(`
+strategy("Adv Strategy Stats Checkpoint", overlay=true, process_orders_on_close=true)
+var stats = table.new(position.top_right, 2, 5, border_width=1, border_color=color.white)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("L", comment="tp")
+if barstate.islast
+    table.cell(stats, 0, 0, "Metric")
+    table.cell(stats, 1, 0, "Value")
+    table.cell(stats, 0, 1, "Net P/L")
+    table.cell(stats, 1, 1, str.tostring(math.round(strategy.netprofit, 2)))
+    table.cell(stats, 0, 2, "Avg Trade")
+    table.cell(stats, 1, 2, str.tostring(math.round(strategy.avg_trade, 2)))
+    table.cell(stats, 0, 3, "Max DD")
+    table.cell(stats, 1, 3, str.tostring(math.round(strategy.max_drawdown, 2)))
+    table.cell(stats, 0, 4, "Wins")
+    table.cell(stats, 1, 4, str.tostring(strategy.wintrades) + "/" + str.tostring(strategy.closedtrades))
+plot(strategy.netprofit, title="Net Profit")
+plot(strategy.avg_trade, title="Avg Trade")
+plot(strategy.closedtrades, title="Closed Trades")
+`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1, 1, 1]);
+    // Entry at bar 0 (close=100), close at bar 1 (close=104) → profit=4
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 4, 4, 4]);
+    // avg_trade is na until first close, then 4/1
+    expect(roundSeries(getPlot(result, 'Avg Trade').values)).toEqual([null, 4, 4, 4]);
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+  });
+
+  it('locks a reduced advanced UDT with methods and for-in iteration idiom', () => {
+    // Advanced idiom: UDT scripts define types with multiple fields, attach
+    // methods that mutate state and return self, store instances in an array,
+    // and aggregate with a for-in loop.
+    // Source search: https://www.tradingview.com/scripts/search/user%20defined%20type%20method%20array/
+    const result = runCompatScript(`
+indicator("Adv UDT Methods Checkpoint")
+type Signal
+    float price = na
+    float score = 0.0
+    bool active = false
+
+method activate(Signal this, float threshold) =>
+    this.active := this.price > threshold
+    this.score := this.active ? (this.price - threshold) / threshold * 100 : 0.0
+    this
+
+var array<Signal> signals = array.new<Signal>()
+sig = Signal.new(close)
+sig.activate(104.0)
+signals.push(sig)
+activeCount = 0
+totalScore = 0.0
+for s in signals
+    if s.active
+        activeCount += 1
+        totalScore += s.score
+plot(signals.size(), title="Signal Count")
+plot(activeCount, title="Active Count")
+plot(totalScore, title="Total Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Signal Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    // Bars where close > 104: bars 2(107),3(103 no),... let's check: bars 1(105 yes), 2(107 yes), 3(103 no), 4(99 no), 5(100 no), 6(104 no), 7(109 yes), 8(108 yes), 9(111 yes), 10(110 yes), 11(112 yes)
+    expect(getPlot(result, 'Active Count').values).toEqual([0, 1, 2, 2, 2, 2, 2, 3, 4, 5, 6, 7]);
+    expect(roundSeries(getPlot(result, 'Total Score').values)).toEqual([
+      0, 0.961538, 3.846154, 3.846154, 3.846154, 3.846154, 3.846154,
+      8.653846, 12.5, 19.230769, 25, 32.692308,
+    ]);
+  });
+
+  it('locks a reduced advanced UDF with default parameters and nested calls idiom', () => {
+    // Advanced idiom: library-style scripts define helper UDFs with default
+    // parameter values and compose them via nested calls — common pattern in
+    // public indicator libraries.
+    // Source search: https://www.tradingview.com/scripts/search/normalize%20function%20default%20parameters/
+    const result = runCompatScript(`
+indicator("Adv UDF Defaults Checkpoint")
+normalize(src, len, minBound = 0.0, maxBound = 100.0) =>
+    highest = ta.highest(src, len)
+    lowest = ta.lowest(src, len)
+    range_ = highest - lowest
+    range_ == 0 ? 50.0 : minBound + (src - lowest) / range_ * (maxBound - minBound)
+
+smoothedNorm(src, len, smooth = 2, minBound = 0.0, maxBound = 100.0) =>
+    n = normalize(src, len, minBound, maxBound)
+    ta.ema(n, smooth)
+
+norm = normalize(close, 5)
+sn = smoothedNorm(close, 5)
+snCustom = smoothedNorm(close, 5, 3, 20.0, 80.0)
+plot(norm, title="Norm")
+plot(sn, title="Smoothed Norm")
+plot(snCustom, title="Custom Norm")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Norm').values)).toEqual([
+      50, 100, 100, 20, 0, 12.5, 62.5, 100, 90, 100, 85.714286, 100,
+    ]);
+    expect(roundSeries(getPlot(result, 'Smoothed Norm').values)).toEqual([
+      50, 83.333333, 94.444444, 44.814815, 14.938272, 13.312757,
+      46.104252, 82.034751, 87.344917, 95.781639, 89.07007, 96.35669,
+    ]);
+    expect(roundSeries(getPlot(result, 'Custom Norm').values)).toEqual([
+      50, 65, 72.5, 52.25, 36.125, 31.8125, 44.65625, 62.328125, 68.164063, 74.082031, 72.755301, 76.377651,
+    ]);
+  });
+
+  it('locks a reduced advanced drawing objects lifecycle idiom', () => {
+    // Advanced idiom: drawing scripts create labels on signal bars, push them
+    // into an array, and delete the oldest label when the cap is exceeded.
+    // Source search: https://www.tradingview.com/scripts/search/label%20array%20delete%20oldest/
+    const result = runCompatScript(`
+indicator("Adv Drawing Lifecycle Checkpoint", overlay=true)
+var array<label> labels = array.new<label>()
+maxLabels = 3
+isBull = close > open
+if isBull
+    lbl = label.new(bar_index, close, "B", style=label.style_label_down, color=color.green, textcolor=color.white)
+    labels.push(lbl)
+    if labels.size() > maxLabels
+        label.delete(labels.shift())
+plot(labels.size(), title="Label Count")
+plot(isBull ? 1 : 0, title="Bull Bar")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Count caps at 3 once 3 bull bars have been seen
+    expect(getPlot(result, 'Label Count').values).toEqual([1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    // close > open per compatibilityBars: bar0(102>100), bar1(105>102), bar2(107>105), bar3(103<107 no), bar4(99<103 no), bar5(100>99), bar6(104>100), bar7(109>104), bar8(108<109 no), bar9(111>108), bar10(110<111 no), bar11(112>110)
+    expect(getPlot(result, 'Bull Bar').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    // After cap is hit, old labels get deleted; remaining alive labels are 3
+    expect(result.drawings.filter((d) => d.type === 'label').length).toBe(3);
+  });
+
+  it('locks a reduced advanced switch expression with local enum state machine idiom', () => {
+    // Advanced idiom: state machine scripts define a local enum type and use a
+    // switch expression to assign the current state based on SMA conditions.
+    // Source search: https://www.tradingview.com/scripts/search/enum%20state%20machine%20switch/
+    const result = runCompatScript(`
+indicator("Adv Switch Enum Checkpoint")
+enum TrendState
+    bull = "Bull"
+    bear = "Bear"
+    neutral = "Neutral"
+
+sma5 = ta.sma(close, 5)
+sma3 = ta.sma(close, 3)
+TrendState state = switch
+    sma3 > sma5 and close > sma5 => TrendState.bull
+    sma3 < sma5 and close < sma5 => TrendState.bear
+    => TrendState.neutral
+
+plot(state == TrendState.bull ? 1 : 0, title="Bull State")
+plot(state == TrendState.bear ? 1 : 0, title="Bear State")
+plot(state == TrendState.neutral ? 1 : 0, title="Neutral State")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Bull State').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bear State').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Neutral State').values).toEqual([1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0]);
+  });
+
+  it('locks a reduced advanced matrix operations idiom', () => {
+    // Advanced idiom: matrix scripts build a score matrix where row 0 is
+    // current OHLC data, row 1 is moving averages, and row 2 is the delta.
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20score%20indicator/
+    const result = runCompatScript(`
+indicator("Adv Matrix Operations Checkpoint")
+m = matrix.new_float(3, 3, 0.0)
+m.set(0, 0, close)
+m.set(0, 1, high)
+m.set(0, 2, low)
+m.set(1, 0, ta.sma(close, 3))
+m.set(1, 1, ta.sma(high, 3))
+m.set(1, 2, ta.sma(low, 3))
+m.set(2, 0, m.get(0,0) - m.get(1,0))
+m.set(2, 1, m.get(0,1) - m.get(1,1))
+m.set(2, 2, m.get(0,2) - m.get(1,2))
+row0 = m.row(0)
+sumRow0 = array.sum(row0)
+plot(m.rows(), title="Rows")
+plot(m.columns(), title="Columns")
+plot(sumRow0, title="Sum Row 0")
+plot(m.get(2, 0), title="Close Delta")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Rows').values).toEqual(Array(compatibilityBars.length).fill(3));
+    expect(getPlot(result, 'Columns').values).toEqual(Array(compatibilityBars.length).fill(3));
+    // Sum row 0 = close + high + low per bar
+    expect(getPlot(result, 'Sum Row 0').values).toEqual([304, 312, 319, 314, 301, 297, 308, 322, 325, 330, 333, 333]);
+    // Close delta = close - sma(close,3); na for bars 0-1
+    expect(roundSeries(getPlot(result, 'Close Delta').values)).toEqual([
+      null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1,
+    ]);
+  });
+
+  it('locks a reduced advanced map-based state tracking idiom', () => {
+    // Advanced idiom: state tracking scripts use a persistent map to accumulate
+    // per-condition counters and running totals across bars, a pattern common in
+    // public screeners and stat dashboards.
+    // Source search: https://www.tradingview.com/scripts/search/map%20state%20tracking%20accumulate/
+    const result = runCompatScript(`
+indicator("Adv Map State Checkpoint")
+var map<string, float> stats = map.new<string, float>()
+if not stats.contains("count")
+    stats.put("count", 0)
+    stats.put("sum", 0.0)
+
+isBullish = close > open
+if isBullish
+    stats.put("count", nz(stats.get("count")) + 1)
+    stats.put("sum", nz(stats.get("sum")) + (close - open))
+
+bullCount = nz(stats.get("count"))
+avgGain = bullCount > 0 ? nz(stats.get("sum")) / bullCount : 0.0
+plot(bullCount, title="Bull Count")
+plot(avgGain, title="Avg Gain")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Bull bars (close > open): bars 0(102>100), 1(105>102), 2(107>105), 5(100>99), 6(104>100), 7(109>104), 9(111>108), 11(112>110)
+    expect(getPlot(result, 'Bull Count').values).toEqual([1, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 8]);
+    expect(roundSeries(getPlot(result, 'Avg Gain').values)).toEqual([
+      2, 2.5, 2.333333, 2.333333, 2.333333, 2, 2.4, 2.833333, 2.833333, 2.857143, 2.857143, 2.75,
+    ]);
+  });
+
+  it('locks a reduced advanced complex conditional plotting idiom', () => {
+    // Advanced idiom: scripts combine dynamic plot colors, fill() between two
+    // plots, and conditional plotshape() markers in a single indicator.
+    // Source search: https://www.tradingview.com/scripts/search/dynamic%20color%20fill%20plotshape%20indicator/
+    const result = runCompatScript(`
+indicator("Adv Conditional Plotting Checkpoint")
+length = input.int(5, "Length")
+sma = ta.sma(close, length)
+rsi = ta.rsi(close, length)
+trendUp = close > sma
+dynamicColor = trendUp ? color.new(color.green, 30) : color.new(color.red, 30)
+plot(close, title="Close", color=dynamicColor)
+smaPlot = plot(sma, title="SMA", color=color.blue)
+closePlot = plot(close, title="Close2", color=color.gray)
+fill(smaPlot, closePlot, color=trendUp ? color.new(color.green, 80) : color.new(color.red, 80), title="Fill")
+plotshape(trendUp and nz(rsi) > 60, title="OB Shape", style=shape.triangleup, location=location.belowbar, color=color.green)
+plot(trendUp ? 1 : 0, title="Trend State")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Trend State').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+    // OB Shape is true when trendUp and rsi > 60 — na during rsi warmup (bars 0-4), then depends on rsi
+    expect(getPlot(result, 'OB Shape').values).toEqual([null, null, null, null, null, null, null, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks a reduced advanced for-loop with array accumulation and sort idiom', () => {
+    // Advanced idiom: scripts keep a rolling window array, compute running
+    // average and rising-bar count via a numeric for loop, then sort a copy
+    // to extract the median.
+    // Source search: https://www.tradingview.com/scripts/search/rolling%20window%20average%20median%20array/
+    const result = runCompatScript(`
+indicator("Adv For-In Array Checkpoint")
+var array<float> window = array.new<float>()
+window.push(close)
+if window.size() > 6
+    window.shift()
+
+total = 0.0
+abovePrev = 0
+for i = 0 to window.size() - 1
+    val = window.get(i)
+    total += val
+    if i > 0 and val > window.get(i - 1)
+        abovePrev += 1
+
+windowAvg = window.size() > 0 ? total / window.size() : 0.0
+sorted = window.copy()
+sorted.sort()
+windowMedian = sorted.size() > 0 ? sorted.get(math.floor(sorted.size() / 2)) : 0.0
+plot(windowAvg, title="Window Avg")
+plot(abovePrev, title="Rising Count")
+plot(windowMedian, title="Window Median")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Window Avg').values)).toEqual([
+      102, 103.5, 104.666667, 104.25, 103.2, 102.666667, 103, 103.666667, 103.833333, 105.166667, 107, 109,
+    ]);
+    expect(getPlot(result, 'Rising Count').values).toEqual([0, 1, 2, 2, 2, 3, 3, 3, 3, 4, 3, 3]);
+    expect(getPlot(result, 'Window Median').values).toEqual([
+      102, 105, 105, 105, 103, 103, 104, 104, 104, 108, 109, 110,
+    ]);
+  });
+
+  it('locks a reduced advanced str.format multi-placeholder dashboard idiom', () => {
+    // Advanced idiom: dashboard scripts format RSI, ATR, and a spread
+    // percentage into labeled strings using str.format with multiple
+    // placeholders, then render them in a last-bar table.
+    // Source search: https://www.tradingview.com/scripts/search/str.format%20dashboard%20rsi%20atr/
+    const result = runCompatScript(`
+indicator("Adv String Format Checkpoint", overlay=true)
+length = input.int(5, "Length")
+rsi = ta.rsi(close, length)
+atr = ta.atr(length)
+sma = ta.sma(close, length)
+
+rsiLabel = str.format("RSI: {0,number,#.#}", nz(rsi))
+atrLabel = str.format("ATR: {0,number,#.##}", nz(atr))
+spreadPct = nz(sma) != 0 ? (close - nz(sma)) / nz(sma) * 100 : 0.0
+
+var table dash = table.new(position.bottom_right, 1, 3)
+if barstate.islast
+    table.cell(dash, 0, 0, rsiLabel)
+    table.cell(dash, 0, 1, atrLabel)
+    table.cell(dash, 0, 2, str.format("Spread: {0,number,#.##}%", spreadPct))
+plot(nz(rsi), title="RSI")
+plot(spreadPct, title="Spread Pct")
+`);
+
+    expect(result.errors).toEqual([]);
+    // RSI is 0 for the first 5 bars (nz converts na to 0), then valid
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([
+      0, 0, 0, 0, 0, 42.857143, 57.894737, 70.16317, 65.39924, 72.421258, 66.774781, 72.194557,
+    ]);
+    // Spread = (close - sma) / sma * 100; 0 during sma warmup
+    expect(roundSeries(getPlot(result, 'Spread Pct').values)).toEqual([
+      0, 0, 0, 0, -4.069767, -2.723735, 1.364522, 5.825243, 3.846154, 4.323308, 1.476015, 1.818182,
+    ]);
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
   });
 });

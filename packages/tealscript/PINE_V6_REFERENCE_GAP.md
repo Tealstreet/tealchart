@@ -99,6 +99,27 @@ with no actionable gaps. No new deferred items were found.
 All 15 scripts ran without parse, semantic, runtime, or output gaps.
 No new failure classes were introduced.
 
+### Advanced corpus probe (10 scripts) — 2026-06-08
+
+An additional 10 advanced scripts were added to `tests/compat/pine-realworld-corpus.test.ts`
+targeting complex feature combinations. All 10 pass.
+
+| Script | Status | Pattern |
+| --- | --- | --- |
+| Strategy stats table | pass | strategy.netprofit + avg_trade + max_drawdown + wintrades in table |
+| UDT with methods + for-in | pass | type with method returning self; array of instances; for-in aggregation |
+| UDF default parameters | pass | nested UDF calls with default args (normalize → smoothedNorm) |
+| Drawing objects lifecycle | pass | label array with max-size eviction via label.delete + array.shift |
+| Switch enum state machine | pass | local enum in switch expression for trend state |
+| Matrix operations | pass | 3×3 matrix built from current + SMA series; row extraction + sum |
+| Map-based state tracking | pass | persistent map<string,float> accumulating count + sum across bars |
+| Complex conditional plotting | pass | dynamic plot color + fill() + plotshape() in one indicator |
+| For-loop with array accumulate + sort | pass | rolling window array; numeric for aggregate; copy + sort for median |
+| str.format multi-placeholder dashboard | pass | str.format with number format specifiers; table at last bar |
+
+All 10 advanced scripts passed without any parse, semantic, runtime, or output gaps.
+No new failure classes were introduced.
+
 ## Summary
 
 | Category | Gaps | Impact |
@@ -111,3 +132,4 @@ No new failure classes were introduced.
 | **Total actionable** | **0** | |
 | Deferred (host-dependent) | 9 | — |
 | **Real-world corpus probe (15 scripts)** | **0** | All pass |
+| **Advanced corpus probe (10 scripts)** | **0** | All pass |
