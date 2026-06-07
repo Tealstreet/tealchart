@@ -89,8 +89,14 @@ defaultTimezoneStamp = timestamp(2024, 1, 5, 9, 30)
 dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
 plot(time(timeframe="60", session="0930-1600", timezone="America/New_York"))
 plot(time(timeframe="60", "0930-1600", "America/New_York"))
+plot(time(timeframe="60", session="0930-1600", bars_back=1))
+plot(time("60", "0930-1600", 1))
+plot(time("60", "0930-1600", "America/New_York", 1))
 plot(time_close(timeframe="60", session="0930-1600", timezone="America/New_York"))
 plot(time_close(timeframe="60", "0930-1600", "America/New_York"))
+plot(time_close(timeframe="60", session="0930-1600", bars_back=1))
+plot(time_close("60", "0930-1600", 1))
+plot(time_close("60", "0930-1600", "America/New_York", 1))
 plot(stamp + prefixStamp + defaultTimezoneStamp + dateStamp)
 `));
 
@@ -124,6 +130,9 @@ plot(dateStamp + literalStamp + seriesStamp)
 indicator("Bad Time Values")
 openTime = time(timeframe=60, session=true, timezone=1)
 closeTime = time_close("60", 123, true)
+badBarsBack = time(timeframe="60", session="0930-1600", bars_back="1")
+badCloseTimezone = time_close("60", session="0930-1600", timezone=true)
+badCloseBarsBack = time_close("60", "0930-1600", "UTC", false)
 changed = timeframe.change(60)
 seconds = timeframe.in_seconds(30)
 label = timeframe.to_seconds(true)
@@ -140,7 +149,10 @@ badDateString = timestamp(1700000000000, 1, 5, 9, timezone="UTC")
       'time session must be a string, got bool',
       'time timezone must be a string, got int',
       'time_close session must be a string, got int',
+      'time_close bars_back must be a number, got bool',
+      'time bars_back must be a number, got string',
       'time_close timezone must be a string, got bool',
+      'time_close bars_back must be a number, got bool',
       'timeframe.change timeframe must be a string, got int',
       'timeframe.in_seconds timeframe must be a string, got int',
       'timeframe.to_seconds timeframe must be a string, got bool',
