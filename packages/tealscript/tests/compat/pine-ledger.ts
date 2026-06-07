@@ -2468,6 +2468,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-float-division-checkpoint',
+      title: 'Ops Float Division Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script division float result',
+      featureTags: ['operators', 'arithmetic', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-modulo-checkpoint',
+      title: 'Ops Modulo Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script modulo operator negative float',
+      featureTags: ['operators', 'arithmetic', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-string-comparison-checkpoint',
+      title: 'Ops String Comparison Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script string equality lexicographic',
+      featureTags: ['operators', 'strings', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-boolean-arithmetic-checkpoint',
+      title: 'Ops Boolean Arithmetic Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script boolean coerce numeric arithmetic',
+      featureTags: ['operators', 'arithmetic', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-comparison-chaining-checkpoint',
+      title: 'Ops Comparison Chaining Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script and comparison chaining range check',
+      featureTags: ['operators', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-precedence-checkpoint',
+      title: 'Ops Precedence Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script operator precedence multiply add unary',
+      featureTags: ['operators', 'arithmetic', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-compound-assignment-checkpoint',
+      title: 'Ops Compound Assignment Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script compound assignment plus equals accumulate',
+      featureTags: ['operators', 'state', 'var', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-unary-minus-series-checkpoint',
+      title: 'Ops Unary Minus Series Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script unary minus negate series',
+      featureTags: ['operators', 'arithmetic', 'series', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-not-operator-checkpoint',
+      title: 'Ops Not Operator Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script not operator boolean negate',
+      featureTags: ['operators', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ops-na-equality-checkpoint',
+      title: 'Ops Na Equality Checkpoint',
+      searchContext: 'TradingView public scripts search: pine script na equality comparison false',
+      featureTags: ['operators', 'na', 'runtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
