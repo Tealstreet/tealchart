@@ -647,6 +647,9 @@ The visual metadata pass captures common Pine v6 display/style fields on
 force-overlay, and plot line-style metadata where those parameters exist. The
 compatibility fixture covers named and positional argument forms plus the
 common `format.*` constants and `plot.linestyle_*` constants used by Pine v6 line plots.
+The source-linked public plot metadata checkpoint also locks a projected-level
+idiom that combines `offset`, `show_last`, `display.price_scale`, `trackprice`,
+precision metadata, force-overlay routing, and a hidden helper plot.
 Semantic diagnostics reject invalid literal `display` option values while
 leaving dynamic display expressions available for Pine-style masks. Tealchart renderer
 coverage applies plot line-style metadata in main and indicator panes and

@@ -765,6 +765,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-plot-metadata-checkpoint',
+      title: 'Public Plot Metadata Checkpoint',
+      searchContext: 'TradingView public scripts search: projected levels',
+      featureTags: ['visuals', 'plot_metadata', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-synthetic-ticker-checkpoint',
       title: 'Public Synthetic Ticker Checkpoint',
       searchContext: 'TradingView public scripts search: heikin ashi trend',
