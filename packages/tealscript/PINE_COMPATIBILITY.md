@@ -948,9 +948,8 @@ settlement-as-close, and chart modifiers propagate as opaque request-datafeed
 keys. Semantic analysis preserves supported `ticker.*` helper return types for
 downstream assignment diagnostics, reports invalid literal session,
 adjustment, back-adjustment, and settlement-as-close modifier values before
-runtime, and planned unsupported ticker constructors such as
-`ticker.rangebar()` are reported explicitly instead of as generic unknown
-functions. The in-memory test datafeed derives
+runtime, while undocumented `ticker.*` members remain on the generic
+unknown-function diagnostic path. The in-memory test datafeed derives
 Heikin-Ashi OHLC when matching base bars exist, with tests covering the
 `ticker.heikinashi()` modifier. The checkpoint corpus tracks an official ticker
 request fixture for extended-session and Heikin-Ashi synthetic IDs. Renko, Line
