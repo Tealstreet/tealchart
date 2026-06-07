@@ -113,6 +113,8 @@ Current `ta.*` progress:
 - `ta.vwap()` covers default-source, source, anchored, and `stdev_mult` band
   tuple forms; a source-linked public anchored VWAP band checkpoint locks the
   common channel-overlay idiom in the offline corpus.
+- A source-linked public Supertrend signal checkpoint locks the common
+  `ta.supertrend()` direction-routing idiom over deterministic bars.
 
 Current `str.*` progress:
 

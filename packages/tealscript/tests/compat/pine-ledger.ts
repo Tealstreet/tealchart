@@ -361,6 +361,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-supertrend-signal-checkpoint',
+      title: 'Public Supertrend Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: supertrend signal',
+      featureTags: ['ta', 'signals', 'supertrend', 'trend_filter', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',

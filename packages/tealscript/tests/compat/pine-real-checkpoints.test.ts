@@ -1375,6 +1375,42 @@ plot(bearish ? 1 : 0, title="Bearish Divergence")
     expect(getPlot(result, 'Bearish Divergence').values).toEqual([0, 0, 0, 0, 1]);
   });
 
+  it('locks a reduced public Supertrend signal idiom', () => {
+    // Public idiom reference: Supertrend public indicators commonly expose ATR
+    // factor/length inputs, route trend-state plots, and mark direction flips.
+    // Source search: https://www.tradingview.com/scripts/search/supertrend%20signal/
+    const result = runCompatScript(`
+indicator("Public Supertrend Signal Checkpoint", overlay=true)
+factor = input.float(2.0, "Factor")
+atrPeriod = input.int(3, "ATR Period")
+[supertrend, direction] = ta.supertrend(factor, atrPeriod)
+upTrend = direction < 0 ? close : na
+downTrend = direction > 0 ? close : na
+buySignal = direction < 0 and direction[1] > 0
+sellSignal = direction > 0 and direction[1] < 0
+plot(supertrend, title="Supertrend")
+plot(direction, title="Direction")
+plot(upTrend, title="Up Trend")
+plot(downTrend, title="Down Trend")
+plot(buySignal ? 1 : 0, title="Buy Signal")
+plot(sellSignal ? 1 : 0, title="Sell Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Supertrend Signal Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Factor', 'float'],
+      ['ATR Period', 'int'],
+    ]);
+    expect(getPlot(result, 'Direction').values).toEqual([-1, 1, 1, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Up Trend').values).toEqual([102, null, null, null, 99, 100, 104, null, null, null, null, null]);
+    expect(getPlot(result, 'Down Trend').values).toEqual([null, 105, 107, 103, null, null, null, 109, 108, 111, 110, 112]);
+    expect(getPlot(result, 'Buy Signal').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Sell Signal').values).toEqual([0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Supertrend').values.some((value) => value !== null)).toBe(true);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
