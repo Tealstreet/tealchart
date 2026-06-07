@@ -162,6 +162,101 @@ rebuild the parser, and unskip the test.
 
 ---
 
+## Pine v5 Compatibility Gaps
+
+Discovered by the Pine v5 compatibility probe in `tests/compat/pine-realworld-corpus.test.ts`
+(describe block "Pine v5 compatibility probe") on 2026-06-08.
+
+7 of 9 planned v5 patterns pass. 2 are skipped.
+
+| Script | Status | Pattern |
+| --- | --- | --- |
+| v5 study() declaration | pass | `study("title", overlay=true)` maps to indicator |
+| v5 generic input() | pass | `input(14, "Length")` infers int type from default |
+| v5 hex color literals | pass | `#FF0000` stored as 6-digit string; works in plot color |
+| v5 sma() global alias | pass | `sma(close, 14)` maps to `ta.sma` |
+| v5 ema() global alias | pass | `ema(close, 14)` maps to `ta.ema` |
+| v5 rsi() global alias | pass | `rsi(close, 14)` maps to `ta.rsi` |
+| v5 mixed-pattern indicator | pass | study() + input() + sma()/ema() combined |
+| **v5 tostring() global** | **skip** | `tostring(close)` → "Unknown function: tostring" |
+| **v5 security() at runtime** | **skip** | Parses + type-checks; fails with "requires a request datafeed" |
+
+### Gap: tostring() global alias
+
+**Pattern:** `tostring(close)` — v5 global alias for `str.tostring()`.
+
+**Status:** Runtime error "Unknown function: tostring". The alias is not registered in
+the engine's builtin map.
+
+**Impact:** Medium — common in v5 public scripts that display prices/values in labels
+or dashboards. Easy fix.
+
+**Test:** `it.skip('v5 tostring() global alias...')` in `pine-realworld-corpus.test.ts`.
+
+**Fix path:** Register `tostring` as an alias for `str.tostring` in `engine.ts`
+`registerBuiltins()`, and add it to `BUILTIN_FUNCTIONS` in `checker.ts`.
+
+### Gap: security() at runtime (datafeed dependency)
+
+**Pattern:** `d = security(syminfo.tickerid, "D", close)` — v5 global alias for
+`request.security()`. Parses and semantic-checks correctly, but the runtime
+emits errors per bar when no request datafeed is provided.
+
+**Status:** Structural limitation — the same constraint applies to all `request.security`
+calls. Not a new gap; documented here for completeness.
+
+**Impact:** Same as `request.security` — works when a datafeed is provided.
+
+**Test:** `it.skip('v5 security() global alias...')` in `pine-realworld-corpus.test.ts`.
+
+---
+
+## Parser Stress Gaps
+
+Discovered by the parser stress probe in `tests/compat/pine-realworld-corpus.test.ts`
+(describe block "Parser stress probe") on 2026-06-08.
+
+7 of 8 planned parser stress patterns pass. 1 is skipped.
+
+| Script | Status | Pattern |
+| --- | --- | --- |
+| Very long single line | pass | 12 chained additions on one line |
+| Deeply nested ternaries | pass | 4-level nested ternary |
+| Multiple continued lines | pass | 5-segment continuation with `+` at end |
+| Comment on continuation line | pass | `//` comment between two continuation segments |
+| Empty lines in block | pass | blank lines before/after `if` body |
+| Inline comments everywhere | pass | every line has trailing `// comment` |
+| Long switch (10 cases) | pass | switch with 10 numeric arms + default |
+| **Mixed tabs and spaces** | **skip** | tab-indented `if` body, space-indented `else` |
+
+### Gap: Mixed tabs and spaces in block bodies
+
+**Pattern:**
+```pine
+if close > open
+\tx = 1
+else
+    x = 0
+plot(x, title="X")
+```
+
+**Status:** The variable `x` declared inside the tab-indented `if` body is not visible
+to the following `plot(x)` statement. The runtime reports "Unknown identifier: x".
+Root cause: the indentation-tracking parser treats a tab and 4 spaces as distinct
+indentation levels, so the `if` and `else` branches are parsed as separate unrelated
+blocks rather than paired branches of the same conditional.
+
+**Impact:** Low — hand-written Pine scripts rarely mix tabs and spaces. Only affects
+scripts formatted by editors with tab/space inconsistency.
+
+**Test:** `it.skip('mixed tabs and spaces in block bodies', ...)` in `pine-realworld-corpus.test.ts`.
+
+**Fix path:** Normalize tab characters to spaces (e.g. 4 spaces per tab) in the
+pre-tokenization phase of `grammar.peggy`, or in the `parse()` function in
+`parser.ts` before the source is fed to the PEG parser.
+
+---
+
 ## Summary
 
 | Category | Gaps | Impact |
@@ -176,3 +271,5 @@ rebuild the parser, and unskip the test.
 | **Real-world corpus probe (15 scripts)** | **0** | All pass |
 | **Advanced corpus probe (10 scripts)** | **0** | All pass |
 | **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
+| **Pine v5 compatibility probe (9 scripts)** | **2** | 7 pass, 2 skipped (tostring, security datafeed) |
+| **Parser stress probe (8 scripts)** | **1 (indentation)** | 7 pass, 1 skipped (mixed tabs/spaces) |

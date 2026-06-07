@@ -1343,6 +1343,139 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-study-checkpoint',
+      title: 'V5 Study Checkpoint',
+      searchContext: 'TradingView public scripts search: study overlay v5',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-generic-input-checkpoint',
+      title: 'V5 Generic Input Checkpoint',
+      searchContext: 'TradingView public scripts search: input length v5 generic',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-hex-color-checkpoint',
+      title: 'V5 Hex Color Checkpoint',
+      searchContext: 'TradingView public scripts search: hex color literal v5',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'visuals', 'color', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-sma-global-checkpoint',
+      title: 'V5 SMA Global Checkpoint',
+      searchContext: 'TradingView public scripts search: sma global v5 no namespace',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-ema-global-checkpoint',
+      title: 'V5 EMA Global Checkpoint',
+      searchContext: 'TradingView public scripts search: ema global v5 no namespace',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-rsi-global-checkpoint',
+      title: 'V5 RSI Global Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi global v5 no namespace',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'v5-mixed-checkpoint',
+      title: 'V5 Mixed Indicator Checkpoint',
+      searchContext: 'TradingView public scripts search: study sma ema input v5',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'inputs', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-long-line-checkpoint',
+      title: 'Parser Long Line Checkpoint',
+      searchContext: 'TradingView public scripts search: long formula single line',
+      featureTags: ['parser', 'layout', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-nested-ternary-checkpoint',
+      title: 'Parser Nested Ternary Checkpoint',
+      searchContext: 'TradingView public scripts search: nested ternary expression',
+      featureTags: ['parser', 'layout', 'ternary', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-continued-lines-checkpoint',
+      title: 'Parser Continued Lines Checkpoint',
+      searchContext: 'TradingView public scripts search: multi line expression continuation',
+      featureTags: ['parser', 'layout', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-comment-continuation-checkpoint',
+      title: 'Parser Comment Continuation Checkpoint',
+      searchContext: 'TradingView public scripts search: comment in continuation',
+      featureTags: ['parser', 'layout', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-empty-lines-checkpoint',
+      title: 'Parser Empty Lines Checkpoint',
+      searchContext: 'TradingView public scripts search: empty lines if block',
+      featureTags: ['parser', 'layout', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-inline-comments-checkpoint',
+      title: 'Parser Inline Comments Checkpoint',
+      searchContext: 'TradingView public scripts search: inline comment every line',
+      featureTags: ['parser', 'layout', 'ta', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'parser-long-switch-checkpoint',
+      title: 'Parser Long Switch Checkpoint',
+      searchContext: 'TradingView public scripts search: switch many cases expression',
+      featureTags: ['parser', 'layout', 'edge_case', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

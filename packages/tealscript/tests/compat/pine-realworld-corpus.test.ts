@@ -1128,3 +1128,337 @@ plot(sma, title="SMA")
     expect(result.errors).toEqual([]);
   });
 });
+
+// ===========================================================================================
+// Pine v5 compatibility probe
+// Tests v5-specific idioms: study(), generic input(), security(), hex color literals,
+// global tostring(), and legacy ta aliases (sma/ema/rsi without namespace).
+// ===========================================================================================
+
+describe('Pine v5 compatibility probe', () => {
+  it('locks v5 study() declaration as an indicator alias', () => {
+    // v5 used study() instead of indicator(). The runtime maps it to an indicator
+    // declaration, so title and overlay propagate correctly.
+    // Source search: https://www.tradingview.com/scripts/search/study%20overlay%20v5/
+    const result = runCompatScript(`
+//@version=5
+study("V5 Study Checkpoint", overlay=true)
+sma = ta.sma(close, 3)
+plot(sma, title="SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V5 Study Checkpoint');
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null,
+      104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+
+  it('locks v5 generic input() with integer default', () => {
+    // v5 used input(defaultVal, title) without a typed variant. The runtime infers
+    // the type from the default value; an integer default becomes an int input.
+    // Source search: https://www.tradingview.com/scripts/search/input%20length%20v5%20generic/
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 Generic Input Checkpoint")
+len = input(14, "Length")
+plot(len, title="Len")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Length', 'int']]);
+    expect(getPlot(result, 'Len').values).toEqual(Array(compatibilityBars.length).fill(14));
+  });
+
+  it('locks v5 hex color literal #RRGGBB as a plot color', () => {
+    // v5 scripts commonly use bare 6-digit hex literals for colors rather than
+    // color.rgb() or named constants. The literal is stored as-is and applied to
+    // plot output without modification.
+    // Source search: https://www.tradingview.com/scripts/search/hex%20color%20literal%20v5/
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 Hex Color Checkpoint")
+bullColor = #00FF00
+bearColor = #FF0000
+isBull = close > open
+c = isBull ? bullColor : bearColor
+plot(close, color=c, title="Close")
+plot(isBull ? 1 : 0, title="Bull")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Close > open: bars 0,1,2 yes; 3,4 no; 5,6,7 yes; 8 no; 9 yes; 10 no; 11 yes
+    expect(getPlot(result, 'Bull').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    // Plot color alternates based on bull/bear
+    const colors = getPlot(result, 'Close').color as string[];
+    expect(colors[0]).toBe('#00FF00');
+    expect(colors[3]).toBe('#FF0000');
+  });
+
+  it('locks v5 sma() global alias (without ta. namespace)', () => {
+    // In v5 and earlier, sma(), ema(), rsi() etc. were global functions.
+    // The runtime maps these to their ta.* counterparts transparently.
+    // Source search: https://www.tradingview.com/scripts/search/sma%20global%20v5%20no%20namespace/
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 SMA Global Checkpoint")
+s = sma(close, 3)
+plot(s, title="SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null,
+      104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+
+  it('locks v5 ema() global alias (without ta. namespace)', () => {
+    // Source search: https://www.tradingview.com/scripts/search/ema%20global%20v5%20no%20namespace/
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 EMA Global Checkpoint")
+e = ema(close, 3)
+plot(e, title="EMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
+      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
+      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+    ]);
+  });
+
+  it('locks v5 rsi() global alias (without ta. namespace)', () => {
+    // Source search: https://www.tradingview.com/scripts/search/rsi%20global%20v5%20no%20namespace/
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 RSI Global Checkpoint")
+r = rsi(close, 5)
+plot(r, title="RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([
+      null, null, null, null, null,
+      42.857143, 57.894737, 70.16317, 65.39924, 72.421258, 66.774781, 72.194557,
+    ]);
+  });
+
+  // tostring() is the v5 global alias for str.tostring(). Not yet implemented.
+  // Error: "Unknown function: tostring"
+  // Gap documented in PINE_V6_REFERENCE_GAP.md under "Pine v5 Compatibility Gaps".
+  it.skip('v5 tostring() global alias for str.tostring()', () => {
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 Tostring Checkpoint")
+s = "Price: " + tostring(close)
+plot(close, title="Close")
+`);
+    expect(result.errors).toEqual([]);
+  });
+
+  // security() parses and semantic-checks correctly, but requires a live
+  // request datafeed at runtime. Skipped for the same reason as other
+  // request.security tests in the corpus.
+  // Gap documented in PINE_V6_REFERENCE_GAP.md under "Pine v5 Compatibility Gaps".
+  it.skip('v5 security() global alias for request.security()', () => {
+    const result = runCompatScript(`
+//@version=5
+indicator("V5 Security Checkpoint")
+d = security(syminfo.tickerid, "D", close)
+plot(d, title="Daily")
+`);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('locks v5 mixed-pattern indicator combining study(), input(), and global ta aliases', () => {
+    // A realistic v5 script combining multiple v5-isms: study() declaration,
+    // generic input(), and sma()/ema() without namespace. This is the most
+    // common pattern when pasting popular v5 public scripts.
+    // Source search: https://www.tradingview.com/scripts/search/study%20sma%20ema%20input%20v5/
+    const result = runCompatScript(`
+//@version=5
+study("V5 Mixed Indicator Checkpoint", overlay=false)
+len = input(3, "Length")
+s = sma(close, len)
+e = ema(close, len)
+bullish = s > e
+plot(s, title="SMA")
+plot(e, title="EMA")
+plot(bullish ? 1 : 0, title="Bull")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V5 Mixed Indicator Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Length', 'int']]);
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null,
+      104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
+      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
+      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+    ]);
+    expect(getPlot(result, 'Bull').values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1]);
+  });
+});
+
+// ===========================================================================================
+// Parser stress probe
+// Tests parser behaviour under unusual layout patterns from real pasted scripts:
+// long lines, nested ternaries, continuation lines, empty lines in blocks,
+// pervasive inline comments, long switch expressions.
+// ===========================================================================================
+
+describe('Parser stress probe', () => {
+  it('locks very long single line with 12 chained additions', () => {
+    // Pattern: a single expression spanning many additions.
+    // Confirms the grammar and runtime do not choke on very wide lines.
+    // Source search: https://www.tradingview.com/scripts/search/long%20formula%20single%20line/
+    const result = runCompatScript(`
+indicator("Parser Long Line Checkpoint")
+v = close + open + high + low + close + open + high + low + close + open + high + low
+plot(v, title="V")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'V').values).toEqual([
+      1212, 1242, 1272, 1263, 1212, 1188, 1224, 1278, 1302, 1314, 1332, 1329,
+    ]);
+  });
+
+  it('locks deeply nested ternary expression (4 levels deep)', () => {
+    // Pattern: a ? b ? c ? d : e : f : g — four levels of ternary nesting.
+    // Confirms the parser resolves right-associative ternary chains without ambiguity.
+    // Source search: https://www.tradingview.com/scripts/search/nested%20ternary%20expression/
+    const result = runCompatScript(`
+indicator("Parser Nested Ternary Checkpoint")
+a = close > 105 ? close > 108 ? close > 110 ? 3 : 2 : 1 : 0
+plot(a, title="Val")
+`);
+
+    expect(result.errors).toEqual([]);
+    // close per compatibilityBars: 102,105,107,103,99,100,104,109,108,111,110,112
+    // >105: no,no,yes,no,no,no,no,yes,yes,yes,yes,yes → 0,0,inner,0,0,0,0,inner,inner,inner,inner,inner
+    // >108: only bars 7(109),8(108→no),9(111),10(110),11(112) → 0,0,1,0,0,0,0,inner2,0,inner3,inner3,inner4
+    expect(getPlot(result, 'Val').values).toEqual([0, 0, 1, 0, 0, 0, 0, 2, 1, 3, 2, 3]);
+  });
+
+  it('locks multi-line continuation with operator at end of each line', () => {
+    // Pattern: declaration split over 5 continuation lines — each line ends with
+    // a binary operator so the parser knows more follows.
+    // Source search: https://www.tradingview.com/scripts/search/multi%20line%20expression%20continuation/
+    const result = runCompatScript(`
+indicator("Parser Continued Lines Checkpoint")
+v = close +
+    open +
+    high +
+    low +
+    close
+plot(v, title="V")
+`);
+
+    expect(result.errors).toEqual([]);
+    // v = close + open + high + low + close = 2*close + open + high + low
+    expect(getPlot(result, 'V').values).toEqual([
+      506, 519, 531, 524, 503, 496, 512, 535, 542, 549, 554, 555,
+    ]);
+  });
+
+  it('locks comment on a continuation line', () => {
+    // Pattern: a comment appears on its own line between two continuation segments.
+    // The grammar should treat the comment as whitespace and resume the expression.
+    // Source search: https://www.tradingview.com/scripts/search/comment%20in%20continuation/
+    const result = runCompatScript(`
+indicator("Parser Comment Continuation Checkpoint")
+v = close +
+// add open
+    open
+plot(v, title="V")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'V').values).toEqual([
+      202, 207, 212, 210, 202, 199, 204, 213, 217, 219, 221, 222,
+    ]);
+  });
+
+  it('locks empty lines inside an if block body', () => {
+    // Pattern: blank lines between the if header and its body, and after the body.
+    // Some scripts emit these after auto-formatting; the parser must not misread
+    // the indentation level.
+    // Source search: https://www.tradingview.com/scripts/search/empty%20lines%20if%20block/
+    const result = runCompatScript(`
+indicator("Parser Empty Lines Checkpoint")
+x = 0
+
+if close > open
+
+    x := 1
+
+plot(x, title="X")
+`);
+
+    expect(result.errors).toEqual([]);
+    // close > open: bars 0,1,2 yes; 3,4 no; 5,6,7 yes; 8 no; 9 yes; 10 no; 11 yes
+    expect(getPlot(result, 'X').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+  });
+
+  it('locks pervasive inline end-of-line comments', () => {
+    // Pattern: every line (including the indicator declaration) carries a trailing
+    // // comment. Confirms the lexer strips inline comments without breaking
+    // line-continuation detection or block-indentation tracking.
+    // Source search: https://www.tradingview.com/scripts/search/inline%20comment%20every%20line/
+    const result = runCompatScript(`
+indicator("Parser Inline Comments Checkpoint") // title
+len = 5 // length param
+s = ta.sma(close, len) // moving average
+plot(s, title="SMA") // output
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+  });
+
+  // Mixed tabs and spaces in block bodies cause the variable declared in the
+  // tab-indented branch to be invisible in a following space-indented line
+  // (the parser treats the indents as distinct levels).
+  // Gap documented in PINE_V6_REFERENCE_GAP.md under "Parser Stress Gaps".
+  it.skip('mixed tabs and spaces in block bodies', () => {
+    const src = 'indicator("Mixed Indent")\nif close > open\n\tx = 1\nelse\n    x = 0\nplot(x, title="X")';
+    const result = runCompatScript(src);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('locks long switch expression with 10 case branches', () => {
+    // Pattern: a switch with 10 numeric cases covering bar_index % 10 and a
+    // default branch. Confirms the parser handles arbitrarily many switch arms.
+    // Source search: https://www.tradingview.com/scripts/search/switch%20many%20cases%20expression/
+    const result = runCompatScript(`
+indicator("Parser Long Switch Checkpoint")
+v = bar_index % 10
+result = switch v
+    0 => 0
+    1 => 1
+    2 => 2
+    3 => 3
+    4 => 4
+    5 => 5
+    6 => 6
+    7 => 7
+    8 => 8
+    9 => 9
+    => -1
+plot(result, title="Result")
+`);
+
+    expect(result.errors).toEqual([]);
+    // bar_index 0-11, v = 0,1,2,3,4,5,6,7,8,9,0,1
+    expect(getPlot(result, 'Result').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1]);
+  });
+});
