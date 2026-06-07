@@ -461,7 +461,8 @@ before exact Strategy Tester UI parity.
 Phases:
 
 1. Maintain strategy declaration settings, namespace variables, order APIs,
-   trade accessors, order-fill alerts, and semantic diagnostics.
+   trade accessors, order-fill alerts, and semantic diagnostics, including
+   pre-runtime `strategy.exit()` target and trailing-offset structure checks.
 2. Refactor fills to consume ordered execution ticks while preserving existing
    deterministic OHLC behavior.
 3. Add gap-crossing and path-order fixtures for Pine's default broker path.

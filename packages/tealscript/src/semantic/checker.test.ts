@@ -1500,6 +1500,33 @@ strategy.risk.max_cons_loss_days(-1)
     ]);
   });
 
+  it('reports invalid Pine strategy exit target shapes', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Exit Targets")
+strategy.exit("NoTarget", from_entry="Long")
+strategy.exit("AllNa", "Long", na, na, na, na, na, na, na, na, na)
+strategy.exit("TrailNoOffset", "Long", trail_points=5)
+strategy.exit("TrailPriceNoOffset", from_entry="Long", trail_price=close)
+strategy.exit("TrailOffsetNa", "Long", trail_price=close, trail_offset=na)
+strategy.exit("TrailPriceNaPointsNoOffset", "Long", trail_price=na, trail_points=5)
+strategy.exit("ProfitOk", "Long", profit=10)
+strategy.exit("LossOk", "Long", loss=5)
+strategy.exit("LimitOk", "Long", limit=close)
+strategy.exit("StopOk", "Long", stop=close)
+strategy.exit("TrailOk", "Long", trail_points=5, trail_offset=1)
+strategy.exit("TrailPriceNaPointsOk", "Long", trail_price=na, trail_points=5, trail_offset=1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.exit requires a limit, stop, profit, loss, or trailing stop price',
+      'strategy.exit requires a limit, stop, profit, loss, or trailing stop price',
+      'strategy.exit trailing stop requires trail_offset',
+      'strategy.exit trailing stop requires trail_offset',
+      'strategy.exit trailing stop requires trail_offset',
+      'strategy.exit trailing stop requires trail_offset',
+    ]);
+  });
+
   it('reports invalid Pine strategy order boolean option values', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy Order Booleans")
