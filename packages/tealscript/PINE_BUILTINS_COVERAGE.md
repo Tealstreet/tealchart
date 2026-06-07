@@ -133,6 +133,9 @@ Current `ta.*` progress:
 - A source-linked public range trend-filter checkpoint locks common
   `ta.range()`, `ta.rising()`, and `ta.falling()` breakout-filter routing over
   deterministic close-series bars.
+- A source-linked public event-memory signal checkpoint locks common
+  `ta.barssince()`/`ta.valuewhen()` trigger-memory routing over deterministic
+  close-series bars.
 - A source-linked public moving-average ribbon checkpoint locks common
   `ta.vwma()`, `ta.wma()`, `ta.alma()`, and `ta.hma()` overlay/ribbon routing
   over deterministic OHLCV bars.

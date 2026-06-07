@@ -184,13 +184,14 @@ Phases:
    Pine Logs startup/signal/final-summary output.
    Public TA signal coverage includes reduced Supertrend, ADX/DMI, Parabolic
    SAR, linear-regression channel, Keltner Channel, Donchian Channel, range
-   trend filters, moving-average ribbon, percentile/rank regimes, stochastic
-   oscillator, MFI, CCI, CMO, TSI, ROC, Momentum, and Williams %R fixtures that route
+   trend filters, event-memory signals, moving-average ribbon,
+   percentile/rank regimes, stochastic oscillator, MFI, CCI, CMO, TSI, ROC, Momentum, and Williams %R fixtures that route
    `ta.supertrend()`
    direction, `ta.dmi()` trend-strength state, `ta.sar()` reversal state,
    `ta.linreg()` channel slope, `ta.kc()`/`ta.kcw()` channel state,
    `ta.highest()`/`ta.lowest()` channel state, highest/lowest-bar offsets,
    `ta.range()` expansion plus `ta.rising()`/`ta.falling()` filters,
+   `ta.barssince()`/`ta.valuewhen()` trigger memory,
    `ta.vwma()`/`ta.wma()`/`ta.alma()`/`ta.hma()` ribbon state,
    `ta.percentile_*()` and `ta.percentrank()` regimes, smoothed `ta.stoch()`
    state, `ta.mfi()` threshold state, `ta.cci()` threshold state,
