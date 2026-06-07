@@ -1157,8 +1157,10 @@ limit/stop prices taking precedence. Pending limit/stop orders fill on later
 bars when OHLC crosses their trigger price, cap fills to the remaining matching
 open trade quantity, and bracket siblings cancel through OCA.
 `strategy.oca.reduce` groups reduce pending sibling order quantities after a
-fill and cancel siblings whose remaining quantity reaches zero. Generated
-`strategy.exit()` bracket orders can be cancelled through the original exit id.
+fill and cancel siblings whose remaining quantity reaches zero. Source-linked
+official checkpoints cover both `strategy.oca.cancel` breakout groups and
+`strategy.oca.reduce` partial-exit groups. Generated `strategy.exit()` bracket
+orders can be cancelled through the original exit id.
 `strategy.entry()` and `strategy.order()` stop-limit orders activate after their
 stop price is crossed, then fill as limit orders on later execution ticks when
 the ordered broker path reaches the limit price. Fixed, cash, and
