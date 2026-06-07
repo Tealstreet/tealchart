@@ -3683,7 +3683,7 @@ class SemanticChecker {
   }
 
   private checkDirectNaComparison(expression: Expression): void {
-    if (expression.type !== 'BinaryExpression' || (expression.operator !== '==' && expression.operator !== '!=')) return;
+    if (expression.type !== 'BinaryExpression' || !this.isComparisonOperator(expression.operator)) return;
     if (!this.isNaLiteralExpression(expression.left) && !this.isNaLiteralExpression(expression.right)) return;
 
     this.addDiagnostic(
@@ -3713,6 +3713,15 @@ class SemanticChecker {
 
   private isNaLiteralExpression(expression: Expression): boolean {
     return expression.type === 'NaExpression';
+  }
+
+  private isComparisonOperator(operator: string): boolean {
+    return operator === '=='
+      || operator === '!='
+      || operator === '<'
+      || operator === '<='
+      || operator === '>'
+      || operator === '>=';
   }
 
   private checkExpression(expression: Expression, scope: SemanticScope): void {
