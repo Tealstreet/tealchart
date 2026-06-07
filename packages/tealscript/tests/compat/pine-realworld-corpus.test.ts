@@ -3416,3 +3416,251 @@ plot(line.get_x2(myLine), title="Line X2")
     expect(getPlot(result, 'Line X2').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
   });
 });
+
+// ===========================================================================================
+// Control flow and scope semantics
+// Tests Pine-specific execution model edge cases: series history in UDFs, var persistence
+// inside for-expression scopes, call-site isolation, switch/if/for/while as expressions,
+// break semantics, and na propagation through chained ternaries.
+// ===========================================================================================
+
+describe('Control flow and scope semantics', () => {
+  it('locks series history reference inside a UDF across call sites', () => {
+    // Pine UDFs capture the caller\'s series history — close[1] inside a UDF
+    // returns the previous bar\'s close value, not the current bar\'s.
+    // This verifies that history references work correctly bar-by-bar when called
+    // from a single call site.
+    // Source search: https://www.tradingview.com/scripts/search/udf%20series%20history%20close%20lag/
+    const result = runCompatScript(`
+indicator("Ctrl Series History UDF Checkpoint")
+prevClose(src) =>
+    src[1]
+pc = prevClose(close)
+delta = close - pc
+plot(pc, title="PrevClose")
+plot(nz(delta), title="Delta")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl Series History UDF Checkpoint');
+    // PrevClose is close shifted by one bar (null on bar 0)
+    expect(getPlot(result, 'PrevClose').values).toEqual([
+      null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110,
+    ]);
+    // Delta = close - prevClose; nz replaces null on bar 0 with 0
+    expect(getPlot(result, 'Delta').values).toEqual([
+      0, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2,
+    ]);
+  });
+
+  it('locks var inside a for-expression body accumulates across bars', () => {
+    // Pine var variables declared inside a for-expression body persist across bars
+    // via the execution model\'s per-call-site scope. Each bar, the var accumulates
+    // the close value three times (once per loop iteration), so the running total
+    // grows by 3*close each bar.
+    // Source search: https://www.tradingview.com/scripts/search/var%20for%20loop%20accumulate%20state/
+    const result = runCompatScript(`
+indicator("Ctrl Var In For Expr Checkpoint")
+total = for i = 0 to 2
+    var float acc = 0.0
+    acc += close
+    acc
+plot(total, title="Total")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl Var In For Expr Checkpoint');
+    // Bar 0: acc starts at 0, runs 3 iterations += 102 each → acc = 306
+    // Bar 1: acc persists as 306, runs 3 more += 105 → acc = 621, etc.
+    expect(getPlot(result, 'Total').values).toEqual([
+      306, 621, 942, 1251, 1548, 1848, 2160, 2487, 2811, 3144, 3474, 3810,
+    ]);
+  });
+
+  it('locks independent var state across two UDF call sites', () => {
+    // Pine UDF call-site isolation: each call site to the same UDF maintains its
+    // own persistent var state. Two separate calls accumulate independent counters.
+    // Source search: https://www.tradingview.com/scripts/search/udf%20call%20site%20var%20isolation/
+    const result = runCompatScript(`
+indicator("Ctrl UDF Var Isolation Checkpoint")
+counter(src) =>
+    var int cnt = 0
+    cnt += 1
+    cnt
+a = counter(close)
+b = counter(open)
+plot(a, title="A")
+plot(b, title="B")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl UDF Var Isolation Checkpoint');
+    // Each call site increments its own counter independently, both count 1..12
+    expect(getPlot(result, 'A').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'B').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it('locks switch as expression assigned to a variable', () => {
+    // Pine switch can be used as an expression assigned to a variable. Each arm
+    // returns a value; the default arm (=>) covers unmatched cases.
+    // Source search: https://www.tradingview.com/scripts/search/switch%20expression%20assign%20variable/
+    const result = runCompatScript(`
+indicator("Ctrl Switch Expr Checkpoint")
+sma3 = ta.sma(close, 3)
+trend = close > sma3 ? "up" : "down"
+x = switch trend
+    "up" => 1
+    "down" => -1
+    => 0
+plot(x, title="X")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl Switch Expr Checkpoint');
+    // close vs sma(close,3): bars 0,1 null warmup → "down"; bar 2 close=107 > sma=104.67 → "up";
+    // bars 3,4,5 "down"; bars 6-11 "up"
+    expect(getPlot(result, 'X').values).toEqual([-1, -1, 1, -1, -1, -1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks nested UDF calls where both UDFs maintain independent var state', () => {
+    // f(g(close)) where both f and g have internal var state that persists
+    // across bars independently. Pine call-site isolation ensures each nested
+    // invocation maintains its own accumulator.
+    // Source search: https://www.tradingview.com/scripts/search/nested%20function%20var%20state%20series/
+    const result = runCompatScript(`
+indicator("Ctrl Nested UDF State Checkpoint")
+smoother(src) =>
+    var float s = 0.0
+    s := s * 0.5 + src * 0.5
+    s
+doubleSmoothed(src) =>
+    smoother(smoother(src))
+ds = doubleSmoothed(close)
+plot(ds, title="DS")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl Nested UDF State Checkpoint');
+    // Outer smoother initialized at 0; inner smoother also at 0.
+    // Bar 0: inner s = 0*0.5 + 102*0.5 = 51; outer s = 0*0.5 + 51*0.5 = 25.5
+    expect(roundSeries(getPlot(result, 'DS').values)).toEqual([
+      25.5, 51.75, 72.125, 84.9375, 91.65625, 95.421875,
+      98.507813, 101.902344, 104.275391, 106.549805, 107.980957, 109.343506,
+    ]);
+  });
+
+  it('locks for loop as expression returning the last evaluated value', () => {
+    // A for loop used as an expression returns the value of the last statement
+    // evaluated in the loop body on the final iteration.
+    // Source search: https://www.tradingview.com/scripts/search/for%20loop%20expression%20return%20value/
+    const result = runCompatScript(`
+indicator("Ctrl For Expr Return Checkpoint")
+result = for i = 0 to 2
+    close * (i + 1)
+plot(result, title="Result")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl For Expr Return Checkpoint');
+    // Last iteration i=2: close * 3 each bar
+    expect(getPlot(result, 'Result').values).toEqual([
+      306, 315, 321, 309, 297, 300, 312, 327, 324, 333, 330, 336,
+    ]);
+  });
+
+  it('locks if block with multiple statements returning the last expression', () => {
+    // Pine if blocks can contain multiple statements; only the last expression
+    // is the block\'s return value when used as an assignment expression.
+    // Source search: https://www.tradingview.com/scripts/search/if%20block%20multi%20statement%20return/
+    const result = runCompatScript(`
+indicator("Ctrl If Block Multi Stmt Checkpoint")
+x = if close > open
+    a = close - open
+    b = a * 2
+    b
+else
+    0
+plot(x, title="X")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl If Block Multi Stmt Checkpoint');
+    // Bull bars (close > open): 0(102-100=2,*2=4), 1(105-102=3,*2=6), 2(107-105=2,*2=4),
+    //   5(100-99=1,*2=2), 6(104-100=4,*2=8), 7(109-104=5,*2=10), 9(111-108=3,*2=6), 11(112-110=2,*2=4)
+    // Bear bars (else → 0): 3,4,8,10
+    expect(getPlot(result, 'X').values).toEqual([4, 6, 4, 0, 0, 2, 8, 10, 0, 6, 0, 4]);
+  });
+
+  it('locks break exits the for loop expression and returns the last evaluated value', () => {
+    // When break is triggered inside a for loop expression, the loop exits and
+    // returns the last evaluated expression value before the break. Here the
+    // loop runs for i=0,1,2 and breaks when i >= 3; the last value before break is i=2.
+    // Source search: https://www.tradingview.com/scripts/search/for%20break%20expression%20return%20last/
+    const result = runCompatScript(`
+indicator("Ctrl For Break Expr Checkpoint")
+result = for i = 0 to 9
+    if i >= 3
+        break
+    i
+plot(result, title="Result")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl For Break Expr Checkpoint');
+    // Loop body runs: i=0 (result=0), i=1 (result=1), i=2 (result=2), i=3 → break
+    // After break, loop returns last result = 2 on every bar
+    expect(getPlot(result, 'Result').values).toEqual(Array(compatibilityBars.length).fill(2));
+  });
+
+  it('locks while loop as expression: computes triangular sum inside a UDF', () => {
+    // A while loop used as an expression inside a UDF that counts down and
+    // accumulates a triangular sum. The UDF returns the accumulated total,
+    // confirming while-as-expression semantics and scope handling.
+    // Source search: https://www.tradingview.com/scripts/search/while%20loop%20expression%20accumulate%20sum/
+    const result = runCompatScript(`
+indicator("Ctrl While Expr Checkpoint")
+triangularSum(n) =>
+    var int ct = 0
+    ct := n
+    total = 0
+    while ct > 0
+        total := total + ct
+        ct := ct - 1
+    total
+s = triangularSum(3)
+plot(s, title="Sum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl While Expr Checkpoint');
+    // triangularSum(3) = 3+2+1 = 6 on every bar
+    expect(getPlot(result, 'Sum').values).toEqual(Array(compatibilityBars.length).fill(6));
+  });
+
+  it('locks chained ternary with na propagation', () => {
+    // Pine supports chaining ternary expressions where the alternate branch may
+    // evaluate to na. The na propagates through the chain, and nz() replaces it.
+    // Source search: https://www.tradingview.com/scripts/search/chained%20ternary%20na%20propagation/
+    const result = runCompatScript(`
+indicator("Ctrl Chained Ternary Na Checkpoint")
+a = close > 105
+b = close > 108
+// Chained ternary: if a then (if b then close else open) else na
+x = a ? (b ? close : open) : na
+isNa = na(x)
+plot(nz(x), title="X")
+plot(isNa ? 1 : 0, title="IsNa")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ctrl Chained Ternary Na Checkpoint');
+    // a=true (close>105): bars 2(107),7(109),8(108),9(111),10(110),11(112)
+    // b=true (close>108): bars 7(109),9(111),10(110),11(112)
+    // When a and b: result=close; when a and not b: result=open; when not a: na (nz→0)
+    // Bar 2: a=T,b=F → open=105; bar 7: a=T,b=T → close=109; bar 8: a=T,b=F → open=109
+    expect(getPlot(result, 'X').values).toEqual([
+      0, 0, 105, 0, 0, 0, 0, 109, 109, 111, 110, 112,
+    ]);
+    expect(getPlot(result, 'IsNa').values).toEqual([1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0]);
+  });
+});

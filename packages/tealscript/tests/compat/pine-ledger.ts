@@ -2107,6 +2107,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-series-history-udf-checkpoint',
+      title: 'Ctrl Series History UDF Checkpoint',
+      searchContext: 'TradingView public scripts search: udf series history close lag',
+      featureTags: ['runtime', 'udf', 'history', 'series', 'scope', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-var-in-for-expr-checkpoint',
+      title: 'Ctrl Var In For Expr Checkpoint',
+      searchContext: 'TradingView public scripts search: var for loop accumulate state',
+      featureTags: ['runtime', 'var', 'scope', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-udf-var-isolation-checkpoint',
+      title: 'Ctrl UDF Var Isolation Checkpoint',
+      searchContext: 'TradingView public scripts search: udf call site var isolation',
+      featureTags: ['runtime', 'udf', 'var', 'scope', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-switch-expr-checkpoint',
+      title: 'Ctrl Switch Expr Checkpoint',
+      searchContext: 'TradingView public scripts search: switch expression assign variable',
+      featureTags: ['runtime', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-nested-udf-state-checkpoint',
+      title: 'Ctrl Nested UDF State Checkpoint',
+      searchContext: 'TradingView public scripts search: nested function var state series',
+      featureTags: ['runtime', 'udf', 'var', 'scope', 'series', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-for-expr-return-checkpoint',
+      title: 'Ctrl For Expr Return Checkpoint',
+      searchContext: 'TradingView public scripts search: for loop expression return value',
+      featureTags: ['runtime', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-if-block-multi-stmt-checkpoint',
+      title: 'Ctrl If Block Multi Stmt Checkpoint',
+      searchContext: 'TradingView public scripts search: if block multi statement return',
+      featureTags: ['runtime', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-for-break-expr-checkpoint',
+      title: 'Ctrl For Break Expr Checkpoint',
+      searchContext: 'TradingView public scripts search: for break expression return last',
+      featureTags: ['runtime', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-while-expr-checkpoint',
+      title: 'Ctrl While Expr Checkpoint',
+      searchContext: 'TradingView public scripts search: while loop expression accumulate sum',
+      featureTags: ['runtime', 'udf', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'ctrl-chained-ternary-na-checkpoint',
+      title: 'Ctrl Chained Ternary Na Checkpoint',
+      searchContext: 'TradingView public scripts search: chained ternary na propagation',
+      featureTags: ['runtime', 'na', 'ternary', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
