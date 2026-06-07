@@ -3638,6 +3638,28 @@ plot(close > threshold ? 1 : 0, title="After Guard")
     expect(getPlot(result, 'After Guard').values).toEqual([0, 1]);
   });
 
+  it('locks a reduced public footprint request diagnostic idiom', () => {
+    // Public idiom reference: footprint-style public scripts may compile around
+    // `request.footprint()`, but deterministic replay still requires a
+    // host-provided footprint/intrabar volume model.
+    // Source search: https://www.tradingview.com/scripts/search/footprint%20request/
+    const result = runCompatScript(`
+indicator("Public Footprint Request Diagnostic Checkpoint")
+footprintDelta = request.footprint(syminfo.tickerid)
+plot(close, title="Close")
+`, { bars: [compatibilityBars[0]!] });
+
+    const unsupportedMessage =
+      'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model';
+
+    expect(result.errors.filter((error) => error.message === unsupportedMessage)).toEqual([
+      expect.objectContaining({
+        message: unsupportedMessage,
+      }),
+    ]);
+    expect(getPlot(result, 'Close').values).toEqual([102]);
+  });
+
   it('locks the official strategy entry and bracket-exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
