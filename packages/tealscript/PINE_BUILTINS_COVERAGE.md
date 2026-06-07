@@ -121,6 +121,9 @@ Current `ta.*` progress:
 - A source-linked public Parabolic SAR reversal checkpoint locks the common
   `ta.sar()` acceleration-input and reversal-state routing idiom over
   deterministic bars.
+- A source-linked public linear-regression channel checkpoint locks the common
+  `ta.linreg()` basis/deviation-band and slope-routing idiom over deterministic
+  bars.
 
 Current `str.*` progress:
 

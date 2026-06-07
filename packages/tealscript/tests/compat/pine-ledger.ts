@@ -388,6 +388,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-linear-regression-channel-checkpoint',
+      title: 'Public Linear Regression Channel Checkpoint',
+      searchContext: 'TradingView public scripts search: linear regression channel',
+      featureTags: ['ta', 'signals', 'linreg', 'channels', 'trend_filter', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',
