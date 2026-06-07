@@ -3067,6 +3067,37 @@ plot(priceValue + constValue)
     expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('infers legacy iff helper branch types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+//@version=4
+study("Legacy IFF Types")
+priceValue = iff(close > open, close, 1)
+title = iff(close > open, "up", "down")
+constValue = iff(true, 1, 2.5)
+mixedValue = iff(close > open, close, "bad")
+simple float simpleValue = 1
+priceValue := "bad"
+title := 1
+constValue := "bad"
+mixedValue := "still unknown"
+simpleValue := mixedValue
+plot(priceValue + constValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable priceValue',
+      'Cannot assign int value to string variable title',
+      'Cannot assign string value to float variable constValue',
+      'Cannot assign series value to simple float variable simpleValue',
+    ]);
+    expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('title')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('constValue')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+  });
+
   it('reports plain identifier reassignment qualifier mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Assignment Qualifier Mismatches")
@@ -6374,6 +6405,7 @@ badStoch = ta.stoch(source=close, high="high", low=true, length="3")
 badPivot = ta.pivothigh(source="high", leftbars=true, rightbars="2")
 badTr = ta.tr(handle_na=1)
 badVwap = ta.vwap(source="close", anchor=1, stdev_mult="2")
+badIff = iff(1, close, open)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -6408,6 +6440,7 @@ badVwap = ta.vwap(source="close", anchor=1, stdev_mult="2")
       'ta.vwap source must be a number, got string',
       'ta.vwap stdev_mult must be a number, got string',
       'ta.vwap anchor must be a boolean, got int',
+      'iff condition must be a boolean, got int',
     ]);
   });
 

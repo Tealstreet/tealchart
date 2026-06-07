@@ -8701,6 +8701,14 @@ export class TealscriptEngine {
       return value;
     });
 
+    this.builtins.set('iff', (args, namedArgs) => {
+      const iffArgs = ['condition', 'then', 'else'];
+      const condition = this.getOrderedCallArg(args, namedArgs, iffArgs, 0);
+      return this.isTruthy(condition)
+        ? this.getOrderedCallArg(args, namedArgs, iffArgs, 1)
+        : this.getOrderedCallArg(args, namedArgs, iffArgs, 2);
+    });
+
     this.builtins.set('float', (args, namedArgs) => this.toNumber(this.getCallArg(args, namedArgs, 0, 'x')));
     this.builtins.set('int', (args, namedArgs) => {
       const value = this.toNumber(this.getCallArg(args, namedArgs, 0, 'x'));
