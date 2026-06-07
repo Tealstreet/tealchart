@@ -1777,6 +1777,48 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public CMO signal idiom', () => {
+    // Public idiom reference: Chande Momentum Oscillator scripts commonly
+    // expose length and threshold inputs before routing momentum regimes.
+    // Source search: https://www.tradingview.com/scripts/search/chande%20momentum%20oscillator%20signal/
+    const result = runCompatScript(`
+indicator("Public CMO Signal Checkpoint")
+length = input.int(4, "Length")
+overbought = input.float(50.0, "Overbought")
+oversold = input.float(-40.0, "Oversold")
+cmo = ta.cmo(source=close, length=length)
+bullSignal = cmo < oversold
+bearSignal = cmo > overbought
+plot(cmo, title="CMO")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public CMO Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Overbought', 'float'],
+      ['Oversold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      -23.076923,
+      -45.454545,
+      -23.076923,
+      42.857143,
+      81.818182,
+      84.615385,
+      60,
+      42.857143,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
