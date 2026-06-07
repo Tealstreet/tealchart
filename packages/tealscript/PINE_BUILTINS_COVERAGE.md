@@ -139,6 +139,8 @@ Current `ta.*` progress:
   threshold-routing idiom over deterministic close-series bars.
 - A source-linked public Momentum signal checkpoint locks the common `ta.mom()`
   threshold-routing idiom over deterministic close-series bars.
+- A source-linked public Williams %R signal checkpoint locks the common
+  `ta.wpr()` threshold-routing idiom over deterministic OHLC bars.
 
 Current `str.*` progress:
 

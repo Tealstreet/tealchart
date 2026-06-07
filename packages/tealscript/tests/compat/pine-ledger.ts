@@ -460,6 +460,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-williams-r-signal-checkpoint',
+      title: 'Public Williams %R Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: williams percent r signal',
+      featureTags: ['ta', 'signals', 'wpr', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',
