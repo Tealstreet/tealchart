@@ -118,6 +118,9 @@ Current `ta.*` progress:
 - A source-linked public ADX/DMI trend-strength checkpoint locks the common
   `ta.dmi()` directional-line and ADX-threshold routing idiom over deterministic
   bars.
+- A source-linked public Parabolic SAR reversal checkpoint locks the common
+  `ta.sar()` acceleration-input and reversal-state routing idiom over
+  deterministic bars.
 
 Current `str.*` progress:
 
