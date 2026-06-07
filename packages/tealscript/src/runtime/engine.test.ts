@@ -3320,12 +3320,15 @@ plot(strategy.avg_trade_percent)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      // After bar 1: 1 closed trade, netProfit = 10
+      // After bar 1: 1 closed trade, netProfit = 10, avg_trade = 10
+      // avg_trade_percent: profit/entryValue*100 = 10/(100*1)*100 = 10%
       expect(result.plots[0]?.values[1]).toBeCloseTo(10);
-      expect(result.plots[1]?.values[1]).toBeCloseTo(1);
-      // After bar 3: 2 closed trades, netProfit = 10 + (-10) = 0
+      expect(result.plots[1]?.values[1]).toBeCloseTo(10);
+      // After bar 3: 2 closed trades, netProfit = 0, avg_trade = 0
+      // avg_trade_percent: (10% + -9.09%)/2 ≈ 0.45% (entry B was at close=110, exit at close=100)
       expect(result.plots[0]?.values[3]).toBeCloseTo(0);
-      expect(result.plots[1]?.values[3]).toBeCloseTo(0);
+      // avg_trade_percent is non-zero: trade A: +10%, trade B: -9.09%
+      expect(result.plots[1]?.values[3]).toBeCloseTo((10 + (-10 / 110) * 100) / 2, 1);
     });
 
     it('returns na for avg_trade when no closed trades', () => {
@@ -3356,10 +3359,11 @@ plot(strategy.avg_losing_trade_percent)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      // 1 winning trade, profit = 10
+      // 1 winning trade: entry at close=100, exit at close=110, profit=10
+      // avg_winning_trade = 10, avg_winning_trade_percent = 10/(100*1)*100 = 10%
       expect(result.plots[0]?.values[1]).toBeCloseTo(10);
       expect(result.plots[1]?.values[1]).toBeNull();
-      expect(result.plots[2]?.values[1]).toBeCloseTo(1); // 10/1000*100
+      expect(result.plots[2]?.values[1]).toBeCloseTo(10); // per-trade entry-value basis
       expect(result.plots[3]?.values[1]).toBeNull();
     });
 

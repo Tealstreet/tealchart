@@ -80,4 +80,4 @@ Used by strategy stats tables and performance dashboards.
 | Symbol info fields | 3 | LOW |
 | Misc constants | 3 | LOW |
 | **Total actionable** | **16** | |
-| Deferred (host-dependent) | 10 | — |
+| Deferred (host-dependent) | 9 | — |

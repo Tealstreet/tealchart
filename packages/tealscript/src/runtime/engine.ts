@@ -5429,7 +5429,11 @@ export class TealscriptEngine {
       case 'avg_trade_percent': {
         const closed = ledger.closedTrades;
         if (closed.length === 0) return Number.NaN;
-        return this.strategyInitialCapitalPercent(ledger.netProfit / closed.length);
+        const totalPercent = closed.reduce(
+          (sum, trade) => sum + this.strategyTradePercentValue(trade, trade.profit),
+          0,
+        );
+        return totalPercent / closed.length;
       }
       case 'avg_winning_trade': {
         const winners = ledger.closedTrades.filter((t) => t.profit > 0);
@@ -5438,7 +5442,11 @@ export class TealscriptEngine {
       case 'avg_winning_trade_percent': {
         const winners = ledger.closedTrades.filter((t) => t.profit > 0);
         if (winners.length === 0) return Number.NaN;
-        return this.strategyInitialCapitalPercent(ledger.grossProfit / winners.length);
+        const totalPercent = winners.reduce(
+          (sum, trade) => sum + this.strategyTradePercentValue(trade, trade.profit),
+          0,
+        );
+        return totalPercent / winners.length;
       }
       case 'avg_losing_trade': {
         const losers = ledger.closedTrades.filter((t) => t.profit < 0);
@@ -5447,7 +5455,11 @@ export class TealscriptEngine {
       case 'avg_losing_trade_percent': {
         const losers = ledger.closedTrades.filter((t) => t.profit < 0);
         if (losers.length === 0) return Number.NaN;
-        return this.strategyInitialCapitalPercent(ledger.grossLoss / losers.length);
+        const totalPercent = losers.reduce(
+          (sum, trade) => sum + this.strategyTradePercentValue(trade, trade.profit),
+          0,
+        );
+        return totalPercent / losers.length;
       }
       case 'max_contracts_held_all':
         return ledger.maxContractsHeldAll;
