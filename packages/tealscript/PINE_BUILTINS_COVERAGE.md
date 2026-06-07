@@ -159,6 +159,9 @@ Current `ta.*` progress:
   threshold-routing idiom over deterministic close-series bars.
 - A source-linked public Williams %R signal checkpoint locks the common
   `ta.wpr()` threshold-routing idiom over deterministic OHLC bars.
+- A source-linked public OBV signal checkpoint locks the common `ta.obv`
+  cumulative-volume momentum idiom with EMA signal line and rising/falling
+  routing over deterministic close/volume bars.
 
 Current `str.*` progress:
 

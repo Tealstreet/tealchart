@@ -6024,6 +6024,33 @@ plot(reqSum, title="Request Sum")
     expect(result.profile.requestContexts).toBe(1);
     expect(getPlot(result, 'Request Sum').values).toEqual([0]);
   });
+
+  it('locks a reduced public OBV signal idiom', () => {
+    // Public idiom reference: OBV scripts commonly expose a signal-line length
+    // input and route rising/falling cumulative volume momentum into plots.
+    // Source search: https://www.tradingview.com/scripts/search/on%20balance%20volume%20signal/
+    const result = runCompatScript(`
+indicator("Public OBV Signal Checkpoint")
+length = input.int(3, "Signal Length")
+obv = ta.obv
+signal = ta.ema(obv, length)
+risingOBV = obv > obv[1]
+plot(obv, title="OBV")
+plot(signal, title="Signal")
+plot(risingOBV ? 1 : 0, title="Rising OBV")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public OBV Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Signal Length', 'int'],
+    ]);
+    expect(getPlot(result, 'OBV').values).toEqual([0, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      0, 550, 1275, 1012.5, 181.25, 290.625, 995.3125, 2147.65625, 2123.828125, 2861.914063, 2555.957031, 3127.978516,
+    ]);
+    expect(getPlot(result, 'Rising OBV').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
