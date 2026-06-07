@@ -3146,6 +3146,39 @@ plot(isUp ? 1 : 0, title="Imported Signal")
     expect(getPlot(result, 'Imported Signal').values).toEqual([0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced public library arithmetic branch source-helper idiom', () => {
+    // Public idiom reference: public library helpers commonly wrap source
+    // calculations in equivalent ternary/switch branches before callers feed
+    // them into delayed rolling windows.
+    // Source search: https://www.tradingview.com/scripts/search/library%20source%20helper%20arithmetic%20branch%20wrapper/
+    const library = parse(`
+library("BranchSourceTools", true)
+export conditionalMidpoint() => bar_index >= 0 ? (high + low) / 2 : (high + low) / 2
+export switchScaled(series float src) => switch
+    bar_index >= 0 => src * 2
+    => src * 2
+`);
+    const result = runCompatScript(`
+indicator("Public Library Arithmetic Branch Source Helper Checkpoint")
+import PublicUser/BranchSourceTools/1 as bst
+plot(bar_index >= 1 ? ta.sma(bst.conditionalMidpoint(), 2) : na, title="Conditional Midpoint Average")
+plot(bar_index >= 1 ? ta.sma(bst.switchScaled(open), 2) : na, title="Switch Scaled Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['PublicUser/BranchSourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Conditional Midpoint Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Switch Scaled Average').values).toEqual([null, 30, 50]);
+  });
+
   it('locks a reduced official dynamic session idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/sessions/
     const result = runCompatScript(`
