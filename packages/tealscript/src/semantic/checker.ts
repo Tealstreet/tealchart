@@ -4278,6 +4278,15 @@ class SemanticChecker {
     const targetType = this.typeFromAnnotation(field.typeAnnotation ?? undefined);
     if (!targetType) return;
 
+    if (targetType.kind === 'bool' && this.isNaLiteralExpression(value)) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Cannot assign na value to bool field ${typeName}.${field.name.name}`,
+        value.loc,
+      );
+      return;
+    }
+
     const sourceType = this.inferExpressionType(value, scope);
     if (!this.isAssignableQualifier(targetType.qualifier, sourceType.qualifier)) {
       this.addDiagnostic(
