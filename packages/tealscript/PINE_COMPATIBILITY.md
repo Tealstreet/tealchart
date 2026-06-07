@@ -818,7 +818,7 @@ calendar-filter idioms by gating plots against a start timestamp, weekday,
 minute threshold, and named exchange timezone. Semantic analysis rejects
 non-numeric calendar `time` arguments and non-string calendar `timezone`
 arguments before runtime, and binds common `timestamp()` overloads before
-diagnosing date-field types.
+diagnosing required `year`/`month`/`day` fields and date-field types.
 
 ## Common Session Time Coverage
 
