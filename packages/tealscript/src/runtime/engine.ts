@@ -11267,20 +11267,22 @@ export class TealscriptEngine {
     const timezoneCandidate = this.getOrderedCallArg(args, namedArgs, ['timeframe', 'session', 'timezone'], 2);
     const hasTimezoneArgument = namedArgs.has('timezone') || (timezoneCandidate !== undefined && typeof timezoneCandidate === 'string');
     const timeArgs = hasTimezoneArgument
-      ? (['timeframe', 'session', 'timezone', 'bars_back'] as const)
-      : (['timeframe', 'session', 'bars_back'] as const);
+      ? (['timeframe', 'session', 'timezone', 'bars_back', 'timeframe_bars_back'] as const)
+      : (['timeframe', 'session', 'bars_back', 'timeframe_bars_back'] as const);
     const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 0, this.ctx.timeframe.period);
     const sessionArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 1);
     const timezoneArg = hasTimezoneArgument ? this.getOrderedCallArg(args, namedArgs, timeArgs, 2, this.ctx.syminfo.timezone) : this.ctx.syminfo.timezone;
     const barsBackArg = this.getOrderedCallArg(args, namedArgs, timeArgs, hasTimezoneArgument ? 3 : 2, 0);
+    const timeframeBarsBackArg = this.getOrderedCallArg(args, namedArgs, timeArgs, hasTimezoneArgument ? 4 : 3, 0);
     const barsBack = Math.trunc(this.toNumber(barsBackArg));
+    const timeframeBarsBack = Math.trunc(this.toNumber(timeframeBarsBackArg));
     const targetBarIndex = this.ctx.bar_index - barsBack;
     const timestamp = barsBack === 0 ? (this.ctx.time.get(0) ?? Number.NaN) : (this.ctx.getBar(targetBarIndex)?.time ?? Number.NaN);
     const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
     const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
-    if (!Number.isFinite(barsBack) || !Number.isFinite(timestamp)) return Number.NaN;
+    if (!Number.isFinite(barsBack) || !Number.isFinite(timeframeBarsBack) || !Number.isFinite(timestamp)) return Number.NaN;
     if (session && this.isExchangeSessionClosed(timestamp, timezone, this.getRuntimeSessionKind(session, timestamp, timezone))) {
       return Number.NaN;
     }
@@ -11288,7 +11290,7 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
-    const openTime = this.getTimeframeOpenTime(timestamp, timeframe, timezone);
+    const openTime = this.shiftTimeframeOpenTime(this.getTimeframeOpenTime(timestamp, timeframe, timezone), timeframe, timezone, -timeframeBarsBack);
     return closeTime ? this.getTimeframeCloseTime(openTime, timeframe, timezone) : openTime;
   }
 
@@ -11454,6 +11456,30 @@ export class TealscriptEngine {
 
     const duration = this.getTimeframeDurationMs(timeframe);
     return duration === null ? Number.NaN : openTime + duration;
+  }
+
+  private shiftTimeframeOpenTime(openTime: number, timeframe: string, timezone: string, offset: number): number {
+    if (!Number.isFinite(openTime) || offset === 0) return openTime;
+
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec || spec.unit === 'tick') return Number.NaN;
+
+    if (spec.unit === 'month') {
+      const year = this.getCalendarPart('year', openTime, timezone);
+      const month = this.getCalendarPart('month', openTime, timezone);
+      return this.resolveLocalTimestamp(timezone, year, month + spec.multiplier * offset, 1, 0, 0, 0);
+    }
+
+    if (spec.unit === 'week' || spec.unit === 'day') {
+      const year = this.getCalendarPart('year', openTime, timezone);
+      const month = this.getCalendarPart('month', openTime, timezone);
+      const day = this.getCalendarPart('dayofmonth', openTime, timezone);
+      const days = spec.unit === 'week' ? spec.multiplier * 7 : spec.multiplier;
+      return this.resolveLocalTimestamp(timezone, year, month, day + days * offset, 0, 0, 0);
+    }
+
+    const duration = this.getTimeframeDurationMs(timeframe);
+    return duration === null ? Number.NaN : openTime + duration * offset;
   }
 
   private getTimeframeDurationMs(timeframe: string): number | null {
