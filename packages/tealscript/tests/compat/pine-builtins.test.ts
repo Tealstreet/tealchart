@@ -1266,6 +1266,39 @@ plot(namedPrice == 101.25, title="Named Price")
     expect(getPlot(result, 'Named Price').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
+  it('accepts legacy generic input type constants', () => {
+    const result = runCompatScript(`
+//@version=4
+study("Legacy input type constants")
+length = input(3, "Length", type=input.integer, minval=1, maxval=5, step=1)
+multiplier = input(2.0, "Multiplier", input.float, minval=1.0, maxval=4.0, confirm=true, step=0.5)
+enabled = input(true, "Enabled", type=input.bool)
+mode = input("EMA", "Mode", type=input.string, options=["SMA", "EMA"])
+source = input(close, "Source", type=input.source)
+tf = input("60", "Timeframe", type=input.resolution)
+symbol = input("BINANCE:BTCUSDT", "Symbol", type=input.symbol)
+session = input("0930-1600", "Session", type=input.session)
+tint = input(color.red, "Tint", type=input.color)
+plot(sma(source, length) * multiplier, title="Average")
+plot(enabled and mode == "EMA" and tf == "60" and symbol == "BINANCE:BTCUSDT" and session == "0930-1600" and tint == color.red, title="Metadata")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toMatchObject([
+      { id: 'input_Length', type: 'int', title: 'Length', defval: 3, minval: 1, maxval: 5, step: 1 },
+      { id: 'input_Multiplier', type: 'float', title: 'Multiplier', defval: 2, minval: 1, maxval: 4, step: 0.5, confirm: true },
+      { id: 'input_Enabled', type: 'bool', title: 'Enabled', defval: true },
+      { id: 'input_Mode', type: 'string', title: 'Mode', defval: 'EMA', options: ['SMA', 'EMA'] },
+      { id: 'input_Source', type: 'source', title: 'Source', defval: 102 },
+      { id: 'input_Timeframe', type: 'timeframe', title: 'Timeframe', defval: '60' },
+      { id: 'input_Symbol', type: 'symbol', title: 'Symbol', defval: 'BINANCE:BTCUSDT' },
+      { id: 'input_Session', type: 'session', title: 'Session', defval: '0930-1600' },
+      { id: 'input_Tint', type: 'color', title: 'Tint' },
+    ]);
+    expect(roundSeries(getPlot(result, 'Average').values)).toEqual([null, null, 209.333333, 210, 206, 201.333333, 202, 208.666667, 214, 218.666667, 219.333333, 222]);
+    expect(getPlot(result, 'Metadata').values).toEqual(Array(compatibilityBars.length).fill(true));
+  });
+
   it('preserves common input metadata', () => {
     const result = runCompatScript(`
 indicator("Input metadata")

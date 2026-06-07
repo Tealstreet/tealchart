@@ -305,19 +305,25 @@ parameters plus non-numeric time, position, count, and occurrence parameters.
 
 ## Common `input.*` Coverage
 
-The common input helper pass covers generic `input()` inference, common typed
-helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.session`,
-`input.text_area`, `input.enum`), and common metadata (`options`, `tooltip`, `group`,
-`inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
-definitions. Semantic analysis preserves generic `input()` scalar defval-derived
-return types and known `input.*` return types for
-downstream assignment diagnostics, including `input.source()` defval source
-types and `input.enum()` defval enum types. Source-linked public checkpoint
+The common input helper pass covers generic `input()` inference, legacy v3/v4
+generic `input(..., type=input.*)` constants (`input.integer`, `input.float`,
+`input.bool`, `input.string`, `input.color`, `input.source`,
+`input.resolution`, `input.symbol`, `input.session`), common typed helpers
+(`input.price`, `input.time`, `input.timeframe`, `input.symbol`,
+`input.session`, `input.text_area`, `input.enum`), and common metadata
+(`options`, `tooltip`, `group`, `inline`, `confirm`, `display`, `active`) so
+generated scripts retain Pine-like control definitions. Semantic analysis
+preserves generic `input()` scalar defval-derived return types, explicit legacy
+generic input type return types, and known `input.*` return types for
+downstream assignment diagnostics, including `input.source()` and legacy
+`input(..., type=input.source)` defval source types and `input.enum()` defval
+enum types. Source-linked public checkpoint
 coverage now locks grouped mode, length, source, toggle, and price-level inputs
 feeding plotted signal output, plus date/session/symbol/timeframe/color/notes
 inputs that gate a filtered public-style signal. It also reports Pine-style diagnostics for typed
-default-value mismatches, including `input.color()` color defaults, literal default
-`minval` / `maxval` / `options` constraint violations, invalid `options`
+default-value mismatches, including legacy generic typed defaults,
+`input.color()` color defaults, literal default `minval` / `maxval` /
+`options` constraint violations, invalid `options`
 argument shapes and element types, invalid literal `display` option values, and `input.int()` /
 `input.float()` calls that mix `options` with range-only
 `minval`/`maxval`/`step` arguments. Input metadata diagnostics also reject
