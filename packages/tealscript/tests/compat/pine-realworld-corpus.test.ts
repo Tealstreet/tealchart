@@ -5607,7 +5607,7 @@ plot(nz(m.get("c")), title="MapC")
   });
 
   it('locks UDT type declaration with float and int fields', () => {
-    // type Block defines a UDT with two fields; .new() assigns price=close and bar=bar_index.
+    // type Signal defines a UDT with two fields; .new() assigns price=close; bar is set via :=.
     // Source search: https://www.tradingview.com/pine-script-docs/language/objects/
     const result = runCompatScript(`
 indicator("UDT Type Fields Checkpoint")
