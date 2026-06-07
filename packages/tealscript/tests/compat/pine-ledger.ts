@@ -747,6 +747,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-custom-bar-checkpoint',
+      title: 'Public Custom Bar Checkpoint',
+      searchContext: 'TradingView public scripts search: custom bars',
+      featureTags: ['visuals', 'custom_bars', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-synthetic-ticker-checkpoint',
       title: 'Public Synthetic Ticker Checkpoint',
       searchContext: 'TradingView public scripts search: heikin ashi trend',
