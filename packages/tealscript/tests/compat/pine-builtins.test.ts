@@ -57,6 +57,37 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
     expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
   });
 
+  it('accepts legacy global TA aliases for supported helper breadth', () => {
+    const result = runCompatScript(`
+//@version=4
+study("Legacy TA alias breadth")
+[macdLine, signalLine, histLine] = macd(close, 3, 6, 2)
+[basis, upper, lower] = bb(close, 3, 2.0)
+[kcBasis, kcUpper, kcLower] = kc(close, 3, 1.25)
+[plusDi, minusDi, adx] = dmi(3, 3)
+[trendLine, direction] = supertrend(2.0, 3)
+event = close > open
+osc = atr(3) + cci(close, 3) + cmo(close, 3) + mom(close, 2) + roc(close, 2) + rma(close, 3)
+stats = stdev(close, 3) + variance(close, 3) + dev(close, 3) + correlation(close, open, 3) + covariance(close, open, 3)
+ranked = percentile_nearest_rank(close, 3, 50) + percentile_linear_interpolation(close, 3, 50) + percentrank(close, 3)
+smooth = alma(close, 3, 0.5, 6) + hma(close, 3) + linreg(close, 3, 0) + vwma(close, 3) + wma(close, 3) + swma(close)
+window = range(close, 3) + median(close, 3) + mode(close, 3) + cog(close, 3) + highestbars(high, 3) + lowestbars(low, 3)
+state = barssince(event) + valuewhen(event, close, 0) + change(close) + cum(close - open)
+signals = (rising(close, 2) ? 1 : 0) + (falling(close, 2) ? 1 : 0)
+bands = bbw(close, 3, 2.0) + kcw(close, 3, 1.25)
+plot(macdLine + signalLine + histLine, title="MACD")
+plot(basis + upper + lower + kcBasis + kcUpper + kcLower, title="Bands")
+plot(plusDi + minusDi + adx + trendLine + direction, title="Trend")
+plot(osc + stats + ranked + smooth + window + state + signals + bands, title="Alias Sum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'MACD').values).toHaveLength(compatibilityBars.length);
+    expect(getPlot(result, 'Bands').values).toHaveLength(compatibilityBars.length);
+    expect(getPlot(result, 'Trend').values).toHaveLength(compatibilityBars.length);
+    expect(getPlot(result, 'Alias Sum').values).toHaveLength(compatibilityBars.length);
+  });
+
   it('runs ta.vwap default, source, anchor, and mixed argument forms', () => {
     const result = runCompatScript(`
 indicator("VWAP call binding")

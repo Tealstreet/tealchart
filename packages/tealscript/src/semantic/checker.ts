@@ -203,16 +203,68 @@ const ALERT_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>(
 const ALERT_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['alertcondition', ['condition']],
 ]);
+const LEGACY_GLOBAL_TA_ALIASES = [
+  'alma',
+  'atr',
+  'barssince',
+  'bb',
+  'bbw',
+  'cci',
+  'change',
+  'cmo',
+  'cog',
+  'correlation',
+  'covariance',
+  'cross',
+  'crossover',
+  'crossunder',
+  'cum',
+  'dev',
+  'dmi',
+  'ema',
+  'falling',
+  'highest',
+  'highestbars',
+  'hma',
+  'kc',
+  'kcw',
+  'linreg',
+  'lowest',
+  'lowestbars',
+  'macd',
+  'median',
+  'mfi',
+  'mode',
+  'mom',
+  'obv',
+  'percentrank',
+  'percentile_linear_interpolation',
+  'percentile_nearest_rank',
+  'pivothigh',
+  'pivotlow',
+  'range',
+  'rising',
+  'rma',
+  'roc',
+  'rsi',
+  'sar',
+  'sma',
+  'stdev',
+  'stoch',
+  'supertrend',
+  'swma',
+  'tr',
+  'tsi',
+  'valuewhen',
+  'variance',
+  'vwap',
+  'vwma',
+  'wma',
+  'wpr',
+] as const;
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
-  ['sma', 'ta.sma'],
-  ['ema', 'ta.ema'],
-  ['rsi', 'ta.rsi'],
-  ['highest', 'ta.highest'],
-  ['lowest', 'ta.lowest'],
-  ['cross', 'ta.cross'],
-  ['crossover', 'ta.crossover'],
-  ['crossunder', 'ta.crossunder'],
+  ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
 ]);
 const canonicalBuiltinName = (name: string): string => LEGACY_GLOBAL_BUILTIN_ALIASES.get(name) ?? name;
 const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
@@ -406,12 +458,9 @@ const STRING_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly
   ['str.replace', ['occurrence']],
 ]);
 
-const TA_BOOL_RETURN_NAMES = new Set(['cross', 'crossover', 'crossunder', 'ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
+const TA_BOOL_RETURN_NAMES = new Set(['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
 const TA_INT_RETURN_NAMES = new Set(['ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
 const TA_FLOAT_RETURN_NAMES = new Set([
-  'ema',
-  'rsi',
-  'sma',
   'ta.alma',
   'ta.atr',
   'ta.bbw',
@@ -446,16 +495,13 @@ const TA_FLOAT_RETURN_NAMES = new Set([
   'ta.wpr',
 ]);
 const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
-const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['highest', 'lowest', 'ta.highest', 'ta.lowest']);
+const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
 const TA_FLOAT_MEMBER_NAMES = new Set(['ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
 const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.alma', ['series', 'length', 'offset', 'sigma']],
   ['ta.cci', ['source', 'length']],
   ['ta.cmo', ['source', 'length']],
   ['ta.cum', ['source']],
-  ['cross', ['source1', 'source2']],
-  ['crossover', ['source1', 'source2']],
-  ['crossunder', ['source1', 'source2']],
   ['ta.crossover', ['source1', 'source2']],
   ['ta.crossunder', ['source1', 'source2']],
   ['ta.cross', ['source1', 'source2']],
@@ -464,12 +510,9 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.cog', ['source', 'length']],
   ['ta.dev', ['source', 'length']],
   ['ta.dmi', ['diLength', 'adxSmoothing']],
-  ['ema', ['source', 'length']],
   ['ta.ema', ['source', 'length']],
   ['ta.hma', ['source', 'length']],
-  ['highest', ['source', 'length']],
   ['ta.highest', ['source', 'length']],
-  ['lowest', ['source', 'length']],
   ['ta.lowest', ['source', 'length']],
   ['ta.highestbars', ['source', 'length']],
   ['ta.lowestbars', ['source', 'length']],
@@ -491,10 +534,8 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.falling', ['source', 'length']],
   ['ta.rma', ['source', 'length']],
   ['ta.roc', ['source', 'length']],
-  ['rsi', ['source', 'length']],
   ['ta.rsi', ['source', 'length']],
   ['ta.sar', ['start', 'inc', 'max']],
-  ['sma', ['source', 'length']],
   ['ta.sma', ['source', 'length']],
   ['ta.stdev', ['source', 'length']],
   ['ta.stoch', ['source', 'high', 'low', 'length']],
@@ -794,21 +835,15 @@ const BUILTIN_FUNCTIONS = new Set([
   'barcolor',
   'bgcolor',
   'bool',
-  'cross',
-  'crossover',
-  'crossunder',
-  'ema',
   'fill',
   'fixnan',
   'float',
-  'highest',
   'hline',
   'indicator',
   'input',
   'int',
   'label',
   'line',
-  'lowest',
   'max_bars_back',
   'na',
   'nz',
@@ -818,16 +853,15 @@ const BUILTIN_FUNCTIONS = new Set([
   'plotcandle',
   'plotchar',
   'plotshape',
-  'rsi',
   'runtime',
   'security',
-  'sma',
   'string',
   'strategy',
   'time',
   'time_close',
   'timestamp',
   ...CALENDAR_FUNCTION_NAMES,
+  ...LEGACY_GLOBAL_TA_ALIASES,
 ]);
 
 const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
@@ -3575,7 +3609,7 @@ class SemanticChecker {
   }
 
   private inferBuiltinTupleElementTypes(expression: CallExpression, _scope: SemanticScope): SemanticType[] | undefined {
-    const calleeName = this.memberPath(expression.callee).join('.');
+    const calleeName = canonicalBuiltinName(this.memberPath(expression.callee).join('.'));
     if (calleeName === 'ta.vwap') {
       const stdevMult = this.resolveCallArgumentExpression(expression, ['source', 'anchor', 'stdev_mult'], 2);
       return stdevMult ? [
@@ -4608,8 +4642,9 @@ class SemanticChecker {
 
   private checkTaFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
     const calleeName = this.memberPath(expression.callee).join('.');
-    const numericParameterNames = TA_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
-    const boolParameterNames = TA_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    const canonicalName = canonicalBuiltinName(calleeName);
+    const numericParameterNames = TA_NUMERIC_PARAMETER_NAMES_BY_CALL.get(canonicalName);
+    const boolParameterNames = TA_BOOL_PARAMETER_NAMES_BY_CALL.get(canonicalName);
     if (!numericParameterNames && !boolParameterNames) return;
 
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
