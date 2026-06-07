@@ -7715,6 +7715,26 @@ pivot.tag += 1
     ]);
   });
 
+  it('reports literal na assigned to bool user-defined type fields', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Bool NA")
+type State
+    bool defaulted = na
+    bool active
+    float value
+badCtor = State.new(true, na, close)
+state = State.new(true, true, close)
+state.active := na
+plot(state.value)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign na value to bool field State.defaulted',
+      'Cannot assign na value to bool field State.active',
+      'Cannot assign na value to bool field State.active',
+    ]);
+  });
+
   it('reports user-defined type field assignment qualifier mismatches', () => {
     const result = checkProgram(parse(`
 indicator("UDT Field Qualifier Mismatches")

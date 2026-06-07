@@ -634,7 +634,8 @@ Known numeric and literal `na` expressions in boolean contexts are also
 rejected, matching Pine v6's explicit boolean condition requirement; compare
 them explicitly or wrap them in `bool(...)`. Typed `bool` variables also reject
 literal `na` initializers and reassignments while preserving explicit
-`bool(na)` conversion.
+`bool(na)` conversion, and typed bool fields on user-defined types reject
+literal `na` defaults, constructor values, and reassignments.
 
 ## Common Visual Coloring Coverage
 
