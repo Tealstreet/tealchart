@@ -53,8 +53,8 @@ matrix scoreboards, drawing-zone, linefill-channel, custom-candle, and
 library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
-public strategy performance tables, plus UDT state objects updated through
-user-defined methods.
+public strategy performance tables, public `varip` intrabar array buffers, plus
+UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
@@ -82,6 +82,9 @@ Resolved in the scope/series hardening PR:
   written call site so separate calls to the same helper do not share
   function-local `var` variables. Function-local `if` and loop block scopes
   persist across bars for nested-block `var` values and regular series history.
+  The source-linked public `varip` array checkpoint locks the common realtime
+  tick-buffer idiom where an intrabar array accumulates same-bar update values
+  and resets on `barstate.isnew`.
 
 Covered behavior and remaining gaps:
 
