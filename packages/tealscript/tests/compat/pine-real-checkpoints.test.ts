@@ -1812,6 +1812,78 @@ plot(bearRibbon ? 1 : 0, title="Bear Ribbon")
     expect(getPlot(result, 'Bear Ribbon').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]);
   });
 
+  it('locks a reduced public percentile rank signal idiom', () => {
+    // Public idiom reference: percentile/rank scripts commonly expose lookback
+    // and percentile inputs before routing price-vs-band and rank regimes.
+    // Source search: https://www.tradingview.com/scripts/search/percentile%20rank%20signal/
+    const result = runCompatScript(`
+indicator("Public Percentile Rank Signal Checkpoint")
+length = input.int(5, "Length")
+percentage = input.float(75.0, "Percentile")
+nearest = ta.percentile_nearest_rank(source=close, length=length, percentage=percentage)
+linear = ta.percentile_linear_interpolation(source=close, length=length, percentage=percentage)
+rank = ta.percentrank(source=close, length=length)
+bullSignal = close > linear
+highRank = rank > percentage
+plot(nearest, title="Nearest Percentile")
+plot(linear, title="Linear Percentile")
+plot(rank, title="Percent Rank")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(highRank ? 1 : 0, title="High Rank")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Percentile Rank Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Percentile', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Nearest Percentile').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      105,
+      105,
+      104,
+      104,
+      108,
+      109,
+      110,
+      111,
+    ]);
+    expect(roundSeries(getPlot(result, 'Linear Percentile').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      105,
+      105,
+      104,
+      104,
+      108,
+      109,
+      110,
+      111,
+    ]);
+    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      20,
+      40,
+      80,
+      100,
+      80,
+      100,
+      80,
+      100,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1]);
+    expect(getPlot(result, 'High Rank').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('locks a reduced public stochastic signal idiom', () => {
     // Public idiom reference: stochastic oscillator scripts commonly expose
     // %K/%D smoothing and overbought/oversold gates before routing signals.
