@@ -110,7 +110,7 @@ yearValue = year(time="now", timezone=1)
 hourValue = hour(time=true, timezone=2)
 badStamp = timestamp("UTC", "2024", 1, 5, 9, 30)
 badDefaultStamp = timestamp(2024, "1", 5)
-badDateString = timestamp(1700000000000, timezone="UTC")
+badDateString = timestamp(1700000000000, 1, 5, 9, timezone="UTC")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -130,6 +130,30 @@ badDateString = timestamp(1700000000000, timezone="UTC")
       'timestamp year must be a number, got string',
       'timestamp month must be a number, got string',
       'Argument \'timezone\' for timestamp() was supplied multiple times',
+    ]);
+  });
+
+  it('reports invalid timestamp date arity', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Timestamp Arity")
+missingMonthDay = timestamp(2024)
+missingDay = timestamp(2024, 1)
+missingNamedDay = timestamp(year=2024, month=1)
+missingPrefixedDay = timestamp(timezone="UTC", 2024, 1)
+extraDateString = timestamp(dateString="20 Aug 2024 00:00:00 +0000", 1)
+extraDefaultTimezoneDate = timestamp(2024, 1, 5, 9, 30, 0, 1)
+extraPrefixedDate = timestamp("UTC", 2024, 1, 5, 9, 30, 0, 1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "timestamp() missing required argument 'month'",
+      "timestamp() missing required argument 'day'",
+      "timestamp() missing required argument 'day'",
+      "timestamp() missing required argument 'day'",
+      "timestamp() missing required argument 'day'",
+      'timestamp() expects at most 1 argument',
+      'timestamp() expects at most 6 arguments',
+      'timestamp() expects at most 7 arguments',
     ]);
   });
 

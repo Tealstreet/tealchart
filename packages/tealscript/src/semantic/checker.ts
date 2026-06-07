@@ -510,7 +510,7 @@ const TIMEFRAME_STRING_MEMBER_NAMES = new Set(['timeframe.main_period', 'timefra
 const TIME_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['time', ['timeframe', 'session', 'timezone']],
   ['time_close', ['timeframe', 'session', 'timezone']],
-  ['timestamp', ['date_string', 'timezone']],
+  ['timestamp', ['dateString', 'timezone']],
   ['timeframe.change', ['timeframe']],
   ['timeframe.in_seconds', ['timeframe']],
   ['timeframe.to_seconds', ['timeframe']],
@@ -1583,7 +1583,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
     {
       params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'],
       overloads: [
-        ['date_string'],
+        ['dateString'],
         ['year', 'month', 'day', 'hour', 'minute', 'second'],
       ],
       minArgs: 1,
@@ -6863,6 +6863,11 @@ class SemanticChecker {
   }
 
   private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    if (signature === BUILTIN_SIGNATURES.get('timestamp')) {
+      this.checkTimestampArgumentCount(args, signature, displayName);
+      return;
+    }
+
     const params = this.resolveSignatureParams(args, signature);
     const binding = signature.allowNamedPrefixWithPositional ? this.bindSignatureArguments(args, signature, params) : undefined;
     const positionalCount = this.leadingPositionalCount(args);
@@ -6949,6 +6954,25 @@ class SemanticChecker {
       if (positionalIndex !== -1 && positionalIndex < positionalCount) {
         this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
       }
+    }
+  }
+
+  private checkTimestampArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const params = this.resolveTimestampSignatureParams(args, signature);
+    const binding = this.bindSignatureArguments(args, signature, params);
+    const requiredParams = params.includes('dateString') ? ['dateString'] : ['year', 'month', 'day'];
+
+    for (const param of requiredParams) {
+      if (binding.boundParams.has(param)) continue;
+      this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
+    }
+
+    if (binding.overflowArgs.length > 0 && !signature.allowExtraPositional) {
+      this.addDiagnostic(
+        'argument-count',
+        `${displayName}() expects at most ${params.length} argument${params.length === 1 ? '' : 's'}`,
+        binding.overflowArgs[0]?.loc,
+      );
     }
   }
 
@@ -7043,7 +7067,7 @@ class SemanticChecker {
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
     const [dateStringParams, numericDateParams] = signature.overloads ?? [];
 
-    if (suppliedNames.has('date_string')) {
+    if (suppliedNames.has('dateString')) {
       return dateStringParams ?? signature.params;
     }
     if (suppliedNames.has('timezone')) {
