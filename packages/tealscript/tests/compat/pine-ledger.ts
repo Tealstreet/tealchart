@@ -1143,6 +1143,97 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-strategy-stats-checkpoint',
+      title: 'Real-World Advanced Strategy Stats Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy performance stats table',
+      category: 'strategy',
+      featureTags: ['strategy', 'performance', 'tables', 'dashboard', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-udt-methods-checkpoint',
+      title: 'Real-World Advanced UDT Methods Checkpoint',
+      searchContext: 'TradingView public scripts search: user defined type method array',
+      featureTags: ['udt', 'methods', 'arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-udf-defaults-checkpoint',
+      title: 'Real-World Advanced UDF Defaults Checkpoint',
+      searchContext: 'TradingView public scripts search: normalize function default parameters',
+      featureTags: ['udf', 'signals', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-drawing-lifecycle-checkpoint',
+      title: 'Real-World Advanced Drawing Lifecycle Checkpoint',
+      searchContext: 'TradingView public scripts search: label array delete oldest',
+      featureTags: ['drawings', 'labels', 'arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-switch-enum-checkpoint',
+      title: 'Real-World Advanced Switch Enum Checkpoint',
+      searchContext: 'TradingView public scripts search: enum state machine switch',
+      featureTags: ['signals', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-matrix-operations-checkpoint',
+      title: 'Real-World Advanced Matrix Operations Checkpoint',
+      searchContext: 'TradingView public scripts search: matrix score indicator',
+      featureTags: ['matrix', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-map-state-checkpoint',
+      title: 'Real-World Advanced Map State Checkpoint',
+      searchContext: 'TradingView public scripts search: map state tracking accumulate',
+      featureTags: ['map', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-conditional-plotting-checkpoint',
+      title: 'Real-World Advanced Conditional Plotting Checkpoint',
+      searchContext: 'TradingView public scripts search: dynamic color fill plotshape indicator',
+      featureTags: ['visuals', 'signals', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-forin-array-checkpoint',
+      title: 'Real-World Advanced For-In Array Checkpoint',
+      searchContext: 'TradingView public scripts search: rolling window average median array',
+      featureTags: ['arrays', 'signals', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-adv-strformat-dashboard-checkpoint',
+      title: 'Real-World Advanced Str.Format Dashboard Checkpoint',
+      searchContext: 'TradingView public scripts search: str.format dashboard rsi atr',
+      featureTags: ['tables', 'dashboard', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
