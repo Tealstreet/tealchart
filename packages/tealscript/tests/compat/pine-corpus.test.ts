@@ -24,6 +24,7 @@ const EXPECTED_CHECKPOINT_TOTAL = compatibilityCheckpointLedger.entries.length;
 const EXPECTED_CHECKPOINT_FAILED = 4;
 const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 4;
 const EXPECTED_CHECKPOINT_PASSED = EXPECTED_CHECKPOINT_TOTAL - EXPECTED_CHECKPOINT_FAILED;
+const EXPECTED_CHECKPOINT_PASS_RATE = `${((EXPECTED_CHECKPOINT_PASSED / EXPECTED_CHECKPOINT_TOTAL) * 100).toFixed(1)}%`;
 
 describe('Pine compatibility checkpoint corpus', () => {
   it('keeps source-linked reduced checkpoints in the offline corpus', () => {
@@ -1000,7 +1001,9 @@ plot(signals.fast(close, 2), title="Fast")
         `"passed": ${EXPECTED_CHECKPOINT_PASSED}`,
       );
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"actionableFailed": 0');
-      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 98.9%');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain(
+        `Pass rate: ${EXPECTED_CHECKPOINT_PASS_RATE}`,
+      );
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Actionable pass rate: 100.0%');
       expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain(
         `"total": ${EXPECTED_CHECKPOINT_TOTAL}`,
