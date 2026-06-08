@@ -11343,7 +11343,7 @@ export class TealscriptEngine {
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 1));
       const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 2));
       const sigma = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 3));
-      const useFlooredOffset = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 4));
+      const useFlooredOffset = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 4, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_alma_source_${callId}`, source, length);
       if (!values || isNaN(offset) || !Number.isFinite(sigma) || sigma === 0) return NaN;
 

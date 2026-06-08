@@ -7758,6 +7758,41 @@ plot(ta.swma(close - open), title="Derived SWMA")`;
       expect(result.plots.find((plot) => plot.title === 'Derived SWMA')?.values).toEqual([null, null, null, 5 / 3, 1]);
     });
 
+    it('ta.alma defaults floor to true, matching explicit floor=true', () => {
+      // length=3, offset=0.85, sigma=6.0 → m=floor(0.85*2)=1 vs m=1.7 without floor
+      const scriptDefault = `//@version=6
+indicator("ALMA floor default")
+plot(ta.alma(close, 3, 0.85, 6.0), title="ALMA")`;
+
+      const scriptExplicit = `//@version=6
+indicator("ALMA floor explicit")
+plot(ta.alma(close, 3, 0.85, 6.0, true), title="ALMA")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 0, high: 1, low: 0, close: 10, volume: 100 },
+        { time: 2, open: 0, high: 3, low: 0, close: 20, volume: 100 },
+        { time: 3, open: 1, high: 2, low: 0, close: 30, volume: 100 },
+        { time: 4, open: 4, high: 5, low: 0, close: 40, volume: 100 },
+        { time: 5, open: 5, high: 4, low: 0, close: 50, volume: 100 },
+      ];
+
+      const resultDefault = executeScript(parse(scriptDefault), bars);
+      const resultExplicit = executeScript(parse(scriptExplicit), bars);
+
+      expect(resultDefault.errors).toHaveLength(0);
+      expect(resultExplicit.errors).toHaveLength(0);
+
+      const defaultVals = roundSeries(resultDefault.plots.find((p) => p.title === 'ALMA')?.values ?? []);
+      const explicitVals = roundSeries(resultExplicit.plots.find((p) => p.title === 'ALMA')?.values ?? []);
+
+      // Both should match — default floor=true equals explicit floor=true
+      expect(defaultVals).toEqual(explicitVals);
+
+      // Spot-check bar 2 (index 2): m=1, weights centered on i=1 (middle value=20)
+      // ALMA ≈ 20.0 (symmetric weights around middle bar)
+      expect(defaultVals[2]).toBeCloseTo(20.0, 4);
+    });
+
     it('calculates ta.dema — double EMA is more responsive than plain EMA', () => {
       const script = `//@version=6
 indicator("DEMA test")
