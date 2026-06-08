@@ -6896,6 +6896,106 @@ plot(slow, title="Slow")
     const longAlert = result.alerts.find((a) => a.type === 'alert' && a.message === 'Long entry');
     expect(longAlert?.events.length).toBeGreaterThan(0);
   });
+
+  it('locks ta.crossover with a numeric constant (PR #992 correctness)', () => {
+    // Source search: https://www.tradingview.com/scripts/search/crossover%20constant%20level%20close/
+    // Verifies that ta.crossover(close, 104) fires only when close crosses strictly above 104
+    // from a previous value at or below 104. PR #992 fixed a false-match regression.
+    const result = runCompatScript(`
+indicator("Crossover Constant Checkpoint")
+signal = ta.crossover(close, 104)
+plot(signal ? 1 : 0, title="Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Bars: closes = [102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]
+    // Crossover fires when close crosses above 104:
+    //   bar1: 102->105 (crosses above 104) => 1
+    //   bar6: 100->104 (reaches 104, but not strictly above) => 0
+    //   bar7: 104->109 (crosses above 104) => 1
+    expect(getPlot(result, 'Signal').values).toEqual([0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+  });
+
+  it('locks ta.rci oscillator output in [-100, 100]', () => {
+    // Source search: https://www.tradingview.com/scripts/search/rci%20rank%20correlation%20index%20oscillator/
+    const result = runCompatScript(`
+indicator("RCI Oscillator Checkpoint")
+r = ta.rci(close, 5)
+plot(r, title="RCI")
+`);
+
+    expect(result.errors).toEqual([]);
+    const rci = getPlot(result, 'RCI').values;
+    // First 4 bars are null (need 5 bars window)
+    expect(rci[0]).toBeNull();
+    expect(rci[1]).toBeNull();
+    expect(rci[2]).toBeNull();
+    expect(rci[3]).toBeNull();
+    // All non-null values must be in the Spearman [-100, 100] range
+    const nonNull = rci.filter((v) => v !== null) as number[];
+    expect(nonNull.length).toBe(8);
+    for (const v of nonNull) {
+      expect(v).toBeGreaterThanOrEqual(-100);
+      expect(v).toBeLessThanOrEqual(100);
+    }
+    // Spot-check computed values
+    expect(roundSeries(rci)).toEqual([null, null, null, null, -30, -80, -30, 70, 90, 90, 80, 80]);
+  });
+
+  it('locks ta.dema and ta.tema producing distinct values in one script', () => {
+    // Source search: https://www.tradingview.com/scripts/search/dema%20tema%20combined%20signal%20distinct/
+    // Both indicators must be evaluated together and produce different series.
+    const result = runCompatScript(`
+indicator("DEMA TEMA Distinct Checkpoint")
+d = ta.dema(close, 4)
+t = ta.tema(close, 4)
+plot(d, title="DEMA4")
+plot(t, title="TEMA4")
+plot(d - t, title="Diff")
+`);
+
+    expect(result.errors).toEqual([]);
+    const dema = roundSeries(getPlot(result, 'DEMA4').values);
+    const tema = roundSeries(getPlot(result, 'TEMA4').values);
+    const diff = roundSeries(getPlot(result, 'Diff').values);
+    // DEMA and TEMA must be distinct for at least one bar
+    const allEqual = dema.every((v, i) => v === tema[i]);
+    expect(allEqual).toBe(false);
+    // Diff plot values must match DEMA - TEMA
+    for (let i = 0; i < diff.length; i++) {
+      if (diff[i] !== null && dema[i] !== null && tema[i] !== null) {
+        expect(Math.abs(diff[i]! - (dema[i]! - tema[i]!))).toBeLessThan(0.001);
+      }
+    }
+  });
+
+  it('locks ta.pivot_point_levels returning an 11-element array', () => {
+    // Source search: https://www.tradingview.com/scripts/search/pivot%20point%20levels%20traditional%20support%20resistance/
+    const result = runCompatScript(`
+indicator("Pivot Point Levels Checkpoint")
+levels = ta.pivot_point_levels("Traditional", "Daily")
+p = array.get(levels, 0)
+s1 = array.get(levels, 1)
+r1 = array.get(levels, 2)
+plot(p, title="P")
+plot(s1, title="S1")
+plot(r1, title="R1")
+plot(array.size(levels), title="Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Count').values).toEqual(Array(12).fill(11));
+    // Bar 0: uses bar 0 H/L/C = 103/99/102 (no prior bar). P = (103+99+102)/3 = 101.333333
+    expect(roundSeries(getPlot(result, 'P').values)[0]).toBeCloseTo(101.333333, 4);
+    // Bar 1 also uses bar 0 H/L/C (developing=false uses previous bar)
+    expect(roundSeries(getPlot(result, 'P').values)[1]).toBeCloseTo(101.333333, 4);
+    // Bar 2 uses bar 1 H/L/C = 106/101/105. P = (106+101+105)/3 = 104.0
+    expect(roundSeries(getPlot(result, 'P').values)[2]).toBeCloseTo(104.0, 4);
+    // S1 = 2*P - H. For bar 0: S1 = 2*101.333 - 103 = 99.666667
+    expect(roundSeries(getPlot(result, 'S1').values)[0]).toBeCloseTo(99.666667, 4);
+    // R1 = 2*P - L. For bar 0: R1 = 2*101.333 - 99 = 103.666667
+    expect(roundSeries(getPlot(result, 'R1').values)[0]).toBeCloseTo(103.666667, 4);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
