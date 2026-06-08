@@ -2411,6 +2411,7 @@ EscapeSequence
   / "\\" { return '\\'; }
   / '"' { return '"'; }
   / "'" { return "'"; }
+  / char:. { return '\\' + char; }
 
 NumberLiteral
   = Float
