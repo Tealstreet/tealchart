@@ -908,15 +908,20 @@ export class TealscriptEngine {
       case 'TupleAssignment':
         return this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
       case 'AssignmentStatement': {
-        const rightMax = this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
+        const rightMax = this.inferInitializerMaxBarsBack(statement.right, collectionScopes);
         if (statement.left.type === 'Identifier') {
-          this.assignStaticNameInfo(
-            statement.left.name,
-            this.expressionReturnsCollection(statement.right, collectionScopes),
-            this.inferStaticNumericValue(statement.right, collectionScopes),
-            this.inferStaticBooleanValue(statement.right, collectionScopes),
-            collectionScopes,
-          );
+          if (statement.right.type !== 'IfStatement') {
+            const rightExpr = statement.right;
+            this.assignStaticNameInfo(
+              statement.left.name,
+              this.expressionReturnsCollection(rightExpr, collectionScopes),
+              this.inferStaticNumericValue(rightExpr, collectionScopes),
+              this.inferStaticBooleanValue(rightExpr, collectionScopes),
+              collectionScopes,
+            );
+          } else {
+            this.assignStaticNameInfo(statement.left.name, false, null, null, collectionScopes);
+          }
         }
         return Math.max(
           this.inferAssignmentTargetMaxBarsBack(statement.left, collectionScopes),
@@ -2750,7 +2755,7 @@ export class TealscriptEngine {
   }
 
   private executeAssignment(stmt: AssignmentStatement): void {
-    const rawValue = this.evaluateExpression(stmt.right);
+    const rawValue = this.evaluateVariableInitializer(stmt.right);
     const value = this.unwrapKnownSourceValue(rawValue);
 
     if (stmt.left.type === 'Identifier') {
@@ -2762,7 +2767,9 @@ export class TealscriptEngine {
       this.scope.set(
         name,
         newValue,
-        stmt.operator === ':=' ? this.getSourceSeriesForExpression(stmt.right, rawValue) : undefined,
+        stmt.operator === ':='
+          ? this.getSourceSeriesForInitializer(stmt.right, rawValue)
+          : undefined,
       );
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
@@ -5630,6 +5637,12 @@ export class TealscriptEngine {
         case 'last_bar_time':
           this.checkHistoryOffset(offset);
           return offset > this.ctx.bar_index ? Number.NaN : this.naIfMissing(this.ctx.getBar(this.ctx.last_bar_index)?.time);
+        case 'bar_index':
+          this.checkHistoryOffset(offset);
+          return offset > this.ctx.bar_index ? Number.NaN : this.ctx.bar_index - offset;
+        case 'last_bar_index':
+          // last_bar_index is a constant; history access always returns the same value
+          return this.ctx.last_bar_index;
         case 'hl2':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getHl2(offset));
