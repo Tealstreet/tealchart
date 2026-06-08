@@ -34,7 +34,8 @@ export function getArrayValue<T = unknown>(array: PineArray<T>, index: number): 
   if (array.view) {
     return getArrayValue(array.view.parent, array.view.from + normalizeExistingIndex(index, getArraySize(array)));
   }
-  return array.values[Math.trunc(index)];
+  const normalizedIndex = normalizeExistingIndex(index, array.values.length);
+  return array.values[normalizedIndex];
 }
 
 function getArrayValues<T = unknown>(array: PineArray<T>): T[] {
@@ -129,7 +130,8 @@ export function copyArray<T = unknown>(array: PineArray<T>): PineArray<T> {
 }
 
 export function firstArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
-  return getArrayValue(array, 0);
+  const size = getArraySize(array);
+  return size === 0 ? undefined : getArrayValue(array, 0);
 }
 
 export function lastArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
@@ -376,7 +378,8 @@ export function stdevArrayValue(array: PineArray, biased: boolean = true): numbe
 }
 
 export function covarianceArrayValue(left: PineArray, right: PineArray, biased: boolean = true): number {
-  const pairs = getArrayValues(left).map((leftValue, index) => [Number(leftValue), Number(getArrayValue(right, index))]);
+  const rightSize = getArraySize(right);
+  const pairs = getArrayValues(left).map((leftValue, index) => [Number(leftValue), index < rightSize ? Number(getArrayValue(right, index)) : NaN]);
   const numericPairs = pairs.filter(([leftValue, rightValue]) => !Number.isNaN(leftValue) && !Number.isNaN(rightValue));
   const length = numericPairs.length;
   if (length === 0 || (!biased && length < 2)) return Number.NaN;

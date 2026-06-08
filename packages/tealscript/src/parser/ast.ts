@@ -172,6 +172,7 @@ export interface FunctionDeclaration extends BaseNode {
   params: FunctionParameter[];
   body: Expression | Statement[];
   isMethod?: boolean;
+  overloaded?: boolean;
   exported?: boolean;
 }
 
