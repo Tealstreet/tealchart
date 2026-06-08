@@ -316,8 +316,9 @@ function peg$parse(input, options) {
   const peg$r8 = /^[a-zA-Z_]/;
   const peg$r9 = /^[a-zA-Z0-9_]/;
   const peg$r10 = /^[.0-9]/;
-  const peg$r11 = /^[ \t]/;
-  const peg$r12 = /^[\n\r]/;
+  const peg$r11 = /^[=->]/;
+  const peg$r12 = /^[ \t]/;
+  const peg$r13 = /^[\n\r]/;
 
   const peg$e0 = peg$literalExpectation("//@version=", false);
   const peg$e1 = peg$literalExpectation("indicator", false);
@@ -469,8 +470,9 @@ function peg$parse(input, options) {
   const peg$e147 = peg$literalExpectation("+", false);
   const peg$e148 = peg$literalExpectation("-", false);
   const peg$e149 = peg$classExpectation([".", ["0", "9"]], false, false, false);
-  const peg$e150 = peg$classExpectation([" ", "\t"], false, false, false);
-  const peg$e151 = peg$classExpectation(["\n", "\r"], false, false, false);
+  const peg$e150 = peg$classExpectation([["=", ">"]], false, false, false);
+  const peg$e151 = peg$classExpectation([" ", "\t"], false, false, false);
+  const peg$e152 = peg$classExpectation(["\n", "\r"], false, false, false);
 
   function peg$f0(version, statements) {
     return {
@@ -19707,12 +19709,12 @@ function peg$parse(input, options) {
           if (s9 !== peg$FAILED) {
             s10 = peg$currPos;
             peg$silentFails++;
-            if (input.charCodeAt(peg$currPos) === 61) {
-              s11 = peg$c13;
+            s11 = input.charAt(peg$currPos);
+            if (peg$r11.test(s11)) {
               peg$currPos++;
             } else {
               s11 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$e13); }
+              if (peg$silentFails === 0) { peg$fail(peg$e150); }
             }
             peg$silentFails--;
             if (s11 === peg$FAILED) {
@@ -19891,11 +19893,11 @@ function peg$parse(input, options) {
     let s0;
 
     s0 = input.charAt(peg$currPos);
-    if (peg$r11.test(s0)) {
+    if (peg$r12.test(s0)) {
       peg$currPos++;
     } else {
       s0 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e150); }
+      if (peg$silentFails === 0) { peg$fail(peg$e151); }
     }
 
     return s0;
@@ -19948,11 +19950,11 @@ function peg$parse(input, options) {
     let s0;
 
     s0 = input.charAt(peg$currPos);
-    if (peg$r12.test(s0)) {
+    if (peg$r13.test(s0)) {
       peg$currPos++;
     } else {
       s0 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e151); }
+      if (peg$silentFails === 0) { peg$fail(peg$e152); }
     }
 
     return s0;

@@ -2348,7 +2348,7 @@ OpSpace
 // Detects when a `[` at the start of the next line begins a tuple declaration
 // rather than an index expression. Patterns: [id] = expr  or  [id, id] := expr
 TuplePatternAhead
-  = "[" __ IdentifierName (__ "," __ IdentifierName)* __ "]" _ ("=" !"=" / ":=")
+  = "[" __ IdentifierName (__ "," __ IdentifierName)* __ "]" _ ("=" !("=" / ">") / ":=")
 
 // Cross-line continuation: allow `.` always, allow `[` only when it is NOT a
 // tuple declaration on the next line. Same-line: consume horizontal whitespace.
