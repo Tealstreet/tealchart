@@ -11461,6 +11461,36 @@ export class TealscriptEngine {
       return ((source - prev) / prev) * 100;
     });
 
+    // RCI - Rank Correlation Index: Spearman rank correlation between price and time ranks, scaled -100..100
+    this.builtins.set('ta.rci', (args, namedArgs, _ctx, scope, callId) => {
+      const taRciArgs = ['source', 'length'];
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taRciArgs, 0);
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taRciArgs, 1));
+      const window = this.getCompleteSourceWindow(scope, `_ta_rci_source_${callId}`, rawSource, length);
+      if (!window) return NaN;
+
+      // Rank prices ascending (rank 1 = smallest). Ties get average rank.
+      const sorted = window.slice().sort((a, b) => a - b);
+      const priceRanks = window.map((v) => {
+        let rank = 0;
+        let count = 0;
+        for (let k = 0; k < sorted.length; k++) {
+          if (sorted[k] === v) { rank += k + 1; count++; }
+        }
+        return rank / count;
+      });
+
+      // Time ranks: window[0] = most recent bar → time rank n; window[n-1] = oldest → time rank 1
+      let sumDSq = 0;
+      for (let i = 0; i < length; i++) {
+        const timeRank = length - i; // most recent = length, oldest = 1
+        const d = priceRanks[i]! - timeRank;
+        sumDSq += d * d;
+      }
+
+      return (1 - (6 * sumDSq) / (length * (length * length - 1))) * 100;
+    });
+
     // KST - Know Sure Thing momentum oscillator
     // Returns [kst, signal] where kst = weighted sum of 4 smoothed ROCs
     this.builtins.set('ta.kst', (args, namedArgs, _ctx, scope, callId) => {

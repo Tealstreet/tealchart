@@ -7664,6 +7664,39 @@ plot(ta.min(close, open), title="Min")`;
       ]);
     });
 
+    it('ta.rci returns values in -100..100 range for a trending series', () => {
+      // Strongly uptrending prices should produce a high positive RCI
+      const trendingBars: Bar[] = Array.from({ length: 20 }, (_, i) => ({
+        time: i + 1,
+        open: 100 + i,
+        high: 102 + i,
+        low: 99 + i,
+        close: 101 + i,
+        volume: 1000,
+      }));
+      const script = `//@version=6
+indicator("RCI test")
+plot(ta.rci(close, 9), title="RCI")`;
+
+      const result = executeScript(parse(script), trendingBars);
+
+      expect(result.errors).toHaveLength(0);
+      const rciValues = result.plots.find((p) => p.title === 'RCI')?.values ?? [];
+      // First 8 bars are null (not enough history)
+      for (let i = 0; i < 8; i++) {
+        expect(rciValues[i]).toBeNull();
+      }
+      // After warmup, all values in [-100, 100]
+      for (let i = 8; i < rciValues.length; i++) {
+        const v = rciValues[i] as number;
+        expect(v).not.toBeNull();
+        expect(v).toBeGreaterThanOrEqual(-100);
+        expect(v).toBeLessThanOrEqual(100);
+      }
+      // Strongly uptrending series → high positive RCI near the end
+      expect(rciValues[19] as number).toBeGreaterThan(90);
+    });
+
     it('calculates rising and falling TA helpers', () => {
       const script = `//@version=6
 indicator("TA direction")
