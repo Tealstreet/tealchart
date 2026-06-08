@@ -1682,6 +1682,53 @@ plot(numericTitle == "numeric" and collectionTitle == "collection" and whileTitl
     expect(roundSeries(getPlot(result, 'Tuple Titles').values)).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
+  it('reassigns pre-declared variables via tuple := syntax', () => {
+    const result = runCompatScript(`
+indicator("Tuple reassignment")
+var float a = 0.0
+var float b = 0.0
+[a, b] := [close, open]
+plot(a, title="A")
+plot(b, title="B")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'A').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'B').values)).toEqual([100, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+  });
+
+  it('reassigns pre-declared variables from a UDF returning a tuple', () => {
+    const result = runCompatScript(`
+indicator("Tuple reassignment from UDF")
+swap(x, y) => [y, x]
+var float a = 0.0
+var float b = 0.0
+[a, b] := swap(close, open)
+plot(a, title="A")
+plot(b, title="B")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'A').values)).toEqual([100, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+    expect(roundSeries(getPlot(result, 'B').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('reassigns pre-declared variables conditionally via tuple :=', () => {
+    const result = runCompatScript(`
+indicator("Conditional tuple reassignment")
+var float hi = 0.0
+var float lo = 0.0
+if bar_index > 0
+    [hi, lo] := [high, low]
+plot(hi, title="Hi")
+plot(lo, title="Lo")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Hi').values)).toEqual([0, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113]);
+    expect(roundSeries(getPlot(result, 'Lo').values)).toEqual([0, 101, 104, 102, 98, 96, 99, 103, 106, 107, 109, 108]);
+  });
+
   it('runs collection loop expressions with break and continue', () => {
     const result = runCompatScript(`
 indicator("Collection loop expressions")

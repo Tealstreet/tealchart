@@ -41,6 +41,7 @@ export type Statement =
   | EnumDeclaration
   | FunctionDeclaration
   | VariableDeclaration
+  | TupleAssignment
   | AssignmentStatement
   | ExpressionStatement
   | IfStatement
@@ -211,6 +212,17 @@ export interface AssignmentStatement extends BaseNode {
   type: 'AssignmentStatement';
   operator: ':=' | '+=' | '-=' | '*=' | '/=' | '%=';
   left: Identifier | MemberExpression | IndexExpression;
+  right: Expression;
+}
+
+/**
+ * Tuple reassignment — assigns to already-declared variables from a tuple-returning expr.
+ *
+ * [a, b] := someFunc()
+ */
+export interface TupleAssignment extends BaseNode {
+  type: 'TupleAssignment';
+  names: Identifier[];
   right: Expression;
 }
 
@@ -569,6 +581,7 @@ export function isStatement(node: AnyNode): node is Statement {
     'EnumDeclaration',
     'FunctionDeclaration',
     'VariableDeclaration',
+    'TupleAssignment',
     'AssignmentStatement',
     'ExpressionStatement',
     'IfStatement',

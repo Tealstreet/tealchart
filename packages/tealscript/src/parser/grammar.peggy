@@ -81,6 +81,7 @@ Statement
   / BreakStatement
   / ContinueStatement
   / VariableDeclaration
+  / TupleAssignment
   / AssignmentStatement
   / ExpressionStatement
   / EmptyStatement
@@ -509,6 +510,17 @@ TypeReferenceName
       return formatTemplateType('map', [keyType, valueType]);
     }
   / TypeName
+
+// Tuple reassignment: [a, b] := expr (reassigns already-declared variables)
+TupleAssignment
+  = "[" __ head:Identifier tail:(__ "," __ Identifier)* __ "]" _ ":=" InitializerSpace right:Expression _ LineTerminator? {
+      return {
+        type: 'TupleAssignment',
+        names: [head, ...tail.map(t => t[3])],
+        right,
+        loc: loc()
+      };
+    }
 
 // Assignment: x := value
 // Left side can be an identifier, member access, or index access
@@ -1904,7 +1916,7 @@ FunctionMaxDeepNestedIndent
   = Indent Indent Indent Indent Indent Indent Indent Indent Indent Indent
 
 SingleLineBody
-  = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
+  = stmt:(VariableDeclaration / TupleAssignment / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
       return stmt;
     }
 
