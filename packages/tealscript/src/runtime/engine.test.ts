@@ -7507,6 +7507,50 @@ plot(ta.rising(close), title="Missing Length")`;
       expect(result.plots.find((plot) => plot.title === 'Derived Falling')?.values).toEqual([false, false, false, true, false, false]);
       expect(result.plots.find((plot) => plot.title === 'Missing Length')?.values).toEqual([false, false, false, false, false, false]);
     });
+
+    it('ta.smma produces same values as ta.rma', () => {
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 21, low: 19, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 31, low: 29, close: 30, volume: 100 },
+        { time: 4, open: 40, high: 41, low: 39, close: 40, volume: 100 },
+        { time: 5, open: 50, high: 51, low: 49, close: 50, volume: 100 },
+      ];
+      const scriptSmma = `//@version=6
+indicator("SMMA Test")
+plot(ta.smma(close, 3), title="SMMA")`;
+      const scriptRma = `//@version=6
+indicator("RMA Test")
+plot(ta.rma(close, 3), title="RMA")`;
+
+      const smmaResult = executeScript(parse(scriptSmma), bars);
+      const rmaResult = executeScript(parse(scriptRma), bars);
+
+      expect(smmaResult.errors).toHaveLength(0);
+      expect(rmaResult.errors).toHaveLength(0);
+      expect(roundSeries(smmaResult.plots.find((p) => p.title === 'SMMA')?.values ?? [])).toEqual(
+        roundSeries(rmaResult.plots.find((p) => p.title === 'RMA')?.values ?? []),
+      );
+    });
+
+    it('plotshape accepts plotshape.style_* v4 constant aliases', () => {
+      const script = `//@version=6
+indicator("Plotshape v4 style")
+plotshape(close > open, style=plotshape.style_triangleup, location=location.abovebar, title="Up")
+plotshape(close < open, style=plotshape.style_triangledown, location=location.belowbar, title="Down")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 11, low: 9, close: 11, volume: 100 },
+        { time: 2, open: 20, high: 21, low: 19, close: 19, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      const upPlot = result.plots.find((p) => p.title === 'Up');
+      const downPlot = result.plots.find((p) => p.title === 'Down');
+      expect(upPlot).toBeDefined();
+      expect(downPlot).toBeDefined();
+    });
   });
 
   describe('history access', () => {

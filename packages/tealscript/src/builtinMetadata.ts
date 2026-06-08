@@ -102,6 +102,7 @@ export const BUILTIN_NAMESPACES = new Set([
   'matrix',
   'order',
   'plot',
+  'plotshape',
   'polyline',
   'position',
   'request',
