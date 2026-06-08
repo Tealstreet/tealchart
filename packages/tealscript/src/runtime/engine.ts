@@ -11116,16 +11116,20 @@ export class TealscriptEngine {
 
       if (length < 1 || isNaN(source) || volume === undefined || isNaN(volume)) return NaN;
 
-      let positiveFlow = 0;
-      let negativeFlow = 0;
+      let positiveFlows: number[];
+      let negativeFlows: number[];
       if (previousSource !== undefined && !isNaN(previousSource)) {
+        let positiveFlow = 0;
+        let negativeFlow = 0;
         const rawFlow = source * volume;
         if (source > previousSource) positiveFlow = rawFlow;
         if (source < previousSource) negativeFlow = rawFlow;
+        positiveFlows = this.updateBuiltinSourceHistory(scope, positiveKey, positiveFlow, length);
+        negativeFlows = this.updateBuiltinSourceHistory(scope, negativeKey, negativeFlow, length);
+      } else {
+        positiveFlows = (scope.get(positiveKey) as number[] | undefined) ?? [];
+        negativeFlows = (scope.get(negativeKey) as number[] | undefined) ?? [];
       }
-
-      const positiveFlows = this.updateBuiltinSourceHistory(scope, positiveKey, positiveFlow, length);
-      const negativeFlows = this.updateBuiltinSourceHistory(scope, negativeKey, negativeFlow, length);
       if (positiveFlows.length < length || negativeFlows.length < length) return NaN;
 
       const positiveSum = positiveFlows.reduce((sum, value) => sum + value, 0);

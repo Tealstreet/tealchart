@@ -7552,6 +7552,75 @@ plot(ta.stoch(close, high, low, 3), title="Stoch")`;
       expect(result.plots.find((plot) => plot.title === 'Stoch')?.values[2]).toBeCloseTo(88.888889);
     });
 
+    it('ta.mfi(close, 1) first non-na value appears at bar 1, not bar 0', () => {
+      const script = `//@version=6
+indicator("MFI warmup length=1")
+plot(ta.mfi(close, 1), title="MFI")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+        { time: 3, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const values = result.plots.find((plot) => plot.title === 'MFI')?.values;
+      expect(values?.[0]).toBeNull();
+      expect(values?.[1]).toBe(100);
+      expect(values?.[2]).toBe(100);
+    });
+
+    it('ta.mfi(close, 3) first non-na value appears at bar 3, bars 0-2 are null', () => {
+      const script = `//@version=6
+indicator("MFI warmup length=3")
+plot(ta.mfi(close, 3), title="MFI")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 104, low: 98, close: 99, volume: 100 },
+        { time: 4, open: 99, high: 103, low: 98, close: 101, volume: 100 },
+        { time: 5, open: 101, high: 106, low: 100, close: 105, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const values = result.plots.find((plot) => plot.title === 'MFI')?.values;
+      expect(values?.[0]).toBeNull();
+      expect(values?.[1]).toBeNull();
+      expect(values?.[2]).toBeNull();
+      expect(values?.[3]).not.toBeNull();
+      expect(values?.[4]).not.toBeNull();
+    });
+
+    it('ta.mfi(close, 3) computes correct value at first valid bar', () => {
+      // bar 0 close=100 vol=100: no prev, NaN
+      // bar 1 close=102 vol=100: up, positiveFlow=10200
+      // bar 2 close=99  vol=100: down, negativeFlow=9900
+      // bar 3 close=101 vol=100: up, positiveFlow=10100
+      //   positiveSum=10100+0+10200=20300, negativeSum=0+9900+0=9900
+      //   MFI = 100 - 100/(1 + 20300/9900)
+      const script = `//@version=6
+indicator("MFI value check")
+plot(ta.mfi(close, 3), title="MFI")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 100, low: 98, close: 99, volume: 100 },
+        { time: 4, open: 99, high: 102, low: 98, close: 101, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const values = result.plots.find((plot) => plot.title === 'MFI')?.values;
+      expect(values?.[3]).toBeCloseTo(100 - 100 / (1 + 20300 / 9900), 5);
+    });
+
     it('calculates Pine-style CCI over the provided source', () => {
       const script = `//@version=6
 indicator("TA CCI")
