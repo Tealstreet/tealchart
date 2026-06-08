@@ -384,11 +384,8 @@ TypedVariableDeclaration
         loc: loc()
       };
       if (tail.length === 0) return first;
-      return {
-        type: 'MultiDeclaration',
-        declarations: [first, ...tail.map(t => t[3]).flat().map(d => d.type === 'MultiDeclaration' ? d.declarations : [d]).flat()],
-        loc: loc()
-      };
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 UntypedVariableDeclaration
@@ -403,11 +400,8 @@ UntypedVariableDeclaration
         loc: loc()
       };
       if (tail.length === 0) return first;
-      return {
-        type: 'MultiDeclaration',
-        declarations: [first, ...tail.map(t => t[3]).flat().map(d => d.type === 'MultiDeclaration' ? d.declarations : [d]).flat()],
-        loc: loc()
-      };
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 VariableInitializer
@@ -861,16 +855,11 @@ TypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: type,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 UntypedFunctionVariableDeclaration
@@ -896,16 +885,11 @@ UntypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: null,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 FunctionNestedBlock
@@ -1058,16 +1042,11 @@ TypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: type,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionNestedVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 UntypedFunctionNestedVariableDeclaration
@@ -1093,16 +1072,11 @@ UntypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: null,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionNestedVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 FunctionDeepNestedBlock
@@ -1255,16 +1229,11 @@ TypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: type,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionDeepNestedVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 UntypedFunctionDeepNestedVariableDeclaration
@@ -1290,16 +1259,11 @@ UntypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: null,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionDeepNestedVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 FunctionVeryDeepNestedBlock
@@ -1416,16 +1380,11 @@ TypedFunctionVeryDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: type,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVeryDeepNestedVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 UntypedFunctionVeryDeepNestedVariableDeclaration
@@ -1440,16 +1399,11 @@ UntypedFunctionVeryDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
-      return {
-        type: 'VariableDeclaration',
-        kind: kind || 'none',
-        names: pattern,
-        typeAnnotation: null,
-        init,
-        exported: !!exported,
-        loc: loc()
-      };
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVeryDeepNestedVariableDeclaration)* LineTerminator? {
+      const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
+      if (tail.length === 0) return first;
+      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
+      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
     }
 
 FunctionVeryDeepNestedIfStatement

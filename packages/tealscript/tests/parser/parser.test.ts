@@ -1923,6 +1923,22 @@ lookup = map.new<
         expect(decl.init.arguments).toHaveLength(3);
       }
     });
+
+    it('parses multi-declaration inside a function body', () => {
+      const ast = parse(`f() =>
+    var x = 0, var y = 0
+    x + y
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body).toHaveLength(3);
+        expect(fn.body[0].type).toBe('VariableDeclaration');
+        expect(fn.body[1].type).toBe('VariableDeclaration');
+        expect(fn.body[2].type).toBe('ExpressionStatement');
+      }
+    });
   });
 
   describe('Assignment statements', () => {
