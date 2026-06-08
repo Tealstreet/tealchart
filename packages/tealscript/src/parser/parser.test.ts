@@ -1000,6 +1000,123 @@ x = syminfo
     });
   });
 
+  describe('NBSP normalization', () => {
+    it('parses a script that contains non-breaking spaces (U+00A0) as regular spaces', () => {
+      // Simulates Pine copied from TradingView where spaces are U+00A0.
+      const source = '//@version=6\nindicator( "Test" )\nx = 1';
+      const ast = parse(source);
+      expect(ast.type).toBe('Program');
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl).toBeDefined();
+    });
+
+    it('preserves NBSP inside string literals without converting it to a regular space', () => {
+      // The NBSP between hello and world is inside a string and must not be normalized.
+      const NBSP = ' ';
+      const source = `//@version=6\nindicator("Test")\nx = "hello${NBSP}world"`;
+      const ast = parse(source);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+      if (decl?.type === 'VariableDeclaration') {
+        expect(decl.init.type).toBe('StringLiteral');
+        if (decl.init.type === 'StringLiteral') {
+          expect(decl.init.value).toBe(`hello${NBSP}world`);
+        }
+      }
+    });
+  });
+
+  describe('comma-separated expression statements', () => {
+    it('parses two comma-separated function calls as two ExpressionStatements', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+f(x), g(y)`);
+
+      const exprs = ast.body.filter(s => s.type === 'ExpressionStatement');
+      expect(exprs).toHaveLength(2);
+    });
+
+    it('parses comma-separated reassignments as two AssignmentStatements', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+a := 1, b := 2`);
+
+      const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
+      expect(assignments).toHaveLength(2);
+    });
+
+    it('parses comma-separated expressions inside an indented block', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+if true
+    f(x), g(y)`);
+
+      const ifStmt = ast.body.find(s => s.type === 'IfStatement');
+      expect(ifStmt?.type).toBe('IfStatement');
+      if (ifStmt?.type === 'IfStatement') {
+        expect(ifStmt.consequent).toHaveLength(2);
+        expect(ifStmt.consequent[0].type).toBe('ExpressionStatement');
+        expect(ifStmt.consequent[1].type).toBe('ExpressionStatement');
+      }
+    });
+  });
+
+  describe('indent normalization (2-space and 3-space)', () => {
+    it('parses a UDF with 2-space indentation', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+myFunc(x) =>
+  x + 1
+plot(myFunc(close))`);
+
+      const fn = ast.body.find(s => s.type === 'FunctionDeclaration');
+      expect(fn?.type).toBe('FunctionDeclaration');
+    });
+
+    it('parses a UDF with 3-space indentation', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+myFunc(x) =>
+   x + 1
+plot(myFunc(close))`);
+
+      const fn = ast.body.find(s => s.type === 'FunctionDeclaration');
+      expect(fn?.type).toBe('FunctionDeclaration');
+    });
+
+    it('parses a UDF with nested 2-space indentation (consistent throughout)', () => {
+      // All indented lines use 2-space steps — normalization promotes them to 4-space.
+      const ast = parse(`//@version=6
+indicator("Test")
+myFunc(x) =>
+  if x > 0
+    if x > 10
+      x + 2
+    else
+      x + 1
+  else
+    x - 1
+plot(myFunc(close))`);
+
+      const fn = ast.body.find(s => s.type === 'FunctionDeclaration');
+      expect(fn?.type).toBe('FunctionDeclaration');
+      if (fn?.type === 'FunctionDeclaration' && Array.isArray(fn.body)) {
+        expect(fn.body[0].type).toBe('IfStatement');
+      }
+    });
+
+    it('does not alter scripts already using 4-space indentation', () => {
+      const src = `//@version=6
+indicator("Test")
+myFunc(x) =>
+    x + 1
+plot(myFunc(close))`;
+      const ast = parse(src);
+      const fn = ast.body.find(s => s.type === 'FunctionDeclaration');
+      expect(fn?.type).toBe('FunctionDeclaration');
+    });
+  });
+
   describe('error handling', () => {
     it('throws TealscriptParseError for syntax errors', () => {
       expect(() => {
