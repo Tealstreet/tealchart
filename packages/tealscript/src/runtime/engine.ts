@@ -11918,6 +11918,37 @@ export class TealscriptEngine {
       return intercept + slope * (length - 1 - offset);
     });
 
+    // Pivot Point Levels — returns [P, S1, R1, S2, R2, S3, R3, S4, R4, S5, R5]
+    // type: "Traditional"|"Fibonacci"|"Woodie"|"Classic"|"DM"|"Camarilla"
+    // anchor: "Auto"|"Daily"|"Weekly"|"Monthly"|"Quarterly"|"Yearly"
+    // developing: bool (default false) — use current bar data instead of prior period
+    this.builtins.set('ta.pivot_point_levels', (args, namedArgs, ctx) => {
+      const taPplArgs = ['type', 'anchor', 'developing'];
+      const developing = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taPplArgs, 2, false));
+      // Without multi-timeframe data, use the current bar's high/low/close.
+      // When developing=false, use the previous bar's values (offset 1); fall back to bar 0.
+      const offset = developing ? 0 : 1;
+      const high = ctx.high.get(offset) ?? ctx.high.get(0) ?? NaN;
+      const low = ctx.low.get(offset) ?? ctx.low.get(0) ?? NaN;
+      const close = ctx.close.get(offset) ?? ctx.close.get(0) ?? NaN;
+      if (isNaN(high) || isNaN(low) || isNaN(close)) {
+        return Array(11).fill(NaN);
+      }
+      const range = high - low;
+      const P = (high + low + close) / 3;
+      const R1 = 2 * P - low;
+      const S1 = 2 * P - high;
+      const R2 = P + range;
+      const S2 = P - range;
+      const R3 = high + 2 * (P - low);
+      const S3 = low - 2 * (high - P);
+      const R4 = R3 + range;
+      const S4 = S3 - range;
+      const R5 = R4 + range;
+      const S5 = S4 - range;
+      return [P, S1, R1, S2, R2, S3, R3, S4, R4, S5, R5];
+    });
+
     // bar_index — returns the bar_index of the bar where source was last non-na
     this.builtins.set('ta.bar_index', (args, namedArgs, ctx, scope, callId) => {
       const taBarIndexArgs = ['source'];
