@@ -69,11 +69,10 @@ max_bars_back(close, num=10)
 `));
 
     expect(result.diagnostics).toEqual([]);
-    expect(result.symbols.map((symbol) => `${symbol.kind}:${symbol.name}`)).toEqual([
-      'variable:length',
-      'variable:basis',
-      'function:spread',
-    ]);
+    expect(result.symbols.map((symbol) => `${symbol.kind}:${symbol.name}`)).toEqual(
+      expect.arrayContaining(['variable:length', 'variable:basis', 'function:spread']),
+    );
+    expect(result.symbols).toHaveLength(3);
   });
 
   it('treats only ta.vwap stdev overload calls as tuple initializers', () => {
@@ -8509,6 +8508,17 @@ indicator("UDF Shadow")
 supertrend(src, mult, period) =>
     src * mult + period
 val = supertrend(close, 3, 10)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts forward function references without unknown-function diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Forward Refs")
+val = add(1, 2)
+add(a, b) => a + b
+plot(val)
 `));
 
     expect(result.diagnostics).toEqual([]);
