@@ -4,6 +4,7 @@ import type {
   DrawingObjectType,
   DrawingOutput,
   LabelDrawingOutput,
+  LineFillDrawingOutput,
   LineDrawingOutput,
   PolylineDrawingOutput,
 } from './types';
@@ -138,6 +139,21 @@ export class DrawingStore {
     };
     this.drawings.push(copy);
     this.enforceLimit('polyline');
+    return copy;
+  }
+
+  copyLineFill(id: string, newId: string, barIndex: number): LineFillDrawingOutput | undefined {
+    const source = this.get(id);
+    if (!source || source.type !== 'linefill') return undefined;
+    if (this.get(newId)) return undefined;
+
+    const copy: LineFillDrawingOutput = {
+      ...source,
+      id: newId,
+      barIndex,
+      persistent: false,
+    };
+    this.drawings.push(copy);
     return copy;
   }
 

@@ -603,6 +603,17 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
 
   builtins.set('linefill.get_line1', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => linefill.line1));
   builtins.set('linefill.get_line2', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => linefill.line2));
+  builtins.set('linefill.get_color', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => linefill.color ?? Number.NaN));
+
+  builtins.set('linefill.copy', (args, namedArgs, ctx, _scope, callId) => {
+    const linefillId = toDrawingId(callArg(args, namedArgs, 0, 'id'), runtime.isNa);
+    if (!linefillId) return Number.NaN;
+
+    const newId = `linefill_${callId}_${ctx.bar_index}`;
+    const copy = ctx.copyLineFillDrawing(linefillId, newId);
+    return copy ? newId : Number.NaN;
+  });
+
   builtins.set('linefill.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('linefill'));
 }
 

@@ -14,6 +14,7 @@ import type {
   DrawingObjectType,
   DrawingOutput,
   LabelDrawingOutput,
+  LineFillDrawingOutput,
   LineDrawingOutput,
   PolylineDrawingOutput,
 } from './drawings/types';
@@ -914,6 +915,13 @@ export class ExecutionContext {
    */
   copyPolylineDrawing(id: string, newId: string): PolylineDrawingOutput | undefined {
     return this.drawingStore.copyPolyline(id, newId, this.bar_index);
+  }
+
+  /**
+   * Copy a linefill drawing object to a new handle ID.
+   */
+  copyLineFillDrawing(id: string, newId: string): LineFillDrawingOutput | undefined {
+    return this.drawingStore.copyLineFill(id, newId, this.bar_index);
   }
 
   /**
