@@ -4820,6 +4820,17 @@ class SemanticChecker {
         return BUILTIN_NAMESPACES.has(this.memberPath(value)[0]);
       case 'UnaryExpression':
         return (value.operator === '-' || value.operator === '+') && value.argument.type === 'NumericLiteral';
+      case 'CallExpression': {
+        const callee = this.memberPath(value.callee).join('.');
+        return (
+          callee === 'array.new'
+          || callee.startsWith('array.new_')
+          || callee === 'matrix.new'
+          || callee.startsWith('matrix.new_')
+          || callee === 'map.new'
+          || callee === 'table.new'
+        );
+      }
       default:
         return false;
     }
