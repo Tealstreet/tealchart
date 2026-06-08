@@ -799,6 +799,29 @@ plot(ma(close, 14, 'SMA'))`);
       }
     });
 
+    it('parses not na(ph) as the last expression in a UDF body', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+isSwingHigh(src, len) =>
+    ph = ta.pivothigh(src, len, len)
+    not na(ph)
+plot(isSwingHigh(close, 5) ? 1 : 0)`);
+
+      const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+      expect(fn).toBeDefined();
+      if (fn?.type === 'FunctionDeclaration') {
+        const body = Array.isArray(fn.body) ? fn.body : [fn.body];
+        const last = body[body.length - 1];
+        expect(last?.type).toBe('ExpressionStatement');
+        if (last?.type === 'ExpressionStatement') {
+          expect(last.expression.type).toBe('UnaryExpression');
+          if (last.expression.type === 'UnaryExpression') {
+            expect(last.expression.operator).toBe('not');
+          }
+        }
+      }
+    });
+
     it('parses na as standalone expression in else block', () => {
       const ast = parse(`//@version=6
 indicator("Test")
