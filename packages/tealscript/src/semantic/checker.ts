@@ -1955,6 +1955,7 @@ const PLOT_STYLE_CONSTANT_VALUES = new Map([
   ['plot.style_line', 'line'],
   ['plot.style_linebr', 'linebr'],
   ['plot.style_stepline', 'stepline'],
+  ['plot.style_step', 'stepline'], // Pine alias for style_stepline
   ['plot.style_steplinebr', 'steplinebr'],
   ['plot.style_stepline_diamond', 'stepline_diamond'],
   ['plot.style_histogram', 'histogram'],
