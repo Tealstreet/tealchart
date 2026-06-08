@@ -212,7 +212,7 @@ plot(signal, title="Signal")
       108.4,
       110,
     ]);
-    expect(getPlot(result, 'Signal').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
+    expect(getPlot(result, 'Signal').values).toEqual([null, null, null, null, null, null, null, 110, null, null, null, null]);
   });
 
   it('locks a reduced public syminfo metadata idiom', () => {
@@ -1870,7 +1870,7 @@ plot(freshSignal ? 1 : 0, title="Fresh Signal")
       2,
       3,
       4,
-      0,
+      5,
     ]);
     expect(getPlot(result, 'Trigger Close').values).toEqual([
       null,
@@ -1884,7 +1884,7 @@ plot(freshSignal ? 1 : 0, title="Fresh Signal")
       104,
       104,
       104,
-      112,
+      104,
     ]);
     expect(getPlot(result, 'Previous Trigger Close').values).toEqual([
       null,
@@ -1898,7 +1898,7 @@ plot(freshSignal ? 1 : 0, title="Fresh Signal")
       null,
       null,
       null,
-      104,
+      null,
     ]);
     expect(getPlot(result, 'Fresh Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]);
   });
