@@ -63,6 +63,7 @@ StatementList
       return statements.map(s => s[0]).filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -639,10 +640,14 @@ StatementReservedWord
     ) !IdentifierPart
 
 ExpressionStatement
-  = !StatementReservedWord expr:Expression _ LineTerminator? {
+  = !StatementReservedWord head:Expression tail:(_ "," _ !StatementReservedWord Expression)* _ LineTerminator? {
+      if (tail.length === 0) {
+        return { type: 'ExpressionStatement', expression: head, loc: loc() };
+      }
+      const exprs = [head, ...tail.map(t => t[4])];
       return {
-        type: 'ExpressionStatement',
-        expression: expr,
+        type: 'MultiExpressionStatement',
+        expressions: exprs,
         loc: loc()
       };
     }
@@ -743,6 +748,7 @@ IndentedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -757,6 +763,7 @@ FunctionIndentedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -957,6 +964,7 @@ FunctionNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1148,6 +1156,7 @@ FunctionDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1339,6 +1348,7 @@ FunctionVeryDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1508,6 +1518,7 @@ FunctionUltraDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1582,6 +1593,7 @@ FunctionMegaDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1656,6 +1668,7 @@ FunctionSuperDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1730,6 +1743,7 @@ FunctionHyperDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1804,6 +1818,7 @@ FunctionExtremeDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
@@ -1878,6 +1893,7 @@ FunctionMaxDeepNestedBlock
       return statements.filter(s => s !== null).flatMap(s => {
         if (s.type === 'MultiDeclaration') return s.declarations;
         if (s.type === 'MultiAssignment') return s.assignments;
+        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
         return [s];
       });
     }
