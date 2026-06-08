@@ -6254,6 +6254,28 @@ plot(midRatio, title="Mid Ratio")
     ]);
   });
 
+  it('locks type[] shorthand array declarations', () => {
+    // Source search: https://www.tradingview.com/scripts/search/type+array+shorthand/
+    // float[], int[], string[] are shorthand for array<float> etc.; they should
+    // produce identical runtime behavior.
+    const result = runCompatScript(`
+indicator("Type Array Shorthand Checkpoint")
+var float[] prices = array.new_float(0)
+var int[] counts = array.new_int(0)
+string[] names = array.from("a", "b")
+array.push(prices, close)
+array.push(counts, bar_index)
+plot(array.size(prices), title="Price Count")
+plot(array.size(counts), title="Count Size")
+plot(array.size(names), title="Names Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Price Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Count Size').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Names Size').values).toEqual(Array(12).fill(2));
+  });
+
   it('locks UDT with array field initialized via var and accumulated per-bar', () => {
     // Source search: https://www.tradingview.com/scripts/search/udt%20accumulator%20array%20field/
     // A UDT whose field is an array<float> initialized empty via var persists
