@@ -861,6 +861,7 @@ const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['label.new', 'label'],
   ['line.copy', 'line'],
   ['line.new', 'line'],
+  ['linefill.copy', 'linefill'],
   ['linefill.new', 'linefill'],
   ['polyline.copy', 'polyline'],
   ['polyline.new', 'polyline'],
@@ -1324,6 +1325,8 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['linefill.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['linefill.get_line1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.get_line2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['linefill.get_color', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['linefill.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   [
     'table.new',
     {
@@ -8096,6 +8099,7 @@ class SemanticChecker {
     if (calleeName === 'box.get_bgcolor' || calleeName === 'box.get_border_color') return { kind: 'color' };
     if (calleeName === 'box.get_text' || calleeName === 'box.get_text_halign' || calleeName === 'box.get_text_valign') return { kind: 'string' };
     if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
+    if (calleeName === 'linefill.get_color') return { kind: 'color' };
 
     const namespace = calleePath[0];
     const inputType = this.inferInputCallType(expression, scope, calleePath);

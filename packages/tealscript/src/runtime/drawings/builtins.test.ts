@@ -659,6 +659,48 @@ plot(array.size(linefill.all), title="Linefills")`;
       expect(result.plots.find((plot) => plot.title === 'Linefills')?.values).toEqual([1, 1, 1]);
     });
 
+    it('returns the color of a linefill via get_color', () => {
+      const script = `//@version=6
+indicator("Linefill get_color")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var lf = linefill.new(upper, lower, color=color.red)
+if barstate.islast
+    label.new(bar_index, close, text=str.tostring(linefill.get_color(lf)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      const labels = result.drawings.filter((d) => d.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect((labels[0] as { text: string }).text).toBe('#F23645');
+    });
+
+    it('copies a linefill to a new handle', () => {
+      const script = `//@version=6
+indicator("Linefill copy")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var lf = linefill.new(upper, lower, color=color.red)
+var lf2 = linefill.copy(lf)
+linefill.set_color(lf2, color.green)
+plot(array.size(linefill.all), title="Linefills")`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((p) => p.title === 'Linefills')?.values).toEqual([2]);
+      const linefills = result.drawings.filter((d) => d.type === 'linefill');
+      expect(linefills).toHaveLength(2);
+      expect((linefills[0] as { color: string | null }).color).toBe('#F23645');
+      expect((linefills[1] as { color: string | null }).color).toBe('#4CAF50');
+    });
+
     it('mutates, reads, copies, and deletes box drawings by handle', () => {
       const script = `//@version=6
 indicator("Box objects")

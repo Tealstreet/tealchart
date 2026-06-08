@@ -5509,6 +5509,42 @@ missingGetter = linefill.get_line2()
     ]);
   });
 
+  it('resolves linefill.copy return type and linefill.get_color return type', () => {
+    const result = checkProgram(parse(`
+indicator("Linefill copy and get_color")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+filled = linefill.new(upper, lower)
+clone = linefill.copy(id=filled)
+colorValue = linefill.get_color(id=filled)
+plot(1)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('clone')).toMatchObject({ kind: 'linefill' });
+    expect(types.get('colorValue')).toMatchObject({ kind: 'color' });
+  });
+
+  it('reports invalid linefill.copy and linefill.get_color argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad linefill copy and get_color")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+filled = linefill.new(upper, lower)
+missingCopy = linefill.copy()
+missingColor = linefill.get_color()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'linefill.copy() expects at least 1 argument',
+      "linefill.copy() missing required argument 'id'",
+      'linefill.get_color() expects at least 1 argument',
+      "linefill.get_color() missing required argument 'id'",
+    ]);
+  });
+
   it('resolves table.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Signatures")
