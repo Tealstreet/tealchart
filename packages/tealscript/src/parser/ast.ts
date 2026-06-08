@@ -42,6 +42,7 @@ export type Statement =
   | FunctionDeclaration
   | VariableDeclaration
   | MultiDeclaration
+  | MultiAssignment
   | TupleAssignment
   | AssignmentStatement
   | ExpressionStatement
@@ -216,6 +217,19 @@ export interface VariableDeclarator extends BaseNode {
 export interface TupleDeclarator extends BaseNode {
   type: 'TupleDeclarator';
   names: Identifier[];
+}
+
+/**
+ * Multiple reassignments on a single comma-separated line.
+ *
+ * x := 1, y := 2
+ * max := float(na), min := float(na)
+ *
+ * Flattened into individual AssignmentStatement nodes by StatementList.
+ */
+export interface MultiAssignment extends BaseNode {
+  type: 'MultiAssignment';
+  assignments: AssignmentStatement[];
 }
 
 /**
@@ -597,6 +611,7 @@ export function isStatement(node: AnyNode): node is Statement {
     'FunctionDeclaration',
     'VariableDeclaration',
     'MultiDeclaration',
+    'MultiAssignment',
     'TupleAssignment',
     'AssignmentStatement',
     'ExpressionStatement',

@@ -598,6 +598,63 @@ values[0] := 3`);
         expect(assignment).toBeDefined();
         expect(assignment.left.type).toBe('IndexExpression');
       });
+
+      it('parses comma-separated reassignments into individual AssignmentStatement nodes', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+x = 0
+y = 0
+x := 1, y := 2`);
+
+        const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
+        expect(assignments.length).toBe(2);
+        const [a, b] = assignments as Array<{ type: string; left: { type: string; name: string }; right: { value: number } }>;
+        expect(a.left.name).toBe('x');
+        expect(b.left.name).toBe('y');
+      });
+
+      it('parses three comma-separated reassignments', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+max = float(na), min = float(na), pivoth = bool(na)
+max := float(na), min := float(na), pivoth := bool(na)`);
+
+        const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
+        expect(assignments.length).toBe(3);
+      });
+
+      it('parses comma-separated compound assignments', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+x = 1
+y = 1
+x += 1, y -= 1`);
+
+        const assignments = ast.body.filter(s => s.type === 'AssignmentStatement') as Array<{ operator: string }>;
+        expect(assignments.length).toBe(2);
+        expect(assignments[0].operator).toBe('+=');
+        expect(assignments[1].operator).toBe('-=');
+      });
+
+      it('does not treat commas inside RHS function calls as assignment separators', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+x = 0
+x := math.max(1, 2)`);
+
+        const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
+        expect(assignments.length).toBe(1);
+      });
+
+      it('single reassignment still works without comma', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+x = 0
+x := 42`);
+
+        const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
+        expect(assignments.length).toBe(1);
+      });
     });
   });
 
