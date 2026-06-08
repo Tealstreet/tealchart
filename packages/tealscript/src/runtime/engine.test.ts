@@ -6709,6 +6709,24 @@ plot(x)`;
       expect(result.plots[0].values[0]).toBe(5);
     });
 
+    it('evaluates math.clamp', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(math.clamp(5, 0, 10), title="In Range")
+plot(math.clamp(-3, 0, 10), title="Below Min")
+plot(math.clamp(15, 0, 10), title="Above Max")
+plot(math.clamp(na, 0, 10), title="Na")`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots[0].values[0]).toBe(5);
+      expect(result.plots[1].values[0]).toBe(0);
+      expect(result.plots[2].values[0]).toBe(10);
+      expect(result.plots[3].values[0]).toBeNull();
+    });
+
     it('evaluates math.sqrt', () => {
       const script = `//@version=6
 indicator("Test")
