@@ -8446,4 +8446,36 @@ multiplier = input.float(2.0, "Multiplier", options=[1.0, 2.0], step=0.5)
       'input.float() cannot use options together with minval/maxval/step',
     ]);
   });
+
+  it('does not produce false defval > maxval error when step occupies positional slot', () => {
+    // Bug: input.float(2.0, "title", minval=0.1, step=0.1) — step is named, not positional maxval
+    const result = checkProgram(parse(`
+indicator("Step False Positive")
+x = input.float(2.0, "title", minval = 0.1, step = 0.1)
+y = input.int(5, "length", minval = 1, step = 1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('does not report unknown-argument for v4 input() with minval/maxval/step', () => {
+    const result = checkProgram(parse(`
+indicator("V4 Input")
+overbought = input(70, "Overbought", minval=0, maxval=100)
+step_input = input(0.5, "Step", minval=0.0, maxval=1.0, step=0.1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('does not report arity errors when a UDF shadows a legacy TA alias', () => {
+    const result = checkProgram(parse(`
+indicator("UDF Shadow")
+supertrend(src, mult, period) =>
+    src * mult + period
+val = supertrend(close, 3, 10)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
 });

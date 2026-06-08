@@ -8814,6 +8814,14 @@ export class TealscriptEngine {
     unaryMath('math.atan', Math.atan);
     unaryMath('math.toradians', (number) => number * (Math.PI / 180));
     unaryMath('math.todegrees', (number) => number * (180 / Math.PI));
+    this.builtins.set('math.clamp', (args, namedArgs) => {
+      const mathClampArgs = ['val', 'min', 'max'];
+      const val = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathClampArgs, 0));
+      const min = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathClampArgs, 1));
+      const max = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathClampArgs, 2));
+      if (Number.isNaN(val) || Number.isNaN(min) || Number.isNaN(max)) return Number.NaN;
+      return Math.max(min, Math.min(max, val));
+    });
 
     this.builtins.set('max_bars_back', (args, namedArgs) => {
       this.normalizeMaxBarsBack(this.getOrderedCallArg(args, namedArgs, ['var', 'num'], 1), 'max_bars_back num');
