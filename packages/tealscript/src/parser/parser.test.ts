@@ -1010,13 +1010,18 @@ x = syminfo
       expect(decl).toBeDefined();
     });
 
-    it('does not corrupt string contents that contain NBSP', () => {
-      const source = '//@version=6\nindicator("Test")\nx = "hello world"';
+    it('preserves NBSP inside string literals without converting it to a regular space', () => {
+      // The NBSP between hello and world is inside a string and must not be normalized.
+      const NBSP = ' ';
+      const source = `//@version=6\nindicator("Test")\nx = "hello${NBSP}world"`;
       const ast = parse(source);
       const decl = ast.body.find(s => s.type === 'VariableDeclaration');
       expect(decl?.type).toBe('VariableDeclaration');
       if (decl?.type === 'VariableDeclaration') {
         expect(decl.init.type).toBe('StringLiteral');
+        if (decl.init.type === 'StringLiteral') {
+          expect(decl.init.value).toBe(`hello${NBSP}world`);
+        }
       }
     });
   });

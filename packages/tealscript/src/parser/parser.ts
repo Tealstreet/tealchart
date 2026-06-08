@@ -84,8 +84,8 @@ export function parse<T extends ParseStartRule>(source: string, options: ParseOp
 export function parse(source: string, options: ParseOptions<ParseStartRule> = {}): Program | Expression | Statement {
   // Strip UTF-8 BOM if present so scripts saved with BOM parse correctly.
   source = source.replace(/^﻿/, '');
-  // Replace non-breaking spaces (U+00A0) copied from TradingView with regular spaces.
-  source = source.replace(/ /g, ' ');
+  // Replace non-breaking spaces (U+00A0) outside string literals with regular spaces.
+  source = normalizeNbspOutsideStrings(source);
   assertSourceLength(source, options.maxSourceLength ?? DEFAULT_MAX_SOURCE_LENGTH);
   const normalized = normalizeIndent(normalizeLeadingTabs(source));
 
@@ -125,6 +125,35 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
 // Only affects leading whitespace so tabs inside string literals are untouched.
 function normalizeLeadingTabs(source: string): string {
   return source.replace(/^(\t+)/gm, (tabs) => '    '.repeat(tabs.length));
+}
+
+// Replace U+00A0 (non-breaking space) with regular space outside string literals.
+// Leaves NBSP inside single- or double-quoted strings untouched.
+function normalizeNbspOutsideStrings(source: string): string {
+  const NBSP = ' ';
+  if (!source.includes(NBSP)) return source;
+  let result = '';
+  let inDouble = false;
+  let inSingle = false;
+  let escaped = false;
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    if (escaped) {
+      escaped = false;
+      result += ch;
+      continue;
+    }
+    if (ch === '\\' && (inDouble || inSingle)) {
+      escaped = true;
+      result += ch;
+      continue;
+    }
+    if (ch === '"' && !inSingle) { inDouble = !inDouble; result += ch; continue; }
+    if (ch === "'" && !inDouble) { inSingle = !inSingle; result += ch; continue; }
+    if (ch === NBSP && !inDouble && !inSingle) { result += ' '; continue; }
+    result += ch;
+  }
+  return result;
 }
 
 // Normalize 2-space or 3-space indented UDF bodies to 4-space.
