@@ -6149,6 +6149,130 @@ plot(factorial(3), title="Factorial")
     expect(result.errors.some((error) => error.message.includes('Recursive user function calls are not supported'))).toBe(true);
     expect(result.errors[0]!.message).toContain(unsupportedMessage);
   });
+
+  it('locks CRLF line-ending tolerance', () => {
+    // Source search: https://www.tradingview.com/scripts/search/CRLF%20indicator/
+    // Scripts copy-pasted from Windows editors arrive with \r\n line endings.
+    // The parser must treat \r as whitespace so the script runs identically.
+    const crlfScript = "indicator(\"CRLF Test\")\r\nplot(close, title=\"Close\")\r\n";
+    const result = runCompatScript(crlfScript);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Close').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('locks indexed for-in array iteration with tuple destructuring', () => {
+    // Source search: https://www.tradingview.com/scripts/search/for%20index%20value%20in%20array/
+    // Pine supports `for [idx, v] in arr` at top-level scope, not only inside UDFs.
+    const result = runCompatScript(`
+indicator("Indexed For-In Checkpoint")
+arr = array.from(10.0, 20.0, 30.0)
+sum = 0.0
+for [idx, v] in arr
+    sum += v * (idx + 1)
+plot(sum, title="Weighted Sum")
+`);
+
+    expect(result.errors).toEqual([]);
+    // 10*1 + 20*2 + 30*3 = 10 + 40 + 90 = 140; constant across all bars
+    expect(getPlot(result, 'Weighted Sum').values).toEqual(Array(compatibilityBars.length).fill(140));
+  });
+
+  it('locks map.new<string, array<float>>() runtime semantics', () => {
+    // Source search: https://www.tradingview.com/scripts/search/map%20array%20float/
+    // Maps whose value type is a generic collection (array<float>) must allocate
+    // correctly and support put/get round-trips inside bar-by-bar execution.
+    const result = runCompatScript(`
+indicator("Map Array Value Checkpoint")
+m = map.new<string, array<float>>()
+vals = array.from(high, close)
+m.put("vals", vals)
+retrieved = m.get("vals")
+plot(array.get(retrieved, 0), title="First Val")
+plot(array.size(retrieved), title="Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    // First element is high; second is close — both series values vary per bar
+    expect(getPlot(result, 'First Val').values).toEqual([103, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113]);
+    expect(getPlot(result, 'Size').values).toEqual(Array(compatibilityBars.length).fill(2));
+  });
+
+  it('locks 2x2 matrix.mult with hand-verified result', () => {
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20multiplication%20factor/
+    // [[1,2],[3,4]] * [[5,6],[7,8]] = [[19,22],[43,50]] — constant across all bars.
+    const result = runCompatScript(`
+indicator("Matrix Mult 2x2 Checkpoint")
+a = matrix.new_float(2, 2, 0)
+matrix.set(a, 0, 0, 1.0)
+matrix.set(a, 0, 1, 2.0)
+matrix.set(a, 1, 0, 3.0)
+matrix.set(a, 1, 1, 4.0)
+b = matrix.new_float(2, 2, 0)
+matrix.set(b, 0, 0, 5.0)
+matrix.set(b, 0, 1, 6.0)
+matrix.set(b, 1, 0, 7.0)
+matrix.set(b, 1, 1, 8.0)
+c = matrix.mult(a, b)
+plot(matrix.get(c, 0, 0), title="C00")
+plot(matrix.get(c, 0, 1), title="C01")
+plot(matrix.get(c, 1, 0), title="C10")
+plot(matrix.get(c, 1, 1), title="C11")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'C00').values).toEqual(Array(compatibilityBars.length).fill(19));
+    expect(getPlot(result, 'C01').values).toEqual(Array(compatibilityBars.length).fill(22));
+    expect(getPlot(result, 'C10').values).toEqual(Array(compatibilityBars.length).fill(43));
+    expect(getPlot(result, 'C11').values).toEqual(Array(compatibilityBars.length).fill(50));
+  });
+
+  it('locks deep parentheses nesting with correct arithmetic result', () => {
+    // Source search: https://www.tradingview.com/scripts/search/midpoint%20ratio%20percentage/
+    // ((((close + open) / 2) * 100) / close) — four layers of parens, result is
+    // midpoint-as-percentage-of-close. Each bar computed by hand against compatibilityBars.
+    const result = runCompatScript(`
+indicator("Deep Parens Checkpoint")
+midRatio = ((((close + open) / 2) * 100) / close)
+plot(midRatio, title="Mid Ratio")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Mid Ratio').values)).toEqual([
+      99.019608,
+      98.571429,
+      99.065421,
+      101.941748,
+      102.020202,
+      99.5,
+      98.076923,
+      97.706422,
+      100.462963,
+      98.648649,
+      100.454545,
+      99.107143,
+    ]);
+  });
+
+  it('locks UDT with array field initialized via var and accumulated per-bar', () => {
+    // Source search: https://www.tradingview.com/scripts/search/udt%20accumulator%20array%20field/
+    // A UDT whose field is an array<float> initialized empty via var persists
+    // across bars; push() grows the field in-place each bar.
+    const result = runCompatScript(`
+indicator("UDT Array Field Checkpoint")
+type Accumulator
+    array<float> values = na
+
+var acc = Accumulator.new(array.new_float(0))
+acc.values.push(close)
+plot(array.size(acc.values), title="Count")
+plot(array.last(acc.values), title="Last")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Last').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {

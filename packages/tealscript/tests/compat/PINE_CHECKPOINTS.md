@@ -194,6 +194,17 @@ fixtures by default.
 | `Input Driven RSI Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20input.int%20length%20parameter/ | `input.int(14, "Length")` feeds directly into `ta.rsi(close, length)`; with 12 bars and period 14, all RSI values are null. | Input metadata confirms defval=14 with minval/maxval; RSI plot is all null; Close plot has 12 values. |
 | `Indicator Shorttitle Overlay Checkpoint` | https://www.tradingview.com/scripts/search/indicator%20shorttitle%20overlay%20legend/ | `indicator(..., shorttitle="ISO", overlay=true)` sets both the legend short name and the pane assignment. | `indicatorShortTitle` is "ISO", `indicatorOverlay` is true, declaration object confirms shortTitle and overlay. |
 
+## Probe Checkpoints
+
+| Fixture | Source | Reduced Contract | Expected Outputs |
+| --- | --- | --- | --- |
+| `CRLF Line Endings Probe Checkpoint` | https://www.tradingview.com/scripts/search/CRLF%20indicator/ | Script using `\r\n` line endings parses and executes identically to the LF-only equivalent. | Close plot values match `compatibilityBars` close series. |
+| `Indexed For-In Array Probe Checkpoint` | https://www.tradingview.com/scripts/search/for%20index%20value%20in%20array/ | `for [idx, v] in arr` at top-level scope accumulates a weighted sum `v * (idx + 1)`; array is `[10, 20, 30]`. | Weighted Sum is 140 (= 10×1 + 20×2 + 30×3) on every bar. |
+| `Map Array Value Probe Checkpoint` | https://www.tradingview.com/scripts/search/map%20array%20float/ | `map.new<string, array<float>>()` stores an `array.from(high, close)` and retrieves it by key each bar. | First Val equals the high series; Size is 2 on every bar. |
+| `Matrix Mult 2x2 Probe Checkpoint` | https://www.tradingview.com/scripts/search/matrix%20multiplication%20factor/ | `matrix.mult([[1,2],[3,4]], [[5,6],[7,8]])` yields `[[19,22],[43,50]]` — hand-verified. | C00=19, C01=22, C10=43, C11=50 on every bar. |
+| `Deep Parentheses Nesting Probe Checkpoint` | https://www.tradingview.com/scripts/search/midpoint%20ratio%20percentage/ | `((((close + open) / 2) * 100) / close)` — four nested paren layers; result is midpoint as percentage of close. | Hand-checked Mid Ratio values over `compatibilityBars`. |
+| `UDT Array Field Var Probe Checkpoint` | https://www.tradingview.com/scripts/search/udt%20accumulator%20array%20field/ | A `var Accumulator` whose `values` field is `array<float>` accumulates `close` each bar via `push()`. | Count increments 1–12 per bar; Last equals the close series. |
+
 ## Checkpoint Coverage Index
 
 This index maps source-linked checkpoints to the major parity areas they guard.
