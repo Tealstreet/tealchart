@@ -962,6 +962,11 @@ export class TealscriptEngine {
             () => this.inferStatementsMaxBarsBack(statement.body, collectionScopes),
           ),
         );
+      case 'MultiDeclaration':
+        return statement.declarations.reduce(
+          (max, decl) => Math.max(max, this.inferStatementMaxBarsBack(decl, collectionScopes)),
+          0,
+        );
       case 'ImportDeclaration':
       case 'BreakStatement':
       case 'ContinueStatement':
@@ -2027,6 +2032,11 @@ export class TealscriptEngine {
       case 'EnumDeclaration':
         break;
       case 'FunctionDeclaration':
+        break;
+      case 'MultiDeclaration':
+        for (const decl of stmt.declarations) {
+          this.executeVariableDeclaration(decl);
+        }
         break;
       case 'VariableDeclaration':
         this.executeVariableDeclaration(stmt);
