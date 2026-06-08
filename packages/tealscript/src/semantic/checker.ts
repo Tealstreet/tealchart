@@ -795,6 +795,7 @@ const STRATEGY_FLOAT_MEMBER_NAMES = new Set([
   'strategy.netprofit_percent',
   'strategy.openprofit',
   'strategy.openprofit_percent',
+  'strategy.percent_profitable',
   'strategy.closedtrades.first_index',
   'strategy.opentrades.capital_held',
   'strategy.position_avg_price',
