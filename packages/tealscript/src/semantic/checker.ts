@@ -596,7 +596,6 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.percentile_nearest_rank', ['source', 'length', 'percentage']],
   ['ta.percentile_linear_interpolation', ['source', 'length', 'percentage']],
   ['ta.percentrank', ['source', 'length']],
-  ['ta.pivot_point_levels', ['type', 'anchor']],
   ['ta.pivothigh', ['source', 'leftbars', 'rightbars']],
   ['ta.pivotlow', ['source', 'leftbars', 'rightbars']],
   ['ta.mom', ['source', 'length']],
