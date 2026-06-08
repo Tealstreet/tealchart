@@ -41,6 +41,7 @@ export type Statement =
   | EnumDeclaration
   | FunctionDeclaration
   | VariableDeclaration
+  | MultiDeclaration
   | TupleAssignment
   | AssignmentStatement
   | ExpressionStatement
@@ -191,6 +192,20 @@ export interface VariableDeclaration extends BaseNode {
   typeAnnotation?: TypeAnnotation | null;
   init: Expression | IfStatement;
   exported?: boolean;
+}
+
+/**
+ * Multiple variable declarations on a single comma-separated line.
+ *
+ * float x = 0, float y = 1
+ * var trend = 0, var itrend = 0
+ *
+ * Flattened into individual VariableDeclaration nodes by StatementList.
+ * Only emitted transiently inside nested block parsers that also flatten.
+ */
+export interface MultiDeclaration extends BaseNode {
+  type: 'MultiDeclaration';
+  declarations: VariableDeclaration[];
 }
 
 export interface VariableDeclarator extends BaseNode {
@@ -581,6 +596,7 @@ export function isStatement(node: AnyNode): node is Statement {
     'EnumDeclaration',
     'FunctionDeclaration',
     'VariableDeclaration',
+    'MultiDeclaration',
     'TupleAssignment',
     'AssignmentStatement',
     'ExpressionStatement',

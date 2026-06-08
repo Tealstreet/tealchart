@@ -1850,6 +1850,97 @@ lookup = map.new<
     });
   });
 
+  describe('Multi-variable comma-separated declarations', () => {
+    it('parses typed multi-declaration', () => {
+      const ast = parse('float x = 0, float y = 1\n');
+      expect(ast.body).toHaveLength(2);
+      const x = ast.body[0] as VariableDeclaration;
+      const y = ast.body[1] as VariableDeclaration;
+      expect(x.type).toBe('VariableDeclaration');
+      expect(x.names.type === 'VariableDeclarator' ? x.names.name.name : null).toBe('x');
+      expect(x.typeAnnotation).toEqual(expect.objectContaining({ baseType: 'float' }));
+      expect(y.type).toBe('VariableDeclaration');
+      expect(y.names.type === 'VariableDeclarator' ? y.names.name.name : null).toBe('y');
+      expect(y.typeAnnotation).toEqual(expect.objectContaining({ baseType: 'float' }));
+    });
+
+    it('parses var multi-declaration', () => {
+      const ast = parse('var trend = 0, var itrend = 0\n');
+      expect(ast.body).toHaveLength(2);
+      const trend = ast.body[0] as VariableDeclaration;
+      const itrend = ast.body[1] as VariableDeclaration;
+      expect(trend.kind).toBe('var');
+      expect(trend.names.type === 'VariableDeclarator' ? trend.names.name.name : null).toBe('trend');
+      expect(itrend.kind).toBe('var');
+      expect(itrend.names.type === 'VariableDeclarator' ? itrend.names.name.name : null).toBe('itrend');
+    });
+
+    it('parses untyped multi-declaration', () => {
+      const ast = parse('x = 1, y = 2\n');
+      expect(ast.body).toHaveLength(2);
+      const x = ast.body[0] as VariableDeclaration;
+      const y = ast.body[1] as VariableDeclaration;
+      expect(x.type).toBe('VariableDeclaration');
+      expect(x.names.type === 'VariableDeclarator' ? x.names.name.name : null).toBe('x');
+      expect(y.type).toBe('VariableDeclaration');
+      expect(y.names.type === 'VariableDeclarator' ? y.names.name.name : null).toBe('y');
+    });
+
+    it('parses multi-declaration with type-cast initializers', () => {
+      const ast = parse('max = float(na), min = float(na)\n');
+      expect(ast.body).toHaveLength(2);
+      const max = ast.body[0] as VariableDeclaration;
+      const min = ast.body[1] as VariableDeclaration;
+      expect(max.names.type === 'VariableDeclarator' ? max.names.name.name : null).toBe('max');
+      expect(max.init.type).toBe('CallExpression');
+      expect(min.names.type === 'VariableDeclarator' ? min.names.name.name : null).toBe('min');
+      expect(min.init.type).toBe('CallExpression');
+    });
+
+    it('parses three-variable typed multi-declaration', () => {
+      const ast = parse('float x = 0.0, float y = 1.0, float z = 2.0\n');
+      expect(ast.body).toHaveLength(3);
+      const names = ast.body.map((stmt) => {
+        const decl = stmt as VariableDeclaration;
+        return decl.names.type === 'VariableDeclarator' ? decl.names.name.name : null;
+      });
+      expect(names).toEqual(['x', 'y', 'z']);
+    });
+
+    it('single declaration still produces one node', () => {
+      const ast = parse('float x = 0.0\n');
+      expect(ast.body).toHaveLength(1);
+      expect(ast.body[0].type).toBe('VariableDeclaration');
+    });
+
+    it('commas inside function calls are not treated as declaration separators', () => {
+      const ast = parse('x = foo(a, b, c)\n');
+      expect(ast.body).toHaveLength(1);
+      const decl = ast.body[0] as VariableDeclaration;
+      expect(decl.type).toBe('VariableDeclaration');
+      expect(decl.init.type).toBe('CallExpression');
+      if (decl.init.type === 'CallExpression') {
+        expect(decl.init.arguments).toHaveLength(3);
+      }
+    });
+
+    it('parses multi-declaration inside a function body', () => {
+      const ast = parse(`f() =>
+    var x = 0, var y = 0
+    x + y
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body).toHaveLength(3);
+        expect(fn.body[0].type).toBe('VariableDeclaration');
+        expect(fn.body[1].type).toBe('VariableDeclaration');
+        expect(fn.body[2].type).toBe('ExpressionStatement');
+      }
+    });
+  });
+
   describe('Assignment statements', () => {
     it('parses := assignment', () => {
       const ast = parse('x = 1\nx := 2\n');

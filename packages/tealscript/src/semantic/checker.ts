@@ -2816,6 +2816,15 @@ class SemanticChecker {
   private collectGlobalVariableQualifiers(statements: Statement[]): Map<string, SemanticQualifier | undefined> {
     const globals = new Map<string, SemanticQualifier | undefined>();
     for (const statement of statements) {
+      if (statement.type === 'MultiDeclaration') {
+        for (const decl of statement.declarations) {
+          const type = this.typeFromAnnotation(decl.typeAnnotation);
+          for (const name of this.declaredNames(decl)) {
+            globals.set(name, type?.qualifier);
+          }
+        }
+        continue;
+      }
       if (statement.type !== 'VariableDeclaration') continue;
       const type = this.typeFromAnnotation(statement.typeAnnotation);
       for (const name of this.declaredNames(statement)) {
@@ -2968,6 +2977,11 @@ class SemanticChecker {
 
     const visitStatement = (statement: Statement, localNames: Set<string>): void => {
       switch (statement.type) {
+        case 'MultiDeclaration':
+          for (const decl of statement.declarations) {
+            visitStatement(decl, localNames);
+          }
+          return;
         case 'VariableDeclaration':
           visitInitializer(statement.init, localNames);
           for (const name of this.declaredNames(statement)) localNames.add(name);
@@ -3011,6 +3025,7 @@ class SemanticChecker {
           return;
         case 'FunctionDeclaration':
         case 'TypeDeclaration':
+        case 'EnumDeclaration':
         case 'IndicatorDeclaration':
         case 'LibraryDeclaration':
         case 'ImportDeclaration':
@@ -3214,6 +3229,11 @@ class SemanticChecker {
         break;
       case 'FunctionDeclaration':
         this.declareFunction(statement, scope);
+        break;
+      case 'MultiDeclaration':
+        for (const decl of statement.declarations) {
+          this.checkVariableDeclaration(decl, scope);
+        }
         break;
       case 'VariableDeclaration':
         this.checkVariableDeclaration(statement, scope);
