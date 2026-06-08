@@ -3003,7 +3003,11 @@ class SemanticChecker {
           return;
         case 'AssignmentStatement':
           this.visitAssignmentTargetExpression(statement.left, localNames, visitExpression);
-          if (statement.right.type !== 'IfStatement') visitExpression(statement.right, localNames);
+          if (statement.right.type === 'IfStatement') {
+            visitStatement(statement.right, localNames);
+          } else {
+            visitExpression(statement.right, localNames);
+          }
           return;
         case 'ExpressionStatement':
           visitExpression(statement.expression, localNames);
@@ -3125,7 +3129,9 @@ class SemanticChecker {
         return this.expressionReferencesAnyName(statement.right, names);
       case 'AssignmentStatement':
         return this.expressionReferencesAnyName(statement.left, names)
-          || (statement.right.type !== 'IfStatement' && this.expressionReferencesAnyName(statement.right, names));
+          || (statement.right.type === 'IfStatement'
+            ? this.statementReferencesAnyName(statement.right, names)
+            : this.expressionReferencesAnyName(statement.right, names));
       case 'ExpressionStatement':
         return this.expressionReferencesAnyName(statement.expression, names);
       case 'IfStatement':
@@ -3894,7 +3900,7 @@ class SemanticChecker {
       this.checkIdentifierCompoundAssignmentType(statement, scope);
     } else if (statement.left.type === 'MemberExpression' && statement.right.type !== 'IfStatement') {
       this.checkUdtFieldAssignmentType(statement.left, statement.right, scope, statement.operator);
-    } else if (statement.left.type === 'IndexExpression' && statement.right.type !== 'IfStatement') {
+    } else if (statement.left.type === 'IndexExpression') {
       this.checkIndexAssignmentType(statement.left, statement.right, scope, statement.operator);
     }
   }
@@ -4345,7 +4351,12 @@ class SemanticChecker {
     this.checkExpression(expression.index, scope);
   }
 
-  private checkIndexAssignmentType(target: IndexExpression, value: Expression, scope: SemanticScope, operator: AssignmentStatement['operator']): void {
+  private checkIndexAssignmentType(
+    target: IndexExpression,
+    value: Expression | IfStatement,
+    scope: SemanticScope,
+    operator: AssignmentStatement['operator'],
+  ): void {
     const objectType = this.inferExpressionType(target.object, scope);
     if (objectType.kind !== 'unknown' && objectType.kind !== 'array') {
       this.addDiagnostic(
@@ -4364,6 +4375,8 @@ class SemanticChecker {
         target.index.loc,
       );
     }
+
+    if (value.type === 'IfStatement') return;
 
     if (objectType.kind !== 'array' || !objectType.elementType) return;
 

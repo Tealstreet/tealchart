@@ -631,6 +631,72 @@ FunctionDeepNestedAssignmentStatement
       };
     }
 
+FunctionVeryDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedSwitchExpression) {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionUltraDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionUltraDeepNestedIfStatement {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionMegaDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionMegaDeepNestedIfStatement {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionSuperDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionSuperDeepNestedIfStatement {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionHyperDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionHyperDeepNestedIfStatement {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionExtremeDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionExtremeDeepNestedIfStatement {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
 // Valid assignment targets
 AssignmentTarget
   = head:Identifier tail:(
@@ -1392,7 +1458,7 @@ FunctionVeryDeepNestedBlock
     }
 
 FunctionVeryDeepNestedStatement
-  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:(FunctionVeryDeepNestedSwitchExpressionStatement / FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedForStatement / FunctionVeryDeepNestedWhileStatement / FunctionVeryDeepNestedVariableDeclaration / Statement) {
+  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:(FunctionVeryDeepNestedSwitchExpressionStatement / FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedForStatement / FunctionVeryDeepNestedWhileStatement / FunctionVeryDeepNestedVariableDeclaration / FunctionVeryDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1562,7 +1628,7 @@ FunctionUltraDeepNestedBlock
     }
 
 FunctionUltraDeepNestedStatement
-  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:(FunctionUltraDeepNestedIfStatement / FunctionUltraDeepNestedForStatement / FunctionUltraDeepNestedWhileStatement / Statement) {
+  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:(FunctionUltraDeepNestedIfStatement / FunctionUltraDeepNestedForStatement / FunctionUltraDeepNestedWhileStatement / FunctionUltraDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1637,7 +1703,7 @@ FunctionMegaDeepNestedBlock
     }
 
 FunctionMegaDeepNestedStatement
-  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent stmt:(FunctionMegaDeepNestedIfStatement / FunctionMegaDeepNestedForStatement / FunctionMegaDeepNestedWhileStatement / Statement) {
+  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent stmt:(FunctionMegaDeepNestedIfStatement / FunctionMegaDeepNestedForStatement / FunctionMegaDeepNestedWhileStatement / FunctionMegaDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1712,7 +1778,7 @@ FunctionSuperDeepNestedBlock
     }
 
 FunctionSuperDeepNestedStatement
-  = &FunctionSuperDeepNestedIndent FunctionSuperDeepNestedIndent stmt:(FunctionSuperDeepNestedIfStatement / FunctionSuperDeepNestedForStatement / FunctionSuperDeepNestedWhileStatement / Statement) {
+  = &FunctionSuperDeepNestedIndent FunctionSuperDeepNestedIndent stmt:(FunctionSuperDeepNestedIfStatement / FunctionSuperDeepNestedForStatement / FunctionSuperDeepNestedWhileStatement / FunctionSuperDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1787,7 +1853,7 @@ FunctionHyperDeepNestedBlock
     }
 
 FunctionHyperDeepNestedStatement
-  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:(FunctionHyperDeepNestedIfStatement / FunctionHyperDeepNestedForStatement / FunctionHyperDeepNestedWhileStatement / Statement) {
+  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:(FunctionHyperDeepNestedIfStatement / FunctionHyperDeepNestedForStatement / FunctionHyperDeepNestedWhileStatement / FunctionHyperDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1862,7 +1928,7 @@ FunctionExtremeDeepNestedBlock
     }
 
 FunctionExtremeDeepNestedStatement
-  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent stmt:(FunctionExtremeDeepNestedIfStatement / FunctionExtremeDeepNestedForStatement / FunctionExtremeDeepNestedWhileStatement / Statement) {
+  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent stmt:(FunctionExtremeDeepNestedIfStatement / FunctionExtremeDeepNestedForStatement / FunctionExtremeDeepNestedWhileStatement / FunctionExtremeDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
