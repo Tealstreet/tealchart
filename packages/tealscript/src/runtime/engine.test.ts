@@ -8241,6 +8241,34 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(11);
     });
+
+    it('bar_index[n] returns the bar_index value n bars ago', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(bar_index[1])`;
+
+      const bars = createBars(5, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      // bar_index[1] on bar 0 → offset > bar_index → na; on bar 1 → 0; on bar 2 → 1; etc.
+      expect(result.plots[0].values).toEqual([null, 0, 1, 2, 3]);
+    });
+
+    it('last_bar_index[n] returns the constant last_bar_index regardless of offset', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(last_bar_index[0])
+plot(last_bar_index[2])`;
+
+      const bars = createBars(5, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      const lastIdx = bars.length - 1;
+      expect(result.plots[0].values).toEqual([lastIdx, lastIdx, lastIdx, lastIdx, lastIdx]);
+      expect(result.plots[1].values).toEqual([lastIdx, lastIdx, lastIdx, lastIdx, lastIdx]);
+    });
   });
 
   describe('inputs', () => {

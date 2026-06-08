@@ -5630,6 +5630,12 @@ export class TealscriptEngine {
         case 'last_bar_time':
           this.checkHistoryOffset(offset);
           return offset > this.ctx.bar_index ? Number.NaN : this.naIfMissing(this.ctx.getBar(this.ctx.last_bar_index)?.time);
+        case 'bar_index':
+          this.checkHistoryOffset(offset);
+          return offset > this.ctx.bar_index ? Number.NaN : this.ctx.bar_index - offset;
+        case 'last_bar_index':
+          // last_bar_index is a constant; history access always returns the same value
+          return this.ctx.last_bar_index;
         case 'hl2':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getHl2(offset));
