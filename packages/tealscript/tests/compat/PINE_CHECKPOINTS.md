@@ -194,6 +194,11 @@ fixtures by default.
 | `Input Driven RSI Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20input.int%20length%20parameter/ | `input.int(14, "Length")` feeds directly into `ta.rsi(close, length)`; with 12 bars and period 14, all RSI values are null. | Input metadata confirms defval=14 with minval/maxval; RSI plot is all null; Close plot has 12 values. |
 | `Indicator Shorttitle Overlay Checkpoint` | https://www.tradingview.com/scripts/search/indicator%20shorttitle%20overlay%20legend/ | `indicator(..., shorttitle="ISO", overlay=true)` sets both the legend short name and the pane assignment. | `indicatorShortTitle` is "ISO", `indicatorOverlay` is true, declaration object confirms shortTitle and overlay. |
 
+| `Realworld Ichimoku Cloud Checkpoint` | https://www.tradingview.com/scripts/search/ichimoku%20cloud%20donchian/ | `donchian(len)` UDF computes midpoint of highest/lowest; tenkan (3-bar), kijun (5-bar), and senkouA derive from it. | Hand-checked tenkan, kijun, and senkouA series over `compatibilityBars`. |
+| `Realworld Chandelier Exit Checkpoint` | https://www.tradingview.com/scripts/search/chandelier%20exit%20atr%20trailing%20stop/ | `ta.atr`, `var int dir`, and `nz(stop[1], stop)` compose a trailing-stop; `stop` and `dir` reassigned each bar. | Hand-checked stop level and direction series over `compatibilityBars`. |
+| `Realworld BB Squeeze Checkpoint` | https://www.tradingview.com/scripts/search/bollinger%20band%20keltner%20squeeze/ | `ta.bb` and `ta.kc` tuple-destructured in the same script; squeeze fires when BB is inside KC. | Hand-checked BBWidth, KCWidth, and squeeze flag series over `compatibilityBars`. |
+| `Realworld Fisher Transform Checkpoint` | https://www.tradingview.com/scripts/search/ehlers%20fisher%20transform/ | `math.log` with value clamped to (−0.999, 0.999); `var float value` and `var float fish` carry recursive IIR state. | Hand-checked value and Fisher series over `compatibilityBars`. |
+
 ## Probe Checkpoints
 
 | Fixture | Source | Reduced Contract | Expected Outputs |

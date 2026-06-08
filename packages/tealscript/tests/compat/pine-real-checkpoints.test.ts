@@ -6295,6 +6295,169 @@ plot(array.last(acc.values), title="Last")
     expect(getPlot(result, 'Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     expect(getPlot(result, 'Last').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
+
+  it('locks the Ichimoku Cloud donchian UDF + fill idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/ichimoku%20cloud%20donchian/
+    // donchian() UDF computes midpoint of highest/lowest over len bars.
+    // Tenkan (conversion, len=3), Kijun (base, len=5), SenkouA (midpoint of both).
+    const result = runCompatScript(`
+indicator("Ichimoku Cloud Checkpoint")
+donchian(len) => math.avg(ta.lowest(len), ta.highest(len))
+tenkan = donchian(3)
+kijun = donchian(5)
+senkouA = math.avg(tenkan, kijun)
+plot(tenkan, title="Tenkan")
+plot(kijun, title="Kijun")
+plot(senkouA, title="SenkouA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Tenkan').values)).toEqual([
+      101, 102.5, 103.5, 105, 103.5, 102.5, 100.5, 103, 105, 107.5, 110, 110.5,
+    ]);
+    expect(roundSeries(getPlot(result, 'Kijun').values)).toEqual([
+      101, 102.5, 103.5, 104, 103.5, 102.5, 102.5, 103, 103.5, 104, 106.5, 108.5,
+    ]);
+    expect(roundSeries(getPlot(result, 'SenkouA').values)).toEqual([
+      101, 102.5, 103.5, 104.5, 103.5, 102.5, 101.5, 103, 104.25, 105.75, 108.25, 109.5,
+    ]);
+  });
+
+  it('locks the Chandelier Exit atr + var direction state idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/chandelier%20exit%20atr%20trailing%20stop/
+    // Classic trailing-stop: var int dir persists direction, nz(stop[1], stop) for
+    // first-bar fallback, stop reassigned based on direction each bar.
+    const result = runCompatScript(`
+indicator("Chandelier Exit Checkpoint")
+length = 3
+mult = 2.0
+atr = ta.atr(length)
+var int dir = 1
+var float stop = na
+longStop = ta.highest(high, length) - mult * atr
+shortStop = ta.lowest(low, length) + mult * atr
+stop := dir == 1 ? longStop : shortStop
+dir := close > nz(stop[1], stop) ? 1 : close < nz(stop[1], stop) ? -1 : dir
+plot(stop, title="Stop")
+plot(dir, title="Dir")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Stop').values)).toEqual([
+      null,
+      null,
+      99.333333,
+      98.555556,
+      98.037037,
+      98.358025,
+      93.90535,
+      97.9369,
+      99.6246,
+      101.083067,
+      103.388711,
+      103.592474,
+    ]);
+    expect(getPlot(result, 'Dir').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks the BB Squeeze ta.bb + ta.kc tuple member access idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/bollinger%20band%20keltner%20squeeze/
+    // Squeeze fires when BB is inside KC. Tests tuple destructuring on both ta.bb
+    // and ta.kc in the same script.
+    const result = runCompatScript(`
+indicator("BB Squeeze Checkpoint")
+length = 5
+mult = 2.0
+[bbMiddle, bbUpper, bbLower] = ta.bb(close, length, mult)
+[kcMiddle, kcUpper, kcLower] = ta.kc(close, length, mult)
+squeeze = bbUpper < kcUpper and bbLower > kcLower
+plot(bbUpper - bbLower, title="BBWidth")
+plot(kcUpper - kcLower, title="KCWidth")
+plot(squeeze ? 1 : 0, title="Squeeze")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'BBWidth').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      10.851728,
+      11.973304,
+      11.48216,
+      14.085453,
+      16.198765,
+      15.717506,
+      9.666437,
+      5.656854,
+    ]);
+    expect(roundSeries(getPlot(result, 'KCWidth').values)).toEqual([
+      16,
+      17.333333,
+      16.888889,
+      20.592593,
+      21.728395,
+      21.152263,
+      22.101509,
+      24.067673,
+      22.711782,
+      21.807854,
+      21.205236,
+      20.803491,
+    ]);
+    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks the Ehlers Fisher Transform math.log + var state idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/ehlers%20fisher%20transform/
+    // Value clamped to (-0.999, 0.999) before math.log; var state persists both
+    // value and fish across bars for the recursive IIR filter.
+    const result = runCompatScript(`
+indicator("Fisher Transform Checkpoint")
+length = 5
+var float value = 0.0
+var float fish = 0.0
+hl2val = (high + low) / 2
+highest = ta.highest(hl2val, length)
+lowest = ta.lowest(hl2val, length)
+range_ = highest - lowest
+norm = range_ > 0 ? 2 * ((hl2val - lowest) / range_) - 1 : 0.0
+value := 0.33 * math.max(math.min(norm, 0.999), -0.999) + 0.67 * nz(value[1])
+fish := 0.5 * math.log((1 + value) / (1 - value)) + 0.5 * nz(fish[1])
+plot(value, title="Value")
+plot(fish, title="Fisher")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([
+      0,
+      0.32967,
+      0.550549,
+      0.632868,
+      0.094351,
+      -0.266455,
+      -0.200525,
+      0.195319,
+      0.460533,
+      0.638227,
+      0.757282,
+      0.705379,
+    ]);
+    expect(roundSeries(getPlot(result, 'Fisher').values)).toEqual([
+      0,
+      0.342458,
+      0.790398,
+      1.141384,
+      0.665325,
+      0.059619,
+      -0.17347,
+      0.111126,
+      0.553551,
+      1.031953,
+      1.505789,
+      1.630821,
+    ]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {

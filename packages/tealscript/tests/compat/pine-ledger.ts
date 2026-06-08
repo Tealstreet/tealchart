@@ -3267,6 +3267,42 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-ichimoku-cloud-checkpoint',
+      title: 'Realworld Ichimoku Cloud Checkpoint',
+      searchContext: 'TradingView public scripts search: ichimoku cloud donchian',
+      featureTags: ['ta', 'udf', 'donchian', 'signals', 'state', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-chandelier-exit-checkpoint',
+      title: 'Realworld Chandelier Exit Checkpoint',
+      searchContext: 'TradingView public scripts search: chandelier exit atr trailing stop',
+      featureTags: ['ta', 'atr', 'var', 'na', 'state', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-bb-squeeze-checkpoint',
+      title: 'Realworld BB Squeeze Checkpoint',
+      searchContext: 'TradingView public scripts search: bollinger band keltner squeeze',
+      featureTags: ['ta', 'bands', 'kc', 'tuple', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-fisher-transform-checkpoint',
+      title: 'Realworld Fisher Transform Checkpoint',
+      searchContext: 'TradingView public scripts search: ehlers fisher transform',
+      featureTags: ['ta', 'var', 'na', 'state', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
