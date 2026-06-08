@@ -3384,6 +3384,52 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'final-lambda-array-map-checkpoint',
+      title: 'Lambda Array Map Checkpoint',
+      searchContext: 'TradingView public scripts search: array map lambda anonymous function',
+      featureTags: ['arrays', 'udf', 'collections', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'final-recursive-fibonacci-udf-checkpoint',
+      title: 'Recursive Fibonacci UDF Checkpoint',
+      searchContext: 'TradingView public scripts search: recursive fibonacci user defined function',
+      featureTags: ['udf', 'recursion', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'final-dema-tema-combined-checkpoint',
+      title: 'DEMA TEMA Combined Checkpoint',
+      searchContext: 'TradingView public scripts search: dema tema double triple exponential moving average',
+      featureTags: ['ta', 'moving_average', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'final-kitchen-sink-drawings-checkpoint',
+      title: 'Kitchen Sink Drawings Tables Plots Checkpoint',
+      searchContext: 'TradingView public scripts search: line label table plot overlay dashboard',
+      featureTags: ['drawings', 'lines', 'labels', 'tables', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'final-strategy-risk-management-checkpoint',
+      title: 'Strategy Risk Management Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy entry close equity position sizing alert',
+      category: 'strategy',
+      featureTags: ['strategy', 'risk', 'alerts', 'ta', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

@@ -6764,6 +6764,131 @@ plot(bar_index, title="BI")
       price: 112,
     });
   });
+
+  it('locks the lambda + array.map transform idiom', () => {
+    // Public idiom reference: array.map with an anonymous lambda is a common
+    // Pine v6 functional pattern for element-wise array transforms.
+    // Source search: https://www.tradingview.com/scripts/search/array%20map%20lambda/
+    const result = runCompatScript(`
+indicator("Lambda Map Checkpoint")
+mapped = array.map(array.from(1.0, 2.0, 3.0), (v) => v * 2.0)
+plot(array.get(mapped, 0), title="V0")
+plot(array.get(mapped, 1), title="V1")
+plot(array.get(mapped, 2), title="V2")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'V0').values).toEqual(Array(compatibilityBars.length).fill(2));
+    expect(getPlot(result, 'V1').values).toEqual(Array(compatibilityBars.length).fill(4));
+    expect(getPlot(result, 'V2').values).toEqual(Array(compatibilityBars.length).fill(6));
+  });
+
+  it('locks the recursive UDF Fibonacci idiom', () => {
+    // Public idiom reference: recursive user-defined functions are a key v6
+    // language feature. fib(8) = 21 is the canonical small verification.
+    // Source search: https://www.tradingview.com/scripts/search/recursive%20fibonacci%20udf/
+    const result = runCompatScript(`
+indicator("Recursive Fibonacci Checkpoint")
+fib(n) =>
+    n <= 1 ? n : fib(n-1) + fib(n-2)
+plot(fib(8), title="Fib8")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Fib8').values).toEqual(Array(compatibilityBars.length).fill(21));
+  });
+
+  it('locks the ta.dema + ta.tema combined idiom', () => {
+    // Public idiom reference: DEMA and TEMA are common advanced smoothing MAs.
+    // Scripts frequently plot both together for ribbon/trend comparisons.
+    // Source search: https://www.tradingview.com/scripts/search/dema%20tema%20double%20triple%20ema/
+    const result = runCompatScript(`
+indicator("DEMA TEMA Checkpoint")
+d = ta.dema(close, 3)
+t = ta.tema(close, 3)
+plot(d, title="DEMA")
+plot(t, title="TEMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'DEMA').values)).toEqual([
+      102, 104.25, 106.5, 104.1875, 100.3125, 99.765625,
+      102.6875, 107.496094, 108.324219, 110.700195, 110.619141, 111.944092,
+    ]);
+    expect(roundSeries(getPlot(result, 'TEMA').values)).toEqual([
+      102, 104.625, 106.9375, 103.8125, 99.46875, 99.460938,
+      103.191406, 108.5, 108.664063, 111.02002, 110.469482, 111.897217,
+    ]);
+  });
+
+  it('locks the kitchen-sink drawings + table + plot idiom', () => {
+    // Public idiom reference: scripts that combine line.new, label.new,
+    // table.new/table.cell, and plot() in one pass are common dashboards.
+    // Source search: https://www.tradingview.com/scripts/search/line%20label%20table%20plot%20overlay/
+    const result = runCompatScript(`
+indicator("Kitchen Sink Checkpoint", overlay=true)
+plot(close, title="Price")
+if barstate.islast
+    line.new(bar_index - 5, close[5], bar_index, close, color=color.blue)
+    label.new(bar_index, close, text="Last", style=label.style_label_down, color=color.green)
+    t = table.new(position.top_right, 1, 2)
+    table.cell(t, 0, 0, str.tostring(close))
+    table.cell(t, 0, 1, "Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Price').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(result.drawings).toHaveLength(3);
+    const types = result.drawings.map((d) => (d as { type: string }).type);
+    expect(types).toContain('line');
+    expect(types).toContain('label');
+    expect(types).toContain('table');
+    const table = result.drawings.find((d) => (d as { type: string }).type === 'table') as {
+      type: string; position: string; rows: number; columns: number;
+      cells: Array<{ column: number; row: number; text: string }>;
+    };
+    expect(table.position).toBe('top_right');
+    expect(table.rows).toBe(2);
+    expect(table.columns).toBe(1);
+    expect(table.cells[0]).toMatchObject({ column: 0, row: 0, text: '112' });
+    expect(table.cells[1]).toMatchObject({ column: 0, row: 1, text: 'Close' });
+  });
+
+  it('locks the complex strategy with risk management idiom', () => {
+    // Public idiom reference: strategies using strategy.entry, strategy.close,
+    // position sizing via strategy.equity/close, and alert() represent the most
+    // complete strategy execution pattern in public scripts.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20entry%20close%20equity%20alert%20risk/
+    const result = runCompatScript(`
+strategy("Risk Management Strategy Checkpoint", overlay=true)
+fastLen = 3
+slowLen = 5
+fast = ta.sma(close, fastLen)
+slow = ta.sma(close, slowLen)
+longCond = ta.crossover(fast, slow)
+shortCond = ta.crossunder(fast, slow)
+qty = math.floor(strategy.equity / close)
+if longCond
+    strategy.entry("Long", strategy.long, qty=qty)
+    alert("Long entry", alert.freq_once_per_bar)
+if shortCond
+    strategy.close("Long")
+    strategy.entry("Short", strategy.short, qty=qty)
+    alert("Short entry", alert.freq_once_per_bar)
+plot(fast, title="Fast")
+plot(slow, title="Slow")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Fast').values)).toEqual([
+      null, null, 104.666667, 105, 103, 100.666667,
+      101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+    expect(roundSeries(getPlot(result, 'Slow').values)).toEqual([
+      null, null, null, null, 103.2, 102.8,
+      102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
