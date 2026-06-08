@@ -212,8 +212,8 @@ export function resolveLabelDrawingPosition(
     y = resolvers.valueToY(bar.low, pane) + 6;
   } else {
     if (label.y === null || !Number.isFinite(label.y)) return null;
-    if (label.y < pane.yMin || label.y > pane.yMax) return null;
-    y = resolvers.valueToY(label.y, pane);
+    const clampedY = Math.max(pane.yMin, Math.min(pane.yMax, label.y));
+    y = resolvers.valueToY(clampedY, pane);
   }
 
   return { x, y };
