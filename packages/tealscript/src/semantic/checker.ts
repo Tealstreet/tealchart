@@ -2982,6 +2982,11 @@ class SemanticChecker {
             visitStatement(decl, localNames);
           }
           return;
+        case 'MultiAssignment':
+          for (const assignment of statement.assignments) {
+            visitStatement(assignment, localNames);
+          }
+          return;
         case 'VariableDeclaration':
           visitInitializer(statement.init, localNames);
           for (const name of this.declaredNames(statement)) localNames.add(name);
@@ -3105,6 +3110,8 @@ class SemanticChecker {
     switch (statement.type) {
       case 'VariableDeclaration':
         return this.initializerReferencesAnyName(statement.init, names);
+      case 'MultiAssignment':
+        return statement.assignments.some((a) => this.statementReferencesAnyName(a, names));
       case 'TupleAssignment':
         return this.expressionReferencesAnyName(statement.right, names);
       case 'AssignmentStatement':
@@ -3233,6 +3240,11 @@ class SemanticChecker {
       case 'MultiDeclaration':
         for (const decl of statement.declarations) {
           this.checkVariableDeclaration(decl, scope);
+        }
+        break;
+      case 'MultiAssignment':
+        for (const assignment of statement.assignments) {
+          this.checkAssignment(assignment, scope);
         }
         break;
       case 'VariableDeclaration':
