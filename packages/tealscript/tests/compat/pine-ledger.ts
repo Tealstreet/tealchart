@@ -1527,24 +1527,9 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
       id: 'deep-request-security-tuple-checkpoint',
       title: 'Deep Request Security Tuple Checkpoint',
       searchContext: 'TradingView public scripts search: request.security ohlc tuple destructure',
-      featureTags: ['request', 'tuple', 'intrabar', 'unsupported'],
+      featureTags: ['request', 'tuple', 'intrabar'],
     }),
-    stages: [
-      { stage: 'parse', status: 'passed' },
-      { stage: 'semantic', status: 'passed' },
-      {
-        stage: 'runtime',
-        status: 'failed',
-        failureClass: 'unsupported_planned',
-        message: 'request.security tuple expression: runtime cannot forward [open,high,low,close] array through the HTF merge — expression evaluates in chart context, not HTF context',
-        diagnostics: [{
-          code: 'unsupported-feature',
-          message: 'request.security with tuple expression argument cannot be destructured at runtime',
-          line: 2,
-          column: 1,
-        }],
-      },
-    ],
+    stages: passedThroughOutput,
   },
   {
     ledgerEntry: publicSearchEntry({

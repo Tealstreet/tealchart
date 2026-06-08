@@ -1254,18 +1254,25 @@ plot(close, title="Close")
     expect(result.errors).toEqual([]);
   });
 
-  // security() parses and semantic-checks correctly, but requires a live
-  // request datafeed at runtime. Skipped for the same reason as other
-  // request.security tests in the corpus.
-  // Gap documented in PINE_V6_REFERENCE_GAP.md under "Pine v5 Compatibility Gaps".
-  it.skip('v5 security() global alias for request.security()', () => {
+  it('v5 security() global alias for request.security()', () => {
+    // security(sym, tf, expr) is the Pine v5 global alias for request.security().
+    // The alias is resolved at both check and runtime layers — confirming the call
+    // reaches the request engine without an "unknown function" error.
+    // Source search: https://www.tradingview.com/scripts/search/security%20v5%20daily%20close/
+    const datafeed = new InMemoryRequestDatafeed([{
+      symbol: 'BTCUSDT',
+      timeframe: 'D',
+      bars: compatibilityBars,
+      syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+    }]);
     const result = runCompatScript(`
 //@version=5
 indicator("V5 Security Checkpoint")
 d = security(syminfo.tickerid, "D", close)
 plot(d, title="Daily")
-`);
+`, { engineOptions: { requestDatafeed: datafeed } });
     expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V5 Security Checkpoint');
   });
 
   it('locks v5 mixed-pattern indicator combining study(), input(), and global ta aliases', () => {
@@ -1613,7 +1620,7 @@ plot(open, title="Open")
   // This is a structural gap: the expression is evaluated in the chart context, not
   // the HTF context, so only scalar series values are forwarded.
   // Skipped: gap documented in PINE_V6_REFERENCE_GAP.md under "Deep parity probes".
-  it.skip('request.security with tuple expression destructure [o, h, l, c]', () => {
+  it('request.security with tuple expression destructure [o, h, l, c]', () => {
     const datafeed = new InMemoryRequestDatafeed([{
       symbol: 'BTCUSDT',
       timeframe: '2',

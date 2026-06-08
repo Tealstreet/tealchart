@@ -4200,6 +4200,10 @@ export class TealscriptEngine {
     const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount, currency });
     if (!result.ok) {
       if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+        if (expressionArg.value.type === 'ArrayExpression') {
+          const arity = (expressionArg.value as Expression & { elements: Expression[] }).elements.length;
+          return Array<number>(arity).fill(Number.NaN);
+        }
         return Number.NaN;
       }
       throw new Error(`request.security failed: ${result.message}`);
@@ -4215,7 +4219,16 @@ export class TealscriptEngine {
       this.requestEvaluationCache.set(cacheKey, cached);
     }
 
-    return this.mergeRequestedValue(cached.bars, cached.values, gaps, lookahead);
+    const merged = this.mergeRequestedValue(cached.bars, cached.values, gaps, lookahead);
+    // When the expression is an array literal [e1, e2, ...] and no HTF bar has
+    // aligned yet, mergeRequestedValue returns NaN. Return [NaN, ...] instead so
+    // tuple destructuring (e.g. [o, h, l, c] = request.security(...)) works on
+    // every chart bar, not just those where an HTF bar has confirmed.
+    if (Number.isNaN(merged as number) && expressionArg.value.type === 'ArrayExpression') {
+      const arity = (expressionArg.value as Expression & { elements: Expression[] }).elements.length;
+      return Array<number>(arity).fill(Number.NaN);
+    }
+    return merged;
   }
 
   private evaluateRequestSecurityLowerTf(expr: CallExpression, callId: string): PineArray {
