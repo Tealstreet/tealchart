@@ -2324,9 +2324,30 @@ GenericTypeArguments
       return [first, ...rest.map(t => t[3])];
     }
 
+// Lambda (anonymous function) expression: (params) => body
+// Lookahead ensures we only try this when "( identifiers ) =>" is ahead.
+LambdaLookahead
+  = "(" _ IdentifierName (_ "," _ IdentifierName)* _ ")" _ "=>"
+
+LambdaExpression
+  = &LambdaLookahead "(" _ params:LambdaParams _ ")" _ "=>" _ body:ConditionalExpression {
+      return {
+        type: 'LambdaExpression',
+        params,
+        body,
+        loc: loc()
+      };
+    }
+
+LambdaParams
+  = head:Identifier tail:(_ "," _ Identifier)* {
+      return [head, ...tail.map(t => t[3])];
+    }
+
 // Primary expressions
 PrimaryExpression
-  = "(" __ expr:Expression __ ")" { return expr; }
+  = LambdaExpression
+  / "(" __ expr:Expression __ ")" { return expr; }
   / ArrayLiteral
   / NaFunctionIdentifier
   / NaLiteral

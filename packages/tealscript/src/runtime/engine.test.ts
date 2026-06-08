@@ -9430,4 +9430,83 @@ plot(getVal(3), title="c")`;
       expect(result.plots.find((p) => p.title === 'c')?.values).toEqual(bars.map((b) => b.close));
     });
   });
+
+  describe('lambda expressions', () => {
+    it('array.every with callback returns true when all elements match', () => {
+      const script = `//@version=6
+indicator("Lambda every")
+arr = array.from(1, 2, 3)
+allPos = array.every(arr, (v) => v > 0)
+plot(allPos ? 1 : 0)`;
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0]?.values).toEqual([1, 1, 1]);
+    });
+
+    it('array.every with callback returns false when one element fails', () => {
+      const script = `//@version=6
+indicator("Lambda every false")
+arr = array.from(1, -2, 3)
+allPos = array.every(arr, (v) => v > 0)
+plot(allPos ? 1 : 0)`;
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0]);
+    });
+
+    it('array.filter with callback returns matching elements', () => {
+      const script = `//@version=6
+indicator("Lambda filter")
+arr = array.from(1, -2, 3, -4)
+pos = array.filter(arr, (v) => v > 0)
+plot(array.size(pos))`;
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0]?.values).toEqual([2, 2, 2]);
+    });
+
+    it('array.map with callback transforms elements', () => {
+      const script = `//@version=6
+indicator("Lambda map")
+arr = array.from(1, 2, 3)
+doubled = array.map(arr, (v) => v * 2)
+plot(array.sum(doubled))`;
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0]?.values).toEqual([12, 12, 12]);
+    });
+
+    it('array.sort with comparator callback sorts ascending', () => {
+      const script = `//@version=6
+indicator("Lambda sort")
+arr = array.from(3, 1, 2)
+array.sort(arr, (a, b) => a < b ? -1 : 1)
+plot(array.get(arr, 0))
+plot(array.get(arr, 1))
+plot(array.get(arr, 2))`;
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0]?.values).toEqual([1, 1, 1]);
+      expect(result.plots[1]?.values).toEqual([2, 2, 2]);
+      expect(result.plots[2]?.values).toEqual([3, 3, 3]);
+    });
+
+    it('lambda can close over outer scope variables', () => {
+      const script = `//@version=6
+indicator("Lambda closure")
+threshold = 2
+arr = array.from(1, 2, 3, 4)
+big = array.filter(arr, (v) => v > threshold)
+plot(array.size(big))`;
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0]?.values).toEqual([2, 2, 2]);
+    });
+  });
 });

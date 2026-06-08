@@ -1362,4 +1362,47 @@ missing paren`;
       }
     });
   });
+
+  describe('lambda expressions', () => {
+    it('parses a single-param lambda', () => {
+      const ast = parse('(v) => v > 0', { startRule: 'Expression' });
+      expect(ast.type).toBe('LambdaExpression');
+      if (ast.type === 'LambdaExpression') {
+        expect(ast.params).toHaveLength(1);
+        expect(ast.params[0].name).toBe('v');
+        expect(ast.body.type).toBe('BinaryExpression');
+      }
+    });
+
+    it('parses a two-param lambda with ternary body', () => {
+      const ast = parse('(a, b) => a < b ? -1 : 1', { startRule: 'Expression' });
+      expect(ast.type).toBe('LambdaExpression');
+      if (ast.type === 'LambdaExpression') {
+        expect(ast.params).toHaveLength(2);
+        expect(ast.params[0].name).toBe('a');
+        expect(ast.params[1].name).toBe('b');
+        expect(ast.body.type).toBe('ConditionalExpression');
+      }
+    });
+
+    it('parses a lambda as a call argument', () => {
+      const ast = parse('array.every(arr, (v) => v > 0)', { startRule: 'Expression' });
+      expect(ast.type).toBe('CallExpression');
+      if (ast.type === 'CallExpression') {
+        expect(ast.arguments).toHaveLength(2);
+        expect(ast.arguments[1].value.type).toBe('LambdaExpression');
+      }
+    });
+
+    it('does not misparse parenthesized expressions as lambdas', () => {
+      const ast = parse('(close + open) * 2', { startRule: 'Expression' });
+      expect(ast.type).toBe('BinaryExpression');
+    });
+
+    it('does not misparse single-identifier parens as lambda', () => {
+      // (v) with no => should parse as identifier v
+      const ast = parse('(v)', { startRule: 'Expression' });
+      expect(ast.type).toBe('Identifier');
+    });
+  });
 });

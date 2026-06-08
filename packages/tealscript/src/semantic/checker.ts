@@ -3011,6 +3011,11 @@ class SemanticChecker {
         case 'ArrayExpression':
           for (const element of expression.elements) visitExpression(element, localNames);
           return;
+        case 'LambdaExpression': {
+          const innerNames = new Set([...localNames, ...expression.params.map((p) => p.name)]);
+          visitExpression(expression.body, innerNames);
+          return;
+        }
       }
     };
 
@@ -3139,6 +3144,10 @@ class SemanticChecker {
       case 'WhileStatement':
         return this.expressionReferencesAnyName(expression.test, names)
           || expression.body.some((statement) => this.statementReferencesAnyName(statement, names));
+      case 'LambdaExpression': {
+        const outerNames = new Set([...names].filter((n) => !expression.params.some((p) => p.name === n)));
+        return this.expressionReferencesAnyName(expression.body, outerNames);
+      }
     }
   }
 
@@ -4208,6 +4217,14 @@ class SemanticChecker {
       case 'ArrayExpression':
         this.checkExpressions(scope, expression.elements);
         break;
+      case 'LambdaExpression': {
+        const lambdaScope = new SemanticScope(scope);
+        for (const param of expression.params) {
+          lambdaScope.declare({ name: param.name, kind: 'parameter' });
+        }
+        this.checkExpression(expression.body, lambdaScope);
+        break;
+      }
     }
   }
 

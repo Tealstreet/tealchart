@@ -32,6 +32,7 @@ import type {
   CallArgument,
   MemberExpression,
   IndexExpression,
+  LambdaExpression,
 } from '../parser/ast';
 import {
   CURRENCY_CONSTANT_CODES,
@@ -213,6 +214,17 @@ import {
   type StrategyQuantityType,
   type StrategyTrade,
 } from './strategy';
+
+/** Internal representation of a Pine inline lambda/callback. */
+interface PineLambda {
+  readonly __pineLambda: true;
+  readonly node: LambdaExpression;
+  readonly capturedScope: Scope;
+}
+
+function isPineLambda(value: unknown): value is PineLambda {
+  return typeof value === 'object' && value !== null && (value as PineLambda).__pineLambda === true;
+}
 
 const MONTH_NAMES = [
   'January',
@@ -1061,6 +1073,8 @@ export class TealscriptEngine {
           (max, element) => Math.max(max, this.inferExpressionMaxBarsBack(element, collectionScopes)),
           0,
         );
+      case 'LambdaExpression':
+        return 0;
     }
   }
 
@@ -3080,6 +3094,9 @@ export class TealscriptEngine {
       case 'ArrayExpression':
         return expr.elements.map((e) => this.evaluateExpression(e));
 
+      case 'LambdaExpression':
+        return { __pineLambda: true, node: expr, capturedScope: this.scope } satisfies PineLambda;
+
       default:
         throw new Error(`Unknown expression type: ${(expr as Expression).type}`);
     }
@@ -5061,6 +5078,22 @@ export class TealscriptEngine {
       const depth = this.userFunctionCallDepth.get(recursionKey) ?? 1;
       if (depth <= 1) this.userFunctionCallDepth.delete(recursionKey);
       else this.userFunctionCallDepth.set(recursionKey, depth - 1);
+      this.scope = savedScope;
+    }
+  }
+
+  private invokeLambda(lambda: PineLambda, args: unknown[]): unknown {
+    const savedScope = this.scope;
+    const callScope = lambda.capturedScope.createChild();
+    this.scope = callScope;
+    try {
+      for (let i = 0; i < lambda.node.params.length; i++) {
+        const name = lambda.node.params[i]!.name;
+        const value = args[i] !== undefined ? args[i] : NaN;
+        this.scope.declare(name, 'none', value, undefined, undefined);
+      }
+      return this.evaluateExpression(lambda.node.body);
+    } finally {
       this.scope = savedScope;
     }
   }
@@ -9175,15 +9208,21 @@ export class TealscriptEngine {
     this.builtins.set('array.includes', (args, namedArgs) => includesArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
     this.builtins.set('array.every', (args, namedArgs) => {
       const array = copyReadonlyArray(readArrayFromCall(args, namedArgs));
+      const callback = arrayCallArg(args, namedArgs, 1, 'callback', undefined);
       for (let index = 0; index < getArraySize(array); index++) {
-        if (!this.isTruthy(getArrayValue(array, index))) return false;
+        const element = getArrayValue(array, index);
+        const result = isPineLambda(callback) ? this.invokeLambda(callback, [element]) : element;
+        if (!this.isTruthy(result)) return false;
       }
       return true;
     });
     this.builtins.set('array.some', (args, namedArgs) => {
       const array = copyReadonlyArray(readArrayFromCall(args, namedArgs));
+      const callback = arrayCallArg(args, namedArgs, 1, 'callback', undefined);
       for (let index = 0; index < getArraySize(array); index++) {
-        if (this.isTruthy(getArrayValue(array, index))) return true;
+        const element = getArrayValue(array, index);
+        const result = isPineLambda(callback) ? this.invokeLambda(callback, [element]) : element;
+        if (this.isTruthy(result)) return true;
       }
       return false;
     });
@@ -9245,9 +9284,19 @@ export class TealscriptEngine {
     ));
     this.builtins.set('array.remove', (args, namedArgs) => removeArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'index') as number));
     this.builtins.set('array.sort', (args, namedArgs) => {
+      const secondArg = arrayCallArg(args, namedArgs, 1, 'order', undefined);
+      if (isPineLambda(secondArg)) {
+        const array = readMutableArrayFromCall(args, namedArgs);
+        const size = getArraySize(array);
+        const elements: unknown[] = [];
+        for (let i = 0; i < size; i++) elements.push(getArrayValue(array, i));
+        elements.sort((a, b) => this.toNumber(this.invokeLambda(secondArg, [a, b])));
+        for (let i = 0; i < size; i++) setArrayValue(array, i, elements[i]);
+        return null;
+      }
       sortArray(
         readMutableArrayFromCall(args, namedArgs),
-        arrayCallArg(args, namedArgs, 1, 'order'),
+        secondArg,
         arrayCallArg(args, namedArgs, 2, 'sort_field', undefined, ['id', 'order']),
       );
       return null;
@@ -9285,6 +9334,29 @@ export class TealscriptEngine {
     this.builtins.set('array.clear', (args, namedArgs) => {
       clearArray(readMutableArrayFromCall(args, namedArgs));
       return null;
+    });
+    this.builtins.set('array.map', (args, namedArgs) => {
+      const array = copyReadonlyArray(readArrayFromCall(args, namedArgs));
+      const callback = arrayCallArg(args, namedArgs, 1, 'callback');
+      if (!isPineLambda(callback)) throw new Error('array.map requires a callback function');
+      const result = createPineArray();
+      for (let i = 0; i < getArraySize(array); i++) {
+        pushArrayValue(result, this.invokeLambda(callback, [getArrayValue(array, i)]));
+      }
+      return result;
+    });
+    this.builtins.set('array.filter', (args, namedArgs) => {
+      const array = copyReadonlyArray(readArrayFromCall(args, namedArgs));
+      const callback = arrayCallArg(args, namedArgs, 1, 'callback');
+      if (!isPineLambda(callback)) throw new Error('array.filter requires a callback function');
+      const result = createPineArray();
+      for (let i = 0; i < getArraySize(array); i++) {
+        const element = getArrayValue(array, i);
+        if (this.isTruthy(this.invokeLambda(callback, [element]))) {
+          pushArrayValue(result, element);
+        }
+      }
+      return result;
     });
   }
 
