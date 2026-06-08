@@ -7562,6 +7562,77 @@ plot(ta.rma(close, 3), title="RMA")`;
       );
     });
 
+    it('ta.adx returns a finite float for ta.adx(14)', () => {
+      const bars: Bar[] = Array.from({ length: 50 }, (_, i) => ({
+        time: i + 1,
+        open: 100 + i,
+        high: 102 + i,
+        low: 99 + i,
+        close: 101 + i,
+        volume: 1000,
+      }));
+      const script = `//@version=6
+indicator("ADX Test")
+plot(ta.adx(14), title="ADX")`;
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      const adxValues = result.plots.find((p) => p.title === 'ADX')?.values ?? [];
+      const nonNull = adxValues.filter((v) => v !== null) as number[];
+      expect(nonNull.length).toBeGreaterThan(0);
+      expect(nonNull.every((v) => isFinite(v) && v >= 0 && v <= 100)).toBe(true);
+    });
+
+    it('ta.adx(14, 14) returns same result as ta.adx(14)', () => {
+      const bars: Bar[] = Array.from({ length: 50 }, (_, i) => ({
+        time: i + 1,
+        open: 100 + i * 0.5,
+        high: 103 + i * 0.5,
+        low: 98 + i * 0.5,
+        close: 101 + i * 0.5,
+        volume: 1000,
+      }));
+      const script1 = `//@version=6
+indicator("ADX 1-arg")
+plot(ta.adx(14), title="ADX")`;
+      const script2 = `//@version=6
+indicator("ADX 2-arg")
+plot(ta.adx(14, 14), title="ADX")`;
+
+      const result1 = executeScript(parse(script1), bars);
+      const result2 = executeScript(parse(script2), bars);
+
+      expect(result1.errors).toHaveLength(0);
+      expect(result2.errors).toHaveLength(0);
+      expect(result1.plots[0]?.values).toEqual(result2.plots[0]?.values);
+    });
+
+    it('ta.adx scalar matches the adx component from ta.dmi', () => {
+      const bars: Bar[] = Array.from({ length: 50 }, (_, i) => ({
+        time: i + 1,
+        open: 100 + Math.sin(i * 0.3) * 5,
+        high: 105 + Math.sin(i * 0.3) * 5,
+        low: 95 + Math.sin(i * 0.3) * 5,
+        close: 101 + Math.sin(i * 0.3) * 5,
+        volume: 1000,
+      }));
+      const adxScript = `//@version=6
+indicator("ADX Scalar")
+plot(ta.adx(14, 14), title="ADX")`;
+      const dmiScript = `//@version=6
+indicator("DMI ADX Component")
+[diPlus, diMinus, adx] = ta.dmi(14, 14)
+plot(adx, title="ADX")`;
+
+      const adxResult = executeScript(parse(adxScript), bars);
+      const dmiResult = executeScript(parse(dmiScript), bars);
+
+      expect(adxResult.errors).toHaveLength(0);
+      expect(dmiResult.errors).toHaveLength(0);
+      expect(adxResult.plots[0]?.values).toEqual(dmiResult.plots[0]?.values);
+    });
+
     it('plotshape accepts plotshape.style_* v4 constant aliases', () => {
       const script = `//@version=6
 indicator("Plotshape v4 style")
