@@ -11586,28 +11586,11 @@ export class TealscriptEngine {
         tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
       }
 
+      // Seed ATR with SMA on first full window, then Wilder's smoothing — mirrors ta.atr
       const atrKey = `_ta_supertrend_atr_${callId}_${atrLength}`;
-      let atr = scope.get(atrKey) as number | undefined;
-
-      if (atr === undefined || isNaN(atr)) {
-        // Initialize with simple average
-        let sum = 0;
-        for (let i = 0; i < atrLength; i++) {
-          const h = ctx.high.get(i);
-          const l = ctx.low.get(i);
-          const pc = ctx.close.get(i + 1);
-          if (h === undefined || l === undefined) continue;
-          let t = h - l;
-          if (pc !== undefined) {
-            t = Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc));
-          }
-          sum += t;
-        }
-        atr = sum / atrLength;
-      } else {
-        atr = (atr * (atrLength - 1) + tr) / atrLength;
-      }
-      this.setBuiltinState(scope, atrKey, atr);
+      const atrSourceKey = `_ta_supertrend_tr_${callId}_${atrLength}`;
+      const atr = this.updateBuiltinRmaState(scope, atrKey, atrSourceKey, tr, atrLength);
+      if (isNaN(atr)) return [NaN, NaN];
 
       // Calculate basic upper and lower bands
       const hl2 = (high + low) / 2;

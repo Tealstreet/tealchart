@@ -780,8 +780,8 @@ plot(histLine, title="Hist")
     for (const title of mixed.plots.map((plot) => plot.title)) {
       expect(roundSeries(getPlot(mixed, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
     }
-    expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([103.666667, 98.388889, 99.925926, 99.925926, 110.8107, 108.3738, 108.3738, 94.778311, 97.352207, 98.734805, 100.98987, 100.98987]);
-    expect(getPlot(positional, 'Supertrend Direction').values).toEqual([-1, 1, 1, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([null, null, 114.666667, 114.666667, 111.962963, 109.141975, 109.141975, 109.141975, 109.141975, 98.583067, 100.888711, 100.888711]);
+    expect(getPlot(positional, 'Supertrend Direction').values).toEqual([null, null, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1]);
     expect(roundSeries(getPlot(positional, 'MACD').values)).toEqual([0, 0.642857, 1.209184, 0.38156, -0.825672, -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671]);
     expect(roundSeries(getPlot(positional, 'Signal').values)).toEqual([0, 0.428571, 0.94898, 0.5707, -0.360214, -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116]);
     expect(roundSeries(getPlot(positional, 'Hist').values)).toEqual([0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555]);
@@ -1839,7 +1839,7 @@ plot(ta.hma(source=close, 5), title="Mixed HMA")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'SWMA').values)).toEqual([null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333]);
-    expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922]);
+    expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 103.054518, 100.423829, 100.807119, 104.100703, 107.305873, 108.841976, 109.980877, 110.662894]);
     expect(roundSeries(getPlot(result, 'Named SWMA').values)).toEqual(roundSeries(getPlot(result, 'SWMA').values));
     expect(roundSeries(getPlot(result, 'Named ALMA').values)).toEqual(roundSeries(getPlot(result, 'ALMA').values));
     expect(roundSeries(getPlot(result, 'Mixed ALMA').values)).toEqual(roundSeries(getPlot(result, 'ALMA').values));

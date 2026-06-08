@@ -7793,6 +7793,53 @@ plot(ta.alma(close, 3, 0.85, 6.0, true), title="ALMA")`;
       expect(defaultVals[2]).toBeCloseTo(20.0, 4);
     });
 
+    it('ta.supertrend returns na for bars before atrPeriod and seeds ATR with SMA', () => {
+      // atrLength=7: bars 0-5 lack a full window → [NaN, NaN]; bar 6 is first valid bar
+      const script = `//@version=6
+indicator("Supertrend seeding")
+[st, dir] = ta.supertrend(3, 7)
+plot(st, title="ST")
+plot(dir, title="Dir")`;
+
+      // TR values: bar0=2, bar1=3, bar2=3, bar3=4, bar4=4, bar5=4, bar6=4
+      // ATR seed at bar6 = SMA([2,3,3,4,4,4,4], 7) = 24/7
+      const bars: Bar[] = [
+        { time: 1, open: 9, high: 10, low: 8, close: 9, volume: 100 },
+        { time: 2, open: 9, high: 12, low: 9, close: 11, volume: 100 },
+        { time: 3, open: 11, high: 11, low: 8, close: 10, volume: 100 },
+        { time: 4, open: 10, high: 13, low: 9, close: 12, volume: 100 },
+        { time: 5, open: 12, high: 14, low: 10, close: 13, volume: 100 },
+        { time: 6, open: 13, high: 15, low: 11, close: 14, volume: 100 },
+        { time: 7, open: 14, high: 16, low: 12, close: 15, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+
+      const stVals = result.plots.find((p) => p.title === 'ST')?.values ?? [];
+      const dirVals = result.plots.find((p) => p.title === 'Dir')?.values ?? [];
+
+      // Bars 0-5: not enough TR history for ATR seed → na
+      for (let i = 0; i < 6; i++) {
+        expect(stVals[i]).toBeNull();
+        expect(dirVals[i]).toBeNull();
+      }
+
+      // Bar 6: ATR seeded with SMA([2,3,3,4,4,4,4],7) = 24/7
+      const expectedAtr = 24 / 7;
+      const hl2Bar6 = (16 + 12) / 2; // 14
+      // factor=3; basicUpper = 14 + 3*(24/7); basicLower = 14 - 3*(24/7)
+      const basicUpper = hl2Bar6 + 3 * expectedAtr;
+      const basicLower = hl2Bar6 - 3 * expectedAtr;
+      expect(stVals[6]).not.toBeNull();
+      // Direction based on close=15 vs bands; verify supertrend value is within a reasonable range
+      if (dirVals[6] === 1) {
+        expect(stVals[6] as number).toBeCloseTo(basicLower, 4);
+      } else {
+        expect(stVals[6] as number).toBeCloseTo(basicUpper, 4);
+      }
+    });
+
     it('calculates ta.dema — double EMA is more responsive than plain EMA', () => {
       const script = `//@version=6
 indicator("DEMA test")

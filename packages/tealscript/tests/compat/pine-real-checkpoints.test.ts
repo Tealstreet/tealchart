@@ -1406,11 +1406,12 @@ plot(sellSignal ? 1 : 0, title="Sell Signal")
       ['Factor', 'float'],
       ['ATR Period', 'int'],
     ]);
-    expect(getPlot(result, 'Direction').values).toEqual([-1, 1, 1, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
-    expect(getPlot(result, 'Up Trend').values).toEqual([102, null, null, null, 99, 100, 104, null, null, null, null, null]);
-    expect(getPlot(result, 'Down Trend').values).toEqual([null, 105, 107, 103, null, null, null, 109, 108, 111, 110, 112]);
-    expect(getPlot(result, 'Buy Signal').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
-    expect(getPlot(result, 'Sell Signal').values).toEqual([0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+    // Bars 0-1 are na: ATR seeds on bar 2 (first full window of atrLen=3)
+    expect(getPlot(result, 'Direction').values).toEqual([null, null, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1]);
+    expect(getPlot(result, 'Up Trend').values).toEqual([null, null, 107, 103, 99, 100, 104, 109, 108, null, null, null]);
+    expect(getPlot(result, 'Down Trend').values).toEqual([null, null, null, null, null, null, null, null, null, 111, 110, 112]);
+    expect(getPlot(result, 'Buy Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Sell Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]);
     expect(getPlot(result, 'Supertrend').values.some((value) => value !== null)).toBe(true);
   });
 
@@ -1964,19 +1965,20 @@ plot(bearRibbon ? 1 : 0, title="Bear Ribbon")
       110,
       111.166667,
     ]);
+    // ALMA with floor=true (default): m=floor(0.85*4)=3 instead of 3.4
     expect(roundSeries(getPlot(result, 'ALMA Smooth').values)).toEqual([
       null,
       null,
       null,
       null,
-      101.918274,
-      99.97516,
-      101.504063,
-      105.458142,
-      107.88929,
-      109.296928,
-      110.200868,
-      110.912922,
+      103.054518,
+      100.423829,
+      100.807119,
+      104.100703,
+      107.305873,
+      108.841976,
+      109.980877,
+      110.662894,
     ]);
     expect(roundSeries(getPlot(result, 'HMA Slow').values)).toEqual([
       null,
@@ -1992,8 +1994,8 @@ plot(bearRibbon ? 1 : 0, title="Bear Ribbon")
       111.511111,
       111.866667,
     ]);
-    expect(getPlot(result, 'Bull Ribbon').values).toEqual([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]);
-    expect(getPlot(result, 'Bear Ribbon').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]);
+    expect(getPlot(result, 'Bull Ribbon').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Ribbon').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
   it('locks a reduced public percentile rank signal idiom', () => {
