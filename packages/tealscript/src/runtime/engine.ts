@@ -551,7 +551,7 @@ export class TealscriptEngine {
   private nextCallExpressionId = 0;
   private nextSourceSeriesId = 0;
   private inferredMaxBarsBack = 0;
-  private userFunctionCallStack: string[] = [];
+  private userFunctionCallDepth = new Map<string, number>();
   private importedLibraryCallStack: string[] = [];
   private indicatorDynamicRequests = true;
   private requestContextDepth = 0;
@@ -648,7 +648,7 @@ export class TealscriptEngine {
     this.nextCallExpressionId = 0;
     this.pineVersion = ast.version;
     this.inferredMaxBarsBack = this.inferStaticMaxBarsBack(ast);
-    this.userFunctionCallStack = [];
+    this.userFunctionCallDepth.clear();
     this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
     this.hasStrategyDeclaration = false;
@@ -4960,10 +4960,9 @@ export class TealscriptEngine {
     hasPositionalArgumentAfterNamed = false,
     sourceBindings: CallSourceBindings = { positional: [], named: new Map() },
   ): unknown {
-    const recursiveIndex = this.userFunctionCallStack.indexOf(recursionKey);
-    if (recursiveIndex !== -1) {
-      const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), recursionKey].join(' -> ');
-      throw new Error(`Recursive user function calls are not supported: ${cycle}`);
+    const currentDepth = this.userFunctionCallDepth.get(recursionKey) ?? 0;
+    if (currentDepth >= 100) {
+      throw new Error(`Maximum recursion depth exceeded for function: ${fn.name.name}`);
     }
 
     if (hasPositionalArgumentAfterNamed) {
@@ -5024,10 +5023,14 @@ export class TealscriptEngine {
       return { value: undefined, sourceSeries: undefined };
     });
 
+    // Increment depth after all argument validation; decrement in finally.
+    this.userFunctionCallDepth.set(recursionKey, currentDepth + 1);
     const savedScope = this.scope;
-    const functionScope = this.ensureFunctionScope(scopeKey);
+    // Recursive calls get a fresh scope per invocation so parameters don't
+    // overwrite each other. The persistent function scope is only used at depth 0.
+    const functionScope =
+      currentDepth === 0 ? this.ensureFunctionScope(scopeKey) : this.rootScope.createChild();
     this.scope = functionScope;
-    this.userFunctionCallStack.push(recursionKey);
 
     try {
       for (let i = 0; i < fn.params.length; i++) {
@@ -5055,7 +5058,9 @@ export class TealscriptEngine {
 
       return this.evaluateSourceAwareExpression(fn.body);
     } finally {
-      this.userFunctionCallStack.pop();
+      const depth = this.userFunctionCallDepth.get(recursionKey) ?? 1;
+      if (depth <= 1) this.userFunctionCallDepth.delete(recursionKey);
+      else this.userFunctionCallDepth.set(recursionKey, depth - 1);
       this.scope = savedScope;
     }
   }

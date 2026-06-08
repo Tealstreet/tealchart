@@ -21,8 +21,8 @@ import {
 import { compatibilityCheckpointCorpus, compatibilityCheckpointLedger } from './pine-ledger';
 
 const EXPECTED_CHECKPOINT_TOTAL = compatibilityCheckpointLedger.entries.length;
-const EXPECTED_CHECKPOINT_FAILED = 2;
-const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 2;
+const EXPECTED_CHECKPOINT_FAILED = 1;
+const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 1;
 const EXPECTED_CHECKPOINT_PASSED = EXPECTED_CHECKPOINT_TOTAL - EXPECTED_CHECKPOINT_FAILED;
 const EXPECTED_CHECKPOINT_PASS_RATE = `${((EXPECTED_CHECKPOINT_PASSED / EXPECTED_CHECKPOINT_TOTAL) * 100).toFixed(1)}%`;
 
@@ -36,8 +36,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.failed).toBe(EXPECTED_CHECKPOINT_FAILED);
     expect(run.summary.plannedUnsupported).toBe(EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED);
     expect(run.summary.actionableFailed).toBe(0);
-    expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1, runtime: 1 });
-    expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 2 });
+    expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1 });
+    expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 1 });
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
       inputs: { total: 18, passed: 18, failed: 0 },
@@ -149,9 +149,9 @@ describe('Pine compatibility checkpoint corpus', () => {
       tables: { total: 22, passed: 22, failed: 0 },
       barstate: { total: 10, passed: 10, failed: 0 },
       table_setters: { total: 1, passed: 1, failed: 0 },
-      udf: { total: 28, passed: 27, failed: 1 },
+      udf: { total: 28, passed: 28, failed: 0 },
       udt: { total: 10, passed: 10, failed: 0 },
-      unsupported: { total: 2, passed: 0, failed: 2 },
+      unsupported: { total: 1, passed: 0, failed: 1 },
       varip: { total: 3, passed: 3, failed: 0 },
       trade_accessors: { total: 4, passed: 4, failed: 0 },
       open_trades: { total: 2, passed: 2, failed: 0 },
@@ -541,8 +541,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('Actionable failed: 0');
     expect(markdown).toContain('Actionable pass rate: 100.0%');
     expect(markdown).toContain('| semantic | 1 |');
-    expect(markdown).toContain('| runtime | 1 |');
-    expect(markdown).toContain('| unsupported_planned | 2 |');
+    expect(markdown).toContain('| unsupported_planned | 1 |');
     expect(markdown).toContain('| inputs | 18 | 18 | 0 |');
     expect(markdown).toContain('| legacy | 19 | 19 | 0 |');
     expect(markdown).toContain('| v4_compat | 3 | 3 | 0 |');
@@ -645,9 +644,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| trade_accessors | 4 | 4 | 0 |');
     expect(markdown).toContain('| open_trades | 2 | 2 | 0 |');
     expect(markdown).toContain('| cancel | 1 | 1 | 0 |');
-    expect(markdown).toContain('| udf | 28 | 27 | 1 |');
+    expect(markdown).toContain('| udf | 28 | 28 | 0 |');
     expect(markdown).toContain('| udt | 10 | 10 | 0 |');
-    expect(markdown).toContain('| unsupported | 2 | 0 | 2 |');
+    expect(markdown).toContain('| unsupported | 1 | 0 | 1 |');
     expect(markdown).toContain('| varip | 3 | 3 | 0 |');
     expect(markdown).toContain('| visuals | 46 | 46 | 0 |');
     expect(markdown).toContain('| volatility | 6 | 6 | 0 |');
@@ -942,7 +941,7 @@ plot(signals.fast(close, 2), title="Fast")
       cancel: 1,
       udf: 28,
       udt: 10,
-      unsupported: 2,
+      unsupported: 1,
       varip: 3,
       volatility: 6,
       vwap: 3,
