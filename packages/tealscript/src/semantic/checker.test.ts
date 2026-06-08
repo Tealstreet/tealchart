@@ -8514,4 +8514,31 @@ val = supertrend(close, 3, 10)
 
     expect(result.diagnostics).toEqual([]);
   });
+
+  it('accepts calendar series globals without diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Calendar Globals")
+plot(year)
+plot(month)
+plot(weekofyear)
+plot(dayofmonth)
+plot(dayofweek)
+plot(hour)
+plot(minute)
+plot(second)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts dayofweek namespace constants without diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Dayofweek Constants")
+isMonday = dayofweek == dayofweek.monday
+isSunday = dayofweek == dayofweek.sunday
+plot(isMonday or isSunday ? 1 : 0)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
 });
