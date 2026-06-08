@@ -8906,7 +8906,11 @@ export class TealscriptEngine {
     const stringPatternArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 1) =>
       getOrderedStringArg(args, namedArgs, stringPatternArgs, index, undefined, 'str pattern');
 
-    this.builtins.set('str.length', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).length);
+    this.builtins.set('str.length', (args, namedArgs) => {
+      const src = stringSourceArg(args, namedArgs);
+      if (this.isNa(src)) return Number.NaN;
+      return this.toStringValue(src).length;
+    });
     this.builtins.set('str.contains', (args, namedArgs) =>
       this.toStringValue(stringSourceArg(args, namedArgs)).includes(this.toStringValue(stringPatternArg(args, namedArgs))),
     );
