@@ -313,7 +313,7 @@ plot(ta.rsi(source=close, 3), title="RSI")
     expect(mixedRsi.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Stoch Close').values)).toEqual([null, null, 88.888889, 25, 9.090909, 30.769231, 88.888889, 92.857143, 75, 88.888889, 50, 71.428571]);
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
-    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, null, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
     expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
     expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, null, null, 55.555556, 33.333333, 42.028986, 67.479675, 82.162765, 72.361316, 82.015652, 69.821198, 79.13023]);
