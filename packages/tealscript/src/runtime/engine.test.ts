@@ -6753,6 +6753,24 @@ plot(sum)`;
     });
   });
 
+  describe('overload methods', () => {
+    it('parses and executes an overload method declaration', () => {
+      const script = `//@version=6
+indicator("Overload Method")
+method double(float this) => this * 2
+overload method double(int this) => this * 3
+x = 5.0
+plot(x.double(), title="Float Double")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Float Double')?.values).toEqual([10, 10]);
+    });
+  });
+
   describe('math functions', () => {
     it('keeps math constants as values, not callable functions', () => {
       const mathConstants = [
