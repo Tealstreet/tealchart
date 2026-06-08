@@ -2410,9 +2410,14 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
     const { values, color } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const hasPerBarColor = Array.isArray(color);
 
-    ctx.fillStyle = baseColor;
-    ctx.globalAlpha = 0.2;
+    if (hasPerBarColor) {
+      this.renderAreaFillPerBar(plot, bars, viewport, valueToY, baselineY, breaksOnNa);
+      return;
+    }
+
+    ctx.fillStyle = this.areaFillColor(baseColor);
 
     ctx.beginPath();
     let started = false;
@@ -2454,8 +2459,72 @@ export class TealchartRenderer {
     if (started) {
       this.closeAreaFillPath(firstX, lastX, baselineY);
     }
+  }
 
-    ctx.globalAlpha = 1;
+  private renderAreaFillPerBar(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    valueToY: (value: number) => number,
+    baselineY: number,
+    breaksOnNa: boolean,
+  ): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const { values, color } = plot;
+    const colors = Array.isArray(color) ? color : [];
+    const baseColor = colors[0] || '#2196F3';
+
+    let prevX: number | null = null;
+    let prevY: number | null = null;
+
+    for (let i = 0; i < bars.length && i < values.length; i++) {
+      const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+        prevX = null;
+        prevY = null;
+        continue;
+      }
+
+      if (value === null || value === undefined || isNaN(value)) {
+        if (breaksOnNa) {
+          prevX = null;
+          prevY = null;
+        }
+        continue;
+      }
+
+      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const y = valueToY(value);
+      const barColor = colors[i] || baseColor;
+
+      if (prevX !== null && prevY !== null) {
+        ctx.fillStyle = this.areaFillColor(barColor);
+        ctx.beginPath();
+        ctx.moveTo(prevX, baselineY);
+        ctx.lineTo(prevX, prevY);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x, baselineY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      prevX = x;
+      prevY = y;
+    }
+  }
+
+  private areaFillColor(color: string): string {
+    if (this.colorHasAlpha(color)) return color;
+    return color.length === 7 ? color + '33' : color;
+  }
+
+  private colorHasAlpha(color: string): boolean {
+    return color.length === 9 && color.startsWith('#');
   }
 
   private closeAreaFillPath(firstX: number, lastX: number, baselineY: number): void {
