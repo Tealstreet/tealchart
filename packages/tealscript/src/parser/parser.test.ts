@@ -1280,6 +1280,51 @@ plot(close)`);
     });
   });
 
+  describe('regex escape sequences in string literals', () => {
+    it('parses "\\\\d+" and the string value contains \\d+', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+v = "\\d+"`);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+      if (decl?.type === 'VariableDeclaration' && decl.init.type === 'StringLiteral') {
+        expect(decl.init.value).toBe('\\d+');
+      }
+    });
+
+    it('parses "\\\\w+\\\\s*" correctly', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+v = "\\w+\\s*"`);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+      if (decl?.type === 'VariableDeclaration' && decl.init.type === 'StringLiteral') {
+        expect(decl.init.value).toBe('\\w+\\s*');
+      }
+    });
+
+    it('parses str.match(s, "\\\\d+") in a full script', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+s = str.tostring(close)
+v = str.match(s, "\\d+")`);
+      expect(ast.type).toBe('Program');
+      const decls = ast.body.filter(s => s.type === 'VariableDeclaration');
+      expect(decls).toHaveLength(2);
+    });
+
+    it('still processes known escape sequences correctly', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+v = "\\n\\t\\\\\\\""`);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+      if (decl?.type === 'VariableDeclaration' && decl.init.type === 'StringLiteral') {
+        expect(decl.init.value).toBe('\n\t\\"');
+      }
+    });
+  });
+
   describe('error handling', () => {
     it('throws TealscriptParseError for syntax errors', () => {
       expect(() => {
