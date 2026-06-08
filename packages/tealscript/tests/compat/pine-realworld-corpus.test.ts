@@ -6520,3 +6520,165 @@ plot(str.length(na), title="LenNa")
     expect(roundSeries(getPlot(result, 'LenNa').values)).toEqual([null, null, null, null, null]);
   });
 });
+
+describe('Previously-failing real-script patterns', () => {
+  // Source: thanhnguyennguyen/tradingview-pine-scripts — RSI+CCI.pine
+  // Source: harryguiacorn/TradingView-Proprietary-Indicators — CommitmentGauge.pine
+  // Source: Ahmed-GoCode/Quant-Edge-Indicators — FVG.pinescript
+  // These patterns were identified as failing in research round 4 and fixed by PRs #969 and #970.
+
+  it('parses and runs typed multi-variable comma declarations', () => {
+    // Multi-var typed: `float x = 0, float y = 0` declares two separate variables.
+    // Source search: thanhnguyennguyen/tradingview-pine-scripts RSI+CCI.pine
+    // Pattern: float maxC = na, float minC = na, bool pivH = na, bool pivL = na
+    const result = runCompatScript(`
+//@version=4
+indicator("Multi-var Typed Declaration")
+float x = 0, float y = 0
+x := close
+y := open
+plot(x + y, title="Sum")
+plot(x - y, title="Diff")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Sum').values)).toEqual([
+      202, 207, 212, 210, 202, 199, 204, 213, 217, 219, 221, 222,
+    ]);
+    expect(roundSeries(getPlot(result, 'Diff').values)).toEqual([
+      2, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2,
+    ]);
+  });
+
+  it('parses and runs four-way typed multi-variable comma declarations', () => {
+    // Multi-var typed four-way: matches the exact RSI+CCI.pine idiom where four variables
+    // are declared on one line — float maxC = na, float minC = na, bool pivH = na, bool pivL = na
+    // Source search: thanhnguyennguyen/tradingview-pine-scripts RSI+CCI.pine
+    const result = runCompatScript(`
+//@version=4
+indicator("Four-Way Multi-var Typed Decl")
+float maxC = na, float minC = na, bool pivH = na, bool pivL = na
+maxC := close
+minC := open
+pivH := close > open
+pivL := close < open
+plot(pivH ? 1 : 0, title="PivH")
+plot(pivL ? 1 : 0, title="PivL")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'PivH').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    expect(getPlot(result, 'PivL').values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0]);
+  });
+
+  it('parses and runs var multi-variable comma declarations', () => {
+    // Multi-var var: `var float accum = 0, var int count = 0` declares two persistent vars.
+    // Source search: harryguiacorn CommitmentGauge.pine
+    // Pattern: var float sumBodyPercentage = 0, var float sumBodyVolumePercentage = 0
+    const result = runCompatScript(`
+//@version=4
+indicator("Multi-var Var Declaration")
+var float accum = 0, var int count = 0
+accum := accum + close
+count := count + 1
+plot(accum / count, title="Avg")
+plot(count, title="Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Avg').values)).toEqual([
+      102, 103.5, 104.666667, 104.25, 103.2, 102.666667,
+      102.857143, 103.625, 104.111111, 104.8, 105.272727, 105.833333,
+    ]);
+    expect(getPlot(result, 'Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it('parses and runs typed bool multi-variable comma declarations', () => {
+    // Multi-var bool: `bool isGreen = false, bool isRed = false` — unambiguous typed bool decl.
+    // Source search: harryguiacorn CommitmentGauge.pine
+    // Pattern: float sumBodyPercentage = 0, float sumBodyVolumePercentage = 0, float sumBodyVolumePercentagePoint = 0
+    const result = runCompatScript(`
+//@version=4
+indicator("Multi-var Bool Typed Decl")
+bool isGreen = false, bool isRed = false
+isGreen := close > open
+isRed := close < open
+plot(isGreen ? 1 : 0, title="Green")
+plot(isRed ? 1 : 0, title="Red")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Green').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    expect(getPlot(result, 'Red').values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0]);
+  });
+
+  it('parses and runs multi-variable typed declarations inside a for loop body', () => {
+    // CommitmentGauge idiom: float declarations before a for loop, updated inside.
+    // Source: harryguiacorn/TradingView-Proprietary-Indicators CommitmentGauge.pine
+    const result = runCompatScript(`
+//@version=4
+indicator("CommitmentGauge Pattern")
+float sumBody = 0, float bodyPct = 0
+for x = 0 to 2
+    rangeBody = close[x] - open[x]
+    rangeWhole = high[x] - low[x]
+    bodyPct = rangeWhole == 0 ? 0 : nz(rangeBody / rangeWhole * 100)
+    sumBody := sumBody + bodyPct
+plot(sumBody > 0 ? 1 : 0, title="Bull")
+plot(sumBody < 0 ? 1 : 0, title="Bear")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Bull').values).toEqual([1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bear').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('parses and runs consecutive single-element tuple destructuring', () => {
+    // Consecutive [x] = f() lines: each assigns a single-element tuple on separate lines.
+    // Source: Ahmed-GoCode/Quant-Edge-Indicators FVG.pinescript
+    // Pattern: [CShowDeIFVG] = SC.SwitchingColorMode(...) / [CShowSuIFVG] = SC.SwitchingColorMode(...)
+    const result = runCompatScript(`
+//@version=5
+indicator("Consecutive Single-Element Tuple Destructure")
+getHigh() => [high]
+getLow() => [low]
+[h] = getHigh()
+[l] = getLow()
+plot(h, title="High")
+plot(l, title="Low")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'High').values)).toEqual([
+      103, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113,
+    ]);
+    expect(roundSeries(getPlot(result, 'Low').values)).toEqual([
+      99, 101, 104, 102, 98, 96, 99, 103, 106, 107, 109, 108,
+    ]);
+  });
+
+  it('parses and runs three consecutive single-element tuple destructuring calls', () => {
+    // Three consecutive [x] = f() lines — regression for the PostfixContinuationSpace fix.
+    // Without PR #970, the second [x] was misinterpreted as index access on the first call result.
+    const result = runCompatScript(`
+//@version=5
+indicator("Three Consecutive Tuple Destructures")
+getH() => [high]
+getL() => [low]
+getC() => [close]
+[h] = getH()
+[l] = getL()
+[c] = getC()
+plot(h - l, title="Range")
+plot(c, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Range').values)).toEqual([
+      4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5,
+    ]);
+    expect(roundSeries(getPlot(result, 'Close').values)).toEqual([
+      102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112,
+    ]);
+  });
+});

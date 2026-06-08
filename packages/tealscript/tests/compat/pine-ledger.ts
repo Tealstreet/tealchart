@@ -3195,6 +3195,69 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-typed-multi-var-checkpoint',
+      title: 'Previously-Failing Typed Multi-Variable Declaration Checkpoint',
+      searchContext: 'thanhnguyennguyen/tradingview-pine-scripts RSI+CCI.pine multi-var typed declaration',
+      featureTags: ['parser', 'var', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-four-way-multi-var-checkpoint',
+      title: 'Previously-Failing Four-Way Typed Multi-Variable Declaration Checkpoint',
+      searchContext: 'thanhnguyennguyen/tradingview-pine-scripts RSI+CCI.pine four-var typed declaration',
+      featureTags: ['parser', 'var', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-var-multi-var-checkpoint',
+      title: 'Previously-Failing Var Multi-Variable Declaration Checkpoint',
+      searchContext: 'harryguiacorn TradingView-Proprietary-Indicators CommitmentGauge.pine var multi-var',
+      featureTags: ['parser', 'var', 'state', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-bool-multi-var-checkpoint',
+      title: 'Previously-Failing Bool Typed Multi-Variable Declaration Checkpoint',
+      searchContext: 'harryguiacorn TradingView-Proprietary-Indicators CommitmentGauge.pine bool typed multi-var',
+      featureTags: ['parser', 'var', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-multi-var-for-loop-checkpoint',
+      title: 'Previously-Failing Multi-Variable Declaration In For Loop Body Checkpoint',
+      searchContext: 'harryguiacorn TradingView-Proprietary-Indicators CommitmentGauge.pine for loop multi-var',
+      featureTags: ['parser', 'var', 'control_flow', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-consecutive-tuple-destructure-checkpoint',
+      title: 'Previously-Failing Consecutive Single-Element Tuple Destructure Checkpoint',
+      searchContext: 'Ahmed-GoCode Quant-Edge-Indicators FVG.pinescript consecutive [x] = f()',
+      featureTags: ['parser', 'tuple', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'prev-fail-three-consecutive-tuple-destructure-checkpoint',
+      title: 'Previously-Failing Three Consecutive Single-Element Tuple Destructure Checkpoint',
+      searchContext: 'Ahmed-GoCode Quant-Edge-Indicators FVG.pinescript three consecutive [x] = f()',
+      featureTags: ['parser', 'tuple', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
