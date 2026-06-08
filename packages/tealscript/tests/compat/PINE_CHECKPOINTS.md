@@ -203,6 +203,17 @@ fixtures by default.
 | `Realworld Pivot Labels Checkpoint` | https://www.tradingview.com/scripts/search/pivot%20high%20low%20labels%20marker/ | `ta.pivothigh` and `ta.pivotlow` return na until a confirmed pivot; `na(ph) ? 0 : 1` routes signal. | Hand-checked PHSignal and PLSignal series over `compatibilityBars`. |
 | `Realworld Heikin Ashi Var Checkpoint` | https://www.tradingview.com/scripts/search/heikin%20ashi%20var%20previous%20open%20close/ | `var float haOpen` initializes from `(open+close)/2` on bar 0 via `na(haOpen[1])` then carries recursive midpoint. | Hand-checked HAClose and HAOpen series over `compatibilityBars`. |
 
+## Edge-Case Checkpoints
+
+| Fixture | Source | Reduced Contract | Expected Outputs |
+| --- | --- | --- | --- |
+| `Library Export UDF Checkpoint` | https://www.tradingview.com/scripts/search/library%20export%20functions/ | A `library()` script exports two named functions (`scale` and `offset`); an importing indicator calls both and plots the results. | `Scaled` = `close * 3.0`; `Offset` = `close + 10.0` over `compatibilityBars`. |
+| `Varip Mixed Var Persistence Checkpoint` | https://www.tradingview.com/scripts/search/varip%20var%20persistence/ | Both `var int barCount` and `varip int tickCount` increment on every bar; on historical bars they are identical, so `Equal` is always 1. | `BarCount` and `TickCount` are 1–12; `Equal` is all 1s over `compatibilityBars`. |
+| `Complex Multi-Line Switch Block Checkpoint` | https://www.tradingview.com/scripts/search/switch%20block%20classify%20zone/ | UDF `classify` uses a multi-statement block per `switch` arm (local variable + trailing expression) to map `close` to zone 1/2/3. | `Zone` = 3 when `close > 105`, 2 when `close > 100`, 1 otherwise over `compatibilityBars`. |
+| `Nested UDT Field Access and Method Checkpoint` | https://www.tradingview.com/scripts/search/nested%20type%20field%20method/ | `Outer` type holds an `Inner` field; `method scaled(Outer this)` multiplies `inner.val * scale`. | `InnerVal` = close series; `Scaled` = close × 2 over `compatibilityBars`. |
+| `Matrix New Set Get Rows Columns Checkpoint` | https://www.tradingview.com/scripts/search/matrix%20new%20set%20get/ | A `var matrix<float>` allocated as 2×3 receives `close`, `high`, `low` writes each bar; rows/columns and three cells are read back. | `Rows` = 2, `Cols` = 3 always; cell values track close/high/low series over `compatibilityBars`. |
+| `Chart Point New Polyline Checkpoint` | https://www.tradingview.com/scripts/search/chart%20point%20new%20polyline/ | On `barstate.islast`, three `chart.point.new(time, index, price)` calls build a 3-point array fed to `polyline.new`. | One polyline drawing on bar 11 with 3 chart.point objects at bar indices 9, 10, 11. |
+
 ## Probe Checkpoints
 
 | Fixture | Source | Reduced Contract | Expected Outputs |
