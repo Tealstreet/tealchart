@@ -185,6 +185,31 @@ import TestUser/RangeTools/12 as rt`);
           expect(declaration.alias.name).toBe('rt');
         }
       });
+
+      it('parses import without alias — uses library name as implicit alias', () => {
+        const ast = parse(`//@version=6
+indicator("Imports")
+import djdrob/TrendChecker/1`);
+
+        const declaration = ast.body[1];
+        expect(declaration.type).toBe('ImportDeclaration');
+        if (declaration.type === 'ImportDeclaration') {
+          expect(declaration.library).toBe('TrendChecker');
+          expect(declaration.alias.name).toBe('TrendChecker');
+        }
+      });
+
+      it('parses import without alias — TradingView/ta/8 uses ta as alias', () => {
+        const ast = parse(`//@version=6
+indicator("Imports")
+import TradingView/ta/8`);
+
+        const declaration = ast.body[1];
+        expect(declaration.type).toBe('ImportDeclaration');
+        if (declaration.type === 'ImportDeclaration') {
+          expect(declaration.alias.name).toBe('ta');
+        }
+      });
     });
 
     describe('variable declarations', () => {
@@ -717,6 +742,38 @@ plot(close)`);
       // The string node should still contain the tab character
       const strDecl = ast.body.find((n) => n.type === 'VariableDeclaration');
       expect(strDecl).toBeDefined();
+    });
+  });
+
+  describe('single-line arrow function body', () => {
+    it('parses var declaration as single-line arrow body', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+_print(_text) => var _label = label.new(bar_index, close, _text)`);
+
+      const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+      expect(fn).toBeDefined();
+      if (fn?.type === 'FunctionDeclaration') {
+        expect(Array.isArray(fn.body)).toBe(true);
+        if (Array.isArray(fn.body)) {
+          expect(fn.body[0]?.type).toBe('VariableDeclaration');
+          if (fn.body[0]?.type === 'VariableDeclaration') {
+            expect(fn.body[0].kind).toBe('var');
+          }
+        }
+      }
+    });
+
+    it('parses expression as single-line arrow body (regression)', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+f(x) => x * 2`);
+
+      const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+      expect(fn).toBeDefined();
+      if (fn?.type === 'FunctionDeclaration' && !Array.isArray(fn.body)) {
+        expect(fn.body.type).toBe('BinaryExpression');
+      }
     });
   });
 

@@ -195,6 +195,18 @@ ImportDeclaration
         loc: loc()
       };
     }
+  / "import" !IdentifierPart _ importPath:ImportPath _ LineTerminator? {
+      const alias = { type: 'Identifier', name: importPath.library, loc: loc() };
+      return {
+        type: 'ImportDeclaration',
+        path: importPath.path,
+        owner: importPath.owner,
+        library: importPath.library,
+        version: importPath.version,
+        alias,
+        loc: loc()
+      };
+    }
 
 ImportPath
   = owner:IdentifierName "/" library:IdentifierName "/" version:Integer {
@@ -308,6 +320,17 @@ MethodDeclaration
         loc: loc()
       };
     }
+  / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:VariableDeclaration {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: [first, ...rest.map(t => t[3])],
+        body: [body],
+        isMethod: true,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
   / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
@@ -328,6 +351,16 @@ FunctionDeclaration
         name,
         params: params || [],
         body,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ body:VariableDeclaration {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: params || [],
+        body: [body],
         exported: !!exported,
         loc: loc()
       };
