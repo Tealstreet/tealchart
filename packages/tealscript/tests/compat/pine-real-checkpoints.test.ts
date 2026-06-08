@@ -899,6 +899,7 @@ indicator("Official Plot Style Checkpoint", overlay=false)
 areaBreak = bar_index == 1 ? na : low
 plot(close, title="Line", style=plot.style_line)
 plot(open, title="Step Line", style=plot.style_stepline)
+plot(open, title="Step Alias", style=plot.style_step)
 plot(open, title="Step Break", style=plot.style_steplinebr)
 plot(high - 100, title="Histogram", style=plot.style_histogram, histbase=0)
 plot(high, title="Circles", style=plot.style_circles, join=true)
@@ -909,6 +910,7 @@ plot(areaBreak, title="Area Break", style=plot.style_areabr, histbase=95)
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Line').style).toBe('line');
     expect(getPlot(result, 'Step Line').style).toBe('stepline');
+    expect(getPlot(result, 'Step Alias').style).toBe('stepline'); // plot.style_step alias
     expect(getPlot(result, 'Step Break').style).toBe('steplinebr');
     expect(getPlot(result, 'Histogram')).toMatchObject({
       style: 'histogram',
@@ -943,11 +945,12 @@ plot(areaBreak, title="Area Break", style=plot.style_areabr, histbase=95)
     expect(result.plots.map((plot) => [plot.title, plot.zOrder])).toEqual([
       ['Line', 0],
       ['Step Line', 1],
-      ['Step Break', 2],
-      ['Histogram', 3],
-      ['Circles', 4],
-      ['Crosses', 5],
-      ['Area Break', 6],
+      ['Step Alias', 2],
+      ['Step Break', 3],
+      ['Histogram', 4],
+      ['Circles', 5],
+      ['Crosses', 6],
+      ['Area Break', 7],
     ]);
   });
 
@@ -6888,6 +6891,10 @@ plot(slow, title="Slow")
       null, null, null, null, 103.2, 102.8,
       102.6, 103, 104, 106.4, 108.4, 110,
     ]);
+    // Strategy side-effects: at least one order placed and one alert emitted
+    expect(result.strategy!.orders.length).toBeGreaterThan(0);
+    const longAlert = result.alerts.find((a) => a.type === 'alert' && a.message === 'Long entry');
+    expect(longAlert?.events.length).toBeGreaterThan(0);
   });
 });
 
