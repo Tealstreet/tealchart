@@ -5227,6 +5227,34 @@ plot(values[0])`;
       expect(outOfBoundsResult.errors[0]?.message).toBe('Array index 9 is out of bounds. Array size is 2');
     });
 
+    it('throws a runtime error when array.get index is out of bounds', () => {
+      const oobPositiveScript = `//@version=6
+indicator("Array OOB Get")
+values = array.from(10, 20)
+result = array.get(values, 99)
+plot(result)`;
+      const oobPositiveResult = executeScript(parse(oobPositiveScript), createBars(1, 100));
+      expect(oobPositiveResult.errors[0]?.message).toBe('Array index 99 is out of bounds. Array size is 2');
+
+      const oobNegativeScript = `//@version=6
+indicator("Array OOB Get Negative")
+values = array.from(10, 20)
+result = array.get(values, -3)
+plot(result)`;
+      const oobNegativeResult = executeScript(parse(oobNegativeScript), createBars(1, 100));
+      expect(oobNegativeResult.errors[0]?.message).toBe('Array index -3 is out of bounds. Array size is 2');
+    });
+
+    it('throws a runtime error when array.set index is out of bounds', () => {
+      const oobScript = `//@version=6
+indicator("Array OOB Set")
+values = array.from(10, 20)
+array.set(values, 99, 99)
+plot(values.get(0))`;
+      const oobResult = executeScript(parse(oobScript), createBars(1, 100));
+      expect(oobResult.errors[0]?.message).toBe('Array index 99 is out of bounds. Array size is 2');
+    });
+
     it('iterates array slice windows', () => {
       const script = `//@version=6
 indicator("Array Slice Loop")

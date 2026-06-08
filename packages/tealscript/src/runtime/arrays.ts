@@ -34,7 +34,8 @@ export function getArrayValue<T = unknown>(array: PineArray<T>, index: number): 
   if (array.view) {
     return getArrayValue(array.view.parent, array.view.from + normalizeExistingIndex(index, getArraySize(array)));
   }
-  return array.values[Math.trunc(index)];
+  const normalizedIndex = normalizeExistingIndex(index, array.values.length);
+  return array.values[normalizedIndex];
 }
 
 function getArrayValues<T = unknown>(array: PineArray<T>): T[] {
