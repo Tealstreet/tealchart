@@ -10622,6 +10622,24 @@ export class TealscriptEngine {
       return lowest === Infinity ? NaN : lowest;
     });
 
+    // ta.max - element-wise series maximum: greater of source1 and source2 per bar
+    this.builtins.set('ta.max', (args, namedArgs) => {
+      const taMaxArgs = ['source1', 'source2'];
+      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMaxArgs, 0));
+      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMaxArgs, 1));
+      if (isNaN(source1) || isNaN(source2)) return NaN;
+      return Math.max(source1, source2);
+    });
+
+    // ta.min - element-wise series minimum: lesser of source1 and source2 per bar
+    this.builtins.set('ta.min', (args, namedArgs) => {
+      const taMinArgs = ['source1', 'source2'];
+      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMinArgs, 0));
+      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMinArgs, 1));
+      if (isNaN(source1) || isNaN(source2)) return NaN;
+      return Math.min(source1, source2);
+    });
+
     this.builtins.set('ta.range', (args, namedArgs, _ctx, scope, callId) => {
       const taRangeArgs = ['source', 'length'];
       const source = this.getOrderedCallArg(args, namedArgs, taRangeArgs, 0);
