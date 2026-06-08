@@ -471,6 +471,15 @@ TypeAnnotationBase
         loc: loc()
       };
     }
+  / elementType:TypeName "[]" {
+      return {
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        isArray: true,
+        elementType,
+        loc: loc()
+      };
+    }
   / baseType:TypeName {
       if (!BUILTIN_TYPE_NAMES.has(baseType)) {
         return {

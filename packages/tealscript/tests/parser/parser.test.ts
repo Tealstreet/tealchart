@@ -304,6 +304,50 @@ arrayValue = [1, 2]
       }));
     });
 
+    it('parses type[] shorthand array annotations (primitives)', () => {
+      const ast = parse(`float[] prices = na
+int[] counts = na
+string[] names = na
+bool[] flags = na
+color[] colors = na
+`);
+      const types = ast.body as VariableDeclaration[];
+      const expected = ['float', 'int', 'string', 'bool', 'color'];
+      for (let i = 0; i < expected.length; i++) {
+        expect(types[i].typeAnnotation).toEqual(expect.objectContaining({
+          type: 'TypeAnnotation',
+          baseType: 'array',
+          isArray: true,
+          elementType: expected[i],
+        }));
+      }
+    });
+
+    it('parses type[] shorthand with var keyword', () => {
+      const ast = parse('var float[] prices = na\n');
+      const decl = ast.body[0] as VariableDeclaration;
+
+      expect(decl.kind).toBe('var');
+      expect(decl.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        isArray: true,
+        elementType: 'float',
+      }));
+    });
+
+    it('parses UDT[] shorthand array annotation', () => {
+      const ast = parse('pivotPoint[] found = na\n');
+      const decl = ast.body[0] as VariableDeclaration;
+
+      expect(decl.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        isArray: true,
+        elementType: 'pivotPoint',
+      }));
+    });
+
     it('parses map type annotations', () => {
       const ast = parse('map<string, float> values = na\n');
       const decl = ast.body[0] as VariableDeclaration;

@@ -3258,6 +3258,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'type-array-shorthand-checkpoint',
+      title: 'Type Array Shorthand Annotation Checkpoint',
+      searchContext: 'TradingView public scripts search: type array shorthand',
+      featureTags: ['parser', 'arrays', 'type_annotations', 'var', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
