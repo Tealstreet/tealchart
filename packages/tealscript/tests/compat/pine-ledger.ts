@@ -3363,6 +3363,42 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-atr-trailing-stop-checkpoint',
+      title: 'ATR Trailing Stop Checkpoint',
+      searchContext: 'TradingView public scripts search: atr trailing stop var float nz',
+      featureTags: ['atr', 'trailing_stop', 'var', 'state', 'ta', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-volume-profile-map-checkpoint',
+      title: 'Volume Profile Map Checkpoint',
+      searchContext: 'TradingView public scripts search: volume profile map for-in accumulation',
+      featureTags: ['map', 'collections', 'var', 'state', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-zscore-indicator-checkpoint',
+      title: 'Z-Score Indicator Checkpoint',
+      searchContext: 'TradingView public scripts search: z-score normalisation ta.sma ta.stdev',
+      featureTags: ['statistics', 'ta', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-fibonacci-retracement-checkpoint',
+      title: 'Fibonacci Retracement Checkpoint',
+      searchContext: 'TradingView public scripts search: fibonacci retracement ta.highest ta.lowest',
+      featureTags: ['highest', 'lowest', 'ta', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
