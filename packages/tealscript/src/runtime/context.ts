@@ -82,6 +82,7 @@ export interface SymInfo {
   ticker: string;
   tickerid?: string;
   main_tickerid?: string;
+  exchange?: string;
   root: string;
   description: string;
   type: string; // 'crypto', 'stock', 'forex', etc.

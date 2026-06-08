@@ -4407,6 +4407,35 @@ plot(timeframe.in_seconds("bad"), title="Invalid Seconds")`;
       expect(result.plots.find((plot) => plot.title === 'Invalid Seconds')?.values).toEqual([null, null]);
     });
 
+    it('exposes syminfo.exchange derived from ticker prefix and from explicit field', () => {
+      const scriptPrefixed = `//@version=6
+indicator("Exchange Test")
+plot(str.length(syminfo.exchange), title="ExchangeLen")`;
+
+      const astPrefixed = parse(scriptPrefixed);
+      const barsPrefixed = createBars(2);
+      const resultPrefixed = executeScript(astPrefixed, barsPrefixed, undefined, {
+        runtime: { syminfo: { ticker: 'BINANCE:BTCUSDT' } },
+      });
+      expect(resultPrefixed.errors).toHaveLength(0);
+      // 'BINANCE' is 7 chars
+      expect(resultPrefixed.plots.find((plot) => plot.title === 'ExchangeLen')?.values).toEqual([7, 7]);
+
+      const resultNoColon = executeScript(astPrefixed, barsPrefixed, undefined, {
+        runtime: { syminfo: { ticker: 'BTCUSDT' } },
+      });
+      expect(resultNoColon.errors).toHaveLength(0);
+      // no colon → empty string → length 0
+      expect(resultNoColon.plots.find((plot) => plot.title === 'ExchangeLen')?.values).toEqual([0, 0]);
+
+      const resultExplicit = executeScript(astPrefixed, barsPrefixed, undefined, {
+        runtime: { syminfo: { ticker: 'BTCUSDT', exchange: 'MYEXCHANGE' } },
+      });
+      expect(resultExplicit.errors).toHaveLength(0);
+      // explicit exchange field takes priority — 'MYEXCHANGE' is 10 chars
+      expect(resultExplicit.plots.find((plot) => plot.title === 'ExchangeLen')?.values).toEqual([10, 10]);
+    });
+
     it('parses and validates Pine timeframe string specifications', () => {
       const validCases: Array<{
         timeframe: string;
