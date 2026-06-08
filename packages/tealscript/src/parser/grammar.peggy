@@ -595,6 +595,42 @@ SingleAssignment
       };
     }
 
+// Reassignment with block if/switch RHS (function body context)
+// These parallel SingleAssignment but allow FunctionIfStatement /
+// FunctionSwitchExpression as the RHS value.
+FunctionAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionIfStatement / FunctionSwitchExpression) {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionNestedIfStatement / FunctionNestedSwitchExpression) {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
+FunctionDeepNestedAssignmentStatement
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionDeepNestedIfStatement / FunctionDeepNestedSwitchExpression) {
+      return {
+        type: 'AssignmentStatement',
+        operator: op,
+        left,
+        right,
+        loc: loc()
+      };
+    }
+
 // Valid assignment targets
 AssignmentTarget
   = head:Identifier tail:(
@@ -756,7 +792,7 @@ IndentedBlock
     }
 
 IndentedStatement
-  = &Indent Indent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / Statement) {
+  = &Indent Indent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / FunctionAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -771,7 +807,7 @@ FunctionIndentedBlock
     }
 
 FunctionIndentedStatement
-  = &FunctionIndent FunctionIndent stmt:(FunctionSwitchExpressionStatement / FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / Statement) {
+  = &FunctionIndent FunctionIndent stmt:(FunctionSwitchExpressionStatement / FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / FunctionAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -972,7 +1008,7 @@ FunctionNestedBlock
     }
 
 FunctionNestedStatement
-  = &FunctionNestedIndent FunctionNestedIndent stmt:(FunctionNestedSwitchExpressionStatement / FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / FunctionNestedVariableDeclaration / Statement) {
+  = &FunctionNestedIndent FunctionNestedIndent stmt:(FunctionNestedSwitchExpressionStatement / FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / FunctionNestedVariableDeclaration / FunctionNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1164,7 +1200,7 @@ FunctionDeepNestedBlock
     }
 
 FunctionDeepNestedStatement
-  = &FunctionDeepNestedIndent FunctionDeepNestedIndent stmt:(FunctionDeepNestedSwitchExpressionStatement / FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / FunctionDeepNestedVariableDeclaration / Statement) {
+  = &FunctionDeepNestedIndent FunctionDeepNestedIndent stmt:(FunctionDeepNestedSwitchExpressionStatement / FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / FunctionDeepNestedVariableDeclaration / FunctionDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 

@@ -3003,7 +3003,7 @@ class SemanticChecker {
           return;
         case 'AssignmentStatement':
           this.visitAssignmentTargetExpression(statement.left, localNames, visitExpression);
-          visitExpression(statement.right, localNames);
+          if (statement.right.type !== 'IfStatement') visitExpression(statement.right, localNames);
           return;
         case 'ExpressionStatement':
           visitExpression(statement.expression, localNames);
@@ -3125,7 +3125,7 @@ class SemanticChecker {
         return this.expressionReferencesAnyName(statement.right, names);
       case 'AssignmentStatement':
         return this.expressionReferencesAnyName(statement.left, names)
-          || this.expressionReferencesAnyName(statement.right, names);
+          || (statement.right.type !== 'IfStatement' && this.expressionReferencesAnyName(statement.right, names));
       case 'ExpressionStatement':
         return this.expressionReferencesAnyName(statement.expression, names);
       case 'IfStatement':
@@ -3880,20 +3880,28 @@ class SemanticChecker {
   }
 
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
-    this.checkExpression(statement.right, scope);
+    if (statement.right.type === 'IfStatement') {
+      this.checkIf(statement.right, scope);
+    } else {
+      this.checkExpression(statement.right, scope);
+    }
     this.checkAssignmentTarget(statement, scope);
     if (statement.left.type === 'Identifier') {
-      this.checkIdentifierAssignmentType(statement, scope);
+      // Skip type inference for block-if RHS; defer to runtime types.
+      if (statement.right.type !== 'IfStatement') {
+        this.checkIdentifierAssignmentType(statement, scope);
+      }
       this.checkIdentifierCompoundAssignmentType(statement, scope);
-    } else if (statement.left.type === 'MemberExpression') {
+    } else if (statement.left.type === 'MemberExpression' && statement.right.type !== 'IfStatement') {
       this.checkUdtFieldAssignmentType(statement.left, statement.right, scope, statement.operator);
-    } else if (statement.left.type === 'IndexExpression') {
+    } else if (statement.left.type === 'IndexExpression' && statement.right.type !== 'IfStatement') {
       this.checkIndexAssignmentType(statement.left, statement.right, scope, statement.operator);
     }
   }
 
   private checkIdentifierAssignmentType(statement: AssignmentStatement, scope: SemanticScope): void {
     if (statement.operator !== ':=' || statement.left.type !== 'Identifier') return;
+    if (statement.right.type === 'IfStatement') return;
 
     const targetType = scope.lookup(statement.left.name)?.type;
     if (!targetType) return;
@@ -3928,6 +3936,7 @@ class SemanticChecker {
 
   private checkIdentifierCompoundAssignmentType(statement: AssignmentStatement, scope: SemanticScope): void {
     if (statement.operator === ':=' || statement.left.type !== 'Identifier') return;
+    if (statement.right.type === 'IfStatement') return;
 
     const targetType = scope.lookup(statement.left.name)?.type;
     if (!targetType || targetType.kind === 'unknown') return;

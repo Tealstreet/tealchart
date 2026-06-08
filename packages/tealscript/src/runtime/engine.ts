@@ -908,15 +908,20 @@ export class TealscriptEngine {
       case 'TupleAssignment':
         return this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
       case 'AssignmentStatement': {
-        const rightMax = this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
+        const rightMax = this.inferInitializerMaxBarsBack(statement.right, collectionScopes);
         if (statement.left.type === 'Identifier') {
-          this.assignStaticNameInfo(
-            statement.left.name,
-            this.expressionReturnsCollection(statement.right, collectionScopes),
-            this.inferStaticNumericValue(statement.right, collectionScopes),
-            this.inferStaticBooleanValue(statement.right, collectionScopes),
-            collectionScopes,
-          );
+          if (statement.right.type !== 'IfStatement') {
+            const rightExpr = statement.right;
+            this.assignStaticNameInfo(
+              statement.left.name,
+              this.expressionReturnsCollection(rightExpr, collectionScopes),
+              this.inferStaticNumericValue(rightExpr, collectionScopes),
+              this.inferStaticBooleanValue(rightExpr, collectionScopes),
+              collectionScopes,
+            );
+          } else {
+            this.assignStaticNameInfo(statement.left.name, false, null, null, collectionScopes);
+          }
         }
         return Math.max(
           this.inferAssignmentTargetMaxBarsBack(statement.left, collectionScopes),
@@ -2750,7 +2755,7 @@ export class TealscriptEngine {
   }
 
   private executeAssignment(stmt: AssignmentStatement): void {
-    const rawValue = this.evaluateExpression(stmt.right);
+    const rawValue = this.evaluateVariableInitializer(stmt.right);
     const value = this.unwrapKnownSourceValue(rawValue);
 
     if (stmt.left.type === 'Identifier') {
@@ -2762,7 +2767,9 @@ export class TealscriptEngine {
       this.scope.set(
         name,
         newValue,
-        stmt.operator === ':=' ? this.getSourceSeriesForExpression(stmt.right, rawValue) : undefined,
+        stmt.operator === ':='
+          ? this.getSourceSeriesForInitializer(stmt.right, rawValue)
+          : undefined,
       );
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);

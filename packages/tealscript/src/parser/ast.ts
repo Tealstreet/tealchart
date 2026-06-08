@@ -251,7 +251,7 @@ export interface AssignmentStatement extends BaseNode {
   type: 'AssignmentStatement';
   operator: ':=' | '+=' | '-=' | '*=' | '/=' | '%=';
   left: Identifier | MemberExpression | IndexExpression;
-  right: Expression;
+  right: Expression | IfStatement;
 }
 
 /**
