@@ -5589,6 +5589,12 @@ export class TealscriptEngine {
         return ledger.closedTrades.filter((trade) => trade.profit < 0).length;
       case 'eventrades':
         return ledger.closedTrades.filter((trade) => trade.profit === 0).length;
+      case 'percent_profitable': {
+        const closed = ledger.closedTrades;
+        if (closed.length === 0) return Number.NaN;
+        const wins = closed.filter((trade) => trade.profit > 0).length;
+        return (wins / closed.length) * 100;
+      }
       case 'max_runup':
         return ledger.maxRunup;
       case 'max_drawdown':

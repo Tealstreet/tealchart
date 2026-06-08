@@ -3473,6 +3473,110 @@ plot(strategy.max_contracts_held_short)`;
       expect(result.plots[2]?.values[4]).toBe(2);
     });
 
+    it('tracks max_contracts_held per-bar as positions grow and shrink', () => {
+      const script = `//@version=6
+strategy("Max contracts detail", process_orders_on_close=true, initial_capital=100000, pyramiding=2)
+if bar_index == 0
+    strategy.entry("Long1", strategy.long, qty=5)
+if bar_index == 1
+    strategy.entry("Long2", strategy.long, qty=3)
+if bar_index == 3
+    strategy.close_all()
+plot(strategy.max_contracts_held_all)
+plot(strategy.max_contracts_held_long)
+plot(strategy.max_contracts_held_short)`;
+      const bars: Bar[] = [
+        { time: 1000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 2000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 3000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 4000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      // After bar 1 (Long2 filled): position = 8, max_all = max_long = 8
+      expect(result.plots[0]?.values[2]).toBe(8);
+      expect(result.plots[1]?.values[2]).toBe(8);
+      expect(result.plots[2]?.values[2]).toBe(0);
+      // After close_all on bar 3: peak values remain at 8
+      expect(result.plots[0]?.values[3]).toBe(8);
+      expect(result.plots[1]?.values[3]).toBe(8);
+      expect(result.plots[2]?.values[3]).toBe(0);
+    });
+
+    it('tracks max_contracts_held_long and _short independently', () => {
+      const script = `//@version=6
+strategy("Long short peak", process_orders_on_close=true, initial_capital=100000)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=4)
+if bar_index == 1
+    strategy.close("Long")
+if bar_index == 2
+    strategy.entry("Short", strategy.short, qty=7)
+if bar_index == 3
+    strategy.close("Short")
+plot(strategy.max_contracts_held_long)
+plot(strategy.max_contracts_held_short)`;
+      const bars: Bar[] = [
+        { time: 1000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 2000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 3000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 4000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      // Long peak = 4, short peak = 7 — each tracked independently
+      expect(result.plots[0]?.values[3]).toBe(4);
+      expect(result.plots[1]?.values[3]).toBe(7);
+    });
+
+    it('returns na for strategy.percent_profitable when no trades closed', () => {
+      const script = `//@version=6
+strategy("Pct profitable empty", process_orders_on_close=true, initial_capital=1000)
+plot(strategy.percent_profitable)`;
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      // No closed trades → na (null in plot output)
+      expect(result.plots[0]?.values[0]).toBeNull();
+      expect(result.plots[0]?.values[1]).toBeNull();
+      expect(result.plots[0]?.values[2]).toBeNull();
+    });
+
+    it('computes strategy.percent_profitable after mixed trades', () => {
+      // Long entry at close=100 (bar 0), exit at close=110 (bar 1) → win (+10)
+      // Short entry at close=110 (bar 2), exit at close=120 (bar 3) → loss (price rose)
+      const script = `//@version=6
+strategy("Pct profitable", process_orders_on_close=true, initial_capital=100000)
+if bar_index == 0
+    strategy.entry("Win", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Win")
+if bar_index == 2
+    strategy.entry("Loss", strategy.short, qty=1)
+if bar_index == 3
+    strategy.close("Loss")
+plot(strategy.percent_profitable)`;
+      const bars: Bar[] = [
+        { time: 1000, open: 100, high: 101, low: 99, close: 100, volume: 1 },
+        { time: 2000, open: 110, high: 111, low: 109, close: 110, volume: 1 },
+        { time: 3000, open: 110, high: 111, low: 109, close: 110, volume: 1 },
+        { time: 4000, open: 120, high: 121, low: 119, close: 120, volume: 1 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      // bar 0: no closed trades → na
+      expect(result.plots[0]?.values[0]).toBeNull();
+      // bar 1: 1 win / 1 closed = 100%
+      expect(result.plots[0]?.values[1]).toBe(100);
+      // bar 2: still 1 win / 1 closed = 100% (loss not yet closed)
+      expect(result.plots[0]?.values[2]).toBe(100);
+      // bar 3: 1 win / 2 closed = 50% (short exited at 120, entered at 110 → loss)
+      expect(result.plots[0]?.values[3]).toBe(50);
+    });
+
     it('returns na for strategy.margin_liquidation_price', () => {
       const script = `//@version=6
 strategy("Margin", process_orders_on_close=true, initial_capital=1000)
