@@ -185,6 +185,37 @@ plot(requestedAsk, title="Requested Ask")`;
       expect(result.plots.find((plot) => plot.title === 'Requested Ask')?.values).toEqual([200.25, 201.25]);
     });
 
+    it('inherits outer-scope input variables inside request.security expression', () => {
+      // smaPeriod is declared via input.int in the outer script; the sub-engine
+      // must see it when evaluating ta.sma(close, smaPeriod).
+      const script = `//@version=6
+indicator("Scope Inherit")
+smaPeriod = input.int(2, title="SMA Period")
+requested = request.security(syminfo.tickerid, "D", ta.sma(close, smaPeriod), lookahead=barmerge.lookahead_on)
+plot(requested, title="Requested SMA")`;
+
+      const bars = createBars(3, 100);
+      const datafeed = new InMemoryRequestDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: 'D',
+        bars,
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { requestDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      const smaValues = result.plots.find((plot) => plot.title === 'Requested SMA')?.values;
+      expect(smaValues).toBeDefined();
+      // lookahead_on: active index finds the last request bar with time <= chart time.
+      // Bar 0: request bar 0 active; only 1 close, sma(close, 2) = na → null.
+      // Bar 1: request bar 1 active; 2 closes available, sma(close, 2) = number.
+      // Bar 2: request bar 2 active; sma(close, 2) = number.
+      expect(smaValues?.[0]).toBeNull();
+      expect(typeof smaValues?.[1]).toBe('number');
+      expect(typeof smaValues?.[2]).toBe('number');
+    });
+
     it('reports execution counters for compatibility profiling', () => {
       const script = `//@version=6
 indicator("Profile")
@@ -1160,6 +1191,30 @@ plot(strategy.opentrades.entry_price())`;
       const result = executeScript(parse(script), createBars(1));
 
       expect(result.errors[0]?.message).toBe('strategy trade_num is required');
+    });
+
+    it('returns na for negative trade index on strategy.closedtrades accessors', () => {
+      const script = `//@version=6
+strategy("Negative index", process_orders_on_close=true)
+plot(strategy.closedtrades.profit(strategy.closedtrades - 1), title="Last Profit")
+plot(strategy.closedtrades.entry_price(-1), title="Negative Entry")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Last Profit')?.values).toEqual([null]);
+      expect(result.plots.find((plot) => plot.title === 'Negative Entry')?.values).toEqual([null]);
+    });
+
+    it('returns na for out-of-range trade index on strategy.opentrades accessors', () => {
+      const script = `//@version=6
+strategy("OOB index", process_orders_on_close=true)
+plot(strategy.opentrades.profit(strategy.opentrades - 1), title="Last Open Profit")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Last Open Profit')?.values).toEqual([null]);
     });
 
     it('exposes basic strategy.closedtrades accessors', () => {

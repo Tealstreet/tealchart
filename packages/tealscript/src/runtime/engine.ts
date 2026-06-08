@@ -4690,6 +4690,17 @@ export class TealscriptEngine {
     }
     engine.registerCallableCallSites(expression);
 
+    // Seed the sub-engine scope with scalar values from the outer scope so
+    // that simple variables (e.g. rsiLength = input.int(14)) are visible
+    // when the expression references them by name. Use 'var' kind so the
+    // values survive advanceBar() across the sub-engine's bar loop.
+    for (const name of this.scope.getAllNames()) {
+      const value = this.scope.get(name);
+      if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
+        engine.scope.declare(name, 'var', value);
+      }
+    }
+
     const values: unknown[] = [];
     while (engine.ctx.advanceBar()) {
       engine.scope.advanceBar();
@@ -7088,11 +7099,13 @@ export class TealscriptEngine {
   }
 
   private strategyOpenTrade(args: unknown[], namedArgs: Map<string, unknown>): StrategyTrade | undefined {
-    return this.ctx.strategyLedger.openTrades[this.strategyTradeIndex(args, namedArgs)];
+    const index = this.strategyTradeIndex(args, namedArgs);
+    return index === undefined ? undefined : this.ctx.strategyLedger.openTrades[index];
   }
 
   private strategyClosedTrade(args: unknown[], namedArgs: Map<string, unknown>): StrategyTrade | undefined {
-    return this.ctx.strategyLedger.closedTrades[this.strategyTradeIndex(args, namedArgs)];
+    const index = this.strategyTradeIndex(args, namedArgs);
+    return index === undefined ? undefined : this.ctx.strategyLedger.closedTrades[index];
   }
 
   private strategyTradePercent(trade: StrategyTrade | undefined, field: 'maxRunup' | 'maxDrawdown'): number {
@@ -7106,14 +7119,15 @@ export class TealscriptEngine {
     return (value / basis) * 100;
   }
 
-  private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number {
+  private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number | undefined {
     const value = this.getCallArg(args, namedArgs, 0, 'trade_num');
     if (value === undefined) {
       throw new Error('strategy trade_num is required');
     }
     const index = this.toOptionalNumber(value);
+    // Pine semantics: out-of-range or invalid index returns na, not an error.
     if (index === undefined || index < 0 || !Number.isInteger(index)) {
-      throw new Error('strategy trade_num must be a non-negative integer');
+      return undefined;
     }
     return index;
   }
