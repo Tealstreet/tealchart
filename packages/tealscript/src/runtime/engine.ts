@@ -2762,9 +2762,9 @@ export class TealscriptEngine {
       case '*=':
         return numCurrent * numValue;
       case '/=':
-        return numCurrent / numValue;
+        return numValue === 0 ? Number.NaN : numCurrent / numValue;
       case '%=':
-        return numCurrent % numValue;
+        return numValue === 0 ? Number.NaN : numCurrent % numValue;
     }
   }
 
@@ -3139,9 +3139,9 @@ export class TealscriptEngine {
       case '*':
         return (left as number) * (right as number);
       case '/':
-        return (left as number) / (right as number);
+        return (right as number) === 0 ? Number.NaN : (left as number) / (right as number);
       case '%':
-        return (left as number) % (right as number);
+        return (right as number) === 0 ? Number.NaN : (left as number) % (right as number);
 
       // Comparison
       case '==':
@@ -3779,9 +3779,9 @@ export class TealscriptEngine {
           case '*':
             return leftValue * rightValue;
           case '/':
-            return leftValue / rightValue;
+            return rightValue === 0 ? Number.NaN : leftValue / rightValue;
           case '%':
-            return leftValue % rightValue;
+            return rightValue === 0 ? Number.NaN : leftValue % rightValue;
           default:
             return undefined;
         }
@@ -9033,6 +9033,7 @@ export class TealscriptEngine {
     this.builtins.set('array.new_linefill', createArray);
     this.builtins.set('array.new_polyline', createArray);
     this.builtins.set('array.new_table', createArray);
+    this.builtins.set('array.new_chart_point', createArray);
     this.builtins.set('array.from', (args) => {
       const array = createPineArray();
       array.values.push(...args);
