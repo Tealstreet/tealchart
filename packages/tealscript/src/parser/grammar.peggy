@@ -2531,8 +2531,14 @@ MultiLineComment
 _
   = (WhiteSpace / MultiLineComment)*
 
+// ContinuationLeadingSpace matches any non-empty leading whitespace on the next
+// line, allowing 1-space continuations (e.g. input.text_area multiline defaults)
+// without relaxing the block-level Indent rule.
+ContinuationLeadingSpace
+  = [ \t]+
+
 InitializerSpace
-  = &( _ LineTerminator Indent) _ LineTerminator Indent _
+  = &( _ LineTerminator ContinuationLeadingSpace) _ LineTerminator ContinuationLeadingSpace _
   / _
 
 LoopHeaderContinuationSpace
