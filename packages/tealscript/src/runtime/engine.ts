@@ -1112,6 +1112,7 @@ export class TealscriptEngine {
       case 'ta.sma':
       case 'ta.ema':
       case 'ta.rma':
+      case 'ta.smma':
       case 'ta.stdev':
       case 'ta.variance':
       case 'ta.range':
@@ -7774,6 +7775,7 @@ export class TealscriptEngine {
         || name === 'ta.pivothigh'
         || name === 'ta.pivotlow'
         || name === 'ta.rma'
+        || name === 'ta.smma'
         || name === 'ta.rsi'
         || name === 'ta.sar'
         || name === 'ta.supertrend'
@@ -9653,6 +9655,19 @@ export class TealscriptEngine {
       'shape.labeldown': 'labeldown',
       'shape.square': 'square',
       'shape.xcross': 'xcross',
+      // Pine v4 plotshape.style_* aliases
+      'plotshape.style_triangleup': 'triangleup',
+      'plotshape.style_triangledown': 'triangledown',
+      'plotshape.style_circle': 'circle',
+      'plotshape.style_cross': 'cross',
+      'plotshape.style_xcross': 'xcross',
+      'plotshape.style_diamond': 'diamond',
+      'plotshape.style_flag': 'flag',
+      'plotshape.style_arrowup': 'arrowup',
+      'plotshape.style_arrowdown': 'arrowdown',
+      'plotshape.style_square': 'square',
+      'plotshape.style_label_up': 'labelup',
+      'plotshape.style_label_down': 'labeldown',
     };
 
     for (const [name, value] of Object.entries(shapes)) {
@@ -11093,6 +11108,20 @@ export class TealscriptEngine {
         scope,
         `_ta_rma_${callId}_${length}`,
         `_ta_rma_source_${callId}_${length}`,
+        source,
+        length,
+      );
+    });
+
+    // SMMA - Smoothed Moving Average (alias for RMA; same alpha = 1/length)
+    this.builtins.set('ta.smma', (args, namedArgs, _ctx, scope, callId) => {
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
+      return this.updateBuiltinRmaState(
+        scope,
+        `_ta_smma_${callId}_${length}`,
+        `_ta_smma_source_${callId}_${length}`,
         source,
         length,
       );
