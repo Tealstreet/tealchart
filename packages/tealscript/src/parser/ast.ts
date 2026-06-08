@@ -43,6 +43,7 @@ export type Statement =
   | VariableDeclaration
   | MultiDeclaration
   | MultiAssignment
+  | MultiExpressionStatement
   | TupleAssignment
   | AssignmentStatement
   | ExpressionStatement
@@ -230,6 +231,15 @@ export interface TupleDeclarator extends BaseNode {
 export interface MultiAssignment extends BaseNode {
   type: 'MultiAssignment';
   assignments: AssignmentStatement[];
+}
+
+/**
+ * Comma-separated expression statements on one line: f(x), g(y)
+ * Flattened into individual ExpressionStatement nodes by block rules.
+ */
+export interface MultiExpressionStatement extends BaseNode {
+  type: 'MultiExpressionStatement';
+  expressions: Expression[];
 }
 
 /**
@@ -612,6 +622,7 @@ export function isStatement(node: AnyNode): node is Statement {
     'VariableDeclaration',
     'MultiDeclaration',
     'MultiAssignment',
+    'MultiExpressionStatement',
     'TupleAssignment',
     'AssignmentStatement',
     'ExpressionStatement',

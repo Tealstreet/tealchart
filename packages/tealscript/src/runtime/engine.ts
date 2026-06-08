@@ -972,6 +972,11 @@ export class TealscriptEngine {
           (max, a) => Math.max(max, this.inferStatementMaxBarsBack(a, collectionScopes)),
           0,
         );
+      case 'MultiExpressionStatement':
+        return statement.expressions.reduce(
+          (max, e) => Math.max(max, this.inferExpressionMaxBarsBack(e, collectionScopes)),
+          0,
+        );
       case 'ImportDeclaration':
       case 'BreakStatement':
       case 'ContinueStatement':
@@ -2052,6 +2057,11 @@ export class TealscriptEngine {
       case 'MultiAssignment':
         for (const assignment of stmt.assignments) {
           this.executeAssignment(assignment);
+        }
+        break;
+      case 'MultiExpressionStatement':
+        for (const expr of stmt.expressions) {
+          this.evaluateExpression(expr);
         }
         break;
       case 'AssignmentStatement':
