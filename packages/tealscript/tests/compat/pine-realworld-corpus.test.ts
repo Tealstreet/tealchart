@@ -6372,3 +6372,151 @@ plot(ma(close, 'SMA'), title="SMA")
     ]);
   });
 });
+
+// Bars used for the na propagation / edge-case suite below.
+// Shorter window so edge effects are visible in 5 bars.
+const naEdgeBars = [
+  { time: 1_700_000_000_000, open: 100, high: 103, low: 99, close: 102, volume: 1_000 },
+  { time: 1_700_000_060_000, open: 102, high: 106, low: 101, close: 105, volume: 1_100 },
+  { time: 1_700_000_120_000, open: 105, high: 108, low: 104, close: 107, volume: 900 },
+  { time: 1_700_000_180_000, open: 107, high: 109, low: 102, close: 103, volume: 1_250 },
+  { time: 1_700_000_240_000, open: 103, high: 104, low: 98, close: 99, volume: 1_400 },
+];
+
+describe('Built-in na propagation and edge cases', () => {
+  it('ta.sma propagates na when any window value is na', () => {
+    // Pine: if any source value in the SMA window is na, the result is na for that bar.
+    // Source: close > 101 ? close : na → [102, 105, 107, 103, na]
+    // ta.sma(src, 3): bars 0-1 null (window not full), bar 4 null (na in window)
+    const result = runCompatScript(`
+indicator("SMA na propagation")
+src = close > 101 ? close : na
+plot(ta.sma(src, 3), title="SMA")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    // close values: 102, 105, 107, 103, 99
+    // src: 102, 105, 107, 103, na  (99 <= 101 → na on bar 4)
+    // bar 0: null (< 3 bars), bar 1: null, bar 2: (102+105+107)/3 = 104.667
+    // bar 3: (105+107+103)/3 = 105, bar 4: na in window → null
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null, 104.666667, 105, null,
+    ]);
+  });
+
+  it('ta.ema seeds with the first source value on bar 0', () => {
+    // Pine: EMA seeds with source value on bar 0 (no "warming up" period returning na).
+    const result = runCompatScript(`
+indicator("EMA seeding")
+plot(ta.ema(close, 3), title="EMA")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    // alpha = 2/(3+1) = 0.5
+    // bar 0: 102 (seed), bar 1: 0.5*105 + 0.5*102 = 103.5
+    // bar 2: 0.5*107 + 0.5*103.5 = 105.25
+    // bar 3: 0.5*103 + 0.5*105.25 = 104.125
+    // bar 4: 0.5*99  + 0.5*104.125 = 101.5625
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
+      102, 103.5, 105.25, 104.125, 101.5625,
+    ]);
+  });
+
+  it('array.indexof returns -1 when searching for na', () => {
+    // Pine: array.indexof(arr, na) returns -1 — na is not found even if na is in the array.
+    // NaN equality is false in JS (NaN !== NaN), matching Pine's na-identity semantics.
+    const result = runCompatScript(`
+indicator("array.indexof na")
+var arr = array.new_float(0)
+if barstate.isfirst
+    array.push(arr, 1.0)
+    array.push(arr, na)
+    array.push(arr, 3.0)
+plot(array.indexof(arr, na), title="IndexOf")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    // -1 on all bars (na search always returns -1)
+    expect(getPlot(result, 'IndexOf').values).toEqual([-1, -1, -1, -1, -1]);
+  });
+
+  it('str.tostring(na) returns "NaN"', () => {
+    // Pine: str.tostring(na) returns the string "NaN".
+    const result = runCompatScript(`
+indicator("str.tostring na")
+s = str.tostring(na)
+plot(s == "NaN" ? 1 : 0, title="IsNaN")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'IsNaN').values).toEqual([1, 1, 1, 1, 1]);
+  });
+
+  it('math.max propagates na when any argument is na', () => {
+    // Pine: math.max(na, 5) returns na — na contaminates the result.
+    const result = runCompatScript(`
+indicator("math.max na")
+plot(math.max(na, 5), title="MaxNa")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    // All bars: NaN (null in plot series)
+    expect(roundSeries(getPlot(result, 'MaxNa').values)).toEqual([null, null, null, null, null]);
+  });
+
+  it('color.new returns na when the base color is na', () => {
+    // Pine: color.new(na, 50) returns na — na base color produces a na result.
+    const result = runCompatScript(`
+indicator("color.new na")
+c = color.new(na, 50)
+plot(na(c) ? 1 : 0, title="ColorIsNa")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'ColorIsNa').values).toEqual([1, 1, 1, 1, 1]);
+  });
+
+  it('ta.highest returns na when length is 0', () => {
+    // Pine: ta.highest(close, 0) returns na — empty window produces na.
+    const result = runCompatScript(`
+indicator("ta.highest length 0")
+plot(ta.highest(close, 0), title="Highest0")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Highest0').values)).toEqual([null, null, null, null, null]);
+  });
+
+  it('nz(na, na) returns na when replacement is also na', () => {
+    // Pine: nz(na, na) returns na — the replacement itself is na, so the result is na.
+    const result = runCompatScript(`
+indicator("nz na na")
+plot(nz(na, na), title="NzNaNa")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'NzNaNa').values)).toEqual([null, null, null, null, null]);
+  });
+
+  it('ta.cross returns false when both arguments are na', () => {
+    // Pine: ta.cross(na, na) returns false — na inputs are never crossing.
+    const result = runCompatScript(`
+indicator("ta.cross na")
+plot(ta.cross(na, na) ? 1 : 0, title="CrossNa")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'CrossNa').values).toEqual([0, 0, 0, 0, 0]);
+  });
+
+  it('str.length returns na when source is na', () => {
+    // Pine: str.length(na) returns na — na string has no defined length.
+    const result = runCompatScript(`
+indicator("str.length na")
+plot(str.length(na), title="LenNa")
+`, { bars: naEdgeBars });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'LenNa').values)).toEqual([null, null, null, null, null]);
+  });
+});
