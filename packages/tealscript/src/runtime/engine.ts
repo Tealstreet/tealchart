@@ -4690,6 +4690,17 @@ export class TealscriptEngine {
     }
     engine.registerCallableCallSites(expression);
 
+    // Seed the sub-engine scope with scalar values from the outer scope so
+    // that simple variables (e.g. rsiLength = input.int(14)) are visible
+    // when the expression references them by name. Use 'var' kind so the
+    // values survive advanceBar() across the sub-engine's bar loop.
+    for (const name of this.scope.getAllNames()) {
+      const value = this.scope.get(name);
+      if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
+        engine.scope.declare(name, 'var', value);
+      }
+    }
+
     const values: unknown[] = [];
     while (engine.ctx.advanceBar()) {
       engine.scope.advanceBar();
