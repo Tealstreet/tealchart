@@ -538,6 +538,7 @@ const TA_FLOAT_RETURN_NAMES = new Set([
   'ta.percentile_nearest_rank',
   'ta.percentrank',
   'ta.rma',
+  'ta.smma',
   'ta.roc',
   'ta.rsi',
   'ta.sar',
@@ -592,6 +593,7 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.rising', ['source', 'length']],
   ['ta.falling', ['source', 'length']],
   ['ta.rma', ['source', 'length']],
+  ['ta.smma', ['source', 'length']],
   ['ta.roc', ['source', 'length']],
   ['ta.rsi', ['source', 'length']],
   ['ta.sar', ['start', 'inc', 'max']],
@@ -1783,6 +1785,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.rising', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.falling', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.rma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['ta.smma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.roc', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.rsi', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.sar', { params: ['start', 'inc', 'max'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
@@ -1991,6 +1994,19 @@ const MARKER_STYLE_CONSTANT_VALUES = new Map([
   ['shape.labeldown', 'labeldown'],
   ['shape.square', 'square'],
   ['shape.xcross', 'xcross'],
+  // Pine v4 plotshape.style_* aliases
+  ['plotshape.style_triangleup', 'triangleup'],
+  ['plotshape.style_triangledown', 'triangledown'],
+  ['plotshape.style_circle', 'circle'],
+  ['plotshape.style_cross', 'cross'],
+  ['plotshape.style_xcross', 'xcross'],
+  ['plotshape.style_diamond', 'diamond'],
+  ['plotshape.style_flag', 'flag'],
+  ['plotshape.style_arrowup', 'arrowup'],
+  ['plotshape.style_arrowdown', 'arrowdown'],
+  ['plotshape.style_square', 'square'],
+  ['plotshape.style_label_up', 'labelup'],
+  ['plotshape.style_label_down', 'labeldown'],
 ]);
 
 const MARKER_LOCATION_VALUES = new Set(['abovebar', 'belowbar', 'top', 'bottom', 'absolute']);
