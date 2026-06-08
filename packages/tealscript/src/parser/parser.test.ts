@@ -1000,6 +1000,36 @@ for i = 0 to 3
       }
     });
 
+    it('allows method as a UDF parameter name', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+calcMA(src, len, method) =>
+    method == "SMA" ? ta.sma(src, len) : ta.ema(src, len)
+plot(calcMA(close, 14, "SMA"))`);
+
+      const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+      expect(fn).toBeDefined();
+      if (fn?.type === 'FunctionDeclaration') {
+        expect(fn.params.map((p) => p.name)).toContain('method');
+      }
+    });
+
+    it('allows method as a local variable name', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+method = "SMA"
+plot(close)`);
+
+      const decl = ast.body.find((s) => s.type === 'VariableDeclaration');
+      expect(decl).toBeDefined();
+      if (decl?.type === 'VariableDeclaration') {
+        expect(decl.names.type).toBe('VariableDeclarator');
+        if (decl.names.type === 'VariableDeclarator') {
+          expect(decl.names.name.name).toBe('method');
+        }
+      }
+    });
+
     it('still rejects switch/na/true/false as variable names', () => {
       // These are allowed as expression statements but must not be valid identifiers.
       expect(() => parse(`//@version=6\nindicator("T")\nswitch = 1`)).toThrow(TealscriptParseError);
