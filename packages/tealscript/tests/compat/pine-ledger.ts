@@ -3011,24 +3011,9 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
       id: 'type-enum-title-checkpoint',
       title: 'Type Enum Title Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/language/enums/',
-      featureTags: ['enum', 'type_system', 'unsupported'],
+      featureTags: ['enum', 'type_system', 'signals', 'output'],
     }),
-    stages: [
-      { stage: 'parse', status: 'passed' },
-      { stage: 'semantic', status: 'passed' },
-      {
-        stage: 'runtime',
-        status: 'failed',
-        failureClass: 'unsupported_planned',
-        message: 'enum .title() built-in method is not implemented — member access is resolved as a namespace call that the runtime does not recognise',
-        diagnostics: [{
-          code: 'unsupported-feature',
-          message: 'enum .title() built-in method is not yet implemented in the runtime',
-          line: 6,
-          column: 5,
-        }],
-      },
-    ],
+    stages: passedThroughRuntime,
   },
   {
     ledgerEntry: officialDocsEntry({
@@ -3375,6 +3360,42 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
       title: 'Chart Point New Polyline Checkpoint',
       searchContext: 'TradingView public scripts search: chart point new polyline',
       featureTags: ['polylines', 'drawings', 'edge_case', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-atr-trailing-stop-checkpoint',
+      title: 'ATR Trailing Stop Checkpoint',
+      searchContext: 'TradingView public scripts search: atr trailing stop var float nz',
+      featureTags: ['atr', 'trailing_stop', 'var', 'state', 'ta', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-volume-profile-map-checkpoint',
+      title: 'Volume Profile Map Checkpoint',
+      searchContext: 'TradingView public scripts search: volume profile map for-in accumulation',
+      featureTags: ['map', 'collections', 'var', 'state', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-zscore-indicator-checkpoint',
+      title: 'Z-Score Indicator Checkpoint',
+      searchContext: 'TradingView public scripts search: z-score normalisation ta.sma ta.stdev',
+      featureTags: ['statistics', 'ta', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-fibonacci-retracement-checkpoint',
+      title: 'Fibonacci Retracement Checkpoint',
+      searchContext: 'TradingView public scripts search: fibonacci retracement ta.highest ta.lowest',
+      featureTags: ['highest', 'lowest', 'ta', 'signals', 'output', 'runtime'],
     }),
     stages: passedThroughRuntime,
   },

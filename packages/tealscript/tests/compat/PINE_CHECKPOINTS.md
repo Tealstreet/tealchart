@@ -72,6 +72,7 @@ fixtures by default.
 | `Official Plotshape Plotchar Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/text-and-shapes/ | `plotshape()` fires on even `bar_index`; `plotchar()` fires every third bar; both are verified against expected 1/null series. | `EvenFlag`, `ThirdFlag`, `Shape`, and `Char` plots over `compatibilityBars`. |
 | `Official Repainting Guard Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/repainting/ | `barstate.isconfirmed` gates a `var int lastDir` update; in the test harness all bars are confirmed so the guard fires every bar. | `LastDir` equals the sign of `close-open` and `Bull` flag matches over `compatibilityBars`. |
 | `Official Conditionals Checkpoint` | https://www.tradingview.com/pine-script-docs/language/conditional-structures/ | A three-zone `if/else if/else` classifier and a `switch` expression with a default branch cover Pine conditional semantics. | `Zone` (-1/0/1 by close threshold) and `Mode` (10/20/30 cycling) over `compatibilityBars`. |
+| `Type Enum Title Checkpoint` | https://www.tradingview.com/pine-script-docs/language/enums/ | `enum Direction` with `LongDir = "Long"` and `ShortDir = "Short"`; `.title()` on a variable holding `Direction.LongDir` returns the assigned string `"Long"`. | `TitleMatch` is 1 on every bar; Close plot is the close series over `compatibilityBars`. |
 
 ## Public Idiom Checkpoints
 
@@ -202,6 +203,10 @@ fixtures by default.
 | `Realworld Williams Alligator Checkpoint` | https://www.tradingview.com/scripts/search/williams%20alligator%20smma%20smoothed/ | Three `ta.smma` calls at lengths 5, 3, 2 for jaw, teeth, and lips. | Hand-checked jaw, teeth, and lips series over `compatibilityBars`. |
 | `Realworld Pivot Labels Checkpoint` | https://www.tradingview.com/scripts/search/pivot%20high%20low%20labels%20marker/ | `ta.pivothigh` and `ta.pivotlow` return na until a confirmed pivot; `na(ph) ? 0 : 1` routes signal. | Hand-checked PHSignal and PLSignal series over `compatibilityBars`. |
 | `Realworld Heikin Ashi Var Checkpoint` | https://www.tradingview.com/scripts/search/heikin%20ashi%20var%20previous%20open%20close/ | `var float haOpen` initializes from `(open+close)/2` on bar 0 via `na(haOpen[1])` then carries recursive midpoint. | Hand-checked HAClose and HAOpen series over `compatibilityBars`. |
+| `ATR Trailing Stop Checkpoint` | https://www.tradingview.com/scripts/search/atr%20trailing%20stop/ | `nz(ta.atr(3))` inside a `var float trailStop` direction-gate updates the stop via `math.max`/`math.min`; `isLong` follows when `close >= trailStop`. | Hand-checked Long signal and Trail series over `compatibilityBars`. |
+| `Volume Profile Map Checkpoint` | https://www.tradingview.com/scripts/search/volume%20profile%20map/ | `var map<float,float>` accumulates `volume` per rounded close-price bucket; a `for [lvl, vol] in volMap` loop extracts the highest-volume level each bar. | Hand-checked TopLevel series over `compatibilityBars`. |
+| `Z-Score Indicator Checkpoint` | https://www.tradingview.com/scripts/search/z-score%20normalisation/ | `(close - ta.sma(close, 5)) / ta.stdev(close, 5)` normalises price deviation; `dev != 0` guard prevents division-by-zero on warm-up bars. | Hand-checked ZScore series over `compatibilityBars`. |
+| `Fibonacci Retracement Checkpoint` | https://www.tradingview.com/scripts/search/fibonacci%20retracement%20levels/ | `ta.highest(high, 5)` and `ta.lowest(low, 5)` derive rolling range; 61.8% and 38.2% Fibonacci levels are computed from the range. | Hand-checked Fib618 and Fib382 series over `compatibilityBars`. |
 
 ## Edge-Case Checkpoints
 

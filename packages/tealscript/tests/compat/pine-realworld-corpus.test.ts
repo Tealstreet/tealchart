@@ -5547,10 +5547,10 @@ plot(signal, title="Signal")
     expect(getPlot(result, 'Signal').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
   });
 
-  // Pine's enum .title() method is not yet implemented — member access is resolved
-  // as a namespace call which the runtime does not recognise.
-  // Gap documented: type system — enum built-in methods are planned but not supported.
-  it.skip('enum .title() method returns the string representation', () => {
+  it('locks enum .title() method returning the assigned string value', () => {
+    // Pine's enum .title() returns the string value assigned to the field ("Long"),
+    // or the field name if no string was assigned. Source:
+    // https://www.tradingview.com/pine-script-docs/language/enums/
     const result = runCompatScript(`
 indicator("Type Enum Title Checkpoint")
 enum Direction
@@ -5558,9 +5558,12 @@ enum Direction
     ShortDir = "Short"
 d = Direction.LongDir
 s = d.title()
+plot(s == "Long" ? 1 : 0, title="TitleMatch")
 plot(close, title="C")
 `);
     expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Type Enum Title Checkpoint');
+    expect(getPlot(result, 'TitleMatch').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
   it('locks explicit type annotations on scalar variables', () => {
@@ -6686,6 +6689,107 @@ plot(c, title="Close")
     ]);
     expect(roundSeries(getPlot(result, 'Close').values)).toEqual([
       102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112,
+    ]);
+  });
+});
+
+describe('TA, map, and drawing pattern checkpoints (rounds 9-10)', () => {
+  it('locks ATR trailing stop with var float and nz guard', () => {
+    // Classic trailing-stop: ATR-based adaptive stop that tightens on trend direction.
+    // Exercises ta.atr, var float, nz(), math.max/min in compound reassignment.
+    // Source search: https://www.tradingview.com/scripts/search/atr+trailing+stop/
+    const result = runCompatScript(`
+indicator("ATR Trailing Stop Checkpoint")
+atrMult = 2.0
+atrLen = 3
+atrVal = nz(ta.atr(atrLen))
+var float trailStop = na
+if na(trailStop)
+    trailStop := close
+else
+    trailStop := close > trailStop ? math.max(trailStop, close - atrMult * atrVal) : math.min(trailStop, close + atrMult * atrVal)
+isLong = close >= trailStop
+plot(isLong ? 1 : 0, title="Long")
+plot(trailStop, title="Trail")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('ATR Trailing Stop Checkpoint');
+    expect(getPlot(result, 'Long').values).toEqual([1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Trail').values)).toEqual([
+      102, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105,
+    ]);
+  });
+
+  it('locks volume profile using map accumulation with for-in iteration', () => {
+    // Volume-profile idiom: accumulate per-price-level volume in a map<float,float>,
+    // then find the price level with the most volume via for-in iteration.
+    // Exercises map.new, map.put, map.get, nz, for [k, v] in map, var map.
+    // Source search: https://www.tradingview.com/scripts/search/volume+profile+map/
+    const result = runCompatScript(`
+indicator("Volume Profile Map Checkpoint")
+priceLevel = math.round(close)
+var map<float, float> volMap = map.new<float, float>()
+map.put(volMap, priceLevel, nz(map.get(volMap, priceLevel)) + volume)
+topLevel = 0.0
+topVol = 0.0
+for [lvl, vol] in volMap
+    if vol > topVol
+        topVol := vol
+        topLevel := lvl
+plot(topLevel, title="TopLevel")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Volume Profile Map Checkpoint');
+    expect(roundSeries(getPlot(result, 'TopLevel').values)).toEqual([
+      102, 105, 105, 103, 99, 99, 99, 109, 109, 109, 109, 109,
+    ]);
+  });
+
+  it('locks z-score normalization using ta.sma and ta.stdev', () => {
+    // Z-score momentum: (close - sma) / stdev normalises price deviation.
+    // Exercises ta.sma, ta.stdev with matching length, and division guard.
+    // Source search: https://www.tradingview.com/scripts/search/z-score+indicator/
+    const result = runCompatScript(`
+indicator("Z-Score Checkpoint")
+len = 5
+avg = ta.sma(close, len)
+dev = ta.stdev(close, len)
+zscore = dev != 0 ? (close - avg) / dev : 0.0
+plot(zscore, title="ZScore")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Z-Score Checkpoint');
+    expect(roundSeries(getPlot(result, 'ZScore').values)).toEqual([
+      0, 0, 0, 0, -1.548141, -0.935414, 0.487713, 1.703886, 0.98773, 1.170669, 0.662085, 1.414214,
+    ]);
+  });
+
+  it('locks Fibonacci retracement levels using ta.highest and ta.lowest', () => {
+    // Fibonacci retracement: derive 38.2% and 61.8% levels from rolling high/low range.
+    // Exercises ta.highest(high, n), ta.lowest(low, n), arithmetic scaling.
+    // Source search: https://www.tradingview.com/scripts/search/fibonacci+retracement+levels/
+    const result = runCompatScript(`
+indicator("Fibonacci Retracement Checkpoint")
+lookback = 5
+highVal = ta.highest(high, lookback)
+lowVal = ta.lowest(low, lookback)
+rangeHL = highVal - lowVal
+fib618 = highVal - rangeHL * 0.618
+fib382 = highVal - rangeHL * 0.382
+plot(fib618, title="Fib618")
+plot(fib382, title="Fib382")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Fibonacci Retracement Checkpoint');
+    expect(roundSeries(getPlot(result, 'Fib618').values)).toEqual([
+      100.528, 101.674, 102.438, 102.82, 102.202, 100.966, 100.966, 101.348, 101.73, 102.112, 104.73, 107.202,
+    ]);
+    expect(roundSeries(getPlot(result, 'Fib382').values)).toEqual([
+      101.472, 103.326, 104.562, 105.18, 104.798, 104.034, 104.034, 104.652, 105.27, 105.888, 108.27, 109.798,
     ]);
   });
 });
