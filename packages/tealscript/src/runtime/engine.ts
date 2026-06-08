@@ -10332,6 +10332,33 @@ export class TealscriptEngine {
       return this.updateBuiltinEmaState(scope, `_ta_ema_${callId}_${length}`, source, length);
     });
 
+    // DEMA - Double Exponential Moving Average
+    // Formula: 2 * ema1 - ema2, where ema2 = ema(ema1)
+    this.builtins.set('ta.dema', (args, namedArgs, _ctx, scope, callId) => {
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
+
+      if (isNaN(source) || length < 1) return NaN;
+      const ema1 = this.updateBuiltinEmaState(scope, `_ta_dema_ema1_${callId}_${length}`, source, length);
+      const ema2 = this.updateBuiltinEmaState(scope, `_ta_dema_ema2_${callId}_${length}`, ema1, length);
+      return 2 * ema1 - ema2;
+    });
+
+    // TEMA - Triple Exponential Moving Average
+    // Formula: 3 * ema1 - 3 * ema2 + ema3
+    this.builtins.set('ta.tema', (args, namedArgs, _ctx, scope, callId) => {
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
+
+      if (isNaN(source) || length < 1) return NaN;
+      const ema1 = this.updateBuiltinEmaState(scope, `_ta_tema_ema1_${callId}_${length}`, source, length);
+      const ema2 = this.updateBuiltinEmaState(scope, `_ta_tema_ema2_${callId}_${length}`, ema1, length);
+      const ema3 = this.updateBuiltinEmaState(scope, `_ta_tema_ema3_${callId}_${length}`, ema2, length);
+      return 3 * ema1 - 3 * ema2 + ema3;
+    });
+
     // RSI - Relative Strength Index
     this.builtins.set('ta.rsi', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
@@ -11336,6 +11363,59 @@ export class TealscriptEngine {
       if (prev === undefined || prev === 0) return NaN;
 
       return ((source - prev) / prev) * 100;
+    });
+
+    // KST - Know Sure Thing momentum oscillator
+    // Returns [kst, signal] where kst = weighted sum of 4 smoothed ROCs
+    this.builtins.set('ta.kst', (args, namedArgs, _ctx, scope, callId) => {
+      const taKstArgs = ['source', 'roclength1', 'roclength2', 'roclength3', 'roclength4', 'smalen1', 'smalen2', 'smalen3', 'smalen4', 'signalLength'];
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taKstArgs, 0);
+      const source = this.toNumber(rawSource);
+      const rlen1 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 1, 10));
+      const rlen2 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 2, 15));
+      const rlen3 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 3, 20));
+      const rlen4 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 4, 30));
+      const slen1 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 5, 10));
+      const slen2 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 6, 10));
+      const slen3 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 7, 10));
+      const slen4 = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 8, 15));
+      const sigLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taKstArgs, 9, 9));
+
+      if (isNaN(source)) return [NaN, NaN];
+
+      // Compute ROC for each period: (current - prev[rlen]) / prev[rlen] * 100
+      const computeRoc = (w: number[], rlen: number): number => {
+        const prev = w[rlen];
+        return prev === undefined || prev === 0 ? NaN : ((source - prev) / prev) * 100;
+      };
+
+      const w1 = this.getCompleteSourceWindow(scope, `_ta_kst_s1_${callId}`, rawSource, rlen1 + 1);
+      const w2 = this.getCompleteSourceWindow(scope, `_ta_kst_s2_${callId}`, rawSource, rlen2 + 1);
+      const w3 = this.getCompleteSourceWindow(scope, `_ta_kst_s3_${callId}`, rawSource, rlen3 + 1);
+      const w4 = this.getCompleteSourceWindow(scope, `_ta_kst_s4_${callId}`, rawSource, rlen4 + 1);
+
+      const roc1 = w1 ? computeRoc(w1, rlen1) : NaN;
+      const roc2 = w2 ? computeRoc(w2, rlen2) : NaN;
+      const roc3 = w3 ? computeRoc(w3, rlen3) : NaN;
+      const roc4 = w4 ? computeRoc(w4, rlen4) : NaN;
+
+      // SMA of each ROC — feed NaN through until seeded
+      const computeSma = (key: string, val: number, slen: number): number => {
+        const win = this.getCompleteSourceWindow(scope, key, val, slen);
+        if (!win) return NaN;
+        return win.reduce((a, b) => a + b, 0) / slen;
+      };
+
+      const sroc1 = computeSma(`_ta_kst_sroc1_${callId}`, roc1, slen1);
+      const sroc2 = computeSma(`_ta_kst_sroc2_${callId}`, roc2, slen2);
+      const sroc3 = computeSma(`_ta_kst_sroc3_${callId}`, roc3, slen3);
+      const sroc4 = computeSma(`_ta_kst_sroc4_${callId}`, roc4, slen4);
+
+      if (isNaN(sroc1) || isNaN(sroc2) || isNaN(sroc3) || isNaN(sroc4)) return [NaN, NaN];
+
+      const kst = sroc1 + 2 * sroc2 + 3 * sroc3 + 4 * sroc4;
+      const signal = computeSma(`_ta_kst_signal_${callId}`, kst, sigLen);
+      return [kst, signal];
     });
 
     // TR - True Range (as a function, can also be accessed as variable)
