@@ -8963,4 +8963,71 @@ if isUp
       expect(alerts.find((alert) => alert.type === 'alert')?.events.map((event) => event.barIndex)).toEqual([0, 1]);
     });
   });
+
+  describe('comma-separated reassignments', () => {
+    it('executes two comma-separated reassignments', () => {
+      const script = `//@version=6
+indicator("Test")
+var x = 0
+var y = 0
+x := 1, y := 2
+plot(x, title="x")
+plot(y, title="y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots.find((p) => p.title === 'x')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((p) => p.title === 'y')?.values).toEqual([2, 2, 2]);
+    });
+
+    it('executes three comma-separated reassignments with function call initializers', () => {
+      const script = `//@version=6
+indicator("Test")
+var float mx = 0.0
+var float mn = 0.0
+mx := float(na), mn := float(na)
+plot(na(mx) ? 1 : 0, title="mxna")
+plot(na(mn) ? 1 : 0, title="mnna")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots.find((p) => p.title === 'mxna')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((p) => p.title === 'mnna')?.values).toEqual([1, 1, 1]);
+    });
+
+    it('executes compound assignment combos on one line', () => {
+      const script = `//@version=6
+indicator("Test")
+var x = 10
+var y = 10
+x += 5, y -= 3
+plot(x, title="x")
+plot(y, title="y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots.find((p) => p.title === 'x')?.values).toEqual([15, 20, 25]);
+      expect(result.plots.find((p) => p.title === 'y')?.values).toEqual([7, 4, 1]);
+    });
+
+    it('does not affect commas inside RHS expressions', () => {
+      const script = `//@version=6
+indicator("Test")
+var x = 0
+x := math.max(3, 7)
+plot(x, title="x")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots.find((p) => p.title === 'x')?.values).toEqual([7, 7, 7]);
+    });
+  });
 });

@@ -60,7 +60,11 @@ VersionAnnotation
 
 StatementList
   = statements:(Statement _)* {
-      return statements.map(s => s[0]).filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.map(s => s[0]).filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 // ============================================================================
@@ -529,10 +533,16 @@ TupleAssignment
       };
     }
 
-// Assignment: x := value
+// Assignment: x := value, or comma-separated: x := 1, y := 2
 // Left side can be an identifier, member access, or index access
 AssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:Expression _ LineTerminator? {
+  = head:SingleAssignment tail:(_ "," _ SingleAssignment)* _ LineTerminator? {
+      if (tail.length === 0) return head;
+      return { type: 'MultiAssignment', assignments: [head, ...tail.map(t => t[3])], loc: loc() };
+    }
+
+SingleAssignment
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:Expression {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -688,7 +698,11 @@ ContinueStatement
 // Indented block (simplified: just look for indented lines)
 IndentedBlock
   = statements:(BlockIgnorableLine / IndentedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 IndentedStatement
@@ -698,7 +712,11 @@ IndentedStatement
 
 FunctionIndentedBlock
   = statements:(BlockIgnorableLine / FunctionIndentedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionIndentedStatement
@@ -894,7 +912,11 @@ UntypedFunctionVariableDeclaration
 
 FunctionNestedBlock
   = statements:(BlockIgnorableLine / FunctionNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionNestedStatement
@@ -1081,7 +1103,11 @@ UntypedFunctionNestedVariableDeclaration
 
 FunctionDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionDeepNestedStatement
@@ -1268,7 +1294,11 @@ UntypedFunctionDeepNestedVariableDeclaration
 
 FunctionVeryDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionVeryDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionVeryDeepNestedStatement
@@ -1433,7 +1463,11 @@ FunctionVeryDeepNestedElseClause
 
 FunctionUltraDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionUltraDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionUltraDeepNestedStatement
@@ -1503,7 +1537,11 @@ FunctionUltraDeepNestedElseClause
 
 FunctionMegaDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionMegaDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionMegaDeepNestedStatement
@@ -1573,7 +1611,11 @@ FunctionMegaDeepNestedElseClause
 
 FunctionSuperDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionSuperDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionSuperDeepNestedStatement
@@ -1643,7 +1685,11 @@ FunctionSuperDeepNestedElseClause
 
 FunctionHyperDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionHyperDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionHyperDeepNestedStatement
@@ -1713,7 +1759,11 @@ FunctionHyperDeepNestedElseClause
 
 FunctionExtremeDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionExtremeDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionExtremeDeepNestedStatement
@@ -1783,7 +1833,11 @@ FunctionExtremeDeepNestedElseClause
 
 FunctionMaxDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionMaxDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => s !== null && s.type === 'MultiDeclaration' ? s.declarations : [s]);
+      return statements.filter(s => s !== null).flatMap(s => {
+        if (s.type === 'MultiDeclaration') return s.declarations;
+        if (s.type === 'MultiAssignment') return s.assignments;
+        return [s];
+      });
     }
 
 FunctionMaxDeepNestedStatement
