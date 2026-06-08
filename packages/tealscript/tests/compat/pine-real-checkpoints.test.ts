@@ -6599,6 +6599,174 @@ plot(haOpen, title="HAOpen")
       109.435059,
     ]);
   });
+
+  it('locks the library export UDF idiom', () => {
+    // Public idiom reference: Pine library scripts export named functions
+    // that indicator scripts import and call; tests that the `export` keyword
+    // parses and the exported functions behave as UDFs with full series semantics.
+    // Source search: https://www.tradingview.com/scripts/search/library%20export%20functions/
+    const library = parse(`
+library("MathHelpers", true)
+export scale(series float src, simple float factor) => src * factor
+export offset(series float src, simple float delta) => src + delta
+`);
+    const result = runCompatScript(`
+indicator("Library Export UDF Checkpoint")
+import TestUser/MathHelpers/1 as mh
+scaled = mh.scale(close, 3.0)
+offsetted = mh.offset(close, 10.0)
+plot(scaled, title="Scaled")
+plot(offsetted, title="Offset")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/MathHelpers/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Scaled').values).toEqual([306, 315, 321, 309, 297, 300, 312, 327, 324, 333, 330, 336]);
+    expect(getPlot(result, 'Offset').values).toEqual([112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120, 122]);
+  });
+
+  it('locks the varip mixed with var persistence idiom', () => {
+    // Public idiom reference: scripts use both `var` (initialized once, bar-persistent)
+    // and `varip` (tick-persistent) in the same scope to demonstrate different
+    // persistence semantics. In historical bars both increment identically.
+    // Source search: https://www.tradingview.com/scripts/search/varip%20var%20persistence/
+    const result = runCompatScript(`
+indicator("Varip Mixed Var Checkpoint")
+var int barCount = 0
+varip int tickCount = 0
+barCount := barCount + 1
+tickCount := tickCount + 1
+plot(barCount, title="BarCount")
+plot(tickCount, title="TickCount")
+plot(barCount == tickCount ? 1 : 0, title="Equal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'BarCount').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'TickCount').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    // On historical bars var and varip increment identically
+    expect(getPlot(result, 'Equal').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks the complex multi-line switch block idiom', () => {
+    // Public idiom reference: UDF bodies use multi-statement `=>` blocks inside
+    // a `switch` expression, with a local variable per arm and a trailing return
+    // expression. Tests the block-switch parsing contract.
+    // Source search: https://www.tradingview.com/scripts/search/switch%20block%20classify%20zone/
+    const result = runCompatScript(`
+indicator("MultiLine Switch Checkpoint")
+classify(series float src) =>
+    switch
+        src > 105 =>
+            x = 3
+            x
+        src > 100 =>
+            x = 2
+            x
+        =>
+            x = 1
+            x
+plot(classify(close), title="Zone")
+`);
+
+    expect(result.errors).toEqual([]);
+    // close series: 102,105,107,103,99,100,104,109,108,111,110,112
+    // >105: 107,109,108,111,110,112 → 3; >100: 102,105,103,104 → 2; ≤100: 99,100 → 1
+    expect(getPlot(result, 'Zone').values).toEqual([2, 2, 3, 2, 1, 1, 2, 3, 3, 3, 3, 3]);
+  });
+
+  it('locks the nested UDT field access and method idiom', () => {
+    // Public idiom reference: scripts define a type containing another type as a
+    // field, then add a `method` on the outer type that reads inner fields.
+    // Tests nested UDT instantiation, field access chains, and method dispatch.
+    // Source search: https://www.tradingview.com/scripts/search/nested%20type%20field%20method/
+    const result = runCompatScript(`
+indicator("Nested UDT Checkpoint")
+type Inner
+    float val = 0.0
+
+type Outer
+    Inner inner = Inner.new()
+    float scale = 1.0
+
+method scaled(Outer this) =>
+    this.inner.val * this.scale
+
+o = Outer.new(Inner.new(close), 2.0)
+plot(o.scaled(), title="Scaled")
+plot(o.inner.val, title="InnerVal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'InnerVal').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(getPlot(result, 'Scaled').values).toEqual([204, 210, 214, 206, 198, 200, 208, 218, 216, 222, 220, 224]);
+  });
+
+  it('locks the matrix.new<float> set/get/rows/columns idiom', () => {
+    // Public idiom reference: indicator scripts allocate a generic float matrix,
+    // write cell values per bar, then read back rows/columns counts and individual
+    // cell values. Tests `matrix.new<float>`, `matrix.set`, `matrix.get`,
+    // `matrix.rows`, and `matrix.columns` together.
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20new%20set%20get/
+    const result = runCompatScript(`
+indicator("Matrix Operations Checkpoint")
+var matrix<float> m = matrix.new<float>(2, 3, 0.0)
+matrix.set(m, 0, 0, close)
+matrix.set(m, 0, 1, high)
+matrix.set(m, 1, 0, low)
+plot(matrix.rows(m), title="Rows")
+plot(matrix.columns(m), title="Cols")
+plot(matrix.get(m, 0, 0), title="Cell00")
+plot(matrix.get(m, 0, 1), title="Cell01")
+plot(matrix.get(m, 1, 0), title="Cell10")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Rows').values).toEqual(Array(compatibilityBars.length).fill(2));
+    expect(getPlot(result, 'Cols').values).toEqual(Array(compatibilityBars.length).fill(3));
+    expect(getPlot(result, 'Cell00').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(getPlot(result, 'Cell01').values).toEqual([103, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113]);
+    expect(getPlot(result, 'Cell10').values).toEqual([99, 101, 104, 102, 98, 96, 99, 103, 106, 107, 109, 108]);
+  });
+
+  it('locks the chart.point.new + polyline.new idiom', () => {
+    // Public idiom reference: scripts construct chart.point objects using
+    // chart.point.new (time + bar_index + price) on the last bar and feed them
+    // into polyline.new. Tests the three-argument chart.point.new constructor
+    // and the polyline drawing output contract.
+    // Source search: https://www.tradingview.com/scripts/search/chart%20point%20new%20polyline/
+    const result = runCompatScript(`
+indicator("Chart Point Polyline Checkpoint", overlay=true, max_polylines_count=1)
+if barstate.islast
+    p1 = chart.point.new(time[2], bar_index - 2, low[2])
+    p2 = chart.point.new(time[1], bar_index - 1, high[1])
+    p3 = chart.point.new(time, bar_index, close)
+    pts = array.from(p1, p2, p3)
+    polyline.new(pts, curved=false, closed=false, line_color=color.blue)
+plot(bar_index, title="BI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'BI').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(result.drawings).toHaveLength(1);
+    const polyline = result.drawings[0]!;
+    expect(polyline.type).toBe('polyline');
+    expect(polyline.barIndex).toBe(11);
+    expect((polyline as { points: unknown[] }).points).toHaveLength(3);
+    expect((polyline as { points: Array<{ type: string; index: number; price: number }> }).points[0]).toMatchObject({
+      type: 'chart.point',
+      index: 9,
+      price: 107,
+    });
+    expect((polyline as { points: Array<{ type: string; index: number; price: number }> }).points[2]).toMatchObject({
+      type: 'chart.point',
+      index: 11,
+      price: 112,
+    });
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {

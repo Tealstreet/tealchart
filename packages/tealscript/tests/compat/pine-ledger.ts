@@ -3339,6 +3339,60 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-library-export-udf-checkpoint',
+      title: 'Library Export UDF Checkpoint',
+      searchContext: 'TradingView public scripts search: library export functions',
+      featureTags: ['libraries', 'imports', 'udf', 'edge_case', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-varip-mixed-var-checkpoint',
+      title: 'Varip Mixed Var Persistence Checkpoint',
+      searchContext: 'TradingView public scripts search: varip var persistence',
+      featureTags: ['varip', 'var', 'state', 'edge_case', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-multiline-switch-block-checkpoint',
+      title: 'Complex Multi-Line Switch Block Checkpoint',
+      searchContext: 'TradingView public scripts search: switch block classify zone',
+      featureTags: ['udf', 'edge_case', 'control_flow', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-nested-udt-method-checkpoint',
+      title: 'Nested UDT Field Access and Method Checkpoint',
+      searchContext: 'TradingView public scripts search: nested type field method',
+      featureTags: ['udt', 'methods', 'edge_case', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-matrix-new-set-get-checkpoint',
+      title: 'Matrix New Set Get Rows Columns Checkpoint',
+      searchContext: 'TradingView public scripts search: matrix new set get',
+      featureTags: ['matrix', 'collections', 'edge_case', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-chart-point-new-polyline-checkpoint',
+      title: 'Chart Point New Polyline Checkpoint',
+      searchContext: 'TradingView public scripts search: chart point new polyline',
+      featureTags: ['polylines', 'drawings', 'edge_case', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
