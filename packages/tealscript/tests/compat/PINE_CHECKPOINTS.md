@@ -280,6 +280,10 @@ idioms rather than isolated unit coverage.
 | DEMA + TEMA combined | `DEMA TEMA Combined Checkpoint` — `ta.dema(close, 3)` and `ta.tema(close, 3)` with hand-verified values | `pine-real-checkpoints.test.ts` |
 | Kitchen-sink drawings + tables + plots | `Kitchen Sink Drawings Tables Plots Checkpoint` — `line.new`, `label.new`, `table.new`/`table.cell`, and `plot` in one script | `pine-real-checkpoints.test.ts` |
 | Complex strategy with risk management | `Strategy Risk Management Checkpoint` — `strategy.entry`, `strategy.close`, equity-based position sizing, `alert()` | `pine-real-checkpoints.test.ts` |
+| ta.crossover with constant (PR #992) | `Crossover Constant Level Checkpoint` — `ta.crossover(close, 104)` fires at bars 1 and 7 where close crosses strictly above 104 | `pine-real-checkpoints.test.ts` |
+| ta.rci oscillator | `RCI Oscillator Checkpoint` — `ta.rci(close, 5)` produces values in [−100, 100]; null for first 4 bars, spot-checked series over `compatibilityBars` | `pine-real-checkpoints.test.ts` |
+| ta.dema + ta.tema distinct | `DEMA TEMA Distinct Values Checkpoint` — both in one script (length=4), verified to produce different series and that `diff = dema - tema` | `pine-real-checkpoints.test.ts` |
+| ta.pivot_point_levels | `Pivot Point Levels Array Checkpoint` — Traditional type returns 11-element array; `array.size(levels) == 11`; P/S1/R1 spot-checked against hand-computed `compatibilityBars` values | `pine-real-checkpoints.test.ts` |
 
 ## Adding A Checkpoint
 

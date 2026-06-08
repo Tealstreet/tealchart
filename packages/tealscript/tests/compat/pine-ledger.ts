@@ -3430,6 +3430,42 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'fix-crossover-constant-checkpoint',
+      title: 'Crossover Constant Level Checkpoint',
+      searchContext: 'TradingView public scripts search: crossover constant level close',
+      featureTags: ['ta', 'crossover', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'fix-rci-oscillator-checkpoint',
+      title: 'RCI Oscillator Checkpoint',
+      searchContext: 'TradingView public scripts search: rci rank correlation index oscillator',
+      featureTags: ['ta', 'oscillator', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'fix-dema-tema-distinct-checkpoint',
+      title: 'DEMA TEMA Distinct Values Checkpoint',
+      searchContext: 'TradingView public scripts search: dema tema combined signal distinct',
+      featureTags: ['ta', 'moving_average', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'fix-pivot-point-levels-checkpoint',
+      title: 'Pivot Point Levels Array Checkpoint',
+      searchContext: 'TradingView public scripts search: pivot point levels traditional support resistance',
+      featureTags: ['ta', 'pivots', 'arrays', 'signals', 'output', 'runtime'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

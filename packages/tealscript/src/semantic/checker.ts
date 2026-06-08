@@ -629,6 +629,7 @@ const TA_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.barssince', ['condition']],
   ['ta.kc', ['useTrueRange']],
   ['ta.kcw', ['useTrueRange']],
+  ['ta.pivot_point_levels', ['developing']],
   ['ta.stdev', ['biased']],
   ['ta.tr', ['handle_na']],
   ['ta.valuewhen', ['condition']],
@@ -1778,6 +1779,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.percentile_nearest_rank', { params: ['source', 'length', 'percentage'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.percentile_linear_interpolation', { params: ['source', 'length', 'percentage'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.percentrank', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['ta.pivot_point_levels', { params: ['type', 'anchor', 'developing'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   [
     'ta.pivothigh',
     {
@@ -8318,6 +8320,9 @@ class SemanticChecker {
     }
     if (TA_DEFAULT_SOURCE_RETURN_NAMES.has(calleeName)) {
       return this.inferTaOptionalSourceReturnType(expression, scope);
+    }
+    if (calleeName === 'ta.pivot_point_levels') {
+      return { kind: 'array', qualifier: 'series', elementType: { kind: 'float' } };
     }
     if (calleeName === 'ta.change') {
       return this.inferTaSourceReturnType(expression, scope, ['source', 'length'], 0);
