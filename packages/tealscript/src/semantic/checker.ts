@@ -655,6 +655,7 @@ const SYMINFO_STRING_MEMBER_NAMES = new Set([
   'syminfo.currency',
   'syminfo.current_contract',
   'syminfo.description',
+  'syminfo.exchange',
   'syminfo.industry',
   'syminfo.isin',
   'syminfo.main_tickerid',

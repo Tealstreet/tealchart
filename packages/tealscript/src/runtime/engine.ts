@@ -5393,6 +5393,8 @@ export class TealscriptEngine {
         return this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker;
       case 'main_tickerid':
         return this.ctx.syminfo.main_tickerid ?? this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker;
+      case 'exchange':
+        return this.ctx.syminfo.exchange ?? (this.ctx.syminfo.ticker.includes(':') ? this.ctx.syminfo.ticker.split(':')[0] : '');
       case 'minmove':
         return this.ctx.syminfo.mintick * this.ctx.syminfo.pricescale;
       default:
