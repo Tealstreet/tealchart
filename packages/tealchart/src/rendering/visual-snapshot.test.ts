@@ -1,3 +1,4 @@
+// @vitest-environment node
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, Viewport } from '../types';
 import type { CanvasContext } from './CanvasContext';
@@ -22,6 +23,10 @@ function ensureSnapshotDir(): void {
   if (!fs.existsSync(SNAPSHOT_DIR)) {
     fs.mkdirSync(SNAPSHOT_DIR, { recursive: true });
   }
+}
+
+function freshCanvas(): ReturnType<typeof createCanvas> {
+  return createCanvas(WIDTH, HEIGHT);
 }
 
 function wrapNapiCanvas(canvas: ReturnType<typeof createCanvas>): CanvasContext {
@@ -53,20 +58,22 @@ function makeViewport(bars: Bar[]): Viewport {
   };
 }
 
-function renderToBuffer(plots: PlotOutput[], bars: Bar[], viewport: Viewport): Buffer {
-  const canvas = createCanvas(WIDTH, HEIGHT);
+function makeRenderer(canvas: ReturnType<typeof createCanvas>): TealchartRenderer {
   const ctx = wrapNapiCanvas(canvas);
-  const renderer = new TealchartRenderer(ctx, {
+  return new TealchartRenderer(ctx, {
     width: WIDTH,
     height: HEIGHT,
     showVolume: false,
     backgroundColor: '#1e222d',
   });
+}
 
+function renderToBuffer(plots: PlotOutput[], bars: Bar[], viewport: Viewport): Buffer {
+  const canvas = freshCanvas();
   const nativeCtx = canvas.getContext('2d');
   nativeCtx.fillStyle = '#1e222d';
   nativeCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
+  const renderer = makeRenderer(canvas);
   renderer.renderPlots(plots, bars, viewport);
   return canvas.toBuffer('image/png');
 }
@@ -554,3 +561,4 @@ describe('visual snapshot rendering', () => {
     });
   });
 });
+
