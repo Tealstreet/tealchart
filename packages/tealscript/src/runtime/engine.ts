@@ -2764,7 +2764,7 @@ export class TealscriptEngine {
       case '/=':
         return numValue === 0 ? Number.NaN : numCurrent / numValue;
       case '%=':
-        return numCurrent % numValue;
+        return numValue === 0 ? Number.NaN : numCurrent % numValue;
     }
   }
 
