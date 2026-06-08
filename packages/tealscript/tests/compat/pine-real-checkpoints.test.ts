@@ -2161,7 +2161,7 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
       null,
       null,
       null,
-      61.624951,
+      null,
       43.64354,
       20.320629,
       26.235953,
