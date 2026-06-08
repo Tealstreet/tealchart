@@ -349,7 +349,8 @@ export type Expression =
   | MemberExpression
   | IndexExpression
   | ArrayExpression
-  | NaExpression;
+  | NaExpression
+  | LambdaExpression;
 
 /**
  * Identifier (variable/function name)
@@ -524,6 +525,20 @@ export interface NaExpression extends BaseNode {
   type: 'NaExpression';
 }
 
+/**
+ * Inline lambda / anonymous function expression.
+ *
+ * (v) => v > 0
+ * (a, b) => a < b ? -1 : 1
+ *
+ * Body is a single ConditionalExpression — no block bodies in Pine.
+ */
+export interface LambdaExpression extends BaseNode {
+  type: 'LambdaExpression';
+  params: Identifier[];
+  body: Expression;
+}
+
 // ============================================================================
 // Type Annotations
 // ============================================================================
@@ -608,6 +623,7 @@ export function isExpression(node: AnyNode): node is Expression {
     'IndexExpression',
     'ArrayExpression',
     'NaExpression',
+    'LambdaExpression',
   ].includes(node.type);
 }
 
