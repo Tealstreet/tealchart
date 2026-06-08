@@ -3141,6 +3141,60 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
       },
     ],
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'probe-crlf-line-endings-checkpoint',
+      title: 'CRLF Line Endings Probe Checkpoint',
+      searchContext: 'TradingView public scripts search: CRLF indicator',
+      featureTags: ['parser', 'edge_case', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'probe-indexed-forin-array-checkpoint',
+      title: 'Indexed For-In Array Probe Checkpoint',
+      searchContext: 'TradingView public scripts search: for index value in array',
+      featureTags: ['arrays', 'control_flow', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'probe-map-array-value-checkpoint',
+      title: 'Map Array Value Probe Checkpoint',
+      searchContext: 'TradingView public scripts search: map array float',
+      featureTags: ['map', 'arrays', 'collections', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'probe-matrix-mult-2x2-checkpoint',
+      title: 'Matrix Mult 2x2 Probe Checkpoint',
+      searchContext: 'TradingView public scripts search: matrix multiplication factor',
+      featureTags: ['matrix', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'probe-deep-parens-checkpoint',
+      title: 'Deep Parentheses Nesting Probe Checkpoint',
+      searchContext: 'TradingView public scripts search: midpoint ratio percentage',
+      featureTags: ['parser', 'arithmetic', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'probe-udt-array-field-var-checkpoint',
+      title: 'UDT Array Field Var Probe Checkpoint',
+      searchContext: 'TradingView public scripts search: udt accumulator array field',
+      featureTags: ['udt', 'arrays', 'var', 'state', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
