@@ -383,6 +383,52 @@ e = 10 % 3
       expect(result.errors).toHaveLength(0);
     });
 
+    it('division by zero produces na (null plot values), not Infinity', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(1 / 0, "pos")
+plot(0 / 0, "zero")
+plot(-1 / 0, "neg")
+plot(na(1 / 0) ? 1 : 0, "na_check")
+plot(nz(1 / 0, 99), "nz_check")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+      // All bars should be null (na) for div-by-zero plots
+      expect(result.plots[0].values.every((v) => v === null)).toBe(true);
+      expect(result.plots[1].values.every((v) => v === null)).toBe(true);
+      expect(result.plots[2].values.every((v) => v === null)).toBe(true);
+      // na(1 / 0) should be true → plots 1
+      expect(result.plots[3].values.every((v) => v === 1)).toBe(true);
+      // nz(1 / 0, 99) should be 99
+      expect(result.plots[4].values.every((v) => v === 99)).toBe(true);
+    });
+
+    it('compound /= by zero produces na', () => {
+      const code = `//@version=6
+indicator("Test")
+x = 10.0
+x /= 0
+plot(na(x) ? 1 : 0, "na_check")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.every((v) => v === 1)).toBe(true);
+    });
+
+    it('normal division still works', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(10 / 2, "result")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.every((v) => v === 5)).toBe(true);
+    });
+
     it('evaluates comparisons', () => {
       const code = `//@version=6
 indicator("Test")
