@@ -1162,6 +1162,30 @@ plot(strategy.opentrades.entry_price())`;
       expect(result.errors[0]?.message).toBe('strategy trade_num is required');
     });
 
+    it('returns na for negative trade index on strategy.closedtrades accessors', () => {
+      const script = `//@version=6
+strategy("Negative index", process_orders_on_close=true)
+plot(strategy.closedtrades.profit(strategy.closedtrades - 1), title="Last Profit")
+plot(strategy.closedtrades.entry_price(-1), title="Negative Entry")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Last Profit')?.values).toEqual([null]);
+      expect(result.plots.find((plot) => plot.title === 'Negative Entry')?.values).toEqual([null]);
+    });
+
+    it('returns na for out-of-range trade index on strategy.opentrades accessors', () => {
+      const script = `//@version=6
+strategy("OOB index", process_orders_on_close=true)
+plot(strategy.opentrades.profit(strategy.opentrades - 1), title="Last Open Profit")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Last Open Profit')?.values).toEqual([null]);
+    });
+
     it('exposes basic strategy.closedtrades accessors', () => {
       const script = `//@version=6
 strategy("Closed access",
