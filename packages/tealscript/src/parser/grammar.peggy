@@ -736,10 +736,12 @@ AssignmentOperator
 // as standalone expression statements (e.g. UDF last-line switch, else-na).
 // not/and/or are operators, not statement keywords — they must be allowed
 // as expression starters (e.g. `not na(ph)` as a UDF return expression).
+// method is intentionally excluded: MethodDeclaration is tried first in Statement,
+// and method is valid as a variable/parameter name in expression context.
 StatementReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "to" / "by"
-    / "type" / "method" / "enum"
+    / "type" / "enum"
     / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 
@@ -2469,7 +2471,7 @@ IdentifierPart
 ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
-    / "switch" / "method" / "enum"
+    / "switch" / "enum"
     / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 
