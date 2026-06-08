@@ -2519,6 +2519,7 @@ class SemanticChecker {
     this.functionSymbolDeclarations = new WeakMap();
     this.activeReturnInferences = new Set();
     this.currentPineVersion = program.version;
+    this.hoistFunctionDeclarations(program.body);
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -2886,6 +2887,22 @@ class SemanticChecker {
       }
     }
     return globals;
+  }
+
+  private hoistFunctionDeclarations(statements: Statement[]): void {
+    for (const statement of statements) {
+      if (statement.type !== 'FunctionDeclaration' || statement.isMethod) continue;
+      const symbol: SemanticSymbol = {
+        name: statement.name.name,
+        kind: 'function',
+        isMethod: false,
+        loc: statement.name.loc,
+      };
+      // Pre-declare into root scope so forward calls resolve; body is checked in the normal pass.
+      if (!this.rootScope.declare(symbol)) {
+        this.functionSymbolDeclarations.set(symbol, statement);
+      }
+    }
   }
 
   private collectTypeDeclarations(statements: Statement[]): Map<string, TypeDeclaration> {
@@ -3513,7 +3530,11 @@ class SemanticChecker {
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
     const existingLocal = scope.lookupLocal(statement.name.name);
-    if (!statement.isMethod || !existingLocal || existingLocal.kind !== 'function' || existingLocal.isMethod !== true) {
+    // Non-method functions are pre-hoisted into root scope; update the declaration map
+    // for the existing symbol rather than re-declaring to avoid duplicate-symbol errors.
+    if (!statement.isMethod && existingLocal?.kind === 'function' && existingLocal.isMethod !== true) {
+      this.functionSymbolDeclarations.set(existingLocal, statement);
+    } else if (!statement.isMethod || !existingLocal || existingLocal.kind !== 'function' || existingLocal.isMethod !== true) {
       const symbol: SemanticSymbol = {
         name: statement.name.name,
         kind: 'function',
@@ -4820,6 +4841,17 @@ class SemanticChecker {
         return BUILTIN_NAMESPACES.has(this.memberPath(value)[0]);
       case 'UnaryExpression':
         return (value.operator === '-' || value.operator === '+') && value.argument.type === 'NumericLiteral';
+      case 'CallExpression': {
+        const callee = this.memberPath(value.callee).join('.');
+        return (
+          callee === 'array.new'
+          || callee.startsWith('array.new_')
+          || callee === 'matrix.new'
+          || callee.startsWith('matrix.new_')
+          || callee === 'map.new'
+          || callee === 'table.new'
+        );
+      }
       default:
         return false;
     }
@@ -8067,11 +8099,12 @@ class SemanticChecker {
   }
 
   private inferIdentifierType(identifier: Identifier, scope: SemanticScope): SemanticType {
-    const builtinType = BUILTIN_GLOBAL_TYPES.get(identifier.name);
-    if (builtinType) return builtinType;
-
+    // Local declarations shadow built-in globals.
     const symbol = scope.lookup(identifier.name);
-    return symbol?.type ?? { kind: 'unknown' };
+    if (symbol) return symbol.type ?? { kind: 'unknown' };
+
+    const builtinType = BUILTIN_GLOBAL_TYPES.get(identifier.name);
+    return builtinType ?? { kind: 'unknown' };
   }
 
   private inferCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
