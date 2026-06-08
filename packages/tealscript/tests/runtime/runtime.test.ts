@@ -13,6 +13,7 @@ import {
   TealscriptEngine,
   createPineArray,
   createPineMatrix,
+  getArraySize,
   getArrayValue,
   getMatrixValue,
   pushArrayValue,
@@ -296,9 +297,9 @@ describe('Scope', () => {
     pushArrayValue(array, 2);
     scope.rollback();
 
-    const restored = scope.get('array');
-    expect(getArrayValue(restored as typeof array, 0)).toBe(1);
-    expect(getArrayValue(restored as typeof array, 1)).toBeUndefined();
+    const restored = scope.get('array') as typeof array;
+    expect(getArrayValue(restored, 0)).toBe(1);
+    expect(getArraySize(restored)).toBe(1);
     expect(restored).not.toBe(array);
   });
 });

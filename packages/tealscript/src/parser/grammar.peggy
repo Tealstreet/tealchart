@@ -309,36 +309,40 @@ EnumFieldDeclaration
     }
 
 // User-defined method: method scale(float this, float factor) => this * factor
+// overload method f(...) => ... overloads an existing method for a different type
 MethodDeclaration
-  = exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
+  = exported:("export" _)? overload:("overload" !IdentifierPart _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
         params: [first, ...rest.map(t => t[3])],
         body,
         isMethod: true,
+        overloaded: !!overload,
         exported: !!exported,
         loc: loc()
       };
     }
-  / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:VariableDeclaration {
+  / exported:("export" _)? overload:("overload" !IdentifierPart _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:VariableDeclaration {
       return {
         type: 'FunctionDeclaration',
         name,
         params: [first, ...rest.map(t => t[3])],
         body: [body],
         isMethod: true,
+        overloaded: !!overload,
         exported: !!exported,
         loc: loc()
       };
     }
-  / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
+  / exported:("export" _)? overload:("overload" !IdentifierPart _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
         name,
         params: [first, ...rest.map(t => t[3])],
         body,
         isMethod: true,
+        overloaded: !!overload,
         exported: !!exported,
         loc: loc()
       };
