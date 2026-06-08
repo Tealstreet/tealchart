@@ -5803,14 +5803,15 @@ plot(trendDir, title="Trend Dir")
       ['ATR Length', 'int'],
       ['Factor', 'float'],
     ]);
-    // SuperTrend line values (resistance when bearish, support when bullish)
+    // SuperTrend line values — bars 0-1 are na (ATR seeds on bar 2 with SMA of first 3 TRs)
     expect(roundSeries(getPlot(result, 'SuperTrend Line').values)).toEqual([
-      102.333333, 100.944444, 102.962963, 102.962963,
-      105.90535, 103.4369, 96.708733, 100.639156,
-      102.926104, 104.117402, 106.244935, 106.244935,
+      null, null,
+      110.333333, 110.333333, 106.481481, 103.820988,
+      96.452675, 100.46845, 102.8123, 104.041533,
+      106.194356, 106.194356,
     ]);
-    // Direction: -1 on bar 0, flips to 1 on bar 1, back to -1 on bar 4, then 1 from bar 6
-    expect(getPlot(result, 'Trend Dir').values).toEqual([-1, 1, 1, 1, -1, -1, 1, 1, 1, 1, 1, 1]);
+    // Direction: na for bars 0-1; -1 from bar 2 to bar 5, flips to 1 at bar 6 onward
+    expect(getPlot(result, 'Trend Dir').values).toEqual([null, null, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1]);
   });
 
   it('replicates Volume Profile Lite — volume colored by direction + volume SMA + bgcolor for high volume', () => {

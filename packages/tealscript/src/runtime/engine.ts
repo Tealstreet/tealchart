@@ -11343,7 +11343,7 @@ export class TealscriptEngine {
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 1));
       const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 2));
       const sigma = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 3));
-      const useFlooredOffset = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 4));
+      const useFlooredOffset = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 4, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_alma_source_${callId}`, source, length);
       if (!values || isNaN(offset) || !Number.isFinite(sigma) || sigma === 0) return NaN;
 
@@ -11586,28 +11586,11 @@ export class TealscriptEngine {
         tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
       }
 
+      // Seed ATR with SMA on first full window, then Wilder's smoothing — mirrors ta.atr
       const atrKey = `_ta_supertrend_atr_${callId}_${atrLength}`;
-      let atr = scope.get(atrKey) as number | undefined;
-
-      if (atr === undefined || isNaN(atr)) {
-        // Initialize with simple average
-        let sum = 0;
-        for (let i = 0; i < atrLength; i++) {
-          const h = ctx.high.get(i);
-          const l = ctx.low.get(i);
-          const pc = ctx.close.get(i + 1);
-          if (h === undefined || l === undefined) continue;
-          let t = h - l;
-          if (pc !== undefined) {
-            t = Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc));
-          }
-          sum += t;
-        }
-        atr = sum / atrLength;
-      } else {
-        atr = (atr * (atrLength - 1) + tr) / atrLength;
-      }
-      this.setBuiltinState(scope, atrKey, atr);
+      const atrSourceKey = `_ta_supertrend_tr_${callId}_${atrLength}`;
+      const atr = this.updateBuiltinRmaState(scope, atrKey, atrSourceKey, tr, atrLength);
+      if (isNaN(atr)) return [NaN, NaN];
 
       // Calculate basic upper and lower bands
       const hl2 = (high + low) / 2;
