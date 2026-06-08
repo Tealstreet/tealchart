@@ -424,7 +424,7 @@ plot(crossUp ? 1 : 0, title="Cross Up")
       null, null, null, null,
       103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
     ]);
-    expect(getPlot(result, 'Cross Up').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+    expect(getPlot(result, 'Cross Up').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
   });
 
   it('locks a reduced public VWAP deviation-band idiom', () => {
@@ -996,9 +996,9 @@ plot(nz(val), title="ValueWhen")
 
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Edge ValueWhen Crossover Checkpoint');
-    // No crossover until the last bar (sma3 crosses sma5 upward at bar 11)
+    // Crossover fires at bar 7 (index 7) when sma3 crosses above sma5
     expect(roundSeries(getPlot(result, 'ValueWhen').values)).toEqual([
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 113,
+      0, 0, 0, 0, 0, 0, 0, 110, 110, 110, 110, 110,
     ]);
   });
 

@@ -102,7 +102,7 @@ plot(signal, title="Signal")
     ]);
     expect(roundSeries(getPlot(result, 'Fast').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
     expect(roundSeries(getPlot(result, 'Slow').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
-    expect(getPlot(result, 'Signal').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
+    expect(getPlot(result, 'Signal').values).toEqual([null, null, null, null, null, null, null, 110, null, null, null, null]);
   });
 
   it('covers tuple-returning MACD and Bollinger band snippets', () => {
