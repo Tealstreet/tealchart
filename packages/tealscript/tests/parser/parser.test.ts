@@ -585,6 +585,33 @@ map<string, sig.State> stateBySymbol = na
       }));
     });
 
+    it('allows type as a function parameter name', () => {
+      const ast = parse('f(type) => type * 2\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.name.name).toBe('f');
+      expect(fn.params.map((param) => param.name)).toEqual(['type']);
+    });
+
+    it('allows type as one of multiple parameter names (Pine BB pattern)', () => {
+      const ast = parse('ma(source, length, type) => source\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.params.map((param) => param.name)).toEqual(['source', 'length', 'type']);
+    });
+
+    it('still parses type declarations with type as keyword', () => {
+      const ast = parse(`type Point
+    float x
+    float y
+`);
+      expect(ast.body[0]).toEqual(expect.objectContaining({
+        type: 'TypeDeclaration',
+      }));
+    });
+
     it('parses user-defined function default parameters', () => {
       const ast = parse('spread(source=close, length=3) => source - ta.sma(source, length)\n');
       const fn = ast.body[0] as FunctionDeclaration;
@@ -1441,6 +1468,61 @@ plot(str.length(score()))
         expect(decl.init).toEqual(expect.objectContaining({
           type: 'NumericLiteral',
           value: 1.5e10,
+        }));
+      });
+
+      it('parses integer scientific notation without decimal (1e10)', () => {
+        const ast = parse('x = 1e10\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'NumericLiteral',
+          value: 1e10,
+        }));
+      });
+
+      it('parses negative exponent scientific notation (2e-4)', () => {
+        const ast = parse('x = 2e-4\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'NumericLiteral',
+          value: 2e-4,
+        }));
+      });
+
+      it('parses positive exponent scientific notation (1e+3)', () => {
+        const ast = parse('x = 1e+3\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'NumericLiteral',
+          value: 1e+3,
+        }));
+      });
+
+      it('parses scientific notation inside a function call (input.float)', () => {
+        const ast = parse('x = input.float(2e-4, "Threshold")\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'CallExpression',
+        }));
+      });
+
+      it('does not parse bare 2e as scientific notation (no trailing digits)', () => {
+        // "2e" without following digits: the 2 is consumed as an integer,
+        // not as scientific notation. The init value is 2, not NaN or 20.
+        const ast = parse('x = 2e\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'NumericLiteral',
+          value: 2,
+        }));
+      });
+
+      it('parses plain integer unchanged after scientific notation fix', () => {
+        const ast = parse('x = 42\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'NumericLiteral',
+          value: 42,
         }));
       });
 

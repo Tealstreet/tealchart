@@ -2271,6 +2271,15 @@ Float
         loc: loc()
       };
     }
+  / digits:$[0-9]+ exp:$([eE] [+-]? [0-9]+) {
+      const raw = digits + exp;
+      return {
+        type: 'NumericLiteral',
+        value: parseFloat(raw),
+        raw,
+        loc: loc()
+      };
+    }
 
 Integer
   = value:$[0-9]+ {
@@ -2307,7 +2316,7 @@ IdentifierPart
 ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
-    / "switch" / "type" / "method" / "enum"
+    / "switch" / "method" / "enum"
     / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 
