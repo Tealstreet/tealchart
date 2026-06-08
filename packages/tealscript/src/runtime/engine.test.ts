@@ -7624,6 +7624,79 @@ plot(signal, title="Signal")`;
       expect(signalValues[39]).not.toBeNaN();
     });
 
+    it('ta.max returns element-wise maximum of two series', () => {
+      const script = `//@version=6
+indicator("TA max test")
+plot(ta.max(close, open), title="Max")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 12, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 18, volume: 100 },
+        { time: 3, open: 15, high: 17, low: 13, close: 15, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'Max')?.values).toEqual([
+        Math.max(12, 10),
+        Math.max(18, 20),
+        Math.max(15, 15),
+      ]);
+    });
+
+    it('ta.min returns element-wise minimum of two series', () => {
+      const script = `//@version=6
+indicator("TA min test")
+plot(ta.min(close, open), title="Min")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 12, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 18, volume: 100 },
+        { time: 3, open: 15, high: 17, low: 13, close: 15, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'Min')?.values).toEqual([
+        Math.min(12, 10),
+        Math.min(18, 20),
+        Math.min(15, 15),
+      ]);
+    });
+
+    it('ta.rci returns values in -100..100 range for a trending series', () => {
+      // Strongly uptrending prices should produce a high positive RCI
+      const trendingBars: Bar[] = Array.from({ length: 20 }, (_, i) => ({
+        time: i + 1,
+        open: 100 + i,
+        high: 102 + i,
+        low: 99 + i,
+        close: 101 + i,
+        volume: 1000,
+      }));
+      const script = `//@version=6
+indicator("RCI test")
+plot(ta.rci(close, 9), title="RCI")`;
+
+      const result = executeScript(parse(script), trendingBars);
+
+      expect(result.errors).toHaveLength(0);
+      const rciValues = result.plots.find((p) => p.title === 'RCI')?.values ?? [];
+      // First 8 bars are null (not enough history)
+      for (let i = 0; i < 8; i++) {
+        expect(rciValues[i]).toBeNull();
+      }
+      // After warmup, all values in [-100, 100]
+      for (let i = 8; i < rciValues.length; i++) {
+        const v = rciValues[i] as number;
+        expect(v).not.toBeNull();
+        expect(v).toBeGreaterThanOrEqual(-100);
+        expect(v).toBeLessThanOrEqual(100);
+      }
+      // Strongly uptrending series → high positive RCI near the end
+      expect(rciValues[19] as number).toBeGreaterThan(90);
+    });
+
     it('calculates rising and falling TA helpers', () => {
       const script = `//@version=6
 indicator("TA direction")
