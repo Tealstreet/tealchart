@@ -734,6 +734,26 @@ plot(getPrice(false, false))`);
           expect(assign?.right.alternate).toBeDefined();
         }
       });
+
+      it('parses := with block if at a deeply nested level inside a UDF body', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+f(a, b, c, d) =>
+    if a
+        if b
+            if c
+                x = 0.0
+                x := if d
+                    high
+                else
+                    low
+                x
+plot(f(true, true, true, false))`);
+
+        expect(ast.type).toBe('Program');
+        const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+        expect(fn).toBeDefined();
+      });
     });
   });
 

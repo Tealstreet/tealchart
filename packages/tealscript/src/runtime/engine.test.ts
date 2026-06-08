@@ -9125,5 +9125,31 @@ plot(getVal(3), title="c")`;
       expect(result.plots.find((p) => p.title === 'l')?.values).toEqual(bars.map((b) => b.low));
       expect(result.plots.find((p) => p.title === 'c')?.values).toEqual(bars.map((b) => b.close));
     });
+
+    it('executes := switch RHS and returns the selected branch value', () => {
+      const script = `//@version=6
+indicator("Test")
+getVal(mode) =>
+    v = 0.0
+    v := switch mode
+        1 =>
+            high
+        2 =>
+            low
+        =>
+            close
+    v
+plot(getVal(1), title="h")
+plot(getVal(2), title="l")
+plot(getVal(3), title="c")`;
+
+      const bars = createBars(3, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'h')?.values).toEqual(bars.map((b) => b.high));
+      expect(result.plots.find((p) => p.title === 'l')?.values).toEqual(bars.map((b) => b.low));
+      expect(result.plots.find((p) => p.title === 'c')?.values).toEqual(bars.map((b) => b.close));
+    });
   });
 });
