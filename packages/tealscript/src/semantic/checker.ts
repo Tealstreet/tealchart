@@ -139,6 +139,7 @@ class SemanticScope {
 const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_bool', 'bool'],
   ['array.new_box', 'box'],
+  ['array.new_chart_point', 'chart.point'],
   ['array.new_color', 'color'],
   ['array.new_float', 'float'],
   ['array.new_int', 'int'],
