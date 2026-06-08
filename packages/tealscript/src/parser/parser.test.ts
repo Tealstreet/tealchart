@@ -799,6 +799,93 @@ for i = 0 to 3
     });
   });
 
+  describe('postfix bracket continuation', () => {
+    it('parses two consecutive single-element tuple declarations as separate statements', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+[x] = someFunc1()
+[y] = someFunc2()`);
+
+      const declarations = ast.body.filter(s => s.type === 'VariableDeclaration');
+      expect(declarations).toHaveLength(2);
+      const first = declarations[0];
+      const second = declarations[1];
+      if (first.type === 'VariableDeclaration' && second.type === 'VariableDeclaration') {
+        expect(first.names.type).toBe('TupleDeclarator');
+        expect(second.names.type).toBe('TupleDeclarator');
+        if (first.names.type === 'TupleDeclarator') {
+          expect(first.names.names.map(n => n.name)).toEqual(['x']);
+        }
+        if (second.names.type === 'TupleDeclarator') {
+          expect(second.names.names.map(n => n.name)).toEqual(['y']);
+        }
+      }
+    });
+
+    it('parses two consecutive multi-element tuple declarations as separate statements', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+[a, b] = someFunc1()
+[c, d] = someFunc2()`);
+
+      const declarations = ast.body.filter(s => s.type === 'VariableDeclaration');
+      expect(declarations).toHaveLength(2);
+    });
+
+    it('parses consecutive request.security tuple declarations', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+[OCTF_Close] = request.security(syminfo.tickerid, "60", close)
+[OCTF_Open] = request.security(syminfo.tickerid, "60", open)`);
+
+      const declarations = ast.body.filter(s => s.type === 'VariableDeclaration');
+      expect(declarations).toHaveLength(2);
+      if (declarations[0].type === 'VariableDeclaration') {
+        expect(declarations[0].names.type).toBe('TupleDeclarator');
+        if (declarations[0].names.type === 'TupleDeclarator') {
+          expect(declarations[0].names.names.map(n => n.name)).toEqual(['OCTF_Close']);
+        }
+      }
+    });
+
+    it('parses same-line index access without regression', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+x = arr[0]`);
+
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl).toBeDefined();
+      if (decl?.type === 'VariableDeclaration') {
+        expect(decl.init.type).toBe('IndexExpression');
+      }
+    });
+
+    it('parses same-line history access without regression', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+x = close[1]`);
+
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl).toBeDefined();
+      if (decl?.type === 'VariableDeclaration') {
+        expect(decl.init.type).toBe('IndexExpression');
+      }
+    });
+
+    it('parses cross-line dot member access without regression', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+x = syminfo
+    .tickerid`);
+
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl).toBeDefined();
+      if (decl?.type === 'VariableDeclaration') {
+        expect(decl.init.type).toBe('MemberExpression');
+      }
+    });
+  });
+
   describe('error handling', () => {
     it('throws TealscriptParseError for syntax errors', () => {
       expect(() => {
