@@ -10516,18 +10516,16 @@ export class TealscriptEngine {
 
     // Crossover - source1 crosses above source2
     // Uses scope to track previous values of both arguments
-    this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.crossover', (args, namedArgs, _ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
       const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
       const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
       const source1 = this.toNumber(rawSource1);
       const source2 = this.toNumber(rawSource2);
-      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
-      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
       const trackKey1 = `_cross_over_src1_${callId}`;
       const trackKey2 = `_cross_over_src2_${callId}`;
-      const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
-      const previous2 = series2?.get(1) ?? (scope.get(trackKey2) as number | undefined);
+      const previous1 = scope.get(trackKey1) as number | undefined;
+      const previous2 = scope.get(trackKey2) as number | undefined;
 
       this.setBuiltinState(scope, trackKey1, source1);
       this.setBuiltinState(scope, trackKey2, source2);
@@ -10541,18 +10539,16 @@ export class TealscriptEngine {
     });
 
     // Crossunder - source1 crosses below source2
-    this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.crossunder', (args, namedArgs, _ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
       const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
       const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
       const source1 = this.toNumber(rawSource1);
       const source2 = this.toNumber(rawSource2);
-      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
-      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
       const trackKey1 = `_cross_under_src1_${callId}`;
       const trackKey2 = `_cross_under_src2_${callId}`;
-      const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
-      const previous2 = series2?.get(1) ?? (scope.get(trackKey2) as number | undefined);
+      const previous1 = scope.get(trackKey1) as number | undefined;
+      const previous2 = scope.get(trackKey2) as number | undefined;
 
       this.setBuiltinState(scope, trackKey1, source1);
       this.setBuiltinState(scope, trackKey2, source2);

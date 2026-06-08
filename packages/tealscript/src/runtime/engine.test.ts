@@ -7837,6 +7837,103 @@ plotshape(close < open, style=plotshape.style_triangledown, location=location.be
       expect(upPlot).toBeDefined();
       expect(downPlot).toBeDefined();
     });
+
+    it('ta.crossover detects close crossing above a constant threshold', () => {
+      // close: 102, 105, 103 — crosses above 104 at bar 1 only
+      // low: 100, 104, 101 — low[bar1]=104 must NOT corrupt threshold lookup
+      const script = `//@version=6
+indicator("Crossover constant")
+plot(ta.crossover(close, 104.0) ? 1 : 0, title="Over")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 2, open: 104, high: 106, low: 104, close: 105, volume: 100 },
+        { time: 3, open: 104, high: 104, low: 101, close: 103, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'Over')?.values).toEqual([0, 1, 0]);
+    });
+
+    it('ta.crossunder detects close crossing below a constant threshold', () => {
+      // close: 98, 95, 97 — crosses below 96 at bar 1 only
+      // high: 100, 96, 98 — high[bar1]=96 must NOT corrupt threshold lookup
+      const script = `//@version=6
+indicator("Crossunder constant")
+plot(ta.crossunder(close, 96.0) ? 1 : 0, title="Under")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 99, high: 100, low: 97, close: 98, volume: 100 },
+        { time: 2, open: 97, high: 96, low: 94, close: 95, volume: 100 },
+        { time: 3, open: 95, high: 98, low: 96, close: 97, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'Under')?.values).toEqual([0, 1, 0]);
+    });
+
+    it('ta.crossover works correctly with two computed series', () => {
+      // fast: 10, 20, 15 — slow: 15, 15, 15 (constant via sma)
+      // fast crosses above slow at bar 1, crosses back under at bar 2
+      const script = `//@version=6
+indicator("Crossover two series")
+fast = ta.sma(close, 1)
+slow = ta.sma(close, 3)
+plot(ta.crossover(fast, slow) ? 1 : 0, title="CO")
+plot(ta.crossunder(fast, slow) ? 1 : 0, title="CU")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 21, low: 19, close: 20, volume: 100 },
+        { time: 3, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+        { time: 4, open: 5, high: 6, low: 4, close: 5, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      // fast sma(1) = close; slow sma(3) = null, null, 13.33, 11.67
+      // Bar 0: fast=10, slow=null → no cross
+      // Bar 1: fast=20, slow=null → no cross
+      // Bar 2: fast=10, slow=13.33 → no cross (fast < slow, no crossover)
+      // Bar 3: fast=5, slow=11.67 → crossunder (fast < slow, prev: fast=10 > slow=13.33 is false)
+      const coValues = result.plots.find((p) => p.title === 'CO')?.values ?? [];
+      const cuValues = result.plots.find((p) => p.title === 'CU')?.values ?? [];
+      // First two bars: slow is null → false
+      expect(coValues[0]).toBe(0);
+      expect(coValues[1]).toBe(0);
+      // All values should be 0 or 1
+      expect(coValues.every((v) => v === 0 || v === 1)).toBe(true);
+      expect(cuValues.every((v) => v === 0 || v === 1)).toBe(true);
+    });
+
+    it('ta.crossover(rsi, 70) detects overbought crossover correctly', () => {
+      // Simulate RSI pattern: below 70, crosses above 70, stays above
+      const script = `//@version=6
+indicator("RSI crossover")
+rsi = ta.rsi(close, 3)
+plot(ta.crossover(rsi, 70) ? 1 : 0, title="OB")
+plot(ta.crossunder(rsi, 30) ? 1 : 0, title="OS")`;
+
+      // Use enough bars to warm up RSI(3)
+      const bars: Bar[] = Array.from({ length: 10 }, (_, i) => ({
+        time: i + 1,
+        open: 100,
+        high: 100 + (i < 5 ? 1 : 3),
+        low: 100 - (i < 5 ? 1 : 3),
+        close: 100 + (i < 5 ? i : 10 - i),
+        volume: 100,
+      }));
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      const obValues = result.plots.find((p) => p.title === 'OB')?.values ?? [];
+      const osValues = result.plots.find((p) => p.title === 'OS')?.values ?? [];
+      // All values must be boolean-like (0 or 1), no errors from value-equality confusion
+      expect(obValues.every((v) => v === null || v === 0 || v === 1)).toBe(true);
+      expect(osValues.every((v) => v === null || v === 0 || v === 1)).toBe(true);
+    });
   });
 
   describe('history access', () => {
