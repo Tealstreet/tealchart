@@ -7188,6 +7188,27 @@ plot(ta.valuewhen(condition=bar_index == 2, open, 0) + 1, title="ValueWhen")`;
       expect(result.plots[0].values).toEqual([null, null, 31]);
     });
 
+    it('calculates ta.bar_index — returns bar_index of last non-na value', () => {
+      // source is na on bar 0 (bar_index=0), non-na on bars 1 and 2 (bar_index 1, 2).
+      // On bar 0: source is na → ta.bar_index returns na
+      // On bar 1: last non-na is bar 1 → returns 1
+      // On bar 2: last non-na is bar 2 → returns 2
+      const script = `//@version=6
+indicator("ta.bar_index test")
+src = bar_index >= 1 ? close : na
+plot(ta.bar_index(src), title="BarIdx")`;
+
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 30, volume: 100 },
+      ];
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'BarIdx')?.values).toEqual([null, 1, 2]);
+    });
+
     it('calculates ta.highest', () => {
       const script = `//@version=6
 indicator("Test")

@@ -11641,6 +11641,27 @@ export class TealscriptEngine {
 
       return intercept + slope * (length - 1 - offset);
     });
+
+    // bar_index — returns the bar_index of the bar where source was last non-na
+    this.builtins.set('ta.bar_index', (args, namedArgs, ctx, scope, callId) => {
+      const taBarIndexArgs = ['source'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBarIndexArgs, 0));
+      const histKey = `_ta_bar_index_hist_${callId}`;
+      const barIdxKey = `_ta_bar_index_baridx_${callId}`;
+      // Keep unbounded history so any prior bar can be found
+      const keep = ctx.bar_index + 1;
+      const sourceHist = this.updateBuiltinSourceHistory(scope, histKey, source, keep, false);
+      const barIdxHist = (scope.get(barIdxKey) as number[] | undefined) ?? [];
+      this.prependBoundedHistory(barIdxHist, ctx.bar_index, keep);
+      this.setBuiltinState(scope, barIdxKey, barIdxHist);
+      // Scan from most recent to oldest to find last non-na bar
+      for (let i = 0; i < sourceHist.length; i++) {
+        if (!isNaN(sourceHist[i]!)) {
+          return barIdxHist[i]!;
+        }
+      }
+      return NaN;
+    });
   }
 
   private registerTimeBuiltins(): void {
