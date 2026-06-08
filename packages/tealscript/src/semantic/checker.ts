@@ -425,7 +425,7 @@ const COLOR_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly 
 ]);
 
 const MATH_CONSTANT_NAMES = new Set(['math.pi', 'math.e', 'math.phi', 'math.rphi']);
-const MATH_PRESERVE_NUMERIC_NAMES = new Set(['math.abs', 'math.max', 'math.min']);
+const MATH_PRESERVE_NUMERIC_NAMES = new Set(['math.abs', 'math.max', 'math.min', 'math.clamp']);
 const MATH_FLOAT_RETURN_NAMES = new Set([
   'math.sqrt',
   'math.log',
@@ -470,6 +470,7 @@ const MATH_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>(
   ['math.round_to_mintick', ['number']],
   ['math.sum', ['source', 'length']],
   ['math.random', ['min', 'max', 'seed']],
+  ['math.clamp', ['val', 'min', 'max']],
 ]);
 const MATH_VARIADIC_NUMERIC_PARAMETER_CALLS = new Set(['math.max', 'math.min', 'math.avg']);
 
@@ -1567,7 +1568,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'input',
     {
-      params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      params: ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
     },
@@ -1653,6 +1654,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['math.round_to_mintick', { params: ['number'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['math.sum', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['math.random', { params: ['min', 'max', 'seed'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['math.clamp', { params: ['val', 'min', 'max'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['na', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['nz', { params: ['source', 'replacement'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['max_bars_back', { params: ['var', 'num'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -4411,6 +4413,12 @@ class SemanticChecker {
   }
 
   private checkBuiltinSignature(expression: CallExpression, scope: SemanticScope): void {
+    // User-defined functions shadow legacy TA aliases — skip builtin checks entirely.
+    if (expression.callee.type === 'Identifier') {
+      const sym = scope.lookup(expression.callee.name);
+      if (sym?.kind === 'function') return;
+    }
+
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = this.resolveBuiltinSignature(displayName, expression, scope);
     if (!signature) {
@@ -5107,14 +5115,14 @@ class SemanticChecker {
     const defvalValue = this.constantLiteralValue(defval);
     if (typeof defvalValue !== 'number') return;
 
-    const minval = this.getCallArgument(expression.arguments, 'minval', 2);
+    const minval = this.getNamedOrUnnamedPositionalArg(expression.arguments, 'minval', 2);
     const minvalValue = minval ? this.constantLiteralValue(minval) : undefined;
     if (typeof minvalValue === 'number' && defvalValue < minvalValue) {
       this.addDiagnostic('type-mismatch', `${displayName} defval must be greater than or equal to minval`, defval.loc);
       return;
     }
 
-    const maxval = this.getCallArgument(expression.arguments, 'maxval', 3);
+    const maxval = this.getNamedOrUnnamedPositionalArg(expression.arguments, 'maxval', 3);
     const maxvalValue = maxval ? this.constantLiteralValue(maxval) : undefined;
     if (typeof maxvalValue === 'number' && defvalValue > maxvalValue) {
       this.addDiagnostic('type-mismatch', `${displayName} defval must be less than or equal to maxval`, defval.loc);
@@ -7192,6 +7200,14 @@ class SemanticChecker {
 
   private getCallArgument(args: CallArgument[], name: string, positionalIndex: number): Expression | undefined {
     return args.find((argument) => argument.name?.name === name)?.value ?? args[positionalIndex]?.value;
+  }
+
+  // Like getCallArgument but only falls back to positional if the arg at that index is not a named arg.
+  private getNamedOrUnnamedPositionalArg(args: CallArgument[], name: string, positionalIndex: number): Expression | undefined {
+    const namedMatch = args.find((argument) => argument.name?.name === name);
+    if (namedMatch) return namedMatch.value;
+    const positional = args[positionalIndex];
+    return positional && !positional.name ? positional.value : undefined;
   }
 
   private checkArgumentOrder(args: CallArgument[], displayName: string, signature?: BuiltinSignature): void {
