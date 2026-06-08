@@ -1214,6 +1214,42 @@ plot(myFunc(close))`;
     });
   });
 
+  describe('InitializerSpace continuation with minimal indent', () => {
+    it('parses multiline string concatenation with 1-space indent continuation', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+txt_scr =
+ 'Formula:\\n\\n'+
+ 'Line 1.\\n'+
+ 'Line 2.'
+plot(close)`);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+    });
+
+    it('parses multiline string concatenation with 2-space indent continuation', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+txt =
+  'Part A' +
+  'Part B'
+plot(close)`);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+    });
+
+    it('parses multiline string continuation with 4-space indent (standard)', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+txt =
+    'Part A' +
+    'Part B'
+plot(close)`);
+      const decl = ast.body.find(s => s.type === 'VariableDeclaration');
+      expect(decl?.type).toBe('VariableDeclaration');
+    });
+  });
+
   describe('error handling', () => {
     it('throws TealscriptParseError for syntax errors', () => {
       expect(() => {

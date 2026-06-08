@@ -517,7 +517,7 @@ const STRING_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly
 ]);
 
 const TA_BOOL_RETURN_NAMES = new Set(['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
-const TA_INT_RETURN_NAMES = new Set(['ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
+const TA_INT_RETURN_NAMES = new Set(['ta.bar_index', 'ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
 const TA_FLOAT_RETURN_NAMES = new Set([
   'ta.alma',
   'ta.atr',
@@ -556,6 +556,7 @@ const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.
 const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
 const TA_FLOAT_MEMBER_NAMES = new Set(['ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
 const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['ta.bar_index', ['source']],
   ['ta.alma', ['series', 'length', 'offset', 'sigma']],
   ['ta.cci', ['source', 'length']],
   ['ta.cmo', ['source', 'length']],
@@ -1708,6 +1709,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['strategy.risk.max_position_size', { params: ['contracts'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.alma', { params: ['series', 'length', 'offset', 'sigma', 'floor'], minArgs: 4, maxArgs: 5, allowNamedPrefixWithPositional: true }],
   ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
+  ['ta.bar_index', { params: ['source'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.barssince', { params: ['condition'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.bb', { params: ['series', 'length', 'mult'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.bbw', { params: ['series', 'length', 'mult'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
