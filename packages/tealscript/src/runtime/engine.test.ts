@@ -5630,31 +5630,73 @@ plot(classify(bar_index - 1), title="Classified")`;
       expect(result.plots.find((plot) => plot.title === 'Classified')?.values).toEqual([-1, 0, 1]);
     });
 
-    it('reports direct recursive user function calls', () => {
+    it('enforces max recursion depth for direct recursive user function calls', () => {
       const script = `//@version=6
 indicator("Direct Recursive Function")
 countdown(value) => value <= 0 ? 0 : countdown(value - 1)
-plot(countdown(2), title="Countdown")`;
+plot(countdown(101), title="Countdown")`;
 
       const ast = parse(script);
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: countdown -> countdown');
+      expect(result.errors[0]?.message).toBe('Maximum recursion depth exceeded for function: countdown');
     });
 
-    it('reports mutual recursive user function calls', () => {
+    it('allows mutual recursive user function calls that terminate within depth limit', () => {
       const script = `//@version=6
 indicator("Mutual Recursive Function")
 even(value) => value <= 0 ? 1 : odd(value - 1)
 odd(value) => value <= 0 ? 0 : even(value - 1)
-plot(even(2), title="Even")`;
+plot(even(4), title="Even")`;
 
       const ast = parse(script);
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: even -> odd -> even');
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Even')?.values).toEqual([1]);
+    });
+
+    it('computes factorial recursively', () => {
+      const script = `//@version=6
+indicator("Factorial")
+factorial(n) => n <= 1 ? 1 : n * factorial(n - 1)
+plot(factorial(5), title="Result")`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Result')?.values).toEqual([120]);
+    });
+
+    it('computes fibonacci recursively', () => {
+      const script = `//@version=6
+indicator("Fibonacci")
+fib(n) => n <= 1 ? n : fib(n - 1) + fib(n - 2)
+plot(fib(8), title="Result")`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Result')?.values).toEqual([21]);
+    });
+
+    it('throws a clear error when recursion exceeds 100 levels', () => {
+      const script = `//@version=6
+indicator("Deep Recursion")
+deep(n) => n <= 0 ? 0 : deep(n - 1)
+plot(deep(101), title="Result")`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Maximum recursion depth exceeded for function: deep');
     });
 
     it('halts execution on runtime.error with a message', () => {

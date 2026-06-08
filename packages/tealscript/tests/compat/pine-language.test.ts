@@ -1754,14 +1754,15 @@ plot(indexed, title="Indexed Collection Loop Expression")
     );
   });
 
-  it('rejects recursive user-defined function calls with a clear diagnostic', () => {
+  it('allows recursive user-defined function calls within depth limit', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")
 countdown(value) => value <= 0 ? 0 : countdown(value - 1)
 plot(countdown(2), title="Countdown")
 `);
 
-    expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: countdown -> countdown');
+    expect(result.errors).toHaveLength(0);
+    expect(getPlot(result, 'Countdown').values).toEqual(Array(compatibilityBars.length).fill(0));
   });
 
   it('matches runtime.error halting behavior', () => {
