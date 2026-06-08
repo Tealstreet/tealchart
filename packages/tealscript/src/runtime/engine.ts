@@ -8142,6 +8142,7 @@ export class TealscriptEngine {
     this.builtins.set('plot.style_line', () => 'line');
     this.builtins.set('plot.style_linebr', () => 'linebr');
     this.builtins.set('plot.style_stepline', () => 'stepline');
+    this.builtins.set('plot.style_step', () => 'stepline'); // Pine alias for style_stepline
     this.builtins.set('plot.style_steplinebr', () => 'steplinebr');
     this.builtins.set('plot.style_stepline_diamond', () => 'stepline_diamond');
     this.builtins.set('plot.style_histogram', () => 'histogram');
