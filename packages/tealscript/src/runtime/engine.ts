@@ -1184,6 +1184,7 @@ export class TealscriptEngine {
       case 'ta.kc':
       case 'ta.kcw':
         return this.inferStaticKeltnerMaxBarsBack(expression, collectionScopes);
+      case 'ta.adx':
       case 'ta.dmi':
         return this.inferStaticDmiMaxBarsBack(expression, collectionScopes);
       case 'ta.supertrend':
@@ -11527,6 +11528,12 @@ export class TealscriptEngine {
       );
 
       return [diPlus, diMinus, adx];
+    });
+
+    // ADX - Average Directional Index (scalar; same logic as ta.dmi but returns only adx)
+    this.builtins.set('ta.adx', (args, namedArgs, ctx, scope, callId) => {
+      const [, , adx] = this.builtins.get('ta.dmi')!(args, namedArgs, ctx, scope, callId) as [number, number, number];
+      return adx;
     });
 
     // SAR - Parabolic Stop and Reverse

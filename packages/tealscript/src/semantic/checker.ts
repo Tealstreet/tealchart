@@ -519,6 +519,7 @@ const STRING_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly
 const TA_BOOL_RETURN_NAMES = new Set(['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
 const TA_INT_RETURN_NAMES = new Set(['ta.bar_index', 'ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
 const TA_FLOAT_RETURN_NAMES = new Set([
+  'ta.adx',
   'ta.alma',
   'ta.atr',
   'ta.bbw',
@@ -569,6 +570,7 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.covariance', ['source1', 'source2', 'length']],
   ['ta.cog', ['source', 'length']],
   ['ta.dev', ['source', 'length']],
+  ['ta.adx', ['diLength', 'adxSmoothing']],
   ['ta.dmi', ['diLength', 'adxSmoothing']],
   ['ta.ema', ['source', 'length']],
   ['ta.hma', ['source', 'length']],
@@ -1728,6 +1730,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.covariance', { params: ['source1', 'source2', 'length'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.cog', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.dev', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['ta.adx', { params: ['diLength', 'adxSmoothing'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.dmi', { params: ['diLength', 'adxSmoothing'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.ema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.hma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
