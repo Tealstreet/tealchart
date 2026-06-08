@@ -18,6 +18,7 @@ import type {
   TypeAnnotation,
   FunctionDeclaration,
   VariableDeclaration,
+  TupleAssignment,
   AssignmentStatement,
   IfStatement,
   ForStatement,
@@ -904,6 +905,8 @@ export class TealscriptEngine {
         }
         return initMax;
       }
+      case 'TupleAssignment':
+        return this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
       case 'AssignmentStatement': {
         const rightMax = this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
         if (statement.left.type === 'Identifier') {
@@ -2028,6 +2031,9 @@ export class TealscriptEngine {
       case 'VariableDeclaration':
         this.executeVariableDeclaration(stmt);
         break;
+      case 'TupleAssignment':
+        this.executeTupleAssignment(stmt);
+        break;
       case 'AssignmentStatement':
         this.executeAssignment(stmt);
         break;
@@ -2697,6 +2703,19 @@ export class TealscriptEngine {
   private markPersistentDeclarationDrawings(kind: string, fromIndex: number): void {
     if (kind === 'var' || kind === 'varip') {
       this.ctx.markDrawingsPersistentFrom(fromIndex);
+    }
+  }
+
+  private executeTupleAssignment(stmt: TupleAssignment): void {
+    const value = this.evaluateExpression(stmt.right);
+    if (!Array.isArray(value)) {
+      throw new Error('Tuple assignment expects a tuple (array) value on the right-hand side');
+    }
+    const values = value as unknown[];
+    for (let i = 0; i < stmt.names.length; i++) {
+      const name = stmt.names[i].name;
+      if (name === '_') continue;
+      this.scope.set(name, values[i]);
     }
   }
 

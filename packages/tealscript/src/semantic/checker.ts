@@ -19,6 +19,7 @@ import type {
   Statement,
   SwitchCase,
   SwitchExpression,
+  TupleAssignment,
   TupleDeclarator,
   TypeAnnotation,
   TypeDeclaration,
@@ -2971,6 +2972,9 @@ class SemanticChecker {
           visitInitializer(statement.init, localNames);
           for (const name of this.declaredNames(statement)) localNames.add(name);
           return;
+        case 'TupleAssignment':
+          visitExpression(statement.right, localNames);
+          return;
         case 'AssignmentStatement':
           this.visitAssignmentTargetExpression(statement.left, localNames, visitExpression);
           visitExpression(statement.right, localNames);
@@ -3086,6 +3090,8 @@ class SemanticChecker {
     switch (statement.type) {
       case 'VariableDeclaration':
         return this.initializerReferencesAnyName(statement.init, names);
+      case 'TupleAssignment':
+        return this.expressionReferencesAnyName(statement.right, names);
       case 'AssignmentStatement':
         return this.expressionReferencesAnyName(statement.left, names)
           || this.expressionReferencesAnyName(statement.right, names);
@@ -3211,6 +3217,9 @@ class SemanticChecker {
         break;
       case 'VariableDeclaration':
         this.checkVariableDeclaration(statement, scope);
+        break;
+      case 'TupleAssignment':
+        this.checkTupleAssignment(statement, scope);
         break;
       case 'AssignmentStatement':
         this.checkAssignment(statement, scope);
@@ -3812,6 +3821,16 @@ class SemanticChecker {
     if (this.isAssignableType(leftType, rightType)) return { ...leftType, qualifier };
 
     return { kind: 'unknown', qualifier };
+  }
+
+  private checkTupleAssignment(statement: TupleAssignment, scope: SemanticScope): void {
+    this.checkExpression(statement.right, scope);
+    for (const name of statement.names) {
+      if (name.name === '_') continue;
+      if (!scope.lookup(name.name) && !this.isKnownIdentifier(name.name)) {
+        this.addDiagnostic('undefined-variable', `Variable '${name.name}' is not declared`, name.loc);
+      }
+    }
   }
 
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
