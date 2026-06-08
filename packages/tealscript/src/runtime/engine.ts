@@ -527,6 +527,8 @@ export class TealscriptEngine {
   private builtins: BuiltinRegistry;
   private typeDeclarations: Map<string, TypeDeclaration>;
   private enumValues: Map<string, Map<string, string>>;
+  // Maps enum value key ("Direction.LongDir") to its display title ("Long" or "LongDir").
+  private enumTitles: Map<string, string>;
   private userFunctions: Map<string, FunctionDeclaration>;
   private userMethods: Map<string, FunctionDeclaration[]>;
   private functionScopes: Map<string, Scope>;
@@ -576,6 +578,7 @@ export class TealscriptEngine {
     this.builtins = new Map();
     this.typeDeclarations = new Map();
     this.enumValues = new Map();
+    this.enumTitles = new Map();
     this.userFunctions = new Map();
     this.userMethods = new Map();
     this.functionScopes = new Map();
@@ -628,6 +631,7 @@ export class TealscriptEngine {
     this.scope = this.rootScope;
     this.typeDeclarations.clear();
     this.enumValues.clear();
+    this.enumTitles.clear();
     this.functionScopes.clear();
     this.functionBlockScopes.clear();
     this.scopeIds = new WeakMap();
@@ -2392,6 +2396,7 @@ export class TealscriptEngine {
   private registerTypeDeclarations(ast: Program): void {
     this.typeDeclarations.clear();
     this.enumValues.clear();
+    this.enumTitles.clear();
     for (const stmt of ast.body) {
       if (stmt.type === 'TypeDeclaration') {
         this.typeDeclarations.set(stmt.name.name, stmt);
@@ -2604,9 +2609,18 @@ export class TealscriptEngine {
   private createLocalEnumValues(declaration: EnumDeclaration): Map<string, string> {
     const values = new Map<string, string>();
     for (const field of declaration.fields) {
-      values.set(field.name.name, `${declaration.name.name}.${field.name.name}`);
+      const key = `${declaration.name.name}.${field.name.name}`;
+      values.set(field.name.name, key);
+      // .title() returns the assigned string value, or the field name if none.
+      this.enumTitles.set(key, field.title?.value ?? field.name.name);
     }
     return values;
+  }
+
+  // Returns the display title for an enum value string, or undefined if not an enum value.
+  private evaluateEnumTitleMethod(receiver: unknown): string | undefined {
+    if (typeof receiver !== 'string') return undefined;
+    return this.enumTitles.get(receiver);
   }
 
   private evaluateLibraryConstantExpression(expression: Expression | IfStatement): unknown {
@@ -3478,6 +3492,10 @@ export class TealscriptEngine {
           return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
         }
       }
+      if (funcName === 'title') {
+        const enumTitle = this.evaluateEnumTitleMethod(receiver);
+        if (enumTitle !== undefined) return enumTitle;
+      }
       if (funcName === 'copy' && isPineUdtObject(receiver)) {
         this.assertNoArguments('copy', args, namedArgs);
         return copyUdtObject(receiver);
@@ -3541,6 +3559,10 @@ export class TealscriptEngine {
       const methodBuiltin = this.builtins.get(methodBuiltinName);
       if (methodBuiltin) {
         return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
+      }
+      if (funcName === 'title') {
+        const enumTitle = this.evaluateEnumTitleMethod(receiver);
+        if (enumTitle !== undefined) return enumTitle;
       }
       if (funcName === 'copy' && isPineUdtObject(receiver)) {
         this.assertNoArguments('copy', args, namedArgs);
@@ -4625,6 +4647,7 @@ export class TealscriptEngine {
     engine.ctx.timeframe = timeframeInfo;
     engine.ctx.loadBars(requestContext.bars);
     engine.enumValues = new Map(Array.from(this.enumValues, ([name, values]) => [name, new Map(values)]));
+    engine.enumTitles = new Map(this.enumTitles);
     engine.userFunctions = new Map(this.userFunctions);
     engine.userMethods = new Map(Array.from(this.userMethods, ([name, methods]) => [name, [...methods]]));
     engine.importedLibraries = new Map(this.importedLibraries);

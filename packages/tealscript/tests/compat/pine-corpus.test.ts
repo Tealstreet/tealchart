@@ -21,8 +21,8 @@ import {
 import { compatibilityCheckpointCorpus, compatibilityCheckpointLedger } from './pine-ledger';
 
 const EXPECTED_CHECKPOINT_TOTAL = compatibilityCheckpointLedger.entries.length;
-const EXPECTED_CHECKPOINT_FAILED = 3;
-const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 3;
+const EXPECTED_CHECKPOINT_FAILED = 2;
+const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 2;
 const EXPECTED_CHECKPOINT_PASSED = EXPECTED_CHECKPOINT_TOTAL - EXPECTED_CHECKPOINT_FAILED;
 const EXPECTED_CHECKPOINT_PASS_RATE = `${((EXPECTED_CHECKPOINT_PASSED / EXPECTED_CHECKPOINT_TOTAL) * 100).toFixed(1)}%`;
 
@@ -36,8 +36,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.failed).toBe(EXPECTED_CHECKPOINT_FAILED);
     expect(run.summary.plannedUnsupported).toBe(EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED);
     expect(run.summary.actionableFailed).toBe(0);
-    expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1, runtime: 2 });
-    expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 3 });
+    expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1, runtime: 1 });
+    expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 2 });
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
       inputs: { total: 18, passed: 18, failed: 0 },
@@ -108,9 +108,9 @@ describe('Pine compatibility checkpoint corpus', () => {
       intrabar: { total: 5, passed: 4, failed: 1 },
       markers: { total: 3, passed: 3, failed: 0 },
       realtime: { total: 4, passed: 4, failed: 0 },
-      signals: { total: 245, passed: 245, failed: 0 },
+      signals: { total: 246, passed: 246, failed: 0 },
       declaration_metadata: { total: 5, passed: 5, failed: 0 },
-      output: { total: 289, passed: 289, failed: 0 },
+      output: { total: 290, passed: 290, failed: 0 },
       supertrend: { total: 2, passed: 2, failed: 0 },
       ta: { total: 92, passed: 92, failed: 0 },
       barcolor: { total: 8, passed: 8, failed: 0 },
@@ -151,7 +151,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       table_setters: { total: 1, passed: 1, failed: 0 },
       udf: { total: 28, passed: 27, failed: 1 },
       udt: { total: 10, passed: 10, failed: 0 },
-      unsupported: { total: 3, passed: 0, failed: 3 },
+      unsupported: { total: 2, passed: 0, failed: 2 },
       varip: { total: 3, passed: 3, failed: 0 },
       trade_accessors: { total: 4, passed: 4, failed: 0 },
       open_trades: { total: 2, passed: 2, failed: 0 },
@@ -183,8 +183,8 @@ describe('Pine compatibility checkpoint corpus', () => {
       arithmetic: { total: 7, passed: 7, failed: 0 },
       scope: { total: 6, passed: 6, failed: 0 },
       control_flow: { total: 9, passed: 9, failed: 0 },
-      enum: { total: 3, passed: 2, failed: 1 },
-      type_system: { total: 11, passed: 10, failed: 1 },
+      enum: { total: 3, passed: 3, failed: 0 },
+      type_system: { total: 11, passed: 11, failed: 0 },
       type_annotations: { total: 5, passed: 5, failed: 0 },
       qualified_types: { total: 1, passed: 1, failed: 0 },
       method_extension: { total: 1, passed: 1, failed: 0 },
@@ -537,8 +537,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('Actionable failed: 0');
     expect(markdown).toContain('Actionable pass rate: 100.0%');
     expect(markdown).toContain('| semantic | 1 |');
-    expect(markdown).toContain('| runtime | 2 |');
-    expect(markdown).toContain('| unsupported_planned | 3 |');
+    expect(markdown).toContain('| runtime | 1 |');
+    expect(markdown).toContain('| unsupported_planned | 2 |');
     expect(markdown).toContain('| inputs | 18 | 18 | 0 |');
     expect(markdown).toContain('| legacy | 19 | 19 | 0 |');
     expect(markdown).toContain('| v4_compat | 3 | 3 | 0 |');
@@ -596,9 +596,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| intrabar | 5 | 4 | 1 |');
     expect(markdown).toContain('| markers | 3 | 3 | 0 |');
     expect(markdown).toContain('| realtime | 4 | 4 | 0 |');
-    expect(markdown).toContain('| signals | 245 | 245 | 0 |');
+    expect(markdown).toContain('| signals | 246 | 246 | 0 |');
     expect(markdown).toContain('| declaration_metadata | 5 | 5 | 0 |');
-    expect(markdown).toContain('| output | 289 | 289 | 0 |');
+    expect(markdown).toContain('| output | 290 | 290 | 0 |');
     expect(markdown).toContain('| supertrend | 2 | 2 | 0 |');
     expect(markdown).toContain('| ta | 92 | 92 | 0 |');
     expect(markdown).toContain('| barssince | 2 | 2 | 0 |');
@@ -643,7 +643,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| cancel | 1 | 1 | 0 |');
     expect(markdown).toContain('| udf | 28 | 27 | 1 |');
     expect(markdown).toContain('| udt | 10 | 10 | 0 |');
-    expect(markdown).toContain('| unsupported | 3 | 0 | 3 |');
+    expect(markdown).toContain('| unsupported | 2 | 0 | 2 |');
     expect(markdown).toContain('| varip | 3 | 3 | 0 |');
     expect(markdown).toContain('| visuals | 46 | 46 | 0 |');
     expect(markdown).toContain('| volatility | 6 | 6 | 0 |');
@@ -675,8 +675,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| calendar | 1 | 1 | 0 |');
     expect(markdown).toContain('| dayofweek | 1 | 1 | 0 |');
     expect(markdown).toContain('| timestamp | 1 | 1 | 0 |');
-    expect(markdown).toContain('| enum | 3 | 2 | 1 |');
-    expect(markdown).toContain('| type_system | 11 | 10 | 1 |');
+    expect(markdown).toContain('| enum | 3 | 3 | 0 |');
+    expect(markdown).toContain('| type_system | 11 | 11 | 0 |');
     expect(markdown).toContain('| type_annotations | 5 | 5 | 0 |');
     expect(markdown).toContain('| qualified_types | 1 | 1 | 0 |');
     expect(markdown).toContain('| method_extension | 1 | 1 | 0 |');
@@ -894,8 +894,8 @@ plot(signals.fast(close, 2), title="Fast")
       intrabar: 5,
       markers: 3,
       realtime: 4,
-      signals: 245,
-      output: 289,
+      signals: 246,
+      output: 290,
       supertrend: 2,
       ta: 92,
       barssince: 2,
@@ -938,7 +938,7 @@ plot(signals.fast(close, 2), title="Fast")
       cancel: 1,
       udf: 28,
       udt: 10,
-      unsupported: 3,
+      unsupported: 2,
       varip: 3,
       volatility: 6,
       vwap: 3,

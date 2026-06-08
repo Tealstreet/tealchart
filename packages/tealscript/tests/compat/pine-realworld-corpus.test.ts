@@ -5547,10 +5547,10 @@ plot(signal, title="Signal")
     expect(getPlot(result, 'Signal').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
   });
 
-  // Pine's enum .title() method is not yet implemented — member access is resolved
-  // as a namespace call which the runtime does not recognise.
-  // Gap documented: type system — enum built-in methods are planned but not supported.
-  it.skip('enum .title() method returns the string representation', () => {
+  it('locks enum .title() method returning the assigned string value', () => {
+    // Pine's enum .title() returns the string value assigned to the field ("Long"),
+    // or the field name if no string was assigned. Source:
+    // https://www.tradingview.com/pine-script-docs/language/enums/
     const result = runCompatScript(`
 indicator("Type Enum Title Checkpoint")
 enum Direction
@@ -5558,9 +5558,12 @@ enum Direction
     ShortDir = "Short"
 d = Direction.LongDir
 s = d.title()
+plot(s == "Long" ? 1 : 0, title="TitleMatch")
 plot(close, title="C")
 `);
     expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Type Enum Title Checkpoint');
+    expect(getPlot(result, 'TitleMatch').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
   it('locks explicit type annotations on scalar variables', () => {
