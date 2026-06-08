@@ -6458,6 +6458,147 @@ plot(fish, title="Fisher")
       1.630821,
     ]);
   });
+
+  it('locks the Chaikin Money Flow volume-weighted arithmetic idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/chaikin%20money%20flow%20volume%20weighted/
+    // CMF = sma(mfv, len) / sma(volume, len) where
+    // mfv = ((close-low)-(high-close))/(high-low)*volume.
+    // Tests complex arithmetic expressions over OHLCV series.
+    const result = runCompatScript(`
+indicator("Chaikin Money Flow Checkpoint")
+length = 3
+hlRange = high - low
+mfv = hlRange > 0 ? ((close - low) - (high - close)) / hlRange * volume : 0.0
+cmf = ta.sma(mfv, length) / ta.sma(volume, length)
+plot(cmf, title="CMF")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'CMF').values)).toEqual([
+      null,
+      null,
+      0.536667,
+      0.066813,
+      -0.387659,
+      -0.323295,
+      0.150222,
+      0.668234,
+      0.431591,
+      0.419269,
+      -0.037037,
+      0.223256,
+    ]);
+  });
+
+  it('locks the Williams Alligator ta.smma triple-MA idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/williams%20alligator%20smma%20smoothed/
+    // Three ta.smma calls at lengths 5 (jaw), 3 (teeth), 2 (lips).
+    // Tests the new ta.smma built-in in a realistic multi-MA context.
+    const result = runCompatScript(`
+indicator("Williams Alligator Checkpoint")
+jaw = ta.smma(close, 5)
+teeth = ta.smma(close, 3)
+lips = ta.smma(close, 2)
+plot(jaw, title="Jaw")
+plot(teeth, title="Teeth")
+plot(lips, title="Lips")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Jaw').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      103.2,
+      102.56,
+      102.848,
+      104.0784,
+      104.86272,
+      106.090176,
+      106.872141,
+      107.897713,
+    ]);
+    expect(roundSeries(getPlot(result, 'Teeth').values)).toEqual([
+      null,
+      null,
+      104.666667,
+      104.111111,
+      102.407407,
+      101.604938,
+      102.403292,
+      104.602195,
+      105.734797,
+      107.489864,
+      108.326576,
+      109.551051,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lips').values)).toEqual([
+      null,
+      103.5,
+      105.25,
+      104.125,
+      101.5625,
+      100.78125,
+      102.390625,
+      105.695313,
+      106.847656,
+      108.923828,
+      109.461914,
+      110.730957,
+    ]);
+  });
+
+  it('locks the Pivot Labels ta.pivothigh + ta.pivotlow signal idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/pivot%20high%20low%20labels%20marker/
+    // ta.pivothigh and ta.pivotlow each return na unless a confirmed pivot is found
+    // (requires left+right bars). Tests TA + na detection signal routing.
+    const result = runCompatScript(`
+indicator("Pivot Labels Checkpoint", overlay=true)
+ph = ta.pivothigh(high, 2, 2)
+pl = ta.pivotlow(low, 2, 2)
+plot(na(ph) ? 0 : 1, title="PHSignal")
+plot(na(pl) ? 0 : 1, title="PLSignal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'PHSignal').values).toEqual([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'PLSignal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+  });
+
+  it('locks the Heikin Ashi var persistence + nz recursive open idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/heikin%20ashi%20var%20previous%20open%20close/
+    // haOpen requires the previous bar's haOpen and haClose — tests var float
+    // persistence and nz() first-bar fallback in a standard HA calculation.
+    const result = runCompatScript(`
+indicator("Heikin Ashi Var Checkpoint")
+var float haClose = na
+var float haOpen = na
+haClose := (open + high + low + close) / 4
+haOpen := na(haOpen[1]) ? (open + close) / 2 : (nz(haOpen[1]) + nz(haClose[1])) / 2
+plot(haClose, title="HAClose")
+plot(haOpen, title="HAOpen")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'HAClose').values)).toEqual([
+      101, 103.5, 106, 105.25, 101, 99, 102, 106.5, 108.5, 109.5, 111, 110.75,
+    ]);
+    expect(roundSeries(getPlot(result, 'HAOpen').values)).toEqual([
+      101,
+      101,
+      102.25,
+      104.125,
+      104.6875,
+      102.84375,
+      100.921875,
+      101.460938,
+      103.980469,
+      106.240234,
+      107.870117,
+      109.435059,
+    ]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {

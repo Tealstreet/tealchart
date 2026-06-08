@@ -3303,6 +3303,42 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-chaikin-money-flow-checkpoint',
+      title: 'Realworld Chaikin Money Flow Checkpoint',
+      searchContext: 'TradingView public scripts search: chaikin money flow volume weighted',
+      featureTags: ['ta', 'arithmetic', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-williams-alligator-checkpoint',
+      title: 'Realworld Williams Alligator Checkpoint',
+      searchContext: 'TradingView public scripts search: williams alligator smma smoothed',
+      featureTags: ['ta', 'moving_average', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-pivot-labels-checkpoint',
+      title: 'Realworld Pivot Labels Checkpoint',
+      searchContext: 'TradingView public scripts search: pivot high low labels marker',
+      featureTags: ['ta', 'pivots', 'na', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-heikin-ashi-var-checkpoint',
+      title: 'Realworld Heikin Ashi Var Checkpoint',
+      searchContext: 'TradingView public scripts search: heikin ashi var previous open close',
+      featureTags: ['var', 'na', 'state', 'candles', 'heikin_ashi', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
