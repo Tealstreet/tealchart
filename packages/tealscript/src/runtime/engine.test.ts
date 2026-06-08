@@ -7511,6 +7511,77 @@ plot(ta.swma(close - open), title="Derived SWMA")`;
       expect(result.plots.find((plot) => plot.title === 'Derived SWMA')?.values).toEqual([null, null, null, 5 / 3, 1]);
     });
 
+    it('calculates ta.dema — double EMA is more responsive than plain EMA', () => {
+      const script = `//@version=6
+indicator("DEMA test")
+plot(ta.dema(close, 3), title="DEMA")
+plot(ta.ema(close, 3), title="EMA")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 0, high: 11, low: 9, close: 10, volume: 100 },
+        { time: 2, open: 0, high: 21, low: 19, close: 20, volume: 100 },
+        { time: 3, open: 0, high: 31, low: 29, close: 30, volume: 100 },
+        { time: 4, open: 0, high: 41, low: 39, close: 40, volume: 100 },
+        { time: 5, open: 0, high: 51, low: 49, close: 50, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const demaValues = result.plots.find((plot) => plot.title === 'DEMA')?.values ?? [];
+      const emaValues = result.plots.find((plot) => plot.title === 'EMA')?.values ?? [];
+      expect(demaValues[4]).toBeCloseTo(48.75);
+      expect(emaValues[4]).toBeCloseTo(40.625);
+      // DEMA tracks the rising series more closely than plain EMA
+      expect(demaValues[4]).toBeGreaterThan(emaValues[4] as number);
+    });
+
+    it('calculates ta.tema — triple EMA is more responsive than DEMA', () => {
+      const script = `//@version=6
+indicator("TEMA test")
+plot(ta.tema(close, 3), title="TEMA")
+plot(ta.dema(close, 3), title="DEMA")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 0, high: 11, low: 9, close: 10, volume: 100 },
+        { time: 2, open: 0, high: 21, low: 19, close: 20, volume: 100 },
+        { time: 3, open: 0, high: 31, low: 29, close: 30, volume: 100 },
+        { time: 4, open: 0, high: 41, low: 39, close: 40, volume: 100 },
+        { time: 5, open: 0, high: 51, low: 49, close: 50, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const temaValues = result.plots.find((plot) => plot.title === 'TEMA')?.values ?? [];
+      const demaValues = result.plots.find((plot) => plot.title === 'DEMA')?.values ?? [];
+      expect(temaValues[4]).toBeCloseTo(50.3125);
+      expect(demaValues[4]).toBeCloseTo(48.75);
+      // TEMA tracks the rising series more closely than DEMA
+      expect(temaValues[4]).toBeGreaterThan(demaValues[4] as number);
+    });
+
+    it('calculates ta.kst — returns a [kst, signal] tuple with valid numbers after warmup', () => {
+      const script = `//@version=6
+indicator("KST test")
+[kst, signal] = ta.kst(close, 2, 3, 4, 5, 2, 2, 2, 3, 2)
+plot(kst, title="KST")
+plot(signal, title="Signal")`;
+
+      const ast = parse(script);
+      const bars = createBars(40, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const kstValues = result.plots.find((plot) => plot.title === 'KST')?.values ?? [];
+      const signalValues = result.plots.find((plot) => plot.title === 'Signal')?.values ?? [];
+      // After warmup, both KST and signal should be non-null numbers
+      expect(kstValues[39]).not.toBeNull();
+      expect(signalValues[39]).not.toBeNull();
+      expect(kstValues[39]).not.toBeNaN();
+      expect(signalValues[39]).not.toBeNaN();
+    });
+
     it('calculates rising and falling TA helpers', () => {
       const script = `//@version=6
 indicator("TA direction")
