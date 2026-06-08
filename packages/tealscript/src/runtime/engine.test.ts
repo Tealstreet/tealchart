@@ -8241,6 +8241,34 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(11);
     });
+
+    it('bar_index[n] returns the bar_index value n bars ago', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(bar_index[1])`;
+
+      const bars = createBars(5, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      // bar_index[1] on bar 0 → offset > bar_index → na; on bar 1 → 0; on bar 2 → 1; etc.
+      expect(result.plots[0].values).toEqual([null, 0, 1, 2, 3]);
+    });
+
+    it('last_bar_index[n] returns the constant last_bar_index regardless of offset', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(last_bar_index[0])
+plot(last_bar_index[2])`;
+
+      const bars = createBars(5, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      const lastIdx = bars.length - 1;
+      expect(result.plots[0].values).toEqual([lastIdx, lastIdx, lastIdx, lastIdx, lastIdx]);
+      expect(result.plots[1].values).toEqual([lastIdx, lastIdx, lastIdx, lastIdx, lastIdx]);
+    });
   });
 
   describe('inputs', () => {
@@ -9046,6 +9074,82 @@ plot(x, title="x")`;
       const result = executeScript(ast, bars);
 
       expect(result.plots.find((p) => p.title === 'x')?.values).toEqual([7, 7, 7]);
+    });
+  });
+
+  describe(':= with block if/switch RHS', () => {
+    it('executes := if/else in a UDF body and returns the selected branch value', () => {
+      const script = `//@version=6
+indicator("Test")
+getPrice(useHigh) =>
+    finalPrice = 0.0
+    finalPrice := if useHigh
+        high
+    else
+        low
+    finalPrice
+plot(getPrice(true), title="high")
+plot(getPrice(false), title="low")`;
+
+      const bars = createBars(3, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      const highPlot = result.plots.find((p) => p.title === 'high');
+      const lowPlot = result.plots.find((p) => p.title === 'low');
+      expect(highPlot?.values).toEqual(bars.map((b) => b.high));
+      expect(lowPlot?.values).toEqual(bars.map((b) => b.low));
+    });
+
+    it('executes := if/else-if/else with multiple branches', () => {
+      const script = `//@version=6
+indicator("Test")
+getVal(mode) =>
+    v = 0.0
+    v := if mode == 1
+        high
+    else if mode == 2
+        low
+    else
+        close
+    v
+plot(getVal(1), title="h")
+plot(getVal(2), title="l")
+plot(getVal(3), title="c")`;
+
+      const bars = createBars(3, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'h')?.values).toEqual(bars.map((b) => b.high));
+      expect(result.plots.find((p) => p.title === 'l')?.values).toEqual(bars.map((b) => b.low));
+      expect(result.plots.find((p) => p.title === 'c')?.values).toEqual(bars.map((b) => b.close));
+    });
+
+    it('executes := switch RHS and returns the selected branch value', () => {
+      const script = `//@version=6
+indicator("Test")
+getVal(mode) =>
+    v = 0.0
+    v := switch mode
+        1 =>
+            high
+        2 =>
+            low
+        =>
+            close
+    v
+plot(getVal(1), title="h")
+plot(getVal(2), title="l")
+plot(getVal(3), title="c")`;
+
+      const bars = createBars(3, 100);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((p) => p.title === 'h')?.values).toEqual(bars.map((b) => b.high));
+      expect(result.plots.find((p) => p.title === 'l')?.values).toEqual(bars.map((b) => b.low));
+      expect(result.plots.find((p) => p.title === 'c')?.values).toEqual(bars.map((b) => b.close));
     });
   });
 });

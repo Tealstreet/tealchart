@@ -680,6 +680,80 @@ x := 42`);
         const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
         expect(assignments.length).toBe(1);
       });
+
+      it('parses := with block if as RHS in a UDF body', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+getPrice(useHigh) =>
+    finalPrice = 0.0
+    finalPrice := if useHigh
+        high
+    else
+        low
+    finalPrice
+plot(getPrice(true))`);
+
+        const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+        expect(fn).toBeDefined();
+        if (fn?.type === 'FunctionDeclaration') {
+          const body = Array.isArray(fn.body) ? fn.body : [fn.body];
+          const assign = body.find((s) => s.type === 'AssignmentStatement') as {
+            type: string;
+            operator: string;
+            right: { type: string };
+          } | undefined;
+          expect(assign).toBeDefined();
+          expect(assign?.operator).toBe(':=');
+          expect(assign?.right.type).toBe('IfStatement');
+        }
+      });
+
+      it('parses := with block if/else-if/else as RHS in a UDF body', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+getPrice(usePercentage, useAtr) =>
+    finalPrice = 0.0
+    finalPrice := if usePercentage
+        close * 1.01
+    else if useAtr
+        close + 1.0
+    else
+        close
+    finalPrice
+plot(getPrice(false, false))`);
+
+        const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+        expect(fn).toBeDefined();
+        if (fn?.type === 'FunctionDeclaration') {
+          const body = Array.isArray(fn.body) ? fn.body : [fn.body];
+          const assign = body.find((s) => s.type === 'AssignmentStatement') as {
+            type: string;
+            right: { type: string; alternate: unknown };
+          } | undefined;
+          expect(assign?.right.type).toBe('IfStatement');
+          expect(assign?.right.alternate).toBeDefined();
+        }
+      });
+
+      it('parses := with block if at a deeply nested level inside a UDF body', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+f(a, b, c, d) =>
+    if a
+        if b
+            if c
+                x = 0.0
+                x := if d
+                    high
+                else
+                    low
+                x
+plot(f(true, true, true, false))`);
+
+        expect(ast.type).toBe('Program');
+        const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+        expect(fn).toBeDefined();
+      });
     });
   });
 
@@ -795,6 +869,29 @@ plot(ma(close, 14, 'SMA'))`);
         expect(last?.type).toBe('ExpressionStatement');
         if (last?.type === 'ExpressionStatement') {
           expect(last.expression.type).toBe('SwitchExpression');
+        }
+      }
+    });
+
+    it('parses not na(ph) as the last expression in a UDF body', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+isSwingHigh(src, len) =>
+    ph = ta.pivothigh(src, len, len)
+    not na(ph)
+plot(isSwingHigh(close, 5) ? 1 : 0)`);
+
+      const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+      expect(fn).toBeDefined();
+      if (fn?.type === 'FunctionDeclaration') {
+        const body = Array.isArray(fn.body) ? fn.body : [fn.body];
+        const last = body[body.length - 1];
+        expect(last?.type).toBe('ExpressionStatement');
+        if (last?.type === 'ExpressionStatement') {
+          expect(last.expression.type).toBe('UnaryExpression');
+          if (last.expression.type === 'UnaryExpression') {
+            expect(last.expression.operator).toBe('not');
+          }
         }
       }
     });
