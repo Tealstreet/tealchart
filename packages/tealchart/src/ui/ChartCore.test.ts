@@ -1,4 +1,5 @@
 import type { Bar, Viewport } from '../types';
+import type { UserDrawingState } from '../drawings';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -241,6 +242,35 @@ describe('ChartCore viewport management', () => {
     expect(coreVp.endTime).toBe(expectedVp.endTime);
     expect(coreVp.priceMin).toBe(expectedVp.priceMin);
     expect(coreVp.priceMax).toBe(expectedVp.priceMax);
+
+    core.dispose();
+  });
+
+  it('keeps select-mode drawing selection inside chart panes without consuming double-click tracking', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingSelection = vi.fn(() => true);
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onUserDrawingSelection,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const testCore = core as unknown as { handleUserDrawingInput(x: number, y: number): boolean };
+
+    expect(testCore.handleUserDrawingInput(100, 100)).toBe(false);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
+    expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
+    expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
 
     core.dispose();
   });
