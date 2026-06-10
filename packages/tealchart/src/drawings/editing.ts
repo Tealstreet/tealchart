@@ -2,6 +2,9 @@ import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
 import type { UserDrawing, UserDrawingAnchor, UserDrawingHandleRole, UserDrawingSelection, UserDrawingState } from './types';
 
 import { screenPointToAnchor } from './coordinates';
+import { hitTestUserDrawings } from './hitTesting';
+import { selectUserDrawing } from './input';
+import type { UserDrawingHitTestOptions } from './hitTesting';
 
 export interface UserDrawingEditDrag {
   selection: UserDrawingSelection;
@@ -12,6 +15,17 @@ export interface UserDrawingEditDrag {
 
 export interface ApplyUserDrawingEditDragOptions {
   now?: () => number;
+}
+
+export interface BeginUserDrawingEditDragOptions {
+  hitTest?: UserDrawingHitTestOptions;
+}
+
+export interface BeginUserDrawingEditDragResult {
+  state: UserDrawingState;
+  drag: UserDrawingEditDrag | null;
+  hit: boolean;
+  changed: boolean;
 }
 
 interface AnchorDelta {
@@ -133,5 +147,43 @@ export function applyUserDrawingEditDrag(
     drawings,
     selection: drag.selection,
     draft: null,
+  };
+}
+
+export function beginUserDrawingEditDragAtPoint(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: BeginUserDrawingEditDragOptions = {},
+): BeginUserDrawingEditDragResult {
+  const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
+  if (!hit) {
+    const nextState = selectUserDrawing(state, null);
+    return {
+      state: nextState,
+      drag: null,
+      hit: false,
+      changed: nextState !== state,
+    };
+  }
+
+  const selection: UserDrawingSelection = hit.handle
+    ? { drawingId: hit.drawing.id, handle: hit.handle }
+    : { drawingId: hit.drawing.id };
+  const nextState = selectUserDrawing(state, selection);
+  const space = spacesByPaneId.get(hit.drawing.paneId);
+
+  return {
+    state: nextState,
+    drag: space
+      ? {
+          selection,
+          startPoint: point,
+          startDrawing: hit.drawing,
+          space,
+        }
+      : null,
+    hit: true,
+    changed: nextState !== state,
   };
 }

@@ -12,16 +12,22 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia passive rendering for committed, draft, and
   selected drawing states.
 
-## Current Epic: Selection Foundation
+## Shipped: Selection Foundation
 
 - Shared selection helper resolves a screen point to the topmost visible,
   unlocked drawing and clears selection on misses.
 - Web click/tap and mobile tap behavior use the same helper in select mode while
   preserving drawing placement priority for active drawing tools.
 
+## Current Epic: Drag Editing
+
+- Shared edit helpers resolve selected drawing handles and apply screen-space
+  drag deltas to drawing state.
+- Web Canvas and mobile Skia route select-mode drag gestures through the shared
+  editing helpers.
+
 ## Known Gaps
 
-- Drag editing for handles and whole drawings.
 - Keyboard or command API deletion for selected drawings.
 - Toolbar-facing APIs for tool selection and selected drawing actions.
 - Text editing UX for text labels.

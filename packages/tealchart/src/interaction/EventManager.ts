@@ -77,6 +77,12 @@ export interface EventManagerCallbacks {
   onPaneDoubleClick?: (paneId: string) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
   onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch') => DrawingInputResult;
+  /** Called before pan starts so selected drawing edits can claim the drag */
+  onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  /** Called while an active drawing edit drag moves */
+  onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  /** Called when an active drawing edit drag ends */
+  onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
   /** Crosshair-only render (skips main canvas repaint) */
   onCrosshairRender?: () => void;
 }
@@ -96,7 +102,7 @@ function allowsPaneDoubleClick(result: DrawingInputResult | undefined): boolean 
   return typeof result === 'boolean' ? false : result?.allowPaneDoubleClick === true;
 }
 
-export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider';
+export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider' | 'drawing';
 
 export interface PaneDividerInfo {
   /** Index of the divider (0 = between pane 0 and 1, etc.) */
@@ -363,6 +369,18 @@ export class EventManager {
       return;
     }
 
+    if (e.button === 0 && this.callbacks.onDrawingDragStart?.(x, y, 'mouse')) {
+      this.state.isDragging = true;
+      this.state.dragMode = 'drawing';
+      this.state.dragStartX = x;
+      this.state.dragStartY = y;
+      this.callbacks.onCursorChange?.('move');
+      window.addEventListener('mousemove', this.boundWindowMouseMove);
+      window.addEventListener('mouseup', this.boundWindowMouseUp);
+      this.scheduleRender();
+      return;
+    }
+
     const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
     const viewport = this.callbacks.getViewport();
@@ -537,6 +555,12 @@ export class EventManager {
       return;
     }
 
+    if (this.state.dragMode === 'drawing') {
+      this.callbacks.onDrawingDragMove?.(x, y, 'mouse');
+      this.scheduleRender();
+      return;
+    }
+
     if (!this.state.dragStartViewport) return;
 
     const dx = x - this.state.dragStartX;
@@ -569,7 +593,9 @@ export class EventManager {
     const dy = Math.abs(mouseY - this.state.dragStartY);
     const wasClick = dx < 5 && dy < 5;
 
-    const drawingInputResult = wasClick && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse') : false;
+    const wasDrawingDrag = this.state.dragMode === 'drawing';
+    const drawingInputResult =
+      wasClick && !wasDrawingDrag && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse') : false;
     const handledDrawingInput = isDrawingInputHandled(drawingInputResult);
 
     if (
@@ -598,6 +624,9 @@ export class EventManager {
     }
 
     if (this.state.isDragging) {
+      if (wasDrawingDrag) {
+        this.callbacks.onDrawingDragEnd?.('mouse');
+      }
       this.state.isDragging = false;
       this.state.dragMode = 'none';
 
@@ -605,7 +634,9 @@ export class EventManager {
       this.callbacks.onCursorChange?.('crosshair');
 
       // Sync viewport change
-      this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+      if (!wasDrawingDrag) {
+        this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+      }
     }
 
     this.state.dragStartViewport = null;
@@ -737,11 +768,13 @@ export class EventManager {
       const dims = this.callbacks.getDimensions();
       const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
+      const drawingDragStarted = this.callbacks.onDrawingDragStart?.(x, y, 'touch') === true;
+
       const viewport = this.callbacks.getViewport();
       this.state.dragStartX = x;
       this.state.dragStartY = y;
       this.state.dragStartViewport = { ...viewport };
-      this.state.dragMode = isOverPriceAxis ? 'priceAxisZoom' : 'pan';
+      this.state.dragMode = drawingDragStarted ? 'drawing' : isOverPriceAxis ? 'priceAxisZoom' : 'pan';
       // Save crosshair position at touch start for tracking during drag
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
@@ -753,27 +786,29 @@ export class EventManager {
           this.state.draggedPaneId = pane.paneId;
           this.state.dragStartPaneYRange = { yMin: pane.yMin, yMax: pane.yMax };
           this.state.dragStartPaneHeight = pane.paneHeight;
-          if (isOverPriceAxis) {
+          if (isOverPriceAxis && !drawingDragStarted) {
             this.touchYPanUnlocked = true; // Allow Y-axis zooming immediately for price axis drag
           }
         }
       }
 
       // Notify that auto-scale should be disabled when user zooms the price axis
-      if (isOverPriceAxis) {
+      if (isOverPriceAxis && !drawingDragStarted) {
         this.callbacks.onAutoScaleDisabled?.(this.state.draggedPaneId ?? 'main');
       }
 
       // Start long-press timer for context menu
       this.clearLongPressTimer();
-      this.longPressTimer = setTimeout(() => {
-        if (!this.isTouchDragging && this.touchStart) {
-          // Long press triggered - show context menu
-          const price = this.callbacks.getPriceFromY?.(y) ?? 0;
-          const time = this.callbacks.getTimeFromX?.(x) ?? 0;
-          this.callbacks.onContextMenu?.(x, y, price, time);
-        }
-      }, LONG_PRESS_DURATION);
+      if (!drawingDragStarted) {
+        this.longPressTimer = setTimeout(() => {
+          if (!this.isTouchDragging && this.touchStart) {
+            // Long press triggered - show context menu
+            const price = this.callbacks.getPriceFromY?.(y) ?? 0;
+            const time = this.callbacks.getTimeFromX?.(x) ?? 0;
+            this.callbacks.onContextMenu?.(x, y, price, time);
+          }
+        }, LONG_PRESS_DURATION);
+      }
     } else if (e.touches.length === 2) {
       // Two touches - prepare for pinch zoom
       this.clearLongPressTimer();
@@ -822,7 +857,9 @@ export class EventManager {
         this.clearLongPressTimer();
         this.state.isDragging = true;
 
-        if (this.touchCrosshairLocked) {
+        if (this.state.dragMode === 'drawing') {
+          this.callbacks.onDrawingDragMove?.(x, y, 'touch');
+        } else if (this.touchCrosshairLocked) {
           // Move crosshair proportionally
           this.crosshair.x = this.touchCrosshairPosition.x + dx;
           this.crosshair.y = this.touchCrosshairPosition.y + dy;
@@ -872,8 +909,12 @@ export class EventManager {
         // This was a tap, not a drag
         this.handleTap(this.touchStart.x, this.touchStart.y);
       } else if (this.state.isDragging) {
-        // Drag ended - sync viewport
-        this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+        if (this.state.dragMode === 'drawing') {
+          this.callbacks.onDrawingDragEnd?.('touch');
+        } else {
+          // Drag ended - sync viewport
+          this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+        }
       }
 
       this.touchStart = null;
