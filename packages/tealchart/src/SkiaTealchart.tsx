@@ -234,20 +234,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
   const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
-    createUserDrawingState(),
+    controlledUserDrawingState ?? createUserDrawingState(),
   );
-  const effectiveUserDrawingState = controlledUserDrawingState ?? uncontrolledUserDrawingState;
+  const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingIdCounterRef = useRef(0);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
-      if (!controlledUserDrawingState) {
-        setUncontrolledUserDrawingState(nextState);
-      }
+      setUncontrolledUserDrawingState(nextState);
       onUserDrawingStateChange?.(nextState);
     },
-    [controlledUserDrawingState, onUserDrawingStateChange],
+    [onUserDrawingStateChange],
   );
+
+  useEffect(() => {
+    if (controlledUserDrawingState) {
+      setUncontrolledUserDrawingState(controlledUserDrawingState);
+    }
+  }, [controlledUserDrawingState]);
 
   useEffect(() => {
     setImperativeTheme(null);
@@ -1183,17 +1187,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 
             return (
-              <SkiaLine
-                key={primitive.id}
-                p1={vec(primitive.start.x, primitive.start.y)}
-                p2={vec(primitive.end.x, primitive.end.y)}
-                color={primitive.style.lineColor}
-                opacity={primitive.opacity}
-                strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                style="stroke"
-              >
-                {dash && <DashPathEffect intervals={dash} />}
-              </SkiaLine>
+              <Group key={primitive.id} clip={primitive.clip}>
+                <SkiaLine
+                  p1={vec(primitive.start.x, primitive.start.y)}
+                  p2={vec(primitive.end.x, primitive.end.y)}
+                  color={primitive.style.lineColor}
+                  opacity={primitive.opacity}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+              </Group>
             );
           }
 
@@ -1201,7 +1206,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 
             return (
-              <Group key={primitive.id} opacity={primitive.opacity}>
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillColor && (
                   <Rect
                     x={primitive.rect.x}
@@ -1237,20 +1242,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   : primitive.point.x - measuredWidth / 2;
 
             return (
-              <SkiaText
-                key={primitive.id}
-                x={textX}
-                y={primitive.point.y}
-                text={primitive.text}
-                font={bracketFont}
-                color={primitive.style.textColor ?? primitive.style.lineColor}
-                opacity={primitive.opacity}
-              />
+              <Group key={primitive.id} clip={primitive.clip}>
+                <SkiaText
+                  x={textX}
+                  y={primitive.point.y}
+                  text={primitive.text}
+                  font={bracketFont}
+                  color={primitive.style.textColor ?? primitive.style.lineColor}
+                  opacity={primitive.opacity}
+                />
+              </Group>
             );
           }
 
           return (
-            <Group key={primitive.id}>
+            <Group key={primitive.id} clip={primitive.clip}>
               <Circle
                 cx={primitive.point.x}
                 cy={primitive.point.y}
