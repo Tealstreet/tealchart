@@ -28,6 +28,7 @@ const space: DrawingCoordinateSpace = {
   chartLeft: 0,
   chartRight: 100,
 };
+const clip = { x: 0, y: 0, width: 100, height: 100 };
 
 describe('mobile user drawing render model', () => {
   it('returns Skia-ready primitives for selected drawings and draft previews', () => {
@@ -74,6 +75,7 @@ describe('mobile user drawing render model', () => {
         phase: 'committed',
         selected: true,
         opacity: 1,
+        clip,
         start: { x: 0, y: 50 },
         end: { x: 100, y: 50 },
         style,
@@ -84,6 +86,7 @@ describe('mobile user drawing render model', () => {
         phase: 'draft',
         selected: false,
         opacity: 0.4,
+        clip,
         rect: { x: 10, y: 10, width: 80, height: 80 },
         style,
       },
@@ -91,6 +94,7 @@ describe('mobile user drawing render model', () => {
         kind: 'handle',
         id: 'line:handle:0',
         drawingId: 'line',
+        clip,
         point: { x: 0, y: 50 },
         strokeColor: '#f5c542',
         fillColor: '#ffffff',
@@ -100,6 +104,7 @@ describe('mobile user drawing render model', () => {
         kind: 'handle',
         id: 'line:handle:1',
         drawingId: 'line',
+        clip,
         point: { x: 100, y: 50 },
         strokeColor: '#f5c542',
         fillColor: '#ffffff',
@@ -162,6 +167,7 @@ describe('mobile user drawing render model', () => {
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
       kind: 'textLabel',
       id: 'label',
+      clip,
       point: { x: 50, y: 50 },
       text: 'Left note',
       textAlign: 'left',

@@ -21,7 +21,8 @@ export const DIRTY = {
   LAYOUT: 1 << 6, // Pane layout changed
   OPTIONS: 1 << 7, // Render options (colors, font) changed
   DATA_LOAD: 1 << 8, // Atomic data transition (symbol/interval/reset)
-  FULL: 0x1ff, // Everything
+  USER_DRAWINGS: 1 << 9, // User-created drawing state changed
+  FULL: 0x3ff, // Everything
 } as const;
 
 export type DirtyFlags = number;
