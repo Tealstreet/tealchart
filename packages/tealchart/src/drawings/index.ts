@@ -38,14 +38,18 @@ export {
 export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
 export {
   cancelUserDrawingDraft,
+  clearUserDrawings,
   createUserDrawingState,
+  deleteUserDrawing,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
+  selectUserDrawingById,
   selectUserDrawing,
   setUserDrawingTool,
 } from './input';
 export type {
+  DeleteUserDrawingOptions,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,

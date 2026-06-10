@@ -18,7 +18,13 @@
 
 import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
-import type { DrawingCoordinateSpace, UserDrawingEditDrag, UserDrawingLineStyle } from './drawings';
+import type {
+  DrawingCoordinateSpace,
+  UserDrawingEditDrag,
+  UserDrawingHandleRole,
+  UserDrawingLineStyle,
+  UserDrawingTool,
+} from './drawings';
 import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
@@ -72,9 +78,14 @@ import { useTealchartCore } from './core/useTealchartCore';
 import {
   applyUserDrawingEditDrag,
   beginUserDrawingEditDragAtPoint,
+  cancelUserDrawingDraft as cancelUserDrawingDraftState,
+  clearUserDrawings as clearUserDrawingsState,
   createUserDrawingState,
+  deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
+  selectUserDrawingById,
+  setUserDrawingTool,
 } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
@@ -121,6 +132,12 @@ export interface SkiaTealchartHandle {
   changeTheme(theme: ChartThemeInput): void;
   getUserDrawingState(): UserDrawingState;
   setUserDrawingState(state: UserDrawingState): void;
+  setActiveUserDrawingTool(tool: UserDrawingTool): void;
+  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
+  deleteUserDrawing(drawingId?: string): boolean;
+  deleteSelectedUserDrawing(): boolean;
+  clearUserDrawings(): void;
+  cancelUserDrawingDraft(): void;
 }
 
 export interface SkiaTealchartProps {
@@ -243,19 +260,31 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     propUserDrawingState ?? createUserDrawingState(),
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
+  const userDrawingStateRef = useRef(effectiveUserDrawingState);
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
+      userDrawingStateRef.current = nextState;
       setUncontrolledUserDrawingState(nextState);
       onUserDrawingStateChange?.(nextState);
     },
     [onUserDrawingStateChange],
   );
 
+  const commitUserDrawingStateIfChanged = useCallback(
+    (nextState: UserDrawingState) => {
+      if (nextState === userDrawingStateRef.current) return false;
+      commitUserDrawingState(nextState);
+      return true;
+    },
+    [commitUserDrawingState],
+  );
+
   useEffect(() => {
     if (propUserDrawingState) {
+      userDrawingStateRef.current = propUserDrawingState;
       setUncontrolledUserDrawingState(propUserDrawingState);
     }
   }, [propUserDrawingState]);
@@ -293,13 +322,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         setImperativeTheme(nextTheme);
       },
       getUserDrawingState(): UserDrawingState {
-        return effectiveUserDrawingState;
+        return userDrawingStateRef.current;
       },
       setUserDrawingState(nextState: UserDrawingState): void {
         commitUserDrawingState(nextState);
       },
+      setActiveUserDrawingTool(tool: UserDrawingTool): void {
+        commitUserDrawingStateIfChanged(setUserDrawingTool(userDrawingStateRef.current, tool));
+      },
+      selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
+        commitUserDrawingStateIfChanged(selectUserDrawingById(userDrawingStateRef.current, drawingId, handle));
+      },
+      deleteUserDrawing(drawingId?: string): boolean {
+        const nextState = deleteUserDrawingState(userDrawingStateRef.current, { drawingId });
+        return commitUserDrawingStateIfChanged(nextState);
+      },
+      deleteSelectedUserDrawing(): boolean {
+        const nextState = deleteUserDrawingState(userDrawingStateRef.current);
+        return commitUserDrawingStateIfChanged(nextState);
+      },
+      clearUserDrawings(): void {
+        commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
+      },
+      cancelUserDrawingDraft(): void {
+        commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(userDrawingStateRef.current));
+      },
     }),
-    [commitUserDrawingState, effectiveUserDrawingState],
+    [commitUserDrawingState, commitUserDrawingStateIfChanged],
   );
 
   // Use core hook for bar fetching and state management

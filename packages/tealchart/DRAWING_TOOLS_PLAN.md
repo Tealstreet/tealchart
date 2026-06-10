@@ -19,16 +19,23 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web click/tap and mobile tap behavior use the same helper in select mode while
   preserving drawing placement priority for active drawing tools.
 
-## Current Epic: Drag Editing
+## Shipped: Drag Editing
 
 - Shared edit helpers resolve selected drawing handles and apply screen-space
   drag deltas to drawing state.
 - Web Canvas and mobile Skia route select-mode drag gestures through the shared
   editing helpers.
 
+## Current Epic: Selected Drawing Actions
+
+- Shared action reducers select drawings by id, delete selected or targeted
+  drawings, clear all drawings, and cancel active drafts.
+- Web widget APIs expose toolbar-ready drawing actions and Delete/Backspace
+  removes the selected drawing when the chart owns keyboard input.
+- Mobile Skia exposes the same drawing action concepts on its imperative handle.
+
 ## Known Gaps
 
-- Keyboard or command API deletion for selected drawings.
-- Toolbar-facing APIs for tool selection and selected drawing actions.
+- Full toolbar UI for drawing tool selection and selected drawing actions.
 - Text editing UX for text labels.
 - Persistence handoff into app-level chart layout state.
