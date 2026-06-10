@@ -203,6 +203,7 @@ export function useChartGestures({
 
       if (onDrawingEditStart?.(x, y)) {
         gestureZoneValue.value = 'outside';
+        onSwipeBlockChange?.(true);
         return true;
       }
 
@@ -286,6 +287,7 @@ export function useChartGestures({
         const zone = gestureZoneValue.value;
         if (drawingEditClaimed.value) {
           onDrawingEditEnd?.();
+          onSwipeBlockChange?.(false);
           drawingEditClaimed.value = false;
         } else if (zone === 'chart' && onSwipeBlockChange) {
           onSwipeBlockChange(false);
