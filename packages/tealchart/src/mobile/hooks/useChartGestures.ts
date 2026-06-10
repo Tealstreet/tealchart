@@ -31,6 +31,12 @@ export interface UseChartGesturesOptions {
   isAutoScale?: (paneId: string) => boolean;
   /** Called for active chart-surface touches so overlays can react without owning gestures */
   onInteraction?: (x: number, y: number) => void;
+  /** Called before chart pan starts so drawing edits can claim the gesture */
+  onDrawingEditStart?: (x: number, y: number) => boolean;
+  /** Called while a claimed drawing edit gesture moves */
+  onDrawingEditMove?: (x: number, y: number) => void;
+  /** Called when a claimed drawing edit gesture ends */
+  onDrawingEditEnd?: () => void;
 }
 
 export interface UseChartGesturesResult {
@@ -47,6 +53,9 @@ export function useChartGestures({
   onAutoScaleDisabled,
   isAutoScale,
   onInteraction,
+  onDrawingEditStart,
+  onDrawingEditMove,
+  onDrawingEditEnd,
 }: UseChartGesturesOptions): UseChartGesturesResult {
   // Shared values for gesture state (UI thread)
   const gestureZoneValue = useSharedValue<GestureZone>('chart');
@@ -58,6 +67,7 @@ export function useChartGestures({
   const interactionFramePending = useSharedValue(false);
   const interactionFrameX = useSharedValue(0);
   const interactionFrameY = useSharedValue(0);
+  const drawingEditClaimed = useSharedValue(false);
 
   // Pan handler for chart scrolling (time and price)
   // All data access happens on JS thread via closure
@@ -186,8 +196,15 @@ export function useChartGestures({
 
   // Handler for pan start - processes zone detection and sets up initial values
   const handlePanStartAndSetValues = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number): boolean => {
       onInteraction?.(x, y);
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
+
+      if (onDrawingEditStart?.(x, y)) {
+        gestureZoneValue.value = 'outside';
+        return true;
+      }
 
       const zone = getGestureZone(x, y, dimensions);
 
@@ -206,8 +223,7 @@ export function useChartGestures({
       } else {
         gestureZoneValue.value = 'outside';
       }
-      savedTranslateX.value = 0;
-      savedTranslateY.value = 0;
+      return false;
     },
     [
       dimensions,
@@ -215,6 +231,7 @@ export function useChartGestures({
       onSwipeBlockChange,
       onAutoScaleDisabled,
       onInteraction,
+      onDrawingEditStart,
       gestureZoneValue,
       priceAxisStartRange,
       timeAxisStartRange,
@@ -226,8 +243,6 @@ export function useChartGestures({
   // Memoize gestures to prevent recreating on every render
   const panGesture = useMemo(() => {
     const scheduleInteraction = (x: number, y: number) => {
-      'worklet';
-
       if (!onInteraction) return;
 
       interactionFrameX.value = x;
@@ -238,37 +253,42 @@ export function useChartGestures({
       interactionFramePending.value = true;
       requestAnimationFrame(() => {
         interactionFramePending.value = false;
-        runOnJS(onInteraction)(interactionFrameX.value, interactionFrameY.value);
+        onInteraction(interactionFrameX.value, interactionFrameY.value);
       });
     };
 
     return Gesture.Pan()
       .enabled(enabled)
+      .runOnJS(true)
       .onStart((event) => {
-        // Determine zone and get initial values on JS thread
-        runOnJS(handlePanStartAndSetValues)(event.x, event.y);
+        drawingEditClaimed.value = handlePanStartAndSetValues(event.x, event.y);
       })
       .onUpdate((event) => {
         scheduleInteraction(event.x, event.y);
 
         const zone = gestureZoneValue.value;
 
-        if (zone === 'priceAxis') {
-          runOnJS(updatePriceScale)(event.translationY, priceAxisStartRange.value);
+        if (drawingEditClaimed.value) {
+          onDrawingEditMove?.(event.x, event.y);
+        } else if (zone === 'priceAxis') {
+          updatePriceScale(event.translationY, priceAxisStartRange.value);
         } else if (zone === 'timeAxis') {
-          runOnJS(updateTimeScale)(event.translationX, timeAxisStartRange.value);
+          updateTimeScale(event.translationX, timeAxisStartRange.value);
         } else if (zone === 'chart') {
           const deltaX = event.translationX - savedTranslateX.value;
           const deltaY = event.translationY - savedTranslateY.value;
           savedTranslateX.value = event.translationX;
           savedTranslateY.value = event.translationY;
-          runOnJS(updateViewportFromPan)(deltaX, deltaY);
+          updateViewportFromPan(deltaX, deltaY);
         }
       })
       .onEnd(() => {
         const zone = gestureZoneValue.value;
-        if (zone === 'chart' && onSwipeBlockChange) {
-          runOnJS(onSwipeBlockChange)(false);
+        if (drawingEditClaimed.value) {
+          onDrawingEditEnd?.();
+          drawingEditClaimed.value = false;
+        } else if (zone === 'chart' && onSwipeBlockChange) {
+          onSwipeBlockChange(false);
         }
       });
   }, [
@@ -279,11 +299,14 @@ export function useChartGestures({
     updateViewportFromPan,
     onSwipeBlockChange,
     onInteraction,
+    onDrawingEditMove,
+    onDrawingEditEnd,
     gestureZoneValue,
     priceAxisStartRange,
     timeAxisStartRange,
     savedTranslateX,
     savedTranslateY,
+    drawingEditClaimed,
     interactionFramePending,
     interactionFrameX,
     interactionFrameY,
