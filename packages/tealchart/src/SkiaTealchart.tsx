@@ -1571,6 +1571,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onIntervalChange={onIntervalChange}
             onIndicatorsPress={handleIndicatorsPress}
             supportedResolutions={supportedResolutions}
+            userDrawingState={effectiveUserDrawingState}
+            onUserDrawingToolSelect={(tool) =>
+              commitUserDrawingStateIfChanged(setUserDrawingTool(userDrawingStateRef.current, tool))
+            }
+            onUserDrawingDeleteSelected={() => {
+              commitUserDrawingStateIfChanged(deleteUserDrawingState(userDrawingStateRef.current));
+            }}
+            onUserDrawingCancelDraft={() => {
+              commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(userDrawingStateRef.current));
+            }}
+            onUserDrawingClearAll={() => {
+              commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
+            }}
           />
         </View>
       )}

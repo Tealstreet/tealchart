@@ -78,12 +78,17 @@ export {
   resolveUserDrawingRenderEntries,
   selectUserDrawing,
   selectUserDrawingById,
+  getUserDrawingToolbarStateKey,
+  getUserDrawingToolDescriptor,
+  isUserDrawingToolbarActionEnabled,
   renderUserDrawing,
   renderUserDrawingLayer,
   renderUserDrawings,
   screenPointToAnchor,
   setUserDrawingTool,
   timeToDrawingX,
+  USER_DRAWING_TOOL_DESCRIPTORS,
+  USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_SCHEMA_VERSION,
 } from './drawings';
 export type {
@@ -119,6 +124,9 @@ export type {
   UserDrawingRenderOptions,
   UserDrawingRenderEntry,
   UserDrawingRenderPhase,
+  UserDrawingToolbarAction,
+  UserDrawingToolbarActionDescriptor,
+  UserDrawingToolDescriptor,
   UserDrawingTool,
   VerticalLineDrawing,
 } from './drawings';

@@ -75,6 +75,18 @@ export {
   isDrawingDraftReady,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
+export {
+  getUserDrawingToolbarStateKey,
+  getUserDrawingToolDescriptor,
+  isUserDrawingToolbarActionEnabled,
+  USER_DRAWING_TOOL_DESCRIPTORS,
+  USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+} from './toolbar';
+export type {
+  UserDrawingToolbarAction,
+  UserDrawingToolbarActionDescriptor,
+  UserDrawingToolDescriptor,
+} from './toolbar';
 export type {
   CreateUserDrawingFromDraftOptions,
   HorizontalLineDrawing,
