@@ -104,6 +104,15 @@ export interface ChartCoreOptions {
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ) => UserDrawingSelectionAtPointResult;
+  /** Called when select-mode pointer down may start editing a user drawing */
+  onUserDrawingEditStart?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => boolean;
+  /** Called while an active user drawing edit drag moves */
+  onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
+  /** Called when an active user drawing edit drag ends */
+  onUserDrawingEditEnd?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -703,7 +712,10 @@ export class ChartCore {
       getTimeFromX: (x) =>
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
-        onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
+      onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
+      onDrawingDragStart: (x, y) => this.handleUserDrawingEditStart(x, y),
+      onDrawingDragMove: (x, y) => this.handleUserDrawingEditMove(x, y),
+      onDrawingDragEnd: () => this.options.onUserDrawingEditEnd?.(),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -1526,6 +1538,21 @@ export class ChartCore {
     });
 
     return point ? this.options.onUserDrawingInput(point) : false;
+  }
+
+  private handleUserDrawingEditStart(x: number, y: number): boolean {
+    if (!this.viewport || this.userDrawingState?.activeTool !== 'select') return false;
+
+    const chartLeft = this.margins.left;
+    const chartRight = this.options.width - this.margins.right;
+    if (x < chartLeft || x >= chartRight || !this.getPaneAtY(y)) return false;
+
+    return this.options.onUserDrawingEditStart?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
+  }
+
+  private handleUserDrawingEditMove(x: number, y: number): boolean {
+    if (!this.viewport || this.userDrawingState?.activeTool !== 'select') return false;
+    return this.options.onUserDrawingEditMove?.({ x, y }) === true;
   }
 
   private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {
