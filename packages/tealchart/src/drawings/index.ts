@@ -25,6 +25,14 @@ export {
   hitTestUserDrawings,
 } from './hitTesting';
 export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
+export {
+  cancelUserDrawingDraft,
+  createUserDrawingState,
+  handleUserDrawingInput,
+  selectUserDrawing,
+  setUserDrawingTool,
+} from './input';
+export type { UserDrawingInputOptions, UserDrawingInputPoint } from './input';
 export { renderUserDrawing, renderUserDrawings } from './renderer';
 export type { UserDrawingRenderOptions } from './renderer';
 export {
