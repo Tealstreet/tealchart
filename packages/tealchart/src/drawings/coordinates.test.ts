@@ -80,6 +80,17 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('extends vertical rays toward the second anchor direction', () => {
+    expect(resolveRaySegment({ x: 100, y: 60 }, { x: 100, y: 40 }, 0, 300, 20, 120).end).toEqual({
+      x: 100,
+      y: 20,
+    });
+    expect(resolveRaySegment({ x: 100, y: 60 }, { x: 100, y: 80 }, 0, 300, 20, 120).end).toEqual({
+      x: 100,
+      y: 120,
+    });
+  });
+
   it('resolves rectangles from unordered anchors', () => {
     const rect = resolveRectFromAnchors({ time: 3_000, price: 90 }, { time: 1_000, price: 110 }, space);
 

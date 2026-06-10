@@ -108,7 +108,19 @@ export function resolveRaySegment(
   through: DrawingScreenPoint,
   chartLeft: number,
   chartRight: number,
+  paneTop?: number,
+  paneBottom?: number,
 ): DrawingScreenSegment {
+  if (start.x === through.x && start.y !== through.y && paneTop !== undefined && paneBottom !== undefined) {
+    return {
+      start,
+      end: {
+        x: start.x,
+        y: through.y < start.y ? paneTop : paneBottom,
+      },
+    };
+  }
+
   const extend = through.x >= start.x ? 'right' : 'left';
   return resolveExtendedSegment(start, through, extend, chartLeft, chartRight);
 }
@@ -148,7 +160,7 @@ export function resolveUserDrawingGeometry(
       return {
         kind: 'ray',
         drawing,
-        segment: resolveRaySegment(start, end, space.chartLeft, space.chartRight),
+        segment: resolveRaySegment(start, end, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
       };
     }
     case 'horizontalLine': {

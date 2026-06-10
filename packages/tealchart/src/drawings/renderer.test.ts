@@ -144,6 +144,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4');
   });
 
+  it('clips drawings to the pane chart area', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'ray',
+      kind: 'ray',
+      points: [
+        { time: 50, price: 50 },
+        { time: 100, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls.slice(0, 4)).toEqual(['save', 'beginPath', 'rect:0,0,100,100', 'clip']);
+  });
+
   it('renders filled rectangles', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
