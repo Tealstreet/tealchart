@@ -1,4 +1,5 @@
-import type { ComputedPane, Viewport } from '../types';
+import type { ChartMargins, ComputedPane, Viewport } from '../types';
+import type { UserDrawingInputPoint } from './input';
 import type { UserDrawing, UserDrawingAnchor } from './types';
 
 export interface DrawingScreenPoint {
@@ -23,6 +24,22 @@ export interface DrawingCoordinateSpace {
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
   chartLeft: number;
   chartRight: number;
+}
+
+export interface ResolveUserDrawingInputPointOptions {
+  point: DrawingScreenPoint;
+  viewport: Viewport;
+  panes: readonly DrawingCoordinateSpace['pane'][];
+  chartLeft: number;
+  chartRight: number;
+}
+
+export interface ResolveUserDrawingInputFromChartOptions {
+  point: DrawingScreenPoint;
+  viewport: Viewport;
+  panes: readonly DrawingCoordinateSpace['pane'][];
+  width: number;
+  margins: Pick<ChartMargins, 'left' | 'right'>;
 }
 
 export type ResolvedUserDrawingGeometry =
@@ -81,6 +98,45 @@ export function screenPointToAnchor(point: DrawingScreenPoint, space: DrawingCoo
     time: drawingXToTime(point.x, space),
     price: drawingYToPrice(point.y, space),
   };
+}
+
+export function resolveUserDrawingInputPoint({
+  point,
+  viewport,
+  panes,
+  chartLeft,
+  chartRight,
+}: ResolveUserDrawingInputPointOptions): UserDrawingInputPoint | null {
+  if (chartRight <= chartLeft || point.x < chartLeft || point.x >= chartRight) return null;
+
+  const pane = panes.find((candidate) => candidate.height > 0 && point.y >= candidate.top && point.y < candidate.bottom);
+  if (!pane) return null;
+
+  return {
+    paneId: pane.id,
+    anchor: screenPointToAnchor(point, {
+      viewport,
+      pane,
+      chartLeft,
+      chartRight,
+    }),
+  };
+}
+
+export function resolveUserDrawingInputPointFromChart({
+  point,
+  viewport,
+  panes,
+  width,
+  margins,
+}: ResolveUserDrawingInputFromChartOptions): UserDrawingInputPoint | null {
+  return resolveUserDrawingInputPoint({
+    point,
+    viewport,
+    panes,
+    chartLeft: margins.left,
+    chartRight: width - margins.right,
+  });
 }
 
 export function resolveExtendedSegment(

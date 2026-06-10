@@ -6,6 +6,8 @@ export {
   resolveExtendedSegment,
   resolveRaySegment,
   resolveRectFromAnchors,
+  resolveUserDrawingInputPoint,
+  resolveUserDrawingInputPointFromChart,
   resolveUserDrawingGeometry,
   screenPointToAnchor,
   timeToDrawingX,
@@ -15,6 +17,8 @@ export type {
   DrawingScreenPoint,
   DrawingScreenRect,
   DrawingScreenSegment,
+  ResolveUserDrawingInputFromChartOptions,
+  ResolveUserDrawingInputPointOptions,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
 export {
