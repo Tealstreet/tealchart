@@ -697,23 +697,30 @@ export class TealscriptEngine {
       this.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       this.resetPerBarBuiltinState();
       this.currentStrategyIntrabarContext = null;
-      this.captureOrderFillRecalculationState();
       const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
-      if (isLastBar) {
+      if (this.hasStrategyDeclaration) {
+        this.captureOrderFillRecalculationState();
+        if (isLastBar) {
+          this.ctx.captureRealtimeRollbackState();
+        }
+        this.fillPendingStrategyMarketOrdersForCurrentBar();
+        this.markStrategyLedgerToMarketForCurrentBar();
+        this.strategyOrderFillRecalculationRequested = false;
+      } else if (isLastBar) {
         this.ctx.captureRealtimeRollbackState();
       }
-      this.fillPendingStrategyMarketOrdersForCurrentBar();
-      this.markStrategyLedgerToMarketForCurrentBar();
-      this.strategyOrderFillRecalculationRequested = false;
 
       if (this.executeHistoricalStatements(ast)) {
         return this.createExecutionResult();
       }
-      this.markStrategyLedgerToMarketAtCurrentClose();
-      this.fillPendingStrategyOrdersForCurrentBar();
-      this.markStrategyLedgerAfterPendingOrders();
-      if (this.recalculateHistoricalStrategyOrderFills(ast)) {
-        return this.createExecutionResult();
+
+      if (this.hasStrategyDeclaration) {
+        this.markStrategyLedgerToMarketAtCurrentClose();
+        this.fillPendingStrategyOrdersForCurrentBar();
+        this.markStrategyLedgerAfterPendingOrders();
+        if (this.recalculateHistoricalStrategyOrderFills(ast)) {
+          return this.createExecutionResult();
+        }
       }
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
@@ -3185,9 +3192,10 @@ export class TealscriptEngine {
         return this.ctx.chart;
     }
 
-    // Check scope
-    if (this.scope.has(name)) {
-      return this.scope.get(name);
+    // Check scope (single lookup instead of has+get)
+    const entry = this.scope.getEntry(name);
+    if (entry) {
+      return entry.series ? entry.series.get(0) : entry.value;
     }
 
     throw new Error(`Unknown identifier: ${name}`);
@@ -3333,11 +3341,15 @@ export class TealscriptEngine {
     if (expr.callee.type === 'Identifier') {
       funcName = expr.callee.name;
     } else if (expr.callee.type === 'MemberExpression') {
-      const memberPath = this.getMemberPath(expr.callee);
-      if (memberPath) {
-        namespace = memberPath.slice(0, -1).join('.');
-      }
       funcName = expr.callee.property.name;
+      if (expr.callee.object.type === 'Identifier') {
+        namespace = expr.callee.object.name;
+      } else {
+        const memberPath = this.getMemberPath(expr.callee);
+        if (memberPath) {
+          namespace = memberPath.slice(0, -1).join('.');
+        }
+      }
     } else {
       throw new Error('Invalid callee type');
     }
@@ -6911,7 +6923,9 @@ export class TealscriptEngine {
 
   private resetPerBarBuiltinState(): void {
     this.plotCallIndex = 0;
-    this.builtinCallCounts.clear();
+    for (const key of this.builtinCallCounts.keys()) {
+      this.builtinCallCounts.set(key, 0);
+    }
   }
 
   private registerRuntimeBuiltins(): void {
