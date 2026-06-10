@@ -135,4 +135,36 @@ describe('mobile user drawing render model', () => {
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toEqual([]);
   });
+
+  it('preserves text label alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Left note',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'textLabel',
+      id: 'label',
+      point: { x: 50, y: 50 },
+      text: 'Left note',
+      textAlign: 'left',
+    });
+  });
 });
