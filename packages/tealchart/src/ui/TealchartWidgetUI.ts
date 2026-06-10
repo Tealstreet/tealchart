@@ -2,6 +2,7 @@ import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tea
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
+import type { UserDrawingState } from '../drawings';
 import type {
   Bar,
   ContextMenuItem,
@@ -370,6 +371,13 @@ export class TealchartWidgetUI {
    */
   setDrawings(drawings: DrawingOutput[]): void {
     this.chartCore?.setDrawings(drawings);
+  }
+
+  /**
+   * Update user drawing state - calls ChartCore directly
+   */
+  setUserDrawingState(state: UserDrawingState): void {
+    this.chartCore?.setUserDrawingState(state);
   }
 
   /**

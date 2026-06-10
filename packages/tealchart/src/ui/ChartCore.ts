@@ -14,6 +14,7 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
+import type { UserDrawingState } from '../drawings';
 
 import Konva from 'konva';
 
@@ -493,6 +494,7 @@ export class ChartCore {
   private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
   private drawings: DrawingOutput[] = [];
+  private userDrawingState: UserDrawingState | null = null;
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
   private indicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
@@ -940,6 +942,16 @@ export class ChartCore {
   setDrawings(drawings: DrawingOutput[]): void {
     if (drawings === this.drawings) return;
     this.drawings = drawings;
+    // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  /**
+   * Set user drawing state
+   * Reference equality check - skip if same object
+   */
+  setUserDrawingState(state: UserDrawingState): void {
+    if (state === this.userDrawingState) return;
+    this.userDrawingState = state;
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1532,6 +1544,7 @@ export class ChartCore {
         DIRTY.BARS |
         DIRTY.PLOTS |
         DIRTY.DRAWINGS |
+        DIRTY.USER_DRAWINGS |
         DIRTY.LAYOUT |
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
@@ -1550,6 +1563,7 @@ export class ChartCore {
         DIRTY.BARS |
         DIRTY.PLOTS |
         DIRTY.DRAWINGS |
+        DIRTY.USER_DRAWINGS |
         DIRTY.LAYOUT |
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
