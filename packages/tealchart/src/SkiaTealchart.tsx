@@ -18,7 +18,7 @@
 
 import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
-import type { DrawingCoordinateSpace, UserDrawingLineStyle } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawingEditDrag, UserDrawingLineStyle } from './drawings';
 import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
@@ -69,7 +69,13 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
-import { createUserDrawingState, handleUserDrawingInput, resolveUserDrawingSelectionAtPoint } from './drawings';
+import {
+  applyUserDrawingEditDrag,
+  beginUserDrawingEditDragAtPoint,
+  createUserDrawingState,
+  handleUserDrawingInput,
+  resolveUserDrawingSelectionAtPoint,
+} from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -238,6 +244,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingIdCounterRef = useRef(0);
+  const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
@@ -864,6 +871,43 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     ],
   );
 
+  const handleUserDrawingEditStart = useCallback(
+    (x: number, y: number) => {
+      if (!viewport || effectiveUserDrawingState.activeTool !== 'select') return;
+      if (!isPointInChartArea(x, y)) return;
+
+      const result = beginUserDrawingEditDragAtPoint(
+        effectiveUserDrawingState,
+        { x, y },
+        userDrawingSpacesByPaneId,
+      );
+      if (!result.hit || !result.drag) return;
+
+      userDrawingEditDragRef.current = result.drag;
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+      }
+    },
+    [commitUserDrawingState, effectiveUserDrawingState, isPointInChartArea, userDrawingSpacesByPaneId, viewport],
+  );
+
+  const handleUserDrawingEditMove = useCallback(
+    (x: number, y: number) => {
+      const drag = userDrawingEditDragRef.current;
+      if (!drag) return;
+
+      const nextState = applyUserDrawingEditDrag(effectiveUserDrawingState, drag, { x, y });
+      if (nextState !== effectiveUserDrawingState) {
+        commitUserDrawingState(nextState);
+      }
+    },
+    [commitUserDrawingState, effectiveUserDrawingState],
+  );
+
+  const handleUserDrawingEditEnd = useCallback(() => {
+    userDrawingEditDragRef.current = null;
+  }, []);
+
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
       revealResetButtonIfInBottomRegion(x, y);
@@ -964,10 +1008,35 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
   );
 
+  const drawingEditPanGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .enabled(effectiveUserDrawingState.activeTool === 'select' && effectiveUserDrawingState.selection !== null)
+        .onStart((event) => {
+          runOnJS(handleUserDrawingEditStart)(event.x, event.y);
+        })
+        .onUpdate((event) => {
+          runOnJS(handleUserDrawingEditMove)(event.x, event.y);
+        })
+        .onEnd(() => {
+          runOnJS(handleUserDrawingEditEnd)();
+        })
+        .onFinalize(() => {
+          runOnJS(handleUserDrawingEditEnd)();
+        }),
+    [
+      effectiveUserDrawingState.activeTool,
+      effectiveUserDrawingState.selection,
+      handleUserDrawingEditEnd,
+      handleUserDrawingEditMove,
+      handleUserDrawingEditStart,
+    ],
+  );
+
   // Combine all gestures
   const allGestures = useMemo(
-    () => Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
-    [composedGesture, crosshairPanGesture, tapOrDoubleTapGesture],
+    () => Gesture.Race(drawingEditPanGesture, crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
+    [composedGesture, crosshairPanGesture, drawingEditPanGesture, tapOrDoubleTapGesture],
   );
 
   // ==========================================================================

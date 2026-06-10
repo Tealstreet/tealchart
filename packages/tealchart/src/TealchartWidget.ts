@@ -12,6 +12,7 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingEditDrag,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
@@ -21,7 +22,13 @@ import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
 import { LOADING_OPACITY } from './constants';
-import { createUserDrawingState, handleUserDrawingInput, resolveUserDrawingSelectionAtPoint } from './drawings';
+import {
+  applyUserDrawingEditDrag,
+  beginUserDrawingEditDragAtPoint,
+  createUserDrawingState,
+  handleUserDrawingInput,
+  resolveUserDrawingSelectionAtPoint,
+} from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
@@ -112,6 +119,7 @@ export class TealchartWidget {
   private _plots: PlotOutput[] = [];
   private _drawings: DrawingOutput[] = [];
   private _userDrawingState: UserDrawingState;
+  private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
   private _userDrawingIdCounter = 0;
 
   // Jailbreak (canvas-drawing) indicator support
@@ -985,6 +993,9 @@ export class TealchartWidget {
       },
       onUserDrawingInput: (point) => this._handleUserDrawingInput(point),
       onUserDrawingSelection: (point, spacesByPaneId) => this._handleUserDrawingSelection(point, spacesByPaneId),
+      onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
+      onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
+      onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
       onPaneDoubleClick: (paneId) => {
         this._paneManager.toggleMaximizePane(paneId);
         this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
@@ -2151,6 +2162,33 @@ export class TealchartWidget {
     const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId);
     this.setUserDrawingState(result.state);
     return result;
+  }
+
+  private _handleUserDrawingEditStart(
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ): boolean {
+    if (this._userDrawingState.activeTool !== 'select') return false;
+
+    const result = beginUserDrawingEditDragAtPoint(this._userDrawingState, point, spacesByPaneId);
+    if (!result.hit || !result.drag) return false;
+
+    this._userDrawingEditDrag = result.drag;
+    this.setUserDrawingState(result.state);
+    return true;
+  }
+
+  private _handleUserDrawingEditMove(point: DrawingScreenPoint): boolean {
+    if (!this._userDrawingEditDrag) return false;
+
+    const previousState = this._userDrawingState;
+    const nextState = applyUserDrawingEditDrag(this._userDrawingState, this._userDrawingEditDrag, point);
+    this.setUserDrawingState(nextState);
+    return nextState !== previousState;
+  }
+
+  private _handleUserDrawingEditEnd(): void {
+    this._userDrawingEditDrag = null;
   }
 
   /**

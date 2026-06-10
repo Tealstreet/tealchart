@@ -113,6 +113,15 @@ export interface TealchartWidgetUIOptions {
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ) => UserDrawingSelectionAtPointResult;
+  /** Called when select-mode pointer down may start editing a user drawing */
+  onUserDrawingEditStart?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => boolean;
+  /** Called while an active user drawing edit drag moves */
+  onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
+  /** Called when an active user drawing edit drag ends */
+  onUserDrawingEditEnd?: () => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
   onAutoScaleDisabled?: (paneId: string) => void;
   /** Called when viewport is reset (re-enables auto-scale) */
@@ -300,6 +309,9 @@ export class TealchartWidgetUI {
       onCrossHairMoved: this.options.onCrossHairMoved,
       onUserDrawingInput: this.options.onUserDrawingInput,
       onUserDrawingSelection: this.options.onUserDrawingSelection,
+      onUserDrawingEditStart: this.options.onUserDrawingEditStart,
+      onUserDrawingEditMove: this.options.onUserDrawingEditMove,
+      onUserDrawingEditEnd: this.options.onUserDrawingEditEnd,
       onAutoScaleDisabled: this.options.onAutoScaleDisabled,
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,

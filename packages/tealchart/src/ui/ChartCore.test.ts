@@ -260,11 +260,17 @@ describe('ChartCore viewport management', () => {
       changed: true,
     };
     const onUserDrawingSelection = vi.fn(() => selectionResult);
+    const onUserDrawingEditStart = vi.fn(() => true);
+    const onUserDrawingEditMove = vi.fn(() => true);
+    const onUserDrawingEditEnd = vi.fn();
     const core = new ChartCore({
       container,
       width: 800,
       height: 600,
       onUserDrawingSelection,
+      onUserDrawingEditStart,
+      onUserDrawingEditMove,
+      onUserDrawingEditEnd,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
     core.setUserDrawingState({
@@ -277,6 +283,8 @@ describe('ChartCore viewport management', () => {
 
     const testCore = core as unknown as {
       handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch'): unknown;
+      handleUserDrawingEditStart(x: number, y: number): boolean;
+      handleUserDrawingEditMove(x: number, y: number): boolean;
     };
 
     expect(testCore.handleUserDrawingInput(100, 100)).toBe(false);
@@ -299,6 +307,13 @@ describe('ChartCore viewport management', () => {
     expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
     expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
+    expect(testCore.handleUserDrawingEditStart(100, 100)).toBe(true);
+    expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
+    expect(testCore.handleUserDrawingEditStart(760, 100)).toBe(false);
+    expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
+    expect(testCore.handleUserDrawingEditMove(110, 105)).toBe(true);
+    expect(onUserDrawingEditMove).toHaveBeenCalledWith({ x: 110, y: 105 });
+    expect(onUserDrawingEditEnd).not.toHaveBeenCalled();
 
     core.dispose();
   });

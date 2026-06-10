@@ -3,7 +3,7 @@ import type { UserDrawing, UserDrawingStyle } from './types';
 
 import { describe, expect, it } from 'vitest';
 
-import { applyUserDrawingEditDrag } from './editing';
+import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 import { createUserDrawingState } from './input';
 
 const style: UserDrawingStyle = {
@@ -41,6 +41,33 @@ const base = {
 };
 
 describe('user drawing editing', () => {
+  it('begins an edit drag from the topmost hit drawing', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'line',
+      kind: 'trendLine',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      extend: 'none',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+    });
+
+    const result = beginUserDrawingEditDragAtPoint(state, { x: 10, y: 10 }, new Map([['main', space]]));
+
+    expect(result.hit).toBe(true);
+    expect(result.changed).toBe(true);
+    expect(result.state.selection).toEqual({ drawingId: 'line', handle: 'start' });
+    expect(result.drag).toMatchObject({
+      selection: { drawingId: 'line', handle: 'start' },
+      startDrawing: drawing,
+      startPoint: { x: 10, y: 10 },
+    });
+  });
+
   it('moves a selected two-anchor drawing by screen delta', () => {
     const drawing: UserDrawing = {
       ...base,
