@@ -37,7 +37,16 @@ export {
   setUserDrawingTool,
 } from './input';
 export type { UserDrawingInputOptions, UserDrawingInputPoint } from './input';
-export { renderUserDrawing, renderUserDrawings } from './renderer';
+export {
+  resolveUserDrawingHandlePoints,
+  resolveUserDrawingRenderEntries,
+} from './renderModel';
+export type {
+  ResolveUserDrawingRenderEntriesOptions,
+  UserDrawingRenderEntry,
+  UserDrawingRenderPhase,
+} from './renderModel';
+export { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from './renderer';
 export type { UserDrawingRenderOptions } from './renderer';
 export {
   createUserDrawingFromDraft,

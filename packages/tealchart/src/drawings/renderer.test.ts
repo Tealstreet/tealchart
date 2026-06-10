@@ -1,11 +1,11 @@
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { UserDrawing, UserDrawingStyle } from './types';
+import type { UserDrawing, UserDrawingState, UserDrawingStyle } from './types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
-import { renderUserDrawing, renderUserDrawings } from './renderer';
+import { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from './renderer';
 
 class RecordingCanvasContext implements CanvasContext {
   fillStyle: string | CanvasGradient | CanvasPattern = '#000';
@@ -20,6 +20,7 @@ class RecordingCanvasContext implements CanvasContext {
   lineJoin: CanvasLineJoin = 'miter';
   readonly calls: string[] = [];
   private lineDash: number[] = [];
+  private readonly stateStack: { globalAlpha: number; lineDash: number[] }[] = [];
 
   beginPath(): void {
     this.calls.push('beginPath');
@@ -34,7 +35,7 @@ class RecordingCanvasContext implements CanvasContext {
     this.calls.push(`quadraticCurveTo:${cpx},${cpy},${x},${y}`);
   }
   arc(x: number, y: number, radius: number): void {
-    this.calls.push(`arc:${x},${y},${radius}`);
+    this.calls.push(`arc:${x},${y},${radius}:${this.globalAlpha}`);
   }
   rect(x: number, y: number, width: number, height: number): void {
     this.calls.push(`rect:${x},${y},${width},${height}`);
@@ -61,9 +62,15 @@ class RecordingCanvasContext implements CanvasContext {
     this.calls.push(`fillText:${text}:${x},${y}:${this.fillStyle}:${this.textAlign}`);
   }
   save(): void {
+    this.stateStack.push({ globalAlpha: this.globalAlpha, lineDash: [...this.lineDash] });
     this.calls.push('save');
   }
   restore(): void {
+    const previous = this.stateStack.pop();
+    if (previous) {
+      this.globalAlpha = previous.globalAlpha;
+      this.lineDash = previous.lineDash;
+    }
     this.calls.push('restore');
   }
   clip(): void {
@@ -215,5 +222,43 @@ describe('user drawing renderer', () => {
     renderUserDrawings(ctx, [{ ...drawing, visible: true, paneId: 'missing' }], new Map([[space.pane.id, space]]));
 
     expect(ctx.calls).toEqual([]);
+  });
+
+  it('renders state layers with draft opacity and selection handles', () => {
+    const ctx = new RecordingCanvasContext();
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'trendLine',
+      selection: { drawingId: 'line' },
+      drawings: [
+        {
+          ...base,
+          id: 'line',
+          kind: 'trendLine',
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+          extend: 'none',
+        },
+      ],
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [{ time: 0, price: 20 }],
+        style,
+        startedAt: 2,
+      },
+    };
+
+    renderUserDrawingLayer(ctx, state, new Map([[space.pane.id, space]]), {
+      draftPreviewAnchor: { time: 100, price: 20 },
+      draftOpacity: 0.5,
+    });
+
+    expect(ctx.calls).toContain('lineTo:100,80');
+    expect(ctx.calls).toContain('arc:0,50,4:1');
+    expect(ctx.calls).toContain('arc:100,50,4:1');
+    expect(ctx.globalAlpha).toBe(1);
   });
 });
