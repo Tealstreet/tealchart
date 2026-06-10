@@ -26,7 +26,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia route select-mode drag gestures through the shared
   editing helpers.
 
-## Current Epic: Selected Drawing Actions
+## Shipped: Selected Drawing Actions
 
 - Shared action reducers select drawings by id, delete selected or targeted
   drawings, clear all drawings, and cancel active drafts.
@@ -34,8 +34,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   removes the selected drawing when the chart owns keyboard input.
 - Mobile Skia exposes the same drawing action concepts on its imperative handle.
 
+## Current Epic: Toolbar Foundation
+
+- Shared toolbar descriptors define the supported drawing tools and selected
+  drawing actions.
+- Web top bar and mobile top bar render the same drawing tool/action controls
+  from the shared descriptors.
+
 ## Known Gaps
 
-- Full toolbar UI for drawing tool selection and selected drawing actions.
+- Full TradingView-style drawing toolbar organization and overflow menus.
 - Text editing UX for text labels.
 - Persistence handoff into app-level chart layout state.

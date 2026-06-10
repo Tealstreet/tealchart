@@ -9,6 +9,9 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import type { UserDrawingState, UserDrawingTool } from '../../drawings';
+
+import { USER_DRAWING_TOOL_DESCRIPTORS, USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS } from '../../drawings';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 
 export interface ChartTopBarComponentProps {
@@ -32,6 +35,16 @@ export interface ChartTopBarComponentProps {
   accentColor?: string;
   /** Supported resolutions from datafeed (filters timeframe buttons) */
   supportedResolutions?: string[] | null;
+  /** Current user drawing state for toolbar highlighting and action availability */
+  userDrawingState?: UserDrawingState;
+  /** Callback when a drawing tool is selected */
+  onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when the selected drawing should be deleted */
+  onUserDrawingDeleteSelected?: () => void;
+  /** Callback when the active drawing draft should be cancelled */
+  onUserDrawingCancelDraft?: () => void;
+  /** Callback when all user drawings should be cleared */
+  onUserDrawingClearAll?: () => void;
 }
 
 const TOP_BAR_HEIGHT = 36;
@@ -48,6 +61,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     textSecondaryColor = '#787b86',
     accentColor = '#2962ff',
     supportedResolutions,
+    userDrawingState,
+    onUserDrawingToolSelect,
+    onUserDrawingDeleteSelected,
+    onUserDrawingCancelDraft,
+    onUserDrawingClearAll,
   }) => {
     // Filter timeframes by supported resolutions (if set by datafeed)
     const timeframes = useMemo(() => {
@@ -121,6 +139,84 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
           <Text style={[styles.indicatorsIcon, { color: textSecondaryColor }]}>ƒ</Text>
           <Text style={[styles.indicatorsText, { color: textSecondaryColor }]}>Indicators</Text>
         </Pressable>
+
+        {userDrawingState && (
+          <>
+            <View style={styles.divider} />
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.drawingContainer}
+            >
+              {USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => (
+                <Pressable
+                  key={descriptor.tool}
+                  accessibilityRole="button"
+                  accessibilityLabel={descriptor.label}
+                  accessibilityState={{ selected: userDrawingState.activeTool === descriptor.tool }}
+                  onPress={() => onUserDrawingToolSelect?.(descriptor.tool)}
+                  style={({ pressed }) => [
+                    styles.drawingButton,
+                    userDrawingState.activeTool === descriptor.tool && [
+                      styles.drawingButtonActive,
+                      { backgroundColor: `${accentColor}33` },
+                    ],
+                    pressed && userDrawingState.activeTool !== descriptor.tool && styles.drawingButtonPressed,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.drawingButtonText,
+                      { color: userDrawingState.activeTool === descriptor.tool ? accentColor : textSecondaryColor },
+                    ]}
+                  >
+                    {descriptor.icon}
+                  </Text>
+                </Pressable>
+              ))}
+
+              <View style={styles.innerDivider} />
+
+              {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
+                const enabled =
+                  descriptor.action === 'deleteSelected'
+                    ? userDrawingState.selection !== null
+                    : descriptor.action === 'cancelDraft'
+                      ? userDrawingState.draft !== null
+                      : userDrawingState.drawings.length > 0;
+                return (
+                  <Pressable
+                    key={descriptor.action}
+                    accessibilityRole="button"
+                    accessibilityLabel={descriptor.label}
+                    accessibilityState={{ disabled: !enabled }}
+                    disabled={!enabled}
+                    onPress={() => {
+                      if (descriptor.action === 'deleteSelected') onUserDrawingDeleteSelected?.();
+                      if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
+                      if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
+                    }}
+                    style={({ pressed }) => [
+                      styles.drawingButton,
+                      !enabled && styles.drawingButtonDisabled,
+                      enabled && pressed && styles.drawingButtonPressed,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.drawingButtonText,
+                        { color: textSecondaryColor },
+                        !enabled && styles.drawingButtonTextDisabled,
+                      ]}
+                    >
+                      {descriptor.icon}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </>
+        )}
       </View>
     );
   },
@@ -238,6 +334,38 @@ const styles = StyleSheet.create({
   indicatorsText: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  drawingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  drawingButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  drawingButtonActive: {},
+  drawingButtonPressed: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  drawingButtonDisabled: {
+    opacity: 0.35,
+  },
+  drawingButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  drawingButtonTextDisabled: {
+    opacity: 0.8,
+  },
+  innerDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: '#363a45',
+    marginHorizontal: 4,
   },
 });
 
