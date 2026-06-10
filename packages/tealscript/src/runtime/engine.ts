@@ -537,6 +537,7 @@ export class TealscriptEngine {
   private rootScope: Scope;
   private scope: Scope;
   private builtins: BuiltinRegistry;
+  private callArgPreserveSourceCache = new WeakMap<CallExpression, boolean[]>();
   private typeDeclarations: Map<string, TypeDeclaration>;
   private enumValues: Map<string, Map<string, string>>;
   // Maps enum value key ("Direction.LongDir") to its display title ("Long" or "LongDir").
@@ -3413,9 +3414,18 @@ export class TealscriptEngine {
     const namedArgs = new Map<string, unknown>();
     const sourceBindings: CallSourceBindings = { positional: [], named: new Map() };
     const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
+
+    let preserveSourceFlags = this.callArgPreserveSourceCache.get(expr);
+    if (!preserveSourceFlags) {
+      preserveSourceFlags = expr.arguments.map((_, i) =>
+        this.shouldPreserveBuiltinSourceArgument(builtinName, expr.arguments, i),
+      );
+      this.callArgPreserveSourceCache.set(expr, preserveSourceFlags);
+    }
+
     for (let argIndex = 0; argIndex < expr.arguments.length; argIndex++) {
       const arg = expr.arguments[argIndex]!;
-      const value = this.shouldPreserveBuiltinSourceArgument(builtinName, expr.arguments, argIndex)
+      const value = preserveSourceFlags[argIndex]
         ? this.evaluateBuiltinSourceArgument(arg.value)
         : this.evaluateExpression(arg.value);
       const sourceSeries = this.getSourceSeriesForExpression(arg.value, value);
