@@ -25,6 +25,8 @@ export {
   hitTestUserDrawings,
 } from './hitTesting';
 export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
+export { renderUserDrawing, renderUserDrawings } from './renderer';
+export type { UserDrawingRenderOptions } from './renderer';
 export {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STATE,

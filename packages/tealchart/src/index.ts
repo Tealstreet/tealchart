@@ -67,6 +67,8 @@ export {
   resolveRaySegment,
   resolveRectFromAnchors,
   resolveUserDrawingGeometry,
+  renderUserDrawing,
+  renderUserDrawings,
   screenPointToAnchor,
   timeToDrawingX,
   USER_DRAWING_SCHEMA_VERSION,
@@ -95,6 +97,7 @@ export type {
   UserDrawingStyle,
   UserDrawingHitResult,
   UserDrawingHitTestOptions,
+  UserDrawingRenderOptions,
   UserDrawingTool,
   VerticalLineDrawing,
 } from './drawings';
