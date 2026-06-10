@@ -69,7 +69,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
-import { createUserDrawingState, handleUserDrawingInput } from './drawings';
+import { createUserDrawingState, handleUserDrawingInput, resolveUserDrawingSelectionAtPoint } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -807,14 +807,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const chartTop = chartDimensions.margins.top;
       const chartBottom = chartDimensions.height - chartDimensions.margins.bottom;
 
-      return x >= chartLeft && x <= chartRight && y >= chartTop && y <= chartBottom;
+      return x >= chartLeft && x < chartRight && y >= chartTop && y < chartBottom;
     },
     [chartDimensions],
   );
 
   const handleUserDrawingTap = useCallback(
     (x: number, y: number) => {
-      if (!viewport || effectiveUserDrawingState.activeTool === 'select') return false;
+      if (!viewport) return false;
+
+      if (effectiveUserDrawingState.activeTool === 'select') {
+        if (!isPointInChartArea(x, y)) return false;
+
+        const selection = resolveUserDrawingSelectionAtPoint(
+          effectiveUserDrawingState,
+          { x, y },
+          userDrawingSpacesByPaneId,
+        );
+        if (selection.changed) {
+          commitUserDrawingState(selection.state);
+        }
+        return selection.hit || selection.changed;
+      }
 
       const point = resolveMobileUserDrawingInputPoint({
         point: { x, y },
@@ -839,7 +853,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingState(nextState);
       return true;
     },
-    [chartDimensions, commitUserDrawingState, effectiveUserDrawingState, userDrawingInputPanes, viewport],
+    [
+      chartDimensions,
+      commitUserDrawingState,
+      effectiveUserDrawingState,
+      isPointInChartArea,
+      userDrawingInputPanes,
+      userDrawingSpacesByPaneId,
+      viewport,
+    ],
   );
 
   const handleCrosshairTap = useCallback(

@@ -5,12 +5,34 @@ import {
   cancelUserDrawingDraft,
   createUserDrawingState,
   handleUserDrawingInput,
+  resolveUserDrawingSelectionAtPoint,
+  selectUserDrawingAtPoint,
   selectUserDrawing,
   setUserDrawingTool,
 } from './input';
+import type { DrawingCoordinateSpace } from './coordinates';
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+const space: DrawingCoordinateSpace = {
+  viewport: {
+    startTime: 0,
+    endTime: 100,
+    priceMin: 0,
+    priceMax: 100,
+  },
+  pane: {
+    id: 'main',
+    top: 0,
+    height: 100,
+    bottom: 100,
+    yMin: 0,
+    yMax: 100,
+  },
+  chartLeft: 0,
+  chartRight: 100,
+};
+const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 
 describe('user drawing input controller', () => {
   afterEach(() => {
@@ -111,7 +133,7 @@ describe('user drawing input controller', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          style,
           price: 100,
         },
       ],
@@ -122,5 +144,99 @@ describe('user drawing input controller', () => {
     expect(selected.selection).toEqual({ drawingId: 'h', handle: 'center' });
     expect(selected.drawings).toBe(drawingState.drawings);
     expect(cancelUserDrawingDraft(selected)).toBe(selected);
+  });
+
+  it('selects the topmost hit drawing at a screen point', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'bottom',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+        {
+          id: 'top',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style,
+          price: 50,
+        },
+      ],
+    });
+
+    expect(selectUserDrawingAtPoint(state, { x: 40, y: 50 }, new Map([['main', space]])).selection).toEqual({
+      drawingId: 'top',
+    });
+  });
+
+  it('reports hit metadata even when selection is unchanged', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+    });
+
+    expect(resolveUserDrawingSelectionAtPoint(state, { x: 40, y: 50 }, new Map([['main', space]]))).toEqual({
+      state,
+      hit: true,
+      changed: false,
+    });
+  });
+
+  it('clears selection and draft when selection misses', () => {
+    const state = createUserDrawingState({
+      activeTool: 'trendLine',
+      selection: { drawingId: 'old' },
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+      drawings: [
+        {
+          id: 'old',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+    });
+
+    const next = selectUserDrawingAtPoint(state, { x: 40, y: 20 }, new Map([['main', space]]));
+    const result = resolveUserDrawingSelectionAtPoint(state, { x: 40, y: 20 }, new Map([['main', space]]));
+
+    expect(next.selection).toBeNull();
+    expect(next.draft).toBeNull();
+    expect(next.activeTool).toBe('select');
+    expect(result.hit).toBe(false);
+    expect(result.changed).toBe(true);
   });
 });

@@ -12,6 +12,9 @@ import {
   isDrawingDraftReady,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
+import { hitTestUserDrawings } from './hitTesting';
+import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
+import type { UserDrawingHitTestOptions } from './hitTesting';
 
 export interface UserDrawingInputPoint {
   paneId: string;
@@ -23,6 +26,16 @@ export interface UserDrawingInputOptions {
   now?: () => number;
   style?: UserDrawingStyle;
   text?: string;
+}
+
+export interface UserDrawingSelectionInputOptions {
+  hitTest?: UserDrawingHitTestOptions;
+}
+
+export interface UserDrawingSelectionAtPointResult {
+  state: UserDrawingState;
+  hit: boolean;
+  changed: boolean;
 }
 
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
@@ -60,6 +73,30 @@ export function selectUserDrawing(
     activeTool: 'select',
     selection,
     draft: null,
+  };
+}
+
+export function selectUserDrawingAtPoint(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: UserDrawingSelectionInputOptions = {},
+): UserDrawingState {
+  return resolveUserDrawingSelectionAtPoint(state, point, spacesByPaneId, options).state;
+}
+
+export function resolveUserDrawingSelectionAtPoint(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: UserDrawingSelectionInputOptions = {},
+): UserDrawingSelectionAtPointResult {
+  const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
+  const nextState = selectUserDrawing(state, hit ? { drawingId: hit.drawing.id, handle: hit.handle } : null);
+  return {
+    state: nextState,
+    hit: hit !== null,
+    changed: nextState !== state,
   };
 }
 
