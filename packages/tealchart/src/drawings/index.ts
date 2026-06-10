@@ -37,8 +37,11 @@ export {
 } from './hitTesting';
 export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
 export {
+  beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
+  cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
   handleUserDrawingInput,
@@ -46,7 +49,9 @@ export {
   selectUserDrawingAtPoint,
   selectUserDrawingById,
   selectUserDrawing,
+  setUserDrawingText,
   setUserDrawingTool,
+  updateUserDrawingTextEdit,
 } from './input';
 export type {
   DeleteUserDrawingOptions,
@@ -54,6 +59,7 @@ export type {
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
+  UserDrawingTextEditOptions,
 } from './input';
 export {
   resolveUserDrawingHandlePoints,
@@ -104,6 +110,7 @@ export type {
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextEdit,
   UserDrawingTool,
   VerticalLineDrawing,
 } from './types';

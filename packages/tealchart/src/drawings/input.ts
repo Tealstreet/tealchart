@@ -5,6 +5,7 @@ import type {
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTool,
+  TextLabelDrawing,
 } from './types';
 
 import {
@@ -44,6 +45,10 @@ export interface DeleteUserDrawingOptions {
   includeLocked?: boolean;
 }
 
+export interface UserDrawingTextEditOptions {
+  now?: () => number;
+}
+
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
     version: USER_DRAWING_SCHEMA_VERSION,
@@ -51,6 +56,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     activeTool: 'select',
     selection: null,
     draft: null,
+    textEdit: null,
     ...overrides,
   };
 }
@@ -63,6 +69,7 @@ export function setUserDrawingTool(state: UserDrawingState, tool: UserDrawingToo
     activeTool: tool,
     selection: tool === 'select' ? state.selection : null,
     draft: null,
+    textEdit: null,
   };
 }
 
@@ -79,6 +86,7 @@ export function selectUserDrawing(
     activeTool: 'select',
     selection,
     draft: null,
+    textEdit: null,
   };
 }
 
@@ -111,6 +119,7 @@ export function deleteUserDrawing(
     drawings,
     selection,
     draft: null,
+    textEdit: state.textEdit?.drawingId === drawingId ? null : state.textEdit,
   };
 }
 
@@ -122,6 +131,7 @@ export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
     drawings: [],
     selection: null,
     draft: null,
+    textEdit: null,
   };
 }
 
@@ -188,6 +198,7 @@ export function handleUserDrawingInput(
       ...state,
       selection: null,
       draft,
+      textEdit: null,
     };
   }
 
@@ -201,6 +212,7 @@ export function handleUserDrawingInput(
       ...state,
       selection: null,
       draft: null,
+      textEdit: null,
     };
   }
 
@@ -209,5 +221,131 @@ export function handleUserDrawingInput(
     drawings: [...state.drawings, drawing],
     selection: { drawingId: drawing.id },
     draft: null,
+    textEdit: null,
+  };
+}
+
+function findEditableTextDrawing(
+  state: UserDrawingState,
+  drawingId: string | null | undefined,
+): { drawing: TextLabelDrawing; index: number } | null {
+  if (!drawingId) return null;
+  const index = state.drawings.findIndex((drawing) => drawing.id === drawingId);
+  const drawing = state.drawings[index];
+  if (!drawing || drawing.kind !== 'textLabel' || drawing.locked) return null;
+  return { drawing, index };
+}
+
+export function beginUserDrawingTextEdit(
+  state: UserDrawingState,
+  drawingId = state.selection?.drawingId,
+  options: UserDrawingTextEditOptions = {},
+): UserDrawingState {
+  const editable = findEditableTextDrawing(state, drawingId);
+  if (!editable) return state;
+
+  const { drawing } = editable;
+  const textEdit = {
+    drawingId: drawing.id,
+    value: drawing.text,
+    originalValue: drawing.text,
+    startedAt: options.now?.() ?? Date.now(),
+  };
+
+  if (
+    state.textEdit?.drawingId === textEdit.drawingId &&
+    state.textEdit.value === textEdit.value &&
+    state.textEdit.originalValue === textEdit.originalValue &&
+    !state.draft
+  ) {
+    return state;
+  }
+
+  return {
+    ...state,
+    activeTool: 'select',
+    selection: { drawingId: drawing.id },
+    draft: null,
+    textEdit,
+  };
+}
+
+export function updateUserDrawingTextEdit(state: UserDrawingState, value: string): UserDrawingState {
+  if (!state.textEdit || state.textEdit.value === value) return state;
+  return {
+    ...state,
+    textEdit: {
+      ...state.textEdit,
+      value,
+    },
+  };
+}
+
+export function cancelUserDrawingTextEdit(state: UserDrawingState): UserDrawingState {
+  if (!state.textEdit) return state;
+  return {
+    ...state,
+    textEdit: null,
+  };
+}
+
+export function commitUserDrawingTextEdit(
+  state: UserDrawingState,
+  options: UserDrawingTextEditOptions = {},
+): UserDrawingState {
+  if (!state.textEdit) return state;
+
+  const editable = findEditableTextDrawing(state, state.textEdit.drawingId);
+  if (!editable) {
+    return {
+      ...state,
+      textEdit: null,
+    };
+  }
+
+  if (editable.drawing.text === state.textEdit.value) {
+    return {
+      ...state,
+      selection: { drawingId: editable.drawing.id },
+      textEdit: null,
+    };
+  }
+
+  const drawings = state.drawings.slice();
+  drawings[editable.index] = {
+    ...editable.drawing,
+    text: state.textEdit.value,
+    updatedAt: options.now?.() ?? Date.now(),
+  };
+
+  return {
+    ...state,
+    drawings,
+    selection: { drawingId: editable.drawing.id },
+    textEdit: null,
+  };
+}
+
+export function setUserDrawingText(
+  state: UserDrawingState,
+  drawingId: string,
+  text: string,
+  options: UserDrawingTextEditOptions = {},
+): UserDrawingState {
+  const editable = findEditableTextDrawing(state, drawingId);
+  if (!editable || editable.drawing.text === text) return state;
+
+  const drawings = state.drawings.slice();
+  drawings[editable.index] = {
+    ...editable.drawing,
+    text,
+    updatedAt: options.now?.() ?? Date.now(),
+  };
+
+  return {
+    ...state,
+    drawings,
+    selection: { drawingId: editable.drawing.id },
+    textEdit: state.textEdit?.drawingId === drawingId ? null : state.textEdit,
   };
 }
