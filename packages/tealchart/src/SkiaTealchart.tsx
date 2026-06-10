@@ -69,7 +69,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
-import { createUserDrawingState, handleUserDrawingInput, selectUserDrawingAtPoint } from './drawings';
+import { createUserDrawingState, handleUserDrawingInput, resolveUserDrawingSelectionAtPoint } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -819,12 +819,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (effectiveUserDrawingState.activeTool === 'select') {
         if (!isPointInChartArea(x, y)) return false;
 
-        const nextState = selectUserDrawingAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId);
-        if (nextState !== effectiveUserDrawingState) {
-          commitUserDrawingState(nextState);
-          return true;
+        const selection = resolveUserDrawingSelectionAtPoint(
+          effectiveUserDrawingState,
+          { x, y },
+          userDrawingSpacesByPaneId,
+        );
+        if (selection.changed) {
+          commitUserDrawingState(selection.state);
         }
-        return false;
+        return selection.hit;
       }
 
       const point = resolveMobileUserDrawingInputPoint({

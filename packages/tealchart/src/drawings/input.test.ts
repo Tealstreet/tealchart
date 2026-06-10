@@ -5,6 +5,7 @@ import {
   cancelUserDrawingDraft,
   createUserDrawingState,
   handleUserDrawingInput,
+  resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
   selectUserDrawing,
   setUserDrawingTool,
@@ -175,6 +176,31 @@ describe('user drawing input controller', () => {
 
     expect(selectUserDrawingAtPoint(state, { x: 40, y: 50 }, new Map([['main', space]])).selection).toEqual({
       drawingId: 'top',
+    });
+  });
+
+  it('reports hit metadata even when selection is unchanged', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+    });
+
+    expect(resolveUserDrawingSelectionAtPoint(state, { x: 40, y: 50 }, new Map([['main', space]]))).toEqual({
+      state,
+      hit: true,
+      changed: false,
     });
   });
 
