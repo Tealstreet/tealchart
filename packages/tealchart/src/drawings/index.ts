@@ -33,10 +33,11 @@ export {
   cancelUserDrawingDraft,
   createUserDrawingState,
   handleUserDrawingInput,
+  selectUserDrawingAtPoint,
   selectUserDrawing,
   setUserDrawingTool,
 } from './input';
-export type { UserDrawingInputOptions, UserDrawingInputPoint } from './input';
+export type { UserDrawingInputOptions, UserDrawingInputPoint, UserDrawingSelectionInputOptions } from './input';
 export {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,

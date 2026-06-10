@@ -12,6 +12,9 @@ import {
   isDrawingDraftReady,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
+import { hitTestUserDrawings } from './hitTesting';
+import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
+import type { UserDrawingHitTestOptions } from './hitTesting';
 
 export interface UserDrawingInputPoint {
   paneId: string;
@@ -23,6 +26,10 @@ export interface UserDrawingInputOptions {
   now?: () => number;
   style?: UserDrawingStyle;
   text?: string;
+}
+
+export interface UserDrawingSelectionInputOptions {
+  hitTest?: UserDrawingHitTestOptions;
 }
 
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
@@ -61,6 +68,16 @@ export function selectUserDrawing(
     selection,
     draft: null,
   };
+}
+
+export function selectUserDrawingAtPoint(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: UserDrawingSelectionInputOptions = {},
+): UserDrawingState {
+  const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
+  return selectUserDrawing(state, hit ? { drawingId: hit.drawing.id, handle: hit.handle } : null);
 }
 
 export function cancelUserDrawingDraft(state: UserDrawingState): UserDrawingState {
