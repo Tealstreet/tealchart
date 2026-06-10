@@ -24,13 +24,10 @@ function tradesToTvCsv(trades: StrategyTrade[]): string {
       t.exitTime !== undefined ? new Date(t.exitTime).toISOString().replace('T', ' ').replace('.000Z', '') : '';
 
     rows.push(`${tradeNum},${entryType},${t.entryOrderId},${entryDate},${t.entryPrice},${t.qty},,`);
-
-    if (t.exitPrice !== undefined && t.exitOrderId !== undefined) {
-      cumProfit += t.profit;
-      rows.push(
-        `${tradeNum},${exitType},${t.exitOrderId},${exitDate},${t.exitPrice},${t.qty},${t.profit.toFixed(2)},${cumProfit.toFixed(2)}`,
-      );
-    }
+    cumProfit += t.profit;
+    rows.push(
+      `${tradeNum},${exitType},${t.exitOrderId},${exitDate},${t.exitPrice},${t.qty},${t.profit.toFixed(2)},${cumProfit.toFixed(2)}`,
+    );
   }
 
   return rows.join('\n') + '\n';

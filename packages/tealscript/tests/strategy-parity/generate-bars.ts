@@ -28,8 +28,8 @@ export function generateDeterministicBars(count: number, seed: number = 42): Bar
     bars.push({
       time: baseTime + i * interval,
       open,
-      high: Math.max(high, open, close),
-      low: Math.min(low, open, close),
+      high,
+      low,
       close,
       volume,
     });

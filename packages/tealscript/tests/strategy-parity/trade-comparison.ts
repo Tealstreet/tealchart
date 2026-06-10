@@ -116,8 +116,13 @@ export function referenceToNormalizedTrades(refs: ReferenceTrade[]): NormalizedT
       group = {};
       grouped.set(ref.tradeNum, group);
     }
-    if (ref.type.startsWith('Entry') && !group.entry) group.entry = ref;
-    else if (ref.type.startsWith('Exit') && !group.exit) group.exit = ref;
+    if (ref.type.startsWith('Entry')) {
+      if (group.entry) console.warn(`Trade #${ref.tradeNum}: duplicate entry row (scale-in?), keeping first`);
+      else group.entry = ref;
+    } else if (ref.type.startsWith('Exit')) {
+      if (group.exit) console.warn(`Trade #${ref.tradeNum}: duplicate exit row (scale-out?), keeping first`);
+      else group.exit = ref;
+    }
   }
 
   const sortedKeys = [...grouped.keys()].sort((a, b) => a - b);
@@ -165,10 +170,10 @@ export function alignTrades(engine: NormalizedTrade[], reference: NormalizedTrad
 
       if (et.direction !== rt.direction) continue;
 
-      const entryDelta = Math.abs(et.entryPrice - rt.entryPrice);
-      const exitDelta = Math.abs(et.exitPrice - rt.exitPrice);
+      const entryRel = relDelta(et.entryPrice, rt.entryPrice);
+      const exitRel = relDelta(et.exitPrice, rt.exitPrice);
       const qtyDelta = Math.abs(et.qty - rt.qty);
-      const score = entryDelta + exitDelta + qtyDelta * 1000;
+      const score = entryRel + exitRel + qtyDelta * 10;
 
       if (score < bestScore) {
         bestScore = score;
@@ -176,7 +181,7 @@ export function alignTrades(engine: NormalizedTrade[], reference: NormalizedTrad
       }
     }
 
-    if (bestRi >= 0 && bestScore < 500) {
+    if (bestRi >= 0 && bestScore < 0.05) {
       const rt = reference[bestRi]!;
       usedRef.add(bestRi);
       matches.push({
@@ -269,7 +274,7 @@ export function computeParity(
 
   const summary = [
     `${strategyId}: ${grade.toUpperCase()}`,
-    `trades: engine=${engineTrades.length} ref=${referenceTrades.length} matched=${matches.length}`,
+    `trades: engine=${effectiveEngine.length} ref=${effectiveRef.length} matched=${matches.length}`,
     `p90 deltas: entry=${(entryPriceP90 * 100).toFixed(3)}% exit=${(exitPriceP90 * 100).toFixed(3)}% pnl=${(profitP90 * 100).toFixed(3)}%`,
     unmatchedEngine.length > 0 ? `unmatched engine: [${unmatchedEngine.join(',')}]` : null,
     unmatchedReference.length > 0 ? `unmatched ref: [${unmatchedReference.join(',')}]` : null,
