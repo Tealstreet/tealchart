@@ -39,6 +39,7 @@ describe('user drawing types', () => {
       activeTool: 'select',
       selection: null,
       draft: null,
+      textEdit: null,
     });
   });
 
