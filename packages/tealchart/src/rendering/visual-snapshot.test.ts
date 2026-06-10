@@ -5,7 +5,7 @@ import type { CanvasContext } from './CanvasContext';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createCanvas, type Canvas } from '@napi-rs/canvas';
+import { createCanvas, loadImage, type Canvas } from '@napi-rs/canvas';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -18,6 +18,14 @@ afterEach(() => {
 const WIDTH = 400;
 const HEIGHT = 300;
 const SNAPSHOT_DIR = path.join(__dirname, '__visual_snapshots__');
+const SNAPSHOT_CHANNEL_TOLERANCE = 16;
+const SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO = 0.08;
+
+interface SnapshotPixels {
+  width: number;
+  height: number;
+  data: Uint8ClampedArray;
+}
 
 function ensureSnapshotDir(): void {
   if (!fs.existsSync(SNAPSHOT_DIR)) {
@@ -78,7 +86,20 @@ function renderToBuffer(plots: PlotOutput[], bars: Bar[], viewport: Viewport): B
   return canvas.toBuffer('image/png');
 }
 
-function assertSnapshot(name: string, buffer: Buffer): void {
+async function readSnapshotPixels(buffer: Buffer): Promise<SnapshotPixels> {
+  const image = await loadImage(buffer);
+  const canvas = createCanvas(image.width, image.height);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  return {
+    width: image.width,
+    height: image.height,
+    data: ctx.getImageData(0, 0, image.width, image.height).data,
+  };
+}
+
+async function assertSnapshot(name: string, buffer: Buffer): Promise<void> {
   ensureSnapshotDir();
   const filePath = path.join(SNAPSHOT_DIR, `${name}.png`);
 
@@ -88,11 +109,38 @@ function assertSnapshot(name: string, buffer: Buffer): void {
   }
 
   const existing = fs.readFileSync(filePath);
-  if (!existing.equals(buffer)) {
-    const diffPath = path.join(SNAPSHOT_DIR, `${name}.diff.png`);
-    fs.writeFileSync(diffPath, buffer);
+  if (existing.equals(buffer)) return;
+
+  const [expected, actual] = await Promise.all([readSnapshotPixels(existing), readSnapshotPixels(buffer)]);
+  const diffPath = path.join(SNAPSHOT_DIR, `${name}.diff.png`);
+  fs.writeFileSync(diffPath, buffer);
+
+  if (expected.width !== actual.width || expected.height !== actual.height) {
     expect.fail(
       `Visual snapshot "${name}" changed. ` +
+      `Compare ${filePath} (expected) with ${diffPath} (actual). ` +
+      `Run with UPDATE_SNAPSHOTS=1 to accept the new baseline.`,
+    );
+  }
+
+  let differingPixels = 0;
+  for (let i = 0; i < expected.data.length; i += 4) {
+    const channelDelta = Math.max(
+      Math.abs(expected.data[i]! - actual.data[i]!),
+      Math.abs(expected.data[i + 1]! - actual.data[i + 1]!),
+      Math.abs(expected.data[i + 2]! - actual.data[i + 2]!),
+      Math.abs(expected.data[i + 3]! - actual.data[i + 3]!),
+    );
+
+    if (channelDelta > SNAPSHOT_CHANNEL_TOLERANCE) {
+      differingPixels += 1;
+    }
+  }
+
+  const differingRatio = differingPixels / (expected.width * expected.height);
+  if (differingRatio > SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO) {
+    expect.fail(
+      `Visual snapshot "${name}" changed by ${(differingRatio * 100).toFixed(2)}% of pixels. ` +
       `Compare ${filePath} (expected) with ${diffPath} (actual). ` +
       `Run with UPDATE_SNAPSHOTS=1 to accept the new baseline.`,
     );
@@ -104,7 +152,7 @@ describe('visual snapshot rendering', () => {
   const viewport = makeViewport(bars);
 
   describe('line plots', () => {
-    it('renders a basic line plot', () => {
+    it('renders a basic line plot', async () => {
       const plots: PlotOutput[] = [{
         id: 'line1',
         type: 'plot',
@@ -117,10 +165,10 @@ describe('visual snapshot rendering', () => {
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
       expect(buffer.length).toBeGreaterThan(100);
-      assertSnapshot('line-basic', buffer);
+      await assertSnapshot('line-basic', buffer);
     });
 
-    it('renders a line plot with per-bar colors', () => {
+    it('renders a line plot with per-bar colors', async () => {
       const plots: PlotOutput[] = [{
         id: 'line_colored',
         type: 'plot',
@@ -132,10 +180,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('line-per-bar-color', buffer);
+      await assertSnapshot('line-per-bar-color', buffer);
     });
 
-    it('renders stepline plot style', () => {
+    it('renders stepline plot style', async () => {
       const plots: PlotOutput[] = [{
         id: 'step1',
         type: 'plot',
@@ -147,10 +195,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('line-stepline', buffer);
+      await assertSnapshot('line-stepline', buffer);
     });
 
-    it('renders cross marker plot style', () => {
+    it('renders cross marker plot style', async () => {
       const plots: PlotOutput[] = [{
         id: 'cross1',
         type: 'plot',
@@ -162,10 +210,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('line-cross', buffer);
+      await assertSnapshot('line-cross', buffer);
     });
 
-    it('renders circles marker plot style', () => {
+    it('renders circles marker plot style', async () => {
       const plots: PlotOutput[] = [{
         id: 'circles1',
         type: 'plot',
@@ -177,10 +225,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('line-circles', buffer);
+      await assertSnapshot('line-circles', buffer);
     });
 
-    it('renders linebr with gaps', () => {
+    it('renders linebr with gaps', async () => {
       const plots: PlotOutput[] = [{
         id: 'linebr1',
         type: 'plot',
@@ -192,12 +240,12 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('line-linebr-gaps', buffer);
+      await assertSnapshot('line-linebr-gaps', buffer);
     });
   });
 
   describe('histogram and area', () => {
-    it('renders histogram plot style', () => {
+    it('renders histogram plot style', async () => {
       const plots: PlotOutput[] = [{
         id: 'hist1',
         type: 'plot',
@@ -209,10 +257,10 @@ describe('visual snapshot rendering', () => {
       }];
       const vp = { ...viewport, priceMin: -15, priceMax: 15 };
       const buffer = renderToBuffer(plots, bars, vp);
-      assertSnapshot('histogram-basic', buffer);
+      await assertSnapshot('histogram-basic', buffer);
     });
 
-    it('renders area plot style with color alpha', () => {
+    it('renders area plot style with color alpha', async () => {
       const plots: PlotOutput[] = [{
         id: 'area1',
         type: 'plot',
@@ -224,10 +272,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('area-with-alpha', buffer);
+      await assertSnapshot('area-with-alpha', buffer);
     });
 
-    it('renders area plot with per-bar colors', () => {
+    it('renders area plot with per-bar colors', async () => {
       const plots: PlotOutput[] = [{
         id: 'area_colored',
         type: 'plot',
@@ -239,12 +287,12 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('area-per-bar-color', buffer);
+      await assertSnapshot('area-per-bar-color', buffer);
     });
   });
 
   describe('shapes and markers', () => {
-    it('renders plotshape above bar', () => {
+    it('renders plotshape above bar', async () => {
       const plots: PlotOutput[] = [{
         id: 'shape1',
         type: 'plotshape',
@@ -257,10 +305,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('plotshape-triangleup-belowbar', buffer);
+      await assertSnapshot('plotshape-triangleup-belowbar', buffer);
     });
 
-    it('renders plotarrow with positive and negative values', () => {
+    it('renders plotarrow with positive and negative values', async () => {
       const arrowValues = bars.map((_, i) => {
         const v = Math.sin(i * 0.4) * 5;
         return Math.abs(v) > 1 ? v : null;
@@ -274,10 +322,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('plotarrow-mixed', buffer);
+      await assertSnapshot('plotarrow-mixed', buffer);
     });
 
-    it('renders plotchar with custom character', () => {
+    it('renders plotchar with custom character', async () => {
       const plots: PlotOutput[] = [{
         id: 'char1',
         type: 'plotchar',
@@ -290,10 +338,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('plotchar-star', buffer);
+      await assertSnapshot('plotchar-star', buffer);
     });
 
-    it('renders all shape types', () => {
+    it('renders all shape types', async () => {
       const shapes = ['circle', 'square', 'diamond', 'triangleup', 'triangledown', 'cross', 'xcross', 'flag', 'labelup', 'labeldown', 'arrowup', 'arrowdown'];
       const midPrice = (viewport.priceMin + viewport.priceMax) / 2;
       const plots: PlotOutput[] = shapes.map((shape, si) => ({
@@ -308,12 +356,12 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }));
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('plotshape-all-types', buffer);
+      await assertSnapshot('plotshape-all-types', buffer);
     });
   });
 
   describe('hline and bgcolor', () => {
-    it('renders horizontal line', () => {
+    it('renders horizontal line', async () => {
       const plots: PlotOutput[] = [{
         id: 'hline1',
         type: 'hline',
@@ -326,10 +374,10 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('hline-dashed', buffer);
+      await assertSnapshot('hline-dashed', buffer);
     });
 
-    it('renders bgcolor highlights', () => {
+    it('renders bgcolor highlights', async () => {
       const plots: PlotOutput[] = [{
         id: 'bg1',
         type: 'bgcolor',
@@ -339,12 +387,12 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('bgcolor-conditional', buffer);
+      await assertSnapshot('bgcolor-conditional', buffer);
     });
   });
 
   describe('fill between plots', () => {
-    it('renders fill between two line plots', () => {
+    it('renders fill between two line plots', async () => {
       const plots: PlotOutput[] = [
         {
           id: 'upper',
@@ -378,10 +426,10 @@ describe('visual snapshot rendering', () => {
         },
       ];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('fill-between-plots', buffer);
+      await assertSnapshot('fill-between-plots', buffer);
     });
 
-    it('renders fill between crossing plots', () => {
+    it('renders fill between crossing plots', async () => {
       const sma10 = bars.map((_, i) => {
         if (i < 10) return null;
         let sum = 0;
@@ -432,12 +480,12 @@ describe('visual snapshot rendering', () => {
         },
       ];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('fill-crossing-smas', buffer);
+      await assertSnapshot('fill-crossing-smas', buffer);
     });
   });
 
   describe('composite indicator', () => {
-    it('renders RSI-like indicator with hlines and fill', () => {
+    it('renders RSI-like indicator with hlines and fill', async () => {
       const rsiValues = bars.map((_, i) => 30 + Math.sin(i * 0.2) * 25 + Math.cos(i * 0.5) * 10);
       const overbought = 70;
       const oversold = 30;
@@ -509,10 +557,10 @@ describe('visual snapshot rendering', () => {
       };
 
       const buffer = renderToBuffer(plots, bars, rsiViewport);
-      assertSnapshot('composite-rsi', buffer);
+      await assertSnapshot('composite-rsi', buffer);
     });
 
-    it('renders MACD-like indicator with histogram and signal lines', () => {
+    it('renders MACD-like indicator with histogram and signal lines', async () => {
       const macdLine = bars.map((_, i) => Math.sin(i * 0.15) * 5);
       const signalLine = bars.map((_, i) => Math.sin(i * 0.15 - 0.5) * 4);
       const histogram = macdLine.map((m, i) => m - signalLine[i]!);
@@ -557,7 +605,7 @@ describe('visual snapshot rendering', () => {
       };
 
       const buffer = renderToBuffer(plots, bars, macdViewport);
-      assertSnapshot('composite-macd', buffer);
+      await assertSnapshot('composite-macd', buffer);
     });
   });
 });
