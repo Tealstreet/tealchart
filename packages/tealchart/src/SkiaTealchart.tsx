@@ -823,7 +823,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         if (nextState !== effectiveUserDrawingState) {
           commitUserDrawingState(nextState);
         }
-        return false;
+        return true;
       }
 
       const point = resolveMobileUserDrawingInputPoint({
