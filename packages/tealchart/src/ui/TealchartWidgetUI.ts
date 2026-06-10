@@ -27,6 +27,7 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { TIME_AXIS_HEIGHT } from '../types';
+import { getUserDrawingToolbarStateKey } from '../drawings';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
@@ -171,6 +172,7 @@ export class TealchartWidgetUI {
   private currentPlots: PlotOutput[] = [];
   private currentPaneLayout: PaneLayout | null = null;
   private currentIndicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
+  private currentUserDrawingToolbarStateKey: string | null = null;
 
   // Indicator pane legends (one per non-overlay indicator pane)
   private indicatorPaneLegends: Map<string, IndicatorPaneLegend> = new Map();
@@ -205,6 +207,9 @@ export class TealchartWidgetUI {
 
     // Create top bar - positioned absolutely over the chart
     if (options.showTopBar !== false) {
+      this.currentUserDrawingToolbarStateKey = options.userDrawingState
+        ? getUserDrawingToolbarStateKey(options.userDrawingState)
+        : null;
       const topBarWrapper = div({
         style: {
           position: 'absolute',
@@ -420,7 +425,11 @@ export class TealchartWidgetUI {
    * Update user drawing state - calls ChartCore directly
    */
   setUserDrawingState(state: UserDrawingState): void {
-    this.topBar?.setUserDrawingState(state);
+    const toolbarStateKey = getUserDrawingToolbarStateKey(state);
+    if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
+      this.currentUserDrawingToolbarStateKey = toolbarStateKey;
+      this.topBar?.setUserDrawingState(state);
+    }
     this.chartCore?.setUserDrawingState(state);
   }
 

@@ -11,7 +11,11 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { UserDrawingState, UserDrawingTool } from '../../drawings';
 
-import { USER_DRAWING_TOOL_DESCRIPTORS, USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS } from '../../drawings';
+import {
+  isUserDrawingToolbarActionEnabled,
+  USER_DRAWING_TOOL_DESCRIPTORS,
+  USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+} from '../../drawings';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 
 export interface ChartTopBarComponentProps {
@@ -178,12 +182,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
               <View style={styles.innerDivider} />
 
               {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
-                const enabled =
-                  descriptor.action === 'deleteSelected'
-                    ? userDrawingState.selection !== null
-                    : descriptor.action === 'cancelDraft'
-                      ? userDrawingState.draft !== null
-                      : userDrawingState.drawings.length > 0;
+                const enabled = isUserDrawingToolbarActionEnabled(userDrawingState, descriptor.action);
                 return (
                   <Pressable
                     key={descriptor.action}
