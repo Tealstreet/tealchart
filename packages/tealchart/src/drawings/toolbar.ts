@@ -1,4 +1,5 @@
 import type { UserDrawingTool } from './types';
+import type { UserDrawingState } from './types';
 
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
 
@@ -32,4 +33,23 @@ export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolba
 
 export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawingToolDescriptor {
   return USER_DRAWING_TOOL_DESCRIPTORS.find((descriptor) => descriptor.tool === tool) ?? USER_DRAWING_TOOL_DESCRIPTORS[0]!;
+}
+
+export function isUserDrawingToolbarActionEnabled(
+  state: UserDrawingState,
+  action: UserDrawingToolbarAction,
+): boolean {
+  if (action === 'deleteSelected') return state.selection !== null;
+  if (action === 'cancelDraft') return state.draft !== null;
+  return state.drawings.length > 0;
+}
+
+export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
+  return [
+    state.activeTool,
+    state.selection?.drawingId ?? '',
+    state.selection?.handle ?? '',
+    state.draft ? 'draft' : '',
+    state.drawings.length,
+  ].join('|');
 }

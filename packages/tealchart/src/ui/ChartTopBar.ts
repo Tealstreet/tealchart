@@ -5,7 +5,11 @@ import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
-import { USER_DRAWING_TOOL_DESCRIPTORS, USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS } from '../drawings';
+import {
+  isUserDrawingToolbarActionEnabled,
+  USER_DRAWING_TOOL_DESCRIPTORS,
+  USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+} from '../drawings';
 import { Component } from './Component';
 import { LayoutSelector } from './LayoutSelector';
 
@@ -370,9 +374,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const group = this.createElement('div', { style: styles.drawingGroup });
     const state = this.options.userDrawingState;
     const activeTool = state?.activeTool ?? 'select';
-    const hasSelection = state?.selection !== null;
-    const hasDraft = state?.draft !== null;
-    const hasDrawings = (state?.drawings.length ?? 0) > 0;
 
     for (const descriptor of USER_DRAWING_TOOL_DESCRIPTORS) {
       const isActive = activeTool === descriptor.tool;
@@ -405,8 +406,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     group.appendChild(this.createElement('div', { style: styles.divider }));
 
     for (const descriptor of USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS) {
-      const enabled =
-        descriptor.action === 'deleteSelected' ? hasSelection : descriptor.action === 'cancelDraft' ? hasDraft : hasDrawings;
+      const enabled = state ? isUserDrawingToolbarActionEnabled(state, descriptor.action) : false;
       const btn = this.createElement('button', {
         style: {
           ...styles.drawingButton,
