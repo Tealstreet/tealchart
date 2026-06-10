@@ -1481,7 +1481,12 @@ export class ChartCore {
     if (!this.viewport) return false;
 
     if (this.userDrawingState?.activeTool === 'select') {
-      return this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
+      const chartLeft = this.margins.left;
+      const chartRight = this.options.width - this.margins.right;
+      if (x < chartLeft || x > chartRight || !this.getPaneAtY(y)) return false;
+
+      this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
+      return false;
     }
 
     if (!this.options.onUserDrawingInput) return false;
