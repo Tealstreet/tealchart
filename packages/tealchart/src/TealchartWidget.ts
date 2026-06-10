@@ -9,13 +9,13 @@ import type {
   PlotOutput,
   TealscriptRuntimeOptions,
 } from '@tealstreet/tealscript';
-import type { UserDrawingState } from './drawings';
+import type { UserDrawingInputPoint, UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
 import { LOADING_OPACITY } from './constants';
-import { createUserDrawingState } from './drawings';
+import { createUserDrawingState, handleUserDrawingInput } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
@@ -106,6 +106,7 @@ export class TealchartWidget {
   private _plots: PlotOutput[] = [];
   private _drawings: DrawingOutput[] = [];
   private _userDrawingState: UserDrawingState;
+  private _userDrawingIdCounter = 0;
 
   // Jailbreak (canvas-drawing) indicator support
   private _jailbreakManager: JailbreakIndicatorManager | null = null;
@@ -976,6 +977,7 @@ export class TealchartWidget {
           this._chartApi.emitCrossHairMoved({ price, time });
         }
       },
+      onUserDrawingInput: (point) => this._handleUserDrawingInput(point),
       onPaneDoubleClick: (paneId) => {
         this._paneManager.toggleMaximizePane(paneId);
         this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
@@ -2109,6 +2111,17 @@ export class TealchartWidget {
     this._userDrawingState = state;
     this._options.onUserDrawingStateChange?.(state);
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
+  }
+
+  private _handleUserDrawingInput(point: UserDrawingInputPoint): boolean {
+    if (this._userDrawingState.activeTool === 'select') return false;
+
+    const previousState = this._userDrawingState;
+    const nextState = handleUserDrawingInput(this._userDrawingState, point, {
+      createId: () => `drawing_${++this._userDrawingIdCounter}`,
+    });
+    this.setUserDrawingState(nextState);
+    return nextState !== previousState;
   }
 
   /**

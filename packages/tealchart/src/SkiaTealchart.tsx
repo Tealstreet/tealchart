@@ -67,7 +67,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
-import { createUserDrawingState } from './drawings';
+import { createUserDrawingState, handleUserDrawingInput } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -79,6 +79,7 @@ import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
+import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -222,6 +223,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     createUserDrawingState(),
   );
   const effectiveUserDrawingState = controlledUserDrawingState ?? uncontrolledUserDrawingState;
+  const userDrawingIdCounterRef = useRef(0);
+
+  const commitUserDrawingState = useCallback(
+    (nextState: UserDrawingState) => {
+      if (!controlledUserDrawingState) {
+        setUncontrolledUserDrawingState(nextState);
+      }
+      onUserDrawingStateChange?.(nextState);
+    },
+    [controlledUserDrawingState, onUserDrawingStateChange],
+  );
 
   useEffect(() => {
     setImperativeTheme(null);
@@ -259,13 +271,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return effectiveUserDrawingState;
       },
       setUserDrawingState(nextState: UserDrawingState): void {
-        if (!controlledUserDrawingState) {
-          setUncontrolledUserDrawingState(nextState);
-        }
-        onUserDrawingStateChange?.(nextState);
+        commitUserDrawingState(nextState);
       },
     }),
-    [controlledUserDrawingState, effectiveUserDrawingState, onUserDrawingStateChange],
+    [commitUserDrawingState, effectiveUserDrawingState],
   );
 
   // Use core hook for bar fetching and state management
@@ -388,6 +397,30 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }),
     };
   }, [baseUnifiedPaneLayout, viewport, plots, bars]);
+
+  const userDrawingInputPanes = useMemo(() => {
+    if (!viewport || !unifiedPaneLayout) return [];
+
+    const availableHeight = dimensions.height - unifiedPaneLayout.timeAxisHeight - margins.top;
+    let currentTop = margins.top;
+
+    return unifiedPaneLayout.panes.map((pane) => {
+      const height = availableHeight * pane.heightRatio;
+      const yRange =
+        pane.type === 'main' && !pane.fixedRange
+          ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
+          : { yMin: pane.yMin, yMax: pane.yMax };
+      const resolvedPane = {
+        id: pane.id,
+        top: currentTop,
+        height,
+        bottom: currentTop + height,
+        ...yRange,
+      };
+      currentTop += height;
+      return resolvedPane;
+    });
+  }, [dimensions.height, margins.top, unifiedPaneLayout, viewport]);
 
   useEffect(() => {
     if (bars.length === 0) {
@@ -740,9 +773,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartDimensions],
   );
 
+  const handleUserDrawingTap = useCallback(
+    (x: number, y: number) => {
+      if (!viewport || effectiveUserDrawingState.activeTool === 'select') return false;
+
+      const point = resolveMobileUserDrawingInputPoint({
+        point: { x, y },
+        viewport,
+        dimensions: chartDimensions,
+        panes: userDrawingInputPanes,
+      });
+      if (!point) return false;
+
+      const nextState = handleUserDrawingInput(effectiveUserDrawingState, point, {
+        createId: () => `drawing_${++userDrawingIdCounterRef.current}`,
+      });
+      if (nextState === effectiveUserDrawingState) return false;
+
+      commitUserDrawingState(nextState);
+      return true;
+    },
+    [chartDimensions, commitUserDrawingState, effectiveUserDrawingState, userDrawingInputPanes, viewport],
+  );
+
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
       revealResetButtonIfInBottomRegion(x, y);
+
+      if (handleUserDrawingTap(x, y)) return;
 
       if (crosshairVisible) {
         setCrosshairVisible(false);
@@ -754,7 +812,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setCrosshairVisible(true);
       handleCrosshairMove(x, y);
     },
-    [crosshairVisible, handleCrosshairMove, isPointInChartArea, revealResetButtonIfInBottomRegion],
+    [crosshairVisible, handleCrosshairMove, handleUserDrawingTap, isPointInChartArea, revealResetButtonIfInBottomRegion],
   );
 
   // Pan gesture for moving crosshair (active only while crosshair is visible)

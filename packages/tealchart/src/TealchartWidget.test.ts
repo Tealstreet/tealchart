@@ -310,6 +310,37 @@ describe('TealchartWidget', () => {
       testWidget._render(DIRTY.USER_DRAWINGS);
       expect(setUserDrawingStateCalls.at(-1)).toBe(nextState);
     });
+
+    it('applies active drawing tool input through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({ ...initial, activeTool: 'trendLine' });
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
+      expect(widget.getUserDrawingState().draft).toMatchObject({
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [{ time: 1, price: 10 }],
+      });
+
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'drawing_1',
+        kind: 'trendLine',
+        paneId: 'main',
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 20 },
+        ],
+      });
+      expect(onChange).toHaveBeenCalled();
+    });
   });
 
   // ============================================================================

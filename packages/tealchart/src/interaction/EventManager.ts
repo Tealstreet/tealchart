@@ -75,6 +75,8 @@ export interface EventManagerCallbacks {
   getTimeFromX?: (x: number) => number;
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string) => void;
+  /** Called on chart-surface click/tap when user drawing input wants first refusal */
+  onDrawingInput?: (x: number, y: number) => boolean;
   /** Crosshair-only render (skips main canvas repaint) */
   onCrosshairRender?: () => void;
 }
@@ -552,7 +554,15 @@ export class EventManager {
     const dy = Math.abs(mouseY - this.state.dragStartY);
     const wasClick = dx < 5 && dy < 5;
 
-    if (wasClick && e.button === 0 && this.callbacks.onPaneDoubleClick && this.callbacks.getPaneAtY) {
+    const handledDrawingInput = wasClick && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY) === true : false;
+
+    if (
+      wasClick &&
+      !handledDrawingInput &&
+      e.button === 0 &&
+      this.callbacks.onPaneDoubleClick &&
+      this.callbacks.getPaneAtY
+    ) {
       const y = mouseY;
       const pane = this.callbacks.getPaneAtY(y);
       if (pane) {
@@ -877,6 +887,11 @@ export class EventManager {
   }
 
   private handleTap(x: number, y: number): void {
+    if (this.callbacks.onDrawingInput?.(x, y)) {
+      this.scheduleRender();
+      return;
+    }
+
     // Double-tap detection for touch
     if (this.callbacks.onPaneDoubleClick && this.callbacks.getPaneAtY) {
       const pane = this.callbacks.getPaneAtY(y);
