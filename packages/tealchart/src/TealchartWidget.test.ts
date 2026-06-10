@@ -436,6 +436,53 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
       expect(onChange).toHaveBeenLastCalledWith(widget.getUserDrawingState());
     });
+
+    it('edits selected drawings from chart-surface drag input in select mode', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({
+        ...initial,
+        activeTool: 'select',
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingEditStart(
+          point: { x: number; y: number },
+          spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+        ): boolean;
+        _handleUserDrawingEditMove(point: { x: number; y: number }): boolean;
+        _handleUserDrawingEditEnd(): void;
+      };
+
+      expect(testWidget._handleUserDrawingEditStart({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]))).toBe(
+        true,
+      );
+      expect(testWidget._handleUserDrawingEditMove({ x: 40, y: 60 })).toBe(true);
+      testWidget._handleUserDrawingEditEnd();
+
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ price: 40 });
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
+      expect(onChange).toHaveBeenLastCalledWith(widget.getUserDrawingState());
+    });
   });
 
   // ============================================================================

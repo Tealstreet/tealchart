@@ -18,7 +18,7 @@
 
 import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
-import type { DrawingCoordinateSpace, UserDrawingLineStyle } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawingEditDrag, UserDrawingLineStyle } from './drawings';
 import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
@@ -69,7 +69,13 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
-import { createUserDrawingState, handleUserDrawingInput, resolveUserDrawingSelectionAtPoint } from './drawings';
+import {
+  applyUserDrawingEditDrag,
+  beginUserDrawingEditDragAtPoint,
+  createUserDrawingState,
+  handleUserDrawingInput,
+  resolveUserDrawingSelectionAtPoint,
+} from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -238,6 +244,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingIdCounterRef = useRef(0);
+  const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
@@ -639,18 +646,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [clearResetButtonTimers],
   );
 
-  const { composedGesture } = useChartGestures({
-    dimensions: chartDimensions,
-    bars,
-    viewport,
-    onViewportChange: handleViewportChange,
-    enabled: !crosshairVisible,
-    onSwipeBlockChange,
-    onAutoScaleDisabled: handleAutoScaleDisabled,
-    isAutoScale: getIsAutoScale,
-    onInteraction: revealResetButtonIfInBottomRegion,
-  });
-
   // Context menu state
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
@@ -863,6 +858,59 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       viewport,
     ],
   );
+
+  const handleUserDrawingEditStart = useCallback(
+    (x: number, y: number) => {
+      if (!viewport || effectiveUserDrawingState.activeTool !== 'select') return false;
+      if (!isPointInChartArea(x, y)) return false;
+
+      const result = beginUserDrawingEditDragAtPoint(
+        effectiveUserDrawingState,
+        { x, y },
+        userDrawingSpacesByPaneId,
+      );
+      if (!result.hit || !result.drag) return false;
+
+      userDrawingEditDragRef.current = result.drag;
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+      }
+      return true;
+    },
+    [commitUserDrawingState, effectiveUserDrawingState, isPointInChartArea, userDrawingSpacesByPaneId, viewport],
+  );
+
+  const handleUserDrawingEditMove = useCallback(
+    (x: number, y: number) => {
+      const drag = userDrawingEditDragRef.current;
+      if (!drag) return;
+
+      const nextState = applyUserDrawingEditDrag(effectiveUserDrawingState, drag, { x, y });
+      if (nextState !== effectiveUserDrawingState) {
+        commitUserDrawingState(nextState);
+      }
+    },
+    [commitUserDrawingState, effectiveUserDrawingState],
+  );
+
+  const handleUserDrawingEditEnd = useCallback(() => {
+    userDrawingEditDragRef.current = null;
+  }, []);
+
+  const { composedGesture } = useChartGestures({
+    dimensions: chartDimensions,
+    bars,
+    viewport,
+    onViewportChange: handleViewportChange,
+    enabled: !crosshairVisible,
+    onSwipeBlockChange,
+    onAutoScaleDisabled: handleAutoScaleDisabled,
+    isAutoScale: getIsAutoScale,
+    onInteraction: revealResetButtonIfInBottomRegion,
+    onDrawingEditStart: handleUserDrawingEditStart,
+    onDrawingEditMove: handleUserDrawingEditMove,
+    onDrawingEditEnd: handleUserDrawingEditEnd,
+  });
 
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {

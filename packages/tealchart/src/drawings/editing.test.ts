@@ -1,0 +1,233 @@
+import type { DrawingCoordinateSpace } from './coordinates';
+import type { UserDrawing, UserDrawingStyle } from './types';
+
+import { describe, expect, it } from 'vitest';
+
+import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
+import { createUserDrawingState } from './input';
+
+const style: UserDrawingStyle = {
+  lineColor: '#fff',
+  lineWidth: 1,
+  lineStyle: 'solid',
+};
+
+const space: DrawingCoordinateSpace = {
+  viewport: {
+    startTime: 0,
+    endTime: 100,
+    priceMin: 0,
+    priceMax: 100,
+  },
+  pane: {
+    id: 'main',
+    top: 0,
+    height: 100,
+    bottom: 100,
+    yMin: 0,
+    yMax: 100,
+  },
+  chartLeft: 0,
+  chartRight: 100,
+};
+
+const base = {
+  paneId: 'main',
+  visible: true,
+  locked: false,
+  createdAt: 1,
+  updatedAt: 1,
+  style,
+};
+
+describe('user drawing editing', () => {
+  it('begins an edit drag from the topmost hit drawing', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'line',
+      kind: 'trendLine',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      extend: 'none',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+    });
+
+    const result = beginUserDrawingEditDragAtPoint(state, { x: 10, y: 10 }, new Map([['main', space]]));
+
+    expect(result.hit).toBe(true);
+    expect(result.changed).toBe(true);
+    expect(result.state.selection).toEqual({ drawingId: 'line', handle: 'start' });
+    expect(result.drag).toMatchObject({
+      selection: { drawingId: 'line', handle: 'start' },
+      startDrawing: drawing,
+      startPoint: { x: 10, y: 10 },
+    });
+  });
+
+  it('moves a selected two-anchor drawing by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'line',
+      kind: 'trendLine',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+      extend: 'none',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'line' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'line' },
+        startPoint: { x: 10, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 25 },
+      { now: () => 2 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 15, price: 75 },
+        { time: 25, price: 55 },
+      ],
+      updatedAt: 2,
+    });
+    expect(next.selection).toEqual({ drawingId: 'line' });
+  });
+
+  it('returns the existing state when drag movement is zero', () => {
+    const drawing: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'h' },
+    });
+
+    expect(
+      applyUserDrawingEditDrag(
+        state,
+        { selection: { drawingId: 'h' }, startPoint: { x: 50, y: 50 }, startDrawing: drawing, space },
+        { x: 50, y: 50 },
+      ),
+    ).toBe(state);
+  });
+
+  it('drags line endpoints without moving the opposite endpoint', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'ray',
+      kind: 'ray',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'ray', handle: 'end' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'ray', handle: 'end' },
+        startPoint: { x: 20, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 70, y: 30 },
+      { now: () => 3 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 80 },
+        { time: 70, price: 70 },
+      ],
+      updatedAt: 3,
+    });
+  });
+
+  it('drags rectangle corner handles around the opposite corner', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rect',
+      kind: 'rectangle',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'rect', handle: 'topLeft' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'rect', handle: 'topLeft' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 25, y: 20 },
+      { now: () => 4 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 25, price: 80 },
+        { time: 90, price: 10 },
+      ],
+      updatedAt: 4,
+    });
+  });
+
+  it('moves horizontal, vertical, and text drawings on their editable axis', () => {
+    const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
+    const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };
+    const label: UserDrawing = {
+      ...base,
+      id: 't',
+      kind: 'textLabel',
+      point: { time: 50, price: 50 },
+      text: 'Note',
+      textAlign: 'center',
+    };
+    const state = createUserDrawingState({
+      drawings: [horizontal, vertical, label],
+      selection: { drawingId: 'h' },
+    });
+
+    const movedHorizontal = applyUserDrawingEditDrag(
+      state,
+      { selection: { drawingId: 'h' }, startPoint: { x: 50, y: 50 }, startDrawing: horizontal, space },
+      { x: 60, y: 60 },
+    ).drawings[0];
+    const movedVertical = applyUserDrawingEditDrag(
+      state,
+      { selection: { drawingId: 'v' }, startPoint: { x: 50, y: 50 }, startDrawing: vertical, space },
+      { x: 60, y: 60 },
+    ).drawings[1];
+    const movedLabel = applyUserDrawingEditDrag(
+      state,
+      { selection: { drawingId: 't' }, startPoint: { x: 50, y: 50 }, startDrawing: label, space },
+      { x: 60, y: 60 },
+    ).drawings[2];
+
+    expect(movedHorizontal).toMatchObject({ price: 40 });
+    expect(movedVertical).toMatchObject({ time: 60 });
+    expect(movedLabel).toMatchObject({ point: { time: 60, price: 40 } });
+  });
+});
