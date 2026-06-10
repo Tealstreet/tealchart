@@ -646,18 +646,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [clearResetButtonTimers],
   );
 
-  const { composedGesture } = useChartGestures({
-    dimensions: chartDimensions,
-    bars,
-    viewport,
-    onViewportChange: handleViewportChange,
-    enabled: !crosshairVisible,
-    onSwipeBlockChange,
-    onAutoScaleDisabled: handleAutoScaleDisabled,
-    isAutoScale: getIsAutoScale,
-    onInteraction: revealResetButtonIfInBottomRegion,
-  });
-
   // Context menu state
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
@@ -873,20 +861,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleUserDrawingEditStart = useCallback(
     (x: number, y: number) => {
-      if (!viewport || effectiveUserDrawingState.activeTool !== 'select') return;
-      if (!isPointInChartArea(x, y)) return;
+      if (!viewport || effectiveUserDrawingState.activeTool !== 'select') return false;
+      if (!isPointInChartArea(x, y)) return false;
 
       const result = beginUserDrawingEditDragAtPoint(
         effectiveUserDrawingState,
         { x, y },
         userDrawingSpacesByPaneId,
       );
-      if (!result.hit || !result.drag) return;
+      if (!result.hit || !result.drag) return false;
 
       userDrawingEditDragRef.current = result.drag;
       if (result.changed) {
         commitUserDrawingState(result.state);
       }
+      return true;
     },
     [commitUserDrawingState, effectiveUserDrawingState, isPointInChartArea, userDrawingSpacesByPaneId, viewport],
   );
@@ -907,6 +896,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleUserDrawingEditEnd = useCallback(() => {
     userDrawingEditDragRef.current = null;
   }, []);
+
+  const { composedGesture } = useChartGestures({
+    dimensions: chartDimensions,
+    bars,
+    viewport,
+    onViewportChange: handleViewportChange,
+    enabled: !crosshairVisible,
+    onSwipeBlockChange,
+    onAutoScaleDisabled: handleAutoScaleDisabled,
+    isAutoScale: getIsAutoScale,
+    onInteraction: revealResetButtonIfInBottomRegion,
+    onDrawingEditStart: handleUserDrawingEditStart,
+    onDrawingEditMove: handleUserDrawingEditMove,
+    onDrawingEditEnd: handleUserDrawingEditEnd,
+  });
 
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
@@ -1008,35 +1012,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
   );
 
-  const drawingEditPanGesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .enabled(effectiveUserDrawingState.activeTool === 'select' && effectiveUserDrawingState.selection !== null)
-        .onStart((event) => {
-          runOnJS(handleUserDrawingEditStart)(event.x, event.y);
-        })
-        .onUpdate((event) => {
-          runOnJS(handleUserDrawingEditMove)(event.x, event.y);
-        })
-        .onEnd(() => {
-          runOnJS(handleUserDrawingEditEnd)();
-        })
-        .onFinalize(() => {
-          runOnJS(handleUserDrawingEditEnd)();
-        }),
-    [
-      effectiveUserDrawingState.activeTool,
-      effectiveUserDrawingState.selection,
-      handleUserDrawingEditEnd,
-      handleUserDrawingEditMove,
-      handleUserDrawingEditStart,
-    ],
-  );
-
   // Combine all gestures
   const allGestures = useMemo(
-    () => Gesture.Race(drawingEditPanGesture, crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
-    [composedGesture, crosshairPanGesture, drawingEditPanGesture, tapOrDoubleTapGesture],
+    () => Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
+    [composedGesture, crosshairPanGesture, tapOrDoubleTapGesture],
   );
 
   // ==========================================================================
