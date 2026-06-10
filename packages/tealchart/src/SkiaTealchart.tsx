@@ -18,6 +18,7 @@
 
 import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
+import type { DrawingCoordinateSpace, UserDrawingLineStyle } from './drawings';
 import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
@@ -50,6 +51,7 @@ import React, {
 
 import {
   Canvas,
+  Circle,
   createPicture,
   DashPathEffect,
   Group,
@@ -80,6 +82,7 @@ import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+import { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -92,6 +95,17 @@ import { intervalToMs } from './viewport/viewScale';
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
+
+function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): number[] | null {
+  switch (lineStyle) {
+    case 'dashed':
+      return [6, 4];
+    case 'dotted':
+      return [2, 4];
+    case 'solid':
+      return null;
+  }
+}
 
 export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
 
@@ -421,6 +435,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       return resolvedPane;
     });
   }, [dimensions.height, margins.top, unifiedPaneLayout, viewport]);
+
+  const userDrawingSpacesByPaneId = useMemo(() => {
+    if (!viewport) return new Map<string, DrawingCoordinateSpace>();
+
+    return new Map(
+      userDrawingInputPanes.map((pane) => [
+        pane.id,
+        {
+          viewport,
+          pane,
+          chartLeft: margins.left,
+          chartRight: dimensions.width - margins.right,
+        },
+      ]),
+    );
+  }, [dimensions.width, margins.left, margins.right, userDrawingInputPanes, viewport]);
+
+  const userDrawingPrimitives = useMemo(
+    () => resolveMobileUserDrawingRenderModel(effectiveUserDrawingState, userDrawingSpacesByPaneId),
+    [effectiveUserDrawingState, userDrawingSpacesByPaneId],
+  );
 
   useEffect(() => {
     if (bars.length === 0) {
@@ -1142,6 +1177,98 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         ]}
       >
         {picture && <Picture picture={picture} />}
+
+        {userDrawingPrimitives.map((primitive) => {
+          if (primitive.kind === 'line') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <SkiaLine
+                key={primitive.id}
+                p1={vec(primitive.start.x, primitive.start.y)}
+                p2={vec(primitive.end.x, primitive.end.y)}
+                color={primitive.style.lineColor}
+                opacity={primitive.opacity}
+                strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                style="stroke"
+              >
+                {dash && <DashPathEffect intervals={dash} />}
+              </SkiaLine>
+            );
+          }
+
+          if (primitive.kind === 'rectangle') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity}>
+                {primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                <Rect
+                  x={primitive.rect.x}
+                  y={primitive.rect.y}
+                  width={primitive.rect.width}
+                  height={primitive.rect.height}
+                  color={primitive.style.lineColor}
+                  style="stroke"
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </Rect>
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'textLabel') {
+            if (!bracketFont) return null;
+            const measuredWidth = bracketFont.measureText(primitive.text).width;
+            const textX =
+              primitive.textAlign === 'left'
+                ? primitive.point.x
+                : primitive.textAlign === 'right'
+                  ? primitive.point.x - measuredWidth
+                  : primitive.point.x - measuredWidth / 2;
+
+            return (
+              <SkiaText
+                key={primitive.id}
+                x={textX}
+                y={primitive.point.y}
+                text={primitive.text}
+                font={bracketFont}
+                color={primitive.style.textColor ?? primitive.style.lineColor}
+                opacity={primitive.opacity}
+              />
+            );
+          }
+
+          return (
+            <Group key={primitive.id}>
+              <Circle
+                cx={primitive.point.x}
+                cy={primitive.point.y}
+                r={primitive.radius}
+                color={primitive.fillColor}
+                style="fill"
+              />
+              <Circle
+                cx={primitive.point.x}
+                cy={primitive.point.y}
+                r={primitive.radius}
+                color={primitive.strokeColor}
+                style="stroke"
+                strokeWidth={1}
+              />
+            </Group>
+          );
+        })}
 
         {/* Crosshair lines mirror the web overlay and avoid RN dashed-border gaps on iOS. */}
         {crosshairOverlay && (
