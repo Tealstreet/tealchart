@@ -1,0 +1,3 @@
+# PineForge reference data (large OHLCV files, downloaded on demand)
+pineforge-data/
+pf-*/bars.json

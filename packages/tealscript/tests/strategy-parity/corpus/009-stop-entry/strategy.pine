@@ -1,0 +1,8 @@
+//@version=6
+strategy("Stop Entry", initial_capital=10000, process_orders_on_close=true)
+highestHigh = ta.highest(high, 5)
+if bar_index > 5 and strategy.position_size == 0
+    strategy.entry("Long", strategy.long, qty=1, stop=highestHigh)
+if strategy.position_size > 0 and close < ta.sma(close, 5)
+    strategy.close("Long")
+plot(strategy.position_size, title="Position")
