@@ -350,12 +350,16 @@ export function useChartGestures({
     return Gesture.Pinch()
       .enabled(enabled)
       .onStart((event) => {
+        if (drawingEditClaimed.value) return;
+
         savedScale.value = 1;
         if (onInteraction) {
           runOnJS(onInteraction)(event.focalX, event.focalY);
         }
       })
       .onUpdate((event) => {
+        if (drawingEditClaimed.value) return;
+
         scheduleInteraction(event.focalX, event.focalY);
         const newScale = savedScale.value * event.scale;
         runOnJS(updateViewportFromPinch)(newScale);
@@ -365,6 +369,7 @@ export function useChartGestures({
     onInteraction,
     updateViewportFromPinch,
     savedScale,
+    drawingEditClaimed,
     interactionFramePending,
     interactionFrameX,
     interactionFrameY,

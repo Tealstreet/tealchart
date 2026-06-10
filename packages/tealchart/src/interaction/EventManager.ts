@@ -809,7 +809,7 @@ export class EventManager {
           }
         }, LONG_PRESS_DURATION);
       }
-    } else if (e.touches.length === 2) {
+    } else if (e.touches.length === 2 && this.state.dragMode !== 'drawing') {
       // Two touches - prepare for pinch zoom
       this.clearLongPressTimer();
       const touch1 = e.touches[0];
@@ -874,7 +874,7 @@ export class EventManager {
           this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
         }
       }
-    } else if (e.touches.length === 2 && this.pinchStartViewport) {
+    } else if (e.touches.length === 2 && this.pinchStartViewport && this.state.dragMode !== 'drawing') {
       // Pinch zoom
       this.clearLongPressTimer();
       const touch1 = e.touches[0];
