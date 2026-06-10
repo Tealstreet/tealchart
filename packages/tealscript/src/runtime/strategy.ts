@@ -333,6 +333,7 @@ export interface StrategyLedger {
   _equityCurveTrough: number;
   _equityCurvePeakBeforeLast: number;
   _equityCurveTroughBeforeLast: number;
+  _pendingOrderCount: number;
 }
 
 export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSettings> = {}): StrategyLedgerSettings {
@@ -405,6 +406,7 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
     _equityCurveTrough: resolvedSettings.initialCapital,
     _equityCurvePeakBeforeLast: resolvedSettings.initialCapital,
     _equityCurveTroughBeforeLast: resolvedSettings.initialCapital,
+    _pendingOrderCount: 0,
   };
 }
 
@@ -432,6 +434,7 @@ export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
     _equityCurveTrough: ledger._equityCurveTrough,
     _equityCurvePeakBeforeLast: ledger._equityCurvePeakBeforeLast,
     _equityCurveTroughBeforeLast: ledger._equityCurveTroughBeforeLast,
+    _pendingOrderCount: ledger._pendingOrderCount,
   };
 }
 
@@ -559,6 +562,7 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
 export function submitStrategyOrder(ledger: StrategyLedger, input: StrategyOrderInput): StrategyOrder {
   const order = createStrategyOrder(input);
   ledger.orders.push(order);
+  ledger._pendingOrderCount++;
   return order;
 }
 
@@ -681,6 +685,9 @@ export function fillPendingStrategyMarketOrders(
   time: number,
   mintick: number = 0,
 ): StrategyFill[] {
+  if (ledger._pendingOrderCount === 0) {
+    return [];
+  }
   const fills: StrategyFill[] = [];
   for (const order of ledger.orders) {
     if (order.status !== 'pending' || order.type !== 'market' || order.activationBarIndex >= barIndex) {
@@ -703,6 +710,9 @@ export function fillPendingStrategyOrders(
   time: number,
   mintick: number = 0,
 ): StrategyFill[] {
+  if (ledger._pendingOrderCount === 0) {
+    return [];
+  }
   const fills: StrategyFill[] = [];
   const limitVerificationPrice = getLimitVerificationPrice(ledger.settings, mintick);
   for (const order of ledger.orders) {
@@ -726,6 +736,9 @@ export function fillPendingStrategyOrdersOnTicks(
   barIndex: number,
   mintick: number = 0,
 ): StrategyFill[] {
+  if (ledger._pendingOrderCount === 0) {
+    return [];
+  }
   const fills: StrategyFill[] = [];
   const orderedTicks = ticks
     .filter((tick) => Number.isFinite(tick.price))
@@ -770,6 +783,7 @@ function fillStrategyOrder(
   const isCloseOnlyEntry = order.isEntry && order.requestedQty === 0;
   if (!order.isExit && !isCloseOnlyEntry && hasReachedStrategyOrderRiskLimit(ledger, time)) {
     order.status = 'cancelled';
+    ledger._pendingOrderCount--;
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
     return null;
@@ -786,6 +800,7 @@ function fillStrategyOrder(
   if (fillQty <= 0) {
     if (order.isExit) {
       order.status = 'cancelled';
+      ledger._pendingOrderCount--;
       order.updatedBarIndex = barIndex;
       order.updatedTime = time;
     }
@@ -794,6 +809,7 @@ function fillStrategyOrder(
   const commission = resolveStrategyFillCommission(ledger.settings, fillQty, fillPrice);
 
   order.status = 'filled';
+  ledger._pendingOrderCount--;
   order.filledQty = fillQty;
   order.avgFillPrice = fillPrice;
   order.updatedBarIndex = barIndex;
@@ -1093,16 +1109,17 @@ function applyOcaOrderEffects(
 
     if (filledOrder.ocaType === 'cancel') {
       order.status = 'cancelled';
+      ledger._pendingOrderCount--;
       order.updatedBarIndex = barIndex;
       order.updatedTime = time;
       continue;
     }
 
-    reduceOcaOrderQuantity(order, filledQty, barIndex, time);
+    reduceOcaOrderQuantity(ledger, order, filledQty, barIndex, time);
   }
 }
 
-function reduceOcaOrderQuantity(order: StrategyOrder, filledQty: number, barIndex: number, time: number): void {
+function reduceOcaOrderQuantity(ledger: StrategyLedger, order: StrategyOrder, filledQty: number, barIndex: number, time: number): void {
   if (order.ocaType !== 'reduce' || order.qty === null || !Number.isFinite(filledQty) || filledQty <= 0) {
     return;
   }
@@ -1115,6 +1132,7 @@ function reduceOcaOrderQuantity(order: StrategyOrder, filledQty: number, barInde
       order.qtyValue = 0;
     }
     order.status = 'cancelled';
+    ledger._pendingOrderCount--;
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
     return;
@@ -1132,6 +1150,9 @@ function reduceOcaOrderQuantity(order: StrategyOrder, filledQty: number, barInde
 }
 
 export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex: number, time: number): boolean {
+  if (ledger._pendingOrderCount === 0) {
+    return false;
+  }
   let cancelled = false;
   for (let index = ledger.orders.length - 1; index >= 0; index--) {
     const order = ledger.orders[index];
@@ -1140,6 +1161,7 @@ export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex
     }
 
     order.status = 'cancelled';
+    ledger._pendingOrderCount--;
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
     cancelled = true;
@@ -1155,6 +1177,7 @@ export function cancelAllStrategyOrders(ledger: StrategyLedger, barIndex: number
     }
 
     order.status = 'cancelled';
+    ledger._pendingOrderCount--;
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
     cancelled++;

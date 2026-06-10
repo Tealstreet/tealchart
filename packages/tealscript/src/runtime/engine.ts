@@ -7614,6 +7614,7 @@ export class TealscriptEngine {
       }
 
       order.status = 'cancelled';
+      this.ctx.strategyLedger._pendingOrderCount--;
       order.updatedBarIndex = this.ctx.bar_index;
       order.updatedTime = this.ctx.time.get(0) ?? 0;
     }
