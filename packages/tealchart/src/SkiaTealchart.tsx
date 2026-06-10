@@ -69,7 +69,7 @@ import {
   useFont,
   vec,
 } from '@shopify/react-native-skia';
-import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { LayoutChangeEvent, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
@@ -78,14 +78,19 @@ import { useTealchartCore } from './core/useTealchartCore';
 import {
   applyUserDrawingEditDrag,
   beginUserDrawingEditDragAtPoint,
+  beginUserDrawingTextEdit,
   cancelUserDrawingDraft as cancelUserDrawingDraftState,
+  cancelUserDrawingTextEdit,
   clearUserDrawings as clearUserDrawingsState,
+  commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
+  setUserDrawingText,
   setUserDrawingTool,
+  updateUserDrawingTextEdit,
 } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
@@ -138,6 +143,11 @@ export interface SkiaTealchartHandle {
   deleteSelectedUserDrawing(): boolean;
   clearUserDrawings(): void;
   cancelUserDrawingDraft(): void;
+  beginUserDrawingTextEdit(drawingId?: string): boolean;
+  updateUserDrawingTextEdit(value: string): boolean;
+  commitUserDrawingTextEdit(): boolean;
+  cancelUserDrawingTextEdit(): boolean;
+  setUserDrawingText(drawingId: string, text: string): boolean;
 }
 
 export interface SkiaTealchartProps {
@@ -347,6 +357,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       cancelUserDrawingDraft(): void {
         commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(userDrawingStateRef.current));
       },
+      beginUserDrawingTextEdit(drawingId?: string): boolean {
+        return commitUserDrawingStateIfChanged(beginUserDrawingTextEdit(userDrawingStateRef.current, drawingId));
+      },
+      updateUserDrawingTextEdit(value: string): boolean {
+        return commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
+      },
+      commitUserDrawingTextEdit(): boolean {
+        return commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
+      },
+      cancelUserDrawingTextEdit(): boolean {
+        return commitUserDrawingStateIfChanged(cancelUserDrawingTextEdit(userDrawingStateRef.current));
+      },
+      setUserDrawingText(drawingId: string, text: string): boolean {
+        return commitUserDrawingStateIfChanged(setUserDrawingText(userDrawingStateRef.current, drawingId, text));
+      },
     }),
     [commitUserDrawingState, commitUserDrawingStateIfChanged],
   );
@@ -516,6 +541,36 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => resolveMobileUserDrawingRenderModel(effectiveUserDrawingState, userDrawingSpacesByPaneId),
     [effectiveUserDrawingState, userDrawingSpacesByPaneId],
   );
+  const activeUserDrawingTextEditPrimitive = useMemo(
+    () =>
+      userDrawingPrimitives.find(
+        (primitive) =>
+          primitive.kind === 'textLabel' &&
+          primitive.editing &&
+          primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
+      ),
+    [effectiveUserDrawingState.textEdit?.drawingId, userDrawingPrimitives],
+  );
+  const activeUserDrawingTextEditorStyle = useMemo(() => {
+    if (!activeUserDrawingTextEditPrimitive) return null;
+    const value = activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text;
+    const width = Math.max(120, Math.min(260, value.length * 7 + 32));
+    const chartRight = dimensions.width - margins.right;
+    const left = Math.max(
+      margins.left,
+      Math.min(activeUserDrawingTextEditPrimitive.point.x - width / 2, chartRight - width - 8),
+    );
+
+    return {
+      left,
+      top: Math.max(margins.top, activeUserDrawingTextEditPrimitive.point.y - 18),
+      width,
+      color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
+      fontSize: activeUserDrawingTextEditPrimitive.style.fontSize ?? 12,
+      fontFamily: activeUserDrawingTextEditPrimitive.style.fontFamily,
+      borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
+    };
+  }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
 
   useEffect(() => {
     if (bars.length === 0) {
@@ -1024,7 +1079,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Double-tap handler for pane maximize/restore
   const handleDoubleTap = useCallback(
-    (y: number) => {
+    (x: number, y: number) => {
+      if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
+        const selection = resolveUserDrawingSelectionAtPoint(
+          effectiveUserDrawingState,
+          { x, y },
+          userDrawingSpacesByPaneId,
+        );
+        const selectedId = selection.state.selection?.drawingId;
+        const selectedDrawing = selectedId
+          ? selection.state.drawings.find((drawing) => drawing.id === selectedId)
+          : null;
+        if (selection.hit && selectedDrawing?.kind === 'textLabel') {
+          const nextState = beginUserDrawingTextEdit(selection.state, selectedDrawing.id);
+          if (nextState !== selection.state) {
+            commitUserDrawingState(nextState);
+            return;
+          }
+        }
+      }
+
       if (!unifiedPaneLayout || !coreResult.core) return;
       const panes = unifiedPaneLayout.panes;
       const availableHeight = dimensions.height - (margins.bottom || DEFAULT_MARGINS.bottom);
@@ -1039,7 +1113,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         currentTop += paneHeight;
       }
     },
-    [unifiedPaneLayout, coreResult.core, dimensions.height, margins],
+    [
+      commitUserDrawingState,
+      coreResult.core,
+      dimensions.height,
+      effectiveUserDrawingState,
+      isPointInChartArea,
+      margins,
+      unifiedPaneLayout,
+      userDrawingSpacesByPaneId,
+    ],
   );
 
   // Double-tap gesture for pane maximize/restore
@@ -1048,7 +1131,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       Gesture.Tap()
         .numberOfTaps(2)
         .onEnd((event) => {
-          runOnJS(handleDoubleTap)(event.y);
+          runOnJS(handleDoubleTap)(event.x, event.y);
         }),
     [handleDoubleTap],
   );
@@ -1561,6 +1644,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         </Animated.View>
       )}
 
+      {activeUserDrawingTextEditPrimitive && activeUserDrawingTextEditorStyle && (
+        <TextInput
+          accessibilityLabel="Edit drawing text"
+          autoFocus
+          blurOnSubmit
+          selectTextOnFocus
+          value={activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text}
+          onChangeText={(value) => {
+            commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
+          }}
+          onSubmitEditing={() => {
+            commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
+          }}
+          onBlur={() => {
+            commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
+          }}
+          style={[styles.userDrawingTextEditor, activeUserDrawingTextEditorStyle]}
+        />
+      )}
+
       {/* Top Bar (overlay on top of chart) */}
       {showTopBar && (
         <View style={styles.topBarOverlay} pointerEvents="box-none">
@@ -1640,6 +1743,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     // No background - transparent overlay
+  },
+  userDrawingTextEditor: {
+    position: 'absolute',
+    zIndex: 6,
+    minHeight: 30,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: 'rgba(9, 12, 18, 0.92)',
+    lineHeight: 18,
   },
   interactiveLayer: {
     // Interactive elements go here
