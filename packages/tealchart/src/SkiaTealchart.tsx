@@ -807,7 +807,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const chartTop = chartDimensions.margins.top;
       const chartBottom = chartDimensions.height - chartDimensions.margins.bottom;
 
-      return x >= chartLeft && x <= chartRight && y >= chartTop && y <= chartBottom;
+      return x >= chartLeft && x < chartRight && y >= chartTop && y < chartBottom;
     },
     [chartDimensions],
   );
