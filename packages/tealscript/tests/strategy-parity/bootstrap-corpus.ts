@@ -24,13 +24,10 @@ function tradesToTvCsv(trades: StrategyTrade[]): string {
       t.exitTime !== undefined ? new Date(t.exitTime).toISOString().replace('T', ' ').replace('.000Z', '') : '';
 
     rows.push(`${tradeNum},${entryType},${t.entryOrderId},${entryDate},${t.entryPrice},${t.qty},,`);
-
-    if (t.exitPrice !== undefined && t.exitOrderId !== undefined) {
-      cumProfit += t.profit;
-      rows.push(
-        `${tradeNum},${exitType},${t.exitOrderId},${exitDate},${t.exitPrice},${t.qty},${t.profit.toFixed(2)},${cumProfit.toFixed(2)}`,
-      );
-    }
+    cumProfit += t.profit;
+    rows.push(
+      `${tradeNum},${exitType},${t.exitOrderId},${exitDate},${t.exitPrice},${t.qty},${t.profit.toFixed(2)},${cumProfit.toFixed(2)}`,
+    );
   }
 
   return rows.join('\n') + '\n';
@@ -53,13 +50,14 @@ function bootstrap(): void {
 
     const pineSource = fs.readFileSync(pinePath, 'utf-8');
 
+    let bars;
     if (!fs.existsSync(barsPath)) {
-      const bars = generateDeterministicBars(BAR_COUNT);
+      bars = generateDeterministicBars(BAR_COUNT);
       fs.writeFileSync(barsPath, JSON.stringify(bars, null, 2) + '\n');
       console.log(`  Generated ${barsPath}`);
+    } else {
+      bars = JSON.parse(fs.readFileSync(barsPath, 'utf-8'));
     }
-
-    const bars = JSON.parse(fs.readFileSync(barsPath, 'utf-8'));
 
     try {
       const ast = parse(pineSource);
@@ -75,10 +73,8 @@ function bootstrap(): void {
         continue;
       }
 
-      const allTrades = [...result.strategy.closedTrades, ...result.strategy.openTrades];
-
       if (!fs.existsSync(csvPath)) {
-        const csv = tradesToTvCsv(allTrades);
+        const csv = tradesToTvCsv(result.strategy.closedTrades);
         fs.writeFileSync(csvPath, csv);
         console.log(`  Generated ${csvPath} (${result.strategy.closedTrades.length} closed trades)`);
       }
