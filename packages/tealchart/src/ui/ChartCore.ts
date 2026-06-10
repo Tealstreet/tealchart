@@ -14,11 +14,12 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
-import type { UserDrawingState } from '../drawings';
+import type { UserDrawingInputPoint, UserDrawingState } from '../drawings';
 
 import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
+import { resolveUserDrawingInputPointFromChart } from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -89,6 +90,8 @@ export interface ChartCoreOptions {
   onMouseDown?: () => void;
   /** Mouse up callback */
   onMouseUp?: () => void;
+  /** Called when a chart-surface click/tap resolves to a user drawing input point */
+  onUserDrawingInput?: (point: UserDrawingInputPoint) => boolean;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -686,6 +689,7 @@ export class ChartCore {
       getTimeFromX: (x) =>
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
+      onDrawingInput: (x, y) => this.handleUserDrawingInput(x, y),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -1458,6 +1462,43 @@ export class ChartCore {
     }
 
     return null;
+  }
+
+  private handleUserDrawingInput(x: number, y: number): boolean {
+    if (!this.options.onUserDrawingInput || !this.viewport) return false;
+
+    const layout = this.getUnifiedLayout();
+    const timeAxisHeight = layout.timeAxisHeight;
+    const topMargin = this.margins.top;
+    const availableHeight = this.options.height - timeAxisHeight - topMargin;
+    let currentTop = topMargin;
+
+    const panes = layout.panes.map((pane) => {
+      const height = availableHeight * pane.heightRatio;
+      const yRange =
+        pane.type === 'main' && !pane.fixedRange
+          ? { yMin: this.viewport!.priceMin, yMax: this.viewport!.priceMax }
+          : { yMin: pane.yMin, yMax: pane.yMax };
+      const resolvedPane = {
+        id: pane.id,
+        top: currentTop,
+        height,
+        bottom: currentTop + height,
+        ...yRange,
+      };
+      currentTop += height;
+      return resolvedPane;
+    });
+
+    const point = resolveUserDrawingInputPointFromChart({
+      point: { x, y },
+      viewport: this.viewport,
+      panes,
+      width: this.options.width,
+      margins: this.margins,
+    });
+
+    return point ? this.options.onUserDrawingInput(point) : false;
   }
 
   private getDividerAtY(y: number): PaneDividerInfo | null {
