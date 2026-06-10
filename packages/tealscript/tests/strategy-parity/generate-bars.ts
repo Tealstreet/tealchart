@@ -8,7 +8,7 @@ export function generateDeterministicBars(count: number, seed: number = 42): Bar
 
   let state = seed;
   const nextRand = (): number => {
-    state = (state * 1103515245 + 12345) & 0x7fffffff;
+    state = (Math.imul(state, 1103515245) + 12345) & 0x7fffffff;
     return (state / 0x7fffffff) * 2 - 1;
   };
 
@@ -19,7 +19,7 @@ export function generateDeterministicBars(count: number, seed: number = 42): Bar
     const open = Math.round((price + drift * 0.3) * 100) / 100;
     const move1 = nextRand() * volatility;
     const move2 = nextRand() * volatility;
-    const close = Math.round((open + drift) * 100) / 100;
+    const close = Math.round((open + drift + nextRand() * volatility * 0.5) * 100) / 100;
 
     const high = Math.round(Math.max(open, close, open + Math.abs(move1)) * 100) / 100;
     const low = Math.round(Math.min(open, close, open - Math.abs(move2)) * 100) / 100;
@@ -28,8 +28,8 @@ export function generateDeterministicBars(count: number, seed: number = 42): Bar
     bars.push({
       time: baseTime + i * interval,
       open,
-      high: Math.max(high, open, close),
-      low: Math.min(low, open, close),
+      high,
+      low,
       close,
       volume,
     });
