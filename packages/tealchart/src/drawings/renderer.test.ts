@@ -249,6 +249,7 @@ describe('user drawing renderer', () => {
         style,
         startedAt: 2,
       },
+      textEdit: null,
     };
 
     renderUserDrawingLayer(ctx, state, new Map([[space.pane.id, space]]), {
@@ -282,6 +283,7 @@ describe('user drawing renderer', () => {
         },
       ],
       draft: null,
+      textEdit: null,
     };
 
     renderUserDrawingLayer(ctx, state, new Map([[space.pane.id, space]]));

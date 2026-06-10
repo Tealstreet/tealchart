@@ -96,12 +96,20 @@ export interface UserDrawingSelection {
   handle?: UserDrawingHandleRole;
 }
 
+export interface UserDrawingTextEdit {
+  drawingId: string;
+  value: string;
+  originalValue: string;
+  startedAt: number;
+}
+
 export interface UserDrawingState {
   version: number;
   drawings: readonly UserDrawing[];
   activeTool: UserDrawingTool;
   selection: UserDrawingSelection | null;
   draft: UserDrawingDraft | null;
+  textEdit: UserDrawingTextEdit | null;
 }
 
 export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
@@ -119,6 +127,7 @@ export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   activeTool: 'select',
   selection: null,
   draft: null,
+  textEdit: null,
 };
 
 export function getRequiredAnchorCount(tool: UserDrawingTool): number {
