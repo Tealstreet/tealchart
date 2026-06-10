@@ -341,6 +341,41 @@ describe('TealchartWidget', () => {
       });
       expect(onChange).toHaveBeenCalled();
     });
+
+    it('generates drawing IDs without colliding with restored drawing state', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({
+        ...initial,
+        activeTool: 'trendLine',
+        drawings: [
+          {
+            id: 'drawing_1',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 10,
+          },
+        ],
+      });
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['drawing_1', 'drawing_2']);
+    });
   });
 
   // ============================================================================

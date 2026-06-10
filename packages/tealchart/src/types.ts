@@ -719,9 +719,9 @@ export interface TealchartWidgetOptions {
   datafeed: IBasicDataFeed;
   /** Initial render options applied before overrides and symbol metadata. */
   renderOptions?: Partial<RenderOptions>;
-  /** Initial user drawing state. Rendering/input support is wired by drawing-tool phases. */
+  /** Initial user drawing state. */
   userDrawingState?: UserDrawingState;
-  /** Called when the widget updates user drawing state through its public API. */
+  /** Called when the widget updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   locale?: string;
   autosize?: boolean;

@@ -150,9 +150,9 @@ export interface SkiaTealchartProps {
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Called when crosshair position changes */
   onCrossHairMoved?: (price: number, time: number) => void;
-  /** Initial or controlled user drawing state. Rendering/input support is wired by drawing-tool phases. */
+  /** Initial user drawing state; later prop changes replace the chart's local drawing state. */
   userDrawingState?: UserDrawingState;
-  /** Called when the chart updates user drawing state through its public API. */
+  /** Called when the chart updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
@@ -207,7 +207,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onViewportChange,
     onContextMenu,
     onCrossHairMoved,
-    userDrawingState: controlledUserDrawingState,
+    userDrawingState: propUserDrawingState,
     onUserDrawingStateChange,
     onSwipeBlockChange,
     onOrderMove,
@@ -234,7 +234,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
   const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
-    controlledUserDrawingState ?? createUserDrawingState(),
+    propUserDrawingState ?? createUserDrawingState(),
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingIdCounterRef = useRef(0);
@@ -248,10 +248,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   useEffect(() => {
-    if (controlledUserDrawingState) {
-      setUncontrolledUserDrawingState(controlledUserDrawingState);
+    if (propUserDrawingState) {
+      setUncontrolledUserDrawingState(propUserDrawingState);
     }
-  }, [controlledUserDrawingState]);
+  }, [propUserDrawingState]);
 
   useEffect(() => {
     setImperativeTheme(null);
@@ -825,7 +825,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!point) return false;
 
       const nextState = handleUserDrawingInput(effectiveUserDrawingState, point, {
-        createId: () => `drawing_${++userDrawingIdCounterRef.current}`,
+        createId: () => {
+          const existingIds = new Set(effectiveUserDrawingState.drawings.map((drawing) => drawing.id));
+          let id = '';
+          do {
+            id = `drawing_${++userDrawingIdCounterRef.current}`;
+          } while (existingIds.has(id));
+          return id;
+        },
       });
       if (nextState === effectiveUserDrawingState) return false;
 
@@ -928,8 +935,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const tapOrDoubleTapGesture = useMemo(
-    () => Gesture.Exclusive(doubleTapGesture, tapGesture),
-    [doubleTapGesture, tapGesture],
+    () =>
+      effectiveUserDrawingState.activeTool === 'select'
+        ? Gesture.Exclusive(doubleTapGesture, tapGesture)
+        : tapGesture,
+    [doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
   );
 
   // Combine all gestures
