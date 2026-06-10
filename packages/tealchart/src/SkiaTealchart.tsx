@@ -18,6 +18,8 @@
 
 import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
+import type { DrawingCoordinateSpace, UserDrawingLineStyle } from './drawings';
+import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
@@ -49,6 +51,7 @@ import React, {
 
 import {
   Canvas,
+  Circle,
   createPicture,
   DashPathEffect,
   Group,
@@ -66,6 +69,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
+import { createUserDrawingState, handleUserDrawingInput } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -77,6 +81,8 @@ import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
+import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+import { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -90,12 +96,25 @@ const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
 
+function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): number[] | null {
+  switch (lineStyle) {
+    case 'dashed':
+      return [6, 4];
+    case 'dotted':
+      return [2, 4];
+    case 'solid':
+      return null;
+  }
+}
+
 export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
 
 export interface SkiaTealchartHandle {
   addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null;
   removeTealscriptIndicator(instanceId: string): void;
   changeTheme(theme: ChartThemeInput): void;
+  getUserDrawingState(): UserDrawingState;
+  setUserDrawingState(state: UserDrawingState): void;
 }
 
 export interface SkiaTealchartProps {
@@ -131,6 +150,10 @@ export interface SkiaTealchartProps {
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Called when crosshair position changes */
   onCrossHairMoved?: (price: number, time: number) => void;
+  /** Initial user drawing state; later prop changes replace the chart's local drawing state. */
+  userDrawingState?: UserDrawingState;
+  /** Called when the chart updates user drawing state through input or its public API. */
+  onUserDrawingStateChange?: (state: UserDrawingState) => void;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when order price is changed via drag */
@@ -184,6 +207,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onViewportChange,
     onContextMenu,
     onCrossHairMoved,
+    userDrawingState: propUserDrawingState,
+    onUserDrawingStateChange,
     onSwipeBlockChange,
     onOrderMove,
     onOrderCancel,
@@ -208,6 +233,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
+  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
+    propUserDrawingState ?? createUserDrawingState(),
+  );
+  const effectiveUserDrawingState = uncontrolledUserDrawingState;
+  const userDrawingIdCounterRef = useRef(0);
+
+  const commitUserDrawingState = useCallback(
+    (nextState: UserDrawingState) => {
+      setUncontrolledUserDrawingState(nextState);
+      onUserDrawingStateChange?.(nextState);
+    },
+    [onUserDrawingStateChange],
+  );
+
+  useEffect(() => {
+    if (propUserDrawingState) {
+      setUncontrolledUserDrawingState(propUserDrawingState);
+    }
+  }, [propUserDrawingState]);
 
   useEffect(() => {
     setImperativeTheme(null);
@@ -241,8 +285,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       changeTheme(nextTheme: ChartThemeInput): void {
         setImperativeTheme(nextTheme);
       },
+      getUserDrawingState(): UserDrawingState {
+        return effectiveUserDrawingState;
+      },
+      setUserDrawingState(nextState: UserDrawingState): void {
+        commitUserDrawingState(nextState);
+      },
     }),
-    [],
+    [commitUserDrawingState, effectiveUserDrawingState],
   );
 
   // Use core hook for bar fetching and state management
@@ -365,6 +415,51 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }),
     };
   }, [baseUnifiedPaneLayout, viewport, plots, bars]);
+
+  const userDrawingInputPanes = useMemo(() => {
+    if (!viewport || !unifiedPaneLayout) return [];
+
+    const availableHeight = dimensions.height - unifiedPaneLayout.timeAxisHeight - margins.top;
+    let currentTop = margins.top;
+
+    return unifiedPaneLayout.panes.map((pane) => {
+      const height = availableHeight * pane.heightRatio;
+      const yRange =
+        pane.type === 'main' && !pane.fixedRange
+          ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
+          : { yMin: pane.yMin, yMax: pane.yMax };
+      const resolvedPane = {
+        id: pane.id,
+        top: currentTop,
+        height,
+        bottom: currentTop + height,
+        ...yRange,
+      };
+      currentTop += height;
+      return resolvedPane;
+    });
+  }, [dimensions.height, margins.top, unifiedPaneLayout, viewport]);
+
+  const userDrawingSpacesByPaneId = useMemo(() => {
+    if (!viewport) return new Map<string, DrawingCoordinateSpace>();
+
+    return new Map(
+      userDrawingInputPanes.map((pane) => [
+        pane.id,
+        {
+          viewport,
+          pane,
+          chartLeft: margins.left,
+          chartRight: dimensions.width - margins.right,
+        },
+      ]),
+    );
+  }, [dimensions.width, margins.left, margins.right, userDrawingInputPanes, viewport]);
+
+  const userDrawingPrimitives = useMemo(
+    () => resolveMobileUserDrawingRenderModel(effectiveUserDrawingState, userDrawingSpacesByPaneId),
+    [effectiveUserDrawingState, userDrawingSpacesByPaneId],
+  );
 
   useEffect(() => {
     if (bars.length === 0) {
@@ -717,9 +812,41 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartDimensions],
   );
 
+  const handleUserDrawingTap = useCallback(
+    (x: number, y: number) => {
+      if (!viewport || effectiveUserDrawingState.activeTool === 'select') return false;
+
+      const point = resolveMobileUserDrawingInputPoint({
+        point: { x, y },
+        viewport,
+        dimensions: chartDimensions,
+        panes: userDrawingInputPanes,
+      });
+      if (!point) return false;
+
+      const nextState = handleUserDrawingInput(effectiveUserDrawingState, point, {
+        createId: () => {
+          const existingIds = new Set(effectiveUserDrawingState.drawings.map((drawing) => drawing.id));
+          let id = '';
+          do {
+            id = `drawing_${++userDrawingIdCounterRef.current}`;
+          } while (existingIds.has(id));
+          return id;
+        },
+      });
+      if (nextState === effectiveUserDrawingState) return false;
+
+      commitUserDrawingState(nextState);
+      return true;
+    },
+    [chartDimensions, commitUserDrawingState, effectiveUserDrawingState, userDrawingInputPanes, viewport],
+  );
+
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
       revealResetButtonIfInBottomRegion(x, y);
+
+      if (handleUserDrawingTap(x, y)) return;
 
       if (crosshairVisible) {
         setCrosshairVisible(false);
@@ -731,7 +858,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setCrosshairVisible(true);
       handleCrosshairMove(x, y);
     },
-    [crosshairVisible, handleCrosshairMove, isPointInChartArea, revealResetButtonIfInBottomRegion],
+    [crosshairVisible, handleCrosshairMove, handleUserDrawingTap, isPointInChartArea, revealResetButtonIfInBottomRegion],
   );
 
   // Pan gesture for moving crosshair (active only while crosshair is visible)
@@ -808,8 +935,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const tapOrDoubleTapGesture = useMemo(
-    () => Gesture.Exclusive(doubleTapGesture, tapGesture),
-    [doubleTapGesture, tapGesture],
+    () =>
+      effectiveUserDrawingState.activeTool === 'select'
+        ? Gesture.Exclusive(doubleTapGesture, tapGesture)
+        : tapGesture,
+    [doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
   );
 
   // Combine all gestures
@@ -1061,6 +1191,100 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         ]}
       >
         {picture && <Picture picture={picture} />}
+
+        {userDrawingPrimitives.map((primitive) => {
+          if (primitive.kind === 'line') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip}>
+                <SkiaLine
+                  p1={vec(primitive.start.x, primitive.start.y)}
+                  p2={vec(primitive.end.x, primitive.end.y)}
+                  color={primitive.style.lineColor}
+                  opacity={primitive.opacity}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'rectangle') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                <Rect
+                  x={primitive.rect.x}
+                  y={primitive.rect.y}
+                  width={primitive.rect.width}
+                  height={primitive.rect.height}
+                  color={primitive.style.lineColor}
+                  style="stroke"
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </Rect>
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'textLabel') {
+            if (!bracketFont) return null;
+            const measuredWidth = bracketFont.measureText(primitive.text).width;
+            const textX =
+              primitive.textAlign === 'left'
+                ? primitive.point.x
+                : primitive.textAlign === 'right'
+                  ? primitive.point.x - measuredWidth
+                  : primitive.point.x - measuredWidth / 2;
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip}>
+                <SkiaText
+                  x={textX}
+                  y={primitive.point.y}
+                  text={primitive.text}
+                  font={bracketFont}
+                  color={primitive.style.textColor ?? primitive.style.lineColor}
+                  opacity={primitive.opacity}
+                />
+              </Group>
+            );
+          }
+
+          return (
+            <Group key={primitive.id} clip={primitive.clip}>
+              <Circle
+                cx={primitive.point.x}
+                cy={primitive.point.y}
+                r={primitive.radius}
+                color={primitive.fillColor}
+                style="fill"
+              />
+              <Circle
+                cx={primitive.point.x}
+                cy={primitive.point.y}
+                r={primitive.radius}
+                color={primitive.strokeColor}
+                style="stroke"
+                strokeWidth={1}
+              />
+            </Group>
+          );
+        })}
 
         {/* Crosshair lines mirror the web overlay and avoid RN dashed-border gaps on iOS. */}
         {crosshairOverlay && (

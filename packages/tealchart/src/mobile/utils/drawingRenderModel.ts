@@ -22,6 +22,7 @@ export type MobileUserDrawingPrimitive =
       phase: UserDrawingRenderPhase;
       selected: boolean;
       opacity: number;
+      clip: MobileUserDrawingClipRect;
       start: DrawingScreenPoint;
       end: DrawingScreenPoint;
       style: UserDrawingStyle;
@@ -32,6 +33,7 @@ export type MobileUserDrawingPrimitive =
       phase: UserDrawingRenderPhase;
       selected: boolean;
       opacity: number;
+      clip: MobileUserDrawingClipRect;
       rect: { x: number; y: number; width: number; height: number };
       style: UserDrawingStyle;
     }
@@ -41,6 +43,7 @@ export type MobileUserDrawingPrimitive =
       phase: UserDrawingRenderPhase;
       selected: boolean;
       opacity: number;
+      clip: MobileUserDrawingClipRect;
       point: DrawingScreenPoint;
       text: string;
       textAlign: TextLabelDrawing['textAlign'];
@@ -50,6 +53,7 @@ export type MobileUserDrawingPrimitive =
       kind: 'handle';
       id: string;
       drawingId: string;
+      clip: MobileUserDrawingClipRect;
       point: DrawingScreenPoint;
       strokeColor: string;
       fillColor: string;
@@ -61,11 +65,28 @@ export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserD
   draftOpacity?: number;
 }
 
+export interface MobileUserDrawingClipRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 const DEFAULT_HANDLE_RADIUS = 4;
 const DEFAULT_DRAFT_OPACITY = 0.65;
 
+function clipRectFromSpace(space: DrawingCoordinateSpace): MobileUserDrawingClipRect {
+  return {
+    x: space.chartLeft,
+    y: space.pane.top,
+    width: space.chartRight - space.chartLeft,
+    height: space.pane.height,
+  };
+}
+
 function primitiveFromGeometry(
   geometry: ResolvedUserDrawingGeometry,
+  clip: MobileUserDrawingClipRect,
   phase: UserDrawingRenderPhase,
   selected: boolean,
   opacity: number,
@@ -81,6 +102,7 @@ function primitiveFromGeometry(
         phase,
         selected,
         opacity,
+        clip,
         start: geometry.segment.start,
         end: geometry.segment.end,
         style: geometry.drawing.style,
@@ -92,6 +114,7 @@ function primitiveFromGeometry(
         phase,
         selected,
         opacity,
+        clip,
         rect: geometry.rect,
         style: geometry.drawing.style,
       };
@@ -103,6 +126,7 @@ function primitiveFromGeometry(
         phase,
         selected,
         opacity,
+        clip,
         point: geometry.point,
         text: drawing.text,
         textAlign: drawing.textAlign,
@@ -124,9 +148,11 @@ export function resolveMobileUserDrawingRenderModel(
     if (!entry.drawing.visible) continue;
     const space = spacesByPaneId.get(entry.drawing.paneId);
     if (!space) continue;
+    const clip = clipRectFromSpace(space);
     primitives.push(
       primitiveFromGeometry(
         resolveUserDrawingGeometry(entry.drawing, space),
+        clip,
         entry.phase,
         entry.selected,
         entry.phase === 'draft' ? draftOpacity : 1,
@@ -138,12 +164,14 @@ export function resolveMobileUserDrawingRenderModel(
     if (!entry.selected || !entry.drawing.visible) continue;
     const space = spacesByPaneId.get(entry.drawing.paneId);
     if (!space) continue;
+    const clip = clipRectFromSpace(space);
 
     for (const [index, point] of resolveUserDrawingHandlePoints(entry.drawing, space).entries()) {
       primitives.push({
         kind: 'handle',
         id: `${entry.drawing.id}:handle:${index}`,
         drawingId: entry.drawing.id,
+        clip,
         point,
         strokeColor: entry.drawing.style.lineColor,
         fillColor: '#ffffff',

@@ -12,12 +12,15 @@
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
+import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
+import type { DrawingCoordinateSpace, UserDrawingInputPoint, UserDrawingState } from '../drawings';
 
 import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
+import { renderUserDrawingLayer, resolveUserDrawingInputPointFromChart } from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -88,6 +91,8 @@ export interface ChartCoreOptions {
   onMouseDown?: () => void;
   /** Mouse up callback */
   onMouseUp?: () => void;
+  /** Called when a chart-surface click/tap resolves to a user drawing input point */
+  onUserDrawingInput?: (point: UserDrawingInputPoint) => boolean;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -480,6 +485,7 @@ export class ChartCore {
 
   // Core components
   private renderer: TealchartRenderer;
+  private canvasContext: CanvasContext;
   private eventManager: EventManager;
   private priceLineManager: PriceLineManager | null = null;
   private stage: Konva.Stage | null = null;
@@ -493,6 +499,7 @@ export class ChartCore {
   private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
   private drawings: DrawingOutput[] = [];
+  private userDrawingState: UserDrawingState | null = null;
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
   private indicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
@@ -593,6 +600,7 @@ export class ChartCore {
 
     // Wrap in CanvasContext abstraction (enables Skia implementation for React Native)
     const ctx = new WebCanvasContext(nativeCtx);
+    this.canvasContext = ctx;
 
     // Initialize renderer
     this.renderer = new TealchartRenderer(
@@ -684,6 +692,7 @@ export class ChartCore {
       getTimeFromX: (x) =>
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
+      onDrawingInput: (x, y) => this.handleUserDrawingInput(x, y),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -940,6 +949,16 @@ export class ChartCore {
   setDrawings(drawings: DrawingOutput[]): void {
     if (drawings === this.drawings) return;
     this.drawings = drawings;
+    // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  /**
+   * Set user drawing state
+   * Reference equality check - skip if same object
+   */
+  setUserDrawingState(state: UserDrawingState): void {
+    if (state === this.userDrawingState) return;
+    this.userDrawingState = state;
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1448,6 +1467,73 @@ export class ChartCore {
     return null;
   }
 
+  private handleUserDrawingInput(x: number, y: number): boolean {
+    if (!this.options.onUserDrawingInput || !this.viewport) return false;
+
+    const layout = this.getUnifiedLayout();
+    const timeAxisHeight = layout.timeAxisHeight;
+    const topMargin = this.margins.top;
+    const availableHeight = this.options.height - timeAxisHeight - topMargin;
+    let currentTop = topMargin;
+
+    const panes = layout.panes.map((pane) => {
+      const height = availableHeight * pane.heightRatio;
+      const yRange =
+        pane.type === 'main' && !pane.fixedRange
+          ? { yMin: this.viewport!.priceMin, yMax: this.viewport!.priceMax }
+          : { yMin: pane.yMin, yMax: pane.yMax };
+      const resolvedPane = {
+        id: pane.id,
+        top: currentTop,
+        height,
+        bottom: currentTop + height,
+        ...yRange,
+      };
+      currentTop += height;
+      return resolvedPane;
+    });
+
+    const point = resolveUserDrawingInputPointFromChart({
+      point: { x, y },
+      viewport: this.viewport,
+      panes,
+      width: this.options.width,
+      margins: this.margins,
+    });
+
+    return point ? this.options.onUserDrawingInput(point) : false;
+  }
+
+  private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {
+    const layout = this.getUnifiedLayout();
+    const availableHeight = this.options.height - layout.timeAxisHeight - this.margins.top;
+    let currentTop = this.margins.top;
+    const spaces = new Map<string, DrawingCoordinateSpace>();
+
+    for (const pane of layout.panes) {
+      const height = availableHeight * pane.heightRatio;
+      const yRange =
+        pane.type === 'main' && !pane.fixedRange
+          ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
+          : { yMin: pane.yMin, yMax: pane.yMax };
+      spaces.set(pane.id, {
+        viewport,
+        pane: {
+          id: pane.id,
+          top: currentTop,
+          height,
+          bottom: currentTop + height,
+          ...yRange,
+        },
+        chartLeft: this.margins.left,
+        chartRight: this.options.width - this.margins.right,
+      });
+      currentTop += height;
+    }
+
+    return spaces;
+  }
+
   private getDividerAtY(y: number): PaneDividerInfo | null {
     const layout = this.getUnifiedLayout();
     const panes = layout.panes;
@@ -1532,6 +1618,7 @@ export class ChartCore {
         DIRTY.BARS |
         DIRTY.PLOTS |
         DIRTY.DRAWINGS |
+        DIRTY.USER_DRAWINGS |
         DIRTY.LAYOUT |
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
@@ -1550,6 +1637,7 @@ export class ChartCore {
         DIRTY.BARS |
         DIRTY.PLOTS |
         DIRTY.DRAWINGS |
+        DIRTY.USER_DRAWINGS |
         DIRTY.LAYOUT |
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
@@ -1737,6 +1825,10 @@ export class ChartCore {
       this.executionLines,
       this.drawings,
     );
+
+    if (this.userDrawingState) {
+      renderUserDrawingLayer(this.canvasContext, this.userDrawingState, this.getUserDrawingSpaces(vp));
+    }
   }
 
   /**
