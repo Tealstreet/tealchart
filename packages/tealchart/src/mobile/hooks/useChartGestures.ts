@@ -68,6 +68,9 @@ export function useChartGestures({
   const interactionFrameX = useSharedValue(0);
   const interactionFrameY = useSharedValue(0);
   const drawingEditClaimed = useSharedValue(false);
+  const panBeginX = useSharedValue(0);
+  const panBeginY = useSharedValue(0);
+  const gestureCleanedUp = useSharedValue(false);
 
   // Pan handler for chart scrolling (time and price)
   // All data access happens on JS thread via closure
@@ -261,8 +264,13 @@ export function useChartGestures({
     return Gesture.Pan()
       .enabled(enabled)
       .runOnJS(true)
-      .onStart((event) => {
-        drawingEditClaimed.value = handlePanStartAndSetValues(event.x, event.y);
+      .onBegin((event) => {
+        panBeginX.value = event.x;
+        panBeginY.value = event.y;
+        gestureCleanedUp.value = false;
+      })
+      .onStart(() => {
+        drawingEditClaimed.value = handlePanStartAndSetValues(panBeginX.value, panBeginY.value);
       })
       .onUpdate((event) => {
         scheduleInteraction(event.x, event.y);
@@ -283,7 +291,10 @@ export function useChartGestures({
           updateViewportFromPan(deltaX, deltaY);
         }
       })
-      .onEnd(() => {
+      .onFinalize(() => {
+        if (gestureCleanedUp.value) return;
+        gestureCleanedUp.value = true;
+
         const zone = gestureZoneValue.value;
         if (drawingEditClaimed.value) {
           onDrawingEditEnd?.();
@@ -309,6 +320,9 @@ export function useChartGestures({
     savedTranslateX,
     savedTranslateY,
     drawingEditClaimed,
+    panBeginX,
+    panBeginY,
+    gestureCleanedUp,
     interactionFramePending,
     interactionFrameX,
     interactionFrameY,
