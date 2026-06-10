@@ -5,7 +5,7 @@ import type { CanvasContext } from './CanvasContext';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createCanvas } from '@napi-rs/canvas';
+import { createCanvas, type Canvas } from '@napi-rs/canvas';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -25,11 +25,11 @@ function ensureSnapshotDir(): void {
   }
 }
 
-function freshCanvas(): ReturnType<typeof createCanvas> {
+function freshCanvas(): Canvas {
   return createCanvas(WIDTH, HEIGHT);
 }
 
-function wrapNapiCanvas(canvas: ReturnType<typeof createCanvas>): CanvasContext {
+function wrapNapiCanvas(canvas: Canvas): CanvasContext {
   const ctx = canvas.getContext('2d');
   return ctx as unknown as CanvasContext;
 }
@@ -58,7 +58,7 @@ function makeViewport(bars: Bar[]): Viewport {
   };
 }
 
-function makeRenderer(canvas: ReturnType<typeof createCanvas>): TealchartRenderer {
+function makeRenderer(canvas: Canvas): TealchartRenderer {
   const ctx = wrapNapiCanvas(canvas);
   return new TealchartRenderer(ctx, {
     width: WIDTH,
@@ -561,4 +561,3 @@ describe('visual snapshot rendering', () => {
     });
   });
 });
-
