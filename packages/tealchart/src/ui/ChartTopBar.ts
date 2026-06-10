@@ -1,9 +1,11 @@
 import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
+import type { UserDrawingState, UserDrawingTool } from '../drawings';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
+import { USER_DRAWING_TOOL_DESCRIPTORS, USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS } from '../drawings';
 import { Component } from './Component';
 import { LayoutSelector } from './LayoutSelector';
 
@@ -30,6 +32,16 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onIndicatorsClick?: () => void;
   /** Layout selector callbacks (if provided, layout selector is shown) */
   layoutCallbacks?: LayoutSelectorCallbacks;
+  /** Current user drawing state for toolbar highlighting and action availability */
+  userDrawingState?: UserDrawingState;
+  /** Callback when a drawing tool is selected */
+  onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when the selected drawing should be deleted */
+  onUserDrawingDeleteSelected?: () => void;
+  /** Callback when the active drawing draft should be cancelled */
+  onUserDrawingCancelDraft?: () => void;
+  /** Callback when all user drawings should be cleared */
+  onUserDrawingClearAll?: () => void;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
 }
@@ -135,6 +147,39 @@ const styles = {
     fontSize: '14px',
     fontStyle: 'italic',
     fontWeight: '700',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '2px',
+    flexShrink: '0',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingButton: {
+    width: '24px',
+    height: '24px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: 'var(--text2, #787b86)',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: '600',
+    lineHeight: '24px',
+    padding: '0',
+    textAlign: 'center',
+    transition: 'background-color 0.15s, color 0.15s, opacity 0.15s',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingButtonActive: {
+    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.2))',
+    color: 'var(--accent, #2962ff)',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingButtonHover: {
+    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
+    color: 'var(--text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   spacer: {
@@ -301,6 +346,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     this.el.appendChild(this.indicatorsBtn);
 
+    if (this.options.userDrawingState) {
+      this.el.appendChild(this.createElement('div', { style: styles.divider }));
+      this.el.appendChild(this.renderDrawingToolbar());
+    }
+
     // Spacer
     this.el.appendChild(this.createElement('div', { style: styles.spacer }));
 
@@ -314,6 +364,79 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
       this.el.appendChild(this.layoutSelector.getElement());
     }
+  }
+
+  private renderDrawingToolbar(): HTMLElement {
+    const group = this.createElement('div', { style: styles.drawingGroup });
+    const state = this.options.userDrawingState;
+    const activeTool = state?.activeTool ?? 'select';
+    const hasSelection = state?.selection !== null;
+    const hasDraft = state?.draft !== null;
+    const hasDrawings = (state?.drawings.length ?? 0) > 0;
+
+    for (const descriptor of USER_DRAWING_TOOL_DESCRIPTORS) {
+      const isActive = activeTool === descriptor.tool;
+      const btn = this.createElement('button', {
+        style: {
+          ...styles.drawingButton,
+          ...(isActive ? styles.drawingButtonActive : {}),
+        },
+        textContent: descriptor.icon,
+        attributes: {
+          type: 'button',
+          title: descriptor.label,
+          'aria-label': descriptor.label,
+          'aria-pressed': isActive ? 'true' : 'false',
+        },
+      });
+      btn.addEventListener('click', () => this.options.onUserDrawingToolSelect?.(descriptor.tool));
+      btn.addEventListener('mouseenter', () => {
+        if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+      });
+      btn.addEventListener('mouseleave', () => {
+        if (!isActive) {
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = 'var(--text2, #787b86)';
+        }
+      });
+      group.appendChild(btn);
+    }
+
+    group.appendChild(this.createElement('div', { style: styles.divider }));
+
+    for (const descriptor of USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS) {
+      const enabled =
+        descriptor.action === 'deleteSelected' ? hasSelection : descriptor.action === 'cancelDraft' ? hasDraft : hasDrawings;
+      const btn = this.createElement('button', {
+        style: {
+          ...styles.drawingButton,
+          opacity: enabled ? '1' : '0.35',
+          cursor: enabled ? 'pointer' : 'default',
+        },
+        textContent: descriptor.icon,
+        attributes: {
+          type: 'button',
+          title: descriptor.label,
+          'aria-label': descriptor.label,
+        },
+      });
+      btn.disabled = !enabled;
+      if (enabled) {
+        btn.addEventListener('click', () => {
+          if (descriptor.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
+          if (descriptor.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
+          if (descriptor.action === 'clearAll') this.options.onUserDrawingClearAll?.();
+        });
+        btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
+        btn.addEventListener('mouseleave', () => {
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = 'var(--text2, #787b86)';
+        });
+      }
+      group.appendChild(btn);
+    }
+
+    return group;
   }
 
   // ============================================================================
@@ -392,6 +515,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
    */
   setSupportedResolutions(resolutions: string[] | null): void {
     this.supportedResolutions = resolutions;
+    this.render();
+  }
+
+  setUserDrawingState(state: UserDrawingState): void {
+    this.options.userDrawingState = state;
     this.render();
   }
 
