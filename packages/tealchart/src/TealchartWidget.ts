@@ -27,14 +27,19 @@ import { LOADING_OPACITY } from './constants';
 import {
   applyUserDrawingEditDrag,
   beginUserDrawingEditDragAtPoint,
+  beginUserDrawingTextEdit,
   cancelUserDrawingDraft as cancelUserDrawingDraftState,
+  cancelUserDrawingTextEdit,
   clearUserDrawings as clearUserDrawingsState,
+  commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
+  setUserDrawingText,
   setUserDrawingTool,
+  updateUserDrawingTextEdit,
 } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
@@ -1010,10 +1015,10 @@ export class TealchartWidget {
       },
       onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
       onUserDrawingClearAll: () => this.clearUserDrawings(),
-      onPaneDoubleClick: (paneId) => {
-        this._paneManager.toggleMaximizePane(paneId);
-        this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
-      },
+      onUserDrawingTextEditChange: (value) => this.updateUserDrawingTextEdit(value),
+      onUserDrawingTextEditCommit: () => this.commitUserDrawingTextEdit(),
+      onUserDrawingTextEditCancel: () => this.cancelUserDrawingTextEdit(),
+      onPaneDoubleClick: (paneId, point, spacesByPaneId) => this._handlePaneDoubleClick(paneId, point, spacesByPaneId),
       layoutCallbacks: this._options.save_load_adapter
         ? {
             getAllLayouts: () => {
@@ -2171,6 +2176,36 @@ export class TealchartWidget {
     this.setUserDrawingState(cancelUserDrawingDraftState(this._userDrawingState));
   }
 
+  beginUserDrawingTextEdit(drawingId = this._userDrawingState.selection?.drawingId): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(beginUserDrawingTextEdit(this._userDrawingState, drawingId));
+    return this._userDrawingState !== previousState;
+  }
+
+  updateUserDrawingTextEdit(value: string): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(updateUserDrawingTextEdit(this._userDrawingState, value));
+    return this._userDrawingState !== previousState;
+  }
+
+  commitUserDrawingTextEdit(): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(commitUserDrawingTextEdit(this._userDrawingState));
+    return this._userDrawingState !== previousState;
+  }
+
+  cancelUserDrawingTextEdit(): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(cancelUserDrawingTextEdit(this._userDrawingState));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingText(drawingId: string, text: string): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingText(this._userDrawingState, drawingId, text));
+    return this._userDrawingState !== previousState;
+  }
+
   private _createUserDrawingId(): string {
     const existingIds = new Set(this._userDrawingState.drawings.map((drawing) => drawing.id));
     let id = '';
@@ -2229,6 +2264,30 @@ export class TealchartWidget {
 
   private _handleUserDrawingEditEnd(): void {
     this._userDrawingEditDrag = null;
+  }
+
+  private _handlePaneDoubleClick(
+    paneId: string,
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ): void {
+    if (this._userDrawingState.activeTool === 'select') {
+      const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId);
+      const selectedId = result.state.selection?.drawingId;
+      const selectedDrawing = selectedId
+        ? result.state.drawings.find((drawing) => drawing.id === selectedId)
+        : null;
+      if (result.hit && selectedDrawing?.kind === 'textLabel') {
+        const nextState = beginUserDrawingTextEdit(result.state, selectedDrawing.id);
+        if (nextState !== result.state) {
+          this.setUserDrawingState(nextState);
+          return;
+        }
+      }
+    }
+
+    this._paneManager.toggleMaximizePane(paneId);
+    this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
   }
 
   /**

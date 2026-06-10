@@ -27,7 +27,7 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { TIME_AXIS_HEIGHT } from '../types';
-import { getUserDrawingToolbarStateKey } from '../drawings';
+import { anchorToScreenPoint, getUserDrawingToolbarStateKey } from '../drawings';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
@@ -134,6 +134,12 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Called when the top bar should clear all user drawings */
   onUserDrawingClearAll?: () => void;
+  /** Called when the active user drawing text editor changes */
+  onUserDrawingTextEditChange?: (value: string) => void;
+  /** Called when the active user drawing text editor should commit */
+  onUserDrawingTextEditCommit?: () => void;
+  /** Called when the active user drawing text editor should cancel */
+  onUserDrawingTextEditCancel?: () => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
   onAutoScaleDisabled?: (paneId: string) => void;
   /** Called when viewport is reset (re-enables auto-scale) */
@@ -141,7 +147,11 @@ export interface TealchartWidgetUIOptions {
   /** Returns whether auto-scale is active for a given pane */
   isAutoScale?: (paneId: string) => boolean;
   /** Called on double-click/double-tap on a pane */
-  onPaneDoubleClick?: (paneId: string) => void;
+  onPaneDoubleClick?: (
+    paneId: string,
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => void;
   /** Layout selector callbacks — if provided, layout selector is shown in the top bar */
   layoutCallbacks?: LayoutSelectorCallbacks;
 }
@@ -158,6 +168,7 @@ export class TealchartWidgetUI {
   private rootEl: HTMLDivElement;
   private chartArea: HTMLDivElement;
   private loadingDots: HTMLDivElement | null = null;
+  private userDrawingTextEditor: HTMLTextAreaElement | null = null;
 
   // Components
   private chartCore: ChartCore | null = null;
@@ -364,6 +375,7 @@ export class TealchartWidgetUI {
    */
   setViewport(viewport: Viewport): void {
     this.chartCore?.setViewport(viewport);
+    this.renderUserDrawingTextEditor(this.options.userDrawingState);
   }
 
   /**
@@ -425,12 +437,104 @@ export class TealchartWidgetUI {
    * Update user drawing state - calls ChartCore directly
    */
   setUserDrawingState(state: UserDrawingState): void {
+    this.options.userDrawingState = state;
     const toolbarStateKey = getUserDrawingToolbarStateKey(state);
     if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
       this.currentUserDrawingToolbarStateKey = toolbarStateKey;
       this.topBar?.setUserDrawingState(state);
     }
     this.chartCore?.setUserDrawingState(state);
+    this.renderUserDrawingTextEditor(state);
+  }
+
+  private removeUserDrawingTextEditor(): void {
+    this.userDrawingTextEditor?.remove();
+    this.userDrawingTextEditor = null;
+  }
+
+  private renderUserDrawingTextEditor(state: UserDrawingState | undefined): void {
+    const textEdit = state?.textEdit;
+    if (!state || !textEdit) {
+      this.removeUserDrawingTextEditor();
+      return;
+    }
+
+    const drawing = state.drawings.find((candidate) => candidate.id === textEdit.drawingId);
+    if (!drawing || drawing.kind !== 'textLabel') {
+      this.removeUserDrawingTextEditor();
+      return;
+    }
+
+    const spacesByPaneId = this.chartCore?.getUserDrawingSpacesForCurrentViewport();
+    const space = spacesByPaneId?.get(drawing.paneId);
+    if (!space) {
+      this.removeUserDrawingTextEditor();
+      return;
+    }
+
+    const point = anchorToScreenPoint(drawing.point, space);
+    const width = Math.max(120, Math.min(260, textEdit.value.length * 7 + 32));
+    const chartWidth = this.chartArea.clientWidth || this.rootEl.clientWidth || 0;
+    const left = Math.max(space.chartLeft, Math.min(point.x - width / 2, Math.max(space.chartLeft, chartWidth - width - 8)));
+    const top = Math.max(space.pane.top, point.y - 18);
+
+    if (!this.userDrawingTextEditor) {
+      const editor = document.createElement('textarea');
+      editor.setAttribute('aria-label', 'Edit drawing text');
+      editor.dataset.tealchartUserDrawingTextEditor = 'true';
+      editor.rows = 1;
+      Object.assign(editor.style, {
+        position: 'absolute',
+        zIndex: '6',
+        minHeight: '28px',
+        resize: 'none',
+        padding: '4px 6px',
+        border: '1px solid rgba(245, 197, 66, 0.9)',
+        borderRadius: '4px',
+        outline: 'none',
+        background: 'rgba(9, 12, 18, 0.92)',
+        color: drawing.style.textColor ?? drawing.style.lineColor,
+        fontSize: `${drawing.style.fontSize ?? 12}px`,
+        fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
+        lineHeight: '18px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.28)',
+        pointerEvents: 'auto',
+      });
+      editor.addEventListener('mousedown', (event) => event.stopPropagation());
+      editor.addEventListener('mouseup', (event) => event.stopPropagation());
+      editor.addEventListener('click', (event) => event.stopPropagation());
+      editor.addEventListener('input', () => this.options.onUserDrawingTextEditChange?.(editor.value));
+      editor.addEventListener('keydown', (event) => {
+        event.stopPropagation();
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          this.options.onUserDrawingTextEditCancel?.();
+        } else if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          this.options.onUserDrawingTextEditCommit?.();
+        }
+      });
+      editor.addEventListener('blur', () => this.options.onUserDrawingTextEditCommit?.());
+      this.rootEl.appendChild(editor);
+      this.userDrawingTextEditor = editor;
+      queueMicrotask(() => {
+        if (this.userDrawingTextEditor === editor) {
+          editor.focus();
+          editor.select();
+        }
+      });
+    }
+
+    const editor = this.userDrawingTextEditor;
+    if (editor.value !== textEdit.value) editor.value = textEdit.value;
+    Object.assign(editor.style, {
+      left: `${left}px`,
+      top: `${top}px`,
+      width: `${width}px`,
+      color: drawing.style.textColor ?? drawing.style.lineColor,
+      fontSize: `${drawing.style.fontSize ?? 12}px`,
+      fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
+    });
   }
 
   /**
@@ -448,6 +552,7 @@ export class TealchartWidgetUI {
     this.chartCore?.setPaneLayout(layout);
     // Update indicator pane legend positions
     this.updateIndicatorPaneLegends();
+    this.renderUserDrawingTextEditor(this.options.userDrawingState);
   }
 
   /**
@@ -689,6 +794,7 @@ export class TealchartWidgetUI {
    * Dispose and clean up
    */
   dispose(preserveDom = false): void {
+    this.removeUserDrawingTextEditor();
     this.chartCore?.dispose(preserveDom);
     this.topBar?.unmount();
     this.legend?.unmount();
