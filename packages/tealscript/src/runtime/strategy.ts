@@ -329,6 +329,10 @@ export interface StrategyLedger {
   maxContractsHeldAll: number;
   maxContractsHeldLong: number;
   maxContractsHeldShort: number;
+  _equityCurvePeak: number;
+  _equityCurveTrough: number;
+  _equityCurvePeakBeforeLast: number;
+  _equityCurveTroughBeforeLast: number;
 }
 
 export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSettings> = {}): StrategyLedgerSettings {
@@ -397,6 +401,10 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
     maxContractsHeldAll: 0,
     maxContractsHeldLong: 0,
     maxContractsHeldShort: 0,
+    _equityCurvePeak: resolvedSettings.initialCapital,
+    _equityCurveTrough: resolvedSettings.initialCapital,
+    _equityCurvePeakBeforeLast: resolvedSettings.initialCapital,
+    _equityCurveTroughBeforeLast: resolvedSettings.initialCapital,
   };
 }
 
@@ -420,6 +428,10 @@ export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
     maxContractsHeldAll: ledger.maxContractsHeldAll,
     maxContractsHeldLong: ledger.maxContractsHeldLong,
     maxContractsHeldShort: ledger.maxContractsHeldShort,
+    _equityCurvePeak: ledger._equityCurvePeak,
+    _equityCurveTrough: ledger._equityCurveTrough,
+    _equityCurvePeakBeforeLast: ledger._equityCurvePeakBeforeLast,
+    _equityCurveTroughBeforeLast: ledger._equityCurveTroughBeforeLast,
   };
 }
 
@@ -468,13 +480,13 @@ function recordStrategyEquityPoint(ledger: StrategyLedger, barIndex: number, tim
     return;
   }
 
-  const existingIndex = ledger.equityCurve.findIndex((point) => point.barIndex === barIndex);
-  const priorPoints = existingIndex === -1
-    ? ledger.equityCurve
-    : ledger.equityCurve.slice(0, existingIndex);
-  const previousEquities = priorPoints.map((point) => point.equity);
-  const peakEquity = Math.max(ledger.initialCapital, ...previousEquities);
-  const troughEquity = Math.min(ledger.initialCapital, ...previousEquities);
+  const curve = ledger.equityCurve;
+  const lastIdx = curve.length - 1;
+  const isReplace = lastIdx >= 0 && curve[lastIdx].barIndex === barIndex;
+
+  const peakEquity = isReplace ? ledger._equityCurvePeakBeforeLast : ledger._equityCurvePeak;
+  const troughEquity = isReplace ? ledger._equityCurveTroughBeforeLast : ledger._equityCurveTrough;
+
   const equityPoint: StrategyEquityPoint = {
     barIndex,
     time,
@@ -485,11 +497,15 @@ function recordStrategyEquityPoint(ledger: StrategyLedger, barIndex: number, tim
     runup: Math.max(0, ledger.equity - troughEquity),
   };
 
-  if (existingIndex === -1) {
-    ledger.equityCurve.push(equityPoint);
+  if (isReplace) {
+    curve[lastIdx] = equityPoint;
   } else {
-    ledger.equityCurve[existingIndex] = equityPoint;
+    ledger._equityCurvePeakBeforeLast = ledger._equityCurvePeak;
+    ledger._equityCurveTroughBeforeLast = ledger._equityCurveTrough;
+    curve.push(equityPoint);
   }
+  ledger._equityCurvePeak = Math.max(peakEquity, ledger.equity);
+  ledger._equityCurveTrough = Math.min(troughEquity, ledger.equity);
 }
 
 export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {

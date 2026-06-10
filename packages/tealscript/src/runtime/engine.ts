@@ -1958,6 +1958,9 @@ export class TealscriptEngine {
   }
 
   private captureOrderFillRecalculationState(): void {
+    if (!this.ctx.strategyLedger.settings.calcOnOrderFills) {
+      return;
+    }
     this.orderFillScopeSnapshot = this.scope.snapshot();
     this.orderFillFunctionScopeSnapshots = new Map();
     for (const [key, functionScope] of this.functionScopes) {
