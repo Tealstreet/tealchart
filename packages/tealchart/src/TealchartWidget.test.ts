@@ -581,6 +581,119 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('applies public text drawing edit commands through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        drawings: [
+          {
+            id: 'label',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            point: { time: 50, price: 50 },
+            text: 'Note',
+            textAlign: 'center',
+          },
+        ],
+      });
+
+      expect(widget.beginUserDrawingTextEdit('label')).toBe(true);
+      expect(widget.getUserDrawingState().textEdit).toMatchObject({
+        drawingId: 'label',
+        value: 'Note',
+      });
+
+      expect(widget.updateUserDrawingTextEdit('Updated')).toBe(true);
+      expect(widget.commitUserDrawingTextEdit()).toBe(true);
+      expect(widget.getUserDrawingState().textEdit).toBeNull();
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'label',
+        text: 'Updated',
+      });
+
+      expect(widget.setUserDrawingText('label', 'Direct')).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ text: 'Direct' });
+
+      expect(widget.beginUserDrawingTextEdit('label')).toBe(true);
+      expect(widget.updateUserDrawingTextEdit('Draft')).toBe(true);
+      expect(widget.cancelUserDrawingTextEdit()).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ text: 'Direct' });
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    it('opens text editing on text-label double-click instead of maximizing the pane', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'select',
+        drawings: [
+          {
+            id: 'label',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            point: { time: 50, price: 50 },
+            text: 'Note',
+            textAlign: 'center',
+          },
+        ],
+      });
+      const testWidget = widget as unknown as {
+        _paneManager: { toggleMaximizePane: ReturnType<typeof vi.fn> };
+        _handlePaneDoubleClick(
+          paneId: string,
+          point: { x: number; y: number },
+          spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+        ): void;
+      };
+      testWidget._paneManager.toggleMaximizePane = vi.fn();
+
+      testWidget._handlePaneDoubleClick('main', { x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+
+      expect(widget.getUserDrawingState().textEdit).toMatchObject({
+        drawingId: 'label',
+        value: 'Note',
+      });
+      expect(testWidget._paneManager.toggleMaximizePane).not.toHaveBeenCalled();
+
+      widget.cancelUserDrawingTextEdit();
+      testWidget._handlePaneDoubleClick('main', { x: 95, y: 5 }, new Map([['main', userDrawingSpace]]));
+
+      expect(testWidget._paneManager.toggleMaximizePane).toHaveBeenCalledWith('main');
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: null,
+        textEdit: null,
+        drawings: [{ ...widget.getUserDrawingState().drawings[0]!, locked: true }],
+      });
+      testWidget._paneManager.toggleMaximizePane.mockClear();
+      testWidget._handlePaneDoubleClick('main', { x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+
+      expect(widget.getUserDrawingState().textEdit).toBeNull();
+      expect(testWidget._paneManager.toggleMaximizePane).toHaveBeenCalledWith('main');
+    });
+
     it('deletes the selected drawing from keyboard delete shortcuts only while chart owns input', () => {
       const datafeed = createMockDatafeed();
       const container = document.createElement('div');
