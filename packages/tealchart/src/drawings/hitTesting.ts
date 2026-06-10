@@ -7,10 +7,11 @@ import type {
 } from './coordinates';
 import type { UserDrawing, UserDrawingHandleRole } from './types';
 
-import { resolveUserDrawingGeometry } from './coordinates';
+import { anchorToScreenPoint, resolveUserDrawingGeometry } from './coordinates';
 
 export interface UserDrawingHitTestOptions {
   tolerance?: number;
+  handleTolerance?: number;
   labelWidth?: number;
   labelHeight?: number;
 }
@@ -22,6 +23,7 @@ export interface UserDrawingHitResult {
 }
 
 const DEFAULT_TOLERANCE = 6;
+const DEFAULT_HANDLE_TOLERANCE = 8;
 const DEFAULT_LABEL_WIDTH = 72;
 const DEFAULT_LABEL_HEIGHT = 24;
 
@@ -65,9 +67,13 @@ export function distanceToRectEdge(point: DrawingScreenPoint, rect: DrawingScree
 function hitTestResolvedGeometry(
   geometry: ResolvedUserDrawingGeometry,
   point: DrawingScreenPoint,
+  space: DrawingCoordinateSpace,
   options: Required<UserDrawingHitTestOptions>,
 ): UserDrawingHitResult | null {
   if (!geometry.drawing.visible || geometry.drawing.locked) return null;
+
+  const handleHit = hitTestUserDrawingHandle(geometry, point, space, options.handleTolerance);
+  if (handleHit) return handleHit;
 
   if (geometry.kind === 'rectangle') {
     const distance = distanceToRectEdge(point, geometry.rect);
@@ -90,6 +96,54 @@ function hitTestResolvedGeometry(
   return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
 }
 
+function hitTestUserDrawingHandle(
+  geometry: ResolvedUserDrawingGeometry,
+  point: DrawingScreenPoint,
+  space: DrawingCoordinateSpace,
+  tolerance: number,
+): UserDrawingHitResult | null {
+  const handles: Array<{ handle: UserDrawingHandleRole; point: DrawingScreenPoint }> = [];
+
+  switch (geometry.kind) {
+    case 'line':
+    case 'ray': {
+      if (geometry.drawing.kind === 'trendLine' || geometry.drawing.kind === 'ray') {
+        handles.push(
+          { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },
+          { handle: 'end', point: anchorToScreenPoint(geometry.drawing.points[1], space) },
+        );
+      }
+      break;
+    }
+    case 'rectangle':
+      handles.push(
+        { handle: 'topLeft', point: { x: geometry.rect.x, y: geometry.rect.y } },
+        { handle: 'topRight', point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y } },
+        {
+          handle: 'bottomRight',
+          point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y + geometry.rect.height },
+        },
+        { handle: 'bottomLeft', point: { x: geometry.rect.x, y: geometry.rect.y + geometry.rect.height } },
+      );
+      break;
+    case 'textLabel':
+      handles.push({ handle: 'center', point: geometry.point });
+      break;
+    case 'horizontalLine':
+    case 'verticalLine':
+      break;
+  }
+
+  for (const candidate of handles) {
+    const distance = distanceBetweenPoints(point, candidate.point);
+    if (distance <= tolerance) {
+      return { drawing: geometry.drawing, handle: candidate.handle, distance };
+    }
+  }
+
+  return null;
+}
+
 export function hitTestUserDrawing(
   drawing: UserDrawing,
   point: DrawingScreenPoint,
@@ -105,8 +159,9 @@ export function hitTestUserDrawing(
     return null;
   }
 
-  return hitTestResolvedGeometry(resolveUserDrawingGeometry(drawing, space), point, {
+  return hitTestResolvedGeometry(resolveUserDrawingGeometry(drawing, space), point, space, {
     tolerance: options.tolerance ?? DEFAULT_TOLERANCE,
+    handleTolerance: options.handleTolerance ?? DEFAULT_HANDLE_TOLERANCE,
     labelWidth: options.labelWidth ?? DEFAULT_LABEL_WIDTH,
     labelHeight: options.labelHeight ?? DEFAULT_LABEL_HEIGHT,
   });

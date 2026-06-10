@@ -71,6 +71,23 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('reports endpoint handles before line body hits', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'line',
+      kind: 'trendLine',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      extend: 'none',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('start');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space)?.handle).toBe('end');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.handle).toBeUndefined();
+  });
+
   it('hits extended rays beyond their second anchor', () => {
     const drawing: UserDrawing = {
       ...base,
@@ -116,6 +133,23 @@ describe('user drawing hit testing', () => {
 
     expect(hitTestUserDrawing(drawing, { x: 50, y: 10 }, space)?.drawing.id).toBe('rect');
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
+  it('reports rectangle corner handles before edge hits', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rect',
+      kind: 'rectangle',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('topLeft');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 10 }, space)?.handle).toBe('topRight');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space)?.handle).toBe('bottomRight');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 90 }, space)?.handle).toBe('bottomLeft');
   });
 
   it('hits text labels using a configurable label box', () => {
