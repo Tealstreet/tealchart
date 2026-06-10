@@ -1003,6 +1003,13 @@ export class TealchartWidget {
       onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
       onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
+      userDrawingState: this._userDrawingState,
+      onUserDrawingToolSelect: (tool) => this.setActiveUserDrawingTool(tool),
+      onUserDrawingDeleteSelected: () => {
+        this.deleteSelectedUserDrawing();
+      },
+      onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
+      onUserDrawingClearAll: () => this.clearUserDrawings(),
       onPaneDoubleClick: (paneId) => {
         this._paneManager.toggleMaximizePane(paneId);
         this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);

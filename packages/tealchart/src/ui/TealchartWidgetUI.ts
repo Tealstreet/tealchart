@@ -8,6 +8,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
+  UserDrawingTool,
 } from '../drawings';
 import type {
   Bar,
@@ -26,6 +27,7 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { TIME_AXIS_HEIGHT } from '../types';
+import { getUserDrawingToolbarStateKey } from '../drawings';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
@@ -122,6 +124,16 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
   onUserDrawingEditEnd?: () => void;
+  /** Initial/current user drawing state for top-bar controls */
+  userDrawingState?: UserDrawingState;
+  /** Called when a drawing tool is selected from the top bar */
+  onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Called when the top bar should delete the selected user drawing */
+  onUserDrawingDeleteSelected?: () => void;
+  /** Called when the top bar should cancel the active user drawing draft */
+  onUserDrawingCancelDraft?: () => void;
+  /** Called when the top bar should clear all user drawings */
+  onUserDrawingClearAll?: () => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
   onAutoScaleDisabled?: (paneId: string) => void;
   /** Called when viewport is reset (re-enables auto-scale) */
@@ -160,6 +172,7 @@ export class TealchartWidgetUI {
   private currentPlots: PlotOutput[] = [];
   private currentPaneLayout: PaneLayout | null = null;
   private currentIndicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
+  private currentUserDrawingToolbarStateKey: string | null = null;
 
   // Indicator pane legends (one per non-overlay indicator pane)
   private indicatorPaneLegends: Map<string, IndicatorPaneLegend> = new Map();
@@ -194,6 +207,9 @@ export class TealchartWidgetUI {
 
     // Create top bar - positioned absolutely over the chart
     if (options.showTopBar !== false) {
+      this.currentUserDrawingToolbarStateKey = options.userDrawingState
+        ? getUserDrawingToolbarStateKey(options.userDrawingState)
+        : null;
       const topBarWrapper = div({
         style: {
           position: 'absolute',
@@ -213,6 +229,11 @@ export class TealchartWidgetUI {
         onIndicatorsClick: () => {
           this.indicatorsModal?.toggle();
         },
+        userDrawingState: options.userDrawingState,
+        onUserDrawingToolSelect: options.onUserDrawingToolSelect,
+        onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
+        onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
+        onUserDrawingClearAll: options.onUserDrawingClearAll,
         layoutCallbacks: options.layoutCallbacks,
       });
       this.topBar.mount(topBarWrapper);
@@ -404,6 +425,11 @@ export class TealchartWidgetUI {
    * Update user drawing state - calls ChartCore directly
    */
   setUserDrawingState(state: UserDrawingState): void {
+    const toolbarStateKey = getUserDrawingToolbarStateKey(state);
+    if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
+      this.currentUserDrawingToolbarStateKey = toolbarStateKey;
+      this.topBar?.setUserDrawingState(state);
+    }
     this.chartCore?.setUserDrawingState(state);
   }
 
