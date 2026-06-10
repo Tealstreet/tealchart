@@ -1,8 +1,9 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { RectangleDrawing, TrendLineDrawing, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   anchorToScreenPoint,
   drawingXToTime,
@@ -42,6 +43,10 @@ const space: DrawingCoordinateSpace = {
 };
 
 describe('user drawing coordinates', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('maps time and price values to screen coordinates and back', () => {
     expect(timeToDrawingX(2_000, space)).toBe(110);
     expect(drawingXToTime(110, space)).toBe(2_000);
