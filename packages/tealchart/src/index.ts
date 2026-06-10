@@ -58,7 +58,9 @@ export {
   drawingXToTime,
   drawingYToPrice,
   cancelUserDrawingDraft,
+  clearUserDrawings,
   createUserDrawingState,
+  deleteUserDrawing,
   getRequiredAnchorCount,
   getUserDrawingPaneId,
   handleUserDrawingInput,
@@ -75,6 +77,7 @@ export {
   resolveUserDrawingInputPointFromChart,
   resolveUserDrawingRenderEntries,
   selectUserDrawing,
+  selectUserDrawingById,
   renderUserDrawing,
   renderUserDrawingLayer,
   renderUserDrawings,
@@ -85,6 +88,7 @@ export {
 } from './drawings';
 export type {
   CreateUserDrawingFromDraftOptions,
+  DeleteUserDrawingOptions,
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   DrawingScreenRect,

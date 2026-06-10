@@ -13,9 +13,11 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UserDrawingEditDrag,
+  UserDrawingHandleRole,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
+  UserDrawingTool,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
@@ -25,9 +27,14 @@ import { LOADING_OPACITY } from './constants';
 import {
   applyUserDrawingEditDrag,
   beginUserDrawingEditDragAtPoint,
+  cancelUserDrawingDraft as cancelUserDrawingDraftState,
+  clearUserDrawings as clearUserDrawingsState,
   createUserDrawingState,
+  deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
+  selectUserDrawingById,
+  setUserDrawingTool,
 } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
@@ -2131,6 +2138,32 @@ export class TealchartWidget {
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
   }
 
+  setActiveUserDrawingTool(tool: UserDrawingTool): void {
+    this.setUserDrawingState(setUserDrawingTool(this._userDrawingState, tool));
+  }
+
+  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
+    this.setUserDrawingState(selectUserDrawingById(this._userDrawingState, drawingId, handle));
+  }
+
+  deleteUserDrawing(drawingId?: string): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(deleteUserDrawingState(this._userDrawingState, { drawingId }));
+    return this._userDrawingState !== previousState;
+  }
+
+  deleteSelectedUserDrawing(): boolean {
+    return this.deleteUserDrawing();
+  }
+
+  clearUserDrawings(): void {
+    this.setUserDrawingState(clearUserDrawingsState(this._userDrawingState));
+  }
+
+  cancelUserDrawingDraft(): void {
+    this.setUserDrawingState(cancelUserDrawingDraftState(this._userDrawingState));
+  }
+
   private _createUserDrawingId(): string {
     const existingIds = new Set(this._userDrawingState.drawings.map((drawing) => drawing.id));
     let id = '';
@@ -2382,6 +2415,12 @@ export class TealchartWidget {
 
     // Don't capture events when user is typing in an input (e.g., modal search)
     if (this._isInputElement(e)) {
+      return;
+    }
+
+    if ((e.key === 'Delete' || e.key === 'Backspace') && this.deleteSelectedUserDrawing()) {
+      e.stopPropagation();
+      e.preventDefault();
       return;
     }
 
