@@ -1484,7 +1484,7 @@ export class ChartCore {
     if (this.userDrawingState?.activeTool === 'select') {
       const chartLeft = this.margins.left;
       const chartRight = this.options.width - this.margins.right;
-      if (x < chartLeft || x > chartRight || !this.getPaneAtY(y)) return false;
+      if (x < chartLeft || x >= chartRight || !this.getPaneAtY(y)) return false;
 
       const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
       return source === 'touch' && (selection?.hit === true || selection?.changed === true)
