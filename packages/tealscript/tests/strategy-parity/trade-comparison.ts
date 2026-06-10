@@ -116,8 +116,8 @@ export function referenceToNormalizedTrades(refs: ReferenceTrade[]): NormalizedT
       group = {};
       grouped.set(ref.tradeNum, group);
     }
-    if (ref.type.startsWith('Entry')) group.entry = ref;
-    else if (ref.type.startsWith('Exit')) group.exit = ref;
+    if (ref.type.startsWith('Entry') && !group.entry) group.entry = ref;
+    else if (ref.type.startsWith('Exit') && !group.exit) group.exit = ref;
   }
 
   const sortedKeys = [...grouped.keys()].sort((a, b) => a - b);
@@ -176,7 +176,7 @@ export function alignTrades(engine: NormalizedTrade[], reference: NormalizedTrad
       }
     }
 
-    if (bestRi >= 0) {
+    if (bestRi >= 0 && bestScore < 500) {
       const rt = reference[bestRi]!;
       usedRef.add(bestRi);
       matches.push({
@@ -196,21 +196,8 @@ export function alignTrades(engine: NormalizedTrade[], reference: NormalizedTrad
 export function trimToOverlap(
   engineTrades: NormalizedTrade[],
   referenceTrades: NormalizedTrade[],
-  tolerancePct: number = 0.01,
 ): { engine: NormalizedTrade[]; reference: NormalizedTrade[] } {
   if (engineTrades.length === 0 || referenceTrades.length === 0) {
-    return { engine: engineTrades, reference: referenceTrades };
-  }
-
-  const eFirst = engineTrades[0]!.entryPrice;
-  const eLast = engineTrades[engineTrades.length - 1]!.entryPrice;
-  const rFirst = referenceTrades[0]!.entryPrice;
-  const rLast = referenceTrades[referenceTrades.length - 1]!.entryPrice;
-
-  const overlapLow = Math.max(Math.min(eFirst, eLast), Math.min(rFirst, rLast)) * (1 - tolerancePct);
-  const overlapHigh = Math.min(Math.max(eFirst, eLast), Math.max(rFirst, rLast)) * (1 + tolerancePct);
-
-  if (overlapLow > overlapHigh) {
     return { engine: engineTrades, reference: referenceTrades };
   }
 
@@ -219,14 +206,17 @@ export function trimToOverlap(
     return { engine: engineTrades, reference: referenceTrades };
   }
 
-  const firstMatchEngineIdx = Math.min(...matches.map((m) => m.engineIndex));
-  const lastMatchEngineIdx = Math.max(...matches.map((m) => m.engineIndex));
-  const firstMatchRefIdx = Math.min(...matches.map((m) => m.referenceIndex));
-  const lastMatchRefIdx = Math.max(...matches.map((m) => m.referenceIndex));
+  let firstE = Infinity, lastE = -Infinity, firstR = Infinity, lastR = -Infinity;
+  for (const m of matches) {
+    if (m.engineIndex < firstE) firstE = m.engineIndex;
+    if (m.engineIndex > lastE) lastE = m.engineIndex;
+    if (m.referenceIndex < firstR) firstR = m.referenceIndex;
+    if (m.referenceIndex > lastR) lastR = m.referenceIndex;
+  }
 
   return {
-    engine: engineTrades.slice(firstMatchEngineIdx, lastMatchEngineIdx + 1),
-    reference: referenceTrades.slice(firstMatchRefIdx, lastMatchRefIdx + 1),
+    engine: engineTrades.slice(firstE, lastE + 1),
+    reference: referenceTrades.slice(firstR, lastR + 1),
   };
 }
 
@@ -265,7 +255,7 @@ export function computeParity(
     effectiveRef.length > 0 ? matches.length / effectiveRef.length : effectiveEngine.length === 0 ? 1 : 0;
 
   let grade: ParityGrade;
-  if (countMatch && entryPriceP90 <= 0 && exitPriceP90 <= 0 && profitP90 <= 0.005) {
+  if (countMatch && entryPriceP90 <= 0.0001 && exitPriceP90 <= 0.0001 && profitP90 <= 0.005) {
     grade = 'excellent';
   } else if (countMatchPct >= 0.99 && entryPriceP90 <= 0.001 && exitPriceP90 <= 0.001) {
     grade = 'strong';

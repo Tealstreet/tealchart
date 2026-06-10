@@ -53,13 +53,14 @@ function bootstrap(): void {
 
     const pineSource = fs.readFileSync(pinePath, 'utf-8');
 
+    let bars;
     if (!fs.existsSync(barsPath)) {
-      const bars = generateDeterministicBars(BAR_COUNT);
+      bars = generateDeterministicBars(BAR_COUNT);
       fs.writeFileSync(barsPath, JSON.stringify(bars, null, 2) + '\n');
       console.log(`  Generated ${barsPath}`);
+    } else {
+      bars = JSON.parse(fs.readFileSync(barsPath, 'utf-8'));
     }
-
-    const bars = JSON.parse(fs.readFileSync(barsPath, 'utf-8'));
 
     try {
       const ast = parse(pineSource);
@@ -75,10 +76,8 @@ function bootstrap(): void {
         continue;
       }
 
-      const allTrades = [...result.strategy.closedTrades, ...result.strategy.openTrades];
-
       if (!fs.existsSync(csvPath)) {
-        const csv = tradesToTvCsv(allTrades);
+        const csv = tradesToTvCsv(result.strategy.closedTrades);
         fs.writeFileSync(csvPath, csv);
         console.log(`  Generated ${csvPath} (${result.strategy.closedTrades.length} closed trades)`);
       }
