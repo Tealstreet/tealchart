@@ -96,6 +96,15 @@ export function hitTestUserDrawing(
   space: DrawingCoordinateSpace,
   options: UserDrawingHitTestOptions = {},
 ): UserDrawingHitResult | null {
+  if (
+    point.x < space.chartLeft ||
+    point.x >= space.chartRight ||
+    point.y < space.pane.top ||
+    point.y >= space.pane.bottom
+  ) {
+    return null;
+  }
+
   return hitTestResolvedGeometry(resolveUserDrawingGeometry(drawing, space), point, {
     tolerance: options.tolerance ?? DEFAULT_TOLERANCE,
     labelWidth: options.labelWidth ?? DEFAULT_LABEL_WIDTH,

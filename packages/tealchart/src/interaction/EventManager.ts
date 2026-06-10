@@ -76,9 +76,24 @@ export interface EventManagerCallbacks {
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
-  onDrawingInput?: (x: number, y: number) => boolean;
+  onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch') => DrawingInputResult;
   /** Crosshair-only render (skips main canvas repaint) */
   onCrosshairRender?: () => void;
+}
+
+export interface DrawingInputHandledResult {
+  handled: boolean;
+  allowPaneDoubleClick?: boolean;
+}
+
+export type DrawingInputResult = boolean | DrawingInputHandledResult;
+
+function isDrawingInputHandled(result: DrawingInputResult | undefined): boolean {
+  return typeof result === 'boolean' ? result : result?.handled === true;
+}
+
+function allowsPaneDoubleClick(result: DrawingInputResult | undefined): boolean {
+  return typeof result === 'boolean' ? false : result?.allowPaneDoubleClick === true;
 }
 
 export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider';
@@ -554,7 +569,8 @@ export class EventManager {
     const dy = Math.abs(mouseY - this.state.dragStartY);
     const wasClick = dx < 5 && dy < 5;
 
-    const handledDrawingInput = wasClick && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY) === true : false;
+    const drawingInputResult = wasClick && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse') : false;
+    const handledDrawingInput = isDrawingInputHandled(drawingInputResult);
 
     if (
       wasClick &&
@@ -887,7 +903,10 @@ export class EventManager {
   }
 
   private handleTap(x: number, y: number): void {
-    if (this.callbacks.onDrawingInput?.(x, y)) {
+    const drawingInputResult = this.callbacks.onDrawingInput?.(x, y, 'touch');
+    const handledDrawingInput = isDrawingInputHandled(drawingInputResult);
+
+    if (handledDrawingInput && !allowsPaneDoubleClick(drawingInputResult)) {
       this.scheduleRender();
       return;
     }
@@ -908,6 +927,11 @@ export class EventManager {
         this._lastClickTime = now;
         this._lastClickPaneId = pane.paneId;
       }
+    }
+
+    if (handledDrawingInput) {
+      this.scheduleRender();
+      return;
     }
 
     const dims = this.callbacks.getDimensions();

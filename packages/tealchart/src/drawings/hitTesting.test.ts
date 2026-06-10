@@ -156,4 +156,39 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawings([{ ...top, paneId: 'missing' }], { x: 50, y: 50 }, spaces)).toBeNull();
     expect(hitTestUserDrawings([{ ...top, locked: true }], { x: 50, y: 50 }, spaces)).toBeNull();
   });
+
+  it('does not hit clipped drawing geometry outside its pane bounds', () => {
+    const mainSpace: DrawingCoordinateSpace = {
+      ...space,
+      pane: { ...space.pane, id: 'main', top: 0, bottom: 100 },
+    };
+    const indicatorSpace: DrawingCoordinateSpace = {
+      ...space,
+      pane: { ...space.pane, id: 'indicator', top: 100, bottom: 200 },
+    };
+    const clipped: UserDrawing = {
+      ...base,
+      id: 'clipped',
+      kind: 'verticalLine',
+      time: 50,
+    };
+    const visible: UserDrawing = {
+      ...base,
+      id: 'visible',
+      kind: 'verticalLine',
+      paneId: 'indicator',
+      time: 50,
+    };
+
+    const hit = hitTestUserDrawings(
+      [clipped, visible],
+      { x: 50, y: 150 },
+      new Map([
+        ['main', mainSpace],
+        ['indicator', indicatorSpace],
+      ]),
+    );
+
+    expect(hit?.drawing.id).toBe('visible');
+  });
 });

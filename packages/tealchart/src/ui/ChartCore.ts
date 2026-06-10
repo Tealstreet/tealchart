@@ -11,11 +11,17 @@
  */
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
+import type { CrosshairState as EventCrosshairState, DrawingInputResult, PaneDividerInfo } from '../interaction/EventManager';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
-import type { DrawingCoordinateSpace, UserDrawingInputPoint, UserDrawingState } from '../drawings';
+import type {
+  DrawingCoordinateSpace,
+  DrawingScreenPoint,
+  UserDrawingInputPoint,
+  UserDrawingSelectionAtPointResult,
+  UserDrawingState,
+} from '../drawings';
 
 import Konva from 'konva';
 
@@ -93,6 +99,11 @@ export interface ChartCoreOptions {
   onMouseUp?: () => void;
   /** Called when a chart-surface click/tap resolves to a user drawing input point */
   onUserDrawingInput?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when select-mode chart-surface input should select or clear a user drawing */
+  onUserDrawingSelection?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => UserDrawingSelectionAtPointResult;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -692,7 +703,7 @@ export class ChartCore {
       getTimeFromX: (x) =>
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
-      onDrawingInput: (x, y) => this.handleUserDrawingInput(x, y),
+        onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -1467,8 +1478,21 @@ export class ChartCore {
     return null;
   }
 
-  private handleUserDrawingInput(x: number, y: number): boolean {
-    if (!this.options.onUserDrawingInput || !this.viewport) return false;
+  private handleUserDrawingInput(x: number, y: number, source: 'mouse' | 'touch' = 'mouse'): DrawingInputResult {
+    if (!this.viewport) return false;
+
+    if (this.userDrawingState?.activeTool === 'select') {
+      const chartLeft = this.margins.left;
+      const chartRight = this.options.width - this.margins.right;
+      if (x < chartLeft || x >= chartRight || !this.getPaneAtY(y)) return false;
+
+      const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
+      return source === 'touch' && (selection?.hit === true || selection?.changed === true)
+        ? { handled: true, allowPaneDoubleClick: true }
+        : false;
+    }
+
+    if (!this.options.onUserDrawingInput) return false;
 
     const layout = this.getUnifiedLayout();
     const timeAxisHeight = layout.timeAxisHeight;
