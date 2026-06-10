@@ -1,0 +1,3 @@
+Trade #,Type,Signal,Date/Time,Price,Contracts,Profit,Cum. Profit
+1,Entry Long,Long,2023-11-14 22:14:20,100.66,2,,
+1,Exit Long,SL,2023-11-14 22:24:20,96.66,2,-8.00,-8.00

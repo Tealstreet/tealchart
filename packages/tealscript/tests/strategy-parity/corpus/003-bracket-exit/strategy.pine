@@ -1,0 +1,10 @@
+//@version=6
+strategy("Bracket Exit", initial_capital=10000, process_orders_on_close=true)
+if bar_index == 2
+    strategy.entry("Long", strategy.long, qty=1)
+if strategy.position_size > 0
+    target = strategy.position_avg_price + 5
+    stop = strategy.position_avg_price - 3
+    strategy.exit("Bracket", "Long", limit=target, stop=stop)
+plot(strategy.position_size, title="Position")
+plot(strategy.netprofit, title="Net Profit")
