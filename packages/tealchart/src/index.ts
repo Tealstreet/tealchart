@@ -46,6 +46,62 @@ export { safeDeepMerge, migrateChartSettings, CHART_SETTINGS_VERSION } from './s
 // Renderer (for advanced usage)
 export { TealchartRenderer } from './TealchartRenderer';
 
+// User drawing model (platform-neutral)
+export {
+  anchorToScreenPoint,
+  createUserDrawingFromDraft,
+  DEFAULT_USER_DRAWING_STATE,
+  DEFAULT_USER_DRAWING_STYLE,
+  distanceBetweenPoints,
+  distanceToRectEdge,
+  distanceToSegment,
+  drawingXToTime,
+  drawingYToPrice,
+  getRequiredAnchorCount,
+  getUserDrawingPaneId,
+  hitTestUserDrawing,
+  hitTestUserDrawings,
+  isDrawingDraftReady,
+  priceToDrawingY,
+  resolveExtendedSegment,
+  resolveRaySegment,
+  resolveRectFromAnchors,
+  resolveUserDrawingGeometry,
+  renderUserDrawing,
+  renderUserDrawings,
+  screenPointToAnchor,
+  timeToDrawingX,
+  USER_DRAWING_SCHEMA_VERSION,
+} from './drawings';
+export type {
+  CreateUserDrawingFromDraftOptions,
+  DrawingCoordinateSpace,
+  DrawingScreenPoint,
+  DrawingScreenRect,
+  DrawingScreenSegment,
+  HorizontalLineDrawing,
+  RayDrawing,
+  RectangleDrawing,
+  ResolvedUserDrawingGeometry,
+  TextLabelDrawing,
+  TrendLineDrawing,
+  UserDrawing,
+  UserDrawingAnchor,
+  UserDrawingBase,
+  UserDrawingDraft,
+  UserDrawingHandleRole,
+  UserDrawingKind,
+  UserDrawingLineStyle,
+  UserDrawingSelection,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingHitResult,
+  UserDrawingHitTestOptions,
+  UserDrawingRenderOptions,
+  UserDrawingTool,
+  VerticalLineDrawing,
+} from './drawings';
+
 // Gap detection (for advanced usage)
 export { GapDetectionManager } from './GapDetectionManager';
 
