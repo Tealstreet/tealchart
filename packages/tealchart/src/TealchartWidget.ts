@@ -2113,12 +2113,21 @@ export class TealchartWidget {
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
   }
 
+  private _createUserDrawingId(): string {
+    const existingIds = new Set(this._userDrawingState.drawings.map((drawing) => drawing.id));
+    let id = '';
+    do {
+      id = `drawing_${++this._userDrawingIdCounter}`;
+    } while (existingIds.has(id));
+    return id;
+  }
+
   private _handleUserDrawingInput(point: UserDrawingInputPoint): boolean {
     if (this._userDrawingState.activeTool === 'select') return false;
 
     const previousState = this._userDrawingState;
     const nextState = handleUserDrawingInput(this._userDrawingState, point, {
-      createId: () => `drawing_${++this._userDrawingIdCounter}`,
+      createId: () => this._createUserDrawingId(),
     });
     this.setUserDrawingState(nextState);
     return nextState !== previousState;
