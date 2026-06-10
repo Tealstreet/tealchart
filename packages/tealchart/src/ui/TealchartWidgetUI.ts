@@ -2,7 +2,7 @@ import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tea
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
-import type { UserDrawingInputPoint, UserDrawingState } from '../drawings';
+import type { DrawingCoordinateSpace, DrawingScreenPoint, UserDrawingInputPoint, UserDrawingState } from '../drawings';
 import type {
   Bar,
   ContextMenuItem,
@@ -102,6 +102,11 @@ export interface TealchartWidgetUIOptions {
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when a chart-surface click/tap resolves to a user drawing input point */
   onUserDrawingInput?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when select-mode chart-surface input should select or clear a user drawing */
+  onUserDrawingSelection?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => boolean;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
   onAutoScaleDisabled?: (paneId: string) => void;
   /** Called when viewport is reset (re-enables auto-scale) */
@@ -288,6 +293,7 @@ export class TealchartWidgetUI {
       onMouseUp: this.options.onMouseUp,
       onCrossHairMoved: this.options.onCrossHairMoved,
       onUserDrawingInput: this.options.onUserDrawingInput,
+      onUserDrawingSelection: this.options.onUserDrawingSelection,
       onAutoScaleDisabled: this.options.onAutoScaleDisabled,
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,

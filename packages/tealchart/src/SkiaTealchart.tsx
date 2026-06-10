@@ -69,7 +69,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
-import { createUserDrawingState, handleUserDrawingInput } from './drawings';
+import { createUserDrawingState, handleUserDrawingInput, selectUserDrawingAtPoint } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -814,7 +814,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleUserDrawingTap = useCallback(
     (x: number, y: number) => {
-      if (!viewport || effectiveUserDrawingState.activeTool === 'select') return false;
+      if (!viewport) return false;
+
+      if (effectiveUserDrawingState.activeTool === 'select') {
+        if (!isPointInChartArea(x, y)) return false;
+
+        const nextState = selectUserDrawingAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId);
+        if (nextState === effectiveUserDrawingState) return false;
+
+        commitUserDrawingState(nextState);
+        return true;
+      }
 
       const point = resolveMobileUserDrawingInputPoint({
         point: { x, y },
@@ -839,7 +849,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingState(nextState);
       return true;
     },
-    [chartDimensions, commitUserDrawingState, effectiveUserDrawingState, userDrawingInputPanes, viewport],
+    [
+      chartDimensions,
+      commitUserDrawingState,
+      effectiveUserDrawingState,
+      isPointInChartArea,
+      userDrawingInputPanes,
+      userDrawingSpacesByPaneId,
+      viewport,
+    ],
   );
 
   const handleCrosshairTap = useCallback(

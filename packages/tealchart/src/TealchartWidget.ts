@@ -9,13 +9,13 @@ import type {
   PlotOutput,
   TealscriptRuntimeOptions,
 } from '@tealstreet/tealscript';
-import type { UserDrawingInputPoint, UserDrawingState } from './drawings';
+import type { DrawingCoordinateSpace, DrawingScreenPoint, UserDrawingInputPoint, UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
 import { LOADING_OPACITY } from './constants';
-import { createUserDrawingState, handleUserDrawingInput } from './drawings';
+import { createUserDrawingState, handleUserDrawingInput, selectUserDrawingAtPoint } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
@@ -978,6 +978,7 @@ export class TealchartWidget {
         }
       },
       onUserDrawingInput: (point) => this._handleUserDrawingInput(point),
+      onUserDrawingSelection: (point, spacesByPaneId) => this._handleUserDrawingSelection(point, spacesByPaneId),
       onPaneDoubleClick: (paneId) => {
         this._paneManager.toggleMaximizePane(paneId);
         this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
@@ -2129,6 +2130,18 @@ export class TealchartWidget {
     const nextState = handleUserDrawingInput(this._userDrawingState, point, {
       createId: () => this._createUserDrawingId(),
     });
+    this.setUserDrawingState(nextState);
+    return nextState !== previousState;
+  }
+
+  private _handleUserDrawingSelection(
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ): boolean {
+    if (this._userDrawingState.activeTool !== 'select') return false;
+
+    const previousState = this._userDrawingState;
+    const nextState = selectUserDrawingAtPoint(this._userDrawingState, point, spacesByPaneId);
     this.setUserDrawingState(nextState);
     return nextState !== previousState;
   }

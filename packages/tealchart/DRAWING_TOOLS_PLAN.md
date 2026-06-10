@@ -16,8 +16,8 @@ matching behavior in the same PR for every user-facing drawing feature.
 
 - Shared selection helper resolves a screen point to the topmost visible,
   unlocked drawing and clears selection on misses.
-- Next phase wires the helper into web click/tap and mobile tap behavior while
-  preserving chart gestures and drawing placement behavior.
+- Web click/tap and mobile tap behavior use the same helper in select mode while
+  preserving drawing placement priority for active drawing tools.
 
 ## Known Gaps
 
