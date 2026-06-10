@@ -107,6 +107,10 @@ export function renderUserDrawing(
 
   ctx.save();
   try {
+    ctx.beginPath();
+    ctx.rect(space.chartLeft, space.pane.top, space.chartRight - space.chartLeft, space.pane.height);
+    ctx.clip();
+
     switch (geometry.kind) {
       case 'line':
       case 'ray':
