@@ -13,6 +13,7 @@ export * from './hooks';
 // Utilities
 export * from './utils/coordinates';
 export * from './utils/drawingInput';
+export * from './utils/drawingRenderModel';
 
 // Class-based indicator management (matches web's React-agnostic pattern)
 export { MobileIndicatorManager } from './MobileIndicatorManager';
