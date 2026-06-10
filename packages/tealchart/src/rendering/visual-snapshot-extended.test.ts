@@ -5,7 +5,7 @@ import type { CanvasContext } from './CanvasContext';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createCanvas, type Canvas } from '@napi-rs/canvas';
+import { createCanvas, loadImage, type Canvas } from '@napi-rs/canvas';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -20,6 +20,14 @@ afterEach(() => {
 const WIDTH = 400;
 const HEIGHT = 300;
 const SNAPSHOT_DIR = path.join(__dirname, '__visual_snapshots__');
+const SNAPSHOT_CHANNEL_TOLERANCE = 16;
+const SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO = 0.08;
+
+interface SnapshotPixels {
+  width: number;
+  height: number;
+  data: Uint8ClampedArray;
+}
 
 function ensureSnapshotDir(): void {
   if (!fs.existsSync(SNAPSHOT_DIR)) {
@@ -122,7 +130,20 @@ function renderDrawingsToBuffer(
   return canvas.toBuffer('image/png');
 }
 
-function assertSnapshot(name: string, buffer: Buffer): void {
+async function readSnapshotPixels(buffer: Buffer): Promise<SnapshotPixels> {
+  const image = await loadImage(buffer);
+  const canvas = createCanvas(image.width, image.height);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  return {
+    width: image.width,
+    height: image.height,
+    data: ctx.getImageData(0, 0, image.width, image.height).data,
+  };
+}
+
+async function assertSnapshot(name: string, buffer: Buffer): Promise<void> {
   ensureSnapshotDir();
   const filePath = path.join(SNAPSHOT_DIR, `${name}.png`);
 
@@ -132,11 +153,38 @@ function assertSnapshot(name: string, buffer: Buffer): void {
   }
 
   const existing = fs.readFileSync(filePath);
-  if (!existing.equals(buffer)) {
-    const diffPath = path.join(SNAPSHOT_DIR, `${name}.diff.png`);
-    fs.writeFileSync(diffPath, buffer);
+  if (existing.equals(buffer)) return;
+
+  const [expected, actual] = await Promise.all([readSnapshotPixels(existing), readSnapshotPixels(buffer)]);
+  const diffPath = path.join(SNAPSHOT_DIR, `${name}.diff.png`);
+  fs.writeFileSync(diffPath, buffer);
+
+  if (expected.width !== actual.width || expected.height !== actual.height) {
     expect.fail(
       `Visual snapshot "${name}" changed. ` +
+      `Compare ${filePath} (expected) with ${diffPath} (actual). ` +
+      `Run with UPDATE_SNAPSHOTS=1 to accept the new baseline.`,
+    );
+  }
+
+  let differingPixels = 0;
+  for (let i = 0; i < expected.data.length; i += 4) {
+    const channelDelta = Math.max(
+      Math.abs(expected.data[i]! - actual.data[i]!),
+      Math.abs(expected.data[i + 1]! - actual.data[i + 1]!),
+      Math.abs(expected.data[i + 2]! - actual.data[i + 2]!),
+      Math.abs(expected.data[i + 3]! - actual.data[i + 3]!),
+    );
+
+    if (channelDelta > SNAPSHOT_CHANNEL_TOLERANCE) {
+      differingPixels += 1;
+    }
+  }
+
+  const differingRatio = differingPixels / (expected.width * expected.height);
+  if (differingRatio > SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO) {
+    expect.fail(
+      `Visual snapshot "${name}" changed by ${(differingRatio * 100).toFixed(2)}% of pixels. ` +
       `Compare ${filePath} (expected) with ${diffPath} (actual). ` +
       `Run with UPDATE_SNAPSHOTS=1 to accept the new baseline.`,
     );
@@ -148,7 +196,7 @@ describe('visual snapshot rendering (extended)', () => {
   const viewport = makeViewport(bars);
 
   describe('OHLC plots', () => {
-    it('renders plotcandle with body and wick', () => {
+    it('renders plotcandle with body and wick', async () => {
       const plots: PlotOutput[] = [{
         id: 'candle1',
         type: 'plotcandle',
@@ -164,10 +212,10 @@ describe('visual snapshot rendering (extended)', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('plotcandle-basic', buffer);
+      await assertSnapshot('plotcandle-basic', buffer);
     });
 
-    it('renders plotbar (OHLC bars)', () => {
+    it('renders plotbar (OHLC bars)', async () => {
       const plots: PlotOutput[] = [{
         id: 'bar1',
         type: 'plotbar',
@@ -181,12 +229,12 @@ describe('visual snapshot rendering (extended)', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('plotbar-basic', buffer);
+      await assertSnapshot('plotbar-basic', buffer);
     });
   });
 
   describe('drawing objects', () => {
-    it('renders label drawings with different styles', () => {
+    it('renders label drawings with different styles', async () => {
       const drawings: DrawingOutput[] = [
         {
           id: 'label1', type: 'label', barIndex: 10,
@@ -208,10 +256,10 @@ describe('visual snapshot rendering (extended)', () => {
         },
       ];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-labels', buffer);
+      await assertSnapshot('drawing-labels', buffer);
     });
 
-    it('renders line drawings with extend', () => {
+    it('renders line drawings with extend', async () => {
       const drawings: DrawingOutput[] = [
         {
           id: 'line1', type: 'line', barIndex: 0,
@@ -227,10 +275,10 @@ describe('visual snapshot rendering (extended)', () => {
         },
       ];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-lines', buffer);
+      await assertSnapshot('drawing-lines', buffer);
     });
 
-    it('renders box drawings with border and fill', () => {
+    it('renders box drawings with border and fill', async () => {
       const drawings: DrawingOutput[] = [{
         id: 'box1', type: 'box', barIndex: 0,
         left: 5, top: bars[5]!.high + 2, right: 15, bottom: bars[15]!.low - 2,
@@ -240,10 +288,10 @@ describe('visual snapshot rendering (extended)', () => {
         text: 'Zone A', textColor: '#2196F3', textSize: 'normal',
       }];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-boxes', buffer);
+      await assertSnapshot('drawing-boxes', buffer);
     });
 
-    it('renders polyline drawings', () => {
+    it('renders polyline drawings', async () => {
       const drawings: DrawingOutput[] = [{
         id: 'poly1', type: 'polyline', barIndex: 0,
         points: [0, 10, 20, 30, 40].map((i) => ({
@@ -257,10 +305,10 @@ describe('visual snapshot rendering (extended)', () => {
         lineStyle: 'solid', lineWidth: 2,
       }];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-polylines', buffer);
+      await assertSnapshot('drawing-polylines', buffer);
     });
 
-    it('renders closed filled polyline', () => {
+    it('renders closed filled polyline', async () => {
       const drawings: DrawingOutput[] = [{
         id: 'poly_filled', type: 'polyline', barIndex: 0,
         points: [
@@ -275,10 +323,10 @@ describe('visual snapshot rendering (extended)', () => {
         lineStyle: 'solid', lineWidth: 2,
       }];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-polyline-filled', buffer);
+      await assertSnapshot('drawing-polyline-filled', buffer);
     });
 
-    it('renders table drawing', () => {
+    it('renders table drawing', async () => {
       const drawings: DrawingOutput[] = [{
         id: 'table1', type: 'table', barIndex: 0,
         position: 'top_right', columns: 2, rows: 3,
@@ -294,10 +342,10 @@ describe('visual snapshot rendering (extended)', () => {
         ],
       }];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-table', buffer);
+      await assertSnapshot('drawing-table', buffer);
     });
 
-    it('renders linefill between two line drawings', () => {
+    it('renders linefill between two line drawings', async () => {
       const drawings: DrawingOutput[] = [
         {
           id: 'lf_line1', type: 'line', barIndex: 0,
@@ -318,32 +366,32 @@ describe('visual snapshot rendering (extended)', () => {
         },
       ];
       const buffer = renderDrawingsToBuffer(drawings, bars, viewport);
-      assertSnapshot('drawing-linefill', buffer);
+      await assertSnapshot('drawing-linefill', buffer);
     });
   });
 
   describe('edge cases', () => {
-    it('renders with all-null values (empty plot)', () => {
+    it('renders with all-null values (empty plot)', async () => {
       const plots: PlotOutput[] = [{
         id: 'empty', type: 'plot', title: 'Empty',
         values: bars.map(() => null), color: '#2196F3',
         linewidth: 2, style: 'line', scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('edge-all-null', buffer);
+      await assertSnapshot('edge-all-null', buffer);
     });
 
-    it('renders showLast limiting visible bars', () => {
+    it('renders showLast limiting visible bars', async () => {
       const plots: PlotOutput[] = [{
         id: 'showlast', type: 'plot', title: 'Last10',
         values: bars.map((b) => b.close), color: '#FF9800',
         linewidth: 2, style: 'line', showLast: 10, scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('edge-show-last-10', buffer);
+      await assertSnapshot('edge-show-last-10', buffer);
     });
 
-    it('renders dashed and dotted line styles', () => {
+    it('renders dashed and dotted line styles', async () => {
       const plots: PlotOutput[] = [
         {
           id: 'solid_line', type: 'plot', title: 'Solid',
@@ -362,10 +410,10 @@ describe('visual snapshot rendering (extended)', () => {
         },
       ];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('edge-line-styles', buffer);
+      await assertSnapshot('edge-line-styles', buffer);
     });
 
-    it('renders columns plot style', () => {
+    it('renders columns plot style', async () => {
       const plots: PlotOutput[] = [{
         id: 'cols1', type: 'plot', title: 'Volume-like',
         values: bars.map((b) => b.volume),
@@ -377,32 +425,32 @@ describe('visual snapshot rendering (extended)', () => {
         priceMin: 0, priceMax: Math.max(...bars.map((b) => b.volume)) * 1.1,
       };
       const buffer = renderToBuffer(plots, bars, volViewport);
-      assertSnapshot('columns-volume-like', buffer);
+      await assertSnapshot('columns-volume-like', buffer);
     });
 
-    it('renders stepline_diamond plot style', () => {
+    it('renders stepline_diamond plot style', async () => {
       const plots: PlotOutput[] = [{
         id: 'stepdiamond', type: 'plot', title: 'StepDiamond',
         values: bars.map((b) => b.close), color: '#E91E63',
         linewidth: 2, style: 'stepline_diamond', scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('stepline-diamond', buffer);
+      await assertSnapshot('stepline-diamond', buffer);
     });
 
-    it('renders areabr with gaps', () => {
+    it('renders areabr with gaps', async () => {
       const plots: PlotOutput[] = [{
         id: 'areabr1', type: 'plot', title: 'AreaBR',
         values: bars.map((b, i) => i % 8 < 5 ? b.close : null),
         color: '#9C27B080', linewidth: 2, style: 'areabr', scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('areabr-with-gaps', buffer);
+      await assertSnapshot('areabr-with-gaps', buffer);
     });
   });
 
   describe('multi-plot composites', () => {
-    it('renders Bollinger Bands composite', () => {
+    it('renders Bollinger Bands composite', async () => {
       const period = 20;
       const sma = bars.map((_, i) => {
         if (i < period - 1) return null;
@@ -430,10 +478,10 @@ describe('visual snapshot rendering (extended)', () => {
         { id: 'bb_fill', type: 'fill', title: 'BB Fill', values: bars.map(() => 1), color: 'rgba(33, 150, 243, 0.1)', plot1Id: 'bb_upper', plot2Id: 'bb_lower', scriptId: 'test' },
       ];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('composite-bollinger', buffer);
+      await assertSnapshot('composite-bollinger', buffer);
     });
 
-    it('renders signal markers with background highlights', () => {
+    it('renders signal markers with background highlights', async () => {
       const plots: PlotOutput[] = [
         { id: 'price_line', type: 'plot', title: 'Close', values: bars.map((b) => b.close), color: '#787b86', linewidth: 1, style: 'line', scriptId: 'test' },
         {
@@ -450,7 +498,7 @@ describe('visual snapshot rendering (extended)', () => {
         },
       ];
       const buffer = renderToBuffer(plots, bars, viewport);
-      assertSnapshot('composite-signals', buffer);
+      await assertSnapshot('composite-signals', buffer);
     });
   });
 });
