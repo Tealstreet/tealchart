@@ -23,6 +23,7 @@ import type { IndicatorSettingsData } from './mobile/components/IndicatorSetting
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
 import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
 import type { PlotStyleOverride } from './state/chartState';
+import type { ChartThemeInput } from './theme';
 import type {
   ChartMargins,
   ContextMenuItem,
@@ -79,7 +80,6 @@ import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
-import type { ChartThemeInput } from './theme';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
@@ -263,6 +263,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Get indicator state from manager
   const plots = indicatorManagerRef.current?.getPlots() || [];
+  const drawings = indicatorManagerRef.current?.getDrawings() || [];
   const baseUnifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
   const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
 
@@ -910,6 +911,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           indicatorPaneInfo,
           undefined,
           plotStyleOverrides,
+          undefined,
+          undefined,
+          drawings,
         );
 
         collectedText = ctx.getCollectedText();
@@ -926,6 +930,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     margins,
     effectivePriceLines,
     plots,
+    drawings,
     unifiedPaneLayout,
     indicatorPaneInfo,
     plotStyleOverrides,
@@ -1041,7 +1046,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // ==========================================================================
 
   if (dimensions.width === 0 || dimensions.height === 0) {
-    return <View style={[styles.container, { backgroundColor: fullRenderOptions.backgroundColor }]} onLayout={onLayout} />;
+    return (
+      <View style={[styles.container, { backgroundColor: fullRenderOptions.backgroundColor }]} onLayout={onLayout} />
+    );
   }
 
   return (

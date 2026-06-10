@@ -19,13 +19,21 @@
  * }, []);
  * ```
  */
-import type { IndicatorDeclarationMetadata, InputDefinition, PlotOutput, Program, WorkerError } from '@tealstreet/tealscript';
+import type {
+  DrawingOutput,
+  IndicatorDeclarationMetadata,
+  InputDefinition,
+  PlotOutput,
+  Program,
+  WorkerError,
+} from '@tealstreet/tealscript';
+import type { EventCallback } from '../events/EventEmitter';
 import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
 import { parse, TealscriptEngine, TealscriptParseError } from '@tealstreet/tealscript';
 import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
-import { EventEmitter, type EventCallback } from '../events/EventEmitter';
+import { EventEmitter } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
 
@@ -92,6 +100,7 @@ export class MobileIndicatorManager {
   private _paneManager: PaneManager;
   private _indicators: ActiveIndicator[] = [];
   private _plots: PlotOutput[] = [];
+  private _drawings: DrawingOutput[] = [];
   private _astCache: Map<string, Program> = new Map();
   private _inputDefsCache: Map<string, InputDefinition[]> = new Map();
   private _declarationCache: Map<string, IndicatorDeclarationMetadata> = new Map();
@@ -304,6 +313,13 @@ export class MobileIndicatorManager {
   }
 
   /**
+   * Get drawing outputs from all indicators.
+   */
+  getDrawings(): DrawingOutput[] {
+    return this._drawings;
+  }
+
+  /**
    * Get unified pane layout for rendering
    */
   getUnifiedLayout(): UnifiedPaneLayout {
@@ -415,11 +431,13 @@ export class MobileIndicatorManager {
   private _recomputePlots(silent = false): void {
     if (this._bars.length === 0) {
       this._plots = [];
+      this._drawings = [];
       if (!silent) this._onUpdate?.();
       return;
     }
 
     const allPlots: PlotOutput[] = [];
+    const allDrawings: DrawingOutput[] = [];
 
     for (const ind of this._indicators) {
       const { indicator, instanceId, ast, inputs } = ind;
@@ -465,6 +483,13 @@ export class MobileIndicatorManager {
             scriptId: instanceId,
           });
         }
+
+        for (const drawing of result.drawings) {
+          allDrawings.push({
+            ...drawing,
+            scriptId: instanceId,
+          });
+        }
       } catch (err) {
         this._logger.error(LogCategory.Indicators, 'Error executing indicator', {
           indicatorId: indicator.id,
@@ -475,6 +500,7 @@ export class MobileIndicatorManager {
     }
 
     this._plots = allPlots;
+    this._drawings = allDrawings;
 
     // Notify React to re-render (unless silent mode for RAF batching)
     if (!silent) this._onUpdate?.();

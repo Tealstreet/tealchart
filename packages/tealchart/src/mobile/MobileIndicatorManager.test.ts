@@ -1,5 +1,5 @@
-import type { Bar } from '../types';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { Bar } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -55,6 +55,29 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     });
   });
 
+  it('retains Tealscript drawings and tags them with the returned instance ID', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(2));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'drawing-study',
+      name: 'Drawing Study',
+      overlay: true,
+      code: 'indicator("Drawing Study", overlay=true)\nlabel.new(bar_index, close, text="mark")',
+    });
+
+    expect(manager.getDrawings()).toHaveLength(2);
+    expect(manager.getDrawings()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          scriptId: instanceId,
+          type: 'label',
+          text: 'mark',
+        }),
+      ]),
+    );
+  });
+
   it('removes custom Tealscript plots and pane metadata by instance ID', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(2));
@@ -69,6 +92,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     manager.removeIndicator(instanceId);
 
     expect(manager.getPlots()).toHaveLength(0);
+    expect(manager.getDrawings()).toHaveLength(0);
     expect(manager.getIndicator(instanceId)).toBeUndefined();
     expect(manager.getIndicatorPaneInfo()[instanceId]).toBeUndefined();
   });
