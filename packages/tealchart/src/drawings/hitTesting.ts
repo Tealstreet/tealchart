@@ -98,9 +98,9 @@ export function hitTestUserDrawing(
 ): UserDrawingHitResult | null {
   if (
     point.x < space.chartLeft ||
-    point.x > space.chartRight ||
+    point.x >= space.chartRight ||
     point.y < space.pane.top ||
-    point.y > space.pane.bottom
+    point.y >= space.pane.bottom
   ) {
     return null;
   }

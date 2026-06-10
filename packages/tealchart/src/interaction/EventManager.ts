@@ -76,7 +76,7 @@ export interface EventManagerCallbacks {
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
-  onDrawingInput?: (x: number, y: number) => boolean;
+  onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
   /** Crosshair-only render (skips main canvas repaint) */
   onCrosshairRender?: () => void;
 }
@@ -554,7 +554,8 @@ export class EventManager {
     const dy = Math.abs(mouseY - this.state.dragStartY);
     const wasClick = dx < 5 && dy < 5;
 
-    const handledDrawingInput = wasClick && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY) === true : false;
+    const handledDrawingInput =
+      wasClick && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse') === true : false;
 
     if (
       wasClick &&
@@ -887,7 +888,7 @@ export class EventManager {
   }
 
   private handleTap(x: number, y: number): void {
-    if (this.callbacks.onDrawingInput?.(x, y)) {
+    if (this.callbacks.onDrawingInput?.(x, y, 'touch')) {
       this.scheduleRender();
       return;
     }

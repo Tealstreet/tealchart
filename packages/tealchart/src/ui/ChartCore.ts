@@ -702,7 +702,7 @@ export class ChartCore {
       getTimeFromX: (x) =>
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
-      onDrawingInput: (x, y) => this.handleUserDrawingInput(x, y),
+        onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -1477,7 +1477,7 @@ export class ChartCore {
     return null;
   }
 
-  private handleUserDrawingInput(x: number, y: number): boolean {
+  private handleUserDrawingInput(x: number, y: number, source: 'mouse' | 'touch' = 'mouse'): boolean {
     if (!this.viewport) return false;
 
     if (this.userDrawingState?.activeTool === 'select') {
@@ -1485,8 +1485,8 @@ export class ChartCore {
       const chartRight = this.options.width - this.margins.right;
       if (x < chartLeft || x > chartRight || !this.getPaneAtY(y)) return false;
 
-      this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
-      return false;
+      const changed = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
+      return source === 'touch' ? changed : false;
     }
 
     if (!this.options.onUserDrawingInput) return false;
