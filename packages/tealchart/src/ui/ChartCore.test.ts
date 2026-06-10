@@ -276,12 +276,15 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
 
     const testCore = core as unknown as {
-      handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch'): boolean;
+      handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch'): unknown;
     };
 
     expect(testCore.handleUserDrawingInput(100, 100)).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
-    expect(testCore.handleUserDrawingInput(100, 100, 'touch')).toBe(true);
+    expect(testCore.handleUserDrawingInput(100, 100, 'touch')).toEqual({
+      handled: true,
+      allowPaneDoubleClick: true,
+    });
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
     expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
     expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);

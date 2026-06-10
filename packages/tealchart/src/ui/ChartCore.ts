@@ -11,7 +11,7 @@
  */
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
+import type { CrosshairState as EventCrosshairState, DrawingInputResult, PaneDividerInfo } from '../interaction/EventManager';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -1478,7 +1478,7 @@ export class ChartCore {
     return null;
   }
 
-  private handleUserDrawingInput(x: number, y: number, source: 'mouse' | 'touch' = 'mouse'): boolean {
+  private handleUserDrawingInput(x: number, y: number, source: 'mouse' | 'touch' = 'mouse'): DrawingInputResult {
     if (!this.viewport) return false;
 
     if (this.userDrawingState?.activeTool === 'select') {
@@ -1487,7 +1487,7 @@ export class ChartCore {
       if (x < chartLeft || x > chartRight || !this.getPaneAtY(y)) return false;
 
       const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
-      return source === 'touch' ? selection?.hit === true : false;
+      return source === 'touch' && selection?.hit === true ? { handled: true, allowPaneDoubleClick: true } : false;
     }
 
     if (!this.options.onUserDrawingInput) return false;
