@@ -1,0 +1,7 @@
+//@version=6
+strategy("Short Only", initial_capital=10000)
+if ta.crossunder(ta.sma(close, 5), ta.sma(close, 10))
+    strategy.entry("Short", strategy.short, qty=1)
+if ta.crossover(ta.sma(close, 5), ta.sma(close, 10))
+    strategy.close("Short")
+plot(strategy.position_size, title="Position")

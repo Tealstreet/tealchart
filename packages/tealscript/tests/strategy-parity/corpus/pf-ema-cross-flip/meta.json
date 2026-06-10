@@ -1,0 +1,10 @@
+{
+  "description": "PineForge probe: EMA(5)/EMA(13) crossover flip-on-cross, no brackets",
+  "source": "tradingview",
+  "symbol": "BINANCE:ETHUSDT.P",
+  "timeframe": "15m",
+  "barCount": 36361,
+  "tvExportDate": "2026-06-10",
+  "pineforgeEntry": "composite-scalping-fast-ma-cross-trigger-01",
+  "license": "Apache-2.0"
+}

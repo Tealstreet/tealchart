@@ -1,0 +1,14 @@
+//@version=6
+strategy("Bollinger Breakout", initial_capital=10000)
+[middle, upper, lower] = ta.bb(close, 20, 2)
+if close > upper
+    strategy.entry("Long", strategy.long, qty=1)
+if close < middle
+    strategy.close("Long")
+if close < lower
+    strategy.entry("Short", strategy.short, qty=1)
+if close > middle
+    strategy.close("Short")
+plot(middle, title="Middle")
+plot(upper, title="Upper")
+plot(lower, title="Lower")

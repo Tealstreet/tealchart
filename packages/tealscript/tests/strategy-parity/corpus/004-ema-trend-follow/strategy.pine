@@ -1,0 +1,12 @@
+//@version=6
+strategy("EMA Trend Follow", initial_capital=10000, commission_type=strategy.commission.percent, commission_value=0.05)
+ema8 = ta.ema(close, 8)
+ema21 = ta.ema(close, 21)
+longCond = ta.crossover(ema8, ema21)
+shortCond = ta.crossunder(ema8, ema21)
+if longCond
+    strategy.entry("Long", strategy.long, qty=1)
+if shortCond
+    strategy.entry("Short", strategy.short, qty=1)
+plot(ema8, title="EMA 8")
+plot(ema21, title="EMA 21")
