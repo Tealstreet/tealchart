@@ -1,4 +1,31 @@
 export {
+  anchorToScreenPoint,
+  drawingXToTime,
+  drawingYToPrice,
+  priceToDrawingY,
+  resolveExtendedSegment,
+  resolveRaySegment,
+  resolveRectFromAnchors,
+  resolveUserDrawingGeometry,
+  screenPointToAnchor,
+  timeToDrawingX,
+} from './coordinates';
+export type {
+  DrawingCoordinateSpace,
+  DrawingScreenPoint,
+  DrawingScreenRect,
+  DrawingScreenSegment,
+  ResolvedUserDrawingGeometry,
+} from './coordinates';
+export {
+  distanceBetweenPoints,
+  distanceToRectEdge,
+  distanceToSegment,
+  hitTestUserDrawing,
+  hitTestUserDrawings,
+} from './hitTesting';
+export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
+export {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STATE,
   DEFAULT_USER_DRAWING_STYLE,
