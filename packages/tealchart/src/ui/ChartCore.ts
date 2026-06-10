@@ -19,6 +19,7 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UserDrawingInputPoint,
+  UserDrawingSelectionAtPointResult,
   UserDrawingState,
 } from '../drawings';
 
@@ -102,7 +103,7 @@ export interface ChartCoreOptions {
   onUserDrawingSelection?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-  ) => boolean;
+  ) => UserDrawingSelectionAtPointResult;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -1485,8 +1486,8 @@ export class ChartCore {
       const chartRight = this.options.width - this.margins.right;
       if (x < chartLeft || x > chartRight || !this.getPaneAtY(y)) return false;
 
-      const changed = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
-      return source === 'touch' ? changed : false;
+      const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
+      return source === 'touch' ? selection?.hit === true : false;
     }
 
     if (!this.options.onUserDrawingInput) return false;

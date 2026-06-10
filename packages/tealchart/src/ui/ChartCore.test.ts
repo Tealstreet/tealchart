@@ -248,7 +248,18 @@ describe('ChartCore viewport management', () => {
 
   it('keeps select-mode drawing selection inside chart panes without consuming double-click tracking', async () => {
     const { ChartCore } = await import('./ChartCore');
-    const onUserDrawingSelection = vi.fn(() => true);
+    const selectionResult = {
+      state: {
+        version: 1,
+        activeTool: 'select' as const,
+        selection: { drawingId: 'h' },
+        draft: null,
+        drawings: [],
+      },
+      hit: true,
+      changed: true,
+    };
+    const onUserDrawingSelection = vi.fn(() => selectionResult);
     const core = new ChartCore({
       container,
       width: 800,

@@ -32,6 +32,12 @@ export interface UserDrawingSelectionInputOptions {
   hitTest?: UserDrawingHitTestOptions;
 }
 
+export interface UserDrawingSelectionAtPointResult {
+  state: UserDrawingState;
+  hit: boolean;
+  changed: boolean;
+}
+
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
     version: USER_DRAWING_SCHEMA_VERSION,
@@ -76,8 +82,22 @@ export function selectUserDrawingAtPoint(
   spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   options: UserDrawingSelectionInputOptions = {},
 ): UserDrawingState {
+  return resolveUserDrawingSelectionAtPoint(state, point, spacesByPaneId, options).state;
+}
+
+export function resolveUserDrawingSelectionAtPoint(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: UserDrawingSelectionInputOptions = {},
+): UserDrawingSelectionAtPointResult {
   const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
-  return selectUserDrawing(state, hit ? { drawingId: hit.drawing.id, handle: hit.handle } : null);
+  const nextState = selectUserDrawing(state, hit ? { drawingId: hit.drawing.id, handle: hit.handle } : null);
+  return {
+    state: nextState,
+    hit: hit !== null,
+    changed: nextState !== state,
+  };
 }
 
 export function cancelUserDrawingDraft(state: UserDrawingState): UserDrawingState {

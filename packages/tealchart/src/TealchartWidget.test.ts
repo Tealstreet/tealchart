@@ -427,11 +427,11 @@ describe('TealchartWidget', () => {
         _handleUserDrawingSelection(
           point: { x: number; y: number },
           spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-        ): boolean;
+        ): { hit: boolean; changed: boolean };
       };
 
-      expect(testWidget._handleUserDrawingSelection({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]))).toBe(
-        true,
+      expect(testWidget._handleUserDrawingSelection({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]))).toEqual(
+        expect.objectContaining({ hit: true, changed: true }),
       );
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
       expect(onChange).toHaveBeenLastCalledWith(widget.getUserDrawingState());

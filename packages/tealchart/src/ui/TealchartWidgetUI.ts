@@ -2,7 +2,13 @@ import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tea
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
-import type { DrawingCoordinateSpace, DrawingScreenPoint, UserDrawingInputPoint, UserDrawingState } from '../drawings';
+import type {
+  DrawingCoordinateSpace,
+  DrawingScreenPoint,
+  UserDrawingInputPoint,
+  UserDrawingSelectionAtPointResult,
+  UserDrawingState,
+} from '../drawings';
 import type {
   Bar,
   ContextMenuItem,
@@ -106,7 +112,7 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingSelection?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-  ) => boolean;
+  ) => UserDrawingSelectionAtPointResult;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
   onAutoScaleDisabled?: (paneId: string) => void;
   /** Called when viewport is reset (re-enables auto-scale) */
