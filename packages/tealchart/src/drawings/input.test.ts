@@ -3,10 +3,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { clearChartStoreCache } from '../state/chartState';
 import {
   cancelUserDrawingDraft,
+  clearUserDrawings,
   createUserDrawingState,
+  deleteUserDrawing,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
+  selectUserDrawingById,
   selectUserDrawing,
   setUserDrawingTool,
 } from './input';
@@ -144,6 +147,129 @@ describe('user drawing input controller', () => {
     expect(selected.selection).toEqual({ drawingId: 'h', handle: 'center' });
     expect(selected.drawings).toBe(drawingState.drawings);
     expect(cancelUserDrawingDraft(selected)).toBe(selected);
+  });
+
+  it('selects an existing drawing by id', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    const selected = selectUserDrawingById(state, 'h', 'center');
+
+    expect(selected.selection).toEqual({ drawingId: 'h', handle: 'center' });
+    expect(selected.drawings).toBe(state.drawings);
+    expect(selectUserDrawingById(selected, 'missing')).toBe(selected);
+  });
+
+  it('deletes the selected drawing while preserving other ids', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'b' },
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 90,
+        },
+        {
+          id: 'b',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    const next = deleteUserDrawing(state);
+
+    expect(next.drawings.map((drawing) => drawing.id)).toEqual(['a']);
+    expect(next.drawings[0]).toBe(state.drawings[0]);
+    expect(next.selection).toBeNull();
+    expect(next.draft).toBeNull();
+  });
+
+  it('does not delete locked drawings unless requested', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'locked' },
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(deleteUserDrawing(state)).toBe(state);
+    expect(deleteUserDrawing(state, { includeLocked: true }).drawings).toEqual([]);
+  });
+
+  it('clears drawings, selection, and draft', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'h' },
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(clearUserDrawings(state)).toMatchObject({
+      drawings: [],
+      selection: null,
+      draft: null,
+    });
+    expect(clearUserDrawings(createUserDrawingState())).toEqual(createUserDrawingState());
   });
 
   it('selects the topmost hit drawing at a screen point', () => {

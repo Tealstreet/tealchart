@@ -1,4 +1,5 @@
 import type {
+  UserDrawingHandleRole,
   UserDrawingAnchor,
   UserDrawingSelection,
   UserDrawingState,
@@ -38,6 +39,11 @@ export interface UserDrawingSelectionAtPointResult {
   changed: boolean;
 }
 
+export interface DeleteUserDrawingOptions {
+  drawingId?: string;
+  includeLocked?: boolean;
+}
+
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
     version: USER_DRAWING_SCHEMA_VERSION,
@@ -72,6 +78,49 @@ export function selectUserDrawing(
     ...state,
     activeTool: 'select',
     selection,
+    draft: null,
+  };
+}
+
+export function selectUserDrawingById(
+  state: UserDrawingState,
+  drawingId: string | null,
+  handle?: UserDrawingHandleRole,
+): UserDrawingState {
+  if (!drawingId) return selectUserDrawing(state, null);
+  if (!state.drawings.some((drawing) => drawing.id === drawingId)) return state;
+
+  return selectUserDrawing(state, handle ? { drawingId, handle } : { drawingId });
+}
+
+export function deleteUserDrawing(
+  state: UserDrawingState,
+  options: DeleteUserDrawingOptions = {},
+): UserDrawingState {
+  const drawingId = options.drawingId ?? state.selection?.drawingId;
+  if (!drawingId) return state;
+
+  const drawing = state.drawings.find((candidate) => candidate.id === drawingId);
+  if (!drawing || (drawing.locked && !options.includeLocked)) return state;
+
+  const drawings = state.drawings.filter((candidate) => candidate.id !== drawingId);
+  const selection = state.selection?.drawingId === drawingId ? null : state.selection;
+
+  return {
+    ...state,
+    drawings,
+    selection,
+    draft: null,
+  };
+}
+
+export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
+  if (state.drawings.length === 0 && !state.selection && !state.draft) return state;
+
+  return {
+    ...state,
+    drawings: [],
+    selection: null,
     draft: null,
   };
 }

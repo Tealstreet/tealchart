@@ -483,6 +483,156 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
       expect(onChange).toHaveBeenLastCalledWith(widget.getUserDrawingState());
     });
+
+    it('applies public drawing action commands through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      const initial = widget.getUserDrawingState();
+
+      widget.setUserDrawingState({
+        ...initial,
+        activeTool: 'trendLine',
+        draft: {
+          tool: 'trendLine',
+          paneId: 'main',
+          anchors: [{ time: 1, price: 10 }],
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+          },
+          startedAt: 1,
+        },
+        drawings: [
+          {
+            id: 'a',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'b',
+            kind: 'verticalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            time: 20,
+          },
+        ],
+      });
+
+      widget.setActiveUserDrawingTool('select');
+      widget.selectUserDrawing('a');
+
+      expect(widget.getUserDrawingState()).toMatchObject({
+        activeTool: 'select',
+        selection: { drawingId: 'a' },
+        draft: null,
+      });
+
+      expect(widget.deleteSelectedUserDrawing()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['b']);
+      expect(widget.getUserDrawingState().selection).toBeNull();
+
+      expect(widget.deleteUserDrawing('missing')).toBe(false);
+      expect(widget.deleteUserDrawing('b')).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        draft: {
+          tool: 'rectangle',
+          paneId: 'main',
+          anchors: [{ time: 1, price: 10 }],
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+          },
+          startedAt: 1,
+        },
+      });
+      widget.cancelUserDrawingDraft();
+      expect(widget.getUserDrawingState().draft).toBeNull();
+
+      widget.clearUserDrawings();
+      expect(widget.getUserDrawingState()).toMatchObject({
+        drawings: [],
+        selection: null,
+        draft: null,
+      });
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    it('deletes the selected drawing from keyboard delete shortcuts only while chart owns input', () => {
+      const datafeed = createMockDatafeed();
+      const container = document.createElement('div');
+      const input = document.createElement('input');
+      const onChange = vi.fn();
+      container.appendChild(input);
+      const widget = createWidget(datafeed, { container, onUserDrawingStateChange: onChange });
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      const inputDelete = new KeyboardEvent('keydown', { key: 'Delete', bubbles: true, cancelable: true });
+      input.dispatchEvent(inputDelete);
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(inputDelete.defaultPrevented).toBe(false);
+
+      const modifiedDelete = new KeyboardEvent('keydown', { key: 'Backspace', metaKey: true, cancelable: true });
+      document.dispatchEvent(modifiedDelete);
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(modifiedDelete.defaultPrevented).toBe(false);
+
+      const chartDelete = new KeyboardEvent('keydown', { key: 'Backspace', cancelable: true });
+      document.dispatchEvent(chartDelete);
+
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(widget.getUserDrawingState().selection).toBeNull();
+      expect(chartDelete.defaultPrevented).toBe(true);
+
+      widget.remove();
+    });
   });
 
   // ============================================================================
