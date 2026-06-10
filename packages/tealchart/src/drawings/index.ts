@@ -21,6 +21,8 @@ export type {
   ResolveUserDrawingInputPointOptions,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
+export { applyUserDrawingEditDrag } from './editing';
+export type { ApplyUserDrawingEditDragOptions, UserDrawingEditDrag } from './editing';
 export {
   distanceBetweenPoints,
   distanceToRectEdge,
