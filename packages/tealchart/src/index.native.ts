@@ -43,3 +43,10 @@ export type { LabelBounds } from './mobile/hooks/useLabelCollision';
 // Mobile utilities
 export { priceToY, yToPrice, timeToX, xToTime, getGestureZone } from './mobile/utils/coordinates';
 export type { ChartDimensions, GestureZone } from './mobile/utils/coordinates';
+export { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+export type { MobileUserDrawingInputPane, ResolveMobileUserDrawingInputPointOptions } from './mobile/utils/drawingInput';
+export { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
+export type {
+  MobileUserDrawingPrimitive,
+  ResolveMobileUserDrawingRenderModelOptions,
+} from './mobile/utils/drawingRenderModel';

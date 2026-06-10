@@ -13,6 +13,8 @@ import {
   resolveRaySegment,
   resolveRectFromAnchors,
   resolveUserDrawingGeometry,
+  resolveUserDrawingInputPoint,
+  resolveUserDrawingInputPointFromChart,
   screenPointToAnchor,
   timeToDrawingX,
 } from './coordinates';
@@ -59,6 +61,80 @@ describe('user drawing coordinates', () => {
 
     expect(point).toEqual({ x: 110, y: 70 });
     expect(screenPointToAnchor(point, space)).toEqual({ time: 2_000, price: 100 });
+  });
+
+  it('resolves screen input points against computed panes', () => {
+    const panes = [
+      space.pane,
+      {
+        id: 'rsi',
+        top: 120,
+        height: 80,
+        bottom: 200,
+        yMin: 0,
+        yMax: 100,
+      },
+    ];
+
+    expect(
+      resolveUserDrawingInputPoint({
+        point: { x: 110, y: 160 },
+        viewport: space.viewport,
+        panes,
+        chartLeft: space.chartLeft,
+        chartRight: space.chartRight,
+      }),
+    ).toEqual({
+      paneId: 'rsi',
+      anchor: { time: 2_000, price: 50 },
+    });
+  });
+
+  it('rejects input points outside chart bounds and pane bounds', () => {
+    expect(
+      resolveUserDrawingInputPoint({
+        point: { x: 9, y: 70 },
+        viewport: space.viewport,
+        panes: [space.pane],
+        chartLeft: space.chartLeft,
+        chartRight: space.chartRight,
+      }),
+    ).toBeNull();
+
+    expect(
+      resolveUserDrawingInputPoint({
+        point: { x: 210, y: 70 },
+        viewport: space.viewport,
+        panes: [space.pane],
+        chartLeft: space.chartLeft,
+        chartRight: space.chartRight,
+      }),
+    ).toBeNull();
+
+    expect(
+      resolveUserDrawingInputPoint({
+        point: { x: 110, y: 120 },
+        viewport: space.viewport,
+        panes: [space.pane],
+        chartLeft: space.chartLeft,
+        chartRight: space.chartRight,
+      }),
+    ).toBeNull();
+  });
+
+  it('resolves chart-bound input points from margins', () => {
+    expect(
+      resolveUserDrawingInputPointFromChart({
+        point: { x: 110, y: 70 },
+        viewport: space.viewport,
+        panes: [space.pane],
+        width: 250,
+        margins: { left: 10, right: 40 },
+      }),
+    ).toEqual({
+      paneId: 'main',
+      anchor: { time: 2_000, price: 100 },
+    });
   });
 
   it('extends non-vertical segments to chart bounds', () => {
