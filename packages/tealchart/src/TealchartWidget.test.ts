@@ -618,6 +618,12 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
       expect(inputDelete.defaultPrevented).toBe(false);
 
+      const modifiedDelete = new KeyboardEvent('keydown', { key: 'Backspace', metaKey: true, cancelable: true });
+      document.dispatchEvent(modifiedDelete);
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(modifiedDelete.defaultPrevented).toBe(false);
+
       const chartDelete = new KeyboardEvent('keydown', { key: 'Backspace', cancelable: true });
       document.dispatchEvent(chartDelete);
 

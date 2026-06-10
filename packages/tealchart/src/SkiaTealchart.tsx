@@ -260,11 +260,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     propUserDrawingState ?? createUserDrawingState(),
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
+  const userDrawingStateRef = useRef(effectiveUserDrawingState);
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
+      userDrawingStateRef.current = nextState;
       setUncontrolledUserDrawingState(nextState);
       onUserDrawingStateChange?.(nextState);
     },
@@ -273,15 +275,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const commitUserDrawingStateIfChanged = useCallback(
     (nextState: UserDrawingState) => {
-      if (nextState === effectiveUserDrawingState) return false;
+      if (nextState === userDrawingStateRef.current) return false;
       commitUserDrawingState(nextState);
       return true;
     },
-    [commitUserDrawingState, effectiveUserDrawingState],
+    [commitUserDrawingState],
   );
 
   useEffect(() => {
     if (propUserDrawingState) {
+      userDrawingStateRef.current = propUserDrawingState;
       setUncontrolledUserDrawingState(propUserDrawingState);
     }
   }, [propUserDrawingState]);
@@ -319,33 +322,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         setImperativeTheme(nextTheme);
       },
       getUserDrawingState(): UserDrawingState {
-        return effectiveUserDrawingState;
+        return userDrawingStateRef.current;
       },
       setUserDrawingState(nextState: UserDrawingState): void {
         commitUserDrawingState(nextState);
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): void {
-        commitUserDrawingStateIfChanged(setUserDrawingTool(effectiveUserDrawingState, tool));
+        commitUserDrawingStateIfChanged(setUserDrawingTool(userDrawingStateRef.current, tool));
       },
       selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
-        commitUserDrawingStateIfChanged(selectUserDrawingById(effectiveUserDrawingState, drawingId, handle));
+        commitUserDrawingStateIfChanged(selectUserDrawingById(userDrawingStateRef.current, drawingId, handle));
       },
       deleteUserDrawing(drawingId?: string): boolean {
-        const nextState = deleteUserDrawingState(effectiveUserDrawingState, { drawingId });
+        const nextState = deleteUserDrawingState(userDrawingStateRef.current, { drawingId });
         return commitUserDrawingStateIfChanged(nextState);
       },
       deleteSelectedUserDrawing(): boolean {
-        const nextState = deleteUserDrawingState(effectiveUserDrawingState);
+        const nextState = deleteUserDrawingState(userDrawingStateRef.current);
         return commitUserDrawingStateIfChanged(nextState);
       },
       clearUserDrawings(): void {
-        commitUserDrawingStateIfChanged(clearUserDrawingsState(effectiveUserDrawingState));
+        commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
       },
       cancelUserDrawingDraft(): void {
-        commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(effectiveUserDrawingState));
+        commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(userDrawingStateRef.current));
       },
     }),
-    [commitUserDrawingState, commitUserDrawingStateIfChanged, effectiveUserDrawingState],
+    [commitUserDrawingState, commitUserDrawingStateIfChanged],
   );
 
   // Use core hook for bar fetching and state management

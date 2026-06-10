@@ -2418,7 +2418,9 @@ export class TealchartWidget {
       return;
     }
 
-    if ((e.key === 'Delete' || e.key === 'Backspace') && this.deleteSelectedUserDrawing()) {
+    const isBareDeleteKey =
+      (e.key === 'Delete' || e.key === 'Backspace') && !e.metaKey && !e.ctrlKey && !e.altKey;
+    if (isBareDeleteKey && this.deleteSelectedUserDrawing()) {
       e.stopPropagation();
       e.preventDefault();
       return;
