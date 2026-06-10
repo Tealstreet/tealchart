@@ -64,6 +64,7 @@ describe('mobile user drawing render model', () => {
     expect(
       resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), {
         draftPreviewAnchor: { time: 90, price: 10 },
+        draftOpacity: 0.4,
         handleRadius: 6,
       }),
     ).toEqual([
@@ -72,6 +73,7 @@ describe('mobile user drawing render model', () => {
         id: 'line',
         phase: 'committed',
         selected: true,
+        opacity: 1,
         start: { x: 0, y: 50 },
         end: { x: 100, y: 50 },
         style,
@@ -81,6 +83,7 @@ describe('mobile user drawing render model', () => {
         id: '__draft__',
         phase: 'draft',
         selected: false,
+        opacity: 0.4,
         rect: { x: 10, y: 10, width: 80, height: 80 },
         style,
       },
@@ -103,5 +106,33 @@ describe('mobile user drawing render model', () => {
         radius: 6,
       },
     ]);
+  });
+
+  it('skips invisible selected drawings and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'hidden' },
+      drawings: [
+        {
+          id: 'hidden',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: false,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+          extend: 'none',
+        },
+      ],
+      draft: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toEqual([]);
   });
 });

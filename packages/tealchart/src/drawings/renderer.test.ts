@@ -261,4 +261,31 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('arc:100,50,4:1');
     expect(ctx.globalAlpha).toBe(1);
   });
+
+  it('does not render selection handles for invisible drawings', () => {
+    const ctx = new RecordingCanvasContext();
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'hidden' },
+      drawings: [
+        {
+          ...base,
+          id: 'hidden',
+          kind: 'trendLine',
+          visible: false,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+          extend: 'none',
+        },
+      ],
+      draft: null,
+    };
+
+    renderUserDrawingLayer(ctx, state, new Map([[space.pane.id, space]]));
+
+    expect(ctx.calls).toEqual([]);
+  });
 });
