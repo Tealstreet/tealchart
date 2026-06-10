@@ -9,11 +9,13 @@ import type {
   PlotOutput,
   TealscriptRuntimeOptions,
 } from '@tealstreet/tealscript';
+import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
 import { LOADING_OPACITY } from './constants';
+import { createUserDrawingState } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
@@ -103,6 +105,7 @@ export class TealchartWidget {
   private _tealScriptManager: TealscriptManager | null = null;
   private _plots: PlotOutput[] = [];
   private _drawings: DrawingOutput[] = [];
+  private _userDrawingState: UserDrawingState;
 
   // Jailbreak (canvas-drawing) indicator support
   private _jailbreakManager: JailbreakIndicatorManager | null = null;
@@ -210,6 +213,7 @@ export class TealchartWidget {
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
     this._renderOptions = mergeChartThemeRenderOptions(options.theme, options.renderOptions);
+    this._userDrawingState = options.userDrawingState ?? createUserDrawingState();
 
     // Apply initial overrides if provided
     if (options.overrides) {
@@ -1053,6 +1057,11 @@ export class TealchartWidget {
     // Drawings changed (worker callback with new drawing data)
     if (dirty & DIRTY.DRAWINGS) {
       this._ui.setDrawings(this._drawings);
+    }
+
+    // User drawings changed (public state API)
+    if (dirty & DIRTY.USER_DRAWINGS) {
+      this._ui.setUserDrawingState(this._userDrawingState);
     }
 
     // Lines changed (order/position updates, last-trade line)
@@ -2089,6 +2098,17 @@ export class TealchartWidget {
    */
   activeChart(): TealchartApi {
     return this._chartApi;
+  }
+
+  getUserDrawingState(): UserDrawingState {
+    return this._userDrawingState;
+  }
+
+  setUserDrawingState(state: UserDrawingState): void {
+    if (state === this._userDrawingState) return;
+    this._userDrawingState = state;
+    this._options.onUserDrawingStateChange?.(state);
+    this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
   }
 
   /**

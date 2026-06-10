@@ -4,6 +4,7 @@
  */
 
 import type { WorkerError } from '@tealstreet/tealscript';
+import type { UserDrawingState } from './drawings';
 import type { ChartThemeInput } from './theme';
 
 // Reuse Bar type from existing codebase
@@ -718,6 +719,10 @@ export interface TealchartWidgetOptions {
   datafeed: IBasicDataFeed;
   /** Initial render options applied before overrides and symbol metadata. */
   renderOptions?: Partial<RenderOptions>;
+  /** Initial user drawing state. Rendering/input support is wired by drawing-tool phases. */
+  userDrawingState?: UserDrawingState;
+  /** Called when the widget updates user drawing state through its public API. */
+  onUserDrawingStateChange?: (state: UserDrawingState) => void;
   locale?: string;
   autosize?: boolean;
   fullscreen?: boolean;

@@ -18,6 +18,7 @@
 
 import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
+import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
@@ -66,6 +67,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
+import { createUserDrawingState } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -96,6 +98,8 @@ export interface SkiaTealchartHandle {
   addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null;
   removeTealscriptIndicator(instanceId: string): void;
   changeTheme(theme: ChartThemeInput): void;
+  getUserDrawingState(): UserDrawingState;
+  setUserDrawingState(state: UserDrawingState): void;
 }
 
 export interface SkiaTealchartProps {
@@ -131,6 +135,10 @@ export interface SkiaTealchartProps {
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Called when crosshair position changes */
   onCrossHairMoved?: (price: number, time: number) => void;
+  /** Initial or controlled user drawing state. Rendering/input support is wired by drawing-tool phases. */
+  userDrawingState?: UserDrawingState;
+  /** Called when the chart updates user drawing state through its public API. */
+  onUserDrawingStateChange?: (state: UserDrawingState) => void;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when order price is changed via drag */
@@ -184,6 +192,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onViewportChange,
     onContextMenu,
     onCrossHairMoved,
+    userDrawingState: controlledUserDrawingState,
+    onUserDrawingStateChange,
     onSwipeBlockChange,
     onOrderMove,
     onOrderCancel,
@@ -208,6 +218,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
+  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
+    createUserDrawingState(),
+  );
+  const effectiveUserDrawingState = controlledUserDrawingState ?? uncontrolledUserDrawingState;
 
   useEffect(() => {
     setImperativeTheme(null);
@@ -241,8 +255,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       changeTheme(nextTheme: ChartThemeInput): void {
         setImperativeTheme(nextTheme);
       },
+      getUserDrawingState(): UserDrawingState {
+        return effectiveUserDrawingState;
+      },
+      setUserDrawingState(nextState: UserDrawingState): void {
+        if (!controlledUserDrawingState) {
+          setUncontrolledUserDrawingState(nextState);
+        }
+        onUserDrawingStateChange?.(nextState);
+      },
     }),
-    [],
+    [controlledUserDrawingState, effectiveUserDrawingState, onUserDrawingStateChange],
   );
 
   // Use core hook for bar fetching and state management

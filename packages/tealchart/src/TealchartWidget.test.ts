@@ -7,6 +7,7 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
+import type { UserDrawingState } from './drawings';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -20,6 +21,7 @@ const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
 const setBarsCalls: Bar[][] = [];
 const setPlotsCalls: PlotOutput[][] = [];
 const setDrawingsCalls: DrawingOutput[][] = [];
+const setUserDrawingStateCalls: UserDrawingState[] = [];
 const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
 
@@ -34,6 +36,9 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     }
     setDrawings(drawings: DrawingOutput[]) {
       setDrawingsCalls.push([...drawings]);
+    }
+    setUserDrawingState(state: UserDrawingState) {
+      setUserDrawingStateCalls.push(state);
     }
     setLoading() {}
     setOrderLines() {}
@@ -209,6 +214,7 @@ describe('TealchartWidget', () => {
     setBarsCalls.length = 0;
     setPlotsCalls.length = 0;
     setDrawingsCalls.length = 0;
+    setUserDrawingStateCalls.length = 0;
     setRenderOptionsCalls.length = 0;
     setExecutionLinesCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
@@ -270,6 +276,39 @@ describe('TealchartWidget', () => {
 
       expect(setPlotsCalls).toHaveLength(0);
       expect(setDrawingsCalls).toEqual([[drawing]]);
+    });
+  });
+
+  // ============================================================================
+  // User Drawing State
+  // ============================================================================
+  describe('user drawing state', () => {
+    it('exposes default user drawing state and pushes explicit updates', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      completeInit(datafeed);
+
+      const initial = widget.getUserDrawingState();
+      expect(initial).toMatchObject({
+        version: 1,
+        activeTool: 'select',
+        drawings: [],
+        selection: null,
+        draft: null,
+      });
+
+      const nextState: UserDrawingState = {
+        ...initial,
+        activeTool: 'trendLine',
+      };
+      widget.setUserDrawingState(nextState);
+      expect(widget.getUserDrawingState()).toBe(nextState);
+      expect(onChange).toHaveBeenCalledWith(nextState);
+
+      const testWidget = widget as unknown as { _render(dirty: number): void };
+      testWidget._render(DIRTY.USER_DRAWINGS);
+      expect(setUserDrawingStateCalls.at(-1)).toBe(nextState);
     });
   });
 
