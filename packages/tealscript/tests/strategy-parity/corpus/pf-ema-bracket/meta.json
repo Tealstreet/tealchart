@@ -1,0 +1,10 @@
+{
+  "description": "PineForge probe: EMA cross + bracket TP/SL via syminfo.mintick",
+  "source": "tradingview",
+  "symbol": "BINANCE:ETHUSDT.P",
+  "timeframe": "15m",
+  "barCount": 36361,
+  "tvExportDate": "2026-06-10",
+  "pineforgeEntry": "composite-scalping-tight-tp-sl-points-01",
+  "license": "Apache-2.0"
+}

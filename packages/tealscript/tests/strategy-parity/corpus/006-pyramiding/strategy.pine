@@ -1,0 +1,7 @@
+//@version=6
+strategy("Pyramiding", initial_capital=10000, pyramiding=3)
+if ta.rsi(close, 14) < 40
+    strategy.entry("Long", strategy.long, qty=1)
+if ta.rsi(close, 14) > 60
+    strategy.close("Long")
+plot(strategy.position_size, title="Position")
