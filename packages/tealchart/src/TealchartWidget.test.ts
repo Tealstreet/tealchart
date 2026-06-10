@@ -7,7 +7,7 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
-import type { UserDrawingState } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawingState } from './drawings';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -183,6 +183,25 @@ const defaultSymbolInfo: LibrarySymbolInfo = {
   pricescale: 100,
   minmov: 1,
   has_intraday: true,
+};
+
+const userDrawingSpace: DrawingCoordinateSpace = {
+  viewport: {
+    startTime: 0,
+    endTime: 100,
+    priceMin: 0,
+    priceMax: 100,
+  },
+  pane: {
+    id: 'main',
+    top: 0,
+    height: 100,
+    bottom: 100,
+    yMin: 0,
+    yMax: 100,
+  },
+  chartLeft: 0,
+  chartRight: 100,
 };
 
 function createWidget(datafeed: MockDatafeed, overrides: Partial<TealchartWidgetOptions> = {}): TealchartWidget {
@@ -375,6 +394,47 @@ describe('TealchartWidget', () => {
       expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
       expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
       expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['drawing_1', 'drawing_2']);
+    });
+
+    it('selects drawings from chart-surface input in select mode', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({
+        ...initial,
+        activeTool: 'select',
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingSelection(
+          point: { x: number; y: number },
+          spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+        ): boolean;
+      };
+
+      expect(testWidget._handleUserDrawingSelection({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]))).toBe(
+        true,
+      );
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
+      expect(onChange).toHaveBeenLastCalledWith(widget.getUserDrawingState());
     });
   });
 

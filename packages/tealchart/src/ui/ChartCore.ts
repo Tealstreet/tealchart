@@ -15,7 +15,12 @@ import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
-import type { DrawingCoordinateSpace, UserDrawingInputPoint, UserDrawingState } from '../drawings';
+import type {
+  DrawingCoordinateSpace,
+  DrawingScreenPoint,
+  UserDrawingInputPoint,
+  UserDrawingState,
+} from '../drawings';
 
 import Konva from 'konva';
 
@@ -93,6 +98,11 @@ export interface ChartCoreOptions {
   onMouseUp?: () => void;
   /** Called when a chart-surface click/tap resolves to a user drawing input point */
   onUserDrawingInput?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when select-mode chart-surface input should select or clear a user drawing */
+  onUserDrawingSelection?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => boolean;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -1468,7 +1478,13 @@ export class ChartCore {
   }
 
   private handleUserDrawingInput(x: number, y: number): boolean {
-    if (!this.options.onUserDrawingInput || !this.viewport) return false;
+    if (!this.viewport) return false;
+
+    if (this.userDrawingState?.activeTool === 'select') {
+      return this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
+    }
+
+    if (!this.options.onUserDrawingInput) return false;
 
     const layout = this.getUnifiedLayout();
     const timeAxisHeight = layout.timeAxisHeight;
