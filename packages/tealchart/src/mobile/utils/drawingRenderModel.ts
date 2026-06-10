@@ -43,6 +43,7 @@ export type MobileUserDrawingPrimitive =
       opacity: number;
       point: DrawingScreenPoint;
       text: string;
+      textAlign: TextLabelDrawing['textAlign'];
       style: UserDrawingStyle;
     }
   | {
@@ -104,6 +105,7 @@ function primitiveFromGeometry(
         opacity,
         point: geometry.point,
         text: drawing.text,
+        textAlign: drawing.textAlign,
         style: drawing.style,
       };
   }
