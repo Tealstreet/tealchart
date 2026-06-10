@@ -1,16 +1,23 @@
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DrawingCoordinateSpace, ResolvedUserDrawingGeometry } from './coordinates';
+import type { ResolveUserDrawingRenderEntriesOptions } from './renderModel';
 import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle } from './types';
+import type { UserDrawingState } from './types';
 
+import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
 
 export interface UserDrawingRenderOptions {
   labelPadding?: number;
   labelHeight?: number;
+  selectionHandleRadius?: number;
+  draftOpacity?: number;
 }
 
 const DEFAULT_LABEL_PADDING = 6;
 const DEFAULT_LABEL_HEIGHT = 20;
+const DEFAULT_SELECTION_HANDLE_RADIUS = 4;
+const DEFAULT_DRAFT_OPACITY = 0.65;
 
 function dashForLineStyle(style: UserDrawingLineStyle): number[] {
   switch (style) {
@@ -91,6 +98,35 @@ function renderTextLabelGeometry(
   ctx.fillText(text, textX, point.y);
 }
 
+function renderSelectionHandles(
+  ctx: CanvasContext,
+  drawing: UserDrawing,
+  space: DrawingCoordinateSpace,
+  options: Required<UserDrawingRenderOptions>,
+): void {
+  const points = resolveUserDrawingHandlePoints(drawing, space);
+  ctx.save();
+  try {
+    ctx.beginPath();
+    ctx.rect(space.chartLeft, space.pane.top, space.chartRight - space.chartLeft, space.pane.height);
+    ctx.clip();
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = drawing.style.lineColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+
+    for (const point of points) {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, options.selectionHandleRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  } finally {
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+}
+
 export function renderUserDrawing(
   ctx: CanvasContext,
   drawing: UserDrawing,
@@ -102,6 +138,8 @@ export function renderUserDrawing(
   const resolvedOptions = {
     labelPadding: options.labelPadding ?? DEFAULT_LABEL_PADDING,
     labelHeight: options.labelHeight ?? DEFAULT_LABEL_HEIGHT,
+    selectionHandleRadius: options.selectionHandleRadius ?? DEFAULT_SELECTION_HANDLE_RADIUS,
+    draftOpacity: options.draftOpacity ?? DEFAULT_DRAFT_OPACITY,
   };
   const geometry = resolveUserDrawingGeometry(drawing, space);
 
@@ -141,5 +179,46 @@ export function renderUserDrawings(
     const space = spacesByPaneId.get(drawing.paneId);
     if (!space) continue;
     renderUserDrawing(ctx, drawing, space, options);
+  }
+}
+
+export function renderUserDrawingLayer(
+  ctx: CanvasContext,
+  state: UserDrawingState,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: UserDrawingRenderOptions & ResolveUserDrawingRenderEntriesOptions = {},
+): void {
+  const resolvedOptions = {
+    labelPadding: options.labelPadding ?? DEFAULT_LABEL_PADDING,
+    labelHeight: options.labelHeight ?? DEFAULT_LABEL_HEIGHT,
+    selectionHandleRadius: options.selectionHandleRadius ?? DEFAULT_SELECTION_HANDLE_RADIUS,
+    draftOpacity: options.draftOpacity ?? DEFAULT_DRAFT_OPACITY,
+  };
+
+  const entries = resolveUserDrawingRenderEntries(state, options);
+
+  for (const entry of entries) {
+    const space = spacesByPaneId.get(entry.drawing.paneId);
+    if (!space) continue;
+
+    if (entry.phase === 'draft') {
+      ctx.save();
+      try {
+        ctx.globalAlpha *= resolvedOptions.draftOpacity;
+        renderUserDrawing(ctx, entry.drawing, space, resolvedOptions);
+      } finally {
+        ctx.restore();
+      }
+      continue;
+    }
+
+    renderUserDrawing(ctx, entry.drawing, space, resolvedOptions);
+  }
+
+  for (const entry of entries) {
+    if (!entry.selected || !entry.drawing.visible) continue;
+    const space = spacesByPaneId.get(entry.drawing.paneId);
+    if (!space) continue;
+    renderSelectionHandles(ctx, entry.drawing, space, resolvedOptions);
   }
 }

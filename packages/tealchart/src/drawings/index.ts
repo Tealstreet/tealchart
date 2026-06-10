@@ -6,6 +6,8 @@ export {
   resolveExtendedSegment,
   resolveRaySegment,
   resolveRectFromAnchors,
+  resolveUserDrawingInputPoint,
+  resolveUserDrawingInputPointFromChart,
   resolveUserDrawingGeometry,
   screenPointToAnchor,
   timeToDrawingX,
@@ -15,6 +17,8 @@ export type {
   DrawingScreenPoint,
   DrawingScreenRect,
   DrawingScreenSegment,
+  ResolveUserDrawingInputFromChartOptions,
+  ResolveUserDrawingInputPointOptions,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
 export {
@@ -25,7 +29,24 @@ export {
   hitTestUserDrawings,
 } from './hitTesting';
 export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
-export { renderUserDrawing, renderUserDrawings } from './renderer';
+export {
+  cancelUserDrawingDraft,
+  createUserDrawingState,
+  handleUserDrawingInput,
+  selectUserDrawing,
+  setUserDrawingTool,
+} from './input';
+export type { UserDrawingInputOptions, UserDrawingInputPoint } from './input';
+export {
+  resolveUserDrawingHandlePoints,
+  resolveUserDrawingRenderEntries,
+} from './renderModel';
+export type {
+  ResolveUserDrawingRenderEntriesOptions,
+  UserDrawingRenderEntry,
+  UserDrawingRenderPhase,
+} from './renderModel';
+export { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from './renderer';
 export type { UserDrawingRenderOptions } from './renderer';
 export {
   createUserDrawingFromDraft,
