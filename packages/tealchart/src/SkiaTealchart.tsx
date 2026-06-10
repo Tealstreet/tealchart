@@ -822,8 +822,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         const nextState = selectUserDrawingAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId);
         if (nextState !== effectiveUserDrawingState) {
           commitUserDrawingState(nextState);
+          return true;
         }
-        return true;
+        return false;
       }
 
       const point = resolveMobileUserDrawingInputPoint({
