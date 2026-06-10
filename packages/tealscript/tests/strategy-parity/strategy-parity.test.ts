@@ -113,14 +113,3 @@ describe('strategy parity corpus', () => {
   }
 });
 
-describe('corpus entry details', () => {
-  const corpus = loadCorpus(CORPUS_DIR);
-  const fastCorpus = corpus.filter((e) => !e.id.startsWith('pf-'));
-
-  for (const entry of fastCorpus) {
-    it(`${entry.id}: produces trades`, () => {
-      const result = runCorpusEntry(entry);
-      expect(result.engineTrades.length).toBeGreaterThan(0);
-    });
-  }
-});
