@@ -60,6 +60,7 @@ describe('mobile user drawing render model', () => {
         style,
         startedAt: 2,
       },
+      textEdit: null,
     };
 
     expect(
@@ -136,6 +137,7 @@ describe('mobile user drawing render model', () => {
         },
       ],
       draft: null,
+      textEdit: null,
     };
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toEqual([]);
@@ -162,6 +164,7 @@ describe('mobile user drawing render model', () => {
         },
       ],
       draft: null,
+      textEdit: null,
     };
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
@@ -170,7 +173,47 @@ describe('mobile user drawing render model', () => {
       clip,
       point: { x: 50, y: 50 },
       text: 'Left note',
+      editing: false,
+      editValue: null,
       textAlign: 'left',
+    });
+  });
+
+  it('marks active text edits with the draft value for mobile overlays', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Committed',
+          textAlign: 'center',
+        },
+      ],
+      draft: null,
+      textEdit: {
+        drawingId: 'label',
+        value: 'Draft value',
+        originalValue: 'Committed',
+        startedAt: 2,
+      },
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'textLabel',
+      id: 'label',
+      text: 'Committed',
+      editing: true,
+      editValue: 'Draft value',
     });
   });
 });

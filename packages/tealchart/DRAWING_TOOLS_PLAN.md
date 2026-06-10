@@ -34,15 +34,24 @@ matching behavior in the same PR for every user-facing drawing feature.
   removes the selected drawing when the chart owns keyboard input.
 - Mobile Skia exposes the same drawing action concepts on its imperative handle.
 
-## Current Epic: Toolbar Foundation
+## Shipped: Toolbar Foundation
 
 - Shared toolbar descriptors define the supported drawing tools and selected
   drawing actions.
 - Web top bar and mobile top bar render the same drawing tool/action controls
   from the shared descriptors.
 
+## Current Epic: Text Editing Foundation
+
+- Shared text edit reducers begin, update, commit, cancel, and directly set text
+  labels while preserving drawing IDs.
+- Web double-click opens a positioned DOM text editor for text labels and falls
+  back to pane maximize for other targets.
+- Mobile Skia double-tap opens a positioned React Native text editor for text
+  labels and exposes matching imperative text-edit APIs.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Text editing UX for text labels.
+- Rich text label styling controls and multiline editor polish.
 - Persistence handoff into app-level chart layout state.

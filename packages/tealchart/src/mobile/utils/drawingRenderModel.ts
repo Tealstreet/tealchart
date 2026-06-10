@@ -46,6 +46,8 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       point: DrawingScreenPoint;
       text: string;
+      editing: boolean;
+      editValue: string | null;
       textAlign: TextLabelDrawing['textAlign'];
       style: UserDrawingStyle;
     }
@@ -90,6 +92,7 @@ function primitiveFromGeometry(
   phase: UserDrawingRenderPhase,
   selected: boolean,
   opacity: number,
+  textEditValue?: string | null,
 ): MobileUserDrawingPrimitive {
   switch (geometry.kind) {
     case 'line':
@@ -129,6 +132,8 @@ function primitiveFromGeometry(
         clip,
         point: geometry.point,
         text: drawing.text,
+        editing: textEditValue !== undefined,
+        editValue: textEditValue ?? null,
         textAlign: drawing.textAlign,
         style: drawing.style,
       };
@@ -149,6 +154,7 @@ export function resolveMobileUserDrawingRenderModel(
     const space = spacesByPaneId.get(entry.drawing.paneId);
     if (!space) continue;
     const clip = clipRectFromSpace(space);
+    const textEditValue = state.textEdit?.drawingId === entry.drawing.id ? state.textEdit.value : undefined;
     primitives.push(
       primitiveFromGeometry(
         resolveUserDrawingGeometry(entry.drawing, space),
@@ -156,6 +162,7 @@ export function resolveMobileUserDrawingRenderModel(
         entry.phase,
         entry.selected,
         entry.phase === 'draft' ? draftOpacity : 1,
+        textEditValue,
       ),
     );
   }
