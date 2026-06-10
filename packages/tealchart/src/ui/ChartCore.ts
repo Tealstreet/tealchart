@@ -12,14 +12,15 @@
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
+import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
-import type { UserDrawingInputPoint, UserDrawingState } from '../drawings';
+import type { DrawingCoordinateSpace, UserDrawingInputPoint, UserDrawingState } from '../drawings';
 
 import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
-import { resolveUserDrawingInputPointFromChart } from '../drawings';
+import { renderUserDrawingLayer, resolveUserDrawingInputPointFromChart } from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -484,6 +485,7 @@ export class ChartCore {
 
   // Core components
   private renderer: TealchartRenderer;
+  private canvasContext: CanvasContext;
   private eventManager: EventManager;
   private priceLineManager: PriceLineManager | null = null;
   private stage: Konva.Stage | null = null;
@@ -598,6 +600,7 @@ export class ChartCore {
 
     // Wrap in CanvasContext abstraction (enables Skia implementation for React Native)
     const ctx = new WebCanvasContext(nativeCtx);
+    this.canvasContext = ctx;
 
     // Initialize renderer
     this.renderer = new TealchartRenderer(
@@ -1501,6 +1504,36 @@ export class ChartCore {
     return point ? this.options.onUserDrawingInput(point) : false;
   }
 
+  private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {
+    const layout = this.getUnifiedLayout();
+    const availableHeight = this.options.height - layout.timeAxisHeight - this.margins.top;
+    let currentTop = this.margins.top;
+    const spaces = new Map<string, DrawingCoordinateSpace>();
+
+    for (const pane of layout.panes) {
+      const height = availableHeight * pane.heightRatio;
+      const yRange =
+        pane.type === 'main' && !pane.fixedRange
+          ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
+          : { yMin: pane.yMin, yMax: pane.yMax };
+      spaces.set(pane.id, {
+        viewport,
+        pane: {
+          id: pane.id,
+          top: currentTop,
+          height,
+          bottom: currentTop + height,
+          ...yRange,
+        },
+        chartLeft: this.margins.left,
+        chartRight: this.options.width - this.margins.right,
+      });
+      currentTop += height;
+    }
+
+    return spaces;
+  }
+
   private getDividerAtY(y: number): PaneDividerInfo | null {
     const layout = this.getUnifiedLayout();
     const panes = layout.panes;
@@ -1792,6 +1825,10 @@ export class ChartCore {
       this.executionLines,
       this.drawings,
     );
+
+    if (this.userDrawingState) {
+      renderUserDrawingLayer(this.canvasContext, this.userDrawingState, this.getUserDrawingSpaces(vp));
+    }
   }
 
   /**
