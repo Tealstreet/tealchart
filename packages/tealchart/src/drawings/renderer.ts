@@ -216,7 +216,7 @@ export function renderUserDrawingLayer(
   }
 
   for (const entry of entries) {
-    if (!entry.selected) continue;
+    if (!entry.selected || !entry.drawing.visible) continue;
     const space = spacesByPaneId.get(entry.drawing.paneId);
     if (!space) continue;
     renderSelectionHandles(ctx, entry.drawing, space, resolvedOptions);

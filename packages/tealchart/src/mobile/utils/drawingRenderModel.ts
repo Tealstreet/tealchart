@@ -21,6 +21,7 @@ export type MobileUserDrawingPrimitive =
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
+      opacity: number;
       start: DrawingScreenPoint;
       end: DrawingScreenPoint;
       style: UserDrawingStyle;
@@ -30,6 +31,7 @@ export type MobileUserDrawingPrimitive =
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
+      opacity: number;
       rect: { x: number; y: number; width: number; height: number };
       style: UserDrawingStyle;
     }
@@ -38,6 +40,7 @@ export type MobileUserDrawingPrimitive =
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
+      opacity: number;
       point: DrawingScreenPoint;
       text: string;
       style: UserDrawingStyle;
@@ -54,14 +57,17 @@ export type MobileUserDrawingPrimitive =
 
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
   handleRadius?: number;
+  draftOpacity?: number;
 }
 
 const DEFAULT_HANDLE_RADIUS = 4;
+const DEFAULT_DRAFT_OPACITY = 0.65;
 
 function primitiveFromGeometry(
   geometry: ResolvedUserDrawingGeometry,
   phase: UserDrawingRenderPhase,
   selected: boolean,
+  opacity: number,
 ): MobileUserDrawingPrimitive {
   switch (geometry.kind) {
     case 'line':
@@ -73,6 +79,7 @@ function primitiveFromGeometry(
         id: geometry.drawing.id,
         phase,
         selected,
+        opacity,
         start: geometry.segment.start,
         end: geometry.segment.end,
         style: geometry.drawing.style,
@@ -83,6 +90,7 @@ function primitiveFromGeometry(
         id: geometry.drawing.id,
         phase,
         selected,
+        opacity,
         rect: geometry.rect,
         style: geometry.drawing.style,
       };
@@ -93,6 +101,7 @@ function primitiveFromGeometry(
         id: drawing.id,
         phase,
         selected,
+        opacity,
         point: geometry.point,
         text: drawing.text,
         style: drawing.style,
@@ -107,15 +116,24 @@ export function resolveMobileUserDrawingRenderModel(
 ): MobileUserDrawingPrimitive[] {
   const entries = resolveUserDrawingRenderEntries(state, options);
   const primitives: MobileUserDrawingPrimitive[] = [];
+  const draftOpacity = options.draftOpacity ?? DEFAULT_DRAFT_OPACITY;
 
   for (const entry of entries) {
+    if (!entry.drawing.visible) continue;
     const space = spacesByPaneId.get(entry.drawing.paneId);
     if (!space) continue;
-    primitives.push(primitiveFromGeometry(resolveUserDrawingGeometry(entry.drawing, space), entry.phase, entry.selected));
+    primitives.push(
+      primitiveFromGeometry(
+        resolveUserDrawingGeometry(entry.drawing, space),
+        entry.phase,
+        entry.selected,
+        entry.phase === 'draft' ? draftOpacity : 1,
+      ),
+    );
   }
 
   for (const entry of entries) {
-    if (!entry.selected) continue;
+    if (!entry.selected || !entry.drawing.visible) continue;
     const space = spacesByPaneId.get(entry.drawing.paneId);
     if (!space) continue;
 
