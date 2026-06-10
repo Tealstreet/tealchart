@@ -46,6 +46,37 @@ export { safeDeepMerge, migrateChartSettings, CHART_SETTINGS_VERSION } from './s
 // Renderer (for advanced usage)
 export { TealchartRenderer } from './TealchartRenderer';
 
+// User drawing model (platform-neutral)
+export {
+  createUserDrawingFromDraft,
+  DEFAULT_USER_DRAWING_STATE,
+  DEFAULT_USER_DRAWING_STYLE,
+  getRequiredAnchorCount,
+  getUserDrawingPaneId,
+  isDrawingDraftReady,
+  USER_DRAWING_SCHEMA_VERSION,
+} from './drawings';
+export type {
+  CreateUserDrawingFromDraftOptions,
+  HorizontalLineDrawing,
+  RayDrawing,
+  RectangleDrawing,
+  TextLabelDrawing,
+  TrendLineDrawing,
+  UserDrawing,
+  UserDrawingAnchor,
+  UserDrawingBase,
+  UserDrawingDraft,
+  UserDrawingHandleRole,
+  UserDrawingKind,
+  UserDrawingLineStyle,
+  UserDrawingSelection,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingTool,
+  VerticalLineDrawing,
+} from './drawings';
+
 // Gap detection (for advanced usage)
 export { GapDetectionManager } from './GapDetectionManager';
 
