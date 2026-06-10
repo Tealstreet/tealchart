@@ -1,5 +1,5 @@
 import type { Bar, Viewport } from '../types';
-import type { UserDrawingState } from '../drawings';
+import type { UserDrawingSelectionAtPointResult, UserDrawingState } from '../drawings';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -248,7 +248,7 @@ describe('ChartCore viewport management', () => {
 
   it('keeps select-mode drawing selection inside chart panes without consuming double-click tracking', async () => {
     const { ChartCore } = await import('./ChartCore');
-    const selectionResult = {
+    const selectionResult: UserDrawingSelectionAtPointResult = {
       state: {
         version: 1,
         activeTool: 'select' as const,
@@ -286,9 +286,19 @@ describe('ChartCore viewport management', () => {
       allowPaneDoubleClick: true,
     });
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
+    onUserDrawingSelection.mockReturnValueOnce({
+      state: { ...selectionResult.state, selection: null },
+      hit: false,
+      changed: true,
+    });
+    expect(testCore.handleUserDrawingInput(100, 100, 'touch')).toEqual({
+      handled: true,
+      allowPaneDoubleClick: true,
+    });
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
     expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
     expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);
-    expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
 
     core.dispose();
   });

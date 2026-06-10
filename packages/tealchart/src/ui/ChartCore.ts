@@ -1487,7 +1487,9 @@ export class ChartCore {
       if (x < chartLeft || x > chartRight || !this.getPaneAtY(y)) return false;
 
       const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
-      return source === 'touch' && selection?.hit === true ? { handled: true, allowPaneDoubleClick: true } : false;
+      return source === 'touch' && (selection?.hit === true || selection?.changed === true)
+        ? { handled: true, allowPaneDoubleClick: true }
+        : false;
     }
 
     if (!this.options.onUserDrawingInput) return false;

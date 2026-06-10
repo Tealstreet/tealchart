@@ -231,9 +231,12 @@ describe('user drawing input controller', () => {
     });
 
     const next = selectUserDrawingAtPoint(state, { x: 40, y: 20 }, new Map([['main', space]]));
+    const result = resolveUserDrawingSelectionAtPoint(state, { x: 40, y: 20 }, new Map([['main', space]]));
 
     expect(next.selection).toBeNull();
     expect(next.draft).toBeNull();
     expect(next.activeTool).toBe('select');
+    expect(result.hit).toBe(false);
+    expect(result.changed).toBe(true);
   });
 });
