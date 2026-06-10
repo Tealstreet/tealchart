@@ -1,7 +1,8 @@
 import type { UserDrawingDraft } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STATE,
@@ -27,6 +28,10 @@ function draft(overrides: Partial<UserDrawingDraft>): UserDrawingDraft {
 }
 
 describe('user drawing types', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('defines an empty default state for new chart instances', () => {
     expect(DEFAULT_USER_DRAWING_STATE).toEqual({
       version: USER_DRAWING_SCHEMA_VERSION,

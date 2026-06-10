@@ -1,8 +1,9 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { distanceToRectEdge, distanceToSegment, hitTestUserDrawing, hitTestUserDrawings } from './hitTesting';
 
 const style: UserDrawingStyle = {
@@ -40,6 +41,10 @@ const base = {
 };
 
 describe('user drawing hit testing', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('measures distance to finite segments', () => {
     expect(distanceToSegment({ x: 50, y: 53 }, { start: { x: 0, y: 50 }, end: { x: 100, y: 50 } })).toBe(3);
     expect(distanceToSegment({ x: 110, y: 50 }, { start: { x: 0, y: 50 }, end: { x: 100, y: 50 } })).toBe(10);

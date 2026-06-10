@@ -2,8 +2,9 @@ import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { renderUserDrawing, renderUserDrawings } from './renderer';
 
 class RecordingCanvasContext implements CanvasContext {
@@ -124,6 +125,10 @@ const base = {
 };
 
 describe('user drawing renderer', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('renders line drawings through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
