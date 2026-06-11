@@ -64,6 +64,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('arrowMarker')).toBe(2);
     expect(getRequiredAnchorCount('ray')).toBe(2);
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
+    expect(getRequiredAnchorCount('circle')).toBe(2);
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
     expect(getRequiredAnchorCount('path')).toBe(3);
@@ -157,6 +158,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'priceRange' }), { id: 'range', now: 20 })).toMatchObject({
       id: 'range',
       kind: 'priceRange',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'circle' }), { id: 'circle', now: 20 })).toMatchObject({
+      id: 'circle',
+      kind: 'circle',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

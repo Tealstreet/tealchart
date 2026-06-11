@@ -84,6 +84,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'circle';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      radius: number;
+      rect: { x: number; y: number; width: number; height: number };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'path';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -147,6 +159,7 @@ export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrim
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
+export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
@@ -306,6 +319,19 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rect: geometry.rect,
+        style: geometry.drawing.style,
+      };
+    case 'circle':
+      return {
+        kind: 'circle',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.circle.center,
+        radius: geometry.circle.radius,
+        rect: geometry.circle.rect,
         style: geometry.drawing.style,
       };
     case 'path':

@@ -409,6 +409,42 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags circle corner handles around the opposite corner', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'circle',
+      kind: 'circle',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'circle', handle: 'topLeft' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'circle', handle: 'topLeft' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 25, y: 20 },
+      { now: () => 4 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 25, price: 80 },
+        { time: 90, price: 10 },
+      ],
+      updatedAt: 4,
+    });
+  });
+
   it('drags price range corner handles around the opposite corner', () => {
     const drawing: UserDrawing = {
       ...base,

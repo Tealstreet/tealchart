@@ -51,6 +51,7 @@ describe('user drawing toolbar descriptors', () => {
       'horizontalLine',
       'verticalLine',
       'rectangle',
+      'circle',
       'priceRange',
       'dateRange',
       'path',
@@ -90,6 +91,9 @@ describe('user drawing toolbar descriptors', () => {
   it('resolves tool descriptors by tool id', () => {
     expect(getUserDrawingToolDescriptor('rectangle')).toEqual(
       expect.objectContaining({ tool: 'rectangle', label: 'Rectangle' }),
+    );
+    expect(getUserDrawingToolDescriptor('circle')).toEqual(
+      expect.objectContaining({ tool: 'circle', label: 'Circle' }),
     );
     expect(getUserDrawingToolDescriptor('priceRange')).toEqual(
       expect.objectContaining({ tool: 'priceRange', label: 'Price range' }),
@@ -140,6 +144,22 @@ describe('user drawing toolbar descriptors', () => {
         updatedAt: 1,
         style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
         point: { time: 1, price: 10 },
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        id: 'circle',
+        kind: 'circle',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+        ],
       }),
     ).toBe(true);
   });

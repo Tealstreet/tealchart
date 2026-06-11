@@ -57,6 +57,7 @@ export {
 export type {
   MobileUserDrawingArrowMarkPrimitive,
   MobileUserDrawingArrowMarkerPrimitive,
+  MobileUserDrawingCirclePrimitive,
   MobileUserDrawingInfoLineLabelPosition,
   MobileUserDrawingInfoLinePrimitive,
   MobileUserDrawingPathPrimitive,

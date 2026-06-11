@@ -150,6 +150,25 @@ function renderRectangleGeometry(
   }
 }
 
+function renderCircleGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'circle' }>,
+): void {
+  const { circle, drawing } = geometry;
+  ctx.beginPath();
+  ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2);
+
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fill();
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.stroke();
+  }
+}
+
 function renderPriceRangeGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'priceRange' }>,
@@ -329,6 +348,9 @@ export function renderUserDrawing(
         break;
       case 'rectangle':
         renderRectangleGeometry(ctx, geometry);
+        break;
+      case 'circle':
+        renderCircleGeometry(ctx, geometry);
         break;
       case 'priceRange':
         renderPriceRangeGeometry(ctx, geometry);
