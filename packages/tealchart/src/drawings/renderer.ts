@@ -502,7 +502,7 @@ function renderProjectionGeometry(
 
 function renderPatternGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'xabcdPattern' | 'abcdPattern' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'xabcdPattern' | 'abcdPattern' | 'threeDrivesPattern' }>,
 ): void {
   const { drawing, pattern } = geometry;
   const [firstPoint, ...remainingPoints] = pattern.polyline.points;
@@ -1134,6 +1134,9 @@ export function renderUserDrawing(
         renderTrianglePatternGeometry(ctx, geometry);
         break;
       case 'xabcdPattern':
+        renderPatternGeometry(ctx, geometry);
+        break;
+      case 'threeDrivesPattern':
         renderPatternGeometry(ctx, geometry);
         break;
       case 'abcdPattern':
