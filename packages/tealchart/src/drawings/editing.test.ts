@@ -112,6 +112,95 @@ describe('user drawing editing', () => {
     expect(next.selection).toEqual({ drawingId: 'line' });
   });
 
+  it('preserves grouped selection when a selected drawing body drag begins', () => {
+    const first: UserDrawing = {
+      ...base,
+      id: 'a',
+      kind: 'trendLine',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+      extend: 'none',
+    };
+    const second: UserDrawing = {
+      ...base,
+      id: 'b',
+      kind: 'trendLine',
+      points: [
+        { time: 40, price: 80 },
+        { time: 50, price: 60 },
+      ],
+      extend: 'none',
+    };
+    const state = createUserDrawingState({
+      drawings: [first, second],
+      selection: { drawingId: 'a', drawingIds: ['a', 'b'] },
+    });
+
+    const result = beginUserDrawingEditDragAtPoint(state, { x: 15, y: 30 }, new Map([['main', space]]));
+
+    expect(result.hit).toBe(true);
+    expect(result.changed).toBe(false);
+    expect(result.state.selection).toEqual({ drawingId: 'a', drawingIds: ['a', 'b'] });
+    expect(result.drag?.selection).toEqual({ drawingId: 'a', drawingIds: ['a', 'b'] });
+    expect(result.drag?.startDrawings?.map((drawing) => drawing.id)).toEqual(['a', 'b']);
+  });
+
+  it('moves grouped whole-drawing selections by screen delta', () => {
+    const first: UserDrawing = {
+      ...base,
+      id: 'a',
+      kind: 'trendLine',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+      extend: 'none',
+    };
+    const second: UserDrawing = {
+      ...base,
+      id: 'b',
+      kind: 'horizontalLine',
+      price: 70,
+    };
+    const locked: UserDrawing = {
+      ...base,
+      id: 'locked',
+      kind: 'verticalLine',
+      locked: true,
+      time: 40,
+    };
+    const state = createUserDrawingState({
+      drawings: [first, second, locked],
+      selection: { drawingId: 'a', drawingIds: ['a', 'b', 'locked'] },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'a', drawingIds: ['a', 'b', 'locked'] },
+        startPoint: { x: 10, y: 20 },
+        startDrawing: first,
+        startDrawings: [first, second],
+        space,
+      },
+      { x: 15, y: 25 },
+      { now: () => 2 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 15, price: 75 },
+        { time: 25, price: 55 },
+      ],
+      updatedAt: 2,
+    });
+    expect(next.drawings[1]).toMatchObject({ price: 65, updatedAt: 2 });
+    expect(next.drawings[2]).toBe(locked);
+    expect(next.selection).toEqual({ drawingId: 'a', drawingIds: ['a', 'b', 'locked'] });
+  });
+
   it('drags callout endpoint handles without moving the text anchor', () => {
     const drawing: UserDrawing = {
       ...base,
