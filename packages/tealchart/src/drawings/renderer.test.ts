@@ -949,6 +949,28 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders gann squares as filled square grid and angle boxes', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'gann-square',
+      kind: 'gannSquare',
+      points: [
+        { time: 10, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,20,60,60:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:70,50');
+    expect(ctx.calls).toContain('moveTo:40,20');
+    expect(ctx.calls).toContain('lineTo:40,80');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders fib channels as filled Fibonacci level channels', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -302,7 +302,7 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'gannBox';
+      kind: 'gannBox' | 'gannSquare';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
@@ -573,7 +573,14 @@ export type MobileUserDrawingFibSpeedResistanceArcsPrimitive = Extract<
 export type MobileUserDrawingFibWedgePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibWedge' }>;
 export type MobileUserDrawingFibSpiralPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibSpiral' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
-export type MobileUserDrawingGannBoxPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannBox' }>;
+export type MobileUserDrawingGannBoxPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'gannBox' | 'gannSquare' }
+> & { kind: 'gannBox' };
+export type MobileUserDrawingGannSquarePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'gannBox' | 'gannSquare' }
+> & { kind: 'gannSquare' };
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
 export type MobileUserDrawingTrendBasedFibTimePrimitive = Extract<
@@ -1017,8 +1024,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'gannBox':
+    case 'gannSquare':
       return {
-        kind: 'gannBox',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,

@@ -260,7 +260,7 @@ function renderGannFanGeometry(
 
 function renderGannBoxGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'gannBox' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'gannBox' | 'gannSquare' }>,
 ): void {
   const { drawing, gannBox } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
@@ -828,6 +828,7 @@ export function renderUserDrawing(
         renderGannFanGeometry(ctx, geometry);
         break;
       case 'gannBox':
+      case 'gannSquare':
         renderGannBoxGeometry(ctx, geometry);
         break;
       case 'fibChannel':
