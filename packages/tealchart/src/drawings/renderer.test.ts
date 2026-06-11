@@ -822,6 +822,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib speed resistance arcs as one-third arc levels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-speed-arcs',
+      kind: 'fibSpeedResistanceArcs',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('arc:10,50,16.666666666666664:1');
+    expect(ctx.calls).toContain('arc:10,50,33.33333333333333:1');
+    expect(ctx.calls).toContain('arc:10,50,50:1');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders fib circles as concentric Fibonacci rings', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
