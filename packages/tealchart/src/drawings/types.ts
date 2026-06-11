@@ -3,6 +3,7 @@ export const USER_DRAWING_SCHEMA_VERSION = 1;
 export type UserDrawingTool =
   | 'select'
   | 'trendLine'
+  | 'extendedLine'
   | 'arrowLine'
   | 'ray'
   | 'horizontalLine'
@@ -51,6 +52,11 @@ export interface TrendLineDrawing extends UserDrawingBase {
   extend: 'none' | 'left' | 'right' | 'both';
 }
 
+export interface ExtendedLineDrawing extends UserDrawingBase {
+  kind: 'extendedLine';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface ArrowLineDrawing extends UserDrawingBase {
   kind: 'arrowLine';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -87,6 +93,7 @@ export interface TextLabelDrawing extends UserDrawingBase {
 
 export type UserDrawing =
   | TrendLineDrawing
+  | ExtendedLineDrawing
   | ArrowLineDrawing
   | RayDrawing
   | HorizontalLineDrawing
@@ -186,6 +193,7 @@ export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
 export function getRequiredAnchorCount(tool: UserDrawingTool): number {
   switch (tool) {
     case 'trendLine':
+    case 'extendedLine':
     case 'arrowLine':
     case 'ray':
     case 'rectangle':
@@ -232,6 +240,12 @@ export function createUserDrawingFromDraft(
         kind: 'trendLine',
         points: [draft.anchors[0]!, draft.anchors[1]!],
         extend: 'none',
+      };
+    case 'extendedLine':
+      return {
+        ...base,
+        kind: 'extendedLine',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'arrowLine':
       return {

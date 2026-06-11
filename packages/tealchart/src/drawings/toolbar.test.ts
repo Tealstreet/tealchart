@@ -41,6 +41,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).toEqual([
       'select',
       'trendLine',
+      'extendedLine',
       'arrowLine',
       'ray',
       'horizontalLine',
