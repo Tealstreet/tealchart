@@ -22,6 +22,10 @@ import {
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
 import type {
+  MobileUserDrawingParallelChannelPrimitive,
+  MobileUserDrawingRegressionTrendPrimitive,
+} from './mobile/utils/drawingRenderModel';
+import type {
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
@@ -49,6 +53,8 @@ import type {
   UserDrawingStyleToggleDescriptor,
 } from './index';
 
+type NonNever<T> = [T] extends [never] ? never : T;
+
 describe('tealchart public entries', () => {
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
@@ -67,6 +73,30 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
+  });
+
+  it('exports usable native channel primitive aliases', () => {
+    const clip = { x: 0, y: 0, width: 100, height: 100 };
+    const channelPrimitive: NonNever<MobileUserDrawingParallelChannelPrimitive> = {
+      kind: 'parallelChannel',
+      id: 'channel',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [],
+      base: { start: { x: 0, y: 0 }, end: { x: 1, y: 1 } },
+      parallel: { start: { x: 0, y: 1 }, end: { x: 1, y: 2 } },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+    const regressionPrimitive: NonNever<MobileUserDrawingRegressionTrendPrimitive> = {
+      ...channelPrimitive,
+      kind: 'regressionTrend',
+      id: 'regression',
+    };
+
+    expect(channelPrimitive.kind).toBe('parallelChannel');
+    expect(regressionPrimitive.kind).toBe('regressionTrend');
   });
 
   it('exports shared drawing opacity helpers', () => {

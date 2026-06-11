@@ -518,6 +518,14 @@ describe('mobile user drawing render model', () => {
   });
 
   it('returns Skia-ready regression trend primitives', () => {
+    const regressionSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 52, low: 48, close: 60, volume: 1 },
+        { time: 50, open: 60, high: 72, low: 58, close: 70, volume: 1 },
+        { time: 90, open: 70, high: 82, low: 68, close: 80, volume: 1 },
+      ],
+    };
     const state: UserDrawingState = {
       version: 1,
       activeTool: 'select',
@@ -543,17 +551,17 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[regressionSpace.pane.id, regressionSpace]]))[0]).toMatchObject({
       kind: 'regressionTrend',
       id: 'regression',
       points: [
-        { x: 10, y: 50 },
-        { x: 90, y: 50 },
+        { x: 10, y: 40 },
         { x: 90, y: 20 },
+        { x: 90, y: 0 },
         { x: 10, y: 20 },
       ],
-      base: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
-      parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+      base: { start: { x: 10, y: 40 }, end: { x: 90, y: 20 } },
+      parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 0 } },
     });
   });
 

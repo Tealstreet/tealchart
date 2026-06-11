@@ -1,4 +1,4 @@
-import type { ChartMargins, ComputedPane, Viewport } from '../types';
+import type { Bar, ChartMargins, ComputedPane, Viewport } from '../types';
 import type { UserDrawingInputPoint } from './input';
 import type { UserDrawing, UserDrawingAnchor } from './types';
 
@@ -77,6 +77,7 @@ export interface DrawingCoordinateSpace {
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
   chartLeft: number;
   chartRight: number;
+  bars?: readonly Bar[];
 }
 
 export interface ResolveUserDrawingInputPointOptions {
@@ -479,6 +480,76 @@ export function resolveParallelChannelFromAnchors(
   };
 }
 
+function resolveRegressionPriceAt(time: number, bars: readonly Bar[]): number {
+  const xOrigin = bars[0]?.time ?? time;
+  let sumX = 0;
+  let sumY = 0;
+
+  for (const bar of bars) {
+    sumX += bar.time - xOrigin;
+    sumY += bar.close;
+  }
+
+  const meanX = sumX / bars.length;
+  const meanY = sumY / bars.length;
+  let numerator = 0;
+  let denominator = 0;
+
+  for (const bar of bars) {
+    const x = bar.time - xOrigin;
+    const dx = x - meanX;
+    numerator += dx * (bar.close - meanY);
+    denominator += dx * dx;
+  }
+
+  const slope = denominator === 0 ? 0 : numerator / denominator;
+  const intercept = meanY - slope * meanX;
+  return intercept + slope * (time - xOrigin);
+}
+
+export function resolveRegressionTrendFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  offset: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenParallelChannel {
+  const startTime = Math.min(first.time, second.time);
+  const endTime = Math.max(first.time, second.time);
+  const regressionBars = (space.bars ?? []).filter(
+    (bar) =>
+      bar.time >= startTime &&
+      bar.time <= endTime &&
+      Number.isFinite(bar.time) &&
+      Number.isFinite(bar.close),
+  );
+
+  if (regressionBars.length < 2) {
+    return resolveParallelChannelFromAnchors(first, second, offset, space);
+  }
+
+  const start = anchorToScreenPoint(
+    { time: first.time, price: resolveRegressionPriceAt(first.time, regressionBars) },
+    space,
+  );
+  const end = anchorToScreenPoint(
+    { time: second.time, price: resolveRegressionPriceAt(second.time, regressionBars) },
+    space,
+  );
+  const offsetPoint = anchorToScreenPoint(offset, space);
+  const dx = offsetPoint.x - start.x;
+  const dy = offsetPoint.y - start.y;
+  const parallelStart = { x: start.x + dx, y: start.y + dy };
+  const parallelEnd = { x: end.x + dx, y: end.y + dy };
+
+  return {
+    base: { start, end },
+    parallel: { start: parallelStart, end: parallelEnd },
+    polygon: {
+      points: [start, end, parallelEnd, parallelStart],
+    },
+  };
+}
+
 export function resolveUserDrawingGeometry(
   drawing: UserDrawing,
   space: DrawingCoordinateSpace,
@@ -663,11 +734,16 @@ export function resolveUserDrawingGeometry(
         polygon: resolvePolylineFromAnchors(drawing.points, space),
       };
     case 'parallelChannel':
-    case 'regressionTrend':
       return {
         kind: drawing.kind,
         drawing,
         channel: resolveParallelChannelFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'regressionTrend':
+      return {
+        kind: drawing.kind,
+        drawing,
+        channel: resolveRegressionTrendFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'textLabel':
       return {
