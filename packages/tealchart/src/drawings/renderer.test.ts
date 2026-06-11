@@ -709,6 +709,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders rotated rectangles as filled closed polygons', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rotated',
+      kind: 'rotatedRectangle',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,50');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('lineTo:10,20');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders regression trends as filled closed channel polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

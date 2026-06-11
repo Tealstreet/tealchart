@@ -1959,6 +1959,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (
             primitive.kind === 'parallelChannel' ||
             primitive.kind === 'regressionTrend' ||
+            primitive.kind === 'rotatedRectangle' ||
             primitive.kind === 'flatTopBottom' ||
             primitive.kind === 'disjointChannel'
           ) {

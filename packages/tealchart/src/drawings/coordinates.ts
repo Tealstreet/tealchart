@@ -227,7 +227,7 @@ export type ResolvedUserDrawingGeometry =
       polygon: DrawingScreenPolyline;
     }
   | {
-      kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel';
+      kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
       drawing: UserDrawing;
       channel: DrawingScreenParallelChannel;
     }
@@ -688,6 +688,42 @@ export function resolveParallelChannelFromAnchors(
   };
 }
 
+export function resolveRotatedRectangleFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  width: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenParallelChannel {
+  const start = anchorToScreenPoint(first, space);
+  const end = anchorToScreenPoint(second, space);
+  const widthPoint = anchorToScreenPoint(width, space);
+  const edgeX = end.x - start.x;
+  const edgeY = end.y - start.y;
+  const length = Math.hypot(edgeX, edgeY);
+
+  if (length === 0) {
+    return {
+      base: { start, end },
+      parallel: { start, end },
+      polygon: { points: [start, end, end, start] },
+    };
+  }
+
+  const normal = { x: -edgeY / length, y: edgeX / length };
+  const widthOffset = (widthPoint.x - start.x) * normal.x + (widthPoint.y - start.y) * normal.y;
+  const offset = { x: normal.x * widthOffset, y: normal.y * widthOffset };
+  const oppositeStart = { x: start.x + offset.x, y: start.y + offset.y };
+  const oppositeEnd = { x: end.x + offset.x, y: end.y + offset.y };
+
+  return {
+    base: { start, end },
+    parallel: { start: oppositeStart, end: oppositeEnd },
+    polygon: {
+      points: [start, end, oppositeEnd, oppositeStart],
+    },
+  };
+}
+
 export function resolveFlatTopBottomFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -1021,6 +1057,12 @@ export function resolveUserDrawingGeometry(
         kind: 'triangle',
         drawing,
         polygon: resolvePolylineFromAnchors(drawing.points, space),
+      };
+    case 'rotatedRectangle':
+      return {
+        kind: 'rotatedRectangle',
+        drawing,
+        channel: resolveRotatedRectangleFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'parallelChannel':
       return {

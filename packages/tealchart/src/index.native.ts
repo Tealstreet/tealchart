@@ -82,6 +82,7 @@ export type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingPriceRangeLabelPosition,
   MobileUserDrawingRegressionTrendPrimitive,
+  MobileUserDrawingRotatedRectanglePrimitive,
   MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
   MobileUserDrawingTextBounds,

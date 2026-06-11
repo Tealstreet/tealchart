@@ -93,6 +93,7 @@ export {
   resolveExtendedSegment,
   resolveRaySegment,
   resolveRectFromAnchors,
+  resolveRotatedRectangleFromAnchors,
   resolveTrendAngleFromSegment,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingGeometry,
