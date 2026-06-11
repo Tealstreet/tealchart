@@ -290,7 +290,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, polygon/rail hit testing, whole-drawing moves, and point-index
   editing use shared channel behavior on both platforms.
 
-## Current Epic: Date and Price Range Tool
+## Shipped: Date and Price Range Tool
 
 - Shared drawing state supports the two-anchor `datePriceRange` measurement
   tool and persists it through layout save/load.
@@ -298,6 +298,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   with shared price-change and duration labels.
 - Selection, rectangle hit testing, whole-drawing moves, corner editing, and
   fill controls reuse shared range behavior on both platforms.
+
+## Current Epic: Anchored Line Tools
+
+- Shared drawing state supports `ray`, `horizontalLine`, and `verticalLine`
+  tools and persists them through layout save/load.
+- Web Canvas and mobile Skia resolve matching chart-bound line primitives for
+  rays and full-pane axis lines.
+- Selection, line hit testing, anchor handles, and whole-drawing moves use
+  shared drawing behavior on both platforms.
 
 ## Known Gaps
 
