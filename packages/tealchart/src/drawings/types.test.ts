@@ -69,6 +69,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
+    expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('path')).toBe(3);
@@ -198,6 +199,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'fibRetracement' }), { id: 'fib', now: 20 })).toMatchObject({
       id: 'fib',
       kind: 'fibRetracement',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'fibExtension' }), { id: 'fib-ext', now: 20 })).toMatchObject({
+      id: 'fib-ext',
+      kind: 'fibExtension',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

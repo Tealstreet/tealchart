@@ -231,8 +231,8 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'fibRetracement') {
-    const distance = Math.min(...geometry.retracement.levels.map((level) => distanceToSegment(point, level.segment)));
+  if (geometry.kind === 'fibRetracement' || geometry.kind === 'fibExtension') {
+    const distance = Math.min(...geometry.fib.levels.map((level) => distanceToSegment(point, level.segment)));
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
@@ -246,8 +246,12 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  const distance = distanceToSegment(point, geometry.segment);
-  return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  if ('segment' in geometry) {
+    const distance = distanceToSegment(point, geometry.segment);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
+  return null;
 }
 
 function hitTestUserDrawingHandle(
@@ -311,7 +315,8 @@ function hitTestUserDrawingHandle(
       );
       break;
     case 'fibRetracement':
-      if (geometry.drawing.kind === 'fibRetracement') {
+    case 'fibExtension':
+      if (geometry.drawing.kind === 'fibRetracement' || geometry.drawing.kind === 'fibExtension') {
         handles.push(
           { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },
           { handle: 'end', point: anchorToScreenPoint(geometry.drawing.points[1], space) },
