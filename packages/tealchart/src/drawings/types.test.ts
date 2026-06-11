@@ -69,6 +69,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
+    expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('path')).toBe(3);
   });
 
@@ -196,6 +197,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'triangle', anchors: [anchorA, anchorB, anchorC] }), { id: 'triangle', now: 20 })).toMatchObject({
       id: 'triangle',
       kind: 'triangle',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'parallelChannel', anchors: [anchorA, anchorB, anchorC] }), { id: 'channel', now: 20 })).toMatchObject({
+      id: 'channel',
+      kind: 'parallelChannel',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

@@ -86,13 +86,15 @@ function renderPathGeometry(
 
 function renderPolygonGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' | 'triangle' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' | 'triangle' | 'parallelChannel' }>,
 ): void {
   const points =
     geometry.kind === 'arrowMarker'
       ? geometry.marker.points
       : geometry.kind === 'arrowMark'
         ? geometry.mark.points
+        : geometry.kind === 'parallelChannel'
+          ? geometry.channel.polygon.points
         : geometry.polygon.points;
   const [firstPoint, ...remainingPoints] = points;
   if (!firstPoint) return;
@@ -367,6 +369,9 @@ export function renderUserDrawing(
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'triangle':
+        renderPolygonGeometry(ctx, geometry);
+        break;
+      case 'parallelChannel':
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'infoLine':

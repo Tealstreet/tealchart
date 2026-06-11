@@ -705,6 +705,82 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags parallel channel width handles without moving the baseline', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'channel',
+      kind: 'parallelChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'channel', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'channel', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 10, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 30 },
+      { now: () => 10 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 20, price: 70 },
+      ],
+      updatedAt: 10,
+    });
+  });
+
+  it('moves selected parallel channels by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'channel',
+      kind: 'parallelChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'channel' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'channel' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 11 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 40 },
+        { time: 100, price: 40 },
+        { time: 20, price: 70 },
+      ],
+      updatedAt: 11,
+    });
+  });
+
   it('moves horizontal, vertical, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };

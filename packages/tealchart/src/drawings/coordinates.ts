@@ -40,6 +40,12 @@ export interface DrawingScreenEllipse {
   rect: DrawingScreenRect;
 }
 
+export interface DrawingScreenParallelChannel {
+  base: DrawingScreenSegment;
+  parallel: DrawingScreenSegment;
+  polygon: DrawingScreenPolyline;
+}
+
 export interface DrawingCoordinateSpace {
   viewport: Viewport;
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
@@ -118,6 +124,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'triangle';
       drawing: UserDrawing;
       polygon: DrawingScreenPolyline;
+    }
+  | {
+      kind: 'parallelChannel';
+      drawing: UserDrawing;
+      channel: DrawingScreenParallelChannel;
     }
   | {
       kind: 'textLabel';
@@ -321,6 +332,29 @@ export function resolvePolylineFromAnchors(
   };
 }
 
+export function resolveParallelChannelFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  offset: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenParallelChannel {
+  const start = anchorToScreenPoint(first, space);
+  const end = anchorToScreenPoint(second, space);
+  const offsetPoint = anchorToScreenPoint(offset, space);
+  const dx = offsetPoint.x - start.x;
+  const dy = offsetPoint.y - start.y;
+  const parallelStart = { x: start.x + dx, y: start.y + dy };
+  const parallelEnd = { x: end.x + dx, y: end.y + dy };
+
+  return {
+    base: { start, end },
+    parallel: { start: parallelStart, end: parallelEnd },
+    polygon: {
+      points: [start, end, parallelEnd, parallelStart],
+    },
+  };
+}
+
 export function resolveUserDrawingGeometry(
   drawing: UserDrawing,
   space: DrawingCoordinateSpace,
@@ -462,6 +496,12 @@ export function resolveUserDrawingGeometry(
         kind: 'triangle',
         drawing,
         polygon: resolvePolylineFromAnchors(drawing.points, space),
+      };
+    case 'parallelChannel':
+      return {
+        kind: 'parallelChannel',
+        drawing,
+        channel: resolveParallelChannelFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'textLabel':
       return {
