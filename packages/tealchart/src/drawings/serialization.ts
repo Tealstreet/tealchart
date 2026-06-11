@@ -22,6 +22,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'extendedLine':
     case 'infoLine':
+    case 'arrowMarker':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -213,6 +214,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'arrowLine',
+            points,
+          }
+        : null;
+    }
+    case 'arrowMarker': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'arrowMarker',
             points,
           }
         : null;

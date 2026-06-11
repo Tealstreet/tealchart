@@ -1,6 +1,7 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type {
   ArrowLineDrawing,
+  ArrowMarkerDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
@@ -248,6 +249,11 @@ describe('user drawing coordinates', () => {
       id: 'arrow',
       kind: 'arrowLine',
     };
+    const arrowMarker: ArrowMarkerDrawing = {
+      ...trendLine,
+      id: 'marker',
+      kind: 'arrowMarker',
+    };
     const extendedLine: ExtendedLineDrawing = {
       ...trendLine,
       id: 'extended',
@@ -298,6 +304,19 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(arrowLine, space)).toMatchObject({
       kind: 'arrowLine',
       segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+    });
+    expect(resolveUserDrawingGeometry(arrowMarker, space)).toMatchObject({
+      kind: 'arrowMarker',
+      marker: {
+        segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        points: [
+          { x: 210, y: 70 },
+          { x: 188, y: 79 },
+          { x: 10, y: 73.5 },
+          { x: 10, y: 66.5 },
+          { x: 188, y: 61 },
+        ],
+      },
     });
     expect(resolveUserDrawingGeometry(extendedLine, space)).toMatchObject({
       kind: 'line',

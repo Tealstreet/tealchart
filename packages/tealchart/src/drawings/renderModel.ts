@@ -75,6 +75,7 @@ export function resolveUserDrawingHandlePoints(
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':
+    case 'arrowMarker':
     case 'ray':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {

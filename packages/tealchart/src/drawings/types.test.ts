@@ -59,6 +59,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
     expect(getRequiredAnchorCount('infoLine')).toBe(2);
     expect(getRequiredAnchorCount('arrowLine')).toBe(2);
+    expect(getRequiredAnchorCount('arrowMarker')).toBe(2);
     expect(getRequiredAnchorCount('ray')).toBe(2);
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
@@ -118,6 +119,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'arrowLine' }), { id: 'arrow', now: 20 })).toMatchObject({
       id: 'arrow',
       kind: 'arrowLine',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'arrowMarker' }), { id: 'marker', now: 20 })).toMatchObject({
+      id: 'marker',
+      kind: 'arrowMarker',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

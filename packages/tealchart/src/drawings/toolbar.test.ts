@@ -44,6 +44,7 @@ describe('user drawing toolbar descriptors', () => {
       'extendedLine',
       'infoLine',
       'arrowLine',
+      'arrowMarker',
       'ray',
       'horizontalLine',
       'verticalLine',
@@ -96,6 +97,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
+    );
+    expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
+      expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
     );
     expect(getUserDrawingToolDescriptor('path')).toEqual(expect.objectContaining({ tool: 'path', label: 'Path' }));
   });
