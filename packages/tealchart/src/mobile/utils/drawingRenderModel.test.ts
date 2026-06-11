@@ -219,6 +219,37 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready cross line primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'cross-line',
+          kind: 'crossLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 30, price: 70 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'crossLine',
+      id: 'cross-line',
+      horizontal: { start: { x: 0, y: 30 }, end: { x: 100, y: 30 } },
+      vertical: { start: { x: 30, y: 0 }, end: { x: 30, y: 100 } },
+      style,
+    });
+  });
+
   it('returns Skia-ready arrow marker polygons', () => {
     const state: UserDrawingState = {
       version: 1,

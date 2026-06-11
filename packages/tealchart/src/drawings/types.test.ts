@@ -57,6 +57,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('arrowMarkUp')).toBe(1);
     expect(getRequiredAnchorCount('arrowMarkDown')).toBe(1);
     expect(getRequiredAnchorCount('horizontalRay')).toBe(1);
+    expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
@@ -257,6 +258,10 @@ describe('user drawing types', () => {
     });
     expect(createUserDrawingFromDraft(draft({ tool: 'horizontalRay', anchors: [anchorA] }), { id: 'hr' })).toMatchObject({
       kind: 'horizontalRay',
+      point: anchorA,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'crossLine', anchors: [anchorA] }), { id: 'cross' })).toMatchObject({
+      kind: 'crossLine',
       point: anchorA,
     });
     expect(createUserDrawingFromDraft(draft({ tool: 'arrowMarkUp', anchors: [anchorA] }), { id: 'up' })).toMatchObject({
