@@ -106,8 +106,13 @@ function renderPolygonGeometry(
   }
   ctx.closePath();
 
-  if (geometry.drawing.style.fillVisible !== false) {
-    ctx.fillStyle = geometry.drawing.style.fillColor ?? geometry.drawing.style.lineColor;
+  const fillColor =
+    geometry.kind === 'parallelChannel'
+      ? geometry.drawing.style.fillColor
+      : (geometry.drawing.style.fillColor ?? geometry.drawing.style.lineColor);
+
+  if (geometry.drawing.style.fillVisible !== false && fillColor) {
+    ctx.fillStyle = fillColor;
     ctx.fill();
   }
 
