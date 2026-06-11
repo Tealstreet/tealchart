@@ -75,6 +75,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
+    expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('path')).toBe(3);
   });
 
@@ -238,6 +239,20 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'parallelChannel', anchors: [anchorA, anchorB, anchorC] }), { id: 'channel', now: 20 })).toMatchObject({
       id: 'channel',
       kind: 'parallelChannel',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'regressionTrend', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'regression',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'regression',
+      kind: 'regressionTrend',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

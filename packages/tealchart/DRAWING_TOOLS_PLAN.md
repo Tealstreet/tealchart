@@ -272,7 +272,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, segment hit testing, anchor handles, and whole-drawing moves use
   shared drawing behavior on both platforms.
 
-## Current Epic: Trend Angle Tool
+## Shipped: Trend Angle Tool
 
 - Shared drawing state supports the two-anchor `trendAngle` tool and persists it
   through layout save/load.
@@ -281,11 +281,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, endpoint editing, and whole-drawing moves reuse
   line-family behavior on both platforms.
 
+## Current Epic: Regression Trend Tool
+
+- Shared drawing state supports the three-anchor `regressionTrend` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked regression channel
+  polygons from shared screen-space channel geometry.
+- Selection, polygon/rail hit testing, whole-drawing moves, and point-index
+  editing use shared channel behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Additional TradingView line-family tools such as regression trend, flat
-  top/bottom, disjoint channel, anchored VWAP, and multi-point arrows.
+- Additional TradingView line-family tools such as flat top/bottom, disjoint
+  channel, anchored VWAP, and multi-point arrows.
 - Additional TradingView measurement tools such as bars pattern and risk/reward.
 - Freehand/variable-point path capture beyond the initial fixed three-anchor
   path workflow.

@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
@@ -37,6 +38,10 @@ const state: UserDrawingState = {
 };
 
 describe('user drawing toolbar descriptors', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('orders every supported drawing tool once', () => {
     expect(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).toEqual([
       'select',
@@ -62,6 +67,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibExtension',
       'triangle',
       'parallelChannel',
+      'regressionTrend',
       'path',
       'textLabel',
     ]);
@@ -135,6 +141,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('parallelChannel')).toEqual(
       expect.objectContaining({ tool: 'parallelChannel', label: 'Parallel channel' }),
+    );
+    expect(getUserDrawingToolDescriptor('regressionTrend')).toEqual(
+      expect.objectContaining({ tool: 'regressionTrend', label: 'Regression trend' }),
     );
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
@@ -400,6 +409,18 @@ describe('user drawing toolbar descriptors', () => {
         ...rectangle,
         id: 'channel',
         kind: 'parallelChannel' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'regression',
+        kind: 'regressionTrend' as const,
         points: [
           { time: 1, price: 10 },
           { time: 2, price: 12 },

@@ -1,7 +1,8 @@
 import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, UserDrawingStyle } from '../../drawings';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import {
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
@@ -37,6 +38,10 @@ const space: DrawingCoordinateSpace = {
 const clip = { x: 0, y: 0, width: 100, height: 100 };
 
 describe('mobile user drawing render model', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('returns Skia-ready primitives for selected drawings and draft previews', () => {
     const fadedStyle = { ...style, opacity: 0.5 };
     const state: UserDrawingState = {
@@ -514,6 +519,54 @@ describe('mobile user drawing render model', () => {
       ],
       base: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
       parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+    });
+  });
+
+  it('returns Skia-ready regression trend primitives', () => {
+    const regressionSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 52, low: 48, close: 60, volume: 1 },
+        { time: 50, open: 60, high: 72, low: 58, close: 70, volume: 1 },
+        { time: 90, open: 70, high: 82, low: 68, close: 80, volume: 1 },
+      ],
+    };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'regression',
+          kind: 'regressionTrend',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 50 },
+            { time: 10, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[regressionSpace.pane.id, regressionSpace]]))[0]).toMatchObject({
+      kind: 'regressionTrend',
+      id: 'regression',
+      points: [
+        { x: 10, y: 40 },
+        { x: 90, y: 20 },
+        { x: 90, y: 0 },
+        { x: 10, y: 20 },
+      ],
+      base: { start: { x: 10, y: 40 }, end: { x: 90, y: 20 } },
+      parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 0 } },
     });
   });
 
