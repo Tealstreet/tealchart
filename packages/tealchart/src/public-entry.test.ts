@@ -23,7 +23,11 @@ import {
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
+import { resolveMobileUserDrawingMeasurementLabelPosition } from './mobile/utils/drawingRenderModel';
 import type {
+  MobileUserDrawingDatePriceRangePrimitive,
+  MobileUserDrawingMeasurementLabelPosition,
+  MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -33,6 +37,7 @@ import type {
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   CircleDrawing,
+  DatePriceRangeDrawing,
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
@@ -68,8 +73,11 @@ describe('tealchart public entries', () => {
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
+    expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
+    expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelPosition');
+    expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelTarget');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
@@ -80,6 +88,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -101,9 +110,37 @@ describe('tealchart public entries', () => {
       kind: 'regressionTrend',
       id: 'regression',
     };
+    const datePricePrimitive: NonNever<MobileUserDrawingDatePriceRangePrimitive> = {
+      kind: 'datePriceRange',
+      id: 'date-price',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      rect: { x: 0, y: 0, width: 10, height: 10 },
+      priceLabelPoint: { x: 5, y: 5 },
+      priceLabel: '+1.00 (+1.00%)',
+      dateLabelPoint: { x: 5, y: 8 },
+      dateLabel: '1 minute',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
+    expect(datePricePrimitive.kind).toBe('datePriceRange');
+  });
+
+  it('exports a reusable native measurement label layout helper', () => {
+    const target: MobileUserDrawingMeasurementLabelTarget = {
+      labelPoint: { x: 50, y: 20 },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+    const position: MobileUserDrawingMeasurementLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(target, {
+      width: 40,
+      height: 12,
+    });
+
+    expect(position).toMatchObject({ fontSize: 12, fontFamily: 'sans-serif', x: 30, y: 26 });
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -193,6 +230,25 @@ describe('tealchart public entries', () => {
 
     expect(metrics.label).toBe('1 minute');
     expect(drawing.kind).toBe('dateRange');
+  });
+
+  it('exports shared drawing date and price range types', () => {
+    const drawing: DatePriceRangeDrawing = {
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 10 },
+        { time: 60_000, price: 20 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('datePriceRange');
   });
 
   it('exports shared drawing info line helpers', () => {

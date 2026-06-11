@@ -553,6 +553,42 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags date and price range corner handles around the opposite corner', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'date-price-range', handle: 'topLeft' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'date-price-range', handle: 'topLeft' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 25, y: 20 },
+      { now: () => 5 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 25, price: 80 },
+        { time: 90, price: 10 },
+      ],
+      updatedAt: 5,
+    });
+  });
+
   it('drags date range boundary handles without changing prices', () => {
     const drawing: UserDrawing = {
       ...base,

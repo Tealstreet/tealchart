@@ -63,6 +63,7 @@ describe('user drawing toolbar descriptors', () => {
       'ellipse',
       'priceRange',
       'dateRange',
+      'datePriceRange',
       'fibRetracement',
       'fibExtension',
       'triangle',
@@ -123,6 +124,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
+    );
+    expect(getUserDrawingToolDescriptor('datePriceRange')).toEqual(
+      expect.objectContaining({ tool: 'datePriceRange', label: 'Date and price range' }),
     );
     expect(getUserDrawingToolDescriptor('horizontalRay')).toEqual(
       expect.objectContaining({ tool: 'horizontalRay', label: 'Horizontal ray' }),
@@ -388,6 +392,11 @@ describe('user drawing toolbar descriptors', () => {
       id: 'd',
       kind: 'dateRange' as const,
     };
+    const datePriceRange = {
+      ...rectangle,
+      id: 'dp',
+      kind: 'datePriceRange' as const,
+    };
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
@@ -430,10 +439,12 @@ describe('user drawing toolbar descriptors', () => {
     ).toBe(true);
     expect(supportsUserDrawingFillControls(priceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
+    expect(supportsUserDrawingFillControls(datePriceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
     expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
+    expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
 
     expect(

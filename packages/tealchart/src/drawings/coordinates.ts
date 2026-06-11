@@ -148,6 +148,11 @@ export type ResolvedUserDrawingGeometry =
       rect: DrawingScreenRect;
     }
   | {
+      kind: 'datePriceRange';
+      drawing: UserDrawing;
+      rect: DrawingScreenRect;
+    }
+  | {
       kind: 'dateRange';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
@@ -700,6 +705,12 @@ export function resolveUserDrawingGeometry(
     case 'priceRange':
       return {
         kind: 'priceRange',
+        drawing,
+        rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'datePriceRange':
+      return {
+        kind: 'datePriceRange',
         drawing,
         rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
       };

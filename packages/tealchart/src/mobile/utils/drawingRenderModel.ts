@@ -201,6 +201,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'datePriceRange';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      priceLabelPoint: DrawingScreenPoint;
+      priceLabel: string;
+      dateLabelPoint: DrawingScreenPoint;
+      dateLabel: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'fibRetracement' | 'fibExtension';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -243,6 +257,7 @@ export type MobileUserDrawingPrimitive =
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
+export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
@@ -276,6 +291,18 @@ export interface MobileUserDrawingPriceRangeLabelPosition {
   fontFamily: string;
   x: number;
   y: number;
+}
+
+export interface MobileUserDrawingMeasurementLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
+export interface MobileUserDrawingMeasurementLabelTarget {
+  labelPoint: DrawingScreenPoint;
+  style: UserDrawingStyle;
 }
 
 export interface MobileUserDrawingInfoLineLabelPosition {
@@ -555,6 +582,36 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'datePriceRange': {
+      const drawing = geometry.drawing;
+      const priceLabel =
+        drawing.kind === 'datePriceRange'
+          ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
+          : '';
+      const dateLabel =
+        drawing.kind === 'datePriceRange' ? resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label : '';
+      const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+      return {
+        kind: 'datePriceRange',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.rect,
+        priceLabelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height / 2,
+        },
+        priceLabel,
+        dateLabelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height - fontSize,
+        },
+        dateLabel,
+        style: geometry.drawing.style,
+      };
+    }
     case 'fibRetracement':
     case 'fibExtension':
       return {
@@ -677,10 +734,10 @@ export function resolveMobileUserDrawingTextLabelLayout(
   };
 }
 
-export function resolveMobileUserDrawingPriceRangeLabelPosition(
-  primitive: MobileUserDrawingMeasurementLabelPrimitive,
+export function resolveMobileUserDrawingMeasurementLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelTarget,
   measuredTextBounds: MobileUserDrawingTextBounds,
-): MobileUserDrawingPriceRangeLabelPosition {
+): MobileUserDrawingMeasurementLabelPosition {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const textX = measuredTextBounds.x ?? 0;
@@ -693,6 +750,13 @@ export function resolveMobileUserDrawingPriceRangeLabelPosition(
     x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
     y: primitive.labelPoint.y - textY - textHeight / 2,
   };
+}
+
+export function resolveMobileUserDrawingPriceRangeLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelPrimitive,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingPriceRangeLabelPosition {
+  return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
 }
 
 export function resolveMobileUserDrawingInfoLineLabelPosition(

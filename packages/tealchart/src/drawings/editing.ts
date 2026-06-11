@@ -108,6 +108,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'circle':
     case 'ellipse':
     case 'priceRange':
+    case 'datePriceRange':
     case 'fibRetracement':
     case 'fibExtension':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
@@ -166,7 +167,7 @@ function editLineEndpoint(
 }
 
 function editRectangleCorner(
-  drawing: Extract<UserDrawing, { kind: 'rectangle' | 'circle' | 'ellipse' | 'priceRange' }>,
+  drawing: Extract<UserDrawing, { kind: 'rectangle' | 'circle' | 'ellipse' | 'priceRange' | 'datePriceRange' }>,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
   updatedAt: number,
@@ -243,6 +244,7 @@ function editDrawingHandle(
     case 'circle':
     case 'ellipse':
     case 'priceRange':
+    case 'datePriceRange':
       return editRectangleCorner(drawing, handle, anchor, updatedAt);
     case 'dateRange':
       return editDateRangeBoundary(drawing, handle, anchor, updatedAt);

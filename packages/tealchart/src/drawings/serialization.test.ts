@@ -613,6 +613,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores date and price range drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'date-price-range',
+          kind: 'datePriceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('restores Fibonacci retracement drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
