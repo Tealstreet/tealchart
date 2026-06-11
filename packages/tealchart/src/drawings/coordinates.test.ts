@@ -36,6 +36,7 @@ import type {
   ParallelChannelDrawing,
   PitchforkDrawing,
   PriceRangeDrawing,
+  ProjectionDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
   SineLineDrawing,
@@ -602,6 +603,16 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 110 },
       ],
     };
+    const projection: ProjectionDrawing = {
+      ...trendLine,
+      id: 'projection',
+      kind: 'projection',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 1_500, price: 105 },
+        { time: 2_000, price: 110 },
+      ],
+    };
     const fibRetracement: FibRetracementDrawing = {
       ...trendLine,
       id: 'fib',
@@ -1012,6 +1023,21 @@ describe('user drawing coordinates', () => {
         sourceLabel: 'Source 100.00',
         targetLabel: 'Target 110.00',
         changeLabel: '+10.00 (+10.00%) / 1 second',
+      },
+    });
+    expect(resolveUserDrawingGeometry(projection, space)).toMatchObject({
+      kind: 'projection',
+      projection: {
+        start: { x: 10, y: 70 },
+        pivot: { x: 60, y: 45 },
+        target: { x: 110, y: 20 },
+        baseSegment: { start: { x: 10, y: 70 }, end: { x: 60, y: 45 } },
+        projectionSegment: { start: { x: 60, y: 45 }, end: { x: 110, y: 20 } },
+        labelPoint: { x: 85, y: 28.5 },
+        startLabel: 'Start 100.00',
+        pivotLabel: 'Pivot 105.00',
+        targetLabel: 'Target 110.00',
+        changeLabel: '+5.00 (+4.76%) / 500 ms',
       },
     });
     expect(resolveUserDrawingGeometry(fibRetracement, space)).toMatchObject({
