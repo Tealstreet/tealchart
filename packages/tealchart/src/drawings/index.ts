@@ -74,6 +74,7 @@ export { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from '.
 export type { UserDrawingRenderOptions } from './renderer';
 export {
   deserializeUserDrawingStateFromLayout,
+  isUserDrawingLayoutStateEqual,
   serializeUserDrawingStateForLayout,
 } from './serialization';
 export {

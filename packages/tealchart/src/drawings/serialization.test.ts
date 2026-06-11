@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createUserDrawingState } from './input';
 import {
   deserializeUserDrawingStateFromLayout,
+  isUserDrawingLayoutStateEqual,
   serializeUserDrawingStateForLayout,
 } from './serialization';
 import type { UserDrawingState } from './types';
@@ -70,5 +71,19 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings).toHaveLength(1);
     expect(restored?.activeTool).toBe('select');
     expect(restored?.selection).toBeNull();
+  });
+
+  it('compares only committed drawing payloads', () => {
+    const previous = createStateWithTransientFields();
+    const next = {
+      ...previous,
+      activeTool: 'select' as const,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(isUserDrawingLayoutStateEqual(previous, next)).toBe(true);
+    expect(isUserDrawingLayoutStateEqual(previous, { ...next, drawings: [] })).toBe(false);
   });
 });
