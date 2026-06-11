@@ -1522,6 +1522,78 @@ describe('drawing layout serialization', () => {
     expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(2);
   });
 
+  it('restores forecast drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'forecast',
+          kind: 'forecast',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'forecast',
+      kind: 'forecast',
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 110 },
+      ],
+    });
+  });
+
+  it('rejects forecast drawings with invalid point counts', () => {
+    const baseForecastPayload = {
+      id: 'forecast',
+      kind: 'forecast',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+
+    expect(
+      deserializeUserDrawingStateFromLayout({
+        version: 1,
+        drawings: [
+          {
+            ...baseForecastPayload,
+            points: [{ time: 1, price: 100 }],
+          },
+        ],
+      })?.drawings ?? [],
+    ).toEqual([]);
+
+    expect(
+      deserializeUserDrawingStateFromLayout({
+        version: 1,
+        drawings: [
+          {
+            ...baseForecastPayload,
+            points: [
+              { time: 1, price: 100 },
+              { time: 2, price: 110 },
+              { time: 3, price: 120 },
+            ],
+          },
+        ],
+      })?.drawings ?? [],
+    ).toEqual([]);
+  });
+
   it('restores bars pattern drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

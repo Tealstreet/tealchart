@@ -437,6 +437,32 @@ function renderInfoLineGeometry(
   );
 }
 
+function renderForecastGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'forecast' }>,
+): void {
+  const { forecast, drawing } = geometry;
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.beginPath();
+    ctx.moveTo(forecast.segment.start.x, forecast.segment.start.y);
+    ctx.lineTo(forecast.segment.end.x, forecast.segment.end.y);
+    ctx.stroke();
+  }
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textBaseline = 'bottom';
+  ctx.textAlign = 'left';
+  ctx.fillText(forecast.sourceLabel, forecast.source.x + 4, forecast.source.y - 4);
+  ctx.textAlign = 'right';
+  ctx.fillText(forecast.targetLabel, forecast.target.x - 4, forecast.target.y - 4);
+  ctx.textAlign = 'center';
+  ctx.fillText(forecast.changeLabel, forecast.labelPoint.x, forecast.labelPoint.y);
+}
+
 function renderRectangleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
@@ -927,6 +953,9 @@ export function renderUserDrawing(
         break;
       case 'sineLine':
         renderSineLineGeometry(ctx, geometry);
+        break;
+      case 'forecast':
+        renderForecastGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

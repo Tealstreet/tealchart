@@ -542,6 +542,28 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:R:R 3.00:50,38:#111:center:1:12px sans-serif');
   });
 
+  it('renders forecast projection lines and labels through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'forecast',
+      kind: 'forecast',
+      points: [
+        { time: 10_000, price: 50 },
+        { time: 70_000, price: 75 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:70,25');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:Source 50.00:14,46:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Target 75.00:66,21:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:+25.00 (+50.00%) / 1 minute:40,33.5:#111:center:1:12px sans-serif');
+  });
+
   it('renders bars pattern candles through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -106,6 +106,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'ellipse':
     case 'priceRange':
     case 'datePriceRange':
+    case 'forecast':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
@@ -192,6 +193,7 @@ function editLineEndpoint(
         | 'arrowLine'
         | 'arrowMarker'
         | 'ray'
+        | 'forecast'
         | 'fibRetracement'
         | 'fibExtension'
         | 'fibFan'
@@ -348,6 +350,7 @@ function editDrawingHandle(
     case 'arrowLine':
     case 'arrowMarker':
     case 'ray':
+    case 'forecast':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':

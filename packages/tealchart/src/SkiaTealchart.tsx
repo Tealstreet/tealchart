@@ -1645,6 +1645,54 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'forecast') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const changeTextBounds = font ? font.measureText(primitive.changeLabel) : { width: 0 };
+            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaLine
+                    p1={vec(primitive.start.x, primitive.start.y)}
+                    p2={vec(primitive.end.x, primitive.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                )}
+                {font && (
+                  <>
+                    <SkiaText
+                      x={primitive.start.x + 4}
+                      y={primitive.start.y - 4}
+                      text={primitive.sourceLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.end.x - font.measureText(primitive.targetLabel).width - 4}
+                      y={primitive.end.y - 4}
+                      text={primitive.targetLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.labelPoint.x - changeTextBounds.width / 2}
+                      y={primitive.labelPoint.y - fontSize}
+                      text={primitive.changeLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                  </>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'trendAngle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
