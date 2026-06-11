@@ -469,6 +469,14 @@ describe('user drawing hit testing', () => {
   });
 
   it('hits regression trend fills, rails, and point-index handles', () => {
+    const regressionSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 62, low: 48, close: 60, volume: 1 },
+        { time: 50, open: 60, high: 72, low: 58, close: 70, volume: 1 },
+        { time: 90, open: 70, high: 82, low: 68, close: 80, volume: 1 },
+      ],
+    };
     const drawing: UserDrawing = {
       ...base,
       id: 'regression',
@@ -480,13 +488,22 @@ describe('user drawing hit testing', () => {
       ],
     };
 
-    expect(hitTestUserDrawing(drawing, { x: 50, y: 35 }, space)?.drawing.id).toBe('regression');
-    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('regression');
-    expect(hitTestUserDrawing(drawing, { x: 10, y: 20 }, space)).toMatchObject({
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 30 }, regressionSpace)?.drawing.id).toBe('regression');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, regressionSpace)?.drawing.id).toBe('regression');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 40 }, regressionSpace)).toMatchObject({
+      handle: 'center',
+      pointIndex: 0,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, regressionSpace)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 20 }, regressionSpace)).toMatchObject({
       handle: 'center',
       pointIndex: 2,
     });
-    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 50 }, regressionSpace, { handleTolerance: 4 })?.handle).toBeUndefined();
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, regressionSpace, { tolerance: 4 })).toBeNull();
   });
 
   it('hits text labels using a configurable label box', () => {

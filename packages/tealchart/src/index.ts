@@ -82,6 +82,7 @@ export {
   resolveEllipseFromAnchors,
   resolvePolylineFromAnchors,
   resolveParallelChannelFromAnchors,
+  resolveRegressionTrendFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveExtendedSegment,

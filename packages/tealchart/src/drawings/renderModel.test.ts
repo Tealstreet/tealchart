@@ -229,6 +229,15 @@ describe('user drawing render model', () => {
   });
 
   it('resolves selection handles for regression trend anchors', () => {
+    const regressionSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 62, low: 48, close: 60, volume: 1 },
+        { time: 50, open: 60, high: 72, low: 58, close: 70, volume: 1 },
+        { time: 90, open: 70, high: 82, low: 68, close: 80, volume: 1 },
+      ],
+    };
+
     expect(
       resolveUserDrawingHandlePoints(
         {
@@ -246,11 +255,11 @@ describe('user drawing render model', () => {
             { time: 10, price: 80 },
           ],
         },
-        space,
+        regressionSpace,
       ),
     ).toEqual([
-      { x: 10, y: 50 },
-      { x: 90, y: 50 },
+      { x: 10, y: 40 },
+      { x: 90, y: 20 },
       { x: 10, y: 20 },
     ]);
   });
