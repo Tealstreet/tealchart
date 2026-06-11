@@ -68,18 +68,25 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia exposes matching imperative handle methods and mobile utility
   wrappers for style, visibility, and lock updates.
 
-## Current Epic: Style Toolbar Controls
+## Shipped: Style Toolbar Controls
 
 - Shared toolbar descriptors define the initial line color, width, dash style,
   visibility, and lock controls for selected drawings.
 - Web top bar and mobile top bar render matching selected-drawing style controls
   and route them through the same state-owner APIs.
 
+## Current Epic: Fill and Text Style Controls
+
+- Shared toolbar descriptors define fill colors, text colors, and text-label
+  font sizes using the existing drawing style model.
+- Web top bar and mobile top bar expose fill controls for rectangles/text labels
+  and text color/font size controls for text labels.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Rich text label controls, font controls, and multiline editor polish.
-- More complete style controls, including fills, opacity, text color, font size,
+- Rich text label controls, font families, and multiline editor polish.
+- More complete style controls, including opacity, no-fill/no-border toggles,
   and per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.

@@ -10,6 +10,7 @@ import type {
 } from '../../drawings';
 
 import {
+  normalizeUserDrawingFontSize,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
@@ -64,6 +65,14 @@ export type MobileUserDrawingPrimitive =
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 
+export interface MobileUserDrawingTextLabelLayout {
+  fontSize: number;
+  labelPadding: number;
+  labelHeight: number;
+  box: { x: number; y: number; width: number; height: number };
+  text: { x: number; y: number };
+}
+
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
   handleRadius?: number;
   draftOpacity?: number;
@@ -78,6 +87,8 @@ export interface MobileUserDrawingClipRect {
 
 const DEFAULT_HANDLE_RADIUS = 4;
 const DEFAULT_DRAFT_OPACITY = 0.65;
+const DEFAULT_TEXT_LABEL_PADDING = 6;
+const DEFAULT_TEXT_LABEL_HEIGHT = 20;
 
 function clipRectFromSpace(space: DrawingCoordinateSpace): MobileUserDrawingClipRect {
   return {
@@ -190,4 +201,35 @@ export function resolveMobileUserDrawingRenderModel(
   }
 
   return primitives;
+}
+
+export function resolveMobileUserDrawingTextLabelLayout(
+  primitive: MobileUserDrawingTextLabelPrimitive,
+  measuredTextWidth: number,
+  options: {
+    labelPadding?: number;
+    labelHeight?: number;
+  } = {},
+): MobileUserDrawingTextLabelLayout {
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
+  const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
+  const width = Math.ceil(measuredTextWidth + labelPadding * 2);
+  const height = labelHeight;
+  const x = primitive.point.x - width / 2;
+  const y = primitive.point.y - height / 2;
+  const textX =
+    primitive.textAlign === 'left'
+      ? x + labelPadding
+      : primitive.textAlign === 'right'
+        ? x + width - labelPadding - measuredTextWidth
+        : primitive.point.x - measuredTextWidth / 2;
+
+  return {
+    fontSize,
+    labelPadding,
+    labelHeight,
+    box: { x, y, width, height },
+    text: { x: textX, y: primitive.point.y },
+  };
 }

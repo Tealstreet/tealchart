@@ -8,12 +8,19 @@ import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
   isUserDrawingToolbarActionEnabled,
   getSelectedUserDrawing,
+  isUserDrawingFillToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
+  isUserDrawingTextToolbarEnabled,
   resolveUserDrawingStyleToolbarAction,
+  supportsUserDrawingFillControls,
+  supportsUserDrawingTextControls,
+  USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
@@ -428,6 +435,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
     const styleEnabled = state ? isUserDrawingStyleToolbarEnabled(state) : false;
+    const fillEnabled = state ? isUserDrawingFillToolbarEnabled(state) : false;
+    const textEnabled = state ? isUserDrawingTextToolbarEnabled(state) : false;
+    const fillSupported = selectedDrawing ? supportsUserDrawingFillControls(selectedDrawing) : false;
+    const textSupported = selectedDrawing ? supportsUserDrawingTextControls(selectedDrawing) : false;
 
     if (selectedDrawing) {
       for (const descriptor of USER_DRAWING_LINE_COLOR_DESCRIPTORS) {
@@ -527,6 +538,104 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
 
       group.appendChild(this.createElement('div', { style: styles.divider }));
+
+      if (fillSupported) {
+        for (const descriptor of USER_DRAWING_FILL_COLOR_DESCRIPTORS) {
+          const isActive = selectedDrawing.style.fillColor?.toLowerCase() === descriptor.fillColor.toLowerCase();
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...styles.drawingSwatch,
+              backgroundColor: descriptor.fillColor,
+              opacity: fillEnabled ? '1' : '0.35',
+              cursor: fillEnabled ? 'pointer' : 'default',
+              outline: isActive ? '2px solid var(--accent, #2962ff)' : 'none',
+            },
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !fillEnabled;
+          if (fillEnabled) {
+            btn.addEventListener('click', () =>
+              this.options.onUserDrawingStyleChange?.({ fillColor: descriptor.fillColor }),
+            );
+          }
+          group.appendChild(btn);
+        }
+
+        group.appendChild(this.createElement('div', { style: styles.divider }));
+      }
+
+      if (textSupported) {
+        for (const descriptor of USER_DRAWING_TEXT_COLOR_DESCRIPTORS) {
+          const isActive = selectedDrawing.style.textColor?.toLowerCase() === descriptor.textColor.toLowerCase();
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...styles.drawingSwatch,
+              backgroundColor: descriptor.textColor,
+              opacity: textEnabled ? '1' : '0.35',
+              cursor: textEnabled ? 'pointer' : 'default',
+              outline: isActive ? '2px solid var(--accent, #2962ff)' : 'none',
+            },
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !textEnabled;
+          if (textEnabled) {
+            btn.addEventListener('click', () =>
+              this.options.onUserDrawingStyleChange?.({ textColor: descriptor.textColor }),
+            );
+          }
+          group.appendChild(btn);
+        }
+
+        for (const descriptor of USER_DRAWING_FONT_SIZE_DESCRIPTORS) {
+          const isActive = selectedDrawing.style.fontSize === descriptor.fontSize;
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...(isActive ? styles.drawingButtonActive : {}),
+              opacity: textEnabled ? '1' : '0.35',
+              cursor: textEnabled ? 'pointer' : 'default',
+              fontSize: '11px',
+            },
+            textContent: String(descriptor.fontSize),
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !textEnabled;
+          if (textEnabled) {
+            btn.addEventListener('click', () =>
+              this.options.onUserDrawingStyleChange?.({ fontSize: descriptor.fontSize }),
+            );
+            btn.addEventListener('mouseenter', () => {
+              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+            });
+            btn.addEventListener('mouseleave', () => {
+              if (!isActive) {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text2, #787b86)';
+              }
+            });
+          }
+          group.appendChild(btn);
+        }
+
+        group.appendChild(this.createElement('div', { style: styles.divider }));
+      }
 
       for (const descriptor of USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS) {
         const actionState = resolveUserDrawingStyleToolbarAction(state!, descriptor.action);

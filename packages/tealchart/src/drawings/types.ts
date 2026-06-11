@@ -121,6 +121,20 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
   fontSize: 12,
 };
 
+export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
+
+export function normalizeUserDrawingFontSize(fontSize: number): number {
+  return USER_DRAWING_FONT_SIZES.reduce((nearest, candidate) =>
+    Math.abs(candidate - fontSize) < Math.abs(nearest - fontSize) ? candidate : nearest,
+  );
+}
+
+export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingStyle {
+  if (style.fontSize === undefined) return style;
+  const fontSize = normalizeUserDrawingFontSize(style.fontSize);
+  return fontSize === style.fontSize ? style : { ...style, fontSize };
+}
+
 export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   version: USER_DRAWING_SCHEMA_VERSION,
   drawings: [],
@@ -168,7 +182,7 @@ export function createUserDrawingFromDraft(
     locked: false,
     createdAt: now,
     updatedAt: now,
-    style: { ...draft.style },
+    style: normalizeUserDrawingStyle({ ...draft.style }),
   };
 
   switch (draft.tool) {

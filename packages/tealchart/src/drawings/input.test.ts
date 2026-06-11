@@ -312,6 +312,34 @@ describe('user drawing input controller', () => {
     expect(updateUserDrawingStyle(updated, { lineColor: '#00ffcc' })).toBe(updated);
   });
 
+  it('normalizes updated text drawing font sizes', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: anchorA,
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    const updated = updateUserDrawingStyle(state, { fontSize: 15 }, { now: () => 11 });
+
+    expect(updated.drawings[0]).toMatchObject({
+      updatedAt: 11,
+      style: expect.objectContaining({ fontSize: 14 }),
+    });
+  });
+
   it('updates targeted drawing style and respects locked drawings by default', () => {
     const state = createUserDrawingState({
       drawings: [

@@ -12,6 +12,7 @@ import {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STYLE,
   isDrawingDraftReady,
+  normalizeUserDrawingStyle,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 import { hitTestUserDrawings } from './hitTesting';
@@ -175,10 +176,10 @@ export function updateUserDrawingStyle(
   const target = findUserDrawingForUpdate(state, options);
   if (!target) return state;
 
-  const nextStyle = {
+  const nextStyle = normalizeUserDrawingStyle({
     ...target.drawing.style,
     ...style,
-  };
+  });
   if (
     nextStyle.lineColor === target.drawing.style.lineColor &&
     nextStyle.lineWidth === target.drawing.style.lineWidth &&
@@ -297,7 +298,7 @@ export function handleUserDrawingInput(
           tool: state.activeTool,
           paneId: point.paneId,
           anchors: [point.anchor],
-          style: options.style ?? DEFAULT_USER_DRAWING_STYLE,
+          style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
           text: options.text,
           startedAt,
         };
