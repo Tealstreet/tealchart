@@ -463,6 +463,26 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits projection legs and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'projection',
+      kind: 'projection',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 70 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 40 }, space)?.drawing.id).toBe('projection');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 20 }, space)?.drawing.id).toBe('projection');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 30 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+  });
+
   it('hits placed bars pattern bounds and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -567,6 +567,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, projection-line hit testing, whole-drawing moves, and endpoint
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Projection Tool
+
+- Shared drawing state supports the three-anchor `projection` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching two-leg projection paths with
+  shared start, pivot, target, and projected-change labels.
+- Selection, two-leg hit testing, whole-drawing moves, and point-index anchor
+  editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

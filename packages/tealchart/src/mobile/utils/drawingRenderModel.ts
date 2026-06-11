@@ -69,6 +69,23 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'projection';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      pivot: DrawingScreenPoint;
+      target: DrawingScreenPoint;
+      labelPoint: DrawingScreenPoint;
+      startLabel: string;
+      pivotLabel: string;
+      targetLabel: string;
+      changeLabel: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'trendAngle';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -692,6 +709,7 @@ export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitiv
 export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingForecastPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'forecast' }>;
+export type MobileUserDrawingProjectionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'projection' }>;
 export type MobileUserDrawingCrossLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'crossLine' }>;
 export type MobileUserDrawingTrendAnglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'trendAngle' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
@@ -1392,6 +1410,24 @@ function primitiveFromGeometry(
         sourceLabel: geometry.forecast.sourceLabel,
         targetLabel: geometry.forecast.targetLabel,
         changeLabel: geometry.forecast.changeLabel,
+        style: geometry.drawing.style,
+      };
+    case 'projection':
+      return {
+        kind: 'projection',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.projection.start,
+        pivot: geometry.projection.pivot,
+        target: geometry.projection.target,
+        labelPoint: geometry.projection.labelPoint,
+        startLabel: geometry.projection.startLabel,
+        pivotLabel: geometry.projection.pivotLabel,
+        targetLabel: geometry.projection.targetLabel,
+        changeLabel: geometry.projection.changeLabel,
         style: geometry.drawing.style,
       };
     case 'fibRetracement':
