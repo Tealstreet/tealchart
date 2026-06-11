@@ -56,6 +56,41 @@ const PLOT_FUNCTIONS = new Set([
 
 const ITERATION_CAP = 10000;
 
+const ARRAY_FUNC_MAP: Record<string, string> = {
+  'array.new': 'create', 'array.new_float': 'create', 'array.new_int': 'create',
+  'array.new_bool': 'create', 'array.new_string': 'create', 'array.new_color': 'create',
+  'array.new_line': 'create', 'array.new_label': 'create', 'array.new_box': 'create',
+  'array.from': 'from',
+  'array.push': 'push', 'array.pop': 'pop',
+  'array.shift': 'shift', 'array.unshift': 'unshift',
+  'array.get': 'get', 'array.set': 'set',
+  'array.size': 'size', 'array.clear': 'clear',
+  'array.copy': 'copy', 'array.sort': 'sort',
+  'array.reverse': 'reverse', 'array.concat': 'concat',
+  'array.join': 'join', 'array.slice': 'slice',
+  'array.includes': 'includes', 'array.indexof': 'indexOf',
+  'array.lastindexof': 'lastIndexOf',
+  'array.insert': 'insert', 'array.remove': 'remove',
+  'array.first': 'first', 'array.last': 'last',
+  'array.min': 'min', 'array.max': 'max',
+  'array.sum': 'sum', 'array.avg': 'avg',
+  'array.range': 'range', 'array.median': 'median',
+  'array.mode': 'mode', 'array.abs': 'abs',
+  'array.variance': 'variance', 'array.stdev': 'stdev',
+  'array.covariance': 'covariance',
+  'array.standardize': 'standardize',
+  'array.sort_indices': 'sortIndices',
+  'array.binary_search': 'binarySearch',
+  'array.binary_search_leftmost': 'binarySearchLeftmost',
+  'array.binary_search_rightmost': 'binarySearchRightmost',
+  'array.percentile_nearest_rank': 'percentileNearestRank',
+  'array.percentile_linear_interpolation': 'percentileLinearInterpolation',
+  'array.percentrank': 'percentRank',
+  'array.fill': 'fill',
+  'array.every': 'every', 'array.some': 'some',
+  'array.map': 'map', 'array.filter': 'filter',
+};
+
 export function emit(ast: Program, ctx: AnalysisContext): string {
   const lines: string[] = [];
   const indent = (n: number) => '  '.repeat(n);
@@ -112,7 +147,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       case 'ArrayExpression':
         return `[${expr.elements.map(emitExpr).join(', ')}]`;
       case 'LambdaExpression':
-        return `((${expr.params.map((p) => p.name).join(', ')}) => ${emitExpr(expr.body)}).bind(this)`;
+        return `(${expr.params.map((p) => p.name).join(', ')}) => ${emitExpr(expr.body)}`;
       case 'ForStatement':
       case 'WhileStatement':
         return 'NaN';
@@ -348,43 +383,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function emitArrayCall(fullName: string, expr: CallExpression): string {
-    const allArgs = expr.arguments.map((a) => emitExpr(a.value));
-    const ARRAY_FUNC_MAP: Record<string, string> = {
-      'array.new': 'create', 'array.new_float': 'create', 'array.new_int': 'create',
-      'array.new_bool': 'create', 'array.new_string': 'create', 'array.new_color': 'create',
-      'array.new_line': 'create', 'array.new_label': 'create', 'array.new_box': 'create',
-      'array.from': 'from',
-      'array.push': 'push', 'array.pop': 'pop',
-      'array.shift': 'shift', 'array.unshift': 'unshift',
-      'array.get': 'get', 'array.set': 'set',
-      'array.size': 'size', 'array.clear': 'clear',
-      'array.copy': 'copy', 'array.sort': 'sort',
-      'array.reverse': 'reverse', 'array.concat': 'concat',
-      'array.join': 'join', 'array.slice': 'slice',
-      'array.includes': 'includes', 'array.indexof': 'indexOf',
-      'array.lastindexof': 'lastIndexOf',
-      'array.insert': 'insert', 'array.remove': 'remove',
-      'array.first': 'first', 'array.last': 'last',
-      'array.min': 'min', 'array.max': 'max',
-      'array.sum': 'sum', 'array.avg': 'avg',
-      'array.range': 'range', 'array.median': 'median',
-      'array.mode': 'mode', 'array.abs': 'abs',
-      'array.variance': 'variance', 'array.stdev': 'stdev',
-      'array.covariance': 'covariance',
-      'array.standardize': 'standardize',
-      'array.sort_indices': 'sortIndices',
-      'array.binary_search': 'binarySearch',
-      'array.binary_search_leftmost': 'binarySearchLeftmost',
-      'array.binary_search_rightmost': 'binarySearchRightmost',
-      'array.percentile_nearest_rank': 'percentileNearestRank',
-      'array.percentile_linear_interpolation': 'percentileLinearInterpolation',
-      'array.percentrank': 'percentRank',
-      'array.fill': 'fill',
-      'array.every': 'every', 'array.some': 'some',
-    };
+    const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
     const mapped = ARRAY_FUNC_MAP[fullName];
-    if (mapped) return `deps._arr.${mapped}(${allArgs.join(', ')})`;
-    return `deps._arr.${fullName.replace('array.', '')}(${allArgs.join(', ')})`;
+    if (mapped) return `deps._arr.${mapped}(${posArgs.join(', ')})`;
+    return `deps._arr.${fullName.replace('array.', '')}(${posArgs.join(', ')})`;
   }
 
   function emitSwitchExpr(expr: SwitchExpression): string {
