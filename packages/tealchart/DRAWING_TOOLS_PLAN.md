@@ -299,7 +299,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, rectangle hit testing, whole-drawing moves, corner editing, and
   fill controls reuse shared range behavior on both platforms.
 
-## Current Epic: Anchored Line Tools
+## Shipped: Anchored Line Tools
 
 - Shared drawing state supports `ray`, `horizontalLine`, and `verticalLine`
   tools and persists them through layout save/load.
@@ -308,14 +308,21 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, line hit testing, anchor handles, and whole-drawing moves use
   shared drawing behavior on both platforms.
 
+## Shipped: Freehand Path Capture
+
+- Shared path drawings support variable-length point arrays while preserving
+  existing fixed-tap path workflows.
+- Web Canvas and mobile Skia collect path samples through matching drag
+  gestures and commit the same path drawing state shape.
+- Layout persistence, point editing, hit testing, and render models retain all
+  sampled path anchors on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Additional TradingView line-family tools such as flat top/bottom, disjoint
   channel, anchored VWAP, and multi-point arrows.
 - Additional TradingView measurement tools such as bars pattern and risk/reward.
-- Freehand/variable-point path capture beyond the initial fixed three-anchor
-  path workflow.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration

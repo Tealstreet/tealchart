@@ -577,6 +577,7 @@ describe('user drawing renderer', () => {
         { time: 10, price: 90 },
         { time: 50, price: 50 },
         { time: 90, price: 90 },
+        { time: 95, price: 80 },
       ],
     };
 
@@ -585,6 +586,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:10,10');
     expect(ctx.calls).toContain('lineTo:50,50');
     expect(ctx.calls).toContain('lineTo:90,10');
+    expect(ctx.calls).toContain('lineTo:95,20');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 

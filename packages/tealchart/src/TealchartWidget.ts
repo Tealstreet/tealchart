@@ -31,11 +31,14 @@ import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } 
 import { LOADING_OPACITY } from './constants';
 import {
   applyUserDrawingEditDrag,
+  appendUserDrawingPathDragPoint,
   beginUserDrawingEditDragAtPoint,
+  beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft as cancelUserDrawingDraftState,
   cancelUserDrawingTextEdit,
   clearUserDrawings as clearUserDrawingsState,
+  commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
@@ -1023,6 +1026,9 @@ export class TealchartWidget {
       onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
       onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
+      onUserDrawingPathDragStart: (point) => this._handleUserDrawingPathDragStart(point),
+      onUserDrawingPathDragMove: (point) => this._handleUserDrawingPathDragMove(point),
+      onUserDrawingPathDragEnd: () => this._handleUserDrawingPathDragEnd(),
       userDrawingState: this._userDrawingState,
       onUserDrawingToolSelect: (tool) => this.setActiveUserDrawingTool(tool),
       onUserDrawingDeleteSelected: () => {
@@ -2307,6 +2313,34 @@ export class TealchartWidget {
     });
     this.setUserDrawingState(nextState);
     return nextState !== previousState;
+  }
+
+  private _handleUserDrawingPathDragStart(point: UserDrawingInputPoint): boolean {
+    if (this._userDrawingState.activeTool !== 'path') return false;
+
+    const previousState = this._userDrawingState;
+    const nextState = beginUserDrawingPathDrag(this._userDrawingState, point);
+    this.setUserDrawingState(nextState);
+    return nextState !== previousState;
+  }
+
+  private _handleUserDrawingPathDragMove(point: UserDrawingInputPoint): boolean {
+    if (this._userDrawingState.activeTool !== 'path') return false;
+
+    const previousState = this._userDrawingState;
+    const nextState = appendUserDrawingPathDragPoint(this._userDrawingState, point);
+    this.setUserDrawingState(nextState);
+    return nextState !== previousState;
+  }
+
+  private _handleUserDrawingPathDragEnd(): void {
+    if (this._userDrawingState.activeTool !== 'path') return;
+
+    this.setUserDrawingState(
+      commitUserDrawingPathDrag(this._userDrawingState, {
+        createId: () => this._createUserDrawingId(),
+      }),
+    );
   }
 
   private _handleUserDrawingSelection(
