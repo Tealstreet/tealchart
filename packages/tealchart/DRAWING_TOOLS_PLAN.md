@@ -531,6 +531,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, sampled-arc hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Cyclic Lines Tool
+
+- Shared drawing state supports the two-anchor `cyclicLines` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching repeated vertical cycle lines
+  across the visible time range from a shared geometry resolver.
+- Selection, cycle-line hit testing, whole-drawing moves, and endpoint editing
+  use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

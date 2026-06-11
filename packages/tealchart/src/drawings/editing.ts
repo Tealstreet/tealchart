@@ -117,6 +117,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'gannBox':
     case 'gannSquare':
     case 'fibTimeZone':
+    case 'cyclicLines':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
@@ -197,7 +198,8 @@ function editLineEndpoint(
         | 'fibCircles'
         | 'fibSpiral'
         | 'gannFan'
-        | 'fibTimeZone';
+        | 'fibTimeZone'
+        | 'cyclicLines';
     }
   >,
   handle: UserDrawingHandleRole,
@@ -351,6 +353,7 @@ function editDrawingHandle(
     case 'fibSpiral':
     case 'gannFan':
     case 'fibTimeZone':
+    case 'cyclicLines':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':

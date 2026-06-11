@@ -20,6 +20,7 @@ import {
   resolveFibSpeedResistanceArcsFromAnchors,
   resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
+  resolveCyclicLinesFromAnchors,
   resolveFibWedgeFromAnchors,
   resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
@@ -55,6 +56,7 @@ import type {
   MobileUserDrawingArcPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingCurvePrimitive,
+  MobileUserDrawingCyclicLinesPrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
@@ -88,6 +90,7 @@ import type {
   AnchoredVwapDrawing,
   BarsPatternDrawing,
   CircleDrawing,
+  CyclicLinesDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
@@ -170,6 +173,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCyclicLinesPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
@@ -332,6 +336,16 @@ describe('tealchart public entries', () => {
       levels: [{ ratio: 1, time: 2, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 10 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const cyclicLinesPrimitive: NonNever<MobileUserDrawingCyclicLinesPrimitive> = {
+      kind: 'cyclicLines',
+      id: 'cyclic-lines',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      levels: [{ ratio: 1, time: 2, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 10 } }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannBoxPrimitive: NonNever<MobileUserDrawingGannBoxPrimitive> = {
       kind: 'gannBox',
       id: 'gann-box',
@@ -487,6 +501,7 @@ describe('tealchart public entries', () => {
     expect(fibSpiralPrimitive.kind).toBe('fibSpiral');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
+    expect(cyclicLinesPrimitive.kind).toBe('cyclicLines');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(gannBoxPrimitive.kind).toBe('gannBox');
@@ -1374,6 +1389,37 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibTimeZone');
     expect(zones.levels).toHaveLength(10);
+  });
+
+  it('exports shared drawing cyclic line types and resolver', () => {
+    const drawing: CyclicLinesDrawing = {
+      id: 'cyclic-lines',
+      kind: 'cyclicLines',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+      ],
+    };
+    const lines = resolveCyclicLinesFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('cyclicLines');
+    expect(lines.levels).toEqual(
+      expect.arrayContaining([
+        { ratio: 0, time: 1, x: 50, segment: { start: { x: 50, y: 0 }, end: { x: 50, y: 100 } } },
+        { ratio: 1, time: 2, x: 100, segment: { start: { x: 100, y: 0 }, end: { x: 100, y: 100 } } },
+      ]),
+    );
   });
 
   it('exports shared drawing trend-based fib time types and resolver', () => {
