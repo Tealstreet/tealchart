@@ -1,7 +1,7 @@
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DrawingCoordinateSpace, ResolvedUserDrawingGeometry } from './coordinates';
 import type { ResolveUserDrawingRenderEntriesOptions } from './renderModel';
-import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle } from './types';
+import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle, UserDrawingPathFamilyKind } from './types';
 import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
@@ -110,7 +110,7 @@ function renderCrossLineGeometry(
 
 function renderPathGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'path' | 'brush' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: UserDrawingPathFamilyKind }>,
 ): void {
   const [firstPoint, ...remainingPoints] = geometry.polyline.points;
   if (!firstPoint) return;
@@ -1000,6 +1000,7 @@ export function renderUserDrawing(
         break;
       case 'path':
       case 'brush':
+      case 'highlighter':
         if (drawing.style.lineVisible !== false) {
           renderPathGeometry(ctx, geometry);
         }

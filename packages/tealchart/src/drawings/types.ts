@@ -60,9 +60,11 @@ export type UserDrawingTool =
   | 'disjointChannel'
   | 'path'
   | 'brush'
+  | 'highlighter'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
+export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -384,6 +386,11 @@ export interface BrushDrawing extends UserDrawingBase {
   points: readonly UserDrawingAnchor[];
 }
 
+export interface HighlighterDrawing extends UserDrawingBase {
+  kind: 'highlighter';
+  points: readonly UserDrawingAnchor[];
+}
+
 export type UserDrawingTextAlign = 'left' | 'center' | 'right';
 
 export interface TextLabelDrawing extends UserDrawingBase {
@@ -449,6 +456,7 @@ export type UserDrawing =
   | DisjointChannelDrawing
   | PathDrawing
   | BrushDrawing
+  | HighlighterDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -605,6 +613,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'barsPattern':
     case 'path':
     case 'brush':
+    case 'highlighter':
       return 3;
     case 'disjointChannel':
       return 4;
@@ -620,6 +629,10 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'select':
       return 0;
   }
+}
+
+export function isUserDrawingPathFamilyTool(tool: UserDrawingTool): tool is UserDrawingPathFamilyKind {
+  return tool === 'path' || tool === 'brush' || tool === 'highlighter';
 }
 
 export function isDrawingDraftReady(draft: UserDrawingDraft): boolean {
@@ -962,6 +975,7 @@ export function createUserDrawingFromDraft(
       };
     case 'path':
     case 'brush':
+    case 'highlighter':
       return {
         ...base,
         kind: draft.tool,

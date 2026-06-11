@@ -124,6 +124,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
     case 'brush':
+    case 'highlighter':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'polyline':
     case 'curve':
@@ -278,6 +279,7 @@ function editDrawingHandle(
   if (
     (drawing.kind === 'path' ||
       drawing.kind === 'brush' ||
+      drawing.kind === 'highlighter' ||
       drawing.kind === 'polyline' ||
       drawing.kind === 'curve' ||
       drawing.kind === 'arc' ||
@@ -302,7 +304,7 @@ function editDrawingHandle(
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
     const points = drawing.points.slice() as UserDrawingAnchor[];
     points[pointIndex] = anchor;
-    if (drawing.kind === 'path' || drawing.kind === 'brush') {
+    if (drawing.kind === 'path' || drawing.kind === 'brush' || drawing.kind === 'highlighter') {
       return {
         ...drawing,
         points,
@@ -388,6 +390,7 @@ function editDrawingHandle(
     case 'anchoredVwap':
     case 'path':
     case 'brush':
+    case 'highlighter':
     case 'polyline':
     case 'curve':
     case 'arc':

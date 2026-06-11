@@ -185,6 +185,16 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'highlighter';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'curve';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -670,6 +680,7 @@ export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
 >;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingBrushPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'brush' }>;
+export type MobileUserDrawingHighlighterPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'highlighter' }>;
 export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'curve' }>;
 export type MobileUserDrawingArcPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arc' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
@@ -965,6 +976,7 @@ function primitiveFromGeometry(
       };
     case 'path':
     case 'brush':
+    case 'highlighter':
       return {
         kind: geometry.kind,
         id: geometry.drawing.id,

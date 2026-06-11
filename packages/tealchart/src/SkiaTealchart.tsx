@@ -96,6 +96,7 @@ import {
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
+  isUserDrawingPathFamilyTool,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
@@ -1050,7 +1051,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!viewport) return false;
       if (!isPointInChartArea(x, y)) return false;
 
-      if (effectiveUserDrawingState.activeTool === 'path') {
+      if (isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)) {
         const point = resolveMobileUserDrawingInputPoint({
           point: { x, y },
           viewport,
@@ -1095,7 +1096,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleUserDrawingEditMove = useCallback(
     (x: number, y: number) => {
-      if (viewport && effectiveUserDrawingState.activeTool === 'path') {
+      if (viewport && isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)) {
         const point = resolveMobileUserDrawingInputPoint({
           point: { x, y },
           viewport,
@@ -1129,7 +1130,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const handleUserDrawingEditEnd = useCallback(() => {
-    if (userDrawingStateRef.current.activeTool === 'path') {
+    if (isUserDrawingPathFamilyTool(userDrawingStateRef.current.activeTool)) {
       commitUserDrawingStateIfChanged(
         commitUserDrawingPathDrag(userDrawingStateRef.current, {
           createId: () => {
@@ -2360,6 +2361,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (
             primitive.kind === 'path' ||
             primitive.kind === 'brush' ||
+            primitive.kind === 'highlighter' ||
             primitive.kind === 'curve' ||
             primitive.kind === 'arc' ||
             primitive.kind === 'fibSpiral'
