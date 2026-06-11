@@ -50,8 +50,16 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'rectangle':
     case 'priceRange':
-    case 'dateRange':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
+    case 'dateRange':
+      return {
+        ...drawing,
+        points: [
+          { ...drawing.points[0], time: drawing.points[0].time + delta.time },
+          { ...drawing.points[1], time: drawing.points[1].time + delta.time },
+        ],
+        updatedAt,
+      };
     case 'horizontalLine':
       return { ...drawing, price: drawing.price + delta.price, updatedAt };
     case 'verticalLine':
