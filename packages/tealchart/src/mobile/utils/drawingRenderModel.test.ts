@@ -1992,6 +1992,46 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready curve primitives with shared sampled points', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'curve',
+          kind: 'curve',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 80 },
+            { time: 90, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const primitive = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0];
+
+    expect(primitive).toMatchObject({
+      kind: 'curve',
+      id: 'curve',
+      clip,
+      start: { x: 10, y: 50 },
+      control: { x: 50, y: 20 },
+      end: { x: 90, y: 50 },
+      style,
+    });
+    expect(primitive?.kind === 'curve' ? primitive.points[24] : null).toEqual({ x: 50, y: 35 });
+  });
+
   it('positions price range labels with a Skia baseline offset', () => {
     const state: UserDrawingState = {
       version: 1,

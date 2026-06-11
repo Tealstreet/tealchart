@@ -508,6 +508,26 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits curve paths and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'curve',
+      kind: 'curve',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 35 }, space)?.drawing.id).toBe('curve');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits triangle fills, edges, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

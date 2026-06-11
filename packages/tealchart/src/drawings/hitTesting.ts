@@ -314,6 +314,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'curve') {
+    const distance = distanceToPolyline(point, geometry.curve.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'anchoredVwap') {
     const distance = Math.min(
       distanceToPolyline(point, geometry.vwap.points),
@@ -551,6 +556,13 @@ function hitTestUserDrawingHandle(
       geometry.polyline.points.forEach((pathPoint, pointIndex) => {
         handles.push({ handle: 'center', point: pathPoint, pointIndex });
       });
+      break;
+    case 'curve':
+      if (geometry.drawing.kind === 'curve') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
       break;
     case 'triangle':
       geometry.polygon.points.forEach((trianglePoint, pointIndex) => {
