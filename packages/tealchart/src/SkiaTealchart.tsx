@@ -138,6 +138,7 @@ import type {
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
+  MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import {
@@ -620,10 +621,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           | MobileUserDrawingTextLabelPrimitive
           | MobileUserDrawingNotePrimitive
           | MobileUserDrawingCalloutPrimitive
+          | MobileUserDrawingPriceNotePrimitive
           | MobileUserDrawingCommentPrimitive =>
           (primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
             primitive.kind === 'callout' ||
+            primitive.kind === 'priceNote' ||
             primitive.kind === 'comment') &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
@@ -1258,6 +1261,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           (selectedDrawing?.kind === 'textLabel' ||
             selectedDrawing?.kind === 'note' ||
             selectedDrawing?.kind === 'callout' ||
+            selectedDrawing?.kind === 'priceNote' ||
             selectedDrawing?.kind === 'comment')
         ) {
           const nextState = beginUserDrawingTextEdit(selection.state, selectedDrawing.id);
@@ -2842,6 +2846,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
             primitive.kind === 'callout' ||
+            primitive.kind === 'priceNote' ||
             primitive.kind === 'comment'
           ) {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
@@ -2852,7 +2857,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.kind === 'callout' && (
+                {(primitive.kind === 'callout' || primitive.kind === 'priceNote') && (
                   <SkiaLine
                     p1={vec(primitive.tip.x, primitive.tip.y)}
                     p2={vec(primitive.point.x, primitive.point.y)}

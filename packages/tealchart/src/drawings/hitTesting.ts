@@ -302,7 +302,8 @@ function hitTestResolvedGeometry(
     geometry.kind === 'textLabel' ||
     geometry.kind === 'note' ||
     geometry.kind === 'callout' ||
-    geometry.kind === 'comment'
+    geometry.kind === 'comment' ||
+    geometry.kind === 'priceNote'
   ) {
     const drawing = geometry.drawing as UserDrawingTextAnnotation;
     const lines = splitUserDrawingTextLines(drawing.text);
@@ -325,7 +326,7 @@ function hitTestResolvedGeometry(
     const inside =
       point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
     if (inside) return { drawing: geometry.drawing, distance: 0 };
-    if (geometry.kind === 'callout') {
+    if (geometry.kind === 'callout' || geometry.kind === 'priceNote') {
       const distance = distanceToSegment(point, { start: geometry.tip, end: geometry.point });
       return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
     }
@@ -734,6 +735,7 @@ function hitTestUserDrawingHandle(
       handles.push({ handle: 'center', point: geometry.point });
       break;
     case 'callout':
+    case 'priceNote':
       handles.push({ handle: 'center', point: geometry.tip, pointIndex: 0 });
       handles.push({ handle: 'center', point: geometry.point, pointIndex: 1 });
       break;
