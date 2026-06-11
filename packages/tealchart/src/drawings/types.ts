@@ -24,6 +24,7 @@ export type UserDrawingTool =
   | 'datePriceRange'
   | 'longPosition'
   | 'shortPosition'
+  | 'forecast'
   | 'barsPattern'
   | 'anchoredVwap'
   | 'fibRetracement'
@@ -213,6 +214,11 @@ export interface ShortPositionDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ForecastDrawing extends UserDrawingBase {
+  kind: 'forecast';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface BarsPatternDrawing extends UserDrawingBase {
   kind: 'barsPattern';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -398,6 +404,7 @@ export type UserDrawing =
   | DatePriceRangeDrawing
   | LongPositionDrawing
   | ShortPositionDrawing
+  | ForecastDrawing
   | BarsPatternDrawing
   | AnchoredVwapDrawing
   | FibRetracementDrawing
@@ -546,6 +553,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'priceRange':
     case 'dateRange':
     case 'datePriceRange':
+    case 'forecast':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
@@ -752,6 +760,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: draft.tool,
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'forecast':
+      return {
+        ...base,
+        kind: 'forecast',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'barsPattern': {
       const sourceStartTime = Math.min(draft.anchors[0]!.time, draft.anchors[1]!.time);

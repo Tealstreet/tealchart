@@ -73,6 +73,7 @@ export type {
   MobileUserDrawingFibRetracementPrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingFlatTopBottomPrimitive,
+  MobileUserDrawingForecastPrimitive,
   MobileUserDrawingGannBoxPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingGannSquarePrimitive,

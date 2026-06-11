@@ -558,6 +558,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, sampled-path hit testing, whole-drawing moves, and endpoint editing
   use shared drawing behavior on both platforms.
 
+## Shipped: Forecast Tool
+
+- Shared drawing state supports the two-anchor `forecast` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching forecast projection lines with
+  shared source, target, and change labels.
+- Selection, projection-line hit testing, whole-drawing moves, and endpoint
+  editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

@@ -1522,6 +1522,37 @@ describe('drawing layout serialization', () => {
     expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(2);
   });
 
+  it('restores forecast drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'forecast',
+          kind: 'forecast',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'forecast',
+      kind: 'forecast',
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 110 },
+      ],
+    });
+  });
+
   it('restores bars pattern drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

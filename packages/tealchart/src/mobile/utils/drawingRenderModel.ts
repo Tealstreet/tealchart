@@ -54,6 +54,21 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'forecast';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      labelPoint: DrawingScreenPoint;
+      sourceLabel: string;
+      targetLabel: string;
+      changeLabel: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'trendAngle';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -676,6 +691,7 @@ export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
 export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
+export type MobileUserDrawingForecastPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'forecast' }>;
 export type MobileUserDrawingCrossLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'crossLine' }>;
 export type MobileUserDrawingTrendAnglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'trendAngle' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
@@ -1362,6 +1378,22 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'forecast':
+      return {
+        kind: 'forecast',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.forecast.segment.start,
+        end: geometry.forecast.segment.end,
+        labelPoint: geometry.forecast.labelPoint,
+        sourceLabel: geometry.forecast.sourceLabel,
+        targetLabel: geometry.forecast.targetLabel,
+        changeLabel: geometry.forecast.changeLabel,
+        style: geometry.drawing.style,
+      };
     case 'fibRetracement':
     case 'fibExtension':
       return {
