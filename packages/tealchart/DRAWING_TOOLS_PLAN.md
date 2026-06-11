@@ -173,7 +173,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, whole-drawing moves, and point-index handle editing
   use shared logic on both platforms.
 
-## Current Epic: Info Line Tool
+## Shipped: Info Line Tool
 
 - Shared drawing state supports the two-anchor `infoLine` tool and persists it
   through layout save/load.
@@ -181,6 +181,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   price/percent and elapsed-time labels.
 - Selection, hit testing, and endpoint editing reuse line-family behavior on
   both platforms.
+
+## Current Epic: Arrow Marker Tool
+
+- Shared drawing state supports the two-anchor `arrowMarker` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching filled arrow marker polygons from
+  shared geometry.
+- Selection, polygon hit testing, whole-drawing moves, and endpoint editing
+  work through shared drawing behavior on both platforms.
 
 ## Known Gaps
 

@@ -94,6 +94,35 @@ function distanceToPolyline(point: DrawingScreenPoint, points: readonly DrawingS
   return distance;
 }
 
+function pointInPolygon(point: DrawingScreenPoint, polygon: readonly DrawingScreenPoint[]): boolean {
+  let inside = false;
+  for (let index = 0, previousIndex = polygon.length - 1; index < polygon.length; previousIndex = index++) {
+    const current = polygon[index]!;
+    const previous = polygon[previousIndex]!;
+    if (
+      current.y > point.y !== previous.y > point.y &&
+      point.x < ((previous.x - current.x) * (point.y - current.y)) / (previous.y - current.y) + current.x
+    ) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+function distanceToClosedPolyline(point: DrawingScreenPoint, points: readonly DrawingScreenPoint[]): number {
+  if (points.length < 2) return Number.POSITIVE_INFINITY;
+
+  let distance = distanceToPolyline(point, points);
+  distance = Math.min(
+    distance,
+    distanceToSegment(point, {
+      start: points[points.length - 1]!,
+      end: points[0]!,
+    }),
+  );
+  return distance;
+}
+
 function hitTestResolvedGeometry(
   geometry: ResolvedUserDrawingGeometry,
   point: DrawingScreenPoint,
@@ -139,6 +168,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'arrowMarker') {
+    const distance = pointInPolygon(point, geometry.marker.points) ? 0 : distanceToClosedPolyline(point, geometry.marker.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   const distance = distanceToSegment(point, geometry.segment);
   return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
 }
@@ -155,12 +189,14 @@ function hitTestUserDrawingHandle(
     case 'line':
     case 'infoLine':
     case 'arrowLine':
+    case 'arrowMarker':
     case 'ray': {
       if (
         geometry.drawing.kind === 'trendLine' ||
         geometry.drawing.kind === 'extendedLine' ||
         geometry.drawing.kind === 'infoLine' ||
         geometry.drawing.kind === 'arrowLine' ||
+        geometry.drawing.kind === 'arrowMarker' ||
         geometry.drawing.kind === 'ray'
       ) {
         handles.push(

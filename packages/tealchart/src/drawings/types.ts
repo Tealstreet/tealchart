@@ -6,6 +6,7 @@ export type UserDrawingTool =
   | 'extendedLine'
   | 'infoLine'
   | 'arrowLine'
+  | 'arrowMarker'
   | 'ray'
   | 'horizontalLine'
   | 'verticalLine'
@@ -71,6 +72,11 @@ export interface ArrowLineDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ArrowMarkerDrawing extends UserDrawingBase {
+  kind: 'arrowMarker';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface RayDrawing extends UserDrawingBase {
   kind: 'ray';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -120,6 +126,7 @@ export type UserDrawing =
   | ExtendedLineDrawing
   | InfoLineDrawing
   | ArrowLineDrawing
+  | ArrowMarkerDrawing
   | RayDrawing
   | HorizontalLineDrawing
   | VerticalLineDrawing
@@ -225,6 +232,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':
+    case 'arrowMarker':
     case 'ray':
     case 'rectangle':
     case 'priceRange':
@@ -291,6 +299,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'arrowLine',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'arrowMarker':
+      return {
+        ...base,
+        kind: 'arrowMarker',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'ray':

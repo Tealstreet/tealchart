@@ -177,6 +177,28 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2::1');
   });
 
+  it('renders arrow markers as filled CanvasContext polygons', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'marker',
+      kind: 'arrowMarker',
+      style: { ...style, fillColor: '#22c55e', lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 50 },
+        { time: 100, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:100,50');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.fillStyle).toBe('#22c55e');
+    expect(ctx.calls).toContain('stroke:#f5c542:2::1');
+  });
+
   it('renders extended lines to chart bounds through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
