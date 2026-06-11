@@ -77,6 +77,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
+    expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
     expect(getRequiredAnchorCount('path')).toBe(3);
   });
 
@@ -263,6 +264,20 @@ describe('user drawing types', () => {
     ).toMatchObject({
       id: 'regression',
       kind: 'regressionTrend',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'flatTopBottom', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'flat',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'flat',
+      kind: 'flatTopBottom',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

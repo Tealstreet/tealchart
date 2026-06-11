@@ -711,6 +711,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders flat top and bottom drawings as filled closed polygons', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'flat',
+      kind: 'flatTopBottom',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('lineTo:90,80');
+    expect(ctx.calls).toContain('lineTo:10,80');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('requires explicit fill colors for parallel channel fills', () => {
     const ctx = new RecordingCanvasContext();
     const { fillColor: _fillColor, ...styleWithoutFillColor } = style;

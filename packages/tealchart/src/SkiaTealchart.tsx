@@ -1928,7 +1928,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'parallelChannel' || primitive.kind === 'regressionTrend') {
+          if (
+            primitive.kind === 'parallelChannel' ||
+            primitive.kind === 'regressionTrend' ||
+            primitive.kind === 'flatTopBottom'
+          ) {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
             const [firstPoint, ...remainingPoints] = primitive.points;

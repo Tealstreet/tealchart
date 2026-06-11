@@ -12,6 +12,7 @@ import type {
   ExtendedLineDrawing,
   FibExtensionDrawing,
   FibRetracementDrawing,
+  FlatTopBottomDrawing,
   HorizontalRayDrawing,
   InfoLineDrawing,
   PathDrawing,
@@ -38,6 +39,7 @@ import {
   resolveExtendedSegment,
   resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
+  resolveFlatTopBottomFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
@@ -555,6 +557,16 @@ describe('user drawing coordinates', () => {
       id: 'regression',
       kind: 'regressionTrend',
     };
+    const flatTopBottom: FlatTopBottomDrawing = {
+      ...trendLine,
+      id: 'flat',
+      kind: 'flatTopBottom',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 110 },
+        { time: 2_000, price: 95 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -765,6 +777,43 @@ describe('user drawing coordinates', () => {
             { x: 10, y: 20 },
           ],
         },
+      },
+    });
+    expect(resolveUserDrawingGeometry(flatTopBottom, space)).toMatchObject({
+      kind: 'flatTopBottom',
+      channel: {
+        base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
+        parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 95 } },
+        polygon: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 20 },
+            { x: 210, y: 95 },
+            { x: 10, y: 95 },
+          ],
+        },
+      },
+    });
+  });
+
+  it('resolves flat top and bottom channels from a sloped edge and flat anchor', () => {
+    expect(
+      resolveFlatTopBottomFromAnchors(
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 110 },
+        { time: 2_000, price: 95 },
+        space,
+      ),
+    ).toEqual({
+      base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
+      parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 95 } },
+      polygon: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 210, y: 20 },
+          { x: 210, y: 95 },
+          { x: 10, y: 95 },
+        ],
       },
     });
   });
