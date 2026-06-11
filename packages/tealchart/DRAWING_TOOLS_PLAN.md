@@ -84,18 +84,25 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia renders text-label fill, stroke, text color, and normalized font
   size in parity with web Canvas.
 
-## Current Epic: Text Alignment Controls
+## Shipped: Text Alignment Controls
 
 - Shared toolbar descriptors and reducers update text-label left, center, and
   right alignment while preserving drawing IDs.
 - Web top bar and mobile top bar expose matching selected text-label alignment
   controls.
 
+## Current Epic: Opacity Controls
+
+- Shared drawing style supports normalized opacity and applies it in both web
+  Canvas and mobile Skia render paths.
+- Web top bar and mobile top bar expose matching selected drawing opacity
+  controls through shared descriptors.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Rich text label controls, font families, and multiline editor polish.
-- More complete style controls, including opacity, no-fill/no-border toggles,
-  and per-tool property panels.
+- More complete style controls, including no-fill/no-border toggles and
+  per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.
