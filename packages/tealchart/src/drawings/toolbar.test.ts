@@ -71,6 +71,7 @@ describe('user drawing toolbar descriptors', () => {
       'anchoredVwap',
       'fibRetracement',
       'fibExtension',
+      'fibFan',
       'triangle',
       'polyline',
       'pitchfork',
@@ -158,6 +159,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibExtension')).toEqual(
       expect.objectContaining({ tool: 'fibExtension', label: 'Fib extension' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibFan')).toEqual(
+      expect.objectContaining({ tool: 'fibFan', label: 'Fib fan' }),
     );
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),

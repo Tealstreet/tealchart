@@ -53,6 +53,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'datePriceRange':
     case 'fibRetracement':
     case 'fibExtension':
+    case 'fibFan':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -424,6 +425,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'fibExtension',
+            points,
+          }
+        : null;
+    }
+    case 'fibFan': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'fibFan',
             points,
           }
         : null;

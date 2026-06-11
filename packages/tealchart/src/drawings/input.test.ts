@@ -159,6 +159,26 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib fan drawings from two anchors', () => {
+    const options = { createId: () => 'fib-fan', now: () => 22 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibFan'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'fib-fan' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'fib-fan',
+      kind: 'fibFan',
+      points: [anchorA, anchorB],
+      createdAt: 22,
+      updatedAt: 22,
+    });
+  });
+
   it('builds variable-point path drawings from drag samples', () => {
     const started = beginUserDrawingPathDrag(
       setUserDrawingTool(createUserDrawingState(), 'path'),

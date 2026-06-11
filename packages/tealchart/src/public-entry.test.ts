@@ -12,6 +12,7 @@ import {
   resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
   resolveFlatTopBottomFromAnchors,
+  resolveFibFanFromAnchors,
   resolvePitchforkFromAnchors,
   resolvePitchfanFromAnchors,
   resolveUserDrawingDateRangeMetrics,
@@ -44,6 +45,7 @@ import type {
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
+  MobileUserDrawingFibFanPrimitive,
   MobileUserDrawingPitchfanPrimitive,
   MobileUserDrawingPitchforkPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
@@ -65,6 +67,7 @@ import type {
   DrawingPitchforkVariant,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FibFanDrawing,
   FlatTopBottomDrawing,
   InfoLineDrawing,
   LongPositionDrawing,
@@ -191,6 +194,11 @@ describe('tealchart public entries', () => {
       rays: [{ ratio: 0.5, start: { x: 0, y: 5 }, end: { x: 10, y: 5 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const fibFanPrimitive: NonNever<MobileUserDrawingFibFanPrimitive> = {
+      ...pitchfanPrimitive,
+      kind: 'fibFan',
+      id: 'fib-fan',
+    };
     const linePrimitive: NonNever<MobileUserDrawingLinePrimitive> = {
       kind: 'line',
       id: 'ray',
@@ -269,6 +277,7 @@ describe('tealchart public entries', () => {
     expect(disjointPrimitive.kind).toBe('disjointChannel');
     expect(pitchforkPrimitive.kind).toBe('pitchfork');
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
+    expect(fibFanPrimitive.kind).toBe('fibFan');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
@@ -802,6 +811,32 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('pitchfan');
+  });
+
+  it('exports shared drawing fib fan types and resolver', () => {
+    const drawing: FibFanDrawing = {
+      id: 'fib-fan',
+      kind: 'fibFan',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const fan = resolveFibFanFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibFan');
+    expect(fan.rays).toHaveLength(7);
   });
 
   it('exports shared drawing regression trend types', () => {

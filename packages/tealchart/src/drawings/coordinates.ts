@@ -70,6 +70,13 @@ export interface DrawingScreenPitchfan {
   rays: readonly DrawingScreenPitchfanRay[];
 }
 
+export interface DrawingScreenFibFan {
+  origin: DrawingScreenPoint;
+  targetStart: DrawingScreenPoint;
+  targetEnd: DrawingScreenPoint;
+  rays: readonly DrawingScreenPitchfanRay[];
+}
+
 export interface DrawingScreenCrossLine {
   horizontal: DrawingScreenSegment;
   vertical: DrawingScreenSegment;
@@ -258,6 +265,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'pitchfan';
       drawing: UserDrawing;
       pitchfan: DrawingScreenPitchfan;
+    }
+  | {
+      kind: 'fibFan';
+      drawing: UserDrawing;
+      fibFan: DrawingScreenFibFan;
     }
   | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
@@ -615,6 +627,7 @@ export function resolveBarsPatternFromAnchors(
 
 export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.618, 2.618] as const;
 export const FIB_EXTENSION_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.414, 1.618, 2, 2.618] as const;
+export const FIB_FAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
 
 export function formatFibRetracementRatio(ratio: number): string {
   return ratio === 0 || ratio === 0.5 || ratio === 1 ? String(ratio) : ratio.toFixed(3);
@@ -670,6 +683,33 @@ export function resolveFibExtensionFromAnchors(
   space: DrawingCoordinateSpace,
 ): DrawingScreenFibLevels {
   return resolveFibLevelsFromAnchors(first, second, space, FIB_EXTENSION_LEVELS);
+}
+
+export function resolveFibFanFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibFan {
+  const origin = anchorToScreenPoint(first, space);
+  const targetStart = anchorToScreenPoint({ time: second.time, price: first.price }, space);
+  const targetEnd = anchorToScreenPoint(second, space);
+
+  return {
+    origin,
+    targetStart,
+    targetEnd,
+    rays: FIB_FAN_LEVELS.map((ratio) => {
+      const target = {
+        x: targetEnd.x,
+        y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
+      };
+      return {
+        ratio,
+        target,
+        segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+      };
+    }),
+  };
 }
 
 export function resolveAnchoredVwapFromAnchor(
@@ -1176,6 +1216,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibExtension',
         drawing,
         fib: resolveFibExtensionFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibFan':
+      return {
+        kind: 'fibFan',
+        drawing,
+        fibFan: resolveFibFanFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
     case 'polyline':
