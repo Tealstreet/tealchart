@@ -12,7 +12,9 @@ import {
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
+  resolveRiskRewardPositionFromAnchors,
   resolveRegressionTrendFromAnchors,
+  resolveUserDrawingRiskRewardMetrics,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -31,6 +33,7 @@ import type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
+  MobileUserDrawingRiskRewardPositionPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import type {
   ArrowLineDrawing,
@@ -43,10 +46,12 @@ import type {
   EllipseDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
+  LongPositionDrawing,
   PathDrawing,
   ParallelChannelDrawing,
   PriceRangeDrawing,
   RegressionTrendDrawing,
+  ShortPositionDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
   UserDrawingFontFamily,
@@ -58,7 +63,9 @@ import type {
   UserDrawingOpacityDescriptor,
   UserDrawingDateRangeMetrics,
   UserDrawingPriceRangeMetrics,
+  UserDrawingRiskRewardMetrics,
   UserDrawingStyleToggleDescriptor,
+  DrawingScreenRiskRewardPosition,
 } from './index';
 
 type NonNever<T> = [T] extends [never] ? never : T;
@@ -90,6 +97,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingRiskRewardPositionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
   });
 
@@ -138,11 +146,33 @@ describe('tealchart public entries', () => {
       dateLabel: '1 minute',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const riskRewardPrimitive: NonNever<MobileUserDrawingRiskRewardPositionPrimitive> = {
+      kind: 'riskRewardPosition',
+      id: 'long',
+      tool: 'longPosition',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      profitRect: { x: 0, y: 0, width: 10, height: 5 },
+      riskRect: { x: 0, y: 5, width: 10, height: 5 },
+      entryLine: { start: { x: 0, y: 5 }, end: { x: 10, y: 5 } },
+      targetLine: { start: { x: 0, y: 0 }, end: { x: 10, y: 0 } },
+      stopLine: { start: { x: 0, y: 10 }, end: { x: 10, y: 10 } },
+      rewardLabelPoint: { x: 5, y: 2.5 },
+      riskLabelPoint: { x: 5, y: 7.5 },
+      ratioLabelPoint: { x: 5, y: 3 },
+      rewardLabel: 'Reward +1.00 (+1.00%)',
+      riskLabel: 'Risk -1.00 (-1.00%)',
+      ratioLabel: 'R:R 1.00',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
+    expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
   });
 
   it('exports a reusable native measurement label layout helper', () => {
@@ -264,6 +294,48 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('datePriceRange');
+  });
+
+  it('exports shared risk reward position helpers and types', () => {
+    const metrics: UserDrawingRiskRewardMetrics = resolveUserDrawingRiskRewardMetrics(
+      'longPosition',
+      { time: 0, price: 100 },
+      { time: 1, price: 110 },
+      { time: 1, price: 95 },
+    );
+    const geometry: DrawingScreenRiskRewardPosition = resolveRiskRewardPositionFromAnchors(
+      'longPosition',
+      { time: 0, price: 100 },
+      { time: 1, price: 110 },
+      { time: 2, price: 95 },
+      {
+        viewport: { startTime: 0, endTime: 2, priceMin: 90, priceMax: 110 },
+        pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 90, yMax: 110 },
+        chartLeft: 0,
+        chartRight: 200,
+      },
+    );
+    const longDrawing: LongPositionDrawing = {
+      id: 'long',
+      kind: 'longPosition',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 100 },
+        { time: 1, price: 110 },
+        { time: 2, price: 95 },
+      ],
+    };
+    const shortDrawing: ShortPositionDrawing = { ...longDrawing, id: 'short', kind: 'shortPosition' };
+
+    expect(metrics.ratioLabel).toBe('R:R 2.00');
+    expect(geometry.entryLine.end.x).toBe(200);
+    expect(longDrawing.kind).toBe('longPosition');
+    expect(shortDrawing.kind).toBe('shortPosition');
   });
 
   it('exports shared drawing info line helpers', () => {

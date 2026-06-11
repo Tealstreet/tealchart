@@ -433,8 +433,8 @@ export function resolveRiskRewardPositionFromAnchors(
   const entry = anchorToScreenPoint(entryAnchor, space);
   const target = anchorToScreenPoint(targetAnchor, space);
   const stop = anchorToScreenPoint(stopAnchor, space);
-  const left = Math.min(entry.x, target.x);
-  const right = Math.max(entry.x, target.x);
+  const left = Math.min(entry.x, target.x, stop.x);
+  const right = Math.max(entry.x, target.x, stop.x);
   const width = right - left;
   const metrics = resolveUserDrawingRiskRewardMetrics(kind, entryAnchor, targetAnchor, stopAnchor);
 
