@@ -84,6 +84,7 @@ export function resolveUserDrawingHandlePoints(
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'fibTimeZone':
     case 'gannFan':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {

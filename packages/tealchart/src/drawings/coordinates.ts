@@ -88,6 +88,17 @@ export interface DrawingScreenFibChannel {
   polygon: DrawingScreenPolyline;
 }
 
+export interface DrawingScreenFibTimeZoneLevel {
+  ratio: number;
+  time: number;
+  x: number;
+  segment: DrawingScreenSegment;
+}
+
+export interface DrawingScreenFibTimeZone {
+  levels: readonly DrawingScreenFibTimeZoneLevel[];
+}
+
 export interface DrawingScreenGannFan {
   origin: DrawingScreenPoint;
   reference: DrawingScreenPoint;
@@ -292,6 +303,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'fibChannel';
       drawing: UserDrawing;
       fibChannel: DrawingScreenFibChannel;
+    }
+  | {
+      kind: 'fibTimeZone';
+      drawing: UserDrawing;
+      fibTimeZone: DrawingScreenFibTimeZone;
     }
   | {
       kind: 'gannFan';
@@ -656,6 +672,7 @@ export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.
 export const FIB_EXTENSION_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.414, 1.618, 2, 2.618] as const;
 export const FIB_FAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
 export const FIB_CHANNEL_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.414, 1.618, 2] as const;
+export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
 export const GANN_FAN_LEVELS = [
   { ratio: 0.125, label: '1/8' },
   { ratio: 0.25, label: '1/4' },
@@ -802,6 +819,27 @@ export function resolveFibChannelFromAnchors(
     base: { start, end },
     levels,
     polygon: { points: [start, end, outer.end, outer.start] },
+  };
+}
+
+export function resolveFibTimeZoneFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibTimeZone {
+  const interval = second.time - first.time;
+
+  return {
+    levels: FIB_TIME_ZONE_LEVELS.map((ratio) => {
+      const time = first.time + interval * ratio;
+      const x = timeToDrawingX(time, space);
+      return {
+        ratio,
+        time,
+        x,
+        segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+      };
+    }),
   };
 }
 
@@ -1321,6 +1359,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibChannel',
         drawing,
         fibChannel: resolveFibChannelFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'fibTimeZone':
+      return {
+        kind: 'fibTimeZone',
+        drawing,
+        fibTimeZone: resolveFibTimeZoneFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'gannFan':
       return {

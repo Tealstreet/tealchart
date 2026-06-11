@@ -15,6 +15,7 @@ import type {
   FibExtensionDrawing,
   FibFanDrawing,
   FibRetracementDrawing,
+  FibTimeZoneDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
   HorizontalRayDrawing,
@@ -580,6 +581,15 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 110 },
       ],
     };
+    const fibTimeZone: FibTimeZoneDrawing = {
+      ...trendLine,
+      id: 'fib-time-zone',
+      kind: 'fibTimeZone',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 100 },
+      ],
+    };
     const gannFan: GannFanDrawing = {
       ...trendLine,
       id: 'gann-fan',
@@ -897,6 +907,16 @@ describe('user drawing coordinates', () => {
           { ratio: 0.5, segment: { start: { x: 10, y: 45 }, end: { x: 210, y: 45 } } },
           { ratio: 1, segment: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } } },
           { ratio: 2, segment: { start: { x: 10, y: -30 }, end: { x: 210, y: -30 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibTimeZone, space)).toMatchObject({
+      kind: 'fibTimeZone',
+      fibTimeZone: {
+        levels: expect.arrayContaining([
+          { ratio: 0, time: 1_000, x: 10, segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } } },
+          { ratio: 1, time: 2_000, x: 110, segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } } },
+          { ratio: 2, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
         ]),
       },
     });

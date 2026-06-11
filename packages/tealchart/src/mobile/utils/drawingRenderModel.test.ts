@@ -856,6 +856,41 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fib time zone primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-time-zone',
+          kind: 'fibTimeZone',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibTimeZone',
+      id: 'fib-time-zone',
+      levels: expect.arrayContaining([
+        { ratio: 0, time: 10, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 100 } },
+        { ratio: 1, time: 20, x: 20, start: { x: 20, y: 0 }, end: { x: 20, y: 100 } },
+      ]),
+    });
+  });
+
   it('returns Skia-ready regression trend primitives', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,
