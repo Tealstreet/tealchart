@@ -156,6 +156,27 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders arrow line heads through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'arrow',
+      kind: 'arrowLine',
+      style: { ...style, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 50 },
+        { time: 100, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:0,50');
+    expect(ctx.calls).toContain('lineTo:100,50');
+    expect(ctx.calls.filter((call) => call === 'lineTo:100,50')).toHaveLength(2);
+    expect(ctx.calls).toContain('stroke:#f5c542:2::1');
+  });
+
   it('clips drawings to the pane chart area', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -4,6 +4,7 @@ import type { ResolveUserDrawingRenderEntriesOptions } from './renderModel';
 import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle } from './types';
 import type { UserDrawingState } from './types';
 
+import { resolveDrawingArrowHead } from './arrowGeometry';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
 import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
@@ -49,6 +50,19 @@ function renderLineGeometry(
   ctx.moveTo(geometry.segment.start.x, geometry.segment.start.y);
   ctx.lineTo(geometry.segment.end.x, geometry.segment.end.y);
   ctx.stroke();
+
+  if (geometry.kind === 'arrowLine') {
+    const arrowHead = resolveDrawingArrowHead(geometry.segment, {
+      size: Math.max(10, geometry.drawing.style.lineWidth * 5),
+    });
+    if (arrowHead) {
+      ctx.beginPath();
+      ctx.moveTo(arrowHead.left.x, arrowHead.left.y);
+      ctx.lineTo(arrowHead.end.x, arrowHead.end.y);
+      ctx.lineTo(arrowHead.right.x, arrowHead.right.y);
+      ctx.stroke();
+    }
+  }
 }
 
 function renderRectangleGeometry(
@@ -162,6 +176,7 @@ export function renderUserDrawing(
 
     switch (geometry.kind) {
       case 'line':
+      case 'arrowLine':
       case 'ray':
       case 'horizontalLine':
       case 'verticalLine':

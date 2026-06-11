@@ -43,6 +43,7 @@ function moveAnchor(anchor: UserDrawingAnchor, delta: AnchorDelta): UserDrawingA
 function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number): UserDrawing {
   switch (drawing.kind) {
     case 'trendLine':
+    case 'arrowLine':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'ray':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
@@ -58,7 +59,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
 }
 
 function editLineEndpoint(
-  drawing: Extract<UserDrawing, { kind: 'trendLine' | 'ray' }>,
+  drawing: Extract<UserDrawing, { kind: 'trendLine' | 'arrowLine' | 'ray' }>,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
   updatedAt: number,
@@ -104,6 +105,7 @@ function editDrawingHandle(
 
   switch (drawing.kind) {
     case 'trendLine':
+    case 'arrowLine':
     case 'ray':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':

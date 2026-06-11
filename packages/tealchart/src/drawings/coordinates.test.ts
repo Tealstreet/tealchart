@@ -1,5 +1,5 @@
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { RectangleDrawing, TrendLineDrawing, UserDrawingStyle } from './types';
+import type { ArrowLineDrawing, RectangleDrawing, TrendLineDrawing, UserDrawingStyle } from './types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -203,9 +203,18 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const arrowLine: ArrowLineDrawing = {
+      ...trendLine,
+      id: 'arrow',
+      kind: 'arrowLine',
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
+      segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+    });
+    expect(resolveUserDrawingGeometry(arrowLine, space)).toMatchObject({
+      kind: 'arrowLine',
       segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
     });
     expect(resolveUserDrawingGeometry(rectangle, space)).toMatchObject({
