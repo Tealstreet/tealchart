@@ -40,7 +40,10 @@ import type {
 describe('tealchart public entries', () => {
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
-    expect(readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8')).toContain('setMobileUserDrawingTextAlign');
+    const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
+    expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
+    expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
+    expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
   });
 
   it('exports shared drawing opacity helpers', () => {
