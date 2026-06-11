@@ -229,6 +229,8 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.lineWidth ?? '',
     selectedDrawing?.style.lineStyle ?? '',
     selectedDrawing?.style.opacity ?? '',
+    selectedDrawing?.style.lineVisible ?? '',
+    selectedDrawing?.style.fillVisible ?? '',
     selectedDrawing?.style.fillColor ?? '',
     selectedDrawing?.style.textColor ?? '',
     selectedDrawing?.style.fontSize ?? '',
