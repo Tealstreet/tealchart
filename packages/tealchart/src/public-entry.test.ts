@@ -23,8 +23,11 @@ import {
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
+import { resolveMobileUserDrawingMeasurementLabelPosition } from './mobile/utils/drawingRenderModel';
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
+  MobileUserDrawingMeasurementLabelPosition,
+  MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -70,8 +73,11 @@ describe('tealchart public entries', () => {
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
+    expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
+    expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelPosition');
+    expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelTarget');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
@@ -122,6 +128,19 @@ describe('tealchart public entries', () => {
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
+  });
+
+  it('exports a reusable native measurement label layout helper', () => {
+    const target: MobileUserDrawingMeasurementLabelTarget = {
+      labelPoint: { x: 50, y: 20 },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+    const position: MobileUserDrawingMeasurementLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(target, {
+      width: 40,
+      height: 12,
+    });
+
+    expect(position).toMatchObject({ fontSize: 12, fontFamily: 'sans-serif', x: 30, y: 26 });
   });
 
   it('exports shared drawing opacity helpers', () => {

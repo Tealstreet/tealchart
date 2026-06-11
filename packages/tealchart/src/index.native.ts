@@ -51,6 +51,7 @@ export {
 } from './mobile/utils/drawingPersistence';
 export {
   resolveMobileUserDrawingInfoLineLabelPosition,
+  resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingTrendAngleLabelPosition,
@@ -66,11 +67,13 @@ export type {
   MobileUserDrawingFibRetracementPrimitive,
   MobileUserDrawingInfoLineLabelPosition,
   MobileUserDrawingInfoLinePrimitive,
+  MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingPathPrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
   MobileUserDrawingMeasurementLabelPrimitive,
+  MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingPriceRangeLabelPosition,
   MobileUserDrawingRegressionTrendPrimitive,
   MobileUserDrawingTextBounds,

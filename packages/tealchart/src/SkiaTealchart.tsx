@@ -123,15 +123,13 @@ import {
 } from './mobile/utils/drawingPersistence';
 import {
   resolveMobileUserDrawingInfoLineLabelPosition,
+  resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import type {
-  MobileUserDrawingPriceRangePrimitive,
-  MobileUserDrawingTextLabelPrimitive,
-} from './mobile/utils/drawingRenderModel';
+import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
@@ -1947,34 +1945,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             const priceTextBounds = font ? font.measureText(primitive.priceLabel) : { width: 0 };
             const dateTextBounds = font ? font.measureText(primitive.dateLabel) : { width: 0 };
-            const priceLabelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(
-              {
-                kind: 'priceRange',
-                id: primitive.id,
-                phase: primitive.phase,
-                selected: primitive.selected,
-                opacity: primitive.opacity,
-                clip: primitive.clip,
-                rect: primitive.rect,
-                labelPoint: primitive.priceLabelPoint,
-                label: primitive.priceLabel,
-                style: primitive.style,
-              } satisfies MobileUserDrawingPriceRangePrimitive,
+            const priceLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
+              { labelPoint: primitive.priceLabelPoint, style: primitive.style },
               priceTextBounds,
             );
-            const dateLabelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(
-              {
-                kind: 'priceRange',
-                id: primitive.id,
-                phase: primitive.phase,
-                selected: primitive.selected,
-                opacity: primitive.opacity,
-                clip: primitive.clip,
-                rect: primitive.rect,
-                labelPoint: primitive.dateLabelPoint,
-                label: primitive.dateLabel,
-                style: primitive.style,
-              } satisfies MobileUserDrawingPriceRangePrimitive,
+            const dateLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
+              { labelPoint: primitive.dateLabelPoint, style: primitive.style },
               dateTextBounds,
             );
 
