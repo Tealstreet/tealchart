@@ -850,6 +850,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:5:90,14:#111:center:1:12px sans-serif');
   });
 
+  it('renders Elliott corrective wave drawings as labeled paths', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-corrective',
+      kind: 'elliottCorrectiveWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:30,70');
+    expect(ctx.calls).toContain('lineTo:50,30');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:A:10,44:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:B:30,64:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:C:50,24:#111:center:1:12px sans-serif');
+  });
+
   it('renders ABCD pattern drawings as labeled stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
