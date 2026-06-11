@@ -891,6 +891,51 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fib wedge primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-wedge',
+          kind: 'fibWedge',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 50 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibWedge',
+      id: 'fib-wedge',
+      center: { x: 10, y: 50 },
+      lower: { x: 50, y: 50 },
+      upper: { x: 50, y: 80 },
+      baseRadius: 50,
+      boundaries: [
+        { start: { x: 10, y: 50 }, end: { x: 50, y: 50 } },
+        { start: { x: 10, y: 50 }, end: { x: 50, y: 80 } },
+      ],
+      arcs: expect.arrayContaining([
+        expect.objectContaining({ ratio: 0.236, radius: 11.799999999999999, startAngle: 0 }),
+        expect.objectContaining({ ratio: 1, radius: 50, startAngle: 0 }),
+        expect.objectContaining({ ratio: 2.618, radius: 130.9, startAngle: 0 }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready gann fan primitives', () => {
     const state: UserDrawingState = {
       version: 1,

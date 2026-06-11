@@ -132,6 +132,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibSpeedResistanceFan', icon: 'S', label: 'Fib speed resistance fan' },
   { tool: 'fibSpeedResistanceArcs', icon: 'A', label: 'Fib speed resistance arcs' },
   { tool: 'fibCircles', icon: 'O', label: 'Fib circles' },
+  { tool: 'fibWedge', icon: 'W', label: 'Fib wedge' },
   { tool: 'fibChannel', icon: 'C', label: 'Fib channel' },
   { tool: 'fibTimeZone', icon: 'T', label: 'Fib time zone' },
   { tool: 'trendBasedFibTime', icon: 'B', label: 'Trend-based fib time' },
@@ -262,6 +263,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'dateRange' ||
     drawing.kind === 'datePriceRange' ||
     drawing.kind === 'triangle' ||
+    drawing.kind === 'fibWedge' ||
     drawing.kind === 'rotatedRectangle' ||
     drawing.kind === 'parallelChannel' ||
     drawing.kind === 'regressionTrend' ||

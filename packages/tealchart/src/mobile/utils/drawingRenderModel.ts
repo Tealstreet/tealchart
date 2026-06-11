@@ -251,6 +251,29 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibWedge';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      lower: DrawingScreenPoint;
+      upper: DrawingScreenPoint;
+      baseRadius: number;
+      arcs: readonly {
+        ratio: number;
+        radius: number;
+        startAngle: number;
+        endAngle: number;
+      }[];
+      boundaries: readonly {
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'gannFan';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -514,6 +537,7 @@ export type MobileUserDrawingFibSpeedResistanceArcsPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'fibSpeedResistanceArcs' }
 >;
+export type MobileUserDrawingFibWedgePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibWedge' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
@@ -900,6 +924,30 @@ function primitiveFromGeometry(
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibWedge':
+      return {
+        kind: 'fibWedge',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.fibWedge.center,
+        lower: geometry.fibWedge.lower,
+        upper: geometry.fibWedge.upper,
+        baseRadius: geometry.fibWedge.baseRadius,
+        arcs: geometry.fibWedge.arcs.map((arc) => ({
+          ratio: arc.ratio,
+          radius: arc.radius,
+          startAngle: arc.startAngle,
+          endAngle: arc.endAngle,
+        })),
+        boundaries: geometry.fibWedge.boundaries.map((boundary) => ({
+          start: boundary.start,
+          end: boundary.end,
         })),
         style: geometry.drawing.style,
       };

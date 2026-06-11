@@ -128,6 +128,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!], updatedAt };
       }
     case 'triangle':
+    case 'fibWedge':
     case 'fibChannel':
     case 'trendBasedFibTime':
     case 'pitchfork':
@@ -259,6 +260,7 @@ function editDrawingHandle(
     (drawing.kind === 'path' ||
       drawing.kind === 'polyline' ||
       drawing.kind === 'triangle' ||
+      drawing.kind === 'fibWedge' ||
       drawing.kind === 'trendBasedFibTime' ||
       drawing.kind === 'pitchfork' ||
       drawing.kind === 'schiffPitchfork' ||
@@ -343,6 +345,7 @@ function editDrawingHandle(
     case 'path':
     case 'polyline':
     case 'triangle':
+    case 'fibWedge':
     case 'fibChannel':
     case 'trendBasedFibTime':
     case 'pitchfork':
