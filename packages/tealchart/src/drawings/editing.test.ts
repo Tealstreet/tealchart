@@ -781,6 +781,78 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('edits Fibonacci retracement endpoints', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib',
+      kind: 'fibRetracement',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'fib', handle: 'end' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'fib', handle: 'end' },
+        startPoint: { x: 90, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 80, y: 30 },
+      { now: () => 12 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 20 },
+        { time: 80, price: 70 },
+      ],
+      updatedAt: 12,
+    });
+  });
+
+  it('moves selected Fibonacci retracements by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib',
+      kind: 'fibRetracement',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'fib' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'fib' },
+        startPoint: { x: 10, y: 80 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 90 },
+      { now: () => 13 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 10 },
+        { time: 100, price: 70 },
+      ],
+      updatedAt: 13,
+    });
+  });
+
   it('moves horizontal, vertical, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };

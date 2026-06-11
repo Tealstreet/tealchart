@@ -153,6 +153,23 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space)?.handle).toBe('end');
   });
 
+  it('hits Fibonacci retracement levels and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib',
+      kind: 'fibRetracement',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 80 }, space)?.handle).toBe('start');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)?.handle).toBe('end');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('fib');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 1 })).toBeNull();
+  });
+
   it('hits vertical extended line drawings across the pane', () => {
     const drawing: UserDrawing = {
       ...base,
