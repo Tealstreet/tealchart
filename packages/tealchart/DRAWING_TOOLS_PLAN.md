@@ -630,6 +630,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, whole-drawing moves, endpoint handle edits, text
   editing, alignment controls, and style controls stay shared across platforms.
 
+## Shipped: Pin Tool
+
+- Shared drawing state supports the single-anchor `pin` marker and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching pin markers with a circle and stem
+  from shared anchor geometry.
+- Selection, marker/stem hit testing, whole-drawing moves, and center-handle
+  editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

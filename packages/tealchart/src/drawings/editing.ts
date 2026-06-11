@@ -183,6 +183,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'pin':
     case 'anchoredVwap':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
   }
@@ -406,6 +407,7 @@ function editDrawingHandle(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'pin':
     case 'anchoredVwap':
     case 'path':
     case 'brush':

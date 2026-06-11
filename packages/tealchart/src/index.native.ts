@@ -90,6 +90,7 @@ export type {
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingPitchfanPrimitive,
   MobileUserDrawingPitchforkPrimitive,
+  MobileUserDrawingPinPrimitive,
   MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,

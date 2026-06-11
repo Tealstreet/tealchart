@@ -532,6 +532,11 @@ export type ResolvedUserDrawingGeometry =
       point: DrawingScreenPoint;
     }
   | {
+      kind: 'pin';
+      drawing: UserDrawing;
+      point: DrawingScreenPoint;
+    }
+  | {
       kind: 'callout' | 'priceNote';
       drawing: UserDrawing;
       tip: DrawingScreenPoint;
@@ -2334,6 +2339,12 @@ export function resolveUserDrawingGeometry(
     case 'comment':
       return {
         kind: drawing.kind,
+        drawing,
+        point: anchorToScreenPoint(drawing.point, space),
+      };
+    case 'pin':
+      return {
+        kind: 'pin',
         drawing,
         point: anchorToScreenPoint(drawing.point, space),
       };
