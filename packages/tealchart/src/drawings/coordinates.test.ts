@@ -698,4 +698,46 @@ describe('user drawing coordinates', () => {
       },
     });
   });
+
+  it('fits regression trend baselines to bar closes in the selected time range', () => {
+    const regressionSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 1_000, open: 100, high: 102, low: 98, close: 102, volume: 1 },
+        { time: 2_000, open: 102, high: 104, low: 101, close: 104, volume: 1 },
+        { time: 3_000, open: 104, high: 106, low: 103, close: 106, volume: 1 },
+      ],
+    };
+    const regressionTrend: RegressionTrendDrawing = {
+      id: 'regression',
+      kind: 'regressionTrend',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 100 },
+        { time: 1_000, price: 110 },
+      ],
+    };
+
+    expect(resolveUserDrawingGeometry(regressionTrend, regressionSpace)).toMatchObject({
+      kind: 'regressionTrend',
+      channel: {
+        base: { start: { x: 10, y: 60 }, end: { x: 210, y: 40 } },
+        parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 0 } },
+        polygon: {
+          points: [
+            { x: 10, y: 60 },
+            { x: 210, y: 40 },
+            { x: 210, y: 0 },
+            { x: 10, y: 20 },
+          ],
+        },
+      },
+    });
+  });
 });

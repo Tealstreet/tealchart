@@ -1585,6 +1585,7 @@ export class ChartCore {
         },
         chartLeft: this.margins.left,
         chartRight: this.options.width - this.margins.right,
+        bars: pane.type === 'main' ? this.bars : undefined,
       });
       currentTop += height;
     }

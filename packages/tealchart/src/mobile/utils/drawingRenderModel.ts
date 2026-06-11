@@ -153,7 +153,19 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'parallelChannel' | 'regressionTrend';
+      kind: 'parallelChannel';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'regressionTrend';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;

@@ -590,10 +590,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           pane,
           chartLeft: margins.left,
           chartRight: dimensions.width - margins.right,
+          bars: pane.id === 'main' ? bars : undefined,
         },
       ]),
     );
-  }, [dimensions.width, margins.left, margins.right, userDrawingInputPanes, viewport]);
+  }, [bars, dimensions.width, margins.left, margins.right, userDrawingInputPanes, viewport]);
 
   const userDrawingPrimitives = useMemo(
     () => resolveMobileUserDrawingRenderModel(effectiveUserDrawingState, userDrawingSpacesByPaneId),
@@ -2059,6 +2060,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               </Group>
             );
           }
+
+          if (primitive.kind !== 'handle') return null;
 
           return (
             <Group key={primitive.id} clip={primitive.clip}>
