@@ -13,3 +13,4 @@ One line per optimization, newest at bottom. Format:
 2026-06-11 07:40 | PR #1012 cache source arg preservation | 2K: 59385bps 10K: 60743bps | +11% at 10K, cache per-call-site AST checks
 2026-06-11 08:00 | exploration: callId cache, source bindings restructure, Series.getCurrent | no gains — V8 JIT already optimizes hot paths, WeakMap overhead exceeds savings
 2026-06-11 10:30 | PRs #1020,#1023,#1025 Pine→JS transpiler (Epics 1-3) | compiled: 2K: 179Kbps 5K: 349Kbps 10K: 286Kbps 20K: 381Kbps | 7-10x speedup over interpreter, Float64Array ring buffers, stateful TA classes
+2026-06-11 14:00 | Hoist barCtx, bypass ExecutionContext, cache plot arrays | compiled: 10K: 548Kbps 20K: 541Kbps | 14.7x speedup, 500K+ target achieved
