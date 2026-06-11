@@ -2,6 +2,7 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenAbcdPatternLabel,
   DrawingScreenPoint,
+  DrawingScreenTrianglePatternLabel,
   DrawingScreenXabcdPatternLabel,
   ResolvedUserDrawingGeometry,
   ResolveUserDrawingRenderEntriesOptions,
@@ -662,6 +663,22 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'trianglePattern';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      polygon: readonly DrawingScreenPoint[];
+      boundaries: readonly {
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      labels: readonly DrawingScreenTrianglePatternLabel[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'abcdPattern';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -852,6 +869,10 @@ export type MobileUserDrawingDisjointChannelPrimitive = Extract<MobileUserDrawin
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
 export type MobileUserDrawingBarsPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'barsPattern' }>;
+export type MobileUserDrawingTrianglePatternPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'trianglePattern' }
+>;
 export type MobileUserDrawingAbcdPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'abcdPattern' }>;
 export type MobileUserDrawingXabcdPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'xabcdPattern' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
@@ -1634,6 +1655,20 @@ function primitiveFromGeometry(
         clip,
         bars: geometry.pattern.bars,
         bounds: geometry.pattern.bounds,
+        style: geometry.drawing.style,
+      };
+    case 'trianglePattern':
+      return {
+        kind: 'trianglePattern',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.pattern.points,
+        polygon: geometry.pattern.polygon.points,
+        boundaries: geometry.pattern.boundaries,
+        labels: geometry.pattern.labels,
         style: geometry.drawing.style,
       };
     case 'xabcdPattern':

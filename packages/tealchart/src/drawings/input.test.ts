@@ -1528,6 +1528,40 @@ describe('user drawing input controller', () => {
     expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
+  it('duplicates triangle pattern drawings with deep-cloned four-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'triangle-pattern' },
+      drawings: [
+        {
+          id: 'triangle-pattern',
+          kind: 'trianglePattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC, anchorD],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 21 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'trianglePattern',
+      createdAt: 21,
+      updatedAt: 21,
+      points: [anchorA, anchorB, anchorC, anchorD],
+    });
+    if (next.drawings[1]?.kind !== 'trianglePattern' || state.drawings[0]?.kind !== 'trianglePattern') {
+      throw new Error('expected triangle pattern drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+  });
+
   it('duplicates grouped selections after each source drawing and selects the copies', () => {
     let id = 0;
     const state = createUserDrawingState({
