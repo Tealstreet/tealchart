@@ -81,6 +81,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('gannFan')).toBe(2);
     expect(getRequiredAnchorCount('fibTimeZone')).toBe(2);
     expect(getRequiredAnchorCount('fibChannel')).toBe(3);
+    expect(getRequiredAnchorCount('trendBasedFibTime')).toBe(3);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('polyline')).toBe(3);
     expect(getRequiredAnchorCount('pitchfork')).toBe(3);
@@ -291,6 +292,20 @@ describe('user drawing types', () => {
       id: 'fib-circles',
       kind: 'fibCircles',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'trendBasedFibTime', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'trend-fib-time',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'trend-fib-time',
+      kind: 'trendBasedFibTime',
+      points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,
       createdAt: 20,
