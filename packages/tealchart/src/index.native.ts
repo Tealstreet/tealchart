@@ -87,6 +87,7 @@ export type {
   MobileUserDrawingPitchforkPrimitive,
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
+  MobileUserDrawingProjectionPrimitive,
   MobileUserDrawingMeasurementLabelPrimitive,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingPriceRangeLabelPosition,

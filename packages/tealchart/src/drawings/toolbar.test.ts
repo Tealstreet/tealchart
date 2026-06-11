@@ -68,6 +68,7 @@ describe('user drawing toolbar descriptors', () => {
       'longPosition',
       'shortPosition',
       'forecast',
+      'projection',
       'barsPattern',
       'anchoredVwap',
       'fibRetracement',
@@ -164,6 +165,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('forecast')).toEqual(
       expect.objectContaining({ tool: 'forecast', label: 'Forecast' }),
+    );
+    expect(getUserDrawingToolDescriptor('projection')).toEqual(
+      expect.objectContaining({ tool: 'projection', label: 'Projection' }),
     );
     expect(getUserDrawingToolDescriptor('horizontalRay')).toEqual(
       expect.objectContaining({ tool: 'horizontalRay', label: 'Horizontal ray' }),

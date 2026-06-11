@@ -148,6 +148,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':
+    case 'projection':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
@@ -292,7 +293,8 @@ function editDrawingHandle(
       drawing.kind === 'disjointChannel' ||
       drawing.kind === 'regressionTrend' ||
       drawing.kind === 'longPosition' ||
-      drawing.kind === 'shortPosition') &&
+      drawing.kind === 'shortPosition' ||
+      drawing.kind === 'projection') &&
     pointIndex !== undefined
   ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
@@ -400,6 +402,7 @@ function editDrawingHandle(
     case 'flatTopBottom':
     case 'disjointChannel':
     case 'regressionTrend':
+    case 'projection':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
