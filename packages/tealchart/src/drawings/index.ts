@@ -78,6 +78,19 @@ export type {
 export { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from './renderer';
 export type { UserDrawingRenderOptions } from './renderer';
 export {
+  DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
+  DEFAULT_USER_DRAWING_TEXT_LINE_HEIGHT,
+  resolveUserDrawingTextEditMetrics,
+  resolveUserDrawingTextLabelLayout,
+  splitUserDrawingTextLines,
+} from './textLayout';
+export type {
+  ResolveUserDrawingTextLabelLayoutOptions,
+  UserDrawingTextEditMetrics,
+  UserDrawingTextLabelLayout,
+  UserDrawingTextLineLayout,
+} from './textLayout';
+export {
   deserializeUserDrawingStateFromLayout,
   isUserDrawingLayoutStateEqual,
   serializeUserDrawingStateForLayout,

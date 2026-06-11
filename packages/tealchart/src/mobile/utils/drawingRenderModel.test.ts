@@ -263,6 +263,7 @@ describe('mobile user drawing render model', () => {
       labelHeight: 20,
       box: { x: 20, y: 40, width: 60, height: 20 },
       text: { x: 26, y: 50 },
+      lines: [{ text: 'Note', width: 48, x: 26, y: 50 }],
     });
 
     expect(
@@ -273,6 +274,42 @@ describe('mobile user drawing render model', () => {
     ).toMatchObject({
       fontSize: 14,
       fontFamily: 'sans-serif',
+    });
+  });
+
+  it('resolves multiline text label layout for Skia rendering', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Longer\nB',
+          textAlign: 'right',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'textLabel') throw new Error('expected text label primitive');
+
+    expect(resolveMobileUserDrawingTextLabelLayout(primitive, [36, 6])).toMatchObject({
+      labelHeight: 38,
+      box: { x: 26, y: 31, width: 48, height: 38 },
+      lines: [
+        { text: 'Longer', width: 36, x: 32, y: 41 },
+        { text: 'B', width: 6, x: 62, y: 59 },
+      ],
     });
   });
 });

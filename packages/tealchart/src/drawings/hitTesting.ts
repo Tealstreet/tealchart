@@ -5,9 +5,10 @@ import type {
   DrawingScreenSegment,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
-import type { UserDrawing, UserDrawingHandleRole } from './types';
+import type { TextLabelDrawing, UserDrawing, UserDrawingHandleRole } from './types';
 
 import { anchorToScreenPoint, resolveUserDrawingGeometry } from './coordinates';
+import { splitUserDrawingTextLines } from './textLayout';
 
 export interface UserDrawingHitTestOptions {
   tolerance?: number;
@@ -81,11 +82,14 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'textLabel') {
+    const drawing = geometry.drawing as TextLabelDrawing;
+    const lineCount = splitUserDrawingTextLines(drawing.text).length;
+    const labelHeight = Math.max(options.labelHeight, lineCount * Math.max(1, options.labelHeight - 2) + 2);
     const rect = {
       x: geometry.point.x - options.labelWidth / 2,
-      y: geometry.point.y - options.labelHeight / 2,
+      y: geometry.point.y - labelHeight / 2,
       width: options.labelWidth,
-      height: options.labelHeight,
+      height: labelHeight,
     };
     const inside =
       point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
