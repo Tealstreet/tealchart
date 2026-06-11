@@ -189,6 +189,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
   it('dispatches selected text label fill, text color, and font size controls', () => {
     const onStyle = vi.fn();
+    const onTextAlign = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-text-style',
       symbol: 'BTCUSDT',
@@ -219,16 +220,19 @@ describe('ChartTopBar drawing toolbar', () => {
         ],
       },
       onUserDrawingStyleChange: onStyle,
+      onUserDrawingTextAlignChange: onTextAlign,
     });
     topBar.mount(document.body);
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Blue fill color"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Red text color"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+    expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.unmount();
   });

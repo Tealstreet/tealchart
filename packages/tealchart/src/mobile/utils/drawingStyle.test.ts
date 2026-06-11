@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './drawingStyle';
@@ -59,6 +60,34 @@ describe('mobile drawing style helpers', () => {
     const locked = setMobileUserDrawingLocked(state, true, { now: () => 30 });
     expect(locked.drawings[0]).toMatchObject({ locked: true, updatedAt: 30 });
     expect(locked.selection).toBeNull();
+  });
+
+  it('updates selected text label alignment through the shared reducer contract', () => {
+    const textState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: state.drawings[0]!.style,
+          point: { time: 1, price: 100 },
+          text: 'Note',
+          textAlign: 'left',
+        },
+      ],
+    };
+
+    expect(setMobileUserDrawingTextAlign(textState, 'right', { now: () => 40 }).drawings[0]).toMatchObject({
+      textAlign: 'right',
+      updatedAt: 40,
+    });
+    expect(setMobileUserDrawingTextAlign(state, 'right')).toBe(state);
   });
 
   it('requires explicit opt-in for locked drawing property changes', () => {

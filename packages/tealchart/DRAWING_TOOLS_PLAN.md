@@ -75,12 +75,21 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar render matching selected-drawing style controls
   and route them through the same state-owner APIs.
 
-## Current Epic: Fill and Text Style Controls
+## Shipped: Fill and Text Style Controls
 
 - Shared toolbar descriptors define fill colors, text colors, and text-label
   font sizes using the existing drawing style model.
 - Web top bar and mobile top bar expose fill controls for rectangles/text labels
   and text color/font size controls for text labels.
+- Mobile Skia renders text-label fill, stroke, text color, and normalized font
+  size in parity with web Canvas.
+
+## Current Epic: Text Alignment Controls
+
+- Shared toolbar descriptors and reducers update text-label left, center, and
+  right alignment while preserving drawing IDs.
+- Web top bar and mobile top bar expose matching selected text-label alignment
+  controls.
 
 ## Known Gaps
 

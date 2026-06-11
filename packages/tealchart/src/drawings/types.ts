@@ -67,11 +67,13 @@ export interface RectangleDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export type UserDrawingTextAlign = 'left' | 'center' | 'right';
+
 export interface TextLabelDrawing extends UserDrawingBase {
   kind: 'textLabel';
   point: UserDrawingAnchor;
   text: string;
-  textAlign: 'left' | 'center' | 'right';
+  textAlign: UserDrawingTextAlign;
 }
 
 export type UserDrawing =

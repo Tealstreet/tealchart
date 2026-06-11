@@ -24,6 +24,7 @@ import type {
   UserDrawingHandleRole,
   UserDrawingLineStyle,
   UserDrawingStyle,
+  UserDrawingTextAlign,
   UserDrawingTool,
   UpdateUserDrawingOptions,
 } from './drawings';
@@ -118,6 +119,7 @@ import {
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './mobile/utils/drawingStyle';
@@ -167,6 +169,7 @@ export interface SkiaTealchartHandle {
   cancelUserDrawingTextEdit(): boolean;
   setUserDrawingText(drawingId: string, text: string): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
 }
@@ -401,6 +404,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style, options));
+      },
+      setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign, options),
+        );
       },
       setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
@@ -1761,6 +1769,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             }}
             onUserDrawingStyleChange={(style) => {
               commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style));
+            }}
+            onUserDrawingTextAlignChange={(textAlign) => {
+              commitUserDrawingStateIfChanged(
+                setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign),
+              );
             }}
             onUserDrawingVisibilityChange={(visible) => {
               commitUserDrawingStateIfChanged(
