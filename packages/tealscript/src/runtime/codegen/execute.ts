@@ -119,7 +119,7 @@ export function executeCompiled(
           if (plot) {
             if (!Array.isArray(plot.color)) {
               const prev = plot.color;
-              plot.color = new Array(barIndex).fill(prev);
+              plot.color = new Array(plot.values.length - 1).fill(prev);
             }
             (plot.color as (string | null)[]).push(named.color);
           }
@@ -134,7 +134,7 @@ export function executeCompiled(
           const type = funcName.replace('input.', '') as InputDefinition['type'];
           inputDefs.set(id, {
             id,
-            type: type === 'int' || type === 'float' ? type : 'float',
+            type,
             title: id,
             defval,
           });
@@ -177,7 +177,7 @@ export function executeCompiled(
       colorG() { return 0; },
       colorB() { return 0; },
       colorT() { return 0; },
-      mathSum() { return 0; },
+      mathSum(..._args: unknown[]) { return NaN; },
       strFormat(...args: unknown[]) { return String(args[0]); },
       strFormatTime(...args: unknown[]) { return String(args[0]); },
     };
@@ -185,7 +185,7 @@ export function executeCompiled(
     try {
       inst.onBar(barCtx);
     } catch (_error) {
-      return null;
+      // Continue execution — single bar errors shouldn't abort
     }
 
     ctx.commitBar();
