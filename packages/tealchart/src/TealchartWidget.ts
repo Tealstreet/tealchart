@@ -18,6 +18,7 @@ import type {
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextAlign,
   UserDrawingTool,
   UpdateUserDrawingOptions,
 } from './drawings';
@@ -44,6 +45,7 @@ import {
   serializeUserDrawingStateForLayout,
   setUserDrawingLocked as setUserDrawingLockedState,
   setUserDrawingText,
+  setUserDrawingTextAlign as setUserDrawingTextAlignState,
   setUserDrawingTool,
   setUserDrawingVisibility as setUserDrawingVisibilityState,
   updateUserDrawingStyle as updateUserDrawingStyleState,
@@ -1025,6 +1027,9 @@ export class TealchartWidget {
       onUserDrawingClearAll: () => this.clearUserDrawings(),
       onUserDrawingStyleChange: (style) => {
         this.updateUserDrawingStyle(style);
+      },
+      onUserDrawingTextAlignChange: (textAlign) => {
+        this.setUserDrawingTextAlign(textAlign);
       },
       onUserDrawingVisibilityChange: (visible) => {
         this.setUserDrawingVisibility(visible);
@@ -2240,6 +2245,12 @@ export class TealchartWidget {
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(updateUserDrawingStyleState(this._userDrawingState, style, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingTextAlignState(this._userDrawingState, textAlign, options));
     return this._userDrawingState !== previousState;
   }
 

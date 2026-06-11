@@ -9,6 +9,7 @@ import type {
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextAlign,
   UserDrawingTool,
 } from '../drawings';
 import type {
@@ -137,6 +138,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingClearAll?: () => void;
   /** Called when the top bar should update selected drawing style */
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
+  /** Called when the top bar should update selected text-label alignment */
+  onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
   /** Called when the top bar should update selected drawing visibility */
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Called when the top bar should update selected drawing locked state */
@@ -253,6 +256,7 @@ export class TealchartWidgetUI {
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,
+        onUserDrawingTextAlignChange: options.onUserDrawingTextAlignChange,
         onUserDrawingVisibilityChange: options.onUserDrawingVisibilityChange,
         onUserDrawingLockedChange: options.onUserDrawingLockedChange,
         layoutCallbacks: options.layoutCallbacks,

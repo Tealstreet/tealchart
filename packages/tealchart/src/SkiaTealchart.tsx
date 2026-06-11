@@ -24,6 +24,7 @@ import type {
   UserDrawingHandleRole,
   UserDrawingLineStyle,
   UserDrawingStyle,
+  UserDrawingTextAlign,
   UserDrawingTool,
   UpdateUserDrawingOptions,
 } from './drawings';
@@ -118,6 +119,7 @@ import {
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './mobile/utils/drawingStyle';
@@ -167,6 +169,7 @@ export interface SkiaTealchartHandle {
   cancelUserDrawingTextEdit(): boolean;
   setUserDrawingText(drawingId: string, text: string): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
 }
@@ -402,6 +405,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style, options));
       },
+      setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign, options),
+        );
+      },
       setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
           setMobileUserDrawingVisibility(userDrawingStateRef.current, visible, options),
@@ -604,7 +612,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       top: Math.max(margins.top, activeUserDrawingTextEditPrimitive.point.y - 18),
       width,
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
-      fontSize: activeUserDrawingTextEditPrimitive.style.fontSize ?? 12,
+      fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
       fontFamily: activeUserDrawingTextEditPrimitive.style.fontFamily,
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
@@ -1761,6 +1769,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             }}
             onUserDrawingStyleChange={(style) => {
               commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style));
+            }}
+            onUserDrawingTextAlignChange={(textAlign) => {
+              commitUserDrawingStateIfChanged(
+                setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign),
+              );
             }}
             onUserDrawingVisibilityChange={(visible) => {
               commitUserDrawingStateIfChanged(

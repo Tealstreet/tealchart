@@ -4,6 +4,7 @@ import type {
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextAlign,
   UserDrawingTool,
   TextLabelDrawing,
 } from './types';
@@ -458,4 +459,19 @@ export function setUserDrawingText(
     selection: { drawingId: editable.drawing.id },
     textEdit: state.textEdit?.drawingId === drawingId ? null : state.textEdit,
   };
+}
+
+export function setUserDrawingTextAlign(
+  state: UserDrawingState,
+  textAlign: UserDrawingTextAlign,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'textLabel' || target.drawing.textAlign === textAlign) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    textAlign,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
 }
