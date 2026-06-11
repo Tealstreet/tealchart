@@ -24,6 +24,7 @@ import {
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
 import type {
+  MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -33,6 +34,7 @@ import type {
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   CircleDrawing,
+  DatePriceRangeDrawing,
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
@@ -80,6 +82,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -101,9 +104,24 @@ describe('tealchart public entries', () => {
       kind: 'regressionTrend',
       id: 'regression',
     };
+    const datePricePrimitive: NonNever<MobileUserDrawingDatePriceRangePrimitive> = {
+      kind: 'datePriceRange',
+      id: 'date-price',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      rect: { x: 0, y: 0, width: 10, height: 10 },
+      priceLabelPoint: { x: 5, y: 5 },
+      priceLabel: '+1.00 (+1.00%)',
+      dateLabelPoint: { x: 5, y: 8 },
+      dateLabel: '1 minute',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
+    expect(datePricePrimitive.kind).toBe('datePriceRange');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -193,6 +211,25 @@ describe('tealchart public entries', () => {
 
     expect(metrics.label).toBe('1 minute');
     expect(drawing.kind).toBe('dateRange');
+  });
+
+  it('exports shared drawing date and price range types', () => {
+    const drawing: DatePriceRangeDrawing = {
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 10 },
+        { time: 60_000, price: 20 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('datePriceRange');
   });
 
   it('exports shared drawing info line helpers', () => {

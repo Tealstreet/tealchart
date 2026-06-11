@@ -281,14 +281,23 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, endpoint editing, and whole-drawing moves reuse
   line-family behavior on both platforms.
 
-## Current Epic: Regression Trend Tool
+## Shipped: Regression Trend Tool
 
 - Shared drawing state supports the three-anchor `regressionTrend` tool and
   persists it through layout save/load.
 - Web Canvas and mobile Skia render matching filled/stroked regression channel
-  polygons from shared screen-space channel geometry.
+  polygons from shared bar-aware regression geometry.
 - Selection, polygon/rail hit testing, whole-drawing moves, and point-index
   editing use shared channel behavior on both platforms.
+
+## Current Epic: Date and Price Range Tool
+
+- Shared drawing state supports the two-anchor `datePriceRange` measurement
+  tool and persists it through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked range rectangles
+  with shared price-change and duration labels.
+- Selection, rectangle hit testing, whole-drawing moves, corner editing, and
+  fill controls reuse shared range behavior on both platforms.
 
 ## Known Gaps
 

@@ -128,7 +128,10 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
+import type {
+  MobileUserDrawingPriceRangePrimitive,
+  MobileUserDrawingTextLabelPrimitive,
+} from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
@@ -1934,6 +1937,88 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}
                   />
+                )}
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'datePriceRange') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const priceTextBounds = font ? font.measureText(primitive.priceLabel) : { width: 0 };
+            const dateTextBounds = font ? font.measureText(primitive.dateLabel) : { width: 0 };
+            const priceLabelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(
+              {
+                kind: 'priceRange',
+                id: primitive.id,
+                phase: primitive.phase,
+                selected: primitive.selected,
+                opacity: primitive.opacity,
+                clip: primitive.clip,
+                rect: primitive.rect,
+                labelPoint: primitive.priceLabelPoint,
+                label: primitive.priceLabel,
+                style: primitive.style,
+              } satisfies MobileUserDrawingPriceRangePrimitive,
+              priceTextBounds,
+            );
+            const dateLabelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(
+              {
+                kind: 'priceRange',
+                id: primitive.id,
+                phase: primitive.phase,
+                selected: primitive.selected,
+                opacity: primitive.opacity,
+                clip: primitive.clip,
+                rect: primitive.rect,
+                labelPoint: primitive.dateLabelPoint,
+                label: primitive.dateLabel,
+                style: primitive.style,
+              } satisfies MobileUserDrawingPriceRangePrimitive,
+              dateTextBounds,
+            );
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
+                {font && (
+                  <>
+                    <SkiaText
+                      x={priceLabelPosition.x}
+                      y={priceLabelPosition.y}
+                      text={primitive.priceLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={dateLabelPosition.x}
+                      y={dateLabelPosition.y}
+                      text={primitive.dateLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                  </>
                 )}
               </Group>
             );

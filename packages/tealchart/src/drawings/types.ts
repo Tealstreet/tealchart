@@ -20,6 +20,7 @@ export type UserDrawingTool =
   | 'ellipse'
   | 'priceRange'
   | 'dateRange'
+  | 'datePriceRange'
   | 'fibRetracement'
   | 'fibExtension'
   | 'triangle'
@@ -154,6 +155,11 @@ export interface DateRangeDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface DatePriceRangeDrawing extends UserDrawingBase {
+  kind: 'datePriceRange';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface FibRetracementDrawing extends UserDrawingBase {
   kind: 'fibRetracement';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -212,6 +218,7 @@ export type UserDrawing =
   | EllipseDrawing
   | PriceRangeDrawing
   | DateRangeDrawing
+  | DatePriceRangeDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
   | TriangleDrawing
@@ -324,6 +331,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'ellipse':
     case 'priceRange':
     case 'dateRange':
+    case 'datePriceRange':
     case 'fibRetracement':
     case 'fibExtension':
       return 2;
@@ -479,6 +487,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'dateRange',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'datePriceRange':
+      return {
+        ...base,
+        kind: 'datePriceRange',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'fibRetracement':
