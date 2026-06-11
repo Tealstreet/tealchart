@@ -383,6 +383,7 @@ export function renderUserDrawing(
     switch (geometry.kind) {
       case 'line':
       case 'ray':
+      case 'horizontalRay':
       case 'horizontalLine':
       case 'verticalLine':
         if (drawing.style.lineVisible !== false) {

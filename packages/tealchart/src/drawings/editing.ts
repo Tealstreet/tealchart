@@ -81,6 +81,8 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
       return { ...drawing, price: drawing.price + delta.price, updatedAt };
     case 'verticalLine':
       return { ...drawing, time: drawing.time + delta.time, updatedAt };
+    case 'horizontalRay':
+      return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':
@@ -188,6 +190,7 @@ function editDrawingHandle(
       return editDateRangeBoundary(drawing, handle, anchor, updatedAt);
     case 'horizontalLine':
     case 'verticalLine':
+    case 'horizontalRay':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':
