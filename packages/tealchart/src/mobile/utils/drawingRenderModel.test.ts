@@ -1,4 +1,4 @@
-import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingStyle } from '../../drawings';
+import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, UserDrawingStyle } from '../../drawings';
 
 import { describe, expect, it } from 'vitest';
 
@@ -187,26 +187,25 @@ describe('mobile user drawing render model', () => {
   });
 
   it('returns Skia-ready extended line segments to chart bounds', () => {
+    const extended: ExtendedLineDrawing = {
+      id: 'extended',
+      kind: 'extendedLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [
+        { time: 25, price: 50 },
+        { time: 75, price: 25 },
+      ],
+    };
     const state: UserDrawingState = {
       version: 1,
       activeTool: 'select',
       selection: null,
-      drawings: [
-        {
-          id: 'extended',
-          kind: 'extendedLine',
-          paneId: 'main',
-          visible: true,
-          locked: false,
-          createdAt: 1,
-          updatedAt: 1,
-          style,
-          points: [
-            { time: 25, price: 50 },
-            { time: 75, price: 25 },
-          ],
-        },
-      ],
+      drawings: [extended],
       draft: null,
       textEdit: null,
     };
@@ -223,7 +222,7 @@ describe('mobile user drawing render model', () => {
       ...state,
       drawings: [
         {
-          ...state.drawings[0]!,
+          ...extended,
           points: [
             { time: 50, price: 25 },
             { time: 50, price: 75 },
