@@ -714,6 +714,25 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits trend-based fib time levels and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'trend-fib-time',
+      kind: 'trendBasedFibTime',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+        { time: 30, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 40, y: 50 }, space)?.drawing.id).toBe('trend-fib-time');
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 80 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

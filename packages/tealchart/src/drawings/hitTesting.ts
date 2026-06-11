@@ -308,6 +308,13 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'trendBasedFibTime') {
+    const distance = Math.min(
+      ...geometry.trendBasedFibTime.levels.map((level) => distanceToSegment(point, level.segment)),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -468,6 +475,13 @@ function hitTestUserDrawingHandle(
       break;
     case 'fibChannel':
       if (geometry.drawing.kind === 'fibChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'trendBasedFibTime':
+      if (geometry.drawing.kind === 'trendBasedFibTime') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });
