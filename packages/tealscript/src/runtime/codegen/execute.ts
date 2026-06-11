@@ -13,13 +13,16 @@ import {
   cancelAllStrategyOrders,
 } from '../strategy';
 import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
+import type { CompiledSecurityScript } from './compile';
 import type { CompiledScript, CompiledBarContext } from './compile';
+import type { RequestDatafeed, RequestDataContext } from '../requestDatafeed';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
 
 export interface CompiledExecutionOptions {
   runtime?: TealscriptRuntimeOptions;
   maxBarsBack?: number;
+  requestDatafeed?: RequestDatafeed;
 }
 
 export function tryCompile(ast: Program, maxBarsBack?: number): CompiledScript {
@@ -110,6 +113,107 @@ function toOptionalString(val: unknown): string | undefined {
   return String(val);
 }
 
+function evaluateSecuritySeries(
+  secScript: CompiledSecurityScript,
+  requestBars: Bar[],
+  maxBarsBack: number,
+): unknown[] {
+  const deps = {
+    NumericSeries, maxBarsBack,
+    _arr: ARRAY_HELPERS, _map: MAP_HELPERS, _udt: UDT_HELPERS, _mtx: MATRIX_HELPERS,
+    ...ta,
+  };
+  const inst = new secScript.ScriptClass(deps);
+  const values: unknown[] = [];
+  let lastPlotValue: unknown = NaN;
+
+  for (let i = 0; i < requestBars.length; i++) {
+    const b = requestBars[i];
+    lastPlotValue = NaN;
+    const secBarCtx = {
+      bar: { open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume, time: b.time },
+      barIndex: i,
+      lastBarIndex: requestBars.length - 1,
+      isFirstTick: true,
+      barstate: { isfirst: i === 0, islast: i === requestBars.length - 1, ishistory: true, isrealtime: false, isnew: true, isconfirmed: true, islastconfirmedhistory: i === requestBars.length - 1 },
+      syminfo: {}, timeframe: {},
+      plot(_index: number, _funcName: string, value: unknown) {
+        lastPlotValue = value;
+      },
+      input(_id: string, _fn: string, defval: unknown) { return defval; },
+      strategyEntry() {}, strategyExit() {}, strategyClose() {}, strategyCloseAll() {},
+      strategyCancel() {}, strategyCancelAll() {}, strategyOrder() {},
+      strategyProp() { return 0; },
+      requestSecurity() { return NaN; },
+      alert() {}, alertCondition() {}, logInfo() {}, logWarning() {}, logError() {},
+      runtimeError(msg: unknown) { throw new Error(String(msg)); },
+      callBuiltin() { return NaN; },
+      colorNew() { return ''; }, colorRgb() { return ''; },
+      colorR() { return 0; }, colorG() { return 0; }, colorB() { return 0; }, colorT() { return 0; },
+      mathSum() { return NaN; },
+      strFormat(...args: unknown[]) { return String(args[0]); },
+      strFormatTime(...args: unknown[]) { return String(args[0]); },
+      tickerNew() { return ''; }, tickerModify() { return ''; }, tickerStandard() { return ''; },
+      tickerHeikinashi() { return ''; }, tickerRenko() { return ''; }, tickerKagi() { return ''; },
+      tickerLinebreak() { return ''; }, tickerPointfigure() { return ''; },
+    };
+    try { inst.onBar(secBarCtx as CompiledBarContext); } catch { /* continue */ }
+    values.push(lastPlotValue);
+  }
+  return values;
+}
+
+function findConfirmedRequestBarIndex(requestBars: Bar[], chartTime: number): number {
+  let index = -1;
+  for (let i = 0; i < requestBars.length - 1; i++) {
+    if (requestBars[i + 1]!.time <= chartTime) {
+      index = i;
+    } else {
+      break;
+    }
+  }
+  return index;
+}
+
+function findActiveRequestBarIndex(requestBars: Bar[], chartTime: number): number {
+  let index = -1;
+  for (let i = 0; i < requestBars.length; i++) {
+    if (requestBars[i]!.time <= chartTime) {
+      index = i;
+    } else {
+      break;
+    }
+  }
+  return index;
+}
+
+function mergeRequestedValue(
+  requestBars: Bar[],
+  requestedValues: unknown[],
+  chartTime: number,
+  previousChartTime: number | undefined,
+  gaps: string,
+  lookahead: string,
+): unknown {
+  if (requestBars.length === 0) return NaN;
+
+  const selectedIndex = lookahead === 'barmerge.lookahead_on'
+    ? findActiveRequestBarIndex(requestBars, chartTime)
+    : findConfirmedRequestBarIndex(requestBars, chartTime);
+  if (selectedIndex < 0) return NaN;
+
+  if (gaps === 'barmerge.gaps_on') {
+    const availableAt = lookahead === 'barmerge.lookahead_on'
+      ? requestBars[selectedIndex]?.time
+      : requestBars[selectedIndex + 1]?.time;
+    if (availableAt === undefined || (previousChartTime !== undefined && previousChartTime >= availableAt)) {
+      return NaN;
+    }
+  }
+
+  return requestedValues[selectedIndex] ?? NaN;
+}
+
 export function executeCompiled(
   compiled: CompiledScript,
   bars: Bar[],
@@ -162,6 +266,9 @@ export function executeCompiled(
   const plotArrays = new Map<number, (number | null)[]>();
   const plotColors = new Map<number, string>();
   const inputDefs = new Map<string, InputDefinition>();
+
+  const securityCache = new Map<string, { bars: Bar[]; values: unknown[] }>();
+  const requestDatafeed = options?.requestDatafeed;
 
   let barCount = 0;
 
@@ -360,6 +467,35 @@ export function executeCompiled(
         if (name === 'wintrades') return ledger.closedTrades.filter((t) => t.profit > 0).length;
         if (name === 'losstrades') return ledger.closedTrades.filter((t) => t.profit <= 0).length;
         return 0;
+      },
+
+      requestSecurity(secId: number, symbol: unknown, timeframe: unknown, gaps: unknown, lookahead: unknown): unknown {
+        const symStr = String(symbol ?? '');
+        const tfStr = String(timeframe ?? '');
+        const gapsStr = String(gaps ?? 'barmerge.gaps_off');
+        const laStr = String(lookahead ?? 'barmerge.lookahead_off');
+        const cacheKey = `${secId}:${symStr}:${tfStr}`;
+
+        let cached = securityCache.get(cacheKey);
+        if (!cached) {
+          const secScript = compiled.securityScripts.get(secId);
+          if (!secScript || !requestDatafeed) return NaN;
+
+          const result = requestDatafeed.getBars({ symbol: symStr, timeframe: tfStr });
+          if (!result.ok) return NaN;
+
+          const values = evaluateSecuritySeries(
+            secScript, result.context.bars, options?.maxBarsBack ?? 500,
+          );
+          cached = { bars: result.context.bars, values };
+          securityCache.set(cacheKey, cached);
+        }
+
+        const chartTime = bar.time;
+        const prevBar = barIndex > 0 ? bars[barIndex - 1] : undefined;
+        return mergeRequestedValue(
+          cached.bars, cached.values, chartTime, prevBar?.time, gapsStr, laStr,
+        );
       },
 
       alert() {},

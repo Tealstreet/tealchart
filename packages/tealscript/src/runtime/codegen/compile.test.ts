@@ -91,6 +91,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
       tickerKagi(...args: unknown[]) { return String(args[0] ?? ''); },
       tickerLinebreak(...args: unknown[]) { return String(args[0] ?? ''); },
       tickerPointfigure(...args: unknown[]) { return String(args[0] ?? ''); },
+      requestSecurity() { return NaN; },
     };
     inst.onBar(ctx);
   }
@@ -240,6 +241,35 @@ plot(close)`;
     const compiled = compile(ast);
     expect(compiled.success).toBe(false);
     expect(compiled.unsupported.length).toBeGreaterThan(0);
+  });
+
+  it('detects request.security calls in analyzer', () => {
+    const pine = `//@version=6
+indicator("test")
+htfClose = request.security(syminfo.tickerid, "D", ta.sma(close, 14))
+plot(htfClose)`;
+
+    const ast = parse(pine);
+    const compiled = compile(ast);
+    expect(compiled.success).toBe(true);
+    expect(compiled.analysis.securitySites.length).toBe(1);
+    const site = compiled.analysis.securitySites[0];
+    expect(site.id).toBe(0);
+    expect(site.expressionExpr.type).toBe('CallExpression');
+    expect(site.taCallSites.length).toBe(1);
+    expect(site.taCallSites[0].className).toBe('SMA');
+  });
+
+  it('rejects request.dividends as unsupported', () => {
+    const pine = `//@version=6
+indicator("test")
+d = request.dividends(syminfo.tickerid)
+plot(d)`;
+
+    const ast = parse(pine);
+    const compiled = compile(ast);
+    expect(compiled.success).toBe(false);
+    expect(compiled.unsupported.some((u) => u.includes('request.dividends'))).toBe(true);
   });
 
   it('compiles for loop', () => {
