@@ -51,6 +51,15 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'rectangle':
     case 'priceRange':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
+    case 'dateRange':
+      return {
+        ...drawing,
+        points: [
+          { ...drawing.points[0], time: drawing.points[0].time + delta.time },
+          { ...drawing.points[1], time: drawing.points[1].time + delta.time },
+        ],
+        updatedAt,
+      };
     case 'horizontalLine':
       return { ...drawing, price: drawing.price + delta.price, updatedAt };
     case 'verticalLine':
@@ -97,6 +106,17 @@ function editRectangleCorner(
   }
 }
 
+function editDateRangeBoundary(
+  drawing: Extract<UserDrawing, { kind: 'dateRange' }>,
+  handle: UserDrawingHandleRole,
+  anchor: UserDrawingAnchor,
+  updatedAt: number,
+): UserDrawing {
+  if (handle === 'start') return { ...drawing, points: [{ ...drawing.points[0], time: anchor.time }, drawing.points[1]], updatedAt };
+  if (handle === 'end') return { ...drawing, points: [drawing.points[0], { ...drawing.points[1], time: anchor.time }], updatedAt };
+  return drawing;
+}
+
 function editDrawingHandle(
   drawing: UserDrawing,
   handle: UserDrawingHandleRole | undefined,
@@ -114,6 +134,8 @@ function editDrawingHandle(
     case 'rectangle':
     case 'priceRange':
       return editRectangleCorner(drawing, handle, anchor, updatedAt);
+    case 'dateRange':
+      return editDateRangeBoundary(drawing, handle, anchor, updatedAt);
     case 'horizontalLine':
     case 'verticalLine':
     case 'textLabel':

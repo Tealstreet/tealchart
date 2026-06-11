@@ -286,6 +286,25 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:+20.00 (+28.57%):50,20:#111:center:1:12px sans-serif');
   });
 
+  it('renders date ranges with a centered duration label', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 10_000, price: 90 },
+        { time: 70_000, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+
+    expect(ctx.calls).toContain('fillRect:10,0,60,100:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,0,60,100:#f5c542:1');
+    expect(ctx.calls).toContain('fillText:1 minute:40,50:#111:center:1:12px sans-serif');
+  });
+
   it('renders text labels with measured boxes', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

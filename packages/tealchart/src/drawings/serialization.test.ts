@@ -342,6 +342,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores date range drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'date-range',
+          kind: 'dateRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('rejects malformed price range point counts', () => {
     const createPayload = (points: unknown[]) => ({
       version: 1,

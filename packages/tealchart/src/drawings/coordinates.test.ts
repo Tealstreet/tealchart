@@ -1,6 +1,7 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type {
   ArrowLineDrawing,
+  DateRangeDrawing,
   ExtendedLineDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
@@ -16,6 +17,7 @@ import {
   drawingXToTime,
   drawingYToPrice,
   priceToDrawingY,
+  resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
   resolveRaySegment,
   resolveRectFromAnchors,
@@ -185,6 +187,15 @@ describe('user drawing coordinates', () => {
     expect(rect).toEqual({ x: 10, y: 20, width: 200, height: 100 });
   });
 
+  it('resolves date ranges across the full pane height', () => {
+    expect(resolveDateRangeRectFromAnchors({ time: 3_000, price: 90 }, { time: 1_000, price: 110 }, space)).toEqual({
+      x: 10,
+      y: 20,
+      width: 200,
+      height: 100,
+    });
+  });
+
   it('resolves drawing geometry by kind', () => {
     const trendLine: TrendLineDrawing = {
       id: 'line',
@@ -233,6 +244,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const dateRange: DateRangeDrawing = {
+      ...trendLine,
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 1_000, price: 95 },
+        { time: 3_000, price: 105 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -267,6 +287,10 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(priceRange, space)).toMatchObject({
       kind: 'priceRange',
+      rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(dateRange, space)).toMatchObject({
+      kind: 'dateRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
     });
   });

@@ -87,7 +87,7 @@ function hitTestResolvedGeometry(
   const handleHit = hitTestUserDrawingHandle(geometry, point, space, options.handleTolerance);
   if (handleHit) return handleHit;
 
-  if (geometry.kind === 'rectangle' || geometry.kind === 'priceRange') {
+  if (geometry.kind === 'rectangle' || geometry.kind === 'priceRange' || geometry.kind === 'dateRange') {
     const distance = distanceToRectEdge(point, geometry.rect);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
@@ -155,6 +155,15 @@ function hitTestUserDrawingHandle(
           point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y + geometry.rect.height },
         },
         { handle: 'bottomLeft', point: { x: geometry.rect.x, y: geometry.rect.y + geometry.rect.height } },
+      );
+      break;
+    case 'dateRange':
+      handles.push(
+        { handle: 'start', point: { x: geometry.rect.x, y: geometry.rect.y + geometry.rect.height / 2 } },
+        {
+          handle: 'end',
+          point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y + geometry.rect.height / 2 },
+        },
       );
       break;
     case 'textLabel':

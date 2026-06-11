@@ -59,6 +59,11 @@ export type ResolvedUserDrawingGeometry =
       rect: DrawingScreenRect;
     }
   | {
+      kind: 'dateRange';
+      drawing: UserDrawing;
+      rect: DrawingScreenRect;
+    }
+  | {
       kind: 'textLabel';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
@@ -201,6 +206,21 @@ export function resolveRectFromAnchors(
   };
 }
 
+export function resolveDateRangeRectFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenRect {
+  const a = anchorToScreenPoint(first, space);
+  const b = anchorToScreenPoint(second, space);
+  return {
+    x: Math.min(a.x, b.x),
+    y: space.pane.top,
+    width: Math.abs(b.x - a.x),
+    height: space.pane.height,
+  };
+}
+
 export function resolveUserDrawingGeometry(
   drawing: UserDrawing,
   space: DrawingCoordinateSpace,
@@ -273,6 +293,12 @@ export function resolveUserDrawingGeometry(
         kind: 'priceRange',
         drawing,
         rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'dateRange':
+      return {
+        kind: 'dateRange',
+        drawing,
+        rect: resolveDateRangeRectFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'textLabel':
       return {

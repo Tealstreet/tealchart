@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
@@ -18,6 +19,7 @@ import {
 } from './index';
 import type {
   ArrowLineDrawing,
+  DateRangeDrawing,
   ExtendedLineDrawing,
   PriceRangeDrawing,
   UserDrawingFontFamily,
@@ -26,6 +28,7 @@ import type {
   UserDrawingHitTestTextMeasure,
   UserDrawingTextLabelLayout,
   UserDrawingOpacityDescriptor,
+  UserDrawingDateRangeMetrics,
   UserDrawingPriceRangeMetrics,
   UserDrawingStyleToggleDescriptor,
 } from './index';
@@ -99,6 +102,30 @@ describe('tealchart public entries', () => {
       resolveUserDrawingVisualPriceRangeMetrics({ time: 1, price: 125 }, { time: 2, price: 100 }).label,
     ).toBe('+25.00 (+25.00%)');
     expect(drawing.kind).toBe('priceRange');
+  });
+
+  it('exports shared drawing date range helpers', () => {
+    const metrics: UserDrawingDateRangeMetrics = resolveUserDrawingDateRangeMetrics(
+      { time: 0, price: 10 },
+      { time: 60_000, price: 20 },
+    );
+    const drawing: DateRangeDrawing = {
+      id: 'range',
+      kind: 'dateRange',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 10 },
+        { time: 60_000, price: 20 },
+      ],
+    };
+
+    expect(metrics.label).toBe('1 minute');
+    expect(drawing.kind).toBe('dateRange');
   });
 
   it('exports shared drawing arrow line types', () => {
