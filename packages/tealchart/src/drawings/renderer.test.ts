@@ -844,6 +844,27 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib time zones as vertical Fibonacci time levels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-time-zone',
+      kind: 'fibTimeZone',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,0');
+    expect(ctx.calls).toContain('lineTo:10,100');
+    expect(ctx.calls).toContain('moveTo:20,0');
+    expect(ctx.calls).toContain('lineTo:20,100');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

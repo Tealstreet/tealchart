@@ -73,6 +73,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibExtension',
       'fibFan',
       'fibChannel',
+      'fibTimeZone',
       'gannFan',
       'triangle',
       'polyline',
@@ -167,6 +168,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibChannel')).toEqual(
       expect.objectContaining({ tool: 'fibChannel', label: 'Fib channel' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibTimeZone')).toEqual(
+      expect.objectContaining({ tool: 'fibTimeZone', label: 'Fib time zone' }),
     );
     expect(getUserDrawingToolDescriptor('gannFan')).toEqual(
       expect.objectContaining({ tool: 'gannFan', label: 'Gann fan' }),
