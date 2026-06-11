@@ -209,6 +209,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (ns === 'extend') return `"${prop}"`;
       if (ns === 'line') return `"${prop}"`;
       if (ns === 'label') return `"${prop}"`;
+      if (ns === 'box') return `"${prop}"`;
+      if (ns === 'polyline') return `"${prop}"`;
+      if (ns === 'linefill') return `"${prop}"`;
+      if (ns === 'table') return `"${prop}"`;
       if (ns === 'adjust') return `"${prop}"`;
       if (ns === 'alert') return `"${prop}"`;
       if (ns === 'order') return `"${prop}"`;
