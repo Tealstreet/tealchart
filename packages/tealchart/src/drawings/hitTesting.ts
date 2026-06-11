@@ -78,6 +78,10 @@ export function distanceToRectEdge(point: DrawingScreenPoint, rect: DrawingScree
   return Math.hypot(point.x - clampedX, point.y - clampedY);
 }
 
+function pointInRect(point: DrawingScreenPoint, rect: DrawingScreenRect): boolean {
+  return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+}
+
 function distanceToCircleEdge(point: DrawingScreenPoint, center: DrawingScreenPoint, radius: number): number {
   return Math.abs(distanceBetweenPoints(point, center) - radius);
 }
@@ -173,6 +177,17 @@ function hitTestResolvedGeometry(
     geometry.kind === 'datePriceRange'
   ) {
     const distance = distanceToRectEdge(point, geometry.rect);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
+  if (geometry.kind === 'longPosition' || geometry.kind === 'shortPosition') {
+    if (pointInRect(point, geometry.position.profitRect) || pointInRect(point, geometry.position.riskRect)) {
+      return { drawing: geometry.drawing, distance: 0 };
+    }
+    const distance = Math.min(
+      distanceToRectEdge(point, geometry.position.profitRect),
+      distanceToRectEdge(point, geometry.position.riskRect),
+    );
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
@@ -366,6 +381,14 @@ function hitTestUserDrawingHandle(
       break;
     case 'parallelChannel':
       if (geometry.drawing.kind === 'parallelChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'longPosition':
+    case 'shortPosition':
+      if (geometry.drawing.kind === 'longPosition' || geometry.drawing.kind === 'shortPosition') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

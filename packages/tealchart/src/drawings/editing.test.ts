@@ -976,6 +976,42 @@ describe('user drawing editing', () => {
     expect(moved.points[3]).toEqual({ time: 70, price: 30 });
   });
 
+  it('moves long position anchors together', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'long',
+      kind: 'longPosition',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 90, price: 40 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'long' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'long' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 45 },
+      { now: () => 15 },
+    );
+
+    const moved = next.drawings[0];
+    if (moved?.kind !== 'longPosition') throw new Error('expected long position');
+    expect(moved.updatedAt).toBe(15);
+    expect(moved.points[0]).toEqual({ time: 20, price: 55 });
+    expect(moved.points[1]).toEqual({ time: 100, price: 85 });
+    expect(moved.points[2]).toEqual({ time: 100, price: 45 });
+  });
+
   it('edits Fibonacci retracement endpoints', () => {
     const drawing: UserDrawing = {
       ...base,

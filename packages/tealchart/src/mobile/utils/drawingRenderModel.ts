@@ -215,6 +215,27 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'riskRewardPosition';
+      id: string;
+      tool: 'longPosition' | 'shortPosition';
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      profitRect: { x: number; y: number; width: number; height: number };
+      riskRect: { x: number; y: number; width: number; height: number };
+      entryLine: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      targetLine: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      stopLine: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      rewardLabelPoint: DrawingScreenPoint;
+      riskLabelPoint: DrawingScreenPoint;
+      ratioLabelPoint: DrawingScreenPoint;
+      rewardLabel: string;
+      riskLabel: string;
+      ratioLabel: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'fibRetracement' | 'fibExtension';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -259,6 +280,10 @@ export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
+export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'riskRewardPosition' }
+>;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
@@ -288,6 +313,13 @@ export interface MobileUserDrawingTextLabelLayout {
 }
 
 export interface MobileUserDrawingPriceRangeLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
+export interface MobileUserDrawingRiskRewardLabelPosition {
   fontSize: number;
   fontFamily: string;
   x: number;
@@ -613,6 +645,33 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'longPosition':
+    case 'shortPosition': {
+      const { position } = geometry;
+      const labelX = position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
+      const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+      return {
+        kind: 'riskRewardPosition',
+        id: geometry.drawing.id,
+        tool: geometry.kind,
+        phase,
+        selected,
+        opacity,
+        clip,
+        profitRect: position.profitRect,
+        riskRect: position.riskRect,
+        entryLine: position.entryLine,
+        targetLine: position.targetLine,
+        stopLine: position.stopLine,
+        rewardLabelPoint: { x: labelX, y: position.profitRect.y + position.profitRect.height / 2 },
+        riskLabelPoint: { x: labelX, y: position.riskRect.y + position.riskRect.height / 2 },
+        ratioLabelPoint: { x: labelX, y: position.entry.y - fontSize },
+        rewardLabel: position.rewardLabel,
+        riskLabel: position.riskLabel,
+        ratioLabel: position.ratioLabel,
+        style: geometry.drawing.style,
+      };
+    }
     case 'fibRetracement':
     case 'fibExtension':
       return {
@@ -757,6 +816,13 @@ export function resolveMobileUserDrawingPriceRangeLabelPosition(
   primitive: MobileUserDrawingMeasurementLabelPrimitive,
   measuredTextBounds: MobileUserDrawingTextBounds,
 ): MobileUserDrawingPriceRangeLabelPosition {
+  return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
+}
+
+export function resolveMobileUserDrawingRiskRewardLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelTarget,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingRiskRewardLabelPosition {
   return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
 }
 

@@ -21,6 +21,8 @@ export type UserDrawingTool =
   | 'priceRange'
   | 'dateRange'
   | 'datePriceRange'
+  | 'longPosition'
+  | 'shortPosition'
   | 'fibRetracement'
   | 'fibExtension'
   | 'triangle'
@@ -160,6 +162,16 @@ export interface DatePriceRangeDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface LongPositionDrawing extends UserDrawingBase {
+  kind: 'longPosition';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
+export interface ShortPositionDrawing extends UserDrawingBase {
+  kind: 'shortPosition';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface FibRetracementDrawing extends UserDrawingBase {
   kind: 'fibRetracement';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -219,6 +231,8 @@ export type UserDrawing =
   | PriceRangeDrawing
   | DateRangeDrawing
   | DatePriceRangeDrawing
+  | LongPositionDrawing
+  | ShortPositionDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
   | TriangleDrawing
@@ -338,6 +352,8 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'triangle':
     case 'parallelChannel':
     case 'regressionTrend':
+    case 'longPosition':
+    case 'shortPosition':
     case 'path':
       return 3;
     case 'horizontalLine':
@@ -494,6 +510,13 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'datePriceRange',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'longPosition':
+    case 'shortPosition':
+      return {
+        ...base,
+        kind: draft.tool,
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'fibRetracement':
       return {

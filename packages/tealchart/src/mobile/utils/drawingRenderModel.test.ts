@@ -7,6 +7,7 @@ import {
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingRiskRewardLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './drawingRenderModel';
@@ -1038,6 +1039,101 @@ describe('mobile user drawing render model', () => {
       dateLabelPoint: { x: 40, y: 78 },
       dateLabel: '1 minute',
       style,
+    });
+  });
+
+  it('returns Skia-ready risk reward position primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'long',
+          kind: 'longPosition',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 80 },
+            { time: 90, price: 40 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'riskRewardPosition',
+      id: 'long',
+      tool: 'longPosition',
+      clip,
+      profitRect: { x: 10, y: 20, width: 80, height: 30 },
+      riskRect: { x: 10, y: 50, width: 80, height: 10 },
+      rewardLabelPoint: { x: 50, y: 35 },
+      riskLabelPoint: { x: 50, y: 55 },
+      ratioLabelPoint: { x: 50, y: 38 },
+      rewardLabel: 'Reward +30.00 (+60.00%)',
+      riskLabel: 'Risk -10.00 (-20.00%)',
+      ratioLabel: 'R:R 3.00',
+      style,
+    });
+  });
+
+  it('positions risk reward labels with a Skia baseline offset', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'long',
+          kind: 'longPosition',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, fontSize: 14, fontFamily: 'monospace' },
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 80 },
+            { time: 90, price: 40 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'riskRewardPosition') throw new Error('expected risk reward primitive');
+
+    expect(
+      resolveMobileUserDrawingRiskRewardLabelPosition(
+        { labelPoint: primitive.rewardLabelPoint, style: primitive.style },
+        { x: 0, y: -10, width: 84, height: 14 },
+      ),
+    ).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: 8,
+      y: 38,
+    });
+    expect(
+      resolveMobileUserDrawingRiskRewardLabelPosition(
+        { labelPoint: primitive.riskLabelPoint, style: primitive.style },
+        { x: 0, y: -10, width: 84, height: 14 },
+      ),
+    ).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: 8,
+      y: 58,
     });
   });
 
