@@ -3,13 +3,14 @@ import type { UserDrawing, UserDrawingAnchor, UserDrawingHandleRole, UserDrawing
 
 import { resolveUserDrawingGeometry, screenPointToAnchor } from './coordinates';
 import { hitTestUserDrawings } from './hitTesting';
-import { selectUserDrawing } from './input';
+import { getUserDrawingSelectionIds, selectUserDrawing } from './input';
 import type { UserDrawingHitTestOptions } from './hitTesting';
 
 export interface UserDrawingEditDrag {
   selection: UserDrawingSelection;
   startPoint: DrawingScreenPoint;
   startDrawing: UserDrawing;
+  startDrawings?: readonly UserDrawing[];
   space: DrawingCoordinateSpace;
 }
 
@@ -441,6 +442,10 @@ function editDrawingHandle(
   }
 }
 
+function isWholeDrawingDrag(selection: UserDrawingSelection): boolean {
+  return selection.pointIndex === undefined && (!selection.handle || selection.handle === 'center');
+}
+
 export function applyUserDrawingEditDrag(
   state: UserDrawingState,
   drag: UserDrawingEditDrag,
@@ -458,6 +463,27 @@ export function applyUserDrawingEditDrag(
     time: currentAnchor.time - startAnchor.time,
     price: currentAnchor.price - startAnchor.price,
   };
+  if (isWholeDrawingDrag(drag.selection) && drag.startDrawings && drag.startDrawings.length > 1) {
+    const startDrawingsById = new Map(drag.startDrawings.map((drawing) => [drawing.id, drawing]));
+    let changed = false;
+    const drawings = state.drawings.map((drawing) => {
+      const startDrawing = startDrawingsById.get(drawing.id);
+      if (!startDrawing) return drawing;
+      changed = true;
+      return moveDrawing(startDrawing, delta, drag.space, updatedAt);
+    });
+
+    if (!changed) return state;
+
+    return {
+      ...state,
+      drawings,
+      selection: drag.selection,
+      draft: null,
+      textEdit: null,
+    };
+  }
+
   const nextDrawing =
     drag.selection.pointIndex !== undefined || (drag.selection.handle && drag.selection.handle !== 'center')
       ? editDrawingHandle(drag.startDrawing, drag.selection.handle, drag.selection.pointIndex, currentAnchor, updatedAt)
@@ -497,9 +523,16 @@ export function beginUserDrawingEditDragAtPoint(
   const selection: UserDrawingSelection =
     hit.handle || hit.pointIndex !== undefined
     ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex }
-    : { drawingId: hit.drawing.id };
+    : getUserDrawingSelectionIds(state.selection).includes(hit.drawing.id)
+      ? state.selection ?? { drawingId: hit.drawing.id }
+      : { drawingId: hit.drawing.id };
   const nextState = selectUserDrawing(state, selection);
   const space = spacesByPaneId.get(hit.drawing.paneId);
+  const selectedIds = new Set(getUserDrawingSelectionIds(selection));
+  const startDrawings =
+    isWholeDrawingDrag(selection) && selectedIds.size > 1
+      ? state.drawings.filter((drawing) => selectedIds.has(drawing.id) && !drawing.locked)
+      : [hit.drawing];
 
   return {
     state: nextState,
@@ -508,6 +541,7 @@ export function beginUserDrawingEditDragAtPoint(
           selection,
           startPoint: point,
           startDrawing: hit.drawing,
+          startDrawings,
           space,
         }
       : null,

@@ -57,6 +57,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web widget APIs and mobile Skia handles expose matching grouped selection,
   delete-selected, and duplicate-selected behavior.
 
+## Shipped: Group Drag Editing
+
+- Shared edit-drag state snapshots grouped selections at drag start and moves
+  all selected, unlocked drawings together for whole-drawing drags.
+- Handle and point-index edits remain single-drawing operations so endpoint and
+  corner editing behavior stays stable on web Canvas and mobile Skia.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text
