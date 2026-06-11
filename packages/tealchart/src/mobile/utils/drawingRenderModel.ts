@@ -274,6 +274,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibSpiral';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      reference: DrawingScreenPoint;
+      baseRadius: number;
+      startAngle: number;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'gannFan';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -538,6 +552,7 @@ export type MobileUserDrawingFibSpeedResistanceArcsPrimitive = Extract<
   { kind: 'fibSpeedResistanceArcs' }
 >;
 export type MobileUserDrawingFibWedgePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibWedge' }>;
+export type MobileUserDrawingFibSpiralPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibSpiral' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
@@ -949,6 +964,21 @@ function primitiveFromGeometry(
           start: boundary.start,
           end: boundary.end,
         })),
+        style: geometry.drawing.style,
+      };
+    case 'fibSpiral':
+      return {
+        kind: 'fibSpiral',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.fibSpiral.center,
+        reference: geometry.fibSpiral.reference,
+        baseRadius: geometry.fibSpiral.baseRadius,
+        startAngle: geometry.fibSpiral.startAngle,
+        points: geometry.fibSpiral.points,
         style: geometry.drawing.style,
       };
     case 'gannFan':

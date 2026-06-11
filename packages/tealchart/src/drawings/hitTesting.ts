@@ -270,6 +270,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibSpiral') {
+    const distance = distanceToPolyline(point, geometry.fibSpiral.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'ellipse') {
     const distance = distanceToEllipseEdge(
       point,
@@ -504,6 +509,7 @@ function hitTestUserDrawingHandle(
     case 'fibSpeedResistanceFan':
     case 'fibSpeedResistanceArcs':
     case 'fibCircles':
+    case 'fibSpiral':
     case 'fibTimeZone':
     case 'gannFan':
       if (
@@ -513,6 +519,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibSpeedResistanceFan' ||
         geometry.drawing.kind === 'fibSpeedResistanceArcs' ||
         geometry.drawing.kind === 'fibCircles' ||
+        geometry.drawing.kind === 'fibSpiral' ||
         geometry.drawing.kind === 'fibTimeZone' ||
         geometry.drawing.kind === 'gannFan'
       ) {

@@ -936,6 +936,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fib spiral primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-spiral',
+          kind: 'fibSpiral',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibSpiral',
+      id: 'fib-spiral',
+      center: { x: 10, y: 50 },
+      reference: { x: 50, y: 50 },
+      baseRadius: 40,
+      startAngle: 0,
+      points: expect.arrayContaining([
+        { x: 50, y: 50 },
+        { x: expect.closeTo(10), y: expect.closeTo(114.72) },
+      ]),
+    });
+  });
+
   it('returns Skia-ready gann fan primitives', () => {
     const state: UserDrawingState = {
       version: 1,

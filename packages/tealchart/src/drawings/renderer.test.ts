@@ -887,6 +887,25 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib spirals as Fibonacci growth paths', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-spiral',
+      kind: 'fibSpiral',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:50,50');
+    expect(ctx.calls.some((call) => call.startsWith('lineTo:') && call.includes('114.721'))).toBe(true);
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders gann fans as ratio fan rays', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

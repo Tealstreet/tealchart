@@ -20,6 +20,7 @@ import type {
   FibRetracementDrawing,
   FibTimeZoneDrawing,
   FibWedgeDrawing,
+  FibSpiralDrawing,
   TrendBasedFibTimeDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
@@ -613,6 +614,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const fibSpiral: FibSpiralDrawing = {
+      ...trendLine,
+      id: 'fib-spiral',
+      kind: 'fibSpiral',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 100 },
+      ],
+    };
     const fibChannel: FibChannelDrawing = {
       ...trendLine,
       id: 'fib-channel',
@@ -987,6 +997,19 @@ describe('user drawing coordinates', () => {
           expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39), startAngle: 0, endAngle: expect.closeTo(0.46) }),
           expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: expect.closeTo(0.46) }),
           expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7), startAngle: 0, endAngle: expect.closeTo(0.46) }),
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibSpiral, space)).toMatchObject({
+      kind: 'fibSpiral',
+      fibSpiral: {
+        center: { x: 10, y: 70 },
+        reference: { x: 110, y: 70 },
+        baseRadius: 100,
+        startAngle: 0,
+        points: expect.arrayContaining([
+          { x: 110, y: 70 },
+          { x: expect.closeTo(10), y: expect.closeTo(231.8) },
         ]),
       },
     });
