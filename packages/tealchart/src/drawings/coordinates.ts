@@ -339,6 +339,19 @@ export interface DrawingScreenXabcdPattern {
   labels: readonly DrawingScreenXabcdPatternLabel[];
 }
 
+export const THREE_DRIVES_PATTERN_LABELS = ['1', 'A', '2', 'C', '3'] as const;
+export type ThreeDrivesPatternLabel = (typeof THREE_DRIVES_PATTERN_LABELS)[number];
+
+export interface DrawingScreenThreeDrivesPatternLabel {
+  text: ThreeDrivesPatternLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenThreeDrivesPattern {
+  polyline: DrawingScreenPolyline;
+  labels: readonly DrawingScreenThreeDrivesPatternLabel[];
+}
+
 export interface DrawingScreenAnchoredVwap {
   anchor: DrawingScreenPoint;
   points: readonly DrawingScreenPoint[];
@@ -458,6 +471,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'xabcdPattern';
       drawing: UserDrawing;
       pattern: DrawingScreenXabcdPattern;
+    }
+  | {
+      kind: 'threeDrivesPattern';
+      drawing: UserDrawing;
+      pattern: DrawingScreenThreeDrivesPattern;
     }
   | {
       kind: 'abcdPattern';
@@ -1098,6 +1116,26 @@ export function resolveXabcdPatternFromAnchors(
     polyline,
     labels: polyline.points.map((point, index) => ({
       text: XABCD_PATTERN_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveThreeDrivesPatternFromAnchors(
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ],
+  space: DrawingCoordinateSpace,
+): DrawingScreenThreeDrivesPattern {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  return {
+    polyline,
+    labels: polyline.points.map((point, index) => ({
+      text: THREE_DRIVES_PATTERN_LABELS[index]!,
       point,
     })),
   };
@@ -2265,6 +2303,12 @@ export function resolveUserDrawingGeometry(
         kind: 'xabcdPattern',
         drawing,
         pattern: resolveXabcdPatternFromAnchors(drawing.points, space),
+      };
+    case 'threeDrivesPattern':
+      return {
+        kind: 'threeDrivesPattern',
+        drawing,
+        pattern: resolveThreeDrivesPatternFromAnchors(drawing.points, space),
       };
     case 'abcdPattern':
       return {

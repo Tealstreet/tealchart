@@ -2160,6 +2160,73 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves and edits three drives pattern anchors with stable five-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'three-drives',
+      kind: 'threeDrivesPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 80 },
+        { time: 30, price: 70 },
+        { time: 40, price: 60 },
+        { time: 50, price: 50 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'three-drives' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'three-drives' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 15 },
+      { now: () => 24 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'threeDrivesPattern',
+      points: [
+        { time: 15, price: 85 },
+        { time: 25, price: 75 },
+        { time: 35, price: 65 },
+        { time: 45, price: 55 },
+        { time: 55, price: 45 },
+      ],
+      updatedAt: 24,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'three-drives', handle: 'center', pointIndex: 4 },
+        startPoint: { x: 50, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 55, y: 55 },
+      { now: () => 25 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'threeDrivesPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 80 },
+        { time: 30, price: 70 },
+        { time: 40, price: 60 },
+        { time: expect.closeTo(55), price: expect.closeTo(45) },
+      ],
+      updatedAt: 25,
+    });
+  });
+
   it('moves and edits ABCD pattern anchors with stable four-point shape', () => {
     const drawing: UserDrawing = {
       ...base,
