@@ -113,6 +113,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'horizontalLine', icon: 'H', label: 'Horizontal line' },
   { tool: 'verticalLine', icon: 'V', label: 'Vertical line' },
   { tool: 'rectangle', icon: '□', label: 'Rectangle' },
+  { tool: 'circle', icon: '○', label: 'Circle' },
   { tool: 'priceRange', icon: 'Δ', label: 'Price range' },
   { tool: 'dateRange', icon: '↔', label: 'Date range' },
   { tool: 'path', icon: '⌁', label: 'Path' },
@@ -224,6 +225,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'arrowMarkUp' ||
     drawing.kind === 'arrowMarkDown' ||
     drawing.kind === 'rectangle' ||
+    drawing.kind === 'circle' ||
     drawing.kind === 'priceRange' ||
     drawing.kind === 'dateRange' ||
     drawing.kind === 'textLabel'

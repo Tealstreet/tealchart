@@ -77,6 +77,10 @@ export function distanceToRectEdge(point: DrawingScreenPoint, rect: DrawingScree
   return Math.hypot(point.x - clampedX, point.y - clampedY);
 }
 
+function distanceToCircleEdge(point: DrawingScreenPoint, center: DrawingScreenPoint, radius: number): number {
+  return Math.abs(distanceBetweenPoints(point, center) - radius);
+}
+
 function distanceToPolyline(point: DrawingScreenPoint, points: readonly DrawingScreenPoint[]): number {
   if (points.length === 0) return Number.POSITIVE_INFINITY;
   if (points.length === 1) return distanceBetweenPoints(point, points[0]!);
@@ -136,6 +140,11 @@ function hitTestResolvedGeometry(
 
   if (geometry.kind === 'rectangle' || geometry.kind === 'priceRange' || geometry.kind === 'dateRange') {
     const distance = distanceToRectEdge(point, geometry.rect);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
+  if (geometry.kind === 'circle') {
+    const distance = distanceToCircleEdge(point, geometry.circle.center, geometry.circle.radius);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
@@ -212,16 +221,20 @@ function hitTestUserDrawingHandle(
       break;
     }
     case 'rectangle':
+    case 'circle':
     case 'priceRange':
-      handles.push(
-        { handle: 'topLeft', point: { x: geometry.rect.x, y: geometry.rect.y } },
-        { handle: 'topRight', point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y } },
-        {
-          handle: 'bottomRight',
-          point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y + geometry.rect.height },
-        },
-        { handle: 'bottomLeft', point: { x: geometry.rect.x, y: geometry.rect.y + geometry.rect.height } },
-      );
+      {
+        const rect = geometry.kind === 'circle' ? geometry.circle.rect : geometry.rect;
+        handles.push(
+          { handle: 'topLeft', point: { x: rect.x, y: rect.y } },
+          { handle: 'topRight', point: { x: rect.x + rect.width, y: rect.y } },
+          {
+            handle: 'bottomRight',
+            point: { x: rect.x + rect.width, y: rect.y + rect.height },
+          },
+          { handle: 'bottomLeft', point: { x: rect.x, y: rect.y + rect.height } },
+        );
+      }
       break;
     case 'dateRange':
       handles.push(

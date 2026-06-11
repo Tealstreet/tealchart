@@ -3,6 +3,7 @@ export {
   drawingXToTime,
   drawingYToPrice,
   priceToDrawingY,
+  resolveCircleFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
   resolvePolylineFromAnchors,
@@ -17,6 +18,7 @@ export {
 export type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  DrawingScreenCircle,
   DrawingScreenPolyline,
   DrawingScreenRect,
   DrawingScreenSegment,
@@ -172,6 +174,7 @@ export type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  CircleDrawing,
   CreateUserDrawingFromDraftOptions,
   DateRangeDrawing,
   ExtendedLineDrawing,

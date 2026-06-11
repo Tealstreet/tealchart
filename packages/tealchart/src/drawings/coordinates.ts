@@ -27,6 +27,12 @@ export interface DrawingScreenRect {
   height: number;
 }
 
+export interface DrawingScreenCircle {
+  center: DrawingScreenPoint;
+  radius: number;
+  rect: DrawingScreenRect;
+}
+
 export interface DrawingCoordinateSpace {
   viewport: Viewport;
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
@@ -75,6 +81,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'rectangle';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
+    }
+  | {
+      kind: 'circle';
+      drawing: UserDrawing;
+      circle: DrawingScreenCircle;
     }
   | {
       kind: 'priceRange';
@@ -234,6 +245,24 @@ export function resolveRectFromAnchors(
   };
 }
 
+export function resolveCircleFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenCircle {
+  const rect = resolveRectFromAnchors(first, second, space);
+  const diameter = Math.min(rect.width, rect.height);
+  const radius = diameter / 2;
+  return {
+    rect,
+    center: {
+      x: rect.x + rect.width / 2,
+      y: rect.y + rect.height / 2,
+    },
+    radius,
+  };
+}
+
 export function resolveDateRangeRectFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -363,6 +392,12 @@ export function resolveUserDrawingGeometry(
         kind: 'rectangle',
         drawing,
         rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'circle':
+      return {
+        kind: 'circle',
+        drawing,
+        circle: resolveCircleFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'priceRange':
       return {

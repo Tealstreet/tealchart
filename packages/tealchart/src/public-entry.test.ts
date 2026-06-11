@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
+  resolveCircleFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
@@ -23,6 +24,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  CircleDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
@@ -49,6 +51,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -222,6 +225,49 @@ describe('tealchart public entries', () => {
 
     expect(up.kind).toBe('arrowMarkUp');
     expect(down.kind).toBe('arrowMarkDown');
+  });
+
+  it('exports shared drawing circle types', () => {
+    const drawing: CircleDrawing = {
+      id: 'circle',
+      kind: 'circle',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('circle');
+    expect(
+      resolveCircleFromAnchors(
+        { time: 1_000, price: 100 },
+        { time: 1_200, price: 104 },
+        {
+          viewport: {
+            startTime: 1_000,
+            endTime: 3_000,
+            priceMin: 90,
+            priceMax: 110,
+          },
+          pane: {
+            id: 'main',
+            top: 20,
+            height: 100,
+            bottom: 120,
+            yMin: 90,
+            yMax: 110,
+          },
+          chartLeft: 10,
+          chartRight: 210,
+        },
+      ).radius,
+    ).toBe(10);
   });
 
   it('exports shared drawing extended line types', () => {

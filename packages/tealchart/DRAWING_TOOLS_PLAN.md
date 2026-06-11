@@ -191,7 +191,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, polygon hit testing, whole-drawing moves, and endpoint editing
   work through shared drawing behavior on both platforms.
 
-## Current Epic: Arrow Marks
+## Shipped: Arrow Marks
 
 - Shared drawing state supports single-anchor `arrowMarkUp` and `arrowMarkDown`
   tools and persists them through layout save/load.
@@ -199,6 +199,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   polygons from shared geometry.
 - Selection, polygon hit testing, whole-drawing moves, and fill controls use
   shared drawing behavior on both platforms.
+
+## Current Epic: Circle Tool
+
+- Shared drawing state supports the two-anchor `circle` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked circles from shared
+  screen-space geometry.
+- Selection, edge hit testing, whole-drawing moves, corner editing, and fill
+  controls use shared drawing behavior on both platforms.
 
 ## Known Gaps
 
