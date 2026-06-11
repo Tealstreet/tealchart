@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingBalloonLayout,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -688,6 +689,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'balloon';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'callout';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -745,6 +760,7 @@ export type MobileUserDrawingCalloutPrimitive = Extract<MobileUserDrawingPrimiti
 export type MobileUserDrawingCommentPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'comment' }>;
 export type MobileUserDrawingPriceNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceNote' }>;
 export type MobileUserDrawingPinPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pin' }>;
+export type MobileUserDrawingBalloonPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'balloon' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
@@ -821,6 +837,14 @@ export interface MobileUserDrawingTextLabelLayout {
   box: { x: number; y: number; width: number; height: number };
   text: { x: number; y: number };
   lines: readonly { text: string; width: number; x: number; y: number }[];
+}
+
+export interface MobileUserDrawingBalloonLayout extends MobileUserDrawingTextLabelLayout {
+  tail: {
+    tip: DrawingScreenPoint;
+    left: DrawingScreenPoint;
+    right: DrawingScreenPoint;
+  };
 }
 
 export interface MobileUserDrawingPriceRangeLabelPosition {
@@ -1562,6 +1586,7 @@ function primitiveFromGeometry(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'balloon':
       const drawing = geometry.drawing as UserDrawingTextAnnotation;
       return {
         kind: geometry.kind,
@@ -1666,6 +1691,7 @@ export function resolveMobileUserDrawingTextLabelLayout(
   primitive:
     | MobileUserDrawingTextLabelPrimitive
     | MobileUserDrawingNotePrimitive
+    | MobileUserDrawingBalloonPrimitive
     | MobileUserDrawingCalloutPrimitive
     | MobileUserDrawingPriceNotePrimitive
     | MobileUserDrawingCommentPrimitive,
@@ -1699,6 +1725,42 @@ export function resolveMobileUserDrawingTextLabelLayout(
     box: layout.box,
     text: { x: firstLine.x, y: firstLine.y },
     lines: layout.lines,
+  };
+}
+
+export function resolveMobileUserDrawingBalloonLayout(
+  primitive: MobileUserDrawingBalloonPrimitive,
+  measuredTextWidth: number | readonly number[],
+  options: {
+    labelPadding?: number;
+    labelHeight?: number;
+  } = {},
+): MobileUserDrawingBalloonLayout {
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
+  const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
+  const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
+  const lines = splitUserDrawingTextLines(primitive.text);
+  const lineWidths = Array.isArray(measuredTextWidth) ? measuredTextWidth : lines.map(() => measuredTextWidth);
+  const layout = resolveUserDrawingBalloonLayout({
+    text: primitive.text,
+    point: primitive.point,
+    textAlign: primitive.textAlign,
+    lineWidths,
+    labelPadding,
+    lineHeight: Math.max(1, labelHeight - 2),
+  });
+  const firstLine = layout.lines[0] ?? { x: primitive.point.x, y: primitive.point.y };
+
+  return {
+    fontSize,
+    fontFamily,
+    labelPadding,
+    labelHeight: layout.box.height,
+    box: layout.box,
+    text: { x: firstLine.x, y: firstLine.y },
+    lines: layout.lines,
+    tail: layout.tail,
   };
 }
 

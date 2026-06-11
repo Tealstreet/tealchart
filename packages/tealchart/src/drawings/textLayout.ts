@@ -15,6 +15,14 @@ export interface UserDrawingTextLabelLayout {
   padding: number;
 }
 
+export interface UserDrawingBalloonLayout extends UserDrawingTextLabelLayout {
+  tail: {
+    tip: DrawingScreenPoint;
+    left: DrawingScreenPoint;
+    right: DrawingScreenPoint;
+  };
+}
+
 export interface UserDrawingTextEditMetrics {
   lines: readonly string[];
   longestLineLength: number;
@@ -27,6 +35,11 @@ export interface ResolveUserDrawingTextLabelLayoutOptions {
   lineWidths: readonly number[];
   labelPadding?: number;
   lineHeight?: number;
+}
+
+export interface ResolveUserDrawingBalloonLayoutOptions extends ResolveUserDrawingTextLabelLayoutOptions {
+  tailLength?: number;
+  tailWidth?: number;
 }
 
 export const DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING = 6;
@@ -82,5 +95,56 @@ export function resolveUserDrawingTextLabelLayout({
         y: y + LABEL_VERTICAL_EXTRA / 2 + lineHeight / 2 + index * lineHeight,
       };
     }),
+  };
+}
+
+export function resolveUserDrawingBalloonLayout({
+  text,
+  point,
+  textAlign,
+  lineWidths,
+  labelPadding = DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
+  lineHeight = DEFAULT_USER_DRAWING_TEXT_LINE_HEIGHT,
+  tailLength = Math.max(10, lineHeight * 0.6),
+  tailWidth = Math.max(10, lineHeight * 0.7),
+}: ResolveUserDrawingBalloonLayoutOptions): UserDrawingBalloonLayout {
+  const lines = splitUserDrawingTextLines(text);
+  const widths = lines.map((_, index) => Math.max(0, lineWidths[index] ?? 0));
+  const maxLineWidth = Math.max(0, ...widths);
+  const width = Math.ceil(maxLineWidth + labelPadding * 2);
+  const height = lines.length * lineHeight + LABEL_VERTICAL_EXTRA;
+  const box = {
+    x: point.x - width / 2,
+    y: point.y - tailLength - height,
+    width,
+    height,
+  };
+  const bottomCenter = { x: point.x, y: box.y + box.height };
+
+  return {
+    box,
+    lineHeight,
+    padding: labelPadding,
+    lines: lines.map((line, index) => {
+      const lineWidth = widths[index] ?? 0;
+      const lineX =
+        textAlign === 'left'
+          ? box.x + labelPadding
+          : textAlign === 'right'
+            ? box.x + box.width - labelPadding - lineWidth
+            : point.x - lineWidth / 2;
+
+      return {
+        text: line,
+        width: lineWidth,
+        x: lineX,
+        y: box.y + LABEL_VERTICAL_EXTRA / 2 + lineHeight / 2 + index * lineHeight,
+      };
+    }),
+    tail: {
+      tip: point,
+      left: { x: bottomCenter.x - tailWidth / 2, y: bottomCenter.y },
+      right: { x: bottomCenter.x + tailWidth / 2, y: bottomCenter.y },
+    },
   };
 }

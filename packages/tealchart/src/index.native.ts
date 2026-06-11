@@ -50,6 +50,7 @@ export {
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
 export {
+  resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
@@ -62,6 +63,8 @@ export type {
   MobileUserDrawingArrowMarkerPrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingArcPrimitive,
+  MobileUserDrawingBalloonLayout,
+  MobileUserDrawingBalloonPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingBrushPrimitive,
   MobileUserDrawingCirclePrimitive,
