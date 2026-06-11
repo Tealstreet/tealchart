@@ -96,6 +96,19 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'ellipse';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      radiusX: number;
+      radiusY: number;
+      rect: { x: number; y: number; width: number; height: number };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'path';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -160,6 +173,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
+export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
@@ -332,6 +346,20 @@ function primitiveFromGeometry(
         center: geometry.circle.center,
         radius: geometry.circle.radius,
         rect: geometry.circle.rect,
+        style: geometry.drawing.style,
+      };
+    case 'ellipse':
+      return {
+        kind: 'ellipse',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.ellipse.center,
+        radiusX: geometry.ellipse.radiusX,
+        radiusY: geometry.ellipse.radiusY,
+        rect: geometry.ellipse.rect,
         style: geometry.drawing.style,
       };
     case 'path':

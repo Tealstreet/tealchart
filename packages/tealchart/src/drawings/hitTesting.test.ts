@@ -249,6 +249,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits ellipse edges and corner handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'ellipse',
+      kind: 'ellipse',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 30 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 40 }, space)?.drawing.id).toBe('ellipse');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('topLeft');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('reports rectangle corner handles before edge hits', () => {
     const drawing: UserDrawing = {
       ...base,

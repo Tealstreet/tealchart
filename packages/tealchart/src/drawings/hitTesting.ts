@@ -81,6 +81,23 @@ function distanceToCircleEdge(point: DrawingScreenPoint, center: DrawingScreenPo
   return Math.abs(distanceBetweenPoints(point, center) - radius);
 }
 
+function distanceToEllipseEdge(
+  point: DrawingScreenPoint,
+  center: DrawingScreenPoint,
+  radiusX: number,
+  radiusY: number,
+): number {
+  if (radiusX <= 0 || radiusY <= 0) return distanceBetweenPoints(point, center);
+  const normalizedX = (point.x - center.x) / radiusX;
+  const normalizedY = (point.y - center.y) / radiusY;
+  const angle = Math.atan2(normalizedY, normalizedX);
+  const edge = {
+    x: center.x + radiusX * Math.cos(angle),
+    y: center.y + radiusY * Math.sin(angle),
+  };
+  return distanceBetweenPoints(point, edge);
+}
+
 function distanceToPolyline(point: DrawingScreenPoint, points: readonly DrawingScreenPoint[]): number {
   if (points.length === 0) return Number.POSITIVE_INFINITY;
   if (points.length === 1) return distanceBetweenPoints(point, points[0]!);
@@ -145,6 +162,16 @@ function hitTestResolvedGeometry(
 
   if (geometry.kind === 'circle') {
     const distance = distanceToCircleEdge(point, geometry.circle.center, geometry.circle.radius);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
+  if (geometry.kind === 'ellipse') {
+    const distance = distanceToEllipseEdge(
+      point,
+      geometry.ellipse.center,
+      geometry.ellipse.radiusX,
+      geometry.ellipse.radiusY,
+    );
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
@@ -222,9 +249,15 @@ function hitTestUserDrawingHandle(
     }
     case 'rectangle':
     case 'circle':
+    case 'ellipse':
     case 'priceRange':
       {
-        const rect = geometry.kind === 'circle' ? geometry.circle.rect : geometry.rect;
+        const rect =
+          geometry.kind === 'circle'
+            ? geometry.circle.rect
+            : geometry.kind === 'ellipse'
+              ? geometry.ellipse.rect
+              : geometry.rect;
         handles.push(
           { handle: 'topLeft', point: { x: rect.x, y: rect.y } },
           { handle: 'topRight', point: { x: rect.x + rect.width, y: rect.y } },

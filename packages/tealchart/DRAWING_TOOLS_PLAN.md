@@ -200,11 +200,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, polygon hit testing, whole-drawing moves, and fill controls use
   shared drawing behavior on both platforms.
 
-## Current Epic: Circle Tool
+## Shipped: Circle Tool
 
 - Shared drawing state supports the two-anchor `circle` tool and persists it
   through layout save/load.
 - Web Canvas and mobile Skia render matching filled/stroked circles from shared
+  screen-space geometry.
+- Selection, edge hit testing, whole-drawing moves, corner editing, and fill
+  controls use shared drawing behavior on both platforms.
+
+## Current Epic: Ellipse Tool
+
+- Shared drawing state supports the two-anchor `ellipse` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked ellipses from shared
   screen-space geometry.
 - Selection, edge hit testing, whole-drawing moves, corner editing, and fill
   controls use shared drawing behavior on both platforms.

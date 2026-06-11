@@ -169,6 +169,29 @@ function renderCircleGeometry(
   }
 }
 
+function renderEllipseGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'ellipse' }>,
+): void {
+  const { ellipse, drawing } = geometry;
+  ctx.save();
+  ctx.translate(ellipse.center.x, ellipse.center.y);
+  ctx.scale(ellipse.radiusX, ellipse.radiusY);
+  ctx.beginPath();
+  ctx.arc(0, 0, 1, 0, Math.PI * 2);
+  ctx.restore();
+
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fill();
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.stroke();
+  }
+}
+
 function renderPriceRangeGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'priceRange' }>,
@@ -351,6 +374,9 @@ export function renderUserDrawing(
         break;
       case 'circle':
         renderCircleGeometry(ctx, geometry);
+        break;
+      case 'ellipse':
+        renderEllipseGeometry(ctx, geometry);
         break;
       case 'priceRange':
         renderPriceRangeGeometry(ctx, geometry);
