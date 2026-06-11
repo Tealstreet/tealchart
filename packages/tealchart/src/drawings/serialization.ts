@@ -69,6 +69,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
     case 'triangle':
+    case 'curve':
     case 'fibWedge':
     case 'fibChannel':
     case 'trendBasedFibTime':
@@ -566,6 +567,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'polyline',
+            points,
+          }
+        : null;
+    }
+    case 'curve': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'curve',
             points,
           }
         : null;

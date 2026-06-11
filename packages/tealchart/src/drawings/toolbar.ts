@@ -141,6 +141,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'gannBox', icon: '□', label: 'Gann box' },
   { tool: 'gannSquare', icon: '◇', label: 'Gann square' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
+  { tool: 'curve', icon: '⌒', label: 'Curve' },
   { tool: 'polyline', icon: '⌁', label: 'Polyline' },
   { tool: 'pitchfork', icon: 'Ψ', label: 'Pitchfork' },
   { tool: 'schiffPitchfork', icon: 'S', label: 'Schiff pitchfork' },

@@ -64,6 +64,7 @@ export type {
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingCirclePrimitive,
   MobileUserDrawingCrossLinePrimitive,
+  MobileUserDrawingCurvePrimitive,
   MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingEllipsePrimitive,
   MobileUserDrawingFibExtensionPrimitive,

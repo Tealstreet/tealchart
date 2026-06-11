@@ -84,6 +84,7 @@ describe('user drawing toolbar descriptors', () => {
       'gannBox',
       'gannSquare',
       'triangle',
+      'curve',
       'polyline',
       'pitchfork',
       'schiffPitchfork',
@@ -210,6 +211,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),
     );
+    expect(getUserDrawingToolDescriptor('curve')).toEqual(expect.objectContaining({ tool: 'curve', label: 'Curve' }));
     expect(getUserDrawingToolDescriptor('polyline')).toEqual(
       expect.objectContaining({ tool: 'polyline', label: 'Polyline' }),
     );
