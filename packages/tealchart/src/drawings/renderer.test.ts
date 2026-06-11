@@ -219,6 +219,25 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2::1');
   });
 
+  it('renders circles through CanvasContext arcs', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'circle',
+      kind: 'circle',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('arc:50,50,40:1');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders extended lines to chart bounds through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

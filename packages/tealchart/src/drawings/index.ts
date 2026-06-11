@@ -17,6 +17,7 @@ export {
 export type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  DrawingScreenCircle,
   DrawingScreenPolyline,
   DrawingScreenRect,
   DrawingScreenSegment,
@@ -172,6 +173,7 @@ export type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  CircleDrawing,
   CreateUserDrawingFromDraftOptions,
   DateRangeDrawing,
   ExtendedLineDrawing,

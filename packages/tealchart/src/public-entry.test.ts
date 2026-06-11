@@ -23,6 +23,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  CircleDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
@@ -49,6 +50,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -222,6 +224,25 @@ describe('tealchart public entries', () => {
 
     expect(up.kind).toBe('arrowMarkUp');
     expect(down.kind).toBe('arrowMarkDown');
+  });
+
+  it('exports shared drawing circle types', () => {
+    const drawing: CircleDrawing = {
+      id: 'circle',
+      kind: 'circle',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('circle');
   });
 
   it('exports shared drawing extended line types', () => {
