@@ -1875,6 +1875,40 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fibRetracement') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.lineVisible !== false &&
+                  primitive.levels.map((level) => (
+                    <SkiaLine
+                      key={`${primitive.id}:level:${level.ratio}:line`}
+                      p1={vec(level.start.x, level.start.y)}
+                      p2={vec(level.end.x, level.end.y)}
+                      color={primitive.style.lineColor}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      strokeCap="round"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                  ))}
+                {font &&
+                  primitive.levels.map((level) => (
+                    <SkiaText
+                      key={`${primitive.id}:level:${level.ratio}:label`}
+                      x={level.start.x + 4}
+                      y={level.start.y - 2}
+                      text={level.label}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                  ))}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'dateRange') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);

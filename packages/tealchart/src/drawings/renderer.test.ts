@@ -409,6 +409,32 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:1 minute:40,50:#111:center:1:12px sans-serif');
   });
 
+  it('renders Fibonacci retracement levels with labels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib',
+      kind: 'fibRetracement',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,80');
+    expect(ctx.calls).toContain('lineTo:90,80');
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,50');
+    expect(ctx.calls).toContain('moveTo:10,20');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls.filter((call) => call === 'stroke:#f5c542:2:6,4:1')).toHaveLength(9);
+    expect(ctx.calls).toContain('fillText:0 20.00:14,78:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:0.5 50.00:14,48:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1 80.00:14,18:#111:left:1:12px sans-serif');
+  });
+
   it('renders path drawings as stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -231,6 +231,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibRetracement') {
+    const distance = Math.min(...geometry.retracement.levels.map((level) => distanceToSegment(point, level.segment)));
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'arrowMarker') {
     const distance = pointInPolygon(point, geometry.marker.points) ? 0 : distanceToClosedPolyline(point, geometry.marker.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -304,6 +309,14 @@ function hitTestUserDrawingHandle(
           point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y + geometry.rect.height / 2 },
         },
       );
+      break;
+    case 'fibRetracement':
+      if (geometry.drawing.kind === 'fibRetracement') {
+        handles.push(
+          { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },
+          { handle: 'end', point: anchorToScreenPoint(geometry.drawing.points[1], space) },
+        );
+      }
       break;
     case 'path':
       geometry.polyline.points.forEach((pathPoint, pointIndex) => {
