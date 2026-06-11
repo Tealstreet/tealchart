@@ -98,7 +98,7 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
 };
 
 const UNSUPPORTED_NAMESPACES = new Set([
-  'request', 'label', 'line', 'box', 'polyline', 'linefill', 'table',
+  'request',
   'matrix',
 ]);
 
