@@ -18,6 +18,7 @@ import type {
   InfoLineDrawing,
   PathDrawing,
   ParallelChannelDrawing,
+  PitchforkDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
@@ -44,6 +45,7 @@ import {
   resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
   resolveFlatTopBottomFromAnchors,
+  resolvePitchforkFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
@@ -595,6 +597,16 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 110 },
       ],
     };
+    const pitchfork: PitchforkDrawing = {
+      ...trendLine,
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const channel: ParallelChannelDrawing = {
       ...trendLine,
       id: 'channel',
@@ -822,6 +834,34 @@ describe('user drawing coordinates', () => {
           { x: 210, y: 120 },
         ],
       },
+    });
+    expect(resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space)).toMatchObject({
+      median: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+      upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 20 } },
+      lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
+      midpoint: { x: 110, y: 70 },
+    });
+    expect(resolveUserDrawingGeometry(pitchfork, space)).toMatchObject({
+      kind: 'pitchfork',
+      pitchfork: {
+        median: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 20 } },
+        lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
+        midpoint: { x: 110, y: 70 },
+      },
+    });
+    expect(
+      resolvePitchforkFromAnchors(
+        { time: 2_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 2_000, price: 90 },
+        space,
+      ),
+    ).toMatchObject({
+      median: { start: { x: 110, y: 70 }, end: { x: 210, y: 70 } },
+      upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 20 } },
+      lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
+      midpoint: { x: 110, y: 70 },
     });
     expect(resolveUserDrawingGeometry(rotatedRectangle, space)).toMatchObject({
       kind: 'rotatedRectangle',

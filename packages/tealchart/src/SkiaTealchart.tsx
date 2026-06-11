@@ -1707,6 +1707,43 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'pitchfork') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                <SkiaLine
+                  p1={vec(primitive.median.start.x, primitive.median.start.y)}
+                  p2={vec(primitive.median.end.x, primitive.median.end.y)}
+                  color={primitive.style.lineColor}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+                <SkiaLine
+                  p1={vec(primitive.upper.start.x, primitive.upper.start.y)}
+                  p2={vec(primitive.upper.end.x, primitive.upper.end.y)}
+                  color={primitive.style.lineColor}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+                <SkiaLine
+                  p1={vec(primitive.lower.start.x, primitive.lower.start.y)}
+                  p2={vec(primitive.lower.end.x, primitive.lower.end.y)}
+                  color={primitive.style.lineColor}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'arrowMarker') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
