@@ -627,6 +627,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib speed resistance fan rays and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-speed-fan',
+      kind: 'fibSpeedResistanceFan',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 80 }, space)?.drawing.id).toBe('fib-speed-fan');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits gann fan rays and endpoint handles', () => {
     const drawing: UserDrawing = {
       ...base,

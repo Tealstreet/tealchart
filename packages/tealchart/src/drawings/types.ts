@@ -29,6 +29,7 @@ export type UserDrawingTool =
   | 'fibRetracement'
   | 'fibExtension'
   | 'fibFan'
+  | 'fibSpeedResistanceFan'
   | 'fibChannel'
   | 'fibTimeZone'
   | 'gannFan'
@@ -226,6 +227,11 @@ export interface FibFanDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface FibSpeedResistanceFanDrawing extends UserDrawingBase {
+  kind: 'fibSpeedResistanceFan';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface GannFanDrawing extends UserDrawingBase {
   kind: 'gannFan';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -325,6 +331,7 @@ export type UserDrawing =
   | FibRetracementDrawing
   | FibExtensionDrawing
   | FibFanDrawing
+  | FibSpeedResistanceFanDrawing
   | FibChannelDrawing
   | FibTimeZoneDrawing
   | GannFanDrawing
@@ -458,6 +465,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'fibSpeedResistanceFan':
     case 'gannFan':
     case 'fibTimeZone':
       return 2;
@@ -686,6 +694,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'fibFan',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'fibSpeedResistanceFan':
+      return {
+        ...base,
+        kind: 'fibSpeedResistanceFan',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'gannFan':

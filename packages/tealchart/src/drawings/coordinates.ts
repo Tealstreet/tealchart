@@ -300,6 +300,11 @@ export type ResolvedUserDrawingGeometry =
       fibFan: DrawingScreenFibFan;
     }
   | {
+      kind: 'fibSpeedResistanceFan';
+      drawing: UserDrawing;
+      fibSpeedResistanceFan: DrawingScreenFibFan;
+    }
+  | {
       kind: 'fibChannel';
       drawing: UserDrawing;
       fibChannel: DrawingScreenFibChannel;
@@ -671,6 +676,7 @@ export function resolveBarsPatternFromAnchors(
 export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.618, 2.618] as const;
 export const FIB_EXTENSION_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.414, 1.618, 2, 2.618] as const;
 export const FIB_FAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
+export const FIB_SPEED_RESISTANCE_FAN_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_CHANNEL_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.414, 1.618, 2] as const;
 export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
 export const GANN_FAN_LEVELS = [
@@ -746,6 +752,23 @@ export function resolveFibFanFromAnchors(
   second: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
 ): DrawingScreenFibFan {
+  return resolveFibFanWithLevelsFromAnchors(first, second, space, FIB_FAN_LEVELS);
+}
+
+export function resolveFibSpeedResistanceFanFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibFan {
+  return resolveFibFanWithLevelsFromAnchors(first, second, space, FIB_SPEED_RESISTANCE_FAN_LEVELS);
+}
+
+function resolveFibFanWithLevelsFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+  levels: readonly number[],
+): DrawingScreenFibFan {
   const origin = anchorToScreenPoint(first, space);
   const targetStart = anchorToScreenPoint({ time: second.time, price: first.price }, space);
   const targetEnd = anchorToScreenPoint(second, space);
@@ -754,7 +777,7 @@ export function resolveFibFanFromAnchors(
     origin,
     targetStart,
     targetEnd,
-    rays: FIB_FAN_LEVELS.map((ratio) => {
+    rays: levels.map((ratio) => {
       const target = {
         x: targetEnd.x,
         y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
@@ -1353,6 +1376,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibFan',
         drawing,
         fibFan: resolveFibFanFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibSpeedResistanceFan':
+      return {
+        kind: 'fibSpeedResistanceFan',
+        drawing,
+        fibSpeedResistanceFan: resolveFibSpeedResistanceFanFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'fibChannel':
       return {
