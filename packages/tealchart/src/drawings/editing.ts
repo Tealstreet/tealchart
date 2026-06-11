@@ -47,6 +47,17 @@ function movePathAnchors(
   return [moveAnchor(points[0], delta), moveAnchor(points[1], delta), moveAnchor(points[2], delta)];
 }
 
+function moveRegressionTrendAnchors(
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
+  delta: AnchorDelta,
+): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] {
+  return points.map((point) => ({ ...point, time: point.time + delta.time })) as [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ];
+}
+
 function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number): UserDrawing {
   switch (drawing.kind) {
     case 'trendLine':
@@ -68,8 +79,10 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'path':
     case 'triangle':
     case 'parallelChannel':
-    case 'regressionTrend':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
+    case 'regressionTrend':
+      if (delta.time === 0) return drawing;
+      return { ...drawing, points: moveRegressionTrendAnchors(drawing.points, delta), updatedAt };
     case 'dateRange':
       return {
         ...drawing,

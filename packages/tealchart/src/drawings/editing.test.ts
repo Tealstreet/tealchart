@@ -817,6 +817,44 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves selected regression trends by time delta without distorting fitted prices', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'regression',
+      kind: 'regressionTrend',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'regression' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'regression' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 12 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 50 },
+        { time: 100, price: 50 },
+        { time: 20, price: 80 },
+      ],
+      updatedAt: 12,
+    });
+  });
+
   it('edits Fibonacci retracement endpoints', () => {
     const drawing: UserDrawing = {
       ...base,

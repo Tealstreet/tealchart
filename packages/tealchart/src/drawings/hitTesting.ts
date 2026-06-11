@@ -359,12 +359,18 @@ function hitTestUserDrawingHandle(
       });
       break;
     case 'parallelChannel':
-    case 'regressionTrend':
-      if (geometry.drawing.kind === 'parallelChannel' || geometry.drawing.kind === 'regressionTrend') {
+      if (geometry.drawing.kind === 'parallelChannel') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });
       }
+      break;
+    case 'regressionTrend':
+      handles.push(
+        { handle: 'center', point: geometry.channel.base.start, pointIndex: 0 },
+        { handle: 'center', point: geometry.channel.base.end, pointIndex: 1 },
+        { handle: 'center', point: geometry.channel.parallel.start, pointIndex: 2 },
+      );
       break;
     case 'textLabel':
       handles.push({ handle: 'center', point: geometry.point });

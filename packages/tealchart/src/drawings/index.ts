@@ -17,6 +17,7 @@ export {
   resolveParallelChannelFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
+  resolveRegressionTrendFromAnchors,
   resolveRectFromAnchors,
   resolveTrendAngleFromSegment,
   resolveUserDrawingInputPoint,

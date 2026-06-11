@@ -11,6 +11,7 @@ import {
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
+  resolveRegressionTrendFromAnchors,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -58,6 +59,7 @@ type NonNever<T> = [T] extends [never] ? never : T;
 describe('tealchart public entries', () => {
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
+    expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
