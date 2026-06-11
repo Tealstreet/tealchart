@@ -540,8 +540,16 @@ describe('user drawing toolbar descriptors', () => {
       id: 'dp',
       kind: 'datePriceRange' as const,
     };
+    const icon = {
+      ...horizontal,
+      id: 'icon',
+      kind: 'icon' as const,
+      point: { time: 1, price: 10 },
+      iconName: 'star' as const,
+    };
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingFillControls(icon)).toBe(true);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'e', kind: 'ellipse' as const })).toBe(true);
     expect(

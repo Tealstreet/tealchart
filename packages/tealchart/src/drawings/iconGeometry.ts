@@ -40,7 +40,7 @@ export function resolveUserDrawingIconGeometry({
   center,
   size = DEFAULT_USER_DRAWING_ICON_SIZE,
 }: ResolveUserDrawingIconGeometryOptions): UserDrawingIconGeometry {
-  const normalizedSize = Math.max(6, size);
+  const normalizedSize = Number.isFinite(size) ? Math.max(6, size) : DEFAULT_USER_DRAWING_ICON_SIZE;
   const points = resolveStarPoints(center, normalizedSize);
 
   return {
