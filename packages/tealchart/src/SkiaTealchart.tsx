@@ -135,6 +135,7 @@ import {
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import type {
+  MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -612,8 +613,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const activeUserDrawingTextEditPrimitive = useMemo(
     () =>
       userDrawingPrimitives.find(
-        (primitive): primitive is MobileUserDrawingTextLabelPrimitive | MobileUserDrawingNotePrimitive =>
-          (primitive.kind === 'textLabel' || primitive.kind === 'note') &&
+        (
+          primitive,
+        ): primitive is MobileUserDrawingTextLabelPrimitive | MobileUserDrawingNotePrimitive | MobileUserDrawingCalloutPrimitive =>
+          (primitive.kind === 'textLabel' || primitive.kind === 'note' || primitive.kind === 'callout') &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
       ),
@@ -1242,7 +1245,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         const selectedDrawing = selectedId
           ? selection.state.drawings.find((drawing) => drawing.id === selectedId)
           : null;
-        if (selection.hit && (selectedDrawing?.kind === 'textLabel' || selectedDrawing?.kind === 'note')) {
+        if (
+          selection.hit &&
+          (selectedDrawing?.kind === 'textLabel' || selectedDrawing?.kind === 'note' || selectedDrawing?.kind === 'callout')
+        ) {
           const nextState = beginUserDrawingTextEdit(selection.state, selectedDrawing.id);
           if (nextState !== selection.state) {
             commitUserDrawingState(nextState);
@@ -2821,7 +2827,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'textLabel' || primitive.kind === 'note') {
+          if (primitive.kind === 'textLabel' || primitive.kind === 'note' || primitive.kind === 'callout') {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
@@ -2830,6 +2836,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.kind === 'callout' && (
+                  <SkiaLine
+                    p1={vec(primitive.tip.x, primitive.tip.y)}
+                    p2={vec(primitive.point.x, primitive.point.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                )}
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
                   <Rect
                     x={layout.box.x}

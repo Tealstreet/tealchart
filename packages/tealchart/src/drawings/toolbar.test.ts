@@ -105,6 +105,7 @@ describe('user drawing toolbar descriptors', () => {
       'brush',
       'highlighter',
       'note',
+      'callout',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -245,6 +246,9 @@ describe('user drawing toolbar descriptors', () => {
       expect.objectContaining({ tool: 'polyline', label: 'Polyline' }),
     );
     expect(getUserDrawingToolDescriptor('note')).toEqual(expect.objectContaining({ tool: 'note', label: 'Note' }));
+    expect(getUserDrawingToolDescriptor('callout')).toEqual(
+      expect.objectContaining({ tool: 'callout', label: 'Callout' }),
+    );
     expect(getUserDrawingToolDescriptor('pitchfork')).toEqual(
       expect.objectContaining({ tool: 'pitchfork', label: 'Pitchfork' }),
     );
@@ -616,12 +620,34 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(datePriceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...textLabel,
+        id: 'callout',
+        kind: 'callout',
+        points: [
+          { time: 1, price: 2 },
+          { time: 2, price: 3 },
+        ],
+      }),
+    ).toBe(true);
     expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
     expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
     expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
+    expect(
+      supportsUserDrawingTextControls({
+        ...textLabel,
+        id: 'callout',
+        kind: 'callout',
+        points: [
+          { time: 1, price: 2 },
+          { time: 2, price: 3 },
+        ],
+      }),
+    ).toBe(true);
 
     expect(
       isUserDrawingFillToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] }),

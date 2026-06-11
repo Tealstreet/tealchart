@@ -190,6 +190,7 @@ export function resolveUserDrawingHandlePoints(
     case 'path':
     case 'brush':
     case 'highlighter':
+    case 'callout':
     case 'polyline':
     case 'curve':
     case 'arc':

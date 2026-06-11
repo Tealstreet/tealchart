@@ -62,11 +62,12 @@ export type UserDrawingTool =
   | 'brush'
   | 'highlighter'
   | 'note'
+  | 'callout'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
-export type UserDrawingTextAnnotationKind = 'textLabel' | 'note';
+export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -409,7 +410,14 @@ export interface NoteDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
-export type UserDrawingTextAnnotation = TextLabelDrawing | NoteDrawing;
+export interface CalloutDrawing extends UserDrawingBase {
+  kind: 'callout';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
+export type UserDrawingTextAnnotation = TextLabelDrawing | NoteDrawing | CalloutDrawing;
 
 export type UserDrawing =
   | TrendLineDrawing
@@ -469,6 +477,7 @@ export type UserDrawing =
   | BrushDrawing
   | HighlighterDrawing
   | NoteDrawing
+  | CalloutDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -602,6 +611,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'cyclicLines':
     case 'timeCycles':
     case 'sineLine':
+    case 'callout':
       return 2;
     case 'triangle':
     case 'curve':
@@ -649,7 +659,11 @@ export function isUserDrawingPathFamilyTool(tool: UserDrawingTool): tool is User
 }
 
 export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is UserDrawingTextAnnotation {
-  return drawing.kind === 'textLabel' || drawing.kind === 'note';
+  return drawing.kind === 'textLabel' || drawing.kind === 'note' || drawing.kind === 'callout';
+}
+
+export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor {
+  return drawing.kind === 'callout' ? drawing.points[1] : drawing.point;
 }
 
 export function isDrawingDraftReady(draft: UserDrawingDraft): boolean {
@@ -1004,6 +1018,14 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: draft.tool,
         point: draft.anchors[0]!,
+        text: draft.text ?? '',
+        textAlign: 'center',
+      };
+    case 'callout':
+      return {
+        ...base,
+        kind: 'callout',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
         text: draft.text ?? '',
         textAlign: 'center',
       };

@@ -530,6 +530,12 @@ export type ResolvedUserDrawingGeometry =
       kind: 'textLabel' | 'note';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
+    }
+  | {
+      kind: 'callout';
+      drawing: UserDrawing;
+      tip: DrawingScreenPoint;
+      point: DrawingScreenPoint;
     };
 
 export function timeToDrawingX(time: number, space: DrawingCoordinateSpace): number {
@@ -2329,6 +2335,13 @@ export function resolveUserDrawingGeometry(
         kind: drawing.kind,
         drawing,
         point: anchorToScreenPoint(drawing.point, space),
+      };
+    case 'callout':
+      return {
+        kind: 'callout',
+        drawing,
+        tip: anchorToScreenPoint(drawing.points[0], space),
+        point: anchorToScreenPoint(drawing.points[1], space),
       };
   }
 }

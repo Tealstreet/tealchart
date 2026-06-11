@@ -163,6 +163,13 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         point: { ...drawing.point },
       };
+    case 'callout':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'callout',
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
+      };
   }
 }
 
@@ -854,6 +861,21 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ...base,
         kind: value.kind,
         point,
+        text: value.text,
+        textAlign,
+      };
+    }
+    case 'callout': {
+      const points = parseTwoPointDrawing(value);
+      if (!points || typeof value.text !== 'string') return null;
+      const textAlign: UserDrawingTextAnnotation['textAlign'] =
+        value.textAlign === 'left' || value.textAlign === 'right' || value.textAlign === 'center'
+          ? value.textAlign
+          : 'center';
+      return {
+        ...base,
+        kind: 'callout',
+        points,
         text: value.text,
         textAlign,
       };

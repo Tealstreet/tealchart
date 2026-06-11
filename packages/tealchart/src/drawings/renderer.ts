@@ -855,6 +855,14 @@ function renderTextLabelGeometry(
     lineHeight: Math.max(1, options.labelHeight - 2),
   });
 
+  if (geometry.kind === 'callout') {
+    applyStrokeStyle(ctx, drawing);
+    ctx.beginPath();
+    ctx.moveTo(geometry.tip.x, geometry.tip.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+  }
+
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
     ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
@@ -1069,6 +1077,7 @@ export function renderUserDrawing(
         break;
       case 'textLabel':
       case 'note':
+      case 'callout':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
         break;
     }

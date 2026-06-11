@@ -61,6 +61,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('note')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
+    expect(getRequiredAnchorCount('callout')).toBe(2);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
     expect(getRequiredAnchorCount('trendAngle')).toBe(2);
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
@@ -671,6 +672,21 @@ describe('user drawing types', () => {
       kind: 'note',
       point: anchorA,
       text: 'Chart note',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'callout',
+          anchors: [anchorA, anchorB],
+          text: 'Callout',
+        }),
+        { id: 'callout' },
+      ),
+    ).toMatchObject({
+      kind: 'callout',
+      points: [anchorA, anchorB],
+      text: 'Callout',
       textAlign: 'center',
     });
   });
