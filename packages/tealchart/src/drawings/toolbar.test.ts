@@ -82,6 +82,7 @@ describe('user drawing toolbar descriptors', () => {
       'trendBasedFibTime',
       'gannFan',
       'gannBox',
+      'gannSquare',
       'triangle',
       'polyline',
       'pitchfork',
@@ -202,6 +203,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('gannBox')).toEqual(
       expect.objectContaining({ tool: 'gannBox', label: 'Gann box' }),
+    );
+    expect(getUserDrawingToolDescriptor('gannSquare')).toEqual(
+      expect.objectContaining({ tool: 'gannSquare', label: 'Gann square' }),
     );
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),
@@ -525,6 +529,7 @@ describe('user drawing toolbar descriptors', () => {
       }),
     ).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-box', kind: 'gannBox' as const })).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square', kind: 'gannSquare' as const })).toBe(true);
     expect(
       supportsUserDrawingFillControls({
         ...rectangle,

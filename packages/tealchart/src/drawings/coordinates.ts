@@ -408,6 +408,11 @@ export type ResolvedUserDrawingGeometry =
       gannBox: DrawingScreenGannBox;
     }
   | {
+      kind: 'gannSquare';
+      drawing: UserDrawing;
+      gannBox: DrawingScreenGannBox;
+    }
+  | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
       drawing: UserDrawing;
       channel: DrawingScreenParallelChannel;
@@ -1051,6 +1056,27 @@ export function resolveGannBoxFromAnchors(
   space: DrawingCoordinateSpace,
 ): DrawingScreenGannBox {
   const rect = resolveRectFromAnchors(first, second, space);
+  return resolveGannBoxFromRect(rect);
+}
+
+export function resolveGannSquareFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenGannBox {
+  const start = anchorToScreenPoint(first, space);
+  const end = anchorToScreenPoint(second, space);
+  const side = Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y));
+  const rect = {
+    x: end.x >= start.x ? start.x : start.x - side,
+    y: end.y >= start.y ? start.y : start.y - side,
+    width: side,
+    height: side,
+  };
+  return resolveGannBoxFromRect(rect);
+}
+
+function resolveGannBoxFromRect(rect: DrawingScreenRect): DrawingScreenGannBox {
   const left = rect.x;
   const right = rect.x + rect.width;
   const top = rect.y;
@@ -1725,6 +1751,12 @@ export function resolveUserDrawingGeometry(
         kind: 'gannBox',
         drawing,
         gannBox: resolveGannBoxFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'gannSquare':
+      return {
+        kind: 'gannSquare',
+        drawing,
+        gannBox: resolveGannSquareFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
     case 'polyline':

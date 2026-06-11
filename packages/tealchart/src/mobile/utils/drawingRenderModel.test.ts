@@ -1053,6 +1053,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready gann square primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'gann-square',
+          kind: 'gannSquare',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 80 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'gannSquare',
+      id: 'gann-square',
+      rect: { x: 10, y: 20, width: 60, height: 60 },
+      levels: expect.arrayContaining([
+        expect.objectContaining({
+          ratio: 0.5,
+          horizontal: { start: { x: 10, y: 50 }, end: { x: 70, y: 50 } },
+          vertical: { start: { x: 40, y: 20 }, end: { x: 40, y: 80 } },
+        }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready fib channel primitives', () => {
     const state: UserDrawingState = {
       version: 1,

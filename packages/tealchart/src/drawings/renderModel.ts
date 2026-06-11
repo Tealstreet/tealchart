@@ -156,6 +156,17 @@ export function resolveUserDrawingHandlePoints(
         { x: rect.x, y: rect.y + rect.height },
       ];
     }
+    case 'gannSquare': {
+      const geometry = resolveUserDrawingGeometry(drawing, space);
+      if (geometry.kind !== 'gannSquare') return [];
+      const rect = geometry.gannBox.rect;
+      return [
+        { x: rect.x, y: rect.y },
+        { x: rect.x + rect.width, y: rect.y },
+        { x: rect.x + rect.width, y: rect.y + rect.height },
+        { x: rect.x, y: rect.y + rect.height },
+      ];
+    }
     case 'datePriceRange': {
       const rect = resolveRectFromAnchors(drawing.points[0], drawing.points[1], space);
       return [
