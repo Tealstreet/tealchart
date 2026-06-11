@@ -893,9 +893,11 @@ export class EventManager {
           if (this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'touch')) {
             this.state.dragMode = 'drawing';
             this.callbacks.onDrawingDragMove?.(x, y, 'touch');
+            this.scheduleRender();
           }
         } else if (this.state.dragMode === 'drawing') {
           this.callbacks.onDrawingDragMove?.(x, y, 'touch');
+          this.scheduleRender();
         } else if (this.touchCrosshairLocked) {
           // Move crosshair proportionally
           this.crosshair.x = this.touchCrosshairPosition.x + dx;

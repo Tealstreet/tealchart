@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { EventManager, type EventManagerCallbacks } from './EventManager';
 
 function createContainer(): HTMLElement {
@@ -44,6 +45,7 @@ describe('EventManager drawing drag routing', () => {
   });
 
   afterEach(() => {
+    clearChartStoreCache();
     vi.unstubAllGlobals();
     document.body.innerHTML = '';
   });

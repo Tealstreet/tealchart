@@ -1577,7 +1577,15 @@ export class ChartCore {
   }
 
   private handleUserDrawingDragPending(x: number, y: number): boolean {
-    if (!this.viewport || this.userDrawingState?.activeTool !== 'path') return false;
+    if (
+      !this.viewport ||
+      this.userDrawingState?.activeTool !== 'path' ||
+      !this.options.onUserDrawingPathDragStart ||
+      !this.options.onUserDrawingPathDragMove ||
+      !this.options.onUserDrawingPathDragEnd
+    ) {
+      return false;
+    }
     return this.resolveUserDrawingInputPoint(x, y) !== null;
   }
 
