@@ -6,6 +6,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   resolveUserDrawingDateRangeMetrics,
+  resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
@@ -21,12 +22,14 @@ import type {
   ArrowLineDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
+  InfoLineDrawing,
   PathDrawing,
   PriceRangeDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
   UserDrawingHitTestTextMeasure,
+  UserDrawingInfoLineMetrics,
   UserDrawingTextLabelLayout,
   UserDrawingOpacityDescriptor,
   UserDrawingDateRangeMetrics,
@@ -127,6 +130,30 @@ describe('tealchart public entries', () => {
 
     expect(metrics.label).toBe('1 minute');
     expect(drawing.kind).toBe('dateRange');
+  });
+
+  it('exports shared drawing info line helpers', () => {
+    const metrics: UserDrawingInfoLineMetrics = resolveUserDrawingInfoLineMetrics(
+      { time: 0, price: 100 },
+      { time: 60_000, price: 125 },
+    );
+    const drawing: InfoLineDrawing = {
+      id: 'info',
+      kind: 'infoLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 100 },
+        { time: 60_000, price: 125 },
+      ],
+    };
+
+    expect(metrics.label).toBe('+25.00 (+25.00%) / 1 minute');
+    expect(drawing.kind).toBe('infoLine');
   });
 
   it('exports shared drawing arrow line types', () => {

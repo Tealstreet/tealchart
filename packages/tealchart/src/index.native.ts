@@ -54,6 +54,7 @@ export {
   resolveMobileUserDrawingRenderModel,
 } from './mobile/utils/drawingRenderModel';
 export type {
+  MobileUserDrawingInfoLinePrimitive,
   MobileUserDrawingPathPrimitive,
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,

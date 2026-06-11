@@ -6,6 +6,7 @@ import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
 import { resolveUserDrawingDateRangeMetrics } from './dateRange';
+import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
@@ -81,6 +82,30 @@ function renderPathGeometry(
     ctx.lineTo(point.x, point.y);
   }
   ctx.stroke();
+}
+
+function renderInfoLineGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
+): void {
+  if (geometry.drawing.style.lineVisible !== false) {
+    renderLineGeometry(ctx, geometry);
+  }
+
+  if (geometry.drawing.kind !== 'infoLine') return;
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  const label = resolveUserDrawingInfoLineMetrics(geometry.drawing.points[0], geometry.drawing.points[1]).label;
+
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(
+    label,
+    (geometry.segment.start.x + geometry.segment.end.x) / 2,
+    (geometry.segment.start.y + geometry.segment.end.y) / 2 - 4,
+  );
 }
 
 function renderRectangleGeometry(
@@ -250,13 +275,20 @@ export function renderUserDrawing(
 
     switch (geometry.kind) {
       case 'line':
-      case 'arrowLine':
       case 'ray':
       case 'horizontalLine':
       case 'verticalLine':
         if (drawing.style.lineVisible !== false) {
           renderLineGeometry(ctx, geometry);
         }
+        break;
+      case 'arrowLine':
+        if (drawing.style.lineVisible !== false) {
+          renderLineGeometry(ctx, geometry);
+        }
+        break;
+      case 'infoLine':
+        renderInfoLineGeometry(ctx, geometry);
         break;
       case 'path':
         if (drawing.style.lineVisible !== false) {

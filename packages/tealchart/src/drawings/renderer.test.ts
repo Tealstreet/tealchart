@@ -196,6 +196,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders info lines with shared measurement labels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'info',
+      kind: 'infoLine',
+      points: [
+        { time: 10_000, price: 50 },
+        { time: 70_000, price: 75 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:70,25');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:+25.00 (+50.00%) / 1 minute:40,33.5:#111:center:1:12px sans-serif');
+  });
+
   it('renders vertical extended lines to pane bounds through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -101,6 +101,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits info line drawings and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'info',
+      kind: 'infoLine',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('info');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('start');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space)?.handle).toBe('end');
+  });
+
   it('hits vertical extended line drawings across the pane', () => {
     const drawing: UserDrawing = {
       ...base,

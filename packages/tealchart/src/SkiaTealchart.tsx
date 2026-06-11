@@ -1545,6 +1545,38 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'infoLine') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
+            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textBounds);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaLine
+                    p1={vec(primitive.start.x, primitive.start.y)}
+                    p2={vec(primitive.end.x, primitive.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                )}
+                {font && (
+                  <SkiaText
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    text={primitive.label}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'rectangle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

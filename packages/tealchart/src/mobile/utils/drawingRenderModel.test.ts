@@ -240,6 +240,44 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready info line primitives with shared labels', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'info',
+          kind: 'infoLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10_000, price: 50 },
+            { time: 70_000, price: 75 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+      kind: 'infoLine',
+      id: 'info',
+      clip,
+      start: { x: 10, y: 50 },
+      end: { x: 70, y: 25 },
+      labelPoint: { x: 40, y: 33.5 },
+      label: '+25.00 (+50.00%) / 1 minute',
+      style,
+    });
+  });
+
   it('returns Skia-ready price range primitives with shared labels', () => {
     const state: UserDrawingState = {
       version: 1,

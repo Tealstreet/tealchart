@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
@@ -37,6 +38,19 @@ export type MobileUserDrawingPrimitive =
         left: DrawingScreenPoint;
         right: DrawingScreenPoint;
       } | null;
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'infoLine';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      labelPoint: DrawingScreenPoint;
+      label: string;
       style: UserDrawingStyle;
     }
   | {
@@ -111,9 +125,10 @@ export type MobileUserDrawingPrimitive =
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
+export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
-  { kind: 'priceRange' | 'dateRange' }
+  { kind: 'priceRange' | 'dateRange' | 'infoLine' }
 >;
 
 export interface MobileUserDrawingTextLabelLayout {
@@ -176,16 +191,27 @@ function primitiveFromGeometry(
 ): MobileUserDrawingPrimitive {
   switch (geometry.kind) {
     case 'line':
-    case 'arrowLine':
     case 'ray':
     case 'horizontalLine':
     case 'verticalLine': {
+      return {
+        kind: 'line',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.segment.start,
+        end: geometry.segment.end,
+        arrowHead: null,
+        style: geometry.drawing.style,
+      };
+    }
+    case 'arrowLine': {
       const arrowHead =
-        geometry.kind === 'arrowLine'
-          ? resolveDrawingArrowHead(geometry.segment, {
-              size: Math.max(10, geometry.drawing.style.lineWidth * 5),
-            })
-          : null;
+        resolveDrawingArrowHead(geometry.segment, {
+          size: Math.max(10, geometry.drawing.style.lineWidth * 5),
+        });
       return {
         kind: 'line',
         id: geometry.drawing.id,
@@ -196,6 +222,27 @@ function primitiveFromGeometry(
         start: geometry.segment.start,
         end: geometry.segment.end,
         arrowHead: arrowHead ? { left: arrowHead.left, right: arrowHead.right } : null,
+        style: geometry.drawing.style,
+      };
+    }
+    case 'infoLine': {
+      const drawing = geometry.drawing;
+      const label =
+        drawing.kind === 'infoLine' ? resolveUserDrawingInfoLineMetrics(drawing.points[0], drawing.points[1]).label : '';
+      return {
+        kind: 'infoLine',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.segment.start,
+        end: geometry.segment.end,
+        labelPoint: {
+          x: (geometry.segment.start.x + geometry.segment.end.x) / 2,
+          y: (geometry.segment.start.y + geometry.segment.end.y) / 2 - 4,
+        },
+        label,
         style: geometry.drawing.style,
       };
     }
