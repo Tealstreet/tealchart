@@ -429,6 +429,16 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'sineLine';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -652,6 +662,7 @@ export type MobileUserDrawingTrendBasedFibTimePrimitive = Extract<
 >;
 export type MobileUserDrawingCyclicLinesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'cyclicLines' }>;
 export type MobileUserDrawingTimeCyclesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'timeCycles' }>;
+export type MobileUserDrawingSineLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'sineLine' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -1222,6 +1233,17 @@ function primitiveFromGeometry(
           endBoundary: cycle.endBoundary,
           points: cycle.points,
         })),
+        style: geometry.drawing.style,
+      };
+    case 'sineLine':
+      return {
+        kind: 'sineLine',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.sineLine.points,
         style: geometry.drawing.style,
       };
     case 'parallelChannel':

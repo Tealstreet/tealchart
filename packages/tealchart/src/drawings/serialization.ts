@@ -64,6 +64,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':
+    case 'sineLine':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -560,6 +561,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'timeCycles',
+            points,
+          }
+        : null;
+    }
+    case 'sineLine': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'sineLine',
             points,
           }
         : null;

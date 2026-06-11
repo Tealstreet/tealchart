@@ -417,6 +417,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'sineLine') {
+    const distance = distanceToPolyline(point, geometry.sineLine.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -557,6 +562,7 @@ function hitTestUserDrawingHandle(
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':
+    case 'sineLine':
     case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
@@ -569,6 +575,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibTimeZone' ||
         geometry.drawing.kind === 'cyclicLines' ||
         geometry.drawing.kind === 'timeCycles' ||
+        geometry.drawing.kind === 'sineLine' ||
         geometry.drawing.kind === 'gannFan'
       ) {
         handles.push(

@@ -896,6 +896,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits sine line paths and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'sine-line',
+      kind: 'sineLine',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 20 }, space)?.drawing.id).toBe('sine-line');
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 20 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -549,6 +549,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, cycle arc/boundary hit testing, whole-drawing moves, and endpoint
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Sine Line Tool
+
+- Shared drawing state supports the two-anchor `sineLine` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching sampled sine waves from a shared
+  geometry resolver.
+- Selection, sampled-path hit testing, whole-drawing moves, and endpoint editing
+  use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

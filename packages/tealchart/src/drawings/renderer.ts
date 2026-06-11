@@ -395,6 +395,24 @@ function renderTimeCyclesGeometry(
   ctx.stroke();
 }
 
+function renderSineLineGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'sineLine' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  const [first, ...rest] = geometry.sineLine.points;
+  if (!first) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(first.x, first.y);
+  for (const point of rest) {
+    ctx.lineTo(point.x, point.y);
+  }
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -906,6 +924,9 @@ export function renderUserDrawing(
         break;
       case 'timeCycles':
         renderTimeCyclesGeometry(ctx, geometry);
+        break;
+      case 'sineLine':
+        renderSineLineGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

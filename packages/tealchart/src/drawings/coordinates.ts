@@ -188,6 +188,13 @@ export interface DrawingScreenTimeCycles {
   cycles: readonly DrawingScreenTimeCycle[];
 }
 
+export interface DrawingScreenSineLine {
+  baseline: DrawingScreenPoint;
+  amplitudePoint: DrawingScreenPoint;
+  cycleLength: number;
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingScreenGannFan {
   origin: DrawingScreenPoint;
   reference: DrawingScreenPoint;
@@ -459,6 +466,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'timeCycles';
       drawing: UserDrawing;
       timeCycles: DrawingScreenTimeCycles;
+    }
+  | {
+      kind: 'sineLine';
+      drawing: UserDrawing;
+      sineLine: DrawingScreenSineLine;
     }
   | {
       kind: 'gannFan';
@@ -1077,6 +1089,8 @@ export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
 export const CYCLIC_LINES_MAX_VISIBLE_LEVELS = 401;
 export const TIME_CYCLES_MAX_VISIBLE_CYCLES = 160;
 export const TIME_CYCLES_POINTS_PER_CYCLE = 32;
+export const SINE_LINE_MAX_VISIBLE_POINTS = 640;
+export const SINE_LINE_POINTS_PER_CYCLE = 64;
 export const GANN_FAN_LEVELS = [
   { ratio: 0.125, label: '1/8' },
   { ratio: 0.25, label: '1/4' },
@@ -1460,6 +1474,61 @@ export function resolveTimeCyclesFromAnchors(
     peak,
     interval,
     cycles,
+  };
+}
+
+export function resolveSineLineFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenSineLine {
+  const baseline = anchorToScreenPoint(first, space);
+  const amplitudePoint = anchorToScreenPoint(second, space);
+  const quarterCycle = Math.abs(second.time - first.time);
+  const cycleLength = quarterCycle * 4;
+  if (cycleLength <= 0) {
+    return {
+      baseline,
+      amplitudePoint,
+      cycleLength,
+      points: [baseline],
+    };
+  }
+
+  const direction = second.time >= first.time ? 1 : -1;
+  const startCycle = Math.floor((space.viewport.startTime - first.time) / cycleLength) - 1;
+  const endCycle = Math.ceil((space.viewport.endTime - first.time) / cycleLength) + 1;
+  const rawPoints = Math.max(2, (endCycle - startCycle + 1) * SINE_LINE_POINTS_PER_CYCLE + 1);
+  const pointStep = Math.max(1, Math.ceil(rawPoints / SINE_LINE_MAX_VISIBLE_POINTS));
+  const pointsByTime = new Map<number, DrawingScreenPoint>();
+
+  for (let index = 0; index < rawPoints; index += pointStep) {
+    const cycleOffset = startCycle + index / SINE_LINE_POINTS_PER_CYCLE;
+    const time = first.time + cycleLength * cycleOffset;
+    const x = timeToDrawingX(time, space);
+    const phase = ((time - first.time) * direction * Math.PI * 2) / cycleLength;
+    pointsByTime.set(time, {
+      x,
+      y: baseline.y + (amplitudePoint.y - baseline.y) * Math.sin(phase),
+    });
+  }
+
+  for (const time of [first.time, second.time]) {
+    const x = timeToDrawingX(time, space);
+    const phase = ((time - first.time) * direction * Math.PI * 2) / cycleLength;
+    pointsByTime.set(time, {
+      x,
+      y: baseline.y + (amplitudePoint.y - baseline.y) * Math.sin(phase),
+    });
+  }
+
+  return {
+    baseline,
+    amplitudePoint,
+    cycleLength,
+    points: Array.from(pointsByTime.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([, point]) => point),
   };
 }
 
@@ -2038,6 +2107,12 @@ export function resolveUserDrawingGeometry(
         kind: 'timeCycles',
         drawing,
         timeCycles: resolveTimeCyclesFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'sineLine':
+      return {
+        kind: 'sineLine',
+        drawing,
+        sineLine: resolveSineLineFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'gannFan':
       return {
