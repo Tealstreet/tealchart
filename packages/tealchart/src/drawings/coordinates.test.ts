@@ -37,6 +37,7 @@ import type {
   PriceRangeDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
+  SineLineDrawing,
   TimeCyclesDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
@@ -701,6 +702,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 110 },
       ],
     };
+    const sineLine: SineLineDrawing = {
+      ...trendLine,
+      id: 'sine-line',
+      kind: 'sineLine',
+      points: [
+        { time: 1_500, price: 100 },
+        { time: 2_000, price: 110 },
+      ],
+    };
     const trendBasedFibTime: TrendBasedFibTimeDrawing = {
       ...trendLine,
       id: 'trend-fib-time',
@@ -1240,6 +1250,18 @@ describe('user drawing coordinates', () => {
             startTime: 1_500,
             endTime: 2_000,
           }),
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(sineLine, space)).toMatchObject({
+      kind: 'sineLine',
+      sineLine: {
+        baseline: { x: 60, y: 70 },
+        amplitudePoint: { x: 110, y: 20 },
+        cycleLength: 2_000,
+        points: expect.arrayContaining([
+          { x: 60, y: 70 },
+          { x: 110, y: 20 },
         ]),
       },
     });

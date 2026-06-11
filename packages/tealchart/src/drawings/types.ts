@@ -39,6 +39,7 @@ export type UserDrawingTool =
   | 'trendBasedFibTime'
   | 'cyclicLines'
   | 'timeCycles'
+  | 'sineLine'
   | 'gannFan'
   | 'gannBox'
   | 'gannSquare'
@@ -303,6 +304,11 @@ export interface TimeCyclesDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface SineLineDrawing extends UserDrawingBase {
+  kind: 'sineLine';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface TriangleDrawing extends UserDrawingBase {
   kind: 'triangle';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -407,6 +413,7 @@ export type UserDrawing =
   | TrendBasedFibTimeDrawing
   | CyclicLinesDrawing
   | TimeCyclesDrawing
+  | SineLineDrawing
   | GannFanDrawing
   | GannBoxDrawing
   | GannSquareDrawing
@@ -552,6 +559,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':
+    case 'sineLine':
       return 2;
     case 'triangle':
     case 'curve':
@@ -854,6 +862,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'timeCycles',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'sineLine':
+      return {
+        ...base,
+        kind: 'sineLine',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'triangle':
