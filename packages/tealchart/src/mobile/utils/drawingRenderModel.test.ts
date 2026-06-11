@@ -182,6 +182,61 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready extended line segments to chart bounds', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'extended',
+          kind: 'extendedLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 25, price: 50 },
+            { time: 75, price: 25 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'line',
+      id: 'extended',
+      start: { x: 0, y: 37.5 },
+      end: { x: 100, y: 87.5 },
+      arrowHead: null,
+    });
+
+    const verticalState: UserDrawingState = {
+      ...state,
+      drawings: [
+        {
+          ...state.drawings[0]!,
+          points: [
+            { time: 50, price: 25 },
+            { time: 50, price: 75 },
+          ],
+        },
+      ],
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(verticalState, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'line',
+      id: 'extended',
+      start: { x: 50, y: 0 },
+      end: { x: 50, y: 100 },
+      arrowHead: null,
+    });
+  });
+
   it('preserves text label alignment in mobile primitives', () => {
     const state: UserDrawingState = {
       version: 1,

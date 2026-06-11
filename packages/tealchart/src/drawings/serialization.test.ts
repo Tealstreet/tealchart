@@ -275,6 +275,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores extended line drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'extended',
+          kind: 'extendedLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'extended',
+      kind: 'extendedLine',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('restores drawing fill and line visibility flags', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

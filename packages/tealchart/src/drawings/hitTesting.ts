@@ -134,6 +134,7 @@ function hitTestUserDrawingHandle(
     case 'ray': {
       if (
         geometry.drawing.kind === 'trendLine' ||
+        geometry.drawing.kind === 'extendedLine' ||
         geometry.drawing.kind === 'arrowLine' ||
         geometry.drawing.kind === 'ray'
       ) {

@@ -16,6 +16,7 @@ import {
 } from './index';
 import type {
   ArrowLineDrawing,
+  ExtendedLineDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
@@ -89,5 +90,24 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('arrowLine');
+  });
+
+  it('exports shared drawing extended line types', () => {
+    const drawing: ExtendedLineDrawing = {
+      id: 'extended',
+      kind: 'extendedLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('extendedLine');
   });
 });
