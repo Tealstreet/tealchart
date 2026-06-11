@@ -26,6 +26,7 @@ import {
 import { resolveMobileUserDrawingMeasurementLabelPosition } from './mobile/utils/drawingRenderModel';
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
+  MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
@@ -89,6 +90,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -110,6 +112,18 @@ describe('tealchart public entries', () => {
       kind: 'regressionTrend',
       id: 'regression',
     };
+    const linePrimitive: NonNever<MobileUserDrawingLinePrimitive> = {
+      kind: 'line',
+      id: 'ray',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      start: { x: 0, y: 5 },
+      end: { x: 10, y: 5 },
+      arrowHead: null,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const datePricePrimitive: NonNever<MobileUserDrawingDatePriceRangePrimitive> = {
       kind: 'datePriceRange',
       id: 'date-price',
@@ -127,6 +141,7 @@ describe('tealchart public entries', () => {
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
+    expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
   });
 
