@@ -110,6 +110,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibCircles':
     case 'gannFan':
     case 'fibTimeZone':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
@@ -184,6 +185,7 @@ function editLineEndpoint(
         | 'fibExtension'
         | 'fibFan'
         | 'fibSpeedResistanceFan'
+        | 'fibCircles'
         | 'gannFan'
         | 'fibTimeZone';
     }
@@ -313,6 +315,7 @@ function editDrawingHandle(
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibCircles':
     case 'gannFan':
     case 'fibTimeZone':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);

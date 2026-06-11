@@ -218,6 +218,21 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibCircles';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      baseRadius: number;
+      circles: readonly {
+        ratio: number;
+        radius: number;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'gannFan';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -460,6 +475,7 @@ export type MobileUserDrawingFibSpeedResistanceFanPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'fibSpeedResistanceFan' }
 >;
+export type MobileUserDrawingFibCirclesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibCircles' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
@@ -807,6 +823,22 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibCircles':
+      return {
+        kind: 'fibCircles',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.fibCircles.center,
+        baseRadius: geometry.fibCircles.baseRadius,
+        circles: geometry.fibCircles.circles.map((circle) => ({
+          ratio: circle.ratio,
+          radius: circle.radius,
         })),
         style: geometry.drawing.style,
       };

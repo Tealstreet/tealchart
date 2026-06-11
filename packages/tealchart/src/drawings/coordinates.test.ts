@@ -13,6 +13,7 @@ import type {
   ExtendedLineDrawing,
   FibChannelDrawing,
   FibExtensionDrawing,
+  FibCirclesDrawing,
   FibFanDrawing,
   FibSpeedResistanceFanDrawing,
   FibRetracementDrawing,
@@ -581,6 +582,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const fibCircles: FibCirclesDrawing = {
+      ...trendLine,
+      id: 'fib-circles',
+      kind: 'fibCircles',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const fibChannel: FibChannelDrawing = {
       ...trendLine,
       id: 'fib-channel',
@@ -903,6 +913,18 @@ describe('user drawing coordinates', () => {
           },
           { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
         ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibCircles, space)).toMatchObject({
+      kind: 'fibCircles',
+      fibCircles: {
+        center: { x: 10, y: 70 },
+        baseRadius: expect.closeTo(111.8),
+        circles: expect.arrayContaining([
+          expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39) }),
+          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8) }),
+          expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7) }),
+        ]),
       },
     });
     expect(resolveUserDrawingGeometry(gannFan, space)).toMatchObject({

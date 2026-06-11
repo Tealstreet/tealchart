@@ -204,6 +204,15 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibCircles') {
+    const distance = Math.min(
+      ...geometry.fibCircles.circles.map((circle) =>
+        distanceToCircleEdge(point, geometry.fibCircles.center, circle.radius),
+      ),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'ellipse') {
     const distance = distanceToEllipseEdge(
       point,
@@ -429,6 +438,7 @@ function hitTestUserDrawingHandle(
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibCircles':
     case 'fibTimeZone':
     case 'gannFan':
       if (
@@ -436,6 +446,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibExtension' ||
         geometry.drawing.kind === 'fibFan' ||
         geometry.drawing.kind === 'fibSpeedResistanceFan' ||
+        geometry.drawing.kind === 'fibCircles' ||
         geometry.drawing.kind === 'fibTimeZone' ||
         geometry.drawing.kind === 'gannFan'
       ) {
