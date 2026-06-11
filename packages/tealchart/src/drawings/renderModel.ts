@@ -212,6 +212,7 @@ export function resolveUserDrawingHandlePoints(
     case 'flatTopBottom':
     case 'disjointChannel':
     case 'projection':
+    case 'elliottCorrectiveWave':
     case 'longPosition':
     case 'shortPosition':
     case 'trianglePattern':

@@ -90,6 +90,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'longPosition':
     case 'shortPosition':
     case 'projection':
+    case 'elliottCorrectiveWave':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -902,6 +903,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'elliottImpulseWave',
+            points,
+          }
+        : null;
+    }
+    case 'elliottCorrectiveWave': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'elliottCorrectiveWave',
             points,
           }
         : null;

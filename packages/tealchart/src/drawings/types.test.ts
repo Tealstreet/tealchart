@@ -114,6 +114,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
+    expect(getRequiredAnchorCount('elliottCorrectiveWave')).toBe(3);
     expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
     expect(getRequiredAnchorCount('trianglePattern')).toBe(4);
     expect(getRequiredAnchorCount('abcdPattern')).toBe(4);
@@ -627,6 +628,20 @@ describe('user drawing types', () => {
       locked: false,
       createdAt: 20,
       updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'elliottCorrectiveWave', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'elliott-corrective',
+        now: 23,
+      }),
+    ).toMatchObject({
+      id: 'elliott-corrective',
+      kind: 'elliottCorrectiveWave',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 23,
+      updatedAt: 23,
     });
     expect(
       createUserDrawingFromDraft(draft({ tool: 'xabcdPattern', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }), {

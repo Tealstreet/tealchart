@@ -80,6 +80,7 @@ describe('user drawing toolbar descriptors', () => {
       'threeDrivesPattern',
       'headShouldersPattern',
       'elliottImpulseWave',
+      'elliottCorrectiveWave',
       'anchoredVwap',
       'fibRetracement',
       'fibExtension',
@@ -215,6 +216,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('elliottImpulseWave')).toEqual(
       expect.objectContaining({ tool: 'elliottImpulseWave', label: 'Elliott impulse wave' }),
+    );
+    expect(getUserDrawingToolDescriptor('elliottCorrectiveWave')).toEqual(
+      expect.objectContaining({ tool: 'elliottCorrectiveWave', label: 'Elliott corrective wave' }),
     );
     expect(getUserDrawingToolDescriptor('brush')).toEqual(expect.objectContaining({ tool: 'brush', label: 'Brush' }));
     expect(getUserDrawingToolDescriptor('highlighter')).toEqual(

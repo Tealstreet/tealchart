@@ -1,6 +1,7 @@
 import type {
   DrawingCoordinateSpace,
   DrawingScreenAbcdPatternLabel,
+  DrawingScreenElliottCorrectiveWaveLabel,
   DrawingScreenElliottImpulseWaveLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
@@ -726,6 +727,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'elliottCorrectiveWave';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      labels: readonly DrawingScreenElliottCorrectiveWaveLabel[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'headShouldersPattern';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -926,6 +938,10 @@ export type MobileUserDrawingHeadShouldersPatternPrimitive = Extract<
 export type MobileUserDrawingElliottImpulseWavePrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'elliottImpulseWave' }
+>;
+export type MobileUserDrawingElliottCorrectiveWavePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'elliottCorrectiveWave' }
 >;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
@@ -1750,6 +1766,18 @@ function primitiveFromGeometry(
     case 'elliottImpulseWave':
       return {
         kind: 'elliottImpulseWave',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.pattern.polyline.points,
+        labels: geometry.pattern.labels,
+        style: geometry.drawing.style,
+      };
+    case 'elliottCorrectiveWave':
+      return {
+        kind: 'elliottCorrectiveWave',
         id: geometry.drawing.id,
         phase,
         selected,
