@@ -117,6 +117,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'ellipse', icon: '⬭', label: 'Ellipse' },
   { tool: 'priceRange', icon: 'Δ', label: 'Price range' },
   { tool: 'dateRange', icon: '↔', label: 'Date range' },
+  { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'parallelChannel', icon: '▱', label: 'Parallel channel' },
   { tool: 'path', icon: '⌁', label: 'Path' },

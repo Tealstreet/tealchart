@@ -55,6 +55,7 @@ describe('user drawing toolbar descriptors', () => {
       'ellipse',
       'priceRange',
       'dateRange',
+      'fibRetracement',
       'triangle',
       'parallelChannel',
       'path',
@@ -109,6 +110,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibRetracement')).toEqual(
+      expect.objectContaining({ tool: 'fibRetracement', label: 'Fib retracement' }),
     );
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),

@@ -260,6 +260,33 @@ function renderDateRangeGeometry(
   ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2);
 }
 
+function renderFibRetracementGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibRetracement' }>,
+): void {
+  const { drawing, retracement } = geometry;
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    for (const level of retracement.levels) {
+      ctx.beginPath();
+      ctx.moveTo(level.segment.start.x, level.segment.start.y);
+      ctx.lineTo(level.segment.end.x, level.segment.end.y);
+      ctx.stroke();
+    }
+  }
+
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  for (const level of retracement.levels) {
+    ctx.fillText(`${level.label} ${level.price.toFixed(2)}`, level.segment.start.x + 4, level.y - 2);
+  }
+}
+
 function renderTextLabelGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'textLabel' }>,
@@ -401,6 +428,9 @@ export function renderUserDrawing(
         break;
       case 'dateRange':
         renderDateRangeGeometry(ctx, geometry);
+        break;
+      case 'fibRetracement':
+        renderFibRetracementGeometry(ctx, geometry);
         break;
       case 'textLabel':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);

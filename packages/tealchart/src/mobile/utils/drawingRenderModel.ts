@@ -165,6 +165,22 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibRetracement';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      levels: readonly {
+        ratio: number;
+        label: string;
+        price: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'textLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -194,6 +210,7 @@ export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrim
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
+export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
@@ -463,6 +480,23 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'fibRetracement':
+      return {
+        kind: 'fibRetracement',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        levels: geometry.retracement.levels.map((level) => ({
+          ratio: level.ratio,
+          label: `${level.label} ${level.price.toFixed(2)}`,
+          price: level.price,
+          start: level.segment.start,
+          end: level.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
     case 'textLabel':
       const drawing = geometry.drawing as TextLabelDrawing;
       return {

@@ -227,7 +227,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, polygon hit testing, whole-drawing moves, point editing, and fill
   controls use shared drawing behavior on both platforms.
 
-## Current Epic: Parallel Channel Tool
+## Shipped: Parallel Channel Tool
 
 - Shared drawing state supports the three-anchor `parallelChannel` tool and
   persists it through layout save/load.
@@ -235,6 +235,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   from shared screen-space geometry.
 - Selection, rail/polygon hit testing, whole-drawing moves, width-anchor
   editing, and fill controls use shared drawing behavior on both platforms.
+
+## Current Epic: Fibonacci Retracement Tool
+
+- Shared drawing state supports the two-anchor `fibRetracement` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching horizontal Fibonacci retracement
+  levels and ratio/price labels from shared screen-space geometry.
+- Selection, level-line hit testing, endpoint editing, and whole-drawing moves
+  use shared drawing behavior on both platforms.
 
 ## Known Gaps
 
