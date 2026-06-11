@@ -138,6 +138,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibTimeZone', icon: 'T', label: 'Fib time zone' },
   { tool: 'trendBasedFibTime', icon: 'B', label: 'Trend-based fib time' },
   { tool: 'cyclicLines', icon: '|', label: 'Cyclic lines' },
+  { tool: 'timeCycles', icon: '∩', label: 'Time cycles' },
   { tool: 'gannFan', icon: 'G', label: 'Gann fan' },
   { tool: 'gannBox', icon: '□', label: 'Gann box' },
   { tool: 'gannSquare', icon: '◇', label: 'Gann square' },

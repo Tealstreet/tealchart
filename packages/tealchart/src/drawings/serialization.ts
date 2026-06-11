@@ -63,6 +63,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'gannSquare':
     case 'fibTimeZone':
     case 'cyclicLines':
+    case 'timeCycles':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -549,6 +550,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'cyclicLines',
+            points,
+          }
+        : null;
+    }
+    case 'timeCycles': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'timeCycles',
             points,
           }
         : null;

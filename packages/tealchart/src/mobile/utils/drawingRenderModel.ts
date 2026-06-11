@@ -412,6 +412,23 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'timeCycles';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      cycles: readonly {
+        ratio: number;
+        startTime: number;
+        endTime: number;
+        startBoundary: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+        endBoundary: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+        points: readonly DrawingScreenPoint[];
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -634,6 +651,7 @@ export type MobileUserDrawingTrendBasedFibTimePrimitive = Extract<
   { kind: 'trendBasedFibTime' }
 >;
 export type MobileUserDrawingCyclicLinesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'cyclicLines' }>;
+export type MobileUserDrawingTimeCyclesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'timeCycles' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -1185,6 +1203,24 @@ function primitiveFromGeometry(
           x: level.x,
           start: level.segment.start,
           end: level.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'timeCycles':
+      return {
+        kind: 'timeCycles',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        cycles: geometry.timeCycles.cycles.map((cycle) => ({
+          ratio: cycle.ratio,
+          startTime: cycle.startTime,
+          endTime: cycle.endTime,
+          startBoundary: cycle.startBoundary,
+          endBoundary: cycle.endBoundary,
+          points: cycle.points,
         })),
         style: geometry.drawing.style,
       };

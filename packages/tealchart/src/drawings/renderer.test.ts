@@ -1099,6 +1099,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders time cycles as repeated vertical boundaries and sampled arcs', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'time-cycles',
+      kind: 'timeCycles',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,0');
+    expect(ctx.calls).toContain('lineTo:10,100');
+    expect(ctx.calls).toContain('moveTo:20,0');
+    expect(ctx.calls).toContain('lineTo:20,100');
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:15,20');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

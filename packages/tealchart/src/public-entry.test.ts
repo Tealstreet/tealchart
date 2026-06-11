@@ -21,6 +21,7 @@ import {
   resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
   resolveCyclicLinesFromAnchors,
+  resolveTimeCyclesFromAnchors,
   resolveFibWedgeFromAnchors,
   resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
@@ -57,6 +58,7 @@ import type {
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingCurvePrimitive,
   MobileUserDrawingCyclicLinesPrimitive,
+  MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
@@ -91,6 +93,7 @@ import type {
   BarsPatternDrawing,
   CircleDrawing,
   CyclicLinesDrawing,
+  TimeCyclesDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
@@ -174,6 +177,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCyclicLinesPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTimeCyclesPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
@@ -346,6 +350,29 @@ describe('tealchart public entries', () => {
       levels: [{ ratio: 1, time: 2, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 10 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const timeCyclesPrimitive: NonNever<MobileUserDrawingTimeCyclesPrimitive> = {
+      kind: 'timeCycles',
+      id: 'time-cycles',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      cycles: [
+        {
+          ratio: 0,
+          startTime: 1,
+          endTime: 2,
+          startBoundary: { start: { x: 0, y: 0 }, end: { x: 0, y: 10 } },
+          endBoundary: { start: { x: 10, y: 0 }, end: { x: 10, y: 10 } },
+          points: [
+            { x: 0, y: 5 },
+            { x: 5, y: 0 },
+            { x: 10, y: 5 },
+          ],
+        },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannBoxPrimitive: NonNever<MobileUserDrawingGannBoxPrimitive> = {
       kind: 'gannBox',
       id: 'gann-box',
@@ -502,6 +529,7 @@ describe('tealchart public entries', () => {
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(cyclicLinesPrimitive.kind).toBe('cyclicLines');
+    expect(timeCyclesPrimitive.kind).toBe('timeCycles');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(gannBoxPrimitive.kind).toBe('gannBox');
@@ -1418,6 +1446,41 @@ describe('tealchart public entries', () => {
       expect.arrayContaining([
         { ratio: 0, time: 1, x: 50, segment: { start: { x: 50, y: 0 }, end: { x: 50, y: 100 } } },
         { ratio: 1, time: 2, x: 100, segment: { start: { x: 100, y: 0 }, end: { x: 100, y: 100 } } },
+      ]),
+    );
+  });
+
+  it('exports shared drawing time cycle types and resolver', () => {
+    const drawing: TimeCyclesDrawing = {
+      id: 'time-cycles',
+      kind: 'timeCycles',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 20 },
+      ],
+    };
+    const cycles = resolveTimeCyclesFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('timeCycles');
+    expect(cycles.cycles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          ratio: 0,
+          startTime: 1,
+          endTime: 2,
+          points: expect.arrayContaining([{ x: 75, y: 0 }]),
+        }),
       ]),
     );
   });
