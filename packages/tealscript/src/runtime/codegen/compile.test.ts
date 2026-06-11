@@ -91,6 +91,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
       tickerKagi(...args: unknown[]) { return String(args[0] ?? ''); },
       tickerLinebreak(...args: unknown[]) { return String(args[0] ?? ''); },
       tickerPointfigure(...args: unknown[]) { return String(args[0] ?? ''); },
+      requestSecurity() { return NaN; },
     };
     inst.onBar(ctx);
   }
