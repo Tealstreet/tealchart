@@ -504,7 +504,15 @@ function renderPatternGeometry(
   ctx: CanvasContext,
   geometry: Extract<
     ResolvedUserDrawingGeometry,
-    { kind: 'xabcdPattern' | 'abcdPattern' | 'threeDrivesPattern' | 'elliottImpulseWave' | 'elliottCorrectiveWave' }
+    {
+      kind:
+        | 'xabcdPattern'
+        | 'abcdPattern'
+        | 'threeDrivesPattern'
+        | 'elliottImpulseWave'
+        | 'elliottCorrectiveWave'
+        | 'elliottTriangleWave';
+    }
   >,
 ): void {
   const { drawing, pattern } = geometry;
@@ -1177,6 +1185,9 @@ export function renderUserDrawing(
         renderPatternGeometry(ctx, geometry);
         break;
       case 'elliottCorrectiveWave':
+        renderPatternGeometry(ctx, geometry);
+        break;
+      case 'elliottTriangleWave':
         renderPatternGeometry(ctx, geometry);
         break;
       case 'headShouldersPattern':

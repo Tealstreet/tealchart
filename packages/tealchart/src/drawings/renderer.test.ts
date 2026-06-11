@@ -874,6 +874,36 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:C:50,24:#111:center:1:12px sans-serif');
   });
 
+  it('renders Elliott triangle wave drawings as labeled paths', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-triangle',
+      kind: 'elliottTriangleWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 70 },
+        { time: 50, price: 40 },
+        { time: 70, price: 60 },
+        { time: 90, price: 45 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:30,30');
+    expect(ctx.calls).toContain('lineTo:50,60');
+    expect(ctx.calls).toContain('lineTo:70,40');
+    expect(ctx.calls).toContain('lineTo:90,55.00000000000001');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:A:10,44:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:B:30,24:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:C:50,54:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:D:70,34:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:E:90,49.00000000000001:#111:center:1:12px sans-serif');
+  });
+
   it('renders ABCD pattern drawings as labeled stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

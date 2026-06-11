@@ -3,6 +3,7 @@ import type {
   DrawingScreenAbcdPatternLabel,
   DrawingScreenElliottCorrectiveWaveLabel,
   DrawingScreenElliottImpulseWaveLabel,
+  DrawingScreenElliottTriangleWaveLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
   DrawingScreenThreeDrivesPatternLabel,
@@ -738,6 +739,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'elliottTriangleWave';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      labels: readonly DrawingScreenElliottTriangleWaveLabel[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'headShouldersPattern';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -942,6 +954,10 @@ export type MobileUserDrawingElliottImpulseWavePrimitive = Extract<
 export type MobileUserDrawingElliottCorrectiveWavePrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'elliottCorrectiveWave' }
+>;
+export type MobileUserDrawingElliottTriangleWavePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'elliottTriangleWave' }
 >;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
@@ -1778,6 +1794,18 @@ function primitiveFromGeometry(
     case 'elliottCorrectiveWave':
       return {
         kind: 'elliottCorrectiveWave',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.pattern.polyline.points,
+        labels: geometry.pattern.labels,
+        style: geometry.drawing.style,
+      };
+    case 'elliottTriangleWave':
+      return {
+        kind: 'elliottTriangleWave',
         id: geometry.drawing.id,
         phase,
         selected,

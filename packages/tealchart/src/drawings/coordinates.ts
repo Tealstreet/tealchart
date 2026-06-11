@@ -392,6 +392,19 @@ export interface DrawingScreenElliottCorrectiveWave {
   labels: readonly DrawingScreenElliottCorrectiveWaveLabel[];
 }
 
+export const ELLIOTT_TRIANGLE_WAVE_LABELS = ['A', 'B', 'C', 'D', 'E'] as const;
+export type ElliottTriangleWaveLabel = (typeof ELLIOTT_TRIANGLE_WAVE_LABELS)[number];
+
+export interface DrawingScreenElliottTriangleWaveLabel {
+  text: ElliottTriangleWaveLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenElliottTriangleWave {
+  polyline: DrawingScreenPolyline;
+  labels: readonly DrawingScreenElliottTriangleWaveLabel[];
+}
+
 export interface DrawingScreenAnchoredVwap {
   anchor: DrawingScreenPoint;
   points: readonly DrawingScreenPoint[];
@@ -531,6 +544,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'elliottCorrectiveWave';
       drawing: UserDrawing;
       pattern: DrawingScreenElliottCorrectiveWave;
+    }
+  | {
+      kind: 'elliottTriangleWave';
+      drawing: UserDrawing;
+      pattern: DrawingScreenElliottTriangleWave;
     }
   | {
       kind: 'abcdPattern';
@@ -1247,6 +1265,26 @@ export function resolveElliottCorrectiveWaveFromAnchors(
     polyline,
     labels: polyline.points.map((point, index) => ({
       text: ELLIOTT_CORRECTIVE_WAVE_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveElliottTriangleWaveFromAnchors(
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ],
+  space: DrawingCoordinateSpace,
+): DrawingScreenElliottTriangleWave {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  return {
+    polyline,
+    labels: polyline.points.map((point, index) => ({
+      text: ELLIOTT_TRIANGLE_WAVE_LABELS[index]!,
       point,
     })),
   };
@@ -2438,6 +2476,12 @@ export function resolveUserDrawingGeometry(
         kind: 'elliottCorrectiveWave',
         drawing,
         pattern: resolveElliottCorrectiveWaveFromAnchors(drawing.points, space),
+      };
+    case 'elliottTriangleWave':
+      return {
+        kind: 'elliottTriangleWave',
+        drawing,
+        pattern: resolveElliottTriangleWaveFromAnchors(drawing.points, space),
       };
     case 'abcdPattern':
       return {
