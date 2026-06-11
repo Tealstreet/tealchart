@@ -72,6 +72,7 @@ describe('user drawing toolbar descriptors', () => {
       'triangle',
       'parallelChannel',
       'regressionTrend',
+      'flatTopBottom',
       'path',
       'textLabel',
     ]);
@@ -151,6 +152,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('regressionTrend')).toEqual(
       expect.objectContaining({ tool: 'regressionTrend', label: 'Regression trend' }),
+    );
+    expect(getUserDrawingToolDescriptor('flatTopBottom')).toEqual(
+      expect.objectContaining({ tool: 'flatTopBottom', label: 'Flat top/bottom' }),
     );
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
@@ -433,6 +437,18 @@ describe('user drawing toolbar descriptors', () => {
         ...rectangle,
         id: 'regression',
         kind: 'regressionTrend' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'flat',
+        kind: 'flatTopBottom' as const,
         points: [
           { time: 1, price: 10 },
           { time: 2, price: 12 },

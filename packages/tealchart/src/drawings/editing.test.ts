@@ -854,6 +854,82 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags flat top and bottom point handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'flat',
+      kind: 'flatTopBottom',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'flat', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'flat', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 10, y: 80 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 70 },
+      { now: () => 12 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 20, price: 30 },
+      ],
+      updatedAt: 12,
+    });
+  });
+
+  it('moves selected flat top and bottom drawings by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'flat',
+      kind: 'flatTopBottom',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'flat' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'flat' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 13 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 40 },
+        { time: 100, price: 70 },
+        { time: 20, price: 10 },
+      ],
+      updatedAt: 13,
+    });
+  });
+
   it('moves selected regression trends by time delta without distorting fitted prices', () => {
     const drawing: UserDrawing = {
       ...base,

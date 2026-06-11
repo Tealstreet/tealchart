@@ -568,6 +568,35 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, regressionSpace, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits flat top and bottom fills, rails, and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'flat',
+      kind: 'flatTopBottom',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('flat');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)?.drawing.id).toBe('flat');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 50 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 0,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 80 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 95 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

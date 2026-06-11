@@ -217,7 +217,7 @@ export type ResolvedUserDrawingGeometry =
       polygon: DrawingScreenPolyline;
     }
   | {
-      kind: 'parallelChannel' | 'regressionTrend';
+      kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom';
       drawing: UserDrawing;
       channel: DrawingScreenParallelChannel;
     }
@@ -652,6 +652,27 @@ export function resolveParallelChannelFromAnchors(
   };
 }
 
+export function resolveFlatTopBottomFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  flat: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenParallelChannel {
+  const start = anchorToScreenPoint(first, space);
+  const end = anchorToScreenPoint(second, space);
+  const flatPoint = anchorToScreenPoint(flat, space);
+  const flatStart = { x: start.x, y: flatPoint.y };
+  const flatEnd = { x: end.x, y: flatPoint.y };
+
+  return {
+    base: { start, end },
+    parallel: { start: flatStart, end: flatEnd },
+    polygon: {
+      points: [start, end, flatEnd, flatStart],
+    },
+  };
+}
+
 function resolveRegressionPriceAt(time: number, bars: readonly Bar[]): number {
   const xOrigin = bars[0]?.time ?? time;
   let sumX = 0;
@@ -942,6 +963,12 @@ export function resolveUserDrawingGeometry(
         kind: drawing.kind,
         drawing,
         channel: resolveParallelChannelFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'flatTopBottom':
+      return {
+        kind: 'flatTopBottom',
+        drawing,
+        channel: resolveFlatTopBottomFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'regressionTrend':
       return {
