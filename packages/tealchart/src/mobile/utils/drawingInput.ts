@@ -41,6 +41,6 @@ export function resolveMobileUserDrawingInputPoint({
 
   return {
     ...inputPoint,
-    bars: inputPoint.paneId === 'main' ? bars : undefined,
+    bars: inputPoint.paneId === 'main' && bars && bars.length > 0 ? bars : undefined,
   };
 }
