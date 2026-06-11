@@ -670,6 +670,41 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready pitchfork variant primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'inside',
+          kind: 'insidePitchfork',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 80 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'pitchfork',
+      id: 'inside',
+      median: { start: { x: 30, y: 35 }, end: { x: 100, y: expect.closeTo(192.5) } },
+      upper: { start: { x: 10, y: 50 }, end: { x: 100, y: expect.closeTo(252.5) } },
+      lower: { start: { x: 50, y: 20 }, end: { x: 100, y: expect.closeTo(132.5) } },
+    });
+  });
+
   it('returns Skia-ready regression trend primitives', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,

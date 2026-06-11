@@ -60,6 +60,7 @@ import type {
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
+  DrawingPitchforkVariant,
   EllipseDrawing,
   ExtendedLineDrawing,
   FlatTopBottomDrawing,
@@ -68,6 +69,7 @@ import type {
   PathDrawing,
   ParallelChannelDrawing,
   PitchforkDrawing,
+  PitchforkDrawingKind,
   PriceRangeDrawing,
   RegressionTrendDrawing,
   RotatedRectangleDrawing,
@@ -744,9 +746,11 @@ describe('tealchart public entries', () => {
   });
 
   it('exports shared drawing pitchfork types', () => {
+    const kind: PitchforkDrawingKind = 'modifiedSchiffPitchfork';
+    const variant: DrawingPitchforkVariant = 'modifiedSchiff';
     const drawing: PitchforkDrawing = {
       id: 'pitchfork',
-      kind: 'pitchfork',
+      kind,
       paneId: 'main',
       visible: true,
       locked: false,
@@ -760,7 +764,8 @@ describe('tealchart public entries', () => {
       ],
     };
 
-    expect(drawing.kind).toBe('pitchfork');
+    expect(variant).toBe('modifiedSchiff');
+    expect(drawing.kind).toBe('modifiedSchiffPitchfork');
   });
 
   it('exports shared drawing regression trend types', () => {

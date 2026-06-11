@@ -734,6 +734,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders pitchfork variants with their adjusted median geometry', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'schiff',
+      kind: 'schiffPitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,35');
+    expect(ctx.calls).toContain('lineTo:100,68.75');
+    expect(ctx.calls).toContain('moveTo:50,20');
+    expect(ctx.calls).toContain('lineTo:100,38.75');
+    expect(ctx.calls).toContain('moveTo:50,80');
+    expect(ctx.calls).toContain('lineTo:100,98.75');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
