@@ -73,7 +73,8 @@ export type UserDrawingTool =
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
 export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment' | 'priceNote' | 'balloon';
-export type UserDrawingIconName = 'star';
+export const USER_DRAWING_ICON_NAMES = ['star', 'circle', 'square', 'triangle', 'flag', 'arrowUp', 'arrowDown'] as const;
+export type UserDrawingIconName = (typeof USER_DRAWING_ICON_NAMES)[number];
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -596,6 +597,12 @@ export function normalizeUserDrawingOpacity(opacity: number): number {
   return Math.max(0, Math.min(1, opacity));
 }
 
+export function normalizeUserDrawingIconName(iconName: unknown): UserDrawingIconName {
+  return USER_DRAWING_ICON_NAMES.includes(iconName as UserDrawingIconName)
+    ? (iconName as UserDrawingIconName)
+    : 'star';
+}
+
 export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingStyle {
   const fontSize = style.fontSize === undefined ? undefined : normalizeUserDrawingFontSize(style.fontSize);
   const fontFamily =
@@ -1095,7 +1102,7 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'icon',
         point: draft.anchors[0]!,
-        iconName: 'star',
+        iconName: normalizeUserDrawingIconName('star'),
       };
     case 'callout':
     case 'priceNote':

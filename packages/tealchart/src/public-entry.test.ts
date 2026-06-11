@@ -6,6 +6,7 @@ import { clearChartStoreCache } from './state/chartState';
 import {
   formatTrendAngleDegrees,
   normalizeUserDrawingFontFamily,
+  normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
   resolveAnchoredVwapFromAnchor,
   resolveArcFromAnchors,
@@ -42,10 +43,13 @@ import {
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
+  setUserDrawingIconName,
   setUserDrawingTextAlign,
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
+  USER_DRAWING_ICON_NAMES,
+  USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   resolveBarsPatternFromAnchors,
@@ -158,6 +162,7 @@ import type {
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
   UserDrawingHitTestTextMeasure,
+  UserDrawingIconNameDescriptor,
   UserDrawingInfoLineMetrics,
   UserDrawingTextLabelLayout,
   UserDrawingOpacityDescriptor,
@@ -178,6 +183,7 @@ describe('tealchart public entries', () => {
 
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
+    expect(setUserDrawingIconName).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
     expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');
@@ -186,6 +192,7 @@ describe('tealchart public entries', () => {
     expect(resolveAnchoredVwapFromAnchor).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
+    expect(nativeEntry).toContain('setMobileUserDrawingIconName');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingRiskRewardLabelPosition');
@@ -791,6 +798,17 @@ describe('tealchart public entries', () => {
     expect(normalizeUserDrawingOpacity(0.5)).toBe(0.5);
     expect(descriptor.label).toBe('100 percent opacity');
     expect(USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity)).toEqual([1, 0.75, 0.5, 0.25]);
+  });
+
+  it('exports shared drawing icon-name helpers', () => {
+    const descriptor: UserDrawingIconNameDescriptor = USER_DRAWING_ICON_NAME_DESCRIPTORS[0]!;
+    expect(descriptor.iconName).toBe('star');
+    expect(normalizeUserDrawingIconName('flag')).toBe('flag');
+    expect(normalizeUserDrawingIconName('unknown')).toBe('star');
+    expect(USER_DRAWING_ICON_NAMES).toEqual(['star', 'circle', 'square', 'triangle', 'flag', 'arrowUp', 'arrowDown']);
+    expect(USER_DRAWING_ICON_NAME_DESCRIPTORS.map((descriptor) => descriptor.iconName)).toEqual(
+      USER_DRAWING_ICON_NAMES,
+    );
   });
 
   it('exports shared drawing style toggle descriptors', () => {
