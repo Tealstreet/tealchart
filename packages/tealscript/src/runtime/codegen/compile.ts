@@ -9,6 +9,8 @@ import {
   DEMA, TEMA, Cum,
 } from './index';
 import * as arrFuncs from '../arrays';
+import * as mapFuncs from '../maps';
+import * as udtFuncs from '../objects';
 
 export interface CompiledScript {
   ScriptClass: new (deps: ScriptDependencies) => GeneratedScriptInstance;
@@ -68,10 +70,33 @@ export interface ArrayHelpers {
   filter(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): arrFuncs.PineArray;
 }
 
+export interface MapHelpers {
+  create(): mapFuncs.PineMap;
+  put(map: mapFuncs.PineMap, key: unknown, value: unknown): unknown;
+  get(map: mapFuncs.PineMap, key: unknown): unknown;
+  contains(map: mapFuncs.PineMap, key: unknown): boolean;
+  remove(map: mapFuncs.PineMap, key: unknown): unknown;
+  clear(map: mapFuncs.PineMap): void;
+  copy(map: mapFuncs.PineMap): mapFuncs.PineMap;
+  keys(map: mapFuncs.PineMap): arrFuncs.PineArray;
+  values(map: mapFuncs.PineMap): arrFuncs.PineArray;
+  size(map: mapFuncs.PineMap): number;
+  putAll(target: mapFuncs.PineMap, source: mapFuncs.PineMap): void;
+}
+
+export interface UdtHelpers {
+  create(typeName: string, fields: Iterable<[string, unknown]>, varipFields: Iterable<string>): udtFuncs.PineUdtObject;
+  getField(obj: udtFuncs.PineUdtObject, fieldName: string): unknown;
+  setField(obj: udtFuncs.PineUdtObject, fieldName: string, value: unknown): void;
+  copy(obj: udtFuncs.PineUdtObject): udtFuncs.PineUdtObject;
+}
+
 export interface ScriptDependencies {
   NumericSeries: typeof NumericSeries;
   maxBarsBack: number;
   _arr: ArrayHelpers;
+  _map: MapHelpers;
+  _udt: UdtHelpers;
   SMA: typeof SMA;
   EMA: typeof EMA;
   RMA: typeof RMA;
@@ -130,6 +155,14 @@ export interface CompiledBarContext {
   logError(...args: unknown[]): void;
   runtimeError(...args: unknown[]): void;
   callBuiltin(name: string, args: unknown[]): unknown;
+  tickerNew(...args: unknown[]): string;
+  tickerModify(...args: unknown[]): string;
+  tickerStandard(...args: unknown[]): string;
+  tickerHeikinashi(...args: unknown[]): string;
+  tickerRenko(...args: unknown[]): string;
+  tickerKagi(...args: unknown[]): string;
+  tickerLinebreak(...args: unknown[]): string;
+  tickerPointfigure(...args: unknown[]): string;
   colorNew(...args: unknown[]): unknown;
   colorRgb(...args: unknown[]): unknown;
   colorR(c: unknown): unknown;
@@ -239,10 +272,33 @@ export const ARRAY_HELPERS: ArrayHelpers = {
   filter: filterArray,
 } as ArrayHelpers;
 
+export const MAP_HELPERS: MapHelpers = {
+  create: mapFuncs.createPineMap,
+  put: mapFuncs.putMapValue,
+  get: mapFuncs.getMapValue,
+  contains: mapFuncs.containsMapKey,
+  remove: mapFuncs.removeMapValue,
+  clear: mapFuncs.clearMap,
+  copy: mapFuncs.copyMap,
+  keys: mapFuncs.mapKeys,
+  values: mapFuncs.mapValues,
+  size: mapFuncs.getMapSize,
+  putAll: mapFuncs.putAllMapValues,
+};
+
+export const UDT_HELPERS: UdtHelpers = {
+  create: udtFuncs.createPineUdtObject,
+  getField: udtFuncs.getUdtField,
+  setField: udtFuncs.setUdtField,
+  copy: udtFuncs.copyUdtObject,
+};
+
 const DEFAULT_DEPS: ScriptDependencies = {
   NumericSeries,
   maxBarsBack: 500,
   _arr: ARRAY_HELPERS,
+  _map: MAP_HELPERS,
+  _udt: UDT_HELPERS,
   SMA, EMA, RMA, RSI, Crossover, Crossunder, Change,
   Highest, Lowest, MACD, ATR, Stoch, StdDev, BB,
   DEMA, TEMA, Cum,
