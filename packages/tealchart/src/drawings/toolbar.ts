@@ -129,6 +129,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
   { tool: 'fibFan', icon: 'F', label: 'Fib fan' },
+  { tool: 'fibChannel', icon: 'C', label: 'Fib channel' },
   { tool: 'gannFan', icon: 'G', label: 'Gann fan' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'polyline', icon: '⌁', label: 'Polyline' },

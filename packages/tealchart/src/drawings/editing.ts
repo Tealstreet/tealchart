@@ -124,6 +124,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!], updatedAt };
       }
     case 'triangle':
+    case 'fibChannel':
     case 'pitchfork':
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
@@ -328,6 +329,7 @@ function editDrawingHandle(
     case 'path':
     case 'polyline':
     case 'triangle':
+    case 'fibChannel':
     case 'pitchfork':
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':

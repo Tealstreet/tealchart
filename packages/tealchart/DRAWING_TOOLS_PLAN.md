@@ -422,11 +422,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, ray hit testing, whole-drawing moves, and endpoint editing use
   shared drawing behavior on both platforms.
 
+## Shipped: Fibonacci Channel Tool
+
+- Shared drawing state supports the three-anchor `fibChannel` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching Fibonacci channel levels from the
+  shared fib channel geometry resolver.
+- Selection, channel/level hit testing, whole-drawing moves, and point-index
+  handle editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
-  Fibonacci tools beyond retracement/extension/fan, Gann tools beyond fan,
+  Fibonacci tools beyond retracement/extension/fan/channel, Gann tools beyond fan,
   pattern tools, volume profile tools, annotation/icon
   tools, and curved geometry.
 - Additional TradingView measurement tool polish beyond the current price/date

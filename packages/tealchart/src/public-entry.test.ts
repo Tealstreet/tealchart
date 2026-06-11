@@ -11,6 +11,7 @@ import {
   resolveCircleFromAnchors,
   resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
+  resolveFibChannelFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveFibFanFromAnchors,
   resolveGannFanFromAnchors,
@@ -46,6 +47,7 @@ import type {
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
+  MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibFanPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingPitchfanPrimitive,
@@ -69,6 +71,7 @@ import type {
   DrawingPitchforkVariant,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FibChannelDrawing,
   FibFanDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
@@ -202,6 +205,22 @@ describe('tealchart public entries', () => {
       kind: 'fibFan',
       id: 'fib-fan',
     };
+    const fibChannelPrimitive: NonNever<MobileUserDrawingFibChannelPrimitive> = {
+      kind: 'fibChannel',
+      id: 'fib-channel',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [
+        { x: 0, y: 5 },
+        { x: 10, y: 5 },
+        { x: 10, y: 0 },
+        { x: 0, y: 0 },
+      ],
+      levels: [{ ratio: 0.5, start: { x: 0, y: 3 }, end: { x: 10, y: 3 } }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannFanPrimitive: NonNever<MobileUserDrawingGannFanPrimitive> = {
       ...pitchfanPrimitive,
       kind: 'gannFan',
@@ -286,6 +305,7 @@ describe('tealchart public entries', () => {
     expect(pitchforkPrimitive.kind).toBe('pitchfork');
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
     expect(fibFanPrimitive.kind).toBe('fibFan');
+    expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
@@ -872,6 +892,33 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('gannFan');
     expect(fan.rays).toHaveLength(9);
+  });
+
+  it('exports shared drawing fib channel types and resolver', () => {
+    const drawing: FibChannelDrawing = {
+      id: 'fib-channel',
+      kind: 'fibChannel',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+        { time: 1, price: 12 },
+      ],
+    };
+    const channel = resolveFibChannelFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibChannel');
+    expect(channel.levels).toHaveLength(11);
   });
 
   it('exports shared drawing regression trend types', () => {

@@ -257,6 +257,35 @@ function renderGannFanGeometry(
   ctx.stroke();
 }
 
+function renderFibChannelGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibChannel' }>,
+): void {
+  if (geometry.drawing.style.fillVisible !== false && geometry.drawing.style.fillColor) {
+    const [firstPoint, ...remainingPoints] = geometry.fibChannel.polygon.points;
+    if (firstPoint) {
+      ctx.beginPath();
+      ctx.moveTo(firstPoint.x, firstPoint.y);
+      for (const point of remainingPoints) {
+        ctx.lineTo(point.x, point.y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = geometry.drawing.style.fillColor;
+      ctx.fill();
+    }
+  }
+
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const level of geometry.fibChannel.levels) {
+    ctx.moveTo(level.segment.start.x, level.segment.start.y);
+    ctx.lineTo(level.segment.end.x, level.segment.end.y);
+  }
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -663,6 +692,9 @@ export function renderUserDrawing(
         break;
       case 'gannFan':
         renderGannFanGeometry(ctx, geometry);
+        break;
+      case 'fibChannel':
+        renderFibChannelGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':
