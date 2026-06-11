@@ -10,9 +10,11 @@ import {
   getRequiredAnchorCount,
   getUserDrawingPaneId,
   isDrawingDraftReady,
+  normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
+  USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
@@ -66,6 +68,15 @@ describe('user drawing types', () => {
     });
   });
 
+  it('normalizes drawing font families to supported cross-platform values', () => {
+    expect(USER_DRAWING_FONT_FAMILIES).toEqual(['sans-serif', 'serif', 'monospace']);
+    expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
+    expect(normalizeUserDrawingFontFamily('Papyrus')).toBe('sans-serif');
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, fontFamily: 'fantasy' })).toMatchObject({
+      fontFamily: 'sans-serif',
+    });
+  });
+
   it('normalizes drawing opacity to a cross-platform alpha range', () => {
     expect(USER_DRAWING_OPACITIES).toEqual([1, 0.75, 0.5, 0.25]);
     expect(normalizeUserDrawingOpacity(-0.5)).toBe(0);
@@ -115,7 +126,7 @@ describe('user drawing types', () => {
         draft({
           tool: 'textLabel',
           anchors: [anchorA],
-          style: { ...DEFAULT_USER_DRAWING_STYLE, fontSize: 15 },
+          style: { ...DEFAULT_USER_DRAWING_STYLE, fontSize: 15, fontFamily: 'monospace' },
           text: 'Note',
         }),
         { id: 't' },
@@ -123,7 +134,7 @@ describe('user drawing types', () => {
     ).toMatchObject({
       kind: 'textLabel',
       point: anchorA,
-      style: expect.objectContaining({ fontSize: 14 }),
+      style: expect.objectContaining({ fontFamily: 'monospace', fontSize: 14 }),
       text: 'Note',
       textAlign: 'center',
     });
