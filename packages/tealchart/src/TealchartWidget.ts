@@ -17,7 +17,9 @@ import type {
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
+  UserDrawingStyle,
   UserDrawingTool,
+  UpdateUserDrawingOptions,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
@@ -40,8 +42,11 @@ import {
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   serializeUserDrawingStateForLayout,
+  setUserDrawingLocked as setUserDrawingLockedState,
   setUserDrawingText,
   setUserDrawingTool,
+  setUserDrawingVisibility as setUserDrawingVisibilityState,
+  updateUserDrawingStyle as updateUserDrawingStyleState,
   updateUserDrawingTextEdit,
 } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
@@ -2220,6 +2225,24 @@ export class TealchartWidget {
   setUserDrawingText(drawingId: string, text: string): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingText(this._userDrawingState, drawingId, text));
+    return this._userDrawingState !== previousState;
+  }
+
+  updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(updateUserDrawingStyleState(this._userDrawingState, style, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingVisibilityState(this._userDrawingState, visible, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingLockedState(this._userDrawingState, locked, options));
     return this._userDrawingState !== previousState;
   }
 
