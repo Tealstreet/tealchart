@@ -1579,6 +1579,36 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'crossLine') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip}>
+                <SkiaLine
+                  p1={vec(primitive.horizontal.start.x, primitive.horizontal.start.y)}
+                  p2={vec(primitive.horizontal.end.x, primitive.horizontal.end.y)}
+                  color={primitive.style.lineColor}
+                  opacity={primitive.opacity}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+                <SkiaLine
+                  p1={vec(primitive.vertical.start.x, primitive.vertical.start.y)}
+                  p2={vec(primitive.vertical.end.x, primitive.vertical.end.y)}
+                  color={primitive.style.lineColor}
+                  opacity={primitive.opacity}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  style="stroke"
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'arrowMarker') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();

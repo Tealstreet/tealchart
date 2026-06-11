@@ -235,6 +235,24 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders cross lines through the anchor across chart and pane bounds', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'cross-line',
+      kind: 'crossLine',
+      point: { time: 30, price: 70 },
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:0,30');
+    expect(ctx.calls).toContain('lineTo:100,30');
+    expect(ctx.calls).toContain('moveTo:30,0');
+    expect(ctx.calls).toContain('lineTo:30,100');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders circles through CanvasContext arcs', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

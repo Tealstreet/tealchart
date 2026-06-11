@@ -464,6 +464,31 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores cross line drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'cross-line',
+          kind: 'crossLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'cross-line',
+      kind: 'crossLine',
+      point: { time: 1, price: 10 },
+    });
+  });
+
   it('restores info line drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

@@ -68,6 +68,19 @@ function renderLineGeometry(
   }
 }
 
+function renderCrossLineGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'crossLine' }>,
+): void {
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(geometry.crossLine.horizontal.start.x, geometry.crossLine.horizontal.start.y);
+  ctx.lineTo(geometry.crossLine.horizontal.end.x, geometry.crossLine.horizontal.end.y);
+  ctx.moveTo(geometry.crossLine.vertical.start.x, geometry.crossLine.vertical.start.y);
+  ctx.lineTo(geometry.crossLine.vertical.end.x, geometry.crossLine.vertical.end.y);
+  ctx.stroke();
+}
+
 function renderPathGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'path' }>,
@@ -388,6 +401,11 @@ export function renderUserDrawing(
       case 'verticalLine':
         if (drawing.style.lineVisible !== false) {
           renderLineGeometry(ctx, geometry);
+        }
+        break;
+      case 'crossLine':
+        if (drawing.style.lineVisible !== false) {
+          renderCrossLineGeometry(ctx, geometry);
         }
         break;
       case 'arrowLine':

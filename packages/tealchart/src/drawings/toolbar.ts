@@ -111,6 +111,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'arrowMarkDown', icon: '↓', label: 'Arrow mark down' },
   { tool: 'ray', icon: '↗', label: 'Ray' },
   { tool: 'horizontalRay', icon: '↦', label: 'Horizontal ray' },
+  { tool: 'crossLine', icon: '⊕', label: 'Cross line' },
   { tool: 'horizontalLine', icon: 'H', label: 'Horizontal line' },
   { tool: 'verticalLine', icon: 'V', label: 'Vertical line' },
   { tool: 'rectangle', icon: '□', label: 'Rectangle' },

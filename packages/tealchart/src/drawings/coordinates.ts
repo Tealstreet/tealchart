@@ -46,6 +46,12 @@ export interface DrawingScreenParallelChannel {
   polygon: DrawingScreenPolyline;
 }
 
+export interface DrawingScreenCrossLine {
+  horizontal: DrawingScreenSegment;
+  vertical: DrawingScreenSegment;
+  point: DrawingScreenPoint;
+}
+
 export interface DrawingScreenFibLevel {
   ratio: number;
   label: string;
@@ -87,6 +93,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'line' | 'arrowLine' | 'ray' | 'horizontalRay' | 'horizontalLine' | 'verticalLine';
       drawing: UserDrawing;
       segment: DrawingScreenSegment;
+    }
+  | {
+      kind: 'crossLine';
+      drawing: UserDrawing;
+      crossLine: DrawingScreenCrossLine;
     }
   | {
       kind: 'arrowMarker';
@@ -522,6 +533,18 @@ export function resolveUserDrawingGeometry(
         kind: 'horizontalRay',
         drawing,
         segment: { start, end: { x: space.chartRight, y: start.y } },
+      };
+    }
+    case 'crossLine': {
+      const point = anchorToScreenPoint(drawing.point, space);
+      return {
+        kind: 'crossLine',
+        drawing,
+        crossLine: {
+          point,
+          horizontal: { start: { x: space.chartLeft, y: point.y }, end: { x: space.chartRight, y: point.y } },
+          vertical: { start: { x: point.x, y: space.pane.top }, end: { x: point.x, y: space.pane.bottom } },
+        },
       };
     }
     case 'horizontalLine': {
