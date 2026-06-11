@@ -1354,6 +1354,29 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits triangle pattern fill, boundaries, and four anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'triangle-pattern',
+      kind: 'trianglePattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 20 },
+        { time: 50, price: 70 },
+        { time: 70, price: 35 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 40 }, space)?.drawing.id).toBe('triangle-pattern');
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 20 }, space)?.drawing.id).toBe('triangle-pattern');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 65 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 3,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('does not hit clipped drawing geometry outside its pane bounds', () => {
     const mainSpace: DrawingCoordinateSpace = {
       ...space,

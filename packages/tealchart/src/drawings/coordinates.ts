@@ -298,6 +298,21 @@ export interface DrawingScreenBarsPattern {
   placement: DrawingScreenPoint;
 }
 
+export const TRIANGLE_PATTERN_LABELS = ['A', 'B', 'C', 'D'] as const;
+export type TrianglePatternLabel = (typeof TRIANGLE_PATTERN_LABELS)[number];
+
+export interface DrawingScreenTrianglePatternLabel {
+  text: TrianglePatternLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenTrianglePattern {
+  points: readonly DrawingScreenPoint[];
+  polygon: DrawingScreenPolyline;
+  boundaries: readonly [DrawingScreenSegment, DrawingScreenSegment];
+  labels: readonly DrawingScreenTrianglePatternLabel[];
+}
+
 export const ABCD_PATTERN_LABELS = ['A', 'B', 'C', 'D'] as const;
 export type AbcdPatternLabel = (typeof ABCD_PATTERN_LABELS)[number];
 
@@ -433,6 +448,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'barsPattern';
       drawing: UserDrawing;
       pattern: DrawingScreenBarsPattern;
+    }
+  | {
+      kind: 'trianglePattern';
+      drawing: UserDrawing;
+      pattern: DrawingScreenTrianglePattern;
     }
   | {
       kind: 'xabcdPattern';
@@ -1038,6 +1058,26 @@ export function resolveAbcdPatternFromAnchors(
     polyline,
     labels: polyline.points.map((point, index) => ({
       text: ABCD_PATTERN_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveTrianglePatternFromAnchors(
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
+  space: DrawingCoordinateSpace,
+): DrawingScreenTrianglePattern {
+  const screenPoints = resolvePolylineFromAnchors(points, space).points;
+  const [a, b, c, d] = screenPoints;
+  return {
+    points: screenPoints,
+    polygon: { points: [a!, c!, d!, b!] },
+    boundaries: [
+      { start: a!, end: c! },
+      { start: b!, end: d! },
+    ],
+    labels: screenPoints.map((point, index) => ({
+      text: TRIANGLE_PATTERN_LABELS[index]!,
       point,
     })),
   };
@@ -2213,6 +2253,12 @@ export function resolveUserDrawingGeometry(
           drawing.bars,
           false,
         ),
+      };
+    case 'trianglePattern':
+      return {
+        kind: 'trianglePattern',
+        drawing,
+        pattern: resolveTrianglePatternFromAnchors(drawing.points, space),
       };
     case 'xabcdPattern':
       return {
