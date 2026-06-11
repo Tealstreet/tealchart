@@ -11,8 +11,8 @@ export class NumericSeries {
   capacity: number;
 
   constructor(capacity: number = 500) {
-    this.capacity = capacity;
-    this.buf = new Float64Array(capacity);
+    this.capacity = Math.max(1, Math.trunc(capacity));
+    this.buf = new Float64Array(this.capacity);
     this.buf.fill(NaN);
   }
 

@@ -111,12 +111,10 @@ export class SMA implements Saveable {
 
 interface EMASnapshot {
   value: number;
-  barCount: number;
 }
 
 export class EMA implements Saveable {
   private value: number = NaN;
-  private barCount: number = 0;
   private readonly alpha: number;
 
   private snap: EMASnapshot | null = null;
@@ -126,20 +124,18 @@ export class EMA implements Saveable {
   }
 
   compute(src: number): number {
-    this.snap = { value: this.value, barCount: this.barCount };
+    this.snap = { value: this.value };
     return this._advance(src);
   }
 
   recompute(src: number): number {
     if (this.snap) {
       this.value = this.snap.value;
-      this.barCount = this.snap.barCount;
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
-    this.barCount++;
     if (src !== src) return NaN;
     if (this.value !== this.value) {
       this.value = src;
@@ -150,12 +146,11 @@ export class EMA implements Saveable {
   }
 
   save(): EMASnapshot {
-    return { value: this.value, barCount: this.barCount };
+    return { value: this.value };
   }
 
   restore(snap: EMASnapshot): void {
     this.value = snap.value;
-    this.barCount = snap.barCount;
     this.snap = null;
   }
 }
@@ -244,14 +239,12 @@ interface RSISnapshot {
   prevSrc: number;
   gainRMA: unknown;
   lossRMA: unknown;
-  barCount: number;
 }
 
 export class RSI implements Saveable {
   private prevSrc: number = NaN;
   private gainRMA: RMA;
   private lossRMA: RMA;
-  private barCount: number = 0;
 
   private snap: RSISnapshot | null = null;
 
@@ -265,7 +258,6 @@ export class RSI implements Saveable {
       prevSrc: this.prevSrc,
       gainRMA: this.gainRMA.save(),
       lossRMA: this.lossRMA.save(),
-      barCount: this.barCount,
     };
     return this._advance(src, false);
   }
@@ -275,13 +267,11 @@ export class RSI implements Saveable {
       this.prevSrc = this.snap.prevSrc;
       this.gainRMA.restore(this.snap.gainRMA as RMASnapshot);
       this.lossRMA.restore(this.snap.lossRMA as RMASnapshot);
-      this.barCount = this.snap.barCount;
     }
     return this._advance(src, true);
   }
 
   private _advance(src: number, isRecompute: boolean): number {
-    this.barCount++;
     if (src !== src) return NaN;
 
     if (this.prevSrc !== this.prevSrc) {
@@ -309,7 +299,6 @@ export class RSI implements Saveable {
       prevSrc: this.prevSrc,
       gainRMA: this.gainRMA.save(),
       lossRMA: this.lossRMA.save(),
-      barCount: this.barCount,
     };
   }
 
@@ -317,7 +306,6 @@ export class RSI implements Saveable {
     this.prevSrc = snap.prevSrc;
     this.gainRMA.restore(snap.gainRMA as RMASnapshot);
     this.lossRMA.restore(snap.lossRMA as RMASnapshot);
-    this.barCount = snap.barCount;
     this.snap = null;
   }
 }
@@ -662,13 +650,11 @@ export class MACD implements Saveable {
 interface ATRSnapshot {
   prevClose: number;
   rma: unknown;
-  barCount: number;
 }
 
 export class ATR implements Saveable {
   private prevClose: number = NaN;
   private rma: RMA;
-  private barCount: number = 0;
 
   private snap: ATRSnapshot | null = null;
 
@@ -680,7 +666,6 @@ export class ATR implements Saveable {
     this.snap = {
       prevClose: this.prevClose,
       rma: this.rma.save(),
-      barCount: this.barCount,
     };
     return this._advance(high, low, close, false);
   }
@@ -689,13 +674,12 @@ export class ATR implements Saveable {
     if (this.snap) {
       this.prevClose = this.snap.prevClose;
       this.rma.restore(this.snap.rma as RMASnapshot);
-      this.barCount = this.snap.barCount;
     }
     return this._advance(high, low, close, true);
   }
 
   private _advance(high: number, low: number, close: number, isRecompute: boolean): number {
-    this.barCount++;
+    if (high !== high || low !== low || close !== close) return NaN;
     let tr: number;
     if (this.prevClose !== this.prevClose) {
       tr = high - low;
@@ -710,14 +694,12 @@ export class ATR implements Saveable {
     return {
       prevClose: this.prevClose,
       rma: this.rma.save(),
-      barCount: this.barCount,
     };
   }
 
   restore(snap: ATRSnapshot): void {
     this.prevClose = snap.prevClose;
     this.rma.restore(snap.rma as RMASnapshot);
-    this.barCount = snap.barCount;
     this.snap = null;
   }
 }
