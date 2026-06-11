@@ -271,6 +271,42 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags info line endpoints without moving the opposite endpoint', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'info',
+      kind: 'infoLine',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'info', handle: 'end' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'info', handle: 'end' },
+        startPoint: { x: 20, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 70, y: 30 },
+      { now: () => 3 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 80 },
+        { time: 70, price: 70 },
+      ],
+      updatedAt: 3,
+    });
+  });
+
   it('drags rectangle corner handles around the opposite corner', () => {
     const drawing: UserDrawing = {
       ...base,

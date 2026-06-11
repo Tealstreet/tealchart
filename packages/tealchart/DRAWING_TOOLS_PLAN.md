@@ -164,7 +164,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, fill controls, and boundary editing reuse shared
   drawing behavior on both platforms.
 
-## Current Epic: Path Tool
+## Shipped: Path Tool
 
 - Shared drawing state supports a fixed three-anchor `path` tool and persists it
   through layout save/load.
@@ -173,11 +173,19 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, whole-drawing moves, and point-index handle editing
   use shared logic on both platforms.
 
+## Current Epic: Info Line Tool
+
+- Shared drawing state supports the two-anchor `infoLine` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching finite line segments with shared
+  price/percent and elapsed-time labels.
+- Selection, hit testing, and endpoint editing reuse line-family behavior on
+  both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Additional TradingView line-family tools such as info lines and multi-point
-  arrows.
+- Additional TradingView line-family tools such as multi-point arrows.
 - Additional TradingView measurement tools such as bars pattern and risk/reward.
 - Freehand/variable-point path capture beyond the initial fixed three-anchor
   path workflow.

@@ -153,11 +153,13 @@ function hitTestUserDrawingHandle(
 
   switch (geometry.kind) {
     case 'line':
+    case 'infoLine':
     case 'arrowLine':
     case 'ray': {
       if (
         geometry.drawing.kind === 'trendLine' ||
         geometry.drawing.kind === 'extendedLine' ||
+        geometry.drawing.kind === 'infoLine' ||
         geometry.drawing.kind === 'arrowLine' ||
         geometry.drawing.kind === 'ray'
       ) {
