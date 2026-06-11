@@ -154,7 +154,7 @@ export interface CompiledBarContext {
   logWarning(...args: unknown[]): void;
   logError(...args: unknown[]): void;
   runtimeError(...args: unknown[]): void;
-  callBuiltin(name: string, args: unknown[]): unknown;
+  callBuiltin(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
   tickerNew(...args: unknown[]): string;
   tickerModify(...args: unknown[]): string;
   tickerStandard(...args: unknown[]): string;
