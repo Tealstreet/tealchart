@@ -19,6 +19,7 @@ export {
   resolveRaySegment,
   resolveRegressionTrendFromAnchors,
   resolveRectFromAnchors,
+  resolveRiskRewardPositionFromAnchors,
   resolveTrendAngleFromSegment,
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
@@ -37,6 +38,7 @@ export type {
   DrawingScreenParallelChannel,
   DrawingScreenPolyline,
   DrawingScreenRect,
+  DrawingScreenRiskRewardPosition,
   DrawingScreenSegment,
   DrawingScreenTrendAngle,
   ResolveUserDrawingInputFromChartOptions,
@@ -101,6 +103,8 @@ export {
   resolveUserDrawingVisualPriceRangeMetrics,
 } from './priceRange';
 export type { UserDrawingPriceRangeMetrics } from './priceRange';
+export { resolveUserDrawingRiskRewardMetrics } from './riskReward';
+export type { UserDrawingRiskRewardMetrics } from './riskReward';
 export {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
@@ -207,12 +211,14 @@ export type {
   HorizontalLineDrawing,
   HorizontalRayDrawing,
   InfoLineDrawing,
+  LongPositionDrawing,
   PathDrawing,
   ParallelChannelDrawing,
   PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
+  ShortPositionDrawing,
   TextLabelDrawing,
   TriangleDrawing,
   TrendAngleDrawing,

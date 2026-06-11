@@ -5,6 +5,7 @@ import type { UserDrawing, UserDrawingAnchor } from './types';
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 
 import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
+import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
 
 export interface DrawingScreenPoint {
   x: number;
@@ -70,6 +71,20 @@ export interface DrawingScreenFibLevel {
 export interface DrawingScreenFibLevels {
   rect: DrawingScreenRect;
   levels: readonly DrawingScreenFibLevel[];
+}
+
+export interface DrawingScreenRiskRewardPosition {
+  entry: DrawingScreenPoint;
+  target: DrawingScreenPoint;
+  stop: DrawingScreenPoint;
+  profitRect: DrawingScreenRect;
+  riskRect: DrawingScreenRect;
+  entryLine: DrawingScreenSegment;
+  targetLine: DrawingScreenSegment;
+  stopLine: DrawingScreenSegment;
+  rewardLabel: string;
+  riskLabel: string;
+  ratioLabel: string;
 }
 
 export interface DrawingCoordinateSpace {
@@ -156,6 +171,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'dateRange';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
+    }
+  | {
+      kind: 'longPosition' | 'shortPosition';
+      drawing: UserDrawing;
+      position: DrawingScreenRiskRewardPosition;
     }
   | {
       kind: 'fibRetracement' | 'fibExtension';
@@ -391,6 +411,45 @@ export function resolveDateRangeRectFromAnchors(
     y: space.pane.top,
     width: Math.abs(b.x - a.x),
     height: space.pane.height,
+  };
+}
+
+function resolveRectBetweenY(x: number, width: number, a: number, b: number): DrawingScreenRect {
+  return {
+    x,
+    y: Math.min(a, b),
+    width,
+    height: Math.abs(a - b),
+  };
+}
+
+export function resolveRiskRewardPositionFromAnchors(
+  kind: 'longPosition' | 'shortPosition',
+  entryAnchor: UserDrawingAnchor,
+  targetAnchor: UserDrawingAnchor,
+  stopAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenRiskRewardPosition {
+  const entry = anchorToScreenPoint(entryAnchor, space);
+  const target = anchorToScreenPoint(targetAnchor, space);
+  const stop = anchorToScreenPoint(stopAnchor, space);
+  const left = Math.min(entry.x, target.x);
+  const right = Math.max(entry.x, target.x);
+  const width = right - left;
+  const metrics = resolveUserDrawingRiskRewardMetrics(kind, entryAnchor, targetAnchor, stopAnchor);
+
+  return {
+    entry,
+    target,
+    stop,
+    profitRect: resolveRectBetweenY(left, width, entry.y, target.y),
+    riskRect: resolveRectBetweenY(left, width, entry.y, stop.y),
+    entryLine: { start: { x: left, y: entry.y }, end: { x: right, y: entry.y } },
+    targetLine: { start: { x: left, y: target.y }, end: { x: right, y: target.y } },
+    stopLine: { start: { x: left, y: stop.y }, end: { x: right, y: stop.y } },
+    rewardLabel: metrics.rewardLabel,
+    riskLabel: metrics.riskLabel,
+    ratioLabel: metrics.ratioLabel,
   };
 }
 
@@ -719,6 +778,19 @@ export function resolveUserDrawingGeometry(
         kind: 'dateRange',
         drawing,
         rect: resolveDateRangeRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'longPosition':
+    case 'shortPosition':
+      return {
+        kind: drawing.kind,
+        drawing,
+        position: resolveRiskRewardPositionFromAnchors(
+          drawing.kind,
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          space,
+        ),
       };
     case 'fibRetracement':
       return {

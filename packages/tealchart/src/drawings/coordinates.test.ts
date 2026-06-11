@@ -40,6 +40,7 @@ import {
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
+  resolveRiskRewardPositionFromAnchors,
   resolveTrendAngleFromSegment,
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
@@ -251,6 +252,23 @@ describe('user drawing coordinates', () => {
       width: 200,
       height: 100,
     });
+  });
+
+  it('resolves long position risk and reward geometry', () => {
+    const position = resolveRiskRewardPositionFromAnchors(
+      'longPosition',
+      { time: 1_000, price: 100 },
+      { time: 3_000, price: 110 },
+      { time: 3_000, price: 95 },
+      space,
+    );
+
+    expect(position.profitRect).toEqual({ x: 10, y: 20, width: 200, height: 50 });
+    expect(position.riskRect).toEqual({ x: 10, y: 70, width: 200, height: 25 });
+    expect(position.entryLine).toEqual({ start: { x: 10, y: 70 }, end: { x: 210, y: 70 } });
+    expect(position.rewardLabel).toBe('Reward +10.00 (+10.00%)');
+    expect(position.riskLabel).toBe('Risk -5.00 (-5.00%)');
+    expect(position.ratioLabel).toBe('R:R 2.00');
   });
 
   it('resolves Fibonacci retracement levels from two anchors', () => {

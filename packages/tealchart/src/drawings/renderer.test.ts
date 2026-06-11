@@ -518,6 +518,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:1 minute:40,78:#111:center:1:12px sans-serif');
   });
 
+  it('renders long position risk and reward boxes through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'long',
+      kind: 'longPosition',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 90, price: 40 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,20,80,30:rgba(34, 197, 94, 0.18):1');
+    expect(ctx.calls).toContain('fillRect:10,50,80,10:rgba(244, 63, 94, 0.18):1');
+    expect(ctx.calls).toContain('strokeRect:10,20,80,30:#22c55e:1');
+    expect(ctx.calls).toContain('strokeRect:10,50,80,10:#f43f5e:1');
+    expect(ctx.calls).toContain('fillText:Reward +30.00 (+60.00%):50,35:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Risk -10.00 (-20.00%):50,55:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:R:R 3.00:50,38:#111:center:1:12px sans-serif');
+  });
+
   it('renders Fibonacci retracement levels with labels', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

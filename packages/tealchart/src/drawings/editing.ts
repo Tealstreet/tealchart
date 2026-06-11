@@ -113,6 +113,8 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'triangle':
     case 'parallelChannel':
+    case 'longPosition':
+    case 'shortPosition':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
@@ -215,7 +217,9 @@ function editDrawingHandle(
     (drawing.kind === 'path' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'parallelChannel' ||
-      drawing.kind === 'regressionTrend') &&
+      drawing.kind === 'regressionTrend' ||
+      drawing.kind === 'longPosition' ||
+      drawing.kind === 'shortPosition') &&
     pointIndex !== undefined
   ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
@@ -267,6 +271,8 @@ function editDrawingHandle(
     case 'triangle':
     case 'parallelChannel':
     case 'regressionTrend':
+    case 'longPosition':
+    case 'shortPosition':
       return drawing;
   }
 }

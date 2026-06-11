@@ -422,6 +422,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits risk reward position boxes and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'long',
+      kind: 'longPosition',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 90, price: 40 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 35 }, space)?.drawing.id).toBe('long');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 55 }, space)?.drawing.id).toBe('long');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits path segments and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,
