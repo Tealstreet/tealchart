@@ -1,4 +1,4 @@
-import type { UserDrawing, UserDrawingLineStyle, UserDrawingState, UserDrawingTool } from './types';
+import type { UserDrawing, UserDrawingLineStyle, UserDrawingState, UserDrawingTextAlign, UserDrawingTool } from './types';
 
 import { USER_DRAWING_FONT_SIZES } from './types';
 
@@ -34,6 +34,12 @@ export interface UserDrawingTextColorDescriptor {
 
 export interface UserDrawingFontSizeDescriptor {
   fontSize: number;
+  label: string;
+}
+
+export interface UserDrawingTextAlignDescriptor {
+  textAlign: UserDrawingTextAlign;
+  icon: string;
   label: string;
 }
 
@@ -113,6 +119,12 @@ export const USER_DRAWING_TEXT_COLOR_DESCRIPTORS: readonly UserDrawingTextColorD
 export const USER_DRAWING_FONT_SIZE_DESCRIPTORS: readonly UserDrawingFontSizeDescriptor[] = [
   ...USER_DRAWING_FONT_SIZES.map((fontSize) => ({ fontSize, label: `${fontSize} pixel font size` })),
 ];
+
+export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignDescriptor[] = [
+  { textAlign: 'left', icon: 'L', label: 'Left text alignment' },
+  { textAlign: 'center', icon: 'C', label: 'Center text alignment' },
+  { textAlign: 'right', icon: 'R', label: 'Right text alignment' },
+] as const;
 
 export const USER_DRAWING_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
   { width: 1, label: '1 pixel line width' },
@@ -207,5 +219,6 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fillColor ?? '',
     selectedDrawing?.style.textColor ?? '',
     selectedDrawing?.style.fontSize ?? '',
+    selectedDrawing?.kind === 'textLabel' ? selectedDrawing.textAlign : '',
   ].join('|');
 }

@@ -17,6 +17,7 @@ import {
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
@@ -65,6 +66,7 @@ describe('user drawing toolbar descriptors', () => {
       ...USER_DRAWING_FILL_COLOR_DESCRIPTORS,
       ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
       ...USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+      ...USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
     ]) {
       expect(descriptor.label.length).toBeGreaterThan(0);
     }
@@ -146,6 +148,11 @@ describe('user drawing toolbar descriptors', () => {
       '#d1d4dc',
     ]);
     expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([10, 12, 14, 16]);
+    expect(USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => descriptor.textAlign)).toEqual([
+      'left',
+      'center',
+      'right',
+    ]);
     expect(USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
       'hideSelected',
       'lockSelected',
@@ -304,5 +311,27 @@ describe('user drawing toolbar descriptors', () => {
         drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, fillColor: '#123456' } }],
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(first));
+
+    const textDrawing = {
+      id: 'text',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      point: { time: 1, price: 10 },
+      text: 'note',
+      textAlign: 'left' as const,
+    };
+    const textState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'text' },
+      drawings: [textDrawing],
+    };
+    expect(getUserDrawingToolbarStateKey({ ...textState, drawings: [{ ...textDrawing, textAlign: 'right' }] })).not.toBe(
+      getUserDrawingToolbarStateKey(textState),
+    );
   });
 });

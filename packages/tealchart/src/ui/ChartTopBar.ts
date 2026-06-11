@@ -1,6 +1,6 @@
 import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
-import type { UserDrawingState, UserDrawingStyle, UserDrawingTool } from '../drawings';
+import type { UserDrawingState, UserDrawingStyle, UserDrawingTextAlign, UserDrawingTool } from '../drawings';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
@@ -20,6 +20,7 @@ import {
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
@@ -62,6 +63,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingClearAll?: () => void;
   /** Callback when selected drawing style should change */
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
+  /** Callback when selected text-label alignment should change */
+  onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
   /** Callback when selected drawing visibility should change */
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Callback when selected drawing locked state should change */
@@ -621,6 +624,40 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             btn.addEventListener('click', () =>
               this.options.onUserDrawingStyleChange?.({ fontSize: descriptor.fontSize }),
             );
+            btn.addEventListener('mouseenter', () => {
+              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+            });
+            btn.addEventListener('mouseleave', () => {
+              if (!isActive) {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text2, #787b86)';
+              }
+            });
+          }
+          group.appendChild(btn);
+        }
+
+        for (const descriptor of USER_DRAWING_TEXT_ALIGN_DESCRIPTORS) {
+          const isActive = selectedDrawing.kind === 'textLabel' && selectedDrawing.textAlign === descriptor.textAlign;
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...(isActive ? styles.drawingButtonActive : {}),
+              opacity: textEnabled ? '1' : '0.35',
+              cursor: textEnabled ? 'pointer' : 'default',
+              fontSize: '11px',
+            },
+            textContent: descriptor.icon,
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !textEnabled;
+          if (textEnabled) {
+            btn.addEventListener('click', () => this.options.onUserDrawingTextAlignChange?.(descriptor.textAlign));
             btn.addEventListener('mouseenter', () => {
               if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
             });

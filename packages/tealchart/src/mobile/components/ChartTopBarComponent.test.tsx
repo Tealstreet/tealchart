@@ -62,6 +62,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
   it('dispatches selected text label fill, text color, and font size controls', () => {
     const onStyle = vi.fn();
+    const onTextAlign = vi.fn();
     render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
@@ -93,20 +94,24 @@ describe('ChartTopBarComponent drawing toolbar', () => {
           ],
         }}
         onUserDrawingStyleChange={onStyle}
+        onUserDrawingTextAlignChange={onTextAlign}
       />,
     );
 
     fireEvent.click(screen.getByLabelText('Blue fill color'));
     fireEvent.click(screen.getByLabelText('Red text color'));
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
+    fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+    expect(onTextAlign).toHaveBeenCalledWith('right');
   });
 
   it('disables locked selected drawing fill and text controls', () => {
     const onStyle = vi.fn();
+    const onTextAlign = vi.fn();
     render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
@@ -138,16 +143,20 @@ describe('ChartTopBarComponent drawing toolbar', () => {
           ],
         }}
         onUserDrawingStyleChange={onStyle}
+        onUserDrawingTextAlignChange={onTextAlign}
       />,
     );
 
     fireEvent.click(screen.getByLabelText('Green fill color'));
     fireEvent.click(screen.getByLabelText('Red text color'));
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
+    fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect((screen.getByLabelText('Green fill color') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Red text color') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('16 pixel font size') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Right text alignment') as HTMLButtonElement).disabled).toBe(true);
     expect(onStyle).not.toHaveBeenCalled();
+    expect(onTextAlign).not.toHaveBeenCalled();
   });
 });
