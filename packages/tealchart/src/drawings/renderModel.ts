@@ -214,6 +214,7 @@ export function resolveUserDrawingHandlePoints(
     case 'projection':
     case 'longPosition':
     case 'shortPosition':
+    case 'abcdPattern':
     case 'xabcdPattern':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'barsPattern':

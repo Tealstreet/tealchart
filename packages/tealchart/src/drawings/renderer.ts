@@ -500,9 +500,9 @@ function renderProjectionGeometry(
   ctx.fillText(projection.changeLabel, projection.labelPoint.x, projection.labelPoint.y);
 }
 
-function renderXabcdPatternGeometry(
+function renderPatternGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'xabcdPattern' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'xabcdPattern' | 'abcdPattern' }>,
 ): void {
   const { drawing, pattern } = geometry;
   const [firstPoint, ...remainingPoints] = pattern.polyline.points;
@@ -1091,7 +1091,10 @@ export function renderUserDrawing(
         renderProjectionGeometry(ctx, geometry);
         break;
       case 'xabcdPattern':
-        renderXabcdPatternGeometry(ctx, geometry);
+        renderPatternGeometry(ctx, geometry);
+        break;
+      case 'abcdPattern':
+        renderPatternGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

@@ -77,6 +77,7 @@ import {
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
+  resolveAbcdPatternFromAnchors,
   resolveXabcdPatternFromAnchors,
   screenPointToAnchor,
   timeToDrawingX,
@@ -435,6 +436,35 @@ describe('user drawing coordinates', () => {
         { text: 'B', point: { x: 110, y: 95 } },
         { text: 'C', point: { x: 160, y: 45 } },
         { text: 'D', point: { x: 210, y: 120 } },
+      ],
+    });
+  });
+
+  it('resolves ABCD pattern polylines and labels from four anchors', () => {
+    expect(
+      resolveAbcdPatternFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 110 },
+          { time: 2_000, price: 95 },
+          { time: 2_500, price: 105 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: 20 },
+          { x: 110, y: 95 },
+          { x: 160, y: 45 },
+        ],
+      },
+      labels: [
+        { text: 'A', point: { x: 10, y: 70 } },
+        { text: 'B', point: { x: 60, y: 20 } },
+        { text: 'C', point: { x: 110, y: 95 } },
+        { text: 'D', point: { x: 160, y: 45 } },
       ],
     });
   });

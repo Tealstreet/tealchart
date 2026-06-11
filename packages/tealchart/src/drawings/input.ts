@@ -284,6 +284,17 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
         points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1]), cloneAnchor(drawing.points[2])],
         bars: drawing.bars.map((bar) => ({ ...bar })),
       };
+    case 'abcdPattern':
+      return {
+        ...base,
+        kind: 'abcdPattern',
+        points: [
+          cloneAnchor(drawing.points[0]),
+          cloneAnchor(drawing.points[1]),
+          cloneAnchor(drawing.points[2]),
+          cloneAnchor(drawing.points[3]),
+        ],
+      };
     case 'xabcdPattern':
       return {
         ...base,
