@@ -2159,4 +2159,68 @@ describe('user drawing editing', () => {
       updatedAt: 21,
     });
   });
+
+  it('moves and edits ABCD pattern anchors with stable four-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'abcd',
+      kind: 'abcdPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 80 },
+        { time: 30, price: 70 },
+        { time: 40, price: 60 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'abcd' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'abcd' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 15 },
+      { now: () => 22 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'abcdPattern',
+      points: [
+        { time: 15, price: 85 },
+        { time: 25, price: 75 },
+        { time: 35, price: 65 },
+        { time: 45, price: 55 },
+      ],
+      updatedAt: 22,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'abcd', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 30, y: 30 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 35, y: 35 },
+      { now: () => 23 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'abcdPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 80 },
+        { time: 35, price: 65 },
+        { time: 40, price: 60 },
+      ],
+      updatedAt: 23,
+    });
+  });
 });

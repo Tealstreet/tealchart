@@ -1,4 +1,5 @@
 export {
+  ABCD_PATTERN_LABELS,
   anchorToScreenPoint,
   drawingXToTime,
   drawingYToPrice,
@@ -50,6 +51,7 @@ export {
   resolveSineLineFromAnchors,
   resolveForecastFromAnchors,
   resolveProjectionFromAnchors,
+  resolveAbcdPatternFromAnchors,
   resolveXabcdPatternFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveGannBoxFromAnchors,
@@ -75,8 +77,11 @@ export {
   XABCD_PATTERN_LABELS,
 } from './coordinates';
 export type {
+  AbcdPatternLabel,
   DrawingCoordinateSpace,
   DrawingPitchforkVariant,
+  DrawingScreenAbcdPattern,
+  DrawingScreenAbcdPatternLabel,
   DrawingScreenAnchoredVwap,
   DrawingScreenArc,
   DrawingScreenBarsPattern,
@@ -301,6 +306,7 @@ export type {
   UserDrawingToolDescriptor,
 } from './toolbar';
 export type {
+  AbcdPatternDrawing,
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,

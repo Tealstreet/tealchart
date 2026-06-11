@@ -74,6 +74,7 @@ describe('user drawing toolbar descriptors', () => {
       'forecast',
       'projection',
       'barsPattern',
+      'abcdPattern',
       'xabcdPattern',
       'anchoredVwap',
       'fibRetracement',
@@ -192,6 +193,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('projection')).toEqual(
       expect.objectContaining({ tool: 'projection', label: 'Projection' }),
+    );
+    expect(getUserDrawingToolDescriptor('abcdPattern')).toEqual(
+      expect.objectContaining({ tool: 'abcdPattern', label: 'ABCD pattern' }),
     );
     expect(getUserDrawingToolDescriptor('xabcdPattern')).toEqual(
       expect.objectContaining({ tool: 'xabcdPattern', label: 'XABCD pattern' }),

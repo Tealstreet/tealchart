@@ -137,6 +137,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
       }
     case 'disjointChannel':
+    case 'abcdPattern':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!], updatedAt };
@@ -314,6 +315,7 @@ function editDrawingHandle(
       drawing.kind === 'longPosition' ||
       drawing.kind === 'shortPosition' ||
       drawing.kind === 'projection' ||
+      drawing.kind === 'abcdPattern' ||
       drawing.kind === 'xabcdPattern' ||
       drawing.kind === 'callout' ||
       drawing.kind === 'priceNote') &&
@@ -358,6 +360,13 @@ function editDrawingHandle(
       };
     }
     if (drawing.kind === 'disjointChannel') {
+      return {
+        ...drawing,
+        points: [points[0]!, points[1]!, points[2]!, points[3]!],
+        updatedAt,
+      };
+    }
+    if (drawing.kind === 'abcdPattern') {
       return {
         ...drawing,
         points: [points[0]!, points[1]!, points[2]!, points[3]!],
@@ -451,6 +460,7 @@ function editDrawingHandle(
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
+    case 'abcdPattern':
     case 'xabcdPattern':
       return drawing;
   }
