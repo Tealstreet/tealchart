@@ -305,8 +305,10 @@ export function formatTrendAngleDegrees(angleDegrees: number): string {
 }
 
 export function resolveTrendAngleFromSegment(segment: DrawingScreenSegment): DrawingScreenTrendAngle {
-  const dx = segment.end.x - segment.start.x;
-  const dy = segment.start.y - segment.end.y;
+  const start = segment.start.x <= segment.end.x ? segment.start : segment.end;
+  const end = segment.start.x <= segment.end.x ? segment.end : segment.start;
+  const dx = end.x - start.x;
+  const dy = start.y - end.y;
   const angleDegrees = dx === 0 && dy === 0 ? 0 : (Math.atan2(dy, dx) * 180) / Math.PI;
   return {
     segment,
