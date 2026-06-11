@@ -1,7 +1,13 @@
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
 import type { UserDrawing, UserDrawingAnchor, UserDrawingState } from './types';
 
-import { anchorToScreenPoint, priceToDrawingY, resolveRectFromAnchors, timeToDrawingX } from './coordinates';
+import {
+  anchorToScreenPoint,
+  priceToDrawingY,
+  resolveDateRangeRectFromAnchors,
+  resolveRectFromAnchors,
+  timeToDrawingX,
+} from './coordinates';
 import { createUserDrawingFromDraft, getRequiredAnchorCount } from './types';
 
 export type UserDrawingRenderPhase = 'committed' | 'draft';
@@ -99,6 +105,13 @@ export function resolveUserDrawingHandlePoints(
         { x: rect.x + rect.width, y: rect.y },
         { x: rect.x + rect.width, y: rect.y + rect.height },
         { x: rect.x, y: rect.y + rect.height },
+      ];
+    }
+    case 'dateRange': {
+      const rect = resolveDateRangeRectFromAnchors(drawing.points[0], drawing.points[1], space);
+      return [
+        { x: rect.x, y: rect.y + rect.height / 2 },
+        { x: rect.x + rect.width, y: rect.y + rect.height / 2 },
       ];
     }
     case 'textLabel':

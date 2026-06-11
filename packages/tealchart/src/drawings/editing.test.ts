@@ -111,6 +111,42 @@ describe('user drawing editing', () => {
     expect(next.selection).toEqual({ drawingId: 'line' });
   });
 
+  it('moves selected date ranges by time delta without changing anchor prices', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'date-range' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'date-range' },
+        startPoint: { x: 10, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 25 },
+      { now: () => 2 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 15, price: 80 },
+        { time: 25, price: 60 },
+      ],
+      updatedAt: 2,
+    });
+  });
+
   it('returns the existing state when drag movement is zero', () => {
     const drawing: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const state = createUserDrawingState({
@@ -304,6 +340,42 @@ describe('user drawing editing', () => {
         { time: 90, price: 10 },
       ],
       updatedAt: 4,
+    });
+  });
+
+  it('drags date range boundary handles without changing prices', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 10, price: 80 },
+        { time: 90, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'date-range', handle: 'start' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'date-range', handle: 'start' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 25, y: 20 },
+      { now: () => 5 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 25, price: 80 },
+        { time: 90, price: 20 },
+      ],
+      updatedAt: 5,
     });
   });
 

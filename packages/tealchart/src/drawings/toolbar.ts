@@ -110,6 +110,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'verticalLine', icon: 'V', label: 'Vertical line' },
   { tool: 'rectangle', icon: '□', label: 'Rectangle' },
   { tool: 'priceRange', icon: 'Δ', label: 'Price range' },
+  { tool: 'dateRange', icon: '↔', label: 'Date range' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
 
@@ -213,7 +214,12 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
 }
 
 export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
-  return drawing.kind === 'rectangle' || drawing.kind === 'priceRange' || drawing.kind === 'textLabel';
+  return (
+    drawing.kind === 'rectangle' ||
+    drawing.kind === 'priceRange' ||
+    drawing.kind === 'dateRange' ||
+    drawing.kind === 'textLabel'
+  );
 }
 
 export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
