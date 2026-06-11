@@ -282,6 +282,45 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored price note drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'price-note',
+          kind: 'priceNote',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 11 },
+          ],
+          text: 'Restored price note',
+          textAlign: 'right',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'price-note',
+      kind: 'priceNote',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 11 },
+      ],
+      text: 'Restored price note',
+      textAlign: 'right',
+    });
+  });
+
   it('normalizes restored text label font sizes', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

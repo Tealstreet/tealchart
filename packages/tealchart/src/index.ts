@@ -260,6 +260,7 @@ export type {
   PitchforkDrawing,
   PitchforkDrawingKind,
   PitchfanDrawing,
+  PriceNoteDrawing,
   PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,

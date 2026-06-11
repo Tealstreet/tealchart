@@ -532,7 +532,7 @@ export type ResolvedUserDrawingGeometry =
       point: DrawingScreenPoint;
     }
   | {
-      kind: 'callout';
+      kind: 'callout' | 'priceNote';
       drawing: UserDrawing;
       tip: DrawingScreenPoint;
       point: DrawingScreenPoint;
@@ -2338,8 +2338,9 @@ export function resolveUserDrawingGeometry(
         point: anchorToScreenPoint(drawing.point, space),
       };
     case 'callout':
+    case 'priceNote':
       return {
-        kind: 'callout',
+        kind: drawing.kind,
         drawing,
         tip: anchorToScreenPoint(drawing.points[0], space),
         point: anchorToScreenPoint(drawing.points[1], space),

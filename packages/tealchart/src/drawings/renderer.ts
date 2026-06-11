@@ -855,7 +855,7 @@ function renderTextLabelGeometry(
     lineHeight: Math.max(1, options.labelHeight - 2),
   });
 
-  if (geometry.kind === 'callout') {
+  if (geometry.kind === 'callout' || geometry.kind === 'priceNote') {
     applyStrokeStyle(ctx, drawing);
     ctx.beginPath();
     ctx.moveTo(geometry.tip.x, geometry.tip.y);
@@ -1079,6 +1079,7 @@ export function renderUserDrawing(
       case 'note':
       case 'callout':
       case 'comment':
+      case 'priceNote':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
         break;
     }

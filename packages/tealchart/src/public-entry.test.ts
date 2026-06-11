@@ -74,6 +74,7 @@ import type {
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
+  MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibCirclesPrimitive,
@@ -140,6 +141,7 @@ import type {
   PitchforkDrawing,
   PitchforkDrawingKind,
   PitchfanDrawing,
+  PriceNoteDrawing,
   PriceRangeDrawing,
   RegressionTrendDrawing,
   RotatedRectangleDrawing,
@@ -218,6 +220,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCalloutPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCommentPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingPriceNotePrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -644,6 +647,21 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const priceNotePrimitive: NonNever<MobileUserDrawingPriceNotePrimitive> = {
+      kind: 'priceNote',
+      id: 'price-note',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      tip: { x: 0, y: 0 },
+      point: { x: 5, y: 5 },
+      text: 'Price note',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -690,6 +708,7 @@ describe('tealchart public entries', () => {
     expect(notePrimitive.kind).toBe('note');
     expect(calloutPrimitive.kind).toBe('callout');
     expect(commentPrimitive.kind).toBe('comment');
+    expect(priceNotePrimitive.kind).toBe('priceNote');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1168,6 +1187,14 @@ describe('tealchart public entries', () => {
       text: 'Comment',
       textAlign: 'center',
     };
+    const priceNote: PriceNoteDrawing = {
+      ...drawing,
+      id: 'price-note',
+      kind: 'priceNote',
+      points: [drawing.points[0]!, drawing.points[1]!],
+      text: 'Price note',
+      textAlign: 'center',
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
@@ -1175,6 +1202,7 @@ describe('tealchart public entries', () => {
     expect(note.kind).toBe('note');
     expect(callout.kind).toBe('callout');
     expect(comment.kind).toBe('comment');
+    expect(priceNote.kind).toBe('priceNote');
   });
 
   it('exports shared drawing curve types and resolver', () => {
