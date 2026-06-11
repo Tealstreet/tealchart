@@ -7,7 +7,7 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTool,
-  TextLabelDrawing,
+  UserDrawingTextAnnotation,
 } from './types';
 
 import {
@@ -15,6 +15,7 @@ import {
   DEFAULT_USER_DRAWING_STYLE,
   isDrawingDraftReady,
   isUserDrawingPathFamilyTool,
+  isUserDrawingTextAnnotation,
   normalizeUserDrawingStyle,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
@@ -448,11 +449,11 @@ export function commitUserDrawingPathDrag(
 function findEditableTextDrawing(
   state: UserDrawingState,
   drawingId: string | null | undefined,
-): { drawing: TextLabelDrawing; index: number } | null {
+): { drawing: UserDrawingTextAnnotation; index: number } | null {
   if (!drawingId) return null;
   const index = state.drawings.findIndex((drawing) => drawing.id === drawingId);
   const drawing = state.drawings[index];
-  if (!drawing || drawing.kind !== 'textLabel' || drawing.locked) return null;
+  if (!drawing || !isUserDrawingTextAnnotation(drawing) || drawing.locked) return null;
   return { drawing, index };
 }
 
@@ -576,7 +577,7 @@ export function setUserDrawingTextAlign(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   const target = findUserDrawingForUpdate(state, options);
-  if (!target || target.drawing.kind !== 'textLabel' || target.drawing.textAlign === textAlign) return state;
+  if (!target || !isUserDrawingTextAnnotation(target.drawing) || target.drawing.textAlign === textAlign) return state;
 
   return replaceUserDrawing(state, target.index, {
     ...target.drawing,

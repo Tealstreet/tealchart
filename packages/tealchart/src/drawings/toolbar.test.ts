@@ -104,6 +104,7 @@ describe('user drawing toolbar descriptors', () => {
       'path',
       'brush',
       'highlighter',
+      'note',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -243,6 +244,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('polyline')).toEqual(
       expect.objectContaining({ tool: 'polyline', label: 'Polyline' }),
     );
+    expect(getUserDrawingToolDescriptor('note')).toEqual(expect.objectContaining({ tool: 'note', label: 'Note' }));
     expect(getUserDrawingToolDescriptor('pitchfork')).toEqual(
       expect.objectContaining({ tool: 'pitchfork', label: 'Pitchfork' }),
     );
@@ -613,11 +615,13 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
     expect(supportsUserDrawingFillControls(datePriceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
     expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
     expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
+    expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
 
     expect(
       isUserDrawingFillToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] }),

@@ -1,7 +1,13 @@
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DrawingCoordinateSpace, ResolvedUserDrawingGeometry } from './coordinates';
 import type { ResolveUserDrawingRenderEntriesOptions } from './renderModel';
-import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle, UserDrawingPathFamilyKind } from './types';
+import type {
+  UserDrawing,
+  UserDrawingLineStyle,
+  UserDrawingPathFamilyKind,
+  UserDrawingTextAnnotation,
+  UserDrawingTextAnnotationKind,
+} from './types';
 import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
@@ -828,10 +834,10 @@ function renderBarsPatternGeometry(
 
 function renderTextLabelGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'textLabel' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: UserDrawingTextAnnotationKind }>,
   options: Required<UserDrawingRenderOptions>,
 ): void {
-  const drawing = geometry.drawing as TextLabelDrawing;
+  const drawing = geometry.drawing as UserDrawingTextAnnotation;
   const { point } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -1062,6 +1068,7 @@ export function renderUserDrawing(
         renderBarsPatternGeometry(ctx, geometry);
         break;
       case 'textLabel':
+      case 'note':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
         break;
     }

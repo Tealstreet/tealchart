@@ -594,6 +594,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Drag input, sampled-path hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Note Tool
+
+- Shared drawing state supports the single-anchor `note` annotation and persists
+  text, alignment, and style through layout save/load.
+- Web Canvas and mobile Skia render matching note text boxes from shared text
+  label layout.
+- Selection, hit testing, whole-drawing moves, text editing, alignment controls,
+  and style controls use shared text annotation behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
