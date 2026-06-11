@@ -463,6 +463,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:1 minute:40,50:#111:center:1:12px sans-serif');
   });
 
+  it('renders date and price ranges with price and duration labels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      points: [
+        { time: 10_000, price: 90 },
+        { time: 70_000, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+
+    expect(ctx.calls).toContain('fillRect:10,10,60,80:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,10,60,80:#f5c542:1');
+    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):40,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1 minute:40,78:#111:center:1:12px sans-serif');
+  });
+
   it('renders Fibonacci retracement levels with labels', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

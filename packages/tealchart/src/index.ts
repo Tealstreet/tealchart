@@ -135,6 +135,7 @@ export type {
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   CircleDrawing,
+  DatePriceRangeDrawing,
   DateRangeDrawing,
   DeleteUserDrawingOptions,
   CrossLineDrawing,

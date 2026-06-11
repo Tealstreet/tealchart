@@ -166,7 +166,12 @@ function hitTestResolvedGeometry(
   const handleHit = hitTestUserDrawingHandle(geometry, point, space, options.handleTolerance);
   if (handleHit) return handleHit;
 
-  if (geometry.kind === 'rectangle' || geometry.kind === 'priceRange' || geometry.kind === 'dateRange') {
+  if (
+    geometry.kind === 'rectangle' ||
+    geometry.kind === 'priceRange' ||
+    geometry.kind === 'dateRange' ||
+    geometry.kind === 'datePriceRange'
+  ) {
     const distance = distanceToRectEdge(point, geometry.rect);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
@@ -312,6 +317,7 @@ function hitTestUserDrawingHandle(
     case 'circle':
     case 'ellipse':
     case 'priceRange':
+    case 'datePriceRange':
       {
         const rect =
           geometry.kind === 'circle'

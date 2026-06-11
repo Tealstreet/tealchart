@@ -930,6 +930,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready date and price range primitives with shared labels', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'date-price-range',
+          kind: 'datePriceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10_000, price: 90 },
+            { time: 70_000, price: 10 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+      kind: 'datePriceRange',
+      id: 'date-price-range',
+      clip,
+      rect: { x: 10, y: 10, width: 60, height: 80 },
+      priceLabelPoint: { x: 40, y: 50 },
+      priceLabel: '+80.00 (+800.00%)',
+      dateLabelPoint: { x: 40, y: 78 },
+      dateLabel: '1 minute',
+      style,
+    });
+  });
+
   it('returns Skia-ready path primitives with shared polyline points', () => {
     const state: UserDrawingState = {
       version: 1,

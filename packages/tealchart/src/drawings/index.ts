@@ -194,6 +194,7 @@ export type {
   CircleDrawing,
   CreateUserDrawingFromDraftOptions,
   CrossLineDrawing,
+  DatePriceRangeDrawing,
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,

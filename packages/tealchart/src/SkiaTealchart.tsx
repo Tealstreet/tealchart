@@ -123,6 +123,7 @@ import {
 } from './mobile/utils/drawingPersistence';
 import {
   resolveMobileUserDrawingInfoLineLabelPosition,
+  resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
@@ -1934,6 +1935,66 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}
                   />
+                )}
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'datePriceRange') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const priceTextBounds = font ? font.measureText(primitive.priceLabel) : { width: 0 };
+            const dateTextBounds = font ? font.measureText(primitive.dateLabel) : { width: 0 };
+            const priceLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
+              { labelPoint: primitive.priceLabelPoint, style: primitive.style },
+              priceTextBounds,
+            );
+            const dateLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
+              { labelPoint: primitive.dateLabelPoint, style: primitive.style },
+              dateTextBounds,
+            );
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
+                {font && (
+                  <>
+                    <SkiaText
+                      x={priceLabelPosition.x}
+                      y={priceLabelPosition.y}
+                      text={primitive.priceLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={dateLabelPosition.x}
+                      y={dateLabelPosition.y}
+                      text={primitive.dateLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                  </>
                 )}
               </Group>
             );

@@ -120,6 +120,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'ellipse', icon: '⬭', label: 'Ellipse' },
   { tool: 'priceRange', icon: 'Δ', label: 'Price range' },
   { tool: 'dateRange', icon: '↔', label: 'Date range' },
+  { tool: 'datePriceRange', icon: '⊞', label: 'Date and price range' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
@@ -238,6 +239,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'ellipse' ||
     drawing.kind === 'priceRange' ||
     drawing.kind === 'dateRange' ||
+    drawing.kind === 'datePriceRange' ||
     drawing.kind === 'triangle' ||
     drawing.kind === 'parallelChannel' ||
     drawing.kind === 'regressionTrend' ||

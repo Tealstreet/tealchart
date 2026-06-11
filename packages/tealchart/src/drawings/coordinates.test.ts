@@ -6,6 +6,7 @@ import type {
   ArrowMarkerDrawing,
   CircleDrawing,
   CrossLineDrawing,
+  DatePriceRangeDrawing,
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
@@ -436,6 +437,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 105 },
       ],
     };
+    const datePriceRange: DatePriceRangeDrawing = {
+      ...trendLine,
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
     const fibRetracement: FibRetracementDrawing = {
       ...trendLine,
       id: 'fib',
@@ -611,6 +621,10 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(dateRange, space)).toMatchObject({
       kind: 'dateRange',
+      rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(datePriceRange, space)).toMatchObject({
+      kind: 'datePriceRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
     });
     expect(resolveUserDrawingGeometry(fibRetracement, space)).toMatchObject({
