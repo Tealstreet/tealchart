@@ -516,11 +516,14 @@ export function resolveBarsPatternFromAnchors(
   placementAnchor: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
   sourceBarsInput: readonly (BarsPatternBarSnapshot | Bar)[] = space.bars ?? [],
+  filterBySourceRange = true,
 ): DrawingScreenBarsPattern {
   const sourceStartTime = Math.min(sourceStartAnchor.time, sourceEndAnchor.time);
   const sourceEndTime = Math.max(sourceStartAnchor.time, sourceEndAnchor.time);
   const sourceBars = sourceBarsInput
-    .filter((bar) => isFiniteBar(bar) && bar.time >= sourceStartTime && bar.time <= sourceEndTime)
+    .filter(
+      (bar) => isFiniteBar(bar) && (!filterBySourceRange || (bar.time >= sourceStartTime && bar.time <= sourceEndTime)),
+    )
     .slice()
     .sort((a, b) => a.time - b.time);
   const sourceStart = anchorToScreenPoint(sourceStartAnchor, space);
@@ -901,7 +904,14 @@ export function resolveUserDrawingGeometry(
       return {
         kind: 'barsPattern',
         drawing,
-        pattern: resolveBarsPatternFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space, drawing.bars),
+        pattern: resolveBarsPatternFromAnchors(
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          space,
+          drawing.bars,
+          false,
+        ),
       };
     case 'fibRetracement':
       return {

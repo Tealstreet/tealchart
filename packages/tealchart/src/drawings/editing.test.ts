@@ -4,6 +4,7 @@ import type { UserDrawing, UserDrawingStyle } from './types';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
+import { resolveUserDrawingGeometry } from './coordinates';
 import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 import { createUserDrawingState } from './input';
 
@@ -1010,6 +1011,51 @@ describe('user drawing editing', () => {
     expect(moved.points[0]).toEqual({ time: 20, price: 55 });
     expect(moved.points[1]).toEqual({ time: 100, price: 85 });
     expect(moved.points[2]).toEqual({ time: 100, price: 45 });
+  });
+
+  it('moves bars pattern anchors without dropping stored bars', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'bars',
+      kind: 'barsPattern',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+        { time: 40, price: 50 },
+      ],
+      bars: [
+        { time: 10, open: 50, high: 60, low: 49, close: 52 },
+        { time: 20, open: 52, high: 58, low: 51, close: 53 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'bars' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'bars' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 50, y: 50 },
+      { now: () => 16 },
+    );
+
+    const moved = next.drawings[0];
+    if (moved?.kind !== 'barsPattern') throw new Error('expected bars pattern');
+    const geometry = resolveUserDrawingGeometry(moved, space);
+    if (geometry.kind !== 'barsPattern') throw new Error('expected bars pattern geometry');
+    expect(moved.updatedAt).toBe(16);
+    expect(moved.points[0].time).toBe(50);
+    expect(moved.points[1].time).toBe(60);
+    expect(moved.points[2].time).toBe(80);
+    expect(moved.bars).toHaveLength(2);
+    expect(geometry.pattern.bars).toHaveLength(2);
+    expect(geometry.pattern.bars.map((bar) => bar.time)).toEqual([80, 90]);
   });
 
   it('edits Fibonacci retracement endpoints', () => {
