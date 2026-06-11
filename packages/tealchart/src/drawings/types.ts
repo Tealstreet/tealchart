@@ -29,6 +29,7 @@ export type UserDrawingTool =
   | 'fibRetracement'
   | 'fibExtension'
   | 'fibFan'
+  | 'gannFan'
   | 'triangle'
   | 'polyline'
   | 'pitchfork'
@@ -223,6 +224,11 @@ export interface FibFanDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface GannFanDrawing extends UserDrawingBase {
+  kind: 'gannFan';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface TriangleDrawing extends UserDrawingBase {
   kind: 'triangle';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -307,6 +313,7 @@ export type UserDrawing =
   | FibRetracementDrawing
   | FibExtensionDrawing
   | FibFanDrawing
+  | GannFanDrawing
   | TriangleDrawing
   | PolylineDrawing
   | PitchforkDrawing
@@ -437,6 +444,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'gannFan':
       return 2;
     case 'triangle':
     case 'polyline':
@@ -662,6 +670,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'fibFan',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'gannFan':
+      return {
+        ...base,
+        kind: 'gannFan',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'triangle':

@@ -77,6 +77,12 @@ export interface DrawingScreenFibFan {
   rays: readonly DrawingScreenPitchfanRay[];
 }
 
+export interface DrawingScreenGannFan {
+  origin: DrawingScreenPoint;
+  reference: DrawingScreenPoint;
+  rays: readonly DrawingScreenPitchfanRay[];
+}
+
 export interface DrawingScreenCrossLine {
   horizontal: DrawingScreenSegment;
   vertical: DrawingScreenSegment;
@@ -270,6 +276,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'fibFan';
       drawing: UserDrawing;
       fibFan: DrawingScreenFibFan;
+    }
+  | {
+      kind: 'gannFan';
+      drawing: UserDrawing;
+      gannFan: DrawingScreenGannFan;
     }
   | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
@@ -628,6 +639,17 @@ export function resolveBarsPatternFromAnchors(
 export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.618, 2.618] as const;
 export const FIB_EXTENSION_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.414, 1.618, 2, 2.618] as const;
 export const FIB_FAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
+export const GANN_FAN_LEVELS = [
+  { ratio: 0.125, label: '1/8' },
+  { ratio: 0.25, label: '1/4' },
+  { ratio: 1 / 3, label: '1/3' },
+  { ratio: 0.5, label: '1/2' },
+  { ratio: 1, label: '1/1' },
+  { ratio: 2, label: '2/1' },
+  { ratio: 3, label: '3/1' },
+  { ratio: 4, label: '4/1' },
+  { ratio: 8, label: '8/1' },
+] as const;
 
 export function formatFibRetracementRatio(ratio: number): string {
   return ratio === 0 || ratio === 0.5 || ratio === 1 ? String(ratio) : ratio.toFixed(3);
@@ -705,6 +727,32 @@ export function resolveFibFanFromAnchors(
       };
       return {
         ratio,
+        target,
+        segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+      };
+    }),
+  };
+}
+
+export function resolveGannFanFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenGannFan {
+  const origin = anchorToScreenPoint(first, space);
+  const reference = anchorToScreenPoint(second, space);
+  const deltaY = reference.y - origin.y;
+
+  return {
+    origin,
+    reference,
+    rays: GANN_FAN_LEVELS.map((level) => {
+      const target = {
+        x: reference.x,
+        y: origin.y + deltaY * level.ratio,
+      };
+      return {
+        ratio: level.ratio,
         target,
         segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
       };
@@ -1222,6 +1270,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibFan',
         drawing,
         fibFan: resolveFibFanFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'gannFan':
+      return {
+        kind: 'gannFan',
+        drawing,
+        gannFan: resolveGannFanFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
     case 'polyline':

@@ -13,6 +13,7 @@ import {
   resolveEllipseFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveFibFanFromAnchors,
+  resolveGannFanFromAnchors,
   resolvePitchforkFromAnchors,
   resolvePitchfanFromAnchors,
   resolveUserDrawingDateRangeMetrics,
@@ -46,6 +47,7 @@ import type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibFanPrimitive,
+  MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingPitchfanPrimitive,
   MobileUserDrawingPitchforkPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
@@ -68,6 +70,7 @@ import type {
   EllipseDrawing,
   ExtendedLineDrawing,
   FibFanDrawing,
+  GannFanDrawing,
   FlatTopBottomDrawing,
   InfoLineDrawing,
   LongPositionDrawing,
@@ -199,6 +202,11 @@ describe('tealchart public entries', () => {
       kind: 'fibFan',
       id: 'fib-fan',
     };
+    const gannFanPrimitive: NonNever<MobileUserDrawingGannFanPrimitive> = {
+      ...pitchfanPrimitive,
+      kind: 'gannFan',
+      id: 'gann-fan',
+    };
     const linePrimitive: NonNever<MobileUserDrawingLinePrimitive> = {
       kind: 'line',
       id: 'ray',
@@ -278,6 +286,7 @@ describe('tealchart public entries', () => {
     expect(pitchforkPrimitive.kind).toBe('pitchfork');
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
     expect(fibFanPrimitive.kind).toBe('fibFan');
+    expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
@@ -837,6 +846,32 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibFan');
     expect(fan.rays).toHaveLength(7);
+  });
+
+  it('exports shared drawing gann fan types and resolver', () => {
+    const drawing: GannFanDrawing = {
+      id: 'gann-fan',
+      kind: 'gannFan',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const fan = resolveGannFanFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('gannFan');
+    expect(fan.rays).toHaveLength(9);
   });
 
   it('exports shared drawing regression trend types', () => {

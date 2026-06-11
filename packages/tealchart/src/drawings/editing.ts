@@ -109,6 +109,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'gannFan':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
@@ -178,7 +179,8 @@ function editLineEndpoint(
         | 'ray'
         | 'fibRetracement'
         | 'fibExtension'
-        | 'fibFan';
+        | 'fibFan'
+        | 'gannFan';
     }
   >,
   handle: UserDrawingHandleRole,
@@ -305,6 +307,7 @@ function editDrawingHandle(
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'gannFan':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':
