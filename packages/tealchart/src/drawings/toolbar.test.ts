@@ -48,6 +48,7 @@ describe('user drawing toolbar descriptors', () => {
       'verticalLine',
       'rectangle',
       'priceRange',
+      'dateRange',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -87,6 +88,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('priceRange')).toEqual(
       expect.objectContaining({ tool: 'priceRange', label: 'Price range' }),
+    );
+    expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
+      expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
     );
   });
 
@@ -252,13 +256,20 @@ describe('user drawing toolbar descriptors', () => {
       id: 'p',
       kind: 'priceRange' as const,
     };
+    const dateRange = {
+      ...rectangle,
+      id: 'd',
+      kind: 'dateRange' as const,
+    };
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
     expect(supportsUserDrawingFillControls(priceRange)).toBe(true);
+    expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
     expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
+    expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
 
     expect(

@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
@@ -61,6 +62,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'dateRange';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      labelPoint: DrawingScreenPoint;
+      label: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'textLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -87,6 +100,10 @@ export type MobileUserDrawingPrimitive =
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
+export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'priceRange' | 'dateRange' }
+>;
 
 export interface MobileUserDrawingTextLabelLayout {
   fontSize: number;
@@ -190,6 +207,26 @@ function primitiveFromGeometry(
           : '';
       return {
         kind: 'priceRange',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.rect,
+        labelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height / 2,
+        },
+        label,
+        style: geometry.drawing.style,
+      };
+    }
+    case 'dateRange': {
+      const drawing = geometry.drawing;
+      const label =
+        drawing.kind === 'dateRange' ? resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label : '';
+      return {
+        kind: 'dateRange',
         id: geometry.drawing.id,
         phase,
         selected,
@@ -309,7 +346,7 @@ export function resolveMobileUserDrawingTextLabelLayout(
 }
 
 export function resolveMobileUserDrawingPriceRangeLabelPosition(
-  primitive: MobileUserDrawingPriceRangePrimitive,
+  primitive: MobileUserDrawingMeasurementLabelPrimitive,
   measuredTextBounds: MobileUserDrawingTextBounds,
 ): MobileUserDrawingPriceRangeLabelPosition {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);

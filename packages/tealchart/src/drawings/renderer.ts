@@ -5,6 +5,7 @@ import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle } from './type
 import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
+import { resolveUserDrawingDateRangeMetrics } from './dateRange';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
@@ -102,6 +103,34 @@ function renderPriceRangeGeometry(
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   const label = resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label;
+
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2);
+}
+
+function renderDateRangeGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'dateRange' }>,
+): void {
+  const { rect, drawing } = geometry;
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  if (drawing.kind !== 'dateRange') return;
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  const label = resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
@@ -218,6 +247,9 @@ export function renderUserDrawing(
         break;
       case 'priceRange':
         renderPriceRangeGeometry(ctx, geometry);
+        break;
+      case 'dateRange':
+        renderDateRangeGeometry(ctx, geometry);
         break;
       case 'textLabel':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);

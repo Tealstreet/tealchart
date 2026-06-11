@@ -308,6 +308,43 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready date range primitives with shared duration labels', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'date-range',
+          kind: 'dateRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10_000, price: 90 },
+            { time: 70_000, price: 10 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+      kind: 'dateRange',
+      id: 'date-range',
+      clip,
+      rect: { x: 10, y: 0, width: 60, height: 100 },
+      labelPoint: { x: 40, y: 50 },
+      label: '1 minute',
+      style,
+    });
+  });
+
   it('positions price range labels with a Skia baseline offset', () => {
     const state: UserDrawingState = {
       version: 1,

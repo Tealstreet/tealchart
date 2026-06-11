@@ -3,6 +3,7 @@ export {
   drawingXToTime,
   drawingYToPrice,
   priceToDrawingY,
+  resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
   resolveRaySegment,
   resolveRectFromAnchors,
@@ -21,6 +22,8 @@ export type {
   ResolveUserDrawingInputPointOptions,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
+export { formatUserDrawingDateRangeDuration, resolveUserDrawingDateRangeMetrics } from './dateRange';
+export type { UserDrawingDateRangeMetrics } from './dateRange';
 export { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 export type {
   ApplyUserDrawingEditDragOptions,
@@ -163,6 +166,7 @@ export type {
 export type {
   ArrowLineDrawing,
   CreateUserDrawingFromDraftOptions,
+  DateRangeDrawing,
   ExtendedLineDrawing,
   HorizontalLineDrawing,
   PriceRangeDrawing,

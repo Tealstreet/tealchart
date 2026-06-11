@@ -214,6 +214,23 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits date range edges and boundary handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 0 }, space)?.drawing.id).toBe('date-range');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 50 }, space)?.handle).toBe('start');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 50 }, space)?.handle).toBe('end');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,
