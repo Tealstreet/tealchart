@@ -19,6 +19,7 @@ import {
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -527,6 +528,40 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           btn.addEventListener('click', () =>
             this.options.onUserDrawingStyleChange?.({ lineStyle: descriptor.lineStyle }),
           );
+          btn.addEventListener('mouseenter', () => {
+            if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+          });
+          btn.addEventListener('mouseleave', () => {
+            if (!isActive) {
+              btn.style.backgroundColor = 'transparent';
+              btn.style.color = 'var(--text2, #787b86)';
+            }
+          });
+        }
+        group.appendChild(btn);
+      }
+
+      for (const descriptor of USER_DRAWING_OPACITY_DESCRIPTORS) {
+        const isActive = (selectedDrawing.style.opacity ?? 1) === descriptor.opacity;
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...(isActive ? styles.drawingButtonActive : {}),
+            opacity: styleEnabled ? '1' : '0.35',
+            cursor: styleEnabled ? 'pointer' : 'default',
+            fontSize: '10px',
+          },
+          textContent: String(Math.round(descriptor.opacity * 100)),
+          attributes: {
+            type: 'button',
+            title: descriptor.label,
+            'aria-label': descriptor.label,
+            'aria-pressed': isActive ? 'true' : 'false',
+          },
+        });
+        btn.disabled = !styleEnabled;
+        if (styleEnabled) {
+          btn.addEventListener('click', () => this.options.onUserDrawingStyleChange?.({ opacity: descriptor.opacity }));
           btn.addEventListener('mouseenter', () => {
             if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
           });
