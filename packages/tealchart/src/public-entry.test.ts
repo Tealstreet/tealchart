@@ -15,6 +15,7 @@ import {
   resolveFibCirclesFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveFibFanFromAnchors,
+  resolveFibSpeedResistanceArcsFromAnchors,
   resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
@@ -53,6 +54,7 @@ import type {
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibCirclesPrimitive,
+  MobileUserDrawingFibSpeedResistanceArcsPrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingTrendBasedFibTimePrimitive,
   MobileUserDrawingFibFanPrimitive,
@@ -82,6 +84,7 @@ import type {
   FibChannelDrawing,
   FibCirclesDrawing,
   FibFanDrawing,
+  FibSpeedResistanceArcsDrawing,
   FibSpeedResistanceFanDrawing,
   FibTimeZoneDrawing,
   TrendBasedFibTimeDrawing,
@@ -222,6 +225,19 @@ describe('tealchart public entries', () => {
       kind: 'fibSpeedResistanceFan',
       id: 'fib-speed-fan',
     };
+    const fibSpeedArcsPrimitive: NonNever<MobileUserDrawingFibSpeedResistanceArcsPrimitive> = {
+      kind: 'fibSpeedResistanceArcs',
+      id: 'fib-speed-arcs',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 5 },
+      reference: { x: 10, y: 10 },
+      baseRadius: 5,
+      arcs: [{ ratio: 1, radius: 5, startAngle: 0, endAngle: 1 }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const fibCirclesPrimitive: NonNever<MobileUserDrawingFibCirclesPrimitive> = {
       kind: 'fibCircles',
       id: 'fib-circles',
@@ -350,6 +366,7 @@ describe('tealchart public entries', () => {
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
     expect(fibFanPrimitive.kind).toBe('fibFan');
     expect(fibSpeedFanPrimitive.kind).toBe('fibSpeedResistanceFan');
+    expect(fibSpeedArcsPrimitive.kind).toBe('fibSpeedResistanceArcs');
     expect(fibCirclesPrimitive.kind).toBe('fibCircles');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
@@ -940,6 +957,32 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibSpeedResistanceFan');
     expect(fan.rays.map((ray) => ray.ratio)).toEqual([1 / 3, 2 / 3, 1]);
+  });
+
+  it('exports shared drawing fib speed resistance arc types and resolver', () => {
+    const drawing: FibSpeedResistanceArcsDrawing = {
+      id: 'fib-speed-arcs',
+      kind: 'fibSpeedResistanceArcs',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const arcs = resolveFibSpeedResistanceArcsFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibSpeedResistanceArcs');
+    expect(arcs.arcs.map((arc) => arc.ratio)).toEqual([1 / 3, 2 / 3, 1]);
   });
 
   it('exports shared drawing fib circle types and resolver', () => {

@@ -86,6 +86,38 @@ function distanceToCircleEdge(point: DrawingScreenPoint, center: DrawingScreenPo
   return Math.abs(distanceBetweenPoints(point, center) - radius);
 }
 
+function normalizeAngle(angle: number): number {
+  const twoPi = Math.PI * 2;
+  return ((angle % twoPi) + twoPi) % twoPi;
+}
+
+function isAngleBetween(angle: number, start: number, end: number): boolean {
+  const normalizedAngle = normalizeAngle(angle);
+  const normalizedStart = normalizeAngle(start);
+  const normalizedEnd = normalizeAngle(end);
+  if (normalizedStart <= normalizedEnd) {
+    return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
+  }
+  return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
+}
+
+function distanceToArcEdge(
+  point: DrawingScreenPoint,
+  center: DrawingScreenPoint,
+  radius: number,
+  startAngle: number,
+  endAngle: number,
+): number {
+  const angle = Math.atan2(point.y - center.y, point.x - center.x);
+  if (isAngleBetween(angle, startAngle, endAngle)) {
+    return distanceToCircleEdge(point, center, radius);
+  }
+
+  const start = { x: center.x + Math.cos(startAngle) * radius, y: center.y + Math.sin(startAngle) * radius };
+  const end = { x: center.x + Math.cos(endAngle) * radius, y: center.y + Math.sin(endAngle) * radius };
+  return Math.min(distanceBetweenPoints(point, start), distanceBetweenPoints(point, end));
+}
+
 function distanceToEllipseEdge(
   point: DrawingScreenPoint,
   center: DrawingScreenPoint,
@@ -208,6 +240,21 @@ function hitTestResolvedGeometry(
     const distance = Math.min(
       ...geometry.fibCircles.circles.map((circle) =>
         distanceToCircleEdge(point, geometry.fibCircles.center, circle.radius),
+      ),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
+  if (geometry.kind === 'fibSpeedResistanceArcs') {
+    const distance = Math.min(
+      ...geometry.fibSpeedResistanceArcs.arcs.map((arc) =>
+        distanceToArcEdge(
+          point,
+          geometry.fibSpeedResistanceArcs.center,
+          arc.radius,
+          arc.startAngle,
+          arc.endAngle,
+        ),
       ),
     );
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -445,6 +492,7 @@ function hitTestUserDrawingHandle(
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibSpeedResistanceArcs':
     case 'fibCircles':
     case 'fibTimeZone':
     case 'gannFan':
@@ -453,6 +501,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibExtension' ||
         geometry.drawing.kind === 'fibFan' ||
         geometry.drawing.kind === 'fibSpeedResistanceFan' ||
+        geometry.drawing.kind === 'fibSpeedResistanceArcs' ||
         geometry.drawing.kind === 'fibCircles' ||
         geometry.drawing.kind === 'fibTimeZone' ||
         geometry.drawing.kind === 'gannFan'
