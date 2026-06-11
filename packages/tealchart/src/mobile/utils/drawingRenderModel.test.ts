@@ -2481,6 +2481,59 @@ describe('mobile user drawing render model', () => {
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
   });
 
+  it('returns Skia-ready Elliott impulse wave primitives with labels and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'elliott-impulse' },
+      drawings: [
+        {
+          id: 'elliott-impulse',
+          kind: 'elliottImpulseWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 30, price: 30 },
+            { time: 50, price: 70 },
+            { time: 70, price: 40 },
+            { time: 90, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'elliottImpulseWave',
+      id: 'elliott-impulse',
+      clip,
+      points: [
+        { x: 10, y: 50 },
+        { x: 30, y: 70 },
+        { x: 50, y: 30 },
+        { x: 70, y: 60 },
+        { x: 90, y: 20 },
+      ],
+      labels: [
+        { text: '1', point: { x: 10, y: 50 } },
+        { text: '2', point: { x: 30, y: 70 } },
+        { text: '3', point: { x: 50, y: 30 } },
+        { text: '4', point: { x: 70, y: 60 } },
+        { text: '5', point: { x: 90, y: 20 } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
+  });
+
   it('returns Skia-ready ABCD pattern primitives with labels and handles', () => {
     const state: UserDrawingState = {
       version: 1,

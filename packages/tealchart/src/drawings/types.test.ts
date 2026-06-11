@@ -119,6 +119,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('abcdPattern')).toBe(4);
     expect(getRequiredAnchorCount('threeDrivesPattern')).toBe(5);
     expect(getRequiredAnchorCount('headShouldersPattern')).toBe(5);
+    expect(getRequiredAnchorCount('elliottImpulseWave')).toBe(5);
     expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
@@ -674,6 +675,23 @@ describe('user drawing types', () => {
       locked: false,
       createdAt: 25,
       updatedAt: 25,
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({ tool: 'elliottImpulseWave', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }),
+        {
+          id: 'elliott-impulse',
+          now: 26,
+        },
+      ),
+    ).toMatchObject({
+      id: 'elliott-impulse',
+      kind: 'elliottImpulseWave',
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+      visible: true,
+      locked: false,
+      createdAt: 26,
+      updatedAt: 26,
     });
     expect(
       createUserDrawingFromDraft(draft({ tool: 'curve', anchors: [anchorA, anchorB, anchorC] }), {

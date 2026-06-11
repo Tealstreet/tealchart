@@ -2294,6 +2294,73 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves and edits Elliott impulse wave anchors with stable five-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-impulse',
+      kind: 'elliottImpulseWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+        { time: 70, price: 40 },
+        { time: 90, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'elliott-impulse' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'elliott-impulse' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 55 },
+      { now: () => 28 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'elliottImpulseWave',
+      points: [
+        { time: 15, price: expect.closeTo(45) },
+        { time: 35, price: expect.closeTo(25) },
+        { time: 55, price: 65 },
+        { time: 75, price: expect.closeTo(35) },
+        { time: 95, price: 75 },
+      ],
+      updatedAt: 28,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'elliott-impulse', handle: 'center', pointIndex: 4 },
+        startPoint: { x: 90, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 95, y: 25 },
+      { now: () => 29 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'elliottImpulseWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+        { time: 70, price: 40 },
+        { time: expect.closeTo(95), price: 75 },
+      ],
+      updatedAt: 29,
+    });
+  });
+
   it('moves and edits ABCD pattern anchors with stable four-point shape', () => {
     const drawing: UserDrawing = {
       ...base,

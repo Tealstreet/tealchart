@@ -820,6 +820,36 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:RS:90,24:#111:center:1:12px sans-serif');
   });
 
+  it('renders Elliott impulse wave drawings as labeled paths', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-impulse',
+      kind: 'elliottImpulseWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+        { time: 70, price: 40 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:30,70');
+    expect(ctx.calls).toContain('lineTo:50,30');
+    expect(ctx.calls).toContain('lineTo:70,60');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:1:10,44:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:2:30,64:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3:50,24:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:4:70,54:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:5:90,14:#111:center:1:12px sans-serif');
+  });
+
   it('renders ABCD pattern drawings as labeled stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
