@@ -271,6 +271,19 @@ describe('user drawing coordinates', () => {
     expect(position.ratioLabel).toBe('R:R 2.00');
   });
 
+  it('includes stop anchor time in risk reward horizontal extents', () => {
+    const position = resolveRiskRewardPositionFromAnchors(
+      'longPosition',
+      { time: 1_500, price: 100 },
+      { time: 2_500, price: 110 },
+      { time: 3_000, price: 95 },
+      space,
+    );
+
+    expect(position.entryLine).toEqual({ start: { x: 60, y: 70 }, end: { x: 210, y: 70 } });
+    expect(position.stopLine).toEqual({ start: { x: 60, y: 95 }, end: { x: 210, y: 95 } });
+  });
+
   it('resolves Fibonacci retracement levels from two anchors', () => {
     const retracement = resolveFibRetracementFromAnchors({ time: 1_000, price: 90 }, { time: 3_000, price: 110 }, space);
 
