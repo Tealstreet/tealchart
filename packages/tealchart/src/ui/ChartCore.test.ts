@@ -290,7 +290,12 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
 
     const testCore = core as unknown as {
-      handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch'): unknown;
+      handleUserDrawingInput(
+        x: number,
+        y: number,
+        source?: 'mouse' | 'touch',
+        options?: { additiveSelection?: boolean },
+      ): unknown;
       handleUserDrawingDragPending(x: number, y: number): boolean;
       handleUserDrawingDragStart(x: number, y: number): boolean;
       handleUserDrawingDragMove(x: number, y: number): boolean;
@@ -299,11 +304,15 @@ describe('ChartCore viewport management', () => {
 
     expect(testCore.handleUserDrawingInput(100, 100)).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), { additive: undefined });
+    expect(testCore.handleUserDrawingInput(100, 100, 'mouse', { additiveSelection: true })).toBe(false);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
+    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), { additive: true });
     expect(testCore.handleUserDrawingInput(100, 100, 'touch')).toEqual({
       handled: true,
       allowPaneDoubleClick: true,
     });
-    expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
     onUserDrawingSelection.mockReturnValueOnce({
       state: { ...selectionResult.state, selection: null },
       hit: false,
@@ -313,10 +322,10 @@ describe('ChartCore viewport management', () => {
       handled: true,
       allowPaneDoubleClick: true,
     });
-    expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(4);
     expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
     expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);
-    expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
+    expect(onUserDrawingSelection).toHaveBeenCalledTimes(4);
     expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
     expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
     expect(testCore.handleUserDrawingDragStart(760, 100)).toBe(false);

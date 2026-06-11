@@ -20,6 +20,7 @@ import type {
   DrawingScreenPoint,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
+  UserDrawingSelectionInputOptions,
   UserDrawingState,
 } from '../drawings';
 
@@ -103,6 +104,7 @@ export interface ChartCoreOptions {
   onUserDrawingSelection?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+    options?: Pick<UserDrawingSelectionInputOptions, 'additive'>,
   ) => UserDrawingSelectionAtPointResult;
   /** Called when select-mode pointer down may start editing a user drawing */
   onUserDrawingEditStart?: (
@@ -718,7 +720,7 @@ export class ChartCore {
       getTimeFromX: (x) =>
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
-      onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
+      onDrawingInput: (x, y, source, options) => this.handleUserDrawingInput(x, y, source, options),
       onDrawingDragPending: (x, y) => this.handleUserDrawingDragPending(x, y),
       onDrawingDragStart: (x, y) => this.handleUserDrawingDragStart(x, y),
       onDrawingDragMove: (x, y) => this.handleUserDrawingDragMove(x, y),
@@ -1504,7 +1506,12 @@ export class ChartCore {
     return null;
   }
 
-  private handleUserDrawingInput(x: number, y: number, source: 'mouse' | 'touch' = 'mouse'): DrawingInputResult {
+  private handleUserDrawingInput(
+    x: number,
+    y: number,
+    source: 'mouse' | 'touch' = 'mouse',
+    options: { additiveSelection?: boolean } = {},
+  ): DrawingInputResult {
     if (!this.viewport) return false;
 
     if (this.userDrawingState?.activeTool === 'select') {
@@ -1512,7 +1519,9 @@ export class ChartCore {
       const chartRight = this.options.width - this.margins.right;
       if (x < chartLeft || x >= chartRight || !this.getPaneAtY(y)) return false;
 
-      const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport));
+      const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport), {
+        additive: options.additiveSelection,
+      });
       return source === 'touch' && (selection?.hit === true || selection?.changed === true)
         ? { handled: true, allowPaneDoubleClick: true }
         : false;
