@@ -10,6 +10,7 @@ import type {
   ExtendedLineDrawing,
   InfoLineDrawing,
   PathDrawing,
+  ParallelChannelDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
   TriangleDrawing,
@@ -341,6 +342,16 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const channel: ParallelChannelDrawing = {
+      ...trendLine,
+      id: 'channel',
+      kind: 'parallelChannel',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 100 },
+        { time: 1_000, price: 110 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -463,6 +474,21 @@ describe('user drawing coordinates', () => {
           { x: 110, y: 20 },
           { x: 210, y: 120 },
         ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(channel, space)).toMatchObject({
+      kind: 'parallelChannel',
+      channel: {
+        base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },
+        polygon: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 70 },
+            { x: 210, y: 20 },
+            { x: 10, y: 20 },
+          ],
+        },
       },
     });
   });

@@ -218,7 +218,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, edge hit testing, whole-drawing moves, corner editing, and fill
   controls use shared drawing behavior on both platforms.
 
-## Current Epic: Triangle Tool
+## Shipped: Triangle Tool
 
 - Shared drawing state supports the three-anchor `triangle` tool and persists it
   through layout save/load.
@@ -226,6 +226,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   from shared screen-space geometry.
 - Selection, polygon hit testing, whole-drawing moves, point editing, and fill
   controls use shared drawing behavior on both platforms.
+
+## Current Epic: Parallel Channel Tool
+
+- Shared drawing state supports the three-anchor `parallelChannel` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked channel polygons
+  from shared screen-space geometry.
+- Selection, rail/polygon hit testing, whole-drawing moves, width-anchor
+  editing, and fill controls use shared drawing behavior on both platforms.
 
 ## Known Gaps
 

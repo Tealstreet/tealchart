@@ -220,6 +220,17 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'parallelChannel') {
+    const distance = pointInPolygon(point, geometry.channel.polygon.points)
+      ? 0
+      : Math.min(
+          distanceToSegment(point, geometry.channel.base),
+          distanceToSegment(point, geometry.channel.parallel),
+          distanceToClosedPolyline(point, geometry.channel.polygon.points),
+        );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'arrowMarker') {
     const distance = pointInPolygon(point, geometry.marker.points) ? 0 : distanceToClosedPolyline(point, geometry.marker.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -303,6 +314,13 @@ function hitTestUserDrawingHandle(
       geometry.polygon.points.forEach((trianglePoint, pointIndex) => {
         handles.push({ handle: 'center', point: trianglePoint, pointIndex });
       });
+      break;
+    case 'parallelChannel':
+      if (geometry.drawing.kind === 'parallelChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
       break;
     case 'textLabel':
       handles.push({ handle: 'center', point: geometry.point });
