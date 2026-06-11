@@ -644,6 +644,25 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib channel fills, levels, and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-channel',
+      kind: 'fibChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 35 }, space)?.drawing.id).toBe('fib-channel');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

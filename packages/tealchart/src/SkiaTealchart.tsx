@@ -1766,6 +1766,39 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fibChannel') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const path = Skia.Path.Make();
+            const [firstPoint, ...remainingPoints] = primitive.points;
+            if (!firstPoint) return null;
+            path.moveTo(firstPoint.x, firstPoint.y);
+            for (const point of remainingPoints) {
+              path.lineTo(point.x, point.y);
+            }
+            path.close();
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <SkiaPath path={path} color={primitive.style.fillColor} />
+                )}
+                {primitive.style.lineVisible !== false &&
+                  primitive.levels.map((level) => (
+                    <SkiaLine
+                      key={`${primitive.id}:level:${level.ratio}`}
+                      p1={vec(level.start.x, level.start.y)}
+                      p2={vec(level.end.x, level.end.y)}
+                      color={primitive.style.lineColor}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      style="stroke"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                  ))}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'arrowMarker') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
