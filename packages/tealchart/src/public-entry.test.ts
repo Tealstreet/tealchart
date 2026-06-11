@@ -22,6 +22,7 @@ import {
   resolveFibTimeZoneFromAnchors,
   resolveCyclicLinesFromAnchors,
   resolveTimeCyclesFromAnchors,
+  resolveSineLineFromAnchors,
   resolveFibWedgeFromAnchors,
   resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
@@ -59,6 +60,7 @@ import type {
   MobileUserDrawingCurvePrimitive,
   MobileUserDrawingCyclicLinesPrimitive,
   MobileUserDrawingTimeCyclesPrimitive,
+  MobileUserDrawingSineLinePrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
@@ -94,6 +96,7 @@ import type {
   CircleDrawing,
   CyclicLinesDrawing,
   TimeCyclesDrawing,
+  SineLineDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
@@ -178,6 +181,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCyclicLinesPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTimeCyclesPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingSineLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
@@ -373,6 +377,20 @@ describe('tealchart public entries', () => {
       ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const sineLinePrimitive: NonNever<MobileUserDrawingSineLinePrimitive> = {
+      kind: 'sineLine',
+      id: 'sine-line',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [
+        { x: 0, y: 5 },
+        { x: 5, y: 0 },
+        { x: 10, y: 5 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannBoxPrimitive: NonNever<MobileUserDrawingGannBoxPrimitive> = {
       kind: 'gannBox',
       id: 'gann-box',
@@ -530,6 +548,7 @@ describe('tealchart public entries', () => {
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(cyclicLinesPrimitive.kind).toBe('cyclicLines');
     expect(timeCyclesPrimitive.kind).toBe('timeCycles');
+    expect(sineLinePrimitive.kind).toBe('sineLine');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(gannBoxPrimitive.kind).toBe('gannBox');
@@ -1481,6 +1500,37 @@ describe('tealchart public entries', () => {
           endTime: 2,
           points: expect.arrayContaining([{ x: 75, y: 0 }]),
         }),
+      ]),
+    );
+  });
+
+  it('exports shared drawing sine line types and resolver', () => {
+    const drawing: SineLineDrawing = {
+      id: 'sine-line',
+      kind: 'sineLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 20 },
+      ],
+    };
+    const sineLine = resolveSineLineFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('sineLine');
+    expect(sineLine.points).toEqual(
+      expect.arrayContaining([
+        { x: 50, y: 50 },
+        { x: 100, y: 0 },
       ]),
     );
   });

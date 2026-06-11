@@ -1283,6 +1283,41 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready sine line primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'sine-line',
+          kind: 'sineLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'sineLine',
+      id: 'sine-line',
+      points: expect.arrayContaining([
+        { x: 10, y: 50 },
+        { x: 20, y: 20 },
+      ]),
+    });
+  });
+
   it('returns Skia-ready regression trend primitives', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,

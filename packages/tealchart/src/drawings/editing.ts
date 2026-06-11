@@ -119,6 +119,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':
+    case 'sineLine':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
@@ -201,7 +202,8 @@ function editLineEndpoint(
         | 'gannFan'
         | 'fibTimeZone'
         | 'cyclicLines'
-        | 'timeCycles';
+        | 'timeCycles'
+        | 'sineLine';
     }
   >,
   handle: UserDrawingHandleRole,
@@ -357,6 +359,7 @@ function editDrawingHandle(
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':
+    case 'sineLine':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':
