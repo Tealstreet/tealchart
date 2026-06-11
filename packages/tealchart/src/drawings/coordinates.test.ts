@@ -78,6 +78,7 @@ import {
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
   resolveAbcdPatternFromAnchors,
+  resolveHeadShouldersPatternFromAnchors,
   resolveThreeDrivesPatternFromAnchors,
   resolveTrianglePatternFromAnchors,
   resolveXabcdPatternFromAnchors,
@@ -470,6 +471,39 @@ describe('user drawing coordinates', () => {
         { text: '2', point: { x: 110, y: 95 } },
         { text: 'C', point: { x: 160, y: 45 } },
         { text: '3', point: { x: 210, y: 120 } },
+      ],
+    });
+  });
+
+  it('resolves head and shoulders pattern polylines, neckline, and labels from five anchors', () => {
+    expect(
+      resolveHeadShouldersPatternFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 90 },
+          { time: 2_000, price: 110 },
+          { time: 2_500, price: 90 },
+          { time: 3_000, price: 100 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: 120 },
+          { x: 110, y: 20 },
+          { x: 160, y: 120 },
+          { x: 210, y: 70 },
+        ],
+      },
+      neckline: { start: { x: 60, y: 120 }, end: { x: 160, y: 120 } },
+      labels: [
+        { text: 'LS', point: { x: 10, y: 70 } },
+        { text: 'N1', point: { x: 60, y: 120 } },
+        { text: 'H', point: { x: 110, y: 20 } },
+        { text: 'N2', point: { x: 160, y: 120 } },
+        { text: 'RS', point: { x: 210, y: 70 } },
       ],
     });
   });

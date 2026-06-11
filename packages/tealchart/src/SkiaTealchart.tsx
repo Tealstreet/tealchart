@@ -2508,6 +2508,51 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'headShouldersPattern') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const path = Skia.Path.Make();
+            const [firstPoint, ...remainingPoints] = primitive.points;
+            if (!firstPoint) return null;
+            path.moveTo(firstPoint.x, firstPoint.y);
+            for (const point of remainingPoints) {
+              path.lineTo(point.x, point.y);
+            }
+            path.moveTo(primitive.neckline.start.x, primitive.neckline.start.y);
+            path.lineTo(primitive.neckline.end.x, primitive.neckline.end.y);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={path}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+                {font &&
+                  primitive.labels.map((label) => {
+                    const bounds = font.measureText(label.text);
+                    return (
+                      <SkiaText
+                        key={`${primitive.id}:label:${label.text}`}
+                        x={label.point.x - bounds.width / 2}
+                        y={label.point.y - 6}
+                        text={label.text}
+                        font={font}
+                        color={primitive.style.textColor ?? primitive.style.lineColor}
+                      />
+                    );
+                  })}
+              </Group>
+            );
+          }
+
           if (
             primitive.kind === 'path' ||
             primitive.kind === 'brush' ||

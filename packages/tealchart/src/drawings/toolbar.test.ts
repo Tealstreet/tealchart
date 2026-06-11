@@ -78,6 +78,7 @@ describe('user drawing toolbar descriptors', () => {
       'abcdPattern',
       'xabcdPattern',
       'threeDrivesPattern',
+      'headShouldersPattern',
       'anchoredVwap',
       'fibRetracement',
       'fibExtension',
@@ -207,6 +208,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('threeDrivesPattern')).toEqual(
       expect.objectContaining({ tool: 'threeDrivesPattern', label: 'Three drives pattern' }),
+    );
+    expect(getUserDrawingToolDescriptor('headShouldersPattern')).toEqual(
+      expect.objectContaining({ tool: 'headShouldersPattern', label: 'Head and shoulders pattern' }),
     );
     expect(getUserDrawingToolDescriptor('brush')).toEqual(expect.objectContaining({ tool: 'brush', label: 'Brush' }));
     expect(getUserDrawingToolDescriptor('highlighter')).toEqual(
