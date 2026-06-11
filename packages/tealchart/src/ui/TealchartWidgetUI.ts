@@ -5,6 +5,7 @@ import type { PlotStyleOverride } from '../state/chartState';
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingIconName,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
@@ -152,6 +153,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Called when the top bar should update selected text-label alignment */
   onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
+  /** Called when the top bar should update selected icon marker shape */
+  onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Called when the top bar should update selected drawing visibility */
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Called when the top bar should update selected drawing locked state */
@@ -269,6 +272,7 @@ export class TealchartWidgetUI {
         onUserDrawingClearAll: options.onUserDrawingClearAll,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,
         onUserDrawingTextAlignChange: options.onUserDrawingTextAlignChange,
+        onUserDrawingIconNameChange: options.onUserDrawingIconNameChange,
         onUserDrawingVisibilityChange: options.onUserDrawingVisibilityChange,
         onUserDrawingLockedChange: options.onUserDrawingLockedChange,
         layoutCallbacks: options.layoutCallbacks,

@@ -4,17 +4,20 @@ import { clearChartStoreCache } from '../state/chartState';
 import {
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
-  isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingFillToolbarEnabled,
+  isUserDrawingIconToolbarEnabled,
+  isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
+  supportsUserDrawingIconControls,
   supportsUserDrawingTextControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+  USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
@@ -126,6 +129,7 @@ describe('user drawing toolbar descriptors', () => {
       ...USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
       ...USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
       ...USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
+      ...USER_DRAWING_ICON_NAME_DESCRIPTORS,
     ]) {
       expect(descriptor.icon.length).toBeGreaterThan(0);
       expect(descriptor.label.length).toBeGreaterThan(0);
@@ -142,6 +146,15 @@ describe('user drawing toolbar descriptors', () => {
     ]) {
       expect(descriptor.label.length).toBeGreaterThan(0);
     }
+    expect(USER_DRAWING_ICON_NAME_DESCRIPTORS.map((descriptor) => descriptor.iconName)).toEqual([
+      'star',
+      'circle',
+      'square',
+      'triangle',
+      'flag',
+      'arrowUp',
+      'arrowDown',
+    ]);
   });
 
   it('resolves tool descriptors by tool id', () => {
@@ -550,6 +563,8 @@ describe('user drawing toolbar descriptors', () => {
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(icon)).toBe(true);
+    expect(supportsUserDrawingIconControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingIconControls(icon)).toBe(true);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'e', kind: 'ellipse' as const })).toBe(true);
     expect(
@@ -706,6 +721,16 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingTextToolbarEnabled({ ...state, selection: { drawingId: 't' }, drawings: [textLabel] })).toBe(
       true,
     );
+    expect(isUserDrawingIconToolbarEnabled({ ...state, selection: { drawingId: 'icon' }, drawings: [icon] })).toBe(
+      true,
+    );
+    expect(
+      isUserDrawingIconToolbarEnabled({
+        ...state,
+        selection: { drawingId: 'icon' },
+        drawings: [{ ...icon, locked: true }],
+      }),
+    ).toBe(false);
     expect(
       isUserDrawingFillToolbarEnabled({
         ...state,
@@ -822,5 +847,26 @@ describe('user drawing toolbar descriptors', () => {
         drawings: [{ ...textDrawing, style: { ...textDrawing.style, fontFamily: 'serif' } }],
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(textState));
+
+    const iconDrawing = {
+      id: 'icon',
+      kind: 'icon' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      point: { time: 1, price: 10 },
+      iconName: 'star' as const,
+    };
+    const iconState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'icon' },
+      drawings: [iconDrawing],
+    };
+    expect(getUserDrawingToolbarStateKey({ ...iconState, drawings: [{ ...iconDrawing, iconName: 'flag' }] })).not.toBe(
+      getUserDrawingToolbarStateKey(iconState),
+    );
   });
 });

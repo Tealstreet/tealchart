@@ -9,21 +9,30 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import type { UserDrawingState, UserDrawingStyle, UserDrawingTextAlign, UserDrawingTool } from '../../drawings';
+import type {
+  UserDrawingIconName,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingTextAlign,
+  UserDrawingTool,
+} from '../../drawings';
 
 import {
   getSelectedUserDrawing,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingFillToolbarEnabled,
+  isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
+  supportsUserDrawingIconControls,
   supportsUserDrawingTextControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+  USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
@@ -72,6 +81,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Callback when selected text-label alignment should change */
   onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
+  /** Callback when selected icon marker shape should change */
+  onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Callback when selected drawing visibility should change */
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Callback when selected drawing locked state should change */
@@ -100,6 +111,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingClearAll,
     onUserDrawingStyleChange,
     onUserDrawingTextAlignChange,
+    onUserDrawingIconNameChange,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
@@ -135,8 +147,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const selectedDrawing = userDrawingState ? getSelectedUserDrawing(userDrawingState) : null;
     const styleControlsEnabled = userDrawingState ? isUserDrawingStyleToolbarEnabled(userDrawingState) : false;
     const fillControlsEnabled = userDrawingState ? isUserDrawingFillToolbarEnabled(userDrawingState) : false;
+    const iconControlsEnabled = userDrawingState ? isUserDrawingIconToolbarEnabled(userDrawingState) : false;
     const textControlsEnabled = userDrawingState ? isUserDrawingTextToolbarEnabled(userDrawingState) : false;
     const fillControlsSupported = selectedDrawing ? supportsUserDrawingFillControls(selectedDrawing) : false;
+    const iconControlsSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
     const textControlsSupported = selectedDrawing ? supportsUserDrawingTextControls(selectedDrawing) : false;
 
     return (
@@ -402,6 +416,36 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                             <Text
                               style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
                             >
+                              {descriptor.icon}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+
+                      <View style={styles.innerDivider} />
+                    </>
+                  )}
+
+                  {iconControlsSupported && (
+                    <>
+                      {USER_DRAWING_ICON_NAME_DESCRIPTORS.map((descriptor) => {
+                        const active = selectedDrawing.kind === 'icon' && selectedDrawing.iconName === descriptor.iconName;
+                        return (
+                          <Pressable
+                            key={descriptor.iconName}
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ disabled: !iconControlsEnabled, selected: active }}
+                            disabled={!iconControlsEnabled}
+                            onPress={() => onUserDrawingIconNameChange?.(descriptor.iconName)}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingButton,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              iconControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                              !iconControlsEnabled && styles.drawingButtonDisabled,
+                            ]}
+                          >
+                            <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
                               {descriptor.icon}
                             </Text>
                           </Pressable>

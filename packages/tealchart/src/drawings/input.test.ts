@@ -17,6 +17,7 @@ import {
   selectUserDrawingAtPoint,
   selectUserDrawingById,
   selectUserDrawing,
+  setUserDrawingIconName,
   setUserDrawingLocked,
   setUserDrawingText,
   setUserDrawingTextAlign,
@@ -879,6 +880,50 @@ describe('user drawing input controller', () => {
       now: () => 13,
     });
     expect(targeted.drawings[1]).toMatchObject({ textAlign: 'right', updatedAt: 13 });
+  });
+
+  it('updates selected or targeted icon drawings while respecting locks', () => {
+    const icon = {
+      id: 'icon',
+      kind: 'icon' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      iconName: 'star' as const,
+    };
+    const locked = { ...icon, id: 'locked', locked: true };
+    const line = {
+      id: 'line',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price: 100,
+    };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'icon' },
+      drawings: [icon, locked, line],
+    });
+
+    const selected = setUserDrawingIconName(state, 'flag', { now: () => 12 });
+    expect(selected.drawings[0]).toMatchObject({ iconName: 'flag', updatedAt: 12 });
+    expect(setUserDrawingIconName(selected, 'flag')).toBe(selected);
+    expect(setUserDrawingIconName(state, 'circle', { drawingId: 'line' })).toBe(state);
+    expect(setUserDrawingIconName(state, 'circle', { drawingId: 'locked' })).toBe(state);
+
+    const targeted = setUserDrawingIconName(state, 'arrowUp', {
+      drawingId: 'locked',
+      includeLocked: true,
+      now: () => 13,
+    });
+    expect(targeted.drawings[1]).toMatchObject({ iconName: 'arrowUp', updatedAt: 13 });
   });
 
   it('updates targeted drawing style and respects locked drawings by default', () => {

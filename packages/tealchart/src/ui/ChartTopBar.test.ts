@@ -193,6 +193,46 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('dispatches selected icon library controls without text controls', () => {
+    const onIconName = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-icon-style',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'icon' },
+        drawings: [
+          {
+            id: 'icon',
+            kind: 'icon',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+              fillColor: 'rgba(245, 197, 66, 0.12)',
+            },
+            point: { time: 1, price: 10 },
+            iconName: 'star',
+          },
+        ],
+      },
+      onUserDrawingIconNameChange: onIconName,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Flag icon"]')?.click();
+
+    expect(onIconName).toHaveBeenCalledWith('flag');
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
   it('dispatches selected text label fill, text color, and font size controls', () => {
     const onStyle = vi.fn();
     const onTextAlign = vi.fn();
