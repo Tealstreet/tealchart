@@ -12,6 +12,7 @@ import type {
   EllipseDrawing,
   ExtendedLineDrawing,
   FibExtensionDrawing,
+  FibFanDrawing,
   FibRetracementDrawing,
   FlatTopBottomDrawing,
   HorizontalRayDrawing,
@@ -558,6 +559,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 110 },
       ],
     };
+    const fibFan: FibFanDrawing = {
+      ...trendLine,
+      id: 'fib-fan',
+      kind: 'fibFan',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const path: PathDrawing = {
       ...trendLine,
       id: 'path',
@@ -814,6 +824,23 @@ describe('user drawing coordinates', () => {
           { ratio: 2, label: '2.000', price: 130, y: -80 },
           { ratio: 2.618, label: '2.618', price: 142.36, y: expect.closeTo(-141.8) },
         ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibFan, space)).toMatchObject({
+      kind: 'fibFan',
+      fibFan: {
+        origin: { x: 10, y: 70 },
+        targetStart: { x: 110, y: 70 },
+        targetEnd: { x: 110, y: 120 },
+        rays: expect.arrayContaining([
+          { ratio: 0, target: { x: 110, y: 70 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
+          {
+            ratio: 0.5,
+            target: { x: 110, y: 95 },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 120 } },
+          },
+          { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+        ]),
       },
     });
     expect(resolveUserDrawingGeometry(path, space)).toMatchObject({

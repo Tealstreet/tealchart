@@ -227,6 +227,21 @@ function renderPitchfanGeometry(
   ctx.stroke();
 }
 
+function renderFibFanGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibFan' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const ray of geometry.fibFan.rays) {
+    ctx.moveTo(ray.segment.start.x, ray.segment.start.y);
+    ctx.lineTo(ray.segment.end.x, ray.segment.end.y);
+  }
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -627,6 +642,9 @@ export function renderUserDrawing(
         break;
       case 'pitchfan':
         renderPitchfanGeometry(ctx, geometry);
+        break;
+      case 'fibFan':
+        renderFibFanGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

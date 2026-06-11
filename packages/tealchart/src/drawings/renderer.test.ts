@@ -780,6 +780,27 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib fans as two-anchor Fibonacci fan rays', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-fan',
+      kind: 'fibFan',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:100,50');
+    expect(ctx.calls).toContain('lineTo:100,83.75');
+    expect(ctx.calls).toContain('lineTo:100,117.5');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -190,6 +190,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibFan';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rays: readonly {
+        ratio: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -382,6 +396,7 @@ export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPr
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
 export type MobileUserDrawingPitchfanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfan' }>;
+export type MobileUserDrawingFibFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibFan' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -693,6 +708,21 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rays: geometry.pitchfan.rays.map((ray) => ({
+          ratio: ray.ratio,
+          start: ray.segment.start,
+          end: ray.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibFan':
+      return {
+        kind: 'fibFan',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rays: geometry.fibFan.rays.map((ray) => ({
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
