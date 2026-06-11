@@ -72,6 +72,7 @@ export {
   isDrawingDraftReady,
   deserializeUserDrawingStateFromLayout,
   isUserDrawingLayoutStateEqual,
+  normalizeUserDrawingOpacity,
   priceToDrawingY,
   resolveExtendedSegment,
   resolveRaySegment,
@@ -99,8 +100,10 @@ export {
   timeToDrawingX,
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
+  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './drawings';
 export type {
@@ -126,6 +129,7 @@ export type {
   UserDrawingHandleRole,
   UserDrawingKind,
   UserDrawingLineStyle,
+  UserDrawingOpacityDescriptor,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,
