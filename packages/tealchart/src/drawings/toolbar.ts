@@ -15,6 +15,7 @@ import {
   USER_DRAWING_FONT_SIZES,
   USER_DRAWING_OPACITIES,
 } from './types';
+import { getUserDrawingSelectionIds } from './input';
 
 export type UserDrawingToolbarAction = 'duplicateSelected' | 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
@@ -296,8 +297,8 @@ export function isUserDrawingToolbarActionEnabled(
   action: UserDrawingToolbarAction,
 ): boolean {
   if (action === 'duplicateSelected') {
-    const selectedDrawing = getSelectedUserDrawing(state);
-    return selectedDrawing !== null && !selectedDrawing.locked;
+    const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+    return state.drawings.some((drawing) => selectedIds.has(drawing.id) && !drawing.locked);
   }
   if (action === 'deleteSelected') return state.selection !== null;
   if (action === 'cancelDraft') return state.draft !== null;

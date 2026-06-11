@@ -48,6 +48,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web widget/top bar and mobile Skia/top bar expose matching duplicate-selected
   drawing behavior through the same toolbar descriptors.
 
+## Shipped: Group Selection Foundation
+
+- Shared selection state can preserve an ordered group of selected drawing IDs
+  while keeping the first ID as the backward-compatible primary selection.
+- Web Canvas and mobile Skia render every drawing in a grouped selection as
+  selected through the shared render-entry model.
+- Web widget APIs and mobile Skia handles expose matching grouped selection,
+  delete-selected, and duplicate-selected behavior.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text
