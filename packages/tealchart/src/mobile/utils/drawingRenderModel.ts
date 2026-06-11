@@ -1,6 +1,7 @@
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  DrawingScreenXabcdPatternLabel,
   ResolvedUserDrawingGeometry,
   ResolveUserDrawingRenderEntriesOptions,
   UserDrawingIconName,
@@ -660,6 +661,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'xabcdPattern';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      labels: readonly DrawingScreenXabcdPatternLabel[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'textLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -828,6 +840,7 @@ export type MobileUserDrawingDisjointChannelPrimitive = Extract<MobileUserDrawin
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
 export type MobileUserDrawingBarsPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'barsPattern' }>;
+export type MobileUserDrawingXabcdPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'xabcdPattern' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
 export type MobileUserDrawingIconPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'icon' }>;
@@ -1608,6 +1621,18 @@ function primitiveFromGeometry(
         clip,
         bars: geometry.pattern.bars,
         bounds: geometry.pattern.bounds,
+        style: geometry.drawing.style,
+      };
+    case 'xabcdPattern':
+      return {
+        kind: 'xabcdPattern',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.pattern.polyline.points,
+        labels: geometry.pattern.labels,
         style: geometry.drawing.style,
       };
     case 'textLabel':

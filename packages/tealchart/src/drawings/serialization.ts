@@ -116,6 +116,19 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
         bars: drawing.bars.map((bar) => ({ ...bar })),
       };
+    case 'xabcdPattern':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'xabcdPattern',
+        points: [
+          { ...drawing.points[0] },
+          { ...drawing.points[1] },
+          { ...drawing.points[2] },
+          { ...drawing.points[3] },
+          { ...drawing.points[4] },
+        ],
+      };
     case 'path':
     case 'brush':
     case 'highlighter':
@@ -293,6 +306,18 @@ function parseFourPointDrawing(
   const third = parseAnchor(value.points[2]);
   const fourth = parseAnchor(value.points[3]);
   return first && second && third && fourth ? [first, second, third, fourth] : null;
+}
+
+function parseFivePointDrawing(
+  value: Record<string, unknown>,
+): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] | null {
+  if (!Array.isArray(value.points) || value.points.length !== 5) return null;
+  const first = parseAnchor(value.points[0]);
+  const second = parseAnchor(value.points[1]);
+  const third = parseAnchor(value.points[2]);
+  const fourth = parseAnchor(value.points[3]);
+  const fifth = parseAnchor(value.points[4]);
+  return first && second && third && fourth && fifth ? [first, second, third, fourth, fifth] : null;
 }
 
 function parsePathDrawingPoints(value: Record<string, unknown>): readonly UserDrawingAnchor[] | null {
@@ -813,6 +838,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         points,
         bars,
       };
+    }
+    case 'xabcdPattern': {
+      const points = parseFivePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'xabcdPattern',
+            points,
+          }
+        : null;
     }
     case 'horizontalLine':
       return isFiniteNumber(value.price)

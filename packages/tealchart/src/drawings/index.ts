@@ -50,6 +50,7 @@ export {
   resolveSineLineFromAnchors,
   resolveForecastFromAnchors,
   resolveProjectionFromAnchors,
+  resolveXabcdPatternFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveGannBoxFromAnchors,
   resolveGannFanFromAnchors,
@@ -71,6 +72,7 @@ export {
   resolveUserDrawingGeometry,
   screenPointToAnchor,
   timeToDrawingX,
+  XABCD_PATTERN_LABELS,
 } from './coordinates';
 export type {
   DrawingCoordinateSpace,
@@ -116,9 +118,12 @@ export type {
   DrawingScreenRiskRewardPosition,
   DrawingScreenSegment,
   DrawingScreenTrendAngle,
+  DrawingScreenXabcdPattern,
+  DrawingScreenXabcdPatternLabel,
   ResolveUserDrawingInputFromChartOptions,
   ResolveUserDrawingInputPointOptions,
   ResolvedUserDrawingGeometry,
+  XabcdPatternLabel,
 } from './coordinates';
 export { formatUserDrawingDateRangeDuration, resolveUserDrawingDateRangeMetrics } from './dateRange';
 export type { UserDrawingDateRangeMetrics } from './dateRange';
@@ -381,4 +386,5 @@ export type {
   UserDrawingTextEdit,
   UserDrawingTool,
   VerticalLineDrawing,
+  XabcdPatternDrawing,
 } from './types';

@@ -298,6 +298,19 @@ export interface DrawingScreenBarsPattern {
   placement: DrawingScreenPoint;
 }
 
+export const XABCD_PATTERN_LABELS = ['X', 'A', 'B', 'C', 'D'] as const;
+export type XabcdPatternLabel = (typeof XABCD_PATTERN_LABELS)[number];
+
+export interface DrawingScreenXabcdPatternLabel {
+  text: XabcdPatternLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenXabcdPattern {
+  polyline: DrawingScreenPolyline;
+  labels: readonly DrawingScreenXabcdPatternLabel[];
+}
+
 export interface DrawingScreenAnchoredVwap {
   anchor: DrawingScreenPoint;
   points: readonly DrawingScreenPoint[];
@@ -407,6 +420,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'barsPattern';
       drawing: UserDrawing;
       pattern: DrawingScreenBarsPattern;
+    }
+  | {
+      kind: 'xabcdPattern';
+      drawing: UserDrawing;
+      pattern: DrawingScreenXabcdPattern;
     }
   | {
       kind: 'fibRetracement' | 'fibExtension';
@@ -990,6 +1008,26 @@ export function resolvePolylineFromAnchors(
 ): DrawingScreenPolyline {
   return {
     points: points.map((point) => anchorToScreenPoint(point, space)),
+  };
+}
+
+export function resolveXabcdPatternFromAnchors(
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ],
+  space: DrawingCoordinateSpace,
+): DrawingScreenXabcdPattern {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  return {
+    polyline,
+    labels: polyline.points.map((point, index) => ({
+      text: XABCD_PATTERN_LABELS[index]!,
+      point,
+    })),
   };
 }
 
@@ -2143,6 +2181,12 @@ export function resolveUserDrawingGeometry(
           drawing.bars,
           false,
         ),
+      };
+    case 'xabcdPattern':
+      return {
+        kind: 'xabcdPattern',
+        drawing,
+        pattern: resolveXabcdPatternFromAnchors(drawing.points, space),
       };
     case 'fibRetracement':
       return {

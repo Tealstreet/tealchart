@@ -22,6 +22,8 @@ import {
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
 const anchorC = { time: 3_000, price: 105 };
+const anchorD = { time: 4_000, price: 115 };
+const anchorE = { time: 5_000, price: 108 };
 
 function draft(overrides: Partial<UserDrawingDraft>): UserDrawingDraft {
   return {
@@ -113,6 +115,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
     expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
+    expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
   });
@@ -585,6 +588,20 @@ describe('user drawing types', () => {
       id: 'polyline',
       kind: 'polyline',
       points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'xabcdPattern', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }), {
+        id: 'xabcd',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'xabcd',
+      kind: 'xabcdPattern',
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
       visible: true,
       locked: false,
       createdAt: 20,

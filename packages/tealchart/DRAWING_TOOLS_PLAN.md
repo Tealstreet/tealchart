@@ -628,6 +628,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, two-leg hit testing, whole-drawing moves, and point-index anchor
   editing use shared drawing behavior on both platforms.
 
+## Shipped: XABCD Pattern Tool
+
+- Shared drawing state supports the five-anchor `xabcdPattern` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching X-A-B-C-D connected pattern paths
+  with shared point labels.
+- Selection, segment hit testing, whole-drawing moves, duplicate actions, and
+  point-index anchor editing use shared drawing behavior on both platforms.
+
 ## Shipped: Brush Tool
 
 - Shared drawing state supports the variable-point `brush` tool and persists it
@@ -718,7 +727,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan/box/square, pattern tools, volume profile tools, annotation/icon tools, and additional curved geometry.
+  Gann tools beyond fan/box/square, pattern tools beyond XABCD, volume profile tools, annotation/icon tools, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond the current price/date
   ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
