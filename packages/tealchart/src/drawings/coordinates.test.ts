@@ -14,6 +14,7 @@ import type {
   FibExtensionDrawing,
   FibFanDrawing,
   FibRetracementDrawing,
+  GannFanDrawing,
   FlatTopBottomDrawing,
   HorizontalRayDrawing,
   InfoLineDrawing,
@@ -568,6 +569,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const gannFan: GannFanDrawing = {
+      ...trendLine,
+      id: 'gann-fan',
+      kind: 'gannFan',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const path: PathDrawing = {
       ...trendLine,
       id: 'path',
@@ -840,6 +850,22 @@ describe('user drawing coordinates', () => {
             segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 120 } },
           },
           { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(gannFan, space)).toMatchObject({
+      kind: 'gannFan',
+      gannFan: {
+        origin: { x: 10, y: 70 },
+        reference: { x: 110, y: 120 },
+        rays: expect.arrayContaining([
+          {
+            ratio: 0.125,
+            target: { x: 110, y: 76.25 },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 82.5 } },
+          },
+          { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+          { ratio: 2, target: { x: 110, y: 170 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 270 } } },
         ]),
       },
     });
