@@ -1,7 +1,7 @@
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
 import type { UserDrawing, UserDrawingAnchor, UserDrawingHandleRole, UserDrawingSelection, UserDrawingState } from './types';
 
-import { screenPointToAnchor } from './coordinates';
+import { resolveUserDrawingGeometry, screenPointToAnchor } from './coordinates';
 import { hitTestUserDrawings } from './hitTesting';
 import { selectUserDrawing } from './input';
 import type { UserDrawingHitTestOptions } from './hitTesting';
@@ -47,7 +47,7 @@ function movePathAnchors(
   return [moveAnchor(points[0], delta), moveAnchor(points[1], delta), moveAnchor(points[2], delta)];
 }
 
-function moveRegressionTrendAnchors(
+function shiftRegressionTrendTimeRange(
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   delta: AnchorDelta,
 ): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] {
@@ -58,7 +58,42 @@ function moveRegressionTrendAnchors(
   ];
 }
 
-function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number): UserDrawing {
+function moveRegressionTrend(
+  drawing: Extract<UserDrawing, { kind: 'regressionTrend' }>,
+  delta: AnchorDelta,
+  space: DrawingCoordinateSpace,
+  updatedAt: number,
+): UserDrawing {
+  if (delta.time === 0) return drawing;
+
+  const oldGeometry = resolveUserDrawingGeometry(drawing, space);
+  if (oldGeometry.kind !== 'regressionTrend') return drawing;
+
+  const shiftedPoints = shiftRegressionTrendTimeRange(drawing.points, delta);
+  const shiftedDrawing = { ...drawing, points: shiftedPoints };
+  const newGeometry = resolveUserDrawingGeometry(shiftedDrawing, space);
+  if (newGeometry.kind !== 'regressionTrend') return drawing;
+
+  const offset = {
+    x: oldGeometry.channel.parallel.start.x - oldGeometry.channel.base.start.x,
+    y: oldGeometry.channel.parallel.start.y - oldGeometry.channel.base.start.y,
+  };
+  const shiftedOffsetAnchor = screenPointToAnchor(
+    {
+      x: newGeometry.channel.base.start.x + offset.x,
+      y: newGeometry.channel.base.start.y + offset.y,
+    },
+    space,
+  );
+
+  return {
+    ...drawing,
+    points: [shiftedPoints[0], shiftedPoints[1], shiftedOffsetAnchor],
+    updatedAt,
+  };
+}
+
+function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoordinateSpace, updatedAt: number): UserDrawing {
   switch (drawing.kind) {
     case 'trendLine':
     case 'trendAngle':
@@ -81,8 +116,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'parallelChannel':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'regressionTrend':
-      if (delta.time === 0) return drawing;
-      return { ...drawing, points: moveRegressionTrendAnchors(drawing.points, delta), updatedAt };
+      return moveRegressionTrend(drawing, delta, space, updatedAt);
     case 'dateRange':
       return {
         ...drawing,
@@ -247,7 +281,7 @@ export function applyUserDrawingEditDrag(
   const nextDrawing =
     drag.selection.pointIndex !== undefined || (drag.selection.handle && drag.selection.handle !== 'center')
       ? editDrawingHandle(drag.startDrawing, drag.selection.handle, drag.selection.pointIndex, currentAnchor, updatedAt)
-      : moveDrawing(drag.startDrawing, delta, updatedAt);
+      : moveDrawing(drag.startDrawing, delta, drag.space, updatedAt);
 
   if (nextDrawing === state.drawings[drawingIndex]) return state;
 
