@@ -585,6 +585,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Drag input, sampled-path hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Highlighter Tool
+
+- Shared drawing state supports the variable-point `highlighter` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching highlighter paths from shared
+  polyline geometry.
+- Drag input, sampled-path hit testing, whole-drawing moves, and point-index
+  anchor editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

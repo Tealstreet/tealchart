@@ -1,6 +1,6 @@
 import type { Bar, ChartMargins, ComputedPane, Viewport } from '../types';
 import type { UserDrawingInputPoint } from './input';
-import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor } from './types';
+import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor, UserDrawingPathFamilyKind } from './types';
 
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 
@@ -412,7 +412,7 @@ export type ResolvedUserDrawingGeometry =
       fib: DrawingScreenFibLevels;
     }
   | {
-      kind: 'path' | 'brush';
+      kind: UserDrawingPathFamilyKind;
       drawing: UserDrawing;
       polyline: DrawingScreenPolyline;
     }
@@ -2235,9 +2235,10 @@ export function resolveUserDrawingGeometry(
       };
     case 'path':
     case 'brush':
+    case 'highlighter':
     case 'polyline':
       return {
-        kind: drawing.kind === 'brush' ? 'brush' : 'path',
+        kind: drawing.kind === 'polyline' ? 'path' : drawing.kind,
         drawing,
         polyline: resolvePolylineFromAnchors(drawing.points, space),
       };

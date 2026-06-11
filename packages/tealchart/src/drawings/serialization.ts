@@ -118,6 +118,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'path':
     case 'brush':
+    case 'highlighter':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -604,6 +605,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'brush',
+            points,
+          }
+        : null;
+    }
+    case 'highlighter': {
+      const points = parsePathDrawingPoints(value);
+      return points
+        ? {
+            ...base,
+            kind: 'highlighter',
             points,
           }
         : null;
