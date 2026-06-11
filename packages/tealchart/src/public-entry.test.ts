@@ -18,6 +18,7 @@ import {
   resolveFibSpeedResistanceArcsFromAnchors,
   resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
+  resolveFibWedgeFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveGannFanFromAnchors,
   resolvePitchforkFromAnchors,
@@ -55,6 +56,7 @@ import type {
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibCirclesPrimitive,
   MobileUserDrawingFibSpeedResistanceArcsPrimitive,
+  MobileUserDrawingFibWedgePrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingTrendBasedFibTimePrimitive,
   MobileUserDrawingFibFanPrimitive,
@@ -87,6 +89,7 @@ import type {
   FibSpeedResistanceArcsDrawing,
   FibSpeedResistanceFanDrawing,
   FibTimeZoneDrawing,
+  FibWedgeDrawing,
   TrendBasedFibTimeDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
@@ -250,6 +253,24 @@ describe('tealchart public entries', () => {
       circles: [{ ratio: 1, radius: 10 }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const fibWedgePrimitive: NonNever<MobileUserDrawingFibWedgePrimitive> = {
+      kind: 'fibWedge',
+      id: 'fib-wedge',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 5 },
+      lower: { x: 10, y: 5 },
+      upper: { x: 10, y: 10 },
+      baseRadius: 5,
+      arcs: [{ ratio: 1, radius: 5, startAngle: 0, endAngle: 1 }],
+      boundaries: [
+        { start: { x: 5, y: 5 }, end: { x: 10, y: 5 } },
+        { start: { x: 5, y: 5 }, end: { x: 10, y: 10 } },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const fibChannelPrimitive: NonNever<MobileUserDrawingFibChannelPrimitive> = {
       kind: 'fibChannel',
       id: 'fib-channel',
@@ -368,6 +389,7 @@ describe('tealchart public entries', () => {
     expect(fibSpeedFanPrimitive.kind).toBe('fibSpeedResistanceFan');
     expect(fibSpeedArcsPrimitive.kind).toBe('fibSpeedResistanceArcs');
     expect(fibCirclesPrimitive.kind).toBe('fibCircles');
+    expect(fibWedgePrimitive.kind).toBe('fibWedge');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
@@ -1009,6 +1031,33 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibCircles');
     expect(circles.circles.map((circle) => circle.ratio)).toEqual([0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618]);
+  });
+
+  it('exports shared drawing fib wedge types and resolver', () => {
+    const drawing: FibWedgeDrawing = {
+      id: 'fib-wedge',
+      kind: 'fibWedge',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const wedge = resolveFibWedgeFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibWedge');
+    expect(wedge.arcs.map((arc) => arc.ratio)).toEqual([0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618]);
   });
 
   it('exports shared drawing gann fan types and resolver', () => {

@@ -19,6 +19,7 @@ import type {
   FibSpeedResistanceFanDrawing,
   FibRetracementDrawing,
   FibTimeZoneDrawing,
+  FibWedgeDrawing,
   TrendBasedFibTimeDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
@@ -602,6 +603,16 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const fibWedge: FibWedgeDrawing = {
+      ...trendLine,
+      id: 'fib-wedge',
+      kind: 'fibWedge',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 100 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const fibChannel: FibChannelDrawing = {
       ...trendLine,
       id: 'fib-channel',
@@ -958,6 +969,24 @@ describe('user drawing coordinates', () => {
           expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39) }),
           expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8) }),
           expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7) }),
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibWedge, space)).toMatchObject({
+      kind: 'fibWedge',
+      fibWedge: {
+        center: { x: 10, y: 70 },
+        lower: { x: 110, y: 70 },
+        upper: { x: 110, y: 120 },
+        baseRadius: expect.closeTo(111.8),
+        boundaries: [
+          { start: { x: 10, y: 70 }, end: { x: 110, y: 70 } },
+          { start: { x: 10, y: 70 }, end: { x: 110, y: 120 } },
+        ],
+        arcs: expect.arrayContaining([
+          expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39), startAngle: 0, endAngle: expect.closeTo(0.46) }),
+          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: expect.closeTo(0.46) }),
+          expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7), startAngle: 0, endAngle: expect.closeTo(0.46) }),
         ]),
       },
     });
