@@ -1002,6 +1002,54 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('updates grouped selected drawing style while skipping locked drawings', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'a', drawingIds: ['a', 'b', 'locked'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 20,
+        },
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 80,
+        },
+      ],
+    });
+
+    const updated = updateUserDrawingStyle(state, { lineColor: '#00ffcc', lineWidth: 3 }, { now: () => 21 });
+
+    expect(updated.drawings[0]).toMatchObject({ updatedAt: 21, style: expect.objectContaining({ lineColor: '#00ffcc' }) });
+    expect(updated.drawings[1]).toMatchObject({ updatedAt: 21, style: expect.objectContaining({ lineWidth: 3 }) });
+    expect(updated.drawings[2]).toBe(state.drawings[2]);
+    expect(updated.selection).toEqual({ drawingId: 'a', drawingIds: ['a', 'b', 'locked'] });
+  });
+
   it('toggles visibility and clears selection/edit state when hiding selected drawings', () => {
     const textLabel = {
       id: 'label',
@@ -1030,6 +1078,54 @@ describe('user drawing input controller', () => {
     const shown = setUserDrawingVisibility(hidden, true, { drawingId: 'label', now: () => 31 });
     expect(shown.drawings[0]).toMatchObject({ visible: true, updatedAt: 31 });
     expect(shown.selection).toBeNull();
+  });
+
+  it('toggles grouped selected drawing visibility and preserves locked selection', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'a', drawingIds: ['a', 'b', 'locked'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 20,
+        },
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 80,
+        },
+      ],
+    });
+
+    const hidden = setUserDrawingVisibility(state, false, { now: () => 32 });
+
+    expect(hidden.drawings.map((drawing) => drawing.visible)).toEqual([false, false, true]);
+    expect(hidden.drawings[0]).toMatchObject({ updatedAt: 32 });
+    expect(hidden.drawings[1]).toMatchObject({ updatedAt: 32 });
+    expect(hidden.selection).toEqual({ drawingId: 'locked' });
   });
 
   it('requires explicit opt-in to change locked drawing visibility', () => {
@@ -1085,6 +1181,43 @@ describe('user drawing input controller', () => {
 
     const forceUnlocked = setUserDrawingLocked(locked, false, { drawingId: 'label', includeLocked: true, now: () => 41 });
     expect(forceUnlocked.drawings[0]).toMatchObject({ locked: false, updatedAt: 41 });
+  });
+
+  it('toggles grouped selected drawing locks and clears newly locked selection ids', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'a', drawingIds: ['a', 'b'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 20,
+        },
+      ],
+    });
+
+    const locked = setUserDrawingLocked(state, true, { now: () => 42 });
+
+    expect(locked.drawings.map((drawing) => drawing.locked)).toEqual([true, true]);
+    expect(locked.drawings[0]).toMatchObject({ updatedAt: 42 });
+    expect(locked.drawings[1]).toMatchObject({ updatedAt: 42 });
+    expect(locked.selection).toBeNull();
   });
 
   it('requires explicit opt-in to unlock locked drawings by id', () => {

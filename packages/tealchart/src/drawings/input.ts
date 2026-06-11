@@ -396,6 +396,23 @@ function findUserDrawingForUpdate(
   return { drawing, index };
 }
 
+function findUserDrawingsForUpdate(
+  state: UserDrawingState,
+  options: UpdateUserDrawingOptions = {},
+): Array<{ drawing: UserDrawingState['drawings'][number]; index: number }> {
+  if (options.drawingId) {
+    const target = findUserDrawingForUpdate(state, options);
+    return target ? [target] : [];
+  }
+
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  if (selectedIds.size === 0) return [];
+
+  return state.drawings.flatMap((drawing, index) =>
+    selectedIds.has(drawing.id) && (!drawing.locked || options.includeLocked) ? [{ drawing, index }] : [],
+  );
+}
+
 function replaceUserDrawing(
   state: UserDrawingState,
   index: number,
@@ -414,33 +431,46 @@ export function updateUserDrawingStyle(
   style: Partial<UserDrawingStyle>,
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
-  const target = findUserDrawingForUpdate(state, options);
-  if (!target) return state;
+  const targets = findUserDrawingsForUpdate(state, options);
+  if (targets.length === 0) return state;
 
-  const nextStyle = normalizeUserDrawingStyle({
-    ...target.drawing.style,
-    ...style,
-  });
-  if (
-    nextStyle.lineColor === target.drawing.style.lineColor &&
-    nextStyle.lineWidth === target.drawing.style.lineWidth &&
-    nextStyle.lineStyle === target.drawing.style.lineStyle &&
-    nextStyle.opacity === target.drawing.style.opacity &&
-    nextStyle.lineVisible === target.drawing.style.lineVisible &&
-    nextStyle.fillVisible === target.drawing.style.fillVisible &&
-    nextStyle.fillColor === target.drawing.style.fillColor &&
-    nextStyle.textColor === target.drawing.style.textColor &&
-    nextStyle.fontSize === target.drawing.style.fontSize &&
-    nextStyle.fontFamily === target.drawing.style.fontFamily
-  ) {
-    return state;
+  const updatedAt = options.now?.() ?? Date.now();
+  let changed = false;
+  const nextByIndex = new Map<number, UserDrawingState['drawings'][number]>();
+
+  for (const target of targets) {
+    const nextStyle = normalizeUserDrawingStyle({
+      ...target.drawing.style,
+      ...style,
+    });
+    if (
+      nextStyle.lineColor === target.drawing.style.lineColor &&
+      nextStyle.lineWidth === target.drawing.style.lineWidth &&
+      nextStyle.lineStyle === target.drawing.style.lineStyle &&
+      nextStyle.opacity === target.drawing.style.opacity &&
+      nextStyle.lineVisible === target.drawing.style.lineVisible &&
+      nextStyle.fillVisible === target.drawing.style.fillVisible &&
+      nextStyle.fillColor === target.drawing.style.fillColor &&
+      nextStyle.textColor === target.drawing.style.textColor &&
+      nextStyle.fontSize === target.drawing.style.fontSize &&
+      nextStyle.fontFamily === target.drawing.style.fontFamily
+    ) {
+      continue;
+    }
+    changed = true;
+    nextByIndex.set(target.index, {
+      ...target.drawing,
+      style: nextStyle,
+      updatedAt,
+    });
   }
 
-  return replaceUserDrawing(state, target.index, {
-    ...target.drawing,
-    style: nextStyle,
-    updatedAt: options.now?.() ?? Date.now(),
-  });
+  if (!changed) return state;
+
+  return {
+    ...state,
+    drawings: state.drawings.map((drawing, index) => nextByIndex.get(index) ?? drawing),
+  };
 }
 
 export function setUserDrawingVisibility(
@@ -448,21 +478,31 @@ export function setUserDrawingVisibility(
   visible: boolean,
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
-  const target = findUserDrawingForUpdate(state, options);
-  if (!target || target.drawing.visible === visible) return state;
+  const targets = findUserDrawingsForUpdate(state, options).filter((target) => target.drawing.visible !== visible);
+  if (targets.length === 0) return state;
 
-  const drawing = {
-    ...target.drawing,
-    visible,
-    updatedAt: options.now?.() ?? Date.now(),
+  const updatedAt = options.now?.() ?? Date.now();
+  const changedIds = new Set(targets.map((target) => target.drawing.id));
+  const nextByIndex = new Map<number, UserDrawingState['drawings'][number]>(
+    targets.map((target) => [
+      target.index,
+      {
+        ...target.drawing,
+        visible,
+        updatedAt,
+      },
+    ]),
+  );
+  const nextState = {
+    ...state,
+    drawings: state.drawings.map((drawing, index) => nextByIndex.get(index) ?? drawing),
   };
-  const nextState = replaceUserDrawing(state, target.index, drawing);
 
-  if (visible || state.selection?.drawingId !== target.drawing.id) return nextState;
+  if (visible || getUserDrawingSelectionIds(state.selection).every((drawingId) => !changedIds.has(drawingId))) return nextState;
   return {
     ...nextState,
-    selection: null,
-    textEdit: state.textEdit?.drawingId === target.drawing.id ? null : state.textEdit,
+    selection: createUserDrawingSelection(getUserDrawingSelectionIds(state.selection).filter((drawingId) => !changedIds.has(drawingId))),
+    textEdit: state.textEdit && changedIds.has(state.textEdit.drawingId) ? null : state.textEdit,
   };
 }
 
@@ -471,21 +511,31 @@ export function setUserDrawingLocked(
   locked: boolean,
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
-  const target = findUserDrawingForUpdate(state, options);
-  if (!target || target.drawing.locked === locked) return state;
+  const targets = findUserDrawingsForUpdate(state, options).filter((target) => target.drawing.locked !== locked);
+  if (targets.length === 0) return state;
 
-  const drawing = {
-    ...target.drawing,
-    locked,
-    updatedAt: options.now?.() ?? Date.now(),
+  const updatedAt = options.now?.() ?? Date.now();
+  const changedIds = new Set(targets.map((target) => target.drawing.id));
+  const nextByIndex = new Map<number, UserDrawingState['drawings'][number]>(
+    targets.map((target) => [
+      target.index,
+      {
+        ...target.drawing,
+        locked,
+        updatedAt,
+      },
+    ]),
+  );
+  const nextState = {
+    ...state,
+    drawings: state.drawings.map((drawing, index) => nextByIndex.get(index) ?? drawing),
   };
-  const nextState = replaceUserDrawing(state, target.index, drawing);
 
-  if (!locked || state.selection?.drawingId !== target.drawing.id) return nextState;
+  if (!locked || getUserDrawingSelectionIds(state.selection).every((drawingId) => !changedIds.has(drawingId))) return nextState;
   return {
     ...nextState,
-    selection: null,
-    textEdit: state.textEdit?.drawingId === target.drawing.id ? null : state.textEdit,
+    selection: createUserDrawingSelection(getUserDrawingSelectionIds(state.selection).filter((drawingId) => !changedIds.has(drawingId))),
+    textEdit: state.textEdit && changedIds.has(state.textEdit.drawingId) ? null : state.textEdit,
   };
 }
 
