@@ -223,6 +223,7 @@ export function resolveUserDrawingHandlePoints(
         ];
       }
     case 'textLabel':
+    case 'note':
       return [anchorToScreenPoint(drawing.point, space)];
   }
 }

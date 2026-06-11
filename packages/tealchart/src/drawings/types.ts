@@ -61,10 +61,12 @@ export type UserDrawingTool =
   | 'path'
   | 'brush'
   | 'highlighter'
+  | 'note'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
+export type UserDrawingTextAnnotationKind = 'textLabel' | 'note';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -400,6 +402,15 @@ export interface TextLabelDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
+export interface NoteDrawing extends UserDrawingBase {
+  kind: 'note';
+  point: UserDrawingAnchor;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
+export type UserDrawingTextAnnotation = TextLabelDrawing | NoteDrawing;
+
 export type UserDrawing =
   | TrendLineDrawing
   | TrendAngleDrawing
@@ -457,6 +468,7 @@ export type UserDrawing =
   | PathDrawing
   | BrushDrawing
   | HighlighterDrawing
+  | NoteDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -623,6 +635,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'arrowMarkDown':
     case 'horizontalRay':
     case 'crossLine':
+    case 'note':
     case 'textLabel':
     case 'anchoredVwap':
       return 1;
@@ -633,6 +646,10 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
 
 export function isUserDrawingPathFamilyTool(tool: UserDrawingTool): tool is UserDrawingPathFamilyKind {
   return tool === 'path' || tool === 'brush' || tool === 'highlighter';
+}
+
+export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is UserDrawingTextAnnotation {
+  return drawing.kind === 'textLabel' || drawing.kind === 'note';
 }
 
 export function isDrawingDraftReady(draft: UserDrawingDraft): boolean {
@@ -981,10 +998,11 @@ export function createUserDrawingFromDraft(
         kind: draft.tool,
         points: draft.anchors.slice(),
       };
+    case 'note':
     case 'textLabel':
       return {
         ...base,
-        kind: 'textLabel',
+        kind: draft.tool,
         point: draft.anchors[0]!,
         text: draft.text ?? '',
         textAlign: 'center',

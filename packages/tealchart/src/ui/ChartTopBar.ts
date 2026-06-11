@@ -11,6 +11,7 @@ import {
   isUserDrawingFillToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
+  isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
   supportsUserDrawingTextControls,
@@ -779,7 +780,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         }
 
         for (const descriptor of USER_DRAWING_TEXT_ALIGN_DESCRIPTORS) {
-          const isActive = selectedDrawing.kind === 'textLabel' && selectedDrawing.textAlign === descriptor.textAlign;
+          const isActive = isUserDrawingTextAnnotation(selectedDrawing) && selectedDrawing.textAlign === descriptor.textAlign;
           const btn = this.createElement('button', {
             style: {
               ...styles.drawingButton,

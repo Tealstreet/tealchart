@@ -5,7 +5,7 @@ import type {
   DrawingScreenSegment,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
-import type { TextLabelDrawing, UserDrawing, UserDrawingHandleRole } from './types';
+import type { UserDrawing, UserDrawingHandleRole, UserDrawingTextAnnotation } from './types';
 
 import { anchorToScreenPoint, resolveUserDrawingGeometry } from './coordinates';
 import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
@@ -25,7 +25,7 @@ export interface UserDrawingHitResult {
   distance: number;
 }
 
-export type UserDrawingHitTestTextMeasure = (drawing: TextLabelDrawing, line: string) => number;
+export type UserDrawingHitTestTextMeasure = (drawing: UserDrawingTextAnnotation, line: string) => number;
 
 interface ResolvedUserDrawingHitTestOptions {
   tolerance: number;
@@ -298,8 +298,8 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'textLabel') {
-    const drawing = geometry.drawing as TextLabelDrawing;
+  if (geometry.kind === 'textLabel' || geometry.kind === 'note') {
+    const drawing = geometry.drawing as UserDrawingTextAnnotation;
     const lines = splitUserDrawingTextLines(drawing.text);
     const layout = resolveUserDrawingTextLabelLayout({
       text: drawing.text,
@@ -719,6 +719,7 @@ function hitTestUserDrawingHandle(
       );
       break;
     case 'textLabel':
+    case 'note':
       handles.push({ handle: 'center', point: geometry.point });
       break;
     case 'anchoredVwap':

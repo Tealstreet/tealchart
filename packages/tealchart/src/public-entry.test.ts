@@ -71,6 +71,7 @@ import type {
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
+  MobileUserDrawingNotePrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibCirclesPrimitive,
@@ -129,6 +130,7 @@ import type {
   FlatTopBottomDrawing,
   InfoLineDrawing,
   LongPositionDrawing,
+  NoteDrawing,
   PathDrawing,
   ParallelChannelDrawing,
   PitchforkDrawing,
@@ -209,6 +211,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingRiskRewardPositionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingGannSquarePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingNotePrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -592,6 +595,20 @@ describe('tealchart public entries', () => {
       ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const notePrimitive: NonNever<MobileUserDrawingNotePrimitive> = {
+      kind: 'note',
+      id: 'note',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      point: { x: 0, y: 0 },
+      text: 'Note',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -635,6 +652,7 @@ describe('tealchart public entries', () => {
     expect(barsPatternPrimitive.kind).toBe('barsPattern');
     expect(brushPrimitive.kind).toBe('brush');
     expect(highlighterPrimitive.kind).toBe('highlighter');
+    expect(notePrimitive.kind).toBe('note');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1089,10 +1107,19 @@ describe('tealchart public entries', () => {
       id: 'highlighter',
       kind: 'highlighter',
     };
+    const note: NoteDrawing = {
+      ...drawing,
+      id: 'note',
+      kind: 'note',
+      point: drawing.points[0]!,
+      text: 'Note',
+      textAlign: 'center',
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
     expect(highlighter.kind).toBe('highlighter');
+    expect(note.kind).toBe('note');
   });
 
   it('exports shared drawing curve types and resolver', () => {
