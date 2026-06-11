@@ -1528,6 +1528,40 @@ describe('user drawing input controller', () => {
     expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
+  it('duplicates head and shoulders pattern drawings with deep-cloned five-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'head-shoulders' },
+      drawings: [
+        {
+          id: 'head-shoulders',
+          kind: 'headShouldersPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 23 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'headShouldersPattern',
+      createdAt: 23,
+      updatedAt: 23,
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+    });
+    if (next.drawings[1]?.kind !== 'headShouldersPattern' || state.drawings[0]?.kind !== 'headShouldersPattern') {
+      throw new Error('expected head and shoulders pattern drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+  });
+
   it('duplicates ABCD pattern drawings with deep-cloned four-point payloads', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'abcd' },

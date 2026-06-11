@@ -352,6 +352,20 @@ export interface DrawingScreenThreeDrivesPattern {
   labels: readonly DrawingScreenThreeDrivesPatternLabel[];
 }
 
+export const HEAD_SHOULDERS_PATTERN_LABELS = ['LS', 'N1', 'H', 'N2', 'RS'] as const;
+export type HeadShouldersPatternLabel = (typeof HEAD_SHOULDERS_PATTERN_LABELS)[number];
+
+export interface DrawingScreenHeadShouldersPatternLabel {
+  text: HeadShouldersPatternLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenHeadShouldersPattern {
+  polyline: DrawingScreenPolyline;
+  neckline: DrawingScreenSegment;
+  labels: readonly DrawingScreenHeadShouldersPatternLabel[];
+}
+
 export interface DrawingScreenAnchoredVwap {
   anchor: DrawingScreenPoint;
   points: readonly DrawingScreenPoint[];
@@ -476,6 +490,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'threeDrivesPattern';
       drawing: UserDrawing;
       pattern: DrawingScreenThreeDrivesPattern;
+    }
+  | {
+      kind: 'headShouldersPattern';
+      drawing: UserDrawing;
+      pattern: DrawingScreenHeadShouldersPattern;
     }
   | {
       kind: 'abcdPattern';
@@ -1136,6 +1155,28 @@ export function resolveThreeDrivesPatternFromAnchors(
     polyline,
     labels: polyline.points.map((point, index) => ({
       text: THREE_DRIVES_PATTERN_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveHeadShouldersPatternFromAnchors(
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ],
+  space: DrawingCoordinateSpace,
+): DrawingScreenHeadShouldersPattern {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  const [, leftNeckline, , rightNeckline] = polyline.points;
+  return {
+    polyline,
+    neckline: { start: leftNeckline!, end: rightNeckline! },
+    labels: polyline.points.map((point, index) => ({
+      text: HEAD_SHOULDERS_PATTERN_LABELS[index]!,
       point,
     })),
   };
@@ -2309,6 +2350,12 @@ export function resolveUserDrawingGeometry(
         kind: 'threeDrivesPattern',
         drawing,
         pattern: resolveThreeDrivesPatternFromAnchors(drawing.points, space),
+      };
+    case 'headShouldersPattern':
+      return {
+        kind: 'headShouldersPattern',
+        drawing,
+        pattern: resolveHeadShouldersPatternFromAnchors(drawing.points, space),
       };
     case 'abcdPattern':
       return {

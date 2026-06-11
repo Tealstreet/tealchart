@@ -142,6 +142,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'xabcdPattern':
     case 'threeDrivesPattern':
+    case 'headShouldersPattern':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -880,6 +881,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'threeDrivesPattern',
+            points,
+        }
+        : null;
+    }
+    case 'headShouldersPattern': {
+      const points = parseFivePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'headShouldersPattern',
             points,
           }
         : null;

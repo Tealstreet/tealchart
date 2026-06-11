@@ -569,6 +569,37 @@ function renderTrianglePatternGeometry(
   }
 }
 
+function renderHeadShouldersPatternGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'headShouldersPattern' }>,
+): void {
+  const { drawing, pattern } = geometry;
+  const [firstPoint, ...remainingPoints] = pattern.polyline.points;
+  if (!firstPoint) return;
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.beginPath();
+    ctx.moveTo(firstPoint.x, firstPoint.y);
+    for (const point of remainingPoints) {
+      ctx.lineTo(point.x, point.y);
+    }
+    ctx.moveTo(pattern.neckline.start.x, pattern.neckline.start.y);
+    ctx.lineTo(pattern.neckline.end.x, pattern.neckline.end.y);
+    ctx.stroke();
+  }
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const label of pattern.labels) {
+    ctx.fillText(label.text, label.point.x, label.point.y - 6);
+  }
+}
+
 function renderRectangleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
@@ -1138,6 +1169,9 @@ export function renderUserDrawing(
         break;
       case 'threeDrivesPattern':
         renderPatternGeometry(ctx, geometry);
+        break;
+      case 'headShouldersPattern':
+        renderHeadShouldersPatternGeometry(ctx, geometry);
         break;
       case 'abcdPattern':
         renderPatternGeometry(ctx, geometry);

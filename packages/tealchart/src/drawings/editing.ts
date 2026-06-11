@@ -145,6 +145,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       }
     case 'xabcdPattern':
     case 'threeDrivesPattern':
+    case 'headShouldersPattern':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!, points[4]!], updatedAt };
@@ -321,6 +322,7 @@ function editDrawingHandle(
       drawing.kind === 'abcdPattern' ||
       drawing.kind === 'xabcdPattern' ||
       drawing.kind === 'threeDrivesPattern' ||
+      drawing.kind === 'headShouldersPattern' ||
       drawing.kind === 'callout' ||
       drawing.kind === 'priceNote') &&
     pointIndex !== undefined
@@ -377,7 +379,11 @@ function editDrawingHandle(
         updatedAt,
       };
     }
-    if (drawing.kind === 'xabcdPattern' || drawing.kind === 'threeDrivesPattern') {
+    if (
+      drawing.kind === 'xabcdPattern' ||
+      drawing.kind === 'threeDrivesPattern' ||
+      drawing.kind === 'headShouldersPattern'
+    ) {
       return {
         ...drawing,
         points: [points[0]!, points[1]!, points[2]!, points[3]!, points[4]!],
@@ -468,6 +474,7 @@ function editDrawingHandle(
     case 'abcdPattern':
     case 'xabcdPattern':
     case 'threeDrivesPattern':
+    case 'headShouldersPattern':
       return drawing;
   }
 }
