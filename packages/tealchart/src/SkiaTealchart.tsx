@@ -126,6 +126,7 @@ import {
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
+  resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import {
@@ -1582,6 +1583,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'trendAngle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
+            const labelPosition = resolveMobileUserDrawingTrendAngleLabelPosition(primitive, textBounds);
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
@@ -1598,8 +1601,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 )}
                 {font && (
                   <SkiaText
-                    x={primitive.labelPoint.x}
-                    y={primitive.labelPoint.y}
+                    x={labelPosition.x}
+                    y={labelPosition.y}
                     text={primitive.label}
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}

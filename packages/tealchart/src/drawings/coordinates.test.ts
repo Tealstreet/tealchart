@@ -210,6 +210,18 @@ describe('user drawing coordinates', () => {
       label: '26.6°',
       labelPoint: { x: 60, y: 41 },
     });
+    expect(
+      resolveTrendAngleFromSegment({
+        start: { x: 110, y: 20 },
+        end: { x: 10, y: 70 },
+      }).label,
+    ).toBe('26.6°');
+    expect(
+      resolveTrendAngleFromSegment({
+        start: { x: 10, y: 20 },
+        end: { x: 110, y: 70 },
+      }).label,
+    ).toBe('-26.6°');
   });
 
   it('resolves rectangles from unordered anchors', () => {

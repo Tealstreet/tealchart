@@ -7,6 +7,7 @@ import {
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingTextLabelLayout,
+  resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './drawingRenderModel';
 
 const style: UserDrawingStyle = {
@@ -212,7 +213,9 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
       kind: 'trendAngle',
       id: 'angle',
       start: { x: 0, y: 50 },
@@ -220,6 +223,13 @@ describe('mobile user drawing render model', () => {
       label: '26.6°',
       labelPoint: { x: 50, y: 21 },
       style,
+    });
+    if (!primitive || primitive.kind !== 'trendAngle') throw new Error('expected trend angle primitive');
+    expect(resolveMobileUserDrawingTrendAngleLabelPosition(primitive, { x: 0, y: -10, width: 42, height: 14 })).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: 29,
+      y: 17,
     });
   });
 
