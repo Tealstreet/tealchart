@@ -50,6 +50,7 @@ function movePathAnchors(
 function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number): UserDrawing {
   switch (drawing.kind) {
     case 'trendLine':
+    case 'trendAngle':
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':
@@ -97,6 +98,7 @@ function editLineEndpoint(
     {
       kind:
         | 'trendLine'
+        | 'trendAngle'
         | 'extendedLine'
         | 'infoLine'
         | 'arrowLine'
@@ -174,6 +176,7 @@ function editDrawingHandle(
 
   switch (drawing.kind) {
     case 'trendLine':
+    case 'trendAngle':
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':

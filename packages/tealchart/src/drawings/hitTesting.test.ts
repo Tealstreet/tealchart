@@ -234,6 +234,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space, { tolerance: 1 })?.drawing.id).toBe('ray');
   });
 
+  it('hits trend angle bodies and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'angle',
+      kind: 'trendAngle',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('start');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space)?.handle).toBe('end');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('angle');
+  });
+
   it('hits axis-aligned line drawings', () => {
     const horizontal: UserDrawing = {
       ...base,

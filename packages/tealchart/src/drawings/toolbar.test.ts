@@ -41,6 +41,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).toEqual([
       'select',
       'trendLine',
+      'trendAngle',
       'extendedLine',
       'infoLine',
       'arrowLine',
@@ -98,6 +99,9 @@ describe('user drawing toolbar descriptors', () => {
   it('resolves tool descriptors by tool id', () => {
     expect(getUserDrawingToolDescriptor('rectangle')).toEqual(
       expect.objectContaining({ tool: 'rectangle', label: 'Rectangle' }),
+    );
+    expect(getUserDrawingToolDescriptor('trendAngle')).toEqual(
+      expect.objectContaining({ tool: 'trendAngle', label: 'Trend angle' }),
     );
     expect(getUserDrawingToolDescriptor('circle')).toEqual(
       expect.objectContaining({ tool: 'circle', label: 'Circle' }),

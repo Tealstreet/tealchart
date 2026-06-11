@@ -53,6 +53,7 @@ export {
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 export type {
   MobileUserDrawingArrowMarkPrimitive,
@@ -71,6 +72,8 @@ export type {
   MobileUserDrawingMeasurementLabelPrimitive,
   MobileUserDrawingPriceRangeLabelPosition,
   MobileUserDrawingTextBounds,
+  MobileUserDrawingTrendAngleLabelPosition,
+  MobileUserDrawingTrendAnglePrimitive,
   MobileUserDrawingTrianglePrimitive,
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';

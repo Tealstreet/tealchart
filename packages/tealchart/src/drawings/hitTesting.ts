@@ -236,6 +236,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'trendAngle') {
+    const distance = distanceToSegment(point, geometry.angle.segment);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'crossLine') {
     const distance = Math.min(
       distanceToSegment(point, geometry.crossLine.horizontal),
@@ -272,12 +277,14 @@ function hitTestUserDrawingHandle(
 
   switch (geometry.kind) {
     case 'line':
+    case 'trendAngle':
     case 'infoLine':
     case 'arrowLine':
     case 'arrowMarker':
     case 'ray': {
       if (
         geometry.drawing.kind === 'trendLine' ||
+        geometry.drawing.kind === 'trendAngle' ||
         geometry.drawing.kind === 'extendedLine' ||
         geometry.drawing.kind === 'infoLine' ||
         geometry.drawing.kind === 'arrowLine' ||

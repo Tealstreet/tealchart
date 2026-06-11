@@ -156,6 +156,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders trend angle line and label through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'angle',
+      kind: 'trendAngle',
+      points: [
+        { time: 0, price: 50 },
+        { time: 100, price: 100 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:0,50');
+    expect(ctx.calls).toContain('lineTo:100,0');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:26.6°:50,21:#111:center:1:12px sans-serif');
+  });
+
   it('renders arrow line heads through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
