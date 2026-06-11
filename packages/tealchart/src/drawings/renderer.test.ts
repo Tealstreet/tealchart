@@ -453,6 +453,52 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders parallel channels as filled closed polygons', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'channel',
+      kind: 'parallelChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,50');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('lineTo:10,20');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
+  it('requires explicit fill colors for parallel channel fills', () => {
+    const ctx = new RecordingCanvasContext();
+    const { fillColor: _fillColor, ...styleWithoutFillColor } = style;
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'channel',
+      kind: 'parallelChannel',
+      style: styleWithoutFillColor,
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).not.toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders text labels with measured boxes', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -86,13 +86,15 @@ function renderPathGeometry(
 
 function renderPolygonGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' | 'triangle' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' | 'triangle' | 'parallelChannel' }>,
 ): void {
   const points =
     geometry.kind === 'arrowMarker'
       ? geometry.marker.points
       : geometry.kind === 'arrowMark'
         ? geometry.mark.points
+        : geometry.kind === 'parallelChannel'
+          ? geometry.channel.polygon.points
         : geometry.polygon.points;
   const [firstPoint, ...remainingPoints] = points;
   if (!firstPoint) return;
@@ -104,8 +106,13 @@ function renderPolygonGeometry(
   }
   ctx.closePath();
 
-  if (geometry.drawing.style.fillVisible !== false) {
-    ctx.fillStyle = geometry.drawing.style.fillColor ?? geometry.drawing.style.lineColor;
+  const fillColor =
+    geometry.kind === 'parallelChannel'
+      ? geometry.drawing.style.fillColor
+      : (geometry.drawing.style.fillColor ?? geometry.drawing.style.lineColor);
+
+  if (geometry.drawing.style.fillVisible !== false && fillColor) {
+    ctx.fillStyle = fillColor;
     ctx.fill();
   }
 
@@ -367,6 +374,9 @@ export function renderUserDrawing(
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'triangle':
+        renderPolygonGeometry(ctx, geometry);
+        break;
+      case 'parallelChannel':
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'infoLine':
