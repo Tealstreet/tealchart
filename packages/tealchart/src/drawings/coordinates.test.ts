@@ -18,6 +18,7 @@ import type {
   FibSpeedResistanceFanDrawing,
   FibRetracementDrawing,
   FibTimeZoneDrawing,
+  TrendBasedFibTimeDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
   HorizontalRayDrawing,
@@ -610,6 +611,16 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 100 },
       ],
     };
+    const trendBasedFibTime: TrendBasedFibTimeDrawing = {
+      ...trendLine,
+      id: 'trend-fib-time',
+      kind: 'trendBasedFibTime',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 100 },
+        { time: 3_000, price: 90 },
+      ],
+    };
     const gannFan: GannFanDrawing = {
       ...trendLine,
       id: 'gann-fan',
@@ -970,6 +981,16 @@ describe('user drawing coordinates', () => {
           { ratio: 0, time: 1_000, x: 10, segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } } },
           { ratio: 1, time: 2_000, x: 110, segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } } },
           { ratio: 2, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(trendBasedFibTime, space)).toMatchObject({
+      kind: 'trendBasedFibTime',
+      trendBasedFibTime: {
+        levels: expect.arrayContaining([
+          { ratio: 0, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
+          { ratio: 1, time: 4_000, x: 310, segment: { start: { x: 310, y: 20 }, end: { x: 310, y: 120 } } },
+          { ratio: 2, time: 5_000, x: 410, segment: { start: { x: 410, y: 20 }, end: { x: 410, y: 120 } } },
         ]),
       },
     });

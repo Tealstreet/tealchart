@@ -17,6 +17,7 @@ import {
   resolveFibFanFromAnchors,
   resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
+  resolveTrendBasedFibTimeFromAnchors,
   resolveGannFanFromAnchors,
   resolvePitchforkFromAnchors,
   resolvePitchfanFromAnchors,
@@ -53,6 +54,7 @@ import type {
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibCirclesPrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
+  MobileUserDrawingTrendBasedFibTimePrimitive,
   MobileUserDrawingFibFanPrimitive,
   MobileUserDrawingFibSpeedResistanceFanPrimitive,
   MobileUserDrawingGannFanPrimitive,
@@ -82,6 +84,7 @@ import type {
   FibFanDrawing,
   FibSpeedResistanceFanDrawing,
   FibTimeZoneDrawing,
+  TrendBasedFibTimeDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
   InfoLineDrawing,
@@ -257,6 +260,11 @@ describe('tealchart public entries', () => {
       levels: [{ ratio: 1, time: 2, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 10 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const trendBasedFibTimePrimitive: NonNever<MobileUserDrawingTrendBasedFibTimePrimitive> = {
+      ...fibTimeZonePrimitive,
+      kind: 'trendBasedFibTime',
+      id: 'trend-fib-time',
+    };
     const gannFanPrimitive: NonNever<MobileUserDrawingGannFanPrimitive> = {
       ...pitchfanPrimitive,
       kind: 'gannFan',
@@ -345,6 +353,7 @@ describe('tealchart public entries', () => {
     expect(fibCirclesPrimitive.kind).toBe('fibCircles');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
+    expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
@@ -1036,6 +1045,33 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibTimeZone');
     expect(zones.levels).toHaveLength(10);
+  });
+
+  it('exports shared drawing trend-based fib time types and resolver', () => {
+    const drawing: TrendBasedFibTimeDrawing = {
+      id: 'trend-fib-time',
+      kind: 'trendBasedFibTime',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+        { time: 3, price: 12 },
+      ],
+    };
+    const zones = resolveTrendBasedFibTimeFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('trendBasedFibTime');
+    expect(zones.levels[0]).toMatchObject({ ratio: 0, time: 3 });
   });
 
   it('exports shared drawing regression trend types', () => {

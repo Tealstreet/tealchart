@@ -133,6 +133,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibCircles', icon: 'O', label: 'Fib circles' },
   { tool: 'fibChannel', icon: 'C', label: 'Fib channel' },
   { tool: 'fibTimeZone', icon: 'T', label: 'Fib time zone' },
+  { tool: 'trendBasedFibTime', icon: 'B', label: 'Trend-based fib time' },
   { tool: 'gannFan', icon: 'G', label: 'Gann fan' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'polyline', icon: '⌁', label: 'Polyline' },

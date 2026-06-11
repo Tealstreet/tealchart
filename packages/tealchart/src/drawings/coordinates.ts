@@ -332,6 +332,11 @@ export type ResolvedUserDrawingGeometry =
       fibTimeZone: DrawingScreenFibTimeZone;
     }
   | {
+      kind: 'trendBasedFibTime';
+      drawing: UserDrawing;
+      trendBasedFibTime: DrawingScreenFibTimeZone;
+    }
+  | {
       kind: 'gannFan';
       drawing: UserDrawing;
       gannFan: DrawingScreenGannFan;
@@ -911,6 +916,28 @@ export function resolveFibTimeZoneFromAnchors(
   };
 }
 
+export function resolveTrendBasedFibTimeFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  origin: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibTimeZone {
+  const interval = second.time - first.time;
+
+  return {
+    levels: FIB_TIME_ZONE_LEVELS.map((ratio) => {
+      const time = origin.time + interval * ratio;
+      const x = timeToDrawingX(time, space);
+      return {
+        ratio,
+        time,
+        x,
+        segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+      };
+    }),
+  };
+}
+
 export function resolveAnchoredVwapFromAnchor(
   anchor: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
@@ -1445,6 +1472,17 @@ export function resolveUserDrawingGeometry(
         kind: 'fibTimeZone',
         drawing,
         fibTimeZone: resolveFibTimeZoneFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'trendBasedFibTime':
+      return {
+        kind: 'trendBasedFibTime',
+        drawing,
+        trendBasedFibTime: resolveTrendBasedFibTimeFromAnchors(
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          space,
+        ),
       };
     case 'gannFan':
       return {

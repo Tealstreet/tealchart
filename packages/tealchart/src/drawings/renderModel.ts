@@ -165,6 +165,7 @@ export function resolveUserDrawingHandlePoints(
     case 'polyline':
     case 'triangle':
     case 'fibChannel':
+    case 'trendBasedFibTime':
     case 'pitchfork':
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':

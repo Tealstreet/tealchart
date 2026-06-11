@@ -906,6 +906,28 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders trend-based fib time as projected vertical Fibonacci time levels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'trend-fib-time',
+      kind: 'trendBasedFibTime',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+        { time: 30, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:30,0');
+    expect(ctx.calls).toContain('lineTo:30,100');
+    expect(ctx.calls).toContain('moveTo:40,0');
+    expect(ctx.calls).toContain('lineTo:40,100');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
