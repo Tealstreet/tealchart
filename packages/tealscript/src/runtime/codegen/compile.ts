@@ -142,6 +142,7 @@ export interface MatrixHelpers {
   isAntisymmetric(m: mtxFuncs.PineMatrix): boolean;
   isTriangular(m: mtxFuncs.PineMatrix): boolean;
   isStochastic(m: mtxFuncs.PineMatrix): boolean;
+  isValid(m: mtxFuncs.PineMatrix): boolean;
 }
 
 export interface ScriptDependencies {
@@ -398,6 +399,7 @@ export const MATRIX_HELPERS: MatrixHelpers = {
   isAntisymmetric: mtxFuncs.isAntisymmetricMatrix,
   isTriangular: mtxFuncs.isTriangularMatrix,
   isStochastic: mtxFuncs.isStochasticMatrix,
+  isValid: mtxFuncs.isValidMatrix,
 } as MatrixHelpers;
 
 const DEFAULT_DEPS: ScriptDependencies = {
