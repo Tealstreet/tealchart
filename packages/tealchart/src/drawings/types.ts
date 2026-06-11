@@ -66,11 +66,12 @@ export type UserDrawingTool =
   | 'comment'
   | 'priceNote'
   | 'pin'
+  | 'balloon'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
-export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment' | 'priceNote';
+export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment' | 'priceNote' | 'balloon';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -439,12 +440,20 @@ export interface PinDrawing extends UserDrawingBase {
   point: UserDrawingAnchor;
 }
 
+export interface BalloonDrawing extends UserDrawingBase {
+  kind: 'balloon';
+  point: UserDrawingAnchor;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
 export type UserDrawingTextAnnotation =
   | TextLabelDrawing
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
-  | PriceNoteDrawing;
+  | PriceNoteDrawing
+  | BalloonDrawing;
 
 export type UserDrawing =
   | TrendLineDrawing
@@ -508,6 +517,7 @@ export type UserDrawing =
   | CommentDrawing
   | PriceNoteDrawing
   | PinDrawing
+  | BalloonDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -679,6 +689,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'note':
     case 'comment':
     case 'pin':
+    case 'balloon':
     case 'textLabel':
     case 'anchoredVwap':
       return 1;
@@ -697,7 +708,8 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
     drawing.kind === 'note' ||
     drawing.kind === 'callout' ||
     drawing.kind === 'comment' ||
-    drawing.kind === 'priceNote'
+    drawing.kind === 'priceNote' ||
+    drawing.kind === 'balloon'
   );
 }
 
@@ -1053,6 +1065,7 @@ export function createUserDrawingFromDraft(
       };
     case 'note':
     case 'comment':
+    case 'balloon':
     case 'textLabel':
       return {
         ...base,

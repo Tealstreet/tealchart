@@ -126,6 +126,7 @@ import {
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
 import {
+  resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingRenderModel,
@@ -2882,13 +2883,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'note' ||
             primitive.kind === 'callout' ||
             primitive.kind === 'priceNote' ||
-            primitive.kind === 'comment'
+            primitive.kind === 'comment' ||
+            primitive.kind === 'balloon'
           ) {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const measuredWidths = splitUserDrawingTextLines(primitive.text).map((line) => font.measureText(line).width);
-            const layout = resolveMobileUserDrawingTextLabelLayout(primitive, measuredWidths);
+            const layout =
+              primitive.kind === 'balloon'
+                ? resolveMobileUserDrawingBalloonLayout(primitive, measuredWidths)
+                : resolveMobileUserDrawingTextLabelLayout(primitive, measuredWidths);
+            const balloonTailPath = primitive.kind === 'balloon' ? Skia.Path.Make() : null;
+            if (balloonTailPath && 'tail' in layout) {
+              balloonTailPath.moveTo(layout.tail.left.x, layout.tail.left.y);
+              balloonTailPath.lineTo(layout.tail.tip.x, layout.tail.tip.y);
+              balloonTailPath.lineTo(layout.tail.right.x, layout.tail.right.y);
+              balloonTailPath.close();
+            }
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
@@ -2903,26 +2915,41 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   </SkiaLine>
                 )}
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={layout.box.x}
-                    y={layout.box.y}
-                    width={layout.box.width}
-                    height={layout.box.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <>
+                    <Rect
+                      x={layout.box.x}
+                      y={layout.box.y}
+                      width={layout.box.width}
+                      height={layout.box.height}
+                      color={primitive.style.fillColor}
+                    />
+                    {balloonTailPath && <SkiaPath path={balloonTailPath} color={primitive.style.fillColor} />}
+                  </>
                 )}
                 {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={layout.box.x}
-                    y={layout.box.y}
-                    width={layout.box.width}
-                    height={layout.box.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
+                  <>
+                    <Rect
+                      x={layout.box.x}
+                      y={layout.box.y}
+                      width={layout.box.width}
+                      height={layout.box.height}
+                      color={primitive.style.lineColor}
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </Rect>
+                    {balloonTailPath && (
+                      <SkiaPath
+                        path={balloonTailPath}
+                        color={primitive.style.lineColor}
+                        style="stroke"
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      >
+                        {dash && <DashPathEffect intervals={dash} />}
+                      </SkiaPath>
+                    )}
+                  </>
                 )}
                 {layout.lines.map((line, index) => (
                   <SkiaText

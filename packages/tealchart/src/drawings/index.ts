@@ -194,12 +194,15 @@ export type { UserDrawingRenderOptions } from './renderer';
 export {
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   DEFAULT_USER_DRAWING_TEXT_LINE_HEIGHT,
+  resolveUserDrawingBalloonLayout,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   splitUserDrawingTextLines,
 } from './textLayout';
 export type {
+  ResolveUserDrawingBalloonLayoutOptions,
   ResolveUserDrawingTextLabelLayoutOptions,
+  UserDrawingBalloonLayout,
   UserDrawingTextEditMetrics,
   UserDrawingTextLabelLayout,
   UserDrawingTextLineLayout,
@@ -279,6 +282,7 @@ export type {
   ArrowMarkerDrawing,
   ArcDrawing,
   AnchoredVwapDrawing,
+  BalloonDrawing,
   BarsPatternDrawing,
   BarsPatternBarSnapshot,
   BrushDrawing,
