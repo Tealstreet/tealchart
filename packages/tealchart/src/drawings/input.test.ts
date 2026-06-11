@@ -1494,6 +1494,40 @@ describe('user drawing input controller', () => {
     expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
+  it('duplicates ABCD pattern drawings with deep-cloned four-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'abcd' },
+      drawings: [
+        {
+          id: 'abcd',
+          kind: 'abcdPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC, anchorD],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 20 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'abcdPattern',
+      createdAt: 20,
+      updatedAt: 20,
+      points: [anchorA, anchorB, anchorC, anchorD],
+    });
+    if (next.drawings[1]?.kind !== 'abcdPattern' || state.drawings[0]?.kind !== 'abcdPattern') {
+      throw new Error('expected ABCD pattern drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+  });
+
   it('duplicates grouped selections after each source drawing and selects the copies', () => {
     let id = 0;
     const state = createUserDrawingState({
