@@ -433,6 +433,24 @@ function renderFibWedgeGeometry(
   ctx.stroke();
 }
 
+function renderFibSpiralGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibSpiral' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  const [firstPoint, ...remainingPoints] = geometry.fibSpiral.points;
+  if (!firstPoint) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(firstPoint.x, firstPoint.y);
+  for (const point of remainingPoints) {
+    ctx.lineTo(point.x, point.y);
+  }
+  ctx.stroke();
+}
+
 function renderEllipseGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'ellipse' }>,
@@ -823,6 +841,9 @@ export function renderUserDrawing(
         break;
       case 'fibWedge':
         renderFibWedgeGeometry(ctx, geometry);
+        break;
+      case 'fibSpiral':
+        renderFibSpiralGeometry(ctx, geometry);
         break;
       case 'ellipse':
         renderEllipseGeometry(ctx, geometry);

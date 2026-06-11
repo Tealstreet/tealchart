@@ -87,6 +87,7 @@ export function resolveUserDrawingHandlePoints(
     case 'fibSpeedResistanceFan':
     case 'fibSpeedResistanceArcs':
     case 'fibCircles':
+    case 'fibSpiral':
     case 'fibTimeZone':
     case 'gannFan':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));

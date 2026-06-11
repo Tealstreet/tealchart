@@ -72,6 +72,14 @@ export interface DrawingScreenFibWedge {
   boundaries: readonly [DrawingScreenSegment, DrawingScreenSegment];
 }
 
+export interface DrawingScreenFibSpiral {
+  center: DrawingScreenPoint;
+  reference: DrawingScreenPoint;
+  baseRadius: number;
+  startAngle: number;
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingScreenEllipse {
   center: DrawingScreenPoint;
   radiusX: number;
@@ -356,6 +364,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'fibWedge';
       drawing: UserDrawing;
       fibWedge: DrawingScreenFibWedge;
+    }
+  | {
+      kind: 'fibSpiral';
+      drawing: UserDrawing;
+      fibSpiral: DrawingScreenFibSpiral;
     }
   | {
       kind: 'fibChannel';
@@ -669,6 +682,33 @@ export function resolveFibWedgeFromAnchors(
   };
 }
 
+export function resolveFibSpiralFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibSpiral {
+  const center = anchorToScreenPoint(first, space);
+  const reference = anchorToScreenPoint(second, space);
+  const baseRadius = Math.hypot(reference.x - center.x, reference.y - center.y);
+  const startAngle = Math.atan2(reference.y - center.y, reference.x - center.x);
+  const points = FIB_SPIRAL_STEPS.map((step) => {
+    const angle = startAngle + step;
+    const radius = baseRadius * Math.pow(FIB_SPIRAL_GROWTH, step / (Math.PI / 2));
+    return {
+      x: center.x + Math.cos(angle) * radius,
+      y: center.y + Math.sin(angle) * radius,
+    };
+  });
+
+  return {
+    center,
+    reference,
+    baseRadius,
+    startAngle,
+    points,
+  };
+}
+
 export function resolveEllipseFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -840,6 +880,13 @@ export const FIB_SPEED_RESISTANCE_FAN_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_SPEED_RESISTANCE_ARC_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_CIRCLE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
 export const FIB_WEDGE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
+export const FIB_SPIRAL_GROWTH = 1.618033988749895;
+export const FIB_SPIRAL_TURNS = 4;
+export const FIB_SPIRAL_SEGMENTS_PER_TURN = 64;
+export const FIB_SPIRAL_STEPS = Array.from(
+  { length: FIB_SPIRAL_TURNS * FIB_SPIRAL_SEGMENTS_PER_TURN + 1 },
+  (_, index) => (index / FIB_SPIRAL_SEGMENTS_PER_TURN) * Math.PI * 2,
+);
 export const FIB_CHANNEL_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.414, 1.618, 2] as const;
 export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
 export const GANN_FAN_LEVELS = [
@@ -1585,6 +1632,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibWedge',
         drawing,
         fibWedge: resolveFibWedgeFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'fibSpiral':
+      return {
+        kind: 'fibSpiral',
+        drawing,
+        fibSpiral: resolveFibSpiralFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'fibChannel':
       return {

@@ -133,6 +133,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibSpeedResistanceArcs', icon: 'A', label: 'Fib speed resistance arcs' },
   { tool: 'fibCircles', icon: 'O', label: 'Fib circles' },
   { tool: 'fibWedge', icon: 'W', label: 'Fib wedge' },
+  { tool: 'fibSpiral', icon: 'S', label: 'Fib spiral' },
   { tool: 'fibChannel', icon: 'C', label: 'Fib channel' },
   { tool: 'fibTimeZone', icon: 'T', label: 'Fib time zone' },
   { tool: 'trendBasedFibTime', icon: 'B', label: 'Trend-based fib time' },

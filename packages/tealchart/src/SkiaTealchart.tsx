@@ -2127,7 +2127,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'path') {
+          if (primitive.kind === 'path' || primitive.kind === 'fibSpiral') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
             const [firstPoint, ...remainingPoints] = primitive.points;
