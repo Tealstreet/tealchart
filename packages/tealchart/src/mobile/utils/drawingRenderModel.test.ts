@@ -1,7 +1,8 @@
 import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, UserDrawingStyle } from '../../drawings';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import {
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
@@ -37,6 +38,10 @@ const space: DrawingCoordinateSpace = {
 const clip = { x: 0, y: 0, width: 100, height: 100 };
 
 describe('mobile user drawing render model', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('returns Skia-ready primitives for selected drawings and draft previews', () => {
     const fadedStyle = { ...style, opacity: 0.5 };
     const state: UserDrawingState = {

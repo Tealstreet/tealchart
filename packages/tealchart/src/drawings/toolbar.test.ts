@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
@@ -37,6 +38,10 @@ const state: UserDrawingState = {
 };
 
 describe('user drawing toolbar descriptors', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('orders every supported drawing tool once', () => {
     expect(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).toEqual([
       'select',
