@@ -65,6 +65,7 @@ export interface ChartTopBarComponentProps {
 }
 
 const TOP_BAR_HEIGHT = 36;
+type PressableStyleState = { pressed: boolean };
 
 export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
   ({
@@ -156,7 +157,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
         {/* Indicators button */}
         <Pressable
-          style={({ pressed }) => [styles.indicatorsButton, pressed && styles.indicatorsButtonPressed]}
+          style={({ pressed }: PressableStyleState) => [
+            styles.indicatorsButton,
+            pressed && styles.indicatorsButtonPressed,
+          ]}
           onPress={onIndicatorsPress}
         >
           <Text style={[styles.indicatorsIcon, { color: textSecondaryColor }]}>ƒ</Text>
@@ -178,7 +182,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   accessibilityLabel={descriptor.label}
                   accessibilityState={{ selected: userDrawingState.activeTool === descriptor.tool }}
                   onPress={() => onUserDrawingToolSelect?.(descriptor.tool)}
-                  style={({ pressed }) => [
+                  style={({ pressed }: PressableStyleState) => [
                     styles.drawingButton,
                     userDrawingState.activeTool === descriptor.tool && [
                       styles.drawingButtonActive,
@@ -234,7 +238,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
                         disabled={!styleControlsEnabled}
                         onPress={() => onUserDrawingStyleChange?.({ lineWidth: descriptor.width })}
-                        style={({ pressed }) => [
+                        style={({ pressed }: PressableStyleState) => [
                           styles.drawingButton,
                           active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
                           styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
@@ -263,7 +267,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
                         disabled={!styleControlsEnabled}
                         onPress={() => onUserDrawingStyleChange?.({ lineStyle: descriptor.lineStyle })}
-                        style={({ pressed }) => [
+                        style={({ pressed }: PressableStyleState) => [
                           styles.drawingButton,
                           active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
                           styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
@@ -300,7 +304,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                             onUserDrawingLockedChange?.(!selectedDrawing.locked, selectedDrawing.locked);
                           }
                         }}
-                        style={({ pressed }) => [
+                        style={({ pressed }: PressableStyleState) => [
                           styles.drawingButton,
                           active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
                           enabled && pressed && !active && styles.drawingButtonPressed,
@@ -332,7 +336,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                       if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
                     }}
-                    style={({ pressed }) => [
+                    style={({ pressed }: PressableStyleState) => [
                       styles.drawingButton,
                       !enabled && styles.drawingButtonDisabled,
                       enabled && pressed && styles.drawingButtonPressed,
