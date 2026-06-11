@@ -153,6 +153,42 @@ describe('toTvFormat', () => {
       expect(content._tealstreetOriginalSettings?.chartType).toBe('area');
       expect(content._tealstreetOriginalSettings?.autoScale).toBe(false);
     });
+
+    it('stores committed user drawings in original settings metadata', () => {
+      const settings = createTestSettings({
+        userDrawingState: {
+          version: 1,
+          drawings: [
+            {
+              id: 'hline_1',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 100,
+              updatedAt: 100,
+              style: {
+                lineColor: '#f5c542',
+                lineWidth: 1,
+                lineStyle: 'solid',
+              },
+              price: 123.45,
+            },
+          ],
+          activeTool: 'trendLine',
+          selection: { drawingId: 'hline_1' },
+          draft: null,
+          textEdit: null,
+        },
+      });
+
+      const result = toTvFormat(settings, 'Test');
+      const content: TvChartContent = JSON.parse(result.content);
+
+      expect(content._tealstreetOriginalSettings?.userDrawingState?.drawings).toHaveLength(1);
+      expect(content._tealstreetOriginalSettings?.userDrawingState?.activeTool).toBe('select');
+      expect(content._tealstreetOriginalSettings?.userDrawingState?.selection).toBeNull();
+    });
   });
 
   describe('indicator transformation', () => {
