@@ -182,7 +182,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, and endpoint editing reuse line-family behavior on
   both platforms.
 
-## Current Epic: Arrow Marker Tool
+## Shipped: Arrow Marker Tool
 
 - Shared drawing state supports the two-anchor `arrowMarker` tool and persists
   it through layout save/load.
@@ -190,6 +190,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   shared geometry.
 - Selection, polygon hit testing, whole-drawing moves, and endpoint editing
   work through shared drawing behavior on both platforms.
+
+## Current Epic: Arrow Marks
+
+- Shared drawing state supports single-anchor `arrowMarkUp` and `arrowMarkDown`
+  tools and persists them through layout save/load.
+- Web Canvas and mobile Skia render matching fixed-size filled arrow mark
+  polygons from shared geometry.
+- Selection, polygon hit testing, whole-drawing moves, and fill controls use
+  shared drawing behavior on both platforms.
 
 ## Known Gaps
 
