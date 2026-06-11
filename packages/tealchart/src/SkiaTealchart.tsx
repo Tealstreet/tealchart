@@ -2359,6 +2359,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
           if (
             primitive.kind === 'path' ||
+            primitive.kind === 'brush' ||
             primitive.kind === 'curve' ||
             primitive.kind === 'arc' ||
             primitive.kind === 'fibSpiral'

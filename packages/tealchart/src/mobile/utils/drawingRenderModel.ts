@@ -175,6 +175,16 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'brush';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'curve';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -659,6 +669,7 @@ export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
   { kind: 'riskRewardPosition' }
 >;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
+export type MobileUserDrawingBrushPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'brush' }>;
 export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'curve' }>;
 export type MobileUserDrawingArcPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arc' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
@@ -953,8 +964,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'path':
+    case 'brush':
       return {
-        kind: 'path',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,

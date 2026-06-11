@@ -278,6 +278,7 @@ export type {
   AnchoredVwapDrawing,
   BarsPatternDrawing,
   BarsPatternBarSnapshot,
+  BrushDrawing,
   CircleDrawing,
   CreateUserDrawingFromDraftOptions,
   CrossLineDrawing,

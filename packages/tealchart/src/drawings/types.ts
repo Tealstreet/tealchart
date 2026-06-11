@@ -59,6 +59,7 @@ export type UserDrawingTool =
   | 'flatTopBottom'
   | 'disjointChannel'
   | 'path'
+  | 'brush'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
@@ -378,6 +379,11 @@ export interface PathDrawing extends UserDrawingBase {
   points: readonly UserDrawingAnchor[];
 }
 
+export interface BrushDrawing extends UserDrawingBase {
+  kind: 'brush';
+  points: readonly UserDrawingAnchor[];
+}
+
 export type UserDrawingTextAlign = 'left' | 'center' | 'right';
 
 export interface TextLabelDrawing extends UserDrawingBase {
@@ -442,6 +448,7 @@ export type UserDrawing =
   | FlatTopBottomDrawing
   | DisjointChannelDrawing
   | PathDrawing
+  | BrushDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -597,6 +604,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'shortPosition':
     case 'barsPattern':
     case 'path':
+    case 'brush':
       return 3;
     case 'disjointChannel':
       return 4;
@@ -953,9 +961,10 @@ export function createUserDrawingFromDraft(
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!, draft.anchors[3]!],
       };
     case 'path':
+    case 'brush':
       return {
         ...base,
-        kind: 'path',
+        kind: draft.tool,
         points: draft.anchors.slice(),
       };
     case 'textLabel':

@@ -59,6 +59,7 @@ import type {
   MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingArcPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
+  MobileUserDrawingBrushPrimitive,
   MobileUserDrawingCurvePrimitive,
   MobileUserDrawingCyclicLinesPrimitive,
   MobileUserDrawingTimeCyclesPrimitive,
@@ -97,6 +98,7 @@ import type {
   ArcDrawing,
   AnchoredVwapDrawing,
   BarsPatternDrawing,
+  BrushDrawing,
   CircleDrawing,
   CyclicLinesDrawing,
   TimeCyclesDrawing,
@@ -182,6 +184,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingAnchoredVwapPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArcPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingBrushPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
@@ -560,6 +563,19 @@ describe('tealchart public entries', () => {
       bounds: { x: -2, y: 0, width: 4, height: 10 },
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const brushPrimitive: NonNever<MobileUserDrawingBrushPrimitive> = {
+      kind: 'brush',
+      id: 'brush',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [
+        { x: 0, y: 0 },
+        { x: 5, y: 5 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -601,6 +617,7 @@ describe('tealchart public entries', () => {
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
     expect(barsPatternPrimitive.kind).toBe('barsPattern');
+    expect(brushPrimitive.kind).toBe('brush');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1045,8 +1062,14 @@ describe('tealchart public entries', () => {
         { time: 3, price: 11 },
       ],
     };
+    const brush: BrushDrawing = {
+      ...drawing,
+      id: 'brush',
+      kind: 'brush',
+    };
 
     expect(drawing.kind).toBe('path');
+    expect(brush.kind).toBe('brush');
   });
 
   it('exports shared drawing curve types and resolver', () => {

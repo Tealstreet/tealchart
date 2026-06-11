@@ -2146,6 +2146,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready brush primitives with shared polyline points', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'brush',
+          kind: 'brush',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 50, price: 50 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'brush',
+      id: 'brush',
+      clip,
+      points: [
+        { x: 10, y: 10 },
+        { x: 50, y: 50 },
+        { x: 90, y: 10 },
+      ],
+      style,
+    });
+  });
+
   it('returns Skia-ready polyline primitives with shared polyline points', () => {
     const state: UserDrawingState = {
       version: 1,
