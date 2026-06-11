@@ -49,9 +49,14 @@ export {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
-export { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
+export {
+  resolveMobileUserDrawingPriceRangeLabelPosition,
+  resolveMobileUserDrawingRenderModel,
+} from './mobile/utils/drawingRenderModel';
 export type {
+  MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
+  MobileUserDrawingPriceRangeLabelPosition,
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';
 export {
