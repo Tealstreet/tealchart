@@ -150,6 +150,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'forecast', icon: '↗', label: 'Forecast' },
   { tool: 'projection', icon: '⌁', label: 'Projection' },
   { tool: 'barsPattern', icon: '▥', label: 'Bars pattern' },
+  { tool: 'xabcdPattern', icon: 'X', label: 'XABCD pattern' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },

@@ -500,6 +500,35 @@ function renderProjectionGeometry(
   ctx.fillText(projection.changeLabel, projection.labelPoint.x, projection.labelPoint.y);
 }
 
+function renderXabcdPatternGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'xabcdPattern' }>,
+): void {
+  const { drawing, pattern } = geometry;
+  const [firstPoint, ...remainingPoints] = pattern.polyline.points;
+  if (!firstPoint) return;
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.beginPath();
+    ctx.moveTo(firstPoint.x, firstPoint.y);
+    for (const point of remainingPoints) {
+      ctx.lineTo(point.x, point.y);
+    }
+    ctx.stroke();
+  }
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const label of pattern.labels) {
+    ctx.fillText(label.text, label.point.x, label.point.y - 6);
+  }
+}
+
 function renderRectangleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
@@ -1060,6 +1089,9 @@ export function renderUserDrawing(
         break;
       case 'projection':
         renderProjectionGeometry(ctx, geometry);
+        break;
+      case 'xabcdPattern':
+        renderXabcdPatternGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

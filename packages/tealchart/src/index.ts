@@ -120,6 +120,7 @@ export {
   resolveSineLineFromAnchors,
   resolveForecastFromAnchors,
   resolveProjectionFromAnchors,
+  resolveXabcdPatternFromAnchors,
   resolveFibWedgeFromAnchors,
   resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
@@ -191,6 +192,7 @@ export {
   USER_DRAWING_SCHEMA_VERSION,
   formatUserDrawingDateRangeDuration,
   formatTrendAngleDegrees,
+  XABCD_PATTERN_LABELS,
 } from './drawings';
 export type {
   CreateUserDrawingFromDraftOptions,
@@ -266,6 +268,8 @@ export type {
   DrawingScreenRiskRewardPosition,
   DrawingScreenSegment,
   DrawingScreenTrendAngle,
+  DrawingScreenXabcdPattern,
+  DrawingScreenXabcdPatternLabel,
   FlatTopBottomDrawing,
   HorizontalLineDrawing,
   HorizontalRayDrawing,
@@ -353,6 +357,8 @@ export type {
   SineLineDrawing,
   UpdateUserDrawingOptions,
   VerticalLineDrawing,
+  XabcdPatternDrawing,
+  XabcdPatternLabel,
 } from './drawings';
 
 // Gap detection (for advanced usage)
