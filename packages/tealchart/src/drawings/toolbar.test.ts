@@ -73,6 +73,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibExtension',
       'fibFan',
       'fibSpeedResistanceFan',
+      'fibCircles',
       'fibChannel',
       'fibTimeZone',
       'gannFan',
@@ -169,6 +170,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibSpeedResistanceFan')).toEqual(
       expect.objectContaining({ tool: 'fibSpeedResistanceFan', label: 'Fib speed resistance fan' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibCircles')).toEqual(
+      expect.objectContaining({ tool: 'fibCircles', label: 'Fib circles' }),
     );
     expect(getUserDrawingToolDescriptor('fibChannel')).toEqual(
       expect.objectContaining({ tool: 'fibChannel', label: 'Fib channel' }),

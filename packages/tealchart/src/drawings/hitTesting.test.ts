@@ -644,6 +644,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib circle rings and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-circles',
+      kind: 'fibCircles',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 60, y: 50 }, space)?.drawing.id).toBe('fib-circles');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits gann fan rays and endpoint handles', () => {
     const drawing: UserDrawing = {
       ...base,
