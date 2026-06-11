@@ -379,6 +379,82 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags path point handles without moving other points', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'path',
+      kind: 'path',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'path', handle: 'center', pointIndex: 1 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'path', handle: 'center', pointIndex: 1 },
+        startPoint: { x: 50, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 60, y: 40 },
+      { now: () => 6 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 90 },
+        { time: 60, price: 60 },
+        { time: 90, price: 90 },
+      ],
+      updatedAt: 6,
+    });
+  });
+
+  it('moves selected paths by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'path',
+      kind: 'path',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'path' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'path' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 20 },
+      { now: () => 7 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 80 },
+        { time: 60, price: 40 },
+        { time: 100, price: 80 },
+      ],
+      updatedAt: 7,
+    });
+  });
+
   it('moves horizontal, vertical, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };

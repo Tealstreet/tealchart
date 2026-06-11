@@ -5,6 +5,7 @@ import {
   anchorToScreenPoint,
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
+  resolvePolylineFromAnchors,
   resolveRectFromAnchors,
   timeToDrawingX,
 } from './coordinates';
@@ -114,6 +115,8 @@ export function resolveUserDrawingHandlePoints(
         { x: rect.x + rect.width, y: rect.y + rect.height / 2 },
       ];
     }
+    case 'path':
+      return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'textLabel':
       return [anchorToScreenPoint(drawing.point, space)];
   }

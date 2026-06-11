@@ -21,6 +21,7 @@ import {
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+const anchorC = { time: 3_000, price: 105 };
 
 function draft(overrides: Partial<UserDrawingDraft>): UserDrawingDraft {
   return {
@@ -61,6 +62,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
+    expect(getRequiredAnchorCount('path')).toBe(3);
   });
 
   it('normalizes drawing font sizes to supported cross-platform values', () => {
@@ -143,6 +145,15 @@ describe('user drawing types', () => {
       id: 'date-range',
       kind: 'dateRange',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'path', anchors: [anchorA, anchorB, anchorC] }), { id: 'path', now: 20 })).toMatchObject({
+      id: 'path',
+      kind: 'path',
+      points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,
       createdAt: 20,

@@ -85,7 +85,12 @@ export function selectUserDrawing(
   state: UserDrawingState,
   selection: UserDrawingSelection | null,
 ): UserDrawingState {
-  if (state.selection?.drawingId === selection?.drawingId && state.selection?.handle === selection?.handle && !state.draft) {
+  if (
+    state.selection?.drawingId === selection?.drawingId &&
+    state.selection?.handle === selection?.handle &&
+    state.selection?.pointIndex === selection?.pointIndex &&
+    !state.draft
+  ) {
     return state;
   }
 

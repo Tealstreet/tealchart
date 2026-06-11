@@ -155,7 +155,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, fill controls, and corner editing reuse rectangle
   behavior on both platforms.
 
-## Current Epic: Date Range Tool
+## Shipped: Date Range Tool
 
 - Shared drawing state supports the two-anchor `dateRange` tool and persists it
   through layout save/load.
@@ -164,12 +164,23 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, fill controls, and boundary editing reuse shared
   drawing behavior on both platforms.
 
+## Current Epic: Path Tool
+
+- Shared drawing state supports a fixed three-anchor `path` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching stroked polylines from shared
+  screen-space geometry.
+- Selection, hit testing, whole-drawing moves, and point-index handle editing
+  use shared logic on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Additional TradingView line-family tools such as info lines and multi-point
   arrows.
 - Additional TradingView measurement tools such as bars pattern and risk/reward.
+- Freehand/variable-point path capture beyond the initial fixed three-anchor
+  path workflow.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration

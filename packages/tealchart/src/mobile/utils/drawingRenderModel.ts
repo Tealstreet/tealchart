@@ -50,6 +50,16 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'path';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'priceRange';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -100,6 +110,7 @@ export type MobileUserDrawingPrimitive =
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
+export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'priceRange' | 'dateRange' }
@@ -197,6 +208,17 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rect: geometry.rect,
+        style: geometry.drawing.style,
+      };
+    case 'path':
+      return {
+        kind: 'path',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.polyline.points,
         style: geometry.drawing.style,
       };
     case 'priceRange': {

@@ -11,6 +11,7 @@ export type UserDrawingTool =
   | 'rectangle'
   | 'priceRange'
   | 'dateRange'
+  | 'path'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
@@ -94,6 +95,11 @@ export interface DateRangeDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface PathDrawing extends UserDrawingBase {
+  kind: 'path';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export type UserDrawingTextAlign = 'left' | 'center' | 'right';
 
 export interface TextLabelDrawing extends UserDrawingBase {
@@ -113,6 +119,7 @@ export type UserDrawing =
   | RectangleDrawing
   | PriceRangeDrawing
   | DateRangeDrawing
+  | PathDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -127,6 +134,7 @@ export interface UserDrawingDraft {
 export interface UserDrawingSelection {
   drawingId: string;
   handle?: UserDrawingHandleRole;
+  pointIndex?: number;
 }
 
 export interface UserDrawingTextEdit {
@@ -214,6 +222,8 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'priceRange':
     case 'dateRange':
       return 2;
+    case 'path':
+      return 3;
     case 'horizontalLine':
     case 'verticalLine':
     case 'textLabel':
@@ -304,6 +314,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'dateRange',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'path':
+      return {
+        ...base,
+        kind: 'path',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'textLabel':
       return {

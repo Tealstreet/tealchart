@@ -5,6 +5,7 @@ export {
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
+  resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
   resolveUserDrawingInputPoint,
@@ -16,6 +17,7 @@ export {
 export type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  DrawingScreenPolyline,
   DrawingScreenRect,
   DrawingScreenSegment,
   ResolveUserDrawingInputFromChartOptions,
@@ -169,6 +171,7 @@ export type {
   DateRangeDrawing,
   ExtendedLineDrawing,
   HorizontalLineDrawing,
+  PathDrawing,
   PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,

@@ -21,6 +21,7 @@ import type {
   ArrowLineDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
+  PathDrawing,
   PriceRangeDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
@@ -164,5 +165,25 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('extendedLine');
+  });
+
+  it('exports shared drawing path types', () => {
+    const drawing: PathDrawing = {
+      id: 'path',
+      kind: 'path',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('path');
   });
 });
