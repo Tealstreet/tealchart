@@ -199,6 +199,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2::1');
   });
 
+  it('renders arrow marks as filled CanvasContext polygons', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'mark-up',
+      kind: 'arrowMarkUp',
+      style: { ...style, fillColor: '#22c55e', lineStyle: 'solid' },
+      point: { time: 50, price: 50 },
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:50,50');
+    expect(ctx.calls).toContain('lineTo:59,60.8');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.fillStyle).toBe('#22c55e');
+    expect(ctx.calls).toContain('stroke:#f5c542:2::1');
+  });
+
   it('renders extended lines to chart bounds through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -1,6 +1,8 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type {
   ArrowLineDrawing,
+  ArrowMarkDownDrawing,
+  ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
@@ -254,6 +256,18 @@ describe('user drawing coordinates', () => {
       id: 'marker',
       kind: 'arrowMarker',
     };
+    const arrowMarkUp: ArrowMarkUpDrawing = {
+      ...trendLine,
+      id: 'mark-up',
+      kind: 'arrowMarkUp',
+      point: { time: 2_000, price: 100 },
+    };
+    const arrowMarkDown: ArrowMarkDownDrawing = {
+      ...trendLine,
+      id: 'mark-down',
+      kind: 'arrowMarkDown',
+      point: { time: 2_000, price: 100 },
+    };
     const extendedLine: ExtendedLineDrawing = {
       ...trendLine,
       id: 'extended',
@@ -315,6 +329,36 @@ describe('user drawing coordinates', () => {
           { x: 10, y: 73.5 },
           { x: 10, y: 66.5 },
           { x: 188, y: 61 },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(arrowMarkUp, space)).toMatchObject({
+      kind: 'arrowMark',
+      mark: {
+        point: { x: 110, y: 70 },
+        points: [
+          { x: 110, y: 70 },
+          { x: 119, y: 80.8 },
+          { x: 113.5, y: 80.8 },
+          { x: 113.5, y: 94 },
+          { x: 106.5, y: 94 },
+          { x: 106.5, y: 80.8 },
+          { x: 101, y: 80.8 },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(arrowMarkDown, space)).toMatchObject({
+      kind: 'arrowMark',
+      mark: {
+        point: { x: 110, y: 70 },
+        points: [
+          { x: 110, y: 70 },
+          { x: 119, y: 59.2 },
+          { x: 113.5, y: 59.2 },
+          { x: 113.5, y: 46 },
+          { x: 106.5, y: 46 },
+          { x: 106.5, y: 59.2 },
+          { x: 101, y: 59.2 },
         ],
       },
     });

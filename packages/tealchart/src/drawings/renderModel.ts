@@ -92,6 +92,9 @@ export function resolveUserDrawingHandlePoints(
         { x, y: space.pane.bottom },
       ];
     }
+    case 'arrowMarkUp':
+    case 'arrowMarkDown':
+      return [anchorToScreenPoint(drawing.point, space)];
     case 'rectangle': {
       const rect = resolveRectFromAnchors(drawing.points[0], drawing.points[1], space);
       return [

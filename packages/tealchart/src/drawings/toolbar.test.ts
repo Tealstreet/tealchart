@@ -45,6 +45,8 @@ describe('user drawing toolbar descriptors', () => {
       'infoLine',
       'arrowLine',
       'arrowMarker',
+      'arrowMarkUp',
+      'arrowMarkDown',
       'ray',
       'horizontalLine',
       'verticalLine',
@@ -101,6 +103,12 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
     );
+    expect(getUserDrawingToolDescriptor('arrowMarkUp')).toEqual(
+      expect.objectContaining({ tool: 'arrowMarkUp', label: 'Arrow mark up' }),
+    );
+    expect(getUserDrawingToolDescriptor('arrowMarkDown')).toEqual(
+      expect.objectContaining({ tool: 'arrowMarkDown', label: 'Arrow mark down' }),
+    );
     expect(getUserDrawingToolDescriptor('path')).toEqual(expect.objectContaining({ tool: 'path', label: 'Path' }));
   });
 
@@ -119,6 +127,19 @@ describe('user drawing toolbar descriptors', () => {
           { time: 1, price: 10 },
           { time: 2, price: 12 },
         ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        id: 'up',
+        kind: 'arrowMarkUp',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+        point: { time: 1, price: 10 },
       }),
     ).toBe(true);
   });

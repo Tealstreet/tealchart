@@ -55,6 +55,7 @@ export {
   resolveMobileUserDrawingRenderModel,
 } from './mobile/utils/drawingRenderModel';
 export type {
+  MobileUserDrawingArrowMarkPrimitive,
   MobileUserDrawingArrowMarkerPrimitive,
   MobileUserDrawingInfoLineLabelPosition,
   MobileUserDrawingInfoLinePrimitive,

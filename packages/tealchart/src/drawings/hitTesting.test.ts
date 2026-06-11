@@ -102,6 +102,26 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 62 }, space, { tolerance: 2 })).toBeNull();
   });
 
+  it('hits arrow mark bodies and center handles', () => {
+    const up: UserDrawing = {
+      ...base,
+      id: 'up',
+      kind: 'arrowMarkUp',
+      point: { time: 50, price: 50 },
+    };
+    const down: UserDrawing = {
+      ...base,
+      id: 'down',
+      kind: 'arrowMarkDown',
+      point: { time: 50, price: 50 },
+    };
+
+    expect(hitTestUserDrawing(up, { x: 50, y: 50 }, space)?.handle).toBe('center');
+    expect(hitTestUserDrawing(up, { x: 50, y: 70 }, space)?.drawing.id).toBe('up');
+    expect(hitTestUserDrawing(down, { x: 50, y: 30 }, space)?.drawing.id).toBe('down');
+    expect(hitTestUserDrawing(up, { x: 80, y: 80 }, space, { tolerance: 2 })).toBeNull();
+  });
+
   it('hits extended line drawings against their extended segment', () => {
     const drawing: UserDrawing = {
       ...base,
