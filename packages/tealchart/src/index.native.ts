@@ -60,6 +60,7 @@ export {
 export type {
   MobileUserDrawingArrowMarkPrimitive,
   MobileUserDrawingArrowMarkerPrimitive,
+  MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingCirclePrimitive,
   MobileUserDrawingCrossLinePrimitive,
   MobileUserDrawingDatePriceRangePrimitive,

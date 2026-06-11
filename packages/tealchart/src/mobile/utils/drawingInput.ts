@@ -1,4 +1,5 @@
 import type { Viewport } from '../../types';
+import type { Bar } from '../../types';
 import type { UserDrawingInputPoint } from '../../drawings';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from '../../drawings';
 import type { ChartDimensions, PaneInfo } from './coordinates';
@@ -12,6 +13,7 @@ export interface ResolveMobileUserDrawingInputPointOptions {
   viewport: Viewport;
   dimensions: ChartDimensions;
   panes: readonly MobileUserDrawingInputPane[];
+  bars?: readonly Bar[];
 }
 
 export function resolveMobileUserDrawingInputPoint({
@@ -19,8 +21,9 @@ export function resolveMobileUserDrawingInputPoint({
   viewport,
   dimensions,
   panes,
+  bars,
 }: ResolveMobileUserDrawingInputPointOptions): UserDrawingInputPoint | null {
-  return resolveUserDrawingInputPointFromChart({
+  const inputPoint = resolveUserDrawingInputPointFromChart({
     point,
     viewport,
     panes: panes.map((pane) => ({
@@ -34,4 +37,10 @@ export function resolveMobileUserDrawingInputPoint({
     width: dimensions.width,
     margins: dimensions.margins,
   });
+  if (!inputPoint) return null;
+
+  return {
+    ...inputPoint,
+    bars: inputPoint.paneId === 'main' && bars && bars.length > 0 ? bars : undefined,
+  };
 }

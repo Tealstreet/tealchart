@@ -1,4 +1,5 @@
 import type {
+  BarsPatternBarSnapshot,
   TextLabelDrawing,
   UserDrawing,
   UserDrawingAnchor,
@@ -69,6 +70,14 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
       };
+    case 'barsPattern':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
+        bars: drawing.bars.map((bar) => ({ ...bar })),
+      };
     case 'path':
       return {
         ...drawing,
@@ -117,6 +126,20 @@ function isLineStyle(value: unknown): value is UserDrawingLineStyle {
 function parseAnchor(value: unknown): UserDrawingAnchor | null {
   if (!isRecord(value) || !isFiniteNumber(value.time) || !isFiniteNumber(value.price)) return null;
   return { time: value.time, price: value.price };
+}
+
+function parseBarsPatternBar(value: unknown): BarsPatternBarSnapshot | null {
+  if (
+    !isRecord(value) ||
+    !isFiniteNumber(value.time) ||
+    !isFiniteNumber(value.open) ||
+    !isFiniteNumber(value.high) ||
+    !isFiniteNumber(value.low) ||
+    !isFiniteNumber(value.close)
+  ) {
+    return null;
+  }
+  return { time: value.time, open: value.open, high: value.high, low: value.low, close: value.close };
 }
 
 function parseStyle(value: unknown): UserDrawingStyle | null {
@@ -401,6 +424,18 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             points,
           }
         : null;
+    }
+    case 'barsPattern': {
+      const points = parseThreePointDrawing(value);
+      if (!points || !Array.isArray(value.bars)) return null;
+      const bars = value.bars.map((bar) => parseBarsPatternBar(bar));
+      if (!bars.every((bar): bar is BarsPatternBarSnapshot => bar !== null) || bars.length === 0) return null;
+      return {
+        ...base,
+        kind: 'barsPattern',
+        points,
+        bars,
+      };
     }
     case 'horizontalLine':
       return isFiniteNumber(value.price)

@@ -1,6 +1,6 @@
 import type { Bar, ChartMargins, ComputedPane, Viewport } from '../types';
 import type { UserDrawingInputPoint } from './input';
-import type { UserDrawing, UserDrawingAnchor } from './types';
+import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor } from './types';
 
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 
@@ -85,6 +85,25 @@ export interface DrawingScreenRiskRewardPosition {
   rewardLabel: string;
   riskLabel: string;
   ratioLabel: string;
+}
+
+export interface DrawingScreenBarsPatternBar {
+  time: number;
+  x: number;
+  openY: number;
+  highY: number;
+  lowY: number;
+  closeY: number;
+  bodyWidth: number;
+  up: boolean;
+}
+
+export interface DrawingScreenBarsPattern {
+  bars: readonly DrawingScreenBarsPatternBar[];
+  bounds: DrawingScreenRect;
+  sourceStart: DrawingScreenPoint;
+  sourceEnd: DrawingScreenPoint;
+  placement: DrawingScreenPoint;
 }
 
 export interface DrawingCoordinateSpace {
@@ -176,6 +195,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'longPosition' | 'shortPosition';
       drawing: UserDrawing;
       position: DrawingScreenRiskRewardPosition;
+    }
+  | {
+      kind: 'barsPattern';
+      drawing: UserDrawing;
+      pattern: DrawingScreenBarsPattern;
     }
   | {
       kind: 'fibRetracement' | 'fibExtension';
@@ -459,6 +483,90 @@ export function resolvePolylineFromAnchors(
 ): DrawingScreenPolyline {
   return {
     points: points.map((point) => anchorToScreenPoint(point, space)),
+  };
+}
+
+function isFiniteBar(bar: BarsPatternBarSnapshot | Bar): boolean {
+  return (
+    Number.isFinite(bar.time) &&
+    Number.isFinite(bar.open) &&
+    Number.isFinite(bar.high) &&
+    Number.isFinite(bar.low) &&
+    Number.isFinite(bar.close)
+  );
+}
+
+function estimateBarsPatternBodyWidth(xs: readonly number[]): number {
+  let spacing = Number.POSITIVE_INFINITY;
+  for (let index = 1; index < xs.length; index++) {
+    const delta = Math.abs(xs[index]! - xs[index - 1]!);
+    if (delta > 0) spacing = Math.min(spacing, delta);
+  }
+  if (!Number.isFinite(spacing)) return 4;
+  return Math.max(2, Math.min(12, spacing * 0.7));
+}
+
+function emptyBarsPatternBounds(point: DrawingScreenPoint): DrawingScreenRect {
+  return { x: point.x, y: point.y, width: 0, height: 0 };
+}
+
+export function resolveBarsPatternFromAnchors(
+  sourceStartAnchor: UserDrawingAnchor,
+  sourceEndAnchor: UserDrawingAnchor,
+  placementAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+  sourceBarsInput: readonly (BarsPatternBarSnapshot | Bar)[] = space.bars ?? [],
+  filterBySourceRange = true,
+): DrawingScreenBarsPattern {
+  const sourceStartTime = Math.min(sourceStartAnchor.time, sourceEndAnchor.time);
+  const sourceEndTime = Math.max(sourceStartAnchor.time, sourceEndAnchor.time);
+  const sourceBars = sourceBarsInput
+    .filter(
+      (bar) => isFiniteBar(bar) && (!filterBySourceRange || (bar.time >= sourceStartTime && bar.time <= sourceEndTime)),
+    )
+    .slice()
+    .sort((a, b) => a.time - b.time);
+  const sourceStart = anchorToScreenPoint(sourceStartAnchor, space);
+  const sourceEnd = anchorToScreenPoint(sourceEndAnchor, space);
+  const placement = anchorToScreenPoint(placementAnchor, space);
+
+  if (sourceBars.length === 0) {
+    return {
+      bars: [],
+      bounds: emptyBarsPatternBounds(placement),
+      sourceStart,
+      sourceEnd,
+      placement,
+    };
+  }
+
+  const firstBar = sourceBars[0]!;
+  const priceOffset = placementAnchor.price - firstBar.close;
+  const mapped = sourceBars.map((bar) => {
+    const time = placementAnchor.time + (bar.time - firstBar.time);
+    return {
+      time,
+      x: timeToDrawingX(time, space),
+      openY: priceToDrawingY(bar.open + priceOffset, space),
+      highY: priceToDrawingY(bar.high + priceOffset, space),
+      lowY: priceToDrawingY(bar.low + priceOffset, space),
+      closeY: priceToDrawingY(bar.close + priceOffset, space),
+      up: bar.close >= bar.open,
+    };
+  });
+  const bodyWidth = estimateBarsPatternBodyWidth(mapped.map((bar) => bar.x));
+  const bars = mapped.map((bar) => ({ ...bar, bodyWidth }));
+  const minX = Math.min(...bars.map((bar) => bar.x - bodyWidth / 2));
+  const maxX = Math.max(...bars.map((bar) => bar.x + bodyWidth / 2));
+  const minY = Math.min(...bars.flatMap((bar) => [bar.openY, bar.highY, bar.lowY, bar.closeY]));
+  const maxY = Math.max(...bars.flatMap((bar) => [bar.openY, bar.highY, bar.lowY, bar.closeY]));
+
+  return {
+    bars,
+    bounds: { x: minX, y: minY, width: maxX - minX, height: maxY - minY },
+    sourceStart,
+    sourceEnd,
+    placement,
   };
 }
 
@@ -790,6 +898,19 @@ export function resolveUserDrawingGeometry(
           drawing.points[1],
           drawing.points[2],
           space,
+        ),
+      };
+    case 'barsPattern':
+      return {
+        kind: 'barsPattern',
+        drawing,
+        pattern: resolveBarsPatternFromAnchors(
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          space,
+          drawing.bars,
+          false,
         ),
       };
     case 'fibRetracement':

@@ -8,6 +8,7 @@ export {
   formatFibRetracementRatio,
   formatTrendAngleDegrees,
   resolveCircleFromAnchors,
+  resolveBarsPatternFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveEllipseFromAnchors,
   resolveExtendedSegment,
@@ -29,6 +30,8 @@ export {
 } from './coordinates';
 export type {
   DrawingCoordinateSpace,
+  DrawingScreenBarsPattern,
+  DrawingScreenBarsPatternBar,
   DrawingScreenPoint,
   DrawingScreenCircle,
   DrawingScreenCrossLine,
@@ -199,6 +202,8 @@ export type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  BarsPatternDrawing,
+  BarsPatternBarSnapshot,
   CircleDrawing,
   CreateUserDrawingFromDraftOptions,
   CrossLineDrawing,

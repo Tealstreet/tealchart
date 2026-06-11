@@ -252,6 +252,26 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'barsPattern';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      bars: readonly {
+        time: number;
+        x: number;
+        openY: number;
+        highY: number;
+        lowY: number;
+        closeY: number;
+        bodyWidth: number;
+        up: boolean;
+      }[];
+      bounds: { x: number; y: number; width: number; height: number };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'textLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -290,6 +310,7 @@ export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawin
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
+export type MobileUserDrawingBarsPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'barsPattern' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
@@ -688,6 +709,18 @@ function primitiveFromGeometry(
           start: level.segment.start,
           end: level.segment.end,
         })),
+        style: geometry.drawing.style,
+      };
+    case 'barsPattern':
+      return {
+        kind: 'barsPattern',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        bars: geometry.pattern.bars,
+        bounds: geometry.pattern.bounds,
         style: geometry.drawing.style,
       };
     case 'textLabel':
