@@ -55,6 +55,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
     case 'path':
+    case 'triangle':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -294,6 +295,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'path',
+            points,
+          }
+        : null;
+    }
+    case 'triangle': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'triangle',
             points,
           }
         : null;

@@ -32,6 +32,7 @@ import type {
   InfoLineDrawing,
   PathDrawing,
   PriceRangeDrawing,
+  TriangleDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
@@ -55,6 +56,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -353,5 +355,25 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('path');
+  });
+
+  it('exports shared drawing triangle types', () => {
+    const drawing: TriangleDrawing = {
+      id: 'triangle',
+      kind: 'triangle',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('triangle');
   });
 });

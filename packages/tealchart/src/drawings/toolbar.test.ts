@@ -55,6 +55,7 @@ describe('user drawing toolbar descriptors', () => {
       'ellipse',
       'priceRange',
       'dateRange',
+      'triangle',
       'path',
       'textLabel',
     ]);
@@ -107,6 +108,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
+    );
+    expect(getUserDrawingToolDescriptor('triangle')).toEqual(
+      expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),
     );
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
@@ -355,6 +359,18 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'e', kind: 'ellipse' as const })).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'tri',
+        kind: 'triangle' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
     expect(supportsUserDrawingFillControls(priceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
