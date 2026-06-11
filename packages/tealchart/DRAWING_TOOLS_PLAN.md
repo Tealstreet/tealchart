@@ -60,7 +60,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia exposes matching layout-safe drawing import/export APIs through
   its imperative handle and mobile utility exports.
 
-## Current Epic: Style Foundation
+## Shipped: Style Foundation
 
 - Shared reducers update drawing style, visibility, and lock state while
   preserving drawing IDs and clearing invalid selection/edit state.
@@ -68,10 +68,18 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia exposes matching imperative handle methods and mobile utility
   wrappers for style, visibility, and lock updates.
 
+## Current Epic: Style Toolbar Controls
+
+- Shared toolbar descriptors define the initial line color, width, dash style,
+  visibility, and lock controls for selected drawings.
+- Web top bar and mobile top bar render matching selected-drawing style controls
+  and route them through the same state-owner APIs.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Rich text label controls, font controls, and multiline editor polish.
-- In-chart or app-toolbar controls for the style APIs.
+- More complete style controls, including fills, opacity, text color, font size,
+  and per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.
