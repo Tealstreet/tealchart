@@ -353,11 +353,16 @@ function renderFibChannelGeometry(
 
 function renderFibTimeZoneGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibTimeZone' | 'trendBasedFibTime' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibTimeZone' | 'trendBasedFibTime' | 'cyclicLines' }>,
 ): void {
   if (geometry.drawing.style.lineVisible === false) return;
 
-  const levels = geometry.kind === 'fibTimeZone' ? geometry.fibTimeZone.levels : geometry.trendBasedFibTime.levels;
+  const levels =
+    geometry.kind === 'fibTimeZone'
+      ? geometry.fibTimeZone.levels
+      : geometry.kind === 'trendBasedFibTime'
+        ? geometry.trendBasedFibTime.levels
+        : geometry.cyclicLines.levels;
   applyStrokeStyle(ctx, geometry.drawing);
   ctx.beginPath();
   for (const level of levels) {
@@ -873,6 +878,7 @@ export function renderUserDrawing(
         break;
       case 'fibTimeZone':
       case 'trendBasedFibTime':
+      case 'cyclicLines':
         renderFibTimeZoneGeometry(ctx, geometry);
         break;
       case 'parallelChannel':

@@ -861,6 +861,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits cyclic line levels and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'cyclic-lines',
+      kind: 'cyclicLines',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 50 }, space)?.drawing.id).toBe('cyclic-lines');
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 50 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -1084,6 +1084,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores cyclic line drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'cyclic-lines',
+          kind: 'cyclicLines',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'cyclic-lines',
+      kind: 'cyclicLines',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('restores path drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

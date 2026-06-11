@@ -401,6 +401,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'cyclicLines') {
+    const distance = Math.min(...geometry.cyclicLines.levels.map((level) => distanceToSegment(point, level.segment)));
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -539,6 +544,7 @@ function hitTestUserDrawingHandle(
     case 'fibCircles':
     case 'fibSpiral':
     case 'fibTimeZone':
+    case 'cyclicLines':
     case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
@@ -549,6 +555,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibCircles' ||
         geometry.drawing.kind === 'fibSpiral' ||
         geometry.drawing.kind === 'fibTimeZone' ||
+        geometry.drawing.kind === 'cyclicLines' ||
         geometry.drawing.kind === 'gannFan'
       ) {
         handles.push(
