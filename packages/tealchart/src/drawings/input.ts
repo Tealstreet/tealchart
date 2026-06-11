@@ -69,6 +69,8 @@ export interface UpdateUserDrawingOptions {
   now?: () => number;
 }
 
+export type UserDrawingZOrderAction = 'bringForward' | 'sendBackward' | 'bringToFront' | 'sendToBack';
+
 export interface UserDrawingPathDragOptions {
   createId: () => string;
   now?: () => number;
@@ -537,6 +539,89 @@ export function setUserDrawingLocked(
     ...nextState,
     selection: createUserDrawingSelection(getUserDrawingSelectionIds(state.selection).filter((drawingId) => !changedIds.has(drawingId))),
     textEdit: state.textEdit && changedIds.has(state.textEdit.drawingId) ? null : state.textEdit,
+  };
+}
+
+function getUserDrawingReorderTargetIds(state: UserDrawingState, options: UpdateUserDrawingOptions = {}): Set<string> {
+  const selectedIds = options.drawingId ? [options.drawingId] : getUserDrawingSelectionIds(state.selection);
+  if (selectedIds.length === 0) return new Set();
+
+  const candidateIds = new Set(selectedIds);
+  return new Set(
+    state.drawings
+      .filter((drawing) => candidateIds.has(drawing.id) && (!drawing.locked || options.includeLocked))
+      .map((drawing) => drawing.id),
+  );
+}
+
+function moveUserDrawingTargetsForward(drawings: readonly UserDrawing[], targetIds: ReadonlySet<string>): UserDrawing[] {
+  const next = drawings.slice();
+  for (let index = next.length - 2; index >= 0; index--) {
+    const drawing = next[index]!;
+    const neighbor = next[index + 1]!;
+    if (!targetIds.has(drawing.id) || targetIds.has(neighbor.id)) continue;
+    next[index] = neighbor;
+    next[index + 1] = drawing;
+  }
+  return next;
+}
+
+function moveUserDrawingTargetsBackward(drawings: readonly UserDrawing[], targetIds: ReadonlySet<string>): UserDrawing[] {
+  const next = drawings.slice();
+  for (let index = 1; index < next.length; index++) {
+    const drawing = next[index]!;
+    const neighbor = next[index - 1]!;
+    if (!targetIds.has(drawing.id) || targetIds.has(neighbor.id)) continue;
+    next[index] = neighbor;
+    next[index - 1] = drawing;
+  }
+  return next;
+}
+
+export function reorderUserDrawings(
+  state: UserDrawingState,
+  action: UserDrawingZOrderAction,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const targetIds = getUserDrawingReorderTargetIds(state, options);
+  if (targetIds.size === 0) return state;
+
+  let drawings: UserDrawing[];
+  switch (action) {
+    case 'bringForward':
+      drawings = moveUserDrawingTargetsForward(state.drawings, targetIds);
+      break;
+    case 'sendBackward':
+      drawings = moveUserDrawingTargetsBackward(state.drawings, targetIds);
+      break;
+    case 'bringToFront': {
+      const targets: UserDrawing[] = [];
+      const others: UserDrawing[] = [];
+      for (const drawing of state.drawings) {
+        (targetIds.has(drawing.id) ? targets : others).push(drawing);
+      }
+      drawings = [...others, ...targets];
+      break;
+    }
+    case 'sendToBack': {
+      const targets: UserDrawing[] = [];
+      const others: UserDrawing[] = [];
+      for (const drawing of state.drawings) {
+        (targetIds.has(drawing.id) ? targets : others).push(drawing);
+      }
+      drawings = [...targets, ...others];
+      break;
+    }
+  }
+
+  if (drawings.length === state.drawings.length && drawings.every((drawing, index) => drawing === state.drawings[index])) {
+    return state;
+  }
+
+  return {
+    ...state,
+    drawings,
+    draft: null,
   };
 }
 

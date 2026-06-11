@@ -15,6 +15,7 @@ import {
   duplicateUserDrawing,
   getUserDrawingSelectionIds,
   handleUserDrawingInput,
+  reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
   selectUserDrawingById,
@@ -1531,6 +1532,110 @@ describe('user drawing input controller', () => {
       { id: 'locked', locked: true },
       { id: 'copy', locked: true, createdAt: 2, updatedAt: 2 },
     ]);
+  });
+
+  it('reorders selected drawings while preserving selected group membership', () => {
+    const createLine = (id: string, price: number, locked = false) => ({
+      id,
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price,
+    });
+    const state = createUserDrawingState({
+      selection: { drawingId: 'a', drawingIds: ['a', 'c'] },
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+      drawings: [createLine('a', 100), createLine('b', 90), createLine('c', 80), createLine('d', 70)],
+    });
+
+    const forward = reorderUserDrawings(state, 'bringForward');
+    expect(forward.drawings.map((drawing) => drawing.id)).toEqual(['b', 'a', 'd', 'c']);
+    expect(forward.selection).toEqual({ drawingId: 'a', drawingIds: ['a', 'c'] });
+    expect(forward.draft).toBeNull();
+    expect(forward.drawings[1]).toBe(state.drawings[0]);
+
+    expect(reorderUserDrawings(forward, 'bringToFront').drawings.map((drawing) => drawing.id)).toEqual([
+      'b',
+      'd',
+      'a',
+      'c',
+    ]);
+    expect(reorderUserDrawings(state, 'sendBackward').drawings.map((drawing) => drawing.id)).toEqual([
+      'a',
+      'c',
+      'b',
+      'd',
+    ]);
+    expect(reorderUserDrawings(state, 'sendToBack').drawings.map((drawing) => drawing.id)).toEqual([
+      'a',
+      'c',
+      'b',
+      'd',
+    ]);
+  });
+
+  it('reorders targeted drawings and requires explicit opt-in for locked drawings', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'locked' },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 80,
+        },
+        {
+          id: 'c',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 60,
+        },
+      ],
+    });
+
+    expect(reorderUserDrawings(state, 'bringForward')).toBe(state);
+    expect(reorderUserDrawings(state, 'bringForward', { includeLocked: true }).drawings.map((drawing) => drawing.id)).toEqual([
+      'a',
+      'c',
+      'locked',
+    ]);
+    expect(reorderUserDrawings(state, 'sendToBack', { drawingId: 'c' }).drawings.map((drawing) => drawing.id)).toEqual([
+      'c',
+      'a',
+      'locked',
+    ]);
+    expect(reorderUserDrawings(state, 'bringForward', { drawingId: 'missing' })).toBe(state);
   });
 
   it('clears drawings, selection, and draft', () => {
