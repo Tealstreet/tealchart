@@ -540,6 +540,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, cycle-line hit testing, whole-drawing moves, and endpoint editing
   use shared drawing behavior on both platforms.
 
+## Shipped: Time Cycles Tool
+
+- Shared drawing state supports the two-anchor `timeCycles` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching repeated time-cycle boundaries and
+  sampled semicycle arcs from a shared geometry resolver.
+- Selection, cycle arc/boundary hit testing, whole-drawing moves, and endpoint
+  editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

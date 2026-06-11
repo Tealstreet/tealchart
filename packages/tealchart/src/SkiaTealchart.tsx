@@ -1830,6 +1830,59 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'timeCycles') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.cycles.map((cycle) => {
+                  const path = Skia.Path.Make();
+                  const [firstPoint, ...remainingPoints] = cycle.points;
+                  if (firstPoint) {
+                    path.moveTo(firstPoint.x, firstPoint.y);
+                    for (const point of remainingPoints) {
+                      path.lineTo(point.x, point.y);
+                    }
+                  }
+
+                  return (
+                    <Group key={`${primitive.id}:cycle:${cycle.ratio}`}>
+                      <SkiaLine
+                        p1={vec(cycle.startBoundary.start.x, cycle.startBoundary.start.y)}
+                        p2={vec(cycle.startBoundary.end.x, cycle.startBoundary.end.y)}
+                        color={primitive.style.lineColor}
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                        style="stroke"
+                      >
+                        {dash && <DashPathEffect intervals={dash} />}
+                      </SkiaLine>
+                      <SkiaLine
+                        p1={vec(cycle.endBoundary.start.x, cycle.endBoundary.start.y)}
+                        p2={vec(cycle.endBoundary.end.x, cycle.endBoundary.end.y)}
+                        color={primitive.style.lineColor}
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                        style="stroke"
+                      >
+                        {dash && <DashPathEffect intervals={dash} />}
+                      </SkiaLine>
+                      {firstPoint && (
+                        <SkiaPath
+                          path={path}
+                          color={primitive.style.lineColor}
+                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                          style="stroke"
+                        >
+                          {dash && <DashPathEffect intervals={dash} />}
+                        </SkiaPath>
+                      )}
+                    </Group>
+                  );
+                })}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'arrowMarker') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();

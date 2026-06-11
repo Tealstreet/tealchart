@@ -94,6 +94,7 @@ export type {
   MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
   MobileUserDrawingTextBounds,
+  MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingTrendAngleLabelPosition,
   MobileUserDrawingTrendAnglePrimitive,
   MobileUserDrawingTrianglePrimitive,

@@ -372,6 +372,29 @@ function renderFibTimeZoneGeometry(
   ctx.stroke();
 }
 
+function renderTimeCyclesGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'timeCycles' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const cycle of geometry.timeCycles.cycles) {
+    ctx.moveTo(cycle.startBoundary.start.x, cycle.startBoundary.start.y);
+    ctx.lineTo(cycle.startBoundary.end.x, cycle.startBoundary.end.y);
+    ctx.moveTo(cycle.endBoundary.start.x, cycle.endBoundary.start.y);
+    ctx.lineTo(cycle.endBoundary.end.x, cycle.endBoundary.end.y);
+    const [first, ...rest] = cycle.points;
+    if (!first) continue;
+    ctx.moveTo(first.x, first.y);
+    for (const point of rest) {
+      ctx.lineTo(point.x, point.y);
+    }
+  }
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -880,6 +903,9 @@ export function renderUserDrawing(
       case 'trendBasedFibTime':
       case 'cyclicLines':
         renderFibTimeZoneGeometry(ctx, geometry);
+        break;
+      case 'timeCycles':
+        renderTimeCyclesGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':
