@@ -1,6 +1,12 @@
 import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
-import type { UserDrawingState, UserDrawingStyle, UserDrawingTextAlign, UserDrawingTool } from '../drawings';
+import type {
+  UserDrawingIconName,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingTextAlign,
+  UserDrawingTool,
+} from '../drawings';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
@@ -9,15 +15,18 @@ import {
   isUserDrawingToolbarActionEnabled,
   getSelectedUserDrawing,
   isUserDrawingFillToolbarEnabled,
+  isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
+  supportsUserDrawingIconControls,
   supportsUserDrawingTextControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+  USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
@@ -69,6 +78,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Callback when selected text-label alignment should change */
   onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
+  /** Callback when selected icon marker shape should change */
+  onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Callback when selected drawing visibility should change */
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Callback when selected drawing locked state should change */
@@ -443,8 +454,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
     const styleEnabled = state ? isUserDrawingStyleToolbarEnabled(state) : false;
     const fillEnabled = state ? isUserDrawingFillToolbarEnabled(state) : false;
+    const iconEnabled = state ? isUserDrawingIconToolbarEnabled(state) : false;
     const textEnabled = state ? isUserDrawingTextToolbarEnabled(state) : false;
     const fillSupported = selectedDrawing ? supportsUserDrawingFillControls(selectedDrawing) : false;
+    const iconSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
     const textSupported = selectedDrawing ? supportsUserDrawingTextControls(selectedDrawing) : false;
 
     if (selectedDrawing) {
@@ -675,6 +688,44 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           });
         }
         group.appendChild(fillBtn);
+
+        group.appendChild(this.createElement('div', { style: styles.divider }));
+      }
+
+      if (iconSupported) {
+        for (const descriptor of USER_DRAWING_ICON_NAME_DESCRIPTORS) {
+          const isActive = selectedDrawing.kind === 'icon' && selectedDrawing.iconName === descriptor.iconName;
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...(isActive ? styles.drawingButtonActive : {}),
+              opacity: iconEnabled ? '1' : '0.35',
+              cursor: iconEnabled ? 'pointer' : 'default',
+              fontSize: '13px',
+            },
+            textContent: descriptor.icon,
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !iconEnabled;
+          if (iconEnabled) {
+            btn.addEventListener('click', () => this.options.onUserDrawingIconNameChange?.(descriptor.iconName));
+            btn.addEventListener('mouseenter', () => {
+              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+            });
+            btn.addEventListener('mouseleave', () => {
+              if (!isActive) {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text2, #787b86)';
+              }
+            });
+          }
+          group.appendChild(btn);
+        }
 
         group.appendChild(this.createElement('div', { style: styles.divider }));
       }

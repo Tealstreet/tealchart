@@ -1,6 +1,7 @@
 import type {
   UserDrawing,
   UserDrawingFontFamily,
+  UserDrawingIconName,
   UserDrawingLineStyle,
   UserDrawingState,
   UserDrawingTextAlign,
@@ -8,6 +9,7 @@ import type {
 } from './types';
 
 import {
+  USER_DRAWING_ICON_NAMES,
   isUserDrawingTextAnnotation,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_SIZES,
@@ -57,6 +59,12 @@ export interface UserDrawingFontFamilyDescriptor {
 
 export interface UserDrawingTextAlignDescriptor {
   textAlign: UserDrawingTextAlign;
+  icon: string;
+  label: string;
+}
+
+export interface UserDrawingIconNameDescriptor {
+  iconName: UserDrawingIconName;
   icon: string;
   label: string;
 }
@@ -223,6 +231,32 @@ export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignD
   { textAlign: 'right', icon: 'R', label: 'Right text alignment' },
 ] as const;
 
+export const USER_DRAWING_ICON_NAME_DESCRIPTORS: readonly UserDrawingIconNameDescriptor[] = USER_DRAWING_ICON_NAMES.map(
+  (iconName) => ({
+    iconName,
+    icon:
+      iconName === 'star'
+        ? '*'
+        : iconName === 'circle'
+          ? '○'
+          : iconName === 'square'
+            ? '□'
+            : iconName === 'triangle'
+              ? '△'
+              : iconName === 'flag'
+                ? '⚑'
+                : iconName === 'arrowUp'
+                  ? '↑'
+                  : '↓',
+    label:
+      iconName === 'arrowUp'
+        ? 'Arrow up icon'
+        : iconName === 'arrowDown'
+          ? 'Arrow down icon'
+          : `${iconName.charAt(0).toUpperCase()}${iconName.slice(1)} icon`,
+  }),
+);
+
 export const USER_DRAWING_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
   { width: 1, label: '1 pixel line width' },
   { width: 2, label: '2 pixel line width' },
@@ -304,6 +338,10 @@ export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
   return isUserDrawingTextAnnotation(drawing);
 }
 
+export function supportsUserDrawingIconControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'icon';
+}
+
 export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
   return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillControls(selectedDrawing);
@@ -312,6 +350,11 @@ export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolea
 export function isUserDrawingTextToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
   return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextControls(selectedDrawing);
+}
+
+export function isUserDrawingIconToolbarEnabled(state: UserDrawingState): boolean {
+  const selectedDrawing = getSelectedUserDrawing(state);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingIconControls(selectedDrawing);
 }
 
 export function isUserDrawingStyleToolbarActionEnabled(
@@ -354,5 +397,6 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fontSize ?? '',
     selectedDrawing?.style.fontFamily ?? '',
     selectedDrawing && isUserDrawingTextAnnotation(selectedDrawing) ? selectedDrawing.textAlign : '',
+    selectedDrawing?.kind === 'icon' ? selectedDrawing.iconName : '',
   ].join('|');
 }

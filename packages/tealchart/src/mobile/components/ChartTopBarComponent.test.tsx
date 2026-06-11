@@ -66,6 +66,45 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
+  it('dispatches selected icon library controls without text controls', () => {
+    const onIconName = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'icon' },
+          drawings: [
+            {
+              id: 'icon',
+              kind: 'icon',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: {
+                lineColor: '#f5c542',
+                lineWidth: 1,
+                lineStyle: 'solid',
+                fillColor: 'rgba(245, 197, 66, 0.12)',
+              },
+              point: { time: 1, price: 10 },
+              iconName: 'star',
+            },
+          ],
+        }}
+        onUserDrawingIconNameChange={onIconName}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Arrow up icon'));
+
+    expect(onIconName).toHaveBeenCalledWith('arrowUp');
+    expect(screen.queryByLabelText('Green text color')).toBeNull();
+  });
+
   it('dispatches selected text label fill, text color, and font size controls', () => {
     const onStyle = vi.fn();
     const onTextAlign = vi.fn();

@@ -368,7 +368,7 @@ describe('drawing layout serialization', () => {
           updatedAt: 1,
           style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
           point: { time: 1, price: 10 },
-          iconName: 'star',
+          iconName: 'flag',
         },
       ],
     });
@@ -377,7 +377,7 @@ describe('drawing layout serialization', () => {
       id: 'icon',
       kind: 'icon',
       point: { time: 1, price: 10 },
-      iconName: 'star',
+      iconName: 'flag',
     });
 
     const restoredFallback = deserializeUserDrawingStateFromLayout({

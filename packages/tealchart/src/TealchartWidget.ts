@@ -15,6 +15,7 @@ import type {
   UserDrawingEditDrag,
   UserDrawingHandleRole,
   UserDrawingHitTestOptions,
+  UserDrawingIconName,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
@@ -51,6 +52,7 @@ import {
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   serializeUserDrawingStateForLayout,
+  setUserDrawingIconName as setUserDrawingIconNameState,
   setUserDrawingLocked as setUserDrawingLockedState,
   setUserDrawingText,
   setUserDrawingTextAlign as setUserDrawingTextAlignState,
@@ -1042,6 +1044,9 @@ export class TealchartWidget {
       },
       onUserDrawingTextAlignChange: (textAlign) => {
         this.setUserDrawingTextAlign(textAlign);
+      },
+      onUserDrawingIconNameChange: (iconName) => {
+        this.setUserDrawingIconName(iconName);
       },
       onUserDrawingVisibilityChange: (visible) => {
         this.setUserDrawingVisibility(visible);
@@ -2263,6 +2268,12 @@ export class TealchartWidget {
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingTextAlignState(this._userDrawingState, textAlign, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingIconNameState(this._userDrawingState, iconName, options));
     return this._userDrawingState !== previousState;
   }
 

@@ -1462,20 +1462,21 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:50,50');
   });
 
-  it('renders icon drawings with shared star polygon geometry', () => {
+  it('renders icon drawings with shared polygon geometry', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
       ...base,
       id: 'icon',
       kind: 'icon',
       point: { time: 50, price: 50 },
-      iconName: 'star',
+      iconName: 'flag',
     };
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('moveTo:50,41');
-    expect(ctx.calls.some((call) => call.startsWith('lineTo:52.380530271784515,46.72348117278146'))).toBe(true);
+    expect(ctx.calls).toContain('moveTo:41,41');
+    expect(ctx.calls).toContain('lineTo:59,41');
+    expect(ctx.calls).toContain('lineTo:53.15,50');
     expect(ctx.calls).toContain('closePath');
     expect(ctx.calls).toContain('fill');
     expect(ctx.calls.some((call) => call.startsWith('stroke:#f5c542:2:'))).toBe(true);

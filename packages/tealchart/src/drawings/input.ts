@@ -4,6 +4,7 @@ import type {
   BarsPatternBarSnapshot,
   UserDrawingSelection,
   UserDrawingState,
+  UserDrawingIconName,
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTool,
@@ -16,6 +17,7 @@ import {
   isDrawingDraftReady,
   isUserDrawingPathFamilyTool,
   isUserDrawingTextAnnotation,
+  normalizeUserDrawingIconName,
   normalizeUserDrawingStyle,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
@@ -582,6 +584,22 @@ export function setUserDrawingTextAlign(
   return replaceUserDrawing(state, target.index, {
     ...target.drawing,
     textAlign,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
+export function setUserDrawingIconName(
+  state: UserDrawingState,
+  iconName: UserDrawingIconName,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  const nextIconName = normalizeUserDrawingIconName(iconName);
+  if (!target || target.drawing.kind !== 'icon' || target.drawing.iconName === nextIconName) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    iconName: nextIconName,
     updatedAt: options.now?.() ?? Date.now(),
   });
 }
