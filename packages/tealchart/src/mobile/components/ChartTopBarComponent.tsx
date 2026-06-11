@@ -26,6 +26,7 @@ import {
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
+  USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -326,6 +327,32 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     );
                   })}
 
+                  {USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.filter(
+                    (descriptor) => descriptor.style === 'lineVisible',
+                  ).map((descriptor) => {
+                    const active = selectedDrawing.style.lineVisible !== false;
+                    return (
+                      <Pressable
+                        key={descriptor.style}
+                        accessibilityRole="button"
+                        accessibilityLabel={descriptor.label}
+                        accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
+                        disabled={!styleControlsEnabled}
+                        onPress={() => onUserDrawingStyleChange?.({ lineVisible: !active })}
+                        style={({ pressed }: PressableStyleState) => [
+                          styles.drawingButton,
+                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                          styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                          !styleControlsEnabled && styles.drawingButtonDisabled,
+                        ]}
+                      >
+                        <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
+                          {descriptor.icon}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+
                   <View style={styles.innerDivider} />
 
                   {fillControlsSupported && (
@@ -348,6 +375,34 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                               !fillControlsEnabled && styles.drawingButtonDisabled,
                             ]}
                           />
+                        );
+                      })}
+
+                      {USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.filter(
+                        (descriptor) => descriptor.style === 'fillVisible',
+                      ).map((descriptor) => {
+                        const active = selectedDrawing.style.fillVisible !== false;
+                        return (
+                          <Pressable
+                            key={descriptor.style}
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ disabled: !fillControlsEnabled, selected: active }}
+                            disabled={!fillControlsEnabled}
+                            onPress={() => onUserDrawingStyleChange?.({ fillVisible: !active })}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingButton,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              fillControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                              !fillControlsEnabled && styles.drawingButtonDisabled,
+                            ]}
+                          >
+                            <Text
+                              style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
+                            >
+                              {descriptor.icon}
+                            </Text>
+                          </Pressable>
                         );
                       })}
 
