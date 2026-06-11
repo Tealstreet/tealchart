@@ -9,3 +9,11 @@ export {
   DEMA, TEMA, Cum,
 } from './ta-classes';
 export type { Saveable, MACDResult, BBResult } from './ta-classes';
+
+export { analyze } from './analyzer';
+export type { AnalysisContext, TACallSite, VarDeclInfo, FuncInfo } from './analyzer';
+
+export { emit, RUNTIME_HELPERS } from './emitter';
+
+export { compile } from './compile';
+export type { CompiledScript, CompiledBarContext, GeneratedScriptInstance, ScriptDependencies } from './compile';
