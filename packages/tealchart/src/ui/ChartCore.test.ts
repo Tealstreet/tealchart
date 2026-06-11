@@ -291,6 +291,7 @@ describe('ChartCore viewport management', () => {
 
     const testCore = core as unknown as {
       handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch'): unknown;
+      handleUserDrawingDragPending(x: number, y: number): boolean;
       handleUserDrawingDragStart(x: number, y: number): boolean;
       handleUserDrawingDragMove(x: number, y: number): boolean;
       handleUserDrawingDragEnd(): void;
@@ -334,6 +335,7 @@ describe('ChartCore viewport management', () => {
       textEdit: null,
       drawings: [],
     } satisfies UserDrawingState);
+    expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
     expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
     expect(onUserDrawingPathDragStart).toHaveBeenCalledWith({
       paneId: 'main',
