@@ -105,6 +105,7 @@ import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
 import { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
+import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -544,7 +545,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const activeUserDrawingTextEditPrimitive = useMemo(
     () =>
       userDrawingPrimitives.find(
-        (primitive) =>
+        (primitive): primitive is MobileUserDrawingTextLabelPrimitive =>
           primitive.kind === 'textLabel' &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
@@ -1651,7 +1652,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           blurOnSubmit
           selectTextOnFocus
           value={activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text}
-          onChangeText={(value) => {
+          onChangeText={(value: string) => {
             commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
           }}
           onSubmitEditing={() => {

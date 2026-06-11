@@ -62,6 +62,8 @@ export type MobileUserDrawingPrimitive =
       radius: number;
     };
 
+export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
+
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
   handleRadius?: number;
   draftOpacity?: number;

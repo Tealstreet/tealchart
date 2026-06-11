@@ -62,7 +62,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
 }
 
 export function setUserDrawingTool(state: UserDrawingState, tool: UserDrawingTool): UserDrawingState {
-  if (state.activeTool === tool && !state.draft) return state;
+  if (state.activeTool === tool && !state.draft && !state.textEdit) return state;
 
   return {
     ...state,
