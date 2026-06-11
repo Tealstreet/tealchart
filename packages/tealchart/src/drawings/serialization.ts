@@ -54,6 +54,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'fibSpeedResistanceFan':
     case 'gannFan':
     case 'fibTimeZone':
       return {
@@ -438,6 +439,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'fibFan',
+            points,
+          }
+        : null;
+    }
+    case 'fibSpeedResistanceFan': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'fibSpeedResistanceFan',
             points,
           }
         : null;

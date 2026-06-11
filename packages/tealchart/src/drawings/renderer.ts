@@ -229,13 +229,14 @@ function renderPitchfanGeometry(
 
 function renderFibFanGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibFan' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibFan' | 'fibSpeedResistanceFan' }>,
 ): void {
   if (geometry.drawing.style.lineVisible === false) return;
 
   applyStrokeStyle(ctx, geometry.drawing);
+  const rays = geometry.kind === 'fibFan' ? geometry.fibFan.rays : geometry.fibSpeedResistanceFan.rays;
   ctx.beginPath();
-  for (const ray of geometry.fibFan.rays) {
+  for (const ray of rays) {
     ctx.moveTo(ray.segment.start.x, ray.segment.start.y);
     ctx.lineTo(ray.segment.end.x, ray.segment.end.y);
   }
@@ -703,6 +704,7 @@ export function renderUserDrawing(
         renderPitchfanGeometry(ctx, geometry);
         break;
       case 'fibFan':
+      case 'fibSpeedResistanceFan':
         renderFibFanGeometry(ctx, geometry);
         break;
       case 'gannFan':

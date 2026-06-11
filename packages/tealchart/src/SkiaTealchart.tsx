@@ -1744,7 +1744,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'pitchfan' || primitive.kind === 'fibFan' || primitive.kind === 'gannFan') {
+          if (
+            primitive.kind === 'pitchfan' ||
+            primitive.kind === 'fibFan' ||
+            primitive.kind === 'fibSpeedResistanceFan' ||
+            primitive.kind === 'gannFan'
+          ) {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

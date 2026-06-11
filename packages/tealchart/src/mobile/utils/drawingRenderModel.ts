@@ -204,6 +204,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibSpeedResistanceFan';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rays: readonly {
+        ratio: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'gannFan';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -442,6 +456,10 @@ export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimit
 export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
 export type MobileUserDrawingPitchfanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfan' }>;
 export type MobileUserDrawingFibFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibFan' }>;
+export type MobileUserDrawingFibSpeedResistanceFanPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'fibSpeedResistanceFan' }
+>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
@@ -771,6 +789,21 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rays: geometry.fibFan.rays.map((ray) => ({
+          ratio: ray.ratio,
+          start: ray.segment.start,
+          end: ray.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibSpeedResistanceFan':
+      return {
+        kind: 'fibSpeedResistanceFan',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rays: geometry.fibSpeedResistanceFan.rays.map((ray) => ({
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,

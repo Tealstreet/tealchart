@@ -14,6 +14,7 @@ import {
   resolveFibChannelFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveFibFanFromAnchors,
+  resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
   resolveGannFanFromAnchors,
   resolvePitchforkFromAnchors,
@@ -51,6 +52,7 @@ import type {
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingFibFanPrimitive,
+  MobileUserDrawingFibSpeedResistanceFanPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingPitchfanPrimitive,
   MobileUserDrawingPitchforkPrimitive,
@@ -75,6 +77,7 @@ import type {
   ExtendedLineDrawing,
   FibChannelDrawing,
   FibFanDrawing,
+  FibSpeedResistanceFanDrawing,
   FibTimeZoneDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
@@ -208,6 +211,11 @@ describe('tealchart public entries', () => {
       kind: 'fibFan',
       id: 'fib-fan',
     };
+    const fibSpeedFanPrimitive: NonNever<MobileUserDrawingFibSpeedResistanceFanPrimitive> = {
+      ...pitchfanPrimitive,
+      kind: 'fibSpeedResistanceFan',
+      id: 'fib-speed-fan',
+    };
     const fibChannelPrimitive: NonNever<MobileUserDrawingFibChannelPrimitive> = {
       kind: 'fibChannel',
       id: 'fib-channel',
@@ -318,6 +326,7 @@ describe('tealchart public entries', () => {
     expect(pitchforkPrimitive.kind).toBe('pitchfork');
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
     expect(fibFanPrimitive.kind).toBe('fibFan');
+    expect(fibSpeedFanPrimitive.kind).toBe('fibSpeedResistanceFan');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(gannFanPrimitive.kind).toBe('gannFan');
@@ -880,6 +889,32 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibFan');
     expect(fan.rays).toHaveLength(7);
+  });
+
+  it('exports shared drawing fib speed resistance fan types and resolver', () => {
+    const drawing: FibSpeedResistanceFanDrawing = {
+      id: 'fib-speed-fan',
+      kind: 'fibSpeedResistanceFan',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const fan = resolveFibSpeedResistanceFanFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibSpeedResistanceFan');
+    expect(fan.rays.map((ray) => ray.ratio)).toEqual([1 / 3, 2 / 3, 1]);
   });
 
   it('exports shared drawing gann fan types and resolver', () => {

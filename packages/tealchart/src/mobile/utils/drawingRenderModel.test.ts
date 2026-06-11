@@ -778,6 +778,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fib speed resistance fan primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-speed-fan',
+          kind: 'fibSpeedResistanceFan',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibSpeedResistanceFan',
+      id: 'fib-speed-fan',
+      rays: [
+        { ratio: 1 / 3, start: { x: 10, y: 50 }, end: { x: 100, y: 72.5 } },
+        { ratio: 2 / 3, start: { x: 10, y: 50 }, end: { x: 100, y: 95 } },
+        { ratio: 1, start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 } },
+      ],
+    });
+  });
+
   it('returns Skia-ready gann fan primitives', () => {
     const state: UserDrawingState = {
       version: 1,

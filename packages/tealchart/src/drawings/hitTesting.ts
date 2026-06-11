@@ -275,6 +275,13 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibSpeedResistanceFan') {
+    const distance = Math.min(
+      ...geometry.fibSpeedResistanceFan.rays.map((ray) => distanceToSegment(point, ray.segment)),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'gannFan') {
     const distance = Math.min(...geometry.gannFan.rays.map((ray) => distanceToSegment(point, ray.segment)));
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -421,12 +428,14 @@ function hitTestUserDrawingHandle(
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'fibSpeedResistanceFan':
     case 'fibTimeZone':
     case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
         geometry.drawing.kind === 'fibExtension' ||
         geometry.drawing.kind === 'fibFan' ||
+        geometry.drawing.kind === 'fibSpeedResistanceFan' ||
         geometry.drawing.kind === 'fibTimeZone' ||
         geometry.drawing.kind === 'gannFan'
       ) {
