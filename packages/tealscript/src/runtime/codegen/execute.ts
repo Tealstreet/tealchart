@@ -4,7 +4,7 @@ import { ExecutionContext } from '../context';
 import type { ExecutionResult, RuntimeProfile, TealscriptRuntimeOptions } from '../engine';
 import type { StrategyLedger } from '../strategy';
 import { createStrategyLedger } from '../strategy';
-import { compile } from './compile';
+import { compile, ARRAY_HELPERS } from './compile';
 import type { CompiledScript, CompiledBarContext } from './compile';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
@@ -50,6 +50,7 @@ export function executeCompiled(
   const deps = {
     NumericSeries,
     maxBarsBack: options?.maxBarsBack ?? 500,
+    _arr: ARRAY_HELPERS,
     ...ta,
   };
 
