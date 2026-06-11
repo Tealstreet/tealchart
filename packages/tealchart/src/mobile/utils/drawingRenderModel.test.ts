@@ -1242,6 +1242,47 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready time cycle primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'time-cycles',
+          kind: 'timeCycles',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'timeCycles',
+      id: 'time-cycles',
+      cycles: expect.arrayContaining([
+        expect.objectContaining({
+          ratio: 0,
+          startTime: 10,
+          endTime: 20,
+          startBoundary: { start: { x: 10, y: 0 }, end: { x: 10, y: 100 } },
+          endBoundary: { start: { x: 20, y: 0 }, end: { x: 20, y: 100 } },
+          points: expect.arrayContaining([{ x: 15, y: 20 }]),
+        }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready regression trend primitives', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,

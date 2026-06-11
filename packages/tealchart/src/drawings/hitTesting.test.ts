@@ -878,6 +878,24 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits time cycle arcs, boundaries, and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'time-cycles',
+      kind: 'timeCycles',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 15, y: 20 }, space)?.drawing.id).toBe('time-cycles');
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 50 }, space)?.drawing.id).toBe('time-cycles');
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 20 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,
