@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
 import { executeScript } from '../engine';
-import { compile } from './compile';
+import { compile, ARRAY_HELPERS } from './compile';
 import type { Bar } from '../context';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
@@ -46,7 +46,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
     throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
   }
 
-  const deps = { NumericSeries, maxBarsBack: 500, ...ta };
+  const deps = { NumericSeries, maxBarsBack: 500, _arr: ARRAY_HELPERS, ...ta };
   const inst = new compiled.ScriptClass(deps);
   const plots = new Map<number, (number | null)[]>();
 
@@ -257,5 +257,95 @@ plot(close > open and high > close[1] ? 1 : 0)`;
     const interpreted = getInterpreterPlots(pine, bars);
 
     expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+  });
+
+  it('compiles array.new and array.push/size/get', () => {
+    const pine = `//@version=6
+indicator("test")
+arr = array.new_float(0)
+array.push(arr, close)
+array.push(arr, open)
+plot(array.size(arr))
+plot(array.get(arr, 0))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles array.from', () => {
+    const pine = `//@version=6
+indicator("test")
+arr = array.from(1, 2, 3, 4, 5)
+plot(array.sum(arr))
+plot(array.avg(arr))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles array.min/max', () => {
+    const pine = `//@version=6
+indicator("test")
+var arr = array.new_float(0)
+array.push(arr, close)
+plot(array.min(arr))
+plot(array.max(arr))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles for-in loop over array', () => {
+    const pine = `//@version=6
+indicator("test")
+arr = array.from(1.0, 2.0, 3.0)
+sum = 0.0
+for val in arr
+    sum := sum + val
+plot(sum)`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+  });
+
+  it('compiles for-in loop with index counter', () => {
+    const pine = `//@version=6
+indicator("test")
+arr = array.from(10.0, 20.0, 30.0)
+sum = 0.0
+for [idx, val] in arr
+    sum := sum + val + idx
+plot(sum)`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+  });
+
+  it('compiles array with sort', () => {
+    const pine = `//@version=6
+indicator("test")
+arr = array.from(3.0, 1.0, 2.0)
+array.sort(arr)
+plot(array.get(arr, 0))
+plot(array.get(arr, 2))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
   });
 });

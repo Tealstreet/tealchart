@@ -15,8 +15,8 @@ export type { AnalysisContext, TACallSite, VarDeclInfo, FuncInfo } from './analy
 
 export { emit, RUNTIME_HELPERS } from './emitter';
 
-export { compile } from './compile';
-export type { CompiledScript, CompiledBarContext, GeneratedScriptInstance, ScriptDependencies } from './compile';
+export { compile, ARRAY_HELPERS } from './compile';
+export type { CompiledScript, CompiledBarContext, GeneratedScriptInstance, ScriptDependencies, ArrayHelpers } from './compile';
 
 export { executeCompiled, tryCompile } from './execute';
 export type { CompiledExecutionOptions } from './execute';
