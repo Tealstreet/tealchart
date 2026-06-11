@@ -40,6 +40,7 @@ export interface UserDrawingInputOptions {
 }
 
 export interface UserDrawingSelectionInputOptions {
+  additive?: boolean;
   hitTest?: UserDrawingHitTestOptions;
 }
 
@@ -555,6 +556,27 @@ export function resolveUserDrawingSelectionAtPoint(
   options: UserDrawingSelectionInputOptions = {},
 ): UserDrawingSelectionAtPointResult {
   const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
+  if (options.additive) {
+    if (!hit) {
+      return {
+        state,
+        hit: false,
+        changed: false,
+      };
+    }
+
+    const selectedIds = getUserDrawingSelectionIds(state.selection);
+    const nextIds = selectedIds.includes(hit.drawing.id)
+      ? selectedIds.filter((drawingId) => drawingId !== hit.drawing.id)
+      : [...selectedIds, hit.drawing.id];
+    const nextState = selectUserDrawing(state, createUserDrawingSelection(nextIds));
+    return {
+      state: nextState,
+      hit: true,
+      changed: nextState !== state,
+    };
+  }
+
   const nextState = selectUserDrawing(
     state,
     hit ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex } : null,

@@ -18,6 +18,7 @@ import type {
   UserDrawingIconName,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
+  UserDrawingSelectionInputOptions,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAnnotation,
@@ -1027,7 +1028,8 @@ export class TealchartWidget {
         }
       },
       onUserDrawingInput: (point) => this._handleUserDrawingInput(point),
-      onUserDrawingSelection: (point, spacesByPaneId) => this._handleUserDrawingSelection(point, spacesByPaneId),
+      onUserDrawingSelection: (point, spacesByPaneId, options) =>
+        this._handleUserDrawingSelection(point, spacesByPaneId, options),
       onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
       onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
@@ -2382,12 +2384,14 @@ export class TealchartWidget {
   private _handleUserDrawingSelection(
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+    options: Pick<UserDrawingSelectionInputOptions, 'additive'> = {},
   ): UserDrawingSelectionAtPointResult {
     if (this._userDrawingState.activeTool !== 'select') {
       return { state: this._userDrawingState, hit: false, changed: false };
     }
 
     const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId, {
+      additive: options.additive,
       hitTest: this._getUserDrawingHitTestOptions(),
     });
     this.setUserDrawingState(result.state);
