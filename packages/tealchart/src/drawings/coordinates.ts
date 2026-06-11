@@ -44,7 +44,7 @@ export interface ResolveUserDrawingInputFromChartOptions {
 
 export type ResolvedUserDrawingGeometry =
   | {
-      kind: 'line' | 'ray' | 'horizontalLine' | 'verticalLine';
+      kind: 'line' | 'arrowLine' | 'ray' | 'horizontalLine' | 'verticalLine';
       drawing: UserDrawing;
       segment: DrawingScreenSegment;
     }
@@ -208,6 +208,15 @@ export function resolveUserDrawingGeometry(
         kind: 'line',
         drawing,
         segment: resolveExtendedSegment(start, end, drawing.extend, space.chartLeft, space.chartRight),
+      };
+    }
+    case 'arrowLine': {
+      const start = anchorToScreenPoint(drawing.points[0], space);
+      const end = anchorToScreenPoint(drawing.points[1], space);
+      return {
+        kind: 'arrowLine',
+        drawing,
+        segment: { start, end },
       };
     }
     case 'ray': {

@@ -130,8 +130,13 @@ function hitTestUserDrawingHandle(
 
   switch (geometry.kind) {
     case 'line':
+    case 'arrowLine':
     case 'ray': {
-      if (geometry.drawing.kind === 'trendLine' || geometry.drawing.kind === 'ray') {
+      if (
+        geometry.drawing.kind === 'trendLine' ||
+        geometry.drawing.kind === 'arrowLine' ||
+        geometry.drawing.kind === 'ray'
+      ) {
         handles.push(
           { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },
           { handle: 'end', point: anchorToScreenPoint(geometry.drawing.points[1], space) },

@@ -117,6 +117,7 @@ export {
 } from './drawings';
 export type {
   CreateUserDrawingFromDraftOptions,
+  ArrowLineDrawing,
   DeleteUserDrawingOptions,
   DrawingCoordinateSpace,
   DrawingScreenPoint,

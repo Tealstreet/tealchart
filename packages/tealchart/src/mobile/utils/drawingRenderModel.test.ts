@@ -80,6 +80,7 @@ describe('mobile user drawing render model', () => {
         clip,
         start: { x: 0, y: 50 },
         end: { x: 100, y: 50 },
+        arrowHead: null,
         style: fadedStyle,
       },
       {
@@ -142,6 +143,43 @@ describe('mobile user drawing render model', () => {
     };
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toEqual([]);
+  });
+
+  it('returns Skia-ready arrowhead geometry for arrow lines', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'arrow',
+          kind: 'arrowLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'line',
+      id: 'arrow',
+      start: { x: 0, y: 50 },
+      end: { x: 100, y: 50 },
+      arrowHead: {
+        left: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
+        right: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
+      },
+    });
   });
 
   it('preserves text label alignment in mobile primitives', () => {
