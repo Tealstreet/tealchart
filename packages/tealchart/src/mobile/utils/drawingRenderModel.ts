@@ -128,7 +128,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
-  { kind: 'priceRange' | 'dateRange' | 'infoLine' }
+  { kind: 'priceRange' | 'dateRange' }
 >;
 
 export interface MobileUserDrawingTextLabelLayout {
@@ -142,6 +142,13 @@ export interface MobileUserDrawingTextLabelLayout {
 }
 
 export interface MobileUserDrawingPriceRangeLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
+export interface MobileUserDrawingInfoLineLabelPosition {
   fontSize: number;
   fontFamily: string;
   x: number;
@@ -429,5 +436,23 @@ export function resolveMobileUserDrawingPriceRangeLabelPosition(
     fontFamily,
     x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
     y: primitive.labelPoint.y - textY - textHeight / 2,
+  };
+}
+
+export function resolveMobileUserDrawingInfoLineLabelPosition(
+  primitive: MobileUserDrawingInfoLinePrimitive,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingInfoLineLabelPosition {
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
+  const textX = measuredTextBounds.x ?? 0;
+  const textY = measuredTextBounds.y ?? -fontSize;
+  const textHeight = measuredTextBounds.height ?? fontSize;
+
+  return {
+    fontSize,
+    fontFamily,
+    x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
+    y: primitive.labelPoint.y - textY - textHeight,
   };
 }

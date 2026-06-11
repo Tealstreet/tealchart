@@ -3,6 +3,7 @@ import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, Use
 import { describe, expect, it } from 'vitest';
 
 import {
+  resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingTextLabelLayout,
@@ -275,6 +276,42 @@ describe('mobile user drawing render model', () => {
       labelPoint: { x: 40, y: 33.5 },
       label: '+25.00 (+50.00%) / 1 minute',
       style,
+    });
+  });
+
+  it('positions info line labels from the shared bottom-baseline point', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'info',
+          kind: 'infoLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, fontSize: 14, fontFamily: 'monospace' },
+          points: [
+            { time: 10_000, price: 50 },
+            { time: 70_000, price: 75 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]));
+    if (!primitive || primitive.kind !== 'infoLine') throw new Error('expected info line primitive');
+
+    expect(resolveMobileUserDrawingInfoLineLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: -2,
+      y: 29.5,
     });
   });
 

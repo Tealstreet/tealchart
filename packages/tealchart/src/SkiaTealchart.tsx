@@ -121,6 +121,7 @@ import {
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
 import {
+  resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
@@ -1549,7 +1550,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
-            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textBounds);
+            const labelPosition = resolveMobileUserDrawingInfoLineLabelPosition(primitive, textBounds);
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>

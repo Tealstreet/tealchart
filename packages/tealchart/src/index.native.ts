@@ -50,6 +50,7 @@ export {
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
 export {
+  resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
 } from './mobile/utils/drawingRenderModel';
