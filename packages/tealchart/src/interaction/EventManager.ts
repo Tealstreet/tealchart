@@ -76,7 +76,7 @@ export interface EventManagerCallbacks {
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string, point: { x: number; y: number }) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
-  onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch') => DrawingInputResult;
+  onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingInputEventOptions) => DrawingInputResult;
   /** Called before drag starts when drawing mode may need to preserve click input */
   onDrawingDragPending?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
   /** Called before pan starts so selected drawing edits can claim the drag */
@@ -92,6 +92,10 @@ export interface EventManagerCallbacks {
 export interface DrawingInputHandledResult {
   handled: boolean;
   allowPaneDoubleClick?: boolean;
+}
+
+export interface DrawingInputEventOptions {
+  additiveSelection?: boolean;
 }
 
 export type DrawingInputResult = boolean | DrawingInputHandledResult;
@@ -626,7 +630,11 @@ export class EventManager {
       }
     }
     const drawingInputResult =
-      wasClick && !wasDrawingDrag && e.button === 0 ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse') : false;
+      wasClick && !wasDrawingDrag && e.button === 0
+        ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse', {
+            additiveSelection: e.shiftKey || e.metaKey || e.ctrlKey,
+          })
+        : false;
     const handledDrawingInput = isDrawingInputHandled(drawingInputResult);
 
     if (

@@ -71,6 +71,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Locked drawings remain protected unless the caller opts into locked updates;
   hide and lock actions remove affected drawings from the active selection.
 
+## Shipped: Additive Selection Input
+
+- Shared point selection supports additive toggling so selected drawing groups
+  can be built or reduced without clearing the existing selection on misses.
+- Web Canvas uses Shift/Cmd/Ctrl-click for additive selection, and mobile Skia
+  uses a two-finger tap routed through the same shared selection reducer.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text

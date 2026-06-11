@@ -1599,6 +1599,54 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('adds and removes drawings from selection with additive point selection', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'bottom' },
+      drawings: [
+        {
+          id: 'bottom',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 40,
+        },
+        {
+          id: 'top',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style,
+          price: 50,
+        },
+      ],
+    });
+
+    const added = resolveUserDrawingSelectionAtPoint(state, { x: 40, y: 50 }, new Map([['main', space]]), {
+      additive: true,
+    });
+
+    expect(added.state.selection).toEqual({ drawingId: 'bottom', drawingIds: ['bottom', 'top'] });
+    expect(added.hit).toBe(true);
+    expect(added.changed).toBe(true);
+
+    const removed = resolveUserDrawingSelectionAtPoint(added.state, { x: 40, y: 50 }, new Map([['main', space]]), {
+      additive: true,
+    });
+    expect(removed.state.selection).toEqual({ drawingId: 'bottom' });
+
+    const missed = resolveUserDrawingSelectionAtPoint(added.state, { x: 40, y: 20 }, new Map([['main', space]]), {
+      additive: true,
+    });
+    expect(missed).toEqual({ state: added.state, hit: false, changed: false });
+  });
+
   it('reports hit metadata even when selection is unchanged', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'h' },

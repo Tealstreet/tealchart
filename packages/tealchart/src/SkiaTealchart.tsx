@@ -1047,7 +1047,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, []);
 
   const handleUserDrawingTap = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, additive = false) => {
       if (!viewport) return false;
 
       if (effectiveUserDrawingState.activeTool === 'select') {
@@ -1057,7 +1057,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           effectiveUserDrawingState,
           { x, y },
           userDrawingSpacesByPaneId,
-          { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
+          { additive, hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
         );
         if (selection.changed) {
           commitUserDrawingState(selection.state);
@@ -1281,6 +1281,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [handleCrosshairTap],
   );
 
+  const additiveTapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .numberOfPointers(2)
+        .maxDuration(250)
+        .maxDistance(10)
+        .onEnd((event) => {
+          runOnJS(handleUserDrawingTap)(event.x, event.y, true);
+        }),
+    [handleUserDrawingTap],
+  );
+
   // Double-tap handler for pane maximize/restore
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
@@ -1352,9 +1364,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const tapOrDoubleTapGesture = useMemo(
     () =>
       effectiveUserDrawingState.activeTool === 'select'
-        ? Gesture.Exclusive(doubleTapGesture, tapGesture)
+        ? Gesture.Exclusive(additiveTapGesture, doubleTapGesture, tapGesture)
         : tapGesture,
-    [doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
+    [additiveTapGesture, doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
   );
 
   // Combine all gestures

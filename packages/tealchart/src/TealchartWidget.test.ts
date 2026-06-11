@@ -609,6 +609,7 @@ describe('TealchartWidget', () => {
         _handleUserDrawingSelection(
           point: { x: number; y: number },
           spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          options?: { additive?: boolean },
         ): { hit: boolean; changed: boolean };
       };
 
@@ -617,6 +618,12 @@ describe('TealchartWidget', () => {
       );
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
       expect(onChange).toHaveBeenLastCalledWith(widget.getUserDrawingState());
+
+      const additive = testWidget._handleUserDrawingSelection({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]), {
+        additive: true,
+      });
+      expect(additive).toEqual(expect.objectContaining({ hit: true, changed: true }));
+      expect(widget.getUserDrawingState().selection).toBeNull();
     });
 
     it('edits selected drawings from chart-surface drag input in select mode', () => {
