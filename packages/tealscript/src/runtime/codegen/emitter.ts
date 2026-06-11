@@ -327,6 +327,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return `ctx.tickerNew(${posArgs.join(', ')})`;
     }
 
+    // Drawing functions — delegate to context
+    if (namespace === 'label' || namespace === 'line' || namespace === 'box' ||
+        namespace === 'polyline' || namespace === 'linefill' || namespace === 'table') {
+      const namedObj = emitNamedArgsObj(expr.arguments);
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj})`;
+    }
+
     // Plot functions
     if (PLOT_FUNCTIONS.has(fullName)) {
       return emitPlotCall(fullName, expr);
