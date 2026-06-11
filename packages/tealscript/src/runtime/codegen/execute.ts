@@ -131,8 +131,6 @@ export function executeCompiled(
     ctx.chart = { ...ctx.chart, ...options.runtime.chart };
   }
 
-  ctx.loadBars(bars);
-
   if (inputs) {
     for (const [key, value] of inputs) {
       ctx.setInput(key, value);
@@ -146,6 +144,7 @@ export function executeCompiled(
   }
   const ledger = createStrategyLedger(strategySettings);
   const mintick = (ctx.syminfo as unknown as { mintick: number }).mintick ?? 0.01;
+  const lastBarIndex = bars.length - 1;
 
   const deps = {
     NumericSeries,
@@ -160,92 +159,82 @@ export function executeCompiled(
   const inst = new compiled.ScriptClass(deps);
 
   const plotRegistered = new Map<number, string>();
+  const plotArrays = new Map<number, (number | null)[]>();
   const plotColors = new Map<number, string>();
   const inputDefs = new Map<string, InputDefinition>();
 
   let barCount = 0;
 
-  while (ctx.advanceBar()) {
-    barCount++;
-    const barIndex = ctx.bar_index;
-    const isLastBar = barIndex === ctx.last_bar_index;
-    const bar = bars[barIndex];
+  const barData = { open: 0, high: 0, low: 0, close: 0, volume: 0, time: 0 };
+  const barstateObj = {
+    isfirst: false, islast: false, ishistory: true, isrealtime: false,
+    isnew: true, isconfirmed: true, islastconfirmedhistory: false,
+  };
 
-    const barCtx: CompiledBarContext = {
-      bar: {
-        open: bar.open,
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-        volume: bar.volume,
-        time: bar.time,
-      },
-      barIndex,
-      lastBarIndex: ctx.last_bar_index,
-      isFirstTick: true,
-      barstate: {
-        isfirst: barIndex === 0,
-        islast: isLastBar,
-        ishistory: true,
-        isrealtime: false,
-        isnew: true,
-        isconfirmed: true,
-        islastconfirmedhistory: isLastBar,
-      },
-      syminfo: ctx.syminfo as unknown as Record<string, unknown>,
-      timeframe: ctx.timeframe as unknown as Record<string, unknown>,
+  const barCtx: CompiledBarContext = {
+    bar: barData,
+    barIndex: 0,
+    lastBarIndex,
+    isFirstTick: true,
+    barstate: barstateObj,
+    syminfo: ctx.syminfo as unknown as Record<string, unknown>,
+    timeframe: ctx.timeframe as unknown as Record<string, unknown>,
 
-      plot(index: number, funcName: string, value: unknown, named: Record<string, unknown>, extraArgs: unknown[]) {
+    plot(index: number, funcName: string, value: unknown, named: Record<string, unknown>, extraArgs: unknown[]) {
+      let arr = plotArrays.get(index);
+      if (!arr) {
         const plotId = `plot_${index}`;
-        if (!plotRegistered.has(index)) {
-          const title = typeof named.title === 'string' ? named.title : `Plot ${index}`;
-          const color = typeof named.color === 'string' ? named.color : (typeof extraArgs[0] === 'string' ? extraArgs[0] : 'blue');
-          plotColors.set(index, color);
+        const title = typeof named.title === 'string' ? named.title : `Plot ${index}`;
+        const color = typeof named.color === 'string' ? named.color : (typeof extraArgs[0] === 'string' ? extraArgs[0] : 'blue');
+        plotColors.set(index, color);
 
-          ctx.registerPlot({
-            id: plotId,
-            type: funcName as PlotOutput['type'],
-            title,
-            color,
-            linewidth: typeof named.linewidth === 'number' ? named.linewidth : undefined,
-            style: typeof named.style === 'string' ? named.style as PlotOutput['style'] : undefined,
-            offset: typeof named.offset === 'number' ? named.offset : undefined,
-            display: typeof named.display === 'number' ? named.display : undefined,
-          });
-          plotRegistered.set(index, plotId);
-        }
+        ctx.registerPlot({
+          id: plotId,
+          type: funcName as PlotOutput['type'],
+          title,
+          color,
+          linewidth: typeof named.linewidth === 'number' ? named.linewidth : undefined,
+          style: typeof named.style === 'string' ? named.style as PlotOutput['style'] : undefined,
+          offset: typeof named.offset === 'number' ? named.offset : undefined,
+          display: typeof named.display === 'number' ? named.display : undefined,
+        });
+        plotRegistered.set(index, plotId);
+        const plot = ctx.getPlots().find((p) => p.id === plotId);
+        arr = plot!.values;
+        plotArrays.set(index, arr);
+      }
 
-        const numValue = typeof value === 'number' ? (value !== value ? null : value) : null;
-        ctx.addPlotValue(plotId, numValue);
+      const numValue = typeof value === 'number' ? (value !== value ? null : value) : null;
+      arr.push(numValue);
 
-        if (typeof named.color === 'string' && named.color !== plotColors.get(index)) {
-          const plot = ctx.getPlots().find((p) => p.id === plotId);
-          if (plot) {
-            if (!Array.isArray(plot.color)) {
-              const prev = plot.color;
-              plot.color = new Array(plot.values.length - 1).fill(prev);
-            }
-            (plot.color as (string | null)[]).push(named.color);
+      if (typeof named.color === 'string' && named.color !== plotColors.get(index)) {
+        const plot = ctx.getPlots().find((p) => p.id === `plot_${index}`);
+        if (plot) {
+          if (!Array.isArray(plot.color)) {
+            const prev = plot.color;
+            plot.color = new Array(plot.values.length - 1).fill(prev);
           }
+          (plot.color as (string | null)[]).push(named.color);
         }
-      },
+      }
+    },
 
-      input(id: string, funcName: string, defval: unknown, _named: Record<string, unknown>, _extraArgs: unknown[]) {
-        const userValue = inputs?.get(id);
-        if (userValue !== undefined) return userValue;
+    input(id: string, funcName: string, defval: unknown, _named: Record<string, unknown>, _extraArgs: unknown[]) {
+      const userValue = inputs?.get(id);
+      if (userValue !== undefined) return userValue;
 
-        if (!inputDefs.has(id)) {
-          const type = funcName.replace('input.', '') as InputDefinition['type'];
-          inputDefs.set(id, {
-            id,
-            type,
-            title: id,
-            defval,
-          });
-        }
+      if (!inputDefs.has(id)) {
+        const type = funcName.replace('input.', '') as InputDefinition['type'];
+        inputDefs.set(id, {
+          id,
+          type,
+          title: id,
+          defval,
+        });
+      }
 
-        return defval;
-      },
+      return defval;
+    },
 
       strategyEntry(...args: unknown[]) {
         if (!isStrategy) return;
@@ -406,6 +395,25 @@ export function executeCompiled(
       tickerPointfigure(...args: unknown[]) { return String(args[0] ?? ''); },
     };
 
+  let bar = bars[0];
+  let barIndex = 0;
+
+  for (barIndex = 0; barIndex < bars.length; barIndex++) {
+    barCount++;
+    const isLastBar = barIndex === lastBarIndex;
+    bar = bars[barIndex];
+
+    barData.open = bar.open;
+    barData.high = bar.high;
+    barData.low = bar.low;
+    barData.close = bar.close;
+    barData.volume = bar.volume;
+    barData.time = bar.time;
+    barCtx.barIndex = barIndex;
+    barstateObj.isfirst = barIndex === 0;
+    barstateObj.islast = isLastBar;
+    barstateObj.islastconfirmedhistory = isLastBar;
+
     if (isStrategy) {
       fillPendingStrategyMarketOrders(ledger, bar.open, barIndex, bar.time, mintick);
       markStrategyLedgerToMarket(ledger, bar.close, bar.high, bar.low, { barIndex, time: bar.time });
@@ -423,7 +431,6 @@ export function executeCompiled(
       markStrategyLedgerToMarket(ledger, bar.close, bar.high, bar.low, { barIndex, time: bar.time });
     }
 
-    ctx.commitBar();
   }
 
   const decl = compiled.analysis.declarationInfo;
