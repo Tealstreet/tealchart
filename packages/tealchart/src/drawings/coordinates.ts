@@ -47,6 +47,13 @@ export interface DrawingScreenParallelChannel {
   polygon: DrawingScreenPolyline;
 }
 
+export interface DrawingScreenPitchfork {
+  median: DrawingScreenSegment;
+  upper: DrawingScreenSegment;
+  lower: DrawingScreenSegment;
+  midpoint: DrawingScreenPoint;
+}
+
 export interface DrawingScreenCrossLine {
   horizontal: DrawingScreenSegment;
   vertical: DrawingScreenSegment;
@@ -225,6 +232,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'triangle';
       drawing: UserDrawing;
       polygon: DrawingScreenPolyline;
+    }
+  | {
+      kind: 'pitchfork';
+      drawing: UserDrawing;
+      pitchfork: DrawingScreenPitchfork;
     }
   | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
@@ -724,6 +736,39 @@ export function resolveRotatedRectangleFromAnchors(
   };
 }
 
+export function resolvePitchforkFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  third: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenPitchfork {
+  const origin = anchorToScreenPoint(first, space);
+  const upperAnchor = anchorToScreenPoint(second, space);
+  const lowerAnchor = anchorToScreenPoint(third, space);
+  const midpoint = {
+    x: (upperAnchor.x + lowerAnchor.x) / 2,
+    y: (upperAnchor.y + lowerAnchor.y) / 2,
+  };
+  const direction = {
+    x: midpoint.x - origin.x,
+    y: midpoint.y - origin.y,
+  };
+  const rayDirection = direction.x === 0 && direction.y === 0 ? { x: 1, y: 0 } : direction;
+
+  const through = (start: DrawingScreenPoint): DrawingScreenPoint => ({
+    x: start.x + rayDirection.x,
+    y: start.y + rayDirection.y,
+  });
+  const medianThrough = direction.x === 0 && direction.y === 0 ? through(origin) : midpoint;
+
+  return {
+    median: resolveRaySegment(origin, medianThrough, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    upper: resolveRaySegment(upperAnchor, through(upperAnchor), space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    lower: resolveRaySegment(lowerAnchor, through(lowerAnchor), space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    midpoint,
+  };
+}
+
 export function resolveFlatTopBottomFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -1057,6 +1102,12 @@ export function resolveUserDrawingGeometry(
         kind: 'triangle',
         drawing,
         polygon: resolvePolylineFromAnchors(drawing.points, space),
+      };
+    case 'pitchfork':
+      return {
+        kind: 'pitchfork',
+        drawing,
+        pitchfork: resolvePitchforkFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'rotatedRectangle':
       return {

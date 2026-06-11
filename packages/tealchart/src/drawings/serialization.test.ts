@@ -840,6 +840,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores pitchfork drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'pitchfork',
+          kind: 'pitchfork',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    });
+  });
+
   it('restores long and short position drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

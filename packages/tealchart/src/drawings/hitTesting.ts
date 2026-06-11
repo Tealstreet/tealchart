@@ -256,6 +256,15 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'pitchfork') {
+    const distance = Math.min(
+      distanceToSegment(point, geometry.pitchfork.median),
+      distanceToSegment(point, geometry.pitchfork.upper),
+      distanceToSegment(point, geometry.pitchfork.lower),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -400,6 +409,13 @@ function hitTestUserDrawingHandle(
       geometry.polygon.points.forEach((trianglePoint, pointIndex) => {
         handles.push({ handle: 'center', point: trianglePoint, pointIndex });
       });
+      break;
+    case 'pitchfork':
+      if (geometry.drawing.kind === 'pitchfork') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
       break;
     case 'parallelChannel':
       if (geometry.drawing.kind === 'parallelChannel') {

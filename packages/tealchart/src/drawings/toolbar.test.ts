@@ -73,6 +73,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibExtension',
       'triangle',
       'polyline',
+      'pitchfork',
       'parallelChannel',
       'regressionTrend',
       'flatTopBottom',
@@ -159,6 +160,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('polyline')).toEqual(
       expect.objectContaining({ tool: 'polyline', label: 'Polyline' }),
+    );
+    expect(getUserDrawingToolDescriptor('pitchfork')).toEqual(
+      expect.objectContaining({ tool: 'pitchfork', label: 'Pitchfork' }),
     );
     expect(getUserDrawingToolDescriptor('parallelChannel')).toEqual(
       expect.objectContaining({ tool: 'parallelChannel', label: 'Parallel channel' }),

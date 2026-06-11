@@ -60,6 +60,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
     case 'triangle':
+    case 'pitchfork':
     case 'parallelChannel':
     case 'rotatedRectangle':
     case 'flatTopBottom':
@@ -459,6 +460,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'triangle',
+            points,
+          }
+        : null;
+    }
+    case 'pitchfork': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'pitchfork',
             points,
           }
         : null;
