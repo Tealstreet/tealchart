@@ -237,6 +237,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready price range primitives with shared labels', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'priceRange',
+      id: 'range',
+      clip,
+      rect: { x: 10, y: 10, width: 80, height: 20 },
+      labelPoint: { x: 50, y: 20 },
+      label: '+20.00 (+28.57%)',
+      style,
+    });
+  });
+
   it('preserves text label alignment in mobile primitives', () => {
     const state: UserDrawingState = {
       version: 1,

@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
@@ -45,6 +46,18 @@ export type MobileUserDrawingPrimitive =
       opacity: number;
       clip: MobileUserDrawingClipRect;
       rect: { x: number; y: number; width: number; height: number };
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'priceRange';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      labelPoint: DrawingScreenPoint;
+      label: string;
       style: UserDrawingStyle;
     }
   | {
@@ -154,6 +167,28 @@ function primitiveFromGeometry(
         rect: geometry.rect,
         style: geometry.drawing.style,
       };
+    case 'priceRange': {
+      const drawing = geometry.drawing;
+      const label =
+        drawing.kind === 'priceRange'
+          ? resolveUserDrawingPriceRangeMetrics(drawing.points[0].price, drawing.points[1].price).label
+          : '';
+      return {
+        kind: 'priceRange',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.rect,
+        labelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height / 2,
+        },
+        label,
+        style: geometry.drawing.style,
+      };
+    }
     case 'textLabel':
       const drawing = geometry.drawing as TextLabelDrawing;
       return {

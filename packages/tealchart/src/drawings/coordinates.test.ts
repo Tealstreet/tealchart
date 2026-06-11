@@ -2,6 +2,7 @@ import type { DrawingCoordinateSpace } from './coordinates';
 import type {
   ArrowLineDrawing,
   ExtendedLineDrawing,
+  PriceRangeDrawing,
   RectangleDrawing,
   TrendLineDrawing,
   UserDrawingStyle,
@@ -223,6 +224,15 @@ describe('user drawing coordinates', () => {
         { time: 2_500, price: 105 },
       ],
     };
+    const priceRange: PriceRangeDrawing = {
+      ...trendLine,
+      id: 'range',
+      kind: 'priceRange',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -253,6 +263,10 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(rectangle, space)).toMatchObject({
       kind: 'rectangle',
+      rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(priceRange, space)).toMatchObject({
+      kind: 'priceRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
     });
   });

@@ -54,6 +54,11 @@ export type ResolvedUserDrawingGeometry =
       rect: DrawingScreenRect;
     }
   | {
+      kind: 'priceRange';
+      drawing: UserDrawing;
+      rect: DrawingScreenRect;
+    }
+  | {
       kind: 'textLabel';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
@@ -260,6 +265,12 @@ export function resolveUserDrawingGeometry(
     case 'rectangle':
       return {
         kind: 'rectangle',
+        drawing,
+        rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'priceRange':
+      return {
+        kind: 'priceRange',
         drawing,
         rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
       };

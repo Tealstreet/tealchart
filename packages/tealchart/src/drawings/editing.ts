@@ -49,6 +49,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'ray':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'rectangle':
+    case 'priceRange':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'horizontalLine':
       return { ...drawing, price: drawing.price + delta.price, updatedAt };
@@ -71,7 +72,7 @@ function editLineEndpoint(
 }
 
 function editRectangleCorner(
-  drawing: Extract<UserDrawing, { kind: 'rectangle' }>,
+  drawing: Extract<UserDrawing, { kind: 'rectangle' | 'priceRange' }>,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
   updatedAt: number,
@@ -111,6 +112,7 @@ function editDrawingHandle(
     case 'ray':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
+    case 'priceRange':
       return editRectangleCorner(drawing, handle, anchor, updatedAt);
     case 'horizontalLine':
     case 'verticalLine':
