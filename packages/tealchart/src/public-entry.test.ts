@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { clearChartStoreCache } from './state/chartState';
 import {
   formatTrendAngleDegrees,
   normalizeUserDrawingFontFamily,
@@ -57,6 +58,10 @@ import type {
 type NonNever<T> = [T] extends [never] ? never : T;
 
 describe('tealchart public entries', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
