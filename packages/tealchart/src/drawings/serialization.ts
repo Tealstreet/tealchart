@@ -9,6 +9,7 @@ import type {
 } from './types';
 
 import { createUserDrawingState } from './input';
+import { normalizeUserDrawingStyle } from './types';
 
 function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
   switch (drawing.kind) {
@@ -86,7 +87,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.textColor === 'string') style.textColor = value.textColor;
   if (isFiniteNumber(value.fontSize)) style.fontSize = value.fontSize;
   if (typeof value.fontFamily === 'string') style.fontFamily = value.fontFamily;
-  return style;
+  return normalizeUserDrawingStyle(style);
 }
 
 function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'> | null {

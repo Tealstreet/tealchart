@@ -145,6 +145,94 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('dispatches selected rectangle fill style controls', () => {
+    const onStyle = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-fill-style',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'rect' },
+        drawings: [
+          {
+            id: 'rect',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+              fillColor: 'rgba(245, 197, 66, 0.12)',
+            },
+            points: [
+              { time: 1, price: 10 },
+              { time: 2, price: 12 },
+            ],
+          },
+        ],
+      },
+      onUserDrawingStyleChange: onStyle,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Green fill color"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
+  it('dispatches selected text label fill, text color, and font size controls', () => {
+    const onStyle = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-text-style',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'text' },
+        drawings: [
+          {
+            id: 'text',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+              fillColor: 'rgba(245, 197, 66, 0.12)',
+              textColor: '#f5c542',
+              fontSize: 12,
+            },
+            point: { time: 1, price: 10 },
+            text: 'note',
+            textAlign: 'center',
+          },
+        ],
+      },
+      onUserDrawingStyleChange: onStyle,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Blue fill color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Red text color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+
+    topBar.unmount();
+  });
+
   it('disables locked selected drawing style controls and one-way actions', () => {
     const onStyle = vi.fn();
     const onLocked = vi.fn();

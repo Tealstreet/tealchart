@@ -141,6 +141,29 @@ describe('drawing layout serialization', () => {
     expect(restored?.selection).toBeNull();
   });
 
+  it('normalizes restored text label font sizes', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', fontSize: 15 },
+          point: { time: 1, price: 10 },
+          text: 'Restored',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]?.style.fontSize).toBe(14);
+  });
+
   it('compares only committed drawing payloads', () => {
     const previous = createStateWithTransientFields();
     const next = {

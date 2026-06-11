@@ -10,6 +10,8 @@ import {
   getRequiredAnchorCount,
   getUserDrawingPaneId,
   isDrawingDraftReady,
+  normalizeUserDrawingFontSize,
+  normalizeUserDrawingStyle,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 
@@ -53,6 +55,15 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
   });
 
+  it('normalizes drawing font sizes to supported cross-platform values', () => {
+    expect(normalizeUserDrawingFontSize(8)).toBe(10);
+    expect(normalizeUserDrawingFontSize(15)).toBe(14);
+    expect(normalizeUserDrawingFontSize(20)).toBe(16);
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, fontSize: 15 })).toMatchObject({
+      fontSize: 14,
+    });
+  });
+
   it('identifies complete drafts', () => {
     expect(isDrawingDraftReady(draft({ tool: 'trendLine', anchors: [anchorA] }))).toBe(false);
     expect(isDrawingDraftReady(draft({ tool: 'trendLine', anchors: [anchorA, anchorB] }))).toBe(true);
@@ -87,10 +98,19 @@ describe('user drawing types', () => {
       time: anchorA.time,
     });
     expect(
-      createUserDrawingFromDraft(draft({ tool: 'textLabel', anchors: [anchorA], text: 'Note' }), { id: 't' }),
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'textLabel',
+          anchors: [anchorA],
+          style: { ...DEFAULT_USER_DRAWING_STYLE, fontSize: 15 },
+          text: 'Note',
+        }),
+        { id: 't' },
+      ),
     ).toMatchObject({
       kind: 'textLabel',
       point: anchorA,
+      style: expect.objectContaining({ fontSize: 14 }),
       text: 'Note',
       textAlign: 'center',
     });

@@ -1,4 +1,6 @@
-import type { UserDrawingLineStyle, UserDrawingState, UserDrawingTool } from './types';
+import type { UserDrawing, UserDrawingLineStyle, UserDrawingState, UserDrawingTool } from './types';
+
+import { USER_DRAWING_FONT_SIZES } from './types';
 
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
@@ -17,6 +19,21 @@ export interface UserDrawingToolbarActionDescriptor {
 
 export interface UserDrawingLineColorDescriptor {
   color: string;
+  label: string;
+}
+
+export interface UserDrawingFillColorDescriptor {
+  fillColor: string;
+  label: string;
+}
+
+export interface UserDrawingTextColorDescriptor {
+  textColor: string;
+  label: string;
+}
+
+export interface UserDrawingFontSizeDescriptor {
+  fontSize: number;
   label: string;
 }
 
@@ -77,6 +94,26 @@ export const USER_DRAWING_LINE_COLOR_DESCRIPTORS: readonly UserDrawingLineColorD
   { color: '#d1d4dc', label: 'Light line color' },
 ] as const;
 
+export const USER_DRAWING_FILL_COLOR_DESCRIPTORS: readonly UserDrawingFillColorDescriptor[] = [
+  { fillColor: 'rgba(245, 197, 66, 0.12)', label: 'Amber fill color' },
+  { fillColor: 'rgba(34, 197, 94, 0.12)', label: 'Green fill color' },
+  { fillColor: 'rgba(56, 189, 248, 0.12)', label: 'Blue fill color' },
+  { fillColor: 'rgba(244, 63, 94, 0.12)', label: 'Red fill color' },
+  { fillColor: 'rgba(209, 212, 220, 0.12)', label: 'Light fill color' },
+] as const;
+
+export const USER_DRAWING_TEXT_COLOR_DESCRIPTORS: readonly UserDrawingTextColorDescriptor[] = [
+  { textColor: '#f5c542', label: 'Amber text color' },
+  { textColor: '#22c55e', label: 'Green text color' },
+  { textColor: '#38bdf8', label: 'Blue text color' },
+  { textColor: '#f43f5e', label: 'Red text color' },
+  { textColor: '#d1d4dc', label: 'Light text color' },
+] as const;
+
+export const USER_DRAWING_FONT_SIZE_DESCRIPTORS: readonly UserDrawingFontSizeDescriptor[] = [
+  ...USER_DRAWING_FONT_SIZES.map((fontSize) => ({ fontSize, label: `${fontSize} pixel font size` })),
+];
+
 export const USER_DRAWING_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
   { width: 1, label: '1 pixel line width' },
   { width: 2, label: '2 pixel line width' },
@@ -117,6 +154,24 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
   return selectedDrawing !== null && !selectedDrawing.locked;
 }
 
+export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'rectangle' || drawing.kind === 'textLabel';
+}
+
+export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'textLabel';
+}
+
+export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolean {
+  const selectedDrawing = getSelectedUserDrawing(state);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillControls(selectedDrawing);
+}
+
+export function isUserDrawingTextToolbarEnabled(state: UserDrawingState): boolean {
+  const selectedDrawing = getSelectedUserDrawing(state);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextControls(selectedDrawing);
+}
+
 export function isUserDrawingStyleToolbarActionEnabled(
   state: UserDrawingState,
   action: UserDrawingStyleToolbarAction,
@@ -149,5 +204,8 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.lineColor ?? '',
     selectedDrawing?.style.lineWidth ?? '',
     selectedDrawing?.style.lineStyle ?? '',
+    selectedDrawing?.style.fillColor ?? '',
+    selectedDrawing?.style.textColor ?? '',
+    selectedDrawing?.style.fontSize ?? '',
   ].join('|');
 }
