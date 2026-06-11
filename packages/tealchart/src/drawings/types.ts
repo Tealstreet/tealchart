@@ -32,6 +32,7 @@ export type UserDrawingTool =
   | 'xabcdPattern'
   | 'threeDrivesPattern'
   | 'headShouldersPattern'
+  | 'elliottImpulseWave'
   | 'anchoredVwap'
   | 'fibRetracement'
   | 'fibExtension'
@@ -292,6 +293,17 @@ export interface HeadShouldersPatternDrawing extends UserDrawingBase {
   ];
 }
 
+export interface ElliottImpulseWaveDrawing extends UserDrawingBase {
+  kind: 'elliottImpulseWave';
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ];
+}
+
 export interface AnchoredVwapDrawing extends UserDrawingBase {
   kind: 'anchoredVwap';
   point: UserDrawingAnchor;
@@ -543,6 +555,7 @@ export type UserDrawing =
   | XabcdPatternDrawing
   | ThreeDrivesPatternDrawing
   | HeadShouldersPatternDrawing
+  | ElliottImpulseWaveDrawing
   | AnchoredVwapDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
@@ -754,6 +767,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
       return 4;
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
+    case 'elliottImpulseWave':
     case 'xabcdPattern':
       return 5;
     case 'horizontalLine':
@@ -1016,6 +1030,18 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'headShouldersPattern',
+        points: [
+          draft.anchors[0]!,
+          draft.anchors[1]!,
+          draft.anchors[2]!,
+          draft.anchors[3]!,
+          draft.anchors[4]!,
+        ],
+      };
+    case 'elliottImpulseWave':
+      return {
+        ...base,
+        kind: 'elliottImpulseWave',
         points: [
           draft.anchors[0]!,
           draft.anchors[1]!,

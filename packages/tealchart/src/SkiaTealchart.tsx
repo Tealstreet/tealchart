@@ -2562,13 +2562,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'fibSpiral' ||
             primitive.kind === 'abcdPattern' ||
             primitive.kind === 'xabcdPattern' ||
-            primitive.kind === 'threeDrivesPattern'
+            primitive.kind === 'threeDrivesPattern' ||
+            primitive.kind === 'elliottImpulseWave'
           ) {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font =
               primitive.kind === 'xabcdPattern' ||
               primitive.kind === 'abcdPattern' ||
-              primitive.kind === 'threeDrivesPattern'
+              primitive.kind === 'threeDrivesPattern' ||
+              primitive.kind === 'elliottImpulseWave'
                 ? getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily)
                 : null;
             const path = Skia.Path.Make();
@@ -2595,7 +2597,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 )}
                 {(primitive.kind === 'xabcdPattern' ||
                   primitive.kind === 'abcdPattern' ||
-                  primitive.kind === 'threeDrivesPattern') &&
+                  primitive.kind === 'threeDrivesPattern' ||
+                  primitive.kind === 'elliottImpulseWave') &&
                   font &&
                   primitive.labels.map((label) => {
                     const bounds = font.measureText(label.text);

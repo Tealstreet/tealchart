@@ -1379,6 +1379,29 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits Elliott impulse wave paths and five anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-impulse',
+      kind: 'elliottImpulseWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+        { time: 70, price: 40 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 60 }, space)?.drawing.id).toBe('elliott-impulse');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 4,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 90 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits ABCD pattern segments and four anchor handles', () => {
     const drawing: UserDrawing = {
       ...base,
