@@ -10,6 +10,7 @@ import type {
   ExtendedLineDrawing,
   FibExtensionDrawing,
   FibRetracementDrawing,
+  HorizontalRayDrawing,
   InfoLineDrawing,
   PathDrawing,
   ParallelChannelDrawing,
@@ -355,6 +356,12 @@ describe('user drawing coordinates', () => {
       id: 'info',
       kind: 'infoLine',
     };
+    const horizontalRay: HorizontalRayDrawing = {
+      ...trendLine,
+      id: 'horizontal-ray',
+      kind: 'horizontalRay',
+      point: { time: 2_000, price: 100 },
+    };
     const priceRange: PriceRangeDrawing = {
       ...trendLine,
       id: 'range',
@@ -480,6 +487,10 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(infoLine, space)).toMatchObject({
       kind: 'infoLine',
       segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+    });
+    expect(resolveUserDrawingGeometry(horizontalRay, space)).toMatchObject({
+      kind: 'horizontalRay',
+      segment: { start: { x: 110, y: 70 }, end: { x: 210, y: 70 } },
     });
     expect(
       resolveUserDrawingGeometry(

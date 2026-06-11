@@ -10,6 +10,7 @@ export type UserDrawingTool =
   | 'arrowMarkUp'
   | 'arrowMarkDown'
   | 'ray'
+  | 'horizontalRay'
   | 'horizontalLine'
   | 'verticalLine'
   | 'rectangle'
@@ -100,6 +101,11 @@ export interface RayDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface HorizontalRayDrawing extends UserDrawingBase {
+  kind: 'horizontalRay';
+  point: UserDrawingAnchor;
+}
+
 export interface HorizontalLineDrawing extends UserDrawingBase {
   kind: 'horizontalLine';
   price: number;
@@ -178,6 +184,7 @@ export type UserDrawing =
   | ArrowMarkUpDrawing
   | ArrowMarkDownDrawing
   | RayDrawing
+  | HorizontalRayDrawing
   | HorizontalLineDrawing
   | VerticalLineDrawing
   | RectangleDrawing
@@ -306,6 +313,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'verticalLine':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
+    case 'horizontalRay':
     case 'textLabel':
       return 1;
     case 'select':
@@ -376,6 +384,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'ray',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'horizontalRay':
+      return {
+        ...base,
+        kind: 'horizontalRay',
+        point: draft.anchors[0]!,
       };
     case 'horizontalLine':
       return {

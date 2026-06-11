@@ -245,7 +245,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, level-line hit testing, endpoint editing, and whole-drawing moves
   use shared drawing behavior on both platforms.
 
-## Current Epic: Fibonacci Extension Tool
+## Shipped: Fibonacci Extension Tool
 
 - Shared drawing state supports the two-anchor `fibExtension` tool and persists
   it through layout save/load.
@@ -253,6 +253,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   levels and ratio/price labels from shared screen-space geometry.
 - Selection, level-line hit testing, endpoint editing, and whole-drawing moves
   use shared drawing behavior on both platforms.
+
+## Current Epic: Horizontal Ray Tool
+
+- Shared drawing state supports the single-anchor `horizontalRay` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching right-extending horizontal ray
+  segments from shared screen-space geometry.
+- Selection, segment hit testing, anchor handles, and whole-drawing moves use
+  shared drawing behavior on both platforms.
 
 ## Known Gaps
 

@@ -194,6 +194,7 @@ export type {
   FibExtensionDrawing,
   FibRetracementDrawing,
   HorizontalLineDrawing,
+  HorizontalRayDrawing,
   InfoLineDrawing,
   PathDrawing,
   ParallelChannelDrawing,
