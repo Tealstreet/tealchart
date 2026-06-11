@@ -67,6 +67,7 @@ export type {
   MobileUserDrawingEllipsePrimitive,
   MobileUserDrawingFibExtensionPrimitive,
   MobileUserDrawingFibRetracementPrimitive,
+  MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingFlatTopBottomPrimitive,
   MobileUserDrawingInfoLineLabelPosition,
   MobileUserDrawingInfoLinePrimitive,

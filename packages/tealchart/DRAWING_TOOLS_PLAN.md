@@ -340,11 +340,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, polygon/rail hit testing, whole-drawing moves, point editing, and
   fill controls use shared drawing behavior on both platforms.
 
+## Shipped: Disjoint Channel Tool
+
+- Shared drawing state supports the four-anchor `disjointChannel` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked polygons from two
+  independently positioned channel rails.
+- Selection, polygon/rail hit testing, whole-drawing moves, point editing, and
+  fill controls use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Additional TradingView line-family tools such as disjoint channel, anchored
-  VWAP, and multi-point arrows.
+- Additional TradingView line-family tools such as anchored VWAP and
+  multi-point arrows.
 - Additional TradingView measurement tool polish beyond the current price/date
   ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.

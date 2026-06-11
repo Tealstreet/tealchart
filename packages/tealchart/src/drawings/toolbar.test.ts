@@ -73,6 +73,7 @@ describe('user drawing toolbar descriptors', () => {
       'parallelChannel',
       'regressionTrend',
       'flatTopBottom',
+      'disjointChannel',
       'path',
       'textLabel',
     ]);
@@ -155,6 +156,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('flatTopBottom')).toEqual(
       expect.objectContaining({ tool: 'flatTopBottom', label: 'Flat top/bottom' }),
+    );
+    expect(getUserDrawingToolDescriptor('disjointChannel')).toEqual(
+      expect.objectContaining({ tool: 'disjointChannel', label: 'Disjoint channel' }),
     );
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
@@ -453,6 +457,19 @@ describe('user drawing toolbar descriptors', () => {
           { time: 1, price: 10 },
           { time: 2, price: 12 },
           { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'disjoint',
+        kind: 'disjointChannel' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+          { time: 4, price: 9 },
         ],
       }),
     ).toBe(true);

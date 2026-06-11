@@ -8,6 +8,7 @@ import type {
   CrossLineDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
+  DisjointChannelDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
   FibExtensionDrawing,
@@ -36,6 +37,7 @@ import {
   priceToDrawingY,
   resolveBarsPatternFromAnchors,
   resolveDateRangeRectFromAnchors,
+  resolveDisjointChannelFromAnchors,
   resolveExtendedSegment,
   resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
@@ -567,6 +569,17 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 95 },
       ],
     };
+    const disjointChannel: DisjointChannelDrawing = {
+      ...trendLine,
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 110 },
+        { time: 1_000, price: 95 },
+        { time: 3_000, price: 90 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -794,6 +807,21 @@ describe('user drawing coordinates', () => {
         },
       },
     });
+    expect(resolveUserDrawingGeometry(disjointChannel, space)).toMatchObject({
+      kind: 'disjointChannel',
+      channel: {
+        base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
+        parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 120 } },
+        polygon: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 20 },
+            { x: 210, y: 120 },
+            { x: 10, y: 95 },
+          ],
+        },
+      },
+    });
   });
 
   it('resolves flat top and bottom channels from a sloped edge and flat anchor', () => {
@@ -812,6 +840,29 @@ describe('user drawing coordinates', () => {
           { x: 10, y: 70 },
           { x: 210, y: 20 },
           { x: 210, y: 95 },
+          { x: 10, y: 95 },
+        ],
+      },
+    });
+  });
+
+  it('resolves disjoint channels from two independent rails', () => {
+    expect(
+      resolveDisjointChannelFromAnchors(
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 110 },
+        { time: 1_000, price: 95 },
+        { time: 3_000, price: 90 },
+        space,
+      ),
+    ).toEqual({
+      base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
+      parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 120 } },
+      polygon: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 210, y: 20 },
+          { x: 210, y: 120 },
           { x: 10, y: 95 },
         ],
       },

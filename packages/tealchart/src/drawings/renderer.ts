@@ -128,7 +128,16 @@ function renderPolygonGeometry(
   ctx: CanvasContext,
   geometry: Extract<
     ResolvedUserDrawingGeometry,
-    { kind: 'arrowMarker' | 'arrowMark' | 'triangle' | 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' }
+    {
+      kind:
+        | 'arrowMarker'
+        | 'arrowMark'
+        | 'triangle'
+        | 'parallelChannel'
+        | 'regressionTrend'
+        | 'flatTopBottom'
+        | 'disjointChannel';
+    }
   >,
 ): void {
   const points =
@@ -150,7 +159,10 @@ function renderPolygonGeometry(
   ctx.closePath();
 
   const fillColor =
-    geometry.kind === 'parallelChannel' || geometry.kind === 'regressionTrend' || geometry.kind === 'flatTopBottom'
+    geometry.kind === 'parallelChannel' ||
+    geometry.kind === 'regressionTrend' ||
+    geometry.kind === 'flatTopBottom' ||
+    geometry.kind === 'disjointChannel'
       ? geometry.drawing.style.fillColor
       : (geometry.drawing.style.fillColor ?? geometry.drawing.style.lineColor);
 
@@ -563,6 +575,7 @@ export function renderUserDrawing(
       case 'parallelChannel':
       case 'regressionTrend':
       case 'flatTopBottom':
+      case 'disjointChannel':
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'infoLine':

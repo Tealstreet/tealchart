@@ -130,6 +130,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'parallelChannel', icon: '▱', label: 'Parallel channel' },
   { tool: 'regressionTrend', icon: '≋', label: 'Regression trend' },
   { tool: 'flatTopBottom', icon: '▰', label: 'Flat top/bottom' },
+  { tool: 'disjointChannel', icon: '◇', label: 'Disjoint channel' },
   { tool: 'path', icon: '⌁', label: 'Path' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
@@ -248,6 +249,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'parallelChannel' ||
     drawing.kind === 'regressionTrend' ||
     drawing.kind === 'flatTopBottom' ||
+    drawing.kind === 'disjointChannel' ||
     drawing.kind === 'textLabel'
   );
 }
