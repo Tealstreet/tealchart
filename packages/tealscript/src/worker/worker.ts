@@ -10,6 +10,7 @@
 import { parse, TealscriptParseError } from '../parser';
 import { createRuntimeErrorPayload, TealscriptEngine } from '../runtime/engine';
 import type { TealscriptRuntimeOptions } from '../runtime/engine';
+import { tryExecuteScript } from '../runtime/codegen';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
@@ -241,8 +242,11 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
     // Convert inputs Record to Map
     const inputsMap = recordToMap(state.inputs);
 
-    // Execute the script
-    const result = state.engine.execute(state.ast, state.bars, inputsMap);
+    // Try compiled path first, fall back to interpreter
+    const compiledResult = tryExecuteScript(state.ast, state.bars, inputsMap, {
+      runtime: state.runtime,
+    });
+    const result = compiledResult ?? state.engine.execute(state.ast, state.bars, inputsMap);
     const runtimeError = result.errors.find((error) => error.runtimeError)?.runtimeError;
     if (runtimeError) {
       postResult(createRuntimeErrorMessage(state.scriptId, runtimeError, metadata));

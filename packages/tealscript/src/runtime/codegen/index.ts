@@ -18,5 +18,5 @@ export { emit, RUNTIME_HELPERS } from './emitter';
 export { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
 export type { CompiledScript, CompiledSecurityScript, CompiledBarContext, GeneratedScriptInstance, ScriptDependencies, ArrayHelpers, MapHelpers, UdtHelpers, MatrixHelpers } from './compile';
 
-export { executeCompiled, tryCompile } from './execute';
+export { executeCompiled, tryCompile, tryExecuteScript } from './execute';
 export type { CompiledExecutionOptions } from './execute';
