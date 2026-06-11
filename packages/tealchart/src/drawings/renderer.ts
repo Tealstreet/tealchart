@@ -6,6 +6,7 @@ import type { UserDrawingState } from './types';
 
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
+import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
 import { normalizeUserDrawingFontFamily, normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
 
 export interface UserDrawingRenderOptions {
@@ -79,28 +80,32 @@ function renderTextLabelGeometry(
   const text = drawing.text;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
-  const textWidth = ctx.measureText(text).width;
-  const boxWidth = Math.ceil(textWidth + padding * 2);
-  const boxHeight = options.labelHeight;
-  const x = point.x - boxWidth / 2;
-  const y = point.y - boxHeight / 2;
+  const textLines = splitUserDrawingTextLines(text);
+  const layout = resolveUserDrawingTextLabelLayout({
+    text,
+    point,
+    textAlign: drawing.textAlign,
+    lineWidths: textLines.map((line) => ctx.measureText(line).width),
+    labelPadding: padding,
+    lineHeight: Math.max(1, options.labelHeight - 2),
+  });
 
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(x, y, boxWidth, boxHeight);
+    ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
   }
 
   if (drawing.style.lineVisible !== false) {
     applyStrokeStyle(ctx, drawing);
-    ctx.strokeRect(x, y, boxWidth, boxHeight);
+    ctx.strokeRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
   }
 
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
-  ctx.textAlign = drawing.textAlign;
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  const textX =
-    drawing.textAlign === 'left' ? x + padding : drawing.textAlign === 'right' ? x + boxWidth - padding : point.x;
-  ctx.fillText(text, textX, point.y);
+  for (const line of layout.lines) {
+    ctx.fillText(line.text, line.x, line.y);
+  }
 }
 
 function renderSelectionHandles(
