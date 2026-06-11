@@ -21,6 +21,7 @@ import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
   UserDrawingEditDrag,
+  UserDrawingFontFamily,
   UserDrawingHandleRole,
   UserDrawingLineStyle,
   UserDrawingStyle,
@@ -72,7 +73,7 @@ import {
   useFont,
   vec,
 } from '@shopify/react-native-skia';
-import { LayoutChangeEvent, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { LayoutChangeEvent, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
@@ -95,6 +96,7 @@ import {
   selectUserDrawingById,
   setUserDrawingText,
   setUserDrawingTool,
+  USER_DRAWING_FONT_FAMILIES,
   updateUserDrawingTextEdit,
 } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
@@ -108,6 +110,7 @@ import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
+import { resolveMobileUserDrawingFontFamily } from './mobile/utils/drawingFonts';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
 import {
   exportMobileUserDrawingStateForLayout,
@@ -614,7 +617,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       width,
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
-      fontFamily: normalizeUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily ?? 'sans-serif'),
+      fontFamily: resolveMobileUserDrawingFontFamily(
+        activeUserDrawingTextEditPrimitive.style.fontFamily,
+        Platform.OS,
+      ),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
@@ -1356,24 +1362,31 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // ==========================================================================
 
   // Fonts for Skia text rendering in bracket preview and drawing labels.
-  const userDrawingFont10 = useFont(null, 10);
   const bracketFont = useFont(null, 12);
-  const userDrawingFont14 = useFont(null, 14);
-  const userDrawingFont16 = useFont(null, 16);
-  const getUserDrawingTextFont = useCallback(
-    (fontSize: number | undefined) => {
-      switch (normalizeUserDrawingFontSize(fontSize ?? 12)) {
-        case 10:
-          return userDrawingFont10;
-        case 14:
-          return userDrawingFont14;
-        case 16:
-          return userDrawingFont16;
-        default:
-          return bracketFont;
+  const userDrawingTextFonts = useMemo(() => {
+    const fontSizes = [10, 12, 14, 16] as const;
+    const fonts: Partial<Record<UserDrawingFontFamily, Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>>>> =
+      {};
+
+    for (const fontFamily of USER_DRAWING_FONT_FAMILIES) {
+      const nativeFontFamily = resolveMobileUserDrawingFontFamily(fontFamily, Platform.OS);
+      const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily);
+      const familyFonts: Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>> = {};
+      for (const fontSize of fontSizes) {
+        familyFonts[fontSize] = Skia.Font(typeface, fontSize);
       }
+      fonts[fontFamily] = familyFonts;
+    }
+
+    return fonts;
+  }, []);
+  const getUserDrawingTextFont = useCallback(
+    (fontSize: number | undefined, fontFamily: string | undefined) => {
+      const normalizedFontFamily = normalizeUserDrawingFontFamily(fontFamily ?? 'sans-serif');
+      const normalizedFontSize = normalizeUserDrawingFontSize(fontSize ?? 12);
+      return userDrawingTextFonts[normalizedFontFamily]?.[normalizedFontSize] ?? bracketFont;
     },
-    [bracketFont, userDrawingFont10, userDrawingFont14, userDrawingFont16],
+    [bracketFont, userDrawingTextFonts],
   );
 
   // Compute bracket drag preview rendering data
@@ -1512,7 +1525,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           }
 
           if (primitive.kind === 'textLabel') {
-            const font = getUserDrawingTextFont(primitive.style.fontSize);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const measuredWidth = font.measureText(primitive.text).width;

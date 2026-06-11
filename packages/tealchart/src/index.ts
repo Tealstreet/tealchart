@@ -133,6 +133,7 @@ export type {
   UserDrawingHandleRole,
   UserDrawingKind,
   UserDrawingFontFamily,
+  UserDrawingFontSize,
   UserDrawingFontFamilyDescriptor,
   UserDrawingLineStyle,
   UserDrawingOpacityDescriptor,

@@ -10,6 +10,7 @@ import type {
 } from '../../drawings';
 
 import {
+  normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
   resolveUserDrawingGeometry,
@@ -68,6 +69,7 @@ export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimi
 
 export interface MobileUserDrawingTextLabelLayout {
   fontSize: number;
+  fontFamily: string;
   labelPadding: number;
   labelHeight: number;
   box: { x: number; y: number; width: number; height: number };
@@ -213,6 +215,7 @@ export function resolveMobileUserDrawingTextLabelLayout(
   } = {},
 ): MobileUserDrawingTextLabelLayout {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
   const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
   const width = Math.ceil(measuredTextWidth + labelPadding * 2);
@@ -228,6 +231,7 @@ export function resolveMobileUserDrawingTextLabelLayout(
 
   return {
     fontSize,
+    fontFamily,
     labelPadding,
     labelHeight,
     box: { x, y, width, height },

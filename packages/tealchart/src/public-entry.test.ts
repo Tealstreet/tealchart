@@ -14,6 +14,7 @@ import {
 import type {
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
+  UserDrawingFontSize,
   UserDrawingOpacityDescriptor,
   UserDrawingStyleToggleDescriptor,
 } from './index';
@@ -41,8 +42,10 @@ describe('tealchart public entries', () => {
   });
 
   it('exports shared drawing font-family helpers', () => {
+    const fontSize: UserDrawingFontSize = 12;
     const fontFamily: UserDrawingFontFamily = USER_DRAWING_FONT_FAMILIES[0]!;
     const descriptor: UserDrawingFontFamilyDescriptor = USER_DRAWING_FONT_FAMILY_DESCRIPTORS[0]!;
+    expect(fontSize).toBe(12);
     expect(fontFamily).toBe('sans-serif');
     expect(descriptor.fontFamily).toBe('sans-serif');
     expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
