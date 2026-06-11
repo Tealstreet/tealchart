@@ -35,6 +35,7 @@ export {
 } from './coordinates';
 export type {
   DrawingCoordinateSpace,
+  DrawingPitchforkVariant,
   DrawingScreenAnchoredVwap,
   DrawingScreenBarsPattern,
   DrawingScreenBarsPatternBar,
@@ -230,6 +231,7 @@ export type {
   PathDrawing,
   ParallelChannelDrawing,
   PitchforkDrawing,
+  PitchforkDrawingKind,
   PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,

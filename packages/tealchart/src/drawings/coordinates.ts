@@ -51,8 +51,11 @@ export interface DrawingScreenPitchfork {
   median: DrawingScreenSegment;
   upper: DrawingScreenSegment;
   lower: DrawingScreenSegment;
+  origin: DrawingScreenPoint;
   midpoint: DrawingScreenPoint;
 }
+
+export type DrawingPitchforkVariant = 'original' | 'schiff' | 'modifiedSchiff' | 'inside';
 
 export interface DrawingScreenCrossLine {
   horizontal: DrawingScreenSegment;
@@ -741,17 +744,31 @@ export function resolvePitchforkFromAnchors(
   second: UserDrawingAnchor,
   third: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
+  variant: DrawingPitchforkVariant = 'original',
 ): DrawingScreenPitchfork {
-  const origin = anchorToScreenPoint(first, space);
-  const upperAnchor = anchorToScreenPoint(second, space);
-  const lowerAnchor = anchorToScreenPoint(third, space);
-  const midpoint = {
-    x: (upperAnchor.x + lowerAnchor.x) / 2,
-    y: (upperAnchor.y + lowerAnchor.y) / 2,
+  const firstPoint = anchorToScreenPoint(first, space);
+  const secondPoint = anchorToScreenPoint(second, space);
+  const thirdPoint = anchorToScreenPoint(third, space);
+  const midpoint12 = {
+    x: (firstPoint.x + secondPoint.x) / 2,
+    y: (firstPoint.y + secondPoint.y) / 2,
   };
+  const midpoint23 = {
+    x: (secondPoint.x + thirdPoint.x) / 2,
+    y: (secondPoint.y + thirdPoint.y) / 2,
+  };
+  const schiffOrigin = { x: firstPoint.x, y: midpoint12.y };
+  const config =
+    variant === 'schiff'
+      ? { origin: schiffOrigin, midpoint: midpoint23, upperAnchor: secondPoint, lowerAnchor: thirdPoint }
+      : variant === 'modifiedSchiff'
+        ? { origin: midpoint12, midpoint: midpoint23, upperAnchor: secondPoint, lowerAnchor: thirdPoint }
+        : variant === 'inside'
+          ? { origin: midpoint12, midpoint: thirdPoint, upperAnchor: firstPoint, lowerAnchor: secondPoint }
+          : { origin: firstPoint, midpoint: midpoint23, upperAnchor: secondPoint, lowerAnchor: thirdPoint };
   const direction = {
-    x: midpoint.x - origin.x,
-    y: midpoint.y - origin.y,
+    x: config.midpoint.x - config.origin.x,
+    y: config.midpoint.y - config.origin.y,
   };
   const rayDirection = direction.x === 0 && direction.y === 0 ? { x: 1, y: 0 } : direction;
 
@@ -759,14 +776,42 @@ export function resolvePitchforkFromAnchors(
     x: start.x + rayDirection.x,
     y: start.y + rayDirection.y,
   });
-  const medianThrough = direction.x === 0 && direction.y === 0 ? through(origin) : midpoint;
+  const medianThrough = direction.x === 0 && direction.y === 0 ? through(config.origin) : config.midpoint;
 
   return {
-    median: resolveRaySegment(origin, medianThrough, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
-    upper: resolveRaySegment(upperAnchor, through(upperAnchor), space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
-    lower: resolveRaySegment(lowerAnchor, through(lowerAnchor), space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
-    midpoint,
+    median: resolveRaySegment(config.origin, medianThrough, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    upper: resolveRaySegment(
+      config.upperAnchor,
+      through(config.upperAnchor),
+      space.chartLeft,
+      space.chartRight,
+      space.pane.top,
+      space.pane.bottom,
+    ),
+    lower: resolveRaySegment(
+      config.lowerAnchor,
+      through(config.lowerAnchor),
+      space.chartLeft,
+      space.chartRight,
+      space.pane.top,
+      space.pane.bottom,
+    ),
+    origin: config.origin,
+    midpoint: config.midpoint,
   };
+}
+
+function pitchforkVariantForDrawingKind(kind: UserDrawing['kind']): DrawingPitchforkVariant {
+  switch (kind) {
+    case 'schiffPitchfork':
+      return 'schiff';
+    case 'modifiedSchiffPitchfork':
+      return 'modifiedSchiff';
+    case 'insidePitchfork':
+      return 'inside';
+    default:
+      return 'original';
+  }
 }
 
 export function resolveFlatTopBottomFromAnchors(
@@ -1104,10 +1149,19 @@ export function resolveUserDrawingGeometry(
         polygon: resolvePolylineFromAnchors(drawing.points, space),
       };
     case 'pitchfork':
+    case 'schiffPitchfork':
+    case 'modifiedSchiffPitchfork':
+    case 'insidePitchfork':
       return {
         kind: 'pitchfork',
         drawing,
-        pitchfork: resolvePitchforkFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+        pitchfork: resolvePitchforkFromAnchors(
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          space,
+          pitchforkVariantForDrawingKind(drawing.kind),
+        ),
       };
     case 'rotatedRectangle':
       return {

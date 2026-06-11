@@ -572,6 +572,25 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 70, y: 65 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits pitchfork variant tines and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'schiff',
+      kind: 'schiffPitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 65 }, space)?.drawing.id).toBe('schiff');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

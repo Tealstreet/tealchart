@@ -385,12 +385,22 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, tine hit testing, whole-drawing moves, and point-index handle
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Pitchfork Variants
+
+- Shared drawing state supports `schiffPitchfork`,
+  `modifiedSchiffPitchfork`, and `insidePitchfork` tools and persists them
+  through layout save/load.
+- Web Canvas and mobile Skia render matching variant median geometry from the
+  shared pitchfork resolver while reusing pitchfork tine rendering.
+- Selection, tine hit testing, whole-drawing moves, and point-index handle
+  editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- TradingView pitchfork variants such as Schiff, Modified Schiff, Inside, extra
-  line sets/backgrounds, plus advanced Fibonacci/Gann tools, pattern tools,
-  volume profile tools, annotation/icon tools, and curved geometry.
+- TradingView pitchfork extra line sets/backgrounds, advanced Fibonacci/Gann
+  tools, pattern tools, volume profile tools, annotation/icon tools, and curved
+  geometry.
 - Additional TradingView measurement tool polish beyond the current price/date
   ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
