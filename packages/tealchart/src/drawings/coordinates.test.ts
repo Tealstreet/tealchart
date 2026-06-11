@@ -5,6 +5,7 @@ import type {
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   CircleDrawing,
+  CrossLineDrawing,
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
@@ -362,6 +363,12 @@ describe('user drawing coordinates', () => {
       kind: 'horizontalRay',
       point: { time: 2_000, price: 100 },
     };
+    const crossLine: CrossLineDrawing = {
+      ...trendLine,
+      id: 'cross-line',
+      kind: 'crossLine',
+      point: { time: 2_000, price: 100 },
+    };
     const priceRange: PriceRangeDrawing = {
       ...trendLine,
       id: 'range',
@@ -491,6 +498,14 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(horizontalRay, space)).toMatchObject({
       kind: 'horizontalRay',
       segment: { start: { x: 110, y: 70 }, end: { x: 210, y: 70 } },
+    });
+    expect(resolveUserDrawingGeometry(crossLine, space)).toMatchObject({
+      kind: 'crossLine',
+      crossLine: {
+        point: { x: 110, y: 70 },
+        horizontal: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        vertical: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
+      },
     });
     expect(
       resolveUserDrawingGeometry(

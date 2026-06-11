@@ -54,6 +54,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'crossLine';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      horizontal: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      vertical: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'arrowMarker';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -217,6 +228,7 @@ export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
 export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
+export type MobileUserDrawingCrossLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'crossLine' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'priceRange' | 'dateRange' }
@@ -306,6 +318,18 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'crossLine':
+      return {
+        kind: 'crossLine',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        horizontal: geometry.crossLine.horizontal,
+        vertical: geometry.crossLine.vertical,
+        style: geometry.drawing.style,
+      };
     case 'arrowLine': {
       const arrowHead =
         resolveDrawingArrowHead(geometry.segment, {

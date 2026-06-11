@@ -56,6 +56,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');

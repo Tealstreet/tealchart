@@ -72,6 +72,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         style: { ...drawing.style },
       };
     case 'horizontalRay':
+    case 'crossLine':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
       return {
@@ -365,6 +366,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'horizontalRay',
+            point,
+          }
+        : null;
+    }
+    case 'crossLine': {
+      const point = parseAnchor(value.point);
+      return point
+        ? {
+            ...base,
+            kind: 'crossLine',
             point,
           }
         : null;
