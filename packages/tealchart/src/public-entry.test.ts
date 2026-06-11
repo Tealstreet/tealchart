@@ -22,6 +22,7 @@ import {
   resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveGannFanFromAnchors,
+  resolveGannBoxFromAnchors,
   resolvePitchforkFromAnchors,
   resolvePitchfanFromAnchors,
   resolveUserDrawingDateRangeMetrics,
@@ -63,6 +64,7 @@ import type {
   MobileUserDrawingTrendBasedFibTimePrimitive,
   MobileUserDrawingFibFanPrimitive,
   MobileUserDrawingFibSpeedResistanceFanPrimitive,
+  MobileUserDrawingGannBoxPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingPitchfanPrimitive,
   MobileUserDrawingPitchforkPrimitive,
@@ -94,6 +96,7 @@ import type {
   FibWedgeDrawing,
   FibSpiralDrawing,
   TrendBasedFibTimeDrawing,
+  GannBoxDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
   InfoLineDrawing,
@@ -317,6 +320,24 @@ describe('tealchart public entries', () => {
       levels: [{ ratio: 1, time: 2, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 10 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const gannBoxPrimitive: NonNever<MobileUserDrawingGannBoxPrimitive> = {
+      kind: 'gannBox',
+      id: 'gann-box',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      rect: { x: 0, y: 0, width: 10, height: 10 },
+      levels: [
+        {
+          ratio: 0.5,
+          horizontal: { start: { x: 0, y: 5 }, end: { x: 10, y: 5 } },
+          vertical: { start: { x: 5, y: 0 }, end: { x: 5, y: 10 } },
+        },
+      ],
+      angles: [{ start: { x: 0, y: 0 }, end: { x: 10, y: 10 } }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const trendBasedFibTimePrimitive: NonNever<MobileUserDrawingTrendBasedFibTimePrimitive> = {
       ...fibTimeZonePrimitive,
       kind: 'trendBasedFibTime',
@@ -415,6 +436,7 @@ describe('tealchart public entries', () => {
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
+    expect(gannBoxPrimitive.kind).toBe('gannBox');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
@@ -1132,6 +1154,33 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('gannFan');
     expect(fan.rays).toHaveLength(9);
+  });
+
+  it('exports shared drawing gann box types and resolver', () => {
+    const drawing: GannBoxDrawing = {
+      id: 'gann-box',
+      kind: 'gannBox',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const box = resolveGannBoxFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('gannBox');
+    expect(box.levels).toHaveLength(9);
+    expect(box.angles).toHaveLength(6);
   });
 
   it('exports shared drawing fib channel types and resolver', () => {
