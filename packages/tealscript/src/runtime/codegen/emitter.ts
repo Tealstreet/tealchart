@@ -59,6 +59,7 @@ const ITERATION_CAP = 10000;
 export function emit(ast: Program, ctx: AnalysisContext): string {
   const lines: string[] = [];
   const indent = (n: number) => '  '.repeat(n);
+  let fixnanIndex = 0;
 
   function emitExpr(expr: Expression): string {
     switch (expr.type) {
@@ -79,9 +80,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         const right = emitExpr(expr.right);
         switch (expr.operator) {
           case 'and':
-            return `(_isTruthy(${left}) && _isTruthy(${right}))`;
+            return `(_and(${left}, ${right}))`;
           case 'or':
-            return `(_isTruthy(${left}) || _isTruthy(${right}))`;
+            return `(_or(${left}, ${right}))`;
           case '==':
             return `_eq(${left}, ${right})`;
           case '!=':
@@ -123,6 +124,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   function emitIdentifier(id: Identifier): string {
     const name = id.name;
     if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(0)`;
+    if (name === 'hl2') return '((ctx.bar.high + ctx.bar.low) / 2)';
+    if (name === 'hlc3') return '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
+    if (name === 'ohlc4') return '((ctx.bar.open + ctx.bar.high + ctx.bar.low + ctx.bar.close) / 4)';
+    if (name === 'hlcc4') return '((ctx.bar.high + ctx.bar.low + ctx.bar.close + ctx.bar.close) / 4)';
     if (name === 'bar_index') return 'ctx.barIndex';
     if (name === 'last_bar_index') return 'ctx.lastBarIndex';
     if (name === 'na') return 'NaN';
@@ -173,6 +178,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (expr.object.type === 'Identifier') {
       const name = expr.object.name;
       if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(${idx})`;
+      if (name === 'hl2' || name === 'hlc3' || name === 'ohlc4' || name === 'hlcc4') {
+        return `this._s_${name}.get(${idx})`;
+      }
       if (ctx.seriesVars.has(name)) return `this._sv_${name}.get(${idx})`;
     }
     return `${emitExpr(expr.object)}[${idx}]`;
@@ -213,7 +221,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     // nz / na
     if (fullName === 'nz') return posArgs.length > 1 ? `_nz(${posArgs[0]}, ${posArgs[1]})` : `_nz(${posArgs[0]})`;
     if (fullName === 'na') return posArgs.length > 0 ? `_isNa(${posArgs[0]})` : 'NaN';
-    if (fullName === 'fixnan') return `_fixnan(${posArgs[0]})`;
+    if (fullName === 'fixnan') {
+      const fnIdx = fixnanIndex++;
+      return `(_isNa(${posArgs[0]}) ? this._fixnan_${fnIdx} : (this._fixnan_${fnIdx} = ${posArgs[0]}))`;
+    }
 
     // Type casts
     if (fullName === 'int') return `Math.trunc(${posArgs[0]})`;
@@ -304,39 +315,36 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return `(ctx.isFirstTick ? ${member}.compute(${argStr}) : ${member}.recompute(${argStr}))`;
   }
 
+  function emitNamedArgsObj(args: { name?: Identifier; value: Expression }[]): string {
+    const entries = args.filter((a) => a.name).map((a) => `${a.name!.name}: ${emitExpr(a.value)}`);
+    return entries.length > 0 ? `{${entries.join(', ')}}` : '{}';
+  }
+
   function emitPlotCall(funcName: string, expr: CallExpression): string {
     const site = ctx.plotSites.find((p) => p.node === expr);
     const idx = site?.index ?? 0;
-    const allArgs = expr.arguments;
-    const posArgs = allArgs.filter((a) => !a.name).map((a) => emitExpr(a.value));
-    const namedMap: Record<string, string> = {};
-    for (const a of allArgs) {
-      if (a.name) namedMap[a.name.name] = emitExpr(a.value);
-    }
-    return `ctx.plot(${idx}, "${funcName}", ${posArgs[0] ?? 'NaN'}, ${JSON.stringify(namedMap)}, [${posArgs.slice(1).join(', ')}])`;
+    const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
+    const namedObj = emitNamedArgsObj(expr.arguments);
+    return `ctx.plot(${idx}, "${funcName}", ${posArgs[0] ?? 'NaN'}, ${namedObj}, [${posArgs.slice(1).join(', ')}])`;
   }
 
   function emitInputCall(funcName: string, expr: CallExpression): string {
     const site = ctx.inputSites.find((s) => s.node === expr);
     const id = site?.id ?? 'unknown';
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
-    const namedMap: Record<string, string> = {};
-    for (const a of expr.arguments) {
-      if (a.name) namedMap[a.name.name] = emitExpr(a.value);
-    }
-    return `ctx.input("${id}", "${funcName}", ${posArgs[0] ?? 'NaN'}, ${JSON.stringify(namedMap)}, [${posArgs.slice(1).join(', ')}])`;
+    const namedObj = emitNamedArgsObj(expr.arguments);
+    return `ctx.input("${id}", "${funcName}", ${posArgs[0] ?? 'NaN'}, ${namedObj}, [${posArgs.slice(1).join(', ')}])`;
   }
 
   function emitStrategyCall(method: string, expr: CallExpression): string {
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
-    const namedMap: Record<string, string> = {};
-    for (const a of expr.arguments) {
-      if (a.name) namedMap[a.name.name] = emitExpr(a.value);
-    }
-    return `ctx.strategy${method.charAt(0).toUpperCase() + method.slice(1)}(${posArgs.join(', ')}, ${JSON.stringify(namedMap)})`;
+    const namedObj = emitNamedArgsObj(expr.arguments);
+    return `ctx.strategy${method.charAt(0).toUpperCase() + method.slice(1)}(${posArgs.join(', ')}, ${namedObj})`;
   }
 
   function emitSwitchExpr(expr: SwitchExpression): string {
+    let hasDefault = false;
+
     if (expr.discriminant) {
       const disc = emitExpr(expr.discriminant);
       const parts: string[] = [];
@@ -347,6 +355,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
             : emitExpr(c.consequent);
           parts.push(`_eq(${disc}, ${emitExpr(c.test)}) ? ${body}`);
         } else {
+          hasDefault = true;
           const body = Array.isArray(c.consequent)
             ? emitBlockAsExpr(c.consequent)
             : emitExpr(c.consequent);
@@ -354,6 +363,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         }
       }
       if (parts.length === 0) return 'NaN';
+      if (!hasDefault) parts.push('NaN');
       return `(${parts.join(' : ')})`;
     }
 
@@ -365,6 +375,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
           : emitExpr(c.consequent);
         parts.push(`_isTruthy(${emitExpr(c.test)}) ? ${body}`);
       } else {
+        hasDefault = true;
         const body = Array.isArray(c.consequent)
           ? emitBlockAsExpr(c.consequent)
           : emitExpr(c.consequent);
@@ -372,6 +383,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       }
     }
     if (parts.length === 0) return 'NaN';
+    if (!hasDefault) parts.push('NaN');
     return `(${parts.join(' : ')})`;
   }
 
@@ -626,6 +638,14 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     lines.push(`    this.${field} = new deps.NumericSeries(deps.maxBarsBack);`);
   }
 
+  // Computed bar field series (only if history-accessed)
+  const computedBarFields = ['hl2', 'hlc3', 'ohlc4', 'hlcc4'];
+  for (const name of computedBarFields) {
+    if (ctx.barFieldSeriesVars.has(name)) {
+      lines.push(`    this._s_${name} = new deps.NumericSeries(deps.maxBarsBack);`);
+    }
+  }
+
   // Series vars
   for (const name of ctx.seriesVars) {
     lines.push(`    this._sv_${name} = new deps.NumericSeries(deps.maxBarsBack);`);
@@ -642,6 +662,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     lines.push(`    this.${site.memberName} = new deps.${site.className}(${argsStr});`);
   }
 
+  // Placeholder for fixnan members (filled after body emission)
+  const fixnanPlaceholderIdx = lines.length;
   lines.push('  }');
 
   // User-defined functions
@@ -665,6 +687,19 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
   }
 
+  // Push computed bar field series
+  const computedFieldExprs: Record<string, string> = {
+    hl2: '(ctx.bar.high + ctx.bar.low) / 2',
+    hlc3: '(ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3',
+    ohlc4: '(ctx.bar.open + ctx.bar.high + ctx.bar.low + ctx.bar.close) / 4',
+    hlcc4: '(ctx.bar.high + ctx.bar.low + ctx.bar.close + ctx.bar.close) / 4',
+  };
+  for (const name of computedBarFields) {
+    if (ctx.barFieldSeriesVars.has(name)) {
+      lines.push(`    this._s_${name}.push(${computedFieldExprs[name]});`);
+    }
+  }
+
   // Emit body
   for (const stmt of ast.body) {
     emitStmt(stmt, 2);
@@ -672,11 +707,25 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   lines.push('  }');
 
+  // Insert fixnan member initialization into the constructor
+  if (fixnanIndex > 0) {
+    const fixnanLines: string[] = [];
+    for (let i = 0; i < fixnanIndex; i++) {
+      fixnanLines.push(`    this._fixnan_${i} = NaN;`);
+    }
+    lines.splice(fixnanPlaceholderIdx, 0, ...fixnanLines);
+  }
+
   // save/restore for realtime rollback
   lines.push('  save() {');
   lines.push('    return {');
   for (const field of Object.values(BAR_FIELDS)) {
     lines.push(`      ${field}: this.${field}.save(),`);
+  }
+  for (const name of computedBarFields) {
+    if (ctx.barFieldSeriesVars.has(name)) {
+      lines.push(`      _s_${name}: this._s_${name}.save(),`);
+    }
   }
   for (const name of ctx.seriesVars) {
     lines.push(`      _sv_${name}: this._sv_${name}.save(),`);
@@ -687,12 +736,20 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   for (const site of ctx.taCallSites) {
     lines.push(`      ${site.memberName}: this.${site.memberName}.save(),`);
   }
+  for (let i = 0; i < fixnanIndex; i++) {
+    lines.push(`      _fixnan_${i}: this._fixnan_${i},`);
+  }
   lines.push('    };');
   lines.push('  }');
 
   lines.push('  restore(snap) {');
   for (const field of Object.values(BAR_FIELDS)) {
     lines.push(`    this.${field}.restore(snap.${field});`);
+  }
+  for (const name of computedBarFields) {
+    if (ctx.barFieldSeriesVars.has(name)) {
+      lines.push(`    this._s_${name}.restore(snap._s_${name});`);
+    }
   }
   for (const name of ctx.seriesVars) {
     lines.push(`    this._sv_${name}.restore(snap._sv_${name});`);
@@ -704,6 +761,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
   for (const site of ctx.taCallSites) {
     lines.push(`    this.${site.memberName}.restore(snap.${site.memberName});`);
+  }
+  for (let i = 0; i < fixnanIndex; i++) {
+    lines.push(`    this._fixnan_${i} = snap._fixnan_${i};`);
   }
   lines.push('  }');
 
@@ -728,6 +788,6 @@ function _cmp(a, b, op) {
   return false;
 }
 function _nz(v, repl) { return _isNa(v) ? (repl !== undefined ? repl : 0) : v; }
-function _fixnan(v) { return _isNa(v) ? _fixnan._last : (_fixnan._last = v); }
-_fixnan._last = NaN;
+function _and(a, b) { return _isTruthy(a) && _isTruthy(b); }
+function _or(a, b) { return _isTruthy(a) || _isTruthy(b); }
 `;
