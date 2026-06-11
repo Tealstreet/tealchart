@@ -3,6 +3,7 @@ import { parse } from '../../parser';
 import { executeScript } from '../engine';
 import { tryCompile, executeCompiled } from './execute';
 import type { Bar } from '../context';
+import { InMemoryRequestDatafeed } from '../requestDatafeed';
 
 function makeBars(closes: number[]): Bar[] {
   return closes.map((close, i) => ({
@@ -264,5 +265,68 @@ plot(strategy.equity)`;
     const lastEq = eqValues[eqValues.length - 1];
     expect(lastEq).not.toBe(0);
     expect(lastEq).not.toBeNull();
+  });
+});
+
+describe('executeCompiled — request.security integration', () => {
+  const chartBars: Bar[] = [
+    { time: 100, open: 10, high: 12, low: 9, close: 11, volume: 100 },
+    { time: 200, open: 11, high: 13, low: 10, close: 12, volume: 110 },
+    { time: 300, open: 12, high: 14, low: 11, close: 13, volume: 120 },
+    { time: 400, open: 13, high: 15, low: 12, close: 14, volume: 130 },
+    { time: 500, open: 14, high: 16, low: 13, close: 15, volume: 140 },
+    { time: 600, open: 15, high: 17, low: 14, close: 16, volume: 150 },
+  ];
+
+  const htfBars: Bar[] = [
+    { time: 100, open: 10, high: 13, low: 9, close: 12, volume: 210 },
+    { time: 300, open: 12, high: 15, low: 11, close: 14, volume: 250 },
+    { time: 500, open: 14, high: 17, low: 13, close: 16, volume: 290 },
+  ];
+
+  const datafeed = new InMemoryRequestDatafeed([
+    { symbol: 'TEST', timeframe: 'D', bars: htfBars },
+  ]);
+
+  it('request.security returns HTF close values aligned to chart', () => {
+    const pine = `//@version=6
+indicator("test")
+htfClose = request.security("TEST", "D", close)
+plot(htfClose)`;
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    expect(compiled.analysis.securitySites.length).toBe(1);
+
+    const result = executeCompiled(compiled, chartBars, undefined, {
+      requestDatafeed: datafeed,
+    });
+    expect(result).not.toBeNull();
+
+    const values = result!.plots[0]?.values ?? [];
+    expect(values.length).toBe(chartBars.length);
+    const nonNull = values.filter((v) => v !== null);
+    expect(nonNull.length).toBeGreaterThan(0);
+  });
+
+  it('request.security with ta.sma expression', () => {
+    const pine = `//@version=6
+indicator("test")
+htfSma = request.security("TEST", "D", ta.sma(close, 2))
+plot(htfSma)`;
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    expect(compiled.securityScripts.size).toBe(1);
+
+    const result = executeCompiled(compiled, chartBars, undefined, {
+      requestDatafeed: datafeed,
+    });
+    expect(result).not.toBeNull();
+
+    const values = result!.plots[0]?.values ?? [];
+    expect(values.length).toBe(chartBars.length);
   });
 });
