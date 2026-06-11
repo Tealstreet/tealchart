@@ -203,6 +203,7 @@ export type {
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   BarsPatternDrawing,
+  BarsPatternBarSnapshot,
   CircleDrawing,
   CreateUserDrawingFromDraftOptions,
   CrossLineDrawing,

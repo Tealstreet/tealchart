@@ -1,6 +1,6 @@
 import type { Bar, ChartMargins, ComputedPane, Viewport } from '../types';
 import type { UserDrawingInputPoint } from './input';
-import type { UserDrawing, UserDrawingAnchor } from './types';
+import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor } from './types';
 
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 
@@ -486,7 +486,7 @@ export function resolvePolylineFromAnchors(
   };
 }
 
-function isFiniteBar(bar: Bar): boolean {
+function isFiniteBar(bar: BarsPatternBarSnapshot | Bar): boolean {
   return (
     Number.isFinite(bar.time) &&
     Number.isFinite(bar.open) &&
@@ -515,10 +515,11 @@ export function resolveBarsPatternFromAnchors(
   sourceEndAnchor: UserDrawingAnchor,
   placementAnchor: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
+  sourceBarsInput: readonly (BarsPatternBarSnapshot | Bar)[] = space.bars ?? [],
 ): DrawingScreenBarsPattern {
   const sourceStartTime = Math.min(sourceStartAnchor.time, sourceEndAnchor.time);
   const sourceEndTime = Math.max(sourceStartAnchor.time, sourceEndAnchor.time);
-  const sourceBars = (space.bars ?? [])
+  const sourceBars = sourceBarsInput
     .filter((bar) => isFiniteBar(bar) && bar.time >= sourceStartTime && bar.time <= sourceEndTime)
     .slice()
     .sort((a, b) => a.time - b.time);
@@ -900,7 +901,7 @@ export function resolveUserDrawingGeometry(
       return {
         kind: 'barsPattern',
         drawing,
-        pattern: resolveBarsPatternFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+        pattern: resolveBarsPatternFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space, drawing.bars),
       };
     case 'fibRetracement':
       return {

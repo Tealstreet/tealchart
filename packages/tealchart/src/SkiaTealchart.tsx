@@ -1013,6 +1013,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         viewport,
         dimensions: chartDimensions,
         panes: userDrawingInputPanes,
+        bars,
       });
       if (!point) return false;
 
@@ -1039,6 +1040,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       measureUserDrawingTextLabelLine,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
+      bars,
       viewport,
     ],
   );
@@ -1054,6 +1056,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           viewport,
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
+          bars,
         });
         if (!point) return false;
 
@@ -1085,6 +1088,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       measureUserDrawingTextLabelLine,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
+      bars,
       viewport,
     ],
   );
@@ -1097,6 +1101,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           viewport,
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
+          bars,
         });
         if (!point) return;
 
@@ -1118,6 +1123,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingStateIfChanged,
       effectiveUserDrawingState,
       userDrawingInputPanes,
+      bars,
       viewport,
     ],
   );

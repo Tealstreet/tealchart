@@ -405,6 +405,10 @@ describe('tealchart public entries', () => {
         { time: 1, price: 100 },
         { time: 1, price: 101 },
       ],
+      bars: [
+        { time: 0, open: 100, high: 104, low: 99, close: 102 },
+        { time: 1, open: 102, high: 105, low: 101, close: 101 },
+      ],
     };
 
     expect(pattern.bars).toHaveLength(2);
