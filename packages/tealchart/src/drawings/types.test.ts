@@ -78,6 +78,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
+    expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
     expect(getRequiredAnchorCount('path')).toBe(3);
   });
 
@@ -279,6 +280,20 @@ describe('user drawing types', () => {
       id: 'flat',
       kind: 'flatTopBottom',
       points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'disjointChannel', anchors: [anchorA, anchorB, anchorC, { time: 4_000, price: 95 }] }), {
+        id: 'disjoint',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      points: [anchorA, anchorB, anchorC, { time: 4_000, price: 95 }],
       visible: true,
       locked: false,
       createdAt: 20,
