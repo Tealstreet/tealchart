@@ -106,15 +106,25 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar expose matching selected drawing fill and
   border toggles.
 
-## Current Epic: Font Family Controls
+## Shipped: Font Family Controls
 
 - Shared drawing style normalizes text-label font family to a small
   cross-platform allowlist.
-- Web Canvas honors the selected font family for text-label rendering.
+- Web Canvas honors the selected font family for text-label rendering and
+  normalizes unsupported family values.
 - Web top bar and mobile top bar expose matching selected text-label font
-  family controls; the mobile text editor uses the normalized family while
-  Skia canvas labels remain on the existing bundled/system font path until
-  font assets are introduced.
+  family controls.
+- Mobile Skia maps the shared logical font family values to native system
+  families for both canvas labels and active text editing.
+
+## Current Epic: Multiline Text Labels
+
+- Shared text-label layout splits committed text into stable lines and preserves
+  existing single-line geometry.
+- Web Canvas and mobile Skia render each text-label line from the same measured
+  layout model.
+- Web and mobile text editors size from the longest line and line count while
+  preserving newline text through shared reducers and layout serialization.
 
 ## Known Gaps
 

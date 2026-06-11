@@ -18,6 +18,7 @@ import type {
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
+  UserDrawingHitTestTextMeasure,
   UserDrawingTextLabelLayout,
   UserDrawingOpacityDescriptor,
   UserDrawingStyleToggleDescriptor,
@@ -56,6 +57,7 @@ describe('tealchart public entries', () => {
   });
 
   it('exports shared drawing text layout helpers', () => {
+    const measureTextLabelLine: UserDrawingHitTestTextMeasure = (_drawing, line) => line.length;
     const layout: UserDrawingTextLabelLayout = resolveUserDrawingTextLabelLayout({
       text: 'A\nB',
       point: { x: 10, y: 10 },
@@ -64,6 +66,7 @@ describe('tealchart public entries', () => {
     });
 
     expect(splitUserDrawingTextLines('A\nB')).toEqual(['A', 'B']);
+    expect(measureTextLabelLine).toBeTypeOf('function');
     expect(resolveUserDrawingTextEditMetrics('A\nB').longestLineLength).toBe(1);
     expect(layout.lines).toHaveLength(2);
   });

@@ -20,6 +20,7 @@ import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
+  TextLabelDrawing,
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
@@ -969,6 +970,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartDimensions],
   );
 
+  const measureUserDrawingTextLabelLine = useCallback((drawing: TextLabelDrawing, line: string): number => {
+    const normalizedFontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+    const nativeFontFamily = resolveMobileUserDrawingFontFamily(normalizedFontFamily, Platform.OS);
+    const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily);
+    const font = Skia.Font(typeface, normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12));
+    return font.measureText(line).width;
+  }, []);
+
   const handleUserDrawingTap = useCallback(
     (x: number, y: number) => {
       if (!viewport) return false;
@@ -980,6 +989,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           effectiveUserDrawingState,
           { x, y },
           userDrawingSpacesByPaneId,
+          { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
         );
         if (selection.changed) {
           commitUserDrawingState(selection.state);
@@ -1015,6 +1025,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingState,
       effectiveUserDrawingState,
       isPointInChartArea,
+      measureUserDrawingTextLabelLine,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
       viewport,
@@ -1030,6 +1041,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         effectiveUserDrawingState,
         { x, y },
         userDrawingSpacesByPaneId,
+        { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
       );
       if (!result.hit || !result.drag) return false;
 
@@ -1039,7 +1051,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
       return true;
     },
-    [commitUserDrawingState, effectiveUserDrawingState, isPointInChartArea, userDrawingSpacesByPaneId, viewport],
+    [
+      commitUserDrawingState,
+      effectiveUserDrawingState,
+      isPointInChartArea,
+      measureUserDrawingTextLabelLine,
+      userDrawingSpacesByPaneId,
+      viewport,
+    ],
   );
 
   const handleUserDrawingEditMove = useCallback(
@@ -1143,6 +1162,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           effectiveUserDrawingState,
           { x, y },
           userDrawingSpacesByPaneId,
+          { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
         );
         const selectedId = selection.state.selection?.drawingId;
         const selectedDrawing = selectedId
@@ -1178,6 +1198,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       margins,
+      measureUserDrawingTextLabelLine,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
     ],
@@ -1755,15 +1776,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <TextInput
           accessibilityLabel="Edit drawing text"
           autoFocus
-          blurOnSubmit
+          blurOnSubmit={false}
           multiline
           selectTextOnFocus
           value={activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text}
           onChangeText={(value: string) => {
             commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
-          }}
-          onSubmitEditing={() => {
-            commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
           }}
           onBlur={() => {
             commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));

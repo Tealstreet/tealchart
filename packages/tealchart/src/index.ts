@@ -150,6 +150,7 @@ export type {
   UserDrawingTextAlign,
   UserDrawingHitResult,
   UserDrawingHitTestOptions,
+  UserDrawingHitTestTextMeasure,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
   UserDrawingRenderOptions,
