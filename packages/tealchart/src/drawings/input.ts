@@ -270,7 +270,10 @@ export function resolveUserDrawingSelectionAtPoint(
   options: UserDrawingSelectionInputOptions = {},
 ): UserDrawingSelectionAtPointResult {
   const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
-  const nextState = selectUserDrawing(state, hit ? { drawingId: hit.drawing.id, handle: hit.handle } : null);
+  const nextState = selectUserDrawing(
+    state,
+    hit ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex } : null,
+  );
   return {
     state: nextState,
     hit: hit !== null,
