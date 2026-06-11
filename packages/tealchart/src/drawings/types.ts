@@ -32,6 +32,7 @@ export type UserDrawingTool =
   | 'fibSpeedResistanceFan'
   | 'fibSpeedResistanceArcs'
   | 'fibCircles'
+  | 'fibWedge'
   | 'fibChannel'
   | 'fibTimeZone'
   | 'trendBasedFibTime'
@@ -245,6 +246,11 @@ export interface FibCirclesDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface FibWedgeDrawing extends UserDrawingBase {
+  kind: 'fibWedge';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface GannFanDrawing extends UserDrawingBase {
   kind: 'gannFan';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -352,6 +358,7 @@ export type UserDrawing =
   | FibSpeedResistanceFanDrawing
   | FibSpeedResistanceArcsDrawing
   | FibCirclesDrawing
+  | FibWedgeDrawing
   | FibChannelDrawing
   | FibTimeZoneDrawing
   | TrendBasedFibTimeDrawing
@@ -494,6 +501,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
       return 2;
     case 'triangle':
     case 'polyline':
+    case 'fibWedge':
     case 'fibChannel':
     case 'trendBasedFibTime':
     case 'pitchfork':
@@ -737,6 +745,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'fibCircles',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'fibWedge':
+      return {
+        ...base,
+        kind: 'fibWedge',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'gannFan':
       return {

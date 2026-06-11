@@ -75,6 +75,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibSpeedResistanceFan',
       'fibSpeedResistanceArcs',
       'fibCircles',
+      'fibWedge',
       'fibChannel',
       'fibTimeZone',
       'trendBasedFibTime',
@@ -178,6 +179,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibCircles')).toEqual(
       expect.objectContaining({ tool: 'fibCircles', label: 'Fib circles' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibWedge')).toEqual(
+      expect.objectContaining({ tool: 'fibWedge', label: 'Fib wedge' }),
     );
     expect(getUserDrawingToolDescriptor('fibChannel')).toEqual(
       expect.objectContaining({ tool: 'fibChannel', label: 'Fib channel' }),
@@ -493,6 +497,18 @@ describe('user drawing toolbar descriptors', () => {
         ...rectangle,
         id: 'tri',
         kind: 'triangle' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'fib-wedge',
+        kind: 'fibWedge' as const,
         points: [
           { time: 1, price: 10 },
           { time: 2, price: 12 },

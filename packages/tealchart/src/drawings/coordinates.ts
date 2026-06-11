@@ -61,6 +61,17 @@ export interface DrawingScreenFibSpeedResistanceArcs {
   arcs: readonly DrawingScreenFibArc[];
 }
 
+export interface DrawingScreenFibWedge {
+  center: DrawingScreenPoint;
+  lower: DrawingScreenPoint;
+  upper: DrawingScreenPoint;
+  startAngle: number;
+  endAngle: number;
+  baseRadius: number;
+  arcs: readonly DrawingScreenFibArc[];
+  boundaries: readonly [DrawingScreenSegment, DrawingScreenSegment];
+}
+
 export interface DrawingScreenEllipse {
   center: DrawingScreenPoint;
   radiusX: number;
@@ -342,6 +353,11 @@ export type ResolvedUserDrawingGeometry =
       fibCircles: DrawingScreenFibCircles;
     }
   | {
+      kind: 'fibWedge';
+      drawing: UserDrawing;
+      fibWedge: DrawingScreenFibWedge;
+    }
+  | {
       kind: 'fibChannel';
       drawing: UserDrawing;
       fibChannel: DrawingScreenFibChannel;
@@ -611,6 +627,48 @@ export function resolveFibSpeedResistanceArcsFromAnchors(
   };
 }
 
+export function resolveFibWedgeFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  third: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibWedge {
+  const center = anchorToScreenPoint(first, space);
+  const lower = anchorToScreenPoint(second, space);
+  const upper = anchorToScreenPoint(third, space);
+  const startAngle = Math.atan2(lower.y - center.y, lower.x - center.x);
+  const endAngle = Math.atan2(upper.y - center.y, upper.x - center.x);
+  const baseRadius = Math.max(Math.hypot(lower.x - center.x, lower.y - center.y), Math.hypot(upper.x - center.x, upper.y - center.y));
+
+  return {
+    center,
+    lower,
+    upper,
+    startAngle,
+    endAngle,
+    baseRadius,
+    boundaries: [
+      { start: center, end: lower },
+      { start: center, end: upper },
+    ],
+    arcs: FIB_WEDGE_LEVELS.map((ratio) => {
+      const radius = baseRadius * ratio;
+      return {
+        ratio,
+        radius,
+        startAngle,
+        endAngle,
+        rect: {
+          x: center.x - radius,
+          y: center.y - radius,
+          width: radius * 2,
+          height: radius * 2,
+        },
+      };
+    }),
+  };
+}
+
 export function resolveEllipseFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -781,6 +839,7 @@ export const FIB_FAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
 export const FIB_SPEED_RESISTANCE_FAN_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_SPEED_RESISTANCE_ARC_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_CIRCLE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
+export const FIB_WEDGE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
 export const FIB_CHANNEL_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.414, 1.618, 2] as const;
 export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
 export const GANN_FAN_LEVELS = [
@@ -1520,6 +1579,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibCircles',
         drawing,
         fibCircles: resolveFibCirclesFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibWedge':
+      return {
+        kind: 'fibWedge',
+        drawing,
+        fibWedge: resolveFibWedgeFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'fibChannel':
       return {

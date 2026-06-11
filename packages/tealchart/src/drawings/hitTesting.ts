@@ -260,6 +260,16 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibWedge') {
+    const distance = Math.min(
+      ...geometry.fibWedge.arcs.map((arc) =>
+        distanceToArcEdge(point, geometry.fibWedge.center, arc.radius, arc.startAngle, arc.endAngle),
+      ),
+      ...geometry.fibWedge.boundaries.map((boundary) => distanceToSegment(point, boundary)),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'ellipse') {
     const distance = distanceToEllipseEdge(
       point,
@@ -521,6 +531,13 @@ function hitTestUserDrawingHandle(
       geometry.polygon.points.forEach((trianglePoint, pointIndex) => {
         handles.push({ handle: 'center', point: trianglePoint, pointIndex });
       });
+      break;
+    case 'fibWedge':
+      if (geometry.drawing.kind === 'fibWedge') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
       break;
     case 'fibChannel':
       if (geometry.drawing.kind === 'fibChannel') {
