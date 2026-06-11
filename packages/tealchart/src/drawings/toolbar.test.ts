@@ -109,6 +109,7 @@ describe('user drawing toolbar descriptors', () => {
       'comment',
       'priceNote',
       'pin',
+      'icon',
       'balloon',
       'textLabel',
     ]);
@@ -260,6 +261,7 @@ describe('user drawing toolbar descriptors', () => {
       expect.objectContaining({ tool: 'priceNote', label: 'Price note' }),
     );
     expect(getUserDrawingToolDescriptor('pin')).toEqual(expect.objectContaining({ tool: 'pin', label: 'Pin' }));
+    expect(getUserDrawingToolDescriptor('icon')).toEqual(expect.objectContaining({ tool: 'icon', label: 'Icon' }));
     expect(getUserDrawingToolDescriptor('balloon')).toEqual(
       expect.objectContaining({ tool: 'balloon', label: 'Balloon' }),
     );
@@ -538,8 +540,16 @@ describe('user drawing toolbar descriptors', () => {
       id: 'dp',
       kind: 'datePriceRange' as const,
     };
+    const icon = {
+      ...horizontal,
+      id: 'icon',
+      kind: 'icon' as const,
+      point: { time: 1, price: 10 },
+      iconName: 'star' as const,
+    };
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingFillControls(icon)).toBe(true);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'e', kind: 'ellipse' as const })).toBe(true);
     expect(

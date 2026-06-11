@@ -3,6 +3,7 @@ import type {
   DrawingScreenPoint,
   ResolvedUserDrawingGeometry,
   ResolveUserDrawingRenderEntriesOptions,
+  UserDrawingIconName,
   UserDrawingRenderPhase,
   UserDrawingState,
   UserDrawingStyle,
@@ -127,6 +128,18 @@ export type MobileUserDrawingPrimitive =
       selected: boolean;
       opacity: number;
       clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'icon';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      iconName: UserDrawingIconName;
       points: readonly DrawingScreenPoint[];
       style: UserDrawingStyle;
     }
@@ -817,6 +830,7 @@ export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPr
 export type MobileUserDrawingBarsPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'barsPattern' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
+export type MobileUserDrawingIconPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'icon' }>;
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
 export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
@@ -1033,6 +1047,19 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.mark.points,
+        style: geometry.drawing.style,
+      };
+    case 'icon':
+      return {
+        kind: 'icon',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        point: geometry.icon.center,
+        iconName: geometry.icon.name,
+        points: geometry.icon.points,
         style: geometry.drawing.style,
       };
     case 'rectangle':

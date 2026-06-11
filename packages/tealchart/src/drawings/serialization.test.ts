@@ -350,6 +350,64 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored icon drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'icon',
+          kind: 'icon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          iconName: 'star',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'icon',
+      kind: 'icon',
+      point: { time: 1, price: 10 },
+      iconName: 'star',
+    });
+
+    const restoredFallback = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'icon',
+          kind: 'icon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          iconName: 'unknown',
+        },
+      ],
+    });
+
+    expect(restoredFallback?.drawings[0]).toMatchObject({
+      kind: 'icon',
+      iconName: 'star',
+    });
+  });
+
   it('preserves restored balloon drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
