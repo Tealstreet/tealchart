@@ -2223,4 +2223,68 @@ describe('user drawing editing', () => {
       updatedAt: 23,
     });
   });
+
+  it('moves and edits triangle pattern anchors with stable four-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'triangle-pattern',
+      kind: 'trianglePattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 20 },
+        { time: 50, price: 70 },
+        { time: 70, price: 35 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'triangle-pattern' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'triangle-pattern' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 15 },
+      { now: () => 24 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'trianglePattern',
+      points: [
+        { time: 15, price: 85 },
+        { time: 25, price: 15 },
+        { time: 55, price: 65 },
+        { time: 75, price: 30 },
+      ],
+      updatedAt: 24,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'triangle-pattern', handle: 'center', pointIndex: 3 },
+        startPoint: { x: 70, y: 65 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 75, y: 60 },
+      { now: () => 25 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'trianglePattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 20 },
+        { time: 50, price: 70 },
+        { time: 75, price: 40 },
+      ],
+      updatedAt: 25,
+    });
+  });
 });

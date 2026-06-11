@@ -529,6 +529,46 @@ function renderPatternGeometry(
   }
 }
 
+function renderTrianglePatternGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'trianglePattern' }>,
+): void {
+  const { drawing, pattern } = geometry;
+  const [firstFillPoint, ...remainingFillPoints] = pattern.polygon.points;
+  if (!firstFillPoint) return;
+
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.beginPath();
+    ctx.moveTo(firstFillPoint.x, firstFillPoint.y);
+    for (const point of remainingFillPoints) {
+      ctx.lineTo(point.x, point.y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fill();
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.beginPath();
+    for (const boundary of pattern.boundaries) {
+      ctx.moveTo(boundary.start.x, boundary.start.y);
+      ctx.lineTo(boundary.end.x, boundary.end.y);
+    }
+    ctx.stroke();
+  }
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const label of pattern.labels) {
+    ctx.fillText(label.text, label.point.x, label.point.y - 6);
+  }
+}
+
 function renderRectangleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
@@ -1089,6 +1129,9 @@ export function renderUserDrawing(
         break;
       case 'projection':
         renderProjectionGeometry(ctx, geometry);
+        break;
+      case 'trianglePattern':
+        renderTrianglePatternGeometry(ctx, geometry);
         break;
       case 'xabcdPattern':
         renderPatternGeometry(ctx, geometry);

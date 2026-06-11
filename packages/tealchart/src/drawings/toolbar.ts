@@ -150,6 +150,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'forecast', icon: '↗', label: 'Forecast' },
   { tool: 'projection', icon: '⌁', label: 'Projection' },
   { tool: 'barsPattern', icon: '▥', label: 'Bars pattern' },
+  { tool: 'trianglePattern', icon: '△', label: 'Triangle pattern' },
   { tool: 'abcdPattern', icon: 'A', label: 'ABCD pattern' },
   { tool: 'xabcdPattern', icon: 'X', label: 'XABCD pattern' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
@@ -357,6 +358,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'dateRange' ||
     drawing.kind === 'datePriceRange' ||
     drawing.kind === 'triangle' ||
+    drawing.kind === 'trianglePattern' ||
     drawing.kind === 'fibWedge' ||
     drawing.kind === 'gannBox' ||
     drawing.kind === 'gannSquare' ||

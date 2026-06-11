@@ -786,6 +786,39 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:D:70,24:#111:center:1:12px sans-serif');
   });
 
+  it('renders triangle pattern drawings as filled labeled AC/BD boundaries', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'triangle-pattern',
+      kind: 'trianglePattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 20 },
+        { time: 50, price: 70 },
+        { time: 70, price: 35 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:50,30');
+    expect(ctx.calls).toContain('lineTo:70,65');
+    expect(ctx.calls).toContain('lineTo:20,80');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:50,30');
+    expect(ctx.calls).toContain('moveTo:20,80');
+    expect(ctx.calls).toContain('lineTo:70,65');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:A:10,4:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:B:20,74:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:C:50,24:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:D:70,59:#111:center:1:12px sans-serif');
+  });
+
   it('renders curve drawings as stroked quadratic curves', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

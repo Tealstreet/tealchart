@@ -52,6 +52,7 @@ export {
   resolveForecastFromAnchors,
   resolveProjectionFromAnchors,
   resolveAbcdPatternFromAnchors,
+  resolveTrianglePatternFromAnchors,
   resolveXabcdPatternFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveGannBoxFromAnchors,
@@ -74,6 +75,7 @@ export {
   resolveUserDrawingGeometry,
   screenPointToAnchor,
   timeToDrawingX,
+  TRIANGLE_PATTERN_LABELS,
   XABCD_PATTERN_LABELS,
 } from './coordinates';
 export type {
@@ -123,11 +125,14 @@ export type {
   DrawingScreenRiskRewardPosition,
   DrawingScreenSegment,
   DrawingScreenTrendAngle,
+  DrawingScreenTrianglePattern,
+  DrawingScreenTrianglePatternLabel,
   DrawingScreenXabcdPattern,
   DrawingScreenXabcdPatternLabel,
   ResolveUserDrawingInputFromChartOptions,
   ResolveUserDrawingInputPointOptions,
   ResolvedUserDrawingGeometry,
+  TrianglePatternLabel,
   XabcdPatternLabel,
 } from './coordinates';
 export { formatUserDrawingDateRangeDuration, resolveUserDrawingDateRangeMetrics } from './dateRange';
@@ -370,6 +375,7 @@ export type {
   TextLabelDrawing,
   TimeCyclesDrawing,
   TriangleDrawing,
+  TrianglePatternDrawing,
   TrendAngleDrawing,
   TrendLineDrawing,
   UserDrawing,

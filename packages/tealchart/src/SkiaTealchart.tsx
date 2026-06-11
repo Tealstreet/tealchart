@@ -2455,6 +2455,59 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'trianglePattern') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const fillPath = Skia.Path.Make();
+            const [firstFillPoint, ...remainingFillPoints] = primitive.polygon;
+            if (!firstFillPoint) return null;
+            fillPath.moveTo(firstFillPoint.x, firstFillPoint.y);
+            for (const point of remainingFillPoints) {
+              fillPath.lineTo(point.x, point.y);
+            }
+            fillPath.close();
+
+            const boundaryPath = Skia.Path.Make();
+            for (const boundary of primitive.boundaries) {
+              boundaryPath.moveTo(boundary.start.x, boundary.start.y);
+              boundaryPath.lineTo(boundary.end.x, boundary.end.y);
+            }
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={boundaryPath}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+                {font &&
+                  primitive.labels.map((label) => {
+                    const bounds = font.measureText(label.text);
+                    return (
+                      <SkiaText
+                        key={`${primitive.id}:label:${label.text}`}
+                        x={label.point.x - bounds.width / 2}
+                        y={label.point.y - 6}
+                        text={label.text}
+                        font={font}
+                        color={primitive.style.textColor ?? primitive.style.lineColor}
+                      />
+                    );
+                  })}
+              </Group>
+            );
+          }
+
           if (
             primitive.kind === 'path' ||
             primitive.kind === 'brush' ||

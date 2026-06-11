@@ -78,6 +78,7 @@ import {
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
   resolveAbcdPatternFromAnchors,
+  resolveTrianglePatternFromAnchors,
   resolveXabcdPatternFromAnchors,
   screenPointToAnchor,
   timeToDrawingX,
@@ -465,6 +466,45 @@ describe('user drawing coordinates', () => {
         { text: 'B', point: { x: 60, y: 20 } },
         { text: 'C', point: { x: 110, y: 95 } },
         { text: 'D', point: { x: 160, y: 45 } },
+      ],
+    });
+  });
+
+  it('resolves triangle pattern boundaries, fill polygon, and labels from four anchors', () => {
+    expect(
+      resolveTrianglePatternFromAnchors(
+        [
+          { time: 1_000, price: 110 },
+          { time: 1_500, price: 90 },
+          { time: 2_000, price: 105 },
+          { time: 2_500, price: 95 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      points: [
+        { x: 10, y: 20 },
+        { x: 60, y: 120 },
+        { x: 110, y: 45 },
+        { x: 160, y: 95 },
+      ],
+      polygon: {
+        points: [
+          { x: 10, y: 20 },
+          { x: 110, y: 45 },
+          { x: 160, y: 95 },
+          { x: 60, y: 120 },
+        ],
+      },
+      boundaries: [
+        { start: { x: 10, y: 20 }, end: { x: 110, y: 45 } },
+        { start: { x: 60, y: 120 }, end: { x: 160, y: 95 } },
+      ],
+      labels: [
+        { text: 'A', point: { x: 10, y: 20 } },
+        { text: 'B', point: { x: 60, y: 120 } },
+        { text: 'C', point: { x: 110, y: 45 } },
+        { text: 'D', point: { x: 160, y: 95 } },
       ],
     });
   });
