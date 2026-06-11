@@ -527,7 +527,7 @@ export type ResolvedUserDrawingGeometry =
       channel: DrawingScreenParallelChannel;
     }
   | {
-      kind: 'textLabel';
+      kind: 'textLabel' | 'note';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
     };
@@ -2324,8 +2324,9 @@ export function resolveUserDrawingGeometry(
         channel: resolveRegressionTrendFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'textLabel':
+    case 'note':
       return {
-        kind: 'textLabel',
+        kind: drawing.kind,
         drawing,
         point: anchorToScreenPoint(drawing.point, space),
       };

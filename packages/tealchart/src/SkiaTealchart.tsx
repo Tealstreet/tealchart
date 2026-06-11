@@ -20,12 +20,12 @@ import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
-  TextLabelDrawing,
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
   UserDrawingLineStyle,
   UserDrawingStyle,
+  UserDrawingTextAnnotation,
   UserDrawingTextAlign,
   UserDrawingTool,
   UpdateUserDrawingOptions,
@@ -134,7 +134,10 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
+import type {
+  MobileUserDrawingNotePrimitive,
+  MobileUserDrawingTextLabelPrimitive,
+} from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
@@ -609,8 +612,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const activeUserDrawingTextEditPrimitive = useMemo(
     () =>
       userDrawingPrimitives.find(
-        (primitive): primitive is MobileUserDrawingTextLabelPrimitive =>
-          primitive.kind === 'textLabel' &&
+        (primitive): primitive is MobileUserDrawingTextLabelPrimitive | MobileUserDrawingNotePrimitive =>
+          (primitive.kind === 'textLabel' || primitive.kind === 'note') &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
       ),
@@ -982,7 +985,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartDimensions],
   );
 
-  const measureUserDrawingTextLabelLine = useCallback((drawing: TextLabelDrawing, line: string): number => {
+  const measureUserDrawingTextLabelLine = useCallback((drawing: UserDrawingTextAnnotation, line: string): number => {
     const normalizedFontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
     const nativeFontFamily = resolveMobileUserDrawingFontFamily(normalizedFontFamily, Platform.OS);
     const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily);
@@ -1239,7 +1242,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         const selectedDrawing = selectedId
           ? selection.state.drawings.find((drawing) => drawing.id === selectedId)
           : null;
-        if (selection.hit && selectedDrawing?.kind === 'textLabel') {
+        if (selection.hit && (selectedDrawing?.kind === 'textLabel' || selectedDrawing?.kind === 'note')) {
           const nextState = beginUserDrawingTextEdit(selection.state, selectedDrawing.id);
           if (nextState !== selection.state) {
             commitUserDrawingState(nextState);
@@ -2818,7 +2821,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'textLabel') {
+          if (primitive.kind === 'textLabel' || primitive.kind === 'note') {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);

@@ -1,12 +1,12 @@
 import type {
   BarsPatternBarSnapshot,
-  TextLabelDrawing,
   UserDrawing,
   UserDrawingAnchor,
   UserDrawingBase,
   UserDrawingLineStyle,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextAnnotation,
 } from './types';
 
 import { createUserDrawingState } from './input';
@@ -156,10 +156,11 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         point: { ...drawing.point },
       };
     case 'textLabel':
+    case 'note':
       return {
         ...drawing,
         style: { ...drawing.style },
-        kind: 'textLabel',
+        kind: drawing.kind,
         point: { ...drawing.point },
       };
   }
@@ -841,16 +842,17 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
           }
         : null;
     }
-    case 'textLabel': {
+    case 'textLabel':
+    case 'note': {
       const point = parseAnchor(value.point);
       if (!point || typeof value.text !== 'string') return null;
-      const textAlign: TextLabelDrawing['textAlign'] =
+      const textAlign: UserDrawingTextAnnotation['textAlign'] =
         value.textAlign === 'left' || value.textAlign === 'right' || value.textAlign === 'center'
           ? value.textAlign
           : 'center';
       return {
         ...base,
-        kind: 'textLabel',
+        kind: value.kind,
         point,
         text: value.text,
         textAlign,

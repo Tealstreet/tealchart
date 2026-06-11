@@ -7,6 +7,7 @@ import type {
   UserDrawingState,
   UserDrawingStyle,
   TextLabelDrawing,
+  UserDrawingTextAnnotation,
 } from '../../drawings';
 
 import { resolveDrawingArrowHead } from '../../drawings/arrowGeometry';
@@ -660,6 +661,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'note';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'handle';
       id: string;
       drawingId: string;
@@ -671,6 +686,7 @@ export type MobileUserDrawingPrimitive =
     };
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
+export type MobileUserDrawingNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'note' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
@@ -1485,9 +1501,10 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'textLabel':
-      const drawing = geometry.drawing as TextLabelDrawing;
+    case 'note':
+      const drawing = geometry.drawing as UserDrawingTextAnnotation;
       return {
-        kind: 'textLabel',
+        kind: geometry.kind,
         id: drawing.id,
         phase,
         selected,
@@ -1554,7 +1571,7 @@ export function resolveMobileUserDrawingRenderModel(
 }
 
 export function resolveMobileUserDrawingTextLabelLayout(
-  primitive: MobileUserDrawingTextLabelPrimitive,
+  primitive: MobileUserDrawingTextLabelPrimitive | MobileUserDrawingNotePrimitive,
   measuredTextWidth: number | readonly number[],
   options: {
     labelPadding?: number;

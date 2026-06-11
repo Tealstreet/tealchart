@@ -17,6 +17,7 @@ import {
   isUserDrawingFillToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
+  isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
   supportsUserDrawingTextControls,
@@ -493,7 +494,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       })}
 
                       {USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => {
-                        const active = selectedDrawing.kind === 'textLabel' && selectedDrawing.textAlign === descriptor.textAlign;
+                        const active = isUserDrawingTextAnnotation(selectedDrawing) && selectedDrawing.textAlign === descriptor.textAlign;
                         return (
                           <Pressable
                             key={descriptor.textAlign}

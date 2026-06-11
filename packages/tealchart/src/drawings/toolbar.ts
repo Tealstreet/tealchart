@@ -7,7 +7,12 @@ import type {
   UserDrawingTool,
 } from './types';
 
-import { USER_DRAWING_FONT_FAMILIES, USER_DRAWING_FONT_SIZES, USER_DRAWING_OPACITIES } from './types';
+import {
+  isUserDrawingTextAnnotation,
+  USER_DRAWING_FONT_FAMILIES,
+  USER_DRAWING_FONT_SIZES,
+  USER_DRAWING_OPACITIES,
+} from './types';
 
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
@@ -161,6 +166,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'path', icon: '⌁', label: 'Path' },
   { tool: 'brush', icon: '✎', label: 'Brush' },
   { tool: 'highlighter', icon: '▰', label: 'Highlighter' },
+  { tool: 'note', icon: 'N', label: 'Note' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
 
@@ -283,12 +289,12 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'regressionTrend' ||
     drawing.kind === 'flatTopBottom' ||
     drawing.kind === 'disjointChannel' ||
-    drawing.kind === 'textLabel'
+    isUserDrawingTextAnnotation(drawing)
   );
 }
 
 export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
-  return drawing.kind === 'textLabel';
+  return isUserDrawingTextAnnotation(drawing);
 }
 
 export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolean {
@@ -340,6 +346,6 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.textColor ?? '',
     selectedDrawing?.style.fontSize ?? '',
     selectedDrawing?.style.fontFamily ?? '',
-    selectedDrawing?.kind === 'textLabel' ? selectedDrawing.textAlign : '',
+    selectedDrawing && isUserDrawingTextAnnotation(selectedDrawing) ? selectedDrawing.textAlign : '',
   ].join('|');
 }

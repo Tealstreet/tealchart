@@ -58,6 +58,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('arrowMarkDown')).toBe(1);
     expect(getRequiredAnchorCount('horizontalRay')).toBe(1);
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
+    expect(getRequiredAnchorCount('note')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
@@ -655,6 +656,21 @@ describe('user drawing types', () => {
       point: anchorA,
       style: expect.objectContaining({ fontFamily: 'monospace', fontSize: 14 }),
       text: 'Note',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'note',
+          anchors: [anchorA],
+          text: 'Chart note',
+        }),
+        { id: 'note' },
+      ),
+    ).toMatchObject({
+      kind: 'note',
+      point: anchorA,
+      text: 'Chart note',
       textAlign: 'center',
     });
   });

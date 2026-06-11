@@ -29,7 +29,12 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { TIME_AXIS_HEIGHT } from '../types';
-import { anchorToScreenPoint, getUserDrawingToolbarStateKey, resolveUserDrawingTextEditMetrics } from '../drawings';
+import {
+  anchorToScreenPoint,
+  getUserDrawingToolbarStateKey,
+  isUserDrawingTextAnnotation,
+  resolveUserDrawingTextEditMetrics,
+} from '../drawings';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
@@ -483,7 +488,7 @@ export class TealchartWidgetUI {
     }
 
     const drawing = state.drawings.find((candidate) => candidate.id === textEdit.drawingId);
-    if (!drawing || drawing.kind !== 'textLabel') {
+    if (!drawing || !isUserDrawingTextAnnotation(drawing)) {
       this.removeUserDrawingTextEditor();
       return;
     }
