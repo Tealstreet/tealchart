@@ -49,8 +49,11 @@ export {
   selectUserDrawingAtPoint,
   selectUserDrawingById,
   selectUserDrawing,
+  setUserDrawingLocked,
   setUserDrawingText,
   setUserDrawingTool,
+  setUserDrawingVisibility,
+  updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
 export type {
@@ -60,6 +63,7 @@ export type {
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
   UserDrawingTextEditOptions,
+  UpdateUserDrawingOptions,
 } from './input';
 export {
   resolveUserDrawingHandlePoints,
