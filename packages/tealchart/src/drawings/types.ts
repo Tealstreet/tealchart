@@ -130,12 +130,21 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
 };
 
 export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
+export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
+export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
+export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
 
-export function normalizeUserDrawingFontSize(fontSize: number): number {
+export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
   return USER_DRAWING_FONT_SIZES.reduce((nearest, candidate) =>
     Math.abs(candidate - fontSize) < Math.abs(nearest - fontSize) ? candidate : nearest,
   );
+}
+
+export function normalizeUserDrawingFontFamily(fontFamily: string): UserDrawingFontFamily {
+  return USER_DRAWING_FONT_FAMILIES.includes(fontFamily as UserDrawingFontFamily)
+    ? (fontFamily as UserDrawingFontFamily)
+    : 'sans-serif';
 }
 
 export function normalizeUserDrawingOpacity(opacity: number): number {
@@ -145,12 +154,15 @@ export function normalizeUserDrawingOpacity(opacity: number): number {
 
 export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingStyle {
   const fontSize = style.fontSize === undefined ? undefined : normalizeUserDrawingFontSize(style.fontSize);
+  const fontFamily =
+    style.fontFamily === undefined ? undefined : normalizeUserDrawingFontFamily(style.fontFamily);
   const opacity = style.opacity === undefined ? undefined : normalizeUserDrawingOpacity(style.opacity);
-  if (fontSize === style.fontSize && opacity === style.opacity) return style;
+  if (fontSize === style.fontSize && fontFamily === style.fontFamily && opacity === style.opacity) return style;
 
   return {
     ...style,
     ...(fontSize === undefined ? {} : { fontSize }),
+    ...(fontFamily === undefined ? {} : { fontFamily }),
     ...(opacity === undefined ? {} : { opacity }),
   };
 }

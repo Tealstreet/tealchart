@@ -12,6 +12,7 @@ export * from './hooks';
 
 // Utilities
 export * from './utils/coordinates';
+export * from './utils/drawingFonts';
 export * from './utils/drawingInput';
 export * from './utils/drawingPersistence';
 export * from './utils/drawingRenderModel';
