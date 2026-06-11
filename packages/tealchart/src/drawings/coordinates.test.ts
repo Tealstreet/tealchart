@@ -4,6 +4,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  CircleDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
@@ -246,6 +247,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const circle: CircleDrawing = {
+      ...trendLine,
+      id: 'circle',
+      kind: 'circle',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
     const arrowLine: ArrowLineDrawing = {
       ...trendLine,
       id: 'arrow',
@@ -388,6 +398,14 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(rectangle, space)).toMatchObject({
       kind: 'rectangle',
       rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(circle, space)).toMatchObject({
+      kind: 'circle',
+      circle: {
+        center: { x: 110, y: 70 },
+        radius: 50,
+        rect: { x: 10, y: 20, width: 200, height: 100 },
+      },
     });
     expect(resolveUserDrawingGeometry(priceRange, space)).toMatchObject({
       kind: 'priceRange',

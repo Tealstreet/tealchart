@@ -13,6 +13,7 @@ export type UserDrawingTool =
   | 'horizontalLine'
   | 'verticalLine'
   | 'rectangle'
+  | 'circle'
   | 'priceRange'
   | 'dateRange'
   | 'path'
@@ -109,6 +110,11 @@ export interface RectangleDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface CircleDrawing extends UserDrawingBase {
+  kind: 'circle';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PriceRangeDrawing extends UserDrawingBase {
   kind: 'priceRange';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -145,6 +151,7 @@ export type UserDrawing =
   | HorizontalLineDrawing
   | VerticalLineDrawing
   | RectangleDrawing
+  | CircleDrawing
   | PriceRangeDrawing
   | DateRangeDrawing
   | PathDrawing
@@ -249,6 +256,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'arrowMarker':
     case 'ray':
     case 'rectangle':
+    case 'circle':
     case 'priceRange':
     case 'dateRange':
       return 2;
@@ -357,6 +365,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'rectangle',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'circle':
+      return {
+        ...base,
+        kind: 'circle',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'priceRange':
