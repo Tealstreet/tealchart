@@ -86,6 +86,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits arrow marker bodies and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'marker',
+      kind: 'arrowMarker',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space)?.drawing.id).toBe('marker');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 50 }, space)?.handle).toBe('end');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 62 }, space, { tolerance: 2 })).toBeNull();
+  });
+
   it('hits extended line drawings against their extended segment', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -187,6 +187,44 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready arrow marker polygons', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'arrowMarker',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'arrowMarker',
+      id: 'marker',
+      points: [
+        { x: 100, y: 50 },
+        { x: 78, y: 59 },
+        { x: 0, y: 53.5 },
+        { x: 0, y: 46.5 },
+        { x: 78, y: 41 },
+      ],
+    });
+  });
+
   it('returns Skia-ready extended line segments to chart bounds', () => {
     const extended: ExtendedLineDrawing = {
       id: 'extended',

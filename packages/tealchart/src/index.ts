@@ -125,6 +125,7 @@ export {
 export type {
   CreateUserDrawingFromDraftOptions,
   ArrowLineDrawing,
+  ArrowMarkerDrawing,
   DateRangeDrawing,
   DeleteUserDrawingOptions,
   ExtendedLineDrawing,
