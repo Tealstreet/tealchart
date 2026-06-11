@@ -8,6 +8,7 @@
 import type { ChartSettings, IndicatorInstance } from '../state/chartState';
 import type { TvChartContent, TvChartData, TvPane, TvSource } from './types';
 
+import { serializeUserDrawingStateForLayout } from '../drawings';
 import { findMappingByCustomId, mapInputsToTv } from './indicatorMapping';
 import { CHART_TYPE_TO_TV_STYLE, LINE_STYLE_TO_TV, TRANSFORMER_VERSION, TV_CHART_STYLES } from './types';
 
@@ -129,6 +130,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
       chartType: settings.chartType,
       autoScale: settings.autoScale,
       viewport: settings.viewport,
+      userDrawingState: serializeUserDrawingStateForLayout(settings.userDrawingState),
     },
     // Preserve indicators that couldn't be mapped
     _tealstreetOriginalIndicators: settings.indicators.filter((ind) => {

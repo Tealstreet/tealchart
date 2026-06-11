@@ -34,9 +34,12 @@ import {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
+  deserializeUserDrawingStateFromLayout,
   handleUserDrawingInput,
+  isUserDrawingLayoutStateEqual,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
+  serializeUserDrawingStateForLayout,
   setUserDrawingText,
   setUserDrawingTool,
   updateUserDrawingTextEdit,
@@ -2143,11 +2146,25 @@ export class TealchartWidget {
     return this._userDrawingState;
   }
 
-  setUserDrawingState(state: UserDrawingState): void {
+  exportUserDrawingStateForLayout(): UserDrawingState | undefined {
+    return serializeUserDrawingStateForLayout(this._userDrawingState);
+  }
+
+  importUserDrawingStateFromLayout(state?: UserDrawingState | null): void {
+    this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState(), {
+      markLayoutDirty: false,
+    });
+  }
+
+  setUserDrawingState(state: UserDrawingState, options: { markLayoutDirty?: boolean } = {}): void {
     if (state === this._userDrawingState) return;
+    const previousState = this._userDrawingState;
     this._userDrawingState = state;
     this._options.onUserDrawingStateChange?.(state);
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
+    if (options.markLayoutDirty !== false && !isUserDrawingLayoutStateEqual(previousState, state)) {
+      this._markDirty();
+    }
   }
 
   setActiveUserDrawingTool(tool: UserDrawingTool): void {
@@ -2690,6 +2707,7 @@ export class TealchartWidget {
     // Apply loaded settings to the in-memory store so auto-save can read them
     if (this._chartStore) {
       this._chartStore.settings.setKey('indicators', settings.indicators || []);
+      this._chartStore.settings.setKey('userDrawingState', settings.userDrawingState);
       this._chartStore.settings.setKey('showVolume', settings.showVolume);
       this._chartStore.settings.setKey('volumeHeight', settings.volumeHeight);
       this._chartStore.settings.setKey('chartType', settings.chartType || 'candle');
@@ -2697,6 +2715,9 @@ export class TealchartWidget {
       this._chartStore.settings.setKey('symbol', settings.symbol || this._symbol);
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
+
+    this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), { markLayoutDirty: false });
+
     if (!settings.autoScale) {
       this._viewportController.disableAutoScale('main');
     }
@@ -3024,6 +3045,7 @@ export class TealchartWidget {
           }
         : undefined,
       indicators,
+      userDrawingState: this._userDrawingState,
       version: 1,
     };
   }

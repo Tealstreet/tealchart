@@ -1,0 +1,226 @@
+import type {
+  TextLabelDrawing,
+  UserDrawing,
+  UserDrawingAnchor,
+  UserDrawingBase,
+  UserDrawingLineStyle,
+  UserDrawingState,
+  UserDrawingStyle,
+} from './types';
+
+import { createUserDrawingState } from './input';
+
+function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
+  switch (drawing.kind) {
+    case 'trendLine':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
+      };
+    case 'ray':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
+      };
+    case 'rectangle':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
+      };
+    case 'horizontalLine':
+    case 'verticalLine':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+      };
+    case 'textLabel':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        point: { ...drawing.point },
+      };
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isLineStyle(value: unknown): value is UserDrawingLineStyle {
+  return value === 'solid' || value === 'dashed' || value === 'dotted';
+}
+
+function parseAnchor(value: unknown): UserDrawingAnchor | null {
+  if (!isRecord(value) || !isFiniteNumber(value.time) || !isFiniteNumber(value.price)) return null;
+  return { time: value.time, price: value.price };
+}
+
+function parseStyle(value: unknown): UserDrawingStyle | null {
+  if (
+    !isRecord(value) ||
+    typeof value.lineColor !== 'string' ||
+    !isFiniteNumber(value.lineWidth) ||
+    !isLineStyle(value.lineStyle)
+  ) {
+    return null;
+  }
+
+  const style: UserDrawingStyle = {
+    lineColor: value.lineColor,
+    lineWidth: value.lineWidth,
+    lineStyle: value.lineStyle,
+  };
+
+  if (typeof value.fillColor === 'string') style.fillColor = value.fillColor;
+  if (typeof value.textColor === 'string') style.textColor = value.textColor;
+  if (isFiniteNumber(value.fontSize)) style.fontSize = value.fontSize;
+  if (typeof value.fontFamily === 'string') style.fontFamily = value.fontFamily;
+  return style;
+}
+
+function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'> | null {
+  const style = parseStyle(value.style);
+  if (
+    typeof value.id !== 'string' ||
+    typeof value.paneId !== 'string' ||
+    typeof value.visible !== 'boolean' ||
+    typeof value.locked !== 'boolean' ||
+    !isFiniteNumber(value.createdAt) ||
+    !isFiniteNumber(value.updatedAt) ||
+    !style
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    paneId: value.paneId,
+    visible: value.visible,
+    locked: value.locked,
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+    style,
+  };
+}
+
+function parseTwoPointDrawing(value: Record<string, unknown>): [UserDrawingAnchor, UserDrawingAnchor] | null {
+  if (!Array.isArray(value.points)) return null;
+  const start = parseAnchor(value.points[0]);
+  const end = parseAnchor(value.points[1]);
+  return start && end ? [start, end] : null;
+}
+
+function parseUserDrawing(value: unknown): UserDrawing | null {
+  if (!isRecord(value)) return null;
+  const base = parseBase(value);
+  if (!base) return null;
+
+  switch (value.kind) {
+    case 'trendLine': {
+      const points = parseTwoPointDrawing(value);
+      if (!points) return null;
+      const extend = value.extend;
+      if (extend !== 'none' && extend !== 'left' && extend !== 'right' && extend !== 'both') return null;
+      return {
+        ...base,
+        kind: 'trendLine',
+        points,
+        extend,
+      };
+    }
+    case 'ray': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'ray',
+            points,
+          }
+        : null;
+    }
+    case 'rectangle': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'rectangle',
+            points,
+          }
+        : null;
+    }
+    case 'horizontalLine':
+      return isFiniteNumber(value.price)
+        ? {
+            ...base,
+            kind: 'horizontalLine',
+            price: value.price,
+          }
+        : null;
+    case 'verticalLine':
+      return isFiniteNumber(value.time)
+        ? {
+            ...base,
+            kind: 'verticalLine',
+            time: value.time,
+          }
+        : null;
+    case 'textLabel': {
+      const point = parseAnchor(value.point);
+      if (!point || typeof value.text !== 'string') return null;
+      const textAlign: TextLabelDrawing['textAlign'] =
+        value.textAlign === 'left' || value.textAlign === 'right' || value.textAlign === 'center'
+          ? value.textAlign
+          : 'center';
+      return {
+        ...base,
+        kind: 'textLabel',
+        point,
+        text: value.text,
+        textAlign,
+      };
+    }
+    default:
+      return null;
+  }
+}
+
+export function serializeUserDrawingStateForLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
+  if (!state || state.drawings.length === 0) return undefined;
+
+  return createUserDrawingState({
+    version: state.version,
+    drawings: state.drawings.map(cloneUserDrawing),
+  });
+}
+
+export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDrawingState | undefined {
+  if (!isRecord(state) || !Array.isArray(state.drawings)) return undefined;
+  const drawings = state.drawings.map(parseUserDrawing).filter((drawing): drawing is UserDrawing => drawing !== null);
+  if (drawings.length === 0) return undefined;
+
+  return createUserDrawingState({
+    version: isFiniteNumber(state.version) ? state.version : undefined,
+    drawings,
+  });
+}
+
+export function isUserDrawingLayoutStateEqual(
+  previous?: UserDrawingState | null,
+  next?: UserDrawingState | null,
+): boolean {
+  return (
+    JSON.stringify(serializeUserDrawingStateForLayout(previous) ?? null) ===
+    JSON.stringify(serializeUserDrawingStateForLayout(next) ?? null)
+  );
+}

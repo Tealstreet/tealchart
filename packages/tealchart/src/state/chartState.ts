@@ -1,5 +1,6 @@
 import type { MapStore, WritableAtom } from 'nanostores';
 import type { ResolutionString } from '../types';
+import type { UserDrawingState } from '../drawings';
 
 import { atom, computed, map } from 'nanostores';
 
@@ -75,6 +76,8 @@ export interface ChartSettings {
   };
   /** Persisted indicators */
   indicators: IndicatorInstance[];
+  /** Persisted user drawing markup */
+  userDrawingState?: UserDrawingState;
   /** Schema version for migrations */
   version: number;
 }
