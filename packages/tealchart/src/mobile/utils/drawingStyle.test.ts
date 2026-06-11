@@ -55,4 +55,21 @@ describe('mobile drawing style helpers', () => {
     expect(locked.drawings[0]).toMatchObject({ locked: true, updatedAt: 30 });
     expect(locked.selection).toBeNull();
   });
+
+  it('requires explicit opt-in for locked drawing property changes', () => {
+    const lockedState: UserDrawingState = {
+      ...state,
+      selection: null,
+      drawings: [{ ...state.drawings[0]!, locked: true }],
+    };
+
+    expect(setMobileUserDrawingVisibility(lockedState, false, { drawingId: 'line' })).toBe(lockedState);
+    expect(setMobileUserDrawingLocked(lockedState, false, { drawingId: 'line' })).toBe(lockedState);
+    expect(
+      setMobileUserDrawingVisibility(lockedState, false, { drawingId: 'line', includeLocked: true }).drawings[0],
+    ).toMatchObject({ visible: false });
+    expect(
+      setMobileUserDrawingLocked(lockedState, false, { drawingId: 'line', includeLocked: true }).drawings[0],
+    ).toMatchObject({ locked: false });
+  });
 });

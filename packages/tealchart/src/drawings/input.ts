@@ -203,7 +203,7 @@ export function setUserDrawingVisibility(
   visible: boolean,
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
-  const target = findUserDrawingForUpdate(state, { ...options, includeLocked: true });
+  const target = findUserDrawingForUpdate(state, options);
   if (!target || target.drawing.visible === visible) return state;
 
   const drawing = {
@@ -226,7 +226,7 @@ export function setUserDrawingLocked(
   locked: boolean,
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
-  const target = findUserDrawingForUpdate(state, { ...options, includeLocked: true });
+  const target = findUserDrawingForUpdate(state, options);
   if (!target || target.drawing.locked === locked) return state;
 
   const drawing = {
