@@ -16,7 +16,7 @@ import {
   USER_DRAWING_OPACITIES,
 } from './types';
 
-export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
+export type UserDrawingToolbarAction = 'duplicateSelected' | 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
 
 export interface UserDrawingToolDescriptor {
@@ -185,6 +185,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
 ] as const;
 
 export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolbarActionDescriptor[] = [
+  { action: 'duplicateSelected', icon: '⧉', label: 'Duplicate selected drawing' },
   { action: 'deleteSelected', icon: '⌫', label: 'Delete selected drawing' },
   { action: 'cancelDraft', icon: '×', label: 'Cancel draft drawing' },
   { action: 'clearAll', icon: '⌧', label: 'Clear all drawings' },
@@ -294,6 +295,10 @@ export function isUserDrawingToolbarActionEnabled(
   state: UserDrawingState,
   action: UserDrawingToolbarAction,
 ): boolean {
+  if (action === 'duplicateSelected') {
+    const selectedDrawing = getSelectedUserDrawing(state);
+    return selectedDrawing !== null && !selectedDrawing.locked;
+  }
   if (action === 'deleteSelected') return state.selection !== null;
   if (action === 'cancelDraft') return state.draft !== null;
   return state.drawings.length > 0;

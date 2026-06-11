@@ -41,6 +41,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar render the same drawing tool/action controls
   from the shared descriptors.
 
+## Shipped: Duplicate Drawing Action
+
+- Shared duplicate reducer clones every committed drawing kind with new IDs,
+  timestamps, and deep-copied nested payloads.
+- Web widget/top bar and mobile Skia/top bar expose matching duplicate-selected
+  drawing behavior through the same toolbar descriptors.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text

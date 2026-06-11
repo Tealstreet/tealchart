@@ -382,8 +382,59 @@ describe('user drawing toolbar descriptors', () => {
   });
 
   it('resolves action availability from toolbar-relevant state', () => {
+    expect(USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
+      'duplicateSelected',
+      'deleteSelected',
+      'cancelDraft',
+      'clearAll',
+    ]);
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);
     expect(isUserDrawingToolbarActionEnabled({ ...state, selection: { drawingId: 'h' } }, 'deleteSelected')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(state, 'duplicateSelected')).toBe(false);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...state,
+          selection: { drawingId: 'h' },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        },
+        'duplicateSelected',
+      ),
+    ).toBe(true);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...state,
+          selection: { drawingId: 'h' },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: true,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        },
+        'duplicateSelected',
+      ),
+    ).toBe(false);
     expect(
       isUserDrawingToolbarActionEnabled(
         {

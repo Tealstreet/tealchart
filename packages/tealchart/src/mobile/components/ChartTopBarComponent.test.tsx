@@ -19,6 +19,58 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     cleanup();
   });
 
+  it('dispatches selected drawing actions from shared toolbar descriptors', () => {
+    const onDuplicate = vi.fn();
+    const onDelete = vi.fn();
+    const onCancel = vi.fn();
+    const onClear = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          activeTool: 'trendLine',
+          selection: { drawingId: 'h' },
+          draft: {
+            tool: 'trendLine',
+            paneId: 'main',
+            anchors: [{ time: 1, price: 10 }],
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            startedAt: 1,
+          },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        }}
+        onUserDrawingDuplicateSelected={onDuplicate}
+        onUserDrawingDeleteSelected={onDelete}
+        onUserDrawingCancelDraft={onCancel}
+        onUserDrawingClearAll={onClear}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
+    fireEvent.click(screen.getByLabelText('Delete selected drawing'));
+    fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
+    fireEvent.click(screen.getByLabelText('Clear all drawings'));
+
+    expect(onDuplicate).toHaveBeenCalledTimes(1);
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onClear).toHaveBeenCalledTimes(1);
+  });
+
   it('dispatches selected rectangle fill style controls without text controls', () => {
     const onStyle = vi.fn();
     render(

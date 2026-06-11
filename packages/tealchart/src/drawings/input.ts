@@ -2,6 +2,7 @@ import type {
   UserDrawingHandleRole,
   UserDrawingAnchor,
   BarsPatternBarSnapshot,
+  UserDrawing,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingIconName,
@@ -51,6 +52,10 @@ export interface UserDrawingSelectionAtPointResult {
 export interface DeleteUserDrawingOptions {
   drawingId?: string;
   includeLocked?: boolean;
+}
+
+export interface DuplicateUserDrawingOptions extends UpdateUserDrawingOptions {
+  createId: () => string;
 }
 
 export interface UserDrawingTextEditOptions {
@@ -145,6 +150,166 @@ export function deleteUserDrawing(
     selection,
     draft: null,
     textEdit: state.textEdit?.drawingId === drawingId ? null : state.textEdit,
+  };
+}
+
+function cloneAnchor(anchor: UserDrawingAnchor): UserDrawingAnchor {
+  return { time: anchor.time, price: anchor.price };
+}
+
+function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number): UserDrawing {
+  const base = {
+    id,
+    paneId: drawing.paneId,
+    visible: drawing.visible,
+    locked: drawing.locked,
+    createdAt: now,
+    updatedAt: now,
+    style: { ...drawing.style },
+  };
+
+  switch (drawing.kind) {
+    case 'trendLine':
+      return {
+        ...base,
+        kind: 'trendLine',
+        points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1])],
+        extend: drawing.extend,
+      };
+    case 'trendAngle':
+    case 'extendedLine':
+    case 'infoLine':
+    case 'arrowLine':
+    case 'arrowMarker':
+    case 'ray':
+    case 'rectangle':
+    case 'circle':
+    case 'ellipse':
+    case 'priceRange':
+    case 'dateRange':
+    case 'datePriceRange':
+    case 'forecast':
+    case 'fibRetracement':
+    case 'fibExtension':
+    case 'fibFan':
+    case 'fibSpeedResistanceFan':
+    case 'fibSpeedResistanceArcs':
+    case 'fibCircles':
+    case 'fibSpiral':
+    case 'gannFan':
+    case 'gannBox':
+    case 'gannSquare':
+    case 'fibTimeZone':
+    case 'cyclicLines':
+    case 'timeCycles':
+    case 'sineLine':
+      return {
+        ...base,
+        kind: drawing.kind,
+        points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1])],
+      } as UserDrawing;
+    case 'triangle':
+    case 'curve':
+    case 'arc':
+    case 'fibWedge':
+    case 'fibChannel':
+    case 'trendBasedFibTime':
+    case 'polyline':
+    case 'pitchfork':
+    case 'schiffPitchfork':
+    case 'modifiedSchiffPitchfork':
+    case 'insidePitchfork':
+    case 'pitchfan':
+    case 'parallelChannel':
+    case 'regressionTrend':
+    case 'flatTopBottom':
+    case 'rotatedRectangle':
+    case 'longPosition':
+    case 'shortPosition':
+    case 'projection':
+      return {
+        ...base,
+        kind: drawing.kind,
+        points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1]), cloneAnchor(drawing.points[2])],
+      } as UserDrawing;
+    case 'disjointChannel':
+      return {
+        ...base,
+        kind: 'disjointChannel',
+        points: [
+          cloneAnchor(drawing.points[0]),
+          cloneAnchor(drawing.points[1]),
+          cloneAnchor(drawing.points[2]),
+          cloneAnchor(drawing.points[3]),
+        ],
+      };
+    case 'barsPattern':
+      return {
+        ...base,
+        kind: 'barsPattern',
+        points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1]), cloneAnchor(drawing.points[2])],
+        bars: drawing.bars.map((bar) => ({ ...bar })),
+      };
+    case 'path':
+    case 'brush':
+    case 'highlighter':
+      return { ...base, kind: drawing.kind, points: drawing.points.map(cloneAnchor) } as UserDrawing;
+    case 'horizontalLine':
+      return { ...base, kind: 'horizontalLine', price: drawing.price };
+    case 'verticalLine':
+      return { ...base, kind: 'verticalLine', time: drawing.time };
+    case 'horizontalRay':
+    case 'crossLine':
+    case 'arrowMarkUp':
+    case 'arrowMarkDown':
+    case 'anchoredVwap':
+    case 'pin':
+      return { ...base, kind: drawing.kind, point: cloneAnchor(drawing.point) } as UserDrawing;
+    case 'icon':
+      return { ...base, kind: 'icon', point: cloneAnchor(drawing.point), iconName: drawing.iconName };
+    case 'textLabel':
+    case 'note':
+    case 'comment':
+    case 'balloon':
+      return {
+        ...base,
+        kind: drawing.kind,
+        point: cloneAnchor(drawing.point),
+        text: drawing.text,
+        textAlign: drawing.textAlign,
+      } as UserDrawing;
+    case 'callout':
+    case 'priceNote':
+      return {
+        ...base,
+        kind: drawing.kind,
+        points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1])],
+        text: drawing.text,
+        textAlign: drawing.textAlign,
+      } as UserDrawing;
+  }
+}
+
+export function duplicateUserDrawing(
+  state: UserDrawingState,
+  options: DuplicateUserDrawingOptions,
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target) return state;
+
+  const id = options.createId();
+  const now = options.now?.() ?? Date.now();
+  const duplicate = cloneDrawingForDuplicate(target.drawing, id, now);
+  const drawings = state.drawings.slice();
+  drawings.splice(target.index + 1, 0, duplicate);
+
+  return {
+    ...state,
+    activeTool: 'select',
+    drawings,
+    selection: { drawingId: id },
+    draft: null,
+    textEdit: null,
   };
 }
 

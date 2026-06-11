@@ -46,6 +46,7 @@ describe('ChartTopBar drawing toolbar', () => {
   });
 
   it('enables selected drawing actions from drawing state', () => {
+    const onDuplicate = vi.fn();
     const onDelete = vi.fn();
     const onCancel = vi.fn();
     const onClear = vi.fn();
@@ -77,22 +78,28 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      onUserDrawingDuplicateSelected: onDuplicate,
       onUserDrawingDeleteSelected: onDelete,
       onUserDrawingCancelDraft: onCancel,
       onUserDrawingClearAll: onClear,
     });
     topBar.mount(document.body);
 
+    document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
 
+    expect(onDuplicate).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
 
     topBar.setUserDrawingState(baseDrawingState);
 
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.disabled).toBe(
+      true,
+    );
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.disabled).toBe(true);
