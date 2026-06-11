@@ -55,6 +55,7 @@ describe('user drawing toolbar descriptors', () => {
       ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
       ...USER_DRAWING_LINE_STYLE_DESCRIPTORS,
       ...USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
+      ...USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
     ]) {
       expect(descriptor.icon.length).toBeGreaterThan(0);
       expect(descriptor.label.length).toBeGreaterThan(0);
@@ -66,7 +67,6 @@ describe('user drawing toolbar descriptors', () => {
       ...USER_DRAWING_FILL_COLOR_DESCRIPTORS,
       ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
       ...USER_DRAWING_FONT_SIZE_DESCRIPTORS,
-      ...USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
     ]) {
       expect(descriptor.label.length).toBeGreaterThan(0);
     }
