@@ -9,6 +9,7 @@ import type {
   TextLabelDrawing,
 } from '../../drawings';
 
+import { resolveDrawingArrowHead } from '../../drawings/arrowGeometry';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -30,6 +31,10 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       start: DrawingScreenPoint;
       end: DrawingScreenPoint;
+      arrowHead: {
+        left: DrawingScreenPoint;
+        right: DrawingScreenPoint;
+      } | null;
       style: UserDrawingStyle;
     }
   | {
@@ -115,9 +120,16 @@ function primitiveFromGeometry(
 ): MobileUserDrawingPrimitive {
   switch (geometry.kind) {
     case 'line':
+    case 'arrowLine':
     case 'ray':
     case 'horizontalLine':
-    case 'verticalLine':
+    case 'verticalLine': {
+      const arrowHead =
+        geometry.kind === 'arrowLine'
+          ? resolveDrawingArrowHead(geometry.segment, {
+              size: Math.max(10, geometry.drawing.style.lineWidth * 5),
+            })
+          : null;
       return {
         kind: 'line',
         id: geometry.drawing.id,
@@ -127,8 +139,10 @@ function primitiveFromGeometry(
         clip,
         start: geometry.segment.start,
         end: geometry.segment.end,
+        arrowHead: arrowHead ? { left: arrowHead.left, right: arrowHead.right } : null,
         style: geometry.drawing.style,
       };
+    }
     case 'rectangle':
       return {
         kind: 'rectangle',

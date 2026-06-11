@@ -15,6 +15,7 @@ import {
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
 import type {
+  ArrowLineDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
@@ -69,5 +70,24 @@ describe('tealchart public entries', () => {
     expect(measureTextLabelLine).toBeTypeOf('function');
     expect(resolveUserDrawingTextEditMetrics('A\nB').longestLineLength).toBe(1);
     expect(layout.lines).toHaveLength(2);
+  });
+
+  it('exports shared drawing arrow line types', () => {
+    const drawing: ArrowLineDrawing = {
+      id: 'arrow',
+      kind: 'arrowLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('arrowLine');
   });
 });

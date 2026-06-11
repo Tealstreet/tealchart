@@ -71,6 +71,21 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits arrow line drawings within tolerance', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'arrow',
+      kind: 'arrowLine',
+      points: [
+        { time: 0, price: 50 },
+        { time: 100, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 52 }, space)?.drawing.id).toBe('arrow');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('reports endpoint handles before line body hits', () => {
     const drawing: UserDrawing = {
       ...base,

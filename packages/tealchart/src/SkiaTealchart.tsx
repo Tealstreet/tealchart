@@ -1515,6 +1515,30 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 >
                   {dash && <DashPathEffect intervals={dash} />}
                 </SkiaLine>
+                {primitive.arrowHead && (
+                  <>
+                    <SkiaLine
+                      p1={vec(primitive.arrowHead.left.x, primitive.arrowHead.left.y)}
+                      p2={vec(primitive.end.x, primitive.end.y)}
+                      color={primitive.style.lineColor}
+                      opacity={primitive.opacity}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      style="stroke"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                    <SkiaLine
+                      p1={vec(primitive.arrowHead.right.x, primitive.arrowHead.right.y)}
+                      p2={vec(primitive.end.x, primitive.end.y)}
+                      color={primitive.style.lineColor}
+                      opacity={primitive.opacity}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      style="stroke"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                  </>
+                )}
               </Group>
             );
           }
