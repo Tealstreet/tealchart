@@ -321,14 +321,16 @@ export function executeCompiled(
       strategyClose(...args: unknown[]) {
         if (!isStrategy) return;
         const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
-        const id = String(args[0] ?? named.id ?? 'close');
-        const openTrades = ledger.openTrades;
-        if (openTrades.length === 0) return;
-        const exitDir: StrategyDirection = openTrades[0].direction === 'long' ? 'short' : 'long';
-        const qty = openTrades.reduce((t, tr) => t + tr.qty, 0);
+        const entryId = String(args[0] ?? named.id ?? '');
+        const matchingTrades = entryId
+          ? ledger.openTrades.filter((t) => t.entryOrderId === entryId)
+          : ledger.openTrades;
+        if (matchingTrades.length === 0) return;
+        const exitDir: StrategyDirection = matchingTrades[0].direction === 'long' ? 'short' : 'long';
+        const qty = matchingTrades.reduce((t, tr) => t + tr.qty, 0);
         submitStrategyOrder(ledger, {
-          id, direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
-          isExit: true, barIndex, time: bar.time,
+          id: `Close ${entryId || 'all'}`, direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
+          isExit: true, fromEntry: entryId || undefined, barIndex, time: bar.time,
         });
       },
       strategyCloseAll(...args: unknown[]) {
@@ -355,7 +357,9 @@ export function executeCompiled(
         cancelAllStrategyOrders(ledger, barIndex, bar.time);
       },
       strategyProp(name: string) {
-        if (name === 'position_size') return ledger.position.size * (ledger.position.direction === 'short' ? -1 : 1);
+        if (name === 'long') return 'long';
+        if (name === 'short') return 'short';
+        if (name === 'position_size') return ledger.position.size;
         if (name === 'equity') return ledger.equity;
         if (name === 'initial_capital') return ledger.settings.initialCapital;
         if (name === 'netprofit') return ledger.netProfit;
