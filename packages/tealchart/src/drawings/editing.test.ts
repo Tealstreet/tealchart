@@ -307,6 +307,42 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags date range boundary handles without changing prices', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      points: [
+        { time: 10, price: 80 },
+        { time: 90, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'date-range', handle: 'start' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'date-range', handle: 'start' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 25, y: 20 },
+      { now: () => 5 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 25, price: 80 },
+        { time: 90, price: 20 },
+      ],
+      updatedAt: 5,
+    });
+  });
+
   it('moves horizontal, vertical, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };

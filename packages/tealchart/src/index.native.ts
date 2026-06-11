@@ -56,6 +56,7 @@ export {
 export type {
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
+  MobileUserDrawingMeasurementLabelPrimitive,
   MobileUserDrawingPriceRangeLabelPosition,
   MobileUserDrawingTextBounds,
   ResolveMobileUserDrawingRenderModelOptions,
