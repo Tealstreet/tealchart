@@ -374,6 +374,18 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return `deps._mtx.${fullName.replace('matrix.', '')}(${posArgs.join(', ')})`;
     }
 
+    // Request.security
+    if (fullName === 'request.security' || fullName === 'security') {
+      const secSite = ctx.securitySites.find((s) => s.node === expr);
+      if (secSite) {
+        const symExpr = emitExpr(secSite.symbolExpr);
+        const tfExpr = emitExpr(secSite.timeframeExpr);
+        const gapsExpr = secSite.gapsExpr ? emitExpr(secSite.gapsExpr) : '"barmerge.gaps_off"';
+        const laExpr = secSite.lookaheadExpr ? emitExpr(secSite.lookaheadExpr) : '"barmerge.lookahead_off"';
+        return `ctx.requestSecurity(${secSite.id}, ${symExpr}, ${tfExpr}, ${gapsExpr}, ${laExpr})`;
+      }
+    }
+
     // Plot functions
     if (PLOT_FUNCTIONS.has(fullName)) {
       return emitPlotCall(fullName, expr);

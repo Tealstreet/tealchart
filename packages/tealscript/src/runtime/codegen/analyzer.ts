@@ -56,6 +56,17 @@ export interface TypeDeclInfo {
   node: TypeDeclaration;
 }
 
+export interface SecurityCallSite {
+  id: number;
+  symbolExpr: Expression;
+  timeframeExpr: Expression;
+  expressionExpr: Expression;
+  gapsExpr: Expression | null;
+  lookaheadExpr: Expression | null;
+  taCallSites: TACallSite[];
+  node: CallExpression;
+}
+
 export interface AnalysisContext {
   seriesVars: Set<string>;
   taCallSites: TACallSite[];
@@ -69,6 +80,7 @@ export interface AnalysisContext {
   barFieldSeriesVars: Set<string>;
   usedBarFields: Set<string>;
   typeDecls: Map<string, TypeDeclInfo>;
+  securitySites: SecurityCallSite[];
 }
 
 const BAR_FIELDS = new Set([
@@ -97,8 +109,10 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
   'ta.stdev': { className: 'StdDev', returnsTuple: false },
 };
 
-const UNSUPPORTED_NAMESPACES = new Set([
-  'request',
+const UNSUPPORTED_REQUEST_FUNCS = new Set([
+  'request.dividends', 'request.earnings', 'request.splits',
+  'request.financial', 'request.economic', 'request.currency_rate',
+  'request.seed', 'request.quandl',
 ]);
 
 const PLOT_FUNCTIONS = new Set([
@@ -154,6 +168,7 @@ export function analyze(ast: Program): AnalysisContext {
     barFieldSeriesVars: new Set(),
     usedBarFields: new Set(),
     typeDecls: new Map(),
+    securitySites: [],
   };
 
   let taIndex = 0;
@@ -178,9 +193,45 @@ export function analyze(ast: Program): AnalysisContext {
       case 'CallExpression': {
         const { fullName, namespace } = resolveCallee(expr.callee);
 
-        if (namespace && UNSUPPORTED_NAMESPACES.has(namespace)) {
-          const msg = `${namespace}.* not yet supported by transpiler`;
+        if (UNSUPPORTED_REQUEST_FUNCS.has(fullName)) {
+          const msg = `${fullName} not yet supported by transpiler`;
           if (!ctx.unsupported.includes(msg)) ctx.unsupported.push(msg);
+        }
+
+        if (fullName === 'request.security' || fullName === 'security') {
+          const positional = expr.arguments.filter((a) => !a.name).map((a) => a.value);
+          const symbolExpr = expr.arguments.find((a) => a.name?.name === 'symbol')?.value ?? positional[0];
+          const timeframeExpr = expr.arguments.find((a) => a.name?.name === 'timeframe')?.value ?? positional[1];
+          const expressionExpr = expr.arguments.find((a) => a.name?.name === 'expression')?.value ?? positional[2];
+          const gapsExpr = expr.arguments.find((a) => a.name?.name === 'gaps')?.value ?? positional[3] ?? null;
+          const lookaheadExpr = expr.arguments.find((a) => a.name?.name === 'lookahead')?.value ?? positional[4] ?? null;
+          if (symbolExpr && timeframeExpr && expressionExpr) {
+            const secId = ctx.securitySites.length;
+            const taCallSitesBefore = ctx.taCallSites.length;
+            walkExpr(symbolExpr);
+            walkExpr(timeframeExpr);
+            walkExpr(expressionExpr);
+            if (gapsExpr) walkExpr(gapsExpr);
+            if (lookaheadExpr) walkExpr(lookaheadExpr);
+            const securityTASites = ctx.taCallSites.slice(taCallSitesBefore)
+              .filter((site) => containsNode(expressionExpr, site.node));
+            // Remove security-expression TAs from global list — they belong
+            // only in the security evaluator, not the main class
+            const securityNodeSet = new Set(securityTASites.map((s) => s.node));
+            ctx.taCallSites = ctx.taCallSites.filter((s) => !securityNodeSet.has(s.node));
+            for (const s of securityTASites) ctx.taCallSiteMap.delete(s.node);
+            ctx.securitySites.push({
+              id: secId,
+              symbolExpr,
+              timeframeExpr,
+              expressionExpr,
+              gapsExpr,
+              lookaheadExpr,
+              taCallSites: securityTASites,
+              node: expr,
+            });
+          }
+          break;
         }
 
         if (fullName in TA_CLASS_MAP) {

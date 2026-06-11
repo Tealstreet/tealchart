@@ -1,6 +1,6 @@
-import type { Program } from '../../parser/ast';
+import type { Program, Expression, Statement } from '../../parser/ast';
 import { analyze } from './analyzer';
-import type { AnalysisContext } from './analyzer';
+import type { AnalysisContext, SecurityCallSite } from './analyzer';
 import { emit, RUNTIME_HELPERS } from './emitter';
 import {
   NumericSeries,
@@ -13,12 +13,18 @@ import * as mapFuncs from '../maps';
 import * as udtFuncs from '../objects';
 import * as mtxFuncs from '../matrices';
 
+export interface CompiledSecurityScript {
+  ScriptClass: new (deps: ScriptDependencies) => GeneratedScriptInstance;
+  generatedCode?: string;
+}
+
 export interface CompiledScript {
   ScriptClass: new (deps: ScriptDependencies) => GeneratedScriptInstance;
   analysis: AnalysisContext;
   success: boolean;
   unsupported: string[];
   generatedCode?: string;
+  securityScripts: Map<number, CompiledSecurityScript>;
 }
 
 export interface ArrayHelpers {
@@ -209,6 +215,7 @@ export interface CompiledBarContext {
   logWarning(...args: unknown[]): void;
   logError(...args: unknown[]): void;
   runtimeError(...args: unknown[]): void;
+  requestSecurity(secId: number, symbol: unknown, timeframe: unknown, gaps: unknown, lookahead: unknown): unknown;
   callBuiltin(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
   tickerNew(...args: unknown[]): string;
   tickerModify(...args: unknown[]): string;
@@ -414,6 +421,64 @@ const DEFAULT_DEPS: ScriptDependencies = {
   DEMA, TEMA, Cum,
 };
 
+function isSecurityCallInit(stmt: Statement, securityNodes: Set<unknown>): boolean {
+  if (stmt.type !== 'VariableDeclaration') return false;
+  const init = (stmt as { init?: Expression }).init;
+  if (!init) return false;
+  if (init.type === 'CallExpression' && securityNodes.has(init)) return true;
+  return false;
+}
+
+function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNodes: Set<unknown>): Program {
+  const body: Statement[] = [
+    {
+      type: 'IndicatorDeclaration',
+      declarationKind: 'indicator',
+      title: { type: 'StringLiteral', value: `security_${site.id}` },
+    } as Statement,
+  ];
+
+  for (const stmt of parentAST.body) {
+    if (stmt.type === 'FunctionDeclaration') {
+      body.push(stmt);
+    } else if (stmt.type === 'VariableDeclaration' && !isSecurityCallInit(stmt, securityNodes)) {
+      body.push(stmt);
+    }
+  }
+
+  body.push({
+    type: 'ExpressionStatement',
+    expression: {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'plot' },
+      arguments: [{ type: 'CallArgument', value: site.expressionExpr }],
+    },
+  } as Statement);
+
+  return { type: 'Program', version: parentAST.version, body };
+}
+
+function compileSecurityExpression(
+  site: SecurityCallSite,
+  parentAST: Program,
+  securityNodes: Set<unknown>,
+  maxBarsBack?: number,
+): CompiledSecurityScript | null {
+  const secAST = buildSecurityAST(site, parentAST, securityNodes);
+  const secAnalysis = analyze(secAST);
+  if (secAnalysis.unsupported.length > 0) return null;
+
+  const code = emit(secAST, secAnalysis);
+  try {
+    const factory = new Function('deps', `${RUNTIME_HELPERS}\n${code}`);
+    const deps = { ...DEFAULT_DEPS };
+    if (maxBarsBack !== undefined) deps.maxBarsBack = maxBarsBack;
+    return { ScriptClass: factory(deps), generatedCode: code };
+  } catch {
+    return null;
+  }
+}
+
 export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
   const analysis = analyze(ast);
 
@@ -423,6 +488,7 @@ export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
       analysis,
       success: false,
       unsupported: analysis.unsupported,
+      securityScripts: new Map(),
     };
   }
 
@@ -439,12 +505,22 @@ export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
 
     const ScriptClass = factory(deps);
 
+    const securityScripts = new Map<number, CompiledSecurityScript>();
+    const securityNodes = new Set<unknown>(analysis.securitySites.map((s) => s.node));
+    for (const site of analysis.securitySites) {
+      const secScript = compileSecurityExpression(site, ast, securityNodes, maxBarsBack);
+      if (secScript) {
+        securityScripts.set(site.id, secScript);
+      }
+    }
+
     return {
       ScriptClass,
       analysis,
       success: true,
       unsupported: [],
       generatedCode: code,
+      securityScripts,
     };
   } catch (error) {
     return {
@@ -453,6 +529,7 @@ export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
       success: false,
       unsupported: [`Compilation error: ${error instanceof Error ? error.message : String(error)}`],
       generatedCode: code,
+      securityScripts: new Map(),
     };
   }
 }
