@@ -123,6 +123,9 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       }
     case 'triangle':
     case 'pitchfork':
+    case 'schiffPitchfork':
+    case 'modifiedSchiffPitchfork':
+    case 'insidePitchfork':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':
@@ -242,6 +245,9 @@ function editDrawingHandle(
       drawing.kind === 'polyline' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'pitchfork' ||
+      drawing.kind === 'schiffPitchfork' ||
+      drawing.kind === 'modifiedSchiffPitchfork' ||
+      drawing.kind === 'insidePitchfork' ||
       drawing.kind === 'rotatedRectangle' ||
       drawing.kind === 'parallelChannel' ||
       drawing.kind === 'flatTopBottom' ||
@@ -315,6 +321,9 @@ function editDrawingHandle(
     case 'polyline':
     case 'triangle':
     case 'pitchfork':
+    case 'schiffPitchfork':
+    case 'modifiedSchiffPitchfork':
+    case 'insidePitchfork':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':

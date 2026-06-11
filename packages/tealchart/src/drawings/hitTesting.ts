@@ -411,7 +411,12 @@ function hitTestUserDrawingHandle(
       });
       break;
     case 'pitchfork':
-      if (geometry.drawing.kind === 'pitchfork') {
+      if (
+        geometry.drawing.kind === 'pitchfork' ||
+        geometry.drawing.kind === 'schiffPitchfork' ||
+        geometry.drawing.kind === 'modifiedSchiffPitchfork' ||
+        geometry.drawing.kind === 'insidePitchfork'
+      ) {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

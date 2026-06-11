@@ -1074,6 +1074,45 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags pitchfork variant handles without changing kind', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'inside',
+      kind: 'insidePitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'inside', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'inside', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 50, y: 80 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 60, y: 70 },
+      { now: () => 14 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      kind: 'insidePitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 60, price: 30 },
+      ],
+      updatedAt: 14,
+    });
+  });
+
   it('moves selected rotated rectangles by screen delta', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -31,6 +31,9 @@ export type UserDrawingTool =
   | 'triangle'
   | 'polyline'
   | 'pitchfork'
+  | 'schiffPitchfork'
+  | 'modifiedSchiffPitchfork'
+  | 'insidePitchfork'
   | 'parallelChannel'
   | 'regressionTrend'
   | 'flatTopBottom'
@@ -223,8 +226,10 @@ export interface PolylineDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export type PitchforkDrawingKind = 'pitchfork' | 'schiffPitchfork' | 'modifiedSchiffPitchfork' | 'insidePitchfork';
+
 export interface PitchforkDrawing extends UserDrawingBase {
-  kind: 'pitchfork';
+  kind: PitchforkDrawingKind;
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
@@ -421,6 +426,9 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'triangle':
     case 'polyline':
     case 'pitchfork':
+    case 'schiffPitchfork':
+    case 'modifiedSchiffPitchfork':
+    case 'insidePitchfork':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'regressionTrend':
@@ -647,9 +655,12 @@ export function createUserDrawingFromDraft(
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'pitchfork':
+    case 'schiffPitchfork':
+    case 'modifiedSchiffPitchfork':
+    case 'insidePitchfork':
       return {
         ...base,
-        kind: 'pitchfork',
+        kind: draft.tool,
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'parallelChannel':
