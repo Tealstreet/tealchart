@@ -63,6 +63,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'priceRange':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
+    case 'triangle':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'dateRange':
       return {
@@ -139,7 +140,7 @@ function editDrawingHandle(
   anchor: UserDrawingAnchor,
   updatedAt: number,
 ): UserDrawing {
-  if (drawing.kind === 'path' && pointIndex !== undefined) {
+  if ((drawing.kind === 'path' || drawing.kind === 'triangle') && pointIndex !== undefined) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
     const points = drawing.points.slice() as UserDrawingAnchor[];
     points[pointIndex] = anchor;
@@ -173,6 +174,7 @@ function editDrawingHandle(
     case 'arrowMarkDown':
     case 'textLabel':
     case 'path':
+    case 'triangle':
       return drawing;
   }
 }
