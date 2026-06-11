@@ -821,6 +821,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib channels as filled Fibonacci level channels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-channel',
+      kind: 'fibChannel',
+      style: { ...base.style, fillColor: 'rgba(245, 197, 66, 0.2)' },
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,50');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -62,6 +62,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
     case 'triangle':
+    case 'fibChannel':
     case 'pitchfork':
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
@@ -486,6 +487,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'triangle',
+            points,
+          }
+        : null;
+    }
+    case 'fibChannel': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'fibChannel',
             points,
           }
         : null;

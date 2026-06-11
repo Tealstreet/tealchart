@@ -280,6 +280,13 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibChannel') {
+    const distance = pointInPolygon(point, geometry.fibChannel.polygon.points)
+      ? 0
+      : Math.min(...geometry.fibChannel.levels.map((level) => distanceToSegment(point, level.segment)));
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -431,6 +438,13 @@ function hitTestUserDrawingHandle(
       geometry.polygon.points.forEach((trianglePoint, pointIndex) => {
         handles.push({ handle: 'center', point: trianglePoint, pointIndex });
       });
+      break;
+    case 'fibChannel':
+      if (geometry.drawing.kind === 'fibChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
       break;
     case 'pitchfork':
       if (
