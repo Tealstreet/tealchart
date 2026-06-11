@@ -79,6 +79,20 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('clears active text editing even when selecting the current tool again', () => {
+    const state = createUserDrawingState({
+      activeTool: 'select',
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 1 },
+    });
+
+    const next = setUserDrawingTool(state, 'select');
+
+    expect(next).not.toBe(state);
+    expect(next.textEdit).toBeNull();
+    expect(next.selection).toEqual({ drawingId: 'label' });
+  });
+
   it('accumulates a two-anchor draft then commits a drawing', () => {
     const options = { createId: () => 'drawing-1', now: () => 20 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'trendLine'), {
