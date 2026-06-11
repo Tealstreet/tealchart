@@ -139,4 +139,62 @@ describe('Transformer round-trip (toTvFormat → fromTvFormat)', () => {
     const result = fromTvFormat(tv);
     expect(result.warnings).toHaveLength(0);
   });
+
+  it('preserves committed user drawings and clears transient drawing state', () => {
+    const settings = createSettings({
+      userDrawingState: {
+        version: 1,
+        activeTool: 'rectangle',
+        selection: { drawingId: 'text_1' },
+        draft: {
+          tool: 'trendLine',
+          paneId: 'main',
+          anchors: [{ time: 3000, price: 30 }],
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+          },
+          startedAt: 300,
+        },
+        textEdit: {
+          drawingId: 'text_1',
+          value: 'editing',
+          originalValue: 'hello',
+          startedAt: 400,
+        },
+        drawings: [
+          {
+            id: 'text_1',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 100,
+            updatedAt: 200,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+              textColor: '#f5c542',
+              fontSize: 12,
+            },
+            point: { time: 1000, price: 10 },
+            text: 'hello',
+            textAlign: 'center',
+          },
+        ],
+      },
+    });
+
+    const tv = toTvFormat(settings, 'Test Layout');
+    const result = fromTvFormat(tv);
+
+    expect(result.data.userDrawingState?.drawings).toHaveLength(1);
+    expect(result.data.userDrawingState?.drawings[0]?.id).toBe('text_1');
+    expect(result.data.userDrawingState?.activeTool).toBe('select');
+    expect(result.data.userDrawingState?.selection).toBeNull();
+    expect(result.data.userDrawingState?.draft).toBeNull();
+    expect(result.data.userDrawingState?.textEdit).toBeNull();
+  });
 });
