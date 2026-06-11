@@ -117,7 +117,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia maps the shared logical font family values to native system
   families for both canvas labels and active text editing.
 
-## Current Epic: Multiline Text Labels
+## Shipped: Multiline Text Labels
 
 - Shared text-label layout splits committed text into stable lines and preserves
   existing single-line geometry.
@@ -125,10 +125,23 @@ matching behavior in the same PR for every user-facing drawing feature.
   layout model.
 - Web and mobile text editors size from the longest line and line count while
   preserving newline text through shared reducers and layout serialization.
+- Web and mobile selection hit testing use rendered text metrics for multiline
+  label bounds.
+
+## Current Epic: Arrow Line Tool
+
+- Shared drawing state supports the two-anchor `arrowLine` tool and persists it
+  through layout save/load.
+- Web Canvas renders arrow-line stems and arrowheads through the same line style
+  pipeline used by existing drawing lines.
+- Mobile Skia render models expose matching arrowhead geometry and render it
+  with the same clip, color, opacity, and width behavior.
 
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
+- Additional TradingView line-family tools such as info lines, extended lines,
+  and multi-point arrows.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration

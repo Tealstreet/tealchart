@@ -156,6 +156,7 @@ export type {
   UserDrawingToolDescriptor,
 } from './toolbar';
 export type {
+  ArrowLineDrawing,
   CreateUserDrawingFromDraftOptions,
   HorizontalLineDrawing,
   RayDrawing,

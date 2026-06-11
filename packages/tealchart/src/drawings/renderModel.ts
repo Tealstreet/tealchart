@@ -65,6 +65,7 @@ export function resolveUserDrawingHandlePoints(
 ): DrawingScreenPoint[] {
   switch (drawing.kind) {
     case 'trendLine':
+    case 'arrowLine':
     case 'ray':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {
