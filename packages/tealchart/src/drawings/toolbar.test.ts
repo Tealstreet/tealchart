@@ -104,6 +104,25 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('path')).toEqual(expect.objectContaining({ tool: 'path', label: 'Path' }));
   });
 
+  it('enables fill controls for filled drawing types', () => {
+    expect(
+      supportsUserDrawingFillControls({
+        id: 'marker',
+        kind: 'arrowMarker',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+        ],
+      }),
+    ).toBe(true);
+  });
+
   it('resolves action availability from toolbar-relevant state', () => {
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);
     expect(isUserDrawingToolbarActionEnabled({ ...state, selection: { drawingId: 'h' } }, 'deleteSelected')).toBe(true);

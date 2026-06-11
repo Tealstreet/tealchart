@@ -218,6 +218,7 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
 
 export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   return (
+    drawing.kind === 'arrowMarker' ||
     drawing.kind === 'rectangle' ||
     drawing.kind === 'priceRange' ||
     drawing.kind === 'dateRange' ||
