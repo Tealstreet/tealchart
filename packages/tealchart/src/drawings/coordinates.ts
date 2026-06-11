@@ -28,6 +28,18 @@ export interface DrawingScreenCurve {
   points: readonly DrawingScreenPoint[];
 }
 
+export interface DrawingScreenArc {
+  center: DrawingScreenPoint;
+  radius: number;
+  start: DrawingScreenPoint;
+  through: DrawingScreenPoint;
+  end: DrawingScreenPoint;
+  startAngle: number;
+  endAngle: number;
+  counterclockwise: boolean;
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingScreenRect {
   x: number;
   y: number;
@@ -343,6 +355,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'curve';
       drawing: UserDrawing;
       curve: DrawingScreenCurve;
+    }
+  | {
+      kind: 'arc';
+      drawing: UserDrawing;
+      arc: DrawingScreenArc;
     }
   | {
       kind: 'anchoredVwap';
@@ -824,6 +841,7 @@ export function resolvePolylineFromAnchors(
 }
 
 const CURVE_SAMPLE_COUNT = 48;
+const ARC_SAMPLE_COUNT = 96;
 
 function resolveQuadraticPoint(
   start: DrawingScreenPoint,
@@ -851,6 +869,75 @@ export function resolveCurveFromAnchors(
     resolveQuadraticPoint(start, control, end, index / CURVE_SAMPLE_COUNT),
   );
   return { start, control, end, points };
+}
+
+function normalizeArcAngle(angle: number): number {
+  const twoPi = Math.PI * 2;
+  return ((angle % twoPi) + twoPi) % twoPi;
+}
+
+function isAngleOnClockwiseSweep(startAngle: number, throughAngle: number, endAngle: number): boolean {
+  const sweep = normalizeArcAngle(endAngle - startAngle);
+  const throughSweep = normalizeArcAngle(throughAngle - startAngle);
+  return throughSweep <= sweep;
+}
+
+function resolveCircumcenter(
+  start: DrawingScreenPoint,
+  through: DrawingScreenPoint,
+  end: DrawingScreenPoint,
+): DrawingScreenPoint | null {
+  const determinant =
+    2 *
+    (start.x * (through.y - end.y) +
+      through.x * (end.y - start.y) +
+      end.x * (start.y - through.y));
+  if (Math.abs(determinant) < 1e-6) return null;
+
+  const startLength = start.x * start.x + start.y * start.y;
+  const throughLength = through.x * through.x + through.y * through.y;
+  const endLength = end.x * end.x + end.y * end.y;
+  return {
+    x:
+      (startLength * (through.y - end.y) +
+        throughLength * (end.y - start.y) +
+        endLength * (start.y - through.y)) /
+      determinant,
+    y:
+      (startLength * (end.x - through.x) +
+        throughLength * (start.x - end.x) +
+        endLength * (through.x - start.x)) /
+      determinant,
+  };
+}
+
+export function resolveArcFromAnchors(
+  startAnchor: UserDrawingAnchor,
+  throughAnchor: UserDrawingAnchor,
+  endAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenArc {
+  const start = anchorToScreenPoint(startAnchor, space);
+  const through = anchorToScreenPoint(throughAnchor, space);
+  const end = anchorToScreenPoint(endAnchor, space);
+  const center = resolveCircumcenter(start, through, end) ?? through;
+  const radius = Math.hypot(start.x - center.x, start.y - center.y);
+  const startAngle = Math.atan2(start.y - center.y, start.x - center.x);
+  const throughAngle = Math.atan2(through.y - center.y, through.x - center.x);
+  const endAngle = Math.atan2(end.y - center.y, end.x - center.x);
+  const counterclockwise = !isAngleOnClockwiseSweep(startAngle, throughAngle, endAngle);
+  const sweep = counterclockwise
+    ? -normalizeArcAngle(startAngle - endAngle)
+    : normalizeArcAngle(endAngle - startAngle);
+  const points =
+    radius <= 0
+      ? [start, through, end]
+      : Array.from({ length: ARC_SAMPLE_COUNT + 1 }, (_, index) => {
+          const angle = startAngle + sweep * (index / ARC_SAMPLE_COUNT);
+          return { x: center.x + Math.cos(angle) * radius, y: center.y + Math.sin(angle) * radius };
+        });
+
+  return { center, radius, start, through, end, startAngle, endAngle, counterclockwise, points };
 }
 
 function isFiniteBar(bar: BarsPatternBarSnapshot | Bar): boolean {
@@ -1812,6 +1899,12 @@ export function resolveUserDrawingGeometry(
         kind: 'curve',
         drawing,
         curve: resolveCurveFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'arc':
+      return {
+        kind: 'arc',
+        drawing,
+        arc: resolveArcFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'anchoredVwap':
       return {

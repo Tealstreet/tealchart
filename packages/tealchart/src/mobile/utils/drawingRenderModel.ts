@@ -156,6 +156,21 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'arc';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      radius: number;
+      start: DrawingScreenPoint;
+      through: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'anchoredVwap';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -570,6 +585,7 @@ export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
 >;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'curve' }>;
+export type MobileUserDrawingArcPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arc' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
@@ -879,6 +895,22 @@ function primitiveFromGeometry(
         control: geometry.curve.control,
         end: geometry.curve.end,
         points: geometry.curve.points,
+        style: geometry.drawing.style,
+      };
+    case 'arc':
+      return {
+        kind: 'arc',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.arc.center,
+        radius: geometry.arc.radius,
+        start: geometry.arc.start,
+        through: geometry.arc.through,
+        end: geometry.arc.end,
+        points: geometry.arc.points,
         style: geometry.drawing.style,
       };
     case 'anchoredVwap':
