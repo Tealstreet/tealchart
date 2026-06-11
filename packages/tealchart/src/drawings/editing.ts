@@ -111,6 +111,11 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
+    case 'polyline':
+      {
+        const points = movePathAnchors(drawing.points, delta);
+        return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
+      }
     case 'disjointChannel':
       {
         const points = movePathAnchors(drawing.points, delta);
@@ -232,6 +237,7 @@ function editDrawingHandle(
 
   if (
     (drawing.kind === 'path' ||
+      drawing.kind === 'polyline' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'parallelChannel' ||
       drawing.kind === 'flatTopBottom' ||
@@ -248,6 +254,13 @@ function editDrawingHandle(
       return {
         ...drawing,
         points,
+        updatedAt,
+      };
+    }
+    if (drawing.kind === 'polyline') {
+      return {
+        ...drawing,
+        points: [points[0]!, points[1]!, points[2]!],
         updatedAt,
       };
     }
@@ -295,6 +308,7 @@ function editDrawingHandle(
     case 'textLabel':
     case 'anchoredVwap':
     case 'path':
+    case 'polyline':
     case 'triangle':
     case 'parallelChannel':
     case 'flatTopBottom':
