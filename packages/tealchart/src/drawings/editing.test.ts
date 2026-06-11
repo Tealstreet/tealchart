@@ -1058,6 +1058,59 @@ describe('user drawing editing', () => {
     expect(geometry.pattern.bars.map((bar) => bar.time)).toEqual([80, 90]);
   });
 
+  it('edits only the bars pattern placement handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'bars',
+      kind: 'barsPattern',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+        { time: 40, price: 50 },
+      ],
+      bars: [
+        { time: 10, open: 50, high: 60, low: 49, close: 52 },
+        { time: 20, open: 52, high: 58, low: 51, close: 53 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'bars', handle: 'center', pointIndex: 0 },
+    });
+
+    const ignored = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'bars', handle: 'center', pointIndex: 0 },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 45 },
+      { now: () => 17 },
+    );
+    expect(ignored.drawings[0]).toBe(drawing);
+
+    const movedPlacement = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'bars', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 40, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 60, y: 45 },
+      { now: () => 18 },
+    );
+    const moved = movedPlacement.drawings[0];
+    if (moved?.kind !== 'barsPattern') throw new Error('expected bars pattern');
+    expect(moved.points[0]).toEqual(drawing.points[0]);
+    expect(moved.points[1]).toEqual(drawing.points[1]);
+    expect(moved.points[2]).toEqual({ time: 60, price: 55 });
+    expect(moved.bars).toEqual(drawing.bars);
+    expect(moved.updatedAt).toBe(18);
+  });
+
   it('edits Fibonacci retracement endpoints', () => {
     const drawing: UserDrawing = {
       ...base,

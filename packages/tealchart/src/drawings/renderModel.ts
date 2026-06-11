@@ -160,8 +160,9 @@ export function resolveUserDrawingHandlePoints(
     case 'parallelChannel':
     case 'longPosition':
     case 'shortPosition':
-    case 'barsPattern':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
+    case 'barsPattern':
+      return [anchorToScreenPoint(drawing.points[2], space)];
     case 'regressionTrend':
       {
         const geometry = resolveUserDrawingGeometry(drawing, space);

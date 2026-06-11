@@ -404,9 +404,7 @@ function hitTestUserDrawingHandle(
       break;
     case 'barsPattern':
       if (geometry.drawing.kind === 'barsPattern') {
-        geometry.drawing.points.forEach((anchor, pointIndex) => {
-          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
-        });
+        handles.push({ handle: 'center', point: anchorToScreenPoint(geometry.drawing.points[2], space), pointIndex: 2 });
       }
       break;
     case 'regressionTrend':
