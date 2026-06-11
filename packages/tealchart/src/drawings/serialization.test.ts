@@ -350,6 +350,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored balloon drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'balloon',
+          kind: 'balloon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Restored balloon',
+          textAlign: 'left',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'balloon',
+      kind: 'balloon',
+      point: { time: 1, price: 10 },
+      text: 'Restored balloon',
+      textAlign: 'left',
+    });
+  });
+
   it('normalizes restored text label font sizes', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

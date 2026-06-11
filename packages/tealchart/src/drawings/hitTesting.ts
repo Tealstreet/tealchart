@@ -8,7 +8,7 @@ import type {
 import type { UserDrawing, UserDrawingHandleRole, UserDrawingTextAnnotation } from './types';
 
 import { anchorToScreenPoint, resolveUserDrawingGeometry } from './coordinates';
-import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
+import { resolveUserDrawingBalloonLayout, resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
 
 export interface UserDrawingHitTestOptions {
   tolerance?: number;
@@ -313,23 +313,39 @@ function hitTestResolvedGeometry(
     geometry.kind === 'note' ||
     geometry.kind === 'callout' ||
     geometry.kind === 'comment' ||
-    geometry.kind === 'priceNote'
+    geometry.kind === 'priceNote' ||
+    geometry.kind === 'balloon'
   ) {
     const drawing = geometry.drawing as UserDrawingTextAnnotation;
     const lines = splitUserDrawingTextLines(drawing.text);
-    const layout = resolveUserDrawingTextLabelLayout({
-      text: drawing.text,
-      point: geometry.point,
-      textAlign: drawing.textAlign,
-      lineWidths: lines.map((line) => Math.max(0, options.measureTextLabelLine?.(drawing, line) ?? line.length * 6)),
-      labelPadding: 6,
-      lineHeight: Math.max(1, options.labelHeight - 2),
-    });
+    const lineWidths = lines.map((line) => Math.max(0, options.measureTextLabelLine?.(drawing, line) ?? line.length * 6));
+    const lineHeight = Math.max(1, options.labelHeight - 2);
+    const balloonLayout =
+      geometry.kind === 'balloon'
+        ? resolveUserDrawingBalloonLayout({
+            text: drawing.text,
+            point: geometry.point,
+            textAlign: drawing.textAlign,
+            lineWidths,
+            labelPadding: 6,
+            lineHeight,
+          })
+        : null;
+    const layout =
+      balloonLayout ??
+      resolveUserDrawingTextLabelLayout({
+        text: drawing.text,
+        point: geometry.point,
+        textAlign: drawing.textAlign,
+        lineWidths,
+        labelPadding: 6,
+        lineHeight,
+      });
     const labelWidth = Math.max(options.labelWidth, layout.box.width);
     const labelHeight = Math.max(options.labelHeight, layout.box.height);
     const rect = {
       x: geometry.point.x - labelWidth / 2,
-      y: geometry.point.y - labelHeight / 2,
+      y: balloonLayout ? layout.box.y : geometry.point.y - labelHeight / 2,
       width: labelWidth,
       height: labelHeight,
     };
@@ -338,6 +354,13 @@ function hitTestResolvedGeometry(
     if (inside) return { drawing: geometry.drawing, distance: 0 };
     if (geometry.kind === 'callout' || geometry.kind === 'priceNote') {
       const distance = distanceToSegment(point, { start: geometry.tip, end: geometry.point });
+      return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+    }
+    if (balloonLayout) {
+      const distance = Math.min(
+        distanceToSegment(point, { start: balloonLayout.tail.left, end: balloonLayout.tail.tip }),
+        distanceToSegment(point, { start: balloonLayout.tail.tip, end: balloonLayout.tail.right }),
+      );
       return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
     }
     return null;

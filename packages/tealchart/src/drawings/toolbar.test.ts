@@ -109,6 +109,7 @@ describe('user drawing toolbar descriptors', () => {
       'comment',
       'priceNote',
       'pin',
+      'balloon',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -259,6 +260,9 @@ describe('user drawing toolbar descriptors', () => {
       expect.objectContaining({ tool: 'priceNote', label: 'Price note' }),
     );
     expect(getUserDrawingToolDescriptor('pin')).toEqual(expect.objectContaining({ tool: 'pin', label: 'Pin' }));
+    expect(getUserDrawingToolDescriptor('balloon')).toEqual(
+      expect.objectContaining({ tool: 'balloon', label: 'Balloon' }),
+    );
     expect(getUserDrawingToolDescriptor('pitchfork')).toEqual(
       expect.objectContaining({ tool: 'pitchfork', label: 'Pitchfork' }),
     );

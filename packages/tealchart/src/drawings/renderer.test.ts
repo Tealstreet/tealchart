@@ -1462,6 +1462,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:50,50');
   });
 
+  it('renders balloon drawings with a text box and tail', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'balloon',
+      kind: 'balloon',
+      point: { time: 50, price: 50 },
+      text: 'Hi',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls.some((call) => call.startsWith('fillRect:38,19.200000000000003,24,20'))).toBe(true);
+    expect(ctx.calls).toContain('moveTo:43.7,39.2');
+    expect(ctx.calls).toContain('lineTo:50,50');
+    expect(ctx.calls).toContain('lineTo:56.3,39.2');
+    expect(ctx.calls.some((call) => call.startsWith('fillText:Hi:44,29.200000000000003:#111:left:1'))).toBe(true);
+  });
+
   it('renders multiline text labels with one canvas text draw per line', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -16,7 +16,7 @@ import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
-import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
+import { resolveUserDrawingBalloonLayout, resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
 import { normalizeUserDrawingFontFamily, normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
 
 export interface UserDrawingRenderOptions {
@@ -846,14 +846,29 @@ function renderTextLabelGeometry(
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   const textLines = splitUserDrawingTextLines(text);
-  const layout = resolveUserDrawingTextLabelLayout({
-    text,
-    point,
-    textAlign: drawing.textAlign,
-    lineWidths: textLines.map((line) => ctx.measureText(line).width),
-    labelPadding: padding,
-    lineHeight: Math.max(1, options.labelHeight - 2),
-  });
+  const lineWidths = textLines.map((line) => ctx.measureText(line).width);
+  const lineHeight = Math.max(1, options.labelHeight - 2);
+  const balloonLayout =
+    geometry.kind === 'balloon'
+      ? resolveUserDrawingBalloonLayout({
+          text,
+          point,
+          textAlign: drawing.textAlign,
+          lineWidths,
+          labelPadding: padding,
+          lineHeight,
+        })
+      : null;
+  const layout =
+    balloonLayout ??
+    resolveUserDrawingTextLabelLayout({
+      text,
+      point,
+      textAlign: drawing.textAlign,
+      lineWidths,
+      labelPadding: padding,
+      lineHeight,
+    });
 
   if (geometry.kind === 'callout' || geometry.kind === 'priceNote') {
     applyStrokeStyle(ctx, drawing);
@@ -863,12 +878,29 @@ function renderTextLabelGeometry(
     ctx.stroke();
   }
 
-  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+  if (balloonLayout && drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
+    ctx.beginPath();
+    ctx.moveTo(balloonLayout.tail.left.x, balloonLayout.tail.left.y);
+    ctx.lineTo(balloonLayout.tail.tip.x, balloonLayout.tail.tip.y);
+    ctx.lineTo(balloonLayout.tail.right.x, balloonLayout.tail.right.y);
+    ctx.closePath();
+    ctx.fill();
+  } else if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
     ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
   }
 
-  if (drawing.style.lineVisible !== false) {
+  if (balloonLayout && drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.strokeRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
+    ctx.beginPath();
+    ctx.moveTo(balloonLayout.tail.left.x, balloonLayout.tail.left.y);
+    ctx.lineTo(balloonLayout.tail.tip.x, balloonLayout.tail.tip.y);
+    ctx.lineTo(balloonLayout.tail.right.x, balloonLayout.tail.right.y);
+    ctx.stroke();
+  } else if (drawing.style.lineVisible !== false) {
     applyStrokeStyle(ctx, drawing);
     ctx.strokeRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
   }
@@ -1101,6 +1133,7 @@ export function renderUserDrawing(
       case 'callout':
       case 'comment':
       case 'priceNote':
+      case 'balloon':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
         break;
       case 'pin':

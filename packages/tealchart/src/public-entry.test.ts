@@ -72,6 +72,7 @@ import type {
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingCalloutPrimitive,
+  MobileUserDrawingBalloonPrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPinPrimitive,
@@ -134,6 +135,7 @@ import type {
   FlatTopBottomDrawing,
   InfoLineDrawing,
   LongPositionDrawing,
+  BalloonDrawing,
   CalloutDrawing,
   CommentDrawing,
   NoteDrawing,
@@ -224,6 +226,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCommentPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingPriceNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingPinPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingBalloonPrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -676,6 +679,20 @@ describe('tealchart public entries', () => {
       radius: 4,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const balloonPrimitive: NonNever<MobileUserDrawingBalloonPrimitive> = {
+      kind: 'balloon',
+      id: 'balloon',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      point: { x: 5, y: 5 },
+      text: 'Balloon',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -724,6 +741,7 @@ describe('tealchart public entries', () => {
     expect(commentPrimitive.kind).toBe('comment');
     expect(priceNotePrimitive.kind).toBe('priceNote');
     expect(pinPrimitive.kind).toBe('pin');
+    expect(balloonPrimitive.kind).toBe('balloon');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1216,6 +1234,14 @@ describe('tealchart public entries', () => {
       kind: 'pin',
       point: drawing.points[0]!,
     };
+    const balloon: BalloonDrawing = {
+      ...drawing,
+      id: 'balloon',
+      kind: 'balloon',
+      point: drawing.points[0]!,
+      text: 'Balloon',
+      textAlign: 'center',
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
@@ -1225,6 +1251,7 @@ describe('tealchart public entries', () => {
     expect(comment.kind).toBe('comment');
     expect(priceNote.kind).toBe('priceNote');
     expect(pin.kind).toBe('pin');
+    expect(balloon.kind).toBe('balloon');
   });
 
   it('exports shared drawing curve types and resolver', () => {

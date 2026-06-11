@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../../state/chartState';
 import {
+  resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
@@ -2633,6 +2634,55 @@ describe('mobile user drawing render model', () => {
       point: { x: 50, y: 50 },
       radius: 4,
       style,
+    });
+  });
+
+  it('returns Skia-ready balloon primitives with shared layout', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'balloon',
+          kind: 'balloon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Hi',
+          textAlign: 'center',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'balloon',
+      id: 'balloon',
+      clip,
+      point: { x: 50, y: 50 },
+      text: 'Hi',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+      style,
+    });
+    if (!primitive || primitive.kind !== 'balloon') throw new Error('expected balloon primitive');
+    expect(resolveMobileUserDrawingBalloonLayout(primitive, 12)).toMatchObject({
+      box: { x: 38, y: expect.closeTo(19.2), width: 24, height: 20 },
+      tail: {
+        tip: { x: 50, y: 50 },
+        left: { x: expect.closeTo(43.7), y: expect.closeTo(39.2) },
+        right: { x: expect.closeTo(56.3), y: expect.closeTo(39.2) },
+      },
+      lines: [{ text: 'Hi', width: 12, x: 44, y: expect.closeTo(29.2) }],
     });
   });
 
