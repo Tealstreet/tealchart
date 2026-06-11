@@ -42,6 +42,7 @@ export type UserDrawingTool =
   | 'gannSquare'
   | 'triangle'
   | 'curve'
+  | 'arc'
   | 'polyline'
   | 'pitchfork'
   | 'schiffPitchfork'
@@ -300,6 +301,11 @@ export interface CurveDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ArcDrawing extends UserDrawingBase {
+  kind: 'arc';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PolylineDrawing extends UserDrawingBase {
   kind: 'polyline';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -392,6 +398,7 @@ export type UserDrawing =
   | GannSquareDrawing
   | TriangleDrawing
   | CurveDrawing
+  | ArcDrawing
   | PolylineDrawing
   | PitchforkDrawing
   | PitchfanDrawing
@@ -532,6 +539,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
       return 2;
     case 'triangle':
     case 'curve':
+    case 'arc':
     case 'polyline':
     case 'fibWedge':
     case 'fibChannel':
@@ -830,6 +838,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'curve',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'arc':
+      return {
+        ...base,
+        kind: 'arc',
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'fibChannel':

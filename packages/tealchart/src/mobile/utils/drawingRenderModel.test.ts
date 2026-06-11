@@ -2032,6 +2032,49 @@ describe('mobile user drawing render model', () => {
     expect(primitive?.kind === 'curve' ? primitive.points[24] : null).toEqual({ x: 50, y: 35 });
   });
 
+  it('returns Skia-ready arc primitives with shared sampled points', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'arc',
+          kind: 'arc',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 80 },
+            { time: 90, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const primitive = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0];
+
+    expect(primitive).toMatchObject({
+      kind: 'arc',
+      id: 'arc',
+      clip,
+      start: { x: 10, y: 50 },
+      through: { x: 50, y: 20 },
+      end: { x: 90, y: 50 },
+      style,
+    });
+    expect(primitive?.kind === 'arc' ? primitive.center.x : null).toBeCloseTo(50);
+    expect(primitive?.kind === 'arc' ? primitive.center.y : null).toBeCloseTo(61.6667);
+    expect(primitive?.kind === 'arc' ? primitive.radius : null).toBeCloseTo(41.6667);
+    expect(primitive?.kind === 'arc' ? primitive.points[48]?.y : null).toBeCloseTo(20);
+  });
+
   it('positions price range labels with a Skia baseline offset', () => {
     const state: UserDrawingState = {
       version: 1,

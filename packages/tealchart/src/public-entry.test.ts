@@ -8,6 +8,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   resolveAnchoredVwapFromAnchor,
+  resolveArcFromAnchors,
   resolveCircleFromAnchors,
   resolveCurveFromAnchors,
   resolveDisjointChannelFromAnchors,
@@ -51,6 +52,7 @@ import {
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
+  MobileUserDrawingArcPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingCurvePrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
@@ -82,6 +84,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  ArcDrawing,
   AnchoredVwapDrawing,
   BarsPatternDrawing,
   CircleDrawing,
@@ -162,6 +165,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingAnchoredVwapPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingArcPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
@@ -390,6 +394,25 @@ describe('tealchart public entries', () => {
       ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const arcPrimitive: NonNever<MobileUserDrawingArcPrimitive> = {
+      kind: 'arc',
+      id: 'arc',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 8 },
+      radius: 5,
+      start: { x: 0, y: 5 },
+      through: { x: 5, y: 3 },
+      end: { x: 10, y: 5 },
+      points: [
+        { x: 0, y: 5 },
+        { x: 5, y: 3 },
+        { x: 10, y: 5 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const datePricePrimitive: NonNever<MobileUserDrawingDatePriceRangePrimitive> = {
       kind: 'datePriceRange',
       id: 'date-price',
@@ -470,6 +493,7 @@ describe('tealchart public entries', () => {
     expect(gannSquarePrimitive.kind).toBe('gannSquare');
     expect(linePrimitive.kind).toBe('line');
     expect(curvePrimitive.kind).toBe('curve');
+    expect(arcPrimitive.kind).toBe('arc');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
     expect(barsPatternPrimitive.kind).toBe('barsPattern');
@@ -947,6 +971,34 @@ describe('tealchart public entries', () => {
     expect(drawing.kind).toBe('curve');
     expect(curve.control).toEqual({ x: 50, y: 0 });
     expect(curve.points).toHaveLength(49);
+  });
+
+  it('exports shared drawing arc types and resolver', () => {
+    const drawing: ArcDrawing = {
+      id: 'arc',
+      kind: 'arc',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 10 },
+      ],
+    };
+    const arc = resolveArcFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], {
+      viewport: { startTime: 1, endTime: 3, priceMin: 8, priceMax: 12 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 8, yMax: 12 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('arc');
+    expect(arc.through).toEqual({ x: 50, y: 0 });
+    expect(arc.points).toHaveLength(97);
   });
 
   it('exports shared drawing triangle types', () => {

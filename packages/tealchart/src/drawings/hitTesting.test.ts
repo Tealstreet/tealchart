@@ -528,6 +528,26 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits arc paths and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'arc',
+      kind: 'arc',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 25, y: 28 }, space)?.drawing.id).toBe('arc');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits triangle fills, edges, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

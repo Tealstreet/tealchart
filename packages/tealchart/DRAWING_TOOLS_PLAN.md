@@ -522,6 +522,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, sampled-curve hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Arc Tool
+
+- Shared drawing state supports the three-anchor `arc` tool and persists it
+  through layout save/load.
+- Web Canvas renders circular arcs through start/middle/end anchors while
+  mobile Skia renders the same sampled arc path.
+- Selection, sampled-arc hit testing, whole-drawing moves, and point-index
+  anchor editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

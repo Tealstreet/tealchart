@@ -4,6 +4,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  ArcDrawing,
   CircleDrawing,
   CrossLineDrawing,
   CurveDrawing,
@@ -51,6 +52,7 @@ import {
   drawingYToPrice,
   priceToDrawingY,
   resolveAnchoredVwapFromAnchor,
+  resolveArcFromAnchors,
   resolveBarsPatternFromAnchors,
   resolveCurveFromAnchors,
   resolveDateRangeRectFromAnchors,
@@ -414,6 +416,24 @@ describe('user drawing coordinates', () => {
     expect(curve.points[24]).toEqual({ x: 110, y: 45 });
   });
 
+  it('resolves circular arcs through start, middle, and end anchors', () => {
+    const arc = resolveArcFromAnchors(
+      { time: 1_000, price: 94 },
+      { time: 2_000, price: 100 },
+      { time: 3_000, price: 94 },
+      space,
+    );
+
+    expect(arc.start).toEqual({ x: 10, y: 100 });
+    expect(arc.through).toEqual({ x: 110, y: 70 });
+    expect(arc.end).toEqual({ x: 210, y: 100 });
+    expect(arc.center.x).toBeCloseTo(110);
+    expect(arc.center.y).toBeCloseTo(251.6667);
+    expect(arc.points).toHaveLength(97);
+    expect(arc.points[48]?.x).toBeCloseTo(110);
+    expect(arc.points[48]?.y).toBeCloseTo(70);
+  });
+
   it('resolves rotated rectangles with perpendicular width', () => {
     expect(
       resolveRotatedRectangleFromAnchors(
@@ -736,6 +756,16 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 100 },
         { time: 2_000, price: 110 },
         { time: 3_000, price: 100 },
+      ],
+    };
+    const arc: ArcDrawing = {
+      ...trendLine,
+      id: 'arc',
+      kind: 'arc',
+      points: [
+        { time: 1_000, price: 94 },
+        { time: 2_000, price: 100 },
+        { time: 3_000, price: 94 },
       ],
     };
     const rotatedRectangle: UserDrawing = {
@@ -1172,6 +1202,14 @@ describe('user drawing coordinates', () => {
         start: { x: 10, y: 70 },
         control: { x: 110, y: 20 },
         end: { x: 210, y: 70 },
+      },
+    });
+    expect(resolveUserDrawingGeometry(arc, space)).toMatchObject({
+      kind: 'arc',
+      arc: {
+        start: { x: 10, y: 100 },
+        through: { x: 110, y: 70 },
+        end: { x: 210, y: 100 },
       },
     });
     expect(resolveUserDrawingGeometry(triangle, space)).toMatchObject({
