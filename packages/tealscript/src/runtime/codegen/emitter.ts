@@ -950,6 +950,7 @@ function _iterSize(obj) {
 }
 function _iterGet(obj, i) {
   if (obj && obj.__tealscriptArray) return deps._arr.get(obj, i);
+  if (obj && obj.__tealscriptMap) return Array.from(obj.entries.values())[i];
   if (Array.isArray(obj)) return obj[i];
   return undefined;
 }
