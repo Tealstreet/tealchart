@@ -421,8 +421,15 @@ const DEFAULT_DEPS: ScriptDependencies = {
   DEMA, TEMA, Cum,
 };
 
-function buildSecurityAST(site: SecurityCallSite, parentAST: Program): Program {
-  const exprIsArray = site.expressionExpr.type === 'ArrayExpression';
+function isSecurityCallInit(stmt: Statement, securityNodes: Set<unknown>): boolean {
+  if (stmt.type !== 'VariableDeclaration') return false;
+  const init = (stmt as { init?: Expression }).init;
+  if (!init) return false;
+  if (init.type === 'CallExpression' && securityNodes.has(init)) return true;
+  return false;
+}
+
+function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNodes: Set<unknown>): Program {
   const body: Statement[] = [
     {
       type: 'IndicatorDeclaration',
@@ -431,32 +438,22 @@ function buildSecurityAST(site: SecurityCallSite, parentAST: Program): Program {
     } as Statement,
   ];
 
-  // Include function and variable declarations from the parent AST
   for (const stmt of parentAST.body) {
-    if (stmt.type === 'FunctionDeclaration' || stmt.type === 'VariableDeclaration') {
+    if (stmt.type === 'FunctionDeclaration') {
+      body.push(stmt);
+    } else if (stmt.type === 'VariableDeclaration' && !isSecurityCallInit(stmt, securityNodes)) {
       body.push(stmt);
     }
   }
 
-  if (exprIsArray) {
-    body.push({
-      type: 'ExpressionStatement',
-      expression: {
-        type: 'CallExpression',
-        callee: { type: 'Identifier', name: 'plot' },
-        arguments: [{ type: 'CallArgument', value: site.expressionExpr }],
-      },
-    } as Statement);
-  } else {
-    body.push({
-      type: 'ExpressionStatement',
-      expression: {
-        type: 'CallExpression',
-        callee: { type: 'Identifier', name: 'plot' },
-        arguments: [{ type: 'CallArgument', value: site.expressionExpr }],
-      },
-    } as Statement);
-  }
+  body.push({
+    type: 'ExpressionStatement',
+    expression: {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'plot' },
+      arguments: [{ type: 'CallArgument', value: site.expressionExpr }],
+    },
+  } as Statement);
 
   return { type: 'Program', version: parentAST.version, body };
 }
@@ -464,9 +461,10 @@ function buildSecurityAST(site: SecurityCallSite, parentAST: Program): Program {
 function compileSecurityExpression(
   site: SecurityCallSite,
   parentAST: Program,
+  securityNodes: Set<unknown>,
   maxBarsBack?: number,
 ): CompiledSecurityScript | null {
-  const secAST = buildSecurityAST(site, parentAST);
+  const secAST = buildSecurityAST(site, parentAST, securityNodes);
   const secAnalysis = analyze(secAST);
   if (secAnalysis.unsupported.length > 0) return null;
 
@@ -508,8 +506,9 @@ export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
     const ScriptClass = factory(deps);
 
     const securityScripts = new Map<number, CompiledSecurityScript>();
+    const securityNodes = new Set<unknown>(analysis.securitySites.map((s) => s.node));
     for (const site of analysis.securitySites) {
-      const secScript = compileSecurityExpression(site, ast, maxBarsBack);
+      const secScript = compileSecurityExpression(site, ast, securityNodes, maxBarsBack);
       if (secScript) {
         securityScripts.set(site.id, secScript);
       }
