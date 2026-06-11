@@ -7,6 +7,7 @@ import {
   formatTrendAngleDegrees,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
+  resolveAnchoredVwapFromAnchor,
   resolveCircleFromAnchors,
   resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
@@ -34,6 +35,7 @@ import {
 } from './mobile/utils/drawingRenderModel';
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
+  MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
@@ -50,6 +52,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  AnchoredVwapDrawing,
   BarsPatternDrawing,
   CircleDrawing,
   DatePriceRangeDrawing,
@@ -94,6 +97,7 @@ describe('tealchart public entries', () => {
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
     expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');
+    expect(resolveAnchoredVwapFromAnchor).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
@@ -107,6 +111,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingAnchoredVwapPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
@@ -211,6 +216,17 @@ describe('tealchart public entries', () => {
       bounds: { x: -2, y: 0, width: 4, height: 10 },
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
+      kind: 'anchoredVwap',
+      id: 'vwap',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      anchor: { x: 0, y: 5 },
+      points: [{ x: 0, y: 5 }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
@@ -220,6 +236,7 @@ describe('tealchart public entries', () => {
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
     expect(barsPatternPrimitive.kind).toBe('barsPattern');
+    expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
   it('exports usable native risk reward label position helpers', () => {
@@ -766,5 +783,21 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('disjointChannel');
+  });
+
+  it('exports shared drawing anchored VWAP types', () => {
+    const drawing: AnchoredVwapDrawing = {
+      id: 'vwap',
+      kind: 'anchoredVwap',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      point: { time: 1, price: 10 },
+    };
+
+    expect(drawing.kind).toBe('anchoredVwap');
   });
 });

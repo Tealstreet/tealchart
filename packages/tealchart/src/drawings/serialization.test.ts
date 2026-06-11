@@ -994,6 +994,31 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores anchored VWAP drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'vwap',
+          kind: 'anchoredVwap',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'vwap',
+      kind: 'anchoredVwap',
+      point: { time: 1, price: 10 },
+    });
+  });
+
   it('rejects malformed path points', () => {
     const createPayload = (points: unknown[]) => ({
       version: 1,

@@ -760,6 +760,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders anchored VWAP as a stroked cumulative volume-weighted path', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'vwap',
+      kind: 'anchoredVwap',
+      point: { time: 50, price: 50 },
+    };
+
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      bars: [
+        { time: 10, open: 98, high: 102, low: 96, close: 99, volume: 10 },
+        { time: 50, open: 50, high: 54, low: 48, close: 51, volume: 20 },
+        { time: 90, open: 56, high: 60, low: 54, close: 57, volume: 10 },
+      ],
+    });
+
+    expect(ctx.calls).toContain('moveTo:50,49');
+    expect(ctx.calls).toContain('lineTo:90,47');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('requires explicit fill colors for parallel channel fills', () => {
     const ctx = new RecordingCanvasContext();
     const { fillColor: _fillColor, ...styleWithoutFillColor } = style;

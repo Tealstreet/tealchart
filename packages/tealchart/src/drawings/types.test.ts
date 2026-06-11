@@ -59,6 +59,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('horizontalRay')).toBe(1);
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
+    expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
     expect(getRequiredAnchorCount('trendAngle')).toBe(2);
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
@@ -234,6 +235,15 @@ describe('user drawing types', () => {
       id: 'fib-ext',
       kind: 'fibExtension',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'anchoredVwap', anchors: [anchorA] }), { id: 'vwap', now: 20 })).toMatchObject({
+      id: 'vwap',
+      kind: 'anchoredVwap',
+      point: anchorA,
       visible: true,
       locked: false,
       createdAt: 20,

@@ -138,6 +138,25 @@ describe('user drawing input controller', () => {
       kind: 'horizontalLine',
       price: anchorA.price,
     });
+
+    const vwap = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'anchoredVwap'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, { createId: () => 'vwap', now: () => 21 });
+
+    expect(vwap).toMatchObject({
+      selection: { drawingId: 'vwap' },
+      draft: null,
+      drawings: [
+        {
+          id: 'vwap',
+          kind: 'anchoredVwap',
+          point: anchorA,
+          createdAt: 21,
+          updatedAt: 21,
+        },
+      ],
+    });
   });
 
   it('builds variable-point path drawings from drag samples', () => {

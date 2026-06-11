@@ -1896,6 +1896,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'anchoredVwap') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const path = Skia.Path.Make();
+            const [firstPoint, ...remainingPoints] = primitive.points;
+            if (!firstPoint) return null;
+            path.moveTo(firstPoint.x, firstPoint.y);
+            for (const point of remainingPoints) {
+              path.lineTo(point.x, point.y);
+            }
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={path}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'triangle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();

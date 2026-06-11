@@ -114,11 +114,18 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         point: { ...drawing.point },
       };
+    case 'anchoredVwap':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'anchoredVwap',
+        point: { ...drawing.point },
+      };
     case 'textLabel':
       return {
         ...drawing,
         style: { ...drawing.style },
-        kind: drawing.kind,
+        kind: 'textLabel',
         point: { ...drawing.point },
       };
   }
@@ -395,6 +402,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             ...base,
             kind: 'fibExtension',
             points,
+          }
+        : null;
+    }
+    case 'anchoredVwap': {
+      const point = parseAnchor(value.point);
+      return point
+        ? {
+            ...base,
+            kind: 'anchoredVwap',
+            point,
           }
         : null;
     }

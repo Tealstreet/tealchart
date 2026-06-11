@@ -124,6 +124,22 @@ function renderPathGeometry(
   ctx.stroke();
 }
 
+function renderAnchoredVwapGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'anchoredVwap' }>,
+): void {
+  const [firstPoint, ...remainingPoints] = geometry.vwap.points;
+  if (!firstPoint) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(firstPoint.x, firstPoint.y);
+  for (const point of remainingPoints) {
+    ctx.lineTo(point.x, point.y);
+  }
+  ctx.stroke();
+}
+
 function renderPolygonGeometry(
   ctx: CanvasContext,
   geometry: Extract<
@@ -584,6 +600,11 @@ export function renderUserDrawing(
       case 'path':
         if (drawing.style.lineVisible !== false) {
           renderPathGeometry(ctx, geometry);
+        }
+        break;
+      case 'anchoredVwap':
+        if (drawing.style.lineVisible !== false) {
+          renderAnchoredVwapGeometry(ctx, geometry);
         }
         break;
       case 'rectangle':
