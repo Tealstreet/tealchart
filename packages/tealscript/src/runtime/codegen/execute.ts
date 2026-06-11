@@ -2,8 +2,16 @@ import type { Program } from '../../parser/ast';
 import type { Bar, PlotOutput, InputDefinition } from '../context';
 import { ExecutionContext } from '../context';
 import type { ExecutionResult, RuntimeProfile, TealscriptRuntimeOptions } from '../engine';
-import type { StrategyLedger } from '../strategy';
-import { createStrategyLedger } from '../strategy';
+import type { StrategyLedger, StrategyDirection, StrategyOrderInput } from '../strategy';
+import {
+  createStrategyLedger,
+  submitStrategyOrder,
+  fillPendingStrategyMarketOrders,
+  fillPendingStrategyOrders,
+  markStrategyLedgerToMarket,
+  cancelStrategyOrder,
+  cancelAllStrategyOrders,
+} from '../strategy';
 import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
 import type { CompiledScript, CompiledBarContext } from './compile';
 import { NumericSeries } from './runtime';
@@ -16,6 +24,90 @@ export interface CompiledExecutionOptions {
 
 export function tryCompile(ast: Program, maxBarsBack?: number): CompiledScript {
   return compile(ast, maxBarsBack);
+}
+
+function extractStrategySettings(compiled: CompiledScript): Partial<StrategyLedger['settings']> {
+  const decl = compiled.analysis.declarationInfo;
+  if (!decl || decl.kind !== 'strategy') return {};
+  const node = decl.node;
+  const settings: Partial<StrategyLedger['settings']> = { title: decl.title };
+
+  const numVal = (expr: unknown): number | undefined => {
+    const e = expr as { type?: string; value?: number } | undefined;
+    if (!e) return undefined;
+    if (e.type === 'NumericLiteral') return e.value;
+    return undefined;
+  };
+  const boolVal = (expr: unknown): boolean | undefined => {
+    const e = expr as { type?: string; value?: boolean } | undefined;
+    if (!e) return undefined;
+    if (e.type === 'BooleanLiteral') return e.value;
+    return undefined;
+  };
+  const strVal = (expr: unknown): string | undefined => {
+    const e = expr as { type?: string; value?: string; name?: string; object?: { name?: string }; property?: { name?: string } } | undefined;
+    if (!e) return undefined;
+    if (e.type === 'StringLiteral') return e.value;
+    if (e.type === 'MemberExpression' && e.object?.name && e.property?.name) {
+      return `${e.object.name}.${e.property.name}`;
+    }
+    return undefined;
+  };
+
+  const ic = numVal(node.initial_capital);
+  if (ic !== undefined) settings.initialCapital = ic;
+  const dqv = numVal(node.default_qty_value);
+  if (dqv !== undefined) settings.defaultQtyValue = dqv;
+  const pyr = numVal(node.pyramiding);
+  if (pyr !== undefined) settings.pyramiding = pyr;
+  const cv = numVal(node.commission_value);
+  if (cv !== undefined) settings.commissionValue = cv;
+  const slip = numVal(node.slippage);
+  if (slip !== undefined) settings.slippageTicks = slip;
+  const ml = numVal(node.margin_long);
+  if (ml !== undefined) settings.marginLong = ml;
+  const ms = numVal(node.margin_short);
+  if (ms !== undefined) settings.marginShort = ms;
+  const coof = boolVal(node.calc_on_order_fills);
+  if (coof !== undefined) settings.calcOnOrderFills = coof;
+  const coet = boolVal(node.calc_on_every_tick);
+  if (coet !== undefined) settings.calcOnEveryTick = coet;
+  const pooc = boolVal(node.process_orders_on_close);
+  if (pooc !== undefined) settings.processOrdersOnClose = pooc;
+  const cur = strVal(node.currency);
+  if (cur !== undefined) settings.currency = cur;
+
+  const dqt = strVal(node.default_qty_type);
+  if (dqt !== undefined) {
+    if (dqt.includes('fixed')) settings.defaultQtyType = 'fixed';
+    else if (dqt.includes('cash')) settings.defaultQtyType = 'cash';
+    else if (dqt.includes('percent_of_equity')) settings.defaultQtyType = 'percent_of_equity';
+  }
+  const ct = strVal(node.commission_type);
+  if (ct !== undefined) {
+    if (ct.includes('cash_per_contract')) settings.commissionType = 'cash_per_contract';
+    else if (ct.includes('cash_per_order')) settings.commissionType = 'cash_per_order';
+    else if (ct.includes('percent')) settings.commissionType = 'percent';
+  }
+
+  return settings;
+}
+
+function normalizeDirection(val: unknown): StrategyDirection {
+  if (val === 'long' || val === true || val === 1) return 'long';
+  if (val === 'short' || val === false || val === -1) return 'short';
+  return 'long';
+}
+
+function toOptionalNumber(val: unknown): number | undefined {
+  if (val === undefined || val === null) return undefined;
+  const n = Number(val);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function toOptionalString(val: unknown): string | undefined {
+  if (val === undefined || val === null) return undefined;
+  return String(val);
 }
 
 export function executeCompiled(
@@ -46,6 +138,14 @@ export function executeCompiled(
       ctx.setInput(key, value);
     }
   }
+
+  const isStrategy = compiled.analysis.declarationInfo?.kind === 'strategy';
+  const strategySettings = extractStrategySettings(compiled);
+  if (options?.runtime?.syminfo?.currency) {
+    strategySettings.currency = options.runtime.syminfo.currency;
+  }
+  const ledger = createStrategyLedger(strategySettings);
+  const mintick = (ctx.syminfo as unknown as { mintick: number }).mintick ?? 0.01;
 
   const deps = {
     NumericSeries,
@@ -147,17 +247,125 @@ export function executeCompiled(
         return defval;
       },
 
-      strategyEntry() {},
-      strategyExit() {},
-      strategyClose() {},
-      strategyCloseAll() {},
-      strategyCancel() {},
-      strategyCancelAll() {},
-      strategyOrder() {},
+      strategyEntry(...args: unknown[]) {
+        if (!isStrategy) return;
+        const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
+        const id = String(args[0] ?? named.id ?? '');
+        const direction = normalizeDirection(args[1] ?? named.direction);
+        const rawQty = toOptionalNumber(args[2] ?? named.qty);
+        const qtyType = rawQty === undefined ? ledger.settings.defaultQtyType : 'fixed' as const;
+        const qtyValue = rawQty ?? ledger.settings.defaultQtyValue;
+        const limitPrice = toOptionalNumber(args[3] ?? named.limit);
+        const stopPrice = toOptionalNumber(args[4] ?? named.stop);
+        const comment = toOptionalString(args[7] ?? named.comment);
+        if (!id || !Number.isFinite(qtyValue) || qtyValue <= 0) return;
+        submitStrategyOrder(ledger, {
+          id, direction, qty: qtyValue, qtyType, qtyValue,
+          isEntry: true, requestedQty: qtyValue,
+          limitPrice, stopPrice, comment,
+          barIndex, time: bar.time,
+        });
+      },
+      strategyOrder(...args: unknown[]) {
+        if (!isStrategy) return;
+        const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
+        const id = String(args[0] ?? named.id ?? '');
+        const direction = normalizeDirection(args[1] ?? named.direction);
+        const rawQty = toOptionalNumber(args[2] ?? named.qty);
+        const qtyType = rawQty === undefined ? ledger.settings.defaultQtyType : 'fixed' as const;
+        const qtyValue = rawQty ?? ledger.settings.defaultQtyValue;
+        const limitPrice = toOptionalNumber(args[3] ?? named.limit);
+        const stopPrice = toOptionalNumber(args[4] ?? named.stop);
+        const comment = toOptionalString(args[7] ?? named.comment);
+        if (!id || !Number.isFinite(qtyValue) || qtyValue <= 0) return;
+        submitStrategyOrder(ledger, {
+          id, direction, qty: qtyValue, qtyType, qtyValue,
+          isEntry: false, requestedQty: qtyValue,
+          limitPrice, stopPrice, comment,
+          barIndex, time: bar.time,
+        });
+      },
+      strategyExit(...args: unknown[]) {
+        if (!isStrategy) return;
+        const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
+        const id = String(args[0] ?? named.id ?? '');
+        const fromEntry = toOptionalString(args[1] ?? named.from_entry);
+        const openTrades = ledger.openTrades.filter((t) => fromEntry === undefined || t.entryOrderId === fromEntry);
+        if (openTrades.length === 0) return;
+        const exitDir: StrategyDirection = openTrades[0].direction === 'long' ? 'short' : 'long';
+        const openQty = openTrades.reduce((t, tr) => t + tr.qty, 0);
+        const rawQty = toOptionalNumber(args[2] ?? named.qty);
+        const qty = rawQty !== undefined ? Math.min(rawQty, openQty) : openQty;
+        const limitPrice = toOptionalNumber(args[5] ?? named.limit);
+        const stopPrice = toOptionalNumber(args[7] ?? named.stop);
+        if (limitPrice === undefined && stopPrice === undefined) {
+          submitStrategyOrder(ledger, {
+            id, direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
+            isExit: true, fromEntry, barIndex, time: bar.time,
+          });
+        } else {
+          if (limitPrice !== undefined) {
+            submitStrategyOrder(ledger, {
+              id: `${id} Limit`, direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
+              isExit: true, fromEntry, limitPrice, barIndex, time: bar.time,
+            });
+          }
+          if (stopPrice !== undefined) {
+            submitStrategyOrder(ledger, {
+              id: `${id} Stop`, direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
+              isExit: true, fromEntry, stopPrice, barIndex, time: bar.time,
+            });
+          }
+        }
+      },
+      strategyClose(...args: unknown[]) {
+        if (!isStrategy) return;
+        const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
+        const id = String(args[0] ?? named.id ?? 'close');
+        const openTrades = ledger.openTrades;
+        if (openTrades.length === 0) return;
+        const exitDir: StrategyDirection = openTrades[0].direction === 'long' ? 'short' : 'long';
+        const qty = openTrades.reduce((t, tr) => t + tr.qty, 0);
+        submitStrategyOrder(ledger, {
+          id, direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
+          isExit: true, barIndex, time: bar.time,
+        });
+      },
+      strategyCloseAll(...args: unknown[]) {
+        if (!isStrategy) return;
+        const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
+        const comment = toOptionalString(named.comment);
+        const openTrades = ledger.openTrades;
+        if (openTrades.length === 0) return;
+        const exitDir: StrategyDirection = openTrades[0].direction === 'long' ? 'short' : 'long';
+        const qty = openTrades.reduce((t, tr) => t + tr.qty, 0);
+        submitStrategyOrder(ledger, {
+          id: 'close_all', direction: exitDir, qty, qtyType: 'fixed', qtyValue: qty,
+          isExit: true, comment, barIndex, time: bar.time,
+        });
+      },
+      strategyCancel(...args: unknown[]) {
+        if (!isStrategy) return;
+        const named = (typeof args[args.length - 1] === 'object' && args[args.length - 1] !== null && !Array.isArray(args[args.length - 1])) ? args.pop() as Record<string, unknown> : {};
+        const id = String(args[0] ?? named.id ?? '');
+        if (id) cancelStrategyOrder(ledger, id, barIndex, bar.time);
+      },
+      strategyCancelAll() {
+        if (!isStrategy) return;
+        cancelAllStrategyOrders(ledger, barIndex, bar.time);
+      },
       strategyProp(name: string) {
-        if (name === 'position_size') return 0;
-        if (name === 'equity') return 0;
-        if (name === 'initial_capital') return 0;
+        if (name === 'position_size') return ledger.position.size * (ledger.position.direction === 'short' ? -1 : 1);
+        if (name === 'equity') return ledger.equity;
+        if (name === 'initial_capital') return ledger.settings.initialCapital;
+        if (name === 'netprofit') return ledger.netProfit;
+        if (name === 'grossprofit') return ledger.grossProfit;
+        if (name === 'grossloss') return ledger.grossLoss;
+        if (name === 'openprofit') return ledger.position.openProfit;
+        if (name === 'closedtrades') return ledger.closedTrades.length;
+        if (name === 'opentrades') return ledger.openTrades.length;
+        if (name === 'wintrades') return ledger.closedTrades.filter((t) => t.profit > 0).length;
+        if (name === 'losstrades') return ledger.closedTrades.filter((t) => t.profit <= 0).length;
         return 0;
       },
 
@@ -194,10 +402,21 @@ export function executeCompiled(
       tickerPointfigure(...args: unknown[]) { return String(args[0] ?? ''); },
     };
 
+    if (isStrategy) {
+      fillPendingStrategyMarketOrders(ledger, bar.open, barIndex, bar.time, mintick);
+      markStrategyLedgerToMarket(ledger, bar.close, bar.high, bar.low, { barIndex, time: bar.time });
+    }
+
     try {
       inst.onBar(barCtx);
     } catch (_error) {
       // Continue execution — single bar errors shouldn't abort
+    }
+
+    if (isStrategy) {
+      markStrategyLedgerToMarket(ledger, bar.close, bar.high, bar.low, { barIndex, time: bar.time });
+      fillPendingStrategyOrders(ledger, bar.high, bar.low, barIndex, bar.time, mintick);
+      markStrategyLedgerToMarket(ledger, bar.close, bar.high, bar.low, { barIndex, time: bar.time });
     }
 
     ctx.commitBar();
@@ -260,7 +479,7 @@ export function executeCompiled(
     indicatorMaxBarsBack: declaration.maxBarsBack,
     indicatorDynamicRequests: declaration.dynamicRequests,
     indicatorDrawingLimits: declaration.drawingLimits,
-    strategy: createStrategyLedger({} as StrategyLedger['settings']),
+    strategy: ledger,
     errors: [],
     profile,
   };

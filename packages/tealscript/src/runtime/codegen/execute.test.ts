@@ -191,3 +191,78 @@ plot(ta.dema(close, 10))
 plot(ta.tema(close, 10))`, bars);
   });
 });
+
+describe('executeCompiled — strategy integration', () => {
+  const closes = [10, 11, 12, 11.5, 13, 12, 14, 15, 13, 12, 11, 14, 16, 15, 13, 12, 14, 15, 16, 17];
+  const bars = closes.map((close, i) => ({
+    time: (i + 1) * 60000,
+    open: close - 0.5,
+    high: close + 1,
+    low: close - 1,
+    close,
+    volume: 100 + i,
+  }));
+
+  it('strategy.entry creates fills', () => {
+    const pine = `//@version=6
+strategy("test", overlay=true)
+if bar_index == 2
+    strategy.entry("Long", strategy.long)
+plot(strategy.position_size)`;
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars);
+    expect(result).not.toBeNull();
+    expect(result!.strategy.fills.length).toBeGreaterThan(0);
+
+    const posValues = result!.plots[0]?.values ?? [];
+    const firstNonZero = posValues.findIndex((v) => v !== null && v !== 0);
+    expect(firstNonZero).toBeGreaterThan(2);
+  });
+
+  it('strategy.entry + strategy.close round trip', () => {
+    const pine = `//@version=6
+strategy("test", overlay=true)
+if bar_index == 2
+    strategy.entry("Long", strategy.long)
+if bar_index == 5
+    strategy.close("Long")
+plot(strategy.position_size)`;
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars);
+    expect(result).not.toBeNull();
+
+    const posValues = result!.plots[0]?.values ?? [];
+    const lastVal = posValues[posValues.length - 1];
+    expect(lastVal).toBe(0);
+    expect(result!.strategy.closedTrades.length).toBeGreaterThan(0);
+  });
+
+  it('strategy.equity tracks capital', () => {
+    const pine = `//@version=6
+strategy("test", overlay=true, initial_capital=10000)
+if bar_index == 1
+    strategy.entry("Long", strategy.long, qty=1)
+plot(strategy.equity)`;
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars);
+    expect(result).not.toBeNull();
+
+    const eqValues = result!.plots[0]?.values ?? [];
+    expect(eqValues[0]).toBe(10000);
+    const lastEq = eqValues[eqValues.length - 1];
+    expect(lastEq).not.toBe(0);
+    expect(lastEq).not.toBeNull();
+  });
+});
