@@ -30,6 +30,7 @@ export type UserDrawingTool =
   | 'parallelChannel'
   | 'regressionTrend'
   | 'flatTopBottom'
+  | 'disjointChannel'
   | 'path'
   | 'textLabel';
 
@@ -218,6 +219,11 @@ export interface FlatTopBottomDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface DisjointChannelDrawing extends UserDrawingBase {
+  kind: 'disjointChannel';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PathDrawing extends UserDrawingBase {
   kind: 'path';
   points: readonly UserDrawingAnchor[];
@@ -261,6 +267,7 @@ export type UserDrawing =
   | ParallelChannelDrawing
   | RegressionTrendDrawing
   | FlatTopBottomDrawing
+  | DisjointChannelDrawing
   | PathDrawing
   | TextLabelDrawing;
 
@@ -392,6 +399,8 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'barsPattern':
     case 'path':
       return 3;
+    case 'disjointChannel':
+      return 4;
     case 'horizontalLine':
     case 'verticalLine':
     case 'arrowMarkUp':
@@ -594,6 +603,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: draft.tool,
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'disjointChannel':
+      return {
+        ...base,
+        kind: 'disjointChannel',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!, draft.anchors[3]!],
       };
     case 'path':
       return {

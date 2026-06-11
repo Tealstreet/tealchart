@@ -8,6 +8,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   resolveCircleFromAnchors,
+  resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveUserDrawingDateRangeMetrics,
@@ -34,6 +35,7 @@ import {
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingBarsPatternPrimitive,
+  MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
@@ -52,6 +54,7 @@ import type {
   CircleDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
+  DisjointChannelDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
   FlatTopBottomDrawing,
@@ -90,6 +93,7 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
+    expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
@@ -112,6 +116,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingFlatTopBottomPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingDisjointChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRiskRewardPositionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
@@ -140,6 +145,11 @@ describe('tealchart public entries', () => {
       ...channelPrimitive,
       kind: 'flatTopBottom',
       id: 'flat',
+    };
+    const disjointPrimitive: NonNever<MobileUserDrawingDisjointChannelPrimitive> = {
+      ...channelPrimitive,
+      kind: 'disjointChannel',
+      id: 'disjoint',
     };
     const linePrimitive: NonNever<MobileUserDrawingLinePrimitive> = {
       kind: 'line',
@@ -205,6 +215,7 @@ describe('tealchart public entries', () => {
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
     expect(flatPrimitive.kind).toBe('flatTopBottom');
+    expect(disjointPrimitive.kind).toBe('disjointChannel');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
@@ -734,5 +745,26 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('flatTopBottom');
+  });
+
+  it('exports shared drawing disjoint channel types', () => {
+    const drawing: DisjointChannelDrawing = {
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+        { time: 4, price: 9 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('disjointChannel');
   });
 });
