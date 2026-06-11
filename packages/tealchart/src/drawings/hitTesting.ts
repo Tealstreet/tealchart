@@ -39,6 +39,7 @@ const DEFAULT_TOLERANCE = 6;
 const DEFAULT_HANDLE_TOLERANCE = 8;
 const DEFAULT_LABEL_WIDTH = 72;
 const DEFAULT_LABEL_HEIGHT = 20;
+const ELLIPSE_HIT_TEST_SEGMENTS = 96;
 
 export function distanceBetweenPoints(a: DrawingScreenPoint, b: DrawingScreenPoint): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -88,14 +89,24 @@ function distanceToEllipseEdge(
   radiusY: number,
 ): number {
   if (radiusX <= 0 || radiusY <= 0) return distanceBetweenPoints(point, center);
-  const normalizedX = (point.x - center.x) / radiusX;
-  const normalizedY = (point.y - center.y) / radiusY;
-  const angle = Math.atan2(normalizedY, normalizedX);
-  const edge = {
-    x: center.x + radiusX * Math.cos(angle),
-    y: center.y + radiusY * Math.sin(angle),
+
+  let distance = Number.POSITIVE_INFINITY;
+  let previous = {
+    x: center.x + radiusX,
+    y: center.y,
   };
-  return distanceBetweenPoints(point, edge);
+
+  for (let index = 1; index <= ELLIPSE_HIT_TEST_SEGMENTS; index++) {
+    const angle = (index / ELLIPSE_HIT_TEST_SEGMENTS) * Math.PI * 2;
+    const current = {
+      x: center.x + radiusX * Math.cos(angle),
+      y: center.y + radiusY * Math.sin(angle),
+    };
+    distance = Math.min(distance, distanceToSegment(point, { start: previous, end: current }));
+    previous = current;
+  }
+
+  return distance;
 }
 
 function distanceToPolyline(point: DrawingScreenPoint, points: readonly DrawingScreenPoint[]): number {
