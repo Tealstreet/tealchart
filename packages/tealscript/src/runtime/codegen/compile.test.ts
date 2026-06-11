@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
 import { executeScript } from '../engine';
-import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS } from './compile';
+import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
 import type { Bar } from '../context';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
@@ -46,7 +46,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
     throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
   }
 
-  const deps = { NumericSeries, maxBarsBack: 500, _arr: ARRAY_HELPERS, _map: MAP_HELPERS, _udt: UDT_HELPERS, ...ta };
+  const deps = { NumericSeries, maxBarsBack: 500, _arr: ARRAY_HELPERS, _map: MAP_HELPERS, _udt: UDT_HELPERS, _mtx: MATRIX_HELPERS, ...ta };
   const inst = new compiled.ScriptClass(deps);
   const plots = new Map<number, (number | null)[]>();
 
@@ -418,5 +418,39 @@ plot(map.contains(m, "y") ? 1 : 0)`;
 
     expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
     expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles matrix.new and matrix operations', () => {
+    const pine = `//@version=6
+indicator("test")
+m = matrix.new<float>(2, 2, 0.0)
+matrix.set(m, 0, 0, close)
+matrix.set(m, 0, 1, open)
+matrix.set(m, 1, 0, high)
+matrix.set(m, 1, 1, low)
+plot(matrix.get(m, 0, 0))
+plot(matrix.rows(m))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles matrix.det', () => {
+    const pine = `//@version=6
+indicator("test")
+m = matrix.new<float>(2, 2, 0.0)
+matrix.set(m, 0, 0, 1.0)
+matrix.set(m, 0, 1, 2.0)
+matrix.set(m, 1, 0, 3.0)
+matrix.set(m, 1, 1, 4.0)
+plot(matrix.det(m))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
   });
 });

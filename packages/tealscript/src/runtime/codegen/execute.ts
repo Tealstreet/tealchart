@@ -4,7 +4,7 @@ import { ExecutionContext } from '../context';
 import type { ExecutionResult, RuntimeProfile, TealscriptRuntimeOptions } from '../engine';
 import type { StrategyLedger } from '../strategy';
 import { createStrategyLedger } from '../strategy';
-import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS } from './compile';
+import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
 import type { CompiledScript, CompiledBarContext } from './compile';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
@@ -53,6 +53,7 @@ export function executeCompiled(
     _arr: ARRAY_HELPERS,
     _map: MAP_HELPERS,
     _udt: UDT_HELPERS,
+    _mtx: MATRIX_HELPERS,
     ...ta,
   };
 

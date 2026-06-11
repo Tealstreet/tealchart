@@ -99,7 +99,6 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
 
 const UNSUPPORTED_NAMESPACES = new Set([
   'request',
-  'matrix',
 ]);
 
 const PLOT_FUNCTIONS = new Set([
