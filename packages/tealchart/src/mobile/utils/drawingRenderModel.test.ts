@@ -408,6 +408,61 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready Fibonacci retracement primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib',
+          kind: 'fibRetracement',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 20 },
+            { time: 90, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibRetracement',
+      id: 'fib',
+      levels: [
+        { ratio: 0, label: '0 20.00', price: 20, start: { x: 10, y: 80 }, end: { x: 90, y: 80 } },
+        { ratio: 0.236, label: '0.236 34.16', price: 34.16, start: { x: 10, y: 65.84 }, end: { x: 90, y: 65.84 } },
+        { ratio: 0.382, label: '0.382 42.92', price: 42.92, start: { x: 10, y: 57.08 }, end: { x: 90, y: 57.08 } },
+        { ratio: 0.5, label: '0.5 50.00', price: 50, start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
+        { ratio: 0.618, label: '0.618 57.08', price: 57.08, start: { x: 10, y: 42.92 }, end: { x: 90, y: 42.92 } },
+        { ratio: 0.786, label: '0.786 67.16', price: 67.16, start: { x: 10, y: 32.84 }, end: { x: 90, y: 32.84 } },
+        { ratio: 1, label: '1 80.00', price: 80, start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+        {
+          ratio: 1.618,
+          label: '1.618 117.08',
+          price: expect.closeTo(117.08),
+          start: { x: 10, y: expect.closeTo(-17.08) },
+          end: { x: 90, y: expect.closeTo(-17.08) },
+        },
+        {
+          ratio: 2.618,
+          label: '2.618 177.08',
+          price: expect.closeTo(177.08),
+          start: { x: 10, y: expect.closeTo(-77.08) },
+          end: { x: 90, y: expect.closeTo(-77.08) },
+        },
+      ],
+      style,
+    });
+  });
+
   it('returns Skia-ready extended line segments to chart bounds', () => {
     const extended: ExtendedLineDrawing = {
       id: 'extended',
