@@ -67,6 +67,7 @@ import type {
   ParallelChannelDrawing,
   PriceRangeDrawing,
   RegressionTrendDrawing,
+  RotatedRectangleDrawing,
   ShortPositionDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
@@ -762,6 +763,26 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('flatTopBottom');
+  });
+
+  it('exports shared drawing rotated rectangle types', () => {
+    const drawing: RotatedRectangleDrawing = {
+      id: 'rotated',
+      kind: 'rotatedRectangle',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('rotatedRectangle');
   });
 
   it('exports shared drawing disjoint channel types', () => {
