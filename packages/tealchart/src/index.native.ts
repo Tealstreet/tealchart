@@ -67,6 +67,7 @@ export type {
   MobileUserDrawingFibRetracementPrimitive,
   MobileUserDrawingInfoLineLabelPosition,
   MobileUserDrawingInfoLinePrimitive,
+  MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingPathPrimitive,
   MobileUserDrawingParallelChannelPrimitive,
