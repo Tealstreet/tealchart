@@ -347,6 +347,34 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('normalizes updated text drawing font families', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: anchorA,
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    const updated = updateUserDrawingStyle(state, { fontFamily: 'Comic Sans MS' }, { now: () => 12 });
+
+    expect(updated.drawings[0]).toMatchObject({
+      updatedAt: 12,
+      style: expect.objectContaining({ fontFamily: 'sans-serif' }),
+    });
+  });
+
   it('updates selected or targeted text drawing alignment while respecting locks', () => {
     const textLabel = {
       id: 'label',
