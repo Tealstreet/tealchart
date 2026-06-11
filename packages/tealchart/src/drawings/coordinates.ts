@@ -46,7 +46,7 @@ export interface DrawingScreenParallelChannel {
   polygon: DrawingScreenPolyline;
 }
 
-export interface DrawingScreenFibRetracementLevel {
+export interface DrawingScreenFibLevel {
   ratio: number;
   label: string;
   segment: DrawingScreenSegment;
@@ -54,9 +54,9 @@ export interface DrawingScreenFibRetracementLevel {
   price: number;
 }
 
-export interface DrawingScreenFibRetracement {
+export interface DrawingScreenFibLevels {
   rect: DrawingScreenRect;
-  levels: readonly DrawingScreenFibRetracementLevel[];
+  levels: readonly DrawingScreenFibLevel[];
 }
 
 export interface DrawingCoordinateSpace {
@@ -129,9 +129,9 @@ export type ResolvedUserDrawingGeometry =
       rect: DrawingScreenRect;
     }
   | {
-      kind: 'fibRetracement';
+      kind: 'fibRetracement' | 'fibExtension';
       drawing: UserDrawing;
-      retracement: DrawingScreenFibRetracement;
+      fib: DrawingScreenFibLevels;
     }
   | {
       kind: 'path';
@@ -351,16 +351,18 @@ export function resolvePolylineFromAnchors(
 }
 
 export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.618, 2.618] as const;
+export const FIB_EXTENSION_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.414, 1.618, 2, 2.618] as const;
 
 export function formatFibRetracementRatio(ratio: number): string {
   return ratio === 0 || ratio === 0.5 || ratio === 1 ? String(ratio) : ratio.toFixed(3);
 }
 
-export function resolveFibRetracementFromAnchors(
+export function resolveFibLevelsFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
-): DrawingScreenFibRetracement {
+  levels: readonly number[],
+): DrawingScreenFibLevels {
   const start = anchorToScreenPoint(first, space);
   const end = anchorToScreenPoint(second, space);
   const x1 = Math.min(start.x, end.x);
@@ -374,7 +376,7 @@ export function resolveFibRetracementFromAnchors(
       width: x2 - x1,
       height: Math.abs(end.y - start.y),
     },
-    levels: FIB_RETRACEMENT_LEVELS.map((ratio) => {
+    levels: levels.map((ratio) => {
       const price = first.price + priceDelta * ratio;
       const y = priceToDrawingY(price, space);
       return {
@@ -389,6 +391,22 @@ export function resolveFibRetracementFromAnchors(
       };
     }),
   };
+}
+
+export function resolveFibRetracementFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibLevels {
+  return resolveFibLevelsFromAnchors(first, second, space, FIB_RETRACEMENT_LEVELS);
+}
+
+export function resolveFibExtensionFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibLevels {
+  return resolveFibLevelsFromAnchors(first, second, space, FIB_EXTENSION_LEVELS);
 }
 
 export function resolveParallelChannelFromAnchors(
@@ -548,7 +566,13 @@ export function resolveUserDrawingGeometry(
       return {
         kind: 'fibRetracement',
         drawing,
-        retracement: resolveFibRetracementFromAnchors(drawing.points[0], drawing.points[1], space),
+        fib: resolveFibRetracementFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibExtension':
+      return {
+        kind: 'fibExtension',
+        drawing,
+        fib: resolveFibExtensionFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
       return {

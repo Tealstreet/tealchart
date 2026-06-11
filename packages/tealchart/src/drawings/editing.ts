@@ -62,6 +62,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'ellipse':
     case 'priceRange':
     case 'fibRetracement':
+    case 'fibExtension':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
     case 'triangle':
@@ -90,7 +91,17 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
 function editLineEndpoint(
   drawing: Extract<
     UserDrawing,
-    { kind: 'trendLine' | 'extendedLine' | 'infoLine' | 'arrowLine' | 'arrowMarker' | 'ray' | 'fibRetracement' }
+    {
+      kind:
+        | 'trendLine'
+        | 'extendedLine'
+        | 'infoLine'
+        | 'arrowLine'
+        | 'arrowMarker'
+        | 'ray'
+        | 'fibRetracement'
+        | 'fibExtension';
+    }
   >,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
@@ -166,6 +177,7 @@ function editDrawingHandle(
     case 'arrowMarker':
     case 'ray':
     case 'fibRetracement':
+    case 'fibExtension':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':

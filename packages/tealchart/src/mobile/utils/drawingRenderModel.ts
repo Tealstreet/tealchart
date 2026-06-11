@@ -165,7 +165,7 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'fibRetracement';
+      kind: 'fibRetracement' | 'fibExtension';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
@@ -211,6 +211,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
+export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
 export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'circle' }>;
@@ -481,14 +482,15 @@ function primitiveFromGeometry(
       };
     }
     case 'fibRetracement':
+    case 'fibExtension':
       return {
-        kind: 'fibRetracement',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,
         opacity,
         clip,
-        levels: geometry.retracement.levels.map((level) => ({
+        levels: geometry.fib.levels.map((level) => ({
           ratio: level.ratio,
           label: `${level.label} ${level.price.toFixed(2)}`,
           price: level.price,
