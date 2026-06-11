@@ -157,6 +157,7 @@ export type {
   PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,
+  RegressionTrendDrawing,
   ResolveUserDrawingInputFromChartOptions,
   ResolveUserDrawingInputPointOptions,
   ResolveUserDrawingRenderEntriesOptions,

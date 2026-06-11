@@ -71,6 +71,7 @@ export type {
   MobileUserDrawingPrimitive,
   MobileUserDrawingMeasurementLabelPrimitive,
   MobileUserDrawingPriceRangeLabelPosition,
+  MobileUserDrawingRegressionTrendPrimitive,
   MobileUserDrawingTextBounds,
   MobileUserDrawingTrendAngleLabelPosition,
   MobileUserDrawingTrendAnglePrimitive,

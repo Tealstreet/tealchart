@@ -228,6 +228,33 @@ describe('user drawing render model', () => {
     ]);
   });
 
+  it('resolves selection handles for regression trend anchors', () => {
+    expect(
+      resolveUserDrawingHandlePoints(
+        {
+          id: 'regression',
+          kind: 'regressionTrend',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 50 },
+            { time: 10, price: 80 },
+          ],
+        },
+        space,
+      ),
+    ).toEqual([
+      { x: 10, y: 50 },
+      { x: 90, y: 50 },
+      { x: 10, y: 20 },
+    ]);
+  });
+
   it('resolves selection handles for date range boundaries', () => {
     expect(
       resolveUserDrawingHandlePoints(

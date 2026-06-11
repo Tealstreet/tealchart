@@ -124,6 +124,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'parallelChannel', icon: '▱', label: 'Parallel channel' },
+  { tool: 'regressionTrend', icon: '≋', label: 'Regression trend' },
   { tool: 'path', icon: '⌁', label: 'Path' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
@@ -239,6 +240,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'dateRange' ||
     drawing.kind === 'triangle' ||
     drawing.kind === 'parallelChannel' ||
+    drawing.kind === 'regressionTrend' ||
     drawing.kind === 'textLabel'
   );
 }
