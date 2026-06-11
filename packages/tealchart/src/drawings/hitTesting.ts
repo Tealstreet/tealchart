@@ -265,6 +265,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'pitchfan') {
+    const distance = Math.min(...geometry.pitchfan.rays.map((ray) => distanceToSegment(point, ray.segment)));
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -417,6 +422,13 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'modifiedSchiffPitchfork' ||
         geometry.drawing.kind === 'insidePitchfork'
       ) {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'pitchfan':
+      if (geometry.drawing.kind === 'pitchfan') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

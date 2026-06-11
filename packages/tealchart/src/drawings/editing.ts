@@ -126,6 +126,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
     case 'insidePitchfork':
+    case 'pitchfan':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':
@@ -248,6 +249,7 @@ function editDrawingHandle(
       drawing.kind === 'schiffPitchfork' ||
       drawing.kind === 'modifiedSchiffPitchfork' ||
       drawing.kind === 'insidePitchfork' ||
+      drawing.kind === 'pitchfan' ||
       drawing.kind === 'rotatedRectangle' ||
       drawing.kind === 'parallelChannel' ||
       drawing.kind === 'flatTopBottom' ||
@@ -324,6 +326,7 @@ function editDrawingHandle(
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
     case 'insidePitchfork':
+    case 'pitchfan':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':

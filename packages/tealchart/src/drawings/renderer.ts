@@ -212,6 +212,21 @@ function renderPitchforkGeometry(
   ctx.stroke();
 }
 
+function renderPitchfanGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'pitchfan' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const ray of geometry.pitchfan.rays) {
+    ctx.moveTo(ray.segment.start.x, ray.segment.start.y);
+    ctx.lineTo(ray.segment.end.x, ray.segment.end.y);
+  }
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -609,6 +624,9 @@ export function renderUserDrawing(
         break;
       case 'pitchfork':
         renderPitchforkGeometry(ctx, geometry);
+        break;
+      case 'pitchfan':
+        renderPitchfanGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

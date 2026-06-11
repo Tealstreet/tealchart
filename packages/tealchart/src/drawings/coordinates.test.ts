@@ -46,6 +46,7 @@ import {
   resolveFibRetracementFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolvePitchforkFromAnchors,
+  resolvePitchfanFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
@@ -617,6 +618,16 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 110 },
       ],
     };
+    const pitchfan: UserDrawing = {
+      ...trendLine,
+      id: 'pitchfan',
+      kind: 'pitchfan',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const regressionTrend: RegressionTrendDrawing = {
       ...channel,
       id: 'regression',
@@ -850,6 +861,33 @@ describe('user drawing coordinates', () => {
         midpoint: { x: 110, y: 70 },
       },
     });
+    expect(resolvePitchfanFromAnchors(pitchfan.points[0], pitchfan.points[1], pitchfan.points[2], space)).toMatchObject({
+      origin: { x: 10, y: 70 },
+      targetStart: { x: 110, y: 20 },
+      targetEnd: { x: 110, y: 120 },
+      rays: [
+        { ratio: 0, target: { x: 110, y: 20 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: -30 } } },
+        {
+          ratio: 0.236,
+          target: { x: 110, y: expect.closeTo(43.6) },
+          segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(17.2) } },
+        },
+        {
+          ratio: 0.382,
+          target: { x: 110, y: expect.closeTo(58.2) },
+          segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(46.4) } },
+        },
+        { ratio: 0.5, target: { x: 110, y: 70 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
+        { ratio: 0.618, target: { x: 110, y: 81.8 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 93.6 } } },
+        {
+          ratio: 0.786,
+          target: { x: 110, y: expect.closeTo(98.6) },
+          segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(127.2) } },
+        },
+        { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+      ],
+    });
+    expect(resolveUserDrawingGeometry(pitchfan, space)).toMatchObject({ kind: 'pitchfan' });
     expect(
       resolvePitchforkFromAnchors(
         { time: 2_000, price: 100 },
