@@ -151,6 +151,7 @@ function renderPolygonGeometry(
         | 'triangle'
         | 'parallelChannel'
         | 'regressionTrend'
+        | 'rotatedRectangle'
         | 'flatTopBottom'
         | 'disjointChannel';
     }
@@ -177,6 +178,7 @@ function renderPolygonGeometry(
   const fillColor =
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
+    geometry.kind === 'rotatedRectangle' ||
     geometry.kind === 'flatTopBottom' ||
     geometry.kind === 'disjointChannel'
       ? geometry.drawing.style.fillColor
@@ -590,6 +592,7 @@ export function renderUserDrawing(
         break;
       case 'parallelChannel':
       case 'regressionTrend':
+      case 'rotatedRectangle':
       case 'flatTopBottom':
       case 'disjointChannel':
         renderPolygonGeometry(ctx, geometry);

@@ -18,6 +18,7 @@ export type UserDrawingTool =
   | 'rectangle'
   | 'circle'
   | 'ellipse'
+  | 'rotatedRectangle'
   | 'priceRange'
   | 'dateRange'
   | 'datePriceRange'
@@ -160,6 +161,11 @@ export interface EllipseDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface RotatedRectangleDrawing extends UserDrawingBase {
+  kind: 'rotatedRectangle';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PriceRangeDrawing extends UserDrawingBase {
   kind: 'priceRange';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -267,6 +273,7 @@ export type UserDrawing =
   | RectangleDrawing
   | CircleDrawing
   | EllipseDrawing
+  | RotatedRectangleDrawing
   | PriceRangeDrawing
   | DateRangeDrawing
   | DatePriceRangeDrawing
@@ -406,6 +413,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
       return 2;
     case 'triangle':
     case 'polyline':
+    case 'rotatedRectangle':
     case 'parallelChannel':
     case 'regressionTrend':
     case 'flatTopBottom':
@@ -553,6 +561,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'ellipse',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'rotatedRectangle':
+      return {
+        ...base,
+        kind: 'rotatedRectangle',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'priceRange':
       return {

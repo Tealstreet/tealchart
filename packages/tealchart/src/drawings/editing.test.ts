@@ -960,6 +960,82 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags rotated rectangle width handles without moving the baseline', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rotated',
+      kind: 'rotatedRectangle',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'rotated', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'rotated', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 10, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 30 },
+      { now: () => 12 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 20, price: 70 },
+      ],
+      updatedAt: 12,
+    });
+  });
+
+  it('moves selected rotated rectangles by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rotated',
+      kind: 'rotatedRectangle',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'rotated' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'rotated' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 13 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 40 },
+        { time: 100, price: 40 },
+        { time: 20, price: 70 },
+      ],
+      updatedAt: 13,
+    });
+  });
+
   it('drags flat top and bottom point handles', () => {
     const drawing: UserDrawing = {
       ...base,
