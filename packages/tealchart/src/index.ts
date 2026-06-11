@@ -176,6 +176,7 @@ export type {
   RayDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
+  RotatedRectangleDrawing,
   ResolveUserDrawingInputFromChartOptions,
   ResolveUserDrawingInputPointOptions,
   ResolveUserDrawingRenderEntriesOptions,
