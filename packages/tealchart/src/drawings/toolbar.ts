@@ -277,6 +277,7 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
 
 export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   return (
+    drawing.kind === 'icon' ||
     drawing.kind === 'arrowMarker' ||
     drawing.kind === 'arrowMarkUp' ||
     drawing.kind === 'arrowMarkDown' ||
