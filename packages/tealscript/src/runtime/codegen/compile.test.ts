@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
 import { executeScript } from '../engine';
-import { compile, ARRAY_HELPERS } from './compile';
+import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS } from './compile';
 import type { Bar } from '../context';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
@@ -46,7 +46,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
     throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
   }
 
-  const deps = { NumericSeries, maxBarsBack: 500, _arr: ARRAY_HELPERS, ...ta };
+  const deps = { NumericSeries, maxBarsBack: 500, _arr: ARRAY_HELPERS, _map: MAP_HELPERS, _udt: UDT_HELPERS, ...ta };
   const inst = new compiled.ScriptClass(deps);
   const plots = new Map<number, (number | null)[]>();
 
@@ -83,6 +83,14 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
       mathSum() { return 0; },
       strFormat(...args: unknown[]) { return String(args[0]); },
       strFormatTime(...args: unknown[]) { return String(args[0]); },
+      tickerNew(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerModify(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerStandard(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerHeikinashi(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerRenko(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerKagi(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerLinebreak(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerPointfigure(...args: unknown[]) { return String(args[0] ?? ''); },
     };
     inst.onBar(ctx);
   }
@@ -341,6 +349,69 @@ arr = array.from(3.0, 1.0, 2.0)
 array.sort(arr)
 plot(array.get(arr, 0))
 plot(array.get(arr, 2))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles map.new and map.put/get/size', () => {
+    const pine = `//@version=6
+indicator("test")
+m = map.new<string, float>()
+map.put(m, "a", close)
+map.put(m, "b", open)
+plot(map.size(m))
+plot(map.get(m, "a"))`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles user-defined types', () => {
+    const pine = `//@version=6
+indicator("test")
+type MyPoint
+    float x = 0.0
+    float y = 0.0
+p = MyPoint.new(x=close, y=open)
+plot(p.x)
+plot(p.y)`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+  });
+
+  it('compiles UDT field assignment', () => {
+    const pine = `//@version=6
+indicator("test")
+type Info
+    float val = 0.0
+i = Info.new()
+i.val := close
+plot(i.val)`;
+
+    const compiled = runCompiledSimple(pine, bars);
+    const interpreted = getInterpreterPlots(pine, bars);
+
+    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+  });
+
+  it('compiles map.contains and map.keys', () => {
+    const pine = `//@version=6
+indicator("test")
+m = map.new<string, float>()
+map.put(m, "x", 42.0)
+plot(map.contains(m, "x") ? 1 : 0)
+plot(map.contains(m, "y") ? 1 : 0)`;
 
     const compiled = runCompiledSimple(pine, bars);
     const interpreted = getInterpreterPlots(pine, bars);

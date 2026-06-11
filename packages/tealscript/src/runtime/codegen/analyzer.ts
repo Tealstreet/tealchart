@@ -4,6 +4,7 @@ import type {
   IfStatement,
   CallExpression,
   CallArgument,
+  TypeDeclaration,
 } from '../../parser/ast';
 
 export interface TACallSite {
@@ -49,6 +50,12 @@ export interface DeclarationInfo {
   node: IndicatorDeclaration;
 }
 
+export interface TypeDeclInfo {
+  name: string;
+  fields: { name: string; defaultExpr: Expression | null; varip: boolean }[];
+  node: TypeDeclaration;
+}
+
 export interface AnalysisContext {
   seriesVars: Set<string>;
   taCallSites: TACallSite[];
@@ -61,6 +68,7 @@ export interface AnalysisContext {
   unsupported: string[];
   barFieldSeriesVars: Set<string>;
   usedBarFields: Set<string>;
+  typeDecls: Map<string, TypeDeclInfo>;
 }
 
 const BAR_FIELDS = new Set([
@@ -91,7 +99,7 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
 
 const UNSUPPORTED_NAMESPACES = new Set([
   'request', 'label', 'line', 'box', 'polyline', 'linefill', 'table',
-  'matrix', 'map', 'ticker',
+  'matrix',
 ]);
 
 const PLOT_FUNCTIONS = new Set([
@@ -146,6 +154,7 @@ export function analyze(ast: Program): AnalysisContext {
     unsupported: [],
     barFieldSeriesVars: new Set(),
     usedBarFields: new Set(),
+    typeDecls: new Map(),
   };
 
   let taIndex = 0;
@@ -371,8 +380,15 @@ export function analyze(ast: Program): AnalysisContext {
         break;
       }
       case 'TypeDeclaration': {
-        const msg = 'User-defined types not yet supported by transpiler';
-        if (!ctx.unsupported.includes(msg)) ctx.unsupported.push(msg);
+        const fields = stmt.fields.map((f) => ({
+          name: f.name.name,
+          defaultExpr: f.defaultValue ?? null,
+          varip: f.varip ?? false,
+        }));
+        ctx.typeDecls.set(stmt.name.name, { name: stmt.name.name, fields, node: stmt });
+        for (const f of stmt.fields) {
+          if (f.defaultValue) walkExpr(f.defaultValue);
+        }
         break;
       }
       case 'MultiDeclaration':

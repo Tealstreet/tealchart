@@ -91,6 +91,15 @@ const ARRAY_FUNC_MAP: Record<string, string> = {
   'array.map': 'map', 'array.filter': 'filter',
 };
 
+const MAP_FUNC_MAP: Record<string, string> = {
+  'map.new': 'create',
+  'map.put': 'put', 'map.get': 'get',
+  'map.contains': 'contains', 'map.remove': 'remove',
+  'map.clear': 'clear', 'map.copy': 'copy',
+  'map.keys': 'keys', 'map.values': 'values',
+  'map.size': 'size', 'map.put_all': 'putAll',
+};
+
 export function emit(ast: Program, ctx: AnalysisContext): string {
   const lines: string[] = [];
   const indent = (n: number) => '  '.repeat(n);
@@ -205,7 +214,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (ns === 'order') return `"${prop}"`;
       if (ns === 'dayofweek') return `"${prop}"`;
     }
-    return `${emitExpr(expr.object)}.${expr.property.name}`;
+    return `_getField(${emitExpr(expr.object)}, "${expr.property.name}")`;
   }
 
   function emitIndexExpr(expr: IndexExpression): string {
@@ -298,6 +307,26 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return emitArrayCall(fullName, expr);
     }
 
+    // Map functions
+    if (namespace === 'map') {
+      const mapped = MAP_FUNC_MAP[fullName];
+      if (mapped) return `deps._map.${mapped}(${posArgs.join(', ')})`;
+      return `deps._map.${fullName.replace('map.', '')}(${posArgs.join(', ')})`;
+    }
+
+    // Ticker functions
+    if (namespace === 'ticker') {
+      if (fullName === 'ticker.new') return `ctx.tickerNew(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.modify') return `ctx.tickerModify(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.standard') return `ctx.tickerStandard(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.heikinashi') return `ctx.tickerHeikinashi(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.renko') return `ctx.tickerRenko(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.kagi') return `ctx.tickerKagi(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.linebreak') return `ctx.tickerLinebreak(${posArgs.join(', ')})`;
+      if (fullName === 'ticker.pointfigure') return `ctx.tickerPointfigure(${posArgs.join(', ')})`;
+      return `ctx.tickerNew(${posArgs.join(', ')})`;
+    }
+
     // Plot functions
     if (PLOT_FUNCTIONS.has(fullName)) {
       return emitPlotCall(fullName, expr);
@@ -335,12 +364,48 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (prop === 'risk') return 'undefined';
     }
 
+    // UDT constructor: MyType.new(field1=val1, ...)
+    if (namespace && ctx.typeDecls.has(namespace) && expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'new') {
+      return emitUdtConstructor(namespace, expr);
+    }
+
     // User-defined function
     if (ctx.funcInfos.has(fullName)) {
       return `this._fn_${fullName}(${posArgs.join(', ')})`;
     }
 
     return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}])`;
+  }
+
+  function emitUdtConstructor(typeName: string, expr: CallExpression): string {
+    const typeInfo = ctx.typeDecls.get(typeName)!;
+    const namedArgs = new Map<string, string>();
+    const positionalArgs: string[] = [];
+    for (const arg of expr.arguments) {
+      if (arg.name) {
+        namedArgs.set(arg.name.name, emitExpr(arg.value));
+      } else {
+        positionalArgs.push(emitExpr(arg.value));
+      }
+    }
+    const fieldEntries: string[] = [];
+    const varipFields: string[] = [];
+    for (let i = 0; i < typeInfo.fields.length; i++) {
+      const field = typeInfo.fields[i];
+      let value: string;
+      if (namedArgs.has(field.name)) {
+        value = namedArgs.get(field.name)!;
+      } else if (i < positionalArgs.length) {
+        value = positionalArgs[i];
+      } else if (field.defaultExpr) {
+        value = emitExpr(field.defaultExpr);
+      } else {
+        value = 'NaN';
+      }
+      fieldEntries.push(`["${field.name}", ${value}]`);
+      if (field.varip) varipFields.push(`"${field.name}"`);
+    }
+    return `deps._udt.create("${typeName}", [${fieldEntries.join(', ')}], [${varipFields.join(', ')}])`;
   }
 
   function emitTACall(site: TACallSite, _expr: CallExpression): string {
@@ -588,6 +653,17 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return;
     }
 
+    if (stmt.left.type === 'MemberExpression') {
+      const obj = emitExpr(stmt.left.object);
+      const field = stmt.left.property.name;
+      if (stmt.operator === ':=') {
+        lines.push(`${pad}_setField(${obj}, "${field}", ${rhs});`);
+      } else {
+        const op = stmt.operator.charAt(0);
+        lines.push(`${pad}_setField(${obj}, "${field}", _getField(${obj}, "${field}") ${op} ${rhs});`);
+      }
+      return;
+    }
     lines.push(`${pad}${emitExpr(stmt.left)} ${stmt.operator === ':=' ? '=' : stmt.operator} ${rhs};`);
   }
 
@@ -665,10 +741,15 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const counter = stmt.counter.name;
       const iterable = emitExpr(stmt.iterable);
       const iterVar = `_iter_${counter}`;
-      lines.push(`${pad}{ const ${iterVar} = ${iterable}; for (let _i = 0; _i < deps._arr.size(${iterVar}) && _i < ${ITERATION_CAP}; _i++) {`);
-      lines.push(`${indent(depth + 1)}let ${counter} = deps._arr.get(${iterVar}, _i);`);
       if (stmt.indexCounter) {
-        lines.push(`${indent(depth + 1)}let ${stmt.indexCounter.name} = _i;`);
+        const entriesVar = `_entries_${counter}`;
+        lines.push(`${pad}{ const ${iterVar} = ${iterable}; const ${entriesVar} = _iterEntries(${iterVar});`);
+        lines.push(`${pad}for (let _i = 0; _i < ${entriesVar}.length && _i < ${ITERATION_CAP}; _i++) {`);
+        lines.push(`${indent(depth + 1)}let ${stmt.indexCounter.name} = ${entriesVar}[_i][0];`);
+        lines.push(`${indent(depth + 1)}let ${counter} = ${entriesVar}[_i][1];`);
+      } else {
+        lines.push(`${pad}{ const ${iterVar} = ${iterable}; for (let _i = 0; _i < _iterSize(${iterVar}) && _i < ${ITERATION_CAP}; _i++) {`);
+        lines.push(`${indent(depth + 1)}let ${counter} = _iterGet(${iterVar}, _i);`);
       }
       for (const s of stmt.body) emitStmt(s, depth + 1);
       lines.push(`${pad}}}`)
@@ -851,5 +932,37 @@ function _or(a, b) { return _isTruthy(a) || _isTruthy(b); }
 function _idx(obj, i) {
   if (obj && obj.__tealscriptArray) return deps._arr.get(obj, i);
   return obj[i];
+}
+function _getField(obj, name) {
+  if (obj && obj.__tealscriptUdt) return deps._udt.getField(obj, name);
+  if (obj && typeof obj === 'object') return obj[name];
+  return undefined;
+}
+function _setField(obj, name, val) {
+  if (obj && obj.__tealscriptUdt) { deps._udt.setField(obj, name, val); return; }
+  if (obj && typeof obj === 'object') obj[name] = val;
+}
+function _iterSize(obj) {
+  if (obj && obj.__tealscriptArray) return deps._arr.size(obj);
+  if (obj && obj.__tealscriptMap) return deps._map.size(obj);
+  if (Array.isArray(obj)) return obj.length;
+  return 0;
+}
+function _iterGet(obj, i) {
+  if (obj && obj.__tealscriptArray) return deps._arr.get(obj, i);
+  if (obj && obj.__tealscriptMap) return Array.from(obj.entries.values())[i];
+  if (Array.isArray(obj)) return obj[i];
+  return undefined;
+}
+function _iterEntries(obj) {
+  if (obj && obj.__tealscriptMap) return Array.from(obj.entries.entries());
+  if (obj && obj.__tealscriptArray) {
+    var result = [];
+    var size = deps._arr.size(obj);
+    for (var i = 0; i < size; i++) result.push([i, deps._arr.get(obj, i)]);
+    return result;
+  }
+  if (Array.isArray(obj)) return obj.map(function(v, i) { return [i, v]; });
+  return [];
 }
 `;
