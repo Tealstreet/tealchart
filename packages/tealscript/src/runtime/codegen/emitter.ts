@@ -107,7 +107,7 @@ const MATRIX_FUNC_MAP: Record<string, string> = {
   'matrix.rows': 'rows', 'matrix.columns': 'columns',
   'matrix.elements_count': 'elementCount',
   'matrix.copy': 'copy', 'matrix.concat': 'concat',
-  'matrix.row': 'row', 'matrix.col': 'col',
+  'matrix.row': 'row', 'matrix.col': 'col', 'matrix.column': 'col',
   'matrix.fill': 'fill', 'matrix.reshape': 'reshape',
   'matrix.add_row': 'addRow', 'matrix.add_col': 'addCol',
   'matrix.remove_row': 'removeRow', 'matrix.remove_col': 'removeCol',
@@ -126,6 +126,7 @@ const MATRIX_FUNC_MAP: Record<string, string> = {
   'matrix.is_diagonal': 'isDiagonal', 'matrix.is_antidiagonal': 'isAntidiagonal',
   'matrix.is_symmetric': 'isSymmetric', 'matrix.is_antisymmetric': 'isAntisymmetric',
   'matrix.is_triangular': 'isTriangular', 'matrix.is_stochastic': 'isStochastic',
+  'matrix.is_valid': 'isValid',
 };
 
 export function emit(ast: Program, ctx: AnalysisContext): string {
@@ -992,12 +993,14 @@ function _setField(obj, name, val) {
 function _iterSize(obj) {
   if (obj && obj.__tealscriptArray) return deps._arr.size(obj);
   if (obj && obj.__tealscriptMap) return deps._map.size(obj);
+  if (obj && obj.__tealscriptMatrix) return deps._mtx.rows(obj);
   if (Array.isArray(obj)) return obj.length;
   return 0;
 }
 function _iterGet(obj, i) {
   if (obj && obj.__tealscriptArray) return deps._arr.get(obj, i);
   if (obj && obj.__tealscriptMap) return Array.from(obj.entries.values())[i];
+  if (obj && obj.__tealscriptMatrix) return deps._mtx.row(obj, i);
   if (Array.isArray(obj)) return obj[i];
   return undefined;
 }
@@ -1007,6 +1010,12 @@ function _iterEntries(obj) {
     var result = [];
     var size = deps._arr.size(obj);
     for (var i = 0; i < size; i++) result.push([i, deps._arr.get(obj, i)]);
+    return result;
+  }
+  if (obj && obj.__tealscriptMatrix) {
+    var result = [];
+    var rows = deps._mtx.rows(obj);
+    for (var i = 0; i < rows; i++) result.push([i, deps._mtx.row(obj, i)]);
     return result;
   }
   if (Array.isArray(obj)) return obj.map(function(v, i) { return [i, v]; });
