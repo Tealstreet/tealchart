@@ -56,9 +56,13 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
     fireEvent.click(screen.getByLabelText('Green fill color'));
     fireEvent.click(screen.getByLabelText('75 percent opacity'));
+    fireEvent.click(screen.getByLabelText('Toggle drawing border'));
+    fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
     expect(onStyle).toHaveBeenCalledWith({ opacity: 0.75 });
+    expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
+    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
@@ -151,12 +155,16 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
     fireEvent.click(screen.getByLabelText('Green fill color'));
     fireEvent.click(screen.getByLabelText('75 percent opacity'));
+    fireEvent.click(screen.getByLabelText('Toggle drawing border'));
+    fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
     fireEvent.click(screen.getByLabelText('Red text color'));
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect((screen.getByLabelText('Green fill color') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('75 percent opacity') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Toggle drawing border') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Toggle drawing fill') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Red text color') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('16 pixel font size') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Right text alignment') as HTMLButtonElement).disabled).toBe(true);

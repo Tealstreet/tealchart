@@ -59,6 +59,12 @@ export interface UserDrawingOpacityDescriptor {
   label: string;
 }
 
+export interface UserDrawingStyleToggleDescriptor {
+  style: 'lineVisible' | 'fillVisible';
+  icon: string;
+  label: string;
+}
+
 export interface UserDrawingStyleToolbarActionDescriptor {
   action: UserDrawingStyleToolbarAction;
   icon: string;
@@ -149,6 +155,11 @@ export const USER_DRAWING_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityDescri
     label: `${Math.round(opacity * 100)} percent opacity`,
   })),
 ];
+
+export const USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS: readonly UserDrawingStyleToggleDescriptor[] = [
+  { style: 'lineVisible', icon: '▣', label: 'Toggle drawing border' },
+  { style: 'fillVisible', icon: '◩', label: 'Toggle drawing fill' },
+] as const;
 
 export const USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingStyleToolbarActionDescriptor[] = [
   { action: 'hideSelected', icon: '◌', label: 'Hide selected drawing' },

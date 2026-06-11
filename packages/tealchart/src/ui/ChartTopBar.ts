@@ -20,6 +20,7 @@ import {
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
+  USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -575,6 +576,40 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         group.appendChild(btn);
       }
 
+      const borderToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find((descriptor) => descriptor.style === 'lineVisible')!;
+      const borderVisible = selectedDrawing.style.lineVisible !== false;
+      const borderBtn = this.createElement('button', {
+        style: {
+          ...styles.drawingButton,
+          ...(borderVisible ? styles.drawingButtonActive : {}),
+          opacity: styleEnabled ? '1' : '0.35',
+          cursor: styleEnabled ? 'pointer' : 'default',
+        },
+        textContent: borderToggle.icon,
+        attributes: {
+          type: 'button',
+          title: borderToggle.label,
+          'aria-label': borderToggle.label,
+          'aria-pressed': borderVisible ? 'true' : 'false',
+        },
+      });
+      borderBtn.disabled = !styleEnabled;
+      if (styleEnabled) {
+        borderBtn.addEventListener('click', () =>
+          this.options.onUserDrawingStyleChange?.({ lineVisible: !borderVisible }),
+        );
+        borderBtn.addEventListener('mouseenter', () => {
+          if (!borderVisible) Object.assign(borderBtn.style, styles.drawingButtonHover);
+        });
+        borderBtn.addEventListener('mouseleave', () => {
+          if (!borderVisible) {
+            borderBtn.style.backgroundColor = 'transparent';
+            borderBtn.style.color = 'var(--text2, #787b86)';
+          }
+        });
+      }
+      group.appendChild(borderBtn);
+
       group.appendChild(this.createElement('div', { style: styles.divider }));
 
       if (fillSupported) {
@@ -604,6 +639,40 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           }
           group.appendChild(btn);
         }
+
+        const fillToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find((descriptor) => descriptor.style === 'fillVisible')!;
+        const fillVisible = selectedDrawing.style.fillVisible !== false;
+        const fillBtn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...(fillVisible ? styles.drawingButtonActive : {}),
+            opacity: fillEnabled ? '1' : '0.35',
+            cursor: fillEnabled ? 'pointer' : 'default',
+          },
+          textContent: fillToggle.icon,
+          attributes: {
+            type: 'button',
+            title: fillToggle.label,
+            'aria-label': fillToggle.label,
+            'aria-pressed': fillVisible ? 'true' : 'false',
+          },
+        });
+        fillBtn.disabled = !fillEnabled;
+        if (fillEnabled) {
+          fillBtn.addEventListener('click', () =>
+            this.options.onUserDrawingStyleChange?.({ fillVisible: !fillVisible }),
+          );
+          fillBtn.addEventListener('mouseenter', () => {
+            if (!fillVisible) Object.assign(fillBtn.style, styles.drawingButtonHover);
+          });
+          fillBtn.addEventListener('mouseleave', () => {
+            if (!fillVisible) {
+              fillBtn.style.backgroundColor = 'transparent';
+              fillBtn.style.color = 'var(--text2, #787b86)';
+            }
+          });
+        }
+        group.appendChild(fillBtn);
 
         group.appendChild(this.createElement('div', { style: styles.divider }));
       }
