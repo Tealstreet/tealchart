@@ -1206,6 +1206,25 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits balloon drawings by text box and tail', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'balloon',
+      kind: 'balloon',
+      point: { time: 50, price: 50 },
+      text: 'Hi',
+      textAlign: 'center',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 25 }, space, { labelWidth: 0, labelHeight: 20 })?.drawing.id).toBe(
+      'balloon',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 45 }, space, { labelWidth: 0, labelHeight: 20 })?.drawing.id).toBe(
+      'balloon',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 0, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits multiline text labels using expanded label height', () => {
     const drawing: UserDrawing = {
       ...base,
