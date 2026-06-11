@@ -90,8 +90,10 @@ export {
   getUserDrawingPaneId,
   isDrawingDraftReady,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
   USER_DRAWING_FONT_SIZES,
+  USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 export {

@@ -11,7 +11,9 @@ import {
   getUserDrawingPaneId,
   isDrawingDraftReady,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
+  USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 
@@ -61,6 +63,17 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingFontSize(20)).toBe(16);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, fontSize: 15 })).toMatchObject({
       fontSize: 14,
+    });
+  });
+
+  it('normalizes drawing opacity to a cross-platform alpha range', () => {
+    expect(USER_DRAWING_OPACITIES).toEqual([1, 0.75, 0.5, 0.25]);
+    expect(normalizeUserDrawingOpacity(-0.5)).toBe(0);
+    expect(normalizeUserDrawingOpacity(0.4)).toBe(0.4);
+    expect(normalizeUserDrawingOpacity(1.5)).toBe(1);
+    expect(normalizeUserDrawingOpacity(Number.NaN)).toBe(1);
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, opacity: 1.4 })).toMatchObject({
+      opacity: 1,
     });
   });
 

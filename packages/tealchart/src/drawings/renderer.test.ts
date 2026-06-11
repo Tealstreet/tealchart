@@ -50,16 +50,16 @@ class RecordingCanvasContext implements CanvasContext {
     this.calls.push('fill');
   }
   stroke(): void {
-    this.calls.push(`stroke:${this.strokeStyle}:${this.lineWidth}:${this.lineDash.join(',')}`);
+    this.calls.push(`stroke:${this.strokeStyle}:${this.lineWidth}:${this.lineDash.join(',')}:${this.globalAlpha}`);
   }
   fillRect(x: number, y: number, width: number, height: number): void {
-    this.calls.push(`fillRect:${x},${y},${width},${height}:${this.fillStyle}`);
+    this.calls.push(`fillRect:${x},${y},${width},${height}:${this.fillStyle}:${this.globalAlpha}`);
   }
   strokeRect(x: number, y: number, width: number, height: number): void {
-    this.calls.push(`strokeRect:${x},${y},${width},${height}:${this.strokeStyle}`);
+    this.calls.push(`strokeRect:${x},${y},${width},${height}:${this.strokeStyle}:${this.globalAlpha}`);
   }
   fillText(text: string, x: number, y: number): void {
-    this.calls.push(`fillText:${text}:${x},${y}:${this.fillStyle}:${this.textAlign}`);
+    this.calls.push(`fillText:${text}:${x},${y}:${this.fillStyle}:${this.textAlign}:${this.globalAlpha}`);
   }
   save(): void {
     this.stateStack.push({ globalAlpha: this.globalAlpha, lineDash: [...this.lineDash] });
@@ -153,7 +153,7 @@ describe('user drawing renderer', () => {
 
     expect(ctx.calls).toContain('moveTo:0,50');
     expect(ctx.calls).toContain('lineTo:100,50');
-    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
   it('clips drawings to the pane chart area', () => {
@@ -187,8 +187,8 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12)');
-    expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542');
+    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542:1');
   });
 
   it('renders text labels with measured boxes', () => {
@@ -204,8 +204,28 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillRect:32,40,36,20:rgba(245, 197, 66, 0.12)');
-    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center');
+    expect(ctx.calls).toContain('fillRect:32,40,36,20:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1');
+  });
+
+  it('applies drawing style opacity while restoring canvas alpha', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rect',
+      kind: 'rectangle',
+      style: { ...style, opacity: 0.5 },
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12):0.5');
+    expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542:0.5');
+    expect(ctx.globalAlpha).toBe(1);
   });
 
   it('skips invisible drawings and drawings without a pane space', () => {

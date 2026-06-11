@@ -32,6 +32,7 @@ const clip = { x: 0, y: 0, width: 100, height: 100 };
 
 describe('mobile user drawing render model', () => {
   it('returns Skia-ready primitives for selected drawings and draft previews', () => {
+    const fadedStyle = { ...style, opacity: 0.5 };
     const state: UserDrawingState = {
       version: 1,
       activeTool: 'rectangle',
@@ -45,7 +46,7 @@ describe('mobile user drawing render model', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style,
+          style: fadedStyle,
           points: [
             { time: 0, price: 50 },
             { time: 100, price: 50 },
@@ -57,7 +58,7 @@ describe('mobile user drawing render model', () => {
         tool: 'rectangle',
         paneId: 'main',
         anchors: [{ time: 10, price: 90 }],
-        style,
+        style: fadedStyle,
         startedAt: 2,
       },
       textEdit: null,
@@ -75,21 +76,21 @@ describe('mobile user drawing render model', () => {
         id: 'line',
         phase: 'committed',
         selected: true,
-        opacity: 1,
+        opacity: 0.5,
         clip,
         start: { x: 0, y: 50 },
         end: { x: 100, y: 50 },
-        style,
+        style: fadedStyle,
       },
       {
         kind: 'rectangle',
         id: '__draft__',
         phase: 'draft',
         selected: false,
-        opacity: 0.4,
+        opacity: 0.2,
         clip,
         rect: { x: 10, y: 10, width: 80, height: 80 },
-        style,
+        style: fadedStyle,
       },
       {
         kind: 'handle',
