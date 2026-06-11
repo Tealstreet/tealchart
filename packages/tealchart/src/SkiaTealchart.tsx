@@ -1574,6 +1574,48 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'priceRange') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textWidth = font ? font.measureText(primitive.label).width : 0;
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
+                {font && (
+                  <SkiaText
+                    x={primitive.labelPoint.x - textWidth / 2}
+                    y={primitive.labelPoint.y}
+                    text={primitive.label}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'textLabel') {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;

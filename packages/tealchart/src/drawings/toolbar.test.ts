@@ -47,6 +47,7 @@ describe('user drawing toolbar descriptors', () => {
       'horizontalLine',
       'verticalLine',
       'rectangle',
+      'priceRange',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -83,6 +84,9 @@ describe('user drawing toolbar descriptors', () => {
   it('resolves tool descriptors by tool id', () => {
     expect(getUserDrawingToolDescriptor('rectangle')).toEqual(
       expect.objectContaining({ tool: 'rectangle', label: 'Rectangle' }),
+    );
+    expect(getUserDrawingToolDescriptor('priceRange')).toEqual(
+      expect.objectContaining({ tool: 'priceRange', label: 'Price range' }),
     );
   });
 
@@ -243,11 +247,18 @@ describe('user drawing toolbar descriptors', () => {
       text: 'note',
       textAlign: 'center' as const,
     };
+    const priceRange = {
+      ...rectangle,
+      id: 'p',
+      kind: 'priceRange' as const,
+    };
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
+    expect(supportsUserDrawingFillControls(priceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
 
     expect(

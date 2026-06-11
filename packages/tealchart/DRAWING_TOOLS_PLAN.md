@@ -137,7 +137,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia render models expose matching arrowhead geometry and render it
   with the same clip, color, opacity, and width behavior.
 
-## Current Epic: Extended Line Tool
+## Shipped: Extended Line Tool
 
 - Shared drawing state supports the two-anchor `extendedLine` tool and persists
   it through layout save/load.
@@ -146,11 +146,22 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, and endpoint editing reuse the existing line-family
   behavior on both platforms.
 
+## Current Epic: Price Range Tool
+
+- Shared drawing state supports the two-anchor `priceRange` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render a filled measurement range with a shared
+  signed price/percent label.
+- Selection, hit testing, fill controls, and corner editing reuse rectangle
+  behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Additional TradingView line-family tools such as info lines and multi-point
   arrows.
+- Additional TradingView measurement tools such as date range, bars pattern,
+  and risk/reward.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration

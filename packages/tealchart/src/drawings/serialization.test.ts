@@ -306,6 +306,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores price range drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'range',
+      kind: 'priceRange',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('restores drawing fill and line visibility flags', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
