@@ -185,6 +185,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'comment':
     case 'balloon':
     case 'pin':
+    case 'icon':
     case 'anchoredVwap':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
   }
@@ -410,6 +411,7 @@ function editDrawingHandle(
     case 'comment':
     case 'balloon':
     case 'pin':
+    case 'icon':
     case 'anchoredVwap':
     case 'path':
     case 'brush':

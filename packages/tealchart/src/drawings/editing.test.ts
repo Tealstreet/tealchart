@@ -444,6 +444,38 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves icons by dragging the center handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'icon',
+      kind: 'icon',
+      point: { time: 20, price: 60 },
+      iconName: 'star',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'icon', handle: 'center' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'icon', handle: 'center' },
+        startPoint: { x: 20, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 70, y: 30 },
+      { now: () => 3 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      point: { time: 70, price: 70 },
+      iconName: 'star',
+      updatedAt: 3,
+    });
+  });
+
   it('moves balloons by dragging the center handle', () => {
     const drawing: UserDrawing = {
       ...base,

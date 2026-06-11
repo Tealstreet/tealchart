@@ -3,8 +3,10 @@ import type { UserDrawingInputPoint } from './input';
 import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor, UserDrawingPathFamilyKind } from './types';
 
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
+import type { UserDrawingIconGeometry } from './iconGeometry';
 
 import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
+import { resolveUserDrawingIconGeometry } from './iconGeometry';
 import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
 
@@ -535,6 +537,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'pin';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
+    }
+  | {
+      kind: 'icon';
+      drawing: UserDrawing;
+      icon: UserDrawingIconGeometry;
     }
   | {
       kind: 'callout' | 'priceNote';
@@ -2348,6 +2355,15 @@ export function resolveUserDrawingGeometry(
         kind: 'pin',
         drawing,
         point: anchorToScreenPoint(drawing.point, space),
+      };
+    case 'icon':
+      return {
+        kind: 'icon',
+        drawing,
+        icon: resolveUserDrawingIconGeometry({
+          name: drawing.iconName,
+          center: anchorToScreenPoint(drawing.point, space),
+        }),
       };
     case 'callout':
     case 'priceNote':

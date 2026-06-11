@@ -149,6 +149,14 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         point: { ...drawing.point },
       };
+    case 'icon':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'icon',
+        point: { ...drawing.point },
+        iconName: drawing.iconName,
+      };
     case 'anchoredVwap':
       return {
         ...drawing,
@@ -851,6 +859,17 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             ...base,
             kind: value.kind,
             point,
+          }
+        : null;
+    }
+    case 'icon': {
+      const point = parseAnchor(value.point);
+      return point
+        ? {
+            ...base,
+            kind: 'icon',
+            point,
+            iconName: value.iconName === 'star' ? value.iconName : 'star',
           }
         : null;
     }

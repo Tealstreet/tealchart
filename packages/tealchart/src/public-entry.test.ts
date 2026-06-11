@@ -74,6 +74,7 @@ import type {
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingBalloonPrimitive,
   MobileUserDrawingCommentPrimitive,
+  MobileUserDrawingIconPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPinPrimitive,
   MobileUserDrawingPriceNotePrimitive,
@@ -138,6 +139,7 @@ import type {
   BalloonDrawing,
   CalloutDrawing,
   CommentDrawing,
+  IconDrawing,
   NoteDrawing,
   PathDrawing,
   ParallelChannelDrawing,
@@ -226,6 +228,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCommentPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingPriceNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingPinPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingIconPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBalloonPrimitive');
   });
 
@@ -679,6 +682,18 @@ describe('tealchart public entries', () => {
       radius: 4,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const iconPrimitive: NonNever<MobileUserDrawingIconPrimitive> = {
+      kind: 'icon',
+      id: 'icon',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      point: { x: 5, y: 5 },
+      iconName: 'star',
+      points: [{ x: 5, y: 0 }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const balloonPrimitive: NonNever<MobileUserDrawingBalloonPrimitive> = {
       kind: 'balloon',
       id: 'balloon',
@@ -741,6 +756,7 @@ describe('tealchart public entries', () => {
     expect(commentPrimitive.kind).toBe('comment');
     expect(priceNotePrimitive.kind).toBe('priceNote');
     expect(pinPrimitive.kind).toBe('pin');
+    expect(iconPrimitive.kind).toBe('icon');
     expect(balloonPrimitive.kind).toBe('balloon');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
@@ -1234,6 +1250,13 @@ describe('tealchart public entries', () => {
       kind: 'pin',
       point: drawing.points[0]!,
     };
+    const icon: IconDrawing = {
+      ...drawing,
+      id: 'icon',
+      kind: 'icon',
+      point: drawing.points[0]!,
+      iconName: 'star',
+    };
     const balloon: BalloonDrawing = {
       ...drawing,
       id: 'balloon',
@@ -1251,6 +1274,7 @@ describe('tealchart public entries', () => {
     expect(comment.kind).toBe('comment');
     expect(priceNote.kind).toBe('priceNote');
     expect(pin.kind).toBe('pin');
+    expect(icon.kind).toBe('icon');
     expect(balloon.kind).toBe('balloon');
   });
 
