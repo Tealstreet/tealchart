@@ -25,6 +25,8 @@ export interface UserDrawingStyle {
   lineWidth: number;
   lineStyle: UserDrawingLineStyle;
   opacity?: number;
+  lineVisible?: boolean;
+  fillVisible?: boolean;
   fillColor?: string;
   textColor?: string;
   fontSize?: number;
@@ -120,6 +122,8 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
   lineWidth: 1,
   lineStyle: 'solid',
   opacity: 1,
+  lineVisible: true,
+  fillVisible: true,
   fillColor: 'rgba(245, 197, 66, 0.12)',
   textColor: '#f5c542',
   fontSize: 12,

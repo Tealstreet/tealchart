@@ -55,13 +55,15 @@ function renderRectangleGeometry(
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
 ): void {
   const { rect, drawing } = geometry;
-  if (drawing.style.fillColor) {
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
     ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
   }
 
-  applyStrokeStyle(ctx, drawing);
-  ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  }
 }
 
 function renderTextLabelGeometry(
@@ -83,13 +85,15 @@ function renderTextLabelGeometry(
   const x = point.x - boxWidth / 2;
   const y = point.y - boxHeight / 2;
 
-  if (drawing.style.fillColor) {
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
     ctx.fillRect(x, y, boxWidth, boxHeight);
   }
 
-  applyStrokeStyle(ctx, drawing);
-  ctx.strokeRect(x, y, boxWidth, boxHeight);
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.strokeRect(x, y, boxWidth, boxHeight);
+  }
 
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = drawing.textAlign;
@@ -156,7 +160,9 @@ export function renderUserDrawing(
       case 'ray':
       case 'horizontalLine':
       case 'verticalLine':
-        renderLineGeometry(ctx, geometry);
+        if (drawing.style.lineVisible !== false) {
+          renderLineGeometry(ctx, geometry);
+        }
         break;
       case 'rectangle':
         renderRectangleGeometry(ctx, geometry);

@@ -320,6 +320,18 @@ describe('user drawing toolbar descriptors', () => {
         drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, opacity: 0.5 } }],
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(first));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...first,
+        drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, lineVisible: false } }],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(first));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...first,
+        drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, fillVisible: false } }],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(first));
 
     const textDrawing = {
       id: 'text',
