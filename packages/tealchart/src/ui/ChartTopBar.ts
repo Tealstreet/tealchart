@@ -6,6 +6,7 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTool,
+  UserDrawingZOrderAction,
 } from '../drawings';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
@@ -13,6 +14,7 @@ import type { LayoutSelectorCallbacks } from './LayoutSelector';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
   isUserDrawingToolbarActionEnabled,
+  getUserDrawingZOrderAction,
   getSelectedUserDrawing,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
@@ -76,6 +78,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Callback when all user drawings should be cleared */
   onUserDrawingClearAll?: () => void;
+  /** Callback when selected drawings should be reordered */
+  onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Callback when selected text-label alignment should change */
@@ -927,6 +931,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         btn.addEventListener('click', () => {
           if (descriptor.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
           if (descriptor.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
+          const zOrderAction = getUserDrawingZOrderAction(descriptor.action);
+          if (zOrderAction) this.options.onUserDrawingZOrderChange?.(zOrderAction);
           if (descriptor.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (descriptor.action === 'clearAll') this.options.onUserDrawingClearAll?.();
         });
