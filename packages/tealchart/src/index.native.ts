@@ -54,6 +54,7 @@ export {
   resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingRiskRewardLabelPosition,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 export type {
@@ -77,6 +78,7 @@ export type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingPriceRangeLabelPosition,
   MobileUserDrawingRegressionTrendPrimitive,
+  MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
   MobileUserDrawingTextBounds,
   MobileUserDrawingTrendAngleLabelPosition,

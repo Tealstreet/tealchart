@@ -319,6 +319,13 @@ export interface MobileUserDrawingPriceRangeLabelPosition {
   y: number;
 }
 
+export interface MobileUserDrawingRiskRewardLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
 export interface MobileUserDrawingMeasurementLabelPosition {
   fontSize: number;
   fontFamily: string;
@@ -809,6 +816,13 @@ export function resolveMobileUserDrawingPriceRangeLabelPosition(
   primitive: MobileUserDrawingMeasurementLabelPrimitive,
   measuredTextBounds: MobileUserDrawingTextBounds,
 ): MobileUserDrawingPriceRangeLabelPosition {
+  return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
+}
+
+export function resolveMobileUserDrawingRiskRewardLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelTarget,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingRiskRewardLabelPosition {
   return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
 }
 
