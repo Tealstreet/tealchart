@@ -28,6 +28,8 @@ const RISK_REWARD_PROFIT_FILL = 'rgba(34, 197, 94, 0.18)';
 const RISK_REWARD_RISK_FILL = 'rgba(244, 63, 94, 0.18)';
 const RISK_REWARD_PROFIT_STROKE = '#22c55e';
 const RISK_REWARD_RISK_STROKE = '#f43f5e';
+const BARS_PATTERN_UP_COLOR = '#22c55e';
+const BARS_PATTERN_DOWN_COLOR = '#f43f5e';
 
 function dashForLineStyle(style: UserDrawingLineStyle): number[] {
   switch (style) {
@@ -399,6 +401,40 @@ function renderFibLevelGeometry(
   }
 }
 
+function renderBarsPatternGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'barsPattern' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false && geometry.drawing.style.fillVisible === false) return;
+
+  ctx.setLineDash([]);
+  ctx.lineWidth = Math.max(1, geometry.drawing.style.lineWidth);
+  for (const bar of geometry.pattern.bars) {
+    const color = bar.up ? BARS_PATTERN_UP_COLOR : BARS_PATTERN_DOWN_COLOR;
+    const bodyTop = Math.min(bar.openY, bar.closeY);
+    const bodyHeight = Math.max(1, Math.abs(bar.closeY - bar.openY));
+    const bodyX = bar.x - bar.bodyWidth / 2;
+
+    if (geometry.drawing.style.lineVisible !== false) {
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(bar.x, bar.highY);
+      ctx.lineTo(bar.x, bar.lowY);
+      ctx.stroke();
+    }
+
+    if (geometry.drawing.style.fillVisible !== false) {
+      ctx.fillStyle = color;
+      ctx.fillRect(bodyX, bodyTop, bar.bodyWidth, bodyHeight);
+    }
+
+    if (geometry.drawing.style.lineVisible !== false) {
+      ctx.strokeStyle = geometry.drawing.style.lineColor;
+      ctx.strokeRect(bodyX, bodyTop, bar.bodyWidth, bodyHeight);
+    }
+  }
+}
+
 function renderTextLabelGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'textLabel' }>,
@@ -561,6 +597,9 @@ export function renderUserDrawing(
       case 'fibRetracement':
       case 'fibExtension':
         renderFibLevelGeometry(ctx, geometry);
+        break;
+      case 'barsPattern':
+        renderBarsPatternGeometry(ctx, geometry);
         break;
       case 'textLabel':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);

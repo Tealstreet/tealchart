@@ -161,6 +161,8 @@ export function resolveUserDrawingHandlePoints(
     case 'longPosition':
     case 'shortPosition':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
+    case 'barsPattern':
+      return [anchorToScreenPoint(drawing.points[2], space)];
     case 'regressionTrend':
       {
         const geometry = resolveUserDrawingGeometry(drawing, space);

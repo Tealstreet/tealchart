@@ -323,12 +323,21 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching profit/risk regions, labels,
   selection handles, persistence, and editing behavior.
 
+## Shipped: Bars Pattern Tool
+
+- Add bars pattern markup with source-start, source-end, and placement anchors.
+- Shared geometry copies source OHLC bars from the chart data and places them
+  at the placement anchor with stable IDs, persistence, hit testing, and editing.
+- Web Canvas and mobile Skia render matching copied candle bodies and wicks
+  from the shared render model.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Additional TradingView line-family tools such as flat top/bottom, disjoint
   channel, anchored VWAP, and multi-point arrows.
-- Additional TradingView measurement tools such as bars pattern.
+- Additional TradingView measurement tool polish beyond the current price/date
+  ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration

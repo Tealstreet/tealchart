@@ -1550,13 +1550,20 @@ export class ChartCore {
       return resolvedPane;
     });
 
-    return resolveUserDrawingInputPointFromChart({
+    const point = resolveUserDrawingInputPointFromChart({
       point: { x, y },
       viewport: this.viewport,
       panes,
       width: this.options.width,
       margins: this.margins,
     });
+    if (!point) return null;
+
+    const sourcePane = layout.panes.find((pane) => pane.id === point.paneId);
+    return {
+      ...point,
+      bars: sourcePane?.type === 'main' && this.bars.length > 0 ? this.bars : undefined,
+    };
   }
 
   private handleUserDrawingDragStart(x: number, y: number): boolean {

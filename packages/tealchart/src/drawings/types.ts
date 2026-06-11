@@ -23,6 +23,7 @@ export type UserDrawingTool =
   | 'datePriceRange'
   | 'longPosition'
   | 'shortPosition'
+  | 'barsPattern'
   | 'fibRetracement'
   | 'fibExtension'
   | 'triangle'
@@ -40,6 +41,14 @@ export type UserDrawingHandleRole = 'start' | 'end' | 'center' | 'topLeft' | 'to
 export interface UserDrawingAnchor {
   time: number;
   price: number;
+}
+
+export interface BarsPatternBarSnapshot {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
 }
 
 export interface UserDrawingStyle {
@@ -172,6 +181,12 @@ export interface ShortPositionDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface BarsPatternDrawing extends UserDrawingBase {
+  kind: 'barsPattern';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+  bars: readonly BarsPatternBarSnapshot[];
+}
+
 export interface FibRetracementDrawing extends UserDrawingBase {
   kind: 'fibRetracement';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -233,6 +248,7 @@ export type UserDrawing =
   | DatePriceRangeDrawing
   | LongPositionDrawing
   | ShortPositionDrawing
+  | BarsPatternDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
   | TriangleDrawing
@@ -247,6 +263,7 @@ export interface UserDrawingDraft {
   anchors: readonly UserDrawingAnchor[];
   style: UserDrawingStyle;
   text?: string;
+  barsPatternBars?: readonly BarsPatternBarSnapshot[];
   startedAt: number;
 }
 
@@ -322,6 +339,16 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
   };
 }
 
+function isFiniteBarsPatternBar(bar: BarsPatternBarSnapshot): boolean {
+  return (
+    Number.isFinite(bar.time) &&
+    Number.isFinite(bar.open) &&
+    Number.isFinite(bar.high) &&
+    Number.isFinite(bar.low) &&
+    Number.isFinite(bar.close)
+  );
+}
+
 export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   version: USER_DRAWING_SCHEMA_VERSION,
   drawings: [],
@@ -354,6 +381,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
     case 'path':
       return 3;
     case 'horizontalLine':
@@ -518,6 +546,21 @@ export function createUserDrawingFromDraft(
         kind: draft.tool,
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
+    case 'barsPattern': {
+      const sourceStartTime = Math.min(draft.anchors[0]!.time, draft.anchors[1]!.time);
+      const sourceEndTime = Math.max(draft.anchors[0]!.time, draft.anchors[1]!.time);
+      const bars = (draft.barsPatternBars ?? [])
+        .filter((bar) => isFiniteBarsPatternBar(bar) && bar.time >= sourceStartTime && bar.time <= sourceEndTime)
+        .map((bar) => ({ time: bar.time, open: bar.open, high: bar.high, low: bar.low, close: bar.close }))
+        .sort((a, b) => a.time - b.time);
+      if (bars.length === 0) return null;
+      return {
+        ...base,
+        kind: 'barsPattern',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+        bars,
+      };
+    }
     case 'fibRetracement':
       return {
         ...base,

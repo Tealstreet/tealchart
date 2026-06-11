@@ -115,6 +115,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'parallelChannel':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
@@ -213,6 +214,15 @@ function editDrawingHandle(
   anchor: UserDrawingAnchor,
   updatedAt: number,
 ): UserDrawing {
+  if (drawing.kind === 'barsPattern' && pointIndex !== undefined) {
+    if (pointIndex !== 2) return drawing;
+    return {
+      ...drawing,
+      points: [drawing.points[0], drawing.points[1], anchor],
+      updatedAt,
+    };
+  }
+
   if (
     (drawing.kind === 'path' ||
       drawing.kind === 'triangle' ||
@@ -273,6 +283,7 @@ function editDrawingHandle(
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
       return drawing;
   }
 }

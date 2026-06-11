@@ -1,6 +1,7 @@
 import type {
   UserDrawingHandleRole,
   UserDrawingAnchor,
+  BarsPatternBarSnapshot,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,
@@ -23,6 +24,7 @@ import type { UserDrawingHitTestOptions } from './hitTesting';
 export interface UserDrawingInputPoint {
   paneId: string;
   anchor: UserDrawingAnchor;
+  bars?: readonly BarsPatternBarSnapshot[];
 }
 
 export interface UserDrawingInputOptions {
@@ -311,6 +313,7 @@ export function handleUserDrawingInput(
           ...state.draft,
           anchors: [...state.draft.anchors, point.anchor],
           text: options.text ?? state.draft.text,
+          barsPatternBars: state.activeTool === 'barsPattern' ? point.bars ?? state.draft.barsPatternBars : undefined,
         }
       : {
           tool: state.activeTool,
@@ -318,6 +321,7 @@ export function handleUserDrawingInput(
           anchors: [point.anchor],
           style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
           text: options.text,
+          barsPatternBars: state.activeTool === 'barsPattern' ? point.bars : undefined,
           startedAt,
         };
 

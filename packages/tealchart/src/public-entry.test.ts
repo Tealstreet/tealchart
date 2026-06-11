@@ -24,6 +24,7 @@ import {
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
+  resolveBarsPatternFromAnchors,
 } from './index';
 import {
   resolveMobileUserDrawingMeasurementLabelPosition,
@@ -31,6 +32,7 @@ import {
 } from './mobile/utils/drawingRenderModel';
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
+  MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
@@ -44,6 +46,7 @@ import type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  BarsPatternDrawing,
   CircleDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
@@ -70,6 +73,7 @@ import type {
   UserDrawingRiskRewardMetrics,
   UserDrawingStyleToggleDescriptor,
   DrawingScreenRiskRewardPosition,
+  DrawingScreenBarsPattern,
 } from './index';
 
 type NonNever<T> = [T] extends [never] ? never : T;
@@ -95,6 +99,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
@@ -173,12 +178,26 @@ describe('tealchart public entries', () => {
       ratioLabel: 'R:R 1.00',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const barsPatternPrimitive: NonNever<MobileUserDrawingBarsPatternPrimitive> = {
+      kind: 'barsPattern',
+      id: 'bars',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      bars: [
+        { time: 1, x: 0, openY: 5, highY: 0, lowY: 10, closeY: 4, bodyWidth: 4, up: true },
+      ],
+      bounds: { x: -2, y: 0, width: 4, height: 10 },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
+    expect(barsPatternPrimitive.kind).toBe('barsPattern');
   });
 
   it('exports usable native risk reward label position helpers', () => {
@@ -354,6 +373,47 @@ describe('tealchart public entries', () => {
     expect(geometry.entryLine.end.x).toBe(200);
     expect(longDrawing.kind).toBe('longPosition');
     expect(shortDrawing.kind).toBe('shortPosition');
+  });
+
+  it('exports shared bars pattern helpers and types', () => {
+    const pattern: DrawingScreenBarsPattern = resolveBarsPatternFromAnchors(
+      { time: 0, price: 100 },
+      { time: 1, price: 100 },
+      { time: 1, price: 101 },
+      {
+        viewport: { startTime: 0, endTime: 2, priceMin: 90, priceMax: 110 },
+        pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 90, yMax: 110 },
+        chartLeft: 0,
+        chartRight: 200,
+        bars: [
+          { time: 0, open: 100, high: 104, low: 99, close: 102, volume: 1 },
+          { time: 1, open: 102, high: 105, low: 101, close: 101, volume: 1 },
+        ],
+      },
+    );
+    const drawing: BarsPatternDrawing = {
+      id: 'bars',
+      kind: 'barsPattern',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 0, price: 100 },
+        { time: 1, price: 100 },
+        { time: 1, price: 101 },
+      ],
+      bars: [
+        { time: 0, open: 100, high: 104, low: 99, close: 102 },
+        { time: 1, open: 102, high: 105, low: 101, close: 101 },
+      ],
+    };
+
+    expect(pattern.bars).toHaveLength(2);
+    expect(pattern.bounds.width).toBeGreaterThan(0);
+    expect(drawing.kind).toBe('barsPattern');
   });
 
   it('exports shared drawing info line helpers', () => {
