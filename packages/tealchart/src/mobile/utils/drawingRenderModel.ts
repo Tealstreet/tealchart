@@ -293,6 +293,18 @@ export interface MobileUserDrawingPriceRangeLabelPosition {
   y: number;
 }
 
+export interface MobileUserDrawingMeasurementLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
+export interface MobileUserDrawingMeasurementLabelTarget {
+  labelPoint: DrawingScreenPoint;
+  style: UserDrawingStyle;
+}
+
 export interface MobileUserDrawingInfoLineLabelPosition {
   fontSize: number;
   fontFamily: string;
@@ -722,10 +734,10 @@ export function resolveMobileUserDrawingTextLabelLayout(
   };
 }
 
-export function resolveMobileUserDrawingPriceRangeLabelPosition(
-  primitive: MobileUserDrawingMeasurementLabelPrimitive,
+export function resolveMobileUserDrawingMeasurementLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelTarget,
   measuredTextBounds: MobileUserDrawingTextBounds,
-): MobileUserDrawingPriceRangeLabelPosition {
+): MobileUserDrawingMeasurementLabelPosition {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const textX = measuredTextBounds.x ?? 0;
@@ -738,6 +750,13 @@ export function resolveMobileUserDrawingPriceRangeLabelPosition(
     x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
     y: primitive.labelPoint.y - textY - textHeight / 2,
   };
+}
+
+export function resolveMobileUserDrawingPriceRangeLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelPrimitive,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingPriceRangeLabelPosition {
+  return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
 }
 
 export function resolveMobileUserDrawingInfoLineLabelPosition(
