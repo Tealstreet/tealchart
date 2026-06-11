@@ -122,6 +122,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'timeCycles':
     case 'sineLine':
     case 'callout':
+    case 'priceNote':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
     case 'brush':
@@ -212,7 +213,8 @@ function editLineEndpoint(
         | 'cyclicLines'
         | 'timeCycles'
         | 'sineLine'
-        | 'callout';
+        | 'callout'
+        | 'priceNote';
     }
   >,
   handle: UserDrawingHandleRole,
@@ -303,7 +305,8 @@ function editDrawingHandle(
       drawing.kind === 'longPosition' ||
       drawing.kind === 'shortPosition' ||
       drawing.kind === 'projection' ||
-      drawing.kind === 'callout') &&
+      drawing.kind === 'callout' ||
+      drawing.kind === 'priceNote') &&
     pointIndex !== undefined
   ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
@@ -337,7 +340,7 @@ function editDrawingHandle(
         updatedAt,
       };
     }
-    if (drawing.kind === 'callout') {
+    if (drawing.kind === 'callout' || drawing.kind === 'priceNote') {
       return {
         ...drawing,
         points: [points[0]!, points[1]!],
@@ -382,6 +385,7 @@ function editDrawingHandle(
     case 'timeCycles':
     case 'sineLine':
     case 'callout':
+    case 'priceNote':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':

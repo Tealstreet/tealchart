@@ -64,11 +64,12 @@ export type UserDrawingTool =
   | 'note'
   | 'callout'
   | 'comment'
+  | 'priceNote'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
-export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment';
+export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment' | 'priceNote';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -425,7 +426,19 @@ export interface CommentDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
-export type UserDrawingTextAnnotation = TextLabelDrawing | NoteDrawing | CalloutDrawing | CommentDrawing;
+export interface PriceNoteDrawing extends UserDrawingBase {
+  kind: 'priceNote';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
+export type UserDrawingTextAnnotation =
+  | TextLabelDrawing
+  | NoteDrawing
+  | CalloutDrawing
+  | CommentDrawing
+  | PriceNoteDrawing;
 
 export type UserDrawing =
   | TrendLineDrawing
@@ -487,6 +500,7 @@ export type UserDrawing =
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
+  | PriceNoteDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -621,6 +635,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'timeCycles':
     case 'sineLine':
     case 'callout':
+    case 'priceNote':
       return 2;
     case 'triangle':
     case 'curve':
@@ -673,12 +688,13 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
     drawing.kind === 'textLabel' ||
     drawing.kind === 'note' ||
     drawing.kind === 'callout' ||
-    drawing.kind === 'comment'
+    drawing.kind === 'comment' ||
+    drawing.kind === 'priceNote'
   );
 }
 
 export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor {
-  return drawing.kind === 'callout' ? drawing.points[1] : drawing.point;
+  return drawing.kind === 'callout' || drawing.kind === 'priceNote' ? drawing.points[1] : drawing.point;
 }
 
 export function isDrawingDraftReady(draft: UserDrawingDraft): boolean {
@@ -1038,9 +1054,10 @@ export function createUserDrawingFromDraft(
         textAlign: 'center',
       };
     case 'callout':
+    case 'priceNote':
       return {
         ...base,
-        kind: 'callout',
+        kind: draft.tool,
         points: [draft.anchors[0]!, draft.anchors[1]!],
         text: draft.text ?? '',
         textAlign: 'center',

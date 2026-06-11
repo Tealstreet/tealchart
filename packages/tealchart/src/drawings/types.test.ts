@@ -76,6 +76,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
     expect(getRequiredAnchorCount('datePriceRange')).toBe(2);
+    expect(getRequiredAnchorCount('priceNote')).toBe(2);
     expect(getRequiredAnchorCount('forecast')).toBe(2);
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
@@ -703,6 +704,21 @@ describe('user drawing types', () => {
       kind: 'callout',
       points: [anchorA, anchorB],
       text: 'Callout',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'priceNote',
+          anchors: [anchorA, anchorB],
+          text: 'Price note',
+        }),
+        { id: 'price-note' },
+      ),
+    ).toMatchObject({
+      kind: 'priceNote',
+      points: [anchorA, anchorB],
+      text: 'Price note',
       textAlign: 'center',
     });
   });
