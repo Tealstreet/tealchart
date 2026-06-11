@@ -143,6 +143,19 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'curve';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      control: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'anchoredVwap';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -556,6 +569,7 @@ export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
   { kind: 'riskRewardPosition' }
 >;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
+export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'curve' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
@@ -851,6 +865,20 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.polyline.points,
+        style: geometry.drawing.style,
+      };
+    case 'curve':
+      return {
+        kind: 'curve',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.curve.start,
+        control: geometry.curve.control,
+        end: geometry.curve.end,
+        points: geometry.curve.points,
         style: geometry.drawing.style,
       };
     case 'anchoredVwap':

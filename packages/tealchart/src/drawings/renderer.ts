@@ -124,6 +124,17 @@ function renderPathGeometry(
   ctx.stroke();
 }
 
+function renderCurveGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'curve' }>,
+): void {
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(geometry.curve.start.x, geometry.curve.start.y);
+  ctx.quadraticCurveTo(geometry.curve.control.x, geometry.curve.control.y, geometry.curve.end.x, geometry.curve.end.y);
+  ctx.stroke();
+}
+
 function renderAnchoredVwapGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'anchoredVwap' }>,
@@ -851,6 +862,11 @@ export function renderUserDrawing(
       case 'path':
         if (drawing.style.lineVisible !== false) {
           renderPathGeometry(ctx, geometry);
+        }
+        break;
+      case 'curve':
+        if (drawing.style.lineVisible !== false) {
+          renderCurveGeometry(ctx, geometry);
         }
         break;
       case 'anchoredVwap':

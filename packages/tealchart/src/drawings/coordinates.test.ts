@@ -6,6 +6,7 @@ import type {
   ArrowMarkerDrawing,
   CircleDrawing,
   CrossLineDrawing,
+  CurveDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
@@ -51,6 +52,7 @@ import {
   priceToDrawingY,
   resolveAnchoredVwapFromAnchor,
   resolveBarsPatternFromAnchors,
+  resolveCurveFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveDisjointChannelFromAnchors,
   resolveExtendedSegment,
@@ -397,6 +399,21 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('resolves quadratic curves from start, control, and end anchors', () => {
+    const curve = resolveCurveFromAnchors(
+      { time: 1_000, price: 100 },
+      { time: 2_000, price: 110 },
+      { time: 3_000, price: 100 },
+      space,
+    );
+
+    expect(curve.start).toEqual({ x: 10, y: 70 });
+    expect(curve.control).toEqual({ x: 110, y: 20 });
+    expect(curve.end).toEqual({ x: 210, y: 70 });
+    expect(curve.points).toHaveLength(49);
+    expect(curve.points[24]).toEqual({ x: 110, y: 45 });
+  });
+
   it('resolves rotated rectangles with perpendicular width', () => {
     expect(
       resolveRotatedRectangleFromAnchors(
@@ -709,6 +726,16 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 100 },
         { time: 2_000, price: 110 },
         { time: 3_000, price: 90 },
+      ],
+    };
+    const curve: CurveDrawing = {
+      ...trendLine,
+      id: 'curve',
+      kind: 'curve',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 3_000, price: 100 },
       ],
     };
     const rotatedRectangle: UserDrawing = {
@@ -1137,6 +1164,14 @@ describe('user drawing coordinates', () => {
           { x: 110, y: 20 },
           { x: 210, y: 120 },
         ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(curve, space)).toMatchObject({
+      kind: 'curve',
+      curve: {
+        start: { x: 10, y: 70 },
+        control: { x: 110, y: 20 },
+        end: { x: 210, y: 70 },
       },
     });
     expect(resolveUserDrawingGeometry(triangle, space)).toMatchObject({
