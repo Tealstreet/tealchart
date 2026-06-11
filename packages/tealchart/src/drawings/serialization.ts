@@ -61,6 +61,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'triangle':
     case 'parallelChannel':
+    case 'rotatedRectangle':
     case 'flatTopBottom':
     case 'regressionTrend':
     case 'longPosition':
@@ -358,6 +359,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'ellipse',
+            points,
+          }
+        : null;
+    }
+    case 'rotatedRectangle': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'rotatedRectangle',
             points,
           }
         : null;

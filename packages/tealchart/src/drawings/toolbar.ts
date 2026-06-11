@@ -118,6 +118,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'rectangle', icon: '□', label: 'Rectangle' },
   { tool: 'circle', icon: '○', label: 'Circle' },
   { tool: 'ellipse', icon: '⬭', label: 'Ellipse' },
+  { tool: 'rotatedRectangle', icon: '▱', label: 'Rotated rectangle' },
   { tool: 'priceRange', icon: 'Δ', label: 'Price range' },
   { tool: 'dateRange', icon: '↔', label: 'Date range' },
   { tool: 'datePriceRange', icon: '⊞', label: 'Date and price range' },
@@ -248,6 +249,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'dateRange' ||
     drawing.kind === 'datePriceRange' ||
     drawing.kind === 'triangle' ||
+    drawing.kind === 'rotatedRectangle' ||
     drawing.kind === 'parallelChannel' ||
     drawing.kind === 'regressionTrend' ||
     drawing.kind === 'flatTopBottom' ||
