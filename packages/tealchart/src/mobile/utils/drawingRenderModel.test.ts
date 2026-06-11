@@ -187,6 +187,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready trend angle primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'angle',
+          kind: 'trendAngle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 100 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'trendAngle',
+      id: 'angle',
+      start: { x: 0, y: 50 },
+      end: { x: 100, y: 0 },
+      label: '26.6°',
+      labelPoint: { x: 50, y: 21 },
+      style,
+    });
+  });
+
   it('returns Skia-ready horizontal ray line primitives', () => {
     const state: UserDrawingState = {
       version: 1,

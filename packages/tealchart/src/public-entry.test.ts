@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import {
+  formatTrendAngleDegrees,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   resolveCircleFromAnchors,
@@ -34,6 +35,7 @@ import type {
   ParallelChannelDrawing,
   PriceRangeDrawing,
   TriangleDrawing,
+  TrendAngleDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
@@ -58,6 +60,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
   });
@@ -338,6 +341,26 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('extendedLine');
+  });
+
+  it('exports shared drawing trend angle types and helpers', () => {
+    const drawing: TrendAngleDrawing = {
+      id: 'angle',
+      kind: 'trendAngle',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('trendAngle');
+    expect(formatTrendAngleDegrees(26.565)).toBe('26.6°');
   });
 
   it('exports shared drawing path types', () => {

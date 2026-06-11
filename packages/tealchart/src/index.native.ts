@@ -71,6 +71,7 @@ export type {
   MobileUserDrawingMeasurementLabelPrimitive,
   MobileUserDrawingPriceRangeLabelPosition,
   MobileUserDrawingTextBounds,
+  MobileUserDrawingTrendAnglePrimitive,
   MobileUserDrawingTrianglePrimitive,
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';

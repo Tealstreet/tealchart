@@ -68,6 +68,27 @@ function renderLineGeometry(
   }
 }
 
+function renderTrendAngleGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'trendAngle' }>,
+): void {
+  if (geometry.drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, geometry.drawing);
+    ctx.beginPath();
+    ctx.moveTo(geometry.angle.segment.start.x, geometry.angle.segment.start.y);
+    ctx.lineTo(geometry.angle.segment.end.x, geometry.angle.segment.end.y);
+    ctx.stroke();
+  }
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(geometry.angle.label, geometry.angle.labelPoint.x, geometry.angle.labelPoint.y);
+}
+
 function renderCrossLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'crossLine' }>,
@@ -412,6 +433,9 @@ export function renderUserDrawing(
         if (drawing.style.lineVisible !== false) {
           renderLineGeometry(ctx, geometry);
         }
+        break;
+      case 'trendAngle':
+        renderTrendAngleGeometry(ctx, geometry);
         break;
       case 'arrowMarker':
         renderPolygonGeometry(ctx, geometry);

@@ -54,6 +54,19 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'trendAngle';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      labelPoint: DrawingScreenPoint;
+      label: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'crossLine';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -229,6 +242,7 @@ export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitiv
 export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingCrossLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'crossLine' }>;
+export type MobileUserDrawingTrendAnglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'trendAngle' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'priceRange' | 'dateRange' }
@@ -348,6 +362,20 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'trendAngle':
+      return {
+        kind: 'trendAngle',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.angle.segment.start,
+        end: geometry.angle.segment.end,
+        labelPoint: geometry.angle.labelPoint,
+        label: geometry.angle.label,
+        style: geometry.drawing.style,
+      };
     case 'infoLine': {
       const drawing = geometry.drawing;
       const label =
