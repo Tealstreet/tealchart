@@ -1799,6 +1799,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fibTimeZone') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.levels.map((level) => (
+                  <SkiaLine
+                    key={`${primitive.id}:level:${level.ratio}`}
+                    p1={vec(level.start.x, level.start.y)}
+                    p2={vec(level.end.x, level.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                ))}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'arrowMarker') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();

@@ -14,6 +14,7 @@ import {
   resolveFibChannelFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveFibFanFromAnchors,
+  resolveFibTimeZoneFromAnchors,
   resolveGannFanFromAnchors,
   resolvePitchforkFromAnchors,
   resolvePitchfanFromAnchors,
@@ -48,6 +49,7 @@ import type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
+  MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingFibFanPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingPitchfanPrimitive,
@@ -73,6 +75,7 @@ import type {
   ExtendedLineDrawing,
   FibChannelDrawing,
   FibFanDrawing,
+  FibTimeZoneDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
   InfoLineDrawing,
@@ -221,6 +224,16 @@ describe('tealchart public entries', () => {
       levels: [{ ratio: 0.5, start: { x: 0, y: 3 }, end: { x: 10, y: 3 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const fibTimeZonePrimitive: NonNever<MobileUserDrawingFibTimeZonePrimitive> = {
+      kind: 'fibTimeZone',
+      id: 'fib-time-zone',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      levels: [{ ratio: 1, time: 2, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 10 } }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannFanPrimitive: NonNever<MobileUserDrawingGannFanPrimitive> = {
       ...pitchfanPrimitive,
       kind: 'gannFan',
@@ -306,6 +319,7 @@ describe('tealchart public entries', () => {
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
     expect(fibFanPrimitive.kind).toBe('fibFan');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
+    expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
@@ -919,6 +933,32 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibChannel');
     expect(channel.levels).toHaveLength(11);
+  });
+
+  it('exports shared drawing fib time zone types and resolver', () => {
+    const drawing: FibTimeZoneDrawing = {
+      id: 'fib-time-zone',
+      kind: 'fibTimeZone',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+      ],
+    };
+    const zones = resolveFibTimeZoneFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibTimeZone');
+    expect(zones.levels).toHaveLength(10);
   });
 
   it('exports shared drawing regression trend types', () => {
