@@ -121,6 +121,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'cyclicLines':
     case 'timeCycles':
     case 'sineLine':
+    case 'callout':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
     case 'brush':
@@ -209,7 +210,8 @@ function editLineEndpoint(
         | 'fibTimeZone'
         | 'cyclicLines'
         | 'timeCycles'
-        | 'sineLine';
+        | 'sineLine'
+        | 'callout';
     }
   >,
   handle: UserDrawingHandleRole,
@@ -299,7 +301,8 @@ function editDrawingHandle(
       drawing.kind === 'regressionTrend' ||
       drawing.kind === 'longPosition' ||
       drawing.kind === 'shortPosition' ||
-      drawing.kind === 'projection') &&
+      drawing.kind === 'projection' ||
+      drawing.kind === 'callout') &&
     pointIndex !== undefined
   ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
@@ -330,6 +333,13 @@ function editDrawingHandle(
       return {
         ...drawing,
         points: [points[0]!, points[1]!, points[2]!],
+        updatedAt,
+      };
+    }
+    if (drawing.kind === 'callout') {
+      return {
+        ...drawing,
+        points: [points[0]!, points[1]!],
         updatedAt,
       };
     }
@@ -370,6 +380,7 @@ function editDrawingHandle(
     case 'cyclicLines':
     case 'timeCycles':
     case 'sineLine':
+    case 'callout':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':

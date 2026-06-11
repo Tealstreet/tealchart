@@ -71,6 +71,7 @@ import type {
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
+  MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
@@ -130,6 +131,7 @@ import type {
   FlatTopBottomDrawing,
   InfoLineDrawing,
   LongPositionDrawing,
+  CalloutDrawing,
   NoteDrawing,
   PathDrawing,
   ParallelChannelDrawing,
@@ -212,6 +214,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingGannSquarePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingNotePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCalloutPrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -609,6 +612,21 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const calloutPrimitive: NonNever<MobileUserDrawingCalloutPrimitive> = {
+      kind: 'callout',
+      id: 'callout',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      tip: { x: 0, y: 0 },
+      point: { x: 5, y: 5 },
+      text: 'Callout',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -653,6 +671,7 @@ describe('tealchart public entries', () => {
     expect(brushPrimitive.kind).toBe('brush');
     expect(highlighterPrimitive.kind).toBe('highlighter');
     expect(notePrimitive.kind).toBe('note');
+    expect(calloutPrimitive.kind).toBe('callout');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1115,11 +1134,20 @@ describe('tealchart public entries', () => {
       text: 'Note',
       textAlign: 'center',
     };
+    const callout: CalloutDrawing = {
+      ...drawing,
+      id: 'callout',
+      kind: 'callout',
+      points: [drawing.points[0]!, drawing.points[1]!],
+      text: 'Callout',
+      textAlign: 'center',
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
     expect(highlighter.kind).toBe('highlighter');
     expect(note.kind).toBe('note');
+    expect(callout.kind).toBe('callout');
   });
 
   it('exports shared drawing curve types and resolver', () => {

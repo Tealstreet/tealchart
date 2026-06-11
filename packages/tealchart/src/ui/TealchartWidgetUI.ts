@@ -31,6 +31,7 @@ import type { LayoutSelectorCallbacks } from './LayoutSelector';
 import { TIME_AXIS_HEIGHT } from '../types';
 import {
   anchorToScreenPoint,
+  getUserDrawingTextAnnotationPoint,
   getUserDrawingToolbarStateKey,
   isUserDrawingTextAnnotation,
   resolveUserDrawingTextEditMetrics,
@@ -500,7 +501,7 @@ export class TealchartWidgetUI {
       return;
     }
 
-    const point = anchorToScreenPoint(drawing.point, space);
+    const point = anchorToScreenPoint(getUserDrawingTextAnnotationPoint(drawing), space);
     const editMetrics = resolveUserDrawingTextEditMetrics(textEdit.value);
     const width = Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
     const height = Math.max(28, Math.min(160, editMetrics.lines.length * 18 + 10));
