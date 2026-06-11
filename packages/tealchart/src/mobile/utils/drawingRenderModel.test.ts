@@ -2424,6 +2424,66 @@ describe('mobile user drawing render model', () => {
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(4);
   });
 
+  it('returns Skia-ready triangle pattern primitives with labels, fill polygon, and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'triangle-pattern' },
+      drawings: [
+        {
+          id: 'triangle-pattern',
+          kind: 'trianglePattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 20, price: 20 },
+            { time: 50, price: 70 },
+            { time: 70, price: 35 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'trianglePattern',
+      id: 'triangle-pattern',
+      clip,
+      points: [
+        { x: 10, y: 10 },
+        { x: 20, y: 80 },
+        { x: 50, y: 30 },
+        { x: 70, y: 65 },
+      ],
+      polygon: [
+        { x: 10, y: 10 },
+        { x: 50, y: 30 },
+        { x: 70, y: 65 },
+        { x: 20, y: 80 },
+      ],
+      boundaries: [
+        { start: { x: 10, y: 10 }, end: { x: 50, y: 30 } },
+        { start: { x: 20, y: 80 }, end: { x: 70, y: 65 } },
+      ],
+      labels: [
+        { text: 'A', point: { x: 10, y: 10 } },
+        { text: 'B', point: { x: 20, y: 80 } },
+        { text: 'C', point: { x: 50, y: 30 } },
+        { text: 'D', point: { x: 70, y: 65 } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(4);
+  });
+
   it('returns Skia-ready curve primitives with shared sampled points', () => {
     const state: UserDrawingState = {
       version: 1,

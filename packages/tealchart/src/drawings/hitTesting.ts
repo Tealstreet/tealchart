@@ -244,6 +244,16 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'trianglePattern') {
+    const distance = pointInPolygon(point, geometry.pattern.polygon.points)
+      ? 0
+      : Math.min(
+          ...geometry.pattern.boundaries.map((boundary) => distanceToSegment(point, boundary)),
+          distanceToClosedPolyline(point, geometry.pattern.polygon.points),
+        );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'xabcdPattern') {
     const distance = distanceToPolyline(point, geometry.pattern.polyline.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -769,6 +779,11 @@ function hitTestUserDrawingHandle(
       if (geometry.drawing.kind === 'barsPattern') {
         handles.push({ handle: 'center', point: anchorToScreenPoint(geometry.drawing.points[2], space), pointIndex: 2 });
       }
+      break;
+    case 'trianglePattern':
+      geometry.pattern.points.forEach((patternPoint, pointIndex) => {
+        handles.push({ handle: 'center', point: patternPoint, pointIndex });
+      });
       break;
     case 'xabcdPattern':
       geometry.pattern.polyline.points.forEach((patternPoint, pointIndex) => {

@@ -1645,6 +1645,41 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores triangle pattern drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'triangle-pattern',
+          kind: 'trianglePattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+            { time: 4, price: 13 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'triangle-pattern',
+      kind: 'trianglePattern',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+        { time: 4, price: 13 },
+      ],
+    });
+  });
+
   it('restores curve drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

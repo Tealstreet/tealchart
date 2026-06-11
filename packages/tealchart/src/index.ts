@@ -121,6 +121,7 @@ export {
   resolveForecastFromAnchors,
   resolveProjectionFromAnchors,
   resolveAbcdPatternFromAnchors,
+  resolveTrianglePatternFromAnchors,
   resolveXabcdPatternFromAnchors,
   resolveFibWedgeFromAnchors,
   resolveFibSpiralFromAnchors,
@@ -194,6 +195,7 @@ export {
   formatUserDrawingDateRangeDuration,
   formatTrendAngleDegrees,
   ABCD_PATTERN_LABELS,
+  TRIANGLE_PATTERN_LABELS,
   XABCD_PATTERN_LABELS,
 } from './drawings';
 export type {
@@ -274,6 +276,8 @@ export type {
   DrawingScreenRiskRewardPosition,
   DrawingScreenSegment,
   DrawingScreenTrendAngle,
+  DrawingScreenTrianglePattern,
+  DrawingScreenTrianglePatternLabel,
   DrawingScreenXabcdPattern,
   DrawingScreenXabcdPatternLabel,
   FlatTopBottomDrawing,
@@ -306,6 +310,8 @@ export type {
   CommentDrawing,
   TimeCyclesDrawing,
   TriangleDrawing,
+  TrianglePatternDrawing,
+  TrianglePatternLabel,
   TrendAngleDrawing,
   TrendLineDrawing,
   UserDrawing,

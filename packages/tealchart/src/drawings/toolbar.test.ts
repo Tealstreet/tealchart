@@ -74,6 +74,7 @@ describe('user drawing toolbar descriptors', () => {
       'forecast',
       'projection',
       'barsPattern',
+      'trianglePattern',
       'abcdPattern',
       'xabcdPattern',
       'anchoredVwap',
@@ -193,6 +194,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('projection')).toEqual(
       expect.objectContaining({ tool: 'projection', label: 'Projection' }),
+    );
+    expect(getUserDrawingToolDescriptor('trianglePattern')).toEqual(
+      expect.objectContaining({ tool: 'trianglePattern', label: 'Triangle pattern' }),
     );
     expect(getUserDrawingToolDescriptor('abcdPattern')).toEqual(
       expect.objectContaining({ tool: 'abcdPattern', label: 'ABCD pattern' }),
@@ -715,6 +719,19 @@ describe('user drawing toolbar descriptors', () => {
           { time: 1, price: 10 },
           { time: 2, price: 12 },
           { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'triangle-pattern',
+        kind: 'trianglePattern' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+          { time: 4, price: 9 },
         ],
       }),
     ).toBe(true);
