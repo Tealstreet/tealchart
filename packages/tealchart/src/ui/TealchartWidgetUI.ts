@@ -29,7 +29,7 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { TIME_AXIS_HEIGHT } from '../types';
-import { anchorToScreenPoint, getUserDrawingToolbarStateKey } from '../drawings';
+import { anchorToScreenPoint, getUserDrawingToolbarStateKey, resolveUserDrawingTextEditMetrics } from '../drawings';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
@@ -487,10 +487,12 @@ export class TealchartWidgetUI {
     }
 
     const point = anchorToScreenPoint(drawing.point, space);
-    const width = Math.max(120, Math.min(260, textEdit.value.length * 7 + 32));
+    const editMetrics = resolveUserDrawingTextEditMetrics(textEdit.value);
+    const width = Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
+    const height = Math.max(28, Math.min(160, editMetrics.lines.length * 18 + 10));
     const chartWidth = this.chartArea.clientWidth || this.rootEl.clientWidth || 0;
     const left = Math.max(space.chartLeft, Math.min(point.x - width / 2, Math.max(space.chartLeft, chartWidth - width - 8)));
-    const top = Math.max(space.pane.top, point.y - 18);
+    const top = Math.max(space.pane.top, point.y - height / 2);
 
     if (!this.userDrawingTextEditor) {
       const editor = document.createElement('textarea');
@@ -501,7 +503,9 @@ export class TealchartWidgetUI {
         position: 'absolute',
         zIndex: '6',
         minHeight: '28px',
+        maxHeight: '160px',
         resize: 'none',
+        overflowY: 'auto',
         padding: '4px 6px',
         border: '1px solid rgba(245, 197, 66, 0.9)',
         borderRadius: '4px',
@@ -541,10 +545,12 @@ export class TealchartWidgetUI {
 
     const editor = this.userDrawingTextEditor;
     if (editor.value !== textEdit.value) editor.value = textEdit.value;
+    editor.rows = Math.max(1, Math.min(8, editMetrics.lines.length));
     Object.assign(editor.style, {
       left: `${left}px`,
       top: `${top}px`,
       width: `${width}px`,
+      height: `${height}px`,
       color: drawing.style.textColor ?? drawing.style.lineColor,
       fontSize: `${drawing.style.fontSize ?? 12}px`,
       fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
