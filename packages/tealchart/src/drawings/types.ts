@@ -187,7 +187,7 @@ export interface RegressionTrendDrawing extends UserDrawingBase {
 
 export interface PathDrawing extends UserDrawingBase {
   kind: 'path';
-  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+  points: readonly UserDrawingAnchor[];
 }
 
 export type UserDrawingTextAlign = 'left' | 'center' | 'right';
@@ -524,7 +524,7 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'path',
-        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+        points: draft.anchors.slice(),
       };
     case 'textLabel':
       return {

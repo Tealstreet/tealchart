@@ -723,6 +723,7 @@ describe('drawing layout serialization', () => {
             { time: 1, price: 10 },
             { time: 2, price: 12 },
             { time: 3, price: 11 },
+            { time: 4, price: 13 },
           ],
         },
       ],
@@ -735,6 +736,7 @@ describe('drawing layout serialization', () => {
         { time: 1, price: 10 },
         { time: 2, price: 12 },
         { time: 3, price: 11 },
+        { time: 4, price: 13 },
       ],
     });
   });
@@ -838,7 +840,7 @@ describe('drawing layout serialization', () => {
     });
   });
 
-  it('rejects malformed path point counts', () => {
+  it('rejects malformed path points', () => {
     const createPayload = (points: unknown[]) => ({
       version: 1,
       drawings: [
@@ -860,7 +862,6 @@ describe('drawing layout serialization', () => {
       deserializeUserDrawingStateFromLayout(
         createPayload([
           { time: 1, price: 10 },
-          { time: 2, price: 12 },
         ]),
       ),
     ).toBeUndefined();
@@ -869,8 +870,7 @@ describe('drawing layout serialization', () => {
         createPayload([
           { time: 1, price: 10 },
           { time: 2, price: 12 },
-          { time: 3, price: 14 },
-          { time: 4, price: 16 },
+          { time: 'bad', price: 14 },
         ]),
       ),
     ).toBeUndefined();

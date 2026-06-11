@@ -264,6 +264,9 @@ describe('ChartCore viewport management', () => {
     const onUserDrawingEditStart = vi.fn(() => true);
     const onUserDrawingEditMove = vi.fn(() => true);
     const onUserDrawingEditEnd = vi.fn();
+    const onUserDrawingPathDragStart = vi.fn(() => true);
+    const onUserDrawingPathDragMove = vi.fn(() => true);
+    const onUserDrawingPathDragEnd = vi.fn();
     const core = new ChartCore({
       container,
       width: 800,
@@ -272,6 +275,9 @@ describe('ChartCore viewport management', () => {
       onUserDrawingEditStart,
       onUserDrawingEditMove,
       onUserDrawingEditEnd,
+      onUserDrawingPathDragStart,
+      onUserDrawingPathDragMove,
+      onUserDrawingPathDragEnd,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
     core.setUserDrawingState({
@@ -285,8 +291,10 @@ describe('ChartCore viewport management', () => {
 
     const testCore = core as unknown as {
       handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch'): unknown;
-      handleUserDrawingEditStart(x: number, y: number): boolean;
-      handleUserDrawingEditMove(x: number, y: number): boolean;
+      handleUserDrawingDragPending(x: number, y: number): boolean;
+      handleUserDrawingDragStart(x: number, y: number): boolean;
+      handleUserDrawingDragMove(x: number, y: number): boolean;
+      handleUserDrawingDragEnd(): void;
     };
 
     expect(testCore.handleUserDrawingInput(100, 100)).toBe(false);
@@ -309,13 +317,37 @@ describe('ChartCore viewport management', () => {
     expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
     expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(3);
-    expect(testCore.handleUserDrawingEditStart(100, 100)).toBe(true);
+    expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
     expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
-    expect(testCore.handleUserDrawingEditStart(760, 100)).toBe(false);
+    expect(testCore.handleUserDrawingDragStart(760, 100)).toBe(false);
     expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
-    expect(testCore.handleUserDrawingEditMove(110, 105)).toBe(true);
+    expect(testCore.handleUserDrawingDragMove(110, 105)).toBe(true);
     expect(onUserDrawingEditMove).toHaveBeenCalledWith({ x: 110, y: 105 });
     expect(onUserDrawingEditEnd).not.toHaveBeenCalled();
+    testCore.handleUserDrawingDragEnd();
+    expect(onUserDrawingEditEnd).toHaveBeenCalledTimes(1);
+
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'path',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+    expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
+    expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
+    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith({
+      paneId: 'main',
+      anchor: { time: expect.any(Number), price: expect.any(Number) },
+    });
+    expect(testCore.handleUserDrawingDragMove(120, 110)).toBe(true);
+    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith({
+      paneId: 'main',
+      anchor: { time: expect.any(Number), price: expect.any(Number) },
+    });
+    testCore.handleUserDrawingDragEnd();
+    expect(onUserDrawingPathDragEnd).toHaveBeenCalledTimes(1);
 
     core.dispose();
   });

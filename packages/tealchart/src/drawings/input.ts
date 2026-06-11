@@ -57,6 +57,12 @@ export interface UpdateUserDrawingOptions {
   now?: () => number;
 }
 
+export interface UserDrawingPathDragOptions {
+  createId: () => string;
+  now?: () => number;
+  style?: UserDrawingStyle;
+}
+
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
     version: USER_DRAWING_SCHEMA_VERSION,
@@ -337,6 +343,87 @@ export function handleUserDrawingInput(
       textEdit: null,
     };
   }
+
+  return {
+    ...state,
+    drawings: [...state.drawings, drawing],
+    selection: { drawingId: drawing.id },
+    draft: null,
+    textEdit: null,
+  };
+}
+
+function isSameDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor): boolean {
+  return a.time === b.time && a.price === b.price;
+}
+
+export function beginUserDrawingPathDrag(
+  state: UserDrawingState,
+  point: UserDrawingInputPoint,
+  options: Omit<UserDrawingPathDragOptions, 'createId'> = {},
+): UserDrawingState {
+  if (state.activeTool !== 'path') return state;
+
+  return {
+    ...state,
+    selection: null,
+    draft: {
+      tool: 'path',
+      paneId: point.paneId,
+      anchors: [point.anchor],
+      style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
+      startedAt: options.now?.() ?? Date.now(),
+    },
+    textEdit: null,
+  };
+}
+
+export function appendUserDrawingPathDragPoint(
+  state: UserDrawingState,
+  point: UserDrawingInputPoint,
+): UserDrawingState {
+  const draft = state.draft;
+  if (state.activeTool !== 'path' || !draft || draft.tool !== 'path' || draft.paneId !== point.paneId) return state;
+
+  const lastAnchor = draft.anchors[draft.anchors.length - 1];
+  if (lastAnchor && isSameDrawingAnchor(lastAnchor, point.anchor)) return state;
+
+  return {
+    ...state,
+    draft: {
+      ...draft,
+      anchors: [...draft.anchors, point.anchor],
+    },
+  };
+}
+
+export function commitUserDrawingPathDrag(
+  state: UserDrawingState,
+  options: UserDrawingPathDragOptions,
+): UserDrawingState {
+  const draft = state.draft;
+  if (state.activeTool !== 'path' || !draft || draft.tool !== 'path') return state;
+
+  if (draft.anchors.length < 2) {
+    return {
+      ...state,
+      draft: null,
+      textEdit: null,
+    };
+  }
+
+  const now = options.now?.() ?? Date.now();
+  const drawing = {
+    id: options.createId(),
+    kind: 'path' as const,
+    paneId: draft.paneId,
+    visible: true,
+    locked: false,
+    createdAt: now,
+    updatedAt: now,
+    style: normalizeUserDrawingStyle({ ...draft.style }),
+    points: draft.anchors.slice(),
+  };
 
   return {
     ...state,
