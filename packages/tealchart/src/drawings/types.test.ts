@@ -60,6 +60,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
+    expect(getRequiredAnchorCount('trendAngle')).toBe(2);
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
     expect(getRequiredAnchorCount('infoLine')).toBe(2);
     expect(getRequiredAnchorCount('arrowLine')).toBe(2);
@@ -121,6 +122,15 @@ describe('user drawing types', () => {
       paneId: 'main',
       points: [anchorA, anchorB],
       extend: 'none',
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'trendAngle' }), { id: 'angle', now: 20 })).toMatchObject({
+      id: 'angle',
+      kind: 'trendAngle',
+      points: [anchorA, anchorB],
       visible: true,
       locked: false,
       createdAt: 20,

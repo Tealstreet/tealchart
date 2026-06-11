@@ -87,6 +87,7 @@ export {
   resolveExtendedSegment,
   resolveRaySegment,
   resolveRectFromAnchors,
+  resolveTrendAngleFromSegment,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
@@ -124,6 +125,7 @@ export {
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
   formatUserDrawingDateRangeDuration,
+  formatTrendAngleDegrees,
 } from './drawings';
 export type {
   CreateUserDrawingFromDraftOptions,
@@ -146,6 +148,7 @@ export type {
   DrawingScreenPolyline,
   DrawingScreenRect,
   DrawingScreenSegment,
+  DrawingScreenTrendAngle,
   HorizontalLineDrawing,
   HorizontalRayDrawing,
   InfoLineDrawing,
@@ -161,6 +164,7 @@ export type {
   ResolvedUserDrawingGeometry,
   TextLabelDrawing,
   TriangleDrawing,
+  TrendAngleDrawing,
   TrendLineDrawing,
   UserDrawing,
   UserDrawingAnchor,

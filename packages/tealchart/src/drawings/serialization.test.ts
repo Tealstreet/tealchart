@@ -439,6 +439,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores trend angle drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'angle',
+          kind: 'trendAngle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'angle',
+      kind: 'trendAngle',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('restores horizontal ray drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

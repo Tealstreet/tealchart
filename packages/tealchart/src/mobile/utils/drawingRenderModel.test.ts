@@ -7,6 +7,7 @@ import {
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingTextLabelLayout,
+  resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './drawingRenderModel';
 
 const style: UserDrawingStyle = {
@@ -184,6 +185,51 @@ describe('mobile user drawing render model', () => {
         left: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
         right: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
       },
+    });
+  });
+
+  it('returns Skia-ready trend angle primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'angle',
+          kind: 'trendAngle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 100 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'trendAngle',
+      id: 'angle',
+      start: { x: 0, y: 50 },
+      end: { x: 100, y: 0 },
+      label: '26.6°',
+      labelPoint: { x: 50, y: 21 },
+      style,
+    });
+    if (!primitive || primitive.kind !== 'trendAngle') throw new Error('expected trend angle primitive');
+    expect(resolveMobileUserDrawingTrendAngleLabelPosition(primitive, { x: 0, y: -10, width: 42, height: 14 })).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: 29,
+      y: 17,
     });
   });
 

@@ -52,6 +52,13 @@ export interface DrawingScreenCrossLine {
   point: DrawingScreenPoint;
 }
 
+export interface DrawingScreenTrendAngle {
+  segment: DrawingScreenSegment;
+  label: string;
+  labelPoint: DrawingScreenPoint;
+  angleDegrees: number;
+}
+
 export interface DrawingScreenFibLevel {
   ratio: number;
   label: string;
@@ -93,6 +100,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'line' | 'arrowLine' | 'ray' | 'horizontalRay' | 'horizontalLine' | 'verticalLine';
       drawing: UserDrawing;
       segment: DrawingScreenSegment;
+    }
+  | {
+      kind: 'trendAngle';
+      drawing: UserDrawing;
+      angle: DrawingScreenTrendAngle;
     }
   | {
       kind: 'crossLine';
@@ -287,6 +299,30 @@ export function resolveRaySegment(
   return resolveExtendedSegment(start, through, extend, chartLeft, chartRight);
 }
 
+export function formatTrendAngleDegrees(angleDegrees: number): string {
+  const rounded = Math.round(angleDegrees * 10) / 10;
+  return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)}°`;
+}
+
+export function resolveTrendAngleFromSegment(segment: DrawingScreenSegment): DrawingScreenTrendAngle {
+  const useOriginalOrder =
+    segment.start.x < segment.end.x || (segment.start.x === segment.end.x && segment.start.y >= segment.end.y);
+  const start = useOriginalOrder ? segment.start : segment.end;
+  const end = useOriginalOrder ? segment.end : segment.start;
+  const dx = end.x - start.x;
+  const dy = start.y - end.y;
+  const angleDegrees = dx === 0 && dy === 0 ? 0 : (Math.atan2(dy, dx) * 180) / Math.PI;
+  return {
+    segment,
+    angleDegrees,
+    label: formatTrendAngleDegrees(angleDegrees),
+    labelPoint: {
+      x: (segment.start.x + segment.end.x) / 2,
+      y: (segment.start.y + segment.end.y) / 2 - 4,
+    },
+  };
+}
+
 export function resolveRectFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -455,6 +491,15 @@ export function resolveUserDrawingGeometry(
         kind: 'line',
         drawing,
         segment: resolveExtendedSegment(start, end, drawing.extend, space.chartLeft, space.chartRight),
+      };
+    }
+    case 'trendAngle': {
+      const start = anchorToScreenPoint(drawing.points[0], space);
+      const end = anchorToScreenPoint(drawing.points[1], space);
+      return {
+        kind: 'trendAngle',
+        drawing,
+        angle: resolveTrendAngleFromSegment({ start, end }),
       };
     }
     case 'extendedLine': {

@@ -54,6 +54,19 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'trendAngle';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      labelPoint: DrawingScreenPoint;
+      label: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'crossLine';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -229,6 +242,7 @@ export type MobileUserDrawingCirclePrimitive = Extract<MobileUserDrawingPrimitiv
 export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'ellipse' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingCrossLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'crossLine' }>;
+export type MobileUserDrawingTrendAnglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'trendAngle' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'priceRange' | 'dateRange' }
@@ -252,6 +266,13 @@ export interface MobileUserDrawingPriceRangeLabelPosition {
 }
 
 export interface MobileUserDrawingInfoLineLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
+export interface MobileUserDrawingTrendAngleLabelPosition {
   fontSize: number;
   fontFamily: string;
   x: number;
@@ -348,6 +369,20 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     }
+    case 'trendAngle':
+      return {
+        kind: 'trendAngle',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.angle.segment.start,
+        end: geometry.angle.segment.end,
+        labelPoint: geometry.angle.labelPoint,
+        label: geometry.angle.label,
+        style: geometry.drawing.style,
+      };
     case 'infoLine': {
       const drawing = geometry.drawing;
       const label =
@@ -650,6 +685,24 @@ export function resolveMobileUserDrawingInfoLineLabelPosition(
   primitive: MobileUserDrawingInfoLinePrimitive,
   measuredTextBounds: MobileUserDrawingTextBounds,
 ): MobileUserDrawingInfoLineLabelPosition {
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
+  const textX = measuredTextBounds.x ?? 0;
+  const textY = measuredTextBounds.y ?? -fontSize;
+  const textHeight = measuredTextBounds.height ?? fontSize;
+
+  return {
+    fontSize,
+    fontFamily,
+    x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
+    y: primitive.labelPoint.y - textY - textHeight,
+  };
+}
+
+export function resolveMobileUserDrawingTrendAngleLabelPosition(
+  primitive: MobileUserDrawingTrendAnglePrimitive,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingTrendAngleLabelPosition {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const textX = measuredTextBounds.x ?? 0;

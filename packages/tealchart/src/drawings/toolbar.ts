@@ -103,6 +103,7 @@ export type UserDrawingStyleToolbarActionState =
 export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[] = [
   { tool: 'select', icon: '⌖', label: 'Select' },
   { tool: 'trendLine', icon: '╱', label: 'Trend line' },
+  { tool: 'trendAngle', icon: '∠', label: 'Trend angle' },
   { tool: 'extendedLine', icon: '⟷', label: 'Extended line' },
   { tool: 'infoLine', icon: 'i', label: 'Info line' },
   { tool: 'arrowLine', icon: '↗', label: 'Arrow line' },

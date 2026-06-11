@@ -20,6 +20,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
+    case 'trendAngle':
     case 'extendedLine':
     case 'infoLine':
     case 'arrowMarker':
@@ -200,6 +201,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'ray',
+            points,
+          }
+        : null;
+    }
+    case 'trendAngle': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'trendAngle',
             points,
           }
         : null;
