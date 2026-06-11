@@ -12,6 +12,7 @@ import {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
+  duplicateUserDrawing,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
@@ -1177,6 +1178,85 @@ describe('user drawing input controller', () => {
 
     expect(deleteUserDrawing(state)).toBe(state);
     expect(deleteUserDrawing(state, { includeLocked: true }).drawings).toEqual([]);
+  });
+
+  it('duplicates selected drawings with a new id, timestamp, and deep-cloned payload', () => {
+    const state = createUserDrawingState({
+      activeTool: 'rectangle',
+      selection: { drawingId: 'pattern' },
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Text', startedAt: 1 },
+      drawings: [
+        {
+          id: 'pattern',
+          kind: 'barsPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC],
+          bars: [{ time: 1, open: 10, high: 12, low: 9, close: 11 }],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 20 });
+
+    expect(next.activeTool).toBe('select');
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+    expect(next.draft).toBeNull();
+    expect(next.textEdit).toBeNull();
+    expect(next.drawings.map((drawing) => drawing.id)).toEqual(['pattern', 'copy']);
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'barsPattern',
+      createdAt: 20,
+      updatedAt: 20,
+      points: [anchorA, anchorB, anchorC],
+      bars: [{ time: 1, open: 10, high: 12, low: 9, close: 11 }],
+    });
+    expect(next.drawings[1]).not.toBe(state.drawings[0]);
+    if (next.drawings[1]?.kind !== 'barsPattern' || state.drawings[0]?.kind !== 'barsPattern') {
+      throw new Error('expected bars pattern drawings');
+    }
+    expect(next.drawings[1].style).not.toBe(state.drawings[0].style);
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.drawings[1].bars[0]).not.toBe(state.drawings[0].bars[0]);
+  });
+
+  it('does not duplicate locked drawings unless requested', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'locked' },
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(duplicateUserDrawing(state, { createId: () => 'copy' })).toBe(state);
+    expect(
+      duplicateUserDrawing(state, { createId: () => 'copy', includeLocked: true, now: () => 2 }).drawings,
+    ).toMatchObject([
+      { id: 'locked', locked: true },
+      { id: 'copy', locked: true, createdAt: 2, updatedAt: 2 },
+    ]);
   });
 
   it('clears drawings, selection, and draft', () => {

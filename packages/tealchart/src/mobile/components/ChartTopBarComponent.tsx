@@ -71,6 +71,8 @@ export interface ChartTopBarComponentProps {
   userDrawingState?: UserDrawingState;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when the selected drawing should be duplicated */
+  onUserDrawingDuplicateSelected?: () => void;
   /** Callback when the selected drawing should be deleted */
   onUserDrawingDeleteSelected?: () => void;
   /** Callback when the active drawing draft should be cancelled */
@@ -106,6 +108,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     supportedResolutions,
     userDrawingState,
     onUserDrawingToolSelect,
+    onUserDrawingDuplicateSelected,
     onUserDrawingDeleteSelected,
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
@@ -608,6 +611,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     accessibilityState={{ disabled: !enabled }}
                     disabled={!enabled}
                     onPress={() => {
+                      if (descriptor.action === 'duplicateSelected') onUserDrawingDuplicateSelected?.();
                       if (descriptor.action === 'deleteSelected') onUserDrawingDeleteSelected?.();
                       if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                       if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();

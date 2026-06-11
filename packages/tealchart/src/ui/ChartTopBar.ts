@@ -68,6 +68,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   userDrawingState?: UserDrawingState;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when the selected drawing should be duplicated */
+  onUserDrawingDuplicateSelected?: () => void;
   /** Callback when the selected drawing should be deleted */
   onUserDrawingDeleteSelected?: () => void;
   /** Callback when the active drawing draft should be cancelled */
@@ -923,6 +925,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       btn.disabled = !enabled;
       if (enabled) {
         btn.addEventListener('click', () => {
+          if (descriptor.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
           if (descriptor.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
           if (descriptor.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (descriptor.action === 'clearAll') this.options.onUserDrawingClearAll?.();

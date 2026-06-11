@@ -150,6 +150,7 @@ export {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
+  duplicateUserDrawing,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
@@ -166,6 +167,7 @@ export {
 } from './input';
 export type {
   DeleteUserDrawingOptions,
+  DuplicateUserDrawingOptions,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
   UserDrawingPathDragOptions,
