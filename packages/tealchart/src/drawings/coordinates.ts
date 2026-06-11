@@ -57,6 +57,19 @@ export interface DrawingScreenPitchfork {
 
 export type DrawingPitchforkVariant = 'original' | 'schiff' | 'modifiedSchiff' | 'inside';
 
+export interface DrawingScreenPitchfanRay {
+  ratio: number;
+  target: DrawingScreenPoint;
+  segment: DrawingScreenSegment;
+}
+
+export interface DrawingScreenPitchfan {
+  origin: DrawingScreenPoint;
+  targetStart: DrawingScreenPoint;
+  targetEnd: DrawingScreenPoint;
+  rays: readonly DrawingScreenPitchfanRay[];
+}
+
 export interface DrawingScreenCrossLine {
   horizontal: DrawingScreenSegment;
   vertical: DrawingScreenSegment;
@@ -240,6 +253,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'pitchfork';
       drawing: UserDrawing;
       pitchfork: DrawingScreenPitchfork;
+    }
+  | {
+      kind: 'pitchfan';
+      drawing: UserDrawing;
+      pitchfan: DrawingScreenPitchfan;
     }
   | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
@@ -801,6 +819,36 @@ export function resolvePitchforkFromAnchors(
   };
 }
 
+export const PITCHFAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
+
+export function resolvePitchfanFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  third: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenPitchfan {
+  const origin = anchorToScreenPoint(first, space);
+  const targetStart = anchorToScreenPoint(second, space);
+  const targetEnd = anchorToScreenPoint(third, space);
+
+  return {
+    origin,
+    targetStart,
+    targetEnd,
+    rays: PITCHFAN_LEVELS.map((ratio) => {
+      const target = {
+        x: targetEnd.x,
+        y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
+      };
+      return {
+        ratio,
+        target,
+        segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+      };
+    }),
+  };
+}
+
 function pitchforkVariantForDrawingKind(kind: UserDrawing['kind']): DrawingPitchforkVariant {
   switch (kind) {
     case 'schiffPitchfork':
@@ -1162,6 +1210,12 @@ export function resolveUserDrawingGeometry(
           space,
           pitchforkVariantForDrawingKind(drawing.kind),
         ),
+      };
+    case 'pitchfan':
+      return {
+        kind: 'pitchfan',
+        drawing,
+        pitchfan: resolvePitchfanFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'rotatedRectangle':
       return {
