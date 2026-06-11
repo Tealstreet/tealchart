@@ -29,6 +29,28 @@ export function tryCompile(ast: Program, maxBarsBack?: number): CompiledScript {
   return compile(ast, maxBarsBack);
 }
 
+const compiledCache = new WeakMap<Program, CompiledScript>();
+
+export function tryExecuteScript(
+  ast: Program,
+  bars: Bar[],
+  inputs?: Map<string, unknown>,
+  options?: CompiledExecutionOptions,
+): ExecutionResult | null {
+  let compiled = compiledCache.get(ast);
+  if (!compiled) {
+    compiled = compile(ast);
+    compiledCache.set(ast, compiled);
+  }
+  if (!compiled.success) return null;
+  if (compiled.securityScripts.size > 0 && !options?.requestDatafeed) return null;
+  try {
+    return executeCompiled(compiled, bars, inputs, options);
+  } catch {
+    return null;
+  }
+}
+
 function extractStrategySettings(compiled: CompiledScript): Partial<StrategyLedger['settings']> {
   const decl = compiled.analysis.declarationInfo;
   if (!decl || decl.kind !== 'strategy') return {};
