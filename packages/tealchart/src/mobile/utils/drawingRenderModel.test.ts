@@ -2564,6 +2564,46 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('preserves price note anchors, text, and alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'price-note',
+          kind: 'priceNote',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 10 },
+            { time: 50, price: 50 },
+          ],
+          text: 'Left price note',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'priceNote',
+      id: 'price-note',
+      clip,
+      tip: { x: 10, y: 90 },
+      point: { x: 50, y: 50 },
+      text: 'Left price note',
+      editing: false,
+      editValue: null,
+      textAlign: 'left',
+    });
+  });
+
   it('marks active text edits with the draft value for mobile overlays', () => {
     const state: UserDrawingState = {
       version: 1,

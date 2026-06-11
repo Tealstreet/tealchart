@@ -150,6 +150,44 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags price note endpoint handles without moving the label anchor', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'price-note',
+      kind: 'priceNote',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+      ],
+      text: 'Price note',
+      textAlign: 'center',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'price-note', handle: 'center', pointIndex: 0 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'price-note', handle: 'center', pointIndex: 0 },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 20 },
+      { now: () => 4 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 80 },
+        { time: 50, price: 50 },
+      ],
+      updatedAt: 4,
+    });
+  });
+
   it('moves selected date ranges by time delta without changing anchor prices', () => {
     const drawing: UserDrawing = {
       ...base,

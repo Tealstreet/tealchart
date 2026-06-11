@@ -191,6 +191,7 @@ export function resolveUserDrawingHandlePoints(
     case 'brush':
     case 'highlighter':
     case 'callout':
+    case 'priceNote':
     case 'polyline':
     case 'curve':
     case 'arc':

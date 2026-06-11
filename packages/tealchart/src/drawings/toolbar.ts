@@ -169,6 +169,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'note', icon: 'N', label: 'Note' },
   { tool: 'callout', icon: 'C', label: 'Callout' },
   { tool: 'comment', icon: '!', label: 'Comment' },
+  { tool: 'priceNote', icon: '$', label: 'Price note' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
 
