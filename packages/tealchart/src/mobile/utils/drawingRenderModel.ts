@@ -153,7 +153,7 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'parallelChannel';
+      kind: 'parallelChannel' | 'regressionTrend';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
@@ -234,6 +234,7 @@ export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrim
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
+export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
@@ -487,8 +488,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'parallelChannel':
+    case 'regressionTrend':
       return {
-        kind: 'parallelChannel',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,

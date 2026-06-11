@@ -206,6 +206,7 @@ export type {
   PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,
+  RegressionTrendDrawing,
   TextLabelDrawing,
   TriangleDrawing,
   TrendAngleDrawing,

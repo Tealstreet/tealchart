@@ -17,6 +17,7 @@ import type {
   ParallelChannelDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
+  RegressionTrendDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
   TrendLineDrawing,
@@ -483,6 +484,11 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 110 },
       ],
     };
+    const regressionTrend: RegressionTrendDrawing = {
+      ...channel,
+      id: 'regression',
+      kind: 'regressionTrend',
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -663,6 +669,21 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(channel, space)).toMatchObject({
       kind: 'parallelChannel',
+      channel: {
+        base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },
+        polygon: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 70 },
+            { x: 210, y: 20 },
+            { x: 10, y: 20 },
+          ],
+        },
+      },
+    });
+    expect(resolveUserDrawingGeometry(regressionTrend, space)).toMatchObject({
+      kind: 'regressionTrend',
       channel: {
         base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
         parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },

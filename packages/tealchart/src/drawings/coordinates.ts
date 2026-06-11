@@ -167,7 +167,7 @@ export type ResolvedUserDrawingGeometry =
       polygon: DrawingScreenPolyline;
     }
   | {
-      kind: 'parallelChannel';
+      kind: 'parallelChannel' | 'regressionTrend';
       drawing: UserDrawing;
       channel: DrawingScreenParallelChannel;
     }
@@ -663,8 +663,9 @@ export function resolveUserDrawingGeometry(
         polygon: resolvePolylineFromAnchors(drawing.points, space),
       };
     case 'parallelChannel':
+    case 'regressionTrend':
       return {
-        kind: 'parallelChannel',
+        kind: drawing.kind,
         drawing,
         channel: resolveParallelChannelFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };

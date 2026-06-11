@@ -68,6 +68,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'path':
     case 'triangle':
     case 'parallelChannel':
+    case 'regressionTrend':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'dateRange':
       return {
@@ -161,7 +162,13 @@ function editDrawingHandle(
   anchor: UserDrawingAnchor,
   updatedAt: number,
 ): UserDrawing {
-  if ((drawing.kind === 'path' || drawing.kind === 'triangle' || drawing.kind === 'parallelChannel') && pointIndex !== undefined) {
+  if (
+    (drawing.kind === 'path' ||
+      drawing.kind === 'triangle' ||
+      drawing.kind === 'parallelChannel' ||
+      drawing.kind === 'regressionTrend') &&
+    pointIndex !== undefined
+  ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
     const points = drawing.points.slice() as UserDrawingAnchor[];
     points[pointIndex] = anchor;
@@ -202,6 +209,7 @@ function editDrawingHandle(
     case 'path':
     case 'triangle':
     case 'parallelChannel':
+    case 'regressionTrend':
       return drawing;
   }
 }

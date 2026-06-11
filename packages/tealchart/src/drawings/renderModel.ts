@@ -148,6 +148,7 @@ export function resolveUserDrawingHandlePoints(
     case 'path':
     case 'triangle':
     case 'parallelChannel':
+    case 'regressionTrend':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'textLabel':
       return [anchorToScreenPoint(drawing.point, space)];

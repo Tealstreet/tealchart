@@ -120,16 +120,19 @@ function renderPathGeometry(
 
 function renderPolygonGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' | 'triangle' | 'parallelChannel' }>,
+  geometry: Extract<
+    ResolvedUserDrawingGeometry,
+    { kind: 'arrowMarker' | 'arrowMark' | 'triangle' | 'parallelChannel' | 'regressionTrend' }
+  >,
 ): void {
   const points =
     geometry.kind === 'arrowMarker'
       ? geometry.marker.points
       : geometry.kind === 'arrowMark'
         ? geometry.mark.points
-        : geometry.kind === 'parallelChannel'
-          ? geometry.channel.polygon.points
-        : geometry.polygon.points;
+        : geometry.kind === 'triangle'
+          ? geometry.polygon.points
+          : geometry.channel.polygon.points;
   const [firstPoint, ...remainingPoints] = points;
   if (!firstPoint) return;
 
@@ -141,7 +144,7 @@ function renderPolygonGeometry(
   ctx.closePath();
 
   const fillColor =
-    geometry.kind === 'parallelChannel'
+    geometry.kind === 'parallelChannel' || geometry.kind === 'regressionTrend'
       ? geometry.drawing.style.fillColor
       : (geometry.drawing.style.fillColor ?? geometry.drawing.style.lineColor);
 
@@ -447,6 +450,7 @@ export function renderUserDrawing(
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
+      case 'regressionTrend':
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'infoLine':

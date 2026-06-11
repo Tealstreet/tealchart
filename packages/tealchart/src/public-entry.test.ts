@@ -34,6 +34,7 @@ import type {
   PathDrawing,
   ParallelChannelDrawing,
   PriceRangeDrawing,
+  RegressionTrendDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
   UserDrawingFontFamily,
@@ -65,6 +66,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -423,5 +425,25 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('parallelChannel');
+  });
+
+  it('exports shared drawing regression trend types', () => {
+    const drawing: RegressionTrendDrawing = {
+      id: 'regression',
+      kind: 'regressionTrend',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('regressionTrend');
   });
 });
