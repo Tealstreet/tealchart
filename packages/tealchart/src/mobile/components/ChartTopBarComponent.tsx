@@ -14,8 +14,8 @@ import type { UserDrawingState, UserDrawingStyle, UserDrawingTool } from '../../
 import {
   getSelectedUserDrawing,
   isUserDrawingToolbarActionEnabled,
-  isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
+  resolveUserDrawingStyleToolbarAction,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
@@ -284,36 +284,30 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   <View style={styles.innerDivider} />
 
                   {USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
-                    const enabled = isUserDrawingStyleToolbarActionEnabled(userDrawingState, descriptor.action);
-                    const active =
-                      descriptor.action === 'toggleVisibility'
-                        ? selectedDrawing.visible
-                        : descriptor.action === 'toggleLocked' && selectedDrawing.locked;
+                    const actionState = resolveUserDrawingStyleToolbarAction(userDrawingState, descriptor.action);
+                    const enabled = actionState.enabled;
                     return (
                       <Pressable
                         key={descriptor.action}
                         accessibilityRole="button"
                         accessibilityLabel={descriptor.label}
-                        accessibilityState={{ disabled: !enabled, selected: active }}
+                        accessibilityState={{ disabled: !enabled }}
                         disabled={!enabled}
                         onPress={() => {
-                          if (descriptor.action === 'toggleVisibility') {
-                            onUserDrawingVisibilityChange?.(!selectedDrawing.visible);
+                          if (actionState.visible !== undefined) {
+                            onUserDrawingVisibilityChange?.(actionState.visible);
                           }
-                          if (descriptor.action === 'toggleLocked') {
-                            onUserDrawingLockedChange?.(!selectedDrawing.locked, selectedDrawing.locked);
+                          if (actionState.locked !== undefined) {
+                            onUserDrawingLockedChange?.(actionState.locked, actionState.includeLocked);
                           }
                         }}
                         style={({ pressed }: PressableStyleState) => [
                           styles.drawingButton,
-                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                          enabled && pressed && !active && styles.drawingButtonPressed,
+                          enabled && pressed && styles.drawingButtonPressed,
                           !enabled && styles.drawingButtonDisabled,
                         ]}
                       >
-                        <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
-                          {descriptor.icon}
-                        </Text>
+                        <Text style={[styles.drawingButtonText, { color: textSecondaryColor }]}>{descriptor.icon}</Text>
                       </Pressable>
                     );
                   })}

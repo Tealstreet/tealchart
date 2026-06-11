@@ -8,8 +8,8 @@ import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
   isUserDrawingToolbarActionEnabled,
   getSelectedUserDrawing,
-  isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
+  resolveUserDrawingStyleToolbarAction,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
@@ -529,13 +529,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       group.appendChild(this.createElement('div', { style: styles.divider }));
 
       for (const descriptor of USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS) {
-        const enabled = state ? isUserDrawingStyleToolbarActionEnabled(state, descriptor.action) : false;
-        const isActive =
-          descriptor.action === 'toggleVisibility' ? selectedDrawing.visible : descriptor.action === 'toggleLocked' && selectedDrawing.locked;
+        const actionState = resolveUserDrawingStyleToolbarAction(state!, descriptor.action);
+        const enabled = actionState.enabled;
         const btn = this.createElement('button', {
           style: {
             ...styles.drawingButton,
-            ...(isActive ? styles.drawingButtonActive : {}),
             opacity: enabled ? '1' : '0.35',
             cursor: enabled ? 'pointer' : 'default',
           },
@@ -544,27 +542,22 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             type: 'button',
             title: descriptor.label,
             'aria-label': descriptor.label,
-            'aria-pressed': isActive ? 'true' : 'false',
           },
         });
         btn.disabled = !enabled;
         if (enabled) {
           btn.addEventListener('click', () => {
-            if (descriptor.action === 'toggleVisibility') {
-              this.options.onUserDrawingVisibilityChange?.(!selectedDrawing.visible);
+            if (actionState.visible !== undefined) {
+              this.options.onUserDrawingVisibilityChange?.(actionState.visible);
             }
-            if (descriptor.action === 'toggleLocked') {
-              this.options.onUserDrawingLockedChange?.(!selectedDrawing.locked, selectedDrawing.locked);
+            if (actionState.locked !== undefined) {
+              this.options.onUserDrawingLockedChange?.(actionState.locked, actionState.includeLocked);
             }
           });
-          btn.addEventListener('mouseenter', () => {
-            if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
-          });
+          btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
           btn.addEventListener('mouseleave', () => {
-            if (!isActive) {
-              btn.style.backgroundColor = 'transparent';
-              btn.style.color = 'var(--text2, #787b86)';
-            }
+            btn.style.backgroundColor = 'transparent';
+            btn.style.color = 'var(--text2, #787b86)';
           });
         }
         group.appendChild(btn);
