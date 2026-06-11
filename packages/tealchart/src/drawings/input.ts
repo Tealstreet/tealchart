@@ -86,6 +86,21 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
   };
 }
 
+export function getUserDrawingSelectionIds(selection: UserDrawingSelection | null): readonly string[] {
+  if (!selection) return [];
+  const ids = [selection.drawingId, ...(selection.drawingIds ?? [])];
+  return [...new Set(ids)];
+}
+
+function createUserDrawingSelection(
+  drawingIds: readonly string[],
+  details: Omit<UserDrawingSelection, 'drawingId' | 'drawingIds'> = {},
+): UserDrawingSelection | null {
+  const ids = [...new Set(drawingIds)];
+  if (ids.length === 0) return null;
+  return ids.length === 1 ? { drawingId: ids[0]!, ...details } : { drawingId: ids[0]!, drawingIds: ids, ...details };
+}
+
 export function setUserDrawingTool(state: UserDrawingState, tool: UserDrawingTool): UserDrawingState {
   if (state.activeTool === tool && !state.draft && !state.textEdit) return state;
 
@@ -102,10 +117,14 @@ export function selectUserDrawing(
   state: UserDrawingState,
   selection: UserDrawingSelection | null,
 ): UserDrawingState {
+  const currentIds = getUserDrawingSelectionIds(state.selection);
+  const nextIds = getUserDrawingSelectionIds(selection);
   if (
     state.selection?.drawingId === selection?.drawingId &&
     state.selection?.handle === selection?.handle &&
     state.selection?.pointIndex === selection?.pointIndex &&
+    currentIds.length === nextIds.length &&
+    currentIds.every((id, index) => id === nextIds[index]) &&
     !state.draft
   ) {
     return state;
@@ -131,25 +150,37 @@ export function selectUserDrawingById(
   return selectUserDrawing(state, handle ? { drawingId, handle } : { drawingId });
 }
 
+export function selectUserDrawingsById(state: UserDrawingState, drawingIds: readonly string[]): UserDrawingState {
+  const existingIds = new Set(state.drawings.map((drawing) => drawing.id));
+  const selectedIds = [...new Set(drawingIds)].filter((drawingId) => existingIds.has(drawingId));
+  return selectUserDrawing(state, createUserDrawingSelection(selectedIds));
+}
+
 export function deleteUserDrawing(
   state: UserDrawingState,
   options: DeleteUserDrawingOptions = {},
 ): UserDrawingState {
-  const drawingId = options.drawingId ?? state.selection?.drawingId;
-  if (!drawingId) return state;
+  const selectedIds = options.drawingId ? [options.drawingId] : getUserDrawingSelectionIds(state.selection);
+  if (selectedIds.length === 0) return state;
 
-  const drawing = state.drawings.find((candidate) => candidate.id === drawingId);
-  if (!drawing || (drawing.locked && !options.includeLocked)) return state;
+  const selectedIdSet = new Set(selectedIds);
+  const removableIds = new Set(
+    state.drawings
+      .filter((drawing) => selectedIdSet.has(drawing.id) && (!drawing.locked || options.includeLocked))
+      .map((drawing) => drawing.id),
+  );
+  if (removableIds.size === 0) return state;
 
-  const drawings = state.drawings.filter((candidate) => candidate.id !== drawingId);
-  const selection = state.selection?.drawingId === drawingId ? null : state.selection;
+  const drawings = state.drawings.filter((candidate) => !removableIds.has(candidate.id));
+  const remainingSelectionIds = getUserDrawingSelectionIds(state.selection).filter((drawingId) => !removableIds.has(drawingId));
+  const selection = createUserDrawingSelection(remainingSelectionIds);
 
   return {
     ...state,
     drawings,
     selection,
     draft: null,
-    textEdit: state.textEdit?.drawingId === drawingId ? null : state.textEdit,
+    textEdit: state.textEdit && removableIds.has(state.textEdit.drawingId) ? null : state.textEdit,
   };
 }
 
@@ -294,20 +325,47 @@ export function duplicateUserDrawing(
   state: UserDrawingState,
   options: DuplicateUserDrawingOptions,
 ): UserDrawingState {
-  const target = findUserDrawingForUpdate(state, options);
-  if (!target) return state;
+  if (options.drawingId) {
+    const target = findUserDrawingForUpdate(state, options);
+    if (!target) return state;
 
-  const id = options.createId();
+    const id = options.createId();
+    const now = options.now?.() ?? Date.now();
+    const duplicate = cloneDrawingForDuplicate(target.drawing, id, now);
+    const drawings = state.drawings.slice();
+    drawings.splice(target.index + 1, 0, duplicate);
+
+    return {
+      ...state,
+      activeTool: 'select',
+      drawings,
+      selection: { drawingId: id },
+      draft: null,
+      textEdit: null,
+    };
+  }
+
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  if (selectedIds.size === 0) return state;
+
   const now = options.now?.() ?? Date.now();
-  const duplicate = cloneDrawingForDuplicate(target.drawing, id, now);
-  const drawings = state.drawings.slice();
-  drawings.splice(target.index + 1, 0, duplicate);
+  const duplicatedIds: string[] = [];
+  const drawings: UserDrawing[] = [];
+  for (const drawing of state.drawings) {
+    drawings.push(drawing);
+    if (!selectedIds.has(drawing.id) || (drawing.locked && !options.includeLocked)) continue;
+    const id = options.createId();
+    duplicatedIds.push(id);
+    drawings.push(cloneDrawingForDuplicate(drawing, id, now));
+  }
+
+  if (duplicatedIds.length === 0) return state;
 
   return {
     ...state,
     activeTool: 'select',
     drawings,
-    selection: { drawingId: id },
+    selection: createUserDrawingSelection(duplicatedIds),
     draft: null,
     textEdit: null,
   };

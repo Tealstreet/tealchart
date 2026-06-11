@@ -52,6 +52,7 @@ import {
   normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
+  selectUserDrawingsById,
   serializeUserDrawingStateForLayout,
   setUserDrawingIconName as setUserDrawingIconNameState,
   setUserDrawingLocked as setUserDrawingLockedState,
@@ -2213,6 +2214,10 @@ export class TealchartWidget {
 
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
     this.setUserDrawingState(selectUserDrawingById(this._userDrawingState, drawingId, handle));
+  }
+
+  selectUserDrawings(drawingIds: readonly string[]): void {
+    this.setUserDrawingState(selectUserDrawingsById(this._userDrawingState, drawingIds));
   }
 
   deleteUserDrawing(drawingId?: string): boolean {
