@@ -1460,6 +1460,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
         {userDrawingPrimitives.map((primitive) => {
           if (primitive.kind === 'line') {
+            if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 
             return (
@@ -1483,7 +1484,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillColor && (
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
                   <Rect
                     x={primitive.rect.x}
                     y={primitive.rect.y}
@@ -1492,17 +1493,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     color={primitive.style.fillColor}
                   />
                 )}
-                <Rect
-                  x={primitive.rect.x}
-                  y={primitive.rect.y}
-                  width={primitive.rect.width}
-                  height={primitive.rect.height}
-                  color={primitive.style.lineColor}
-                  style="stroke"
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </Rect>
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
               </Group>
             );
           }
@@ -1516,7 +1519,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillColor && (
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
                   <Rect
                     x={layout.box.x}
                     y={layout.box.y}
@@ -1525,17 +1528,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     color={primitive.style.fillColor}
                   />
                 )}
-                <Rect
-                  x={layout.box.x}
-                  y={layout.box.y}
-                  width={layout.box.width}
-                  height={layout.box.height}
-                  color={primitive.style.lineColor}
-                  style="stroke"
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </Rect>
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={layout.box.x}
+                    y={layout.box.y}
+                    width={layout.box.width}
+                    height={layout.box.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
                 <SkiaText
                   x={layout.text.x}
                   y={layout.text.y}

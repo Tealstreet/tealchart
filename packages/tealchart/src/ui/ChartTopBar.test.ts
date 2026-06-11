@@ -134,6 +134,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="3 pixel line width"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Dashed line style"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="50 percent opacity"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing border"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]')?.click();
 
@@ -141,6 +142,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ lineWidth: 3 });
     expect(onStyle).toHaveBeenCalledWith({ lineStyle: 'dashed' });
     expect(onStyle).toHaveBeenCalledWith({ opacity: 0.5 });
+    expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
     expect(onVisibility).toHaveBeenCalledWith(false);
     expect(onLocked).toHaveBeenCalledWith(true, undefined);
 
@@ -182,8 +184,10 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Green fill color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing fill"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')).toBeNull();
 
     topBar.unmount();

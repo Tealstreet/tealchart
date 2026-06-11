@@ -22,6 +22,8 @@ function createStateWithTransientFields(): UserDrawingState {
       lineWidth: 2,
       lineStyle: 'dashed' as const,
       opacity: 0.75,
+      lineVisible: false,
+      fillVisible: true,
     },
     points: [
       { time: 1000, price: 10 },
@@ -187,6 +189,40 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings[0]?.style.opacity).toBe(1);
+  });
+
+  it('restores drawing fill and line visibility flags', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            lineVisible: false,
+            fillVisible: false,
+            fillColor: '#123456',
+          },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]?.style).toMatchObject({
+      lineVisible: false,
+      fillVisible: false,
+    });
   });
 
   it('compares only committed drawing payloads', () => {
