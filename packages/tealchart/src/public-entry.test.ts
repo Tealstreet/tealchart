@@ -31,6 +31,7 @@ import type {
   ExtendedLineDrawing,
   InfoLineDrawing,
   PathDrawing,
+  ParallelChannelDrawing,
   PriceRangeDrawing,
   TriangleDrawing,
   UserDrawingFontFamily,
@@ -57,6 +58,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -375,5 +377,25 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('triangle');
+  });
+
+  it('exports shared drawing parallel channel types', () => {
+    const drawing: ParallelChannelDrawing = {
+      id: 'channel',
+      kind: 'parallelChannel',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('parallelChannel');
   });
 });

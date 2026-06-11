@@ -56,6 +56,7 @@ describe('user drawing toolbar descriptors', () => {
       'priceRange',
       'dateRange',
       'triangle',
+      'parallelChannel',
       'path',
       'textLabel',
     ]);
@@ -111,6 +112,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),
+    );
+    expect(getUserDrawingToolDescriptor('parallelChannel')).toEqual(
+      expect.objectContaining({ tool: 'parallelChannel', label: 'Parallel channel' }),
     );
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
@@ -364,6 +368,18 @@ describe('user drawing toolbar descriptors', () => {
         ...rectangle,
         id: 'tri',
         kind: 'triangle' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'channel',
+        kind: 'parallelChannel' as const,
         points: [
           { time: 1, price: 10 },
           { time: 2, price: 12 },

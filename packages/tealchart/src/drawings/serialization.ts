@@ -56,6 +56,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'path':
     case 'triangle':
+    case 'parallelChannel':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -305,6 +306,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'triangle',
+            points,
+          }
+        : null;
+    }
+    case 'parallelChannel': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'parallelChannel',
             points,
           }
         : null;

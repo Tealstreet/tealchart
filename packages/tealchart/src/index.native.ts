@@ -62,6 +62,7 @@ export type {
   MobileUserDrawingInfoLineLabelPosition,
   MobileUserDrawingInfoLinePrimitive,
   MobileUserDrawingPathPrimitive,
+  MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
   MobileUserDrawingMeasurementLabelPrimitive,

@@ -18,6 +18,7 @@ export type UserDrawingTool =
   | 'priceRange'
   | 'dateRange'
   | 'triangle'
+  | 'parallelChannel'
   | 'path'
   | 'textLabel';
 
@@ -137,6 +138,11 @@ export interface TriangleDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ParallelChannelDrawing extends UserDrawingBase {
+  kind: 'parallelChannel';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PathDrawing extends UserDrawingBase {
   kind: 'path';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -168,6 +174,7 @@ export type UserDrawing =
   | PriceRangeDrawing
   | DateRangeDrawing
   | TriangleDrawing
+  | ParallelChannelDrawing
   | PathDrawing
   | TextLabelDrawing;
 
@@ -276,6 +283,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'dateRange':
       return 2;
     case 'triangle':
+    case 'parallelChannel':
     case 'path':
       return 3;
     case 'horizontalLine':
@@ -411,6 +419,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'triangle',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'parallelChannel':
+      return {
+        ...base,
+        kind: 'parallelChannel',
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'path':
