@@ -235,6 +235,42 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags arrow marker endpoints without moving the opposite endpoint', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'marker',
+      kind: 'arrowMarker',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'marker', handle: 'end' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'marker', handle: 'end' },
+        startPoint: { x: 20, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 70, y: 30 },
+      { now: () => 3 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 80 },
+        { time: 70, price: 70 },
+      ],
+      updatedAt: 3,
+    });
+  });
+
   it('drags extended line endpoints without moving the opposite endpoint', () => {
     const drawing: UserDrawing = {
       ...base,

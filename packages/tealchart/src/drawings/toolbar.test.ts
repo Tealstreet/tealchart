@@ -44,6 +44,7 @@ describe('user drawing toolbar descriptors', () => {
       'extendedLine',
       'infoLine',
       'arrowLine',
+      'arrowMarker',
       'ray',
       'horizontalLine',
       'verticalLine',
@@ -97,7 +98,29 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
     );
+    expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
+      expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
+    );
     expect(getUserDrawingToolDescriptor('path')).toEqual(expect.objectContaining({ tool: 'path', label: 'Path' }));
+  });
+
+  it('enables fill controls for filled drawing types', () => {
+    expect(
+      supportsUserDrawingFillControls({
+        id: 'marker',
+        kind: 'arrowMarker',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+        ],
+      }),
+    ).toBe(true);
   });
 
   it('resolves action availability from toolbar-relevant state', () => {

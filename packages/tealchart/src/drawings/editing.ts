@@ -53,6 +53,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':
+    case 'arrowMarker':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'ray':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
@@ -80,7 +81,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
 }
 
 function editLineEndpoint(
-  drawing: Extract<UserDrawing, { kind: 'trendLine' | 'extendedLine' | 'infoLine' | 'arrowLine' | 'ray' }>,
+  drawing: Extract<UserDrawing, { kind: 'trendLine' | 'extendedLine' | 'infoLine' | 'arrowLine' | 'arrowMarker' | 'ray' }>,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
   updatedAt: number,
@@ -152,6 +153,7 @@ function editDrawingHandle(
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':
+    case 'arrowMarker':
     case 'ray':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
