@@ -64,6 +64,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Handle and point-index edits remain single-drawing operations so endpoint and
   corner editing behavior stays stable on web Canvas and mobile Skia.
 
+## Shipped: Group Style Actions
+
+- Shared style, visibility, and lock reducers apply to grouped selections while
+  preserving targeted single-drawing calls.
+- Locked drawings remain protected unless the caller opts into locked updates;
+  hide and lock actions remove affected drawings from the active selection.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text
