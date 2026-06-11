@@ -12,6 +12,7 @@ import type {
   PathDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
+  TriangleDrawing,
   TrendLineDrawing,
   UserDrawingStyle,
 } from './types';
@@ -330,6 +331,16 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const triangle: TriangleDrawing = {
+      ...trendLine,
+      id: 'triangle',
+      kind: 'triangle',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -437,6 +448,16 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(path, space)).toMatchObject({
       kind: 'path',
       polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 110, y: 20 },
+          { x: 210, y: 120 },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(triangle, space)).toMatchObject({
+      kind: 'triangle',
+      polygon: {
         points: [
           { x: 10, y: 70 },
           { x: 110, y: 20 },

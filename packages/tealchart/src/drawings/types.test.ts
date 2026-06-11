@@ -68,6 +68,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('ellipse')).toBe(2);
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
+    expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('path')).toBe(3);
   });
 
@@ -187,6 +188,15 @@ describe('user drawing types', () => {
       id: 'date-range',
       kind: 'dateRange',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'triangle', anchors: [anchorA, anchorB, anchorC] }), { id: 'triangle', now: 20 })).toMatchObject({
+      id: 'triangle',
+      kind: 'triangle',
+      points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,
       createdAt: 20,

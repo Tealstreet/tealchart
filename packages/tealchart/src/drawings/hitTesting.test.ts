@@ -349,6 +349,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits triangle fills, edges, and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'triangle',
+      kind: 'triangle',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 30 }, space)?.drawing.id).toBe('triangle');
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 30 }, space)?.drawing.id).toBe('triangle');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -215,6 +215,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'triangle') {
+    const distance = pointInPolygon(point, geometry.polygon.points) ? 0 : distanceToClosedPolyline(point, geometry.polygon.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'arrowMarker') {
     const distance = pointInPolygon(point, geometry.marker.points) ? 0 : distanceToClosedPolyline(point, geometry.marker.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -292,6 +297,11 @@ function hitTestUserDrawingHandle(
     case 'path':
       geometry.polyline.points.forEach((pathPoint, pointIndex) => {
         handles.push({ handle: 'center', point: pathPoint, pointIndex });
+      });
+      break;
+    case 'triangle':
+      geometry.polygon.points.forEach((trianglePoint, pointIndex) => {
+        handles.push({ handle: 'center', point: trianglePoint, pointIndex });
       });
       break;
     case 'textLabel':

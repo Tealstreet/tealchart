@@ -115,6 +115,11 @@ export type ResolvedUserDrawingGeometry =
       polyline: DrawingScreenPolyline;
     }
   | {
+      kind: 'triangle';
+      drawing: UserDrawing;
+      polygon: DrawingScreenPolyline;
+    }
+  | {
       kind: 'textLabel';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
@@ -451,6 +456,12 @@ export function resolveUserDrawingGeometry(
         kind: 'path',
         drawing,
         polyline: resolvePolylineFromAnchors(drawing.points, space),
+      };
+    case 'triangle':
+      return {
+        kind: 'triangle',
+        drawing,
+        polygon: resolvePolylineFromAnchors(drawing.points, space),
       };
     case 'textLabel':
       return {
