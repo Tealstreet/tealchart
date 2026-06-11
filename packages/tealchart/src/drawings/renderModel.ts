@@ -217,6 +217,7 @@ export function resolveUserDrawingHandlePoints(
     case 'trianglePattern':
     case 'abcdPattern':
     case 'xabcdPattern':
+    case 'threeDrivesPattern':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'barsPattern':
       return [anchorToScreenPoint(drawing.points[2], space)];

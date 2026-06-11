@@ -1332,6 +1332,29 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits three drives pattern segments and five anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'three-drives',
+      kind: 'threeDrivesPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 30, price: 70 },
+        { time: 50, price: 90 },
+        { time: 70, price: 70 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 20 }, space)?.drawing.id).toBe('three-drives');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 10 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 4,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits ABCD pattern segments and four anchor handles', () => {
     const drawing: UserDrawing = {
       ...base,

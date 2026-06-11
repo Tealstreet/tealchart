@@ -254,7 +254,7 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'xabcdPattern') {
+  if (geometry.kind === 'xabcdPattern' || geometry.kind === 'threeDrivesPattern') {
     const distance = distanceToPolyline(point, geometry.pattern.polyline.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
@@ -786,6 +786,7 @@ function hitTestUserDrawingHandle(
       });
       break;
     case 'xabcdPattern':
+    case 'threeDrivesPattern':
       geometry.pattern.polyline.points.forEach((patternPoint, pointIndex) => {
         handles.push({ handle: 'center', point: patternPoint, pointIndex });
       });
