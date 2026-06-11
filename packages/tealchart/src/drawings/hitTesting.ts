@@ -5,15 +5,17 @@ import type {
   DrawingScreenSegment,
   ResolvedUserDrawingGeometry,
 } from './coordinates';
-import type { UserDrawing, UserDrawingHandleRole } from './types';
+import type { TextLabelDrawing, UserDrawing, UserDrawingHandleRole } from './types';
 
 import { anchorToScreenPoint, resolveUserDrawingGeometry } from './coordinates';
+import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
 
 export interface UserDrawingHitTestOptions {
   tolerance?: number;
   handleTolerance?: number;
   labelWidth?: number;
   labelHeight?: number;
+  measureTextLabelLine?: UserDrawingHitTestTextMeasure;
 }
 
 export interface UserDrawingHitResult {
@@ -22,10 +24,20 @@ export interface UserDrawingHitResult {
   distance: number;
 }
 
+export type UserDrawingHitTestTextMeasure = (drawing: TextLabelDrawing, line: string) => number;
+
+interface ResolvedUserDrawingHitTestOptions {
+  tolerance: number;
+  handleTolerance: number;
+  labelWidth: number;
+  labelHeight: number;
+  measureTextLabelLine?: UserDrawingHitTestTextMeasure;
+}
+
 const DEFAULT_TOLERANCE = 6;
 const DEFAULT_HANDLE_TOLERANCE = 8;
 const DEFAULT_LABEL_WIDTH = 72;
-const DEFAULT_LABEL_HEIGHT = 24;
+const DEFAULT_LABEL_HEIGHT = 20;
 
 export function distanceBetweenPoints(a: DrawingScreenPoint, b: DrawingScreenPoint): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -68,7 +80,7 @@ function hitTestResolvedGeometry(
   geometry: ResolvedUserDrawingGeometry,
   point: DrawingScreenPoint,
   space: DrawingCoordinateSpace,
-  options: Required<UserDrawingHitTestOptions>,
+  options: ResolvedUserDrawingHitTestOptions,
 ): UserDrawingHitResult | null {
   if (!geometry.drawing.visible || geometry.drawing.locked) return null;
 
@@ -81,11 +93,23 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'textLabel') {
+    const drawing = geometry.drawing as TextLabelDrawing;
+    const lines = splitUserDrawingTextLines(drawing.text);
+    const layout = resolveUserDrawingTextLabelLayout({
+      text: drawing.text,
+      point: geometry.point,
+      textAlign: drawing.textAlign,
+      lineWidths: lines.map((line) => Math.max(0, options.measureTextLabelLine?.(drawing, line) ?? line.length * 6)),
+      labelPadding: 6,
+      lineHeight: Math.max(1, options.labelHeight - 2),
+    });
+    const labelWidth = Math.max(options.labelWidth, layout.box.width);
+    const labelHeight = Math.max(options.labelHeight, layout.box.height);
     const rect = {
-      x: geometry.point.x - options.labelWidth / 2,
-      y: geometry.point.y - options.labelHeight / 2,
-      width: options.labelWidth,
-      height: options.labelHeight,
+      x: geometry.point.x - labelWidth / 2,
+      y: geometry.point.y - labelHeight / 2,
+      width: labelWidth,
+      height: labelHeight,
     };
     const inside =
       point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
@@ -164,6 +188,7 @@ export function hitTestUserDrawing(
     handleTolerance: options.handleTolerance ?? DEFAULT_HANDLE_TOLERANCE,
     labelWidth: options.labelWidth ?? DEFAULT_LABEL_WIDTH,
     labelHeight: options.labelHeight ?? DEFAULT_LABEL_HEIGHT,
+    measureTextLabelLine: options.measureTextLabelLine,
   });
 }
 

@@ -205,7 +205,25 @@ describe('user drawing renderer', () => {
     renderUserDrawing(ctx, drawing, space);
 
     expect(ctx.calls).toContain('fillRect:32,40,36,20:rgba(245, 197, 66, 0.12):1');
-    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
+  });
+
+  it('renders multiline text labels with one canvas text draw per line', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'label',
+      kind: 'textLabel',
+      point: { time: 50, price: 50 },
+      text: 'Longer\nB',
+      textAlign: 'right',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:26,31,48,38:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:Longer:32,41:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:B:62,59:#111:left:1:12px sans-serif');
   });
 
   it('renders text labels with configured font families', () => {
@@ -222,7 +240,7 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1:12px monospace');
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px monospace');
   });
 
   it('normalizes unsupported text label font families', () => {
@@ -239,7 +257,7 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
   });
 
   it('applies drawing style opacity while restoring canvas alpha', () => {

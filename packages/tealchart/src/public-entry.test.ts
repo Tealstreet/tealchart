@@ -5,7 +5,10 @@ import { resolve } from 'node:path';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingTextEditMetrics,
+  resolveUserDrawingTextLabelLayout,
   setUserDrawingTextAlign,
+  splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
@@ -15,6 +18,8 @@ import type {
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
+  UserDrawingHitTestTextMeasure,
+  UserDrawingTextLabelLayout,
   UserDrawingOpacityDescriptor,
   UserDrawingStyleToggleDescriptor,
 } from './index';
@@ -49,5 +54,20 @@ describe('tealchart public entries', () => {
     expect(fontFamily).toBe('sans-serif');
     expect(descriptor.fontFamily).toBe('sans-serif');
     expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
+  });
+
+  it('exports shared drawing text layout helpers', () => {
+    const measureTextLabelLine: UserDrawingHitTestTextMeasure = (_drawing, line) => line.length;
+    const layout: UserDrawingTextLabelLayout = resolveUserDrawingTextLabelLayout({
+      text: 'A\nB',
+      point: { x: 10, y: 10 },
+      textAlign: 'center',
+      lineWidths: [6, 6],
+    });
+
+    expect(splitUserDrawingTextLines('A\nB')).toEqual(['A', 'B']);
+    expect(measureTextLabelLine).toBeTypeOf('function');
+    expect(resolveUserDrawingTextEditMetrics('A\nB').longestLineLength).toBe(1);
+    expect(layout.lines).toHaveLength(2);
   });
 });

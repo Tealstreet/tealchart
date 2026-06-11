@@ -20,6 +20,7 @@ import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
+  TextLabelDrawing,
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
@@ -93,6 +94,8 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
+  resolveUserDrawingTextEditMetrics,
+  splitUserDrawingTextLines,
   selectUserDrawingById,
   setUserDrawingText,
   setUserDrawingTool,
@@ -604,7 +607,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const activeUserDrawingTextEditorStyle = useMemo(() => {
     if (!activeUserDrawingTextEditPrimitive) return null;
     const value = activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text;
-    const width = Math.max(120, Math.min(260, value.length * 7 + 32));
+    const editMetrics = resolveUserDrawingTextEditMetrics(value);
+    const width = Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
+    const height = Math.max(32, Math.min(160, editMetrics.lines.length * 18 + 14));
     const chartRight = dimensions.width - margins.right;
     const left = Math.max(
       margins.left,
@@ -613,8 +618,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     return {
       left,
-      top: Math.max(margins.top, activeUserDrawingTextEditPrimitive.point.y - 18),
+      top: Math.max(margins.top, activeUserDrawingTextEditPrimitive.point.y - height / 2),
       width,
+      height,
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
       fontFamily: resolveMobileUserDrawingFontFamily(
@@ -964,6 +970,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartDimensions],
   );
 
+  const measureUserDrawingTextLabelLine = useCallback((drawing: TextLabelDrawing, line: string): number => {
+    const normalizedFontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+    const nativeFontFamily = resolveMobileUserDrawingFontFamily(normalizedFontFamily, Platform.OS);
+    const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily);
+    const font = Skia.Font(typeface, normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12));
+    return font.measureText(line).width;
+  }, []);
+
   const handleUserDrawingTap = useCallback(
     (x: number, y: number) => {
       if (!viewport) return false;
@@ -975,6 +989,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           effectiveUserDrawingState,
           { x, y },
           userDrawingSpacesByPaneId,
+          { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
         );
         if (selection.changed) {
           commitUserDrawingState(selection.state);
@@ -1010,6 +1025,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingState,
       effectiveUserDrawingState,
       isPointInChartArea,
+      measureUserDrawingTextLabelLine,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
       viewport,
@@ -1025,6 +1041,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         effectiveUserDrawingState,
         { x, y },
         userDrawingSpacesByPaneId,
+        { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
       );
       if (!result.hit || !result.drag) return false;
 
@@ -1034,7 +1051,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
       return true;
     },
-    [commitUserDrawingState, effectiveUserDrawingState, isPointInChartArea, userDrawingSpacesByPaneId, viewport],
+    [
+      commitUserDrawingState,
+      effectiveUserDrawingState,
+      isPointInChartArea,
+      measureUserDrawingTextLabelLine,
+      userDrawingSpacesByPaneId,
+      viewport,
+    ],
   );
 
   const handleUserDrawingEditMove = useCallback(
@@ -1138,6 +1162,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           effectiveUserDrawingState,
           { x, y },
           userDrawingSpacesByPaneId,
+          { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
         );
         const selectedId = selection.state.selection?.drawingId;
         const selectedDrawing = selectedId
@@ -1173,6 +1198,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       margins,
+      measureUserDrawingTextLabelLine,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
     ],
@@ -1528,8 +1554,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const measuredWidth = font.measureText(primitive.text).width;
-            const layout = resolveMobileUserDrawingTextLabelLayout(primitive, measuredWidth);
+            const measuredWidths = splitUserDrawingTextLines(primitive.text).map((line) => font.measureText(line).width);
+            const layout = resolveMobileUserDrawingTextLabelLayout(primitive, measuredWidths);
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
@@ -1555,13 +1581,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     {dash && <DashPathEffect intervals={dash} />}
                   </Rect>
                 )}
-                <SkiaText
-                  x={layout.text.x}
-                  y={layout.text.y}
-                  text={primitive.text}
-                  font={font}
-                  color={primitive.style.textColor ?? primitive.style.lineColor}
-                />
+                {layout.lines.map((line, index) => (
+                  <SkiaText
+                    key={`${primitive.id}:line:${index}`}
+                    x={line.x}
+                    y={line.y}
+                    text={line.text}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
+                ))}
               </Group>
             );
           }
@@ -1747,14 +1776,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <TextInput
           accessibilityLabel="Edit drawing text"
           autoFocus
-          blurOnSubmit
+          blurOnSubmit={false}
+          multiline
           selectTextOnFocus
           value={activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text}
           onChangeText={(value: string) => {
             commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
-          }}
-          onSubmitEditing={() => {
-            commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
           }}
           onBlur={() => {
             commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));

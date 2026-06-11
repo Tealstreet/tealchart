@@ -12,8 +12,10 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  TextLabelDrawing,
   UserDrawingEditDrag,
   UserDrawingHandleRole,
+  UserDrawingHitTestOptions,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
@@ -40,6 +42,8 @@ import {
   deserializeUserDrawingStateFromLayout,
   handleUserDrawingInput,
   isUserDrawingLayoutStateEqual,
+  normalizeUserDrawingFontFamily,
+  normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   serializeUserDrawingStateForLayout,
@@ -143,6 +147,7 @@ export class TealchartWidget {
   private _userDrawingState: UserDrawingState;
   private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
   private _userDrawingIdCounter = 0;
+  private _userDrawingTextMeasureCtx: CanvasRenderingContext2D | null = null;
 
   // Jailbreak (canvas-drawing) indicator support
   private _jailbreakManager: JailbreakIndicatorManager | null = null;
@@ -2275,6 +2280,24 @@ export class TealchartWidget {
     return id;
   }
 
+  private _measureUserDrawingTextLabelLine = (drawing: TextLabelDrawing, line: string): number => {
+    this._userDrawingTextMeasureCtx ??= document.createElement('canvas').getContext('2d');
+    const ctx = this._userDrawingTextMeasureCtx;
+    if (!ctx) return line.length * 6;
+
+    const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+    const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    return ctx.measureText(line).width;
+  };
+
+  private _getUserDrawingHitTestOptions(): UserDrawingHitTestOptions {
+    return {
+      labelHeight: 20,
+      measureTextLabelLine: this._measureUserDrawingTextLabelLine,
+    };
+  }
+
   private _handleUserDrawingInput(point: UserDrawingInputPoint): boolean {
     if (this._userDrawingState.activeTool === 'select') return false;
 
@@ -2294,7 +2317,9 @@ export class TealchartWidget {
       return { state: this._userDrawingState, hit: false, changed: false };
     }
 
-    const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId);
+    const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId, {
+      hitTest: this._getUserDrawingHitTestOptions(),
+    });
     this.setUserDrawingState(result.state);
     return result;
   }
@@ -2305,7 +2330,9 @@ export class TealchartWidget {
   ): boolean {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
-    const result = beginUserDrawingEditDragAtPoint(this._userDrawingState, point, spacesByPaneId);
+    const result = beginUserDrawingEditDragAtPoint(this._userDrawingState, point, spacesByPaneId, {
+      hitTest: this._getUserDrawingHitTestOptions(),
+    });
     if (!result.hit || !result.drag) return false;
 
     this._userDrawingEditDrag = result.drag;
@@ -2332,7 +2359,9 @@ export class TealchartWidget {
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ): void {
     if (this._userDrawingState.activeTool === 'select') {
-      const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId);
+      const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId, {
+        hitTest: this._getUserDrawingHitTestOptions(),
+      });
       const selectedId = result.state.selection?.drawingId;
       const selectedDrawing = selectedId
         ? result.state.drawings.find((drawing) => drawing.id === selectedId)

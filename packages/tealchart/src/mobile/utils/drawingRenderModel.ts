@@ -13,9 +13,11 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
+  splitUserDrawingTextLines,
 } from '../../drawings';
 
 export type MobileUserDrawingPrimitive =
@@ -74,6 +76,7 @@ export interface MobileUserDrawingTextLabelLayout {
   labelHeight: number;
   box: { x: number; y: number; width: number; height: number };
   text: { x: number; y: number };
+  lines: readonly { text: string; width: number; x: number; y: number }[];
 }
 
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
@@ -208,7 +211,7 @@ export function resolveMobileUserDrawingRenderModel(
 
 export function resolveMobileUserDrawingTextLabelLayout(
   primitive: MobileUserDrawingTextLabelPrimitive,
-  measuredTextWidth: number,
+  measuredTextWidth: number | readonly number[],
   options: {
     labelPadding?: number;
     labelHeight?: number;
@@ -218,23 +221,25 @@ export function resolveMobileUserDrawingTextLabelLayout(
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
   const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
-  const width = Math.ceil(measuredTextWidth + labelPadding * 2);
-  const height = labelHeight;
-  const x = primitive.point.x - width / 2;
-  const y = primitive.point.y - height / 2;
-  const textX =
-    primitive.textAlign === 'left'
-      ? x + labelPadding
-      : primitive.textAlign === 'right'
-        ? x + width - labelPadding - measuredTextWidth
-        : primitive.point.x - measuredTextWidth / 2;
+  const lines = splitUserDrawingTextLines(primitive.text);
+  const lineWidths = Array.isArray(measuredTextWidth) ? measuredTextWidth : lines.map(() => measuredTextWidth);
+  const layout = resolveUserDrawingTextLabelLayout({
+    text: primitive.text,
+    point: primitive.point,
+    textAlign: primitive.textAlign,
+    lineWidths,
+    labelPadding,
+    lineHeight: Math.max(1, labelHeight - 2),
+  });
+  const firstLine = layout.lines[0] ?? { x: primitive.point.x, y: primitive.point.y };
 
   return {
     fontSize,
     fontFamily,
     labelPadding,
-    labelHeight,
-    box: { x, y, width, height },
-    text: { x: textX, y: primitive.point.y },
+    labelHeight: layout.box.height,
+    box: layout.box,
+    text: { x: firstLine.x, y: firstLine.y },
+    lines: layout.lines,
   };
 }

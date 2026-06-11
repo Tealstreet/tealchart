@@ -144,6 +144,36 @@ describe('drawing layout serialization', () => {
     expect(restored?.selection).toBeNull();
   });
 
+  it('preserves restored multiline text labels', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Restored\nSecond line',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      kind: 'textLabel',
+      text: 'Restored\nSecond line',
+    });
+  });
+
   it('normalizes restored text label font sizes', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
