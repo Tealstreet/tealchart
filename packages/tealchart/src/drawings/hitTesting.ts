@@ -257,7 +257,8 @@ function hitTestResolvedGeometry(
   if (
     geometry.kind === 'xabcdPattern' ||
     geometry.kind === 'threeDrivesPattern' ||
-    geometry.kind === 'elliottImpulseWave'
+    geometry.kind === 'elliottImpulseWave' ||
+    geometry.kind === 'elliottCorrectiveWave'
   ) {
     const distance = distanceToPolyline(point, geometry.pattern.polyline.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -800,6 +801,7 @@ function hitTestUserDrawingHandle(
     case 'xabcdPattern':
     case 'threeDrivesPattern':
     case 'elliottImpulseWave':
+    case 'elliottCorrectiveWave':
     case 'headShouldersPattern':
       geometry.pattern.polyline.points.forEach((patternPoint, pointIndex) => {
         handles.push({ handle: 'center', point: patternPoint, pointIndex });

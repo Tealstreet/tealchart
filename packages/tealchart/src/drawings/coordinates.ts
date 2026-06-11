@@ -379,6 +379,19 @@ export interface DrawingScreenElliottImpulseWave {
   labels: readonly DrawingScreenElliottImpulseWaveLabel[];
 }
 
+export const ELLIOTT_CORRECTIVE_WAVE_LABELS = ['A', 'B', 'C'] as const;
+export type ElliottCorrectiveWaveLabel = (typeof ELLIOTT_CORRECTIVE_WAVE_LABELS)[number];
+
+export interface DrawingScreenElliottCorrectiveWaveLabel {
+  text: ElliottCorrectiveWaveLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenElliottCorrectiveWave {
+  polyline: DrawingScreenPolyline;
+  labels: readonly DrawingScreenElliottCorrectiveWaveLabel[];
+}
+
 export interface DrawingScreenAnchoredVwap {
   anchor: DrawingScreenPoint;
   points: readonly DrawingScreenPoint[];
@@ -513,6 +526,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'elliottImpulseWave';
       drawing: UserDrawing;
       pattern: DrawingScreenElliottImpulseWave;
+    }
+  | {
+      kind: 'elliottCorrectiveWave';
+      drawing: UserDrawing;
+      pattern: DrawingScreenElliottCorrectiveWave;
     }
   | {
       kind: 'abcdPattern';
@@ -1215,6 +1233,20 @@ export function resolveElliottImpulseWaveFromAnchors(
     polyline,
     labels: polyline.points.map((point, index) => ({
       text: ELLIOTT_IMPULSE_WAVE_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveElliottCorrectiveWaveFromAnchors(
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
+  space: DrawingCoordinateSpace,
+): DrawingScreenElliottCorrectiveWave {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  return {
+    polyline,
+    labels: polyline.points.map((point, index) => ({
+      text: ELLIOTT_CORRECTIVE_WAVE_LABELS[index]!,
       point,
     })),
   };
@@ -2400,6 +2432,12 @@ export function resolveUserDrawingGeometry(
         kind: 'elliottImpulseWave',
         drawing,
         pattern: resolveElliottImpulseWaveFromAnchors(drawing.points, space),
+      };
+    case 'elliottCorrectiveWave':
+      return {
+        kind: 'elliottCorrectiveWave',
+        drawing,
+        pattern: resolveElliottCorrectiveWaveFromAnchors(drawing.points, space),
       };
     case 'abcdPattern':
       return {

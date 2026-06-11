@@ -156,6 +156,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'threeDrivesPattern', icon: '3', label: 'Three drives pattern' },
   { tool: 'headShouldersPattern', icon: 'HS', label: 'Head and shoulders pattern' },
   { tool: 'elliottImpulseWave', icon: '123', label: 'Elliott impulse wave' },
+  { tool: 'elliottCorrectiveWave', icon: 'ABC', label: 'Elliott corrective wave' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },

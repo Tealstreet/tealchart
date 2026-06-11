@@ -1402,6 +1402,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits Elliott corrective wave paths and three anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-corrective',
+      kind: 'elliottCorrectiveWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 60 }, space)?.drawing.id).toBe('elliott-corrective');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 30 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 90 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits ABCD pattern segments and four anchor handles', () => {
     const drawing: UserDrawing = {
       ...base,
