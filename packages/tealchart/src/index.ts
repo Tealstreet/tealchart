@@ -72,6 +72,7 @@ export {
   isDrawingDraftReady,
   deserializeUserDrawingStateFromLayout,
   isUserDrawingLayoutStateEqual,
+  normalizeUserDrawingOpacity,
   priceToDrawingY,
   resolveExtendedSegment,
   resolveRaySegment,
@@ -101,6 +102,7 @@ export {
   updateUserDrawingTextEdit,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './drawings';
 export type {

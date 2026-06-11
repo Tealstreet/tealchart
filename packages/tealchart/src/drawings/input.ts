@@ -185,6 +185,7 @@ export function updateUserDrawingStyle(
     nextStyle.lineColor === target.drawing.style.lineColor &&
     nextStyle.lineWidth === target.drawing.style.lineWidth &&
     nextStyle.lineStyle === target.drawing.style.lineStyle &&
+    nextStyle.opacity === target.drawing.style.opacity &&
     nextStyle.fillColor === target.drawing.style.fillColor &&
     nextStyle.textColor === target.drawing.style.textColor &&
     nextStyle.fontSize === target.drawing.style.fontSize &&

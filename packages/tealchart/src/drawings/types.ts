@@ -24,6 +24,7 @@ export interface UserDrawingStyle {
   lineColor: string;
   lineWidth: number;
   lineStyle: UserDrawingLineStyle;
+  opacity?: number;
   fillColor?: string;
   textColor?: string;
   fontSize?: number;
@@ -118,12 +119,14 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
   lineColor: '#f5c542',
   lineWidth: 1,
   lineStyle: 'solid',
+  opacity: 1,
   fillColor: 'rgba(245, 197, 66, 0.12)',
   textColor: '#f5c542',
   fontSize: 12,
 };
 
 export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
+export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): number {
   return USER_DRAWING_FONT_SIZES.reduce((nearest, candidate) =>
@@ -131,10 +134,21 @@ export function normalizeUserDrawingFontSize(fontSize: number): number {
   );
 }
 
+export function normalizeUserDrawingOpacity(opacity: number): number {
+  if (!Number.isFinite(opacity)) return 1;
+  return Math.max(0, Math.min(1, opacity));
+}
+
 export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingStyle {
-  if (style.fontSize === undefined) return style;
-  const fontSize = normalizeUserDrawingFontSize(style.fontSize);
-  return fontSize === style.fontSize ? style : { ...style, fontSize };
+  const fontSize = style.fontSize === undefined ? undefined : normalizeUserDrawingFontSize(style.fontSize);
+  const opacity = style.opacity === undefined ? undefined : normalizeUserDrawingOpacity(style.opacity);
+  if (fontSize === style.fontSize && opacity === style.opacity) return style;
+
+  return {
+    ...style,
+    ...(fontSize === undefined ? {} : { fontSize }),
+    ...(opacity === undefined ? {} : { opacity }),
+  };
 }
 
 export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {

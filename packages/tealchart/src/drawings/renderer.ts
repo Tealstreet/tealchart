@@ -6,7 +6,7 @@ import type { UserDrawingState } from './types';
 
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
-import { normalizeUserDrawingFontSize } from './types';
+import { normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
 
 export interface UserDrawingRenderOptions {
   labelPadding?: number;
@@ -149,6 +149,7 @@ export function renderUserDrawing(
     ctx.beginPath();
     ctx.rect(space.chartLeft, space.pane.top, space.chartRight - space.chartLeft, space.pane.height);
     ctx.clip();
+    ctx.globalAlpha *= normalizeUserDrawingOpacity(drawing.style.opacity ?? 1);
 
     switch (geometry.kind) {
       case 'line':
