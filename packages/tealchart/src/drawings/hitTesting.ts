@@ -275,6 +275,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'gannFan') {
+    const distance = Math.min(...geometry.gannFan.rays.map((ray) => distanceToSegment(point, ray.segment)));
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -404,10 +409,12 @@ function hitTestUserDrawingHandle(
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
         geometry.drawing.kind === 'fibExtension' ||
-        geometry.drawing.kind === 'fibFan'
+        geometry.drawing.kind === 'fibFan' ||
+        geometry.drawing.kind === 'gannFan'
       ) {
         handles.push(
           { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },

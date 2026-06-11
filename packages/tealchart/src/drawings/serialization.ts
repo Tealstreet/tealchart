@@ -54,6 +54,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
+    case 'gannFan':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -435,6 +436,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'fibFan',
+            points,
+          }
+        : null;
+    }
+    case 'gannFan': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'gannFan',
             points,
           }
         : null;

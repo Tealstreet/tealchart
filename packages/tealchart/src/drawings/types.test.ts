@@ -76,6 +76,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('fibFan')).toBe(2);
+    expect(getRequiredAnchorCount('gannFan')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('polyline')).toBe(3);
     expect(getRequiredAnchorCount('pitchfork')).toBe(3);
@@ -265,6 +266,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'fibFan' }), { id: 'fib-fan', now: 20 })).toMatchObject({
       id: 'fib-fan',
       kind: 'fibFan',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'gannFan' }), { id: 'gann-fan', now: 20 })).toMatchObject({
+      id: 'gann-fan',
+      kind: 'gannFan',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,
