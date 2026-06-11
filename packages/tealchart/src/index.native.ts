@@ -115,6 +115,7 @@ export type {
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';
 export {
+  setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,

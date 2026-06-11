@@ -2653,7 +2653,7 @@ describe('mobile user drawing render model', () => {
           updatedAt: 1,
           style,
           point: { time: 50, price: 50 },
-          iconName: 'star',
+          iconName: 'flag',
         },
       ],
       draft: null,
@@ -2667,15 +2667,13 @@ describe('mobile user drawing render model', () => {
       id: 'icon',
       clip,
       point: { x: 50, y: 50 },
-      iconName: 'star',
+      iconName: 'flag',
       style,
     });
     if (!primitive || primitive.kind !== 'icon') throw new Error('expected icon primitive');
-    expect(primitive.points[0]).toEqual({ x: 50, y: 41 });
-    expect(primitive.points[1]).toMatchObject({
-      x: expect.closeTo(52.380530271784515),
-      y: expect.closeTo(46.72348117278146),
-    });
+    expect(primitive.points[0]).toEqual({ x: 41, y: 41 });
+    expect(primitive.points[1]).toEqual({ x: 59, y: 41 });
+    expect(primitive.points[2]).toEqual({ x: 53.15, y: 50 });
   });
 
   it('returns Skia-ready balloon primitives with shared layout', () => {

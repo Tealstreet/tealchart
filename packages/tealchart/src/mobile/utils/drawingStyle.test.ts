@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../../state/chartState';
 import {
+  setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
@@ -88,6 +89,33 @@ describe('mobile drawing style helpers', () => {
       updatedAt: 40,
     });
     expect(setMobileUserDrawingTextAlign(state, 'right')).toBe(state);
+  });
+
+  it('updates selected icon name through the shared reducer contract', () => {
+    const iconState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'icon' },
+      drawings: [
+        {
+          id: 'icon',
+          kind: 'icon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: state.drawings[0]!.style,
+          point: { time: 1, price: 100 },
+          iconName: 'star',
+        },
+      ],
+    };
+
+    expect(setMobileUserDrawingIconName(iconState, 'arrowDown', { now: () => 50 }).drawings[0]).toMatchObject({
+      iconName: 'arrowDown',
+      updatedAt: 50,
+    });
+    expect(setMobileUserDrawingIconName(state, 'arrowDown')).toBe(state);
   });
 
   it('requires explicit opt-in for locked drawing property changes', () => {

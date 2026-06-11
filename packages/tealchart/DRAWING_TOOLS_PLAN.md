@@ -642,9 +642,12 @@ matching behavior in the same PR for every user-facing drawing feature.
 ## Shipped: Icon Tool
 
 - Shared drawing state supports the single-anchor `icon` marker with a default
-  star symbol and persists it through layout save/load.
+  star symbol, a small reusable icon-name library, and layout persistence.
 - Web Canvas and mobile Skia render matching filled/stroked vector icon
-  polygons from shared icon geometry.
+  polygons from shared icon geometry for star, circle, square, triangle, flag,
+  arrow-up, and arrow-down variants.
+- Web top bar and mobile top bar expose matching selected-icon controls for
+  switching icon names through shared reducers and public APIs.
 - Selection, polygon hit testing, whole-drawing moves, and center-handle
   editing use shared drawing behavior on both platforms.
 

@@ -1,6 +1,13 @@
-import type { UpdateUserDrawingOptions, UserDrawingState, UserDrawingStyle, UserDrawingTextAlign } from '../../drawings';
+import type {
+  UpdateUserDrawingOptions,
+  UserDrawingIconName,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingTextAlign,
+} from '../../drawings';
 
 import {
+  setUserDrawingIconName,
   setUserDrawingTextAlign,
   setUserDrawingLocked,
   setUserDrawingVisibility,
@@ -37,4 +44,12 @@ export function setMobileUserDrawingTextAlign(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingTextAlign(state, textAlign, options);
+}
+
+export function setMobileUserDrawingIconName(
+  state: UserDrawingState,
+  iconName: UserDrawingIconName,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return setUserDrawingIconName(state, iconName, options);
 }

@@ -23,6 +23,7 @@ import type {
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
+  UserDrawingIconName,
   UserDrawingLineStyle,
   UserDrawingStyle,
   UserDrawingTextAnnotation,
@@ -143,6 +144,7 @@ import type {
   MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import {
+  setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
@@ -195,6 +197,7 @@ export interface SkiaTealchartHandle {
   setUserDrawingText(drawingId: string, text: string): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
 }
@@ -433,6 +436,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
           setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign, options),
+        );
+      },
+      setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingIconName(userDrawingStateRef.current, iconName, options),
         );
       },
       setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
@@ -3191,6 +3199,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onUserDrawingTextAlignChange={(textAlign) => {
               commitUserDrawingStateIfChanged(
                 setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign),
+              );
+            }}
+            onUserDrawingIconNameChange={(iconName) => {
+              commitUserDrawingStateIfChanged(
+                setMobileUserDrawingIconName(userDrawingStateRef.current, iconName),
               );
             }}
             onUserDrawingVisibilityChange={(visible) => {

@@ -10,7 +10,7 @@ import type {
 } from './types';
 
 import { createUserDrawingState } from './input';
-import { normalizeUserDrawingStyle } from './types';
+import { normalizeUserDrawingIconName, normalizeUserDrawingStyle } from './types';
 
 function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
   switch (drawing.kind) {
@@ -869,7 +869,7 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             ...base,
             kind: 'icon',
             point,
-            iconName: value.iconName === 'star' ? value.iconName : 'star',
+            iconName: normalizeUserDrawingIconName(value.iconName),
           }
         : null;
     }
