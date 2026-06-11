@@ -2534,6 +2534,53 @@ describe('mobile user drawing render model', () => {
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
   });
 
+  it('returns Skia-ready Elliott corrective wave primitives with labels and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'elliott-corrective' },
+      drawings: [
+        {
+          id: 'elliott-corrective',
+          kind: 'elliottCorrectiveWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 30, price: 30 },
+            { time: 50, price: 70 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'elliottCorrectiveWave',
+      id: 'elliott-corrective',
+      clip,
+      points: [
+        { x: 10, y: 50 },
+        { x: 30, y: 70 },
+        { x: 50, y: 30 },
+      ],
+      labels: [
+        { text: 'A', point: { x: 10, y: 50 } },
+        { text: 'B', point: { x: 30, y: 70 } },
+        { text: 'C', point: { x: 50, y: 30 } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(3);
+  });
+
   it('returns Skia-ready ABCD pattern primitives with labels and handles', () => {
     const state: UserDrawingState = {
       version: 1,

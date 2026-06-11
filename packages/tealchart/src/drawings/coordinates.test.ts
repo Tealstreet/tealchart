@@ -78,6 +78,7 @@ import {
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
   resolveAbcdPatternFromAnchors,
+  resolveElliottCorrectiveWaveFromAnchors,
   resolveElliottImpulseWaveFromAnchors,
   resolveHeadShouldersPatternFromAnchors,
   resolveThreeDrivesPatternFromAnchors,
@@ -537,6 +538,32 @@ describe('user drawing coordinates', () => {
         { text: '3', point: { x: 110, y: -30 } },
         { text: '4', point: { x: 160, y: 120 } },
         { text: '5', point: { x: 210, y: -80 } },
+      ],
+    });
+  });
+
+  it('resolves Elliott corrective wave polylines and labels from three anchors', () => {
+    expect(
+      resolveElliottCorrectiveWaveFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 80 },
+          { time: 2_000, price: 120 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: 170 },
+          { x: 110, y: -30 },
+        ],
+      },
+      labels: [
+        { text: 'A', point: { x: 10, y: 70 } },
+        { text: 'B', point: { x: 60, y: 170 } },
+        { text: 'C', point: { x: 110, y: -30 } },
       ],
     });
   });

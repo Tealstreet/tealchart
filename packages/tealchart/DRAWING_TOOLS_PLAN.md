@@ -683,6 +683,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, segment hit testing, whole-drawing moves, duplicate actions, and
   point-index anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Elliott Corrective Wave Tool
+
+- Shared drawing state supports the three-anchor `elliottCorrectiveWave` tool
+  and persists it through layout save/load.
+- Web Canvas and mobile Skia render matching connected A-B-C corrective wave
+  paths with shared point labels.
+- Selection, segment hit testing, whole-drawing moves, duplicate actions, and
+  point-index anchor editing use shared drawing behavior on both platforms.
+
 ## Shipped: Brush Tool
 
 - Shared drawing state supports the variable-point `brush` tool and persists it
@@ -773,7 +782,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan/box/square, pattern tools beyond Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, annotation/icon tools, and additional curved geometry.
+  Gann tools beyond fan/box/square, pattern tools beyond Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, annotation/icon tools, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond the current price/date
   ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
