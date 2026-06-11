@@ -311,6 +311,41 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores arrow mark drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'up',
+          kind: 'arrowMarkUp',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+        },
+        {
+          id: 'down',
+          kind: 'arrowMarkDown',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 2, price: 12 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings).toMatchObject([
+      { id: 'up', kind: 'arrowMarkUp', point: { time: 1, price: 10 } },
+      { id: 'down', kind: 'arrowMarkDown', point: { time: 2, price: 12 } },
+    ]);
+  });
+
   it('restores extended line drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

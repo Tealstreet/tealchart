@@ -64,6 +64,16 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'arrowMark';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'rectangle';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -136,6 +146,7 @@ export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
+export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
   MobileUserDrawingPrimitive,
@@ -273,6 +284,17 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.marker.points,
+        style: geometry.drawing.style,
+      };
+    case 'arrowMark':
+      return {
+        kind: 'arrowMark',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.mark.points,
         style: geometry.drawing.style,
       };
     case 'rectangle':
