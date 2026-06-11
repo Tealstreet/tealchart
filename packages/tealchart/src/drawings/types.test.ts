@@ -82,6 +82,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibSpiral')).toBe(2);
     expect(getRequiredAnchorCount('gannFan')).toBe(2);
     expect(getRequiredAnchorCount('gannBox')).toBe(2);
+    expect(getRequiredAnchorCount('gannSquare')).toBe(2);
     expect(getRequiredAnchorCount('fibTimeZone')).toBe(2);
     expect(getRequiredAnchorCount('fibWedge')).toBe(3);
     expect(getRequiredAnchorCount('fibChannel')).toBe(3);
@@ -361,6 +362,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'gannBox' }), { id: 'gann-box', now: 20 })).toMatchObject({
       id: 'gann-box',
       kind: 'gannBox',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'gannSquare' }), { id: 'gann-square', now: 20 })).toMatchObject({
+      id: 'gann-square',
+      kind: 'gannSquare',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

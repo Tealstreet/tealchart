@@ -1927,7 +1927,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'gannBox') {
+          if (primitive.kind === 'gannBox' || primitive.kind === 'gannSquare') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
             for (const level of primitive.levels) {

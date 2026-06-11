@@ -115,6 +115,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'fibSpiral':
     case 'gannFan':
     case 'gannBox':
+    case 'gannSquare':
     case 'fibTimeZone':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
@@ -207,7 +208,10 @@ function editLineEndpoint(
 }
 
 function editRectangleCorner(
-  drawing: Extract<UserDrawing, { kind: 'rectangle' | 'circle' | 'ellipse' | 'priceRange' | 'datePriceRange' | 'gannBox' }>,
+  drawing: Extract<
+    UserDrawing,
+    { kind: 'rectangle' | 'circle' | 'ellipse' | 'priceRange' | 'datePriceRange' | 'gannBox' | 'gannSquare' }
+  >,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
   updatedAt: number,
@@ -336,6 +340,7 @@ function editDrawingHandle(
     case 'priceRange':
     case 'datePriceRange':
     case 'gannBox':
+    case 'gannSquare':
       return editRectangleCorner(drawing, handle, anchor, updatedAt);
     case 'dateRange':
       return editDateRangeBoundary(drawing, handle, anchor, updatedAt);
