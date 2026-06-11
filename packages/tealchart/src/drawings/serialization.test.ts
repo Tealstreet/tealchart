@@ -211,6 +211,45 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored callout drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'callout',
+          kind: 'callout',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 11 },
+          ],
+          text: 'Restored callout',
+          textAlign: 'right',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'callout',
+      kind: 'callout',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 11 },
+      ],
+      text: 'Restored callout',
+      textAlign: 'right',
+    });
+  });
+
   it('normalizes restored text label font sizes', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
