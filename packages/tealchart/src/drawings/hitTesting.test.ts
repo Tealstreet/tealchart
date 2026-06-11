@@ -597,6 +597,40 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 95 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits disjoint channel fills, rails, and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 45 }, space)?.drawing.id).toBe('disjoint');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)?.drawing.id).toBe('disjoint');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 50 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 0,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 80 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 3,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 5 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

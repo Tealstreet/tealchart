@@ -930,6 +930,86 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags disjoint channel point handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+        { time: 90, price: 10 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'disjoint', handle: 'center', pointIndex: 3 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'disjoint', handle: 'center', pointIndex: 3 },
+        startPoint: { x: 90, y: 90 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 80, y: 80 },
+      { now: () => 14 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+        { time: 80, price: 20 },
+      ],
+      updatedAt: 14,
+    });
+  });
+
+  it('moves selected disjoint channels by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 10, price: 20 },
+        { time: 90, price: 10 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'disjoint' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'disjoint' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 15 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 40 },
+        { time: 100, price: 70 },
+        { time: 20, price: 10 },
+        { time: 100, price: 0 },
+      ],
+      updatedAt: 15,
+    });
+  });
+
   it('moves selected regression trends by time delta without distorting fitted prices', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -217,7 +217,7 @@ export type ResolvedUserDrawingGeometry =
       polygon: DrawingScreenPolyline;
     }
   | {
-      kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom';
+      kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel';
       drawing: UserDrawing;
       channel: DrawingScreenParallelChannel;
     }
@@ -673,6 +673,27 @@ export function resolveFlatTopBottomFromAnchors(
   };
 }
 
+export function resolveDisjointChannelFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  third: UserDrawingAnchor,
+  fourth: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenParallelChannel {
+  const start = anchorToScreenPoint(first, space);
+  const end = anchorToScreenPoint(second, space);
+  const oppositeStart = anchorToScreenPoint(third, space);
+  const oppositeEnd = anchorToScreenPoint(fourth, space);
+
+  return {
+    base: { start, end },
+    parallel: { start: oppositeStart, end: oppositeEnd },
+    polygon: {
+      points: [start, end, oppositeEnd, oppositeStart],
+    },
+  };
+}
+
 function resolveRegressionPriceAt(time: number, bars: readonly Bar[]): number {
   const xOrigin = bars[0]?.time ?? time;
   let sumX = 0;
@@ -969,6 +990,18 @@ export function resolveUserDrawingGeometry(
         kind: 'flatTopBottom',
         drawing,
         channel: resolveFlatTopBottomFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'disjointChannel':
+      return {
+        kind: 'disjointChannel',
+        drawing,
+        channel: resolveDisjointChannelFromAnchors(
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          drawing.points[3],
+          space,
+        ),
       };
     case 'regressionTrend':
       return {

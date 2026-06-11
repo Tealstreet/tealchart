@@ -206,6 +206,27 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits disjoint channel drawings from four anchors', () => {
+    const anchorD = { time: 3_000, price: 90 };
+    const options = { createId: () => 'disjoint-channel', now: () => 32 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'disjointChannel'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+    const fourth = handleUserDrawingInput(third, { paneId: 'main', anchor: anchorD }, options);
+
+    expect(third.drawings).toEqual([]);
+    expect(fourth.draft).toBeNull();
+    expect(fourth.selection).toEqual({ drawingId: 'disjoint-channel' });
+    expect(fourth.drawings[0]).toMatchObject({
+      id: 'disjoint-channel',
+      kind: 'disjointChannel',
+      points: [anchorA, anchorB, anchorC, anchorD],
+    });
+  });
+
   it('commits bars pattern drawings from three anchors', () => {
     const options = { createId: () => 'bars-pattern', now: () => 31 };
     const bars = [

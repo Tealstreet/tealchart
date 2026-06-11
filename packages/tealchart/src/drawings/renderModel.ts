@@ -159,6 +159,7 @@ export function resolveUserDrawingHandlePoints(
     case 'triangle':
     case 'parallelChannel':
     case 'flatTopBottom':
+    case 'disjointChannel':
     case 'longPosition':
     case 'shortPosition':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();

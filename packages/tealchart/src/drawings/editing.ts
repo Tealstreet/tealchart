@@ -111,6 +111,11 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
+    case 'disjointChannel':
+      {
+        const points = movePathAnchors(drawing.points, delta);
+        return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!], updatedAt };
+      }
     case 'triangle':
     case 'parallelChannel':
     case 'flatTopBottom':
@@ -229,6 +234,7 @@ function editDrawingHandle(
       drawing.kind === 'triangle' ||
       drawing.kind === 'parallelChannel' ||
       drawing.kind === 'flatTopBottom' ||
+      drawing.kind === 'disjointChannel' ||
       drawing.kind === 'regressionTrend' ||
       drawing.kind === 'longPosition' ||
       drawing.kind === 'shortPosition') &&
@@ -241,6 +247,13 @@ function editDrawingHandle(
       return {
         ...drawing,
         points,
+        updatedAt,
+      };
+    }
+    if (drawing.kind === 'disjointChannel') {
+      return {
+        ...drawing,
+        points: [points[0]!, points[1]!, points[2]!, points[3]!],
         updatedAt,
       };
     }
@@ -283,6 +296,7 @@ function editDrawingHandle(
     case 'triangle':
     case 'parallelChannel':
     case 'flatTopBottom':
+    case 'disjointChannel':
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':

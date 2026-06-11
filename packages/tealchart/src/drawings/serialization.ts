@@ -71,6 +71,18 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
       };
+    case 'disjointChannel':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'disjointChannel',
+        points: [
+          { ...drawing.points[0] },
+          { ...drawing.points[1] },
+          { ...drawing.points[2] },
+          { ...drawing.points[3] },
+        ],
+      };
     case 'barsPattern':
       return {
         ...drawing,
@@ -209,6 +221,17 @@ function parseThreePointDrawing(
   const second = parseAnchor(value.points[1]);
   const third = parseAnchor(value.points[2]);
   return first && second && third ? [first, second, third] : null;
+}
+
+function parseFourPointDrawing(
+  value: Record<string, unknown>,
+): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] | null {
+  if (!Array.isArray(value.points) || value.points.length !== 4) return null;
+  const first = parseAnchor(value.points[0]);
+  const second = parseAnchor(value.points[1]);
+  const third = parseAnchor(value.points[2]);
+  const fourth = parseAnchor(value.points[3]);
+  return first && second && third && fourth ? [first, second, third, fourth] : null;
 }
 
 function parsePathDrawingPoints(value: Record<string, unknown>): readonly UserDrawingAnchor[] | null {
@@ -411,6 +434,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'flatTopBottom',
+            points,
+          }
+        : null;
+    }
+    case 'disjointChannel': {
+      const points = parseFourPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'disjointChannel',
             points,
           }
         : null;

@@ -959,6 +959,41 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores disjoint channel drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'disjoint',
+          kind: 'disjointChannel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+            { time: 4, price: 9 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'disjoint',
+      kind: 'disjointChannel',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+        { time: 4, price: 9 },
+      ],
+    });
+  });
+
   it('rejects malformed path points', () => {
     const createPayload = (points: unknown[]) => ({
       version: 1,
