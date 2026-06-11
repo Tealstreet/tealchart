@@ -965,6 +965,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready trend-based fib time primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'trend-fib-time',
+          kind: 'trendBasedFibTime',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 50 },
+            { time: 30, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'trendBasedFibTime',
+      id: 'trend-fib-time',
+      levels: expect.arrayContaining([
+        { ratio: 0, time: 30, x: 30, start: { x: 30, y: 0 }, end: { x: 30, y: 100 } },
+        { ratio: 1, time: 40, x: 40, start: { x: 40, y: 0 }, end: { x: 40, y: 100 } },
+      ]),
+    });
+  });
+
   it('returns Skia-ready regression trend primitives', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,

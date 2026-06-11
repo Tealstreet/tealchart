@@ -66,6 +66,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'triangle':
     case 'fibChannel':
+    case 'trendBasedFibTime':
     case 'pitchfork':
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
@@ -530,6 +531,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'fibChannel',
+            points,
+          }
+        : null;
+    }
+    case 'trendBasedFibTime': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'trendBasedFibTime',
             points,
           }
         : null;

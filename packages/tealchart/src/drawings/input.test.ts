@@ -259,6 +259,28 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits trend-based fib time drawings from three anchors', () => {
+    const options = { createId: () => 'trend-fib-time', now: () => 26 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'trendBasedFibTime'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.drawings).toEqual([]);
+    expect(third.draft).toBeNull();
+    expect(third.selection).toEqual({ drawingId: 'trend-fib-time' });
+    expect(third.drawings[0]).toMatchObject({
+      id: 'trend-fib-time',
+      kind: 'trendBasedFibTime',
+      points: [anchorA, anchorB, anchorC],
+      createdAt: 26,
+      updatedAt: 26,
+    });
+  });
+
   it('commits fib channel drawings from three anchors', () => {
     const options = { createId: () => 'fib-channel', now: () => 24 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibChannel'), {

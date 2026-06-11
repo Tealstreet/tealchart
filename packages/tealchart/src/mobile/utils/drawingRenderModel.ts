@@ -278,6 +278,22 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'trendBasedFibTime';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      levels: readonly {
+        ratio: number;
+        time: number;
+        x: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -479,6 +495,10 @@ export type MobileUserDrawingFibCirclesPrimitive = Extract<MobileUserDrawingPrim
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
+export type MobileUserDrawingTrendBasedFibTimePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'trendBasedFibTime' }
+>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -882,6 +902,23 @@ function primitiveFromGeometry(
         opacity,
         clip,
         levels: geometry.fibTimeZone.levels.map((level) => ({
+          ratio: level.ratio,
+          time: level.time,
+          x: level.x,
+          start: level.segment.start,
+          end: level.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'trendBasedFibTime':
+      return {
+        kind: 'trendBasedFibTime',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        levels: geometry.trendBasedFibTime.levels.map((level) => ({
           ratio: level.ratio,
           time: level.time,
           x: level.x,
