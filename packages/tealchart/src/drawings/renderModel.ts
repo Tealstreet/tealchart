@@ -102,6 +102,7 @@ export function resolveUserDrawingHandlePoints(
     case 'arrowMarkDown':
     case 'horizontalRay':
     case 'crossLine':
+    case 'anchoredVwap':
       return [anchorToScreenPoint(drawing.point, space)];
     case 'rectangle': {
       const rect = resolveRectFromAnchors(drawing.points[0], drawing.points[1], space);

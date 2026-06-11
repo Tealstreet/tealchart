@@ -243,6 +243,14 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'anchoredVwap') {
+    const distance = Math.min(
+      distanceToPolyline(point, geometry.vwap.points),
+      distanceBetweenPoints(point, geometry.vwap.anchor),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'triangle') {
     const distance = pointInPolygon(point, geometry.polygon.points) ? 0 : distanceToClosedPolyline(point, geometry.polygon.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -435,6 +443,9 @@ function hitTestUserDrawingHandle(
       break;
     case 'textLabel':
       handles.push({ handle: 'center', point: geometry.point });
+      break;
+    case 'anchoredVwap':
+      handles.push({ handle: 'center', point: geometry.vwap.anchor });
       break;
     case 'arrowMark':
       handles.push({ handle: 'center', point: geometry.mark.point });

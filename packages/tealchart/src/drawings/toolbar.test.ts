@@ -67,6 +67,7 @@ describe('user drawing toolbar descriptors', () => {
       'longPosition',
       'shortPosition',
       'barsPattern',
+      'anchoredVwap',
       'fibRetracement',
       'fibExtension',
       'triangle',
@@ -141,6 +142,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibRetracement')).toEqual(
       expect.objectContaining({ tool: 'fibRetracement', label: 'Fib retracement' }),
+    );
+    expect(getUserDrawingToolDescriptor('anchoredVwap')).toEqual(
+      expect.objectContaining({ tool: 'anchoredVwap', label: 'Anchored VWAP' }),
     );
     expect(getUserDrawingToolDescriptor('fibExtension')).toEqual(
       expect.objectContaining({ tool: 'fibExtension', label: 'Fib extension' }),

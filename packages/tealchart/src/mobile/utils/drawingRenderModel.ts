@@ -143,6 +143,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'anchoredVwap';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      anchor: DrawingScreenPoint;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'triangle';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -329,6 +340,7 @@ export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
   { kind: 'riskRewardPosition' }
 >;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
+export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -593,6 +605,18 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.polyline.points,
+        style: geometry.drawing.style,
+      };
+    case 'anchoredVwap':
+      return {
+        kind: 'anchoredVwap',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        anchor: geometry.vwap.anchor,
+        points: geometry.vwap.points,
         style: geometry.drawing.style,
       };
     case 'triangle':

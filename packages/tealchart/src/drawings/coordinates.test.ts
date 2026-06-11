@@ -35,6 +35,7 @@ import {
   drawingXToTime,
   drawingYToPrice,
   priceToDrawingY,
+  resolveAnchoredVwapFromAnchor,
   resolveBarsPatternFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveDisjointChannelFromAnchors,
@@ -864,6 +865,50 @@ describe('user drawing coordinates', () => {
           { x: 210, y: 20 },
           { x: 210, y: 120 },
           { x: 10, y: 95 },
+        ],
+      },
+    });
+  });
+
+  it('resolves anchored VWAP curves from the selected anchor forward', () => {
+    const vwapSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 1_000, open: 98, high: 102, low: 96, close: 99, volume: 10 },
+        { time: 2_000, open: 100, high: 104, low: 98, close: 100, volume: 20 },
+        { time: 3_000, open: 102, high: 106, low: 100, close: 105, volume: 10 },
+      ],
+    };
+
+    expect(resolveAnchoredVwapFromAnchor({ time: 2_000, price: 100 }, vwapSpace)).toEqual({
+      anchor: { x: 110, y: 70 },
+      points: [
+        { x: 110, y: expect.closeTo(66.6667) },
+        { x: 210, y: expect.closeTo(61.6667) },
+      ],
+    });
+    expect(
+      resolveUserDrawingGeometry(
+        {
+          id: 'vwap',
+          kind: 'anchoredVwap',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 2_000, price: 100 },
+        },
+        vwapSpace,
+      ),
+    ).toMatchObject({
+      kind: 'anchoredVwap',
+      vwap: {
+        anchor: { x: 110, y: 70 },
+        points: [
+          { x: 110, y: expect.closeTo(66.6667) },
+          { x: 210, y: expect.closeTo(61.6667) },
         ],
       },
     });

@@ -7,6 +7,7 @@ export {
   FIB_RETRACEMENT_LEVELS,
   formatFibRetracementRatio,
   formatTrendAngleDegrees,
+  resolveAnchoredVwapFromAnchor,
   resolveCircleFromAnchors,
   resolveBarsPatternFromAnchors,
   resolveDateRangeRectFromAnchors,
@@ -32,6 +33,7 @@ export {
 } from './coordinates';
 export type {
   DrawingCoordinateSpace,
+  DrawingScreenAnchoredVwap,
   DrawingScreenBarsPattern,
   DrawingScreenBarsPatternBar,
   DrawingScreenPoint,
@@ -204,6 +206,7 @@ export type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  AnchoredVwapDrawing,
   BarsPatternDrawing,
   BarsPatternBarSnapshot,
   CircleDrawing,
