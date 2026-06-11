@@ -40,11 +40,8 @@ function moveAnchor(anchor: UserDrawingAnchor, delta: AnchorDelta): UserDrawingA
   };
 }
 
-function movePathAnchors(
-  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
-  delta: AnchorDelta,
-): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] {
-  return [moveAnchor(points[0], delta), moveAnchor(points[1], delta), moveAnchor(points[2], delta)];
+function movePathAnchors(points: readonly UserDrawingAnchor[], delta: AnchorDelta): UserDrawingAnchor[] {
+  return points.map((point) => moveAnchor(point, delta));
 }
 
 function shiftRegressionTrendTimeRange(
@@ -113,9 +110,13 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'fibExtension':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
+      return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'triangle':
     case 'parallelChannel':
-      return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
+      {
+        const points = movePathAnchors(drawing.points, delta);
+        return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
+      }
     case 'regressionTrend':
       return moveRegressionTrend(drawing, delta, space, updatedAt);
     case 'dateRange':
@@ -220,6 +221,13 @@ function editDrawingHandle(
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
     const points = drawing.points.slice() as UserDrawingAnchor[];
     points[pointIndex] = anchor;
+    if (drawing.kind === 'path') {
+      return {
+        ...drawing,
+        points,
+        updatedAt,
+      };
+    }
     return {
       ...drawing,
       points: [points[0]!, points[1]!, points[2]!],

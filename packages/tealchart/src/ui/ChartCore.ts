@@ -113,6 +113,12 @@ export interface ChartCoreOptions {
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
   onUserDrawingEditEnd?: () => void;
+  /** Called when path-tool pointer down starts collecting freehand samples */
+  onUserDrawingPathDragStart?: (point: UserDrawingInputPoint) => boolean;
+  /** Called while an active path-tool drag collects freehand samples */
+  onUserDrawingPathDragMove?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when an active path-tool drag ends */
+  onUserDrawingPathDragEnd?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -713,9 +719,9 @@ export class ChartCore {
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
       onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
-      onDrawingDragStart: (x, y) => this.handleUserDrawingEditStart(x, y),
-      onDrawingDragMove: (x, y) => this.handleUserDrawingEditMove(x, y),
-      onDrawingDragEnd: () => this.options.onUserDrawingEditEnd?.(),
+      onDrawingDragStart: (x, y) => this.handleUserDrawingDragStart(x, y),
+      onDrawingDragMove: (x, y) => this.handleUserDrawingDragMove(x, y),
+      onDrawingDragEnd: () => this.handleUserDrawingDragEnd(),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -1513,6 +1519,13 @@ export class ChartCore {
 
     if (!this.options.onUserDrawingInput) return false;
 
+    const point = this.resolveUserDrawingInputPoint(x, y);
+    return point ? this.options.onUserDrawingInput(point) : false;
+  }
+
+  private resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null {
+    if (!this.viewport) return null;
+
     const layout = this.getUnifiedLayout();
     const timeAxisHeight = layout.timeAxisHeight;
     const topMargin = this.margins.top;
@@ -1536,19 +1549,24 @@ export class ChartCore {
       return resolvedPane;
     });
 
-    const point = resolveUserDrawingInputPointFromChart({
+    return resolveUserDrawingInputPointFromChart({
       point: { x, y },
       viewport: this.viewport,
       panes,
       width: this.options.width,
       margins: this.margins,
     });
-
-    return point ? this.options.onUserDrawingInput(point) : false;
   }
 
-  private handleUserDrawingEditStart(x: number, y: number): boolean {
-    if (!this.viewport || this.userDrawingState?.activeTool !== 'select') return false;
+  private handleUserDrawingDragStart(x: number, y: number): boolean {
+    if (!this.viewport) return false;
+
+    if (this.userDrawingState?.activeTool === 'path') {
+      const point = this.resolveUserDrawingInputPoint(x, y);
+      return point ? this.options.onUserDrawingPathDragStart?.(point) === true : false;
+    }
+
+    if (this.userDrawingState?.activeTool !== 'select') return false;
 
     const chartLeft = this.margins.left;
     const chartRight = this.options.width - this.margins.right;
@@ -1557,9 +1575,25 @@ export class ChartCore {
     return this.options.onUserDrawingEditStart?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
   }
 
-  private handleUserDrawingEditMove(x: number, y: number): boolean {
-    if (!this.viewport || this.userDrawingState?.activeTool !== 'select') return false;
+  private handleUserDrawingDragMove(x: number, y: number): boolean {
+    if (!this.viewport) return false;
+
+    if (this.userDrawingState?.activeTool === 'path') {
+      const point = this.resolveUserDrawingInputPoint(x, y);
+      return point ? this.options.onUserDrawingPathDragMove?.(point) === true : false;
+    }
+
+    if (this.userDrawingState?.activeTool !== 'select') return false;
     return this.options.onUserDrawingEditMove?.({ x, y }) === true;
+  }
+
+  private handleUserDrawingDragEnd(): void {
+    if (this.userDrawingState?.activeTool === 'path') {
+      this.options.onUserDrawingPathDragEnd?.();
+      return;
+    }
+
+    this.options.onUserDrawingEditEnd?.();
   }
 
   private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {
