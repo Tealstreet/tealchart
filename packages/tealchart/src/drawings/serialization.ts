@@ -116,6 +116,18 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
         bars: drawing.bars.map((bar) => ({ ...bar })),
       };
+    case 'abcdPattern':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'abcdPattern',
+        points: [
+          { ...drawing.points[0] },
+          { ...drawing.points[1] },
+          { ...drawing.points[2] },
+          { ...drawing.points[3] },
+        ],
+      };
     case 'xabcdPattern':
       return {
         ...drawing,
@@ -845,6 +857,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'xabcdPattern',
+            points,
+          }
+        : null;
+    }
+    case 'abcdPattern': {
+      const points = parseFourPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'abcdPattern',
             points,
           }
         : null;

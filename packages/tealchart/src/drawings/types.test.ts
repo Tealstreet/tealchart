@@ -115,6 +115,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
     expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
+    expect(getRequiredAnchorCount('abcdPattern')).toBe(4);
     expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
@@ -588,6 +589,20 @@ describe('user drawing types', () => {
       id: 'polyline',
       kind: 'polyline',
       points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'abcdPattern', anchors: [anchorA, anchorB, anchorC, anchorD] }), {
+        id: 'abcd',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'abcd',
+      kind: 'abcdPattern',
+      points: [anchorA, anchorB, anchorC, anchorD],
       visible: true,
       locked: false,
       createdAt: 20,
