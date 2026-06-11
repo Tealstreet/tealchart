@@ -129,6 +129,7 @@ import {
   resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
+  resolveMobileUserDrawingRiskRewardLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
@@ -1956,6 +1957,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'riskRewardPosition') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const rewardTextBounds = font ? font.measureText(primitive.rewardLabel) : { width: 0 };
+            const riskTextBounds = font ? font.measureText(primitive.riskLabel) : { width: 0 };
+            const ratioTextBounds = font ? font.measureText(primitive.ratioLabel) : { width: 0 };
+            const rewardLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
+              { labelPoint: primitive.rewardLabelPoint, style: primitive.style },
+              rewardTextBounds,
+            );
+            const riskLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
+              { labelPoint: primitive.riskLabelPoint, style: primitive.style },
+              riskTextBounds,
+            );
+            const ratioLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
+              { labelPoint: primitive.ratioLabelPoint, style: primitive.style },
+              ratioTextBounds,
+            );
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
@@ -2018,22 +2034,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 {font && (
                   <>
                     <SkiaText
-                      x={primitive.rewardLabelPoint.x - font.measureText(primitive.rewardLabel).width / 2}
-                      y={primitive.rewardLabelPoint.y}
+                      x={rewardLabelPosition.x}
+                      y={rewardLabelPosition.y}
                       text={primitive.rewardLabel}
                       font={font}
                       color={primitive.style.textColor ?? primitive.style.lineColor}
                     />
                     <SkiaText
-                      x={primitive.riskLabelPoint.x - font.measureText(primitive.riskLabel).width / 2}
-                      y={primitive.riskLabelPoint.y}
+                      x={riskLabelPosition.x}
+                      y={riskLabelPosition.y}
                       text={primitive.riskLabel}
                       font={font}
                       color={primitive.style.textColor ?? primitive.style.lineColor}
                     />
                     <SkiaText
-                      x={primitive.ratioLabelPoint.x - font.measureText(primitive.ratioLabel).width / 2}
-                      y={primitive.ratioLabelPoint.y}
+                      x={ratioLabelPosition.x}
+                      y={ratioLabelPosition.y}
                       text={primitive.ratioLabel}
                       font={font}
                       color={primitive.style.textColor ?? primitive.style.lineColor}

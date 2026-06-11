@@ -25,7 +25,10 @@ import {
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
-import { resolveMobileUserDrawingMeasurementLabelPosition } from './mobile/utils/drawingRenderModel';
+import {
+  resolveMobileUserDrawingMeasurementLabelPosition,
+  resolveMobileUserDrawingRiskRewardLabelPosition,
+} from './mobile/utils/drawingRenderModel';
 import type {
   MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingLinePrimitive,
@@ -33,6 +36,7 @@ import type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
+  MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import type {
@@ -82,10 +86,12 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
+    expect(nativeEntry).toContain('resolveMobileUserDrawingRiskRewardLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelTarget');
+    expect(nativeEntry).toContain('MobileUserDrawingRiskRewardLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
@@ -173,6 +179,18 @@ describe('tealchart public entries', () => {
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
+  });
+
+  it('exports usable native risk reward label position helpers', () => {
+    const labelPosition: MobileUserDrawingRiskRewardLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
+      {
+        labelPoint: { x: 50, y: 35 },
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', fontSize: 14, fontFamily: 'monospace' },
+      },
+      { x: 0, y: -10, width: 84, height: 14 },
+    );
+
+    expect(labelPosition).toEqual({ fontSize: 14, fontFamily: 'monospace', x: 8, y: 38 });
   });
 
   it('exports a reusable native measurement label layout helper', () => {
