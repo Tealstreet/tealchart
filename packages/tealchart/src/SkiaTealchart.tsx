@@ -2041,7 +2041,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'arrowMarker') {
+          if (primitive.kind === 'arrowMarker' || primitive.kind === 'icon') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
             const [firstPoint, ...remainingPoints] = primitive.points;

@@ -181,6 +181,12 @@ export type { UserDrawingPriceRangeMetrics } from './priceRange';
 export { resolveUserDrawingRiskRewardMetrics } from './riskReward';
 export type { UserDrawingRiskRewardMetrics } from './riskReward';
 export {
+  DEFAULT_USER_DRAWING_ICON_NAME,
+  DEFAULT_USER_DRAWING_ICON_SIZE,
+  resolveUserDrawingIconGeometry,
+} from './iconGeometry';
+export type { ResolveUserDrawingIconGeometryOptions, UserDrawingIconGeometry } from './iconGeometry';
+export {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
 } from './renderModel';
@@ -283,6 +289,7 @@ export type {
   ArcDrawing,
   AnchoredVwapDrawing,
   BalloonDrawing,
+  IconDrawing,
   BarsPatternDrawing,
   BarsPatternBarSnapshot,
   BrushDrawing,
@@ -347,6 +354,7 @@ export type {
   UserDrawingFontFamily,
   UserDrawingFontSize,
   UserDrawingHandleRole,
+  UserDrawingIconName,
   UserDrawingKind,
   UserDrawingTextAnnotation,
   UserDrawingTextAnnotationKind,

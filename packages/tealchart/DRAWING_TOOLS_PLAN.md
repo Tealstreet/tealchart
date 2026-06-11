@@ -639,6 +639,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, marker/stem hit testing, whole-drawing moves, and center-handle
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Icon Tool
+
+- Shared drawing state supports the single-anchor `icon` marker with a default
+  star symbol and persists it through layout save/load.
+- Web Canvas and mobile Skia render matching filled/stroked vector icon
+  polygons from shared icon geometry.
+- Selection, polygon hit testing, whole-drawing moves, and center-handle
+  editing use shared drawing behavior on both platforms.
+
 ## Shipped: Balloon Tool
 
 - Shared drawing state supports the single-anchor `balloon` text annotation and

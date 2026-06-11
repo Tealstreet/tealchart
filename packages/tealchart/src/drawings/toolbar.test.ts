@@ -109,6 +109,7 @@ describe('user drawing toolbar descriptors', () => {
       'comment',
       'priceNote',
       'pin',
+      'icon',
       'balloon',
       'textLabel',
     ]);
@@ -260,6 +261,7 @@ describe('user drawing toolbar descriptors', () => {
       expect.objectContaining({ tool: 'priceNote', label: 'Price note' }),
     );
     expect(getUserDrawingToolDescriptor('pin')).toEqual(expect.objectContaining({ tool: 'pin', label: 'Pin' }));
+    expect(getUserDrawingToolDescriptor('icon')).toEqual(expect.objectContaining({ tool: 'icon', label: 'Icon' }));
     expect(getUserDrawingToolDescriptor('balloon')).toEqual(
       expect.objectContaining({ tool: 'balloon', label: 'Balloon' }),
     );

@@ -1206,6 +1206,24 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits icon drawings by shared polygon geometry', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'icon',
+      kind: 'icon',
+      point: { time: 50, price: 50 },
+      iconName: 'star',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })?.drawing.id).toBe(
+      'icon',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 41 }, space, { labelWidth: 50, labelHeight: 20 })?.drawing.id).toBe(
+      'icon',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits balloon drawings by text box and tail', () => {
     const drawing: UserDrawing = {
       ...base,

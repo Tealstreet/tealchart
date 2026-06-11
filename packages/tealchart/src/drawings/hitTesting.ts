@@ -524,6 +524,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'icon') {
+    const distance = pointInPolygon(point, geometry.icon.points) ? 0 : distanceToClosedPolyline(point, geometry.icon.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if ('segment' in geometry) {
     const distance = distanceToSegment(point, geometry.segment);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -780,6 +785,9 @@ function hitTestUserDrawingHandle(
       break;
     case 'pin':
       handles.push({ handle: 'center', point: geometry.point });
+      break;
+    case 'icon':
+      handles.push({ handle: 'center', point: geometry.icon.center });
       break;
     case 'horizontalLine':
     case 'verticalLine':

@@ -61,6 +61,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('note')).toBe(1);
     expect(getRequiredAnchorCount('comment')).toBe(1);
     expect(getRequiredAnchorCount('pin')).toBe(1);
+    expect(getRequiredAnchorCount('icon')).toBe(1);
     expect(getRequiredAnchorCount('balloon')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
@@ -696,6 +697,11 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'pin', anchors: [anchorA] }), { id: 'pin' })).toMatchObject({
       kind: 'pin',
       point: anchorA,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'icon', anchors: [anchorA] }), { id: 'icon' })).toMatchObject({
+      kind: 'icon',
+      point: anchorA,
+      iconName: 'star',
     });
     expect(
       createUserDrawingFromDraft(
