@@ -311,6 +311,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores info line drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'info',
+          kind: 'infoLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'info',
+      kind: 'infoLine',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    });
+  });
+
   it('restores price range drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

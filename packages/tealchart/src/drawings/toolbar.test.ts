@@ -42,6 +42,7 @@ describe('user drawing toolbar descriptors', () => {
       'select',
       'trendLine',
       'extendedLine',
+      'infoLine',
       'arrowLine',
       'ray',
       'horizontalLine',
@@ -89,6 +90,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('priceRange')).toEqual(
       expect.objectContaining({ tool: 'priceRange', label: 'Price range' }),
+    );
+    expect(getUserDrawingToolDescriptor('infoLine')).toEqual(
+      expect.objectContaining({ tool: 'infoLine', label: 'Info line' }),
     );
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),

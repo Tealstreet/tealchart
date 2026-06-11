@@ -41,6 +41,8 @@ export {
   hitTestUserDrawings,
 } from './hitTesting';
 export type { UserDrawingHitResult, UserDrawingHitTestOptions, UserDrawingHitTestTextMeasure } from './hitTesting';
+export { resolveUserDrawingInfoLineMetrics } from './infoLine';
+export type { UserDrawingInfoLineMetrics } from './infoLine';
 export {
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
@@ -171,6 +173,7 @@ export type {
   DateRangeDrawing,
   ExtendedLineDrawing,
   HorizontalLineDrawing,
+  InfoLineDrawing,
   PathDrawing,
   PriceRangeDrawing,
   RayDrawing,
