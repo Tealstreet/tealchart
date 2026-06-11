@@ -847,6 +847,73 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('reorders selected or targeted drawings through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'a', drawingIds: ['a', 'c'] },
+        drawings: [
+          {
+            id: 'a',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'b',
+            kind: 'verticalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            time: 20,
+          },
+          {
+            id: 'c',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 3,
+            updatedAt: 3,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 40,
+          },
+        ],
+      });
+
+      expect(widget.bringUserDrawingForward()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['b', 'a', 'c']);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'a', drawingIds: ['a', 'c'] });
+
+      expect(widget.sendUserDrawingToBack({ drawingId: 'c' })).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['c', 'b', 'a']);
+
+      expect(widget.reorderUserDrawings('bringToFront', { drawingId: 'missing' })).toBe(false);
+      expect(onChange).toHaveBeenCalled();
+    });
+
     it('applies public drawing style and property commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

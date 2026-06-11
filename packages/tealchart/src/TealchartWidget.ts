@@ -24,6 +24,7 @@ import type {
   UserDrawingTextAnnotation,
   UserDrawingTextAlign,
   UserDrawingTool,
+  UserDrawingZOrderAction,
   UpdateUserDrawingOptions,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
@@ -51,6 +52,7 @@ import {
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   selectUserDrawingsById,
@@ -2313,6 +2315,28 @@ export class TealchartWidget {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingLockedState(this._userDrawingState, locked, options));
     return this._userDrawingState !== previousState;
+  }
+
+  reorderUserDrawings(action: UserDrawingZOrderAction, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(reorderUserDrawings(this._userDrawingState, action, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  bringUserDrawingForward(options: UpdateUserDrawingOptions = {}): boolean {
+    return this.reorderUserDrawings('bringForward', options);
+  }
+
+  sendUserDrawingBackward(options: UpdateUserDrawingOptions = {}): boolean {
+    return this.reorderUserDrawings('sendBackward', options);
+  }
+
+  bringUserDrawingToFront(options: UpdateUserDrawingOptions = {}): boolean {
+    return this.reorderUserDrawings('bringToFront', options);
+  }
+
+  sendUserDrawingToBack(options: UpdateUserDrawingOptions = {}): boolean {
+    return this.reorderUserDrawings('sendToBack', options);
   }
 
   private _createUserDrawingId(): string {
