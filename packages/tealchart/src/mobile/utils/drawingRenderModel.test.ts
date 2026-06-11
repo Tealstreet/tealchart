@@ -2488,6 +2488,46 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('preserves callout anchors, text, and alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'callout',
+          kind: 'callout',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 10 },
+            { time: 50, price: 50 },
+          ],
+          text: 'Left callout',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'callout',
+      id: 'callout',
+      clip,
+      tip: { x: 10, y: 90 },
+      point: { x: 50, y: 50 },
+      text: 'Left callout',
+      editing: false,
+      editValue: null,
+      textAlign: 'left',
+    });
+  });
+
   it('marks active text edits with the draft value for mobile overlays', () => {
     const state: UserDrawingState = {
       version: 1,

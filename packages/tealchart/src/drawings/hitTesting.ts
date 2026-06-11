@@ -298,7 +298,7 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'textLabel' || geometry.kind === 'note') {
+  if (geometry.kind === 'textLabel' || geometry.kind === 'note' || geometry.kind === 'callout') {
     const drawing = geometry.drawing as UserDrawingTextAnnotation;
     const lines = splitUserDrawingTextLines(drawing.text);
     const layout = resolveUserDrawingTextLabelLayout({
@@ -319,7 +319,12 @@ function hitTestResolvedGeometry(
     };
     const inside =
       point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
-    return inside ? { drawing: geometry.drawing, distance: 0 } : null;
+    if (inside) return { drawing: geometry.drawing, distance: 0 };
+    if (geometry.kind === 'callout') {
+      const distance = distanceToSegment(point, { start: geometry.tip, end: geometry.point });
+      return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+    }
+    return null;
   }
 
   if (geometry.kind === 'path' || geometry.kind === 'brush' || geometry.kind === 'highlighter') {
@@ -721,6 +726,10 @@ function hitTestUserDrawingHandle(
     case 'textLabel':
     case 'note':
       handles.push({ handle: 'center', point: geometry.point });
+      break;
+    case 'callout':
+      handles.push({ handle: 'center', point: geometry.tip, pointIndex: 0 });
+      handles.push({ handle: 'center', point: geometry.point, pointIndex: 1 });
       break;
     case 'anchoredVwap':
       handles.push({ handle: 'center', point: geometry.vwap.anchor });
