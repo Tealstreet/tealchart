@@ -2488,6 +2488,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('preserves comment text and alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'comment',
+          kind: 'comment',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Left comment',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'comment',
+      id: 'comment',
+      clip,
+      point: { x: 50, y: 50 },
+      text: 'Left comment',
+      editing: false,
+      editValue: null,
+      textAlign: 'left',
+    });
+  });
+
   it('preserves callout anchors, text, and alignment in mobile primitives', () => {
     const state: UserDrawingState = {
       version: 1,

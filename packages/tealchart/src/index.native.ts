@@ -84,6 +84,7 @@ export type {
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingCalloutPrimitive,
+  MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPathPrimitive,
   MobileUserDrawingParallelChannelPrimitive,

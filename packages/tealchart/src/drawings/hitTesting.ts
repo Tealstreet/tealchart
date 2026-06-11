@@ -298,7 +298,12 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'textLabel' || geometry.kind === 'note' || geometry.kind === 'callout') {
+  if (
+    geometry.kind === 'textLabel' ||
+    geometry.kind === 'note' ||
+    geometry.kind === 'callout' ||
+    geometry.kind === 'comment'
+  ) {
     const drawing = geometry.drawing as UserDrawingTextAnnotation;
     const lines = splitUserDrawingTextLines(drawing.text);
     const layout = resolveUserDrawingTextLabelLayout({
@@ -725,6 +730,7 @@ function hitTestUserDrawingHandle(
       break;
     case 'textLabel':
     case 'note':
+    case 'comment':
       handles.push({ handle: 'center', point: geometry.point });
       break;
     case 'callout':
