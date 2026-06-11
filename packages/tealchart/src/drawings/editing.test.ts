@@ -2422,6 +2422,73 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves and edits Elliott triangle wave anchors with stable five-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-triangle',
+      kind: 'elliottTriangleWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 70 },
+        { time: 50, price: 40 },
+        { time: 70, price: 60 },
+        { time: 90, price: 45 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'elliott-triangle' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'elliott-triangle' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 55 },
+      { now: () => 32 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'elliottTriangleWave',
+      points: [
+        { time: 15, price: expect.closeTo(45) },
+        { time: 35, price: 65 },
+        { time: 55, price: expect.closeTo(35) },
+        { time: 75, price: expect.closeTo(55) },
+        { time: 95, price: expect.closeTo(40) },
+      ],
+      updatedAt: 32,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'elliott-triangle', handle: 'center', pointIndex: 4 },
+        startPoint: { x: 90, y: 55 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 95, y: 60 },
+      { now: () => 33 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'elliottTriangleWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 70 },
+        { time: 50, price: 40 },
+        { time: 70, price: 60 },
+        { time: expect.closeTo(95), price: 40 },
+      ],
+      updatedAt: 33,
+    });
+  });
+
   it('moves and edits ABCD pattern anchors with stable four-point shape', () => {
     const drawing: UserDrawing = {
       ...base,
