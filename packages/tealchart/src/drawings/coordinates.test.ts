@@ -222,6 +222,18 @@ describe('user drawing coordinates', () => {
         end: { x: 110, y: 70 },
       }).label,
     ).toBe('-26.6°');
+    expect(
+      resolveTrendAngleFromSegment({
+        start: { x: 50, y: 20 },
+        end: { x: 50, y: 80 },
+      }).label,
+    ).toBe('90°');
+    expect(
+      resolveTrendAngleFromSegment({
+        start: { x: 50, y: 80 },
+        end: { x: 50, y: 20 },
+      }).label,
+    ).toBe('90°');
   });
 
   it('resolves rectangles from unordered anchors', () => {
