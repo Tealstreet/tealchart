@@ -64,6 +64,8 @@ export interface ArrayHelpers {
   fill(arr: arrFuncs.PineArray, val: unknown, from?: number, to?: number): void;
   every(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): boolean;
   some(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): boolean;
+  map(arr: arrFuncs.PineArray, fn: (val: unknown) => unknown): arrFuncs.PineArray;
+  filter(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): arrFuncs.PineArray;
 }
 
 export interface ScriptDependencies {
@@ -164,6 +166,25 @@ function someArray(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): bool
   return false;
 }
 
+function mapArray(arr: arrFuncs.PineArray, fn: (val: unknown) => unknown): arrFuncs.PineArray {
+  const result = arrFuncs.createPineArray();
+  const size = arrFuncs.getArraySize(arr);
+  for (let i = 0; i < size; i++) {
+    arrFuncs.pushArrayValue(result, fn(arrFuncs.getArrayValue(arr, i)));
+  }
+  return result;
+}
+
+function filterArray(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): arrFuncs.PineArray {
+  const result = arrFuncs.createPineArray();
+  const size = arrFuncs.getArraySize(arr);
+  for (let i = 0; i < size; i++) {
+    const val = arrFuncs.getArrayValue(arr, i);
+    if (fn(val)) arrFuncs.pushArrayValue(result, val);
+  }
+  return result;
+}
+
 export const ARRAY_HELPERS: ArrayHelpers = {
   create: (size?: unknown, val?: unknown) => arrFuncs.createPineArray(Number(size) || 0, val),
   from: (...args: unknown[]) => {
@@ -214,6 +235,8 @@ export const ARRAY_HELPERS: ArrayHelpers = {
   fill: fillArray,
   every: everyArray,
   some: someArray,
+  map: mapArray,
+  filter: filterArray,
 } as ArrayHelpers;
 
 const DEFAULT_DEPS: ScriptDependencies = {
