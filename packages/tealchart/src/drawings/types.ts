@@ -29,6 +29,7 @@ export type UserDrawingTool =
   | 'triangle'
   | 'parallelChannel'
   | 'regressionTrend'
+  | 'flatTopBottom'
   | 'path'
   | 'textLabel';
 
@@ -212,6 +213,11 @@ export interface RegressionTrendDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface FlatTopBottomDrawing extends UserDrawingBase {
+  kind: 'flatTopBottom';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PathDrawing extends UserDrawingBase {
   kind: 'path';
   points: readonly UserDrawingAnchor[];
@@ -254,6 +260,7 @@ export type UserDrawing =
   | TriangleDrawing
   | ParallelChannelDrawing
   | RegressionTrendDrawing
+  | FlatTopBottomDrawing
   | PathDrawing
   | TextLabelDrawing;
 
@@ -379,6 +386,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'triangle':
     case 'parallelChannel':
     case 'regressionTrend':
+    case 'flatTopBottom':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
@@ -581,6 +589,7 @@ export function createUserDrawingFromDraft(
       };
     case 'parallelChannel':
     case 'regressionTrend':
+    case 'flatTopBottom':
       return {
         ...base,
         kind: draft.tool,
