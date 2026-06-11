@@ -219,6 +219,22 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2::1');
   });
 
+  it('renders horizontal rays from their anchor to the chart right edge', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'horizontal-ray',
+      kind: 'horizontalRay',
+      point: { time: 30, price: 70 },
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:30,30');
+    expect(ctx.calls).toContain('lineTo:100,30');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders circles through CanvasContext arcs', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

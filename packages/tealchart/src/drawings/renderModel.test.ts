@@ -138,6 +138,25 @@ describe('user drawing render model', () => {
     ]);
   });
 
+  it('resolves selection handles for horizontal ray anchors', () => {
+    expect(
+      resolveUserDrawingHandlePoints(
+        {
+          id: 'horizontal-ray',
+          kind: 'horizontalRay',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 30, price: 70 },
+        },
+        space,
+      ),
+    ).toEqual([{ x: 30, y: 30 }]);
+  });
+
   it('resolves selection handles for price range corners', () => {
     expect(
       resolveUserDrawingHandlePoints(

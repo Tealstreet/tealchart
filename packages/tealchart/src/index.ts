@@ -145,6 +145,7 @@ export type {
   DrawingScreenRect,
   DrawingScreenSegment,
   HorizontalLineDrawing,
+  HorizontalRayDrawing,
   InfoLineDrawing,
   PathDrawing,
   ParallelChannelDrawing,

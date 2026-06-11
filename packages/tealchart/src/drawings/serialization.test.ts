@@ -439,6 +439,31 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores horizontal ray drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'horizontal-ray',
+          kind: 'horizontalRay',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'horizontal-ray',
+      kind: 'horizontalRay',
+      point: { time: 1, price: 10 },
+    });
+  });
+
   it('restores info line drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

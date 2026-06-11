@@ -48,6 +48,7 @@ describe('user drawing toolbar descriptors', () => {
       'arrowMarkUp',
       'arrowMarkDown',
       'ray',
+      'horizontalRay',
       'horizontalLine',
       'verticalLine',
       'rectangle',
@@ -111,6 +112,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
+    );
+    expect(getUserDrawingToolDescriptor('horizontalRay')).toEqual(
+      expect.objectContaining({ tool: 'horizontalRay', label: 'Horizontal ray' }),
     );
     expect(getUserDrawingToolDescriptor('fibRetracement')).toEqual(
       expect.objectContaining({ tool: 'fibRetracement', label: 'Fib retracement' }),

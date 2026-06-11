@@ -925,9 +925,10 @@ describe('user drawing editing', () => {
     });
   });
 
-  it('moves horizontal, vertical, and text drawings on their editable axis', () => {
+  it('moves horizontal, vertical, horizontal ray, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };
+    const horizontalRay: UserDrawing = { ...base, id: 'hr', kind: 'horizontalRay', point: { time: 50, price: 50 } };
     const label: UserDrawing = {
       ...base,
       id: 't',
@@ -937,7 +938,7 @@ describe('user drawing editing', () => {
       textAlign: 'center',
     };
     const state = createUserDrawingState({
-      drawings: [horizontal, vertical, label],
+      drawings: [horizontal, vertical, horizontalRay, label],
       selection: { drawingId: 'h' },
     });
 
@@ -955,10 +956,16 @@ describe('user drawing editing', () => {
       state,
       { selection: { drawingId: 't' }, startPoint: { x: 50, y: 50 }, startDrawing: label, space },
       { x: 60, y: 60 },
+    ).drawings[3];
+    const movedHorizontalRay = applyUserDrawingEditDrag(
+      state,
+      { selection: { drawingId: 'hr' }, startPoint: { x: 50, y: 50 }, startDrawing: horizontalRay, space },
+      { x: 60, y: 60 },
     ).drawings[2];
 
     expect(movedHorizontal).toMatchObject({ price: 40 });
     expect(movedVertical).toMatchObject({ time: 60 });
+    expect(movedHorizontalRay).toMatchObject({ point: { time: 60, price: 40 } });
     expect(movedLabel).toMatchObject({ point: { time: 60, price: 40 } });
   });
 });

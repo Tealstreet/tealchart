@@ -187,6 +187,38 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready horizontal ray line primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'horizontal-ray',
+          kind: 'horizontalRay',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 30, price: 70 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'line',
+      id: 'horizontal-ray',
+      start: { x: 30, y: 30 },
+      end: { x: 100, y: 30 },
+      arrowHead: null,
+      style,
+    });
+  });
+
   it('returns Skia-ready arrow marker polygons', () => {
     const state: UserDrawingState = {
       version: 1,

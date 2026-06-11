@@ -252,6 +252,19 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(vertical, { x: 75, y: 40 }, space)?.drawing.id).toBe('v');
   });
 
+  it('hits horizontal ray bodies and start handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'horizontal-ray',
+      kind: 'horizontalRay',
+      point: { time: 30, price: 70 },
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 30 }, space)?.handle).toBe('center');
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 30 }, space)?.drawing.id).toBe('horizontal-ray');
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 30 }, space, { tolerance: 1 })).toBeNull();
+  });
+
   it('hits rectangle edges but not the center by default', () => {
     const drawing: UserDrawing = {
       ...base,

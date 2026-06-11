@@ -283,6 +283,11 @@ function hitTestUserDrawingHandle(
       }
       break;
     }
+    case 'horizontalRay':
+      if (geometry.drawing.kind === 'horizontalRay') {
+        handles.push({ handle: 'center', point: anchorToScreenPoint(geometry.drawing.point, space) });
+      }
+      break;
     case 'rectangle':
     case 'circle':
     case 'ellipse':
