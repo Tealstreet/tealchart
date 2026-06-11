@@ -129,6 +129,7 @@ export type {
   UserDrawingHandleRole,
   UserDrawingKind,
   UserDrawingLineStyle,
+  UserDrawingOpacityDescriptor,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,
