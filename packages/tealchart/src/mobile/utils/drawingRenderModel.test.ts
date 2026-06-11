@@ -1060,6 +1060,7 @@ describe('mobile user drawing render model', () => {
             { time: 10, price: 90 },
             { time: 50, price: 50 },
             { time: 90, price: 90 },
+            { time: 95, price: 80 },
           ],
         },
       ],
@@ -1075,6 +1076,7 @@ describe('mobile user drawing render model', () => {
         { x: 10, y: 10 },
         { x: 50, y: 50 },
         { x: 90, y: 10 },
+        { x: 95, y: 20 },
       ],
       style,
     });

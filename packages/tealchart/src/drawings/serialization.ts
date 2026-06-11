@@ -58,7 +58,6 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
-    case 'path':
     case 'triangle':
     case 'parallelChannel':
     case 'regressionTrend':
@@ -67,6 +66,13 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         style: { ...drawing.style },
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
+      };
+    case 'path':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: drawing.points.map((point) => ({ ...point })),
       };
     case 'horizontalLine':
     case 'verticalLine':
@@ -177,6 +183,12 @@ function parseThreePointDrawing(
   const second = parseAnchor(value.points[1]);
   const third = parseAnchor(value.points[2]);
   return first && second && third ? [first, second, third] : null;
+}
+
+function parsePathDrawingPoints(value: Record<string, unknown>): readonly UserDrawingAnchor[] | null {
+  if (!Array.isArray(value.points) || value.points.length < 2) return null;
+  const points = value.points.map((point) => parseAnchor(point));
+  return points.every((point): point is UserDrawingAnchor => point !== null) ? points : null;
 }
 
 function parseUserDrawing(value: unknown): UserDrawing | null {
@@ -338,7 +350,7 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         : null;
     }
     case 'path': {
-      const points = parseThreePointDrawing(value);
+      const points = parsePathDrawingPoints(value);
       return points
         ? {
             ...base,

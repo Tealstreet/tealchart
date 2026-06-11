@@ -64,9 +64,12 @@ export { resolveUserDrawingInfoLineMetrics } from './infoLine';
 export type { UserDrawingInfoLineMetrics } from './infoLine';
 export {
   beginUserDrawingTextEdit,
+  beginUserDrawingPathDrag,
+  appendUserDrawingPathDragPoint,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
@@ -87,6 +90,7 @@ export type {
   DeleteUserDrawingOptions,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
+  UserDrawingPathDragOptions,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
   UserDrawingTextEditOptions,

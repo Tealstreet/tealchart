@@ -936,6 +936,46 @@ describe('user drawing editing', () => {
     expect(moved.points[2].price).toBeCloseTo(82.5);
   });
 
+  it('edits variable-point path handles without truncating sampled points', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'path',
+      kind: 'path',
+      points: [
+        { time: 10, price: 90 },
+        { time: 30, price: 70 },
+        { time: 50, price: 50 },
+        { time: 70, price: 30 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'path', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'path', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 50, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 55, y: 45 },
+      { now: () => 14 },
+    );
+
+    const moved = next.drawings[0];
+    if (moved?.kind !== 'path') throw new Error('expected path');
+    expect(moved.updatedAt).toBe(14);
+    expect(moved.points).toHaveLength(4);
+    expect(moved.points[0]).toEqual({ time: 10, price: 90 });
+    expect(moved.points[1]).toEqual({ time: 30, price: 70 });
+    expect(moved.points[2]?.time).toBeCloseTo(55);
+    expect(moved.points[2]?.price).toBe(55);
+    expect(moved.points[3]).toEqual({ time: 70, price: 30 });
+  });
+
   it('edits Fibonacci retracement endpoints', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -126,6 +126,12 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
   onUserDrawingEditEnd?: () => void;
+  /** Called when path-tool pointer down starts collecting freehand samples */
+  onUserDrawingPathDragStart?: (point: UserDrawingInputPoint) => boolean;
+  /** Called while an active path-tool drag collects freehand samples */
+  onUserDrawingPathDragMove?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when an active path-tool drag ends */
+  onUserDrawingPathDragEnd?: () => void;
   /** Initial/current user drawing state for top-bar controls */
   userDrawingState?: UserDrawingState;
   /** Called when a drawing tool is selected from the top bar */
@@ -358,6 +364,9 @@ export class TealchartWidgetUI {
       onUserDrawingEditStart: this.options.onUserDrawingEditStart,
       onUserDrawingEditMove: this.options.onUserDrawingEditMove,
       onUserDrawingEditEnd: this.options.onUserDrawingEditEnd,
+      onUserDrawingPathDragStart: this.options.onUserDrawingPathDragStart,
+      onUserDrawingPathDragMove: this.options.onUserDrawingPathDragMove,
+      onUserDrawingPathDragEnd: this.options.onUserDrawingPathDragEnd,
       onAutoScaleDisabled: this.options.onAutoScaleDisabled,
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,

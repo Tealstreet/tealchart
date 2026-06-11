@@ -2,10 +2,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
 import {
+  appendUserDrawingPathDragPoint,
+  beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
@@ -134,6 +137,45 @@ describe('user drawing input controller', () => {
       kind: 'horizontalLine',
       price: anchorA.price,
     });
+  });
+
+  it('builds variable-point path drawings from drag samples', () => {
+    const started = beginUserDrawingPathDrag(
+      setUserDrawingTool(createUserDrawingState(), 'path'),
+      { paneId: 'main', anchor: anchorA },
+      { now: () => 10, style },
+    );
+    const duplicate = appendUserDrawingPathDragPoint(started, { paneId: 'main', anchor: anchorA });
+    const second = appendUserDrawingPathDragPoint(duplicate, { paneId: 'main', anchor: anchorB });
+    const third = appendUserDrawingPathDragPoint(second, { paneId: 'main', anchor: { time: 3_000, price: 90 } });
+    const committed = commitUserDrawingPathDrag(third, { createId: () => 'freehand', now: () => 20 });
+
+    expect(duplicate).toBe(started);
+    expect(third.draft?.anchors).toEqual([anchorA, anchorB, { time: 3_000, price: 90 }]);
+    expect(committed).toMatchObject({
+      selection: { drawingId: 'freehand' },
+      draft: null,
+      drawings: [
+        {
+          id: 'freehand',
+          kind: 'path',
+          points: [anchorA, anchorB, { time: 3_000, price: 90 }],
+          createdAt: 20,
+          updatedAt: 20,
+        },
+      ],
+    });
+  });
+
+  it('clears too-short path drags without creating drawings', () => {
+    const started = beginUserDrawingPathDrag(setUserDrawingTool(createUserDrawingState(), 'path'), {
+      paneId: 'main',
+      anchor: anchorA,
+    });
+    const committed = commitUserDrawingPathDrag(started, { createId: () => 'unused' });
+
+    expect(committed.drawings).toEqual([]);
+    expect(committed.draft).toBeNull();
   });
 
   it('starts a new draft when the pane changes mid-drawing', () => {
