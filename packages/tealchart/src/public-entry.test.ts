@@ -8,6 +8,7 @@ import {
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
+  resolveUserDrawingVisualPriceRangeMetrics,
   setUserDrawingTextAlign,
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
@@ -94,6 +95,9 @@ describe('tealchart public entries', () => {
     };
 
     expect(metrics.label).toBe('+25.00 (+25.00%)');
+    expect(
+      resolveUserDrawingVisualPriceRangeMetrics({ time: 1, price: 125 }, { time: 2, price: 100 }).label,
+    ).toBe('+25.00 (+25.00%)');
     expect(drawing.kind).toBe('priceRange');
   });
 

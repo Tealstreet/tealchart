@@ -68,6 +68,7 @@ export type {
 } from './input';
 export {
   resolveUserDrawingPriceRangeMetrics,
+  resolveUserDrawingVisualPriceRangeMetrics,
 } from './priceRange';
 export type { UserDrawingPriceRangeMetrics } from './priceRange';
 export {

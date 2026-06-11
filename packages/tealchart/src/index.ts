@@ -88,6 +88,7 @@ export {
   resolveUserDrawingRenderEntries,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
+  resolveUserDrawingVisualPriceRangeMetrics,
   selectUserDrawing,
   selectUserDrawingById,
   getUserDrawingToolbarStateKey,

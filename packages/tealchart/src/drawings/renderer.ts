@@ -5,7 +5,7 @@ import type { TextLabelDrawing, UserDrawing, UserDrawingLineStyle } from './type
 import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
-import { resolveUserDrawingPriceRangeMetrics } from './priceRange';
+import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
 import { resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
@@ -101,7 +101,7 @@ function renderPriceRangeGeometry(
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
-  const label = resolveUserDrawingPriceRangeMetrics(drawing.points[0].price, drawing.points[1].price).label;
+  const label = resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;

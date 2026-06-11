@@ -277,6 +277,37 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('keeps price range labels stable when anchor order changes', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 90, price: 90 },
+            { time: 10, price: 70 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'priceRange',
+      label: '+20.00 (+28.57%)',
+    });
+  });
+
   it('positions price range labels with a Skia baseline offset', () => {
     const state: UserDrawingState = {
       version: 1,

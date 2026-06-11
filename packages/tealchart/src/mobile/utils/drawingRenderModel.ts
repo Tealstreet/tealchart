@@ -14,7 +14,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
-  resolveUserDrawingPriceRangeMetrics,
+  resolveUserDrawingVisualPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
@@ -179,7 +179,7 @@ function primitiveFromGeometry(
       const drawing = geometry.drawing;
       const label =
         drawing.kind === 'priceRange'
-          ? resolveUserDrawingPriceRangeMetrics(drawing.points[0].price, drawing.points[1].price).label
+          ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
           : '';
       return {
         kind: 'priceRange',
