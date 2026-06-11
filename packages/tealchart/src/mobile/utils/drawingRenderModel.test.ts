@@ -296,6 +296,41 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready ellipse primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'ellipse',
+          kind: 'ellipse',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 30 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'ellipse',
+      id: 'ellipse',
+      center: { x: 50, y: 40 },
+      radiusX: 40,
+      radiusY: 30,
+      rect: { x: 10, y: 10, width: 80, height: 60 },
+    });
+  });
+
   it('returns Skia-ready extended line segments to chart bounds', () => {
     const extended: ExtendedLineDrawing = {
       id: 'extended',

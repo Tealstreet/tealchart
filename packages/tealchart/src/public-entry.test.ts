@@ -6,6 +6,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   resolveCircleFromAnchors,
+  resolveEllipseFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
@@ -26,6 +27,7 @@ import type {
   ArrowMarkerDrawing,
   CircleDrawing,
   DateRangeDrawing,
+  EllipseDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
   PathDrawing,
@@ -52,6 +54,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -268,6 +271,49 @@ describe('tealchart public entries', () => {
         },
       ).radius,
     ).toBe(10);
+  });
+
+  it('exports shared drawing ellipse types', () => {
+    const drawing: EllipseDrawing = {
+      id: 'ellipse',
+      kind: 'ellipse',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('ellipse');
+    expect(
+      resolveEllipseFromAnchors(
+        { time: 1_000, price: 100 },
+        { time: 1_200, price: 104 },
+        {
+          viewport: {
+            startTime: 1_000,
+            endTime: 3_000,
+            priceMin: 90,
+            priceMax: 110,
+          },
+          pane: {
+            id: 'main',
+            top: 20,
+            height: 100,
+            bottom: 120,
+            yMin: 90,
+            yMax: 110,
+          },
+          chartLeft: 10,
+          chartRight: 210,
+        },
+      ),
+    ).toMatchObject({ radiusX: 10, radiusY: 10 });
   });
 
   it('exports shared drawing extended line types', () => {

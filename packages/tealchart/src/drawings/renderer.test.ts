@@ -238,6 +238,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders ellipses through CanvasContext transforms', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'ellipse',
+      kind: 'ellipse',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 30 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('save');
+    expect(ctx.calls).toContain('translate:50,40');
+    expect(ctx.calls).toContain('scale:40,30');
+    expect(ctx.calls).toContain('arc:0,0,1:1');
+    expect(ctx.calls).toContain('restore');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders extended lines to chart bounds through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

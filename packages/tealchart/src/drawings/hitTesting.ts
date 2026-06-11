@@ -39,6 +39,7 @@ const DEFAULT_TOLERANCE = 6;
 const DEFAULT_HANDLE_TOLERANCE = 8;
 const DEFAULT_LABEL_WIDTH = 72;
 const DEFAULT_LABEL_HEIGHT = 20;
+const ELLIPSE_HIT_TEST_SEGMENTS = 96;
 
 export function distanceBetweenPoints(a: DrawingScreenPoint, b: DrawingScreenPoint): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -79,6 +80,33 @@ export function distanceToRectEdge(point: DrawingScreenPoint, rect: DrawingScree
 
 function distanceToCircleEdge(point: DrawingScreenPoint, center: DrawingScreenPoint, radius: number): number {
   return Math.abs(distanceBetweenPoints(point, center) - radius);
+}
+
+function distanceToEllipseEdge(
+  point: DrawingScreenPoint,
+  center: DrawingScreenPoint,
+  radiusX: number,
+  radiusY: number,
+): number {
+  if (radiusX <= 0 || radiusY <= 0) return distanceBetweenPoints(point, center);
+
+  let distance = Number.POSITIVE_INFINITY;
+  let previous = {
+    x: center.x + radiusX,
+    y: center.y,
+  };
+
+  for (let index = 1; index <= ELLIPSE_HIT_TEST_SEGMENTS; index++) {
+    const angle = (index / ELLIPSE_HIT_TEST_SEGMENTS) * Math.PI * 2;
+    const current = {
+      x: center.x + radiusX * Math.cos(angle),
+      y: center.y + radiusY * Math.sin(angle),
+    };
+    distance = Math.min(distance, distanceToSegment(point, { start: previous, end: current }));
+    previous = current;
+  }
+
+  return distance;
 }
 
 function distanceToPolyline(point: DrawingScreenPoint, points: readonly DrawingScreenPoint[]): number {
@@ -145,6 +173,16 @@ function hitTestResolvedGeometry(
 
   if (geometry.kind === 'circle') {
     const distance = distanceToCircleEdge(point, geometry.circle.center, geometry.circle.radius);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
+  if (geometry.kind === 'ellipse') {
+    const distance = distanceToEllipseEdge(
+      point,
+      geometry.ellipse.center,
+      geometry.ellipse.radiusX,
+      geometry.ellipse.radiusY,
+    );
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
@@ -222,9 +260,15 @@ function hitTestUserDrawingHandle(
     }
     case 'rectangle':
     case 'circle':
+    case 'ellipse':
     case 'priceRange':
       {
-        const rect = geometry.kind === 'circle' ? geometry.circle.rect : geometry.rect;
+        const rect =
+          geometry.kind === 'circle'
+            ? geometry.circle.rect
+            : geometry.kind === 'ellipse'
+              ? geometry.ellipse.rect
+              : geometry.rect;
         handles.push(
           { handle: 'topLeft', point: { x: rect.x, y: rect.y } },
           { handle: 'topRight', point: { x: rect.x + rect.width, y: rect.y } },
