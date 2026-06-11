@@ -86,6 +86,7 @@ export type MobileUserDrawingPrimitive =
     };
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
+export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 
 export interface MobileUserDrawingTextLabelLayout {
   fontSize: number;
@@ -95,6 +96,13 @@ export interface MobileUserDrawingTextLabelLayout {
   box: { x: number; y: number; width: number; height: number };
   text: { x: number; y: number };
   lines: readonly { text: string; width: number; x: number; y: number }[];
+}
+
+export interface MobileUserDrawingPriceRangeLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
 }
 
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
@@ -290,5 +298,20 @@ export function resolveMobileUserDrawingTextLabelLayout(
     box: layout.box,
     text: { x: firstLine.x, y: firstLine.y },
     lines: layout.lines,
+  };
+}
+
+export function resolveMobileUserDrawingPriceRangeLabelPosition(
+  primitive: MobileUserDrawingPriceRangePrimitive,
+  measuredTextWidth: number,
+): MobileUserDrawingPriceRangeLabelPosition {
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
+
+  return {
+    fontSize,
+    fontFamily,
+    x: primitive.labelPoint.x - measuredTextWidth / 2,
+    y: primitive.labelPoint.y + fontSize / 2,
   };
 }

@@ -2,7 +2,11 @@ import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingStyle } from 
 
 import { describe, expect, it } from 'vitest';
 
-import { resolveMobileUserDrawingRenderModel, resolveMobileUserDrawingTextLabelLayout } from './drawingRenderModel';
+import {
+  resolveMobileUserDrawingPriceRangeLabelPosition,
+  resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingTextLabelLayout,
+} from './drawingRenderModel';
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -270,6 +274,41 @@ describe('mobile user drawing render model', () => {
       labelPoint: { x: 50, y: 20 },
       label: '+20.00 (+28.57%)',
       style,
+    });
+  });
+
+  it('positions price range labels with a Skia baseline offset', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, fontSize: 14, fontFamily: 'monospace' },
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
+
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, 84)).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: 8,
+      y: 27,
     });
   });
 
