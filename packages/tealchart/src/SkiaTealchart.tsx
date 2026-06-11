@@ -23,7 +23,9 @@ import type {
   UserDrawingEditDrag,
   UserDrawingHandleRole,
   UserDrawingLineStyle,
+  UserDrawingStyle,
   UserDrawingTool,
+  UpdateUserDrawingOptions,
 } from './drawings';
 import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
@@ -110,6 +112,11 @@ import {
 } from './mobile/utils/drawingPersistence';
 import { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
+import {
+  setMobileUserDrawingLocked,
+  setMobileUserDrawingVisibility,
+  updateMobileUserDrawingStyle,
+} from './mobile/utils/drawingStyle';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -155,6 +162,9 @@ export interface SkiaTealchartHandle {
   commitUserDrawingTextEdit(): boolean;
   cancelUserDrawingTextEdit(): boolean;
   setUserDrawingText(drawingId: string, text: string): boolean;
+  updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
 }
 
 export interface SkiaTealchartProps {
@@ -384,6 +394,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       setUserDrawingText(drawingId: string, text: string): boolean {
         return commitUserDrawingStateIfChanged(setUserDrawingText(userDrawingStateRef.current, drawingId, text));
+      },
+      updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style, options));
+      },
+      setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingVisibility(userDrawingStateRef.current, visible, options),
+        );
+      },
+      setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(setMobileUserDrawingLocked(userDrawingStateRef.current, locked, options));
       },
     }),
     [commitUserDrawingState, commitUserDrawingStateIfChanged],
