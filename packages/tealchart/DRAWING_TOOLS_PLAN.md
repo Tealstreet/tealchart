@@ -236,11 +236,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, rail/polygon hit testing, whole-drawing moves, width-anchor
   editing, and fill controls use shared drawing behavior on both platforms.
 
-## Current Epic: Fibonacci Retracement Tool
+## Shipped: Fibonacci Retracement Tool
 
 - Shared drawing state supports the two-anchor `fibRetracement` tool and
   persists it through layout save/load.
 - Web Canvas and mobile Skia render matching horizontal Fibonacci retracement
+  levels and ratio/price labels from shared screen-space geometry.
+- Selection, level-line hit testing, endpoint editing, and whole-drawing moves
+  use shared drawing behavior on both platforms.
+
+## Current Epic: Fibonacci Extension Tool
+
+- Shared drawing state supports the two-anchor `fibExtension` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching horizontal Fibonacci extension
   levels and ratio/price labels from shared screen-space geometry.
 - Selection, level-line hit testing, endpoint editing, and whole-drawing moves
   use shared drawing behavior on both platforms.

@@ -435,6 +435,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:1 80.00:14,18:#111:left:1:12px sans-serif');
   });
 
+  it('renders Fibonacci extension levels with labels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-ext',
+      kind: 'fibExtension',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,80');
+    expect(ctx.calls).toContain('lineTo:90,80');
+    expect(ctx.calls).toContain('moveTo:10,20');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls.filter((call) => call === 'stroke:#f5c542:2:6,4:1')).toHaveLength(9);
+    expect(ctx.calls.some((call) => call.startsWith('fillText:1.272 96.32:14,1.'))).toBe(true);
+    expect(ctx.calls).toContain('fillText:2.000 140.00:14,-42:#111:left:1:12px sans-serif');
+  });
+
   it('renders path drawings as stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
