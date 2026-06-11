@@ -265,6 +265,20 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 20, y: 30 }, space, { tolerance: 1 })).toBeNull();
   });
 
+  it('hits cross line bodies and center handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'cross-line',
+      kind: 'crossLine',
+      point: { time: 30, price: 70 },
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 30 }, space)?.handle).toBe('center');
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 30 }, space)?.drawing.id).toBe('cross-line');
+    expect(hitTestUserDrawing(drawing, { x: 30, y: 80 }, space)?.drawing.id).toBe('cross-line');
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 80 }, space, { tolerance: 1 })).toBeNull();
+  });
+
   it('hits rectangle edges but not the center by default', () => {
     const drawing: UserDrawing = {
       ...base,

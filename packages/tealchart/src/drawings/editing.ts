@@ -82,6 +82,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'verticalLine':
       return { ...drawing, time: drawing.time + delta.time, updatedAt };
     case 'horizontalRay':
+    case 'crossLine':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
     case 'arrowMarkUp':
     case 'arrowMarkDown':
@@ -191,6 +192,7 @@ function editDrawingHandle(
     case 'horizontalLine':
     case 'verticalLine':
     case 'horizontalRay':
+    case 'crossLine':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':

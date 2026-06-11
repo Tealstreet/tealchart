@@ -49,6 +49,7 @@ describe('user drawing toolbar descriptors', () => {
       'arrowMarkDown',
       'ray',
       'horizontalRay',
+      'crossLine',
       'horizontalLine',
       'verticalLine',
       'rectangle',
@@ -115,6 +116,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('horizontalRay')).toEqual(
       expect.objectContaining({ tool: 'horizontalRay', label: 'Horizontal ray' }),
+    );
+    expect(getUserDrawingToolDescriptor('crossLine')).toEqual(
+      expect.objectContaining({ tool: 'crossLine', label: 'Cross line' }),
     );
     expect(getUserDrawingToolDescriptor('fibRetracement')).toEqual(
       expect.objectContaining({ tool: 'fibRetracement', label: 'Fib retracement' }),

@@ -236,6 +236,14 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'crossLine') {
+    const distance = Math.min(
+      distanceToSegment(point, geometry.crossLine.horizontal),
+      distanceToSegment(point, geometry.crossLine.vertical),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'arrowMarker') {
     const distance = pointInPolygon(point, geometry.marker.points) ? 0 : distanceToClosedPolyline(point, geometry.marker.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -285,6 +293,11 @@ function hitTestUserDrawingHandle(
     }
     case 'horizontalRay':
       if (geometry.drawing.kind === 'horizontalRay') {
+        handles.push({ handle: 'center', point: anchorToScreenPoint(geometry.drawing.point, space) });
+      }
+      break;
+    case 'crossLine':
+      if (geometry.drawing.kind === 'crossLine') {
         handles.push({ handle: 'center', point: anchorToScreenPoint(geometry.drawing.point, space) });
       }
       break;

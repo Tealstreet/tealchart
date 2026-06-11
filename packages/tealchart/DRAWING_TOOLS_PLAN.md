@@ -254,12 +254,21 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, level-line hit testing, endpoint editing, and whole-drawing moves
   use shared drawing behavior on both platforms.
 
-## Current Epic: Horizontal Ray Tool
+## Shipped: Horizontal Ray Tool
 
 - Shared drawing state supports the single-anchor `horizontalRay` tool and
   persists it through layout save/load.
 - Web Canvas and mobile Skia render matching right-extending horizontal ray
   segments from shared screen-space geometry.
+- Selection, segment hit testing, anchor handles, and whole-drawing moves use
+  shared drawing behavior on both platforms.
+
+## Current Epic: Cross Line Tool
+
+- Shared drawing state supports the single-anchor `crossLine` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching full-width horizontal and
+  full-height vertical crosshair segments from shared screen-space geometry.
 - Selection, segment hit testing, anchor handles, and whole-drawing moves use
   shared drawing behavior on both platforms.
 
