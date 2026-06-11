@@ -53,3 +53,13 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
 export function deserializeUserDrawingStateFromLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
   return serializeUserDrawingStateForLayout(state);
 }
+
+export function isUserDrawingLayoutStateEqual(
+  previous?: UserDrawingState | null,
+  next?: UserDrawingState | null,
+): boolean {
+  return (
+    JSON.stringify(serializeUserDrawingStateForLayout(previous) ?? null) ===
+    JSON.stringify(serializeUserDrawingStateForLayout(next) ?? null)
+  );
+}
