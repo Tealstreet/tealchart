@@ -9,10 +9,17 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import type { UserDrawingState, UserDrawingTool } from '../../drawings';
+import type { UserDrawingState, UserDrawingStyle, UserDrawingTool } from '../../drawings';
 
 import {
+  getSelectedUserDrawing,
   isUserDrawingToolbarActionEnabled,
+  isUserDrawingStyleToolbarActionEnabled,
+  isUserDrawingStyleToolbarEnabled,
+  USER_DRAWING_LINE_COLOR_DESCRIPTORS,
+  USER_DRAWING_LINE_STYLE_DESCRIPTORS,
+  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../../drawings';
@@ -49,6 +56,12 @@ export interface ChartTopBarComponentProps {
   onUserDrawingCancelDraft?: () => void;
   /** Callback when all user drawings should be cleared */
   onUserDrawingClearAll?: () => void;
+  /** Callback when selected drawing style should change */
+  onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
+  /** Callback when selected drawing visibility should change */
+  onUserDrawingVisibilityChange?: (visible: boolean) => void;
+  /** Callback when selected drawing locked state should change */
+  onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
 }
 
 const TOP_BAR_HEIGHT = 36;
@@ -70,6 +83,9 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingDeleteSelected,
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
+    onUserDrawingStyleChange,
+    onUserDrawingVisibilityChange,
+    onUserDrawingLockedChange,
   }) => {
     // Filter timeframes by supported resolutions (if set by datafeed)
     const timeframes = useMemo(() => {
@@ -99,6 +115,9 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
       },
       [onIntervalChange],
     );
+
+    const selectedDrawing = userDrawingState ? getSelectedUserDrawing(userDrawingState) : null;
+    const styleControlsEnabled = userDrawingState ? isUserDrawingStyleToolbarEnabled(userDrawingState) : false;
 
     return (
       <View style={[styles.container, { backgroundColor }]}>
@@ -180,6 +199,124 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
               ))}
 
               <View style={styles.innerDivider} />
+
+              {selectedDrawing && (
+                <>
+                  {USER_DRAWING_LINE_COLOR_DESCRIPTORS.map((descriptor) => {
+                    const active = selectedDrawing.style.lineColor.toLowerCase() === descriptor.color.toLowerCase();
+                    return (
+                      <Pressable
+                        key={descriptor.color}
+                        accessibilityRole="button"
+                        accessibilityLabel={descriptor.label}
+                        accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
+                        disabled={!styleControlsEnabled}
+                        onPress={() => onUserDrawingStyleChange?.({ lineColor: descriptor.color })}
+                        style={[
+                          styles.drawingSwatchButton,
+                          { backgroundColor: descriptor.color },
+                          active && [styles.drawingSwatchButtonActive, { borderColor: accentColor }],
+                          !styleControlsEnabled && styles.drawingButtonDisabled,
+                        ]}
+                      />
+                    );
+                  })}
+
+                  <View style={styles.innerDivider} />
+
+                  {USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => {
+                    const active = selectedDrawing.style.lineWidth === descriptor.width;
+                    return (
+                      <Pressable
+                        key={descriptor.width}
+                        accessibilityRole="button"
+                        accessibilityLabel={descriptor.label}
+                        accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
+                        disabled={!styleControlsEnabled}
+                        onPress={() => onUserDrawingStyleChange?.({ lineWidth: descriptor.width })}
+                        style={({ pressed }) => [
+                          styles.drawingButton,
+                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                          styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                          !styleControlsEnabled && styles.drawingButtonDisabled,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.drawingButtonText,
+                            { color: active ? accentColor : textSecondaryColor, fontSize: 10 + descriptor.width },
+                          ]}
+                        >
+                          ━
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+
+                  {USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => {
+                    const active = selectedDrawing.style.lineStyle === descriptor.lineStyle;
+                    return (
+                      <Pressable
+                        key={descriptor.lineStyle}
+                        accessibilityRole="button"
+                        accessibilityLabel={descriptor.label}
+                        accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
+                        disabled={!styleControlsEnabled}
+                        onPress={() => onUserDrawingStyleChange?.({ lineStyle: descriptor.lineStyle })}
+                        style={({ pressed }) => [
+                          styles.drawingButton,
+                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                          styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                          !styleControlsEnabled && styles.drawingButtonDisabled,
+                        ]}
+                      >
+                        <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
+                          {descriptor.icon}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+
+                  <View style={styles.innerDivider} />
+
+                  {USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
+                    const enabled = isUserDrawingStyleToolbarActionEnabled(userDrawingState, descriptor.action);
+                    const active =
+                      descriptor.action === 'toggleVisibility'
+                        ? selectedDrawing.visible
+                        : descriptor.action === 'toggleLocked' && selectedDrawing.locked;
+                    return (
+                      <Pressable
+                        key={descriptor.action}
+                        accessibilityRole="button"
+                        accessibilityLabel={descriptor.label}
+                        accessibilityState={{ disabled: !enabled, selected: active }}
+                        disabled={!enabled}
+                        onPress={() => {
+                          if (descriptor.action === 'toggleVisibility') {
+                            onUserDrawingVisibilityChange?.(!selectedDrawing.visible);
+                          }
+                          if (descriptor.action === 'toggleLocked') {
+                            onUserDrawingLockedChange?.(!selectedDrawing.locked, selectedDrawing.locked);
+                          }
+                        }}
+                        style={({ pressed }) => [
+                          styles.drawingButton,
+                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                          enabled && pressed && !active && styles.drawingButtonPressed,
+                          !enabled && styles.drawingButtonDisabled,
+                        ]}
+                      >
+                        <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
+                          {descriptor.icon}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+
+                  <View style={styles.innerDivider} />
+                </>
+              )}
 
               {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
                 const enabled = isUserDrawingToolbarActionEnabled(userDrawingState, descriptor.action);
@@ -347,6 +484,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   drawingButtonActive: {},
+  drawingSwatchButton: {
+    width: 22,
+    height: 22,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#363a45',
+    marginHorizontal: 3,
+  },
+  drawingSwatchButtonActive: {
+    borderWidth: 2,
+  },
   drawingButtonPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },

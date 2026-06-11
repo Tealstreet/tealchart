@@ -1,12 +1,19 @@
 import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
-import type { UserDrawingState, UserDrawingTool } from '../drawings';
+import type { UserDrawingState, UserDrawingStyle, UserDrawingTool } from '../drawings';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
   isUserDrawingToolbarActionEnabled,
+  getSelectedUserDrawing,
+  isUserDrawingStyleToolbarActionEnabled,
+  isUserDrawingStyleToolbarEnabled,
+  USER_DRAWING_LINE_COLOR_DESCRIPTORS,
+  USER_DRAWING_LINE_STYLE_DESCRIPTORS,
+  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
@@ -46,6 +53,12 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Callback when all user drawings should be cleared */
   onUserDrawingClearAll?: () => void;
+  /** Callback when selected drawing style should change */
+  onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
+  /** Callback when selected drawing visibility should change */
+  onUserDrawingVisibilityChange?: (visible: boolean) => void;
+  /** Callback when selected drawing locked state should change */
+  onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
 }
@@ -184,6 +197,14 @@ const styles = {
   drawingButtonHover: {
     backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
     color: 'var(--text, #d1d4dc)',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingSwatch: {
+    width: '18px',
+    height: '18px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: '4px',
+    padding: '0',
   } as Partial<CSSStyleDeclaration>,
 
   spacer: {
@@ -404,6 +425,153 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
 
     group.appendChild(this.createElement('div', { style: styles.divider }));
+
+    const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
+    const styleEnabled = state ? isUserDrawingStyleToolbarEnabled(state) : false;
+
+    if (selectedDrawing) {
+      for (const descriptor of USER_DRAWING_LINE_COLOR_DESCRIPTORS) {
+        const isActive = selectedDrawing.style.lineColor.toLowerCase() === descriptor.color.toLowerCase();
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...styles.drawingSwatch,
+            backgroundColor: descriptor.color,
+            opacity: styleEnabled ? '1' : '0.35',
+            cursor: styleEnabled ? 'pointer' : 'default',
+            outline: isActive ? '2px solid var(--accent, #2962ff)' : 'none',
+          },
+          attributes: {
+            type: 'button',
+            title: descriptor.label,
+            'aria-label': descriptor.label,
+            'aria-pressed': isActive ? 'true' : 'false',
+          },
+        });
+        btn.disabled = !styleEnabled;
+        if (styleEnabled) {
+          btn.addEventListener('click', () => this.options.onUserDrawingStyleChange?.({ lineColor: descriptor.color }));
+        }
+        group.appendChild(btn);
+      }
+
+      group.appendChild(this.createElement('div', { style: styles.divider }));
+
+      for (const descriptor of USER_DRAWING_LINE_WIDTH_DESCRIPTORS) {
+        const isActive = selectedDrawing.style.lineWidth === descriptor.width;
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...(isActive ? styles.drawingButtonActive : {}),
+            opacity: styleEnabled ? '1' : '0.35',
+            cursor: styleEnabled ? 'pointer' : 'default',
+            fontSize: `${10 + descriptor.width}px`,
+          },
+          textContent: '━',
+          attributes: {
+            type: 'button',
+            title: descriptor.label,
+            'aria-label': descriptor.label,
+            'aria-pressed': isActive ? 'true' : 'false',
+          },
+        });
+        btn.disabled = !styleEnabled;
+        if (styleEnabled) {
+          btn.addEventListener('click', () => this.options.onUserDrawingStyleChange?.({ lineWidth: descriptor.width }));
+          btn.addEventListener('mouseenter', () => {
+            if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+          });
+          btn.addEventListener('mouseleave', () => {
+            if (!isActive) {
+              btn.style.backgroundColor = 'transparent';
+              btn.style.color = 'var(--text2, #787b86)';
+            }
+          });
+        }
+        group.appendChild(btn);
+      }
+
+      for (const descriptor of USER_DRAWING_LINE_STYLE_DESCRIPTORS) {
+        const isActive = selectedDrawing.style.lineStyle === descriptor.lineStyle;
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...(isActive ? styles.drawingButtonActive : {}),
+            opacity: styleEnabled ? '1' : '0.35',
+            cursor: styleEnabled ? 'pointer' : 'default',
+          },
+          textContent: descriptor.icon,
+          attributes: {
+            type: 'button',
+            title: descriptor.label,
+            'aria-label': descriptor.label,
+            'aria-pressed': isActive ? 'true' : 'false',
+          },
+        });
+        btn.disabled = !styleEnabled;
+        if (styleEnabled) {
+          btn.addEventListener('click', () =>
+            this.options.onUserDrawingStyleChange?.({ lineStyle: descriptor.lineStyle }),
+          );
+          btn.addEventListener('mouseenter', () => {
+            if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+          });
+          btn.addEventListener('mouseleave', () => {
+            if (!isActive) {
+              btn.style.backgroundColor = 'transparent';
+              btn.style.color = 'var(--text2, #787b86)';
+            }
+          });
+        }
+        group.appendChild(btn);
+      }
+
+      group.appendChild(this.createElement('div', { style: styles.divider }));
+
+      for (const descriptor of USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS) {
+        const enabled = state ? isUserDrawingStyleToolbarActionEnabled(state, descriptor.action) : false;
+        const isActive =
+          descriptor.action === 'toggleVisibility' ? selectedDrawing.visible : descriptor.action === 'toggleLocked' && selectedDrawing.locked;
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...(isActive ? styles.drawingButtonActive : {}),
+            opacity: enabled ? '1' : '0.35',
+            cursor: enabled ? 'pointer' : 'default',
+          },
+          textContent: descriptor.icon,
+          attributes: {
+            type: 'button',
+            title: descriptor.label,
+            'aria-label': descriptor.label,
+            'aria-pressed': isActive ? 'true' : 'false',
+          },
+        });
+        btn.disabled = !enabled;
+        if (enabled) {
+          btn.addEventListener('click', () => {
+            if (descriptor.action === 'toggleVisibility') {
+              this.options.onUserDrawingVisibilityChange?.(!selectedDrawing.visible);
+            }
+            if (descriptor.action === 'toggleLocked') {
+              this.options.onUserDrawingLockedChange?.(!selectedDrawing.locked, selectedDrawing.locked);
+            }
+          });
+          btn.addEventListener('mouseenter', () => {
+            if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+          });
+          btn.addEventListener('mouseleave', () => {
+            if (!isActive) {
+              btn.style.backgroundColor = 'transparent';
+              btn.style.color = 'var(--text2, #787b86)';
+            }
+          });
+        }
+        group.appendChild(btn);
+      }
+
+      group.appendChild(this.createElement('div', { style: styles.divider }));
+    }
 
     for (const descriptor of USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS) {
       const enabled = state ? isUserDrawingToolbarActionEnabled(state, descriptor.action) : false;

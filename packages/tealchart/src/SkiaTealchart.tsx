@@ -1721,6 +1721,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onUserDrawingClearAll={() => {
               commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
             }}
+            onUserDrawingStyleChange={(style) => {
+              commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style));
+            }}
+            onUserDrawingVisibilityChange={(visible) => {
+              commitUserDrawingStateIfChanged(
+                setMobileUserDrawingVisibility(userDrawingStateRef.current, visible),
+              );
+            }}
+            onUserDrawingLockedChange={(locked, includeLocked) => {
+              commitUserDrawingStateIfChanged(
+                setMobileUserDrawingLocked(userDrawingStateRef.current, locked, { includeLocked }),
+              );
+            }}
           />
         </View>
       )}
