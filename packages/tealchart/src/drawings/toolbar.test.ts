@@ -71,6 +71,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibRetracement',
       'fibExtension',
       'triangle',
+      'polyline',
       'parallelChannel',
       'regressionTrend',
       'flatTopBottom',
@@ -151,6 +152,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),
+    );
+    expect(getUserDrawingToolDescriptor('polyline')).toEqual(
+      expect.objectContaining({ tool: 'polyline', label: 'Polyline' }),
     );
     expect(getUserDrawingToolDescriptor('parallelChannel')).toEqual(
       expect.objectContaining({ tool: 'parallelChannel', label: 'Parallel channel' }),

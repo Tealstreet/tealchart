@@ -95,8 +95,15 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       return {
         ...drawing,
         style: { ...drawing.style },
-        kind: drawing.kind,
+        kind: 'path',
         points: drawing.points.map((point) => ({ ...point })),
+      };
+    case 'polyline':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'polyline',
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
       };
     case 'horizontalLine':
     case 'verticalLine':
@@ -421,6 +428,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'path',
+            points,
+          }
+        : null;
+    }
+    case 'polyline': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'polyline',
             points,
           }
         : null;
