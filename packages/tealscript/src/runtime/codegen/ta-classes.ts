@@ -597,7 +597,7 @@ export class MACD implements Saveable {
     this.signalEMA = new EMA(signalLength);
   }
 
-  compute(src: number): MACDResult {
+  compute(src: number): [number, number, number] {
     this.snap = {
       fastEMA: this.fastEMA.save(),
       slowEMA: this.slowEMA.save(),
@@ -606,7 +606,7 @@ export class MACD implements Saveable {
     return this._advance(src, false);
   }
 
-  recompute(src: number): MACDResult {
+  recompute(src: number): [number, number, number] {
     if (this.snap) {
       this.fastEMA.restore(this.snap.fastEMA as EMASnapshot);
       this.slowEMA.restore(this.snap.slowEMA as EMASnapshot);
@@ -615,16 +615,12 @@ export class MACD implements Saveable {
     return this._advance(src, true);
   }
 
-  private _advance(src: number, isRecompute: boolean): MACDResult {
+  private _advance(src: number, isRecompute: boolean): [number, number, number] {
     const fast = isRecompute ? this.fastEMA.recompute(src) : this.fastEMA.compute(src);
     const slow = isRecompute ? this.slowEMA.recompute(src) : this.slowEMA.compute(src);
     const macdLine = fast - slow;
     const signalLine = isRecompute ? this.signalEMA.recompute(macdLine) : this.signalEMA.compute(macdLine);
-    return {
-      macdLine,
-      signalLine,
-      histogram: macdLine - signalLine,
-    };
+    return [macdLine, signalLine, macdLine - signalLine];
   }
 
   save(): MACDSnapshot {
@@ -849,7 +845,7 @@ export class BB implements Saveable {
     this.mult = mult;
   }
 
-  compute(src: number): BBResult {
+  compute(src: number): [number, number, number] {
     this.snap = {
       sma: this.sma.save(),
       stddev: this.stddev.save(),
@@ -857,7 +853,7 @@ export class BB implements Saveable {
     return this._advance(src, false);
   }
 
-  recompute(src: number): BBResult {
+  recompute(src: number): [number, number, number] {
     if (this.snap) {
       this.sma.restore(this.snap.sma as SMASnapshot);
       this.stddev.restore(this.snap.stddev as StdDevSnapshot);
@@ -865,14 +861,10 @@ export class BB implements Saveable {
     return this._advance(src, true);
   }
 
-  private _advance(src: number, isRecompute: boolean): BBResult {
+  private _advance(src: number, isRecompute: boolean): [number, number, number] {
     const middle = isRecompute ? this.sma.recompute(src) : this.sma.compute(src);
     const dev = isRecompute ? this.stddev.recompute(src) : this.stddev.compute(src);
-    return {
-      middle,
-      upper: middle + this.mult * dev,
-      lower: middle - this.mult * dev,
-    };
+    return [middle, middle + this.mult * dev, middle - this.mult * dev];
   }
 
   save(): BBSnapshot {

@@ -158,7 +158,7 @@ describe('TA Classes vs Interpreter Parity', () => {
       const macd = new MACD(12, 26, 9);
       const classValues: (number | null)[] = closes.map((c) => {
         const r = macd.compute(c);
-        return r.macdLine !== r.macdLine ? null : r.macdLine;
+        return r[0] !== r[0] ? null : r[0];
       });
 
       const interpValues = getInterpreterPlot(

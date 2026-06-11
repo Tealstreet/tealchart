@@ -682,7 +682,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   // Push bar field series
   for (const [field, member] of Object.entries(BAR_FIELDS)) {
-    if (ctx.barFieldSeriesVars.has(field) || field === 'close' || field === 'open' || field === 'high' || field === 'low') {
+    if (ctx.barFieldSeriesVars.has(field) || ctx.usedBarFields.has(field) || field === 'close' || field === 'open' || field === 'high' || field === 'low') {
       lines.push(`    this.${member}.push(ctx.bar.${field});`);
     }
   }
