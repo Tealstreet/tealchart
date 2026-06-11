@@ -2842,6 +2842,41 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'pin') {
+            const radius = primitive.radius;
+            const stem = radius * 1.8;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const color = primitive.style.lineColor;
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                <Circle
+                  cx={primitive.point.x}
+                  cy={primitive.point.y - stem}
+                  r={radius}
+                  color={primitive.style.fillColor ?? color}
+                />
+                <Circle
+                  cx={primitive.point.x}
+                  cy={primitive.point.y - stem}
+                  r={radius}
+                  color={color}
+                  style="stroke"
+                  strokeWidth={1}
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </Circle>
+                <SkiaLine
+                  p1={vec(primitive.point.x, primitive.point.y - stem + radius)}
+                  p2={vec(primitive.point.x, primitive.point.y)}
+                  color={color}
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </SkiaLine>
+              </Group>
+            );
+          }
+
           if (
             primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||

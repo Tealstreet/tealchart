@@ -60,6 +60,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('note')).toBe(1);
     expect(getRequiredAnchorCount('comment')).toBe(1);
+    expect(getRequiredAnchorCount('pin')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
     expect(getRequiredAnchorCount('callout')).toBe(2);
@@ -690,6 +691,10 @@ describe('user drawing types', () => {
       point: anchorA,
       text: 'Comment',
       textAlign: 'center',
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'pin', anchors: [anchorA] }), { id: 'pin' })).toMatchObject({
+      kind: 'pin',
+      point: anchorA,
     });
     expect(
       createUserDrawingFromDraft(

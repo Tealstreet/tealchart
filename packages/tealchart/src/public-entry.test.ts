@@ -74,6 +74,7 @@ import type {
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
+  MobileUserDrawingPinPrimitive,
   MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
@@ -138,6 +139,7 @@ import type {
   NoteDrawing,
   PathDrawing,
   ParallelChannelDrawing,
+  PinDrawing,
   PitchforkDrawing,
   PitchforkDrawingKind,
   PitchfanDrawing,
@@ -221,6 +223,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCalloutPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCommentPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingPriceNotePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingPinPrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -662,6 +665,17 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const pinPrimitive: NonNever<MobileUserDrawingPinPrimitive> = {
+      kind: 'pin',
+      id: 'pin',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      point: { x: 5, y: 5 },
+      radius: 4,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -709,6 +723,7 @@ describe('tealchart public entries', () => {
     expect(calloutPrimitive.kind).toBe('callout');
     expect(commentPrimitive.kind).toBe('comment');
     expect(priceNotePrimitive.kind).toBe('priceNote');
+    expect(pinPrimitive.kind).toBe('pin');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1195,6 +1210,12 @@ describe('tealchart public entries', () => {
       text: 'Price note',
       textAlign: 'center',
     };
+    const pin: PinDrawing = {
+      ...drawing,
+      id: 'pin',
+      kind: 'pin',
+      point: drawing.points[0]!,
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
@@ -1203,6 +1224,7 @@ describe('tealchart public entries', () => {
     expect(callout.kind).toBe('callout');
     expect(comment.kind).toBe('comment');
     expect(priceNote.kind).toBe('priceNote');
+    expect(pin.kind).toBe('pin');
   });
 
   it('exports shared drawing curve types and resolver', () => {

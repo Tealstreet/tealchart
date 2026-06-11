@@ -718,6 +718,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'pin';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      radius: number;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'handle';
       id: string;
       drawingId: string;
@@ -733,6 +744,7 @@ export type MobileUserDrawingNotePrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingCalloutPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'callout' }>;
 export type MobileUserDrawingCommentPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'comment' }>;
 export type MobileUserDrawingPriceNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceNote' }>;
+export type MobileUserDrawingPinPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pin' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
@@ -890,6 +902,7 @@ function primitiveFromGeometry(
   phase: UserDrawingRenderPhase,
   selected: boolean,
   opacity: number,
+  handleRadius: number,
   textEditValue?: string | null,
 ): MobileUserDrawingPrimitive {
   switch (geometry.kind) {
@@ -1582,6 +1595,18 @@ function primitiveFromGeometry(
         textAlign: callout.textAlign,
         style: callout.style,
       };
+    case 'pin':
+      return {
+        kind: 'pin',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        point: geometry.point,
+        radius: Math.max(4, handleRadius),
+        style: geometry.drawing.style,
+      };
   }
 }
 
@@ -1593,6 +1618,7 @@ export function resolveMobileUserDrawingRenderModel(
   const entries = resolveUserDrawingRenderEntries(state, options);
   const primitives: MobileUserDrawingPrimitive[] = [];
   const draftOpacity = options.draftOpacity ?? DEFAULT_DRAFT_OPACITY;
+  const handleRadius = options.handleRadius ?? DEFAULT_HANDLE_RADIUS;
 
   for (const entry of entries) {
     if (!entry.drawing.visible) continue;
@@ -1607,6 +1633,7 @@ export function resolveMobileUserDrawingRenderModel(
         entry.phase,
         entry.selected,
         normalizeUserDrawingOpacity(entry.drawing.style.opacity ?? 1) * (entry.phase === 'draft' ? draftOpacity : 1),
+        handleRadius,
         textEditValue,
       ),
     );
