@@ -406,6 +406,17 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'timeCycles') {
+    const distance = Math.min(
+      ...geometry.timeCycles.cycles.flatMap((cycle) => [
+        distanceToPolyline(point, cycle.points),
+        distanceToSegment(point, cycle.startBoundary),
+        distanceToSegment(point, cycle.endBoundary),
+      ]),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -545,6 +556,7 @@ function hitTestUserDrawingHandle(
     case 'fibSpiral':
     case 'fibTimeZone':
     case 'cyclicLines':
+    case 'timeCycles':
     case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
@@ -556,6 +568,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibSpiral' ||
         geometry.drawing.kind === 'fibTimeZone' ||
         geometry.drawing.kind === 'cyclicLines' ||
+        geometry.drawing.kind === 'timeCycles' ||
         geometry.drawing.kind === 'gannFan'
       ) {
         handles.push(

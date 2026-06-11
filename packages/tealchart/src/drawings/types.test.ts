@@ -85,6 +85,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('gannSquare')).toBe(2);
     expect(getRequiredAnchorCount('fibTimeZone')).toBe(2);
     expect(getRequiredAnchorCount('cyclicLines')).toBe(2);
+    expect(getRequiredAnchorCount('timeCycles')).toBe(2);
     expect(getRequiredAnchorCount('fibWedge')).toBe(3);
     expect(getRequiredAnchorCount('fibChannel')).toBe(3);
     expect(getRequiredAnchorCount('trendBasedFibTime')).toBe(3);
@@ -392,6 +393,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'cyclicLines' }), { id: 'cyclic-lines', now: 20 })).toMatchObject({
       id: 'cyclic-lines',
       kind: 'cyclicLines',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'timeCycles' }), { id: 'time-cycles', now: 20 })).toMatchObject({
+      id: 'time-cycles',
+      kind: 'timeCycles',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

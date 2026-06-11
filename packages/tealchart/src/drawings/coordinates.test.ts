@@ -37,6 +37,7 @@ import type {
   PriceRangeDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
+  TimeCyclesDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
   TrendLineDrawing,
@@ -691,6 +692,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 100 },
       ],
     };
+    const timeCycles: TimeCyclesDrawing = {
+      ...trendLine,
+      id: 'time-cycles',
+      kind: 'timeCycles',
+      points: [
+        { time: 1_500, price: 100 },
+        { time: 2_000, price: 110 },
+      ],
+    };
     const trendBasedFibTime: TrendBasedFibTimeDrawing = {
       ...trendLine,
       id: 'trend-fib-time',
@@ -1195,6 +1205,41 @@ describe('user drawing coordinates', () => {
           { ratio: 0, time: 1_500, x: 60, segment: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } } },
           { ratio: 1, time: 2_000, x: 110, segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } } },
           { ratio: 3, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(timeCycles, space)).toMatchObject({
+      kind: 'timeCycles',
+      timeCycles: {
+        baseline: { x: 60, y: 70 },
+        peak: { x: 110, y: 20 },
+        interval: 500,
+        cycles: expect.arrayContaining([
+          expect.objectContaining({
+            ratio: 0,
+            startTime: 1_500,
+            endTime: 2_000,
+            startBoundary: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } },
+            endBoundary: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
+            points: expect.arrayContaining([{ x: 85, y: 20 }]),
+          }),
+        ]),
+      },
+    });
+    expect(
+      resolveUserDrawingGeometry(
+        { ...timeCycles, points: [{ time: 2_000, price: 100 }, { time: 1_500, price: 110 }] },
+        space,
+      ),
+    ).toMatchObject({
+      kind: 'timeCycles',
+      timeCycles: {
+        cycles: expect.arrayContaining([
+          expect.objectContaining({
+            ratio: -1,
+            startTime: 1_500,
+            endTime: 2_000,
+          }),
         ]),
       },
     });

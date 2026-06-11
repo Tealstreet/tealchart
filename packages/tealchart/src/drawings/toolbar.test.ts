@@ -81,6 +81,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibTimeZone',
       'trendBasedFibTime',
       'cyclicLines',
+      'timeCycles',
       'gannFan',
       'gannBox',
       'gannSquare',
@@ -203,6 +204,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('cyclicLines')).toEqual(
       expect.objectContaining({ tool: 'cyclicLines', label: 'Cyclic lines' }),
+    );
+    expect(getUserDrawingToolDescriptor('timeCycles')).toEqual(
+      expect.objectContaining({ tool: 'timeCycles', label: 'Time cycles' }),
     );
     expect(getUserDrawingToolDescriptor('gannFan')).toEqual(
       expect.objectContaining({ tool: 'gannFan', label: 'Gann fan' }),
