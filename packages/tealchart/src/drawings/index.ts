@@ -88,6 +88,9 @@ export {
   getRequiredAnchorCount,
   getUserDrawingPaneId,
   isDrawingDraftReady,
+  normalizeUserDrawingFontSize,
+  normalizeUserDrawingStyle,
+  USER_DRAWING_FONT_SIZES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 export {

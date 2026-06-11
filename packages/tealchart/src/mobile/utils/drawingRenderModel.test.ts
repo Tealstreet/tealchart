@@ -261,5 +261,12 @@ describe('mobile user drawing render model', () => {
       box: { x: 20, y: 40, width: 60, height: 20 },
       text: { x: 26, y: 50 },
     });
+
+    expect(
+      resolveMobileUserDrawingTextLabelLayout(
+        { ...primitive, style: { ...primitive.style, fontSize: 15 } },
+        48,
+      ).fontSize,
+    ).toBe(14);
   });
 });

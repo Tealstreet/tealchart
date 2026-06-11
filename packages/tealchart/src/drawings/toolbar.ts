@@ -1,5 +1,7 @@
 import type { UserDrawing, UserDrawingLineStyle, UserDrawingState, UserDrawingTool } from './types';
 
+import { USER_DRAWING_FONT_SIZES } from './types';
+
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
 
@@ -109,11 +111,8 @@ export const USER_DRAWING_TEXT_COLOR_DESCRIPTORS: readonly UserDrawingTextColorD
 ] as const;
 
 export const USER_DRAWING_FONT_SIZE_DESCRIPTORS: readonly UserDrawingFontSizeDescriptor[] = [
-  { fontSize: 10, label: '10 pixel font size' },
-  { fontSize: 12, label: '12 pixel font size' },
-  { fontSize: 14, label: '14 pixel font size' },
-  { fontSize: 16, label: '16 pixel font size' },
-] as const;
+  ...USER_DRAWING_FONT_SIZES.map((fontSize) => ({ fontSize, label: `${fontSize} pixel font size` })),
+];
 
 export const USER_DRAWING_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
   { width: 1, label: '1 pixel line width' },
