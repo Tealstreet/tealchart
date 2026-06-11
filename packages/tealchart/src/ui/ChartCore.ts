@@ -719,6 +719,7 @@ export class ChartCore {
         this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
       onDrawingInput: (x, y, source) => this.handleUserDrawingInput(x, y, source),
+      onDrawingDragPending: (x, y) => this.handleUserDrawingDragPending(x, y),
       onDrawingDragStart: (x, y) => this.handleUserDrawingDragStart(x, y),
       onDrawingDragMove: (x, y) => this.handleUserDrawingDragMove(x, y),
       onDrawingDragEnd: () => this.handleUserDrawingDragEnd(),
@@ -1573,6 +1574,11 @@ export class ChartCore {
     if (x < chartLeft || x >= chartRight || !this.getPaneAtY(y)) return false;
 
     return this.options.onUserDrawingEditStart?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
+  }
+
+  private handleUserDrawingDragPending(x: number, y: number): boolean {
+    if (!this.viewport || this.userDrawingState?.activeTool !== 'path') return false;
+    return this.resolveUserDrawingInputPoint(x, y) !== null;
   }
 
   private handleUserDrawingDragMove(x: number, y: number): boolean {
