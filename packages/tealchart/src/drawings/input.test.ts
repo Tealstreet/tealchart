@@ -14,8 +14,11 @@ import {
   selectUserDrawingAtPoint,
   selectUserDrawingById,
   selectUserDrawing,
+  setUserDrawingLocked,
   setUserDrawingText,
   setUserDrawingTool,
+  setUserDrawingVisibility,
+  updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
 import type { DrawingCoordinateSpace } from './coordinates';
@@ -266,6 +269,184 @@ describe('user drawing input controller', () => {
     expect(setUserDrawingText(changed, 'locked', 'Ignored')).toBe(changed);
     expect(beginUserDrawingTextEdit(changed, 'line')).toBe(changed);
     expect(beginUserDrawingTextEdit(changed, 'locked')).toBe(changed);
+  });
+
+  it('updates selected drawing style while preserving identity and selection', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'line' },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    const updated = updateUserDrawingStyle(
+      state,
+      {
+        lineColor: '#00ffcc',
+        lineWidth: 3,
+        lineStyle: 'dashed',
+      },
+      { now: () => 10 },
+    );
+
+    expect(updated.drawings[0]).toMatchObject({
+      id: 'line',
+      updatedAt: 10,
+      style: {
+        lineColor: '#00ffcc',
+        lineWidth: 3,
+        lineStyle: 'dashed',
+      },
+    });
+    expect(updated.selection).toEqual({ drawingId: 'line' });
+    expect(updateUserDrawingStyle(updated, { lineColor: '#00ffcc' })).toBe(updated);
+  });
+
+  it('updates targeted drawing style and respects locked drawings by default', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [anchorA, anchorB],
+        },
+      ],
+    });
+
+    expect(updateUserDrawingStyle(state, { fillColor: '#123456' }, { drawingId: 'locked' })).toBe(state);
+
+    const updated = updateUserDrawingStyle(
+      state,
+      { fillColor: '#123456' },
+      { drawingId: 'locked', includeLocked: true, now: () => 20 },
+    );
+    expect(updated.drawings[0]).toMatchObject({
+      updatedAt: 20,
+      style: expect.objectContaining({ fillColor: '#123456' }),
+    });
+  });
+
+  it('toggles visibility and clears selection/edit state when hiding selected drawings', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'center' as const,
+    };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 1 },
+      drawings: [textLabel],
+    });
+
+    const hidden = setUserDrawingVisibility(state, false, { now: () => 30 });
+    expect(hidden.drawings[0]).toMatchObject({ visible: false, updatedAt: 30 });
+    expect(hidden.selection).toBeNull();
+    expect(hidden.textEdit).toBeNull();
+
+    const shown = setUserDrawingVisibility(hidden, true, { drawingId: 'label', now: () => 31 });
+    expect(shown.drawings[0]).toMatchObject({ visible: true, updatedAt: 31 });
+    expect(shown.selection).toBeNull();
+  });
+
+  it('requires explicit opt-in to change locked drawing visibility', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(setUserDrawingVisibility(state, false, { drawingId: 'locked' })).toBe(state);
+    expect(setUserDrawingVisibility(state, false, { drawingId: 'locked', includeLocked: true }).drawings[0]).toMatchObject({
+      visible: false,
+    });
+  });
+
+  it('toggles locked state and clears selection/edit state when locking selected drawings', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'center' as const,
+    };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 1 },
+      drawings: [textLabel],
+    });
+
+    const locked = setUserDrawingLocked(state, true, { now: () => 40 });
+    expect(locked.drawings[0]).toMatchObject({ locked: true, updatedAt: 40 });
+    expect(locked.selection).toBeNull();
+    expect(locked.textEdit).toBeNull();
+
+    const unlocked = setUserDrawingLocked(locked, false, { drawingId: 'label', now: () => 41 });
+    expect(unlocked).toBe(locked);
+
+    const forceUnlocked = setUserDrawingLocked(locked, false, { drawingId: 'label', includeLocked: true, now: () => 41 });
+    expect(forceUnlocked.drawings[0]).toMatchObject({ locked: false, updatedAt: 41 });
+  });
+
+  it('requires explicit opt-in to unlock locked drawings by id', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(setUserDrawingLocked(state, false, { drawingId: 'locked' })).toBe(state);
+    const unlocked = setUserDrawingLocked(state, false, { drawingId: 'locked', includeLocked: true, now: () => 50 });
+    expect(unlocked.drawings[0]).toMatchObject({ locked: false, updatedAt: 50 });
   });
 
   it('clears stale text edits when the edited drawing is removed or selection changes', () => {

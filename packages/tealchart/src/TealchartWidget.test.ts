@@ -724,6 +724,57 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('applies public drawing style and property commands through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'line' },
+        drawings: [
+          {
+            id: 'line',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      expect(widget.updateUserDrawingStyle({ lineColor: '#00ffcc', lineWidth: 3 })).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        style: expect.objectContaining({ lineColor: '#00ffcc', lineWidth: 3 }),
+      });
+
+      expect(widget.setUserDrawingLocked(true)).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        selection: null,
+        drawings: [expect.objectContaining({ id: 'line', locked: true })],
+      });
+
+      expect(widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'line' })).toBe(false);
+      expect(widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'line', includeLocked: true })).toBe(
+        true,
+      );
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        style: expect.objectContaining({ lineColor: '#ffffff' }),
+      });
+
+      expect(widget.setUserDrawingVisibility(false, { drawingId: 'line' })).toBe(false);
+      expect(widget.setUserDrawingVisibility(false, { drawingId: 'line', includeLocked: true })).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ visible: false });
+      expect(onChange).toHaveBeenCalled();
+    });
+
     it('applies public text drawing edit commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();
