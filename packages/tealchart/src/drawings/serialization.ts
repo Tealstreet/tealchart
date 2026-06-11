@@ -65,6 +65,14 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         ...drawing,
         style: { ...drawing.style },
       };
+    case 'arrowMarkUp':
+    case 'arrowMarkDown':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        point: { ...drawing.point },
+      };
     case 'textLabel':
       return {
         ...drawing,
@@ -284,6 +292,17 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             time: value.time,
           }
         : null;
+    case 'arrowMarkUp':
+    case 'arrowMarkDown': {
+      const point = parseAnchor(value.point);
+      return point
+        ? {
+            ...base,
+            kind: value.kind,
+            point,
+          }
+        : null;
+    }
     case 'textLabel': {
       const point = parseAnchor(value.point);
       if (!point || typeof value.text !== 'string') return null;

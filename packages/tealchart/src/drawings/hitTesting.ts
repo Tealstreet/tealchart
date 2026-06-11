@@ -173,6 +173,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'arrowMark') {
+    const distance = pointInPolygon(point, geometry.mark.points) ? 0 : distanceToClosedPolyline(point, geometry.mark.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   const distance = distanceToSegment(point, geometry.segment);
   return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
 }
@@ -234,6 +239,9 @@ function hitTestUserDrawingHandle(
       break;
     case 'textLabel':
       handles.push({ handle: 'center', point: geometry.point });
+      break;
+    case 'arrowMark':
+      handles.push({ handle: 'center', point: geometry.mark.point });
       break;
     case 'horizontalLine':
     case 'verticalLine':

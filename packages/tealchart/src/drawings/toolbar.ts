@@ -107,6 +107,8 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'infoLine', icon: 'i', label: 'Info line' },
   { tool: 'arrowLine', icon: '↗', label: 'Arrow line' },
   { tool: 'arrowMarker', icon: '➤', label: 'Arrow marker' },
+  { tool: 'arrowMarkUp', icon: '↑', label: 'Arrow mark up' },
+  { tool: 'arrowMarkDown', icon: '↓', label: 'Arrow mark down' },
   { tool: 'ray', icon: '↗', label: 'Ray' },
   { tool: 'horizontalLine', icon: 'H', label: 'Horizontal line' },
   { tool: 'verticalLine', icon: 'V', label: 'Vertical line' },
@@ -219,6 +221,8 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
 export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   return (
     drawing.kind === 'arrowMarker' ||
+    drawing.kind === 'arrowMarkUp' ||
+    drawing.kind === 'arrowMarkDown' ||
     drawing.kind === 'rectangle' ||
     drawing.kind === 'priceRange' ||
     drawing.kind === 'dateRange' ||

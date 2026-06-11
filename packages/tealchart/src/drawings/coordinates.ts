@@ -2,9 +2,9 @@ import type { ChartMargins, ComputedPane, Viewport } from '../types';
 import type { UserDrawingInputPoint } from './input';
 import type { UserDrawing, UserDrawingAnchor } from './types';
 
-import type { DrawingArrowMarker } from './arrowGeometry';
+import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 
-import { resolveDrawingArrowMarker } from './arrowGeometry';
+import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
 
 export interface DrawingScreenPoint {
   x: number;
@@ -60,6 +60,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'arrowMarker';
       drawing: UserDrawing;
       marker: DrawingArrowMarker;
+    }
+  | {
+      kind: 'arrowMark';
+      drawing: UserDrawing;
+      mark: DrawingArrowMark;
     }
   | {
       kind: 'infoLine';
@@ -313,6 +318,19 @@ export function resolveUserDrawingGeometry(
               tailWidth: Math.max(7, drawing.style.lineWidth * 3),
             },
           ) ?? { segment: { start, end }, points: [start] },
+      };
+    }
+    case 'arrowMarkUp':
+    case 'arrowMarkDown': {
+      const point = anchorToScreenPoint(drawing.point, space);
+      return {
+        kind: 'arrowMark',
+        drawing,
+        mark: resolveDrawingArrowMark(point, drawing.kind === 'arrowMarkUp' ? 'up' : 'down', {
+          height: Math.max(24, drawing.style.lineWidth * 9),
+          width: Math.max(18, drawing.style.lineWidth * 7),
+          stemWidth: Math.max(7, drawing.style.lineWidth * 3),
+        }),
       };
     }
     case 'ray': {
