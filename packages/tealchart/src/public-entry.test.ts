@@ -12,6 +12,7 @@ import {
   resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
   resolveFlatTopBottomFromAnchors,
+  resolvePitchforkFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
@@ -42,6 +43,7 @@ import type {
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
+  MobileUserDrawingPitchforkPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
   MobileUserDrawingFlatTopBottomPrimitive,
   MobileUserDrawingRiskRewardLabelPosition,
@@ -65,6 +67,7 @@ import type {
   LongPositionDrawing,
   PathDrawing,
   ParallelChannelDrawing,
+  PitchforkDrawing,
   PriceRangeDrawing,
   RegressionTrendDrawing,
   RotatedRectangleDrawing,
@@ -98,6 +101,7 @@ describe('tealchart public entries', () => {
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
     expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');
+    expect(resolvePitchforkFromAnchors).toBeTypeOf('function');
     expect(resolveAnchoredVwapFromAnchor).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
@@ -119,6 +123,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingPitchforkPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingFlatTopBottomPrimitive');
@@ -156,6 +161,18 @@ describe('tealchart public entries', () => {
       ...channelPrimitive,
       kind: 'disjointChannel',
       id: 'disjoint',
+    };
+    const pitchforkPrimitive: NonNever<MobileUserDrawingPitchforkPrimitive> = {
+      kind: 'pitchfork',
+      id: 'pitchfork',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      median: { start: { x: 0, y: 5 }, end: { x: 10, y: 5 } },
+      upper: { start: { x: 0, y: 0 }, end: { x: 10, y: 0 } },
+      lower: { start: { x: 0, y: 10 }, end: { x: 10, y: 10 } },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const linePrimitive: NonNever<MobileUserDrawingLinePrimitive> = {
       kind: 'line',
@@ -233,6 +250,7 @@ describe('tealchart public entries', () => {
     expect(regressionPrimitive.kind).toBe('regressionTrend');
     expect(flatPrimitive.kind).toBe('flatTopBottom');
     expect(disjointPrimitive.kind).toBe('disjointChannel');
+    expect(pitchforkPrimitive.kind).toBe('pitchfork');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
@@ -723,6 +741,26 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('parallelChannel');
+  });
+
+  it('exports shared drawing pitchfork types', () => {
+    const drawing: PitchforkDrawing = {
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('pitchfork');
   });
 
   it('exports shared drawing regression trend types', () => {

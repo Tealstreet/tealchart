@@ -164,6 +164,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'pitchfork';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      upper: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      lower: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -354,6 +366,7 @@ export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
+export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -641,6 +654,19 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.polygon.points,
+        style: geometry.drawing.style,
+      };
+    case 'pitchfork':
+      return {
+        kind: 'pitchfork',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        median: geometry.pitchfork.median,
+        upper: geometry.pitchfork.upper,
+        lower: geometry.pitchfork.lower,
         style: geometry.drawing.style,
       };
     case 'parallelChannel':

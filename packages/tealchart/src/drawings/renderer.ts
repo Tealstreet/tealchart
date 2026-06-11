@@ -195,6 +195,23 @@ function renderPolygonGeometry(
   }
 }
 
+function renderPitchforkGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'pitchfork' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(geometry.pitchfork.median.start.x, geometry.pitchfork.median.start.y);
+  ctx.lineTo(geometry.pitchfork.median.end.x, geometry.pitchfork.median.end.y);
+  ctx.moveTo(geometry.pitchfork.upper.start.x, geometry.pitchfork.upper.start.y);
+  ctx.lineTo(geometry.pitchfork.upper.end.x, geometry.pitchfork.upper.end.y);
+  ctx.moveTo(geometry.pitchfork.lower.start.x, geometry.pitchfork.lower.start.y);
+  ctx.lineTo(geometry.pitchfork.lower.end.x, geometry.pitchfork.lower.end.y);
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -589,6 +606,9 @@ export function renderUserDrawing(
         break;
       case 'triangle':
         renderPolygonGeometry(ctx, geometry);
+        break;
+      case 'pitchfork':
+        renderPitchforkGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':
