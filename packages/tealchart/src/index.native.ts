@@ -60,6 +60,7 @@ export type {
   MobileUserDrawingArrowMarkerPrimitive,
   MobileUserDrawingCirclePrimitive,
   MobileUserDrawingCrossLinePrimitive,
+  MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingEllipsePrimitive,
   MobileUserDrawingFibExtensionPrimitive,
   MobileUserDrawingFibRetracementPrimitive,

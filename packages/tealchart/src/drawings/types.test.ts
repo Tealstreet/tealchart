@@ -71,6 +71,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('ellipse')).toBe(2);
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
     expect(getRequiredAnchorCount('dateRange')).toBe(2);
+    expect(getRequiredAnchorCount('datePriceRange')).toBe(2);
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
@@ -203,6 +204,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'dateRange' }), { id: 'date-range', now: 20 })).toMatchObject({
       id: 'date-range',
       kind: 'dateRange',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'datePriceRange' }), { id: 'date-price-range', now: 20 })).toMatchObject({
+      id: 'date-price-range',
+      kind: 'datePriceRange',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

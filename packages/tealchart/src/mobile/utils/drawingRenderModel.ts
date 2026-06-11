@@ -201,6 +201,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'datePriceRange';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      priceLabelPoint: DrawingScreenPoint;
+      priceLabel: string;
+      dateLabelPoint: DrawingScreenPoint;
+      dateLabel: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'fibRetracement' | 'fibExtension';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -243,6 +257,7 @@ export type MobileUserDrawingPrimitive =
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
+export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
 export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'path' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
@@ -552,6 +567,36 @@ function primitiveFromGeometry(
           y: geometry.rect.y + geometry.rect.height / 2,
         },
         label,
+        style: geometry.drawing.style,
+      };
+    }
+    case 'datePriceRange': {
+      const drawing = geometry.drawing;
+      const priceLabel =
+        drawing.kind === 'datePriceRange'
+          ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
+          : '';
+      const dateLabel =
+        drawing.kind === 'datePriceRange' ? resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label : '';
+      const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+      return {
+        kind: 'datePriceRange',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.rect,
+        priceLabelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height / 2,
+        },
+        priceLabel,
+        dateLabelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height - fontSize,
+        },
+        dateLabel,
         style: geometry.drawing.style,
       };
     }
