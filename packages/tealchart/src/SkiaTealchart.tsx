@@ -121,6 +121,7 @@ import {
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
 import {
+  resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
@@ -1540,6 +1541,38 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       {dash && <DashPathEffect intervals={dash} />}
                     </SkiaLine>
                   </>
+                )}
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'infoLine') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
+            const labelPosition = resolveMobileUserDrawingInfoLineLabelPosition(primitive, textBounds);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaLine
+                    p1={vec(primitive.start.x, primitive.start.y)}
+                    p2={vec(primitive.end.x, primitive.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                )}
+                {font && (
+                  <SkiaText
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    text={primitive.label}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
                 )}
               </Group>
             );

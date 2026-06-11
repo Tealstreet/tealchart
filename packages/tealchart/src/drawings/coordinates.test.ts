@@ -3,6 +3,7 @@ import type {
   ArrowLineDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
+  InfoLineDrawing,
   PathDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
@@ -256,6 +257,11 @@ describe('user drawing coordinates', () => {
         { time: 2_500, price: 105 },
       ],
     };
+    const infoLine: InfoLineDrawing = {
+      ...trendLine,
+      id: 'info',
+      kind: 'infoLine',
+    };
     const priceRange: PriceRangeDrawing = {
       ...trendLine,
       id: 'range',
@@ -296,6 +302,10 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(extendedLine, space)).toMatchObject({
       kind: 'line',
       segment: { start: { x: 10, y: 82.5 }, end: { x: 210, y: 32.5 } },
+    });
+    expect(resolveUserDrawingGeometry(infoLine, space)).toMatchObject({
+      kind: 'infoLine',
+      segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
     });
     expect(
       resolveUserDrawingGeometry(

@@ -53,6 +53,11 @@ export type ResolvedUserDrawingGeometry =
       segment: DrawingScreenSegment;
     }
   | {
+      kind: 'infoLine';
+      drawing: UserDrawing;
+      segment: DrawingScreenSegment;
+    }
+  | {
       kind: 'rectangle';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
@@ -264,6 +269,15 @@ export function resolveUserDrawingGeometry(
         kind: 'line',
         drawing,
         segment,
+      };
+    }
+    case 'infoLine': {
+      const start = anchorToScreenPoint(drawing.points[0], space);
+      const end = anchorToScreenPoint(drawing.points[1], space);
+      return {
+        kind: 'infoLine',
+        drawing,
+        segment: { start, end },
       };
     }
     case 'arrowLine': {

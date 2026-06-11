@@ -57,6 +57,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
+    expect(getRequiredAnchorCount('infoLine')).toBe(2);
     expect(getRequiredAnchorCount('arrowLine')).toBe(2);
     expect(getRequiredAnchorCount('ray')).toBe(2);
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
@@ -126,6 +127,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'extendedLine' }), { id: 'extended', now: 20 })).toMatchObject({
       id: 'extended',
       kind: 'extendedLine',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'infoLine' }), { id: 'info', now: 20 })).toMatchObject({
+      id: 'info',
+      kind: 'infoLine',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

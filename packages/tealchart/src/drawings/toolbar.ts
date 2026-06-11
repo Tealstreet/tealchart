@@ -104,6 +104,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'select', icon: '⌖', label: 'Select' },
   { tool: 'trendLine', icon: '╱', label: 'Trend line' },
   { tool: 'extendedLine', icon: '⟷', label: 'Extended line' },
+  { tool: 'infoLine', icon: 'i', label: 'Info line' },
   { tool: 'arrowLine', icon: '↗', label: 'Arrow line' },
   { tool: 'ray', icon: '↗', label: 'Ray' },
   { tool: 'horizontalLine', icon: 'H', label: 'Horizontal line' },
