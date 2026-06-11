@@ -59,6 +59,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('horizontalRay')).toBe(1);
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('note')).toBe(1);
+    expect(getRequiredAnchorCount('comment')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
     expect(getRequiredAnchorCount('callout')).toBe(2);
@@ -672,6 +673,21 @@ describe('user drawing types', () => {
       kind: 'note',
       point: anchorA,
       text: 'Chart note',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'comment',
+          anchors: [anchorA],
+          text: 'Comment',
+        }),
+        { id: 'comment' },
+      ),
+    ).toMatchObject({
+      kind: 'comment',
+      point: anchorA,
+      text: 'Comment',
       textAlign: 'center',
     });
     expect(

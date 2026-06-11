@@ -72,6 +72,7 @@ import type {
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingCalloutPrimitive,
+  MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
@@ -132,6 +133,7 @@ import type {
   InfoLineDrawing,
   LongPositionDrawing,
   CalloutDrawing,
+  CommentDrawing,
   NoteDrawing,
   PathDrawing,
   ParallelChannelDrawing,
@@ -215,6 +217,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCalloutPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCommentPrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -627,6 +630,20 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const commentPrimitive: NonNever<MobileUserDrawingCommentPrimitive> = {
+      kind: 'comment',
+      id: 'comment',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      point: { x: 0, y: 0 },
+      text: 'Comment',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -672,6 +689,7 @@ describe('tealchart public entries', () => {
     expect(highlighterPrimitive.kind).toBe('highlighter');
     expect(notePrimitive.kind).toBe('note');
     expect(calloutPrimitive.kind).toBe('callout');
+    expect(commentPrimitive.kind).toBe('comment');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1142,12 +1160,21 @@ describe('tealchart public entries', () => {
       text: 'Callout',
       textAlign: 'center',
     };
+    const comment: CommentDrawing = {
+      ...drawing,
+      id: 'comment',
+      kind: 'comment',
+      point: drawing.points[0]!,
+      text: 'Comment',
+      textAlign: 'center',
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
     expect(highlighter.kind).toBe('highlighter');
     expect(note.kind).toBe('note');
     expect(callout.kind).toBe('callout');
+    expect(comment.kind).toBe('comment');
   });
 
   it('exports shared drawing curve types and resolver', () => {
