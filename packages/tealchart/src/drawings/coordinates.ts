@@ -366,6 +366,19 @@ export interface DrawingScreenHeadShouldersPattern {
   labels: readonly DrawingScreenHeadShouldersPatternLabel[];
 }
 
+export const ELLIOTT_IMPULSE_WAVE_LABELS = ['1', '2', '3', '4', '5'] as const;
+export type ElliottImpulseWaveLabel = (typeof ELLIOTT_IMPULSE_WAVE_LABELS)[number];
+
+export interface DrawingScreenElliottImpulseWaveLabel {
+  text: ElliottImpulseWaveLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenElliottImpulseWave {
+  polyline: DrawingScreenPolyline;
+  labels: readonly DrawingScreenElliottImpulseWaveLabel[];
+}
+
 export interface DrawingScreenAnchoredVwap {
   anchor: DrawingScreenPoint;
   points: readonly DrawingScreenPoint[];
@@ -495,6 +508,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'headShouldersPattern';
       drawing: UserDrawing;
       pattern: DrawingScreenHeadShouldersPattern;
+    }
+  | {
+      kind: 'elliottImpulseWave';
+      drawing: UserDrawing;
+      pattern: DrawingScreenElliottImpulseWave;
     }
   | {
       kind: 'abcdPattern';
@@ -1177,6 +1195,26 @@ export function resolveHeadShouldersPatternFromAnchors(
     neckline: { start: leftNeckline!, end: rightNeckline! },
     labels: polyline.points.map((point, index) => ({
       text: HEAD_SHOULDERS_PATTERN_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveElliottImpulseWaveFromAnchors(
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ],
+  space: DrawingCoordinateSpace,
+): DrawingScreenElliottImpulseWave {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  return {
+    polyline,
+    labels: polyline.points.map((point, index) => ({
+      text: ELLIOTT_IMPULSE_WAVE_LABELS[index]!,
       point,
     })),
   };
@@ -2356,6 +2394,12 @@ export function resolveUserDrawingGeometry(
         kind: 'headShouldersPattern',
         drawing,
         pattern: resolveHeadShouldersPatternFromAnchors(drawing.points, space),
+      };
+    case 'elliottImpulseWave':
+      return {
+        kind: 'elliottImpulseWave',
+        drawing,
+        pattern: resolveElliottImpulseWaveFromAnchors(drawing.points, space),
       };
     case 'abcdPattern':
       return {

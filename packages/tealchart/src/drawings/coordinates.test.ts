@@ -78,6 +78,7 @@ import {
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
   resolveAbcdPatternFromAnchors,
+  resolveElliottImpulseWaveFromAnchors,
   resolveHeadShouldersPatternFromAnchors,
   resolveThreeDrivesPatternFromAnchors,
   resolveTrianglePatternFromAnchors,
@@ -504,6 +505,38 @@ describe('user drawing coordinates', () => {
         { text: 'H', point: { x: 110, y: 20 } },
         { text: 'N2', point: { x: 160, y: 120 } },
         { text: 'RS', point: { x: 210, y: 70 } },
+      ],
+    });
+  });
+
+  it('resolves Elliott impulse wave polylines and labels from five anchors', () => {
+    expect(
+      resolveElliottImpulseWaveFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 80 },
+          { time: 2_000, price: 120 },
+          { time: 2_500, price: 90 },
+          { time: 3_000, price: 130 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: 170 },
+          { x: 110, y: -30 },
+          { x: 160, y: 120 },
+          { x: 210, y: -80 },
+        ],
+      },
+      labels: [
+        { text: '1', point: { x: 10, y: 70 } },
+        { text: '2', point: { x: 60, y: 170 } },
+        { text: '3', point: { x: 110, y: -30 } },
+        { text: '4', point: { x: 160, y: 120 } },
+        { text: '5', point: { x: 210, y: -80 } },
       ],
     });
   });

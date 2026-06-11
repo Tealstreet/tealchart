@@ -1,6 +1,7 @@
 import type {
   DrawingCoordinateSpace,
   DrawingScreenAbcdPatternLabel,
+  DrawingScreenElliottImpulseWaveLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
   DrawingScreenThreeDrivesPatternLabel,
@@ -714,6 +715,17 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'elliottImpulseWave';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      labels: readonly DrawingScreenElliottImpulseWaveLabel[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'headShouldersPattern';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -910,6 +922,10 @@ export type MobileUserDrawingThreeDrivesPatternPrimitive = Extract<
 export type MobileUserDrawingHeadShouldersPatternPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'headShouldersPattern' }
+>;
+export type MobileUserDrawingElliottImpulseWavePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'elliottImpulseWave' }
 >;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
@@ -1722,6 +1738,18 @@ function primitiveFromGeometry(
     case 'threeDrivesPattern':
       return {
         kind: 'threeDrivesPattern',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.pattern.polyline.points,
+        labels: geometry.pattern.labels,
+        style: geometry.drawing.style,
+      };
+    case 'elliottImpulseWave':
+      return {
+        kind: 'elliottImpulseWave',
         id: geometry.drawing.id,
         phase,
         selected,
