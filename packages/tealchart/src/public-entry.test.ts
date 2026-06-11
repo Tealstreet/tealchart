@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
+  resolveCircleFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
@@ -243,6 +244,30 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('circle');
+    expect(
+      resolveCircleFromAnchors(
+        { time: 1_000, price: 100 },
+        { time: 1_200, price: 104 },
+        {
+          viewport: {
+            startTime: 1_000,
+            endTime: 3_000,
+            priceMin: 90,
+            priceMax: 110,
+          },
+          pane: {
+            id: 'main',
+            top: 20,
+            height: 100,
+            bottom: 120,
+            yMin: 90,
+            yMax: 110,
+          },
+          chartLeft: 10,
+          chartRight: 210,
+        },
+      ).radius,
+    ).toBe(10);
   });
 
   it('exports shared drawing extended line types', () => {

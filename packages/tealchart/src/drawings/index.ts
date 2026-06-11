@@ -3,6 +3,7 @@ export {
   drawingXToTime,
   drawingYToPrice,
   priceToDrawingY,
+  resolveCircleFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
   resolvePolylineFromAnchors,
