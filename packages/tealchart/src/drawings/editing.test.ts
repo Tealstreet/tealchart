@@ -1113,6 +1113,45 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags pitchfan handles without changing kind', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pitchfan',
+      kind: 'pitchfan',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'pitchfan', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'pitchfan', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 50, y: 80 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 60, y: 70 },
+      { now: () => 15 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      kind: 'pitchfan',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 60, price: 30 },
+      ],
+      updatedAt: 15,
+    });
+  });
+
   it('moves selected rotated rectangles by screen delta', () => {
     const drawing: UserDrawing = {
       ...base,

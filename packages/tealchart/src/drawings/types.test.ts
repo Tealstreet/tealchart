@@ -81,6 +81,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('schiffPitchfork')).toBe(3);
     expect(getRequiredAnchorCount('modifiedSchiffPitchfork')).toBe(3);
     expect(getRequiredAnchorCount('insidePitchfork')).toBe(3);
+    expect(getRequiredAnchorCount('pitchfan')).toBe(3);
     expect(getRequiredAnchorCount('rotatedRectangle')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
@@ -298,6 +299,15 @@ describe('user drawing types', () => {
         updatedAt: 20,
       });
     }
+    expect(createUserDrawingFromDraft(draft({ tool: 'pitchfan', anchors: [anchorA, anchorB, anchorC] }), { id: 'pitchfan', now: 20 })).toMatchObject({
+      id: 'pitchfan',
+      kind: 'pitchfan',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
     expect(createUserDrawingFromDraft(draft({ tool: 'parallelChannel', anchors: [anchorA, anchorB, anchorC] }), { id: 'channel', now: 20 })).toMatchObject({
       id: 'channel',
       kind: 'parallelChannel',

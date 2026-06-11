@@ -163,6 +163,7 @@ export function resolveUserDrawingHandlePoints(
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
     case 'insidePitchfork':
+    case 'pitchfan':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':
