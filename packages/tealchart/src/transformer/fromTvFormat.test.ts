@@ -210,6 +210,46 @@ describe('fromTvFormat', () => {
       expect(result.data.autoScale).toBe(false);
     });
 
+    it('restores user drawings from Tealstreet metadata', () => {
+      const content = createBasicTvContent({
+        _tealstreetTealchart: true,
+        _tealstreetVersion: TRANSFORMER_VERSION,
+        _tealstreetOriginalSettings: {
+          userDrawingState: {
+            version: 1,
+            drawings: [
+              {
+                id: 'vline_1',
+                kind: 'verticalLine',
+                paneId: 'main',
+                visible: true,
+                locked: false,
+                createdAt: 100,
+                updatedAt: 100,
+                style: {
+                  lineColor: '#f5c542',
+                  lineWidth: 1,
+                  lineStyle: 'solid',
+                },
+                time: 123456789,
+              },
+            ],
+            activeTool: 'ray',
+            selection: { drawingId: 'vline_1' },
+            draft: null,
+            textEdit: null,
+          },
+        },
+      });
+
+      const result = fromTvFormat(JSON.stringify(content));
+
+      expect(result.data.userDrawingState?.drawings).toHaveLength(1);
+      expect(result.data.userDrawingState?.drawings[0]?.id).toBe('vline_1');
+      expect(result.data.userDrawingState?.activeTool).toBe('select');
+      expect(result.data.userDrawingState?.selection).toBeNull();
+    });
+
     it('restores unmapped indicators from Tealstreet metadata', () => {
       const customIndicator: IndicatorInstance = {
         id: 'custom_123',

@@ -9,6 +9,7 @@ import type { ChartSettings, IndicatorInstance } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type { TransformResult, TvChartContent, TvChartData, TvPane, TvSource } from './types';
 
+import { deserializeUserDrawingStateFromLayout } from '../drawings';
 import { CHART_SETTINGS_VERSION } from '../state/safeDeepMerge';
 import { findMappingByTvStudyId, mapInputsFromTv } from './indicatorMapping';
 import { TV_STYLE_TO_CHART_TYPE, TV_TO_LINE_STYLE } from './types';
@@ -135,6 +136,7 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
     autoScale: originalSettings?.autoScale ?? true,
     viewport: originalSettings?.viewport,
     indicators,
+    userDrawingState: deserializeUserDrawingStateFromLayout(originalSettings?.userDrawingState),
     version: CHART_SETTINGS_VERSION,
   };
 

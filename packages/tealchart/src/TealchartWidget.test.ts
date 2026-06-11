@@ -330,6 +330,149 @@ describe('TealchartWidget', () => {
       expect(setUserDrawingStateCalls.at(-1)).toBe(nextState);
     });
 
+    it('marks layouts dirty only when committed user drawings change', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as {
+        _chartStore: { isDirty: { get(): boolean; set(value: boolean): void } };
+        _getCurrentSettings(): { userDrawingState?: UserDrawingState };
+      };
+
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({ ...initial, activeTool: 'select', selection: { drawingId: 'missing' } });
+      expect(testWidget._chartStore.isDirty.get()).toBe(false);
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+      expect(testWidget._chartStore.isDirty.get()).toBe(true);
+      expect(testWidget._getCurrentSettings().userDrawingState?.drawings).toHaveLength(1);
+
+      testWidget._chartStore.isDirty.set(false);
+      widget.selectUserDrawing('h');
+      expect(testWidget._chartStore.isDirty.get()).toBe(false);
+    });
+
+    it('loads user drawings from layout settings without dirtying the loaded layout', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as {
+        _chartStore: { isDirty: { get(): boolean; set(value: boolean): void } };
+        _handleLoadLayout(settings: unknown, warnings: string[], layoutId: string, layoutName: string): void;
+      };
+
+      testWidget._chartStore.isDirty.set(false);
+      testWidget._handleLoadLayout(
+        {
+          symbol: 'BTCUSDT',
+          interval: '60',
+          showVolume: true,
+          volumeHeight: 0.2,
+          chartType: 'candle',
+          autoScale: true,
+          indicators: [],
+          version: 1,
+          userDrawingState: {
+            version: 1,
+            activeTool: 'select',
+            selection: null,
+            draft: null,
+            textEdit: null,
+            drawings: [
+              {
+                id: 'loaded',
+                kind: 'verticalLine',
+                paneId: 'main',
+                visible: true,
+                locked: false,
+                createdAt: 1,
+                updatedAt: 1,
+                style: {
+                  lineColor: '#f5c542',
+                  lineWidth: 1,
+                  lineStyle: 'solid',
+                },
+                time: 123,
+              },
+            ],
+          },
+        },
+        [],
+        'layout-1',
+        'Layout 1',
+      );
+
+      expect(widget.getUserDrawingState().drawings).toEqual([
+        expect.objectContaining({ id: 'loaded', kind: 'verticalLine' }),
+      ]);
+      expect(testWidget._chartStore.isDirty.get()).toBe(false);
+    });
+
+    it('exports and imports layout-safe user drawing state', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'rectangle',
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      const exported = widget.exportUserDrawingStateForLayout();
+      expect(exported?.drawings).toHaveLength(1);
+      expect(exported?.activeTool).toBe('select');
+      expect(exported?.selection).toBeNull();
+
+      widget.clearUserDrawings();
+      widget.importUserDrawingStateFromLayout(exported);
+      expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
+      expect(widget.getUserDrawingState().activeTool).toBe('select');
+
+      const testWidget = widget as unknown as {
+        _chartStore: { isDirty: { get(): boolean; set(value: boolean): void } };
+      };
+      testWidget._chartStore.isDirty.set(false);
+      widget.importUserDrawingStateFromLayout(exported);
+      expect(testWidget._chartStore.isDirty.get()).toBe(false);
+
+      widget.importUserDrawingStateFromLayout(undefined);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+    });
+
     it('applies active drawing tool input through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

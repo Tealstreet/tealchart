@@ -41,7 +41,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar render the same drawing tool/action controls
   from the shared descriptors.
 
-## Current Epic: Text Editing Foundation
+## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text
   labels while preserving drawing IDs.
@@ -50,8 +50,19 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia double-tap opens a positioned React Native text editor for text
   labels and exposes matching imperative text-edit APIs.
 
+## Current Epic: Persistence Foundation
+
+- Shared layout serialization preserves committed drawings and clears transient
+  active tool, selection, draft, and text-edit state on restore.
+- Web layout save/load includes user drawing state through the existing
+  SaveLoadAdapter transformer path and marks layouts dirty only when committed
+  drawing payloads change.
+- Mobile Skia exposes matching layout-safe drawing import/export APIs through
+  its imperative handle and mobile utility exports.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Rich text label styling controls and multiline editor polish.
-- Persistence handoff into app-level chart layout state.
+- Cross-device/server sync policy for host apps that need drawing collaboration
+  or layout conflict resolution.

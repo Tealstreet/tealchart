@@ -73,6 +73,11 @@ export type {
 export { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from './renderer';
 export type { UserDrawingRenderOptions } from './renderer';
 export {
+  deserializeUserDrawingStateFromLayout,
+  isUserDrawingLayoutStateEqual,
+  serializeUserDrawingStateForLayout,
+} from './serialization';
+export {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STATE,
   DEFAULT_USER_DRAWING_STYLE,
