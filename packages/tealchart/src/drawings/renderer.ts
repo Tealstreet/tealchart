@@ -110,7 +110,7 @@ function renderCrossLineGeometry(
 
 function renderPathGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'path' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'path' | 'brush' }>,
 ): void {
   const [firstPoint, ...remainingPoints] = geometry.polyline.points;
   if (!firstPoint) return;
@@ -999,6 +999,7 @@ export function renderUserDrawing(
         renderInfoLineGeometry(ctx, geometry);
         break;
       case 'path':
+      case 'brush':
         if (drawing.style.lineVisible !== false) {
           renderPathGeometry(ctx, geometry);
         }

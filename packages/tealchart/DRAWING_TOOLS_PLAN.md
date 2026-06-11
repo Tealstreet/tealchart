@@ -576,6 +576,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, two-leg hit testing, whole-drawing moves, and point-index anchor
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Brush Tool
+
+- Shared drawing state supports the variable-point `brush` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching freehand brush paths from shared
+  polyline geometry.
+- Drag input, sampled-path hit testing, whole-drawing moves, and point-index
+  anchor editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

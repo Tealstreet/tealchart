@@ -310,6 +310,7 @@ export type {
   UserDrawingToolDescriptor,
   UserDrawingTool,
   BarsPatternDrawing,
+  BrushDrawing,
   ForecastDrawing,
   ProjectionDrawing,
   ShortPositionDrawing,
