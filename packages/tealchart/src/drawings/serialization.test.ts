@@ -167,6 +167,29 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings[0]?.style.fontSize).toBe(14);
   });
 
+  it('normalizes restored text label font families', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', fontFamily: 'cursive' },
+          point: { time: 1, price: 10 },
+          text: 'Restored',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]?.style.fontFamily).toBe('sans-serif');
+  });
+
   it('normalizes restored drawing opacity', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

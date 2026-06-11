@@ -224,6 +224,7 @@ describe('mobile user drawing render model', () => {
       fillColor: 'rgba(56, 189, 248, 0.12)',
       textColor: '#38bdf8',
       fontSize: 16,
+      fontFamily: 'monospace',
     };
     const state: UserDrawingState = {
       version: 1,
@@ -257,6 +258,7 @@ describe('mobile user drawing render model', () => {
 
     expect(resolveMobileUserDrawingTextLabelLayout(primitive, 48)).toEqual({
       fontSize: 16,
+      fontFamily: 'monospace',
       labelPadding: 6,
       labelHeight: 20,
       box: { x: 20, y: 40, width: 60, height: 20 },
@@ -265,9 +267,12 @@ describe('mobile user drawing render model', () => {
 
     expect(
       resolveMobileUserDrawingTextLabelLayout(
-        { ...primitive, style: { ...primitive.style, fontSize: 15 } },
+        { ...primitive, style: { ...primitive.style, fontSize: 15, fontFamily: 'fantasy' } },
         48,
-      ).fontSize,
-    ).toBe(14);
+      ),
+    ).toMatchObject({
+      fontSize: 14,
+      fontFamily: 'sans-serif',
+    });
   });
 });

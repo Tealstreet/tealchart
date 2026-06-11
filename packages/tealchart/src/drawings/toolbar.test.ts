@@ -12,6 +12,7 @@ import {
   supportsUserDrawingFillControls,
   supportsUserDrawingTextControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
@@ -69,6 +70,7 @@ describe('user drawing toolbar descriptors', () => {
     for (const descriptor of [
       ...USER_DRAWING_FILL_COLOR_DESCRIPTORS,
       ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
+      ...USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
       ...USER_DRAWING_FONT_SIZE_DESCRIPTORS,
       ...USER_DRAWING_OPACITY_DESCRIPTORS,
     ]) {
@@ -155,6 +157,11 @@ describe('user drawing toolbar descriptors', () => {
       '#38bdf8',
       '#f43f5e',
       '#d1d4dc',
+    ]);
+    expect(USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => descriptor.fontFamily)).toEqual([
+      'sans-serif',
+      'serif',
+      'monospace',
     ]);
     expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([10, 12, 14, 16]);
     expect(USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => descriptor.textAlign)).toEqual([
@@ -360,5 +367,11 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolbarStateKey({ ...textState, drawings: [{ ...textDrawing, textAlign: 'right' }] })).not.toBe(
       getUserDrawingToolbarStateKey(textState),
     );
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...textState,
+        drawings: [{ ...textDrawing, style: { ...textDrawing.style, fontFamily: 'serif' } }],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(textState));
   });
 });

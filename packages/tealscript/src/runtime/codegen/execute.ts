@@ -88,8 +88,8 @@ export function executeCompiled(
         isconfirmed: true,
         islastconfirmedhistory: isLastBar,
       },
-      syminfo: ctx.syminfo as Record<string, unknown>,
-      timeframe: ctx.timeframe as Record<string, unknown>,
+      syminfo: ctx.syminfo as unknown as Record<string, unknown>,
+      timeframe: ctx.timeframe as unknown as Record<string, unknown>,
 
       plot(index: number, funcName: string, value: unknown, named: Record<string, unknown>, extraArgs: unknown[]) {
         const plotId = `plot_${index}`;

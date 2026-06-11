@@ -21,6 +21,7 @@ import {
   supportsUserDrawingFillControls,
   supportsUserDrawingTextControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
@@ -457,6 +458,35 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                               ]}
                             >
                               {descriptor.fontSize}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+
+                      {USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => {
+                        const active = (selectedDrawing.style.fontFamily ?? 'sans-serif') === descriptor.fontFamily;
+                        return (
+                          <Pressable
+                            key={descriptor.fontFamily}
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
+                            disabled={!textControlsEnabled}
+                            onPress={() => onUserDrawingStyleChange?.({ fontFamily: descriptor.fontFamily })}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingButton,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                              !textControlsEnabled && styles.drawingButtonDisabled,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.drawingButtonText,
+                                { color: active ? accentColor : textSecondaryColor, fontSize: 11 },
+                              ]}
+                            >
+                              {descriptor.icon}
                             </Text>
                           </Pressable>
                         );

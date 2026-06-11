@@ -3,12 +3,21 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import {
+  normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   setUserDrawingTextAlign,
+  USER_DRAWING_FONT_FAMILIES,
+  USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
-import type { UserDrawingOpacityDescriptor, UserDrawingStyleToggleDescriptor } from './index';
+import type {
+  UserDrawingFontFamily,
+  UserDrawingFontFamilyDescriptor,
+  UserDrawingFontSize,
+  UserDrawingOpacityDescriptor,
+  UserDrawingStyleToggleDescriptor,
+} from './index';
 
 describe('tealchart public entries', () => {
   it('exports shared and native drawing text alignment helpers', () => {
@@ -30,5 +39,15 @@ describe('tealchart public entries', () => {
       'lineVisible',
       'fillVisible',
     ]);
+  });
+
+  it('exports shared drawing font-family helpers', () => {
+    const fontSize: UserDrawingFontSize = 12;
+    const fontFamily: UserDrawingFontFamily = USER_DRAWING_FONT_FAMILIES[0]!;
+    const descriptor: UserDrawingFontFamilyDescriptor = USER_DRAWING_FONT_FAMILY_DESCRIPTORS[0]!;
+    expect(fontSize).toBe(12);
+    expect(fontFamily).toBe('sans-serif');
+    expect(descriptor.fontFamily).toBe('sans-serif');
+    expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
   });
 });
