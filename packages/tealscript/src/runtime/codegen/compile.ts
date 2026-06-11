@@ -11,6 +11,7 @@ import {
 import * as arrFuncs from '../arrays';
 import * as mapFuncs from '../maps';
 import * as udtFuncs from '../objects';
+import * as mtxFuncs from '../matrices';
 
 export interface CompiledScript {
   ScriptClass: new (deps: ScriptDependencies) => GeneratedScriptInstance;
@@ -91,12 +92,65 @@ export interface UdtHelpers {
   copy(obj: udtFuncs.PineUdtObject): udtFuncs.PineUdtObject;
 }
 
+export interface MatrixHelpers {
+  create(rows?: unknown, cols?: unknown, val?: unknown): mtxFuncs.PineMatrix;
+  get(m: mtxFuncs.PineMatrix, row: number, col: number): unknown;
+  set(m: mtxFuncs.PineMatrix, row: number, col: number, val: unknown): void;
+  rows(m: mtxFuncs.PineMatrix): number;
+  columns(m: mtxFuncs.PineMatrix): number;
+  elementCount(m: mtxFuncs.PineMatrix): number;
+  copy(m: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  concat(a: mtxFuncs.PineMatrix, b: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  row(m: mtxFuncs.PineMatrix, r: number): arrFuncs.PineArray;
+  col(m: mtxFuncs.PineMatrix, c: number): arrFuncs.PineArray;
+  fill(m: mtxFuncs.PineMatrix, val: unknown): void;
+  reshape(m: mtxFuncs.PineMatrix, r: number, c: number): void;
+  addRow(m: mtxFuncs.PineMatrix, r: number, vals?: arrFuncs.PineArray): void;
+  addCol(m: mtxFuncs.PineMatrix, c: number, vals?: arrFuncs.PineArray): void;
+  removeRow(m: mtxFuncs.PineMatrix, r: number): arrFuncs.PineArray;
+  removeCol(m: mtxFuncs.PineMatrix, c: number): arrFuncs.PineArray;
+  swapRows(m: mtxFuncs.PineMatrix, a: number, b: number): void;
+  swapCols(m: mtxFuncs.PineMatrix, a: number, b: number): void;
+  reverse(m: mtxFuncs.PineMatrix): void;
+  transpose(m: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  avg(m: mtxFuncs.PineMatrix): number;
+  min(m: mtxFuncs.PineMatrix): number;
+  max(m: mtxFuncs.PineMatrix): number;
+  median(m: mtxFuncs.PineMatrix): number;
+  mode(m: mtxFuncs.PineMatrix): number;
+  sum(a: mtxFuncs.PineMatrix, b?: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix | number;
+  diff(a: mtxFuncs.PineMatrix, b: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  mult(a: mtxFuncs.PineMatrix, b: unknown): mtxFuncs.PineMatrix;
+  pow(m: mtxFuncs.PineMatrix, p: number): mtxFuncs.PineMatrix;
+  trace(m: mtxFuncs.PineMatrix): number;
+  det(m: mtxFuncs.PineMatrix): number;
+  rank(m: mtxFuncs.PineMatrix): number;
+  inv(m: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  pinv(m: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  eigenvalues(m: mtxFuncs.PineMatrix): arrFuncs.PineArray;
+  eigenvectors(m: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  kron(a: mtxFuncs.PineMatrix, b: mtxFuncs.PineMatrix): mtxFuncs.PineMatrix;
+  sort(m: mtxFuncs.PineMatrix, col: number, order?: unknown): void;
+  submatrix(m: mtxFuncs.PineMatrix, fr: number, tr: number, fc: number, tc: number): mtxFuncs.PineMatrix;
+  isSquare(m: mtxFuncs.PineMatrix): boolean;
+  isZero(m: mtxFuncs.PineMatrix): boolean;
+  isBinary(m: mtxFuncs.PineMatrix): boolean;
+  isIdentity(m: mtxFuncs.PineMatrix): boolean;
+  isDiagonal(m: mtxFuncs.PineMatrix): boolean;
+  isAntidiagonal(m: mtxFuncs.PineMatrix): boolean;
+  isSymmetric(m: mtxFuncs.PineMatrix): boolean;
+  isAntisymmetric(m: mtxFuncs.PineMatrix): boolean;
+  isTriangular(m: mtxFuncs.PineMatrix): boolean;
+  isStochastic(m: mtxFuncs.PineMatrix): boolean;
+}
+
 export interface ScriptDependencies {
   NumericSeries: typeof NumericSeries;
   maxBarsBack: number;
   _arr: ArrayHelpers;
   _map: MapHelpers;
   _udt: UdtHelpers;
+  _mtx: MatrixHelpers;
   SMA: typeof SMA;
   EMA: typeof EMA;
   RMA: typeof RMA;
@@ -293,12 +347,66 @@ export const UDT_HELPERS: UdtHelpers = {
   copy: udtFuncs.copyUdtObject,
 };
 
+export const MATRIX_HELPERS: MatrixHelpers = {
+  create: (rows?: unknown, cols?: unknown, val?: unknown) =>
+    mtxFuncs.createPineMatrix(Number(rows) || 0, Number(cols) || 0, val),
+  get: mtxFuncs.getMatrixValue,
+  set: mtxFuncs.setMatrixValue,
+  rows: mtxFuncs.getMatrixRows,
+  columns: mtxFuncs.getMatrixColumns,
+  elementCount: mtxFuncs.getMatrixElementCount,
+  copy: mtxFuncs.copyMatrix,
+  concat: mtxFuncs.concatMatrix,
+  row: mtxFuncs.matrixRow,
+  col: mtxFuncs.matrixColumn,
+  fill: mtxFuncs.fillMatrix,
+  reshape: mtxFuncs.reshapeMatrix,
+  addRow: mtxFuncs.addMatrixRow,
+  addCol: mtxFuncs.addMatrixColumn,
+  removeRow: mtxFuncs.removeMatrixRow,
+  removeCol: mtxFuncs.removeMatrixColumn,
+  swapRows: mtxFuncs.swapMatrixRows,
+  swapCols: mtxFuncs.swapMatrixColumns,
+  reverse: mtxFuncs.reverseMatrix,
+  transpose: mtxFuncs.transposeMatrix,
+  avg: mtxFuncs.avgMatrixValue,
+  min: mtxFuncs.minMatrixValue,
+  max: mtxFuncs.maxMatrixValue,
+  median: mtxFuncs.medianMatrixValue,
+  mode: mtxFuncs.modeMatrixValue,
+  sum: mtxFuncs.sumMatrixValue,
+  diff: mtxFuncs.diffMatrixValue,
+  mult: mtxFuncs.multMatrixValue,
+  pow: mtxFuncs.powMatrixValue,
+  trace: mtxFuncs.traceMatrixValue,
+  det: mtxFuncs.detMatrixValue,
+  rank: mtxFuncs.rankMatrixValue,
+  inv: mtxFuncs.invMatrixValue,
+  pinv: mtxFuncs.pinvMatrixValue,
+  eigenvalues: mtxFuncs.eigenvaluesMatrixValue,
+  eigenvectors: mtxFuncs.eigenvectorsMatrixValue,
+  kron: mtxFuncs.kronMatrixValue,
+  sort: mtxFuncs.sortMatrixRows,
+  submatrix: mtxFuncs.submatrixValue,
+  isSquare: mtxFuncs.isSquareMatrix,
+  isZero: mtxFuncs.isZeroMatrix,
+  isBinary: mtxFuncs.isBinaryMatrix,
+  isIdentity: mtxFuncs.isIdentityMatrix,
+  isDiagonal: mtxFuncs.isDiagonalMatrix,
+  isAntidiagonal: mtxFuncs.isAntidiagonalMatrix,
+  isSymmetric: mtxFuncs.isSymmetricMatrix,
+  isAntisymmetric: mtxFuncs.isAntisymmetricMatrix,
+  isTriangular: mtxFuncs.isTriangularMatrix,
+  isStochastic: mtxFuncs.isStochasticMatrix,
+} as MatrixHelpers;
+
 const DEFAULT_DEPS: ScriptDependencies = {
   NumericSeries,
   maxBarsBack: 500,
   _arr: ARRAY_HELPERS,
   _map: MAP_HELPERS,
   _udt: UDT_HELPERS,
+  _mtx: MATRIX_HELPERS,
   SMA, EMA, RMA, RSI, Crossover, Crossunder, Change,
   Highest, Lowest, MACD, ATR, Stoch, StdDev, BB,
   DEMA, TEMA, Cum,
