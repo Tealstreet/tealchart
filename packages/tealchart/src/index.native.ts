@@ -76,6 +76,7 @@ export type {
   MobileUserDrawingMeasurementLabelPosition,
   MobileUserDrawingPathPrimitive,
   MobileUserDrawingParallelChannelPrimitive,
+  MobileUserDrawingPitchforkPrimitive,
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
   MobileUserDrawingMeasurementLabelPrimitive,

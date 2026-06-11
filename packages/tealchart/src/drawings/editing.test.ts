@@ -998,6 +998,82 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags pitchfork handles without moving the other anchors', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'pitchfork', handle: 'center', pointIndex: 1 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'pitchfork', handle: 'center', pointIndex: 1 },
+        startPoint: { x: 50, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 60, y: 30 },
+      { now: () => 12 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 50 },
+        { time: 60, price: 70 },
+        { time: 50, price: 20 },
+      ],
+      updatedAt: 12,
+    });
+  });
+
+  it('moves selected pitchforks by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'pitchfork' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'pitchfork' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 13 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 40 },
+        { time: 60, price: 70 },
+        { time: 60, price: 10 },
+      ],
+      updatedAt: 13,
+    });
+  });
+
   it('moves selected rotated rectangles by screen delta', () => {
     const drawing: UserDrawing = {
       ...base,

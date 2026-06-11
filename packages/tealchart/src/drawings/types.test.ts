@@ -77,6 +77,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('polyline')).toBe(3);
+    expect(getRequiredAnchorCount('pitchfork')).toBe(3);
     expect(getRequiredAnchorCount('rotatedRectangle')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
@@ -268,6 +269,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'triangle', anchors: [anchorA, anchorB, anchorC] }), { id: 'triangle', now: 20 })).toMatchObject({
       id: 'triangle',
       kind: 'triangle',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'pitchfork', anchors: [anchorA, anchorB, anchorC] }), { id: 'pitchfork', now: 20 })).toMatchObject({
+      id: 'pitchfork',
+      kind: 'pitchfork',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

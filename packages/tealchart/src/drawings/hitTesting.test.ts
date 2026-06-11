@@ -550,6 +550,28 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits pitchfork tines and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space)?.drawing.id).toBe('pitchfork');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 20 }, space)?.drawing.id).toBe('pitchfork');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 80 }, space)?.drawing.id).toBe('pitchfork');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 1,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 65 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

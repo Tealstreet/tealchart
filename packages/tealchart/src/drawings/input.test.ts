@@ -225,6 +225,25 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits pitchfork drawings from three anchors', () => {
+    const options = { createId: () => 'pitchfork', now: () => 32 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'pitchfork'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(second.drawings).toEqual([]);
+    expect(third.draft).toBeNull();
+    expect(third.selection).toEqual({ drawingId: 'pitchfork' });
+    expect(third.drawings[0]).toMatchObject({
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [anchorA, anchorB, anchorC],
+    });
+  });
+
   it('commits disjoint channel drawings from four anchors', () => {
     const anchorD = { time: 3_000, price: 90 };
     const options = { createId: () => 'disjoint-channel', now: () => 32 };

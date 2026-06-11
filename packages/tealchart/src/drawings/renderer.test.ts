@@ -709,6 +709,31 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders pitchforks as three parallel rays', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pitchfork',
+      kind: 'pitchfork',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:100,50');
+    expect(ctx.calls).toContain('moveTo:50,20');
+    expect(ctx.calls).toContain('lineTo:100,20');
+    expect(ctx.calls).toContain('moveTo:50,80');
+    expect(ctx.calls).toContain('lineTo:100,80');
+    expect(ctx.calls).not.toContain('fill');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders rotated rectangles as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

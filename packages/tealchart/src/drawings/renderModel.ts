@@ -159,6 +159,7 @@ export function resolveUserDrawingHandlePoints(
     case 'path':
     case 'polyline':
     case 'triangle':
+    case 'pitchfork':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'flatTopBottom':
