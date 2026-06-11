@@ -157,6 +157,7 @@ export function resolveUserDrawingHandlePoints(
       ];
     }
     case 'path':
+    case 'polyline':
     case 'triangle':
     case 'parallelChannel':
     case 'flatTopBottom':

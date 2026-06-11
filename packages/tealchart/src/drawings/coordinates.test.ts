@@ -24,6 +24,7 @@ import type {
   TriangleDrawing,
   TrendAngleDrawing,
   TrendLineDrawing,
+  UserDrawing,
   UserDrawingStyle,
 } from './types';
 
@@ -545,6 +546,16 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const polyline: UserDrawing = {
+      ...trendLine,
+      id: 'polyline',
+      kind: 'polyline',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
     const channel: ParallelChannelDrawing = {
       ...trendLine,
       id: 'channel',
@@ -744,6 +755,16 @@ describe('user drawing coordinates', () => {
       },
     });
     expect(resolveUserDrawingGeometry(path, space)).toMatchObject({
+      kind: 'path',
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 110, y: 20 },
+          { x: 210, y: 120 },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(polyline, space)).toMatchObject({
       kind: 'path',
       polyline: {
         points: [

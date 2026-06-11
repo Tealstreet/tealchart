@@ -76,6 +76,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
+    expect(getRequiredAnchorCount('polyline')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
@@ -312,6 +313,20 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'path', anchors: [anchorA, anchorB, anchorC] }), { id: 'path', now: 20 })).toMatchObject({
       id: 'path',
       kind: 'path',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'polyline', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'polyline',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'polyline',
+      kind: 'polyline',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

@@ -1004,6 +1004,7 @@ export function resolveUserDrawingGeometry(
         fib: resolveFibExtensionFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
+    case 'polyline':
       return {
         kind: 'path',
         drawing,
