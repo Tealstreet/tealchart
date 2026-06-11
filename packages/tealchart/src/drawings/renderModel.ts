@@ -189,6 +189,7 @@ export function resolveUserDrawingHandlePoints(
     }
     case 'path':
     case 'brush':
+    case 'highlighter':
     case 'polyline':
     case 'curve':
     case 'arc':

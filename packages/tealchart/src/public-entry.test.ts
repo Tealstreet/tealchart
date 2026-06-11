@@ -66,6 +66,7 @@ import type {
   MobileUserDrawingSineLinePrimitive,
   MobileUserDrawingForecastPrimitive,
   MobileUserDrawingProjectionPrimitive,
+  MobileUserDrawingHighlighterPrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
@@ -104,6 +105,7 @@ import type {
   TimeCyclesDrawing,
   SineLineDrawing,
   ForecastDrawing,
+  HighlighterDrawing,
   ProjectionDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
@@ -185,6 +187,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingArcPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBrushPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingHighlighterPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
@@ -576,6 +579,19 @@ describe('tealchart public entries', () => {
       ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const highlighterPrimitive: NonNever<MobileUserDrawingHighlighterPrimitive> = {
+      kind: 'highlighter',
+      id: 'highlighter',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [
+        { x: 0, y: 0 },
+        { x: 5, y: 5 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -618,6 +634,7 @@ describe('tealchart public entries', () => {
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
     expect(barsPatternPrimitive.kind).toBe('barsPattern');
     expect(brushPrimitive.kind).toBe('brush');
+    expect(highlighterPrimitive.kind).toBe('highlighter');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
   });
 
@@ -1067,9 +1084,15 @@ describe('tealchart public entries', () => {
       id: 'brush',
       kind: 'brush',
     };
+    const highlighter: HighlighterDrawing = {
+      ...drawing,
+      id: 'highlighter',
+      kind: 'highlighter',
+    };
 
     expect(drawing.kind).toBe('path');
     expect(brush.kind).toBe('brush');
+    expect(highlighter.kind).toBe('highlighter');
   });
 
   it('exports shared drawing curve types and resolver', () => {

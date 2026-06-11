@@ -107,6 +107,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
     expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
     expect(getRequiredAnchorCount('path')).toBe(3);
+    expect(getRequiredAnchorCount('highlighter')).toBe(3);
   });
 
   it('normalizes drawing font sizes to supported cross-platform values', () => {
@@ -548,6 +549,20 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'path', anchors: [anchorA, anchorB, anchorC] }), { id: 'path', now: 20 })).toMatchObject({
       id: 'path',
       kind: 'path',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'highlighter', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'highlighter',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'highlighter',
+      kind: 'highlighter',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,
