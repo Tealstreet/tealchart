@@ -365,6 +365,20 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'gannBox') {
+    const distance = pointInRect(point, geometry.gannBox.rect)
+      ? 0
+      : Math.min(
+          distanceToRectEdge(point, geometry.gannBox.rect),
+          ...geometry.gannBox.levels.flatMap((level) => [
+            distanceToSegment(point, level.horizontal),
+            distanceToSegment(point, level.vertical),
+          ]),
+          ...geometry.gannBox.angles.map((angle) => distanceToSegment(point, angle)),
+        );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'fibTimeZone') {
     const distance = Math.min(...geometry.fibTimeZone.levels.map((level) => distanceToSegment(point, level.segment)));
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -472,6 +486,7 @@ function hitTestUserDrawingHandle(
       }
       break;
     case 'rectangle':
+    case 'gannBox':
     case 'circle':
     case 'ellipse':
     case 'priceRange':
@@ -482,6 +497,8 @@ function hitTestUserDrawingHandle(
             ? geometry.circle.rect
             : geometry.kind === 'ellipse'
               ? geometry.ellipse.rect
+              : geometry.kind === 'gannBox'
+                ? geometry.gannBox.rect
               : geometry.rect;
         handles.push(
           { handle: 'topLeft', point: { x: rect.x, y: rect.y } },

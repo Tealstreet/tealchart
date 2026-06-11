@@ -22,6 +22,7 @@ import type {
   FibWedgeDrawing,
   FibSpiralDrawing,
   TrendBasedFibTimeDrawing,
+  GannBoxDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
   HorizontalRayDrawing,
@@ -661,6 +662,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const gannBox: GannBoxDrawing = {
+      ...trendLine,
+      id: 'gann-box',
+      kind: 'gannBox',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
     const path: PathDrawing = {
       ...trendLine,
       id: 'path',
@@ -1026,6 +1036,23 @@ describe('user drawing coordinates', () => {
           },
           { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
           { ratio: 2, target: { x: 110, y: 170 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 270 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(gannBox, space)).toMatchObject({
+      kind: 'gannBox',
+      gannBox: {
+        rect: { x: 10, y: 20, width: 200, height: 100 },
+        levels: expect.arrayContaining([
+          expect.objectContaining({
+            ratio: 0.5,
+            horizontal: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+            vertical: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
+          }),
+        ]),
+        angles: expect.arrayContaining([
+          { start: { x: 10, y: 20 }, end: { x: 210, y: 120 } },
+          { start: { x: 10, y: 120 }, end: { x: 210, y: 20 } },
         ]),
       },
     });

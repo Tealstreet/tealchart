@@ -38,6 +38,7 @@ export type UserDrawingTool =
   | 'fibTimeZone'
   | 'trendBasedFibTime'
   | 'gannFan'
+  | 'gannBox'
   | 'triangle'
   | 'polyline'
   | 'pitchfork'
@@ -262,6 +263,11 @@ export interface GannFanDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface GannBoxDrawing extends UserDrawingBase {
+  kind: 'gannBox';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface FibChannelDrawing extends UserDrawingBase {
   kind: 'fibChannel';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -370,6 +376,7 @@ export type UserDrawing =
   | FibTimeZoneDrawing
   | TrendBasedFibTimeDrawing
   | GannFanDrawing
+  | GannBoxDrawing
   | TriangleDrawing
   | PolylineDrawing
   | PitchforkDrawing
@@ -505,6 +512,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibCircles':
     case 'fibSpiral':
     case 'gannFan':
+    case 'gannBox':
     case 'fibTimeZone':
       return 2;
     case 'triangle':
@@ -770,6 +778,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'gannFan',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'gannBox':
+      return {
+        ...base,
+        kind: 'gannBox',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'fibTimeZone':
