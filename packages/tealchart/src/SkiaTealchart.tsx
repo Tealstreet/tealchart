@@ -3262,6 +3262,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onUserDrawingClearAll={() => {
               commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
             }}
+            onUserDrawingZOrderChange={(action) => {
+              commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, action));
+            }}
             onUserDrawingStyleChange={(style) => {
               commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style));
             }}

@@ -250,6 +250,7 @@ export {
   getSelectedUserDrawing,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
+  getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarActionEnabled,

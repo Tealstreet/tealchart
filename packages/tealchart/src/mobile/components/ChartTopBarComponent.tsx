@@ -15,10 +15,12 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTool,
+  UserDrawingZOrderAction,
 } from '../../drawings';
 
 import {
   getSelectedUserDrawing,
+  getUserDrawingZOrderAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
@@ -79,6 +81,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingCancelDraft?: () => void;
   /** Callback when all user drawings should be cleared */
   onUserDrawingClearAll?: () => void;
+  /** Callback when selected drawings should be reordered */
+  onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Callback when selected text-label alignment should change */
@@ -112,6 +116,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingDeleteSelected,
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
+    onUserDrawingZOrderChange,
     onUserDrawingStyleChange,
     onUserDrawingTextAlignChange,
     onUserDrawingIconNameChange,
@@ -613,6 +618,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     onPress={() => {
                       if (descriptor.action === 'duplicateSelected') onUserDrawingDuplicateSelected?.();
                       if (descriptor.action === 'deleteSelected') onUserDrawingDeleteSelected?.();
+                      const zOrderAction = getUserDrawingZOrderAction(descriptor.action);
+                      if (zOrderAction) onUserDrawingZOrderChange?.(zOrderAction);
                       if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                       if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
                     }}

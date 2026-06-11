@@ -4,6 +4,7 @@ import { clearChartStoreCache } from '../state/chartState';
 import {
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
+  getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarActionEnabled,
@@ -385,9 +386,15 @@ describe('user drawing toolbar descriptors', () => {
     expect(USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
       'duplicateSelected',
       'deleteSelected',
+      'bringForward',
+      'sendBackward',
+      'bringToFront',
+      'sendToBack',
       'cancelDraft',
       'clearAll',
     ]);
+    expect(getUserDrawingZOrderAction('bringForward')).toBe('bringForward');
+    expect(getUserDrawingZOrderAction('deleteSelected')).toBeNull();
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);
     expect(isUserDrawingToolbarActionEnabled({ ...state, selection: { drawingId: 'h' } }, 'deleteSelected')).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'duplicateSelected')).toBe(false);
@@ -433,6 +440,67 @@ describe('user drawing toolbar descriptors', () => {
           ],
         },
         'duplicateSelected',
+      ),
+    ).toBe(false);
+    const layeredState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'middle' },
+      drawings: [
+        {
+          id: 'back',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 8,
+        },
+        {
+          id: 'middle',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 10,
+        },
+        {
+          id: 'front',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 12,
+        },
+      ],
+    };
+    expect(isUserDrawingToolbarActionEnabled(layeredState, 'bringForward')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(layeredState, 'sendBackward')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(layeredState, 'bringToFront')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(layeredState, 'sendToBack')).toBe(true);
+    expect(
+      isUserDrawingToolbarActionEnabled({ ...layeredState, selection: { drawingId: 'front' } }, 'bringForward'),
+    ).toBe(false);
+    expect(isUserDrawingToolbarActionEnabled({ ...layeredState, selection: { drawingId: 'back' } }, 'sendBackward')).toBe(
+      false,
+    );
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...layeredState,
+          selection: { drawingId: 'middle' },
+          drawings: layeredState.drawings.map((drawing) =>
+            drawing.id === 'middle' ? { ...drawing, locked: true } : drawing,
+          ),
+        },
+        'bringForward',
       ),
     ).toBe(false);
     expect(
@@ -839,6 +907,25 @@ describe('user drawing toolbar descriptors', () => {
     };
 
     expect(getUserDrawingToolbarStateKey(moved)).toBe(getUserDrawingToolbarStateKey(first));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...first,
+        drawings: [
+          {
+            id: 'other',
+            kind: 'horizontalLine' as const,
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+            price: 8,
+          },
+          first.drawings[0]!,
+        ],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(first));
     expect(getUserDrawingToolbarStateKey({ ...first, selection: null })).not.toBe(getUserDrawingToolbarStateKey(first));
     expect(
       getUserDrawingToolbarStateKey({
