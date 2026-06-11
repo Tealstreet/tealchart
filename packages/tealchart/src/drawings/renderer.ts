@@ -67,6 +67,22 @@ function renderLineGeometry(
   }
 }
 
+function renderPathGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'path' }>,
+): void {
+  const [firstPoint, ...remainingPoints] = geometry.polyline.points;
+  if (!firstPoint) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(firstPoint.x, firstPoint.y);
+  for (const point of remainingPoints) {
+    ctx.lineTo(point.x, point.y);
+  }
+  ctx.stroke();
+}
+
 function renderRectangleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
@@ -240,6 +256,11 @@ export function renderUserDrawing(
       case 'verticalLine':
         if (drawing.style.lineVisible !== false) {
           renderLineGeometry(ctx, geometry);
+        }
+        break;
+      case 'path':
+        if (drawing.style.lineVisible !== false) {
+          renderPathGeometry(ctx, geometry);
         }
         break;
       case 'rectangle':

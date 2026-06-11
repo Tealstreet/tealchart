@@ -85,7 +85,12 @@ export function selectUserDrawing(
   state: UserDrawingState,
   selection: UserDrawingSelection | null,
 ): UserDrawingState {
-  if (state.selection?.drawingId === selection?.drawingId && state.selection?.handle === selection?.handle && !state.draft) {
+  if (
+    state.selection?.drawingId === selection?.drawingId &&
+    state.selection?.handle === selection?.handle &&
+    state.selection?.pointIndex === selection?.pointIndex &&
+    !state.draft
+  ) {
     return state;
   }
 
@@ -265,7 +270,10 @@ export function resolveUserDrawingSelectionAtPoint(
   options: UserDrawingSelectionInputOptions = {},
 ): UserDrawingSelectionAtPointResult {
   const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
-  const nextState = selectUserDrawing(state, hit ? { drawingId: hit.drawing.id, handle: hit.handle } : null);
+  const nextState = selectUserDrawing(
+    state,
+    hit ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex } : null,
+  );
   return {
     state: nextState,
     hit: hit !== null,

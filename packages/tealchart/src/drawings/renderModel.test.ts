@@ -164,4 +164,31 @@ describe('user drawing render model', () => {
       { x: 90, y: 50 },
     ]);
   });
+
+  it('resolves selection handles for path points', () => {
+    expect(
+      resolveUserDrawingHandlePoints(
+        {
+          id: 'path',
+          kind: 'path',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 50, price: 50 },
+            { time: 90, price: 90 },
+          ],
+        },
+        space,
+      ),
+    ).toEqual([
+      { x: 10, y: 10 },
+      { x: 50, y: 50 },
+      { x: 90, y: 10 },
+    ]);
+  });
 });

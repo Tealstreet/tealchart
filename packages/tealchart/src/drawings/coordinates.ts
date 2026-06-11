@@ -12,6 +12,10 @@ export interface DrawingScreenSegment {
   end: DrawingScreenPoint;
 }
 
+export interface DrawingScreenPolyline {
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingScreenRect {
   x: number;
   y: number;
@@ -62,6 +66,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'dateRange';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
+    }
+  | {
+      kind: 'path';
+      drawing: UserDrawing;
+      polyline: DrawingScreenPolyline;
     }
   | {
       kind: 'textLabel';
@@ -221,6 +230,15 @@ export function resolveDateRangeRectFromAnchors(
   };
 }
 
+export function resolvePolylineFromAnchors(
+  points: readonly UserDrawingAnchor[],
+  space: DrawingCoordinateSpace,
+): DrawingScreenPolyline {
+  return {
+    points: points.map((point) => anchorToScreenPoint(point, space)),
+  };
+}
+
 export function resolveUserDrawingGeometry(
   drawing: UserDrawing,
   space: DrawingCoordinateSpace,
@@ -299,6 +317,12 @@ export function resolveUserDrawingGeometry(
         kind: 'dateRange',
         drawing,
         rect: resolveDateRangeRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'path':
+      return {
+        kind: 'path',
+        drawing,
+        polyline: resolvePolylineFromAnchors(drawing.points, space),
       };
     case 'textLabel':
       return {

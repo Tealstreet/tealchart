@@ -50,6 +50,13 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
+    case 'path':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
+      };
     case 'horizontalLine':
     case 'verticalLine':
       return {
@@ -141,6 +148,16 @@ function parseTwoPointDrawing(value: Record<string, unknown>): [UserDrawingAncho
   return start && end ? [start, end] : null;
 }
 
+function parseThreePointDrawing(
+  value: Record<string, unknown>,
+): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] | null {
+  if (!Array.isArray(value.points) || value.points.length !== 3) return null;
+  const first = parseAnchor(value.points[0]);
+  const second = parseAnchor(value.points[1]);
+  const third = parseAnchor(value.points[2]);
+  return first && second && third ? [first, second, third] : null;
+}
+
 function parseUserDrawing(value: unknown): UserDrawing | null {
   if (!isRecord(value)) return null;
   const base = parseBase(value);
@@ -215,6 +232,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'dateRange',
+            points,
+          }
+        : null;
+    }
+    case 'path': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'path',
             points,
           }
         : null;

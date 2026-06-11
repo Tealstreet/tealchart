@@ -305,6 +305,27 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:1 minute:40,50:#111:center:1:12px sans-serif');
   });
 
+  it('renders path drawings as stroked polylines', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'path',
+      kind: 'path',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:50,50');
+    expect(ctx.calls).toContain('lineTo:90,10');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders text labels with measured boxes', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -21,6 +21,7 @@ export interface UserDrawingHitTestOptions {
 export interface UserDrawingHitResult {
   drawing: UserDrawing;
   handle?: UserDrawingHandleRole;
+  pointIndex?: number;
   distance: number;
 }
 
@@ -76,6 +77,23 @@ export function distanceToRectEdge(point: DrawingScreenPoint, rect: DrawingScree
   return Math.hypot(point.x - clampedX, point.y - clampedY);
 }
 
+function distanceToPolyline(point: DrawingScreenPoint, points: readonly DrawingScreenPoint[]): number {
+  if (points.length === 0) return Number.POSITIVE_INFINITY;
+  if (points.length === 1) return distanceBetweenPoints(point, points[0]!);
+
+  let distance = Number.POSITIVE_INFINITY;
+  for (let index = 1; index < points.length; index++) {
+    distance = Math.min(
+      distance,
+      distanceToSegment(point, {
+        start: points[index - 1]!,
+        end: points[index]!,
+      }),
+    );
+  }
+  return distance;
+}
+
 function hitTestResolvedGeometry(
   geometry: ResolvedUserDrawingGeometry,
   point: DrawingScreenPoint,
@@ -116,6 +134,11 @@ function hitTestResolvedGeometry(
     return inside ? { drawing: geometry.drawing, distance: 0 } : null;
   }
 
+  if (geometry.kind === 'path') {
+    const distance = distanceToPolyline(point, geometry.polyline.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   const distance = distanceToSegment(point, geometry.segment);
   return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
 }
@@ -126,7 +149,7 @@ function hitTestUserDrawingHandle(
   space: DrawingCoordinateSpace,
   tolerance: number,
 ): UserDrawingHitResult | null {
-  const handles: Array<{ handle: UserDrawingHandleRole; point: DrawingScreenPoint }> = [];
+  const handles: Array<{ handle: UserDrawingHandleRole; point: DrawingScreenPoint; pointIndex?: number }> = [];
 
   switch (geometry.kind) {
     case 'line':
@@ -166,6 +189,11 @@ function hitTestUserDrawingHandle(
         },
       );
       break;
+    case 'path':
+      geometry.polyline.points.forEach((pathPoint, pointIndex) => {
+        handles.push({ handle: 'center', point: pathPoint, pointIndex });
+      });
+      break;
     case 'textLabel':
       handles.push({ handle: 'center', point: geometry.point });
       break;
@@ -177,7 +205,12 @@ function hitTestUserDrawingHandle(
   for (const candidate of handles) {
     const distance = distanceBetweenPoints(point, candidate.point);
     if (distance <= tolerance) {
-      return { drawing: geometry.drawing, handle: candidate.handle, distance };
+      return {
+        drawing: geometry.drawing,
+        handle: candidate.handle,
+        pointIndex: candidate.pointIndex,
+        distance,
+      };
     }
   }
 

@@ -175,6 +175,33 @@ describe('user drawing input controller', () => {
     expect(cancelUserDrawingDraft(selected)).toBe(selected);
   });
 
+  it('preserves path point indexes during point selection', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'path',
+          kind: 'path',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 50, price: 50 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+    });
+
+    const selected = resolveUserDrawingSelectionAtPoint(state, { x: 50, y: 50 }, new Map([['main', space]]));
+
+    expect(selected.hit).toBe(true);
+    expect(selected.state.selection).toEqual({ drawingId: 'path', handle: 'center', pointIndex: 1 });
+  });
+
   it('begins, updates, commits, and cancels text label edits', () => {
     const textLabel = {
       id: 'label',
