@@ -2427,6 +2427,60 @@ describe('mobile user drawing render model', () => {
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
   });
 
+  it('returns Skia-ready head and shoulders pattern primitives with neckline labels and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'head-shoulders' },
+      drawings: [
+        {
+          id: 'head-shoulders',
+          kind: 'headShouldersPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 70 },
+            { time: 30, price: 30 },
+            { time: 50, price: 90 },
+            { time: 70, price: 30 },
+            { time: 90, price: 70 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'headShouldersPattern',
+      id: 'head-shoulders',
+      clip,
+      points: [
+        { x: 10, y: 30 },
+        { x: 30, y: 70 },
+        { x: 50, y: 10 },
+        { x: 70, y: 70 },
+        { x: 90, y: 30 },
+      ],
+      neckline: { start: { x: 30, y: 70 }, end: { x: 70, y: 70 } },
+      labels: [
+        { text: 'LS', point: { x: 10, y: 30 } },
+        { text: 'N1', point: { x: 30, y: 70 } },
+        { text: 'H', point: { x: 50, y: 10 } },
+        { text: 'N2', point: { x: 70, y: 70 } },
+        { text: 'RS', point: { x: 90, y: 30 } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
+  });
+
   it('returns Skia-ready ABCD pattern primitives with labels and handles', () => {
     const state: UserDrawingState = {
       version: 1,

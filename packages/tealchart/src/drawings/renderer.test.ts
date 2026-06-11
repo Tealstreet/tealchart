@@ -788,6 +788,38 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:3:90,4:#111:center:1:12px sans-serif');
   });
 
+  it('renders head and shoulders pattern drawings as labeled paths with necklines', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'head-shoulders',
+      kind: 'headShouldersPattern',
+      points: [
+        { time: 10, price: 70 },
+        { time: 30, price: 30 },
+        { time: 50, price: 90 },
+        { time: 70, price: 30 },
+        { time: 90, price: 70 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,30');
+    expect(ctx.calls).toContain('lineTo:30,70');
+    expect(ctx.calls).toContain('lineTo:50,10');
+    expect(ctx.calls).toContain('lineTo:70,70');
+    expect(ctx.calls).toContain('lineTo:90,30');
+    expect(ctx.calls).toContain('moveTo:30,70');
+    expect(ctx.calls).toContain('lineTo:70,70');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:LS:10,24:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:N1:30,64:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:H:50,4:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:N2:70,64:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:RS:90,24:#111:center:1:12px sans-serif');
+  });
+
   it('renders ABCD pattern drawings as labeled stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

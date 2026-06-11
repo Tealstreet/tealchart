@@ -218,6 +218,7 @@ export function resolveUserDrawingHandlePoints(
     case 'abcdPattern':
     case 'xabcdPattern':
     case 'threeDrivesPattern':
+    case 'headShouldersPattern':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'barsPattern':
       return [anchorToScreenPoint(drawing.points[2], space)];

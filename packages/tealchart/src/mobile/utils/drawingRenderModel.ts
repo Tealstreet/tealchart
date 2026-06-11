@@ -1,6 +1,7 @@
 import type {
   DrawingCoordinateSpace,
   DrawingScreenAbcdPatternLabel,
+  DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
   DrawingScreenThreeDrivesPatternLabel,
   DrawingScreenTrianglePatternLabel,
@@ -713,6 +714,21 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'headShouldersPattern';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      neckline: {
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      };
+      labels: readonly DrawingScreenHeadShouldersPatternLabel[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'textLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -890,6 +906,10 @@ export type MobileUserDrawingXabcdPatternPrimitive = Extract<MobileUserDrawingPr
 export type MobileUserDrawingThreeDrivesPatternPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'threeDrivesPattern' }
+>;
+export type MobileUserDrawingHeadShouldersPatternPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'headShouldersPattern' }
 >;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
@@ -1708,6 +1728,19 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
+        labels: geometry.pattern.labels,
+        style: geometry.drawing.style,
+      };
+    case 'headShouldersPattern':
+      return {
+        kind: 'headShouldersPattern',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.pattern.polyline.points,
+        neckline: geometry.pattern.neckline,
         labels: geometry.pattern.labels,
         style: geometry.drawing.style,
       };
