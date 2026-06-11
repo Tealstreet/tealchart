@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { clearChartStoreCache } from './state/chartState';
 import {
   formatTrendAngleDegrees,
+  duplicateUserDrawing,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
@@ -184,6 +185,7 @@ describe('tealchart public entries', () => {
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(setUserDrawingIconName).toBeTypeOf('function');
+    expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
     expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');

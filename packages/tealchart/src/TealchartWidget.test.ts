@@ -724,6 +724,83 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('duplicates selected or targeted drawings through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'trendLine',
+        selection: { drawingId: 'a' },
+        draft: {
+          tool: 'rectangle',
+          paneId: 'main',
+          anchors: [{ time: 1, price: 10 }],
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+          },
+          startedAt: 1,
+        },
+        drawings: [
+          {
+            id: 'a',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'b',
+            kind: 'verticalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            time: 20,
+          },
+        ],
+      });
+
+      expect(widget.duplicateSelectedUserDrawing()).toBe(true);
+      const selectedCopy = widget.getUserDrawingState().drawings[1]!;
+      expect(widget.getUserDrawingState()).toMatchObject({
+        activeTool: 'select',
+        selection: { drawingId: selectedCopy.id },
+        draft: null,
+      });
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.kind)).toEqual([
+        'horizontalLine',
+        'horizontalLine',
+        'verticalLine',
+      ]);
+
+      expect(widget.duplicateUserDrawing('b')).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.kind)).toEqual([
+        'horizontalLine',
+        'horizontalLine',
+        'verticalLine',
+        'verticalLine',
+      ]);
+      expect(widget.duplicateUserDrawing('missing')).toBe(false);
+      expect(onChange).toHaveBeenCalled();
+    });
+
     it('applies public drawing style and property commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

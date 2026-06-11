@@ -96,6 +96,7 @@ import {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
+  duplicateUserDrawing as duplicateUserDrawingState,
   handleUserDrawingInput,
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingFontFamily,
@@ -188,6 +189,8 @@ export interface SkiaTealchartHandle {
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
   deleteUserDrawing(drawingId?: string): boolean;
   deleteSelectedUserDrawing(): boolean;
+  duplicateUserDrawing(drawingId?: string): boolean;
+  duplicateSelectedUserDrawing(): boolean;
   clearUserDrawings(): void;
   cancelUserDrawingDraft(): void;
   beginUserDrawingTextEdit(drawingId?: string): boolean;
@@ -355,6 +358,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setImperativeTheme(null);
   }, [theme]);
 
+  const createUserDrawingId = useCallback(() => {
+    const existingIds = new Set(userDrawingStateRef.current.drawings.map((drawing) => drawing.id));
+    let id = '';
+    do {
+      id = `drawing_${++userDrawingIdCounterRef.current}`;
+    } while (existingIds.has(id));
+    return id;
+  }, []);
+
   // Create indicator manager (stable ref)
   const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
   if (!indicatorManagerRef.current) {
@@ -409,6 +421,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         const nextState = deleteUserDrawingState(userDrawingStateRef.current);
         return commitUserDrawingStateIfChanged(nextState);
       },
+      duplicateUserDrawing(drawingId?: string): boolean {
+        const nextState = duplicateUserDrawingState(userDrawingStateRef.current, {
+          drawingId,
+          createId: createUserDrawingId,
+        });
+        return commitUserDrawingStateIfChanged(nextState);
+      },
+      duplicateSelectedUserDrawing(): boolean {
+        const nextState = duplicateUserDrawingState(userDrawingStateRef.current, {
+          createId: createUserDrawingId,
+        });
+        return commitUserDrawingStateIfChanged(nextState);
+      },
       clearUserDrawings(): void {
         commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
       },
@@ -452,7 +477,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return commitUserDrawingStateIfChanged(setMobileUserDrawingLocked(userDrawingStateRef.current, locked, options));
       },
     }),
-    [commitUserDrawingState, commitUserDrawingStateIfChanged],
+    [commitUserDrawingState, commitUserDrawingStateIfChanged, createUserDrawingId],
   );
 
   // Use core hook for bar fetching and state management
@@ -3184,6 +3209,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onUserDrawingToolSelect={(tool) =>
               commitUserDrawingStateIfChanged(setUserDrawingTool(userDrawingStateRef.current, tool))
             }
+            onUserDrawingDuplicateSelected={() => {
+              commitUserDrawingStateIfChanged(
+                duplicateUserDrawingState(userDrawingStateRef.current, { createId: createUserDrawingId }),
+              );
+            }}
             onUserDrawingDeleteSelected={() => {
               commitUserDrawingStateIfChanged(deleteUserDrawingState(userDrawingStateRef.current));
             }}
