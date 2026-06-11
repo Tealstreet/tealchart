@@ -91,7 +91,7 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
 
 const UNSUPPORTED_NAMESPACES = new Set([
   'request', 'label', 'line', 'box', 'polyline', 'linefill', 'table',
-  'array', 'matrix', 'map', 'ticker',
+  'matrix', 'map', 'ticker',
 ]);
 
 const PLOT_FUNCTIONS = new Set([
@@ -251,8 +251,6 @@ export function analyze(ast: Program): AnalysisContext {
         for (const el of expr.elements) walkExpr(el);
         break;
       case 'LambdaExpression': {
-        const msg = 'Lambda expressions not yet supported by transpiler';
-        if (!ctx.unsupported.includes(msg)) ctx.unsupported.push(msg);
         walkExpr(expr.body);
         break;
       }
@@ -337,8 +335,6 @@ export function analyze(ast: Program): AnalysisContext {
           if (stmt.step) walkExpr(stmt.step);
         } else {
           walkExpr(stmt.iterable);
-          const msg = 'Collection for-in loops not yet supported by transpiler';
-          if (!ctx.unsupported.includes(msg)) ctx.unsupported.push(msg);
         }
         for (const s of stmt.body) walkStmt(s);
         break;
