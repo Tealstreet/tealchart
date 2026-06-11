@@ -91,18 +91,25 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar expose matching selected text-label alignment
   controls.
 
-## Current Epic: Opacity Controls
+## Shipped: Opacity Controls
 
 - Shared drawing style supports normalized opacity and applies it in both web
   Canvas and mobile Skia render paths.
 - Web top bar and mobile top bar expose matching selected drawing opacity
   controls through shared descriptors.
 
+## Current Epic: Fill and Border Toggles
+
+- Shared drawing style supports explicit fill and border visibility flags.
+- Web Canvas and mobile Skia skip matching fill or stroke draw calls while
+  preserving existing default rendering for older drawings.
+- Web top bar and mobile top bar expose matching selected drawing fill and
+  border toggles.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Rich text label controls, font families, and multiline editor polish.
-- More complete style controls, including no-fill/no-border toggles and
-  per-tool property panels.
+- More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.

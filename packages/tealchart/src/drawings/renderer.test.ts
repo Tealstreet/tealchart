@@ -228,6 +228,44 @@ describe('user drawing renderer', () => {
     expect(ctx.globalAlpha).toBe(1);
   });
 
+  it('suppresses fill and stroke draw calls from style visibility flags', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rect',
+      kind: 'rectangle',
+      style: { ...style, fillVisible: false, lineVisible: false },
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls.some((call) => call.startsWith('fillRect:'))).toBe(false);
+    expect(ctx.calls.some((call) => call.startsWith('strokeRect:'))).toBe(false);
+  });
+
+  it('suppresses line drawing strokes from style visibility flags', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'line',
+      kind: 'trendLine',
+      style: { ...style, lineVisible: false },
+      points: [
+        { time: 0, price: 50 },
+        { time: 100, price: 50 },
+      ],
+      extend: 'none',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls.some((call) => call.startsWith('stroke:'))).toBe(false);
+  });
+
   it('skips invisible drawings and drawings without a pane space', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

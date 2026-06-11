@@ -84,6 +84,8 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   };
 
   if (isFiniteNumber(value.opacity)) style.opacity = value.opacity;
+  if (typeof value.lineVisible === 'boolean') style.lineVisible = value.lineVisible;
+  if (typeof value.fillVisible === 'boolean') style.fillVisible = value.fillVisible;
   if (typeof value.fillColor === 'string') style.fillColor = value.fillColor;
   if (typeof value.textColor === 'string') style.textColor = value.textColor;
   if (isFiniteNumber(value.fontSize)) style.fontSize = value.fontSize;
