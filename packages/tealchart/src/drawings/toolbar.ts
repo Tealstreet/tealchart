@@ -139,6 +139,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'trendBasedFibTime', icon: 'B', label: 'Trend-based fib time' },
   { tool: 'gannFan', icon: 'G', label: 'Gann fan' },
   { tool: 'gannBox', icon: '□', label: 'Gann box' },
+  { tool: 'gannSquare', icon: '◇', label: 'Gann square' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'polyline', icon: '⌁', label: 'Polyline' },
   { tool: 'pitchfork', icon: 'Ψ', label: 'Pitchfork' },
@@ -267,6 +268,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'triangle' ||
     drawing.kind === 'fibWedge' ||
     drawing.kind === 'gannBox' ||
+    drawing.kind === 'gannSquare' ||
     drawing.kind === 'rotatedRectangle' ||
     drawing.kind === 'parallelChannel' ||
     drawing.kind === 'regressionTrend' ||

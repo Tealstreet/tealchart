@@ -60,6 +60,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'fibSpiral':
     case 'gannFan':
     case 'gannBox':
+    case 'gannSquare':
     case 'fibTimeZone':
       return {
         ...drawing,
@@ -515,6 +516,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'gannBox',
+            points,
+          }
+        : null;
+    }
+    case 'gannSquare': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'gannSquare',
             points,
           }
         : null;

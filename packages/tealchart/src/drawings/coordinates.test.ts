@@ -24,6 +24,7 @@ import type {
   TrendBasedFibTimeDrawing,
   GannBoxDrawing,
   GannFanDrawing,
+  GannSquareDrawing,
   FlatTopBottomDrawing,
   HorizontalRayDrawing,
   InfoLineDrawing,
@@ -671,6 +672,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const gannSquare: GannSquareDrawing = {
+      ...trendLine,
+      id: 'gann-square',
+      kind: 'gannSquare',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const path: PathDrawing = {
       ...trendLine,
       id: 'path',
@@ -1053,6 +1063,19 @@ describe('user drawing coordinates', () => {
         angles: expect.arrayContaining([
           { start: { x: 10, y: 20 }, end: { x: 210, y: 120 } },
           { start: { x: 10, y: 120 }, end: { x: 210, y: 20 } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(gannSquare, space)).toMatchObject({
+      kind: 'gannSquare',
+      gannBox: {
+        rect: { x: 10, y: 20, width: 100, height: 100 },
+        levels: expect.arrayContaining([
+          expect.objectContaining({
+            ratio: 0.5,
+            horizontal: { start: { x: 10, y: 70 }, end: { x: 110, y: 70 } },
+            vertical: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } },
+          }),
         ]),
       },
     });
