@@ -114,6 +114,7 @@ export function resolveUserDrawingHandlePoints(
     case 'horizontalRay':
     case 'crossLine':
     case 'anchoredVwap':
+    case 'icon':
       return [anchorToScreenPoint(drawing.point, space)];
     case 'rectangle': {
       const rect = resolveRectFromAnchors(drawing.points[0], drawing.points[1], space);

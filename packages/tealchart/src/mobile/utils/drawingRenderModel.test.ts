@@ -2637,6 +2637,47 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready icon primitives with shared polygon geometry', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'icon',
+          kind: 'icon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          iconName: 'star',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'icon',
+      id: 'icon',
+      clip,
+      point: { x: 50, y: 50 },
+      iconName: 'star',
+      style,
+    });
+    if (!primitive || primitive.kind !== 'icon') throw new Error('expected icon primitive');
+    expect(primitive.points[0]).toEqual({ x: 50, y: 41 });
+    expect(primitive.points[1]).toMatchObject({
+      x: expect.closeTo(52.380530271784515),
+      y: expect.closeTo(46.72348117278146),
+    });
+  });
+
   it('returns Skia-ready balloon primitives with shared layout', () => {
     const state: UserDrawingState = {
       version: 1,

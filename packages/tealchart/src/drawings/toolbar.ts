@@ -171,6 +171,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'comment', icon: '!', label: 'Comment' },
   { tool: 'priceNote', icon: '$', label: 'Price note' },
   { tool: 'pin', icon: 'P', label: 'Pin' },
+  { tool: 'icon', icon: '*', label: 'Icon' },
   { tool: 'balloon', icon: 'B', label: 'Balloon' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
@@ -276,6 +277,7 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
 
 export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   return (
+    drawing.kind === 'icon' ||
     drawing.kind === 'arrowMarker' ||
     drawing.kind === 'arrowMarkUp' ||
     drawing.kind === 'arrowMarkDown' ||

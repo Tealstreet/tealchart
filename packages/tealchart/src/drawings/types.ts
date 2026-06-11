@@ -66,12 +66,14 @@ export type UserDrawingTool =
   | 'comment'
   | 'priceNote'
   | 'pin'
+  | 'icon'
   | 'balloon'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
 export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment' | 'priceNote' | 'balloon';
+export type UserDrawingIconName = 'star';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -440,6 +442,12 @@ export interface PinDrawing extends UserDrawingBase {
   point: UserDrawingAnchor;
 }
 
+export interface IconDrawing extends UserDrawingBase {
+  kind: 'icon';
+  point: UserDrawingAnchor;
+  iconName: UserDrawingIconName;
+}
+
 export interface BalloonDrawing extends UserDrawingBase {
   kind: 'balloon';
   point: UserDrawingAnchor;
@@ -517,6 +525,7 @@ export type UserDrawing =
   | CommentDrawing
   | PriceNoteDrawing
   | PinDrawing
+  | IconDrawing
   | BalloonDrawing
   | TextLabelDrawing;
 
@@ -689,6 +698,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'note':
     case 'comment':
     case 'pin':
+    case 'icon':
     case 'balloon':
     case 'textLabel':
     case 'anchoredVwap':
@@ -1079,6 +1089,13 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'pin',
         point: draft.anchors[0]!,
+      };
+    case 'icon':
+      return {
+        ...base,
+        kind: 'icon',
+        point: draft.anchors[0]!,
+        iconName: 'star',
       };
     case 'callout':
     case 'priceNote':

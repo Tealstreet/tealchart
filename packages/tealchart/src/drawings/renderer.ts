@@ -191,6 +191,7 @@ function renderPolygonGeometry(
       kind:
         | 'arrowMarker'
         | 'arrowMark'
+        | 'icon'
         | 'triangle'
         | 'parallelChannel'
         | 'regressionTrend'
@@ -205,9 +206,11 @@ function renderPolygonGeometry(
       ? geometry.marker.points
       : geometry.kind === 'arrowMark'
         ? geometry.mark.points
-        : geometry.kind === 'triangle'
-          ? geometry.polygon.points
-          : geometry.channel.polygon.points;
+        : geometry.kind === 'icon'
+          ? geometry.icon.points
+          : geometry.kind === 'triangle'
+            ? geometry.polygon.points
+            : geometry.channel.polygon.points;
   const [firstPoint, ...remainingPoints] = points;
   if (!firstPoint) return;
 
@@ -1013,6 +1016,9 @@ export function renderUserDrawing(
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'arrowMark':
+        renderPolygonGeometry(ctx, geometry);
+        break;
+      case 'icon':
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'triangle':
