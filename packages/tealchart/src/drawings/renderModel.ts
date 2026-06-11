@@ -92,6 +92,7 @@ export function resolveUserDrawingHandlePoints(
     case 'cyclicLines':
     case 'timeCycles':
     case 'sineLine':
+    case 'forecast':
     case 'gannFan':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {

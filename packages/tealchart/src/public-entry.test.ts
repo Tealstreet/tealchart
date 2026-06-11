@@ -23,6 +23,7 @@ import {
   resolveCyclicLinesFromAnchors,
   resolveTimeCyclesFromAnchors,
   resolveSineLineFromAnchors,
+  resolveForecastFromAnchors,
   resolveFibWedgeFromAnchors,
   resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
@@ -61,6 +62,7 @@ import type {
   MobileUserDrawingCyclicLinesPrimitive,
   MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingSineLinePrimitive,
+  MobileUserDrawingForecastPrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
@@ -97,6 +99,7 @@ import type {
   CyclicLinesDrawing,
   TimeCyclesDrawing,
   SineLineDrawing,
+  ForecastDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
@@ -182,6 +185,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCyclicLinesPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTimeCyclesPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingSineLinePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingForecastPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
@@ -391,6 +395,21 @@ describe('tealchart public entries', () => {
       ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const forecastPrimitive: NonNever<MobileUserDrawingForecastPrimitive> = {
+      kind: 'forecast',
+      id: 'forecast',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      start: { x: 0, y: 10 },
+      end: { x: 10, y: 0 },
+      labelPoint: { x: 5, y: 4 },
+      sourceLabel: 'Source 10.00',
+      targetLabel: 'Target 20.00',
+      changeLabel: '+10.00 (+100.00%) / 1 second',
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannBoxPrimitive: NonNever<MobileUserDrawingGannBoxPrimitive> = {
       kind: 'gannBox',
       id: 'gann-box',
@@ -549,6 +568,7 @@ describe('tealchart public entries', () => {
     expect(cyclicLinesPrimitive.kind).toBe('cyclicLines');
     expect(timeCyclesPrimitive.kind).toBe('timeCycles');
     expect(sineLinePrimitive.kind).toBe('sineLine');
+    expect(forecastPrimitive.kind).toBe('forecast');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(gannBoxPrimitive.kind).toBe('gannBox');
@@ -1533,6 +1553,38 @@ describe('tealchart public entries', () => {
         { x: 100, y: 0 },
       ]),
     );
+  });
+
+  it('exports shared drawing forecast types and resolver', () => {
+    const drawing: ForecastDrawing = {
+      id: 'forecast',
+      kind: 'forecast',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 20 },
+      ],
+    };
+    const forecast = resolveForecastFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('forecast');
+    expect(forecast).toMatchObject({
+      source: { x: 50, y: 50 },
+      target: { x: 100, y: 0 },
+      sourceLabel: 'Source 10.00',
+      targetLabel: 'Target 20.00',
+      changeLabel: '+10.00 (+100.00%) / 1 ms',
+    });
   });
 
   it('exports shared drawing trend-based fib time types and resolver', () => {
