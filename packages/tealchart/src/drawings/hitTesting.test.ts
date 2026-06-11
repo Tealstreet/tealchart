@@ -464,6 +464,7 @@ describe('user drawing hit testing', () => {
       handle: 'center',
       pointIndex: 2,
     });
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 50 }, space, { tolerance: 1 })).toBeNull();
     expect(hitTestUserDrawing(drawing, { x: 75, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 

@@ -214,14 +214,22 @@ function editDrawingHandle(
   anchor: UserDrawingAnchor,
   updatedAt: number,
 ): UserDrawing {
+  if (drawing.kind === 'barsPattern' && pointIndex !== undefined) {
+    if (pointIndex !== 2) return drawing;
+    return {
+      ...drawing,
+      points: [drawing.points[0], drawing.points[1], anchor],
+      updatedAt,
+    };
+  }
+
   if (
     (drawing.kind === 'path' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'parallelChannel' ||
       drawing.kind === 'regressionTrend' ||
       drawing.kind === 'longPosition' ||
-      drawing.kind === 'shortPosition' ||
-      drawing.kind === 'barsPattern') &&
+      drawing.kind === 'shortPosition') &&
     pointIndex !== undefined
   ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
