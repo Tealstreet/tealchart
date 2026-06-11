@@ -24,6 +24,7 @@ export type UserDrawingTool =
   | 'fibExtension'
   | 'triangle'
   | 'parallelChannel'
+  | 'regressionTrend'
   | 'path'
   | 'textLabel';
 
@@ -173,6 +174,11 @@ export interface ParallelChannelDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface RegressionTrendDrawing extends UserDrawingBase {
+  kind: 'regressionTrend';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PathDrawing extends UserDrawingBase {
   kind: 'path';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -210,6 +216,7 @@ export type UserDrawing =
   | FibExtensionDrawing
   | TriangleDrawing
   | ParallelChannelDrawing
+  | RegressionTrendDrawing
   | PathDrawing
   | TextLabelDrawing;
 
@@ -322,6 +329,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
       return 2;
     case 'triangle':
     case 'parallelChannel':
+    case 'regressionTrend':
     case 'path':
       return 3;
     case 'horizontalLine':
@@ -492,9 +500,10 @@ export function createUserDrawingFromDraft(
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'parallelChannel':
+    case 'regressionTrend':
       return {
         ...base,
-        kind: 'parallelChannel',
+        kind: draft.tool,
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'path':

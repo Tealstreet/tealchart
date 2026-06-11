@@ -60,6 +60,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'path':
     case 'triangle':
     case 'parallelChannel':
+    case 'regressionTrend':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -351,6 +352,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'parallelChannel',
+            points,
+          }
+        : null;
+    }
+    case 'regressionTrend': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'regressionTrend',
             points,
           }
         : null;

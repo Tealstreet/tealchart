@@ -220,7 +220,7 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'parallelChannel') {
+  if (geometry.kind === 'parallelChannel' || geometry.kind === 'regressionTrend') {
     const distance = pointInPolygon(point, geometry.channel.polygon.points)
       ? 0
       : Math.min(
@@ -364,6 +364,13 @@ function hitTestUserDrawingHandle(
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });
       }
+      break;
+    case 'regressionTrend':
+      handles.push(
+        { handle: 'center', point: geometry.channel.base.start, pointIndex: 0 },
+        { handle: 'center', point: geometry.channel.base.end, pointIndex: 1 },
+        { handle: 'center', point: geometry.channel.parallel.start, pointIndex: 2 },
+      );
       break;
     case 'textLabel':
       handles.push({ handle: 'center', point: geometry.point });

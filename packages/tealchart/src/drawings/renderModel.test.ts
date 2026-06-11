@@ -228,6 +228,42 @@ describe('user drawing render model', () => {
     ]);
   });
 
+  it('resolves selection handles for regression trend anchors', () => {
+    const regressionSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 62, low: 48, close: 60, volume: 1 },
+        { time: 50, open: 60, high: 72, low: 58, close: 70, volume: 1 },
+        { time: 90, open: 70, high: 82, low: 68, close: 80, volume: 1 },
+      ],
+    };
+
+    expect(
+      resolveUserDrawingHandlePoints(
+        {
+          id: 'regression',
+          kind: 'regressionTrend',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 50 },
+            { time: 10, price: 80 },
+          ],
+        },
+        regressionSpace,
+      ),
+    ).toEqual([
+      { x: 10, y: 40 },
+      { x: 90, y: 20 },
+      { x: 10, y: 20 },
+    ]);
+  });
+
   it('resolves selection handles for date range boundaries', () => {
     expect(
       resolveUserDrawingHandlePoints(

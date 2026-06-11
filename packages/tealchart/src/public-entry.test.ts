@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { clearChartStoreCache } from './state/chartState';
 import {
   formatTrendAngleDegrees,
   normalizeUserDrawingFontFamily,
@@ -11,6 +12,7 @@ import {
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
+  resolveRegressionTrendFromAnchors,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -21,6 +23,10 @@ import {
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
 } from './index';
+import type {
+  MobileUserDrawingParallelChannelPrimitive,
+  MobileUserDrawingRegressionTrendPrimitive,
+} from './mobile/utils/drawingRenderModel';
 import type {
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
@@ -34,6 +40,7 @@ import type {
   PathDrawing,
   ParallelChannelDrawing,
   PriceRangeDrawing,
+  RegressionTrendDrawing,
   TriangleDrawing,
   TrendAngleDrawing,
   UserDrawingFontFamily,
@@ -48,9 +55,16 @@ import type {
   UserDrawingStyleToggleDescriptor,
 } from './index';
 
+type NonNever<T> = [T] extends [never] ? never : T;
+
 describe('tealchart public entries', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
+    expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
@@ -65,6 +79,31 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
+  });
+
+  it('exports usable native channel primitive aliases', () => {
+    const clip = { x: 0, y: 0, width: 100, height: 100 };
+    const channelPrimitive: NonNever<MobileUserDrawingParallelChannelPrimitive> = {
+      kind: 'parallelChannel',
+      id: 'channel',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [],
+      base: { start: { x: 0, y: 0 }, end: { x: 1, y: 1 } },
+      parallel: { start: { x: 0, y: 1 }, end: { x: 1, y: 2 } },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+    const regressionPrimitive: NonNever<MobileUserDrawingRegressionTrendPrimitive> = {
+      ...channelPrimitive,
+      kind: 'regressionTrend',
+      id: 'regression',
+    };
+
+    expect(channelPrimitive.kind).toBe('parallelChannel');
+    expect(regressionPrimitive.kind).toBe('regressionTrend');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -423,5 +462,25 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('parallelChannel');
+  });
+
+  it('exports shared drawing regression trend types', () => {
+    const drawing: RegressionTrendDrawing = {
+      id: 'regression',
+      kind: 'regressionTrend',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('regressionTrend');
   });
 });

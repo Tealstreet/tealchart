@@ -9,6 +9,7 @@ import {
   resolveEllipseFromAnchors,
   resolvePolylineFromAnchors,
   resolveRectFromAnchors,
+  resolveUserDrawingGeometry,
   timeToDrawingX,
 } from './coordinates';
 import { createUserDrawingFromDraft, getRequiredAnchorCount } from './types';
@@ -149,6 +150,16 @@ export function resolveUserDrawingHandlePoints(
     case 'triangle':
     case 'parallelChannel':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
+    case 'regressionTrend':
+      {
+        const geometry = resolveUserDrawingGeometry(drawing, space);
+        if (geometry.kind !== 'regressionTrend') return [];
+        return [
+          geometry.channel.base.start,
+          geometry.channel.base.end,
+          geometry.channel.parallel.start,
+        ];
+      }
     case 'textLabel':
       return [anchorToScreenPoint(drawing.point, space)];
   }
