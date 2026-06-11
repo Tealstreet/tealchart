@@ -24,6 +24,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     const onDelete = vi.fn();
     const onCancel = vi.fn();
     const onClear = vi.fn();
+    const onZOrder = vi.fn();
     render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
@@ -41,6 +42,17 @@ describe('ChartTopBarComponent drawing toolbar', () => {
           },
           drawings: [
             {
+              id: 'back',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 8,
+            },
+            {
               id: 'h',
               kind: 'horizontalLine',
               paneId: 'main',
@@ -51,17 +63,33 @@ describe('ChartTopBarComponent drawing toolbar', () => {
               style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
               price: 10,
             },
+            {
+              id: 'front',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 12,
+            },
           ],
         }}
         onUserDrawingDuplicateSelected={onDuplicate}
         onUserDrawingDeleteSelected={onDelete}
         onUserDrawingCancelDraft={onCancel}
         onUserDrawingClearAll={onClear}
+        onUserDrawingZOrderChange={onZOrder}
       />,
     );
 
     fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
     fireEvent.click(screen.getByLabelText('Delete selected drawing'));
+    fireEvent.click(screen.getByLabelText('Bring selected drawing forward'));
+    fireEvent.click(screen.getByLabelText('Send selected drawing backward'));
+    fireEvent.click(screen.getByLabelText('Bring selected drawing to front'));
+    fireEvent.click(screen.getByLabelText('Send selected drawing to back'));
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
     fireEvent.click(screen.getByLabelText('Clear all drawings'));
 
@@ -69,6 +97,10 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
+    expect(onZOrder).toHaveBeenCalledWith('bringForward');
+    expect(onZOrder).toHaveBeenCalledWith('sendBackward');
+    expect(onZOrder).toHaveBeenCalledWith('bringToFront');
+    expect(onZOrder).toHaveBeenCalledWith('sendToBack');
   });
 
   it('dispatches selected rectangle fill style controls without text controls', () => {

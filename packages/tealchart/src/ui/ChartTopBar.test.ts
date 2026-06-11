@@ -50,6 +50,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onDelete = vi.fn();
     const onCancel = vi.fn();
     const onClear = vi.fn();
+    const onZOrder = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-actions',
       symbol: 'BTCUSDT',
@@ -66,6 +67,17 @@ describe('ChartTopBar drawing toolbar', () => {
         },
         drawings: [
           {
+            id: 'back',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            price: 8,
+          },
+          {
             id: 'h',
             kind: 'horizontalLine',
             paneId: 'main',
@@ -76,17 +88,33 @@ describe('ChartTopBar drawing toolbar', () => {
             style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
             price: 10,
           },
+          {
+            id: 'front',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            price: 12,
+          },
         ],
       },
       onUserDrawingDuplicateSelected: onDuplicate,
       onUserDrawingDeleteSelected: onDelete,
       onUserDrawingCancelDraft: onCancel,
       onUserDrawingClearAll: onClear,
+      onUserDrawingZOrderChange: onZOrder,
     });
     topBar.mount(document.body);
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing forward"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Send selected drawing backward"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing to front"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Send selected drawing to back"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
 
@@ -94,6 +122,10 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
+    expect(onZOrder).toHaveBeenCalledWith('bringForward');
+    expect(onZOrder).toHaveBeenCalledWith('sendBackward');
+    expect(onZOrder).toHaveBeenCalledWith('bringToFront');
+    expect(onZOrder).toHaveBeenCalledWith('sendToBack');
 
     topBar.setUserDrawingState(baseDrawingState);
 

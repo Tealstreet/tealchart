@@ -159,6 +159,7 @@ export {
   selectUserDrawingsById,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
+  getUserDrawingZOrderAction,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
   normalizeUserDrawingIconName,
