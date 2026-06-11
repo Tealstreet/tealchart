@@ -137,6 +137,7 @@ export type {
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
+  BarsPatternBarSnapshot,
   CircleDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,

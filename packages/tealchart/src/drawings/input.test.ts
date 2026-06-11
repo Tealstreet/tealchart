@@ -189,12 +189,17 @@ describe('user drawing input controller', () => {
 
   it('commits bars pattern drawings from three anchors', () => {
     const options = { createId: () => 'bars-pattern', now: () => 31 };
+    const bars = [
+      { time: 1_000, open: 100, high: 104, low: 99, close: 102 },
+      { time: 2_000, open: 102, high: 105, low: 101, close: 101 },
+    ];
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'barsPattern'), {
       paneId: 'main',
       anchor: anchorA,
+      bars,
     }, options);
-    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
-    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB, bars }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC, bars }, options);
 
     expect(second.drawings).toEqual([]);
     expect(third.draft).toBeNull();
@@ -203,7 +208,22 @@ describe('user drawing input controller', () => {
       id: 'bars-pattern',
       kind: 'barsPattern',
       points: [anchorA, anchorB, anchorC],
+      bars,
     });
+  });
+
+  it('does not commit bars pattern drawings without source bars', () => {
+    const options = { createId: () => 'bars-pattern', now: () => 32 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'barsPattern'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(third.drawings).toEqual([]);
+    expect(third.selection).toBeNull();
+    expect(third.draft).toBeNull();
   });
 
   it('clears too-short path drags without creating drawings', () => {

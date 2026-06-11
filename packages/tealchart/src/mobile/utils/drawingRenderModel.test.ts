@@ -1157,20 +1157,17 @@ describe('mobile user drawing render model', () => {
             { time: 20, price: 50 },
             { time: 40, price: 50 },
           ],
+          bars: [
+            { time: 10, open: 50, high: 60, low: 49, close: 52 },
+            { time: 20, open: 52, high: 58, low: 51, close: 53 },
+          ],
         },
       ],
       draft: null,
       textEdit: null,
     };
-    const barsSpace: DrawingCoordinateSpace = {
-      ...space,
-      bars: [
-        { time: 10, open: 50, high: 60, low: 49, close: 52, volume: 1 },
-        { time: 20, open: 52, high: 58, low: 51, close: 53, volume: 1 },
-      ],
-    };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, barsSpace]]))[0]).toMatchObject({
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
       kind: 'barsPattern',
       id: 'bars',
       selected: true,

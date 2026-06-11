@@ -836,6 +836,10 @@ describe('drawing layout serialization', () => {
             { time: 2, price: 110 },
             { time: 3, price: 105 },
           ],
+          bars: [
+            { time: 1, open: 100, high: 104, low: 99, close: 102 },
+            { time: 2, open: 102, high: 105, low: 101, close: 101 },
+          ],
         },
       ],
     });
@@ -847,6 +851,10 @@ describe('drawing layout serialization', () => {
         { time: 1, price: 100 },
         { time: 2, price: 110 },
         { time: 3, price: 105 },
+      ],
+      bars: [
+        { time: 1, open: 100, high: 104, low: 99, close: 102 },
+        { time: 2, open: 102, high: 105, low: 101, close: 101 },
       ],
     });
     expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(1);
