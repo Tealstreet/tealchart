@@ -612,6 +612,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, whole-drawing moves, endpoint handle edits, text
   editing, alignment controls, and style controls stay shared across platforms.
 
+## Shipped: Comment Tool
+
+- Shared drawing state supports the single-anchor `comment` annotation and
+  persists text, alignment, and style through layout save/load.
+- Web Canvas and mobile Skia render matching comment text boxes from shared text
+  annotation layout.
+- Selection, hit testing, whole-drawing moves, text editing, alignment controls,
+  and style controls use shared text annotation behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

@@ -136,6 +136,7 @@ import {
 } from './mobile/utils/drawingRenderModel';
 import type {
   MobileUserDrawingCalloutPrimitive,
+  MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -615,8 +616,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       userDrawingPrimitives.find(
         (
           primitive,
-        ): primitive is MobileUserDrawingTextLabelPrimitive | MobileUserDrawingNotePrimitive | MobileUserDrawingCalloutPrimitive =>
-          (primitive.kind === 'textLabel' || primitive.kind === 'note' || primitive.kind === 'callout') &&
+        ): primitive is
+          | MobileUserDrawingTextLabelPrimitive
+          | MobileUserDrawingNotePrimitive
+          | MobileUserDrawingCalloutPrimitive
+          | MobileUserDrawingCommentPrimitive =>
+          (primitive.kind === 'textLabel' ||
+            primitive.kind === 'note' ||
+            primitive.kind === 'callout' ||
+            primitive.kind === 'comment') &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
       ),
@@ -1247,7 +1255,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           : null;
         if (
           selection.hit &&
-          (selectedDrawing?.kind === 'textLabel' || selectedDrawing?.kind === 'note' || selectedDrawing?.kind === 'callout')
+          (selectedDrawing?.kind === 'textLabel' ||
+            selectedDrawing?.kind === 'note' ||
+            selectedDrawing?.kind === 'callout' ||
+            selectedDrawing?.kind === 'comment')
         ) {
           const nextState = beginUserDrawingTextEdit(selection.state, selectedDrawing.id);
           if (nextState !== selection.state) {
@@ -2827,7 +2838,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'textLabel' || primitive.kind === 'note' || primitive.kind === 'callout') {
+          if (
+            primitive.kind === 'textLabel' ||
+            primitive.kind === 'note' ||
+            primitive.kind === 'callout' ||
+            primitive.kind === 'comment'
+          ) {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);

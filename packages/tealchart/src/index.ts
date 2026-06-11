@@ -273,6 +273,7 @@ export type {
   TextLabelDrawing,
   NoteDrawing,
   CalloutDrawing,
+  CommentDrawing,
   TimeCyclesDrawing,
   TriangleDrawing,
   TrendAngleDrawing,

@@ -63,11 +63,12 @@ export type UserDrawingTool =
   | 'highlighter'
   | 'note'
   | 'callout'
+  | 'comment'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
-export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout';
+export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment';
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -417,7 +418,14 @@ export interface CalloutDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
-export type UserDrawingTextAnnotation = TextLabelDrawing | NoteDrawing | CalloutDrawing;
+export interface CommentDrawing extends UserDrawingBase {
+  kind: 'comment';
+  point: UserDrawingAnchor;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
+export type UserDrawingTextAnnotation = TextLabelDrawing | NoteDrawing | CalloutDrawing | CommentDrawing;
 
 export type UserDrawing =
   | TrendLineDrawing
@@ -478,6 +486,7 @@ export type UserDrawing =
   | HighlighterDrawing
   | NoteDrawing
   | CalloutDrawing
+  | CommentDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -646,6 +655,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'horizontalRay':
     case 'crossLine':
     case 'note':
+    case 'comment':
     case 'textLabel':
     case 'anchoredVwap':
       return 1;
@@ -659,7 +669,12 @@ export function isUserDrawingPathFamilyTool(tool: UserDrawingTool): tool is User
 }
 
 export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is UserDrawingTextAnnotation {
-  return drawing.kind === 'textLabel' || drawing.kind === 'note' || drawing.kind === 'callout';
+  return (
+    drawing.kind === 'textLabel' ||
+    drawing.kind === 'note' ||
+    drawing.kind === 'callout' ||
+    drawing.kind === 'comment'
+  );
 }
 
 export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor {
@@ -1013,6 +1028,7 @@ export function createUserDrawingFromDraft(
         points: draft.anchors.slice(),
       };
     case 'note':
+    case 'comment':
     case 'textLabel':
       return {
         ...base,

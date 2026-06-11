@@ -211,6 +211,38 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored comment drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'comment',
+          kind: 'comment',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Restored comment',
+          textAlign: 'left',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'comment',
+      kind: 'comment',
+      text: 'Restored comment',
+      textAlign: 'left',
+    });
+  });
+
   it('preserves restored callout drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

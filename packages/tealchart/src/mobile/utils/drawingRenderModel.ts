@@ -674,6 +674,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'comment';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'callout';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -702,6 +716,7 @@ export type MobileUserDrawingPrimitive =
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
 export type MobileUserDrawingNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'note' }>;
 export type MobileUserDrawingCalloutPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'callout' }>;
+export type MobileUserDrawingCommentPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'comment' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
@@ -1517,6 +1532,7 @@ function primitiveFromGeometry(
       };
     case 'textLabel':
     case 'note':
+    case 'comment':
       const drawing = geometry.drawing as UserDrawingTextAnnotation;
       return {
         kind: geometry.kind,
@@ -1603,7 +1619,11 @@ export function resolveMobileUserDrawingRenderModel(
 }
 
 export function resolveMobileUserDrawingTextLabelLayout(
-  primitive: MobileUserDrawingTextLabelPrimitive | MobileUserDrawingNotePrimitive | MobileUserDrawingCalloutPrimitive,
+  primitive:
+    | MobileUserDrawingTextLabelPrimitive
+    | MobileUserDrawingNotePrimitive
+    | MobileUserDrawingCalloutPrimitive
+    | MobileUserDrawingCommentPrimitive,
   measuredTextWidth: number | readonly number[],
   options: {
     labelPadding?: number;

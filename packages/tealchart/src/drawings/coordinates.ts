@@ -527,7 +527,7 @@ export type ResolvedUserDrawingGeometry =
       channel: DrawingScreenParallelChannel;
     }
   | {
-      kind: 'textLabel' | 'note';
+      kind: 'textLabel' | 'note' | 'comment';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
     }
@@ -2331,6 +2331,7 @@ export function resolveUserDrawingGeometry(
       };
     case 'textLabel':
     case 'note':
+    case 'comment':
       return {
         kind: drawing.kind,
         drawing,

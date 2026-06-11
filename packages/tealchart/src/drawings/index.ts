@@ -317,6 +317,7 @@ export type {
   PathDrawing,
   NoteDrawing,
   CalloutDrawing,
+  CommentDrawing,
   ParallelChannelDrawing,
   PitchforkDrawing,
   PitchforkDrawingKind,

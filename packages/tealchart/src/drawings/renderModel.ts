@@ -225,6 +225,7 @@ export function resolveUserDrawingHandlePoints(
       }
     case 'textLabel':
     case 'note':
+    case 'comment':
       return [anchorToScreenPoint(drawing.point, space)];
   }
 }
