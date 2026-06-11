@@ -297,9 +297,10 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
         ],
       };
     case 'xabcdPattern':
+    case 'threeDrivesPattern':
       return {
         ...base,
-        kind: 'xabcdPattern',
+        kind: drawing.kind,
         points: [
           cloneAnchor(drawing.points[0]),
           cloneAnchor(drawing.points[1]),

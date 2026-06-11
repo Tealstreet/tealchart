@@ -759,6 +759,35 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:D:90,4:#111:center:1:12px sans-serif');
   });
 
+  it('renders three drives pattern drawings as labeled stroked polylines', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'three-drives',
+      kind: 'threeDrivesPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 30, price: 70 },
+        { time: 50, price: 90 },
+        { time: 70, price: 70 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:30,30');
+    expect(ctx.calls).toContain('lineTo:90,10');
+    expect(ctx.calls).not.toContain('closePath');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:1:10,4:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:A:30,24:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:2:50,4:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:C:70,24:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3:90,4:#111:center:1:12px sans-serif');
+  });
+
   it('renders ABCD pattern drawings as labeled stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

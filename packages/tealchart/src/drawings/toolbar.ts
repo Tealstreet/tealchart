@@ -153,6 +153,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'trianglePattern', icon: '△', label: 'Triangle pattern' },
   { tool: 'abcdPattern', icon: 'A', label: 'ABCD pattern' },
   { tool: 'xabcdPattern', icon: 'X', label: 'XABCD pattern' },
+  { tool: 'threeDrivesPattern', icon: '3', label: 'Three drives pattern' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },

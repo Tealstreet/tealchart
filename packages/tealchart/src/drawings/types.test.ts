@@ -117,6 +117,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
     expect(getRequiredAnchorCount('trianglePattern')).toBe(4);
     expect(getRequiredAnchorCount('abcdPattern')).toBe(4);
+    expect(getRequiredAnchorCount('threeDrivesPattern')).toBe(5);
     expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
@@ -638,6 +639,23 @@ describe('user drawing types', () => {
       locked: false,
       createdAt: 20,
       updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({ tool: 'threeDrivesPattern', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }),
+        {
+          id: 'three-drives',
+          now: 24,
+        },
+      ),
+    ).toMatchObject({
+      id: 'three-drives',
+      kind: 'threeDrivesPattern',
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+      visible: true,
+      locked: false,
+      createdAt: 24,
+      updatedAt: 24,
     });
     expect(
       createUserDrawingFromDraft(draft({ tool: 'curve', anchors: [anchorA, anchorB, anchorC] }), {
