@@ -1,8 +1,9 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 import { createUserDrawingState } from './input';
 
@@ -41,6 +42,10 @@ const base = {
 };
 
 describe('user drawing editing', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('begins an edit drag from the topmost hit drawing', () => {
     const drawing: UserDrawing = {
       ...base,
@@ -249,6 +254,42 @@ describe('user drawing editing', () => {
       state,
       {
         selection: { drawingId: 'rect', handle: 'topLeft' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 25, y: 20 },
+      { now: () => 4 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 25, price: 80 },
+        { time: 90, price: 10 },
+      ],
+      updatedAt: 4,
+    });
+  });
+
+  it('drags price range corner handles around the opposite corner', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'range',
+      kind: 'priceRange',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'range', handle: 'topLeft' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'range', handle: 'topLeft' },
         startPoint: { x: 10, y: 10 },
         startDrawing: drawing,
         space,

@@ -87,7 +87,7 @@ function hitTestResolvedGeometry(
   const handleHit = hitTestUserDrawingHandle(geometry, point, space, options.handleTolerance);
   if (handleHit) return handleHit;
 
-  if (geometry.kind === 'rectangle') {
+  if (geometry.kind === 'rectangle' || geometry.kind === 'priceRange') {
     const distance = distanceToRectEdge(point, geometry.rect);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
@@ -146,6 +146,7 @@ function hitTestUserDrawingHandle(
       break;
     }
     case 'rectangle':
+    case 'priceRange':
       handles.push(
         { handle: 'topLeft', point: { x: geometry.rect.x, y: geometry.rect.y } },
         { handle: 'topRight', point: { x: geometry.rect.x + geometry.rect.width, y: geometry.rect.y } },
