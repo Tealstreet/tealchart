@@ -259,6 +259,14 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'headShouldersPattern') {
+    const distance = Math.min(
+      distanceToPolyline(point, geometry.pattern.polyline.points),
+      distanceToSegment(point, geometry.pattern.neckline),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'abcdPattern') {
     const distance = distanceToPolyline(point, geometry.pattern.polyline.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -787,6 +795,7 @@ function hitTestUserDrawingHandle(
       break;
     case 'xabcdPattern':
     case 'threeDrivesPattern':
+    case 'headShouldersPattern':
       geometry.pattern.polyline.points.forEach((patternPoint, pointIndex) => {
         handles.push({ handle: 'center', point: patternPoint, pointIndex });
       });

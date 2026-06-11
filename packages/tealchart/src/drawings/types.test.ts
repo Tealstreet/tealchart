@@ -118,6 +118,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('trianglePattern')).toBe(4);
     expect(getRequiredAnchorCount('abcdPattern')).toBe(4);
     expect(getRequiredAnchorCount('threeDrivesPattern')).toBe(5);
+    expect(getRequiredAnchorCount('headShouldersPattern')).toBe(5);
     expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
@@ -656,6 +657,23 @@ describe('user drawing types', () => {
       locked: false,
       createdAt: 24,
       updatedAt: 24,
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({ tool: 'headShouldersPattern', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }),
+        {
+          id: 'head-shoulders',
+          now: 25,
+        },
+      ),
+    ).toMatchObject({
+      id: 'head-shoulders',
+      kind: 'headShouldersPattern',
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+      visible: true,
+      locked: false,
+      createdAt: 25,
+      updatedAt: 25,
     });
     expect(
       createUserDrawingFromDraft(draft({ tool: 'curve', anchors: [anchorA, anchorB, anchorC] }), {

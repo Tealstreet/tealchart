@@ -1355,6 +1355,30 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits head and shoulders pattern paths, neckline, and five anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'head-shoulders',
+      kind: 'headShouldersPattern',
+      points: [
+        { time: 10, price: 70 },
+        { time: 30, price: 30 },
+        { time: 50, price: 90 },
+        { time: 70, price: 30 },
+        { time: 90, price: 70 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 40, y: 40 }, space)?.drawing.id).toBe('head-shoulders');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 70 }, space)?.drawing.id).toBe('head-shoulders');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 30 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 4,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 90 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits ABCD pattern segments and four anchor handles', () => {
     const drawing: UserDrawing = {
       ...base,

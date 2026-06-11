@@ -298,6 +298,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
       };
     case 'xabcdPattern':
     case 'threeDrivesPattern':
+    case 'headShouldersPattern':
       return {
         ...base,
         kind: drawing.kind,

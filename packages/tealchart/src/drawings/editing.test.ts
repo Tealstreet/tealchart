@@ -2227,6 +2227,73 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves and edits head and shoulders pattern anchors with stable five-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'head-shoulders',
+      kind: 'headShouldersPattern',
+      points: [
+        { time: 10, price: 70 },
+        { time: 30, price: 30 },
+        { time: 50, price: 90 },
+        { time: 70, price: 30 },
+        { time: 90, price: 70 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'head-shoulders' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'head-shoulders' },
+        startPoint: { x: 10, y: 30 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 35 },
+      { now: () => 26 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'headShouldersPattern',
+      points: [
+        { time: 15, price: 65 },
+        { time: 35, price: 25 },
+        { time: 55, price: 85 },
+        { time: 75, price: 25 },
+        { time: 95, price: 65 },
+      ],
+      updatedAt: 26,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'head-shoulders', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 50, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 55, y: 15 },
+      { now: () => 27 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'headShouldersPattern',
+      points: [
+        { time: 10, price: 70 },
+        { time: 30, price: 30 },
+        { time: expect.closeTo(55), price: 85 },
+        { time: 70, price: 30 },
+        { time: 90, price: 70 },
+      ],
+      updatedAt: 27,
+    });
+  });
+
   it('moves and edits ABCD pattern anchors with stable four-point shape', () => {
     const drawing: UserDrawing = {
       ...base,
