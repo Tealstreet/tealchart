@@ -40,10 +40,25 @@ export interface DrawingScreenFibCircle {
   rect: DrawingScreenRect;
 }
 
+export interface DrawingScreenFibArc {
+  ratio: number;
+  radius: number;
+  startAngle: number;
+  endAngle: number;
+  rect: DrawingScreenRect;
+}
+
 export interface DrawingScreenFibCircles {
   center: DrawingScreenPoint;
   baseRadius: number;
   circles: readonly DrawingScreenFibCircle[];
+}
+
+export interface DrawingScreenFibSpeedResistanceArcs {
+  center: DrawingScreenPoint;
+  reference: DrawingScreenPoint;
+  baseRadius: number;
+  arcs: readonly DrawingScreenFibArc[];
 }
 
 export interface DrawingScreenEllipse {
@@ -317,6 +332,11 @@ export type ResolvedUserDrawingGeometry =
       fibSpeedResistanceFan: DrawingScreenFibFan;
     }
   | {
+      kind: 'fibSpeedResistanceArcs';
+      drawing: UserDrawing;
+      fibSpeedResistanceArcs: DrawingScreenFibSpeedResistanceArcs;
+    }
+  | {
       kind: 'fibCircles';
       drawing: UserDrawing;
       fibCircles: DrawingScreenFibCircles;
@@ -558,6 +578,39 @@ export function resolveFibCirclesFromAnchors(
   };
 }
 
+export function resolveFibSpeedResistanceArcsFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibSpeedResistanceArcs {
+  const center = anchorToScreenPoint(first, space);
+  const reference = anchorToScreenPoint(second, space);
+  const baseRadius = Math.hypot(reference.x - center.x, reference.y - center.y);
+  const endAngle = Math.atan2(reference.y - center.y, reference.x - center.x);
+  const startAngle = reference.x >= center.x ? 0 : Math.PI;
+
+  return {
+    center,
+    reference,
+    baseRadius,
+    arcs: FIB_SPEED_RESISTANCE_ARC_LEVELS.map((ratio) => {
+      const radius = baseRadius * ratio;
+      return {
+        ratio,
+        radius,
+        startAngle,
+        endAngle,
+        rect: {
+          x: center.x - radius,
+          y: center.y - radius,
+          width: radius * 2,
+          height: radius * 2,
+        },
+      };
+    }),
+  };
+}
+
 export function resolveEllipseFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -726,6 +779,7 @@ export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.
 export const FIB_EXTENSION_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.414, 1.618, 2, 2.618] as const;
 export const FIB_FAN_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] as const;
 export const FIB_SPEED_RESISTANCE_FAN_LEVELS = [1 / 3, 2 / 3, 1] as const;
+export const FIB_SPEED_RESISTANCE_ARC_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_CIRCLE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
 export const FIB_CHANNEL_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.414, 1.618, 2] as const;
 export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
@@ -1454,6 +1508,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibSpeedResistanceFan',
         drawing,
         fibSpeedResistanceFan: resolveFibSpeedResistanceFanFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibSpeedResistanceArcs':
+      return {
+        kind: 'fibSpeedResistanceArcs',
+        drawing,
+        fibSpeedResistanceArcs: resolveFibSpeedResistanceArcsFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'fibCircles':
       return {

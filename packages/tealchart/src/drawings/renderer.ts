@@ -377,6 +377,20 @@ function renderFibCirclesGeometry(
   ctx.stroke();
 }
 
+function renderFibSpeedResistanceArcsGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibSpeedResistanceArcs' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const arc of geometry.fibSpeedResistanceArcs.arcs) {
+    ctx.arc(geometry.fibSpeedResistanceArcs.center.x, geometry.fibSpeedResistanceArcs.center.y, arc.radius, arc.startAngle, arc.endAngle);
+  }
+  ctx.stroke();
+}
+
 function renderEllipseGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'ellipse' }>,
@@ -761,6 +775,9 @@ export function renderUserDrawing(
         break;
       case 'fibCircles':
         renderFibCirclesGeometry(ctx, geometry);
+        break;
+      case 'fibSpeedResistanceArcs':
+        renderFibSpeedResistanceArcsGeometry(ctx, geometry);
         break;
       case 'ellipse':
         renderEllipseGeometry(ctx, geometry);

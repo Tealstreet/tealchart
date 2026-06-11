@@ -30,6 +30,7 @@ export type UserDrawingTool =
   | 'fibExtension'
   | 'fibFan'
   | 'fibSpeedResistanceFan'
+  | 'fibSpeedResistanceArcs'
   | 'fibCircles'
   | 'fibChannel'
   | 'fibTimeZone'
@@ -234,6 +235,11 @@ export interface FibSpeedResistanceFanDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface FibSpeedResistanceArcsDrawing extends UserDrawingBase {
+  kind: 'fibSpeedResistanceArcs';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface FibCirclesDrawing extends UserDrawingBase {
   kind: 'fibCircles';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -344,6 +350,7 @@ export type UserDrawing =
   | FibExtensionDrawing
   | FibFanDrawing
   | FibSpeedResistanceFanDrawing
+  | FibSpeedResistanceArcsDrawing
   | FibCirclesDrawing
   | FibChannelDrawing
   | FibTimeZoneDrawing
@@ -480,6 +487,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibSpeedResistanceArcs':
     case 'fibCircles':
     case 'gannFan':
     case 'fibTimeZone':
@@ -716,6 +724,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'fibSpeedResistanceFan',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'fibSpeedResistanceArcs':
+      return {
+        ...base,
+        kind: 'fibSpeedResistanceArcs',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'fibCircles':

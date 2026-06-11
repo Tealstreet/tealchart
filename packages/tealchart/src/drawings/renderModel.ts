@@ -85,6 +85,7 @@ export function resolveUserDrawingHandlePoints(
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibSpeedResistanceArcs':
     case 'fibCircles':
     case 'fibTimeZone':
     case 'gannFan':

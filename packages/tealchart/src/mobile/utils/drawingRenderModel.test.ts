@@ -814,6 +814,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fib speed resistance arc primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-speed-arcs',
+          kind: 'fibSpeedResistanceArcs',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibSpeedResistanceArcs',
+      id: 'fib-speed-arcs',
+      center: { x: 10, y: 50 },
+      reference: { x: 50, y: 80 },
+      baseRadius: 50,
+      arcs: expect.arrayContaining([
+        expect.objectContaining({ ratio: 1 / 3, radius: expect.closeTo(50 / 3), startAngle: 0 }),
+        expect.objectContaining({ ratio: 2 / 3, radius: expect.closeTo(100 / 3), startAngle: 0 }),
+        expect.objectContaining({ ratio: 1, radius: 50, startAngle: 0 }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready fib circle primitives', () => {
     const state: UserDrawingState = {
       version: 1,

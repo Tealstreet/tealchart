@@ -199,8 +199,28 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib speed resistance arc drawings from two anchors', () => {
+    const options = { createId: () => 'fib-speed-arcs', now: () => 24 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibSpeedResistanceArcs'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'fib-speed-arcs' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'fib-speed-arcs',
+      kind: 'fibSpeedResistanceArcs',
+      points: [anchorA, anchorB],
+      createdAt: 24,
+      updatedAt: 24,
+    });
+  });
+
   it('commits fib circle drawings from two anchors', () => {
-    const options = { createId: () => 'fib-circles', now: () => 24 };
+    const options = { createId: () => 'fib-circles', now: () => 25 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibCircles'), {
       paneId: 'main',
       anchor: anchorA,
@@ -214,8 +234,8 @@ describe('user drawing input controller', () => {
       id: 'fib-circles',
       kind: 'fibCircles',
       points: [anchorA, anchorB],
-      createdAt: 24,
-      updatedAt: 24,
+      createdAt: 25,
+      updatedAt: 25,
     });
   });
 
