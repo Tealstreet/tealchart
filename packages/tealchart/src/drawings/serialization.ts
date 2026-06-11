@@ -64,6 +64,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
     case 'insidePitchfork':
+    case 'pitchfan':
     case 'parallelChannel':
     case 'rotatedRectangle':
     case 'flatTopBottom':
@@ -485,6 +486,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: value.kind,
+            points,
+          }
+        : null;
+    }
+    case 'pitchfan': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'pitchfan',
             points,
           }
         : null;

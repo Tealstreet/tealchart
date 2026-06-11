@@ -134,6 +134,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'schiffPitchfork', icon: 'S', label: 'Schiff pitchfork' },
   { tool: 'modifiedSchiffPitchfork', icon: 'M', label: 'Modified Schiff pitchfork' },
   { tool: 'insidePitchfork', icon: 'I', label: 'Inside pitchfork' },
+  { tool: 'pitchfan', icon: 'F', label: 'Pitchfan' },
   { tool: 'parallelChannel', icon: '▱', label: 'Parallel channel' },
   { tool: 'regressionTrend', icon: '≋', label: 'Regression trend' },
   { tool: 'flatTopBottom', icon: '▰', label: 'Flat top/bottom' },

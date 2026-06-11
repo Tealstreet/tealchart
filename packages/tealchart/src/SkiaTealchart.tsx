@@ -1744,6 +1744,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'pitchfan') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.rays.map((ray) => (
+                  <SkiaLine
+                    key={ray.ratio}
+                    p1={vec(ray.start.x, ray.start.y)}
+                    p2={vec(ray.end.x, ray.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                ))}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'arrowMarker') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();

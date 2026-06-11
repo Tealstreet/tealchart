@@ -77,6 +77,7 @@ describe('user drawing toolbar descriptors', () => {
       'schiffPitchfork',
       'modifiedSchiffPitchfork',
       'insidePitchfork',
+      'pitchfan',
       'parallelChannel',
       'regressionTrend',
       'flatTopBottom',
@@ -175,6 +176,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('insidePitchfork')).toEqual(
       expect.objectContaining({ tool: 'insidePitchfork', label: 'Inside pitchfork' }),
+    );
+    expect(getUserDrawingToolDescriptor('pitchfan')).toEqual(
+      expect.objectContaining({ tool: 'pitchfan', label: 'Pitchfan' }),
     );
     expect(getUserDrawingToolDescriptor('parallelChannel')).toEqual(
       expect.objectContaining({ tool: 'parallelChannel', label: 'Parallel channel' }),

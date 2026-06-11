@@ -34,6 +34,7 @@ export type UserDrawingTool =
   | 'schiffPitchfork'
   | 'modifiedSchiffPitchfork'
   | 'insidePitchfork'
+  | 'pitchfan'
   | 'parallelChannel'
   | 'regressionTrend'
   | 'flatTopBottom'
@@ -233,6 +234,11 @@ export interface PitchforkDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface PitchfanDrawing extends UserDrawingBase {
+  kind: 'pitchfan';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface ParallelChannelDrawing extends UserDrawingBase {
   kind: 'parallelChannel';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -297,6 +303,7 @@ export type UserDrawing =
   | TriangleDrawing
   | PolylineDrawing
   | PitchforkDrawing
+  | PitchfanDrawing
   | ParallelChannelDrawing
   | RegressionTrendDrawing
   | FlatTopBottomDrawing
@@ -429,6 +436,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
     case 'insidePitchfork':
+    case 'pitchfan':
     case 'rotatedRectangle':
     case 'parallelChannel':
     case 'regressionTrend':
@@ -658,6 +666,7 @@ export function createUserDrawingFromDraft(
     case 'schiffPitchfork':
     case 'modifiedSchiffPitchfork':
     case 'insidePitchfork':
+    case 'pitchfan':
       return {
         ...base,
         kind: draft.tool,

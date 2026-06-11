@@ -176,6 +176,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'pitchfan';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rays: readonly {
+        ratio: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -367,6 +381,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
+export type MobileUserDrawingPitchfanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfan' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -667,6 +682,21 @@ function primitiveFromGeometry(
         median: geometry.pitchfork.median,
         upper: geometry.pitchfork.upper,
         lower: geometry.pitchfork.lower,
+        style: geometry.drawing.style,
+      };
+    case 'pitchfan':
+      return {
+        kind: 'pitchfan',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rays: geometry.pitchfan.rays.map((ray) => ({
+          ratio: ray.ratio,
+          start: ray.segment.start,
+          end: ray.segment.end,
+        })),
         style: geometry.drawing.style,
       };
     case 'parallelChannel':
