@@ -129,6 +129,63 @@ describe('mobile user drawing render model', () => {
     ]);
   });
 
+  it('returns selected Skia primitives and handles for grouped selections', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'a', drawingIds: ['a', 'b'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+          extend: 'none',
+        },
+        {
+          id: 'b',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 40 },
+            { time: 90, price: 40 },
+          ],
+          extend: 'none',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(
+      model.filter((primitive) => primitive.kind === 'line').map((primitive) => [primitive.id, primitive.selected]),
+    ).toEqual([
+      ['a', true],
+      ['b', true],
+    ]);
+    expect(model.filter((primitive) => primitive.kind === 'handle').map((primitive) => primitive.drawingId)).toEqual([
+      'a',
+      'a',
+      'b',
+      'b',
+    ]);
+  });
+
   it('skips invisible selected drawings and handles', () => {
     const state: UserDrawingState = {
       version: 1,

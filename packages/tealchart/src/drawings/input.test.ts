@@ -13,10 +13,12 @@ import {
   createUserDrawingState,
   deleteUserDrawing,
   duplicateUserDrawing,
+  getUserDrawingSelectionIds,
   handleUserDrawingInput,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
   selectUserDrawingById,
+  selectUserDrawingsById,
   selectUserDrawing,
   setUserDrawingIconName,
   setUserDrawingLocked,
@@ -611,6 +613,49 @@ describe('user drawing input controller', () => {
     expect(cancelUserDrawingDraft(selected)).toBe(selected);
   });
 
+  it('selects multiple drawings by id while preserving a primary drawing id', () => {
+    const state = createUserDrawingState({
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 20,
+        },
+      ],
+    });
+
+    const selected = selectUserDrawingsById(state, ['b', 'a', 'missing', 'b']);
+
+    expect(selected.selection).toEqual({ drawingId: 'b', drawingIds: ['b', 'a'] });
+    expect(getUserDrawingSelectionIds(selected.selection)).toEqual(['b', 'a']);
+    expect(selected.draft).toBeNull();
+    expect(selectUserDrawingsById(selected, ['b', 'a'])).toBe(selected);
+  });
+
   it('preserves path point indexes during point selection', () => {
     const state = createUserDrawingState({
       drawings: [
@@ -1180,6 +1225,53 @@ describe('user drawing input controller', () => {
     expect(deleteUserDrawing(state, { includeLocked: true }).drawings).toEqual([]);
   });
 
+  it('deletes unlocked grouped selections and preserves locked selected drawings', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'a', drawingIds: ['a', 'b', 'c'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 20,
+        },
+        {
+          id: 'c',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 80,
+        },
+      ],
+    });
+
+    const next = deleteUserDrawing(state);
+
+    expect(next.drawings.map((drawing) => drawing.id)).toEqual(['b']);
+    expect(next.selection).toEqual({ drawingId: 'b' });
+    expect(deleteUserDrawing(state, { includeLocked: true }).drawings).toEqual([]);
+  });
+
   it('duplicates selected drawings with a new id, timestamp, and deep-cloned payload', () => {
     const state = createUserDrawingState({
       activeTool: 'rectangle',
@@ -1230,6 +1322,55 @@ describe('user drawing input controller', () => {
     expect(next.drawings[1].style).not.toBe(state.drawings[0].style);
     expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
     expect(next.drawings[1].bars[0]).not.toBe(state.drawings[0].bars[0]);
+  });
+
+  it('duplicates grouped selections after each source drawing and selects the copies', () => {
+    let id = 0;
+    const state = createUserDrawingState({
+      selection: { drawingId: 'a', drawingIds: ['a', 'c'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 20,
+        },
+        {
+          id: 'c',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 80,
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => `copy-${++id}`, now: () => 20 });
+
+    expect(next.drawings.map((drawing) => drawing.id)).toEqual(['a', 'copy-1', 'b', 'c', 'copy-2']);
+    expect(next.selection).toEqual({ drawingId: 'copy-1', drawingIds: ['copy-1', 'copy-2'] });
+    expect(next.drawings[1]).toMatchObject({ kind: 'horizontalLine', price: 100, createdAt: 20, updatedAt: 20 });
+    expect(next.drawings[4]).toMatchObject({ kind: 'horizontalLine', price: 80, createdAt: 20, updatedAt: 20 });
   });
 
   it('does not duplicate locked drawings unless requested', () => {
