@@ -14,6 +14,7 @@ import type {
   FibChannelDrawing,
   FibExtensionDrawing,
   FibFanDrawing,
+  FibSpeedResistanceFanDrawing,
   FibRetracementDrawing,
   FibTimeZoneDrawing,
   GannFanDrawing,
@@ -571,6 +572,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const fibSpeedResistanceFan: FibSpeedResistanceFanDrawing = {
+      ...trendLine,
+      id: 'fib-speed-fan',
+      kind: 'fibSpeedResistanceFan',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const fibChannel: FibChannelDrawing = {
       ...trendLine,
       id: 'fib-channel',
@@ -872,6 +882,27 @@ describe('user drawing coordinates', () => {
           },
           { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
         ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibSpeedResistanceFan, space)).toMatchObject({
+      kind: 'fibSpeedResistanceFan',
+      fibSpeedResistanceFan: {
+        origin: { x: 10, y: 70 },
+        targetStart: { x: 110, y: 70 },
+        targetEnd: { x: 110, y: 120 },
+        rays: [
+          {
+            ratio: 1 / 3,
+            target: { x: 110, y: expect.closeTo(86.67) },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(103.33) } },
+          },
+          {
+            ratio: 2 / 3,
+            target: { x: 110, y: expect.closeTo(103.33) },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(136.67) } },
+          },
+          { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+        ],
       },
     });
     expect(resolveUserDrawingGeometry(gannFan, space)).toMatchObject({
