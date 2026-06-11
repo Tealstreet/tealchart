@@ -8,6 +8,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
+  UserDrawingStyle,
   UserDrawingTool,
 } from '../drawings';
 import type {
@@ -134,6 +135,12 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Called when the top bar should clear all user drawings */
   onUserDrawingClearAll?: () => void;
+  /** Called when the top bar should update selected drawing style */
+  onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
+  /** Called when the top bar should update selected drawing visibility */
+  onUserDrawingVisibilityChange?: (visible: boolean) => void;
+  /** Called when the top bar should update selected drawing locked state */
+  onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
   /** Called when the active user drawing text editor changes */
   onUserDrawingTextEditChange?: (value: string) => void;
   /** Called when the active user drawing text editor should commit */
@@ -245,6 +252,9 @@ export class TealchartWidgetUI {
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,
+        onUserDrawingStyleChange: options.onUserDrawingStyleChange,
+        onUserDrawingVisibilityChange: options.onUserDrawingVisibilityChange,
+        onUserDrawingLockedChange: options.onUserDrawingLockedChange,
         layoutCallbacks: options.layoutCallbacks,
       });
       this.topBar.mount(topBarWrapper);

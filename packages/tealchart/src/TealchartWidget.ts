@@ -1023,6 +1023,15 @@ export class TealchartWidget {
       },
       onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
       onUserDrawingClearAll: () => this.clearUserDrawings(),
+      onUserDrawingStyleChange: (style) => {
+        this.updateUserDrawingStyle(style);
+      },
+      onUserDrawingVisibilityChange: (visible) => {
+        this.setUserDrawingVisibility(visible);
+      },
+      onUserDrawingLockedChange: (locked, includeLocked) => {
+        this.setUserDrawingLocked(locked, { includeLocked });
+      },
       onUserDrawingTextEditChange: (value) => this.updateUserDrawingTextEdit(value),
       onUserDrawingTextEditCommit: () => this.commitUserDrawingTextEdit(),
       onUserDrawingTextEditCancel: () => this.cancelUserDrawingTextEdit(),

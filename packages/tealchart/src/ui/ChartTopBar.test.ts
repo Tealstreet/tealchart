@@ -99,4 +99,90 @@ describe('ChartTopBar drawing toolbar', () => {
 
     topBar.unmount();
   });
+
+  it('dispatches selected drawing style controls', () => {
+    const onStyle = vi.fn();
+    const onVisibility = vi.fn();
+    const onLocked = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-style',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      onUserDrawingStyleChange: onStyle,
+      onUserDrawingVisibilityChange: onVisibility,
+      onUserDrawingLockedChange: onLocked,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Green line color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="3 pixel line width"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Dashed line style"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ lineColor: '#22c55e' });
+    expect(onStyle).toHaveBeenCalledWith({ lineWidth: 3 });
+    expect(onStyle).toHaveBeenCalledWith({ lineStyle: 'dashed' });
+    expect(onVisibility).toHaveBeenCalledWith(false);
+    expect(onLocked).toHaveBeenCalledWith(true, undefined);
+
+    topBar.unmount();
+  });
+
+  it('disables locked selected drawing style controls and one-way actions', () => {
+    const onStyle = vi.fn();
+    const onLocked = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-locked-style',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: true,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      onUserDrawingStyleChange: onStyle,
+      onUserDrawingLockedChange: onLocked,
+    });
+    topBar.mount(document.body);
+
+    const green = document.querySelector<HTMLButtonElement>('button[aria-label="Green line color"]');
+    expect(green?.disabled).toBe(true);
+    green?.click();
+    const lock = document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]');
+    expect(lock?.disabled).toBe(true);
+    lock?.click();
+
+    expect(onStyle).not.toHaveBeenCalled();
+    expect(onLocked).not.toHaveBeenCalled();
+
+    topBar.unmount();
+  });
 });
