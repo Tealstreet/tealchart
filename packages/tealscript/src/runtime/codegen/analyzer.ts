@@ -60,6 +60,7 @@ export interface AnalysisContext {
   plotSites: PlotCallSite[];
   unsupported: string[];
   barFieldSeriesVars: Set<string>;
+  usedBarFields: Set<string>;
 }
 
 const BAR_FIELDS = new Set([
@@ -123,7 +124,8 @@ function resolveCallee(callee: Expression): { funcName: string; namespace?: stri
   return { funcName: '', fullName: '' };
 }
 
-function extractStaticNumber(expr: Expression): number | null {
+function extractStaticNumber(expr: Expression | undefined): number | null {
+  if (!expr) return null;
   if (expr.type === 'NumericLiteral') return expr.value;
   if (expr.type === 'UnaryExpression' && expr.operator === '-' && expr.argument.type === 'NumericLiteral') {
     return -expr.argument.value;
@@ -143,6 +145,7 @@ export function analyze(ast: Program): AnalysisContext {
     plotSites: [],
     unsupported: [],
     barFieldSeriesVars: new Set(),
+    usedBarFields: new Set(),
   };
 
   let taIndex = 0;
@@ -258,6 +261,10 @@ export function analyze(ast: Program): AnalysisContext {
         walkStmt(expr as unknown as Statement);
         break;
       case 'Identifier':
+        if (BAR_FIELDS.has(expr.name)) {
+          ctx.usedBarFields.add(expr.name);
+        }
+        break;
       case 'NumericLiteral':
       case 'StringLiteral':
       case 'BooleanLiteral':
