@@ -1,8 +1,9 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 import { createUserDrawingState } from './input';
 
@@ -41,6 +42,10 @@ const base = {
 };
 
 describe('user drawing editing', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('begins an edit drag from the topmost hit drawing', () => {
     const drawing: UserDrawing = {
       ...base,

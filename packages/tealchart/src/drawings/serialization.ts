@@ -134,7 +134,7 @@ function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'
 }
 
 function parseTwoPointDrawing(value: Record<string, unknown>): [UserDrawingAnchor, UserDrawingAnchor] | null {
-  if (!Array.isArray(value.points)) return null;
+  if (!Array.isArray(value.points) || value.points.length !== 2) return null;
   const start = parseAnchor(value.points[0]);
   const end = parseAnchor(value.points[1]);
   return start && end ? [start, end] : null;
