@@ -199,6 +199,27 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib channel drawings from three anchors', () => {
+    const options = { createId: () => 'fib-channel', now: () => 24 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibChannel'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(second.drawings).toEqual([]);
+    expect(third.draft).toBeNull();
+    expect(third.selection).toEqual({ drawingId: 'fib-channel' });
+    expect(third.drawings[0]).toMatchObject({
+      id: 'fib-channel',
+      kind: 'fibChannel',
+      points: [anchorA, anchorB, anchorC],
+      createdAt: 24,
+      updatedAt: 24,
+    });
+  });
+
   it('builds variable-point path drawings from drag samples', () => {
     const started = beginUserDrawingPathDrag(
       setUserDrawingTool(createUserDrawingState(), 'path'),

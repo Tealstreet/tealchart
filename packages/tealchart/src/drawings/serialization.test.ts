@@ -768,6 +768,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores Fibonacci channel drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'fib-channel',
+          kind: 'fibChannel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 1, price: 13 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'fib-channel',
+      kind: 'fibChannel',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 1, price: 13 },
+      ],
+    });
+  });
+
   it('restores path drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

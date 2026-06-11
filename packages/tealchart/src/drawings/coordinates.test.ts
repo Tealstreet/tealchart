@@ -11,6 +11,7 @@ import type {
   DisjointChannelDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FibChannelDrawing,
   FibExtensionDrawing,
   FibFanDrawing,
   FibRetracementDrawing,
@@ -569,6 +570,16 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const fibChannel: FibChannelDrawing = {
+      ...trendLine,
+      id: 'fib-channel',
+      kind: 'fibChannel',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 100 },
+        { time: 1_000, price: 110 },
+      ],
+    };
     const gannFan: GannFanDrawing = {
       ...trendLine,
       id: 'gann-fan',
@@ -866,6 +877,26 @@ describe('user drawing coordinates', () => {
           },
           { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
           { ratio: 2, target: { x: 110, y: 170 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 270 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibChannel, space)).toMatchObject({
+      kind: 'fibChannel',
+      fibChannel: {
+        base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        polygon: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 70 },
+            { x: 210, y: 20 },
+            { x: 10, y: 20 },
+          ],
+        },
+        levels: expect.arrayContaining([
+          { ratio: 0, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
+          { ratio: 0.5, segment: { start: { x: 10, y: 45 }, end: { x: 210, y: 45 } } },
+          { ratio: 1, segment: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } } },
+          { ratio: 2, segment: { start: { x: 10, y: -30 }, end: { x: 210, y: -30 } } },
         ]),
       },
     });

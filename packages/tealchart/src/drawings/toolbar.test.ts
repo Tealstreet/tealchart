@@ -72,6 +72,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibRetracement',
       'fibExtension',
       'fibFan',
+      'fibChannel',
       'gannFan',
       'triangle',
       'polyline',
@@ -163,6 +164,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibFan')).toEqual(
       expect.objectContaining({ tool: 'fibFan', label: 'Fib fan' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibChannel')).toEqual(
+      expect.objectContaining({ tool: 'fibChannel', label: 'Fib channel' }),
     );
     expect(getUserDrawingToolDescriptor('gannFan')).toEqual(
       expect.objectContaining({ tool: 'gannFan', label: 'Gann fan' }),

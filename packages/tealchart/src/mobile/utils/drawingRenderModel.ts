@@ -218,6 +218,21 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibChannel';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      levels: readonly {
+        ratio: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -412,6 +427,7 @@ export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingPitchfanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfan' }>;
 export type MobileUserDrawingFibFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibFan' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
+export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -756,6 +772,22 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibChannel':
+      return {
+        kind: 'fibChannel',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        points: geometry.fibChannel.polygon.points,
+        levels: geometry.fibChannel.levels.map((level) => ({
+          ratio: level.ratio,
+          start: level.segment.start,
+          end: level.segment.end,
         })),
         style: geometry.drawing.style,
       };
