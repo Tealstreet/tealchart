@@ -88,6 +88,7 @@ import {
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
+  normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   setUserDrawingText,
@@ -1352,7 +1353,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingFont16 = useFont(null, 16);
   const getUserDrawingTextFont = useCallback(
     (fontSize: number | undefined) => {
-      switch (fontSize ?? 12) {
+      switch (normalizeUserDrawingFontSize(fontSize ?? 12)) {
         case 10:
           return userDrawingFont10;
         case 14:

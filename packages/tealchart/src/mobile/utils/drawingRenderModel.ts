@@ -10,6 +10,7 @@ import type {
 } from '../../drawings';
 
 import {
+  normalizeUserDrawingFontSize,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
@@ -210,7 +211,7 @@ export function resolveMobileUserDrawingTextLabelLayout(
     labelHeight?: number;
   } = {},
 ): MobileUserDrawingTextLabelLayout {
-  const fontSize = primitive.style.fontSize ?? 12;
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
   const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
   const width = Math.ceil(measuredTextWidth + labelPadding * 2);
