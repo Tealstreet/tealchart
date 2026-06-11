@@ -270,6 +270,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibFan') {
+    const distance = Math.min(...geometry.fibFan.rays.map((ray) => distanceToSegment(point, ray.segment)));
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
@@ -398,7 +403,12 @@ function hitTestUserDrawingHandle(
       break;
     case 'fibRetracement':
     case 'fibExtension':
-      if (geometry.drawing.kind === 'fibRetracement' || geometry.drawing.kind === 'fibExtension') {
+    case 'fibFan':
+      if (
+        geometry.drawing.kind === 'fibRetracement' ||
+        geometry.drawing.kind === 'fibExtension' ||
+        geometry.drawing.kind === 'fibFan'
+      ) {
         handles.push(
           { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },
           { handle: 'end', point: anchorToScreenPoint(geometry.drawing.points[1], space) },

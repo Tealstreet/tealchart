@@ -108,6 +108,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'datePriceRange':
     case 'fibRetracement':
     case 'fibExtension':
+    case 'fibFan':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
@@ -176,7 +177,8 @@ function editLineEndpoint(
         | 'arrowMarker'
         | 'ray'
         | 'fibRetracement'
-        | 'fibExtension';
+        | 'fibExtension'
+        | 'fibFan';
     }
   >,
   handle: UserDrawingHandleRole,
@@ -302,6 +304,7 @@ function editDrawingHandle(
     case 'ray':
     case 'fibRetracement':
     case 'fibExtension':
+    case 'fibFan':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
     case 'circle':

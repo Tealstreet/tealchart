@@ -610,6 +610,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib fan rays and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-fan',
+      kind: 'fibFan',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 95 }, space)?.drawing.id).toBe('fib-fan');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,
