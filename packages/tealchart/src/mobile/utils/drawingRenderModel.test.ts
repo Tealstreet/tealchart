@@ -335,7 +335,42 @@ describe('mobile user drawing render model', () => {
     const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
     if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
 
-    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, 84)).toEqual({
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: 8,
+      y: 23,
+    });
+  });
+
+  it('falls back to normalized font size when measured price range label height is unavailable', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, fontSize: 14, fontFamily: 'monospace' },
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
+
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { width: 84 })).toEqual({
       fontSize: 14,
       fontFamily: 'monospace',
       x: 8,

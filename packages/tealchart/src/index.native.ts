@@ -57,6 +57,7 @@ export type {
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
   MobileUserDrawingPriceRangeLabelPosition,
+  MobileUserDrawingTextBounds,
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';
 export {

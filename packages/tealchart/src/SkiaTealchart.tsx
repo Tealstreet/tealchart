@@ -1578,8 +1578,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'priceRange') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textWidth = font ? font.measureText(primitive.label).width : 0;
-            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textWidth);
+            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
+            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textBounds);
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
