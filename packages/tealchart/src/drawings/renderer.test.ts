@@ -269,6 +269,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:+20.00 (+28.57%):50,20:#111:center:1:12px sans-serif');
   });
 
+  it('renders price range labels from visual low to high when anchors are reversed', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'range',
+      kind: 'priceRange',
+      points: [
+        { time: 90, price: 90 },
+        { time: 10, price: 70 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillText:+20.00 (+28.57%):50,20:#111:center:1:12px sans-serif');
+  });
+
   it('renders text labels with measured boxes', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

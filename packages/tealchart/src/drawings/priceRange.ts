@@ -1,3 +1,5 @@
+import type { UserDrawingAnchor } from './types';
+
 export interface UserDrawingPriceRangeMetrics {
   delta: number;
   percent: number | null;
@@ -24,4 +26,13 @@ export function resolveUserDrawingPriceRangeMetrics(
     percent,
     label: `${deltaLabel}${percentLabel}`,
   };
+}
+
+export function resolveUserDrawingVisualPriceRangeMetrics(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+): UserDrawingPriceRangeMetrics {
+  const low = Math.min(first.price, second.price);
+  const high = Math.max(first.price, second.price);
+  return resolveUserDrawingPriceRangeMetrics(low, high);
 }
