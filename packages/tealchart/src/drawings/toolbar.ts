@@ -1,6 +1,6 @@
 import type { UserDrawing, UserDrawingLineStyle, UserDrawingState, UserDrawingTextAlign, UserDrawingTool } from './types';
 
-import { USER_DRAWING_FONT_SIZES } from './types';
+import { USER_DRAWING_FONT_SIZES, USER_DRAWING_OPACITIES } from './types';
 
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
@@ -51,6 +51,11 @@ export interface UserDrawingLineWidthDescriptor {
 export interface UserDrawingLineStyleDescriptor {
   lineStyle: UserDrawingLineStyle;
   icon: string;
+  label: string;
+}
+
+export interface UserDrawingOpacityDescriptor {
+  opacity: number;
   label: string;
 }
 
@@ -138,6 +143,13 @@ export const USER_DRAWING_LINE_STYLE_DESCRIPTORS: readonly UserDrawingLineStyleD
   { lineStyle: 'dotted', icon: '┈', label: 'Dotted line style' },
 ] as const;
 
+export const USER_DRAWING_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityDescriptor[] = [
+  ...USER_DRAWING_OPACITIES.map((opacity) => ({
+    opacity,
+    label: `${Math.round(opacity * 100)} percent opacity`,
+  })),
+];
+
 export const USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingStyleToolbarActionDescriptor[] = [
   { action: 'hideSelected', icon: '◌', label: 'Hide selected drawing' },
   { action: 'lockSelected', icon: '🔒', label: 'Lock selected drawing' },
@@ -216,6 +228,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.lineColor ?? '',
     selectedDrawing?.style.lineWidth ?? '',
     selectedDrawing?.style.lineStyle ?? '',
+    selectedDrawing?.style.opacity ?? '',
     selectedDrawing?.style.fillColor ?? '',
     selectedDrawing?.style.textColor ?? '',
     selectedDrawing?.style.fontSize ?? '',

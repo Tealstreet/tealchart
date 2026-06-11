@@ -16,6 +16,7 @@ import {
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -67,6 +68,7 @@ describe('user drawing toolbar descriptors', () => {
       ...USER_DRAWING_FILL_COLOR_DESCRIPTORS,
       ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
       ...USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+      ...USER_DRAWING_OPACITY_DESCRIPTORS,
     ]) {
       expect(descriptor.label.length).toBeGreaterThan(0);
     }
@@ -133,6 +135,7 @@ describe('user drawing toolbar descriptors', () => {
       'dashed',
       'dotted',
     ]);
+    expect(USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity)).toEqual([1, 0.75, 0.5, 0.25]);
     expect(USER_DRAWING_FILL_COLOR_DESCRIPTORS.map((descriptor) => descriptor.fillColor)).toEqual([
       'rgba(245, 197, 66, 0.12)',
       'rgba(34, 197, 94, 0.12)',
@@ -309,6 +312,12 @@ describe('user drawing toolbar descriptors', () => {
       getUserDrawingToolbarStateKey({
         ...first,
         drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, fillColor: '#123456' } }],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(first));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...first,
+        drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, opacity: 0.5 } }],
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(first));
 

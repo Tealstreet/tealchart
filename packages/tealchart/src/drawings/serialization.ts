@@ -83,6 +83,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
     lineStyle: value.lineStyle,
   };
 
+  if (isFiniteNumber(value.opacity)) style.opacity = value.opacity;
   if (typeof value.fillColor === 'string') style.fillColor = value.fillColor;
   if (typeof value.textColor === 'string') style.textColor = value.textColor;
   if (isFiniteNumber(value.fontSize)) style.fontSize = value.fontSize;

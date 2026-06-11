@@ -90,8 +90,10 @@ export {
   getUserDrawingPaneId,
   isDrawingDraftReady,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
   USER_DRAWING_FONT_SIZES,
+  USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 export {
@@ -111,6 +113,7 @@ export {
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -123,6 +126,7 @@ export type {
   UserDrawingLineColorDescriptor,
   UserDrawingLineStyleDescriptor,
   UserDrawingLineWidthDescriptor,
+  UserDrawingOpacityDescriptor,
   UserDrawingStyleToolbarAction,
   UserDrawingStyleToolbarActionState,
   UserDrawingStyleToolbarActionDescriptor,

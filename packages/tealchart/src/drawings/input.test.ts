@@ -296,6 +296,7 @@ describe('user drawing input controller', () => {
         lineColor: '#00ffcc',
         lineWidth: 3,
         lineStyle: 'dashed',
+        opacity: 0.5,
       },
       { now: () => 10 },
     );
@@ -307,6 +308,7 @@ describe('user drawing input controller', () => {
         lineColor: '#00ffcc',
         lineWidth: 3,
         lineStyle: 'dashed',
+        opacity: 0.5,
       },
     });
     expect(updated.selection).toEqual({ drawingId: 'line' });

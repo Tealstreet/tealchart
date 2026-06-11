@@ -25,6 +25,7 @@ import {
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -291,6 +292,35 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       >
                         <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
                           {descriptor.icon}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+
+                  {USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => {
+                    const active = (selectedDrawing.style.opacity ?? 1) === descriptor.opacity;
+                    return (
+                      <Pressable
+                        key={descriptor.opacity}
+                        accessibilityRole="button"
+                        accessibilityLabel={descriptor.label}
+                        accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
+                        disabled={!styleControlsEnabled}
+                        onPress={() => onUserDrawingStyleChange?.({ opacity: descriptor.opacity })}
+                        style={({ pressed }: PressableStyleState) => [
+                          styles.drawingButton,
+                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                          styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                          !styleControlsEnabled && styles.drawingButtonDisabled,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.drawingButtonText,
+                            { color: active ? accentColor : textSecondaryColor, fontSize: 10 },
+                          ]}
+                        >
+                          {Math.round(descriptor.opacity * 100)}
                         </Text>
                       </Pressable>
                     );

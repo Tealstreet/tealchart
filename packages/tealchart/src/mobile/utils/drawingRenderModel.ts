@@ -11,6 +11,7 @@ import type {
 
 import {
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingOpacity,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
@@ -174,7 +175,7 @@ export function resolveMobileUserDrawingRenderModel(
         clip,
         entry.phase,
         entry.selected,
-        entry.phase === 'draft' ? draftOpacity : 1,
+        normalizeUserDrawingOpacity(entry.drawing.style.opacity ?? 1) * (entry.phase === 'draft' ? draftOpacity : 1),
         textEditValue,
       ),
     );
