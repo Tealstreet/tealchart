@@ -9,7 +9,7 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import type { UserDrawingState, UserDrawingStyle, UserDrawingTool } from '../../drawings';
+import type { UserDrawingState, UserDrawingStyle, UserDrawingTextAlign, UserDrawingTool } from '../../drawings';
 
 import {
   getSelectedUserDrawing,
@@ -26,6 +26,7 @@ import {
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
@@ -65,6 +66,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingClearAll?: () => void;
   /** Callback when selected drawing style should change */
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
+  /** Callback when selected text-label alignment should change */
+  onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
   /** Callback when selected drawing visibility should change */
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Callback when selected drawing locked state should change */
@@ -92,6 +95,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
     onUserDrawingStyleChange,
+    onUserDrawingTextAlignChange,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
@@ -368,6 +372,30 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                               ]}
                             >
                               {descriptor.fontSize}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+
+                      {USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => {
+                        const active = selectedDrawing.kind === 'textLabel' && selectedDrawing.textAlign === descriptor.textAlign;
+                        return (
+                          <Pressable
+                            key={descriptor.textAlign}
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
+                            disabled={!textControlsEnabled}
+                            onPress={() => onUserDrawingTextAlignChange?.(descriptor.textAlign)}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingButton,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                              !textControlsEnabled && styles.drawingButtonDisabled,
+                            ]}
+                          >
+                            <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
+                              {descriptor.icon}
                             </Text>
                           </Pressable>
                         );

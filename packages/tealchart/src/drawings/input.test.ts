@@ -16,6 +16,7 @@ import {
   selectUserDrawing,
   setUserDrawingLocked,
   setUserDrawingText,
+  setUserDrawingTextAlign,
   setUserDrawingTool,
   setUserDrawingVisibility,
   updateUserDrawingStyle,
@@ -338,6 +339,51 @@ describe('user drawing input controller', () => {
       updatedAt: 11,
       style: expect.objectContaining({ fontSize: 14 }),
     });
+  });
+
+  it('updates selected or targeted text drawing alignment while respecting locks', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'left' as const,
+    };
+    const locked = { ...textLabel, id: 'locked', locked: true };
+    const line = {
+      id: 'line',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price: 100,
+    };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      drawings: [textLabel, locked, line],
+    });
+
+    const selected = setUserDrawingTextAlign(state, 'center', { now: () => 12 });
+    expect(selected.drawings[0]).toMatchObject({ textAlign: 'center', updatedAt: 12 });
+    expect(setUserDrawingTextAlign(selected, 'center')).toBe(selected);
+    expect(setUserDrawingTextAlign(state, 'right', { drawingId: 'line' })).toBe(state);
+    expect(setUserDrawingTextAlign(state, 'right', { drawingId: 'locked' })).toBe(state);
+
+    const targeted = setUserDrawingTextAlign(state, 'right', {
+      drawingId: 'locked',
+      includeLocked: true,
+      now: () => 13,
+    });
+    expect(targeted.drawings[1]).toMatchObject({ textAlign: 'right', updatedAt: 13 });
   });
 
   it('updates targeted drawing style and respects locked drawings by default', () => {
