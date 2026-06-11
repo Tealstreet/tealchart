@@ -1,5 +1,11 @@
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { ArrowLineDrawing, RectangleDrawing, TrendLineDrawing, UserDrawingStyle } from './types';
+import type {
+  ArrowLineDrawing,
+  ExtendedLineDrawing,
+  RectangleDrawing,
+  TrendLineDrawing,
+  UserDrawingStyle,
+} from './types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -208,6 +214,15 @@ describe('user drawing coordinates', () => {
       id: 'arrow',
       kind: 'arrowLine',
     };
+    const extendedLine: ExtendedLineDrawing = {
+      ...trendLine,
+      id: 'extended',
+      kind: 'extendedLine',
+      points: [
+        { time: 1_500, price: 100 },
+        { time: 2_500, price: 105 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -216,6 +231,25 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(arrowLine, space)).toMatchObject({
       kind: 'arrowLine',
       segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+    });
+    expect(resolveUserDrawingGeometry(extendedLine, space)).toMatchObject({
+      kind: 'line',
+      segment: { start: { x: 10, y: 82.5 }, end: { x: 210, y: 32.5 } },
+    });
+    expect(
+      resolveUserDrawingGeometry(
+        {
+          ...extendedLine,
+          points: [
+            { time: 2_000, price: 95 },
+            { time: 2_000, price: 105 },
+          ],
+        },
+        space,
+      ),
+    ).toMatchObject({
+      kind: 'line',
+      segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
     });
     expect(resolveUserDrawingGeometry(rectangle, space)).toMatchObject({
       kind: 'rectangle',

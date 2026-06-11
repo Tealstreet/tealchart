@@ -86,6 +86,37 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits extended line drawings against their extended segment', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'extended',
+      kind: 'extendedLine',
+      points: [
+        { time: 25, price: 50 },
+        { time: 75, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 5, y: 50 }, space)?.drawing.id).toBe('extended');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
+  });
+
+  it('hits vertical extended line drawings across the pane', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'extended',
+      kind: 'extendedLine',
+      points: [
+        { time: 50, price: 25 },
+        { time: 50, price: 75 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 5 }, space)?.drawing.id).toBe('extended');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 95 }, space)?.drawing.id).toBe('extended');
+    expect(hitTestUserDrawing(drawing, { x: 60, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('reports endpoint handles before line body hits', () => {
     const drawing: UserDrawing = {
       ...base,

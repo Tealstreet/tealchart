@@ -158,6 +158,7 @@ export type {
 export type {
   ArrowLineDrawing,
   CreateUserDrawingFromDraftOptions,
+  ExtendedLineDrawing,
   HorizontalLineDrawing,
   RayDrawing,
   RectangleDrawing,

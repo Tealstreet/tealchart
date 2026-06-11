@@ -20,6 +20,13 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
+    case 'extendedLine':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: drawing.kind,
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
+      };
     case 'arrowLine':
       return {
         ...drawing,
@@ -156,6 +163,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'ray',
+            points,
+          }
+        : null;
+    }
+    case 'extendedLine': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'extendedLine',
             points,
           }
         : null;
