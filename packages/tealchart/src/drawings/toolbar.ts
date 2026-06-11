@@ -7,6 +7,7 @@ import type {
   UserDrawingTextAlign,
   UserDrawingTool,
 } from './types';
+import type { UserDrawingZOrderAction } from './input';
 
 import {
   USER_DRAWING_ICON_NAMES,
@@ -15,9 +16,17 @@ import {
   USER_DRAWING_FONT_SIZES,
   USER_DRAWING_OPACITIES,
 } from './types';
-import { getUserDrawingSelectionIds } from './input';
+import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
-export type UserDrawingToolbarAction = 'duplicateSelected' | 'deleteSelected' | 'cancelDraft' | 'clearAll';
+export type UserDrawingToolbarAction =
+  | 'duplicateSelected'
+  | 'deleteSelected'
+  | 'bringForward'
+  | 'sendBackward'
+  | 'bringToFront'
+  | 'sendToBack'
+  | 'cancelDraft'
+  | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
 
 export interface UserDrawingToolDescriptor {
@@ -188,9 +197,25 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
 export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolbarActionDescriptor[] = [
   { action: 'duplicateSelected', icon: '⧉', label: 'Duplicate selected drawing' },
   { action: 'deleteSelected', icon: '⌫', label: 'Delete selected drawing' },
+  { action: 'bringForward', icon: '↑', label: 'Bring selected drawing forward' },
+  { action: 'sendBackward', icon: '↓', label: 'Send selected drawing backward' },
+  { action: 'bringToFront', icon: '⇧', label: 'Bring selected drawing to front' },
+  { action: 'sendToBack', icon: '⇩', label: 'Send selected drawing to back' },
   { action: 'cancelDraft', icon: '×', label: 'Cancel draft drawing' },
   { action: 'clearAll', icon: '⌧', label: 'Clear all drawings' },
 ] as const;
+
+export function getUserDrawingZOrderAction(action: UserDrawingToolbarAction): UserDrawingZOrderAction | null {
+  switch (action) {
+    case 'bringForward':
+    case 'sendBackward':
+    case 'bringToFront':
+    case 'sendToBack':
+      return action;
+    default:
+      return null;
+  }
+}
 
 export const USER_DRAWING_LINE_COLOR_DESCRIPTORS: readonly UserDrawingLineColorDescriptor[] = [
   { color: '#f5c542', label: 'Amber line color' },
@@ -301,6 +326,8 @@ export function isUserDrawingToolbarActionEnabled(
     return state.drawings.some((drawing) => selectedIds.has(drawing.id) && !drawing.locked);
   }
   if (action === 'deleteSelected') return state.selection !== null;
+  const zOrderAction = getUserDrawingZOrderAction(action);
+  if (zOrderAction) return reorderUserDrawings(state, zOrderAction) !== state;
   if (action === 'cancelDraft') return state.draft !== null;
   return state.drawings.length > 0;
 }
@@ -390,6 +417,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     state.selection?.handle ?? '',
     state.draft ? 'draft' : '',
     state.drawings.length,
+    state.drawings.map((drawing) => drawing.id).join(','),
     selectedDrawing?.visible === false ? 'hidden' : 'visible',
     selectedDrawing?.locked ? 'locked' : 'unlocked',
     selectedDrawing?.style.lineColor ?? '',

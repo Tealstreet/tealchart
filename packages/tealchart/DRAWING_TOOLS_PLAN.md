@@ -86,6 +86,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web widget APIs and mobile Skia handles expose matching z-order methods for
   app toolbar integration.
 
+## Shipped: Z-Order Toolbar Controls
+
+- Shared toolbar action descriptors include bring-forward, send-backward,
+  bring-to-front, and send-to-back controls.
+- Web and mobile top bars enable the controls from the same shared reducer
+  semantics and route actions through the matching platform state owner.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text

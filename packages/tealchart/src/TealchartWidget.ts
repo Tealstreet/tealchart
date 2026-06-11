@@ -1048,6 +1048,9 @@ export class TealchartWidget {
       },
       onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
       onUserDrawingClearAll: () => this.clearUserDrawings(),
+      onUserDrawingZOrderChange: (action) => {
+        this.reorderUserDrawings(action);
+      },
       onUserDrawingStyleChange: (style) => {
         this.updateUserDrawingStyle(style);
       },

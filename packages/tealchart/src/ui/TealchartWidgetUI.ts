@@ -13,6 +13,7 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTool,
+  UserDrawingZOrderAction,
 } from '../drawings';
 import type {
   Bar,
@@ -153,6 +154,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Called when the top bar should clear all user drawings */
   onUserDrawingClearAll?: () => void;
+  /** Called when the top bar should reorder selected user drawings */
+  onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Called when the top bar should update selected drawing style */
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Called when the top bar should update selected text-label alignment */
@@ -275,6 +278,7 @@ export class TealchartWidgetUI {
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,
+        onUserDrawingZOrderChange: options.onUserDrawingZOrderChange,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,
         onUserDrawingTextAlignChange: options.onUserDrawingTextAlignChange,
         onUserDrawingIconNameChange: options.onUserDrawingIconNameChange,
