@@ -631,6 +631,28 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 5 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits anchored VWAP curves and the anchor handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'vwap',
+      kind: 'anchoredVwap',
+      point: { time: 50, price: 50 },
+    };
+    const vwapSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 50, open: 50, high: 54, low: 48, close: 51, volume: 20 },
+        { time: 90, open: 56, high: 60, low: 54, close: 57, volume: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 49 }, vwapSpace)?.drawing.id).toBe('vwap');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, vwapSpace)).toMatchObject({
+      handle: 'center',
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, vwapSpace, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

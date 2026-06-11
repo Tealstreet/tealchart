@@ -724,6 +724,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready anchored VWAP primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'vwap',
+          kind: 'anchoredVwap',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, {
+      ...space,
+      bars: [
+        { time: 50, open: 50, high: 54, low: 48, close: 51, volume: 20 },
+        { time: 90, open: 56, high: 60, low: 54, close: 57, volume: 10 },
+      ],
+    }]]))[0]).toMatchObject({
+      kind: 'anchoredVwap',
+      id: 'vwap',
+      anchor: { x: 50, y: 50 },
+      points: [
+        { x: 50, y: 49 },
+        { x: 90, y: 47 },
+      ],
+    });
+  });
+
   it('returns Skia-ready Fibonacci retracement primitives', () => {
     const state: UserDrawingState = {
       version: 1,
