@@ -142,6 +142,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'crossLine':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
+    case 'pin':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -841,7 +842,8 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         : null;
     }
     case 'arrowMarkUp':
-    case 'arrowMarkDown': {
+    case 'arrowMarkDown':
+    case 'pin': {
       const point = parseAnchor(value.point);
       return point
         ? {

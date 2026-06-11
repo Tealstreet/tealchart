@@ -1446,6 +1446,22 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
   });
 
+  it('renders pin drawings with a marker and stem', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pin',
+      kind: 'pin',
+      point: { time: 50, price: 50 },
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('arc:50,42.8,4:1');
+    expect(ctx.calls).toContain('moveTo:50,46.8');
+    expect(ctx.calls).toContain('lineTo:50,50');
+  });
+
   it('renders multiline text labels with one canvas text draw per line', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

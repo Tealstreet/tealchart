@@ -322,6 +322,7 @@ export type {
   PitchforkDrawing,
   PitchforkDrawingKind,
   PitchfanDrawing,
+  PinDrawing,
   PriceNoteDrawing,
   PriceRangeDrawing,
   RayDrawing,
