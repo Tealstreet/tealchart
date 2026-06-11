@@ -462,6 +462,13 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
       expect(widget.getUserDrawingState().activeTool).toBe('select');
 
+      const testWidget = widget as unknown as {
+        _chartStore: { isDirty: { get(): boolean; set(value: boolean): void } };
+      };
+      testWidget._chartStore.isDirty.set(false);
+      widget.importUserDrawingStateFromLayout(exported);
+      expect(testWidget._chartStore.isDirty.get()).toBe(false);
+
       widget.importUserDrawingStateFromLayout(undefined);
       expect(widget.getUserDrawingState().drawings).toEqual([]);
     });

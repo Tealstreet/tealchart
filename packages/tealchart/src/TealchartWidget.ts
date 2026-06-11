@@ -2151,7 +2151,9 @@ export class TealchartWidget {
   }
 
   importUserDrawingStateFromLayout(state?: UserDrawingState | null): void {
-    this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState());
+    this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState(), {
+      markLayoutDirty: false,
+    });
   }
 
   setUserDrawingState(state: UserDrawingState, options: { markLayoutDirty?: boolean } = {}): void {
