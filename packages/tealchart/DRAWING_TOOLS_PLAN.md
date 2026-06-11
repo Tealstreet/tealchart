@@ -98,7 +98,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar expose matching selected drawing opacity
   controls through shared descriptors.
 
-## Current Epic: Fill and Border Toggles
+## Shipped: Fill and Border Toggles
 
 - Shared drawing style supports explicit fill and border visibility flags.
 - Web Canvas and mobile Skia skip matching fill or stroke draw calls while
@@ -106,10 +106,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web top bar and mobile top bar expose matching selected drawing fill and
   border toggles.
 
+## Current Epic: Font Family Controls
+
+- Shared drawing style normalizes text-label font family to a small
+  cross-platform allowlist.
+- Web Canvas honors the selected font family for text-label rendering.
+- Web top bar and mobile top bar expose matching selected text-label font
+  family controls; the mobile text editor uses the normalized family while
+  Skia canvas labels remain on the existing bundled/system font path until
+  font assets are introduced.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Rich text label controls, font families, and multiline editor polish.
+- Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.

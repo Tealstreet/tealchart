@@ -89,6 +89,7 @@ import {
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
   handleUserDrawingInput,
+  normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
@@ -613,7 +614,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       width,
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
-      fontFamily: activeUserDrawingTextEditPrimitive.style.fontFamily,
+      fontFamily: normalizeUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily ?? 'sans-serif'),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
