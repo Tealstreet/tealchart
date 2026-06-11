@@ -1980,6 +1980,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready forecast primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'forecast',
+          kind: 'forecast',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 70, price: 75 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'forecast',
+      id: 'forecast',
+      clip,
+      start: { x: 10, y: 50 },
+      end: { x: 70, y: 25 },
+      labelPoint: { x: 40, y: 33.5 },
+      sourceLabel: 'Source 50.00',
+      targetLabel: 'Target 75.00',
+      changeLabel: '+25.00 (+50.00%) / 60 ms',
+      style,
+    });
+  });
+
   it('returns Skia-ready bars pattern primitives from source bars', () => {
     const state: UserDrawingState = {
       version: 1,

@@ -223,6 +223,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'forecast') {
+    const distance = distanceToSegment(point, geometry.forecast.segment);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'barsPattern') {
     if (pointInRect(point, geometry.pattern.bounds)) {
       return { drawing: geometry.drawing, distance: 0 };
@@ -563,6 +568,7 @@ function hitTestUserDrawingHandle(
     case 'cyclicLines':
     case 'timeCycles':
     case 'sineLine':
+    case 'forecast':
     case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
@@ -576,6 +582,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'cyclicLines' ||
         geometry.drawing.kind === 'timeCycles' ||
         geometry.drawing.kind === 'sineLine' ||
+        geometry.drawing.kind === 'forecast' ||
         geometry.drawing.kind === 'gannFan'
       ) {
         handles.push(

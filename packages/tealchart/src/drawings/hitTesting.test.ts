@@ -443,6 +443,26 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits forecast projection lines and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'forecast',
+      kind: 'forecast',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 30 }, space)?.drawing.id).toBe('forecast');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 50 }, space)).toMatchObject({
+      handle: 'start',
+    });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 10 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits placed bars pattern bounds and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

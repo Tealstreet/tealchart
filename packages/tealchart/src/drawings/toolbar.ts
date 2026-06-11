@@ -124,6 +124,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'datePriceRange', icon: '⊞', label: 'Date and price range' },
   { tool: 'longPosition', icon: 'L', label: 'Long position' },
   { tool: 'shortPosition', icon: 'S', label: 'Short position' },
+  { tool: 'forecast', icon: '↗', label: 'Forecast' },
   { tool: 'barsPattern', icon: '▥', label: 'Bars pattern' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },

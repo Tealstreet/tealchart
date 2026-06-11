@@ -67,6 +67,7 @@ describe('user drawing toolbar descriptors', () => {
       'datePriceRange',
       'longPosition',
       'shortPosition',
+      'forecast',
       'barsPattern',
       'anchoredVwap',
       'fibRetracement',
@@ -160,6 +161,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('datePriceRange')).toEqual(
       expect.objectContaining({ tool: 'datePriceRange', label: 'Date and price range' }),
+    );
+    expect(getUserDrawingToolDescriptor('forecast')).toEqual(
+      expect.objectContaining({ tool: 'forecast', label: 'Forecast' }),
     );
     expect(getUserDrawingToolDescriptor('horizontalRay')).toEqual(
       expect.objectContaining({ tool: 'horizontalRay', label: 'Horizontal ray' }),

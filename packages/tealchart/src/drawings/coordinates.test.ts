@@ -22,6 +22,7 @@ import type {
   FibSpeedResistanceFanDrawing,
   FibRetracementDrawing,
   FibTimeZoneDrawing,
+  ForecastDrawing,
   FibWedgeDrawing,
   FibSpiralDrawing,
   TrendBasedFibTimeDrawing,
@@ -592,6 +593,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const forecast: ForecastDrawing = {
+      ...trendLine,
+      id: 'forecast',
+      kind: 'forecast',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+      ],
+    };
     const fibRetracement: FibRetracementDrawing = {
       ...trendLine,
       id: 'fib',
@@ -991,6 +1001,18 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(datePriceRange, space)).toMatchObject({
       kind: 'datePriceRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(forecast, space)).toMatchObject({
+      kind: 'forecast',
+      forecast: {
+        source: { x: 10, y: 70 },
+        target: { x: 110, y: 20 },
+        segment: { start: { x: 10, y: 70 }, end: { x: 110, y: 20 } },
+        labelPoint: { x: 60, y: 41 },
+        sourceLabel: 'Source 100.00',
+        targetLabel: 'Target 110.00',
+        changeLabel: '+10.00 (+10.00%) / 1 second',
+      },
     });
     expect(resolveUserDrawingGeometry(fibRetracement, space)).toMatchObject({
       kind: 'fibRetracement',

@@ -410,6 +410,42 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags forecast endpoints without moving the opposite endpoint', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'forecast',
+      kind: 'forecast',
+      points: [
+        { time: 10, price: 80 },
+        { time: 20, price: 60 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'forecast', handle: 'end' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'forecast', handle: 'end' },
+        startPoint: { x: 20, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 70, y: 30 },
+      { now: () => 4 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 80 },
+        { time: 70, price: 70 },
+      ],
+      updatedAt: 4,
+    });
+  });
+
   it('drags rectangle corner handles around the opposite corner', () => {
     const drawing: UserDrawing = {
       ...base,
