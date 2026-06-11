@@ -391,6 +391,48 @@ function renderFibSpeedResistanceArcsGeometry(
   ctx.stroke();
 }
 
+function renderFibWedgeGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibWedge' }>,
+): void {
+  if (geometry.drawing.style.fillVisible !== false && geometry.drawing.style.fillColor) {
+    const radius = geometry.fibWedge.baseRadius;
+    ctx.beginPath();
+    ctx.moveTo(geometry.fibWedge.center.x, geometry.fibWedge.center.y);
+    ctx.lineTo(
+      geometry.fibWedge.center.x + Math.cos(geometry.fibWedge.startAngle) * radius,
+      geometry.fibWedge.center.y + Math.sin(geometry.fibWedge.startAngle) * radius,
+    );
+    ctx.arc(
+      geometry.fibWedge.center.x,
+      geometry.fibWedge.center.y,
+      radius,
+      geometry.fibWedge.startAngle,
+      geometry.fibWedge.endAngle,
+    );
+    ctx.closePath();
+    ctx.fillStyle = geometry.drawing.style.fillColor;
+    ctx.fill();
+  }
+
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const boundary of geometry.fibWedge.boundaries) {
+    ctx.moveTo(boundary.start.x, boundary.start.y);
+    ctx.lineTo(boundary.end.x, boundary.end.y);
+  }
+  for (const arc of geometry.fibWedge.arcs) {
+    ctx.moveTo(
+      geometry.fibWedge.center.x + Math.cos(arc.startAngle) * arc.radius,
+      geometry.fibWedge.center.y + Math.sin(arc.startAngle) * arc.radius,
+    );
+    ctx.arc(geometry.fibWedge.center.x, geometry.fibWedge.center.y, arc.radius, arc.startAngle, arc.endAngle);
+  }
+  ctx.stroke();
+}
+
 function renderEllipseGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'ellipse' }>,
@@ -778,6 +820,9 @@ export function renderUserDrawing(
         break;
       case 'fibSpeedResistanceArcs':
         renderFibSpeedResistanceArcsGeometry(ctx, geometry);
+        break;
+      case 'fibWedge':
+        renderFibWedgeGeometry(ctx, geometry);
         break;
       case 'ellipse':
         renderEllipseGeometry(ctx, geometry);

@@ -476,11 +476,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, arc hit testing, whole-drawing moves, and endpoint editing use
   shared drawing behavior on both platforms.
 
+## Shipped: Fibonacci Wedge Tool
+
+- Shared drawing state supports the three-anchor `fibWedge` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render matching filled Fibonacci wedge arcs and
+  boundary rays from a shared wedge geometry resolver.
+- Selection, arc/boundary hit testing, whole-drawing moves, fill controls, and
+  point-index handle editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
-  Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/channel/time-zone/trend-based time,
+  Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/channel/time-zone/trend-based time,
   Gann tools beyond fan, pattern tools, volume profile tools, annotation/icon tools, and curved geometry.
 - Additional TradingView measurement tool polish beyond the current price/date
   ranges, risk/reward positions, and bars pattern.

@@ -678,6 +678,26 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib wedge arcs, boundaries, and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-wedge',
+      kind: 'fibWedge',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 34, y: 50 }, space)?.drawing.id).toBe('fib-wedge');
+    expect(hitTestUserDrawing(drawing, { x: 40, y: 72 }, space)?.drawing.id).toBe('fib-wedge');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+  });
+
   it('hits gann fan rays and endpoint handles', () => {
     const drawing: UserDrawing = {
       ...base,

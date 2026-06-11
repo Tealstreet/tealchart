@@ -2016,6 +2016,86 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fibWedge') {
+            if (primitive.style.lineVisible === false && primitive.style.fillVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const boundaryPath = Skia.Path.Make();
+            for (const boundary of primitive.boundaries) {
+              boundaryPath.moveTo(boundary.start.x, boundary.start.y);
+              boundaryPath.lineTo(boundary.end.x, boundary.end.y);
+            }
+            const outerArc = primitive.arcs[primitive.arcs.length - 1];
+            const fillPath = Skia.Path.Make();
+            fillPath.moveTo(primitive.center.x, primitive.center.y);
+            if (outerArc) {
+              fillPath.lineTo(
+                primitive.center.x + Math.cos(outerArc.startAngle) * primitive.baseRadius,
+                primitive.center.y + Math.sin(outerArc.startAngle) * primitive.baseRadius,
+              );
+              fillPath.arcToOval(
+                Skia.XYWHRect(
+                  primitive.center.x - primitive.baseRadius,
+                  primitive.center.y - primitive.baseRadius,
+                  primitive.baseRadius * 2,
+                  primitive.baseRadius * 2,
+                ),
+                (outerArc.startAngle * 180) / Math.PI,
+                ((outerArc.endAngle - outerArc.startAngle) * 180) / Math.PI,
+                false,
+              );
+              fillPath.close();
+            }
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <>
+                    <SkiaPath
+                      path={boundaryPath}
+                      color={primitive.style.lineColor}
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      strokeCap="round"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaPath>
+                    {primitive.arcs.map((arc) => {
+                      const path = Skia.Path.Make();
+                      const startDeg = (arc.startAngle * 180) / Math.PI;
+                      const sweepDeg = ((arc.endAngle - arc.startAngle) * 180) / Math.PI;
+                      path.arcToOval(
+                        Skia.XYWHRect(
+                          primitive.center.x - arc.radius,
+                          primitive.center.y - arc.radius,
+                          arc.radius * 2,
+                          arc.radius * 2,
+                        ),
+                        startDeg,
+                        sweepDeg,
+                        false,
+                      );
+                      return (
+                        <SkiaPath
+                          key={`${primitive.id}:arc:${arc.ratio}`}
+                          path={path}
+                          color={primitive.style.lineColor}
+                          style="stroke"
+                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                          strokeCap="round"
+                        >
+                          {dash && <DashPathEffect intervals={dash} />}
+                        </SkiaPath>
+                      );
+                    })}
+                  </>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'ellipse') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

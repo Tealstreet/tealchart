@@ -81,6 +81,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibCircles')).toBe(2);
     expect(getRequiredAnchorCount('gannFan')).toBe(2);
     expect(getRequiredAnchorCount('fibTimeZone')).toBe(2);
+    expect(getRequiredAnchorCount('fibWedge')).toBe(3);
     expect(getRequiredAnchorCount('fibChannel')).toBe(3);
     expect(getRequiredAnchorCount('trendBasedFibTime')).toBe(3);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
@@ -304,6 +305,20 @@ describe('user drawing types', () => {
       id: 'fib-circles',
       kind: 'fibCircles',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'fibWedge', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'fib-wedge',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'fib-wedge',
+      kind: 'fibWedge',
+      points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,
       createdAt: 20,
