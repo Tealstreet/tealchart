@@ -100,6 +100,34 @@ const MAP_FUNC_MAP: Record<string, string> = {
   'map.size': 'size', 'map.put_all': 'putAll',
 };
 
+const MATRIX_FUNC_MAP: Record<string, string> = {
+  'matrix.new': 'create', 'matrix.new_float': 'create', 'matrix.new_int': 'create',
+  'matrix.new_bool': 'create', 'matrix.new_string': 'create', 'matrix.new_color': 'create',
+  'matrix.get': 'get', 'matrix.set': 'set',
+  'matrix.rows': 'rows', 'matrix.columns': 'columns',
+  'matrix.elements_count': 'elementCount',
+  'matrix.copy': 'copy', 'matrix.concat': 'concat',
+  'matrix.row': 'row', 'matrix.col': 'col',
+  'matrix.fill': 'fill', 'matrix.reshape': 'reshape',
+  'matrix.add_row': 'addRow', 'matrix.add_col': 'addCol',
+  'matrix.remove_row': 'removeRow', 'matrix.remove_col': 'removeCol',
+  'matrix.swap_rows': 'swapRows', 'matrix.swap_columns': 'swapCols',
+  'matrix.reverse': 'reverse', 'matrix.transpose': 'transpose',
+  'matrix.avg': 'avg', 'matrix.min': 'min', 'matrix.max': 'max',
+  'matrix.median': 'median', 'matrix.mode': 'mode', 'matrix.sum': 'sum',
+  'matrix.diff': 'diff', 'matrix.mult': 'mult', 'matrix.pow': 'pow',
+  'matrix.trace': 'trace', 'matrix.det': 'det', 'matrix.rank': 'rank',
+  'matrix.inv': 'inv', 'matrix.pinv': 'pinv',
+  'matrix.eigenvalues': 'eigenvalues', 'matrix.eigenvectors': 'eigenvectors',
+  'matrix.kron': 'kron', 'matrix.sort': 'sort',
+  'matrix.submatrix': 'submatrix',
+  'matrix.is_square': 'isSquare', 'matrix.is_zero': 'isZero',
+  'matrix.is_binary': 'isBinary', 'matrix.is_identity': 'isIdentity',
+  'matrix.is_diagonal': 'isDiagonal', 'matrix.is_antidiagonal': 'isAntidiagonal',
+  'matrix.is_symmetric': 'isSymmetric', 'matrix.is_antisymmetric': 'isAntisymmetric',
+  'matrix.is_triangular': 'isTriangular', 'matrix.is_stochastic': 'isStochastic',
+};
+
 export function emit(ast: Program, ctx: AnalysisContext): string {
   const lines: string[] = [];
   const indent = (n: number) => '  '.repeat(n);
@@ -336,6 +364,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         namespace === 'polyline' || namespace === 'linefill' || namespace === 'table') {
       const namedObj = emitNamedArgsObj(expr.arguments);
       return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj})`;
+    }
+
+    // Matrix functions
+    if (namespace === 'matrix') {
+      const mapped = MATRIX_FUNC_MAP[fullName];
+      if (mapped) return `deps._mtx.${mapped}(${posArgs.join(', ')})`;
+      return `deps._mtx.${fullName.replace('matrix.', '')}(${posArgs.join(', ')})`;
     }
 
     // Plot functions
@@ -942,6 +977,7 @@ function _and(a, b) { return _isTruthy(a) && _isTruthy(b); }
 function _or(a, b) { return _isTruthy(a) || _isTruthy(b); }
 function _idx(obj, i) {
   if (obj && obj.__tealscriptArray) return deps._arr.get(obj, i);
+  if (obj && obj.__tealscriptMatrix) return deps._mtx.row(obj, i);
   return obj[i];
 }
 function _getField(obj, name) {
