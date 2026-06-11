@@ -186,6 +186,7 @@ export function resolveUserDrawingHandlePoints(
     case 'path':
     case 'polyline':
     case 'curve':
+    case 'arc':
     case 'triangle':
     case 'fibWedge':
     case 'fibChannel':

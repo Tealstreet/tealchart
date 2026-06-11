@@ -319,6 +319,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'arc') {
+    const distance = distanceToPolyline(point, geometry.arc.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'anchoredVwap') {
     const distance = Math.min(
       distanceToPolyline(point, geometry.vwap.points),
@@ -559,6 +564,13 @@ function hitTestUserDrawingHandle(
       break;
     case 'curve':
       if (geometry.drawing.kind === 'curve') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'arc':
+      if (geometry.drawing.kind === 'arc') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

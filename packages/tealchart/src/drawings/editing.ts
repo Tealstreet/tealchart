@@ -122,6 +122,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'polyline':
     case 'curve':
+    case 'arc':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
@@ -268,6 +269,7 @@ function editDrawingHandle(
     (drawing.kind === 'path' ||
       drawing.kind === 'polyline' ||
       drawing.kind === 'curve' ||
+      drawing.kind === 'arc' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'fibWedge' ||
       drawing.kind === 'trendBasedFibTime' ||
@@ -303,6 +305,13 @@ function editDrawingHandle(
       };
     }
     if (drawing.kind === 'curve') {
+      return {
+        ...drawing,
+        points: [points[0]!, points[1]!, points[2]!],
+        updatedAt,
+      };
+    }
+    if (drawing.kind === 'arc') {
       return {
         ...drawing,
         points: [points[0]!, points[1]!, points[2]!],
@@ -364,6 +373,7 @@ function editDrawingHandle(
     case 'path':
     case 'polyline':
     case 'curve':
+    case 'arc':
     case 'triangle':
     case 'fibWedge':
     case 'fibChannel':

@@ -92,6 +92,7 @@ export {
   PITCHFAN_LEVELS,
   priceToDrawingY,
   resolveAnchoredVwapFromAnchor,
+  resolveArcFromAnchors,
   resolveBarsPatternFromAnchors,
   resolveCircleFromAnchors,
   resolveCurveFromAnchors,
@@ -167,6 +168,7 @@ export {
 export type {
   CreateUserDrawingFromDraftOptions,
   AnchoredVwapDrawing,
+  ArcDrawing,
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
@@ -196,6 +198,7 @@ export type {
   DrawingCoordinateSpace,
   DrawingPitchforkVariant,
   DrawingScreenAnchoredVwap,
+  DrawingScreenArc,
   DrawingScreenBarsPattern,
   DrawingScreenBarsPatternBar,
   DrawingScreenPoint,
