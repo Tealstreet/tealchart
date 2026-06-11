@@ -1245,6 +1245,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores highlighter drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'highlighter',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'highlighter',
+      kind: 'highlighter',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    });
+  });
+
   it('restores polyline drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
@@ -1861,13 +1894,13 @@ describe('drawing layout serialization', () => {
     });
   });
 
-  it('rejects malformed path points', () => {
+  it.each(['path', 'highlighter'] as const)('rejects malformed %s points', (kind) => {
     const createPayload = (points: unknown[]) => ({
       version: 1,
       drawings: [
         {
-          id: 'path',
-          kind: 'path',
+          id: kind,
+          kind,
           paneId: 'main',
           visible: true,
           locked: false,

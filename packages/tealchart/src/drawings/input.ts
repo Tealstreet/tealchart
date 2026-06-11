@@ -14,6 +14,7 @@ import {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STYLE,
   isDrawingDraftReady,
+  isUserDrawingPathFamilyTool,
   normalizeUserDrawingStyle,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
@@ -366,7 +367,7 @@ export function beginUserDrawingPathDrag(
   point: UserDrawingInputPoint,
   options: Omit<UserDrawingPathDragOptions, 'createId'> = {},
 ): UserDrawingState {
-  if (state.activeTool !== 'path' && state.activeTool !== 'brush') return state;
+  if (!isUserDrawingPathFamilyTool(state.activeTool)) return state;
 
   return {
     ...state,
@@ -388,9 +389,9 @@ export function appendUserDrawingPathDragPoint(
 ): UserDrawingState {
   const draft = state.draft;
   if (
-    (state.activeTool !== 'path' && state.activeTool !== 'brush') ||
+    !isUserDrawingPathFamilyTool(state.activeTool) ||
     !draft ||
-    (draft.tool !== 'path' && draft.tool !== 'brush') ||
+    !isUserDrawingPathFamilyTool(draft.tool) ||
     draft.paneId !== point.paneId
   )
     return state;
@@ -412,8 +413,7 @@ export function commitUserDrawingPathDrag(
   options: UserDrawingPathDragOptions,
 ): UserDrawingState {
   const draft = state.draft;
-  if ((state.activeTool !== 'path' && state.activeTool !== 'brush') || !draft || (draft.tool !== 'path' && draft.tool !== 'brush'))
-    return state;
+  if (!isUserDrawingPathFamilyTool(state.activeTool) || !draft || !isUserDrawingPathFamilyTool(draft.tool)) return state;
 
   if (draft.anchors.length < 2) {
     return {

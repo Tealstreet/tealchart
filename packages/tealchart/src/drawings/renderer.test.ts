@@ -687,6 +687,27 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders highlighter drawings as stroked polylines', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'highlighter',
+      kind: 'highlighter',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:50,50');
+    expect(ctx.calls).toContain('lineTo:90,10');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders polyline drawings as stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
