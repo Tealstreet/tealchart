@@ -215,6 +215,31 @@ describe('user drawing render model', () => {
     ]);
   });
 
+  it('resolves selection handles for Fibonacci extension endpoints', () => {
+    expect(
+      resolveUserDrawingHandlePoints(
+        {
+          id: 'fib-ext',
+          kind: 'fibExtension',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+        space,
+      ),
+    ).toEqual([
+      { x: 10, y: 10 },
+      { x: 90, y: 90 },
+    ]);
+  });
+
   it('resolves selection handles for path points', () => {
     expect(
       resolveUserDrawingHandlePoints(
