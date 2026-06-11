@@ -290,6 +290,7 @@ function primitiveFromGeometry(
   switch (geometry.kind) {
     case 'line':
     case 'ray':
+    case 'horizontalRay':
     case 'horizontalLine':
     case 'verticalLine': {
       return {
