@@ -228,6 +228,14 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'projection') {
+    const distance = Math.min(
+      distanceToSegment(point, geometry.projection.baseSegment),
+      distanceToSegment(point, geometry.projection.projectionSegment),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'barsPattern') {
     if (pointInRect(point, geometry.pattern.bounds)) {
       return { drawing: geometry.drawing, distance: 0 };
@@ -685,7 +693,12 @@ function hitTestUserDrawingHandle(
       break;
     case 'longPosition':
     case 'shortPosition':
-      if (geometry.drawing.kind === 'longPosition' || geometry.drawing.kind === 'shortPosition') {
+    case 'projection':
+      if (
+        geometry.drawing.kind === 'longPosition' ||
+        geometry.drawing.kind === 'shortPosition' ||
+        geometry.drawing.kind === 'projection'
+      ) {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

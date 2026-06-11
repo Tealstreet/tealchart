@@ -264,6 +264,19 @@ export interface DrawingScreenForecast {
   changeLabel: string;
 }
 
+export interface DrawingScreenProjection {
+  start: DrawingScreenPoint;
+  pivot: DrawingScreenPoint;
+  target: DrawingScreenPoint;
+  baseSegment: DrawingScreenSegment;
+  projectionSegment: DrawingScreenSegment;
+  labelPoint: DrawingScreenPoint;
+  startLabel: string;
+  pivotLabel: string;
+  targetLabel: string;
+  changeLabel: string;
+}
+
 export interface DrawingScreenBarsPatternBar {
   time: number;
   x: number;
@@ -382,6 +395,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'forecast';
       drawing: UserDrawing;
       forecast: DrawingScreenForecast;
+    }
+  | {
+      kind: 'projection';
+      drawing: UserDrawing;
+      projection: DrawingScreenProjection;
     }
   | {
       kind: 'barsPattern';
@@ -915,6 +933,34 @@ export function resolveForecastFromAnchors(
       y: (source.y + target.y) / 2 - 4,
     },
     sourceLabel: `Source ${formatForecastPriceLabel(sourceAnchor.price)}`,
+    targetLabel: `Target ${formatForecastPriceLabel(targetAnchor.price)}`,
+    changeLabel: metrics.label,
+  };
+}
+
+export function resolveProjectionFromAnchors(
+  startAnchor: UserDrawingAnchor,
+  pivotAnchor: UserDrawingAnchor,
+  targetAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenProjection {
+  const start = anchorToScreenPoint(startAnchor, space);
+  const pivot = anchorToScreenPoint(pivotAnchor, space);
+  const target = anchorToScreenPoint(targetAnchor, space);
+  const metrics = resolveUserDrawingInfoLineMetrics(pivotAnchor, targetAnchor);
+
+  return {
+    start,
+    pivot,
+    target,
+    baseSegment: { start, end: pivot },
+    projectionSegment: { start: pivot, end: target },
+    labelPoint: {
+      x: (pivot.x + target.x) / 2,
+      y: (pivot.y + target.y) / 2 - 4,
+    },
+    startLabel: `Start ${formatForecastPriceLabel(startAnchor.price)}`,
+    pivotLabel: `Pivot ${formatForecastPriceLabel(pivotAnchor.price)}`,
     targetLabel: `Target ${formatForecastPriceLabel(targetAnchor.price)}`,
     changeLabel: metrics.label,
   };
@@ -2060,6 +2106,12 @@ export function resolveUserDrawingGeometry(
         kind: 'forecast',
         drawing,
         forecast: resolveForecastFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'projection':
+      return {
+        kind: 'projection',
+        drawing,
+        projection: resolveProjectionFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'barsPattern':
       return {

@@ -1693,6 +1693,65 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'projection') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const changeTextBounds = font ? font.measureText(primitive.changeLabel) : { width: 0 };
+            const targetTextBounds = font ? font.measureText(primitive.targetLabel) : { width: 0 };
+            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+            const path = Skia.Path.Make();
+            path.moveTo(primitive.start.x, primitive.start.y);
+            path.lineTo(primitive.pivot.x, primitive.pivot.y);
+            path.lineTo(primitive.target.x, primitive.target.y);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={path}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+                {font && (
+                  <>
+                    <SkiaText
+                      x={primitive.start.x + 4}
+                      y={primitive.start.y - 4}
+                      text={primitive.startLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.pivot.x + 4}
+                      y={primitive.pivot.y - 4}
+                      text={primitive.pivotLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.target.x - targetTextBounds.width - 4}
+                      y={primitive.target.y - 4}
+                      text={primitive.targetLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.labelPoint.x - changeTextBounds.width / 2}
+                      y={primitive.labelPoint.y - fontSize}
+                      text={primitive.changeLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                  </>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'trendAngle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);

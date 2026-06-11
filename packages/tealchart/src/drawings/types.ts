@@ -25,6 +25,7 @@ export type UserDrawingTool =
   | 'longPosition'
   | 'shortPosition'
   | 'forecast'
+  | 'projection'
   | 'barsPattern'
   | 'anchoredVwap'
   | 'fibRetracement'
@@ -219,6 +220,11 @@ export interface ForecastDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ProjectionDrawing extends UserDrawingBase {
+  kind: 'projection';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface BarsPatternDrawing extends UserDrawingBase {
   kind: 'barsPattern';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -405,6 +411,7 @@ export type UserDrawing =
   | LongPositionDrawing
   | ShortPositionDrawing
   | ForecastDrawing
+  | ProjectionDrawing
   | BarsPatternDrawing
   | AnchoredVwapDrawing
   | FibRetracementDrawing
@@ -585,6 +592,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'parallelChannel':
     case 'regressionTrend':
     case 'flatTopBottom':
+    case 'projection':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
@@ -766,6 +774,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'forecast',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'projection':
+      return {
+        ...base,
+        kind: 'projection',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'barsPattern': {
       const sourceStartTime = Math.min(draft.anchors[0]!.time, draft.anchors[1]!.time);

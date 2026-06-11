@@ -463,6 +463,34 @@ function renderForecastGeometry(
   ctx.fillText(forecast.changeLabel, forecast.labelPoint.x, forecast.labelPoint.y);
 }
 
+function renderProjectionGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'projection' }>,
+): void {
+  const { projection, drawing } = geometry;
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.beginPath();
+    ctx.moveTo(projection.baseSegment.start.x, projection.baseSegment.start.y);
+    ctx.lineTo(projection.baseSegment.end.x, projection.baseSegment.end.y);
+    ctx.lineTo(projection.projectionSegment.end.x, projection.projectionSegment.end.y);
+    ctx.stroke();
+  }
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textBaseline = 'bottom';
+  ctx.textAlign = 'left';
+  ctx.fillText(projection.startLabel, projection.start.x + 4, projection.start.y - 4);
+  ctx.fillText(projection.pivotLabel, projection.pivot.x + 4, projection.pivot.y - 4);
+  ctx.textAlign = 'right';
+  ctx.fillText(projection.targetLabel, projection.target.x - 4, projection.target.y - 4);
+  ctx.textAlign = 'center';
+  ctx.fillText(projection.changeLabel, projection.labelPoint.x, projection.labelPoint.y);
+}
+
 function renderRectangleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'rectangle' }>,
@@ -956,6 +984,9 @@ export function renderUserDrawing(
         break;
       case 'forecast':
         renderForecastGeometry(ctx, geometry);
+        break;
+      case 'projection':
+        renderProjectionGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':
