@@ -372,6 +372,29 @@ describe('user drawing input controller', () => {
     expect(shown.selection).toBeNull();
   });
 
+  it('requires explicit opt-in to change locked drawing visibility', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(setUserDrawingVisibility(state, false, { drawingId: 'locked' })).toBe(state);
+    expect(setUserDrawingVisibility(state, false, { drawingId: 'locked', includeLocked: true }).drawings[0]).toMatchObject({
+      visible: false,
+    });
+  });
+
   it('toggles locked state and clears selection/edit state when locking selected drawings', () => {
     const textLabel = {
       id: 'label',
@@ -398,7 +421,32 @@ describe('user drawing input controller', () => {
     expect(locked.textEdit).toBeNull();
 
     const unlocked = setUserDrawingLocked(locked, false, { drawingId: 'label', now: () => 41 });
-    expect(unlocked.drawings[0]).toMatchObject({ locked: false, updatedAt: 41 });
+    expect(unlocked).toBe(locked);
+
+    const forceUnlocked = setUserDrawingLocked(locked, false, { drawingId: 'label', includeLocked: true, now: () => 41 });
+    expect(forceUnlocked.drawings[0]).toMatchObject({ locked: false, updatedAt: 41 });
+  });
+
+  it('requires explicit opt-in to unlock locked drawings by id', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+      ],
+    });
+
+    expect(setUserDrawingLocked(state, false, { drawingId: 'locked' })).toBe(state);
+    const unlocked = setUserDrawingLocked(state, false, { drawingId: 'locked', includeLocked: true, now: () => 50 });
+    expect(unlocked.drawings[0]).toMatchObject({ locked: false, updatedAt: 50 });
   });
 
   it('clears stale text edits when the edited drawing is removed or selection changes', () => {

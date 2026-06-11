@@ -769,7 +769,8 @@ describe('TealchartWidget', () => {
         style: expect.objectContaining({ lineColor: '#ffffff' }),
       });
 
-      expect(widget.setUserDrawingVisibility(false, { drawingId: 'line' })).toBe(true);
+      expect(widget.setUserDrawingVisibility(false, { drawingId: 'line' })).toBe(false);
+      expect(widget.setUserDrawingVisibility(false, { drawingId: 'line', includeLocked: true })).toBe(true);
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ visible: false });
       expect(onChange).toHaveBeenCalled();
     });
