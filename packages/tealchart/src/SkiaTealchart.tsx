@@ -1956,6 +1956,29 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fibCircles') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.circles.map((circle) => (
+                  <Circle
+                    key={`${primitive.id}:circle:${circle.ratio}`}
+                    cx={primitive.center.x}
+                    cy={primitive.center.y}
+                    r={circle.radius}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Circle>
+                ))}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'ellipse') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

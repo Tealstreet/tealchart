@@ -12,6 +12,7 @@ import {
   resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
   resolveFibChannelFromAnchors,
+  resolveFibCirclesFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolveFibFanFromAnchors,
   resolveFibSpeedResistanceFanFromAnchors,
@@ -50,6 +51,7 @@ import type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingFibChannelPrimitive,
+  MobileUserDrawingFibCirclesPrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingFibFanPrimitive,
   MobileUserDrawingFibSpeedResistanceFanPrimitive,
@@ -76,6 +78,7 @@ import type {
   EllipseDrawing,
   ExtendedLineDrawing,
   FibChannelDrawing,
+  FibCirclesDrawing,
   FibFanDrawing,
   FibSpeedResistanceFanDrawing,
   FibTimeZoneDrawing,
@@ -216,6 +219,18 @@ describe('tealchart public entries', () => {
       kind: 'fibSpeedResistanceFan',
       id: 'fib-speed-fan',
     };
+    const fibCirclesPrimitive: NonNever<MobileUserDrawingFibCirclesPrimitive> = {
+      kind: 'fibCircles',
+      id: 'fib-circles',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 5 },
+      baseRadius: 10,
+      circles: [{ ratio: 1, radius: 10 }],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const fibChannelPrimitive: NonNever<MobileUserDrawingFibChannelPrimitive> = {
       kind: 'fibChannel',
       id: 'fib-channel',
@@ -327,6 +342,7 @@ describe('tealchart public entries', () => {
     expect(pitchfanPrimitive.kind).toBe('pitchfan');
     expect(fibFanPrimitive.kind).toBe('fibFan');
     expect(fibSpeedFanPrimitive.kind).toBe('fibSpeedResistanceFan');
+    expect(fibCirclesPrimitive.kind).toBe('fibCircles');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(gannFanPrimitive.kind).toBe('gannFan');
@@ -915,6 +931,32 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibSpeedResistanceFan');
     expect(fan.rays.map((ray) => ray.ratio)).toEqual([1 / 3, 2 / 3, 1]);
+  });
+
+  it('exports shared drawing fib circle types and resolver', () => {
+    const drawing: FibCirclesDrawing = {
+      id: 'fib-circles',
+      kind: 'fibCircles',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const circles = resolveFibCirclesFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibCircles');
+    expect(circles.circles.map((circle) => circle.ratio)).toEqual([0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618]);
   });
 
   it('exports shared drawing gann fan types and resolver', () => {
