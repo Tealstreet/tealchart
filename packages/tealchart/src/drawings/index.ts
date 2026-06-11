@@ -111,6 +111,7 @@ export {
   supportsUserDrawingFillControls,
   supportsUserDrawingTextControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
@@ -125,6 +126,7 @@ export {
 } from './toolbar';
 export type {
   UserDrawingFillColorDescriptor,
+  UserDrawingFontFamilyDescriptor,
   UserDrawingFontSizeDescriptor,
   UserDrawingLineColorDescriptor,
   UserDrawingLineStyleDescriptor,

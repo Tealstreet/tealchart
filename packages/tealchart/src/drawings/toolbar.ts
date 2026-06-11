@@ -1,6 +1,13 @@
-import type { UserDrawing, UserDrawingLineStyle, UserDrawingState, UserDrawingTextAlign, UserDrawingTool } from './types';
+import type {
+  UserDrawing,
+  UserDrawingFontFamily,
+  UserDrawingLineStyle,
+  UserDrawingState,
+  UserDrawingTextAlign,
+  UserDrawingTool,
+} from './types';
 
-import { USER_DRAWING_FONT_SIZES, USER_DRAWING_OPACITIES } from './types';
+import { USER_DRAWING_FONT_FAMILIES, USER_DRAWING_FONT_SIZES, USER_DRAWING_OPACITIES } from './types';
 
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
@@ -34,6 +41,12 @@ export interface UserDrawingTextColorDescriptor {
 
 export interface UserDrawingFontSizeDescriptor {
   fontSize: number;
+  label: string;
+}
+
+export interface UserDrawingFontFamilyDescriptor {
+  fontFamily: UserDrawingFontFamily;
+  icon: string;
   label: string;
 }
 
@@ -130,6 +143,13 @@ export const USER_DRAWING_TEXT_COLOR_DESCRIPTORS: readonly UserDrawingTextColorD
 export const USER_DRAWING_FONT_SIZE_DESCRIPTORS: readonly UserDrawingFontSizeDescriptor[] = [
   ...USER_DRAWING_FONT_SIZES.map((fontSize) => ({ fontSize, label: `${fontSize} pixel font size` })),
 ];
+
+export const USER_DRAWING_FONT_FAMILY_DESCRIPTORS: readonly UserDrawingFontFamilyDescriptor[] =
+  USER_DRAWING_FONT_FAMILIES.map((fontFamily) => ({
+    fontFamily,
+    icon: fontFamily === 'monospace' ? 'M' : fontFamily === 'serif' ? 'R' : 'S',
+    label: `${fontFamily} font family`,
+  }));
 
 export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignDescriptor[] = [
   { textAlign: 'left', icon: 'L', label: 'Left text alignment' },
@@ -245,6 +265,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fillColor ?? '',
     selectedDrawing?.style.textColor ?? '',
     selectedDrawing?.style.fontSize ?? '',
+    selectedDrawing?.style.fontFamily ?? '',
     selectedDrawing?.kind === 'textLabel' ? selectedDrawing.textAlign : '',
   ].join('|');
 }

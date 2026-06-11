@@ -59,7 +59,7 @@ class RecordingCanvasContext implements CanvasContext {
     this.calls.push(`strokeRect:${x},${y},${width},${height}:${this.strokeStyle}:${this.globalAlpha}`);
   }
   fillText(text: string, x: number, y: number): void {
-    this.calls.push(`fillText:${text}:${x},${y}:${this.fillStyle}:${this.textAlign}:${this.globalAlpha}`);
+    this.calls.push(`fillText:${text}:${x},${y}:${this.fillStyle}:${this.textAlign}:${this.globalAlpha}:${this.font}`);
   }
   save(): void {
     this.stateStack.push({ globalAlpha: this.globalAlpha, lineDash: [...this.lineDash] });
@@ -205,7 +205,24 @@ describe('user drawing renderer', () => {
     renderUserDrawing(ctx, drawing, space);
 
     expect(ctx.calls).toContain('fillRect:32,40,36,20:rgba(245, 197, 66, 0.12):1');
-    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1');
+    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1:12px sans-serif');
+  });
+
+  it('renders text labels with configured font families', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'label',
+      kind: 'textLabel',
+      style: { ...style, fontFamily: 'monospace' },
+      point: { time: 50, price: 50 },
+      text: 'Note',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillText:Note:50,50:#111:center:1:12px monospace');
   });
 
   it('applies drawing style opacity while restoring canvas alpha', () => {
