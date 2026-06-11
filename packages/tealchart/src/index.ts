@@ -77,6 +77,7 @@ export {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   priceToDrawingY,
+  resolveCircleFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolvePolylineFromAnchors,
   resolveUserDrawingDateRangeMetrics,
