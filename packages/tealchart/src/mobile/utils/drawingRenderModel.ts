@@ -233,6 +233,24 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibSpeedResistanceArcs';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      reference: DrawingScreenPoint;
+      baseRadius: number;
+      arcs: readonly {
+        ratio: number;
+        radius: number;
+        startAngle: number;
+        endAngle: number;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'gannFan';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -492,6 +510,10 @@ export type MobileUserDrawingFibSpeedResistanceFanPrimitive = Extract<
   { kind: 'fibSpeedResistanceFan' }
 >;
 export type MobileUserDrawingFibCirclesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibCircles' }>;
+export type MobileUserDrawingFibSpeedResistanceArcsPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'fibSpeedResistanceArcs' }
+>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
@@ -859,6 +881,25 @@ function primitiveFromGeometry(
         circles: geometry.fibCircles.circles.map((circle) => ({
           ratio: circle.ratio,
           radius: circle.radius,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibSpeedResistanceArcs':
+      return {
+        kind: 'fibSpeedResistanceArcs',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.fibSpeedResistanceArcs.center,
+        reference: geometry.fibSpeedResistanceArcs.reference,
+        baseRadius: geometry.fibSpeedResistanceArcs.baseRadius,
+        arcs: geometry.fibSpeedResistanceArcs.arcs.map((arc) => ({
+          ratio: arc.ratio,
+          radius: arc.radius,
+          startAngle: arc.startAngle,
+          endAngle: arc.endAngle,
         })),
         style: geometry.drawing.style,
       };

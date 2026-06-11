@@ -644,6 +644,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib speed resistance arc levels and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-speed-arcs',
+      kind: 'fibSpeedResistanceArcs',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 42, y: 60 }, space)?.drawing.id).toBe('fib-speed-arcs');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits fib circle rings and endpoint handles', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -1979,6 +1979,43 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fibSpeedResistanceArcs') {
+            if (primitive.style.lineVisible === false) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.arcs.map((arc) => {
+                  const path = Skia.Path.Make();
+                  const startDeg = (arc.startAngle * 180) / Math.PI;
+                  const sweepDeg = ((arc.endAngle - arc.startAngle) * 180) / Math.PI;
+                  path.arcToOval(
+                    Skia.XYWHRect(
+                      primitive.center.x - arc.radius,
+                      primitive.center.y - arc.radius,
+                      arc.radius * 2,
+                      arc.radius * 2,
+                    ),
+                    startDeg,
+                    sweepDeg,
+                    false,
+                  );
+                  return (
+                    <SkiaPath
+                      key={`${primitive.id}:arc:${arc.ratio}`}
+                      path={path}
+                      color={primitive.style.lineColor}
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaPath>
+                  );
+                })}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'ellipse') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

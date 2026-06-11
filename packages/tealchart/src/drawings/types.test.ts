@@ -77,6 +77,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
     expect(getRequiredAnchorCount('fibFan')).toBe(2);
     expect(getRequiredAnchorCount('fibSpeedResistanceFan')).toBe(2);
+    expect(getRequiredAnchorCount('fibSpeedResistanceArcs')).toBe(2);
     expect(getRequiredAnchorCount('fibCircles')).toBe(2);
     expect(getRequiredAnchorCount('gannFan')).toBe(2);
     expect(getRequiredAnchorCount('fibTimeZone')).toBe(2);
@@ -282,6 +283,17 @@ describe('user drawing types', () => {
     ).toMatchObject({
       id: 'fib-speed-fan',
       kind: 'fibSpeedResistanceFan',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'fibSpeedResistanceArcs' }), { id: 'fib-speed-arcs', now: 20 }),
+    ).toMatchObject({
+      id: 'fib-speed-arcs',
+      kind: 'fibSpeedResistanceArcs',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,
