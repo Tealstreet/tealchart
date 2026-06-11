@@ -9,6 +9,7 @@ import {
   normalizeUserDrawingOpacity,
   resolveAnchoredVwapFromAnchor,
   resolveCircleFromAnchors,
+  resolveCurveFromAnchors,
   resolveDisjointChannelFromAnchors,
   resolveEllipseFromAnchors,
   resolveFibChannelFromAnchors,
@@ -51,6 +52,7 @@ import type {
   MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
+  MobileUserDrawingCurvePrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
   MobileUserDrawingLinePrimitive,
   MobileUserDrawingMeasurementLabelPosition,
@@ -86,6 +88,7 @@ import type {
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
+  CurveDrawing,
   DrawingPitchforkVariant,
   EllipseDrawing,
   ExtendedLineDrawing,
@@ -162,6 +165,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCirclePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
@@ -369,6 +373,23 @@ describe('tealchart public entries', () => {
       arrowHead: null,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const curvePrimitive: NonNever<MobileUserDrawingCurvePrimitive> = {
+      kind: 'curve',
+      id: 'curve',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      start: { x: 0, y: 5 },
+      control: { x: 5, y: 0 },
+      end: { x: 10, y: 5 },
+      points: [
+        { x: 0, y: 5 },
+        { x: 5, y: 2.5 },
+        { x: 10, y: 5 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const datePricePrimitive: NonNever<MobileUserDrawingDatePriceRangePrimitive> = {
       kind: 'datePriceRange',
       id: 'date-price',
@@ -448,6 +469,7 @@ describe('tealchart public entries', () => {
     expect(gannBoxPrimitive.kind).toBe('gannBox');
     expect(gannSquarePrimitive.kind).toBe('gannSquare');
     expect(linePrimitive.kind).toBe('line');
+    expect(curvePrimitive.kind).toBe('curve');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
     expect(barsPatternPrimitive.kind).toBe('barsPattern');
@@ -897,6 +919,34 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('path');
+  });
+
+  it('exports shared drawing curve types and resolver', () => {
+    const drawing: CurveDrawing = {
+      id: 'curve',
+      kind: 'curve',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 10 },
+      ],
+    };
+    const curve = resolveCurveFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], {
+      viewport: { startTime: 1, endTime: 3, priceMin: 8, priceMax: 12 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 8, yMax: 12 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('curve');
+    expect(curve.control).toEqual({ x: 50, y: 0 });
+    expect(curve.points).toHaveLength(49);
   });
 
   it('exports shared drawing triangle types', () => {

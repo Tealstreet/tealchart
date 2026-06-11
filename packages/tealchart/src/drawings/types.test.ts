@@ -88,6 +88,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibChannel')).toBe(3);
     expect(getRequiredAnchorCount('trendBasedFibTime')).toBe(3);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
+    expect(getRequiredAnchorCount('curve')).toBe(3);
     expect(getRequiredAnchorCount('polyline')).toBe(3);
     expect(getRequiredAnchorCount('pitchfork')).toBe(3);
     expect(getRequiredAnchorCount('schiffPitchfork')).toBe(3);
@@ -510,6 +511,20 @@ describe('user drawing types', () => {
     ).toMatchObject({
       id: 'polyline',
       kind: 'polyline',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'curve', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'curve',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'curve',
+      kind: 'curve',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

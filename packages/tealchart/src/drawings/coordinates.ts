@@ -21,6 +21,13 @@ export interface DrawingScreenPolyline {
   points: readonly DrawingScreenPoint[];
 }
 
+export interface DrawingScreenCurve {
+  start: DrawingScreenPoint;
+  control: DrawingScreenPoint;
+  end: DrawingScreenPoint;
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingScreenRect {
   x: number;
   y: number;
@@ -331,6 +338,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'path';
       drawing: UserDrawing;
       polyline: DrawingScreenPolyline;
+    }
+  | {
+      kind: 'curve';
+      drawing: UserDrawing;
+      curve: DrawingScreenCurve;
     }
   | {
       kind: 'anchoredVwap';
@@ -809,6 +821,36 @@ export function resolvePolylineFromAnchors(
   return {
     points: points.map((point) => anchorToScreenPoint(point, space)),
   };
+}
+
+const CURVE_SAMPLE_COUNT = 48;
+
+function resolveQuadraticPoint(
+  start: DrawingScreenPoint,
+  control: DrawingScreenPoint,
+  end: DrawingScreenPoint,
+  t: number,
+): DrawingScreenPoint {
+  const inverse = 1 - t;
+  return {
+    x: inverse * inverse * start.x + 2 * inverse * t * control.x + t * t * end.x,
+    y: inverse * inverse * start.y + 2 * inverse * t * control.y + t * t * end.y,
+  };
+}
+
+export function resolveCurveFromAnchors(
+  startAnchor: UserDrawingAnchor,
+  controlAnchor: UserDrawingAnchor,
+  endAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenCurve {
+  const start = anchorToScreenPoint(startAnchor, space);
+  const control = anchorToScreenPoint(controlAnchor, space);
+  const end = anchorToScreenPoint(endAnchor, space);
+  const points = Array.from({ length: CURVE_SAMPLE_COUNT + 1 }, (_, index) =>
+    resolveQuadraticPoint(start, control, end, index / CURVE_SAMPLE_COUNT),
+  );
+  return { start, control, end, points };
 }
 
 function isFiniteBar(bar: BarsPatternBarSnapshot | Bar): boolean {
@@ -1764,6 +1806,12 @@ export function resolveUserDrawingGeometry(
         kind: 'path',
         drawing,
         polyline: resolvePolylineFromAnchors(drawing.points, space),
+      };
+    case 'curve':
+      return {
+        kind: 'curve',
+        drawing,
+        curve: resolveCurveFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'anchoredVwap':
       return {

@@ -662,6 +662,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders curve drawings as stroked quadratic curves', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'curve',
+      kind: 'curve',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 80 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('quadraticCurveTo:50,20,90,50');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders triangle drawings as filled closed polygons', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
