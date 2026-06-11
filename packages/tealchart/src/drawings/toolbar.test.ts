@@ -49,6 +49,7 @@ describe('user drawing toolbar descriptors', () => {
       'rectangle',
       'priceRange',
       'dateRange',
+      'path',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -92,6 +93,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('dateRange')).toEqual(
       expect.objectContaining({ tool: 'dateRange', label: 'Date range' }),
     );
+    expect(getUserDrawingToolDescriptor('path')).toEqual(expect.objectContaining({ tool: 'path', label: 'Path' }));
   });
 
   it('resolves action availability from toolbar-relevant state', () => {
