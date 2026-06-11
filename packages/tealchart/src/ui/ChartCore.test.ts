@@ -254,6 +254,7 @@ describe('ChartCore viewport management', () => {
         activeTool: 'select' as const,
         selection: { drawingId: 'h' },
         draft: null,
+        textEdit: null,
         drawings: [],
       },
       hit: true,
@@ -278,6 +279,7 @@ describe('ChartCore viewport management', () => {
       activeTool: 'select',
       selection: null,
       draft: null,
+      textEdit: null,
       drawings: [],
     } satisfies UserDrawingState);
 

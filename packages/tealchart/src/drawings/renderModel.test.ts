@@ -60,6 +60,7 @@ describe('user drawing render model', () => {
         style,
         startedAt: 2,
       },
+      textEdit: null,
     };
 
     const entries = resolveUserDrawingRenderEntries(state, {

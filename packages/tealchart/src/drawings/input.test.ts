@@ -2,8 +2,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
 import {
+  beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
+  cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
   handleUserDrawingInput,
@@ -11,7 +14,9 @@ import {
   selectUserDrawingAtPoint,
   selectUserDrawingById,
   selectUserDrawing,
+  setUserDrawingText,
   setUserDrawingTool,
+  updateUserDrawingTextEdit,
 } from './input';
 import type { DrawingCoordinateSpace } from './coordinates';
 
@@ -49,6 +54,7 @@ describe('user drawing input controller', () => {
       activeTool: 'select',
       selection: null,
       draft: null,
+      textEdit: null,
     });
   });
 
@@ -62,13 +68,29 @@ describe('user drawing input controller', () => {
         style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
         startedAt: 1,
       },
+      textEdit: { drawingId: 'label', value: 'A', originalValue: 'A', startedAt: 1 },
     });
 
     expect(setUserDrawingTool(state, 'rectangle')).toMatchObject({
       activeTool: 'rectangle',
       selection: null,
       draft: null,
+      textEdit: null,
     });
+  });
+
+  it('clears active text editing even when selecting the current tool again', () => {
+    const state = createUserDrawingState({
+      activeTool: 'select',
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 1 },
+    });
+
+    const next = setUserDrawingTool(state, 'select');
+
+    expect(next).not.toBe(state);
+    expect(next.textEdit).toBeNull();
+    expect(next.selection).toEqual({ drawingId: 'label' });
   });
 
   it('accumulates a two-anchor draft then commits a drawing', () => {
@@ -147,6 +169,129 @@ describe('user drawing input controller', () => {
     expect(selected.selection).toEqual({ drawingId: 'h', handle: 'center' });
     expect(selected.drawings).toBe(drawingState.drawings);
     expect(cancelUserDrawingDraft(selected)).toBe(selected);
+  });
+
+  it('begins, updates, commits, and cancels text label edits', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'center' as const,
+    };
+    const state = createUserDrawingState({
+      activeTool: 'rectangle',
+      drawings: [textLabel],
+      draft: {
+        tool: 'rectangle',
+        paneId: 'main',
+        anchors: [anchorA],
+        style,
+        startedAt: 1,
+      },
+    });
+
+    const editing = beginUserDrawingTextEdit(state, 'label', { now: () => 10 });
+
+    expect(editing).toMatchObject({
+      activeTool: 'select',
+      selection: { drawingId: 'label' },
+      draft: null,
+      textEdit: {
+        drawingId: 'label',
+        value: 'Note',
+        originalValue: 'Note',
+        startedAt: 10,
+      },
+    });
+
+    const updated = updateUserDrawingTextEdit(editing, 'Updated note');
+    const committed = commitUserDrawingTextEdit(updated, { now: () => 11 });
+
+    expect(committed.textEdit).toBeNull();
+    expect(committed.selection).toEqual({ drawingId: 'label' });
+    expect(committed.drawings[0]).toMatchObject({
+      id: 'label',
+      text: 'Updated note',
+      updatedAt: 11,
+    });
+
+    const secondEdit = beginUserDrawingTextEdit(committed, 'label', { now: () => 12 });
+    expect(cancelUserDrawingTextEdit(updateUserDrawingTextEdit(secondEdit, 'Draft')).drawings[0]).toMatchObject({
+      text: 'Updated note',
+    });
+  });
+
+  it('sets text directly without changing ids or editing unsupported drawings', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'center' as const,
+    };
+    const line = {
+      id: 'line',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price: 100,
+    };
+    const locked = { ...textLabel, id: 'locked', locked: true };
+    const state = createUserDrawingState({
+      drawings: [textLabel, line, locked],
+    });
+
+    const changed = setUserDrawingText(state, 'label', 'Changed', { now: () => 20 });
+
+    expect(changed.drawings.map((drawing) => drawing.id)).toEqual(['label', 'line', 'locked']);
+    expect(changed.drawings[0]).toMatchObject({ text: 'Changed', updatedAt: 20 });
+    expect(setUserDrawingText(changed, 'line', 'Ignored')).toBe(changed);
+    expect(setUserDrawingText(changed, 'locked', 'Ignored')).toBe(changed);
+    expect(beginUserDrawingTextEdit(changed, 'line')).toBe(changed);
+    expect(beginUserDrawingTextEdit(changed, 'locked')).toBe(changed);
+  });
+
+  it('clears stale text edits when the edited drawing is removed or selection changes', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'center' as const,
+    };
+    const other = { ...textLabel, id: 'other' };
+    const state = createUserDrawingState({
+      drawings: [textLabel, other],
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 1 },
+    });
+
+    expect(deleteUserDrawing(state).textEdit).toBeNull();
+    expect(clearUserDrawings(state).textEdit).toBeNull();
+    expect(selectUserDrawing(state, { drawingId: 'other' }).textEdit).toBeNull();
   });
 
   it('selects an existing drawing by id', () => {

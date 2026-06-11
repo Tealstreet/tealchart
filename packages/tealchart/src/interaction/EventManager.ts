@@ -74,7 +74,7 @@ export interface EventManagerCallbacks {
   /** Get time from X coordinate */
   getTimeFromX?: (x: number) => number;
   /** Called on double-click/double-tap on a pane */
-  onPaneDoubleClick?: (paneId: string) => void;
+  onPaneDoubleClick?: (paneId: string, point: { x: number; y: number }) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
   onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch') => DrawingInputResult;
   /** Called before pan starts so selected drawing edits can claim the drag */
@@ -610,7 +610,7 @@ export class EventManager {
       if (pane) {
         const now = Date.now();
         if (this._lastClickPaneId === pane.paneId && now - this._lastClickTime < 300) {
-          this.callbacks.onPaneDoubleClick(pane.paneId);
+          this.callbacks.onPaneDoubleClick(pane.paneId, { x: mouseX, y: mouseY });
           this._lastClickTime = 0;
           this._lastClickPaneId = null;
         } else {
@@ -958,7 +958,7 @@ export class EventManager {
       if (pane) {
         const now = Date.now();
         if (this._lastClickPaneId === pane.paneId && now - this._lastClickTime < 300) {
-          this.callbacks.onPaneDoubleClick(pane.paneId);
+          this.callbacks.onPaneDoubleClick(pane.paneId, { x, y });
           // Reset to prevent triple-tap
           this._lastClickTime = 0;
           this._lastClickPaneId = null;

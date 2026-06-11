@@ -14,6 +14,7 @@ const state: UserDrawingState = {
   activeTool: 'select',
   selection: null,
   draft: null,
+  textEdit: null,
   drawings: [],
 };
 
