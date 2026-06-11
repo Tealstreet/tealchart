@@ -48,6 +48,7 @@ import {
   resolveRaySegment,
   resolveRectFromAnchors,
   resolveRiskRewardPositionFromAnchors,
+  resolveRotatedRectangleFromAnchors,
   resolveTrendAngleFromSegment,
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
@@ -381,6 +382,34 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('resolves rotated rectangles with perpendicular width', () => {
+    expect(
+      resolveRotatedRectangleFromAnchors(
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+        {
+          ...space,
+          viewport: { startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 },
+          pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 100 },
+          chartLeft: 0,
+          chartRight: 100,
+        },
+      ),
+    ).toEqual({
+      base: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
+      parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+      polygon: {
+        points: [
+          { x: 10, y: 50 },
+          { x: 90, y: 50 },
+          { x: 90, y: 20 },
+          { x: 10, y: 20 },
+        ],
+      },
+    });
+  });
+
   it('resolves drawing geometry by kind', () => {
     const trendLine: TrendLineDrawing = {
       id: 'line',
@@ -554,6 +583,16 @@ describe('user drawing coordinates', () => {
         { time: 1_000, price: 100 },
         { time: 2_000, price: 110 },
         { time: 3_000, price: 90 },
+      ],
+    };
+    const rotatedRectangle: UserDrawing = {
+      ...trendLine,
+      id: 'rotated',
+      kind: 'rotatedRectangle',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 3_000, price: 100 },
+        { time: 1_000, price: 110 },
       ],
     };
     const channel: ParallelChannelDrawing = {
@@ -782,6 +821,21 @@ describe('user drawing coordinates', () => {
           { x: 110, y: 20 },
           { x: 210, y: 120 },
         ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(rotatedRectangle, space)).toMatchObject({
+      kind: 'rotatedRectangle',
+      channel: {
+        base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+        parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },
+        polygon: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 70 },
+            { x: 210, y: 20 },
+            { x: 10, y: 20 },
+          ],
+        },
       },
     });
     expect(resolveUserDrawingGeometry(channel, space)).toMatchObject({

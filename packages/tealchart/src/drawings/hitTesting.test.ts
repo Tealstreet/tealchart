@@ -550,6 +550,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits rotated rectangle fills, rails, and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'rotated',
+      kind: 'rotatedRectangle',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 10, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 35 }, space)?.drawing.id).toBe('rotated');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('rotated');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits regression trend fills, rails, and point-index handles', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,

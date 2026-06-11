@@ -61,6 +61,7 @@ describe('user drawing toolbar descriptors', () => {
       'rectangle',
       'circle',
       'ellipse',
+      'rotatedRectangle',
       'priceRange',
       'dateRange',
       'datePriceRange',
@@ -122,6 +123,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('ellipse')).toEqual(
       expect.objectContaining({ tool: 'ellipse', label: 'Ellipse' }),
+    );
+    expect(getUserDrawingToolDescriptor('rotatedRectangle')).toEqual(
+      expect.objectContaining({ tool: 'rotatedRectangle', label: 'Rotated rectangle' }),
     );
     expect(getUserDrawingToolDescriptor('priceRange')).toEqual(
       expect.objectContaining({ tool: 'priceRange', label: 'Price range' }),
@@ -420,6 +424,18 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'e', kind: 'ellipse' as const })).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'rotated',
+        kind: 'rotatedRectangle' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
     expect(
       supportsUserDrawingFillControls({
         ...rectangle,

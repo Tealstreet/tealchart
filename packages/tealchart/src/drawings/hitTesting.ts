@@ -259,6 +259,7 @@ function hitTestResolvedGeometry(
   if (
     geometry.kind === 'parallelChannel' ||
     geometry.kind === 'regressionTrend' ||
+    geometry.kind === 'rotatedRectangle' ||
     geometry.kind === 'flatTopBottom' ||
     geometry.kind === 'disjointChannel'
   ) {
@@ -402,6 +403,13 @@ function hitTestUserDrawingHandle(
       break;
     case 'parallelChannel':
       if (geometry.drawing.kind === 'parallelChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'rotatedRectangle':
+      if (geometry.drawing.kind === 'rotatedRectangle') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

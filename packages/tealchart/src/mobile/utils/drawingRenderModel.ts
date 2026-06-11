@@ -176,6 +176,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'rotatedRectangle';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'regressionTrend';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -343,6 +355,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
+export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
 export type MobileUserDrawingFlatTopBottomPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'flatTopBottom' }>;
 export type MobileUserDrawingDisjointChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'disjointChannel' }>;
@@ -632,6 +645,7 @@ function primitiveFromGeometry(
       };
     case 'parallelChannel':
     case 'regressionTrend':
+    case 'rotatedRectangle':
     case 'flatTopBottom':
     case 'disjointChannel':
       return {
