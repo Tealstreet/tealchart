@@ -77,6 +77,7 @@ export {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
   priceToDrawingY,
+  resolveAnchoredVwapFromAnchor,
   resolveBarsPatternFromAnchors,
   resolveCircleFromAnchors,
   resolveDateRangeRectFromAnchors,
@@ -135,6 +136,7 @@ export {
 } from './drawings';
 export type {
   CreateUserDrawingFromDraftOptions,
+  AnchoredVwapDrawing,
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
   ArrowMarkUpDrawing,
@@ -149,6 +151,7 @@ export type {
   EllipseDrawing,
   ExtendedLineDrawing,
   DrawingCoordinateSpace,
+  DrawingScreenAnchoredVwap,
   DrawingScreenBarsPattern,
   DrawingScreenBarsPatternBar,
   DrawingScreenPoint,

@@ -778,6 +778,36 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves selected anchored VWAP anchors by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'vwap',
+      kind: 'anchoredVwap',
+      point: { time: 10, price: 50 },
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'vwap' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'vwap' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 60 },
+      { now: () => 9 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      point: { time: 20, price: 40 },
+      updatedAt: 9,
+    });
+  });
+
   it('drags parallel channel width handles without moving the baseline', () => {
     const drawing: UserDrawing = {
       ...base,

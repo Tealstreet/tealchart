@@ -24,6 +24,7 @@ export type UserDrawingTool =
   | 'longPosition'
   | 'shortPosition'
   | 'barsPattern'
+  | 'anchoredVwap'
   | 'fibRetracement'
   | 'fibExtension'
   | 'triangle'
@@ -189,6 +190,11 @@ export interface BarsPatternDrawing extends UserDrawingBase {
   bars: readonly BarsPatternBarSnapshot[];
 }
 
+export interface AnchoredVwapDrawing extends UserDrawingBase {
+  kind: 'anchoredVwap';
+  point: UserDrawingAnchor;
+}
+
 export interface FibRetracementDrawing extends UserDrawingBase {
   kind: 'fibRetracement';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -261,6 +267,7 @@ export type UserDrawing =
   | LongPositionDrawing
   | ShortPositionDrawing
   | BarsPatternDrawing
+  | AnchoredVwapDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
   | TriangleDrawing
@@ -408,6 +415,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'horizontalRay':
     case 'crossLine':
     case 'textLabel':
+    case 'anchoredVwap':
       return 1;
     case 'select':
       return 0;
@@ -578,6 +586,12 @@ export function createUserDrawingFromDraft(
         bars,
       };
     }
+    case 'anchoredVwap':
+      return {
+        ...base,
+        kind: 'anchoredVwap',
+        point: draft.anchors[0]!,
+      };
     case 'fibRetracement':
       return {
         ...base,

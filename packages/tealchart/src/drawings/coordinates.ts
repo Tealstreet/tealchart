@@ -106,6 +106,11 @@ export interface DrawingScreenBarsPattern {
   placement: DrawingScreenPoint;
 }
 
+export interface DrawingScreenAnchoredVwap {
+  anchor: DrawingScreenPoint;
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingCoordinateSpace {
   viewport: Viewport;
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
@@ -210,6 +215,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'path';
       drawing: UserDrawing;
       polyline: DrawingScreenPolyline;
+    }
+  | {
+      kind: 'anchoredVwap';
+      drawing: UserDrawing;
+      vwap: DrawingScreenAnchoredVwap;
     }
   | {
       kind: 'triangle';
@@ -629,6 +639,32 @@ export function resolveFibExtensionFromAnchors(
   return resolveFibLevelsFromAnchors(first, second, space, FIB_EXTENSION_LEVELS);
 }
 
+export function resolveAnchoredVwapFromAnchor(
+  anchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenAnchoredVwap {
+  const anchorPoint = anchorToScreenPoint(anchor, space);
+  const points: DrawingScreenPoint[] = [];
+  let cumulativeTypicalVolume = 0;
+  let cumulativeVolume = 0;
+
+  for (const bar of space.bars ?? []) {
+    if (bar.time < anchor.time || bar.volume <= 0) continue;
+    const typicalPrice = (bar.high + bar.low + bar.close) / 3;
+    cumulativeTypicalVolume += typicalPrice * bar.volume;
+    cumulativeVolume += bar.volume;
+    points.push({
+      x: timeToDrawingX(bar.time, space),
+      y: priceToDrawingY(cumulativeTypicalVolume / cumulativeVolume, space),
+    });
+  }
+
+  return {
+    anchor: anchorPoint,
+    points,
+  };
+}
+
 export function resolveParallelChannelFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -972,6 +1008,12 @@ export function resolveUserDrawingGeometry(
         kind: 'path',
         drawing,
         polyline: resolvePolylineFromAnchors(drawing.points, space),
+      };
+    case 'anchoredVwap':
+      return {
+        kind: 'anchoredVwap',
+        drawing,
+        vwap: resolveAnchoredVwapFromAnchor(drawing.point, space),
       };
     case 'triangle':
       return {

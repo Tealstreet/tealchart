@@ -147,6 +147,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':
+    case 'anchoredVwap':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
   }
 }
@@ -292,6 +293,7 @@ function editDrawingHandle(
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':
+    case 'anchoredVwap':
     case 'path':
     case 'triangle':
     case 'parallelChannel':
