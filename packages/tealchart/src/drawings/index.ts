@@ -154,6 +154,7 @@ export type {
   UserDrawingBase,
   UserDrawingDraft,
   UserDrawingFontFamily,
+  UserDrawingFontSize,
   UserDrawingHandleRole,
   UserDrawingKind,
   UserDrawingLineStyle,

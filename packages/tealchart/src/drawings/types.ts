@@ -131,10 +131,11 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
 
 export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
 export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
+export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
 
-export function normalizeUserDrawingFontSize(fontSize: number): number {
+export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
   return USER_DRAWING_FONT_SIZES.reduce((nearest, candidate) =>
     Math.abs(candidate - fontSize) < Math.abs(nearest - fontSize) ? candidate : nearest,
   );

@@ -6,7 +6,7 @@ import type { UserDrawingState } from './types';
 
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
-import { normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
+import { normalizeUserDrawingFontFamily, normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
 
 export interface UserDrawingRenderOptions {
   labelPadding?: number;
@@ -74,7 +74,7 @@ function renderTextLabelGeometry(
   const drawing = geometry.drawing as TextLabelDrawing;
   const { point } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
-  const fontFamily = drawing.style.fontFamily ?? 'sans-serif';
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   const padding = options.labelPadding;
   const text = drawing.text;
 
