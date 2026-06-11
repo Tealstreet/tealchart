@@ -59,6 +59,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('arrowLine')).toBe(2);
     expect(getRequiredAnchorCount('ray')).toBe(2);
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
+    expect(getRequiredAnchorCount('priceRange')).toBe(2);
   });
 
   it('normalizes drawing font sizes to supported cross-platform values', () => {
@@ -122,6 +123,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'extendedLine' }), { id: 'extended', now: 20 })).toMatchObject({
       id: 'extended',
       kind: 'extendedLine',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'priceRange' }), { id: 'range', now: 20 })).toMatchObject({
+      id: 'range',
+      kind: 'priceRange',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,

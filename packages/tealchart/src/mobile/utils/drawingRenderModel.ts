@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingVisualPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
@@ -48,6 +49,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'priceRange';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      labelPoint: DrawingScreenPoint;
+      label: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'textLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -73,6 +86,7 @@ export type MobileUserDrawingPrimitive =
     };
 
 export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'textLabel' }>;
+export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 
 export interface MobileUserDrawingTextLabelLayout {
   fontSize: number;
@@ -82,6 +96,20 @@ export interface MobileUserDrawingTextLabelLayout {
   box: { x: number; y: number; width: number; height: number };
   text: { x: number; y: number };
   lines: readonly { text: string; width: number; x: number; y: number }[];
+}
+
+export interface MobileUserDrawingPriceRangeLabelPosition {
+  fontSize: number;
+  fontFamily: string;
+  x: number;
+  y: number;
+}
+
+export interface MobileUserDrawingTextBounds {
+  x?: number;
+  y?: number;
+  width: number;
+  height?: number;
 }
 
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
@@ -154,6 +182,28 @@ function primitiveFromGeometry(
         rect: geometry.rect,
         style: geometry.drawing.style,
       };
+    case 'priceRange': {
+      const drawing = geometry.drawing;
+      const label =
+        drawing.kind === 'priceRange'
+          ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
+          : '';
+      return {
+        kind: 'priceRange',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.rect,
+        labelPoint: {
+          x: geometry.rect.x + geometry.rect.width / 2,
+          y: geometry.rect.y + geometry.rect.height / 2,
+        },
+        label,
+        style: geometry.drawing.style,
+      };
+    }
     case 'textLabel':
       const drawing = geometry.drawing as TextLabelDrawing;
       return {
@@ -255,5 +305,23 @@ export function resolveMobileUserDrawingTextLabelLayout(
     box: layout.box,
     text: { x: firstLine.x, y: firstLine.y },
     lines: layout.lines,
+  };
+}
+
+export function resolveMobileUserDrawingPriceRangeLabelPosition(
+  primitive: MobileUserDrawingPriceRangePrimitive,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingPriceRangeLabelPosition {
+  const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
+  const textX = measuredTextBounds.x ?? 0;
+  const textY = measuredTextBounds.y ?? -fontSize;
+  const textHeight = measuredTextBounds.height ?? fontSize;
+
+  return {
+    fontSize,
+    fontFamily,
+    x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
+    y: primitive.labelPoint.y - textY - textHeight / 2,
   };
 }

@@ -121,6 +121,7 @@ import {
 } from './mobile/utils/drawingPersistence';
 import {
   resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
 } from './mobile/utils/drawingRenderModel';
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
@@ -1569,6 +1570,49 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   >
                     {dash && <DashPathEffect intervals={dash} />}
                   </Rect>
+                )}
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'priceRange') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
+            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textBounds);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
+                {font && (
+                  <SkiaText
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    text={primitive.label}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
                 )}
               </Group>
             );

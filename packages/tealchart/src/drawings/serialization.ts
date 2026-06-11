@@ -42,6 +42,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
     case 'rectangle':
+    case 'priceRange':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -133,7 +134,7 @@ function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'
 }
 
 function parseTwoPointDrawing(value: Record<string, unknown>): [UserDrawingAnchor, UserDrawingAnchor] | null {
-  if (!Array.isArray(value.points)) return null;
+  if (!Array.isArray(value.points) || value.points.length !== 2) return null;
   const start = parseAnchor(value.points[0]);
   const end = parseAnchor(value.points[1]);
   return start && end ? [start, end] : null;
@@ -193,6 +194,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'rectangle',
+            points,
+          }
+        : null;
+    }
+    case 'priceRange': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'priceRange',
             points,
           }
         : null;

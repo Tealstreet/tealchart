@@ -1,8 +1,9 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingState, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 
 const style: UserDrawingStyle = {
@@ -31,6 +32,10 @@ const space: DrawingCoordinateSpace = {
 };
 
 describe('user drawing render model', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('marks committed selection and appends draft previews', () => {
     const state: UserDrawingState = {
       version: 1,
@@ -87,6 +92,33 @@ describe('user drawing render model', () => {
         {
           id: 'rect',
           kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+        space,
+      ),
+    ).toEqual([
+      { x: 10, y: 10 },
+      { x: 90, y: 10 },
+      { x: 90, y: 90 },
+      { x: 10, y: 90 },
+    ]);
+  });
+
+  it('resolves selection handles for price range corners', () => {
+    expect(
+      resolveUserDrawingHandlePoints(
+        {
+          id: 'range',
+          kind: 'priceRange',
           paneId: 'main',
           visible: true,
           locked: false,

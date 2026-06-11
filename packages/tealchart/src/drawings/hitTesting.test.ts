@@ -198,6 +198,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 10, y: 90 }, space)?.handle).toBe('bottomLeft');
   });
 
+  it('hits price range edges and corner handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'range',
+      kind: 'priceRange',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 10 }, space)?.drawing.id).toBe('range');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('topLeft');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

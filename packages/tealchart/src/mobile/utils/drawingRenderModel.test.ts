@@ -2,7 +2,11 @@ import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingStyle } from 
 
 import { describe, expect, it } from 'vitest';
 
-import { resolveMobileUserDrawingRenderModel, resolveMobileUserDrawingTextLabelLayout } from './drawingRenderModel';
+import {
+  resolveMobileUserDrawingPriceRangeLabelPosition,
+  resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingTextLabelLayout,
+} from './drawingRenderModel';
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -234,6 +238,143 @@ describe('mobile user drawing render model', () => {
       start: { x: 50, y: 0 },
       end: { x: 50, y: 100 },
       arrowHead: null,
+    });
+  });
+
+  it('returns Skia-ready price range primitives with shared labels', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'priceRange',
+      id: 'range',
+      clip,
+      rect: { x: 10, y: 10, width: 80, height: 20 },
+      labelPoint: { x: 50, y: 20 },
+      label: '+20.00 (+28.57%)',
+      style,
+    });
+  });
+
+  it('keeps price range labels stable when anchor order changes', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 90, price: 90 },
+            { time: 10, price: 70 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'priceRange',
+      label: '+20.00 (+28.57%)',
+    });
+  });
+
+  it('positions price range labels with a Skia baseline offset', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, fontSize: 14, fontFamily: 'monospace' },
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
+
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: 8,
+      y: 23,
+    });
+  });
+
+  it('falls back to normalized font size when measured price range label height is unavailable', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, fontSize: 14, fontFamily: 'monospace' },
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
+
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { width: 84 })).toEqual({
+      fontSize: 14,
+      fontFamily: 'monospace',
+      x: 8,
+      y: 27,
     });
   });
 

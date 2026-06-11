@@ -67,6 +67,11 @@ export type {
   UpdateUserDrawingOptions,
 } from './input';
 export {
+  resolveUserDrawingPriceRangeMetrics,
+  resolveUserDrawingVisualPriceRangeMetrics,
+} from './priceRange';
+export type { UserDrawingPriceRangeMetrics } from './priceRange';
+export {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
 } from './renderModel';
@@ -160,6 +165,7 @@ export type {
   CreateUserDrawingFromDraftOptions,
   ExtendedLineDrawing,
   HorizontalLineDrawing,
+  PriceRangeDrawing,
   RayDrawing,
   RectangleDrawing,
   TextLabelDrawing,

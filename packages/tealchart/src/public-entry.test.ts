@@ -5,8 +5,10 @@ import { resolve } from 'node:path';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingOpacity,
+  resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
+  resolveUserDrawingVisualPriceRangeMetrics,
   setUserDrawingTextAlign,
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
@@ -17,12 +19,14 @@ import {
 import type {
   ArrowLineDrawing,
   ExtendedLineDrawing,
+  PriceRangeDrawing,
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
   UserDrawingHitTestTextMeasure,
   UserDrawingTextLabelLayout,
   UserDrawingOpacityDescriptor,
+  UserDrawingPriceRangeMetrics,
   UserDrawingStyleToggleDescriptor,
 } from './index';
 
@@ -71,6 +75,30 @@ describe('tealchart public entries', () => {
     expect(measureTextLabelLine).toBeTypeOf('function');
     expect(resolveUserDrawingTextEditMetrics('A\nB').longestLineLength).toBe(1);
     expect(layout.lines).toHaveLength(2);
+  });
+
+  it('exports shared drawing price range helpers', () => {
+    const metrics: UserDrawingPriceRangeMetrics = resolveUserDrawingPriceRangeMetrics(100, 125);
+    const drawing: PriceRangeDrawing = {
+      id: 'range',
+      kind: 'priceRange',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 125 },
+      ],
+    };
+
+    expect(metrics.label).toBe('+25.00 (+25.00%)');
+    expect(
+      resolveUserDrawingVisualPriceRangeMetrics({ time: 1, price: 125 }, { time: 2, price: 100 }).label,
+    ).toBe('+25.00 (+25.00%)');
+    expect(drawing.kind).toBe('priceRange');
   });
 
   it('exports shared drawing arrow line types', () => {
