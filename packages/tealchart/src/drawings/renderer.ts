@@ -258,6 +258,33 @@ function renderGannFanGeometry(
   ctx.stroke();
 }
 
+function renderGannBoxGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'gannBox' }>,
+): void {
+  const { drawing, gannBox } = geometry;
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fillRect(gannBox.rect.x, gannBox.rect.y, gannBox.rect.width, gannBox.rect.height);
+  }
+
+  if (drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, drawing);
+  ctx.beginPath();
+  for (const level of gannBox.levels) {
+    ctx.moveTo(level.horizontal.start.x, level.horizontal.start.y);
+    ctx.lineTo(level.horizontal.end.x, level.horizontal.end.y);
+    ctx.moveTo(level.vertical.start.x, level.vertical.start.y);
+    ctx.lineTo(level.vertical.end.x, level.vertical.end.y);
+  }
+  for (const angle of gannBox.angles) {
+    ctx.moveTo(angle.start.x, angle.start.y);
+    ctx.lineTo(angle.end.x, angle.end.y);
+  }
+  ctx.stroke();
+}
+
 function renderFibChannelGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibChannel' }>,
@@ -799,6 +826,9 @@ export function renderUserDrawing(
         break;
       case 'gannFan':
         renderGannFanGeometry(ctx, geometry);
+        break;
+      case 'gannBox':
+        renderGannBoxGeometry(ctx, geometry);
         break;
       case 'fibChannel':
         renderFibChannelGeometry(ctx, geometry);

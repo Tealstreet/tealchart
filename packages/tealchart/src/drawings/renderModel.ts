@@ -147,6 +147,15 @@ export function resolveUserDrawingHandlePoints(
         { x: rect.x, y: rect.y + rect.height },
       ];
     }
+    case 'gannBox': {
+      const rect = resolveRectFromAnchors(drawing.points[0], drawing.points[1], space);
+      return [
+        { x: rect.x, y: rect.y },
+        { x: rect.x + rect.width, y: rect.y },
+        { x: rect.x + rect.width, y: rect.y + rect.height },
+        { x: rect.x, y: rect.y + rect.height },
+      ];
+    }
     case 'datePriceRange': {
       const rect = resolveRectFromAnchors(drawing.points[0], drawing.points[1], space);
       return [
