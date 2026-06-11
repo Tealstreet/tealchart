@@ -302,6 +302,25 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'gannBox';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      levels: readonly {
+        ratio: number;
+        horizontal: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+        vertical: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      }[];
+      angles: readonly {
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'fibChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -554,6 +573,7 @@ export type MobileUserDrawingFibSpeedResistanceArcsPrimitive = Extract<
 export type MobileUserDrawingFibWedgePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibWedge' }>;
 export type MobileUserDrawingFibSpiralPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibSpiral' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
+export type MobileUserDrawingGannBoxPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannBox' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
 export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
 export type MobileUserDrawingTrendBasedFibTimePrimitive = Extract<
@@ -993,6 +1013,26 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'gannBox':
+      return {
+        kind: 'gannBox',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.gannBox.rect,
+        levels: geometry.gannBox.levels.map((level) => ({
+          ratio: level.ratio,
+          horizontal: level.horizontal,
+          vertical: level.vertical,
+        })),
+        angles: geometry.gannBox.angles.map((angle) => ({
+          start: angle.start,
+          end: angle.end,
         })),
         style: geometry.drawing.style,
       };

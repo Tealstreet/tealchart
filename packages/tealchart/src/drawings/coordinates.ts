@@ -151,6 +151,18 @@ export interface DrawingScreenGannFan {
   rays: readonly DrawingScreenPitchfanRay[];
 }
 
+export interface DrawingScreenGannBoxLevel {
+  ratio: number;
+  horizontal: DrawingScreenSegment;
+  vertical: DrawingScreenSegment;
+}
+
+export interface DrawingScreenGannBox {
+  rect: DrawingScreenRect;
+  levels: readonly DrawingScreenGannBoxLevel[];
+  angles: readonly DrawingScreenSegment[];
+}
+
 export interface DrawingScreenCrossLine {
   horizontal: DrawingScreenSegment;
   vertical: DrawingScreenSegment;
@@ -389,6 +401,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'gannFan';
       drawing: UserDrawing;
       gannFan: DrawingScreenGannFan;
+    }
+  | {
+      kind: 'gannBox';
+      drawing: UserDrawing;
+      gannBox: DrawingScreenGannBox;
     }
   | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
@@ -900,6 +917,7 @@ export const GANN_FAN_LEVELS = [
   { ratio: 4, label: '4/1' },
   { ratio: 8, label: '8/1' },
 ] as const;
+export const GANN_BOX_LEVELS = [0, 0.125, 0.25, 1 / 3, 0.5, 2 / 3, 0.75, 0.875, 1] as const;
 
 export function formatFibRetracementRatio(ratio: number): string {
   return ratio === 0 || ratio === 0.5 || ratio === 1 ? String(ratio) : ratio.toFixed(3);
@@ -1024,6 +1042,40 @@ export function resolveGannFanFromAnchors(
         segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
       };
     }),
+  };
+}
+
+export function resolveGannBoxFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenGannBox {
+  const rect = resolveRectFromAnchors(first, second, space);
+  const left = rect.x;
+  const right = rect.x + rect.width;
+  const top = rect.y;
+  const bottom = rect.y + rect.height;
+  const levels = GANN_BOX_LEVELS.map((ratio) => {
+    const x = left + rect.width * ratio;
+    const y = top + rect.height * ratio;
+    return {
+      ratio,
+      horizontal: { start: { x: left, y }, end: { x: right, y } },
+      vertical: { start: { x, y: top }, end: { x, y: bottom } },
+    };
+  });
+
+  return {
+    rect,
+    levels,
+    angles: [
+      { start: { x: left, y: top }, end: { x: right, y: bottom } },
+      { start: { x: left, y: bottom }, end: { x: right, y: top } },
+      { start: { x: left + rect.width / 2, y: top }, end: { x: right, y: top + rect.height / 2 } },
+      { start: { x: right, y: top + rect.height / 2 }, end: { x: left + rect.width / 2, y: bottom } },
+      { start: { x: left + rect.width / 2, y: bottom }, end: { x: left, y: top + rect.height / 2 } },
+      { start: { x: left, y: top + rect.height / 2 }, end: { x: left + rect.width / 2, y: top } },
+    ],
   };
 }
 
@@ -1667,6 +1719,12 @@ export function resolveUserDrawingGeometry(
         kind: 'gannFan',
         drawing,
         gannFan: resolveGannFanFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'gannBox':
+      return {
+        kind: 'gannBox',
+        drawing,
+        gannBox: resolveGannBoxFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
     case 'polyline':

@@ -1927,6 +1927,47 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'gannBox') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const path = Skia.Path.Make();
+            for (const level of primitive.levels) {
+              path.moveTo(level.horizontal.start.x, level.horizontal.start.y);
+              path.lineTo(level.horizontal.end.x, level.horizontal.end.y);
+              path.moveTo(level.vertical.start.x, level.vertical.start.y);
+              path.lineTo(level.vertical.end.x, level.vertical.end.y);
+            }
+            for (const angle of primitive.angles) {
+              path.moveTo(angle.start.x, angle.start.y);
+              path.lineTo(angle.end.x, angle.end.y);
+            }
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={path}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'circle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

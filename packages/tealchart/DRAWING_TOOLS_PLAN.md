@@ -494,12 +494,21 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, spiral path hit testing, whole-drawing moves, and endpoint editing
   use shared drawing behavior on both platforms.
 
+## Shipped: Gann Box Tool
+
+- Shared drawing state supports the two-anchor `gannBox` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching filled Gann boxes with price/time
+  levels and angle lines from a shared geometry resolver.
+- Selection, grid/angle hit testing, whole-drawing moves, fill controls, and
+  rectangle-corner editing use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan, pattern tools, volume profile tools, annotation/icon tools, and curved geometry.
+  Gann tools beyond fan/box, pattern tools, volume profile tools, annotation/icon tools, and curved geometry.
 - Additional TradingView measurement tool polish beyond the current price/date
   ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
