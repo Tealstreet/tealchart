@@ -147,6 +147,7 @@ export function applyUserDrawingEditDrag(
     drawings,
     selection: drag.selection,
     draft: null,
+    textEdit: null,
   };
 }
 

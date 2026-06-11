@@ -124,7 +124,7 @@ export interface ChartCoreOptions {
   /** Returns whether auto-scale is active for a given pane */
   isAutoScale?: (paneId: string) => boolean;
   /** Called on double-click/double-tap on a pane */
-  onPaneDoubleClick?: (paneId: string) => void;
+  onPaneDoubleClick?: (paneId: string, point: DrawingScreenPoint, spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>) => void;
 }
 
 // ============================================================================
@@ -809,7 +809,10 @@ export class ChartCore {
           this.stage.container().style.cursor = cursor;
         }
       },
-      onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),
+      onPaneDoubleClick: (paneId, point) => {
+        if (!this.viewport) return;
+        this.options.onPaneDoubleClick?.(paneId, point, this.getUserDrawingSpaces(this.viewport));
+      },
     });
 
     // Click listener for canvas-drawn + button (stored for cleanup in dispose)
@@ -1237,6 +1240,10 @@ export class ChartCore {
    */
   getViewport(): Viewport | null {
     return this.viewport;
+  }
+
+  getUserDrawingSpacesForCurrentViewport(): Map<string, DrawingCoordinateSpace> | null {
+    return this.viewport ? this.getUserDrawingSpaces(this.viewport) : null;
   }
 
   /**
