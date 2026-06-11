@@ -65,6 +65,7 @@ export type UserDrawingTool =
   | 'callout'
   | 'comment'
   | 'priceNote'
+  | 'pin'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
@@ -433,6 +434,11 @@ export interface PriceNoteDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
+export interface PinDrawing extends UserDrawingBase {
+  kind: 'pin';
+  point: UserDrawingAnchor;
+}
+
 export type UserDrawingTextAnnotation =
   | TextLabelDrawing
   | NoteDrawing
@@ -501,6 +507,7 @@ export type UserDrawing =
   | CalloutDrawing
   | CommentDrawing
   | PriceNoteDrawing
+  | PinDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -671,6 +678,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'crossLine':
     case 'note':
     case 'comment':
+    case 'pin':
     case 'textLabel':
     case 'anchoredVwap':
       return 1;
@@ -1052,6 +1060,12 @@ export function createUserDrawingFromDraft(
         point: draft.anchors[0]!,
         text: draft.text ?? '',
         textAlign: 'center',
+      };
+    case 'pin':
+      return {
+        ...base,
+        kind: 'pin',
+        point: draft.anchors[0]!,
       };
     case 'callout':
     case 'priceNote':

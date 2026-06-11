@@ -881,6 +881,27 @@ function renderTextLabelGeometry(
   }
 }
 
+function renderPinGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'pin' }>,
+  options: Required<UserDrawingRenderOptions>,
+): void {
+  const radius = Math.max(4, options.selectionHandleRadius);
+  const stem = radius * 1.8;
+  const { point, drawing } = geometry;
+
+  applyStrokeStyle(ctx, drawing);
+  ctx.fillStyle = drawing.style.fillColor ?? drawing.style.lineColor;
+  ctx.beginPath();
+  ctx.arc(point.x, point.y - stem, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(point.x, point.y - stem + radius);
+  ctx.lineTo(point.x, point.y);
+  ctx.stroke();
+}
+
 function renderSelectionHandles(
   ctx: CanvasContext,
   drawing: UserDrawing,
@@ -1081,6 +1102,9 @@ export function renderUserDrawing(
       case 'comment':
       case 'priceNote':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
+        break;
+      case 'pin':
+        renderPinGeometry(ctx, geometry, resolvedOptions);
         break;
     }
   } finally {

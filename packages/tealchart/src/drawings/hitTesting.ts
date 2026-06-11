@@ -288,6 +288,16 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'pin') {
+    const radius = Math.max(options.tolerance, options.labelHeight / 2);
+    const stemStart = { x: geometry.point.x, y: geometry.point.y - radius * 1.8 };
+    const distance = Math.min(
+      distanceBetweenPoints(point, stemStart),
+      distanceToSegment(point, { start: stemStart, end: geometry.point }),
+    );
+    return distance <= radius ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'ellipse') {
     const distance = distanceToEllipseEdge(
       point,
@@ -744,6 +754,9 @@ function hitTestUserDrawingHandle(
       break;
     case 'arrowMark':
       handles.push({ handle: 'center', point: geometry.mark.point });
+      break;
+    case 'pin':
+      handles.push({ handle: 'center', point: geometry.point });
       break;
     case 'horizontalLine':
     case 'verticalLine':

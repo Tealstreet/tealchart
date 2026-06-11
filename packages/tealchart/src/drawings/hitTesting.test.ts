@@ -1189,6 +1189,23 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits pin drawings by marker and stem', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pin',
+      kind: 'pin',
+      point: { time: 50, price: 50 },
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 40 }, space, { labelWidth: 50, labelHeight: 20 })?.drawing.id).toBe(
+      'pin',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })?.drawing.id).toBe(
+      'pin',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits multiline text labels using expanded label height', () => {
     const drawing: UserDrawing = {
       ...base,
