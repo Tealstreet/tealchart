@@ -1,7 +1,8 @@
 import type { UserDrawingState } from '../../drawings';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import {
   setMobileUserDrawingLocked,
   setMobileUserDrawingVisibility,
@@ -34,6 +35,10 @@ const state: UserDrawingState = {
 };
 
 describe('mobile drawing style helpers', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('updates selected drawing style through the shared reducer contract', () => {
     const updated = updateMobileUserDrawingStyle(state, { lineColor: '#00ffcc', lineStyle: 'dashed' }, { now: () => 10 });
 
