@@ -463,6 +463,79 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready Fibonacci extension primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-ext',
+          kind: 'fibExtension',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 20 },
+            { time: 90, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibExtension',
+      id: 'fib-ext',
+      levels: [
+        { ratio: 0, label: '0 20.00', price: 20, start: { x: 10, y: 80 }, end: { x: 90, y: 80 } },
+        { ratio: 0.382, label: '0.382 42.92', price: 42.92, start: { x: 10, y: 57.08 }, end: { x: 90, y: 57.08 } },
+        { ratio: 0.618, label: '0.618 57.08', price: 57.08, start: { x: 10, y: 42.92 }, end: { x: 90, y: 42.92 } },
+        { ratio: 1, label: '1 80.00', price: 80, start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+        {
+          ratio: 1.272,
+          label: '1.272 96.32',
+          price: expect.closeTo(96.32),
+          start: { x: 10, y: expect.closeTo(3.68) },
+          end: { x: 90, y: expect.closeTo(3.68) },
+        },
+        {
+          ratio: 1.414,
+          label: '1.414 104.84',
+          price: expect.closeTo(104.84),
+          start: { x: 10, y: expect.closeTo(-4.84) },
+          end: { x: 90, y: expect.closeTo(-4.84) },
+        },
+        {
+          ratio: 1.618,
+          label: '1.618 117.08',
+          price: expect.closeTo(117.08),
+          start: { x: 10, y: expect.closeTo(-17.08) },
+          end: { x: 90, y: expect.closeTo(-17.08) },
+        },
+        {
+          ratio: 2,
+          label: '2.000 140.00',
+          price: 140,
+          start: { x: 10, y: -40 },
+          end: { x: 90, y: -40 },
+        },
+        {
+          ratio: 2.618,
+          label: '2.618 177.08',
+          price: expect.closeTo(177.08),
+          start: { x: 10, y: expect.closeTo(-77.08) },
+          end: { x: 90, y: expect.closeTo(-77.08) },
+        },
+      ],
+      style,
+    });
+  });
+
   it('returns Skia-ready extended line segments to chart bounds', () => {
     const extended: ExtendedLineDrawing = {
       id: 'extended',

@@ -853,6 +853,78 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('edits Fibonacci extension endpoints', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-ext',
+      kind: 'fibExtension',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'fib-ext', handle: 'end' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'fib-ext', handle: 'end' },
+        startPoint: { x: 90, y: 20 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 80, y: 30 },
+      { now: () => 14 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 20 },
+        { time: 80, price: 70 },
+      ],
+      updatedAt: 14,
+    });
+  });
+
+  it('moves selected Fibonacci extensions by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-ext',
+      kind: 'fibExtension',
+      points: [
+        { time: 10, price: 20 },
+        { time: 90, price: 80 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'fib-ext' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'fib-ext' },
+        startPoint: { x: 10, y: 80 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 90 },
+      { now: () => 15 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 10 },
+        { time: 100, price: 70 },
+      ],
+      updatedAt: 15,
+    });
+  });
+
   it('moves horizontal, vertical, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };

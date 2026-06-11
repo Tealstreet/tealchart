@@ -8,6 +8,7 @@ import type {
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FibExtensionDrawing,
   FibRetracementDrawing,
   InfoLineDrawing,
   PathDrawing,
@@ -29,6 +30,7 @@ import {
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
+  resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
@@ -237,6 +239,24 @@ describe('user drawing coordinates', () => {
     expect(retracement.levels[3]?.segment).toEqual({ start: { x: 10, y: 70 }, end: { x: 210, y: 70 } });
   });
 
+  it('resolves Fibonacci extension levels from two anchors', () => {
+    const extension = resolveFibExtensionFromAnchors({ time: 1_000, price: 90 }, { time: 3_000, price: 110 }, space);
+
+    expect(extension.rect).toEqual({ x: 10, y: 20, width: 200, height: 100 });
+    expect(extension.levels.map(({ ratio, label, price }) => ({ ratio, label, price }))).toEqual([
+      { ratio: 0, label: '0', price: 90 },
+      { ratio: 0.382, label: '0.382', price: 97.64 },
+      { ratio: 0.618, label: '0.618', price: 102.36 },
+      { ratio: 1, label: '1', price: 110 },
+      { ratio: 1.272, label: '1.272', price: 115.44 },
+      { ratio: 1.414, label: '1.414', price: 118.28 },
+      { ratio: 1.618, label: '1.618', price: 122.36 },
+      { ratio: 2, label: '2.000', price: 130 },
+      { ratio: 2.618, label: '2.618', price: 142.36 },
+    ]);
+    expect(extension.levels[3]?.segment).toEqual({ start: { x: 10, y: 20 }, end: { x: 210, y: 20 } });
+  });
+
   it('resolves polylines from ordered anchors', () => {
     expect(
       resolvePolylineFromAnchors(
@@ -357,6 +377,15 @@ describe('user drawing coordinates', () => {
       ...trendLine,
       id: 'fib',
       kind: 'fibRetracement',
+      points: [
+        { time: 1_000, price: 90 },
+        { time: 3_000, price: 110 },
+      ],
+    };
+    const fibExtension: FibExtensionDrawing = {
+      ...trendLine,
+      id: 'fib-ext',
+      kind: 'fibExtension',
       points: [
         { time: 1_000, price: 90 },
         { time: 3_000, price: 110 },
@@ -498,7 +527,7 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(fibRetracement, space)).toMatchObject({
       kind: 'fibRetracement',
-      retracement: {
+      fib: {
         rect: { x: 10, y: 20, width: 200, height: 100 },
         levels: [
           { ratio: 0, label: '0', price: 90, y: 120 },
@@ -509,6 +538,23 @@ describe('user drawing coordinates', () => {
           { ratio: 0.786, label: '0.786', price: 105.72, y: expect.closeTo(41.4) },
           { ratio: 1, label: '1', price: 110, y: 20 },
           { ratio: 1.618, label: '1.618', price: 122.36, y: -41.8 },
+          { ratio: 2.618, label: '2.618', price: 142.36, y: expect.closeTo(-141.8) },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibExtension, space)).toMatchObject({
+      kind: 'fibExtension',
+      fib: {
+        rect: { x: 10, y: 20, width: 200, height: 100 },
+        levels: [
+          { ratio: 0, label: '0', price: 90, y: 120 },
+          { ratio: 0.382, label: '0.382', price: 97.64, y: 81.8 },
+          { ratio: 0.618, label: '0.618', price: 102.36, y: 58.2 },
+          { ratio: 1, label: '1', price: 110, y: 20 },
+          { ratio: 1.272, label: '1.272', price: 115.44, y: expect.closeTo(-7.2) },
+          { ratio: 1.414, label: '1.414', price: 118.28, y: expect.closeTo(-21.4) },
+          { ratio: 1.618, label: '1.618', price: 122.36, y: -41.8 },
+          { ratio: 2, label: '2.000', price: 130, y: -80 },
           { ratio: 2.618, label: '2.618', price: 142.36, y: expect.closeTo(-141.8) },
         ],
       },
