@@ -130,6 +130,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
   { tool: 'fibFan', icon: 'F', label: 'Fib fan' },
   { tool: 'fibSpeedResistanceFan', icon: 'S', label: 'Fib speed resistance fan' },
+  { tool: 'fibCircles', icon: 'O', label: 'Fib circles' },
   { tool: 'fibChannel', icon: 'C', label: 'Fib channel' },
   { tool: 'fibTimeZone', icon: 'T', label: 'Fib time zone' },
   { tool: 'gannFan', icon: 'G', label: 'Gann fan' },

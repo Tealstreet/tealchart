@@ -822,6 +822,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib circles as concentric Fibonacci rings', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-circles',
+      kind: 'fibCircles',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:60,50');
+    expect(ctx.calls).toContain('arc:10,50,50:1');
+    expect(ctx.calls).toContain('arc:10,50,130.9:1');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders gann fans as ratio fan rays', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

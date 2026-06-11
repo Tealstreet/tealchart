@@ -199,8 +199,28 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib circle drawings from two anchors', () => {
+    const options = { createId: () => 'fib-circles', now: () => 24 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibCircles'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'fib-circles' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'fib-circles',
+      kind: 'fibCircles',
+      points: [anchorA, anchorB],
+      createdAt: 24,
+      updatedAt: 24,
+    });
+  });
+
   it('commits gann fan drawings from two anchors', () => {
-    const options = { createId: () => 'gann-fan', now: () => 24 };
+    const options = { createId: () => 'gann-fan', now: () => 25 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'gannFan'), {
       paneId: 'main',
       anchor: anchorA,
@@ -214,8 +234,8 @@ describe('user drawing input controller', () => {
       id: 'gann-fan',
       kind: 'gannFan',
       points: [anchorA, anchorB],
-      createdAt: 24,
-      updatedAt: 24,
+      createdAt: 25,
+      updatedAt: 25,
     });
   });
 
