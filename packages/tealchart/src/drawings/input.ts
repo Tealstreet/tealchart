@@ -49,6 +49,12 @@ export interface UserDrawingTextEditOptions {
   now?: () => number;
 }
 
+export interface UpdateUserDrawingOptions {
+  drawingId?: string;
+  includeLocked?: boolean;
+  now?: () => number;
+}
+
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
     version: USER_DRAWING_SCHEMA_VERSION,
@@ -132,6 +138,109 @@ export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
     selection: null,
     draft: null,
     textEdit: null,
+  };
+}
+
+function findUserDrawingForUpdate(
+  state: UserDrawingState,
+  options: UpdateUserDrawingOptions = {},
+): { drawing: UserDrawingState['drawings'][number]; index: number } | null {
+  const drawingId = options.drawingId ?? state.selection?.drawingId;
+  if (!drawingId) return null;
+
+  const index = state.drawings.findIndex((drawing) => drawing.id === drawingId);
+  const drawing = state.drawings[index];
+  if (!drawing || (drawing.locked && !options.includeLocked)) return null;
+  return { drawing, index };
+}
+
+function replaceUserDrawing(
+  state: UserDrawingState,
+  index: number,
+  drawing: UserDrawingState['drawings'][number],
+): UserDrawingState {
+  const drawings = state.drawings.slice();
+  drawings[index] = drawing;
+  return {
+    ...state,
+    drawings,
+  };
+}
+
+export function updateUserDrawingStyle(
+  state: UserDrawingState,
+  style: Partial<UserDrawingStyle>,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target) return state;
+
+  const nextStyle = {
+    ...target.drawing.style,
+    ...style,
+  };
+  if (
+    nextStyle.lineColor === target.drawing.style.lineColor &&
+    nextStyle.lineWidth === target.drawing.style.lineWidth &&
+    nextStyle.lineStyle === target.drawing.style.lineStyle &&
+    nextStyle.fillColor === target.drawing.style.fillColor &&
+    nextStyle.textColor === target.drawing.style.textColor &&
+    nextStyle.fontSize === target.drawing.style.fontSize &&
+    nextStyle.fontFamily === target.drawing.style.fontFamily
+  ) {
+    return state;
+  }
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    style: nextStyle,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
+export function setUserDrawingVisibility(
+  state: UserDrawingState,
+  visible: boolean,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.visible === visible) return state;
+
+  const drawing = {
+    ...target.drawing,
+    visible,
+    updatedAt: options.now?.() ?? Date.now(),
+  };
+  const nextState = replaceUserDrawing(state, target.index, drawing);
+
+  if (visible || state.selection?.drawingId !== target.drawing.id) return nextState;
+  return {
+    ...nextState,
+    selection: null,
+    textEdit: state.textEdit?.drawingId === target.drawing.id ? null : state.textEdit,
+  };
+}
+
+export function setUserDrawingLocked(
+  state: UserDrawingState,
+  locked: boolean,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.locked === locked) return state;
+
+  const drawing = {
+    ...target.drawing,
+    locked,
+    updatedAt: options.now?.() ?? Date.now(),
+  };
+  const nextState = replaceUserDrawing(state, target.index, drawing);
+
+  if (!locked || state.selection?.drawingId !== target.drawing.id) return nextState;
+  return {
+    ...nextState,
+    selection: null,
+    textEdit: state.textEdit?.drawingId === target.drawing.id ? null : state.textEdit,
   };
 }
 

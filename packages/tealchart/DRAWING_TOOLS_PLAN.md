@@ -50,7 +50,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia double-tap opens a positioned React Native text editor for text
   labels and exposes matching imperative text-edit APIs.
 
-## Current Epic: Persistence Foundation
+## Shipped: Persistence Foundation
 
 - Shared layout serialization preserves committed drawings and clears transient
   active tool, selection, draft, and text-edit state on restore.
@@ -60,9 +60,18 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia exposes matching layout-safe drawing import/export APIs through
   its imperative handle and mobile utility exports.
 
+## Current Epic: Style Foundation
+
+- Shared reducers update drawing style, visibility, and lock state while
+  preserving drawing IDs and clearing invalid selection/edit state.
+- Web widget APIs expose selected or targeted drawing style/property updates.
+- Mobile Skia exposes matching imperative handle methods and mobile utility
+  wrappers for style, visibility, and lock updates.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Rich text label styling controls and multiline editor polish.
+- Rich text label controls, font controls, and multiline editor polish.
+- In-chart or app-toolbar controls for the style APIs.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.

@@ -90,10 +90,13 @@ export {
   renderUserDrawingLayer,
   renderUserDrawings,
   screenPointToAnchor,
+  setUserDrawingLocked,
   setUserDrawingText,
   setUserDrawingTool,
+  setUserDrawingVisibility,
   serializeUserDrawingStateForLayout,
   timeToDrawingX,
+  updateUserDrawingStyle,
   updateUserDrawingTextEdit,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
@@ -138,6 +141,7 @@ export type {
   UserDrawingToolbarActionDescriptor,
   UserDrawingToolDescriptor,
   UserDrawingTool,
+  UpdateUserDrawingOptions,
   VerticalLineDrawing,
 } from './drawings';
 

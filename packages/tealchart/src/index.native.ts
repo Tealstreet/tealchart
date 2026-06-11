@@ -54,3 +54,8 @@ export type {
   MobileUserDrawingPrimitive,
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';
+export {
+  setMobileUserDrawingLocked,
+  setMobileUserDrawingVisibility,
+  updateMobileUserDrawingStyle,
+} from './mobile/utils/drawingStyle';

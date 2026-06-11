@@ -15,6 +15,7 @@ export * from './utils/coordinates';
 export * from './utils/drawingInput';
 export * from './utils/drawingPersistence';
 export * from './utils/drawingRenderModel';
+export * from './utils/drawingStyle';
 
 // Class-based indicator management (matches web's React-agnostic pattern)
 export { MobileIndicatorManager } from './MobileIndicatorManager';
