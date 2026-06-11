@@ -443,6 +443,33 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits placed bars pattern bounds and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'bars',
+      kind: 'barsPattern',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+        { time: 40, price: 50 },
+      ],
+    };
+    const barsSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 60, low: 49, close: 52, volume: 1 },
+        { time: 20, open: 52, high: 58, low: 51, close: 53, volume: 1 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 45, y: 50 }, barsSpace)?.drawing.id).toBe('bars');
+    expect(hitTestUserDrawing(drawing, { x: 40, y: 50 }, barsSpace)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 75, y: 50 }, barsSpace, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits path segments and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

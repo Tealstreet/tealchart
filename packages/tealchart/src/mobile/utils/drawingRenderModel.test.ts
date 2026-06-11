@@ -1137,6 +1137,53 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready bars pattern primitives from source bars', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'bars' },
+      drawings: [
+        {
+          id: 'bars',
+          kind: 'barsPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 50 },
+            { time: 40, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const barsSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 60, low: 49, close: 52, volume: 1 },
+        { time: 20, open: 52, high: 58, low: 51, close: 53, volume: 1 },
+      ],
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, barsSpace]]))[0]).toMatchObject({
+      kind: 'barsPattern',
+      id: 'bars',
+      selected: true,
+      clip,
+      bounds: { x: 36.5, y: 42, width: 17, height: 11 },
+      bars: [
+        { time: 40, x: 40, openY: 52, highY: 42, lowY: 53, closeY: 50, bodyWidth: 7, up: true },
+        { time: 50, x: 50, openY: 50, highY: 44, lowY: 51, closeY: 49, bodyWidth: 7, up: true },
+      ],
+      style,
+    });
+  });
+
   it('returns Skia-ready path primitives with shared polyline points', () => {
     const state: UserDrawingState = {
       version: 1,

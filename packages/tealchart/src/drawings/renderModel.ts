@@ -160,6 +160,7 @@ export function resolveUserDrawingHandlePoints(
     case 'parallelChannel':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'regressionTrend':
       {

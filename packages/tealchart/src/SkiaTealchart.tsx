@@ -2060,6 +2060,47 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'barsPattern') {
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.bars.map((bar) => {
+                  const color = bar.up ? '#22c55e' : '#f43f5e';
+                  const bodyTop = Math.min(bar.openY, bar.closeY);
+                  const bodyHeight = Math.max(1, Math.abs(bar.closeY - bar.openY));
+                  const bodyX = bar.x - bar.bodyWidth / 2;
+
+                  return (
+                    <Group key={`${primitive.id}:bar:${bar.time}`}>
+                      {primitive.style.lineVisible !== false && (
+                        <SkiaLine
+                          p1={vec(bar.x, bar.highY)}
+                          p2={vec(bar.x, bar.lowY)}
+                          color={color}
+                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                          style="stroke"
+                        />
+                      )}
+                      {primitive.style.fillVisible !== false && (
+                        <Rect x={bodyX} y={bodyTop} width={bar.bodyWidth} height={bodyHeight} color={color} />
+                      )}
+                      {primitive.style.lineVisible !== false && (
+                        <Rect
+                          x={bodyX}
+                          y={bodyTop}
+                          width={bar.bodyWidth}
+                          height={bodyHeight}
+                          color={primitive.style.lineColor}
+                          style="stroke"
+                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                        />
+                      )}
+                    </Group>
+                  );
+                })}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'priceRange') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);

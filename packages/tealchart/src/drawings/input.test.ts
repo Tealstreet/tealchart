@@ -187,6 +187,25 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits bars pattern drawings from three anchors', () => {
+    const options = { createId: () => 'bars-pattern', now: () => 31 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'barsPattern'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(second.drawings).toEqual([]);
+    expect(third.draft).toBeNull();
+    expect(third.selection).toEqual({ drawingId: 'bars-pattern' });
+    expect(third.drawings[0]).toMatchObject({
+      id: 'bars-pattern',
+      kind: 'barsPattern',
+      points: [anchorA, anchorB, anchorC],
+    });
+  });
+
   it('clears too-short path drags without creating drawings', () => {
     const started = beginUserDrawingPathDrag(setUserDrawingTool(createUserDrawingState(), 'path'), {
       paneId: 'main',

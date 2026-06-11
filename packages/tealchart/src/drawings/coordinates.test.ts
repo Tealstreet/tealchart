@@ -33,6 +33,7 @@ import {
   drawingXToTime,
   drawingYToPrice,
   priceToDrawingY,
+  resolveBarsPatternFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
   resolveFibExtensionFromAnchors,
@@ -282,6 +283,30 @@ describe('user drawing coordinates', () => {
 
     expect(position.entryLine).toEqual({ start: { x: 60, y: 70 }, end: { x: 210, y: 70 } });
     expect(position.stopLine).toEqual({ start: { x: 60, y: 95 }, end: { x: 210, y: 95 } });
+  });
+
+  it('resolves bars pattern candles from source bars at a placement anchor', () => {
+    const pattern = resolveBarsPatternFromAnchors(
+      { time: 1_000, price: 100 },
+      { time: 2_000, price: 100 },
+      { time: 2_000, price: 101 },
+      {
+        ...space,
+        bars: [
+          { time: 1_000, open: 100, high: 104, low: 99, close: 102, volume: 1 },
+          { time: 2_000, open: 102, high: 105, low: 101, close: 101, volume: 1 },
+          { time: 3_000, open: 101, high: 103, low: 100, close: 103, volume: 1 },
+        ],
+      },
+    );
+
+    expect(pattern.bars).toMatchObject([
+      { time: 2_000, x: 110, openY: 75, highY: 55, lowY: 80, closeY: 65, up: true },
+      { time: 3_000, x: 210, openY: 65, highY: 50, lowY: 70, closeY: 70, up: false },
+    ]);
+    expect(pattern.bars[0]?.bodyWidth).toBe(12);
+    expect(pattern.bounds).toEqual({ x: 104, y: 50, width: 112, height: 30 });
+    expect(pattern.placement).toEqual({ x: 110, y: 65 });
   });
 
   it('resolves Fibonacci retracement levels from two anchors', () => {
