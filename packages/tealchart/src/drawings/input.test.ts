@@ -179,8 +179,28 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib speed resistance fan drawings from two anchors', () => {
+    const options = { createId: () => 'fib-speed-fan', now: () => 23 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibSpeedResistanceFan'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'fib-speed-fan' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'fib-speed-fan',
+      kind: 'fibSpeedResistanceFan',
+      points: [anchorA, anchorB],
+      createdAt: 23,
+      updatedAt: 23,
+    });
+  });
+
   it('commits gann fan drawings from two anchors', () => {
-    const options = { createId: () => 'gann-fan', now: () => 23 };
+    const options = { createId: () => 'gann-fan', now: () => 24 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'gannFan'), {
       paneId: 'main',
       anchor: anchorA,
@@ -194,8 +214,8 @@ describe('user drawing input controller', () => {
       id: 'gann-fan',
       kind: 'gannFan',
       points: [anchorA, anchorB],
-      createdAt: 23,
-      updatedAt: 23,
+      createdAt: 24,
+      updatedAt: 24,
     });
   });
 
