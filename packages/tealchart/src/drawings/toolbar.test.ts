@@ -106,6 +106,7 @@ describe('user drawing toolbar descriptors', () => {
       'highlighter',
       'note',
       'callout',
+      'comment',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -248,6 +249,9 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('note')).toEqual(expect.objectContaining({ tool: 'note', label: 'Note' }));
     expect(getUserDrawingToolDescriptor('callout')).toEqual(
       expect.objectContaining({ tool: 'callout', label: 'Callout' }),
+    );
+    expect(getUserDrawingToolDescriptor('comment')).toEqual(
+      expect.objectContaining({ tool: 'comment', label: 'Comment' }),
     );
     expect(getUserDrawingToolDescriptor('pitchfork')).toEqual(
       expect.objectContaining({ tool: 'pitchfork', label: 'Pitchfork' }),
@@ -620,6 +624,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(datePriceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
     expect(
       supportsUserDrawingFillControls({
         ...textLabel,
@@ -637,6 +642,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
+    expect(supportsUserDrawingTextControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
     expect(
       supportsUserDrawingTextControls({
         ...textLabel,

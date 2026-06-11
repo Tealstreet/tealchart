@@ -157,6 +157,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'textLabel':
     case 'note':
+    case 'comment':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -850,7 +851,8 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         : null;
     }
     case 'textLabel':
-    case 'note': {
+    case 'note':
+    case 'comment': {
       const point = parseAnchor(value.point);
       if (!point || typeof value.text !== 'string') return null;
       const textAlign: UserDrawingTextAnnotation['textAlign'] =

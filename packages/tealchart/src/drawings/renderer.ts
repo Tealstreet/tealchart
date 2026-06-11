@@ -1078,6 +1078,7 @@ export function renderUserDrawing(
       case 'textLabel':
       case 'note':
       case 'callout':
+      case 'comment':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
         break;
     }

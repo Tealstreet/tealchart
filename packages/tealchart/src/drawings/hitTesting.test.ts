@@ -1129,6 +1129,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits comment drawings using a configurable label box', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'comment',
+      kind: 'comment',
+      point: { time: 50, price: 50 },
+      text: 'Comment',
+      textAlign: 'center',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })?.drawing.id).toBe(
+      'comment',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits callout drawings by text box and pointer segment', () => {
     const drawing: UserDrawing = {
       ...base,

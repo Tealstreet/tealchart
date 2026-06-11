@@ -1385,6 +1385,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
   });
 
+  it('renders comment drawings with measured boxes', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'comment',
+      kind: 'comment',
+      point: { time: 50, price: 50 },
+      text: 'Note',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:32,40,36,20:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
+  });
+
   it('renders callout drawings with a pointer and measured text box', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
