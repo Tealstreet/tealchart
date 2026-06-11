@@ -350,6 +350,32 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('builds variable-point brush drawings from drag samples', () => {
+    const started = beginUserDrawingPathDrag(
+      setUserDrawingTool(createUserDrawingState(), 'brush'),
+      { paneId: 'main', anchor: anchorA },
+      { now: () => 10, style },
+    );
+    const second = appendUserDrawingPathDragPoint(started, { paneId: 'main', anchor: anchorB });
+    const third = appendUserDrawingPathDragPoint(second, { paneId: 'main', anchor: { time: 3_000, price: 90 } });
+    const committed = commitUserDrawingPathDrag(third, { createId: () => 'brush', now: () => 20 });
+
+    expect(third.draft?.tool).toBe('brush');
+    expect(committed).toMatchObject({
+      selection: { drawingId: 'brush' },
+      draft: null,
+      drawings: [
+        {
+          id: 'brush',
+          kind: 'brush',
+          points: [anchorA, anchorB, { time: 3_000, price: 90 }],
+          createdAt: 20,
+          updatedAt: 20,
+        },
+      ],
+    });
+  });
+
   it('commits long position drawings from three anchors', () => {
     const options = { createId: () => 'long-position', now: () => 30 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'longPosition'), {

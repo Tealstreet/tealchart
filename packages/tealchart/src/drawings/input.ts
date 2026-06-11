@@ -366,13 +366,13 @@ export function beginUserDrawingPathDrag(
   point: UserDrawingInputPoint,
   options: Omit<UserDrawingPathDragOptions, 'createId'> = {},
 ): UserDrawingState {
-  if (state.activeTool !== 'path') return state;
+  if (state.activeTool !== 'path' && state.activeTool !== 'brush') return state;
 
   return {
     ...state,
     selection: null,
     draft: {
-      tool: 'path',
+      tool: state.activeTool,
       paneId: point.paneId,
       anchors: [point.anchor],
       style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
@@ -387,7 +387,13 @@ export function appendUserDrawingPathDragPoint(
   point: UserDrawingInputPoint,
 ): UserDrawingState {
   const draft = state.draft;
-  if (state.activeTool !== 'path' || !draft || draft.tool !== 'path' || draft.paneId !== point.paneId) return state;
+  if (
+    (state.activeTool !== 'path' && state.activeTool !== 'brush') ||
+    !draft ||
+    (draft.tool !== 'path' && draft.tool !== 'brush') ||
+    draft.paneId !== point.paneId
+  )
+    return state;
 
   const lastAnchor = draft.anchors[draft.anchors.length - 1];
   if (lastAnchor && isSameDrawingAnchor(lastAnchor, point.anchor)) return state;
@@ -406,7 +412,8 @@ export function commitUserDrawingPathDrag(
   options: UserDrawingPathDragOptions,
 ): UserDrawingState {
   const draft = state.draft;
-  if (state.activeTool !== 'path' || !draft || draft.tool !== 'path') return state;
+  if ((state.activeTool !== 'path' && state.activeTool !== 'brush') || !draft || (draft.tool !== 'path' && draft.tool !== 'brush'))
+    return state;
 
   if (draft.anchors.length < 2) {
     return {
@@ -419,7 +426,7 @@ export function commitUserDrawingPathDrag(
   const now = options.now?.() ?? Date.now();
   const drawing = {
     id: options.createId(),
-    kind: 'path' as const,
+    kind: draft.tool,
     paneId: draft.paneId,
     visible: true,
     locked: false,

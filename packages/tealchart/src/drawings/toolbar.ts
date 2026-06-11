@@ -159,6 +159,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'flatTopBottom', icon: '▰', label: 'Flat top/bottom' },
   { tool: 'disjointChannel', icon: '◇', label: 'Disjoint channel' },
   { tool: 'path', icon: '⌁', label: 'Path' },
+  { tool: 'brush', icon: '✎', label: 'Brush' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
 

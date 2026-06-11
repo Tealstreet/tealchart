@@ -63,6 +63,7 @@ export type {
   MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingArcPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
+  MobileUserDrawingBrushPrimitive,
   MobileUserDrawingCirclePrimitive,
   MobileUserDrawingCrossLinePrimitive,
   MobileUserDrawingCurvePrimitive,

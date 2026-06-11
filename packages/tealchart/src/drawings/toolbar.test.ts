@@ -102,6 +102,7 @@ describe('user drawing toolbar descriptors', () => {
       'flatTopBottom',
       'disjointChannel',
       'path',
+      'brush',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -169,6 +170,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('projection')).toEqual(
       expect.objectContaining({ tool: 'projection', label: 'Projection' }),
     );
+    expect(getUserDrawingToolDescriptor('brush')).toEqual(expect.objectContaining({ tool: 'brush', label: 'Brush' }));
     expect(getUserDrawingToolDescriptor('horizontalRay')).toEqual(
       expect.objectContaining({ tool: 'horizontalRay', label: 'Horizontal ray' }),
     );

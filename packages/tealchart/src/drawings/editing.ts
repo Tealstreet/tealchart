@@ -123,6 +123,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'sineLine':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'path':
+    case 'brush':
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'polyline':
     case 'curve':
@@ -276,6 +277,7 @@ function editDrawingHandle(
 
   if (
     (drawing.kind === 'path' ||
+      drawing.kind === 'brush' ||
       drawing.kind === 'polyline' ||
       drawing.kind === 'curve' ||
       drawing.kind === 'arc' ||
@@ -300,7 +302,7 @@ function editDrawingHandle(
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
     const points = drawing.points.slice() as UserDrawingAnchor[];
     points[pointIndex] = anchor;
-    if (drawing.kind === 'path') {
+    if (drawing.kind === 'path' || drawing.kind === 'brush') {
       return {
         ...drawing,
         points,
@@ -385,6 +387,7 @@ function editDrawingHandle(
     case 'textLabel':
     case 'anchoredVwap':
     case 'path':
+    case 'brush':
     case 'polyline':
     case 'curve':
     case 'arc':

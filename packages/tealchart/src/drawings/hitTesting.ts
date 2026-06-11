@@ -322,7 +322,7 @@ function hitTestResolvedGeometry(
     return inside ? { drawing: geometry.drawing, distance: 0 } : null;
   }
 
-  if (geometry.kind === 'path') {
+  if (geometry.kind === 'path' || geometry.kind === 'brush') {
     const distance = distanceToPolyline(point, geometry.polyline.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
@@ -600,6 +600,7 @@ function hitTestUserDrawingHandle(
       }
       break;
     case 'path':
+    case 'brush':
       geometry.polyline.points.forEach((pathPoint, pointIndex) => {
         handles.push({ handle: 'center', point: pathPoint, pointIndex });
       });
