@@ -45,6 +45,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'rectangle':
     case 'circle':
+    case 'ellipse':
     case 'priceRange':
     case 'dateRange':
       return {
@@ -253,6 +254,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'circle',
+            points,
+          }
+        : null;
+    }
+    case 'ellipse': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'ellipse',
             points,
           }
         : null;

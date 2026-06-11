@@ -6,6 +6,7 @@ import type {
   ArrowMarkerDrawing,
   CircleDrawing,
   DateRangeDrawing,
+  EllipseDrawing,
   ExtendedLineDrawing,
   InfoLineDrawing,
   PathDrawing,
@@ -256,6 +257,15 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 90 },
       ],
     };
+    const ellipse: EllipseDrawing = {
+      ...trendLine,
+      id: 'ellipse',
+      kind: 'ellipse',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
     const arrowLine: ArrowLineDrawing = {
       ...trendLine,
       id: 'arrow',
@@ -404,6 +414,15 @@ describe('user drawing coordinates', () => {
       circle: {
         center: { x: 110, y: 70 },
         radius: 50,
+        rect: { x: 10, y: 20, width: 200, height: 100 },
+      },
+    });
+    expect(resolveUserDrawingGeometry(ellipse, space)).toMatchObject({
+      kind: 'ellipse',
+      ellipse: {
+        center: { x: 110, y: 70 },
+        radiusX: 100,
+        radiusY: 50,
         rect: { x: 10, y: 20, width: 200, height: 100 },
       },
     });
