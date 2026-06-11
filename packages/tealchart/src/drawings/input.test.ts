@@ -199,6 +199,26 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib time zone drawings from two anchors', () => {
+    const options = { createId: () => 'fib-time-zone', now: () => 25 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibTimeZone'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'fib-time-zone' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'fib-time-zone',
+      kind: 'fibTimeZone',
+      points: [anchorA, anchorB],
+      createdAt: 25,
+      updatedAt: 25,
+    });
+  });
+
   it('commits fib channel drawings from three anchors', () => {
     const options = { createId: () => 'fib-channel', now: () => 24 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibChannel'), {

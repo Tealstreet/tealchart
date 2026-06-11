@@ -286,6 +286,21 @@ function renderFibChannelGeometry(
   ctx.stroke();
 }
 
+function renderFibTimeZoneGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibTimeZone' }>,
+): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const level of geometry.fibTimeZone.levels) {
+    ctx.moveTo(level.segment.start.x, level.segment.start.y);
+    ctx.lineTo(level.segment.end.x, level.segment.end.y);
+  }
+  ctx.stroke();
+}
+
 function renderInfoLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'infoLine' }>,
@@ -695,6 +710,9 @@ export function renderUserDrawing(
         break;
       case 'fibChannel':
         renderFibChannelGeometry(ctx, geometry);
+        break;
+      case 'fibTimeZone':
+        renderFibTimeZoneGeometry(ctx, geometry);
         break;
       case 'parallelChannel':
       case 'regressionTrend':

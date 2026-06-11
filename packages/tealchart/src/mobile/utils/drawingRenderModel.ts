@@ -233,6 +233,22 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibTimeZone';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      levels: readonly {
+        ratio: number;
+        time: number;
+        x: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'parallelChannel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -428,6 +444,7 @@ export type MobileUserDrawingPitchfanPrimitive = Extract<MobileUserDrawingPrimit
 export type MobileUserDrawingFibFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibFan' }>;
 export type MobileUserDrawingGannFanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'gannFan' }>;
 export type MobileUserDrawingFibChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibChannel' }>;
+export type MobileUserDrawingFibTimeZonePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibTimeZone' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
@@ -786,6 +803,23 @@ function primitiveFromGeometry(
         points: geometry.fibChannel.polygon.points,
         levels: geometry.fibChannel.levels.map((level) => ({
           ratio: level.ratio,
+          start: level.segment.start,
+          end: level.segment.end,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibTimeZone':
+      return {
+        kind: 'fibTimeZone',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        levels: geometry.fibTimeZone.levels.map((level) => ({
+          ratio: level.ratio,
+          time: level.time,
+          x: level.x,
           start: level.segment.start,
           end: level.segment.end,
         })),

@@ -663,6 +663,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib time zone levels and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-time-zone',
+      kind: 'fibTimeZone',
+      points: [
+        { time: 10, price: 50 },
+        { time: 20, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 50 }, space)?.drawing.id).toBe('fib-time-zone');
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 50 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits rotated rectangle fills, rails, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

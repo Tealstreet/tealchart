@@ -30,6 +30,7 @@ export type UserDrawingTool =
   | 'fibExtension'
   | 'fibFan'
   | 'fibChannel'
+  | 'fibTimeZone'
   | 'gannFan'
   | 'triangle'
   | 'polyline'
@@ -235,6 +236,11 @@ export interface FibChannelDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface FibTimeZoneDrawing extends UserDrawingBase {
+  kind: 'fibTimeZone';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface TriangleDrawing extends UserDrawingBase {
   kind: 'triangle';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -320,6 +326,7 @@ export type UserDrawing =
   | FibExtensionDrawing
   | FibFanDrawing
   | FibChannelDrawing
+  | FibTimeZoneDrawing
   | GannFanDrawing
   | TriangleDrawing
   | PolylineDrawing
@@ -452,6 +459,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibExtension':
     case 'fibFan':
     case 'gannFan':
+    case 'fibTimeZone':
       return 2;
     case 'triangle':
     case 'polyline':
@@ -684,6 +692,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'gannFan',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'fibTimeZone':
+      return {
+        ...base,
+        kind: 'fibTimeZone',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'triangle':
