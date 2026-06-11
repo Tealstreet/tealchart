@@ -29,6 +29,7 @@ import type { DrawingCoordinateSpace } from './coordinates';
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+const anchorC = { time: 2_000, price: 95 };
 const space: DrawingCoordinateSpace = {
   viewport: {
     startTime: 0,
@@ -164,6 +165,25 @@ describe('user drawing input controller', () => {
           updatedAt: 20,
         },
       ],
+    });
+  });
+
+  it('commits long position drawings from three anchors', () => {
+    const options = { createId: () => 'long-position', now: () => 30 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'longPosition'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(second.drawings).toEqual([]);
+    expect(third.draft).toBeNull();
+    expect(third.selection).toEqual({ drawingId: 'long-position' });
+    expect(third.drawings[0]).toMatchObject({
+      id: 'long-position',
+      kind: 'longPosition',
+      points: [anchorA, anchorB, anchorC],
     });
   });
 
