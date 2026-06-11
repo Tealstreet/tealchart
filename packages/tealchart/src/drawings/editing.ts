@@ -148,6 +148,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTriangleWave':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!, points[4]!], updatedAt };
@@ -327,6 +328,7 @@ function editDrawingHandle(
       drawing.kind === 'threeDrivesPattern' ||
       drawing.kind === 'headShouldersPattern' ||
       drawing.kind === 'elliottImpulseWave' ||
+      drawing.kind === 'elliottTriangleWave' ||
       drawing.kind === 'callout' ||
       drawing.kind === 'priceNote') &&
     pointIndex !== undefined
@@ -387,7 +389,8 @@ function editDrawingHandle(
       drawing.kind === 'xabcdPattern' ||
       drawing.kind === 'threeDrivesPattern' ||
       drawing.kind === 'headShouldersPattern' ||
-      drawing.kind === 'elliottImpulseWave'
+      drawing.kind === 'elliottImpulseWave' ||
+      drawing.kind === 'elliottTriangleWave'
     ) {
       return {
         ...drawing,
@@ -482,6 +485,7 @@ function editDrawingHandle(
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTriangleWave':
       return drawing;
   }
 }

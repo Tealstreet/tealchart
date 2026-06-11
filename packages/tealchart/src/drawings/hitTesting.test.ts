@@ -1423,6 +1423,29 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits Elliott triangle wave paths and five anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-triangle',
+      kind: 'elliottTriangleWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 70 },
+        { time: 50, price: 40 },
+        { time: 70, price: 60 },
+        { time: 90, price: 45 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 40 }, space)?.drawing.id).toBe('elliott-triangle');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 55 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 4,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 90 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits ABCD pattern segments and four anchor handles', () => {
     const drawing: UserDrawing = {
       ...base,

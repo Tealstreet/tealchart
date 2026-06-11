@@ -221,6 +221,7 @@ export function resolveUserDrawingHandlePoints(
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTriangleWave':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'barsPattern':
       return [anchorToScreenPoint(drawing.points[2], space)];
