@@ -4,7 +4,7 @@ import { ExecutionContext } from '../context';
 import type { ExecutionResult, RuntimeProfile, TealscriptRuntimeOptions } from '../engine';
 import type { StrategyLedger } from '../strategy';
 import { createStrategyLedger } from '../strategy';
-import { compile, ARRAY_HELPERS } from './compile';
+import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS } from './compile';
 import type { CompiledScript, CompiledBarContext } from './compile';
 import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
@@ -51,6 +51,8 @@ export function executeCompiled(
     NumericSeries,
     maxBarsBack: options?.maxBarsBack ?? 500,
     _arr: ARRAY_HELPERS,
+    _map: MAP_HELPERS,
+    _udt: UDT_HELPERS,
     ...ta,
   };
 
@@ -181,6 +183,14 @@ export function executeCompiled(
       mathSum(..._args: unknown[]) { return NaN; },
       strFormat(...args: unknown[]) { return String(args[0]); },
       strFormatTime(...args: unknown[]) { return String(args[0]); },
+      tickerNew(...args: unknown[]) { return String(args[0] ?? ctx.syminfo.tickerid ?? ''); },
+      tickerModify(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerStandard(...args: unknown[]) { return String(args[0] ?? ctx.syminfo.tickerid ?? ''); },
+      tickerHeikinashi(...args: unknown[]) { return String(args[0] ?? ctx.syminfo.tickerid ?? ''); },
+      tickerRenko(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerKagi(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerLinebreak(...args: unknown[]) { return String(args[0] ?? ''); },
+      tickerPointfigure(...args: unknown[]) { return String(args[0] ?? ''); },
     };
 
     try {
