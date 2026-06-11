@@ -184,6 +184,33 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 70 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits text labels using measured multiline label widths', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'label',
+      kind: 'textLabel',
+      point: { time: 50, price: 50 },
+      text: 'WW\nI',
+      textAlign: 'center',
+    };
+    const measureTextLabelLine = (_drawing: UserDrawing, line: string) => (line === 'WW' ? 80 : 4);
+
+    expect(
+      hitTestUserDrawing(drawing, { x: 88, y: 50 }, space, {
+        labelWidth: 50,
+        labelHeight: 20,
+        measureTextLabelLine,
+      })?.drawing.id,
+    ).toBe('label');
+    expect(
+      hitTestUserDrawing(drawing, { x: 97, y: 50 }, space, {
+        labelWidth: 50,
+        labelHeight: 20,
+        measureTextLabelLine,
+      }),
+    ).toBeNull();
+  });
+
   it('skips hidden, locked, and pane-mismatched drawings while honoring topmost order', () => {
     const bottom: UserDrawing = {
       ...base,

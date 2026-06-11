@@ -35,7 +35,7 @@ export {
   hitTestUserDrawing,
   hitTestUserDrawings,
 } from './hitTesting';
-export type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
+export type { UserDrawingHitResult, UserDrawingHitTestOptions, UserDrawingHitTestTextMeasure } from './hitTesting';
 export {
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,

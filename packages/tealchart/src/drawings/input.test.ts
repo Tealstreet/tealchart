@@ -215,20 +215,20 @@ describe('user drawing input controller', () => {
       },
     });
 
-    const updated = updateUserDrawingTextEdit(editing, 'Updated note');
+    const updated = updateUserDrawingTextEdit(editing, 'Updated note\nSecond line');
     const committed = commitUserDrawingTextEdit(updated, { now: () => 11 });
 
     expect(committed.textEdit).toBeNull();
     expect(committed.selection).toEqual({ drawingId: 'label' });
     expect(committed.drawings[0]).toMatchObject({
       id: 'label',
-      text: 'Updated note',
+      text: 'Updated note\nSecond line',
       updatedAt: 11,
     });
 
     const secondEdit = beginUserDrawingTextEdit(committed, 'label', { now: () => 12 });
     expect(cancelUserDrawingTextEdit(updateUserDrawingTextEdit(secondEdit, 'Draft')).drawings[0]).toMatchObject({
-      text: 'Updated note',
+      text: 'Updated note\nSecond line',
     });
   });
 
