@@ -40,6 +40,13 @@ function moveAnchor(anchor: UserDrawingAnchor, delta: AnchorDelta): UserDrawingA
   };
 }
 
+function movePathAnchors(
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
+  delta: AnchorDelta,
+): [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor] {
+  return [moveAnchor(points[0], delta), moveAnchor(points[1], delta), moveAnchor(points[2], delta)];
+}
+
 function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number): UserDrawing {
   switch (drawing.kind) {
     case 'trendLine':
@@ -51,6 +58,8 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, updatedAt: number
     case 'rectangle':
     case 'priceRange':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
+    case 'path':
+      return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'dateRange':
       return {
         ...drawing,
@@ -120,9 +129,21 @@ function editDateRangeBoundary(
 function editDrawingHandle(
   drawing: UserDrawing,
   handle: UserDrawingHandleRole | undefined,
+  pointIndex: number | undefined,
   anchor: UserDrawingAnchor,
   updatedAt: number,
 ): UserDrawing {
+  if (drawing.kind === 'path' && pointIndex !== undefined) {
+    if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
+    const points = drawing.points.slice() as UserDrawingAnchor[];
+    points[pointIndex] = anchor;
+    return {
+      ...drawing,
+      points: [points[0]!, points[1]!, points[2]!],
+      updatedAt,
+    };
+  }
+
   if (!handle || handle === 'center') return drawing;
 
   switch (drawing.kind) {
@@ -139,6 +160,7 @@ function editDrawingHandle(
     case 'horizontalLine':
     case 'verticalLine':
     case 'textLabel':
+    case 'path':
       return drawing;
   }
 }
@@ -161,8 +183,8 @@ export function applyUserDrawingEditDrag(
     price: currentAnchor.price - startAnchor.price,
   };
   const nextDrawing =
-    drag.selection.handle && drag.selection.handle !== 'center'
-      ? editDrawingHandle(drag.startDrawing, drag.selection.handle, currentAnchor, updatedAt)
+    drag.selection.pointIndex !== undefined || (drag.selection.handle && drag.selection.handle !== 'center')
+      ? editDrawingHandle(drag.startDrawing, drag.selection.handle, drag.selection.pointIndex, currentAnchor, updatedAt)
       : moveDrawing(drag.startDrawing, delta, updatedAt);
 
   if (nextDrawing === state.drawings[drawingIndex]) return state;
@@ -196,8 +218,9 @@ export function beginUserDrawingEditDragAtPoint(
     };
   }
 
-  const selection: UserDrawingSelection = hit.handle
-    ? { drawingId: hit.drawing.id, handle: hit.handle }
+  const selection: UserDrawingSelection =
+    hit.handle || hit.pointIndex !== undefined
+    ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex }
     : { drawingId: hit.drawing.id };
   const nextState = selectUserDrawing(state, selection);
   const space = spacesByPaneId.get(hit.drawing.paneId);

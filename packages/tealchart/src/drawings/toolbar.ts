@@ -111,6 +111,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'rectangle', icon: '□', label: 'Rectangle' },
   { tool: 'priceRange', icon: 'Δ', label: 'Price range' },
   { tool: 'dateRange', icon: '↔', label: 'Date range' },
+  { tool: 'path', icon: '⌁', label: 'Path' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
 

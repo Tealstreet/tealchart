@@ -3,6 +3,7 @@ import type {
   ArrowLineDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
+  PathDrawing,
   PriceRangeDrawing,
   RectangleDrawing,
   TrendLineDrawing,
@@ -19,6 +20,7 @@ import {
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
+  resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
   resolveUserDrawingGeometry,
@@ -196,6 +198,25 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('resolves polylines from ordered anchors', () => {
+    expect(
+      resolvePolylineFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 110 },
+          { time: 3_000, price: 90 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      points: [
+        { x: 10, y: 70 },
+        { x: 110, y: 20 },
+        { x: 210, y: 120 },
+      ],
+    });
+  });
+
   it('resolves drawing geometry by kind', () => {
     const trendLine: TrendLineDrawing = {
       id: 'line',
@@ -253,6 +274,16 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 105 },
       ],
     };
+    const path: PathDrawing = {
+      ...trendLine,
+      id: 'path',
+      kind: 'path',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+        { time: 3_000, price: 90 },
+      ],
+    };
 
     expect(resolveUserDrawingGeometry(trendLine, space)).toMatchObject({
       kind: 'line',
@@ -292,6 +323,16 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(dateRange, space)).toMatchObject({
       kind: 'dateRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(path, space)).toMatchObject({
+      kind: 'path',
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 110, y: 20 },
+          { x: 210, y: 120 },
+        ],
+      },
     });
   });
 });
