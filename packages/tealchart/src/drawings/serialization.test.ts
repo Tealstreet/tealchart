@@ -1573,6 +1573,43 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores XABCD pattern drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'xabcd',
+          kind: 'xabcdPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+            { time: 4, price: 13 },
+            { time: 5, price: 9 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'xabcd',
+      kind: 'xabcdPattern',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+        { time: 4, price: 13 },
+        { time: 5, price: 9 },
+      ],
+    });
+  });
+
   it('restores curve drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

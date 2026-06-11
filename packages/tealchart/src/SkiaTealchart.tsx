@@ -2461,9 +2461,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'highlighter' ||
             primitive.kind === 'curve' ||
             primitive.kind === 'arc' ||
-            primitive.kind === 'fibSpiral'
+            primitive.kind === 'fibSpiral' ||
+            primitive.kind === 'xabcdPattern'
           ) {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font =
+              primitive.kind === 'xabcdPattern'
+                ? getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily)
+                : null;
             const path = Skia.Path.Make();
             const [firstPoint, ...remainingPoints] = primitive.points;
             if (!firstPoint) return null;
@@ -2486,6 +2491,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     {dash && <DashPathEffect intervals={dash} />}
                   </SkiaPath>
                 )}
+                {primitive.kind === 'xabcdPattern' &&
+                  font &&
+                  primitive.labels.map((label) => {
+                    const bounds = font.measureText(label.text);
+                    return (
+                      <SkiaText
+                        key={`${primitive.id}:label:${label.text}`}
+                        x={label.point.x - bounds.width / 2}
+                        y={label.point.y - 6}
+                        text={label.text}
+                        font={font}
+                        color={primitive.style.textColor ?? primitive.style.lineColor}
+                      />
+                    );
+                  })}
               </Group>
             );
           }
