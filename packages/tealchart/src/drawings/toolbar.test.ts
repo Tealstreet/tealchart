@@ -4,13 +4,20 @@ import {
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   isUserDrawingStyleToolbarActionEnabled,
+  isUserDrawingFillToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
+  isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
   resolveUserDrawingStyleToolbarAction,
+  supportsUserDrawingFillControls,
+  supportsUserDrawingTextControls,
+  USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -52,6 +59,13 @@ describe('user drawing toolbar descriptors', () => {
       expect(descriptor.label.length).toBeGreaterThan(0);
     }
     for (const descriptor of [...USER_DRAWING_LINE_COLOR_DESCRIPTORS, ...USER_DRAWING_LINE_WIDTH_DESCRIPTORS]) {
+      expect(descriptor.label.length).toBeGreaterThan(0);
+    }
+    for (const descriptor of [
+      ...USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+      ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
+      ...USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+    ]) {
       expect(descriptor.label.length).toBeGreaterThan(0);
     }
   });
@@ -117,6 +131,21 @@ describe('user drawing toolbar descriptors', () => {
       'dashed',
       'dotted',
     ]);
+    expect(USER_DRAWING_FILL_COLOR_DESCRIPTORS.map((descriptor) => descriptor.fillColor)).toEqual([
+      'rgba(245, 197, 66, 0.12)',
+      'rgba(34, 197, 94, 0.12)',
+      'rgba(56, 189, 248, 0.12)',
+      'rgba(244, 63, 94, 0.12)',
+      'rgba(209, 212, 220, 0.12)',
+    ]);
+    expect(USER_DRAWING_TEXT_COLOR_DESCRIPTORS.map((descriptor) => descriptor.textColor)).toEqual([
+      '#f5c542',
+      '#22c55e',
+      '#38bdf8',
+      '#f43f5e',
+      '#d1d4dc',
+    ]);
+    expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([10, 12, 14, 16]);
     expect(USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
       'hideSelected',
       'lockSelected',
@@ -148,6 +177,70 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingStyleToolbarEnabled(locked)).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'hideSelected')).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'lockSelected')).toBe(false);
+  });
+
+  it('enables fill and text style controls only for supported selected drawing kinds', () => {
+    const horizontal = {
+      id: 'h',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      price: 10,
+    };
+    const rectangle = {
+      id: 'r',
+      kind: 'rectangle' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ] as const,
+    };
+    const textLabel = {
+      id: 't',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      point: { time: 1, price: 10 },
+      text: 'note',
+      textAlign: 'center' as const,
+    };
+
+    expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
+    expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
+    expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
+
+    expect(
+      isUserDrawingFillToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] }),
+    ).toBe(true);
+    expect(isUserDrawingTextToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] })).toBe(
+      false,
+    );
+    expect(isUserDrawingTextToolbarEnabled({ ...state, selection: { drawingId: 't' }, drawings: [textLabel] })).toBe(
+      true,
+    );
+    expect(
+      isUserDrawingFillToolbarEnabled({
+        ...state,
+        selection: { drawingId: 'r' },
+        drawings: [{ ...rectangle, locked: true }],
+      }),
+    ).toBe(false);
   });
 
   it('resolves selected drawing style action payloads for renderers', () => {
@@ -203,6 +296,12 @@ describe('user drawing toolbar descriptors', () => {
       getUserDrawingToolbarStateKey({
         ...first,
         drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, lineWidth: 3 } }],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(first));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...first,
+        drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, fillColor: '#123456' } }],
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(first));
   });
