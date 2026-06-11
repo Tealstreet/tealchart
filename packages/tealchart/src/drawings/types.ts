@@ -28,6 +28,7 @@ export type UserDrawingTool =
   | 'anchoredVwap'
   | 'fibRetracement'
   | 'fibExtension'
+  | 'fibFan'
   | 'triangle'
   | 'polyline'
   | 'pitchfork'
@@ -217,6 +218,11 @@ export interface FibExtensionDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface FibFanDrawing extends UserDrawingBase {
+  kind: 'fibFan';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface TriangleDrawing extends UserDrawingBase {
   kind: 'triangle';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -300,6 +306,7 @@ export type UserDrawing =
   | AnchoredVwapDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
+  | FibFanDrawing
   | TriangleDrawing
   | PolylineDrawing
   | PitchforkDrawing
@@ -429,6 +436,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'datePriceRange':
     case 'fibRetracement':
     case 'fibExtension':
+    case 'fibFan':
       return 2;
     case 'triangle':
     case 'polyline':
@@ -648,6 +656,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'fibExtension',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'fibFan':
+      return {
+        ...base,
+        kind: 'fibFan',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'triangle':
