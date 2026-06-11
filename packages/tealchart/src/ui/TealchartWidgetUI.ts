@@ -8,6 +8,7 @@ import type {
   UserDrawingIconName,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
+  UserDrawingSelectionInputOptions,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -123,6 +124,7 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingSelection?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+    options?: Pick<UserDrawingSelectionInputOptions, 'additive'>,
   ) => UserDrawingSelectionAtPointResult;
   /** Called when select-mode pointer down may start editing a user drawing */
   onUserDrawingEditStart?: (
