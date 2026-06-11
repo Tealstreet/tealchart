@@ -331,6 +331,43 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready triangle primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'triangle',
+          kind: 'triangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 50, price: 50 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'triangle',
+      id: 'triangle',
+      points: [
+        { x: 10, y: 10 },
+        { x: 50, y: 50 },
+        { x: 90, y: 10 },
+      ],
+    });
+  });
+
   it('returns Skia-ready extended line segments to chart bounds', () => {
     const extended: ExtendedLineDrawing = {
       id: 'extended',

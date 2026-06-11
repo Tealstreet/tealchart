@@ -17,6 +17,7 @@ export type UserDrawingTool =
   | 'ellipse'
   | 'priceRange'
   | 'dateRange'
+  | 'triangle'
   | 'path'
   | 'textLabel';
 
@@ -131,6 +132,11 @@ export interface DateRangeDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface TriangleDrawing extends UserDrawingBase {
+  kind: 'triangle';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface PathDrawing extends UserDrawingBase {
   kind: 'path';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -161,6 +167,7 @@ export type UserDrawing =
   | EllipseDrawing
   | PriceRangeDrawing
   | DateRangeDrawing
+  | TriangleDrawing
   | PathDrawing
   | TextLabelDrawing;
 
@@ -268,6 +275,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'priceRange':
     case 'dateRange':
       return 2;
+    case 'triangle':
     case 'path':
       return 3;
     case 'horizontalLine':
@@ -398,6 +406,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'dateRange',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'triangle':
+      return {
+        ...base,
+        kind: 'triangle',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'path':
       return {

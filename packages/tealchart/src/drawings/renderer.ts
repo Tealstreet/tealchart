@@ -86,9 +86,14 @@ function renderPathGeometry(
 
 function renderPolygonGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arrowMarker' | 'arrowMark' | 'triangle' }>,
 ): void {
-  const points = geometry.kind === 'arrowMarker' ? geometry.marker.points : geometry.mark.points;
+  const points =
+    geometry.kind === 'arrowMarker'
+      ? geometry.marker.points
+      : geometry.kind === 'arrowMark'
+        ? geometry.mark.points
+        : geometry.polygon.points;
   const [firstPoint, ...remainingPoints] = points;
   if (!firstPoint) return;
 
@@ -359,6 +364,9 @@ export function renderUserDrawing(
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'arrowMark':
+        renderPolygonGeometry(ctx, geometry);
+        break;
+      case 'triangle':
         renderPolygonGeometry(ctx, geometry);
         break;
       case 'infoLine':

@@ -154,6 +154,7 @@ export type {
   ResolveUserDrawingTextLabelLayoutOptions,
   ResolvedUserDrawingGeometry,
   TextLabelDrawing,
+  TriangleDrawing,
   TrendLineDrawing,
   UserDrawing,
   UserDrawingAnchor,

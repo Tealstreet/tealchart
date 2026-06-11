@@ -188,6 +188,7 @@ export type {
   RayDrawing,
   RectangleDrawing,
   TextLabelDrawing,
+  TriangleDrawing,
   TrendLineDrawing,
   UserDrawing,
   UserDrawingAnchor,
