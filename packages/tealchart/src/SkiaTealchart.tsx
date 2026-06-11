@@ -110,7 +110,10 @@ import {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
-import { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
+import {
+  resolveMobileUserDrawingRenderModel,
+  resolveMobileUserDrawingTextLabelLayout,
+} from './mobile/utils/drawingRenderModel';
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingLocked,
@@ -1342,8 +1345,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Bracket Drag Preview (Skia rendering data)
   // ==========================================================================
 
-  // Font for Skia text rendering in bracket preview
+  // Fonts for Skia text rendering in bracket preview and drawing labels.
+  const userDrawingFont10 = useFont(null, 10);
   const bracketFont = useFont(null, 12);
+  const userDrawingFont14 = useFont(null, 14);
+  const userDrawingFont16 = useFont(null, 16);
+  const getUserDrawingTextFont = useCallback(
+    (fontSize: number | undefined) => {
+      switch (fontSize ?? 12) {
+        case 10:
+          return userDrawingFont10;
+        case 14:
+          return userDrawingFont14;
+        case 16:
+          return userDrawingFont16;
+        default:
+          return bracketFont;
+      }
+    },
+    [bracketFont, userDrawingFont10, userDrawingFont14, userDrawingFont16],
+  );
 
   // Compute bracket drag preview rendering data
   const bracketPreview = useMemo(() => {
@@ -1478,24 +1499,40 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           }
 
           if (primitive.kind === 'textLabel') {
-            if (!bracketFont) return null;
-            const measuredWidth = bracketFont.measureText(primitive.text).width;
-            const textX =
-              primitive.textAlign === 'left'
-                ? primitive.point.x
-                : primitive.textAlign === 'right'
-                  ? primitive.point.x - measuredWidth
-                  : primitive.point.x - measuredWidth / 2;
+            const font = getUserDrawingTextFont(primitive.style.fontSize);
+            if (!font) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const measuredWidth = font.measureText(primitive.text).width;
+            const layout = resolveMobileUserDrawingTextLabelLayout(primitive, measuredWidth);
 
             return (
-              <Group key={primitive.id} clip={primitive.clip}>
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillColor && (
+                  <Rect
+                    x={layout.box.x}
+                    y={layout.box.y}
+                    width={layout.box.width}
+                    height={layout.box.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                <Rect
+                  x={layout.box.x}
+                  y={layout.box.y}
+                  width={layout.box.width}
+                  height={layout.box.height}
+                  color={primitive.style.lineColor}
+                  style="stroke"
+                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                >
+                  {dash && <DashPathEffect intervals={dash} />}
+                </Rect>
                 <SkiaText
-                  x={textX}
-                  y={primitive.point.y}
+                  x={layout.text.x}
+                  y={layout.text.y}
                   text={primitive.text}
-                  font={bracketFont}
+                  font={font}
                   color={primitive.style.textColor ?? primitive.style.lineColor}
-                  opacity={primitive.opacity}
                 />
               </Group>
             );

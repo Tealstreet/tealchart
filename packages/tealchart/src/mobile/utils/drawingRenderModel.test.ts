@@ -2,7 +2,7 @@ import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingStyle } from 
 
 import { describe, expect, it } from 'vitest';
 
-import { resolveMobileUserDrawingRenderModel } from './drawingRenderModel';
+import { resolveMobileUserDrawingRenderModel, resolveMobileUserDrawingTextLabelLayout } from './drawingRenderModel';
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -214,6 +214,52 @@ describe('mobile user drawing render model', () => {
       text: 'Committed',
       editing: true,
       editValue: 'Draft value',
+    });
+  });
+
+  it('resolves text label fill and font layout for Skia rendering', () => {
+    const textStyle: UserDrawingStyle = {
+      ...style,
+      fillColor: 'rgba(56, 189, 248, 0.12)',
+      textColor: '#38bdf8',
+      fontSize: 16,
+    };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: textStyle,
+          point: { time: 50, price: 50 },
+          text: 'Note',
+          textAlign: 'right',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    expect(primitive).toMatchObject({
+      kind: 'textLabel',
+      style: textStyle,
+    });
+    if (!primitive || primitive.kind !== 'textLabel') throw new Error('expected text label primitive');
+
+    expect(resolveMobileUserDrawingTextLabelLayout(primitive, 48)).toEqual({
+      fontSize: 16,
+      labelPadding: 6,
+      labelHeight: 20,
+      box: { x: 20, y: 40, width: 60, height: 20 },
+      text: { x: 26, y: 50 },
     });
   });
 });
