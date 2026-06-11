@@ -74,6 +74,7 @@ export function resolveUserDrawingHandlePoints(
 ): DrawingScreenPoint[] {
   switch (drawing.kind) {
     case 'trendLine':
+    case 'trendAngle':
     case 'extendedLine':
     case 'infoLine':
     case 'arrowLine':

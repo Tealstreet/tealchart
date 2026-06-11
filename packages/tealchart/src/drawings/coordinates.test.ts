@@ -18,6 +18,7 @@ import type {
   PriceRangeDrawing,
   RectangleDrawing,
   TriangleDrawing,
+  TrendAngleDrawing,
   TrendLineDrawing,
   UserDrawingStyle,
 } from './types';
@@ -37,6 +38,7 @@ import {
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
+  resolveTrendAngleFromSegment,
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
@@ -197,6 +199,19 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('formats screen-space trend angle labels', () => {
+    expect(
+      resolveTrendAngleFromSegment({
+        start: { x: 10, y: 70 },
+        end: { x: 110, y: 20 },
+      }),
+    ).toMatchObject({
+      angleDegrees: 26.56505117707799,
+      label: '26.6°',
+      labelPoint: { x: 60, y: 41 },
+    });
+  });
+
   it('resolves rectangles from unordered anchors', () => {
     const rect = resolveRectFromAnchors({ time: 3_000, price: 90 }, { time: 1_000, price: 110 }, space);
 
@@ -326,6 +341,15 @@ describe('user drawing coordinates', () => {
       id: 'arrow',
       kind: 'arrowLine',
     };
+    const trendAngle: TrendAngleDrawing = {
+      ...trendLine,
+      id: 'angle',
+      kind: 'trendAngle',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 110 },
+      ],
+    };
     const arrowMarker: ArrowMarkerDrawing = {
       ...trendLine,
       id: 'marker',
@@ -443,6 +467,14 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(arrowLine, space)).toMatchObject({
       kind: 'arrowLine',
       segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+    });
+    expect(resolveUserDrawingGeometry(trendAngle, space)).toMatchObject({
+      kind: 'trendAngle',
+      angle: {
+        segment: { start: { x: 10, y: 70 }, end: { x: 110, y: 20 } },
+        label: '26.6°',
+        labelPoint: { x: 60, y: 41 },
+      },
     });
     expect(resolveUserDrawingGeometry(arrowMarker, space)).toMatchObject({
       kind: 'arrowMarker',

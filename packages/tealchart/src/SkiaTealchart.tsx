@@ -1579,6 +1579,36 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'trendAngle') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaLine
+                    p1={vec(primitive.start.x, primitive.start.y)}
+                    p2={vec(primitive.end.x, primitive.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                )}
+                {font && (
+                  <SkiaText
+                    x={primitive.labelPoint.x}
+                    y={primitive.labelPoint.y}
+                    text={primitive.label}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'crossLine') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
