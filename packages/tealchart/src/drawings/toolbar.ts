@@ -1,7 +1,7 @@
 import type { UserDrawingLineStyle, UserDrawingState, UserDrawingTool } from './types';
 
 export type UserDrawingToolbarAction = 'deleteSelected' | 'cancelDraft' | 'clearAll';
-export type UserDrawingStyleToolbarAction = 'toggleVisibility' | 'toggleLocked';
+export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected';
 
 export interface UserDrawingToolDescriptor {
   tool: UserDrawingTool;
@@ -36,6 +36,22 @@ export interface UserDrawingStyleToolbarActionDescriptor {
   icon: string;
   label: string;
 }
+
+export type UserDrawingStyleToolbarActionState =
+  | {
+      enabled: true;
+      style?: never;
+      visible?: boolean;
+      locked?: boolean;
+      includeLocked?: boolean;
+    }
+  | {
+      enabled: false;
+      style?: never;
+      visible?: never;
+      locked?: never;
+      includeLocked?: never;
+    };
 
 export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[] = [
   { tool: 'select', icon: '⌖', label: 'Select' },
@@ -74,8 +90,8 @@ export const USER_DRAWING_LINE_STYLE_DESCRIPTORS: readonly UserDrawingLineStyleD
 ] as const;
 
 export const USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingStyleToolbarActionDescriptor[] = [
-  { action: 'toggleVisibility', icon: '◉', label: 'Toggle selected drawing visibility' },
-  { action: 'toggleLocked', icon: '🔒', label: 'Toggle selected drawing lock' },
+  { action: 'hideSelected', icon: '◌', label: 'Hide selected drawing' },
+  { action: 'lockSelected', icon: '🔒', label: 'Lock selected drawing' },
 ] as const;
 
 export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawingToolDescriptor {
@@ -105,10 +121,18 @@ export function isUserDrawingStyleToolbarActionEnabled(
   state: UserDrawingState,
   action: UserDrawingStyleToolbarAction,
 ): boolean {
+  return resolveUserDrawingStyleToolbarAction(state, action).enabled;
+}
+
+export function resolveUserDrawingStyleToolbarAction(
+  state: UserDrawingState,
+  action: UserDrawingStyleToolbarAction,
+): UserDrawingStyleToolbarActionState {
   const selectedDrawing = getSelectedUserDrawing(state);
-  if (!selectedDrawing) return false;
-  if (action === 'toggleLocked') return true;
-  return !selectedDrawing.locked;
+  if (!selectedDrawing || selectedDrawing.locked) return { enabled: false };
+
+  if (action === 'hideSelected') return { enabled: true, visible: false };
+  return { enabled: true, locked: true };
 }
 
 export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {

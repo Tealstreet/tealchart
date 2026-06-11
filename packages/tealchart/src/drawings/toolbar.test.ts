@@ -6,6 +6,7 @@ import {
   isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveUserDrawingStyleToolbarAction,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
@@ -117,8 +118,8 @@ describe('user drawing toolbar descriptors', () => {
       'dotted',
     ]);
     expect(USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
-      'toggleVisibility',
-      'toggleLocked',
+      'hideSelected',
+      'lockSelected',
     ]);
   });
 
@@ -145,8 +146,32 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingStyleToolbarEnabled(state)).toBe(false);
     expect(isUserDrawingStyleToolbarEnabled(selected)).toBe(true);
     expect(isUserDrawingStyleToolbarEnabled(locked)).toBe(false);
-    expect(isUserDrawingStyleToolbarActionEnabled(locked, 'toggleVisibility')).toBe(false);
-    expect(isUserDrawingStyleToolbarActionEnabled(locked, 'toggleLocked')).toBe(true);
+    expect(isUserDrawingStyleToolbarActionEnabled(locked, 'hideSelected')).toBe(false);
+    expect(isUserDrawingStyleToolbarActionEnabled(locked, 'lockSelected')).toBe(false);
+  });
+
+  it('resolves selected drawing style action payloads for renderers', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    };
+
+    expect(resolveUserDrawingStyleToolbarAction(state, 'hideSelected')).toEqual({ enabled: false });
+    expect(resolveUserDrawingStyleToolbarAction(selected, 'hideSelected')).toEqual({ enabled: true, visible: false });
+    expect(resolveUserDrawingStyleToolbarAction(selected, 'lockSelected')).toEqual({ enabled: true, locked: true });
   });
 
   it('keeps the toolbar state key stable across geometry-only edits', () => {
