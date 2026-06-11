@@ -35,6 +35,8 @@ import type { DrawingCoordinateSpace } from './coordinates';
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
 const anchorC = { time: 2_000, price: 95 };
+const anchorD = { time: 3_000, price: 115 };
+const anchorE = { time: 4_000, price: 105 };
 const space: DrawingCoordinateSpace = {
   viewport: {
     startTime: 0,
@@ -1456,6 +1458,40 @@ describe('user drawing input controller', () => {
     expect(next.drawings[1].style).not.toBe(state.drawings[0].style);
     expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
     expect(next.drawings[1].bars[0]).not.toBe(state.drawings[0].bars[0]);
+  });
+
+  it('duplicates XABCD pattern drawings with deep-cloned five-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'xabcd' },
+      drawings: [
+        {
+          id: 'xabcd',
+          kind: 'xabcdPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 20 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'xabcdPattern',
+      createdAt: 20,
+      updatedAt: 20,
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+    });
+    if (next.drawings[1]?.kind !== 'xabcdPattern' || state.drawings[0]?.kind !== 'xabcdPattern') {
+      throw new Error('expected XABCD pattern drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
   it('duplicates grouped selections after each source drawing and selects the copies', () => {

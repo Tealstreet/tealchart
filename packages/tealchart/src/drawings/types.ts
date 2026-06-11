@@ -27,6 +27,7 @@ export type UserDrawingTool =
   | 'forecast'
   | 'projection'
   | 'barsPattern'
+  | 'xabcdPattern'
   | 'anchoredVwap'
   | 'fibRetracement'
   | 'fibExtension'
@@ -242,6 +243,17 @@ export interface BarsPatternDrawing extends UserDrawingBase {
   kind: 'barsPattern';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
   bars: readonly BarsPatternBarSnapshot[];
+}
+
+export interface XabcdPatternDrawing extends UserDrawingBase {
+  kind: 'xabcdPattern';
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ];
 }
 
 export interface AnchoredVwapDrawing extends UserDrawingBase {
@@ -490,6 +502,7 @@ export type UserDrawing =
   | ForecastDrawing
   | ProjectionDrawing
   | BarsPatternDrawing
+  | XabcdPatternDrawing
   | AnchoredVwapDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
@@ -697,6 +710,8 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
       return 3;
     case 'disjointChannel':
       return 4;
+    case 'xabcdPattern':
+      return 5;
     case 'horizontalLine':
     case 'verticalLine':
     case 'arrowMarkUp':
@@ -917,6 +932,18 @@ export function createUserDrawingFromDraft(
         bars,
       };
     }
+    case 'xabcdPattern':
+      return {
+        ...base,
+        kind: 'xabcdPattern',
+        points: [
+          draft.anchors[0]!,
+          draft.anchors[1]!,
+          draft.anchors[2]!,
+          draft.anchors[3]!,
+          draft.anchors[4]!,
+        ],
+      };
     case 'anchoredVwap':
       return {
         ...base,

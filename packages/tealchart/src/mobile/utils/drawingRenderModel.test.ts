@@ -2321,6 +2321,59 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready XABCD pattern primitives with labels and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'xabcd' },
+      drawings: [
+        {
+          id: 'xabcd',
+          kind: 'xabcdPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 30, price: 70 },
+            { time: 50, price: 90 },
+            { time: 70, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'xabcdPattern',
+      id: 'xabcd',
+      clip,
+      points: [
+        { x: 10, y: 10 },
+        { x: 30, y: 30 },
+        { x: 50, y: 10 },
+        { x: 70, y: 30 },
+        { x: 90, y: 10 },
+      ],
+      labels: [
+        { text: 'X', point: { x: 10, y: 10 } },
+        { text: 'A', point: { x: 30, y: 30 } },
+        { text: 'B', point: { x: 50, y: 10 } },
+        { text: 'C', point: { x: 70, y: 30 } },
+        { text: 'D', point: { x: 90, y: 10 } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
+  });
+
   it('returns Skia-ready curve primitives with shared sampled points', () => {
     const state: UserDrawingState = {
       version: 1,

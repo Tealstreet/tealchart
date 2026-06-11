@@ -1309,6 +1309,29 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawings([{ ...top, locked: true }], { x: 50, y: 50 }, spaces)).toBeNull();
   });
 
+  it('hits XABCD pattern segments and five anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'xabcd',
+      kind: 'xabcdPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 30, price: 70 },
+        { time: 50, price: 90 },
+        { time: 70, price: 70 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 20 }, space)?.drawing.id).toBe('xabcd');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 30 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 3,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('does not hit clipped drawing geometry outside its pane bounds', () => {
     const mainSpace: DrawingCoordinateSpace = {
       ...space,
