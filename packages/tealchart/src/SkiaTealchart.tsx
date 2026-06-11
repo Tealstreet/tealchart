@@ -1804,7 +1804,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'fibTimeZone' || primitive.kind === 'trendBasedFibTime') {
+          if (
+            primitive.kind === 'fibTimeZone' ||
+            primitive.kind === 'trendBasedFibTime' ||
+            primitive.kind === 'cyclicLines'
+          ) {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

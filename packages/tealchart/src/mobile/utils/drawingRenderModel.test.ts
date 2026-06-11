@@ -1206,6 +1206,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready cyclic line primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'cyclic-lines',
+          kind: 'cyclicLines',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'cyclicLines',
+      id: 'cyclic-lines',
+      levels: expect.arrayContaining([
+        { ratio: 0, time: 10, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 100 } },
+        { ratio: 1, time: 20, x: 20, start: { x: 20, y: 0 }, end: { x: 20, y: 100 } },
+        { ratio: 2, time: 30, x: 30, start: { x: 30, y: 0 }, end: { x: 30, y: 100 } },
+      ]),
+    });
+  });
+
   it('returns Skia-ready regression trend primitives', () => {
     const regressionSpace: DrawingCoordinateSpace = {
       ...space,

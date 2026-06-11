@@ -89,6 +89,7 @@ export function resolveUserDrawingHandlePoints(
     case 'fibCircles':
     case 'fibSpiral':
     case 'fibTimeZone':
+    case 'cyclicLines':
     case 'gannFan':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {
