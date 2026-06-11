@@ -78,6 +78,9 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('polyline')).toBe(3);
     expect(getRequiredAnchorCount('pitchfork')).toBe(3);
+    expect(getRequiredAnchorCount('schiffPitchfork')).toBe(3);
+    expect(getRequiredAnchorCount('modifiedSchiffPitchfork')).toBe(3);
+    expect(getRequiredAnchorCount('insidePitchfork')).toBe(3);
     expect(getRequiredAnchorCount('rotatedRectangle')).toBe(3);
     expect(getRequiredAnchorCount('parallelChannel')).toBe(3);
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
@@ -284,6 +287,17 @@ describe('user drawing types', () => {
       createdAt: 20,
       updatedAt: 20,
     });
+    for (const tool of ['schiffPitchfork', 'modifiedSchiffPitchfork', 'insidePitchfork'] as const) {
+      expect(createUserDrawingFromDraft(draft({ tool, anchors: [anchorA, anchorB, anchorC] }), { id: tool, now: 20 })).toMatchObject({
+        id: tool,
+        kind: tool,
+        points: [anchorA, anchorB, anchorC],
+        visible: true,
+        locked: false,
+        createdAt: 20,
+        updatedAt: 20,
+      });
+    }
     expect(createUserDrawingFromDraft(draft({ tool: 'parallelChannel', anchors: [anchorA, anchorB, anchorC] }), { id: 'channel', now: 20 })).toMatchObject({
       id: 'channel',
       kind: 'parallelChannel',

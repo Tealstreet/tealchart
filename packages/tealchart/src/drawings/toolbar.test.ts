@@ -74,6 +74,9 @@ describe('user drawing toolbar descriptors', () => {
       'triangle',
       'polyline',
       'pitchfork',
+      'schiffPitchfork',
+      'modifiedSchiffPitchfork',
+      'insidePitchfork',
       'parallelChannel',
       'regressionTrend',
       'flatTopBottom',
@@ -163,6 +166,15 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('pitchfork')).toEqual(
       expect.objectContaining({ tool: 'pitchfork', label: 'Pitchfork' }),
+    );
+    expect(getUserDrawingToolDescriptor('schiffPitchfork')).toEqual(
+      expect.objectContaining({ tool: 'schiffPitchfork', label: 'Schiff pitchfork' }),
+    );
+    expect(getUserDrawingToolDescriptor('modifiedSchiffPitchfork')).toEqual(
+      expect.objectContaining({ tool: 'modifiedSchiffPitchfork', label: 'Modified Schiff pitchfork' }),
+    );
+    expect(getUserDrawingToolDescriptor('insidePitchfork')).toEqual(
+      expect.objectContaining({ tool: 'insidePitchfork', label: 'Inside pitchfork' }),
     );
     expect(getUserDrawingToolDescriptor('parallelChannel')).toEqual(
       expect.objectContaining({ tool: 'parallelChannel', label: 'Parallel channel' }),

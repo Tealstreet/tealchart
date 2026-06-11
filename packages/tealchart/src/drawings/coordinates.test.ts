@@ -863,6 +863,29 @@ describe('user drawing coordinates', () => {
       lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
       midpoint: { x: 110, y: 70 },
     });
+    expect(resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'schiff')).toMatchObject({
+      median: { start: { x: 10, y: 45 }, end: { x: 210, y: 95 } },
+      upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 45 } },
+      lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 145 } },
+      origin: { x: 10, y: 45 },
+      midpoint: { x: 110, y: 70 },
+    });
+    expect(
+      resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'modifiedSchiff'),
+    ).toMatchObject({
+      median: { start: { x: 60, y: 45 }, end: { x: 210, y: 120 } },
+      upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 70 } },
+      lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 170 } },
+      origin: { x: 60, y: 45 },
+      midpoint: { x: 110, y: 70 },
+    });
+    expect(resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'inside')).toMatchObject({
+      median: { start: { x: 60, y: 45 }, end: { x: 210, y: 270 } },
+      upper: { start: { x: 10, y: 70 }, end: { x: 210, y: 370 } },
+      lower: { start: { x: 110, y: 20 }, end: { x: 210, y: 170 } },
+      origin: { x: 60, y: 45 },
+      midpoint: { x: 110, y: 120 },
+    });
     expect(resolveUserDrawingGeometry(rotatedRectangle, space)).toMatchObject({
       kind: 'rotatedRectangle',
       channel: {
