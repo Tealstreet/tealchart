@@ -80,6 +80,7 @@ import {
   resolveAbcdPatternFromAnchors,
   resolveElliottCorrectiveWaveFromAnchors,
   resolveElliottImpulseWaveFromAnchors,
+  resolveElliottTriangleWaveFromAnchors,
   resolveHeadShouldersPatternFromAnchors,
   resolveThreeDrivesPatternFromAnchors,
   resolveTrianglePatternFromAnchors,
@@ -564,6 +565,38 @@ describe('user drawing coordinates', () => {
         { text: 'A', point: { x: 10, y: 70 } },
         { text: 'B', point: { x: 60, y: 170 } },
         { text: 'C', point: { x: 110, y: -30 } },
+      ],
+    });
+  });
+
+  it('resolves Elliott triangle wave polylines and labels from five anchors', () => {
+    expect(
+      resolveElliottTriangleWaveFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 120 },
+          { time: 2_000, price: 90 },
+          { time: 2_500, price: 110 },
+          { time: 3_000, price: 95 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: -30 },
+          { x: 110, y: 120 },
+          { x: 160, y: 20 },
+          { x: 210, y: 95 },
+        ],
+      },
+      labels: [
+        { text: 'A', point: { x: 10, y: 70 } },
+        { text: 'B', point: { x: 60, y: -30 } },
+        { text: 'C', point: { x: 110, y: 120 } },
+        { text: 'D', point: { x: 160, y: 20 } },
+        { text: 'E', point: { x: 210, y: 95 } },
       ],
     });
   });

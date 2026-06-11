@@ -301,6 +301,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTriangleWave':
       return {
         ...base,
         kind: drawing.kind,
