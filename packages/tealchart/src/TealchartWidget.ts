@@ -43,6 +43,7 @@ import {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
+  duplicateUserDrawing as duplicateUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   handleUserDrawingInput,
   isUserDrawingLayoutStateEqual,
@@ -1034,6 +1035,9 @@ export class TealchartWidget {
       onUserDrawingPathDragEnd: () => this._handleUserDrawingPathDragEnd(),
       userDrawingState: this._userDrawingState,
       onUserDrawingToolSelect: (tool) => this.setActiveUserDrawingTool(tool),
+      onUserDrawingDuplicateSelected: () => {
+        this.duplicateSelectedUserDrawing();
+      },
       onUserDrawingDeleteSelected: () => {
         this.deleteSelectedUserDrawing();
       },
@@ -2219,6 +2223,21 @@ export class TealchartWidget {
 
   deleteSelectedUserDrawing(): boolean {
     return this.deleteUserDrawing();
+  }
+
+  duplicateUserDrawing(drawingId?: string): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(
+      duplicateUserDrawingState(this._userDrawingState, {
+        drawingId,
+        createId: () => this._createUserDrawingId(),
+      }),
+    );
+    return this._userDrawingState !== previousState;
+  }
+
+  duplicateSelectedUserDrawing(): boolean {
+    return this.duplicateUserDrawing();
   }
 
   clearUserDrawings(): void {
