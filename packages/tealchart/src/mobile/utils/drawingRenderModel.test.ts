@@ -193,6 +193,78 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready line primitives for rays and axis lines', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'ray',
+          kind: 'ray',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 30, price: 70 },
+          ],
+        },
+        {
+          id: 'horizontal-line',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 70,
+        },
+        {
+          id: 'vertical-line',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 30,
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toMatchObject([
+      {
+        kind: 'line',
+        id: 'ray',
+        start: { x: 10, y: 10 },
+        end: { x: 100, y: 100 },
+        arrowHead: null,
+      },
+      {
+        kind: 'line',
+        id: 'horizontal-line',
+        start: { x: 0, y: 30 },
+        end: { x: 100, y: 30 },
+        arrowHead: null,
+      },
+      {
+        kind: 'line',
+        id: 'vertical-line',
+        start: { x: 30, y: 0 },
+        end: { x: 30, y: 100 },
+        arrowHead: null,
+      },
+    ]);
+  });
+
   it('returns Skia-ready trend angle primitives', () => {
     const state: UserDrawingState = {
       version: 1,

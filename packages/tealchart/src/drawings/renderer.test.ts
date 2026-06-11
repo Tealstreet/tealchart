@@ -255,6 +255,41 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders rays extended from the first anchor through the second anchor', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'ray',
+      kind: 'ray',
+      points: [
+        { time: 10, price: 90 },
+        { time: 30, price: 70 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:100,100');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
+  it('renders vertical lines across pane bounds', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'vertical-line',
+      kind: 'verticalLine',
+      time: 30,
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:30,0');
+    expect(ctx.calls).toContain('lineTo:30,100');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders cross lines through the anchor across chart and pane bounds', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
