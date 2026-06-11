@@ -177,6 +177,44 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2::1');
   });
 
+  it('renders extended lines to chart bounds through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'extended',
+      kind: 'extendedLine',
+      points: [
+        { time: 25, price: 50 },
+        { time: 75, price: 25 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:0,37.5');
+    expect(ctx.calls).toContain('lineTo:100,87.5');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
+  it('renders vertical extended lines to pane bounds through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'extended',
+      kind: 'extendedLine',
+      points: [
+        { time: 50, price: 25 },
+        { time: 50, price: 75 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:50,0');
+    expect(ctx.calls).toContain('lineTo:50,100');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('clips drawings to the pane chart area', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

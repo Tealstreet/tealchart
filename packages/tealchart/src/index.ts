@@ -119,6 +119,7 @@ export type {
   CreateUserDrawingFromDraftOptions,
   ArrowLineDrawing,
   DeleteUserDrawingOptions,
+  ExtendedLineDrawing,
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   DrawingScreenRect,

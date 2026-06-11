@@ -210,6 +210,19 @@ export function resolveUserDrawingGeometry(
         segment: resolveExtendedSegment(start, end, drawing.extend, space.chartLeft, space.chartRight),
       };
     }
+    case 'extendedLine': {
+      const start = anchorToScreenPoint(drawing.points[0], space);
+      const end = anchorToScreenPoint(drawing.points[1], space);
+      const segment =
+        start.x === end.x
+          ? { start: { x: start.x, y: space.pane.top }, end: { x: start.x, y: space.pane.bottom } }
+          : resolveExtendedSegment(start, end, 'both', space.chartLeft, space.chartRight);
+      return {
+        kind: 'line',
+        drawing,
+        segment,
+      };
+    }
     case 'arrowLine': {
       const start = anchorToScreenPoint(drawing.points[0], space);
       const end = anchorToScreenPoint(drawing.points[1], space);

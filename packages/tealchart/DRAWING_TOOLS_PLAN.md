@@ -128,7 +128,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile selection hit testing use rendered text metrics for multiline
   label bounds.
 
-## Current Epic: Arrow Line Tool
+## Shipped: Arrow Line Tool
 
 - Shared drawing state supports the two-anchor `arrowLine` tool and persists it
   through layout save/load.
@@ -137,11 +137,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia render models expose matching arrowhead geometry and render it
   with the same clip, color, opacity, and width behavior.
 
+## Current Epic: Extended Line Tool
+
+- Shared drawing state supports the two-anchor `extendedLine` tool and persists
+  it through layout save/load.
+- Web Canvas and mobile Skia render the same chart-bound extended segment from
+  the shared geometry resolver.
+- Selection, hit testing, and endpoint editing reuse the existing line-family
+  behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- Additional TradingView line-family tools such as info lines, extended lines,
-  and multi-point arrows.
+- Additional TradingView line-family tools such as info lines and multi-point
+  arrows.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
