@@ -46,6 +46,19 @@ export interface DrawingScreenParallelChannel {
   polygon: DrawingScreenPolyline;
 }
 
+export interface DrawingScreenFibRetracementLevel {
+  ratio: number;
+  label: string;
+  segment: DrawingScreenSegment;
+  y: number;
+  price: number;
+}
+
+export interface DrawingScreenFibRetracement {
+  rect: DrawingScreenRect;
+  levels: readonly DrawingScreenFibRetracementLevel[];
+}
+
 export interface DrawingCoordinateSpace {
   viewport: Viewport;
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
@@ -114,6 +127,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'dateRange';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
+    }
+  | {
+      kind: 'fibRetracement';
+      drawing: UserDrawing;
+      retracement: DrawingScreenFibRetracement;
     }
   | {
       kind: 'path';
@@ -332,6 +350,47 @@ export function resolvePolylineFromAnchors(
   };
 }
 
+export const FIB_RETRACEMENT_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.618, 2.618] as const;
+
+export function formatFibRetracementRatio(ratio: number): string {
+  return ratio === 0 || ratio === 0.5 || ratio === 1 ? String(ratio) : ratio.toFixed(3);
+}
+
+export function resolveFibRetracementFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibRetracement {
+  const start = anchorToScreenPoint(first, space);
+  const end = anchorToScreenPoint(second, space);
+  const x1 = Math.min(start.x, end.x);
+  const x2 = Math.max(start.x, end.x);
+  const priceDelta = second.price - first.price;
+
+  return {
+    rect: {
+      x: x1,
+      y: Math.min(start.y, end.y),
+      width: x2 - x1,
+      height: Math.abs(end.y - start.y),
+    },
+    levels: FIB_RETRACEMENT_LEVELS.map((ratio) => {
+      const price = first.price + priceDelta * ratio;
+      const y = priceToDrawingY(price, space);
+      return {
+        ratio,
+        label: formatFibRetracementRatio(ratio),
+        price,
+        y,
+        segment: {
+          start: { x: x1, y },
+          end: { x: x2, y },
+        },
+      };
+    }),
+  };
+}
+
 export function resolveParallelChannelFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -484,6 +543,12 @@ export function resolveUserDrawingGeometry(
         kind: 'dateRange',
         drawing,
         rect: resolveDateRangeRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibRetracement':
+      return {
+        kind: 'fibRetracement',
+        drawing,
+        retracement: resolveFibRetracementFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
       return {

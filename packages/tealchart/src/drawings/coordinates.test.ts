@@ -8,6 +8,7 @@ import type {
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FibRetracementDrawing,
   InfoLineDrawing,
   PathDrawing,
   ParallelChannelDrawing,
@@ -28,6 +29,7 @@ import {
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
   resolveExtendedSegment,
+  resolveFibRetracementFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
@@ -206,6 +208,35 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('resolves Fibonacci retracement levels from two anchors', () => {
+    const retracement = resolveFibRetracementFromAnchors({ time: 1_000, price: 90 }, { time: 3_000, price: 110 }, space);
+
+    expect(retracement.rect).toEqual({ x: 10, y: 20, width: 200, height: 100 });
+    expect(retracement.levels.map(({ ratio, label, price }) => ({ ratio, label, price }))).toEqual([
+      { ratio: 0, label: '0', price: 90 },
+      { ratio: 0.236, label: '0.236', price: 94.72 },
+      { ratio: 0.382, label: '0.382', price: 97.64 },
+      { ratio: 0.5, label: '0.5', price: 100 },
+      { ratio: 0.618, label: '0.618', price: 102.36 },
+      { ratio: 0.786, label: '0.786', price: 105.72 },
+      { ratio: 1, label: '1', price: 110 },
+      { ratio: 1.618, label: '1.618', price: 122.36 },
+      { ratio: 2.618, label: '2.618', price: 142.36 },
+    ]);
+    expect(retracement.levels.map((level) => level.y)).toEqual([
+      120,
+      96.4,
+      81.8,
+      70,
+      58.2,
+      expect.closeTo(41.4),
+      20,
+      -41.8,
+      expect.closeTo(-141.8),
+    ]);
+    expect(retracement.levels[3]?.segment).toEqual({ start: { x: 10, y: 70 }, end: { x: 210, y: 70 } });
+  });
+
   it('resolves polylines from ordered anchors', () => {
     expect(
       resolvePolylineFromAnchors(
@@ -320,6 +351,15 @@ describe('user drawing coordinates', () => {
       points: [
         { time: 1_000, price: 95 },
         { time: 3_000, price: 105 },
+      ],
+    };
+    const fibRetracement: FibRetracementDrawing = {
+      ...trendLine,
+      id: 'fib',
+      kind: 'fibRetracement',
+      points: [
+        { time: 1_000, price: 90 },
+        { time: 3_000, price: 110 },
       ],
     };
     const path: PathDrawing = {
@@ -455,6 +495,23 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(dateRange, space)).toMatchObject({
       kind: 'dateRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
+    });
+    expect(resolveUserDrawingGeometry(fibRetracement, space)).toMatchObject({
+      kind: 'fibRetracement',
+      retracement: {
+        rect: { x: 10, y: 20, width: 200, height: 100 },
+        levels: [
+          { ratio: 0, label: '0', price: 90, y: 120 },
+          { ratio: 0.236, label: '0.236', price: 94.72, y: 96.4 },
+          { ratio: 0.382, label: '0.382', price: 97.64, y: 81.8 },
+          { ratio: 0.5, label: '0.5', price: 100, y: 70 },
+          { ratio: 0.618, label: '0.618', price: 102.36, y: 58.2 },
+          { ratio: 0.786, label: '0.786', price: 105.72, y: expect.closeTo(41.4) },
+          { ratio: 1, label: '1', price: 110, y: 20 },
+          { ratio: 1.618, label: '1.618', price: 122.36, y: -41.8 },
+          { ratio: 2.618, label: '2.618', price: 142.36, y: expect.closeTo(-141.8) },
+        ],
+      },
     });
     expect(resolveUserDrawingGeometry(path, space)).toMatchObject({
       kind: 'path',
