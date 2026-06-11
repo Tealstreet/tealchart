@@ -29,6 +29,7 @@ import type {
   UserDrawingTextAnnotation,
   UserDrawingTextAlign,
   UserDrawingTool,
+  UserDrawingZOrderAction,
   UpdateUserDrawingOptions,
 } from './drawings';
 import type { UserDrawingState } from './drawings';
@@ -101,6 +102,7 @@ import {
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   resolveUserDrawingTextEditMetrics,
   splitUserDrawingTextLines,
@@ -205,6 +207,11 @@ export interface SkiaTealchartHandle {
   setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
+  reorderUserDrawings(action: UserDrawingZOrderAction, options?: UpdateUserDrawingOptions): boolean;
+  bringUserDrawingForward(options?: UpdateUserDrawingOptions): boolean;
+  sendUserDrawingBackward(options?: UpdateUserDrawingOptions): boolean;
+  bringUserDrawingToFront(options?: UpdateUserDrawingOptions): boolean;
+  sendUserDrawingToBack(options?: UpdateUserDrawingOptions): boolean;
 }
 
 export interface SkiaTealchartProps {
@@ -480,6 +487,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(setMobileUserDrawingLocked(userDrawingStateRef.current, locked, options));
+      },
+      reorderUserDrawings(action: UserDrawingZOrderAction, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, action, options));
+      },
+      bringUserDrawingForward(options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'bringForward', options));
+      },
+      sendUserDrawingBackward(options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'sendBackward', options));
+      },
+      bringUserDrawingToFront(options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'bringToFront', options));
+      },
+      sendUserDrawingToBack(options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'sendToBack', options));
       },
     }),
     [commitUserDrawingState, commitUserDrawingStateIfChanged, createUserDrawingId],
