@@ -56,6 +56,7 @@ export type {
 } from './mobile/utils/drawingRenderModel';
 export {
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './mobile/utils/drawingStyle';
