@@ -91,13 +91,25 @@ export {
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 export {
+  getSelectedUserDrawing,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
+  isUserDrawingStyleToolbarActionEnabled,
+  isUserDrawingStyleToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  USER_DRAWING_LINE_COLOR_DESCRIPTORS,
+  USER_DRAWING_LINE_STYLE_DESCRIPTORS,
+  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
 export type {
+  UserDrawingLineColorDescriptor,
+  UserDrawingLineStyleDescriptor,
+  UserDrawingLineWidthDescriptor,
+  UserDrawingStyleToolbarAction,
+  UserDrawingStyleToolbarActionDescriptor,
   UserDrawingToolbarAction,
   UserDrawingToolbarActionDescriptor,
   UserDrawingToolDescriptor,
