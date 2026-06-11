@@ -70,6 +70,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'triangle':
     case 'curve':
+    case 'arc':
     case 'fibWedge':
     case 'fibChannel':
     case 'trendBasedFibTime':
@@ -577,6 +578,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'curve',
+            points,
+          }
+        : null;
+    }
+    case 'arc': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'arc',
             points,
           }
         : null;

@@ -135,6 +135,32 @@ function renderCurveGeometry(
   ctx.stroke();
 }
 
+function renderArcGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arc' }>,
+): void {
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  if (geometry.arc.radius <= 0) {
+    const [firstPoint, ...remainingPoints] = geometry.arc.points;
+    if (!firstPoint) return;
+    ctx.moveTo(firstPoint.x, firstPoint.y);
+    for (const point of remainingPoints) {
+      ctx.lineTo(point.x, point.y);
+    }
+  } else {
+    ctx.arc(
+      geometry.arc.center.x,
+      geometry.arc.center.y,
+      geometry.arc.radius,
+      geometry.arc.startAngle,
+      geometry.arc.endAngle,
+      geometry.arc.counterclockwise,
+    );
+  }
+  ctx.stroke();
+}
+
 function renderAnchoredVwapGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'anchoredVwap' }>,
@@ -867,6 +893,11 @@ export function renderUserDrawing(
       case 'curve':
         if (drawing.style.lineVisible !== false) {
           renderCurveGeometry(ctx, geometry);
+        }
+        break;
+      case 'arc':
+        if (drawing.style.lineVisible !== false) {
+          renderArcGeometry(ctx, geometry);
         }
         break;
       case 'anchoredVwap':
