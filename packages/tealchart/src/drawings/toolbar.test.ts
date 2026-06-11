@@ -76,6 +76,7 @@ describe('user drawing toolbar descriptors', () => {
       'fibSpeedResistanceArcs',
       'fibCircles',
       'fibWedge',
+      'fibSpiral',
       'fibChannel',
       'fibTimeZone',
       'trendBasedFibTime',
@@ -182,6 +183,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibWedge')).toEqual(
       expect.objectContaining({ tool: 'fibWedge', label: 'Fib wedge' }),
+    );
+    expect(getUserDrawingToolDescriptor('fibSpiral')).toEqual(
+      expect.objectContaining({ tool: 'fibSpiral', label: 'Fib spiral' }),
     );
     expect(getUserDrawingToolDescriptor('fibChannel')).toEqual(
       expect.objectContaining({ tool: 'fibChannel', label: 'Fib channel' }),

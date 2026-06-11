@@ -863,6 +863,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores Fibonacci spiral drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'fib-spiral',
+          kind: 'fibSpiral',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 10 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'fib-spiral',
+      kind: 'fibSpiral',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+      ],
+    });
+  });
+
   it('restores Gann fan drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

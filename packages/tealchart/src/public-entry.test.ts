@@ -19,6 +19,7 @@ import {
   resolveFibSpeedResistanceFanFromAnchors,
   resolveFibTimeZoneFromAnchors,
   resolveFibWedgeFromAnchors,
+  resolveFibSpiralFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveGannFanFromAnchors,
   resolvePitchforkFromAnchors,
@@ -57,6 +58,7 @@ import type {
   MobileUserDrawingFibCirclesPrimitive,
   MobileUserDrawingFibSpeedResistanceArcsPrimitive,
   MobileUserDrawingFibWedgePrimitive,
+  MobileUserDrawingFibSpiralPrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingTrendBasedFibTimePrimitive,
   MobileUserDrawingFibFanPrimitive,
@@ -90,6 +92,7 @@ import type {
   FibSpeedResistanceFanDrawing,
   FibTimeZoneDrawing,
   FibWedgeDrawing,
+  FibSpiralDrawing,
   TrendBasedFibTimeDrawing,
   GannFanDrawing,
   FlatTopBottomDrawing,
@@ -271,6 +274,23 @@ describe('tealchart public entries', () => {
       ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const fibSpiralPrimitive: NonNever<MobileUserDrawingFibSpiralPrimitive> = {
+      kind: 'fibSpiral',
+      id: 'fib-spiral',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 5 },
+      reference: { x: 10, y: 5 },
+      baseRadius: 5,
+      startAngle: 0,
+      points: [
+        { x: 10, y: 5 },
+        { x: 5, y: 10 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const fibChannelPrimitive: NonNever<MobileUserDrawingFibChannelPrimitive> = {
       kind: 'fibChannel',
       id: 'fib-channel',
@@ -390,6 +410,7 @@ describe('tealchart public entries', () => {
     expect(fibSpeedArcsPrimitive.kind).toBe('fibSpeedResistanceArcs');
     expect(fibCirclesPrimitive.kind).toBe('fibCircles');
     expect(fibWedgePrimitive.kind).toBe('fibWedge');
+    expect(fibSpiralPrimitive.kind).toBe('fibSpiral');
     expect(fibChannelPrimitive.kind).toBe('fibChannel');
     expect(fibTimeZonePrimitive.kind).toBe('fibTimeZone');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
@@ -1058,6 +1079,33 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibWedge');
     expect(wedge.arcs.map((arc) => arc.ratio)).toEqual([0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618]);
+  });
+
+  it('exports shared drawing fib spiral types and resolver', () => {
+    const drawing: FibSpiralDrawing = {
+      id: 'fib-spiral',
+      kind: 'fibSpiral',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 10 },
+      ],
+    };
+    const spiral = resolveFibSpiralFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('fibSpiral');
+    expect(spiral.points[0]).toEqual({ x: 100, y: 50 });
+    expect(spiral.points.length).toBeGreaterThan(100);
   });
 
   it('exports shared drawing gann fan types and resolver', () => {

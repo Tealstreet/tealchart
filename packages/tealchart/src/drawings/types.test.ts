@@ -79,6 +79,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibSpeedResistanceFan')).toBe(2);
     expect(getRequiredAnchorCount('fibSpeedResistanceArcs')).toBe(2);
     expect(getRequiredAnchorCount('fibCircles')).toBe(2);
+    expect(getRequiredAnchorCount('fibSpiral')).toBe(2);
     expect(getRequiredAnchorCount('gannFan')).toBe(2);
     expect(getRequiredAnchorCount('fibTimeZone')).toBe(2);
     expect(getRequiredAnchorCount('fibWedge')).toBe(3);
@@ -304,6 +305,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'fibCircles' }), { id: 'fib-circles', now: 20 })).toMatchObject({
       id: 'fib-circles',
       kind: 'fibCircles',
+      points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'fibSpiral' }), { id: 'fib-spiral', now: 20 })).toMatchObject({
+      id: 'fib-spiral',
+      kind: 'fibSpiral',
       points: [anchorA, anchorB],
       visible: true,
       locked: false,
