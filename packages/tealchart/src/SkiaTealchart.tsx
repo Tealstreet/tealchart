@@ -105,6 +105,7 @@ import {
   resolveUserDrawingTextEditMetrics,
   splitUserDrawingTextLines,
   selectUserDrawingById,
+  selectUserDrawingsById,
   setUserDrawingText,
   setUserDrawingTool,
   USER_DRAWING_FONT_FAMILIES,
@@ -187,6 +188,7 @@ export interface SkiaTealchartHandle {
   setUserDrawingState(state: UserDrawingState): void;
   setActiveUserDrawingTool(tool: UserDrawingTool): void;
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
+  selectUserDrawings(drawingIds: readonly string[]): void;
   deleteUserDrawing(drawingId?: string): boolean;
   deleteSelectedUserDrawing(): boolean;
   duplicateUserDrawing(drawingId?: string): boolean;
@@ -412,6 +414,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
         commitUserDrawingStateIfChanged(selectUserDrawingById(userDrawingStateRef.current, drawingId, handle));
+      },
+      selectUserDrawings(drawingIds: readonly string[]): void {
+        commitUserDrawingStateIfChanged(selectUserDrawingsById(userDrawingStateRef.current, drawingIds));
       },
       deleteUserDrawing(drawingId?: string): boolean {
         const nextState = deleteUserDrawingState(userDrawingStateRef.current, { drawingId });

@@ -542,6 +542,7 @@ export interface UserDrawingDraft {
 
 export interface UserDrawingSelection {
   drawingId: string;
+  drawingIds?: readonly string[];
   handle?: UserDrawingHandleRole;
   pointIndex?: number;
 }

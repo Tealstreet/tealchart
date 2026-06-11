@@ -86,6 +86,45 @@ describe('user drawing render model', () => {
     });
   });
 
+  it('marks every drawing in a grouped selection as selected', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'a', drawingIds: ['a', 'b'] },
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+        {
+          id: 'b',
+          kind: 'verticalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          time: 25,
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveUserDrawingRenderEntries(state).map((entry) => [entry.drawing.id, entry.selected])).toEqual([
+      ['a', true],
+      ['b', true],
+    ]);
+  });
+
   it('resolves selection handles for rectangle corners', () => {
     expect(
       resolveUserDrawingHandlePoints(

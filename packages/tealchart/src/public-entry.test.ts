@@ -6,6 +6,7 @@ import { clearChartStoreCache } from './state/chartState';
 import {
   formatTrendAngleDegrees,
   duplicateUserDrawing,
+  getUserDrawingSelectionIds,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
@@ -45,6 +46,7 @@ import {
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
   setUserDrawingIconName,
+  selectUserDrawingsById,
   setUserDrawingTextAlign,
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
@@ -186,6 +188,8 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(setUserDrawingIconName).toBeTypeOf('function');
     expect(duplicateUserDrawing).toBeTypeOf('function');
+    expect(getUserDrawingSelectionIds).toBeTypeOf('function');
+    expect(selectUserDrawingsById).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
     expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');

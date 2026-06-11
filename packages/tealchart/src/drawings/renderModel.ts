@@ -12,6 +12,7 @@ import {
   resolveUserDrawingGeometry,
   timeToDrawingX,
 } from './coordinates';
+import { getUserDrawingSelectionIds } from './input';
 import { createUserDrawingFromDraft, getRequiredAnchorCount } from './types';
 
 export type UserDrawingRenderPhase = 'committed' | 'draft';
@@ -32,10 +33,11 @@ export function resolveUserDrawingRenderEntries(
   state: UserDrawingState,
   options: ResolveUserDrawingRenderEntriesOptions = {},
 ): UserDrawingRenderEntry[] {
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
   const entries = state.drawings.map((drawing) => ({
     drawing,
     phase: 'committed' as const,
-    selected: state.selection?.drawingId === drawing.id,
+    selected: selectedIds.has(drawing.id),
   }));
 
   if (!state.draft) return entries;

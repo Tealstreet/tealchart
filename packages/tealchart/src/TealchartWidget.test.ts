@@ -330,6 +330,45 @@ describe('TealchartWidget', () => {
       expect(setUserDrawingStateCalls.at(-1)).toBe(nextState);
     });
 
+    it('selects grouped user drawings through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        drawings: [
+          {
+            id: 'a',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 100,
+          },
+          {
+            id: 'b',
+            kind: 'verticalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            time: 20,
+          },
+        ],
+      });
+
+      widget.selectUserDrawings(['b', 'a', 'missing']);
+
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'b', drawingIds: ['b', 'a'] });
+      expect(onChange).toHaveBeenCalled();
+    });
+
     it('marks layouts dirty only when committed user drawings change', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
