@@ -63,6 +63,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -398,6 +399,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: value.kind,
+            points,
+          }
+        : null;
+    }
+    case 'barsPattern': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'barsPattern',
             points,
           }
         : null;

@@ -115,6 +115,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'parallelChannel':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
@@ -219,7 +220,8 @@ function editDrawingHandle(
       drawing.kind === 'parallelChannel' ||
       drawing.kind === 'regressionTrend' ||
       drawing.kind === 'longPosition' ||
-      drawing.kind === 'shortPosition') &&
+      drawing.kind === 'shortPosition' ||
+      drawing.kind === 'barsPattern') &&
     pointIndex !== undefined
   ) {
     if (pointIndex < 0 || pointIndex >= drawing.points.length) return drawing;
@@ -273,6 +275,7 @@ function editDrawingHandle(
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':
+    case 'barsPattern':
       return drawing;
   }
 }

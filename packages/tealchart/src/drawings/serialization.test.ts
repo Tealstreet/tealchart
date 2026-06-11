@@ -818,6 +818,40 @@ describe('drawing layout serialization', () => {
     expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(2);
   });
 
+  it('restores bars pattern drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'bars',
+          kind: 'barsPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+            { time: 3, price: 105 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'bars',
+      kind: 'barsPattern',
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 110 },
+        { time: 3, price: 105 },
+      ],
+    });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(1);
+  });
+
   it('restores parallel channel drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
