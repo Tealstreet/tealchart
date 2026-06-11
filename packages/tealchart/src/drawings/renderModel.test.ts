@@ -1,8 +1,9 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingState, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 
 const style: UserDrawingStyle = {
@@ -31,6 +32,10 @@ const space: DrawingCoordinateSpace = {
 };
 
 describe('user drawing render model', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('marks committed selection and appends draft previews', () => {
     const state: UserDrawingState = {
       version: 1,

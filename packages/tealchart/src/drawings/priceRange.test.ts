@@ -1,8 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingPriceRangeMetrics, resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 
 describe('user drawing price range metrics', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('formats signed price and percent changes', () => {
     expect(resolveUserDrawingPriceRangeMetrics(100, 112.5)).toEqual({
       delta: 12.5,
@@ -21,6 +26,14 @@ describe('user drawing price range metrics', () => {
       delta: 10,
       percent: null,
       label: '+10.00',
+    });
+  });
+
+  it('does not render rounded negative zero labels', () => {
+    expect(resolveUserDrawingPriceRangeMetrics(100, 99.9999)).toMatchObject({
+      delta: expect.closeTo(-0.0001),
+      percent: expect.closeTo(-0.0001),
+      label: '0.00 (0.00%)',
     });
   });
 

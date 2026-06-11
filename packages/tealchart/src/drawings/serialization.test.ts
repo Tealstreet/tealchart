@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { createUserDrawingState } from './input';
 import {
   deserializeUserDrawingStateFromLayout,
@@ -53,6 +54,10 @@ function createStateWithTransientFields(): UserDrawingState {
 }
 
 describe('drawing layout serialization', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('persists committed drawings and clears transient editing state', () => {
     const persisted = serializeUserDrawingStateForLayout(createStateWithTransientFields());
 
@@ -335,6 +340,36 @@ describe('drawing layout serialization', () => {
         { time: 2, price: 12 },
       ],
     });
+  });
+
+  it('rejects malformed price range point counts', () => {
+    const createPayload = (points: unknown[]) => ({
+      version: 1,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points,
+        },
+      ],
+    });
+
+    expect(deserializeUserDrawingStateFromLayout(createPayload([{ time: 1, price: 10 }]))).toBeUndefined();
+    expect(
+      deserializeUserDrawingStateFromLayout(
+        createPayload([
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 14 },
+        ]),
+      ),
+    ).toBeUndefined();
   });
 
   it('restores drawing fill and line visibility flags', () => {

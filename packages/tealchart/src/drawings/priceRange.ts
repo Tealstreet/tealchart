@@ -8,8 +8,10 @@ export interface UserDrawingPriceRangeMetrics {
 
 function formatSignedNumber(value: number): string {
   const normalized = Object.is(value, -0) ? 0 : value;
-  const sign = normalized > 0 ? '+' : '';
-  return `${sign}${normalized.toFixed(2)}`;
+  const rounded = Number(normalized.toFixed(2));
+  const finalValue = Object.is(rounded, -0) ? 0 : rounded;
+  const sign = finalValue > 0 ? '+' : '';
+  return `${sign}${finalValue.toFixed(2)}`;
 }
 
 export function resolveUserDrawingPriceRangeMetrics(
