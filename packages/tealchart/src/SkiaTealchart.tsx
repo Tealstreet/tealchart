@@ -612,7 +612,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       top: Math.max(margins.top, activeUserDrawingTextEditPrimitive.point.y - 18),
       width,
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
-      fontSize: activeUserDrawingTextEditPrimitive.style.fontSize ?? 12,
+      fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
       fontFamily: activeUserDrawingTextEditPrimitive.style.fontFamily,
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
