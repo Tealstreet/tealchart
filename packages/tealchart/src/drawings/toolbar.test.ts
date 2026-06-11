@@ -64,6 +64,8 @@ describe('user drawing toolbar descriptors', () => {
       'priceRange',
       'dateRange',
       'datePriceRange',
+      'longPosition',
+      'shortPosition',
       'fibRetracement',
       'fibExtension',
       'triangle',

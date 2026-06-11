@@ -24,6 +24,10 @@ const DEFAULT_LABEL_PADDING = 6;
 const DEFAULT_LABEL_HEIGHT = 20;
 const DEFAULT_SELECTION_HANDLE_RADIUS = 4;
 const DEFAULT_DRAFT_OPACITY = 0.65;
+const RISK_REWARD_PROFIT_FILL = 'rgba(34, 197, 94, 0.18)';
+const RISK_REWARD_RISK_FILL = 'rgba(244, 63, 94, 0.18)';
+const RISK_REWARD_PROFIT_STROKE = '#22c55e';
+const RISK_REWARD_RISK_STROKE = '#f43f5e';
 
 function dashForLineStyle(style: UserDrawingLineStyle): number[] {
   switch (style) {
@@ -327,6 +331,47 @@ function renderDatePriceRangeGeometry(
   ctx.fillText(dateLabel, rect.x + rect.width / 2, rect.y + rect.height - fontSize);
 }
 
+function renderRiskRewardPositionGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'longPosition' | 'shortPosition' }>,
+): void {
+  const { drawing, position } = geometry;
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  const labelX = position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
+
+  if (drawing.style.fillVisible !== false) {
+    ctx.fillStyle = RISK_REWARD_PROFIT_FILL;
+    ctx.fillRect(position.profitRect.x, position.profitRect.y, position.profitRect.width, position.profitRect.height);
+    ctx.fillStyle = RISK_REWARD_RISK_FILL;
+    ctx.fillRect(position.riskRect.x, position.riskRect.y, position.riskRect.width, position.riskRect.height);
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    ctx.lineWidth = Math.max(1, drawing.style.lineWidth);
+    ctx.setLineDash(dashForLineStyle(drawing.style.lineStyle));
+    ctx.strokeStyle = RISK_REWARD_PROFIT_STROKE;
+    ctx.strokeRect(position.profitRect.x, position.profitRect.y, position.profitRect.width, position.profitRect.height);
+    ctx.strokeStyle = RISK_REWARD_RISK_STROKE;
+    ctx.strokeRect(position.riskRect.x, position.riskRect.y, position.riskRect.width, position.riskRect.height);
+    ctx.strokeStyle = drawing.style.lineColor;
+    for (const segment of [position.targetLine, position.entryLine, position.stopLine]) {
+      ctx.beginPath();
+      ctx.moveTo(segment.start.x, segment.start.y);
+      ctx.lineTo(segment.end.x, segment.end.y);
+      ctx.stroke();
+    }
+  }
+
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(position.rewardLabel, labelX, position.profitRect.y + position.profitRect.height / 2);
+  ctx.fillText(position.riskLabel, labelX, position.riskRect.y + position.riskRect.height / 2);
+  ctx.fillText(position.ratioLabel, labelX, position.entry.y - fontSize);
+}
+
 function renderFibLevelGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibRetracement' | 'fibExtension' }>,
@@ -508,6 +553,10 @@ export function renderUserDrawing(
         break;
       case 'datePriceRange':
         renderDatePriceRangeGeometry(ctx, geometry);
+        break;
+      case 'longPosition':
+      case 'shortPosition':
+        renderRiskRewardPositionGeometry(ctx, geometry);
         break;
       case 'fibRetracement':
       case 'fibExtension':

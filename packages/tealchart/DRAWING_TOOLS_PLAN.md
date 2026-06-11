@@ -317,12 +317,18 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Layout persistence, point editing, hit testing, and render models retain all
   sampled path anchors on both platforms.
 
+## Shipped: Risk/Reward Position Tools
+
+- Add long and short position markup with entry, target, and stop anchors.
+- Web Canvas and mobile Skia render matching profit/risk regions, labels,
+  selection handles, persistence, and editing behavior.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - Additional TradingView line-family tools such as flat top/bottom, disjoint
   channel, anchored VWAP, and multi-point arrows.
-- Additional TradingView measurement tools such as bars pattern and risk/reward.
+- Additional TradingView measurement tools such as bars pattern.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration

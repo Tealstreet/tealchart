@@ -158,6 +158,8 @@ export function resolveUserDrawingHandlePoints(
     case 'path':
     case 'triangle':
     case 'parallelChannel':
+    case 'longPosition':
+    case 'shortPosition':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
     case 'regressionTrend':
       {

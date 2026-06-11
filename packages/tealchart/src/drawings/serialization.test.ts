@@ -774,6 +774,50 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores long and short position drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'long',
+          kind: 'longPosition',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+            { time: 2, price: 95 },
+          ],
+        },
+        {
+          id: 'short',
+          kind: 'shortPosition',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 90 },
+            { time: 2, price: 105 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings).toMatchObject([
+      { id: 'long', kind: 'longPosition' },
+      { id: 'short', kind: 'shortPosition' },
+    ]);
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(2);
+  });
+
   it('restores parallel channel drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

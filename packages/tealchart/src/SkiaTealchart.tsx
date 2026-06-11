@@ -1953,6 +1953,97 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'riskRewardPosition') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && (
+                  <>
+                    <Rect
+                      x={primitive.profitRect.x}
+                      y={primitive.profitRect.y}
+                      width={primitive.profitRect.width}
+                      height={primitive.profitRect.height}
+                      color="rgba(34, 197, 94, 0.18)"
+                    />
+                    <Rect
+                      x={primitive.riskRect.x}
+                      y={primitive.riskRect.y}
+                      width={primitive.riskRect.width}
+                      height={primitive.riskRect.height}
+                      color="rgba(244, 63, 94, 0.18)"
+                    />
+                  </>
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <>
+                    <Rect
+                      x={primitive.profitRect.x}
+                      y={primitive.profitRect.y}
+                      width={primitive.profitRect.width}
+                      height={primitive.profitRect.height}
+                      color="#22c55e"
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </Rect>
+                    <Rect
+                      x={primitive.riskRect.x}
+                      y={primitive.riskRect.y}
+                      width={primitive.riskRect.width}
+                      height={primitive.riskRect.height}
+                      color="#f43f5e"
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </Rect>
+                    {[primitive.targetLine, primitive.entryLine, primitive.stopLine].map((line, index) => (
+                      <SkiaLine
+                        key={`${primitive.id}:line:${index}`}
+                        p1={vec(line.start.x, line.start.y)}
+                        p2={vec(line.end.x, line.end.y)}
+                        color={primitive.style.lineColor}
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                        style="stroke"
+                      >
+                        {dash && <DashPathEffect intervals={dash} />}
+                      </SkiaLine>
+                    ))}
+                  </>
+                )}
+                {font && (
+                  <>
+                    <SkiaText
+                      x={primitive.rewardLabelPoint.x - font.measureText(primitive.rewardLabel).width / 2}
+                      y={primitive.rewardLabelPoint.y}
+                      text={primitive.rewardLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.riskLabelPoint.x - font.measureText(primitive.riskLabel).width / 2}
+                      y={primitive.riskLabelPoint.y}
+                      text={primitive.riskLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                    <SkiaText
+                      x={primitive.ratioLabelPoint.x - font.measureText(primitive.ratioLabel).width / 2}
+                      y={primitive.ratioLabelPoint.y}
+                      text={primitive.ratioLabel}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
+                  </>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'priceRange') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
