@@ -425,6 +425,47 @@ describe('TealchartWidget', () => {
       expect(testWidget._chartStore.isDirty.get()).toBe(false);
     });
 
+    it('exports and imports layout-safe user drawing state', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'rectangle',
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      const exported = widget.exportUserDrawingStateForLayout();
+      expect(exported?.drawings).toHaveLength(1);
+      expect(exported?.activeTool).toBe('select');
+      expect(exported?.selection).toBeNull();
+
+      widget.clearUserDrawings();
+      widget.importUserDrawingStateFromLayout(exported);
+      expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
+      expect(widget.getUserDrawingState().activeTool).toBe('select');
+
+      widget.importUserDrawingStateFromLayout(undefined);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+    });
+
     it('applies active drawing tool input through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

@@ -104,6 +104,10 @@ import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+import {
+  exportMobileUserDrawingStateForLayout,
+  importMobileUserDrawingStateFromLayout,
+} from './mobile/utils/drawingPersistence';
 import { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
 import type { MobileUserDrawingTextLabelPrimitive } from './mobile/utils/drawingRenderModel';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
@@ -137,6 +141,8 @@ export interface SkiaTealchartHandle {
   removeTealscriptIndicator(instanceId: string): void;
   changeTheme(theme: ChartThemeInput): void;
   getUserDrawingState(): UserDrawingState;
+  exportUserDrawingStateForLayout(): UserDrawingState | undefined;
+  importUserDrawingStateFromLayout(state?: UserDrawingState | null): void;
   setUserDrawingState(state: UserDrawingState): void;
   setActiveUserDrawingTool(tool: UserDrawingTool): void;
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
@@ -334,6 +340,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       getUserDrawingState(): UserDrawingState {
         return userDrawingStateRef.current;
+      },
+      exportUserDrawingStateForLayout(): UserDrawingState | undefined {
+        return exportMobileUserDrawingStateForLayout(userDrawingStateRef.current);
+      },
+      importUserDrawingStateFromLayout(nextState?: UserDrawingState | null): void {
+        commitUserDrawingState(importMobileUserDrawingStateFromLayout(nextState));
       },
       setUserDrawingState(nextState: UserDrawingState): void {
         commitUserDrawingState(nextState);

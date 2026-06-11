@@ -34,10 +34,12 @@ import {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
+  deserializeUserDrawingStateFromLayout,
   handleUserDrawingInput,
   isUserDrawingLayoutStateEqual,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
+  serializeUserDrawingStateForLayout,
   setUserDrawingText,
   setUserDrawingTool,
   updateUserDrawingTextEdit,
@@ -2142,6 +2144,14 @@ export class TealchartWidget {
 
   getUserDrawingState(): UserDrawingState {
     return this._userDrawingState;
+  }
+
+  exportUserDrawingStateForLayout(): UserDrawingState | undefined {
+    return serializeUserDrawingStateForLayout(this._userDrawingState);
+  }
+
+  importUserDrawingStateFromLayout(state?: UserDrawingState | null): void {
+    this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState());
   }
 
   setUserDrawingState(state: UserDrawingState, options: { markLayoutDirty?: boolean } = {}): void {

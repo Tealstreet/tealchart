@@ -45,6 +45,10 @@ export { priceToY, yToPrice, timeToX, xToTime, getGestureZone } from './mobile/u
 export type { ChartDimensions, GestureZone } from './mobile/utils/coordinates';
 export { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
 export type { MobileUserDrawingInputPane, ResolveMobileUserDrawingInputPointOptions } from './mobile/utils/drawingInput';
+export {
+  exportMobileUserDrawingStateForLayout,
+  importMobileUserDrawingStateFromLayout,
+} from './mobile/utils/drawingPersistence';
 export { resolveMobileUserDrawingRenderModel } from './mobile/utils/drawingRenderModel';
 export type {
   MobileUserDrawingPrimitive,
