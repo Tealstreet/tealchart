@@ -52,6 +52,7 @@ describe('user drawing toolbar descriptors', () => {
       'verticalLine',
       'rectangle',
       'circle',
+      'ellipse',
       'priceRange',
       'dateRange',
       'path',
@@ -94,6 +95,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('circle')).toEqual(
       expect.objectContaining({ tool: 'circle', label: 'Circle' }),
+    );
+    expect(getUserDrawingToolDescriptor('ellipse')).toEqual(
+      expect.objectContaining({ tool: 'ellipse', label: 'Ellipse' }),
     );
     expect(getUserDrawingToolDescriptor('priceRange')).toEqual(
       expect.objectContaining({ tool: 'priceRange', label: 'Price range' }),
@@ -150,6 +154,22 @@ describe('user drawing toolbar descriptors', () => {
       supportsUserDrawingFillControls({
         id: 'circle',
         kind: 'circle',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        id: 'ellipse',
+        kind: 'ellipse',
         paneId: 'main',
         visible: true,
         locked: false,
@@ -334,6 +354,7 @@ describe('user drawing toolbar descriptors', () => {
 
     expect(supportsUserDrawingFillControls(horizontal)).toBe(false);
     expect(supportsUserDrawingFillControls(rectangle)).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...rectangle, id: 'e', kind: 'ellipse' as const })).toBe(true);
     expect(supportsUserDrawingFillControls(priceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);

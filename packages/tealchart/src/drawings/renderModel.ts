@@ -6,6 +6,7 @@ import {
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
   resolveCircleFromAnchors,
+  resolveEllipseFromAnchors,
   resolvePolylineFromAnchors,
   resolveRectFromAnchors,
   timeToDrawingX,
@@ -107,6 +108,15 @@ export function resolveUserDrawingHandlePoints(
     }
     case 'circle': {
       const rect = resolveCircleFromAnchors(drawing.points[0], drawing.points[1], space).rect;
+      return [
+        { x: rect.x, y: rect.y },
+        { x: rect.x + rect.width, y: rect.y },
+        { x: rect.x + rect.width, y: rect.y + rect.height },
+        { x: rect.x, y: rect.y + rect.height },
+      ];
+    }
+    case 'ellipse': {
+      const rect = resolveEllipseFromAnchors(drawing.points[0], drawing.points[1], space).rect;
       return [
         { x: rect.x, y: rect.y },
         { x: rect.x + rect.width, y: rect.y },

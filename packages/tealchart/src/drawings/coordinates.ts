@@ -33,6 +33,13 @@ export interface DrawingScreenCircle {
   rect: DrawingScreenRect;
 }
 
+export interface DrawingScreenEllipse {
+  center: DrawingScreenPoint;
+  radiusX: number;
+  radiusY: number;
+  rect: DrawingScreenRect;
+}
+
 export interface DrawingCoordinateSpace {
   viewport: Viewport;
   pane: Pick<ComputedPane, 'id' | 'top' | 'height' | 'bottom' | 'yMin' | 'yMax'>;
@@ -86,6 +93,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'circle';
       drawing: UserDrawing;
       circle: DrawingScreenCircle;
+    }
+  | {
+      kind: 'ellipse';
+      drawing: UserDrawing;
+      ellipse: DrawingScreenEllipse;
     }
   | {
       kind: 'priceRange';
@@ -263,6 +275,23 @@ export function resolveCircleFromAnchors(
   };
 }
 
+export function resolveEllipseFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenEllipse {
+  const rect = resolveRectFromAnchors(first, second, space);
+  return {
+    rect,
+    center: {
+      x: rect.x + rect.width / 2,
+      y: rect.y + rect.height / 2,
+    },
+    radiusX: rect.width / 2,
+    radiusY: rect.height / 2,
+  };
+}
+
 export function resolveDateRangeRectFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -398,6 +427,12 @@ export function resolveUserDrawingGeometry(
         kind: 'circle',
         drawing,
         circle: resolveCircleFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'ellipse':
+      return {
+        kind: 'ellipse',
+        drawing,
+        ellipse: resolveEllipseFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'priceRange':
       return {
