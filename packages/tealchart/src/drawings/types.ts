@@ -28,6 +28,7 @@ export type UserDrawingTool =
   | 'fibRetracement'
   | 'fibExtension'
   | 'triangle'
+  | 'polyline'
   | 'parallelChannel'
   | 'regressionTrend'
   | 'flatTopBottom'
@@ -210,6 +211,11 @@ export interface TriangleDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface PolylineDrawing extends UserDrawingBase {
+  kind: 'polyline';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface ParallelChannelDrawing extends UserDrawingBase {
   kind: 'parallelChannel';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -271,6 +277,7 @@ export type UserDrawing =
   | FibRetracementDrawing
   | FibExtensionDrawing
   | TriangleDrawing
+  | PolylineDrawing
   | ParallelChannelDrawing
   | RegressionTrendDrawing
   | FlatTopBottomDrawing
@@ -398,6 +405,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'fibExtension':
       return 2;
     case 'triangle':
+    case 'polyline':
     case 'parallelChannel':
     case 'regressionTrend':
     case 'flatTopBottom':
@@ -608,6 +616,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'triangle',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'polyline':
+      return {
+        ...base,
+        kind: 'polyline',
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'parallelChannel':

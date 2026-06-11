@@ -128,6 +128,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
+  { tool: 'polyline', icon: '⌁', label: 'Polyline' },
   { tool: 'parallelChannel', icon: '▱', label: 'Parallel channel' },
   { tool: 'regressionTrend', icon: '≋', label: 'Regression trend' },
   { tool: 'flatTopBottom', icon: '▰', label: 'Flat top/bottom' },

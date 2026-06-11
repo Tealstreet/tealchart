@@ -702,6 +702,82 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags polyline point handles without moving other points', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'polyline',
+      kind: 'polyline',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'polyline', handle: 'center', pointIndex: 1 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'polyline', handle: 'center', pointIndex: 1 },
+        startPoint: { x: 50, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 60, y: 40 },
+      { now: () => 8 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 90 },
+        { time: 60, price: 60 },
+        { time: 90, price: 90 },
+      ],
+      updatedAt: 8,
+    });
+  });
+
+  it('moves selected polylines by screen delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'polyline',
+      kind: 'polyline',
+      points: [
+        { time: 10, price: 90 },
+        { time: 50, price: 50 },
+        { time: 90, price: 90 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'polyline' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'polyline' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 20, y: 20 },
+      { now: () => 9 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 20, price: 80 },
+        { time: 60, price: 40 },
+        { time: 100, price: 80 },
+      ],
+      updatedAt: 9,
+    });
+  });
+
   it('drags triangle point handles without moving other points', () => {
     const drawing: UserDrawing = {
       ...base,
