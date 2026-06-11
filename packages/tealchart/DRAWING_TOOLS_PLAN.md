@@ -78,6 +78,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas uses Shift/Cmd/Ctrl-click for additive selection, and mobile Skia
   uses a two-finger tap routed through the same shared selection reducer.
 
+## Shipped: Z-Order Action APIs
+
+- Shared z-order reducers move selected or targeted drawings forward, backward,
+  to front, or to back while preserving group membership and drawing IDs.
+- Locked drawings remain protected unless the caller opts into locked updates.
+- Web widget APIs and mobile Skia handles expose matching z-order methods for
+  app toolbar integration.
+
 ## Shipped: Text Editing Foundation
 
 - Shared text edit reducers begin, update, commit, cancel, and directly set text

@@ -153,6 +153,7 @@ export {
   duplicateUserDrawing,
   getUserDrawingSelectionIds,
   handleUserDrawingInput,
+  reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
   selectUserDrawingById,
@@ -177,6 +178,7 @@ export type {
   UserDrawingSelectionInputOptions,
   UserDrawingTextEditOptions,
   UpdateUserDrawingOptions,
+  UserDrawingZOrderAction,
 } from './input';
 export {
   resolveUserDrawingPriceRangeMetrics,
