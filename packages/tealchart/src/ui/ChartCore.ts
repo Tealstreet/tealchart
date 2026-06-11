@@ -1562,7 +1562,7 @@ export class ChartCore {
     const sourcePane = layout.panes.find((pane) => pane.id === point.paneId);
     return {
       ...point,
-      bars: sourcePane?.type === 'main' ? this.bars : undefined,
+      bars: sourcePane?.type === 'main' && this.bars.length > 0 ? this.bars : undefined,
     };
   }
 
