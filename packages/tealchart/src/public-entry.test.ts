@@ -20,6 +20,8 @@ import {
 } from './index';
 import type {
   ArrowLineDrawing,
+  ArrowMarkDownDrawing,
+  ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   DateRangeDrawing,
   ExtendedLineDrawing,
@@ -46,6 +48,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
   });
 
   it('exports shared drawing opacity helpers', () => {
@@ -197,6 +200,28 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('arrowMarker');
+  });
+
+  it('exports shared drawing arrow mark types', () => {
+    const up: ArrowMarkUpDrawing = {
+      id: 'up',
+      kind: 'arrowMarkUp',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      point: { time: 1, price: 10 },
+    };
+    const down: ArrowMarkDownDrawing = {
+      ...up,
+      id: 'down',
+      kind: 'arrowMarkDown',
+    };
+
+    expect(up.kind).toBe('arrowMarkUp');
+    expect(down.kind).toBe('arrowMarkDown');
   });
 
   it('exports shared drawing extended line types', () => {

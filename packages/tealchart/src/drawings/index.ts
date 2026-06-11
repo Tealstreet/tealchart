@@ -169,6 +169,8 @@ export type {
 } from './toolbar';
 export type {
   ArrowLineDrawing,
+  ArrowMarkDownDrawing,
+  ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   CreateUserDrawingFromDraftOptions,
   DateRangeDrawing,

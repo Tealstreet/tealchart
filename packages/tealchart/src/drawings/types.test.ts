@@ -54,6 +54,8 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('select')).toBe(0);
     expect(getRequiredAnchorCount('horizontalLine')).toBe(1);
     expect(getRequiredAnchorCount('verticalLine')).toBe(1);
+    expect(getRequiredAnchorCount('arrowMarkUp')).toBe(1);
+    expect(getRequiredAnchorCount('arrowMarkDown')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('trendLine')).toBe(2);
     expect(getRequiredAnchorCount('extendedLine')).toBe(2);
@@ -191,6 +193,14 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'verticalLine', anchors: [anchorA] }), { id: 'v' })).toMatchObject({
       kind: 'verticalLine',
       time: anchorA.time,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'arrowMarkUp', anchors: [anchorA] }), { id: 'up' })).toMatchObject({
+      kind: 'arrowMarkUp',
+      point: anchorA,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'arrowMarkDown', anchors: [anchorA] }), { id: 'down' })).toMatchObject({
+      kind: 'arrowMarkDown',
+      point: anchorA,
     });
     expect(
       createUserDrawingFromDraft(

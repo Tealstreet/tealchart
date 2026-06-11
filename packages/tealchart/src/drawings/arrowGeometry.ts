@@ -11,6 +11,11 @@ export interface DrawingArrowMarker {
   segment: DrawingScreenSegment;
 }
 
+export interface DrawingArrowMark {
+  points: readonly DrawingScreenPoint[];
+  point: DrawingScreenPoint;
+}
+
 export function resolveDrawingArrowHead(
   segment: DrawingScreenSegment,
   options: {
@@ -73,6 +78,37 @@ export function resolveDrawingArrowMarker(
       { x: segment.start.x + px * tailHalfWidth, y: segment.start.y + py * tailHalfWidth },
       { x: segment.start.x - px * tailHalfWidth, y: segment.start.y - py * tailHalfWidth },
       { x: shoulder.x - px * headHalfWidth, y: shoulder.y - py * headHalfWidth },
+    ],
+  };
+}
+
+export function resolveDrawingArrowMark(
+  point: DrawingScreenPoint,
+  direction: 'up' | 'down',
+  options: {
+    height?: number;
+    width?: number;
+    stemWidth?: number;
+  } = {},
+): DrawingArrowMark {
+  const height = options.height ?? 24;
+  const halfWidth = (options.width ?? 18) / 2;
+  const stemHalfWidth = (options.stemWidth ?? 7) / 2;
+  const sign = direction === 'up' ? -1 : 1;
+  const tip = point;
+  const shoulderY = point.y - sign * height * 0.45;
+  const tailY = point.y - sign * height;
+
+  return {
+    point,
+    points: [
+      tip,
+      { x: point.x + halfWidth, y: shoulderY },
+      { x: point.x + stemHalfWidth, y: shoulderY },
+      { x: point.x + stemHalfWidth, y: tailY },
+      { x: point.x - stemHalfWidth, y: tailY },
+      { x: point.x - stemHalfWidth, y: shoulderY },
+      { x: point.x - halfWidth, y: shoulderY },
     ],
   };
 }
