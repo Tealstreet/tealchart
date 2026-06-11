@@ -412,7 +412,7 @@ export type ResolvedUserDrawingGeometry =
       fib: DrawingScreenFibLevels;
     }
   | {
-      kind: 'path';
+      kind: 'path' | 'brush';
       drawing: UserDrawing;
       polyline: DrawingScreenPolyline;
     }
@@ -2234,9 +2234,10 @@ export function resolveUserDrawingGeometry(
         gannBox: resolveGannSquareFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'path':
+    case 'brush':
     case 'polyline':
       return {
-        kind: 'path',
+        kind: drawing.kind === 'brush' ? 'brush' : 'path',
         drawing,
         polyline: resolvePolylineFromAnchors(drawing.points, space),
       };
