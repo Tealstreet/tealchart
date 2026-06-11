@@ -73,6 +73,74 @@ describe('drawing layout serialization', () => {
     expect(restored?.selection).toBeNull();
   });
 
+  it('ignores malformed layout payloads without throwing', () => {
+    expect(deserializeUserDrawingStateFromLayout({ drawings: 'not-an-array' })).toBeUndefined();
+    expect(
+      deserializeUserDrawingStateFromLayout({
+        version: 1,
+        drawings: [
+          null,
+          { kind: 'futureTool', id: 'future' },
+          {
+            id: 'broken',
+            kind: 'trendLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            points: [{ time: 1, price: 10 }],
+            extend: 'none',
+          },
+        ],
+      }),
+    ).toBeUndefined();
+  });
+
+  it('filters invalid drawings while restoring valid layout payloads', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'rectangle',
+      selection: { drawingId: 'valid' },
+      drawings: [
+        {
+          id: 'invalid',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'unknown' },
+          price: 10,
+        },
+        {
+          id: 'valid',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Restored',
+          textAlign: 'unexpected',
+        },
+      ],
+    });
+
+    expect(restored?.drawings).toEqual([
+      expect.objectContaining({
+        id: 'valid',
+        kind: 'textLabel',
+        textAlign: 'center',
+      }),
+    ]);
+    expect(restored?.selection).toBeNull();
+  });
+
   it('compares only committed drawing payloads', () => {
     const previous = createStateWithTransientFields();
     const next = {
