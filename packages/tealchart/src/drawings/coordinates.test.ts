@@ -8,6 +8,7 @@ import type {
   CircleDrawing,
   CrossLineDrawing,
   CurveDrawing,
+  CyclicLinesDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
@@ -681,6 +682,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 100 },
       ],
     };
+    const cyclicLines: CyclicLinesDrawing = {
+      ...trendLine,
+      id: 'cyclic-lines',
+      kind: 'cyclicLines',
+      points: [
+        { time: 1_500, price: 100 },
+        { time: 2_000, price: 100 },
+      ],
+    };
     const trendBasedFibTime: TrendBasedFibTimeDrawing = {
       ...trendLine,
       id: 'trend-fib-time',
@@ -1173,6 +1183,18 @@ describe('user drawing coordinates', () => {
           { ratio: 0, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
           { ratio: 1, time: 4_000, x: 310, segment: { start: { x: 310, y: 20 }, end: { x: 310, y: 120 } } },
           { ratio: 2, time: 5_000, x: 410, segment: { start: { x: 410, y: 20 }, end: { x: 410, y: 120 } } },
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(cyclicLines, space)).toMatchObject({
+      kind: 'cyclicLines',
+      cyclicLines: {
+        interval: 500,
+        levels: expect.arrayContaining([
+          { ratio: -1, time: 1_000, x: 10, segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } } },
+          { ratio: 0, time: 1_500, x: 60, segment: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } } },
+          { ratio: 1, time: 2_000, x: 110, segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } } },
+          { ratio: 3, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
         ]),
       },
     });

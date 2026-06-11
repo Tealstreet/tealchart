@@ -164,6 +164,14 @@ export interface DrawingScreenFibTimeZone {
   levels: readonly DrawingScreenFibTimeZoneLevel[];
 }
 
+export type DrawingScreenCyclicLineLevel = DrawingScreenFibTimeZoneLevel;
+
+export interface DrawingScreenCyclicLines {
+  anchor: DrawingScreenPoint;
+  interval: number;
+  levels: readonly DrawingScreenCyclicLineLevel[];
+}
+
 export interface DrawingScreenGannFan {
   origin: DrawingScreenPoint;
   reference: DrawingScreenPoint;
@@ -425,6 +433,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'trendBasedFibTime';
       drawing: UserDrawing;
       trendBasedFibTime: DrawingScreenFibTimeZone;
+    }
+  | {
+      kind: 'cyclicLines';
+      drawing: UserDrawing;
+      cyclicLines: DrawingScreenCyclicLines;
     }
   | {
       kind: 'gannFan';
@@ -1040,6 +1053,7 @@ export const FIB_SPIRAL_STEPS = Array.from(
 );
 export const FIB_CHANNEL_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.414, 1.618, 2] as const;
 export const FIB_TIME_ZONE_LEVELS = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55] as const;
+export const CYCLIC_LINES_MAX_VISIBLE_LEVELS = 401;
 export const GANN_FAN_LEVELS = [
   { ratio: 0.125, label: '1/8' },
   { ratio: 0.25, label: '1/4' },
@@ -1302,6 +1316,60 @@ export function resolveTrendBasedFibTimeFromAnchors(
         segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
       };
     }),
+  };
+}
+
+export function resolveCyclicLinesFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenCyclicLines {
+  const anchor = anchorToScreenPoint(first, space);
+  const interval = Math.abs(second.time - first.time);
+  if (interval <= 0) {
+    const x = timeToDrawingX(first.time, space);
+    return {
+      anchor,
+      interval,
+      levels: [
+        {
+          ratio: 0,
+          time: first.time,
+          x,
+          segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+        },
+      ],
+    };
+  }
+
+  const startIndex = Math.floor((space.viewport.startTime - first.time) / interval) - 1;
+  const endIndex = Math.ceil((space.viewport.endTime - first.time) / interval) + 1;
+  const rawCount = Math.max(0, endIndex - startIndex + 1);
+  const step = Math.max(1, Math.ceil(rawCount / CYCLIC_LINES_MAX_VISIBLE_LEVELS));
+  const visibleIndexes = new Set<number>();
+
+  for (let index = startIndex; index <= endIndex; index += step) {
+    visibleIndexes.add(index);
+  }
+  visibleIndexes.add(0);
+  visibleIndexes.add(second.time >= first.time ? 1 : -1);
+
+  const levels: DrawingScreenCyclicLineLevel[] = [];
+  for (const index of Array.from(visibleIndexes).sort((a, b) => a - b)) {
+    const time = first.time + interval * index;
+    const x = timeToDrawingX(time, space);
+    levels.push({
+      ratio: index,
+      time,
+      x,
+      segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+    });
+  }
+
+  return {
+    anchor,
+    interval,
+    levels,
   };
 }
 
@@ -1868,6 +1936,12 @@ export function resolveUserDrawingGeometry(
           drawing.points[2],
           space,
         ),
+      };
+    case 'cyclicLines':
+      return {
+        kind: 'cyclicLines',
+        drawing,
+        cyclicLines: resolveCyclicLinesFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'gannFan':
       return {
