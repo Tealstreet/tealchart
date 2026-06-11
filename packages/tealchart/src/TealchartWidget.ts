@@ -12,7 +12,6 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
-  TextLabelDrawing,
   UserDrawingEditDrag,
   UserDrawingHandleRole,
   UserDrawingHitTestOptions,
@@ -20,6 +19,7 @@ import type {
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextAnnotation,
   UserDrawingTextAlign,
   UserDrawingTool,
   UpdateUserDrawingOptions,
@@ -45,6 +45,7 @@ import {
   deserializeUserDrawingStateFromLayout,
   handleUserDrawingInput,
   isUserDrawingLayoutStateEqual,
+  isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   resolveUserDrawingSelectionAtPoint,
@@ -2286,7 +2287,7 @@ export class TealchartWidget {
     return id;
   }
 
-  private _measureUserDrawingTextLabelLine = (drawing: TextLabelDrawing, line: string): number => {
+  private _measureUserDrawingTextLabelLine = (drawing: UserDrawingTextAnnotation, line: string): number => {
     this._userDrawingTextMeasureCtx ??= document.createElement('canvas').getContext('2d');
     const ctx = this._userDrawingTextMeasureCtx;
     if (!ctx) return line.length * 6;
@@ -2400,7 +2401,7 @@ export class TealchartWidget {
       const selectedDrawing = selectedId
         ? result.state.drawings.find((drawing) => drawing.id === selectedId)
         : null;
-      if (result.hit && selectedDrawing?.kind === 'textLabel') {
+      if (result.hit && selectedDrawing && isUserDrawingTextAnnotation(selectedDrawing)) {
         const nextState = beginUserDrawingTextEdit(result.state, selectedDrawing.id);
         if (nextState !== result.state) {
           this.setUserDrawingState(nextState);

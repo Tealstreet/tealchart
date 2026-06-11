@@ -1368,6 +1368,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
   });
 
+  it('renders note drawings with measured boxes', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'note',
+      kind: 'note',
+      point: { time: 50, price: 50 },
+      text: 'Note',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:32,40,36,20:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
+  });
+
   it('renders multiline text labels with one canvas text draw per line', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

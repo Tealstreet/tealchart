@@ -2452,6 +2452,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('preserves note text and alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'note',
+          kind: 'note',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Left note',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'note',
+      id: 'note',
+      clip,
+      point: { x: 50, y: 50 },
+      text: 'Left note',
+      editing: false,
+      editValue: null,
+      textAlign: 'left',
+    });
+  });
+
   it('marks active text edits with the draft value for mobile overlays', () => {
     const state: UserDrawingState = {
       version: 1,
