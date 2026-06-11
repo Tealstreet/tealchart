@@ -48,6 +48,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'ellipse':
     case 'priceRange':
     case 'dateRange':
+    case 'fibRetracement':
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -286,6 +287,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'dateRange',
+            points,
+          }
+        : null;
+    }
+    case 'fibRetracement': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'fibRetracement',
             points,
           }
         : null;

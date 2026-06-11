@@ -79,6 +79,7 @@ export function resolveUserDrawingHandlePoints(
     case 'arrowLine':
     case 'arrowMarker':
     case 'ray':
+    case 'fibRetracement':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {
       const y = priceToDrawingY(drawing.price, space);
