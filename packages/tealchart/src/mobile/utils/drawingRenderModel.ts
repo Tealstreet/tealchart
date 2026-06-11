@@ -177,6 +177,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'flatTopBottom';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      points: readonly DrawingScreenPoint[];
+      base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'priceRange';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -308,6 +320,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
 export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
+export type MobileUserDrawingFlatTopBottomPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'flatTopBottom' }>;
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
 export type MobileUserDrawingBarsPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'barsPattern' }>;
@@ -582,6 +595,7 @@ function primitiveFromGeometry(
       };
     case 'parallelChannel':
     case 'regressionTrend':
+    case 'flatTopBottom':
       return {
         kind: geometry.kind,
         id: geometry.drawing.id,

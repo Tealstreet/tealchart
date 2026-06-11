@@ -643,6 +643,46 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready flat top and bottom primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'flat',
+          kind: 'flatTopBottom',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 80 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'flatTopBottom',
+      id: 'flat',
+      points: [
+        { x: 10, y: 50 },
+        { x: 90, y: 20 },
+        { x: 90, y: 80 },
+        { x: 10, y: 80 },
+      ],
+      base: { start: { x: 10, y: 50 }, end: { x: 90, y: 20 } },
+      parallel: { start: { x: 10, y: 80 }, end: { x: 90, y: 80 } },
+    });
+  });
+
   it('returns Skia-ready Fibonacci retracement primitives', () => {
     const state: UserDrawingState = {
       version: 1,

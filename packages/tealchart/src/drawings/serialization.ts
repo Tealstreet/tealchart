@@ -61,6 +61,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'triangle':
     case 'parallelChannel':
+    case 'flatTopBottom':
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':
@@ -400,6 +401,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'parallelChannel',
+            points,
+          }
+        : null;
+    }
+    case 'flatTopBottom': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'flatTopBottom',
             points,
           }
         : null;

@@ -113,6 +113,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
       return { ...drawing, points: movePathAnchors(drawing.points, delta), updatedAt };
     case 'triangle':
     case 'parallelChannel':
+    case 'flatTopBottom':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
@@ -227,6 +228,7 @@ function editDrawingHandle(
     (drawing.kind === 'path' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'parallelChannel' ||
+      drawing.kind === 'flatTopBottom' ||
       drawing.kind === 'regressionTrend' ||
       drawing.kind === 'longPosition' ||
       drawing.kind === 'shortPosition') &&
@@ -280,6 +282,7 @@ function editDrawingHandle(
     case 'path':
     case 'triangle':
     case 'parallelChannel':
+    case 'flatTopBottom':
     case 'regressionTrend':
     case 'longPosition':
     case 'shortPosition':

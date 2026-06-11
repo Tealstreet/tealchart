@@ -9,6 +9,7 @@ import {
   normalizeUserDrawingOpacity,
   resolveCircleFromAnchors,
   resolveEllipseFromAnchors,
+  resolveFlatTopBottomFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
@@ -38,6 +39,7 @@ import type {
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingParallelChannelPrimitive,
   MobileUserDrawingRegressionTrendPrimitive,
+  MobileUserDrawingFlatTopBottomPrimitive,
   MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -52,6 +54,7 @@ import type {
   DateRangeDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FlatTopBottomDrawing,
   InfoLineDrawing,
   LongPositionDrawing,
   PathDrawing,
@@ -86,6 +89,7 @@ describe('tealchart public entries', () => {
   it('exports shared and native drawing text alignment helpers', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
+    expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
@@ -107,6 +111,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingParallelChannelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRegressionTrendPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFlatTopBottomPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRiskRewardPositionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
@@ -130,6 +135,11 @@ describe('tealchart public entries', () => {
       ...channelPrimitive,
       kind: 'regressionTrend',
       id: 'regression',
+    };
+    const flatPrimitive: NonNever<MobileUserDrawingFlatTopBottomPrimitive> = {
+      ...channelPrimitive,
+      kind: 'flatTopBottom',
+      id: 'flat',
     };
     const linePrimitive: NonNever<MobileUserDrawingLinePrimitive> = {
       kind: 'line',
@@ -194,6 +204,7 @@ describe('tealchart public entries', () => {
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
+    expect(flatPrimitive.kind).toBe('flatTopBottom');
     expect(linePrimitive.kind).toBe('line');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
     expect(riskRewardPrimitive.kind).toBe('riskRewardPosition');
@@ -703,5 +714,25 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('regressionTrend');
+  });
+
+  it('exports shared drawing flat top and bottom types', () => {
+    const drawing: FlatTopBottomDrawing = {
+      id: 'flat',
+      kind: 'flatTopBottom',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(drawing.kind).toBe('flatTopBottom');
   });
 });

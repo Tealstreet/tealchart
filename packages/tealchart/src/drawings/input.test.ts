@@ -187,6 +187,25 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits flat top and bottom drawings from three anchors', () => {
+    const options = { createId: () => 'flat-top-bottom', now: () => 31 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'flatTopBottom'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+    const third = handleUserDrawingInput(second, { paneId: 'main', anchor: anchorC }, options);
+
+    expect(second.drawings).toEqual([]);
+    expect(third.draft).toBeNull();
+    expect(third.selection).toEqual({ drawingId: 'flat-top-bottom' });
+    expect(third.drawings[0]).toMatchObject({
+      id: 'flat-top-bottom',
+      kind: 'flatTopBottom',
+      points: [anchorA, anchorB, anchorC],
+    });
+  });
+
   it('commits bars pattern drawings from three anchors', () => {
     const options = { createId: () => 'bars-pattern', now: () => 31 };
     const bars = [

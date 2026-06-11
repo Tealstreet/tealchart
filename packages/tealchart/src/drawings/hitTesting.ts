@@ -248,7 +248,7 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'parallelChannel' || geometry.kind === 'regressionTrend') {
+  if (geometry.kind === 'parallelChannel' || geometry.kind === 'regressionTrend' || geometry.kind === 'flatTopBottom') {
     const distance = pointInPolygon(point, geometry.channel.polygon.points)
       ? 0
       : Math.min(
@@ -389,6 +389,13 @@ function hitTestUserDrawingHandle(
       break;
     case 'parallelChannel':
       if (geometry.drawing.kind === 'parallelChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'flatTopBottom':
+      if (geometry.drawing.kind === 'flatTopBottom') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });
