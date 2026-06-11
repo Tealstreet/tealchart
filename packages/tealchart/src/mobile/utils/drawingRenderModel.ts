@@ -105,6 +105,13 @@ export interface MobileUserDrawingPriceRangeLabelPosition {
   y: number;
 }
 
+export interface MobileUserDrawingTextBounds {
+  x?: number;
+  y?: number;
+  width: number;
+  height?: number;
+}
+
 export interface ResolveMobileUserDrawingRenderModelOptions extends ResolveUserDrawingRenderEntriesOptions {
   handleRadius?: number;
   draftOpacity?: number;
@@ -303,15 +310,18 @@ export function resolveMobileUserDrawingTextLabelLayout(
 
 export function resolveMobileUserDrawingPriceRangeLabelPosition(
   primitive: MobileUserDrawingPriceRangePrimitive,
-  measuredTextWidth: number,
+  measuredTextBounds: MobileUserDrawingTextBounds,
 ): MobileUserDrawingPriceRangeLabelPosition {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
+  const textX = measuredTextBounds.x ?? 0;
+  const textY = measuredTextBounds.y ?? -fontSize;
+  const textHeight = measuredTextBounds.height ?? fontSize;
 
   return {
     fontSize,
     fontFamily,
-    x: primitive.labelPoint.x - measuredTextWidth / 2,
-    y: primitive.labelPoint.y + fontSize / 2,
+    x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
+    y: primitive.labelPoint.y - textY - textHeight / 2,
   };
 }
