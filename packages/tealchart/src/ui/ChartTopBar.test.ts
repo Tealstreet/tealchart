@@ -495,6 +495,7 @@ describe('ChartTopBar drawing toolbar', () => {
   it('disables locked selected drawing style controls and one-way actions', () => {
     const onStyle = vi.fn();
     const onLocked = vi.fn();
+    const onDeleteSelected = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-locked-style',
       symbol: 'BTCUSDT',
@@ -517,9 +518,13 @@ describe('ChartTopBar drawing toolbar', () => {
       },
       onUserDrawingStyleChange: onStyle,
       onUserDrawingLockedChange: onLocked,
+      onUserDrawingDeleteSelected: onDeleteSelected,
     });
     topBar.mount(document.body);
 
+    const deleteSelected = document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]');
+    expect(deleteSelected?.disabled).toBe(true);
+    deleteSelected?.click();
     const green = document.querySelector<HTMLButtonElement>('button[aria-label="Green line color"]');
     expect(green?.disabled).toBe(true);
     green?.click();
@@ -531,6 +536,7 @@ describe('ChartTopBar drawing toolbar', () => {
     unlock?.click();
 
     expect(onStyle).not.toHaveBeenCalled();
+    expect(onDeleteSelected).not.toHaveBeenCalled();
     expect(onLocked).toHaveBeenCalledWith(false, true);
 
     topBar.unmount();
