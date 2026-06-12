@@ -1097,6 +1097,46 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('drags double curve point handles without moving other points', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'double-curve',
+      kind: 'doubleCurve',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 80 },
+        { time: 70, price: 20 },
+        { time: 90, price: 50 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'double-curve', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'double-curve', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 70, y: 80 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 75, y: 70 },
+      { now: () => 8 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 80 },
+        { time: 75, price: 30 },
+        { time: 90, price: 50 },
+      ],
+      updatedAt: 8,
+    });
+  });
+
   it('moves selected polylines by screen delta', () => {
     const drawing: UserDrawing = {
       ...base,

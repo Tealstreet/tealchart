@@ -592,6 +592,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, sampled-curve hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Double Curve Tool
+
+- Shared drawing state supports the four-anchor `doubleCurve` tool and persists
+  it through layout save/load.
+- Web Canvas renders cubic Bezier curves from shared start/control/control/end
+  geometry while mobile Skia renders the same sampled double-curve path.
+- Selection, sampled-path hit testing, whole-drawing moves, and point-index
+  anchor editing use shared drawing behavior on both platforms.
+
 ## Shipped: Arc Tool
 
 - Shared drawing state supports the three-anchor `arc` tool and persists it

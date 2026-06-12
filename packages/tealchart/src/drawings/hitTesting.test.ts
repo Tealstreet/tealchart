@@ -583,6 +583,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits double curve paths and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'double-curve',
+      kind: 'doubleCurve',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 80 },
+        { time: 70, price: 20 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('double-curve');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 80 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits arc paths and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

@@ -36,6 +36,8 @@ function createRecordingContext(events: string[]): CanvasContext {
     moveTo: (x, y) => events.push(`moveTo:${x},${y}`),
     lineTo: (x, y) => events.push(`lineTo:${x},${y}`),
     quadraticCurveTo: (cpx, cpy, x, y) => events.push(`quadraticCurveTo:${cpx},${cpy},${x},${y}`),
+    bezierCurveTo: (cp1x, cp1y, cp2x, cp2y, x, y) =>
+      events.push(`bezierCurveTo:${cp1x},${cp1y},${cp2x},${cp2y},${x},${y}`),
     arc: () => events.push('arc'),
     rect: (x, y, width, height) => events.push(`rect:${x},${y},${width},${height}`),
     roundRect: (x, y, width, height) => events.push(`roundRect:${x},${y},${width},${height}`),

@@ -97,11 +97,12 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }, { ...drawing.points[2] }],
       };
+    case 'doubleCurve':
     case 'disjointChannel':
       return {
         ...drawing,
         style: { ...drawing.style },
-        kind: 'disjointChannel',
+        kind: drawing.kind,
         points: [
           { ...drawing.points[0] },
           { ...drawing.points[1] },
@@ -713,6 +714,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'curve',
+            points,
+          }
+        : null;
+    }
+    case 'doubleCurve': {
+      const points = parseFourPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'doubleCurve',
             points,
           }
         : null;
