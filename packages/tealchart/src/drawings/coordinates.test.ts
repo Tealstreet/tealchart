@@ -1788,9 +1788,11 @@ describe('user drawing coordinates', () => {
         arcs: [
           expect.objectContaining({
             ratio: 1 / 3,
+            label: '0.333',
             radius: expect.closeTo(37.27),
             startAngle: 0,
             endAngle: expect.closeTo(0.46),
+            labelPoint: { x: expect.closeTo(46.27), y: expect.closeTo(74.56) },
           }),
           expect.objectContaining({
             ratio: 2 / 3,
@@ -1800,9 +1802,11 @@ describe('user drawing coordinates', () => {
           }),
           expect.objectContaining({
             ratio: 1,
+            label: '1',
             radius: expect.closeTo(111.8),
             startAngle: 0,
             endAngle: expect.closeTo(0.46),
+            labelPoint: { x: expect.closeTo(118.81), y: expect.closeTo(91.69) },
           }),
         ],
       },
@@ -1814,8 +1818,22 @@ describe('user drawing coordinates', () => {
         reference: { x: 110, y: 120 },
         baseRadius: expect.closeTo(111.8),
         arcs: expect.arrayContaining([
-          expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39), startAngle: 0, endAngle: Math.PI }),
-          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: Math.PI }),
+          expect.objectContaining({
+            ratio: 0.236,
+            label: '0.236',
+            radius: expect.closeTo(26.39),
+            startAngle: 0,
+            endAngle: Math.PI,
+            labelPoint: { x: expect.closeTo(10), y: expect.closeTo(92.39) },
+          }),
+          expect.objectContaining({
+            ratio: 1,
+            label: '1',
+            radius: expect.closeTo(111.8),
+            startAngle: 0,
+            endAngle: Math.PI,
+            labelPoint: { x: expect.closeTo(10), y: expect.closeTo(177.8) },
+          }),
           expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7), startAngle: 0, endAngle: Math.PI }),
         ]),
       },
@@ -1826,8 +1844,18 @@ describe('user drawing coordinates', () => {
         center: { x: 10, y: 70 },
         baseRadius: expect.closeTo(111.8),
         circles: expect.arrayContaining([
-          expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39) }),
-          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8) }),
+          expect.objectContaining({
+            ratio: 0.236,
+            label: '0.236',
+            radius: expect.closeTo(26.39),
+            labelPoint: { x: expect.closeTo(36.39), y: 66 },
+          }),
+          expect.objectContaining({
+            ratio: 1,
+            label: '1',
+            radius: expect.closeTo(111.8),
+            labelPoint: { x: expect.closeTo(121.8), y: 66 },
+          }),
           expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7) }),
         ]),
       },

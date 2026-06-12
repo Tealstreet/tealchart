@@ -1002,6 +1002,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching time guide labels from the shared
   model without changing persisted drawing state.
 
+## Shipped: Curved Fibonacci Guide Labels
+
+- Shared Fibonacci circle, arc, and speed-resistance arc geometry now carries
+  ratio labels and screen label points.
+- Web Canvas and mobile Skia render matching curved Fibonacci guide labels from
+  the shared model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
