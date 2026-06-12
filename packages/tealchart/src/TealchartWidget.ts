@@ -65,6 +65,7 @@ import {
   setUserDrawingLocked as setUserDrawingLockedState,
   setUserDrawingTableCell as setUserDrawingTableCellState,
   setUserDrawingTableCells as setUserDrawingTableCellsState,
+  setUserDrawingTableDimensions as setUserDrawingTableDimensionsState,
   setUserDrawingText,
   setUserDrawingTextContent as setUserDrawingTextContentState,
   setUserDrawingTextAlign as setUserDrawingTextAlignState,
@@ -2341,6 +2342,12 @@ export class TealchartWidget {
   ): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingTableCellState(this._userDrawingState, row, column, value, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingTableDimensions(rows: number, columns: number, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingTableDimensionsState(this._userDrawingState, rows, columns, options));
     return this._userDrawingState !== previousState;
   }
 
