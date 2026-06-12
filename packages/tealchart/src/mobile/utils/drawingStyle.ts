@@ -12,6 +12,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingTableCells,
+  setUserDrawingTextContent,
   setUserDrawingTextAlign,
   setUserDrawingLocked,
   setUserDrawingVisibility,
@@ -48,6 +49,14 @@ export function setMobileUserDrawingTextAlign(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingTextAlign(state, textAlign, options);
+}
+
+export function setMobileUserDrawingTextContent(
+  state: UserDrawingState,
+  text: string,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return setUserDrawingTextContent(state, text, options);
 }
 
 export function setMobileUserDrawingIconName(

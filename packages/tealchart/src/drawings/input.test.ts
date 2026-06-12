@@ -26,6 +26,7 @@ import {
   setUserDrawingLocked,
   setUserDrawingTableCells,
   setUserDrawingText,
+  setUserDrawingTextContent,
   setUserDrawingTextAlign,
   setUserDrawingTool,
   setUserDrawingVisibility,
@@ -867,6 +868,56 @@ describe('user drawing input controller', () => {
     expect(setUserDrawingText(changed, 'locked', 'Ignored')).toBe(changed);
     expect(beginUserDrawingTextEdit(changed, 'line')).toBe(changed);
     expect(beginUserDrawingTextEdit(changed, 'locked')).toBe(changed);
+  });
+
+  it('updates selected or targeted text content while respecting locks', () => {
+    const textLabel = {
+      id: 'label',
+      kind: 'textLabel' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      text: 'Note',
+      textAlign: 'center' as const,
+    };
+    const note = { ...textLabel, id: 'note', kind: 'note' as const, text: 'Note target' };
+    const line = {
+      id: 'line',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price: 100,
+    };
+    const locked = { ...textLabel, id: 'locked', locked: true };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 2 },
+      drawings: [textLabel, note, line, locked],
+    });
+
+    const selected = setUserDrawingTextContent(state, 'Selected text', { now: () => 30 });
+
+    expect(selected.selection).toEqual({ drawingId: 'label' });
+    expect(selected.textEdit).toBeNull();
+    expect(selected.drawings[0]).toMatchObject({ text: 'Selected text', updatedAt: 30 });
+    expect(setUserDrawingTextContent(selected, 'Selected text')).toBe(selected);
+    expect(setUserDrawingTextContent(selected, 'Ignored', { drawingId: 'line' })).toBe(selected);
+    expect(setUserDrawingTextContent(selected, 'Ignored', { drawingId: 'locked' })).toBe(selected);
+
+    const targeted = setUserDrawingTextContent(selected, 'Targeted text', { drawingId: 'note', now: () => 31 });
+    expect(targeted.selection).toEqual({ drawingId: 'note' });
+    expect(targeted.drawings[1]).toMatchObject({ text: 'Targeted text', updatedAt: 31 });
+    expect(
+      setUserDrawingTextContent(targeted, 'Unlocked', { drawingId: 'locked', includeLocked: true }).drawings[3],
+    ).toMatchObject({ text: 'Unlocked' });
   });
 
   it('updates selected drawing style while preserving identity and selection', () => {
