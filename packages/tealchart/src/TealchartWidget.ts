@@ -24,6 +24,8 @@ import type {
   UserDrawingStyle,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
+  UserDrawingTableColumnInput,
+  UserDrawingTableRowInput,
   UserDrawingTextAnnotation,
   UserDrawingTextAlign,
   UserDrawingTool,
@@ -50,7 +52,11 @@ import {
   deleteUserDrawing as deleteUserDrawingState,
   duplicateUserDrawing as duplicateUserDrawingState,
   deserializeUserDrawingStateFromLayout,
+  deleteUserDrawingTableColumn as deleteUserDrawingTableColumnState,
+  deleteUserDrawingTableRow as deleteUserDrawingTableRowState,
   handleUserDrawingInput,
+  insertUserDrawingTableColumn as insertUserDrawingTableColumnState,
+  insertUserDrawingTableRow as insertUserDrawingTableRowState,
   isUserDrawingLayoutStateEqual,
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
@@ -2348,6 +2354,38 @@ export class TealchartWidget {
   setUserDrawingTableDimensions(rows: number, columns: number, options: UpdateUserDrawingOptions = {}): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingTableDimensionsState(this._userDrawingState, rows, columns, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  insertUserDrawingTableRow(
+    row: number,
+    values?: UserDrawingTableRowInput,
+    options: UpdateUserDrawingOptions = {},
+  ): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(insertUserDrawingTableRowState(this._userDrawingState, row, values, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  deleteUserDrawingTableRow(row: number, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(deleteUserDrawingTableRowState(this._userDrawingState, row, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  insertUserDrawingTableColumn(
+    column: number,
+    values?: UserDrawingTableColumnInput,
+    options: UpdateUserDrawingOptions = {},
+  ): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(insertUserDrawingTableColumnState(this._userDrawingState, column, values, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(deleteUserDrawingTableColumnState(this._userDrawingState, column, options));
     return this._userDrawingState !== previousState;
   }
 
