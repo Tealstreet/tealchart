@@ -236,6 +236,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingAbcdPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingAnchoredVolumeProfilePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingAnchoredVwapPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArcPrimitive');
@@ -246,8 +247,25 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingCrossLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCurvePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCyclicLinesPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingCypherPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTimeCyclesPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingSineLinePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingDoubleCurvePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingElliottCorrectiveWavePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingElliottDoubleComboWavePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingElliottImpulseWavePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingElliottTriangleWavePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingElliottTripleComboWavePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibArcsPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibChannelPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibCirclesPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibFanPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibSpeedResistanceArcsPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibSpeedResistanceFanPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibSpiralPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibTimeZonePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFibWedgePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingFixedRangeVolumeProfilePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingForecastPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingProjectionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingSectorPrimitive');
@@ -264,6 +282,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingRiskRewardPositionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingGannSquarePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingGannSquareFixedPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingHeadShouldersPatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCalloutPrimitive');
@@ -271,11 +290,18 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingPriceNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingPinPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingIconPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingImagePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingPriceLabelPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBalloonPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingSignpostPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTextBoxPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTextLabelLayout');
     expect(nativeEntry).toContain('MobileUserDrawingTablePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingThreeDrivesPatternPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTrendBasedFibExtensionPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTrendBasedFibTimePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTrianglePatternPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingXabcdPatternPrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {

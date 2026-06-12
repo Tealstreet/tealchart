@@ -1102,6 +1102,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile host apps can consume the same text annotation helper surface that
   SkiaTealchart uses internally for drawing text-box parity.
 
+## Shipped: Native Mobile Primitive Export Parity
+
+- The native entrypoint now exports every mobile drawing primitive alias from
+  the Skia render model, including image, Fibonacci, pattern, Elliott, and
+  volume profile primitives.
+- Public-entry coverage verifies native host integrations can import the full
+  mobile drawing primitive surface without reaching into internal utility paths.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
