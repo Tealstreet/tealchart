@@ -199,6 +199,25 @@ function renderAnchoredVwapGeometry(
   ctx.stroke();
 }
 
+function renderFixedRangeVolumeProfileGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fixedRangeVolumeProfile' }>,
+): void {
+  const { drawing, volumeProfile } = geometry;
+  if (drawing.style.fillVisible !== false) {
+    ctx.fillStyle = drawing.style.fillColor ?? drawing.style.lineColor;
+    for (const bin of volumeProfile.bins) {
+      if (bin.volume <= 0 || bin.rect.width <= 0 || bin.rect.height <= 0) continue;
+      ctx.fillRect(bin.rect.x, bin.rect.y, bin.rect.width, bin.rect.height);
+    }
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.strokeRect(volumeProfile.bounds.x, volumeProfile.bounds.y, volumeProfile.bounds.width, volumeProfile.bounds.height);
+  }
+}
+
 function renderPolygonGeometry(
   ctx: CanvasContext,
   geometry: Extract<
@@ -1266,6 +1285,9 @@ export function renderUserDrawing(
         if (drawing.style.lineVisible !== false) {
           renderAnchoredVwapGeometry(ctx, geometry);
         }
+        break;
+      case 'fixedRangeVolumeProfile':
+        renderFixedRangeVolumeProfileGeometry(ctx, geometry);
         break;
       case 'rectangle':
         renderRectangleGeometry(ctx, geometry);

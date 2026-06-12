@@ -53,6 +53,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'dateRange':
     case 'datePriceRange':
     case 'forecast':
+    case 'fixedRangeVolumeProfile':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
@@ -911,6 +912,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'forecast',
+            points,
+          }
+        : null;
+    }
+    case 'fixedRangeVolumeProfile': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'fixedRangeVolumeProfile',
             points,
           }
         : null;
