@@ -208,6 +208,7 @@ import {
   setUserDrawingTableDimensions,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
+  setUserDrawingTrendLineExtend,
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
@@ -223,6 +224,8 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTENDS,
 } from './index';
 import {
   resolveMobileUserDrawingMeasurementLabelPosition,
@@ -249,6 +252,14 @@ describe('tealchart public entries', () => {
     expect(insertUserDrawingTableColumn).toBeTypeOf('function');
     expect(deleteUserDrawingTableColumn).toBeTypeOf('function');
     expect(setUserDrawingTextContent).toBeTypeOf('function');
+    expect(setUserDrawingTrendLineExtend).toBeTypeOf('function');
+    expect(USER_DRAWING_TREND_LINE_EXTENDS).toEqual(['none', 'left', 'right', 'both']);
+    expect(USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.map((descriptor) => descriptor.extend)).toEqual([
+      'none',
+      'left',
+      'right',
+      'both',
+    ]);
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
@@ -262,6 +273,7 @@ describe('tealchart public entries', () => {
     expect(resolveAnchoredVwapFromAnchor).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
+    expect(nativeEntry).toContain('setMobileUserDrawingTrendLineExtend');
     expect(nativeEntry).toContain('setMobileUserDrawingIconName');
     expect(nativeEntry).toContain('setMobileUserDrawingImageSource');
     expect(nativeEntry).toContain('setMobileUserDrawingTableCell');

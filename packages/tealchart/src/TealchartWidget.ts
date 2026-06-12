@@ -28,6 +28,7 @@ import type {
   UserDrawingTableRowInput,
   UserDrawingTextAnnotation,
   UserDrawingTextAlign,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
   UpdateUserDrawingOptions,
@@ -75,6 +76,7 @@ import {
   setUserDrawingText,
   setUserDrawingTextContent as setUserDrawingTextContentState,
   setUserDrawingTextAlign as setUserDrawingTextAlignState,
+  setUserDrawingTrendLineExtend as setUserDrawingTrendLineExtendState,
   setUserDrawingTool,
   setUserDrawingVisibility as setUserDrawingVisibilityState,
   updateUserDrawingStyle as updateUserDrawingStyleState,
@@ -1070,6 +1072,9 @@ export class TealchartWidget {
       },
       onUserDrawingTextAlignChange: (textAlign) => {
         this.setUserDrawingTextAlign(textAlign);
+      },
+      onUserDrawingTrendLineExtendChange: (extend) => {
+        this.setUserDrawingTrendLineExtend(extend);
       },
       onUserDrawingIconNameChange: (iconName) => {
         this.setUserDrawingIconName(iconName);
@@ -2319,6 +2324,15 @@ export class TealchartWidget {
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingTextAlignState(this._userDrawingState, textAlign, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingTrendLineExtend(
+    extend: UserDrawingTrendLineExtend,
+    options: UpdateUserDrawingOptions = {},
+  ): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingTrendLineExtendState(this._userDrawingState, extend, options));
     return this._userDrawingState !== previousState;
   }
 

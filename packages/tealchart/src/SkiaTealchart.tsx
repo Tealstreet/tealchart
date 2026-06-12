@@ -35,6 +35,7 @@ import type {
   UserDrawingTableRowInput,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
 } from './drawings';
@@ -166,6 +167,7 @@ import {
   setMobileUserDrawingTableDimensions,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
+  setMobileUserDrawingTrendLineExtend,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './mobile/utils/drawingStyle';
@@ -298,6 +300,7 @@ export interface SkiaTealchartHandle {
   deleteUserDrawingTableColumn(column: number, options?: UpdateUserDrawingOptions): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingTrendLineExtend(extend: UserDrawingTrendLineExtend, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
@@ -629,6 +632,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
           setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign, options),
+        );
+      },
+      setUserDrawingTrendLineExtend(
+        extend: UserDrawingTrendLineExtend,
+        options: UpdateUserDrawingOptions = {},
+      ): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingTrendLineExtend(userDrawingStateRef.current, extend, options),
         );
       },
       setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
@@ -4034,6 +4045,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             }}
             onUserDrawingTextAlignChange={(textAlign) => {
               commitUserDrawingStateIfChanged(setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign));
+            }}
+            onUserDrawingTrendLineExtendChange={(extend) => {
+              commitUserDrawingStateIfChanged(
+                setMobileUserDrawingTrendLineExtend(userDrawingStateRef.current, extend),
+              );
             }}
             onUserDrawingIconNameChange={(iconName) => {
               commitUserDrawingStateIfChanged(setMobileUserDrawingIconName(userDrawingStateRef.current, iconName));
