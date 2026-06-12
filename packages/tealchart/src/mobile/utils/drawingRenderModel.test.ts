@@ -871,6 +871,26 @@ describe('mobile user drawing render model', () => {
         { ratio: 0.5, start: { x: 10, y: 50 }, end: { x: 100, y: 50 } },
         { ratio: 1, start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 } },
       ]),
+      bands: expect.arrayContaining([
+        {
+          fromRatio: 0,
+          toRatio: 0.236,
+          points: [
+            { x: 10, y: 50 },
+            { x: 100, y: -17.5 },
+            { x: 100, y: expect.closeTo(14.36) },
+          ],
+        },
+        {
+          fromRatio: 0.5,
+          toRatio: 0.618,
+          points: [
+            { x: 10, y: 50 },
+            { x: 100, y: 50 },
+            { x: 100, y: expect.closeTo(65.93) },
+          ],
+        },
+      ]),
     });
   });
 

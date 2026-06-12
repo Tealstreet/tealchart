@@ -1991,12 +1991,44 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (
-            primitive.kind === 'pitchfan' ||
-            primitive.kind === 'fibFan' ||
-            primitive.kind === 'fibSpeedResistanceFan' ||
-            primitive.kind === 'gannFan'
-          ) {
+          if (primitive.kind === 'pitchfan') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const linePath = Skia.Path.Make();
+            for (const ray of primitive.rays) {
+              linePath.moveTo(ray.start.x, ray.start.y);
+              linePath.lineTo(ray.end.x, ray.end.y);
+            }
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.fillVisible !== false &&
+                  primitive.style.fillColor &&
+                  primitive.bands.map((band) => {
+                    const path = Skia.Path.Make();
+                    const [origin, first, second] = band.points;
+                    path.moveTo(origin.x, origin.y);
+                    path.lineTo(first.x, first.y);
+                    path.lineTo(second.x, second.y);
+                    path.close();
+                    return <SkiaPath key={`${band.fromRatio}-${band.toRatio}`} path={path} color={primitive.style.fillColor} style="fill" />;
+                  })}
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={linePath}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+              </Group>
+            );
+          }
+
+          if (primitive.kind === 'fibFan' || primitive.kind === 'fibSpeedResistanceFan' || primitive.kind === 'gannFan') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 
