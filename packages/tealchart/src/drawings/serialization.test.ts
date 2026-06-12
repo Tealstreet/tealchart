@@ -326,6 +326,22 @@ describe('drawing layout serialization', () => {
       text: 'Restored anchored note',
       textAlign: 'left',
     });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toMatchObject([
+      {
+        id: 'anchored-text',
+        kind: 'anchoredText',
+        position: { x: 0.25, y: 0.75 },
+        text: 'Restored anchored text',
+        textAlign: 'right',
+      },
+      {
+        id: 'anchored-note',
+        kind: 'anchoredNote',
+        position: { x: 1, y: 0 },
+        text: 'Restored anchored note',
+        textAlign: 'left',
+      },
+    ]);
   });
 
   it('preserves restored signpost drawings', () => {

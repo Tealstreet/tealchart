@@ -145,6 +145,39 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('clamps anchored annotations when dragged outside pane bounds', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'anchored-text',
+      kind: 'anchoredText',
+      position: { x: 0.95, y: 0.05 },
+      text: 'Anchored',
+      textAlign: 'center',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'anchored-text' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'anchored-text' },
+        startPoint: { x: 95, y: 5 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 130, y: -20 },
+      { now: () => 3 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      kind: 'anchoredText',
+      position: { x: 1, y: 0 },
+      updatedAt: 3,
+    });
+  });
+
   it('preserves grouped selection when a selected drawing body drag begins', () => {
     const first: UserDrawing = {
       ...base,
