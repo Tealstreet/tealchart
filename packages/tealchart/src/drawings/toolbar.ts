@@ -420,6 +420,14 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
 }
 
 export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
+  return supportsUserDrawingTextStyleControls(drawing);
+}
+
+export function supportsUserDrawingTextStyleControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'table' || isUserDrawingTextAnnotation(drawing);
+}
+
+export function supportsUserDrawingTextAlignControls(drawing: UserDrawing): boolean {
   return isUserDrawingTextAnnotation(drawing);
 }
 
@@ -434,7 +442,7 @@ export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolea
 
 export function isUserDrawingTextToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
-  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextControls(selectedDrawing);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextStyleControls(selectedDrawing);
 }
 
 export function isUserDrawingIconToolbarEnabled(state: UserDrawingState): boolean {

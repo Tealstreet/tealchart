@@ -30,7 +30,8 @@ import {
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
   supportsUserDrawingIconControls,
-  supportsUserDrawingTextControls,
+  supportsUserDrawingTextAlignControls,
+  supportsUserDrawingTextStyleControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -160,7 +161,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const textControlsEnabled = userDrawingState ? isUserDrawingTextToolbarEnabled(userDrawingState) : false;
     const fillControlsSupported = selectedDrawing ? supportsUserDrawingFillControls(selectedDrawing) : false;
     const iconControlsSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
-    const textControlsSupported = selectedDrawing ? supportsUserDrawingTextControls(selectedDrawing) : false;
+    const textStyleControlsSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
+    const textAlignControlsSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
 
     return (
       <View style={[styles.container, { backgroundColor }]}>
@@ -465,7 +467,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     </>
                   )}
 
-                  {textControlsSupported && (
+                  {textStyleControlsSupported && (
                     <>
                       {USER_DRAWING_TEXT_COLOR_DESCRIPTORS.map((descriptor) => {
                         const active =
@@ -579,29 +581,34 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         );
                       })}
 
-                      {USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => {
-                        const active = isUserDrawingTextAnnotation(selectedDrawing) && selectedDrawing.textAlign === descriptor.textAlign;
-                        return (
-                          <Pressable
-                            key={descriptor.textAlign}
-                            accessibilityRole="button"
-                            accessibilityLabel={descriptor.label}
-                            accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
-                            disabled={!textControlsEnabled}
-                            onPress={() => onUserDrawingTextAlignChange?.(descriptor.textAlign)}
-                            style={({ pressed }: PressableStyleState) => [
-                              styles.drawingButton,
-                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                              textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
-                              !textControlsEnabled && styles.drawingButtonDisabled,
-                            ]}
-                          >
-                            <Text style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}>
-                              {descriptor.icon}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
+                      {textAlignControlsSupported &&
+                        USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => {
+                          const active =
+                            isUserDrawingTextAnnotation(selectedDrawing) &&
+                            selectedDrawing.textAlign === descriptor.textAlign;
+                          return (
+                            <Pressable
+                              key={descriptor.textAlign}
+                              accessibilityRole="button"
+                              accessibilityLabel={descriptor.label}
+                              accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
+                              disabled={!textControlsEnabled}
+                              onPress={() => onUserDrawingTextAlignChange?.(descriptor.textAlign)}
+                              style={({ pressed }: PressableStyleState) => [
+                                styles.drawingButton,
+                                active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                                textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                                !textControlsEnabled && styles.drawingButtonDisabled,
+                              ]}
+                            >
+                              <Text
+                                style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
+                              >
+                                {descriptor.icon}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
 
                       <View style={styles.innerDivider} />
                     </>
