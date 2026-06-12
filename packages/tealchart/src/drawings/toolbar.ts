@@ -487,6 +487,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'priceRange' ||
     drawing.kind === 'dateRange' ||
     drawing.kind === 'datePriceRange' ||
+    drawing.kind === 'projection' ||
     drawing.kind === 'sector' ||
     drawing.kind === 'triangle' ||
     drawing.kind === 'trianglePattern' ||

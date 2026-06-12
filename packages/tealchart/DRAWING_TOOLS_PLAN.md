@@ -1241,6 +1241,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose the same show-selected affordance for host apps
   that select hidden drawings through external drawing lists or APIs.
 
+## Shipped: Projection Fill Controls
+
+- Projection drawings now use the shared fill color and fill-visibility style
+  values to paint their projected area on both web Canvas and mobile Skia.
+- Web and mobile top bars expose matching selected projection fill controls
+  through the shared toolbar eligibility helper.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices

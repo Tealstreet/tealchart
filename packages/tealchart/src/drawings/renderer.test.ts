@@ -57,6 +57,7 @@ class RecordingCanvasContext implements CanvasContext {
   }
   fill(): void {
     this.calls.push('fill');
+    this.calls.push(`fill:${this.fillStyle}:${this.globalAlpha}`);
   }
   stroke(): void {
     this.calls.push(`stroke:${this.strokeStyle}:${this.lineWidth}:${this.lineDash.join(',')}:${this.globalAlpha}`);
@@ -747,7 +748,13 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:10,50');
     expect(ctx.calls).toContain('lineTo:40,40');
     expect(ctx.calls).toContain('lineTo:70,25');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls.indexOf('fill:rgba(245, 197, 66, 0.12):1')).toBeLessThan(
+      ctx.calls.indexOf('stroke:#f5c542:2:6,4:1'),
+    );
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.fillStyle).toBe('#111');
     expect(ctx.calls).toContain('fillText:Start 50.00:14,46:#111:left:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:Pivot 60.00:44,36:#111:left:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:Target 75.00:66,21:#111:right:1:12px sans-serif');

@@ -156,6 +156,50 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
+  it('dispatches selected projection fill style controls without text controls', () => {
+    const onStyle = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'projection' },
+          drawings: [
+            {
+              id: 'projection',
+              kind: 'projection',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: {
+                lineColor: '#f5c542',
+                lineWidth: 1,
+                lineStyle: 'solid',
+                fillColor: 'rgba(245, 197, 66, 0.12)',
+              },
+              points: [
+                { time: 1, price: 10 },
+                { time: 2, price: 12 },
+                { time: 3, price: 11 },
+              ],
+            },
+          ],
+        }}
+        onUserDrawingStyleChange={onStyle}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Orange fill color'));
+    fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
+
+    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
+    expect(screen.queryByLabelText('Green text color')).toBeNull();
+  });
+
   it('dispatches hidden selected drawing show control', () => {
     const onVisibility = vi.fn();
     render(
