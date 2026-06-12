@@ -181,7 +181,7 @@ describe('user drawing types', () => {
   });
 
   it('normalizes drawing opacity to a cross-platform alpha range', () => {
-    expect(USER_DRAWING_OPACITIES).toEqual([1, 0.75, 0.5, 0.25]);
+    expect(USER_DRAWING_OPACITIES).toEqual([1, 0.75, 0.5, 0.25, 0.1]);
     expect(normalizeUserDrawingOpacity(-0.5)).toBe(0);
     expect(normalizeUserDrawingOpacity(0.4)).toBe(0.4);
     expect(normalizeUserDrawingOpacity(1.5)).toBe(1);

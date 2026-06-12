@@ -907,7 +907,7 @@ export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
-export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
+export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25, 0.1] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
   return USER_DRAWING_FONT_SIZES.reduce((nearest, candidate) =>
