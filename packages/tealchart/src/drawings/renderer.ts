@@ -523,6 +523,7 @@ function renderPatternGeometry(
     {
       kind:
         | 'xabcdPattern'
+        | 'cypherPattern'
         | 'abcdPattern'
         | 'threeDrivesPattern'
         | 'elliottImpulseWave'
@@ -1192,6 +1193,7 @@ export function renderUserDrawing(
         renderTrianglePatternGeometry(ctx, geometry);
         break;
       case 'xabcdPattern':
+      case 'cypherPattern':
         renderPatternGeometry(ctx, geometry);
         break;
       case 'threeDrivesPattern':
