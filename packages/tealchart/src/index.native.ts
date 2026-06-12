@@ -159,6 +159,7 @@ export {
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTableCells,
+  setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,

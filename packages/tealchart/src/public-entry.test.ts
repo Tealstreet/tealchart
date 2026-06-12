@@ -184,6 +184,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingTableCells,
+  setUserDrawingTextContent,
   setUserDrawingTextAlign,
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
@@ -211,6 +212,7 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingIconName).toBeTypeOf('function');
     expect(setUserDrawingImageSource).toBeTypeOf('function');
     expect(setUserDrawingTableCells).toBeTypeOf('function');
+    expect(setUserDrawingTextContent).toBeTypeOf('function');
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
@@ -227,6 +229,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('setMobileUserDrawingIconName');
     expect(nativeEntry).toContain('setMobileUserDrawingImageSource');
     expect(nativeEntry).toContain('setMobileUserDrawingTableCells');
+    expect(nativeEntry).toContain('setMobileUserDrawingTextContent');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingRiskRewardLabelPosition');

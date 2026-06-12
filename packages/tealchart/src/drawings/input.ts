@@ -1034,6 +1034,25 @@ export function setUserDrawingText(
   };
 }
 
+export function setUserDrawingTextContent(
+  state: UserDrawingState,
+  text: string,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || !isUserDrawingTextAnnotation(target.drawing) || target.drawing.text === text) return state;
+
+  return {
+    ...replaceUserDrawing(state, target.index, {
+      ...target.drawing,
+      text,
+      updatedAt: options.now?.() ?? Date.now(),
+    }),
+    selection: { drawingId: target.drawing.id },
+    textEdit: state.textEdit?.drawingId === target.drawing.id ? null : state.textEdit,
+  };
+}
+
 export function setUserDrawingTextAlign(
   state: UserDrawingState,
   textAlign: UserDrawingTextAlign,
