@@ -2788,6 +2788,36 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores anchored volume profile drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'anchored-volume-profile',
+          kind: 'anchoredVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 100 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'anchored-volume-profile',
+      kind: 'anchoredVolumeProfile',
+      point: { time: 1, price: 100 },
+    });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings[0]).toMatchObject({
+      id: 'anchored-volume-profile',
+      kind: 'anchoredVolumeProfile',
+      point: { time: 1, price: 100 },
+    });
+  });
+
   it('rejects forecast drawings with invalid point counts', () => {
     const baseForecastPayload = {
       id: 'forecast',

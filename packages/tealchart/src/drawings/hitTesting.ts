@@ -229,7 +229,7 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'fixedRangeVolumeProfile') {
+  if (geometry.kind === 'anchoredVolumeProfile' || geometry.kind === 'fixedRangeVolumeProfile') {
     const insideBin = geometry.volumeProfile.bins.some(
       (bin) => bin.volume > 0 && pointInRect(point, bin.rect),
     );
@@ -735,6 +735,11 @@ function hitTestUserDrawingHandle(
           { handle: 'start', point: anchorToScreenPoint(geometry.drawing.points[0], space) },
           { handle: 'end', point: anchorToScreenPoint(geometry.drawing.points[1], space) },
         );
+      }
+      break;
+    case 'anchoredVolumeProfile':
+      if (geometry.drawing.kind === 'anchoredVolumeProfile') {
+        handles.push({ handle: 'center', point: anchorToScreenPoint(geometry.drawing.point, space) });
       }
       break;
     case 'path':

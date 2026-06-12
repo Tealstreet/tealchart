@@ -91,6 +91,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('datePriceRange')).toBe(2);
     expect(getRequiredAnchorCount('priceNote')).toBe(2);
     expect(getRequiredAnchorCount('forecast')).toBe(2);
+    expect(getRequiredAnchorCount('anchoredVolumeProfile')).toBe(1);
     expect(getRequiredAnchorCount('fixedRangeVolumeProfile')).toBe(2);
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
@@ -314,6 +315,20 @@ describe('user drawing types', () => {
       id: 'forecast',
       kind: 'forecast',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'anchoredVolumeProfile', anchors: [anchorA] }), {
+        id: 'anchored-volume-profile',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'anchored-volume-profile',
+      kind: 'anchoredVolumeProfile',
+      point: anchorA,
       visible: true,
       locked: false,
       createdAt: 20,

@@ -950,6 +950,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   editing, and toolbar descriptors use shared drawing behavior on both
   platforms.
 
+## Shipped: Anchored Volume Profile Tool
+
+- Shared drawing state supports the one-anchor `anchoredVolumeProfile` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching anchor-to-latest-bar volume bins
+  from the shared bar-data geometry resolver.
+- Selection, bin/bounds hit testing, whole-drawing moves, anchor editing, and
+  toolbar descriptors use shared drawing behavior on both platforms.
+
 ## Shipped: Fixed Range Volume Profile Guides
 
 - Shared fixed-range volume profile geometry derives point-of-control and

@@ -219,7 +219,7 @@ function renderAnchoredVwapGeometry(
 
 function renderFixedRangeVolumeProfileGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fixedRangeVolumeProfile' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'anchoredVolumeProfile' | 'fixedRangeVolumeProfile' }>,
 ): void {
   const { drawing, volumeProfile } = geometry;
   if (drawing.style.fillVisible !== false) {
@@ -1603,6 +1603,7 @@ export function renderUserDrawing(
           renderAnchoredVwapGeometry(ctx, geometry);
         }
         break;
+      case 'anchoredVolumeProfile':
       case 'fixedRangeVolumeProfile':
         renderFixedRangeVolumeProfileGeometry(ctx, geometry);
         break;
