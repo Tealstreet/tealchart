@@ -687,6 +687,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           (primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
             primitive.kind === 'callout' ||
+            primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
             primitive.kind === 'comment') &&
           primitive.editing &&
@@ -1334,6 +1335,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           (selectedDrawing?.kind === 'textLabel' ||
             selectedDrawing?.kind === 'note' ||
             selectedDrawing?.kind === 'callout' ||
+            selectedDrawing?.kind === 'priceLabel' ||
             selectedDrawing?.kind === 'priceNote' ||
             selectedDrawing?.kind === 'comment')
         ) {
@@ -3118,6 +3120,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
             primitive.kind === 'callout' ||
+            primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
             primitive.kind === 'comment' ||
             primitive.kind === 'balloon'

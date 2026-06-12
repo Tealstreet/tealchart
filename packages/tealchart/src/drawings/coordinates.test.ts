@@ -39,6 +39,7 @@ import type {
   PathDrawing,
   ParallelChannelDrawing,
   PitchforkDrawing,
+  PriceLabelDrawing,
   PriceRangeDrawing,
   ProjectionDrawing,
   RectangleDrawing,
@@ -849,6 +850,14 @@ describe('user drawing coordinates', () => {
       text: 'Signal',
       textAlign: 'center',
     };
+    const priceLabel: PriceLabelDrawing = {
+      ...trendLine,
+      id: 'price-label',
+      kind: 'priceLabel',
+      point: { time: 2_000, price: 100 },
+      text: 'Price',
+      textAlign: 'center',
+    };
     const flagMark: FlagMarkDrawing = {
       ...trendLine,
       id: 'flag',
@@ -1302,6 +1311,10 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(signpost, space)).toMatchObject({
       kind: 'signpost',
+      point: { x: 110, y: 70 },
+    });
+    expect(resolveUserDrawingGeometry(priceLabel, space)).toMatchObject({
+      kind: 'priceLabel',
       point: { x: 110, y: 70 },
     });
     expect(resolveUserDrawingGeometry(flagMark, space)).toMatchObject({

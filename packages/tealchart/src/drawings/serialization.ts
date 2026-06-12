@@ -213,6 +213,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
       return {
@@ -1028,6 +1029,7 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost': {
       const point = parseAnchor(value.point);

@@ -243,6 +243,38 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored price label drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'price-label',
+          kind: 'priceLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Restored price label',
+          textAlign: 'right',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'price-label',
+      kind: 'priceLabel',
+      text: 'Restored price label',
+      textAlign: 'right',
+    });
+  });
+
   it('preserves restored signpost drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
