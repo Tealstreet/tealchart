@@ -348,7 +348,8 @@ function hitTestResolvedGeometry(
     geometry.kind === 'callout' ||
     geometry.kind === 'comment' ||
     geometry.kind === 'priceNote' ||
-    geometry.kind === 'balloon'
+    geometry.kind === 'balloon' ||
+    geometry.kind === 'signpost'
   ) {
     const drawing = geometry.drawing as UserDrawingTextAnnotation;
     const lines = splitUserDrawingTextLines(drawing.text);
@@ -824,6 +825,7 @@ function hitTestUserDrawingHandle(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'signpost':
       handles.push({ handle: 'center', point: geometry.point });
       break;
     case 'callout':

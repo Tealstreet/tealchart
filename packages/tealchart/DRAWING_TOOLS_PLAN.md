@@ -180,6 +180,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile selection hit testing use rendered text metrics for multiline
   label bounds.
 
+## Shipped: Signpost Tool
+
+- Shared drawing state supports the single-anchor `signpost` annotation and
+  persists text and alignment through layout save/load.
+- Web Canvas and mobile Skia render signpost annotations through the shared text
+  annotation geometry and styling pipeline.
+- Selection, hit testing, whole-drawing moves, text editing, and style controls
+  reuse the existing text annotation behavior on both platforms.
+
 ## Shipped: Arrow Line Tool
 
 - Shared drawing state supports the two-anchor `arrowLine` tool and persists it

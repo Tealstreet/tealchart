@@ -123,6 +123,7 @@ describe('user drawing toolbar descriptors', () => {
       'pin',
       'icon',
       'balloon',
+      'signpost',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -199,6 +200,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('projection')).toEqual(
       expect.objectContaining({ tool: 'projection', label: 'Projection' }),
+    );
+    expect(getUserDrawingToolDescriptor('signpost')).toEqual(
+      expect.objectContaining({ tool: 'signpost', label: 'Signpost' }),
     );
     expect(getUserDrawingToolDescriptor('trianglePattern')).toEqual(
       expect.objectContaining({ tool: 'trianglePattern', label: 'Triangle pattern' }),

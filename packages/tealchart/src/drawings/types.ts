@@ -76,11 +76,19 @@ export type UserDrawingTool =
   | 'pin'
   | 'icon'
   | 'balloon'
+  | 'signpost'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
-export type UserDrawingTextAnnotationKind = 'textLabel' | 'note' | 'callout' | 'comment' | 'priceNote' | 'balloon';
+export type UserDrawingTextAnnotationKind =
+  | 'textLabel'
+  | 'note'
+  | 'callout'
+  | 'comment'
+  | 'priceNote'
+  | 'balloon'
+  | 'signpost';
 export const USER_DRAWING_ICON_NAMES = ['star', 'circle', 'square', 'triangle', 'flag', 'arrowUp', 'arrowDown'] as const;
 export type UserDrawingIconName = (typeof USER_DRAWING_ICON_NAMES)[number];
 
@@ -534,13 +542,21 @@ export interface BalloonDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
+export interface SignpostDrawing extends UserDrawingBase {
+  kind: 'signpost';
+  point: UserDrawingAnchor;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
 export type UserDrawingTextAnnotation =
   | TextLabelDrawing
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
   | PriceNoteDrawing
-  | BalloonDrawing;
+  | BalloonDrawing
+  | SignpostDrawing;
 
 export type UserDrawing =
   | TrendLineDrawing
@@ -614,6 +630,7 @@ export type UserDrawing =
   | PinDrawing
   | IconDrawing
   | BalloonDrawing
+  | SignpostDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -803,6 +820,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'pin':
     case 'icon':
     case 'balloon':
+    case 'signpost':
     case 'textLabel':
     case 'anchoredVwap':
       return 1;
@@ -822,7 +840,8 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
     drawing.kind === 'callout' ||
     drawing.kind === 'comment' ||
     drawing.kind === 'priceNote' ||
-    drawing.kind === 'balloon'
+    drawing.kind === 'balloon' ||
+    drawing.kind === 'signpost'
   );
 }
 
@@ -1257,6 +1276,7 @@ export function createUserDrawingFromDraft(
     case 'note':
     case 'comment':
     case 'balloon':
+    case 'signpost':
     case 'textLabel':
       return {
         ...base,
