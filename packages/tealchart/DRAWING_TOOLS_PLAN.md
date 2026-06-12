@@ -743,6 +743,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, segment hit testing, whole-drawing moves, duplicate actions, and
   point-index anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Elliott Double Combo Wave Tool
+
+- Shared drawing state supports the three-anchor `elliottDoubleComboWave` tool
+  and persists it through layout save/load.
+- Web Canvas and mobile Skia render matching connected W-X-Y double combo wave
+  paths with shared point labels.
+- Selection, segment hit testing, whole-drawing moves, duplicate actions, and
+  point-index anchor editing use shared drawing behavior on both platforms.
+
 ## Shipped: Elliott Triangle Wave Tool
 
 - Shared drawing state supports the five-anchor `elliottTriangleWave` tool and

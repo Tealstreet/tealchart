@@ -133,6 +133,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'curve':
     case 'arc':
     case 'elliottCorrectiveWave':
+    case 'elliottDoubleComboWave':
       {
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
@@ -331,6 +332,7 @@ function editDrawingHandle(
       drawing.kind === 'shortPosition' ||
       drawing.kind === 'projection' ||
       drawing.kind === 'elliottCorrectiveWave' ||
+      drawing.kind === 'elliottDoubleComboWave' ||
       drawing.kind === 'abcdPattern' ||
       drawing.kind === 'xabcdPattern' ||
       drawing.kind === 'cypherPattern' ||
@@ -352,7 +354,11 @@ function editDrawingHandle(
         updatedAt,
       };
     }
-    if (drawing.kind === 'polyline' || drawing.kind === 'elliottCorrectiveWave') {
+    if (
+      drawing.kind === 'polyline' ||
+      drawing.kind === 'elliottCorrectiveWave' ||
+      drawing.kind === 'elliottDoubleComboWave'
+    ) {
       return {
         ...drawing,
         points: [points[0]!, points[1]!, points[2]!],
@@ -503,6 +509,7 @@ function editDrawingHandle(
     case 'shortPosition':
     case 'barsPattern':
     case 'elliottCorrectiveWave':
+    case 'elliottDoubleComboWave':
     case 'abcdPattern':
     case 'xabcdPattern':
     case 'cypherPattern':

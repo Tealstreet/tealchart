@@ -1527,6 +1527,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits Elliott double combo wave paths and three anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-double-combo',
+      kind: 'elliottDoubleComboWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 60 }, space)?.drawing.id).toBe('elliott-double-combo');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 30 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+      pointIndex: 2,
+    });
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 90 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits Elliott triangle wave paths and five anchor handles', () => {
     const drawing: UserDrawing = {
       ...base,
