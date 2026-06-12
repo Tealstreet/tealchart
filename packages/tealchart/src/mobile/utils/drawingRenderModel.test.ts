@@ -3265,6 +3265,44 @@ describe('mobile user drawing render model', () => {
     expect(primitive.points[2]).toEqual({ x: 53.15, y: 50 });
   });
 
+  it('returns Skia-ready flag mark primitives with shared flag geometry', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'flag',
+          kind: 'flagMark',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'icon',
+      id: 'flag',
+      clip,
+      point: { x: 50, y: 50 },
+      iconName: 'flag',
+      style,
+    });
+    if (!primitive || primitive.kind !== 'icon') throw new Error('expected icon primitive');
+    expect(primitive.points[0]).toEqual({ x: 41, y: 41 });
+    expect(primitive.points[1]).toEqual({ x: 59, y: 41 });
+    expect(primitive.points[2]).toEqual({ x: 53.15, y: 50 });
+  });
+
   it('returns Skia-ready balloon primitives with shared layout', () => {
     const state: UserDrawingState = {
       version: 1,

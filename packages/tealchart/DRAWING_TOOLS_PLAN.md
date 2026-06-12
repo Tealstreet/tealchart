@@ -809,6 +809,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, polygon hit testing, whole-drawing moves, and center-handle
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Flag Mark Tool
+
+- Shared drawing state supports the single-anchor `flagMark` annotation marker
+  and persists it through layout save/load.
+- Web Canvas and mobile Skia render matching flag polygons through the shared
+  icon geometry pipeline.
+- Selection, polygon hit testing, whole-drawing moves, center-handle editing,
+  and fill controls use shared marker behavior on both platforms.
+
 ## Shipped: Balloon Tool
 
 - Shared drawing state supports the single-anchor `balloon` text annotation and
