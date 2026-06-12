@@ -989,6 +989,16 @@ function renderFibWedgeGeometry(
     ctx.arc(geometry.fibWedge.center.x, geometry.fibWedge.center.y, arc.radius, arc.startAngle, arc.endAngle);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const arc of geometry.fibWedge.arcs) {
+    ctx.fillText(arc.label, arc.labelPoint.x, arc.labelPoint.y);
+  }
 }
 
 function renderFibSpiralGeometry(
