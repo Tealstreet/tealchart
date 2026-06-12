@@ -2871,16 +2871,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   </SkiaPath>
                 )}
                 {primitive.style.lineVisible !== false &&
-                  primitive.labels.map((label) => (
-                    <SkiaText
-                      key={`${primitive.id}:label:${label.text}`}
-                      x={label.point.x}
-                      y={label.point.y}
-                      text={label.text}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  ))}
+                  font &&
+                  primitive.labels.map((label) => {
+                    const bounds = font.measureText(label.text);
+                    return (
+                      <SkiaText
+                        key={`${primitive.id}:label:${label.text}`}
+                        x={label.point.x - bounds.width / 2}
+                        y={label.point.y - 6}
+                        text={label.text}
+                        font={font}
+                        color={primitive.style.textColor ?? primitive.style.lineColor}
+                      />
+                    );
+                  })}
               </Group>
             );
           }
