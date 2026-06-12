@@ -448,15 +448,16 @@ export function isUserDrawingToolbarActionEnabled(
   state: UserDrawingState,
   action: UserDrawingToolbarAction,
 ): boolean {
-  if (action === 'duplicateSelected') {
-    const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
-    return state.drawings.some((drawing) => selectedIds.has(drawing.id) && !drawing.locked);
-  }
-  if (action === 'deleteSelected') return state.selection !== null;
+  if (action === 'duplicateSelected' || action === 'deleteSelected') return hasUnlockedSelectedDrawing(state);
   const zOrderAction = getUserDrawingZOrderAction(action);
   if (zOrderAction) return reorderUserDrawings(state, zOrderAction) !== state;
   if (action === 'cancelDraft') return state.draft !== null;
   return state.drawings.length > 0;
+}
+
+function hasUnlockedSelectedDrawing(state: UserDrawingState): boolean {
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  return state.drawings.some((drawing) => selectedIds.has(drawing.id) && !drawing.locked);
 }
 
 export function getSelectedUserDrawing(state: UserDrawingState) {
