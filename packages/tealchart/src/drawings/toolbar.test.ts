@@ -1067,6 +1067,18 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(priceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
     expect(supportsUserDrawingFillControls(datePriceRange)).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'projection',
+        kind: 'projection' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
+    ).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(
       supportsUserDrawingFillControls({
