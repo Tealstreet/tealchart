@@ -1273,6 +1273,7 @@ export function renderUserDrawing(
       case 'comment':
       case 'priceNote':
       case 'balloon':
+      case 'signpost':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
         break;
       case 'pin':

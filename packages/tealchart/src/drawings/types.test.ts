@@ -65,6 +65,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('pin')).toBe(1);
     expect(getRequiredAnchorCount('icon')).toBe(1);
     expect(getRequiredAnchorCount('balloon')).toBe(1);
+    expect(getRequiredAnchorCount('signpost')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
     expect(getRequiredAnchorCount('anchoredVwap')).toBe(1);
     expect(getRequiredAnchorCount('callout')).toBe(2);
@@ -828,6 +829,21 @@ describe('user drawing types', () => {
       kind: 'comment',
       point: anchorA,
       text: 'Comment',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'signpost',
+          anchors: [anchorA],
+          text: 'Signal',
+        }),
+        { id: 'signpost' },
+      ),
+    ).toMatchObject({
+      kind: 'signpost',
+      point: anchorA,
+      text: 'Signal',
       textAlign: 'center',
     });
     expect(createUserDrawingFromDraft(draft({ tool: 'pin', anchors: [anchorA] }), { id: 'pin' })).toMatchObject({
