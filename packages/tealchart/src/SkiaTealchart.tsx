@@ -68,6 +68,7 @@ import {
   createPicture,
   DashPathEffect,
   Group,
+  Image as SkiaImage,
   Oval,
   Path as SkiaPath,
   Picture,
@@ -76,6 +77,7 @@ import {
   Line as SkiaLine,
   Text as SkiaText,
   useFont,
+  useImage,
   vec,
 } from '@shopify/react-native-skia';
 import { LayoutChangeEvent, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -146,6 +148,7 @@ import type {
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingEmojiPrimitive,
+  MobileUserDrawingImagePrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingStickerPrimitive,
@@ -180,6 +183,22 @@ function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): 
     case 'solid':
       return null;
   }
+}
+
+function LoadedUserDrawingSkiaImage({ primitive }: { primitive: MobileUserDrawingImagePrimitive }) {
+  const image = useImage(primitive.src || null);
+  if (!image) return null;
+
+  return (
+    <SkiaImage
+      image={image}
+      x={primitive.rect.x}
+      y={primitive.rect.y}
+      width={primitive.rect.width}
+      height={primitive.rect.height}
+      fit="fill"
+    />
+  );
 }
 
 export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
@@ -2250,17 +2269,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.lineColor}
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </Rect>
                     <SkiaLine
                       p1={vec(primitive.rect.x, primitive.rect.y)}
                       p2={vec(primitive.rect.x + primitive.rect.width, primitive.rect.y + primitive.rect.height)}
@@ -2287,6 +2295,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}
                   />
+                )}
+                <LoadedUserDrawingSkiaImage primitive={primitive} />
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
                 )}
               </Group>
             );
