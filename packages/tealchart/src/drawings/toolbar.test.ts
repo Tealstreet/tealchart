@@ -671,7 +671,13 @@ describe('user drawing toolbar descriptors', () => {
       'dashed',
       'dotted',
     ]);
-    expect(USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity)).toEqual([1, 0.75, 0.5, 0.25]);
+    expect(USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity)).toEqual([
+      1,
+      0.75,
+      0.5,
+      0.25,
+      0.1,
+    ]);
     expect(USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.map((descriptor) => descriptor.style)).toEqual([
       'lineVisible',
       'fillVisible',

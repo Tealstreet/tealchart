@@ -1218,6 +1218,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Expanded Opacity Presets
+
+- Shared selected-drawing opacity descriptors now include a 10% opacity preset
+  for subtle annotations.
+- Web and mobile top bars dispatch the same expanded opacity controls, while
+  Canvas and Skia renderers continue to consume the existing shared `opacity`
+  style value.
+
 ## Shipped: Expanded Line Width Presets
 
 - Shared selected-drawing stroke width descriptors now expose 1px through 5px
