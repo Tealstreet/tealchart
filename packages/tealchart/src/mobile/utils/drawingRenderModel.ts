@@ -25,7 +25,6 @@ import {
   normalizeUserDrawingOpacity,
   resolveUserDrawingBalloonLayout,
   resolveUserDrawingInfoLineMetrics,
-  resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
@@ -1601,9 +1600,6 @@ function primitiveFromGeometry(
       };
     }
     case 'dateRange': {
-      const drawing = geometry.drawing;
-      const label =
-        drawing.kind === 'dateRange' ? resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label : '';
       return {
         kind: 'dateRange',
         id: geometry.drawing.id,
@@ -1616,7 +1612,7 @@ function primitiveFromGeometry(
           x: geometry.rect.x + geometry.rect.width / 2,
           y: geometry.rect.y + geometry.rect.height / 2,
         },
-        label,
+        label: geometry.dateMetrics.label,
         style: geometry.drawing.style,
       };
     }
@@ -1626,8 +1622,6 @@ function primitiveFromGeometry(
         drawing.kind === 'datePriceRange'
           ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
           : '';
-      const dateLabel =
-        drawing.kind === 'datePriceRange' ? resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label : '';
       const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
       return {
         kind: 'datePriceRange',
@@ -1646,7 +1640,7 @@ function primitiveFromGeometry(
           x: geometry.rect.x + geometry.rect.width / 2,
           y: geometry.rect.y + geometry.rect.height - fontSize,
         },
-        dateLabel,
+        dateLabel: geometry.dateMetrics.label,
         style: geometry.drawing.style,
       };
     }

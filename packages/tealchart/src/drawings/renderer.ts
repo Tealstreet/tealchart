@@ -11,7 +11,6 @@ import type {
 import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
-import { resolveUserDrawingDateRangeMetrics } from './dateRange';
 import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
@@ -805,7 +804,7 @@ function renderDateRangeGeometry(
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
-  const label = resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label;
+  const label = geometry.dateMetrics.label;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
@@ -834,7 +833,7 @@ function renderDatePriceRangeGeometry(
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   const priceLabel = resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label;
-  const dateLabel = resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1]).label;
+  const dateLabel = geometry.dateMetrics.label;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;

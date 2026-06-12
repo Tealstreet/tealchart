@@ -491,11 +491,20 @@ describe('user drawing renderer', () => {
       ],
     };
 
-    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    });
 
     expect(ctx.calls).toContain('fillRect:10,0,60,100:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('strokeRect:10,0,60,100:#f5c542:1');
-    expect(ctx.calls).toContain('fillText:1 minute:40,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,50:#111:center:1:12px sans-serif');
   });
 
   it('renders date and price ranges with price and duration labels', () => {
@@ -510,12 +519,21 @@ describe('user drawing renderer', () => {
       ],
     };
 
-    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    });
 
     expect(ctx.calls).toContain('fillRect:10,10,60,80:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('strokeRect:10,10,60,80:#f5c542:1');
     expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):40,50:#111:center:1:12px sans-serif');
-    expect(ctx.calls).toContain('fillText:1 minute:40,78:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,78:#111:center:1:12px sans-serif');
   });
 
   it('renders long position risk and reward boxes through CanvasContext', () => {

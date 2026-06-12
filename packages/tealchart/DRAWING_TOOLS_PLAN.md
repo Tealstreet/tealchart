@@ -351,6 +351,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, rectangle hit testing, whole-drawing moves, corner editing, and
   fill controls reuse shared range behavior on both platforms.
 
+## Shipped: Date Range Bar Count Labels
+
+- Shared date/date-price range geometry resolves elapsed time and inclusive bar
+  counts from loaded chart bars.
+- Web Canvas and mobile Skia consume the same resolved measurement labels,
+  rendering `N bars, duration` when bar data is available.
+- Duration-only labels remain the fallback for callers without bar data.
+
 ## Shipped: Anchored Line Tools
 
 - Shared drawing state supports `ray`, `horizontalLine`, and `verticalLine`
@@ -792,8 +800,8 @@ matching behavior in the same PR for every user-facing drawing feature.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, annotation/icon tools, and additional curved geometry.
-- Additional TradingView measurement tool polish beyond the current price/date
-  ranges, risk/reward positions, and bars pattern.
+- Additional TradingView measurement tool polish beyond current bar-count
+  price/date ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
