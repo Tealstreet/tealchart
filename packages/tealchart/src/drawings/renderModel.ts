@@ -239,6 +239,7 @@ export function resolveUserDrawingHandlePoints(
     case 'note':
     case 'comment':
     case 'balloon':
+    case 'signpost':
     case 'pin':
       return [anchorToScreenPoint(drawing.point, space)];
   }

@@ -334,6 +334,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'note':
     case 'comment':
     case 'balloon':
+    case 'signpost':
       return {
         ...base,
         kind: drawing.kind,
