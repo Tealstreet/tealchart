@@ -197,6 +197,7 @@ export {
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
+  formatUserDrawingDateRangeBars,
   formatUserDrawingDateRangeDuration,
   formatTrendAngleDegrees,
   ABCD_PATTERN_LABELS,

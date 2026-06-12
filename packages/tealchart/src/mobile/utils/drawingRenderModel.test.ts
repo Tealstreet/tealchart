@@ -1891,7 +1891,16 @@ describe('mobile user drawing render model', () => {
       draft: null,
       textEdit: null,
     };
-    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+    const durationSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    };
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
       kind: 'dateRange',
@@ -1899,7 +1908,7 @@ describe('mobile user drawing render model', () => {
       clip,
       rect: { x: 10, y: 0, width: 60, height: 100 },
       labelPoint: { x: 40, y: 50 },
-      label: '1 minute',
+      label: '3 bars, 1 minute',
       style,
     });
   });
@@ -1928,7 +1937,16 @@ describe('mobile user drawing render model', () => {
       draft: null,
       textEdit: null,
     };
-    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+    const durationSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    };
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
       kind: 'datePriceRange',
@@ -1938,7 +1956,7 @@ describe('mobile user drawing render model', () => {
       priceLabelPoint: { x: 40, y: 50 },
       priceLabel: '+80.00 (+800.00%)',
       dateLabelPoint: { x: 40, y: 78 },
-      dateLabel: '1 minute',
+      dateLabel: '3 bars, 1 minute',
       style,
     });
   });
