@@ -172,7 +172,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Green line color"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="5 pixel line width"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Dashed line style"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="50 percent opacity"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="10 percent opacity"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing border"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]')?.click();
@@ -180,7 +180,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ lineColor: '#22c55e' });
     expect(onStyle).toHaveBeenCalledWith({ lineWidth: 5 });
     expect(onStyle).toHaveBeenCalledWith({ lineStyle: 'dashed' });
-    expect(onStyle).toHaveBeenCalledWith({ opacity: 0.5 });
+    expect(onStyle).toHaveBeenCalledWith({ opacity: 0.1 });
     expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
     expect(onVisibility).toHaveBeenCalledWith(false);
     expect(onLocked).toHaveBeenCalledWith(true, undefined);
