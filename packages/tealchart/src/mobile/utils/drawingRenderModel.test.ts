@@ -186,6 +186,42 @@ describe('mobile user drawing render model', () => {
     ]);
   });
 
+  it('returns Skia-ready image annotation primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'image',
+          kind: 'image',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+          src: 'https://example.test/chart.png',
+          alt: 'Chart snapshot',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'image',
+      id: 'image',
+      rect: { x: 10, y: 10, width: 80, height: 80 },
+      src: 'https://example.test/chart.png',
+      alt: 'Chart snapshot',
+    });
+  });
+
   it('skips invisible selected drawings and handles', () => {
     const state: UserDrawingState = {
       version: 1,

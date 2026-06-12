@@ -204,6 +204,7 @@ function hitTestResolvedGeometry(
 
   if (
     geometry.kind === 'rectangle' ||
+    geometry.kind === 'image' ||
     geometry.kind === 'priceRange' ||
     geometry.kind === 'dateRange' ||
     geometry.kind === 'datePriceRange'
@@ -649,6 +650,7 @@ function hitTestUserDrawingHandle(
       }
       break;
     case 'rectangle':
+    case 'image':
     case 'gannBox':
     case 'gannSquare':
     case 'circle':

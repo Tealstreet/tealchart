@@ -220,6 +220,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'arrowMarker':
     case 'ray':
     case 'rectangle':
+    case 'image':
     case 'circle':
     case 'ellipse':
     case 'priceRange':

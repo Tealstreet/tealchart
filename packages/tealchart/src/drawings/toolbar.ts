@@ -211,6 +211,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'pin', icon: 'P', label: 'Pin' },
   { tool: 'icon', icon: '*', label: 'Icon' },
   { tool: 'flagMark', icon: '⚑', label: 'Flag mark' },
+  { tool: 'image', icon: 'IMG', label: 'Image' },
   { tool: 'emoji', icon: '☺', label: 'Emoji' },
   { tool: 'sticker', icon: '★', label: 'Sticker' },
   { tool: 'balloon', icon: 'B', label: 'Balloon' },
@@ -369,6 +370,7 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
 export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   return (
     drawing.kind === 'icon' ||
+    drawing.kind === 'image' ||
     drawing.kind === 'arrowMarker' ||
     drawing.kind === 'arrowMarkLeft' ||
     drawing.kind === 'arrowMarkRight' ||
