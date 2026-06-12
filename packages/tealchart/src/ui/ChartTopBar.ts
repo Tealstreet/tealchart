@@ -1026,7 +1026,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             if (textEnabled) {
               btn.addEventListener('click', () =>
                 this.options.onUserDrawingStyleChange?.({
-                  textWrap: !selectedDrawing.style.textWrap,
+                  textWrap: descriptor.textWrap,
                   textMaxWidth: selectedDrawing.style.textMaxWidth ?? 180,
                 }),
               );

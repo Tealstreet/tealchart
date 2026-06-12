@@ -350,8 +350,10 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
+    fireEvent.click(screen.getByLabelText('Do not wrap text'));
     fireEvent.click(screen.getByLabelText('320 pixel text box width'));
 
+    expect(onStyle).toHaveBeenCalledWith({ textWrap: false, textMaxWidth: 180 });
     expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 320 });
   });
 
