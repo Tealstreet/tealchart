@@ -1139,6 +1139,19 @@ export type MobileUserDrawingStickerPrimitive = Extract<MobileUserDrawingPrimiti
 export type MobileUserDrawingBalloonPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'balloon' }>;
 export type MobileUserDrawingSignpostPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'signpost' }>;
 export type MobileUserDrawingTablePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'table' }>;
+export type MobileUserDrawingTextBoxPrimitive =
+  | MobileUserDrawingTextLabelPrimitive
+  | MobileUserDrawingNotePrimitive
+  | MobileUserDrawingAnchoredTextPrimitive
+  | MobileUserDrawingAnchoredNotePrimitive
+  | MobileUserDrawingCalloutPrimitive
+  | MobileUserDrawingPriceLabelPrimitive
+  | MobileUserDrawingPriceNotePrimitive
+  | MobileUserDrawingEmojiPrimitive
+  | MobileUserDrawingStickerPrimitive
+  | MobileUserDrawingCommentPrimitive
+  | MobileUserDrawingBalloonPrimitive
+  | MobileUserDrawingSignpostPrimitive;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingImagePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'image' }>;
@@ -2377,13 +2390,7 @@ export function resolveMobileUserDrawingRenderModel(
 }
 
 export function resolveMobileUserDrawingTextLabelLayout(
-  primitive:
-    | MobileUserDrawingTextLabelPrimitive
-    | MobileUserDrawingNotePrimitive
-    | MobileUserDrawingBalloonPrimitive
-    | MobileUserDrawingCalloutPrimitive
-    | MobileUserDrawingPriceNotePrimitive
-    | MobileUserDrawingCommentPrimitive,
+  primitive: MobileUserDrawingTextBoxPrimitive,
   measuredTextWidth: number | readonly number[],
   options: {
     labelPadding?: number;

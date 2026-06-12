@@ -4435,6 +4435,43 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('resolves signpost text box layout for Skia rendering', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'signpost',
+          kind: 'signpost',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 40, price: 60 },
+          text: 'Event',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    expect(primitive).toMatchObject({
+      kind: 'signpost',
+      point: { x: 40, y: 40 },
+      text: 'Event',
+    });
+    if (!primitive || primitive.kind !== 'signpost') throw new Error('expected signpost primitive');
+
+    expect(resolveMobileUserDrawingTextLabelLayout(primitive, 35)).toMatchObject({
+      box: { x: 16.5, y: 30, width: 47, height: 20 },
+      lines: [{ text: 'Event', width: 35, x: 22.5, y: 40 }],
+    });
+  });
+
   it('resolves multiline text label layout for Skia rendering', () => {
     const state: UserDrawingState = {
       version: 1,

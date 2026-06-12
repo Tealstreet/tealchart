@@ -48,6 +48,7 @@ import type {
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingStickerPrimitive,
+  MobileUserDrawingTextBoxPrimitive,
   MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import type { PlotStyleOverride } from './state/chartState';
@@ -3542,8 +3543,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'comment' ||
             primitive.kind === 'emoji' ||
             primitive.kind === 'sticker' ||
-            primitive.kind === 'balloon'
+            primitive.kind === 'balloon' ||
+            primitive.kind === 'signpost'
           ) {
+            const textPrimitive: MobileUserDrawingTextBoxPrimitive = primitive;
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
@@ -3551,10 +3554,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               (line) => font.measureText(line).width,
             );
             const layout =
-              primitive.kind === 'balloon'
-                ? resolveMobileUserDrawingBalloonLayout(primitive, measuredWidths)
-                : resolveMobileUserDrawingTextLabelLayout(primitive, measuredWidths);
-            const balloonTailPath = primitive.kind === 'balloon' ? Skia.Path.Make() : null;
+              textPrimitive.kind === 'balloon'
+                ? resolveMobileUserDrawingBalloonLayout(textPrimitive, measuredWidths)
+                : resolveMobileUserDrawingTextLabelLayout(textPrimitive, measuredWidths);
+            const balloonTailPath = textPrimitive.kind === 'balloon' ? Skia.Path.Make() : null;
             if (balloonTailPath && 'tail' in layout) {
               balloonTailPath.moveTo(layout.tail.left.x, layout.tail.left.y);
               balloonTailPath.lineTo(layout.tail.tip.x, layout.tail.tip.y);
