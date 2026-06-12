@@ -1218,6 +1218,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Expanded Color Presets
+
+- Shared line, fill, and text color descriptors now include orange and purple
+  presets in addition to the existing drawing palette.
+- Web and mobile top bars dispatch matching expanded color controls, while
+  Canvas and Skia renderers continue to consume the existing shared color style
+  values.
+
 ## Shipped: Expanded Opacity Presets
 
 - Shared selected-drawing opacity descriptors now include a 10% opacity preset
