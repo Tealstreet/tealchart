@@ -613,7 +613,7 @@ export type ResolvedUserDrawingGeometry =
       pattern: DrawingScreenAbcdPattern;
     }
   | {
-      kind: 'fibRetracement' | 'fibExtension';
+      kind: 'fibRetracement' | 'fibExtension' | 'trendBasedFibExtension';
       drawing: UserDrawing;
       fib: DrawingScreenFibLevels;
     }
@@ -1737,6 +1737,46 @@ export function resolveFibExtensionFromAnchors(
   return resolveFibLevelsFromAnchors(first, second, space, FIB_EXTENSION_LEVELS);
 }
 
+export function resolveTrendBasedFibExtensionFromAnchors(
+  trendStart: UserDrawingAnchor,
+  trendEnd: UserDrawingAnchor,
+  retrace: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibLevels {
+  const first = anchorToScreenPoint(trendStart, space);
+  const second = anchorToScreenPoint(trendEnd, space);
+  const third = anchorToScreenPoint(retrace, space);
+  const x1 = Math.min(first.x, third.x);
+  const x2 = Math.max(first.x, third.x);
+  const priceDelta = trendEnd.price - trendStart.price;
+  const projectedPrices = FIB_EXTENSION_LEVELS.map((ratio) => retrace.price + priceDelta * ratio);
+  const projectedYs = projectedPrices.map((price) => priceToDrawingY(price, space));
+  const yValues = [first.y, second.y, third.y, ...projectedYs];
+
+  return {
+    rect: {
+      x: x1,
+      y: Math.min(...yValues),
+      width: x2 - x1,
+      height: Math.max(...yValues) - Math.min(...yValues),
+    },
+    levels: FIB_EXTENSION_LEVELS.map((ratio, index) => {
+      const price = projectedPrices[index]!;
+      const y = projectedYs[index]!;
+      return {
+        ratio,
+        label: formatFibRetracementRatio(ratio),
+        price,
+        y,
+        segment: {
+          start: { x: x1, y },
+          end: { x: x2, y },
+        },
+      };
+    }),
+  };
+}
+
 export function resolveFibFanFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -2699,6 +2739,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibExtension',
         drawing,
         fib: resolveFibExtensionFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'trendBasedFibExtension':
+      return {
+        kind: 'trendBasedFibExtension',
+        drawing,
+        fib: resolveTrendBasedFibExtensionFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'fibFan':
       return {

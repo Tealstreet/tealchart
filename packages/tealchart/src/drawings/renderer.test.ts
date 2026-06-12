@@ -732,6 +732,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:2.000 140.00:14,-42:#111:left:1:12px sans-serif');
   });
 
+  it('renders trend-based Fibonacci extension levels with labels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'trend-fib-ext',
+      kind: 'trendBasedFibExtension',
+      points: [
+        { time: 10, price: 20 },
+        { time: 50, price: 80 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,50');
+    expect(ctx.calls).toContain('moveTo:10,-10');
+    expect(ctx.calls).toContain('lineTo:90,-10');
+    expect(ctx.calls.filter((call) => call === 'stroke:#f5c542:2:6,4:1')).toHaveLength(9);
+    expect(ctx.calls).toContain('fillText:0 50.00:14,48:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1 110.00:14,-12:#111:left:1:12px sans-serif');
+  });
+
   it('renders path drawings as stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

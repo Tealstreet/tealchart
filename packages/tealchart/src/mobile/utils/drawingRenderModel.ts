@@ -646,7 +646,7 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'fibRetracement' | 'fibExtension';
+      kind: 'fibRetracement' | 'fibExtension' | 'trendBasedFibExtension';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
@@ -1007,6 +1007,10 @@ export type MobileUserDrawingFlatTopBottomPrimitive = Extract<MobileUserDrawingP
 export type MobileUserDrawingDisjointChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'disjointChannel' }>;
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
+export type MobileUserDrawingTrendBasedFibExtensionPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'trendBasedFibExtension' }
+>;
 export type MobileUserDrawingBarsPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'barsPattern' }>;
 export type MobileUserDrawingTrianglePatternPrimitive = Extract<
   MobileUserDrawingPrimitive,
@@ -1804,6 +1808,7 @@ function primitiveFromGeometry(
       };
     case 'fibRetracement':
     case 'fibExtension':
+    case 'trendBasedFibExtension':
       return {
         kind: geometry.kind,
         id: geometry.drawing.id,

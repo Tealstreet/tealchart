@@ -3021,7 +3021,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'fibRetracement' || primitive.kind === 'fibExtension') {
+          if (
+            primitive.kind === 'fibRetracement' ||
+            primitive.kind === 'fibExtension' ||
+            primitive.kind === 'trendBasedFibExtension'
+          ) {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
 

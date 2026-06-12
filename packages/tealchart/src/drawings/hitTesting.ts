@@ -542,7 +542,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'fibRetracement' || geometry.kind === 'fibExtension') {
+  if (
+    geometry.kind === 'fibRetracement' ||
+    geometry.kind === 'fibExtension' ||
+    geometry.kind === 'trendBasedFibExtension'
+  ) {
     const distance = Math.min(...geometry.fib.levels.map((level) => distanceToSegment(point, level.segment)));
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
@@ -736,6 +740,13 @@ function hitTestUserDrawingHandle(
       break;
     case 'fibChannel':
       if (geometry.drawing.kind === 'fibChannel') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'trendBasedFibExtension':
+      if (geometry.drawing.kind === 'trendBasedFibExtension') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });

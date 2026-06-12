@@ -92,6 +92,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('forecast')).toBe(2);
     expect(getRequiredAnchorCount('fibRetracement')).toBe(2);
     expect(getRequiredAnchorCount('fibExtension')).toBe(2);
+    expect(getRequiredAnchorCount('trendBasedFibExtension')).toBe(3);
     expect(getRequiredAnchorCount('fibFan')).toBe(2);
     expect(getRequiredAnchorCount('fibSpeedResistanceFan')).toBe(2);
     expect(getRequiredAnchorCount('fibSpeedResistanceArcs')).toBe(2);
@@ -313,6 +314,20 @@ describe('user drawing types', () => {
       id: 'fib-ext',
       kind: 'fibExtension',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'trendBasedFibExtension', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'trend-fib-ext',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'trend-fib-ext',
+      kind: 'trendBasedFibExtension',
+      points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,
       createdAt: 20,

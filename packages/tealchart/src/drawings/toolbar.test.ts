@@ -90,6 +90,7 @@ describe('user drawing toolbar descriptors', () => {
       'anchoredVwap',
       'fibRetracement',
       'fibExtension',
+      'trendBasedFibExtension',
       'fibFan',
       'fibSpeedResistanceFan',
       'fibSpeedResistanceArcs',
@@ -265,6 +266,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('fibExtension')).toEqual(
       expect.objectContaining({ tool: 'fibExtension', label: 'Fib extension' }),
+    );
+    expect(getUserDrawingToolDescriptor('trendBasedFibExtension')).toEqual(
+      expect.objectContaining({ tool: 'trendBasedFibExtension', label: 'Trend-based fib extension' }),
     );
     expect(getUserDrawingToolDescriptor('fibFan')).toEqual(
       expect.objectContaining({ tool: 'fibFan', label: 'Fib fan' }),
