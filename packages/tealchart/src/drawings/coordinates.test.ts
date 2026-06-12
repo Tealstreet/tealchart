@@ -39,6 +39,7 @@ import type {
   ProjectionDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
+  SignpostDrawing,
   SineLineDrawing,
   TimeCyclesDrawing,
   TriangleDrawing,
@@ -804,6 +805,14 @@ describe('user drawing coordinates', () => {
       kind: 'arrowMarkDown',
       point: { time: 2_000, price: 100 },
     };
+    const signpost: SignpostDrawing = {
+      ...trendLine,
+      id: 'signpost',
+      kind: 'signpost',
+      point: { time: 2_000, price: 100 },
+      text: 'Signal',
+      textAlign: 'center',
+    };
     const extendedLine: ExtendedLineDrawing = {
       ...trendLine,
       id: 'extended',
@@ -1207,6 +1216,10 @@ describe('user drawing coordinates', () => {
           { x: 101, y: 59.2 },
         ],
       },
+    });
+    expect(resolveUserDrawingGeometry(signpost, space)).toMatchObject({
+      kind: 'signpost',
+      point: { x: 110, y: 70 },
     });
     expect(resolveUserDrawingGeometry(extendedLine, space)).toMatchObject({
       kind: 'line',

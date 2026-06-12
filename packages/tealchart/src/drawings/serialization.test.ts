@@ -243,6 +243,38 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored signpost drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'signpost',
+          kind: 'signpost',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Restored signpost',
+          textAlign: 'left',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'signpost',
+      kind: 'signpost',
+      text: 'Restored signpost',
+      textAlign: 'left',
+    });
+  });
+
   it('preserves restored callout drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

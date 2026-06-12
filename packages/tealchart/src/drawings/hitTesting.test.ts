@@ -1145,6 +1145,22 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits signpost drawings using a configurable label box', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'signpost',
+      kind: 'signpost',
+      point: { time: 50, price: 50 },
+      text: 'Signpost',
+      textAlign: 'center',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })?.drawing.id).toBe(
+      'signpost',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 81, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits callout drawings by text box and pointer segment', () => {
     const drawing: UserDrawing = {
       ...base,
