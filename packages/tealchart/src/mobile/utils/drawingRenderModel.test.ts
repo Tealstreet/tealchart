@@ -714,6 +714,7 @@ describe('mobile user drawing render model', () => {
       ],
       base: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
       parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+      median: { start: { x: 10, y: 35 }, end: { x: 90, y: 35 } },
     });
   });
 
@@ -754,6 +755,7 @@ describe('mobile user drawing render model', () => {
       ],
       base: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
       parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+      median: { start: { x: 10, y: 35 }, end: { x: 90, y: 35 } },
     });
   });
 
@@ -1690,6 +1692,7 @@ describe('mobile user drawing render model', () => {
       ],
       base: { start: { x: 10, y: 40 }, end: { x: 90, y: 20 } },
       parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 0 } },
+      median: { start: { x: 10, y: 30 }, end: { x: 90, y: 10 } },
     });
   });
 
@@ -1730,6 +1733,7 @@ describe('mobile user drawing render model', () => {
       ],
       base: { start: { x: 10, y: 50 }, end: { x: 90, y: 20 } },
       parallel: { start: { x: 10, y: 80 }, end: { x: 90, y: 80 } },
+      median: { start: { x: 10, y: 65 }, end: { x: 90, y: 65 } },
     });
   });
 
@@ -1770,6 +1774,7 @@ describe('mobile user drawing render model', () => {
         { x: 10, y: 80 },
       ],
       base: { start: { x: 10, y: 50 }, end: { x: 90, y: 20 } },
+      median: { start: { x: 10, y: 65 }, end: { x: 90, y: 55 } },
       parallel: { start: { x: 10, y: 80 }, end: { x: 90, y: 90 } },
     });
   });

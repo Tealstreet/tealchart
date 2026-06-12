@@ -1329,6 +1329,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('closePath');
     expect(ctx.calls).toContain('fill');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('moveTo:10,35');
+    expect(ctx.calls).toContain('lineTo:90,35');
   });
 
   it('renders pitchforks with filled bands and extra parallel rays', () => {
