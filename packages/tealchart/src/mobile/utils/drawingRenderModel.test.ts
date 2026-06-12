@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../../state/chartState';
 import {
+  isMobileUserDrawingTextBoxPrimitive,
   resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
@@ -4335,6 +4336,68 @@ describe('mobile user drawing render model', () => {
         right: { x: expect.closeTo(56.3), y: expect.closeTo(39.2) },
       },
       lines: [{ text: 'Hi', width: 12, x: 44, y: expect.closeTo(29.2) }],
+    });
+  });
+
+  it('classifies balloon and signpost primitives as mobile text boxes', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'balloon',
+          kind: 'balloon',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Balloon',
+          textAlign: 'center',
+        },
+        {
+          id: 'signpost',
+          kind: 'signpost',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 40, price: 60 },
+          text: 'Signpost',
+          textAlign: 'center',
+        },
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 10, price: 90 },
+          cells: [['A']],
+        },
+      ],
+      draft: null,
+      textEdit: { drawingId: 'balloon', value: 'Draft', originalValue: 'Balloon', startedAt: 2 },
+    };
+    const primitives = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitives.map((primitive) => [primitive.kind, isMobileUserDrawingTextBoxPrimitive(primitive)])).toEqual([
+      ['balloon', true],
+      ['signpost', true],
+      ['table', false],
+    ]);
+    expect(primitives[0]).toMatchObject({
+      kind: 'balloon',
+      editing: true,
+      editValue: 'Draft',
     });
   });
 
