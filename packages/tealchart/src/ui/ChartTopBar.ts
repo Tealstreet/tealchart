@@ -24,6 +24,7 @@ import {
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
+  getUserDrawingToolDescriptor,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
@@ -50,7 +51,7 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
-  USER_DRAWING_TOOL_DESCRIPTORS,
+  USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
 import { Component } from './Component';
@@ -215,8 +216,25 @@ const styles = {
   drawingGroup: {
     display: 'flex',
     alignItems: 'center',
+    gap: '8px',
+    flexShrink: '0',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolCategory: {
+    display: 'flex',
+    alignItems: 'center',
     gap: '2px',
     flexShrink: '0',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolCategoryLabel: {
+    color: 'var(--text2, #787b86)',
+    fontSize: '10px',
+    fontWeight: '600',
+    letterSpacing: '0',
+    textTransform: 'uppercase',
+    marginRight: '2px',
+    whiteSpace: 'nowrap',
   } as Partial<CSSStyleDeclaration>,
 
   drawingButton: {
@@ -442,32 +460,51 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const state = this.options.userDrawingState;
     const activeTool = state?.activeTool ?? 'select';
 
-    for (const descriptor of USER_DRAWING_TOOL_DESCRIPTORS) {
-      const isActive = activeTool === descriptor.tool;
-      const btn = this.createElement('button', {
-        style: {
-          ...styles.drawingButton,
-          ...(isActive ? styles.drawingButtonActive : {}),
-        },
-        textContent: descriptor.icon,
+    for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
+      const categoryGroup = this.createElement('div', {
+        style: styles.drawingToolCategory,
         attributes: {
-          type: 'button',
-          title: descriptor.label,
-          'aria-label': descriptor.label,
-          'aria-pressed': isActive ? 'true' : 'false',
+          role: 'group',
+          'aria-label': `${category.label} drawing tools`,
         },
       });
-      btn.addEventListener('click', () => this.options.onUserDrawingToolSelect?.(descriptor.tool));
-      btn.addEventListener('mouseenter', () => {
-        if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
-      });
-      btn.addEventListener('mouseleave', () => {
-        if (!isActive) {
-          btn.style.backgroundColor = 'transparent';
-          btn.style.color = 'var(--text2, #787b86)';
-        }
-      });
-      group.appendChild(btn);
+      categoryGroup.appendChild(
+        this.createElement('span', {
+          style: styles.drawingToolCategoryLabel,
+          textContent: category.label,
+        }),
+      );
+
+      for (const tool of category.tools) {
+        const descriptor = getUserDrawingToolDescriptor(tool);
+        const isActive = activeTool === descriptor.tool;
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            ...(isActive ? styles.drawingButtonActive : {}),
+          },
+          textContent: descriptor.icon,
+          attributes: {
+            type: 'button',
+            title: descriptor.label,
+            'aria-label': descriptor.label,
+            'aria-pressed': isActive ? 'true' : 'false',
+          },
+        });
+        btn.addEventListener('click', () => this.options.onUserDrawingToolSelect?.(descriptor.tool));
+        btn.addEventListener('mouseenter', () => {
+          if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+        });
+        btn.addEventListener('mouseleave', () => {
+          if (!isActive) {
+            btn.style.backgroundColor = 'transparent';
+            btn.style.color = 'var(--text2, #787b86)';
+          }
+        });
+        categoryGroup.appendChild(btn);
+      }
+
+      group.appendChild(categoryGroup);
     }
 
     group.appendChild(this.createElement('div', { style: styles.divider }));

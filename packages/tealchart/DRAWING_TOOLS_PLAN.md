@@ -1330,9 +1330,16 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching extend controls only for selected
   trend lines; existing extended-line and ray semantics remain unchanged.
 
+## Shipped: Categorized Drawing Tool Sidebar
+
+- Shared toolbar metadata now groups every drawing tool into TradingView-style
+  categories while preserving the existing flat descriptor API.
+- Web and mobile drawing tool controls render matching category sections from
+  the shared metadata instead of one long flat tool strip.
+
 ## Known Gaps
 
-- Full TradingView-style drawing toolbar organization and overflow menus.
+- Full TradingView-style drawing toolbar overflow menus and category flyouts.
 - TradingView advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
