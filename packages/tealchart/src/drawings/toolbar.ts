@@ -351,6 +351,7 @@ export const USER_DRAWING_TEXT_DECORATION_DESCRIPTORS: readonly UserDrawingTextD
 ] as const;
 
 export const USER_DRAWING_TEXT_WRAP_DESCRIPTORS: readonly UserDrawingTextWrapDescriptor[] = [
+  { textWrap: false, icon: '↔', label: 'Do not wrap text' },
   { textWrap: true, icon: '↵', label: 'Wrap text' },
 ] as const;
 

@@ -1087,7 +1087,8 @@ describe('tealchart public entries', () => {
     const weightDescriptor: UserDrawingFontWeightDescriptor = USER_DRAWING_FONT_WEIGHT_DESCRIPTORS[1]!;
     const underlineDescriptor: UserDrawingTextDecorationDescriptor = USER_DRAWING_TEXT_DECORATION_DESCRIPTORS[0]!;
     const strikeDescriptor: UserDrawingTextDecorationDescriptor = USER_DRAWING_TEXT_DECORATION_DESCRIPTORS[1]!;
-    const wrapDescriptor: UserDrawingTextWrapDescriptor = USER_DRAWING_TEXT_WRAP_DESCRIPTORS[0]!;
+    const unwrapDescriptor: UserDrawingTextWrapDescriptor = USER_DRAWING_TEXT_WRAP_DESCRIPTORS[0]!;
+    const wrapDescriptor: UserDrawingTextWrapDescriptor = USER_DRAWING_TEXT_WRAP_DESCRIPTORS[1]!;
     const maxWidth: UserDrawingTextMaxWidth = USER_DRAWING_TEXT_MAX_WIDTHS[1]!;
     const maxWidthDescriptor: UserDrawingTextMaxWidthDescriptor = USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS[1]!;
     expect(fontSize).toBe(12);
@@ -1099,6 +1100,7 @@ describe('tealchart public entries', () => {
     expect(weightDescriptor.fontWeight).toBe('bold');
     expect(underlineDescriptor.textUnderline).toBe(true);
     expect(strikeDescriptor.textLineThrough).toBe(true);
+    expect(unwrapDescriptor.textWrap).toBe(false);
     expect(wrapDescriptor.textWrap).toBe(true);
     expect(maxWidth).toBe(180);
     expect(maxWidthDescriptor.textMaxWidth).toBe(180);

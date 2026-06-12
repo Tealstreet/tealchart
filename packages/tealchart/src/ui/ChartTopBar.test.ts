@@ -421,8 +421,10 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
+    document.querySelector<HTMLButtonElement>('button[aria-label="Do not wrap text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="320 pixel text box width"]')?.click();
 
+    expect(onStyle).toHaveBeenCalledWith({ textWrap: false, textMaxWidth: 180 });
     expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 320 });
 
     topBar.unmount();
