@@ -1384,7 +1384,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
-  it('renders pitchfans as Fibonacci fan rays', () => {
+  it('renders pitchfans as filled Fibonacci fan bands and rays', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
       ...base,
@@ -1403,6 +1403,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:100,-17.5');
     expect(ctx.calls).toContain('lineTo:100,50');
     expect(ctx.calls).toContain('lineTo:100,117.5');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 

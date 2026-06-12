@@ -332,6 +332,19 @@ function renderPitchfanGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'pitchfan' }>,
 ): void {
+  if (geometry.drawing.style.fillVisible !== false && geometry.drawing.style.fillColor) {
+    ctx.fillStyle = geometry.drawing.style.fillColor;
+    for (const band of geometry.pitchfan.bands) {
+      const [origin, first, second] = band.points;
+      ctx.beginPath();
+      ctx.moveTo(origin.x, origin.y);
+      ctx.lineTo(first.x, first.y);
+      ctx.lineTo(second.x, second.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
   if (geometry.drawing.style.lineVisible === false) return;
 
   applyStrokeStyle(ctx, geometry.drawing);

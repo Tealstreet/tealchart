@@ -2082,6 +2082,26 @@ describe('user drawing coordinates', () => {
         },
         { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
       ],
+      bands: expect.arrayContaining([
+        {
+          fromRatio: 0,
+          toRatio: 0.236,
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: -30 },
+            { x: 210, y: expect.closeTo(17.2) },
+          ],
+        },
+        {
+          fromRatio: 0.5,
+          toRatio: 0.618,
+          points: [
+            { x: 10, y: 70 },
+            { x: 210, y: 70 },
+            { x: 210, y: expect.closeTo(93.6) },
+          ],
+        },
+      ]),
     });
     expect(resolveUserDrawingGeometry(pitchfan, space)).toMatchObject({ kind: 'pitchfan' });
     expect(
