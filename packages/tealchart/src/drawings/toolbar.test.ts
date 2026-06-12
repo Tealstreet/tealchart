@@ -748,6 +748,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
       'hideSelected',
       'lockSelected',
+      'unlockSelected',
     ]);
   });
 
@@ -776,6 +777,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingStyleToolbarEnabled(locked)).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'hideSelected')).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'lockSelected')).toBe(false);
+    expect(isUserDrawingStyleToolbarActionEnabled(locked, 'unlockSelected')).toBe(true);
   });
 
   it('enables fill and text style controls only for supported selected drawing kinds', () => {
@@ -1194,10 +1196,17 @@ describe('user drawing toolbar descriptors', () => {
         },
       ],
     };
+    const locked = { ...selected, drawings: [{ ...selected.drawings[0]!, locked: true }] };
 
     expect(resolveUserDrawingStyleToolbarAction(state, 'hideSelected')).toEqual({ enabled: false });
     expect(resolveUserDrawingStyleToolbarAction(selected, 'hideSelected')).toEqual({ enabled: true, visible: false });
     expect(resolveUserDrawingStyleToolbarAction(selected, 'lockSelected')).toEqual({ enabled: true, locked: true });
+    expect(resolveUserDrawingStyleToolbarAction(selected, 'unlockSelected')).toEqual({ enabled: false });
+    expect(resolveUserDrawingStyleToolbarAction(locked, 'unlockSelected')).toEqual({
+      enabled: true,
+      locked: false,
+      includeLocked: true,
+    });
   });
 
   it('keeps the toolbar state key stable across geometry-only edits', () => {
