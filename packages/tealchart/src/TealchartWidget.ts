@@ -22,6 +22,7 @@ import type {
   UserDrawingSelectionInputOptions,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTableCellsInput,
   UserDrawingTextAnnotation,
   UserDrawingTextAlign,
   UserDrawingTool,
@@ -61,6 +62,7 @@ import {
   setUserDrawingIconName as setUserDrawingIconNameState,
   setUserDrawingImageSource as setUserDrawingImageSourceState,
   setUserDrawingLocked as setUserDrawingLockedState,
+  setUserDrawingTableCells as setUserDrawingTableCellsState,
   setUserDrawingText,
   setUserDrawingTextAlign as setUserDrawingTextAlignState,
   setUserDrawingTool,
@@ -2313,6 +2315,12 @@ export class TealchartWidget {
   setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
     const previousState = this._userDrawingState;
     this.setUserDrawingState(setUserDrawingImageSourceState(this._userDrawingState, source, options));
+    return this._userDrawingState !== previousState;
+  }
+
+  setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options: UpdateUserDrawingOptions = {}): boolean {
+    const previousState = this._userDrawingState;
+    this.setUserDrawingState(setUserDrawingTableCellsState(this._userDrawingState, cells, options));
     return this._userDrawingState !== previousState;
   }
 
