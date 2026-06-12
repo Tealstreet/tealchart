@@ -137,6 +137,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
         const points = movePathAnchors(drawing.points, delta);
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!], updatedAt };
       }
+    case 'doubleCurve':
     case 'disjointChannel':
     case 'trianglePattern':
     case 'abcdPattern':
@@ -308,6 +309,7 @@ function editDrawingHandle(
       drawing.kind === 'highlighter' ||
       drawing.kind === 'polyline' ||
       drawing.kind === 'curve' ||
+      drawing.kind === 'doubleCurve' ||
       drawing.kind === 'arc' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'fibWedge' ||
@@ -358,6 +360,13 @@ function editDrawingHandle(
       return {
         ...drawing,
         points: [points[0]!, points[1]!, points[2]!],
+        updatedAt,
+      };
+    }
+    if (drawing.kind === 'doubleCurve') {
+      return {
+        ...drawing,
+        points: [points[0]!, points[1]!, points[2]!, points[3]!],
         updatedAt,
       };
     }
@@ -467,6 +476,7 @@ function editDrawingHandle(
     case 'highlighter':
     case 'polyline':
     case 'curve':
+    case 'doubleCurve':
     case 'arc':
     case 'triangle':
     case 'fibWedge':

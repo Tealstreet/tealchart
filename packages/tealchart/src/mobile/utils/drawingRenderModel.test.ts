@@ -2857,6 +2857,49 @@ describe('mobile user drawing render model', () => {
     expect(primitive?.kind === 'curve' ? primitive.points[24] : null).toEqual({ x: 50, y: 35 });
   });
 
+  it('returns Skia-ready double curve primitives with shared sampled points', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'double-curve',
+          kind: 'doubleCurve',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 30, price: 80 },
+            { time: 70, price: 20 },
+            { time: 90, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const primitive = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0];
+
+    expect(primitive).toMatchObject({
+      kind: 'doubleCurve',
+      id: 'double-curve',
+      clip,
+      start: { x: 10, y: 50 },
+      firstControl: { x: 30, y: 20 },
+      secondControl: { x: 70, y: 80 },
+      end: { x: 90, y: 50 },
+      style,
+    });
+    expect(primitive?.kind === 'doubleCurve' ? primitive.points : []).toHaveLength(49);
+    expect(primitive?.kind === 'doubleCurve' ? primitive.points[24] : null).toEqual({ x: 50, y: 50 });
+  });
+
   it('returns Skia-ready arc primitives with shared sampled points', () => {
     const state: UserDrawingState = {
       version: 1,

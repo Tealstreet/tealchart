@@ -200,6 +200,7 @@ export function resolveUserDrawingHandlePoints(
     case 'priceNote':
     case 'polyline':
     case 'curve':
+    case 'doubleCurve':
     case 'arc':
     case 'triangle':
     case 'fibWedge':

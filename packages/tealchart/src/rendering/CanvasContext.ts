@@ -59,6 +59,9 @@ export interface CanvasContext {
   /** Draw a quadratic curve to a point */
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
 
+  /** Draw a cubic Bezier curve to a point */
+  bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void;
+
   /** Draw an arc/circle */
   arc(
     x: number,
@@ -153,6 +156,7 @@ export function isCanvasContext(ctx: unknown): ctx is CanvasContext {
   return (
     typeof c.beginPath === 'function' &&
     typeof c.quadraticCurveTo === 'function' &&
+    typeof c.bezierCurveTo === 'function' &&
     typeof c.fill === 'function' &&
     typeof c.stroke === 'function' &&
     typeof c.fillRect === 'function' &&

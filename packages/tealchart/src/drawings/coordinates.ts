@@ -34,6 +34,14 @@ export interface DrawingScreenCurve {
   points: readonly DrawingScreenPoint[];
 }
 
+export interface DrawingScreenDoubleCurve {
+  start: DrawingScreenPoint;
+  firstControl: DrawingScreenPoint;
+  secondControl: DrawingScreenPoint;
+  end: DrawingScreenPoint;
+  points: readonly DrawingScreenPoint[];
+}
+
 export interface DrawingScreenArc {
   center: DrawingScreenPoint;
   radius: number;
@@ -575,6 +583,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'curve';
       drawing: UserDrawing;
       curve: DrawingScreenCurve;
+    }
+  | {
+      kind: 'doubleCurve';
+      drawing: UserDrawing;
+      doubleCurve: DrawingScreenDoubleCurve;
     }
   | {
       kind: 'arc';
@@ -1312,6 +1325,28 @@ function resolveQuadraticPoint(
   };
 }
 
+function resolveCubicPoint(
+  start: DrawingScreenPoint,
+  firstControl: DrawingScreenPoint,
+  secondControl: DrawingScreenPoint,
+  end: DrawingScreenPoint,
+  t: number,
+): DrawingScreenPoint {
+  const inverse = 1 - t;
+  return {
+    x:
+      inverse * inverse * inverse * start.x +
+      3 * inverse * inverse * t * firstControl.x +
+      3 * inverse * t * t * secondControl.x +
+      t * t * t * end.x,
+    y:
+      inverse * inverse * inverse * start.y +
+      3 * inverse * inverse * t * firstControl.y +
+      3 * inverse * t * t * secondControl.y +
+      t * t * t * end.y,
+  };
+}
+
 export function resolveCurveFromAnchors(
   startAnchor: UserDrawingAnchor,
   controlAnchor: UserDrawingAnchor,
@@ -1325,6 +1360,30 @@ export function resolveCurveFromAnchors(
     resolveQuadraticPoint(start, control, end, index / CURVE_SAMPLE_COUNT),
   );
   return { start, control, end, points };
+}
+
+export function resolveDoubleCurveFromAnchors(
+  startAnchor: UserDrawingAnchor,
+  firstControlAnchor: UserDrawingAnchor,
+  secondControlAnchor: UserDrawingAnchor,
+  endAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenDoubleCurve {
+  const start = anchorToScreenPoint(startAnchor, space);
+  const firstControl = anchorToScreenPoint(firstControlAnchor, space);
+  const secondControl = anchorToScreenPoint(secondControlAnchor, space);
+  const end = anchorToScreenPoint(endAnchor, space);
+  const points = Array.from({ length: CURVE_SAMPLE_COUNT + 1 }, (_, index) =>
+    resolveCubicPoint(start, firstControl, secondControl, end, index / CURVE_SAMPLE_COUNT),
+  );
+
+  return {
+    start,
+    firstControl,
+    secondControl,
+    end,
+    points,
+  };
 }
 
 function normalizeArcAngle(angle: number): number {
@@ -2629,6 +2688,18 @@ export function resolveUserDrawingGeometry(
         kind: 'curve',
         drawing,
         curve: resolveCurveFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'doubleCurve':
+      return {
+        kind: 'doubleCurve',
+        drawing,
+        doubleCurve: resolveDoubleCurveFromAnchors(
+          drawing.points[0],
+          drawing.points[1],
+          drawing.points[2],
+          drawing.points[3],
+          space,
+        ),
       };
     case 'arc':
       return {
