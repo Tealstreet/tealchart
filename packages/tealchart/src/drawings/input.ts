@@ -74,6 +74,9 @@ export interface UserDrawingImageSourceInput {
 
 export type UserDrawingTableCellsInput = readonly (readonly unknown[])[];
 export type UserDrawingTableCellInput = unknown;
+export type UserDrawingTableRowInput = readonly unknown[];
+export type UserDrawingTableColumnInput = readonly unknown[];
+type UserDrawingTableTarget = { index: number; drawing: Extract<UserDrawing, { kind: 'table' }> };
 
 export interface UpdateUserDrawingOptions {
   drawingId?: string;
@@ -1124,6 +1127,40 @@ function areUserDrawingTableCellsEqual(
   });
 }
 
+function normalizeUserDrawingTableRowInput(
+  values: UserDrawingTableRowInput | undefined,
+  columns: number,
+): string[] {
+  const source = values ?? [];
+  return (
+    normalizeUserDrawingTableCells([Array.from({ length: columns }, (_, columnIndex) => source[columnIndex])])[0]?.slice() ??
+    []
+  );
+}
+
+function normalizeUserDrawingTableColumnInput(
+  values: UserDrawingTableColumnInput | undefined,
+  rows: number,
+): string[] {
+  return Array.from({ length: rows }, (_, rowIndex) => normalizeUserDrawingTableCells([[values?.[rowIndex]]])[0]?.[0] ?? '');
+}
+
+function replaceUserDrawingTableCells(
+  state: UserDrawingState,
+  target: UserDrawingTableTarget,
+  cells: readonly (readonly unknown[])[],
+  options: UpdateUserDrawingOptions,
+): UserDrawingState {
+  const nextCells = normalizeUserDrawingTableCells(cells);
+  if (areUserDrawingTableCellsEqual(target.drawing.cells, nextCells)) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    cells: nextCells,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
 export function setUserDrawingTableCells(
   state: UserDrawingState,
   cells: UserDrawingTableCellsInput,
@@ -1204,4 +1241,85 @@ export function setUserDrawingTableDimensions(
     cells: nextCells,
     updatedAt: options.now?.() ?? Date.now(),
   });
+}
+
+export function insertUserDrawingTableRow(
+  state: UserDrawingState,
+  row: number,
+  values?: UserDrawingTableRowInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table') return state;
+  const tableTarget: UserDrawingTableTarget = { index: target.index, drawing: target.drawing };
+
+  const rowIndex = Math.trunc(row);
+  if (!Number.isFinite(rowIndex) || rowIndex < 0 || rowIndex > tableTarget.drawing.cells.length) return state;
+
+  const columnCount = tableTarget.drawing.cells[0]?.length ?? 1;
+  const nextCells = tableTarget.drawing.cells.map((cellsRow) => cellsRow.slice());
+  nextCells.splice(rowIndex, 0, normalizeUserDrawingTableRowInput(values, columnCount));
+  return replaceUserDrawingTableCells(state, tableTarget, nextCells, options);
+}
+
+export function deleteUserDrawingTableRow(
+  state: UserDrawingState,
+  row: number,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table' || target.drawing.cells.length <= 1) return state;
+  const tableTarget: UserDrawingTableTarget = { index: target.index, drawing: target.drawing };
+
+  const rowIndex = Math.trunc(row);
+  if (!Number.isFinite(rowIndex) || rowIndex < 0 || rowIndex >= tableTarget.drawing.cells.length) return state;
+
+  const nextCells = tableTarget.drawing.cells.map((cellsRow) => cellsRow.slice());
+  nextCells.splice(rowIndex, 1);
+  return replaceUserDrawingTableCells(state, tableTarget, nextCells, options);
+}
+
+export function insertUserDrawingTableColumn(
+  state: UserDrawingState,
+  column: number,
+  values?: UserDrawingTableColumnInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table') return state;
+  const tableTarget: UserDrawingTableTarget = { index: target.index, drawing: target.drawing };
+
+  const columnIndex = Math.trunc(column);
+  const columnCount = tableTarget.drawing.cells[0]?.length ?? 1;
+  if (!Number.isFinite(columnIndex) || columnIndex < 0 || columnIndex > columnCount) return state;
+
+  const columnValues = normalizeUserDrawingTableColumnInput(values, tableTarget.drawing.cells.length);
+  const nextCells = tableTarget.drawing.cells.map((cellsRow, rowIndex) => {
+    const nextRow = cellsRow.slice();
+    nextRow.splice(columnIndex, 0, columnValues[rowIndex] ?? '');
+    return nextRow;
+  });
+  return replaceUserDrawingTableCells(state, tableTarget, nextCells, options);
+}
+
+export function deleteUserDrawingTableColumn(
+  state: UserDrawingState,
+  column: number,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table') return state;
+  const tableTarget: UserDrawingTableTarget = { index: target.index, drawing: target.drawing };
+  const columnCount = tableTarget.drawing.cells[0]?.length ?? 0;
+  if (columnCount <= 1) return state;
+
+  const columnIndex = Math.trunc(column);
+  if (!Number.isFinite(columnIndex) || columnIndex < 0 || columnIndex >= columnCount) return state;
+
+  const nextCells = tableTarget.drawing.cells.map((cellsRow) => {
+    const nextRow = cellsRow.slice();
+    nextRow.splice(columnIndex, 1);
+    return nextRow;
+  });
+  return replaceUserDrawingTableCells(state, tableTarget, nextCells, options);
 }

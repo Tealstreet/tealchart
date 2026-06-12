@@ -31,6 +31,8 @@ import type {
   UserDrawingStyle,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
+  UserDrawingTableColumnInput,
+  UserDrawingTableRowInput,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
   UserDrawingTool,
@@ -152,6 +154,10 @@ import {
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import {
+  deleteMobileUserDrawingTableColumn,
+  deleteMobileUserDrawingTableRow,
+  insertMobileUserDrawingTableColumn,
+  insertMobileUserDrawingTableRow,
   setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTableCell,
@@ -259,6 +265,18 @@ export interface SkiaTealchartHandle {
     options?: UpdateUserDrawingOptions,
   ): boolean;
   setUserDrawingTableDimensions(rows: number, columns: number, options?: UpdateUserDrawingOptions): boolean;
+  insertUserDrawingTableRow(
+    row: number,
+    values?: UserDrawingTableRowInput,
+    options?: UpdateUserDrawingOptions,
+  ): boolean;
+  deleteUserDrawingTableRow(row: number, options?: UpdateUserDrawingOptions): boolean;
+  insertUserDrawingTableColumn(
+    column: number,
+    values?: UserDrawingTableColumnInput,
+    options?: UpdateUserDrawingOptions,
+  ): boolean;
+  deleteUserDrawingTableColumn(column: number, options?: UpdateUserDrawingOptions): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
@@ -554,6 +572,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       ): boolean {
         return commitUserDrawingStateIfChanged(
           setMobileUserDrawingTableDimensions(userDrawingStateRef.current, rows, columns, options),
+        );
+      },
+      insertUserDrawingTableRow(
+        row: number,
+        values?: UserDrawingTableRowInput,
+        options: UpdateUserDrawingOptions = {},
+      ): boolean {
+        return commitUserDrawingStateIfChanged(
+          insertMobileUserDrawingTableRow(userDrawingStateRef.current, row, values, options),
+        );
+      },
+      deleteUserDrawingTableRow(row: number, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          deleteMobileUserDrawingTableRow(userDrawingStateRef.current, row, options),
+        );
+      },
+      insertUserDrawingTableColumn(
+        column: number,
+        values?: UserDrawingTableColumnInput,
+        options: UpdateUserDrawingOptions = {},
+      ): boolean {
+        return commitUserDrawingStateIfChanged(
+          insertMobileUserDrawingTableColumn(userDrawingStateRef.current, column, values, options),
+        );
+      },
+      deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          deleteMobileUserDrawingTableColumn(userDrawingStateRef.current, column, options),
         );
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {

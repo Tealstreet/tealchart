@@ -11,10 +11,14 @@ import {
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
+  deleteUserDrawingTableColumn,
+  deleteUserDrawingTableRow,
   deleteUserDrawing,
   duplicateUserDrawing,
   getUserDrawingSelectionIds,
   handleUserDrawingInput,
+  insertUserDrawingTableColumn,
+  insertUserDrawingTableRow,
   reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
@@ -1874,6 +1878,75 @@ describe('user drawing input controller', () => {
     expect(setUserDrawingTableDimensions(expanded, Number.NaN, 2)).toBe(expanded);
   });
 
+  it('inserts and deletes table rows and columns while preserving existing cells', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          point: anchorA,
+          textAlign: 'left',
+          cells: [
+            ['Metric', 'Value'],
+            ['Price', '101.25'],
+          ],
+        },
+      ],
+    });
+
+    const withRow = insertUserDrawingTableRow(state, 1, ['Volume', 10_000, 'ignored'], { now: () => 34 });
+    expect(withRow.selection).toEqual({ drawingId: 'table' });
+    expect(withRow.drawings[0]).toMatchObject({
+      updatedAt: 34,
+      cells: [
+        ['Metric', 'Value'],
+        ['Volume', '10000'],
+        ['Price', '101.25'],
+      ],
+    });
+
+    const withoutRow = deleteUserDrawingTableRow(withRow, 0, { now: () => 35 });
+    expect(withoutRow.drawings[0]).toMatchObject({
+      updatedAt: 35,
+      cells: [
+        ['Volume', '10000'],
+        ['Price', '101.25'],
+      ],
+    });
+
+    const withColumn = insertUserDrawingTableColumn(withoutRow, 1, ['Type', 'Spot'], { now: () => 36 });
+    expect(withColumn.drawings[0]).toMatchObject({
+      updatedAt: 36,
+      cells: [
+        ['Volume', 'Type', '10000'],
+        ['Price', 'Spot', '101.25'],
+      ],
+    });
+
+    expect(deleteUserDrawingTableColumn(withColumn, 2, { now: () => 37 }).drawings[0]).toMatchObject({
+      updatedAt: 37,
+      cells: [
+        ['Volume', 'Type'],
+        ['Price', 'Spot'],
+      ],
+    });
+    expect(insertUserDrawingTableRow(state, -1)).toBe(state);
+    expect(deleteUserDrawingTableRow(state, 4)).toBe(state);
+    expect(insertUserDrawingTableColumn(state, Number.NaN)).toBe(state);
+    expect(deleteUserDrawingTableColumn(state, -1)).toBe(state);
+    const oneRow = setUserDrawingTableDimensions(state, 1, 2);
+    const oneColumn = setUserDrawingTableDimensions(state, 2, 1);
+    expect(deleteUserDrawingTableRow(oneRow, 0)).toBe(oneRow);
+    expect(deleteUserDrawingTableColumn(oneColumn, 0)).toBe(oneColumn);
+  });
+
   it('ignores table cell updates for non-table and locked drawings without opt-in', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'line' },
@@ -1908,9 +1981,17 @@ describe('user drawing input controller', () => {
     expect(setUserDrawingTableCells(state, [['Ignored']])).toBe(state);
     expect(setUserDrawingTableCell(state, 0, 0, 'Ignored')).toBe(state);
     expect(setUserDrawingTableDimensions(state, 2, 2)).toBe(state);
+    expect(insertUserDrawingTableRow(state, 0)).toBe(state);
+    expect(deleteUserDrawingTableRow(state, 0)).toBe(state);
+    expect(insertUserDrawingTableColumn(state, 0)).toBe(state);
+    expect(deleteUserDrawingTableColumn(state, 0)).toBe(state);
     expect(setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table' })).toBe(state);
     expect(setUserDrawingTableCell(state, 0, 0, 'Updated', { drawingId: 'table' })).toBe(state);
     expect(setUserDrawingTableDimensions(state, 2, 2, { drawingId: 'table' })).toBe(state);
+    expect(insertUserDrawingTableRow(state, 0, undefined, { drawingId: 'table' })).toBe(state);
+    expect(deleteUserDrawingTableRow(state, 0, { drawingId: 'table' })).toBe(state);
+    expect(insertUserDrawingTableColumn(state, 0, undefined, { drawingId: 'table' })).toBe(state);
+    expect(deleteUserDrawingTableColumn(state, 0, { drawingId: 'table' })).toBe(state);
     expect(
       setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table', includeLocked: true }).drawings[1],
     ).toMatchObject({
@@ -1928,6 +2009,19 @@ describe('user drawing input controller', () => {
         ['Metric', 'Value'],
         ['', ''],
       ],
+    });
+    expect(
+      insertUserDrawingTableRow(state, 1, ['Added', 1], { drawingId: 'table', includeLocked: true }).drawings[1],
+    ).toMatchObject({
+      cells: [
+        ['Metric', 'Value'],
+        ['Added', '1'],
+      ],
+    });
+    expect(
+      insertUserDrawingTableColumn(state, 1, ['Added'], { drawingId: 'table', includeLocked: true }).drawings[1],
+    ).toMatchObject({
+      cells: [['Metric', 'Added', 'Value']],
     });
   });
 

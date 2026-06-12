@@ -79,6 +79,8 @@ import type {
   UserDrawingStyleToggleDescriptor,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
+  UserDrawingTableColumnInput,
+  UserDrawingTableRowInput,
   UserDrawingTextLabelLayout,
 } from './index';
 import type {
@@ -184,7 +186,11 @@ import {
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
+  deleteUserDrawingTableColumn,
+  deleteUserDrawingTableRow,
   selectUserDrawingsById,
+  insertUserDrawingTableColumn,
+  insertUserDrawingTableRow,
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingTableCell,
@@ -222,6 +228,10 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingTableCell).toBeTypeOf('function');
     expect(setUserDrawingTableCells).toBeTypeOf('function');
     expect(setUserDrawingTableDimensions).toBeTypeOf('function');
+    expect(insertUserDrawingTableRow).toBeTypeOf('function');
+    expect(deleteUserDrawingTableRow).toBeTypeOf('function');
+    expect(insertUserDrawingTableColumn).toBeTypeOf('function');
+    expect(deleteUserDrawingTableColumn).toBeTypeOf('function');
     expect(setUserDrawingTextContent).toBeTypeOf('function');
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
@@ -241,6 +251,10 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('setMobileUserDrawingTableCell');
     expect(nativeEntry).toContain('setMobileUserDrawingTableCells');
     expect(nativeEntry).toContain('setMobileUserDrawingTableDimensions');
+    expect(nativeEntry).toContain('insertMobileUserDrawingTableRow');
+    expect(nativeEntry).toContain('deleteMobileUserDrawingTableRow');
+    expect(nativeEntry).toContain('insertMobileUserDrawingTableColumn');
+    expect(nativeEntry).toContain('deleteMobileUserDrawingTableColumn');
     expect(nativeEntry).toContain('setMobileUserDrawingTextContent');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
@@ -1255,6 +1269,8 @@ describe('tealchart public entries', () => {
 
     const cells: UserDrawingTableCellsInput = [['Metric', 101.25]];
     const cell: UserDrawingTableCellInput = null;
+    const row: UserDrawingTableRowInput = ['Price', 101.25];
+    const column: UserDrawingTableColumnInput = ['Type', 'Spot'];
     const state = {
       version: 1 as const,
       drawings: [drawing],
@@ -1272,6 +1288,18 @@ describe('tealchart public entries', () => {
         ['', ''],
       ],
     });
+    expect(insertUserDrawingTableRow(state, 1, row).drawings[0]).toMatchObject({
+      cells: [
+        ['Metric', 'Value'],
+        ['Price', '101.25'],
+      ],
+    });
+    expect(deleteUserDrawingTableRow(insertUserDrawingTableRow(state, 1, row), 0).drawings[0])
+      .toMatchObject({ cells: [['Price', '101.25']] });
+    expect(insertUserDrawingTableColumn(state, 1, column).drawings[0])
+      .toMatchObject({ cells: [['Metric', 'Type', 'Value']] });
+    expect(deleteUserDrawingTableColumn(insertUserDrawingTableColumn(state, 1, column), 1).drawings[0])
+      .toMatchObject({ cells: [['Metric', 'Value']] });
   });
 
   it('exports shared drawing info line helpers', () => {

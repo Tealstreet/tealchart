@@ -6,10 +6,16 @@ import type {
   UserDrawingStyle,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
+  UserDrawingTableColumnInput,
+  UserDrawingTableRowInput,
   UserDrawingTextAlign,
 } from '../../drawings';
 
 import {
+  deleteUserDrawingTableColumn,
+  deleteUserDrawingTableRow,
+  insertUserDrawingTableColumn,
+  insertUserDrawingTableRow,
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingTableCell,
@@ -103,4 +109,38 @@ export function setMobileUserDrawingTableDimensions(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingTableDimensions(state, rows, columns, options);
+}
+
+export function insertMobileUserDrawingTableRow(
+  state: UserDrawingState,
+  row: number,
+  values?: UserDrawingTableRowInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return insertUserDrawingTableRow(state, row, values, options);
+}
+
+export function deleteMobileUserDrawingTableRow(
+  state: UserDrawingState,
+  row: number,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return deleteUserDrawingTableRow(state, row, options);
+}
+
+export function insertMobileUserDrawingTableColumn(
+  state: UserDrawingState,
+  column: number,
+  values?: UserDrawingTableColumnInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return insertUserDrawingTableColumn(state, column, values, options);
+}
+
+export function deleteMobileUserDrawingTableColumn(
+  state: UserDrawingState,
+  column: number,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return deleteUserDrawingTableColumn(state, column, options);
 }
