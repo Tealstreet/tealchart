@@ -152,9 +152,11 @@ describe('user drawing types', () => {
   });
 
   it('normalizes drawing font sizes to supported cross-platform values', () => {
-    expect(normalizeUserDrawingFontSize(8)).toBe(10);
+    expect(normalizeUserDrawingFontSize(7)).toBe(8);
     expect(normalizeUserDrawingFontSize(15)).toBe(14);
-    expect(normalizeUserDrawingFontSize(20)).toBe(16);
+    expect(normalizeUserDrawingFontSize(20)).toBe(20);
+    expect(normalizeUserDrawingFontSize(30)).toBe(28);
+    expect(normalizeUserDrawingFontSize(38)).toBe(40);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, fontSize: 15 })).toMatchObject({
       fontSize: 14,
     });
