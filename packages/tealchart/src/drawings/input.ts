@@ -244,6 +244,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'gannFan':
     case 'gannBox':
     case 'gannSquare':
+    case 'gannSquareFixed':
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':

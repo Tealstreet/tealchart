@@ -2437,7 +2437,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'gannBox' || primitive.kind === 'gannSquare') {
+          if (primitive.kind === 'gannBox' || primitive.kind === 'gannSquare' || primitive.kind === 'gannSquareFixed') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             const textColor = primitive.style.textColor ?? primitive.style.lineColor;

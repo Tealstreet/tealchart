@@ -245,6 +245,7 @@ export type {
   GannBoxDrawing,
   GannFanDrawing,
   GannSquareDrawing,
+  GannSquareFixedDrawing,
   DrawingCoordinateSpace,
   DrawingPitchforkVariant,
   DrawingScreenAbcdPattern,

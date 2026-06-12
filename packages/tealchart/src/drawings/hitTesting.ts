@@ -504,7 +504,7 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
-  if (geometry.kind === 'gannBox' || geometry.kind === 'gannSquare') {
+  if (geometry.kind === 'gannBox' || geometry.kind === 'gannSquare' || geometry.kind === 'gannSquareFixed') {
     const distance = pointInRect(point, geometry.gannBox.rect)
       ? 0
       : Math.min(
@@ -658,13 +658,14 @@ function hitTestUserDrawingHandle(
     case 'image':
     case 'gannBox':
     case 'gannSquare':
+    case 'gannSquareFixed':
     case 'circle':
     case 'ellipse':
     case 'priceRange':
     case 'datePriceRange':
       {
         const rect =
-          geometry.kind === 'gannBox' || geometry.kind === 'gannSquare'
+          geometry.kind === 'gannBox' || geometry.kind === 'gannSquare' || geometry.kind === 'gannSquareFixed'
             ? geometry.gannBox.rect
             : geometry.kind === 'circle'
               ? geometry.circle.rect
