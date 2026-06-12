@@ -95,6 +95,7 @@ import {
   resolveRectFromAnchors,
   resolveRiskRewardPositionFromAnchors,
   resolveRotatedRectangleFromAnchors,
+  resolveTableFromAnchor,
   resolveThreeDrivesPatternFromAnchors,
   resolveTrendAngleFromSegment,
   resolveTrendBasedFibExtensionFromAnchors,
@@ -142,6 +143,35 @@ describe('user drawing coordinates', () => {
     expect(drawingXToTime(110, space)).toBe(2_000);
     expect(priceToDrawingY(100, space)).toBe(70);
     expect(drawingYToPrice(70, space)).toBe(100);
+  });
+
+  it('resolves table cells from a one-anchor screen origin', () => {
+    const table = resolveTableFromAnchor(
+      { time: 2_000, price: 100 },
+      [
+        ['Metric', 'Value'],
+        ['Price', '101.25'],
+      ],
+      space,
+      12,
+    );
+
+    expect(table.bounds).toEqual({ x: 110, y: 70, width: 124, height: 48 });
+    expect(table.cells).toHaveLength(4);
+    expect(table.cells[0]).toMatchObject({
+      row: 0,
+      column: 0,
+      text: 'Metric',
+      rect: { x: 110, y: 70, width: 62, height: 24 },
+      textPoint: { x: 120, y: 82 },
+    });
+    expect(table.cells[3]).toMatchObject({
+      row: 1,
+      column: 1,
+      text: '101.25',
+      rect: { x: 172, y: 94, width: 62, height: 24 },
+      textPoint: { x: 182, y: 106 },
+    });
   });
 
   it('maps anchors to screen points and back', () => {

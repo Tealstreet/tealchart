@@ -11,7 +11,12 @@ import type {
 } from './types';
 
 import { createUserDrawingState } from './input';
-import { normalizeUserDrawingIconName, normalizeUserDrawingPanePosition, normalizeUserDrawingStyle } from './types';
+import {
+  normalizeUserDrawingIconName,
+  normalizeUserDrawingPanePosition,
+  normalizeUserDrawingStyle,
+  normalizeUserDrawingTableCells,
+} from './types';
 
 function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
   switch (drawing.kind) {
@@ -234,6 +239,14 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         style: { ...drawing.style },
         kind: 'anchoredVolumeProfile',
         point: { ...drawing.point },
+      };
+    case 'table':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'table',
+        point: { ...drawing.point },
+        cells: normalizeUserDrawingTableCells(drawing.cells),
       };
     case 'textLabel':
     case 'note':
@@ -1123,6 +1136,17 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             ...base,
             kind: 'anchoredVolumeProfile',
             point,
+          }
+        : null;
+    }
+    case 'table': {
+      const point = parseAnchor(value.point);
+      return point
+        ? {
+            ...base,
+            kind: 'table',
+            point,
+            cells: normalizeUserDrawingTableCells(Array.isArray(value.cells) ? value.cells : undefined),
           }
         : null;
     }
