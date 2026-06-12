@@ -4,8 +4,8 @@ import type {
   DrawingScreenElliottCorrectiveWaveLabel,
   DrawingScreenElliottDoubleComboWaveLabel,
   DrawingScreenElliottImpulseWaveLabel,
-  DrawingScreenElliottTripleComboWaveLabel,
   DrawingScreenElliottTriangleWaveLabel,
+  DrawingScreenElliottTripleComboWaveLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
   DrawingScreenRect,
@@ -21,19 +21,19 @@ import type {
   UserDrawingTextAnnotation,
 } from '../../drawings';
 
-import { resolveDrawingArrowHead } from '../../drawings/arrowGeometry';
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
   resolveUserDrawingBalloonLayout,
-  resolveUserDrawingVisualPriceRangeMetrics,
-  resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
+  resolveUserDrawingTextLabelLayout,
+  resolveUserDrawingVisualPriceRangeMetrics,
   splitUserDrawingTextLines,
 } from '../../drawings';
+import { resolveDrawingArrowHead } from '../../drawings/arrowGeometry';
 
 export type MobileUserDrawingPrimitive =
   | {
@@ -535,10 +535,12 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       levels: readonly {
         ratio: number;
+        label: string;
         time: number;
         x: number;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -551,10 +553,12 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       levels: readonly {
         ratio: number;
+        label: string;
         time: number;
         x: number;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -567,10 +571,12 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       levels: readonly {
         ratio: number;
+        label: string;
         time: number;
         x: number;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -583,11 +589,13 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       cycles: readonly {
         ratio: number;
+        label: string;
         startTime: number;
         endTime: number;
         startBoundary: { start: DrawingScreenPoint; end: DrawingScreenPoint };
         endBoundary: { start: DrawingScreenPoint; end: DrawingScreenPoint };
         points: readonly DrawingScreenPoint[];
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -1111,11 +1119,23 @@ export type MobileUserDrawingTrendBasedFibTimePrimitive = Extract<
 export type MobileUserDrawingCyclicLinesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'cyclicLines' }>;
 export type MobileUserDrawingTimeCyclesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'timeCycles' }>;
 export type MobileUserDrawingSineLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'sineLine' }>;
-export type MobileUserDrawingParallelChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'parallelChannel' }>;
-export type MobileUserDrawingRotatedRectanglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'rotatedRectangle' }>;
-export type MobileUserDrawingRegressionTrendPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'regressionTrend' }>;
+export type MobileUserDrawingParallelChannelPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'parallelChannel' }
+>;
+export type MobileUserDrawingRotatedRectanglePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'rotatedRectangle' }
+>;
+export type MobileUserDrawingRegressionTrendPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'regressionTrend' }
+>;
 export type MobileUserDrawingFlatTopBottomPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'flatTopBottom' }>;
-export type MobileUserDrawingDisjointChannelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'disjointChannel' }>;
+export type MobileUserDrawingDisjointChannelPrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'disjointChannel' }
+>;
 export type MobileUserDrawingFibRetracementPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibRetracement' }>;
 export type MobileUserDrawingFibExtensionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibExtension' }>;
 export type MobileUserDrawingTrendBasedFibExtensionPrimitive = Extract<
@@ -1305,10 +1325,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'arrowLine': {
-      const arrowHead =
-        resolveDrawingArrowHead(geometry.segment, {
-          size: Math.max(10, geometry.drawing.style.lineWidth * 5),
-        });
+      const arrowHead = resolveDrawingArrowHead(geometry.segment, {
+        size: Math.max(10, geometry.drawing.style.lineWidth * 5),
+      });
       return {
         kind: 'line',
         id: geometry.drawing.id,
@@ -1767,10 +1786,12 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.fibTimeZone.levels.map((level) => ({
           ratio: level.ratio,
+          label: level.label,
           time: level.time,
           x: level.x,
           start: level.segment.start,
           end: level.segment.end,
+          labelPoint: level.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1784,10 +1805,12 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.trendBasedFibTime.levels.map((level) => ({
           ratio: level.ratio,
+          label: level.label,
           time: level.time,
           x: level.x,
           start: level.segment.start,
           end: level.segment.end,
+          labelPoint: level.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1801,10 +1824,12 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.cyclicLines.levels.map((level) => ({
           ratio: level.ratio,
+          label: level.label,
           time: level.time,
           x: level.x,
           start: level.segment.start,
           end: level.segment.end,
+          labelPoint: level.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1818,11 +1843,13 @@ function primitiveFromGeometry(
         clip,
         cycles: geometry.timeCycles.cycles.map((cycle) => ({
           ratio: cycle.ratio,
+          label: cycle.label,
           startTime: cycle.startTime,
           endTime: cycle.endTime,
           startBoundary: cycle.startBoundary,
           endBoundary: cycle.endBoundary,
           points: cycle.points,
+          labelPoint: cycle.labelPoint,
         })),
         style: geometry.drawing.style,
       };

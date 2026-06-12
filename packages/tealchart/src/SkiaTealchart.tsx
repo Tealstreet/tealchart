@@ -20,24 +20,36 @@ import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
+  UpdateUserDrawingOptions,
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
   UserDrawingIconName,
   UserDrawingImageSourceInput,
   UserDrawingLineStyle,
+  UserDrawingState,
   UserDrawingStyle,
-  UserDrawingTextAnnotation,
   UserDrawingTextAlign,
+  UserDrawingTextAnnotation,
   UserDrawingTool,
   UserDrawingZOrderAction,
-  UpdateUserDrawingOptions,
 } from './drawings';
-import type { UserDrawingState } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
 import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
+import type {
+  MobileUserDrawingAnchoredNotePrimitive,
+  MobileUserDrawingAnchoredTextPrimitive,
+  MobileUserDrawingCalloutPrimitive,
+  MobileUserDrawingCommentPrimitive,
+  MobileUserDrawingEmojiPrimitive,
+  MobileUserDrawingImagePrimitive,
+  MobileUserDrawingNotePrimitive,
+  MobileUserDrawingPriceNotePrimitive,
+  MobileUserDrawingStickerPrimitive,
+  MobileUserDrawingTextLabelPrimitive,
+} from './mobile/utils/drawingRenderModel';
 import type { PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type {
@@ -69,13 +81,13 @@ import {
   createPicture,
   DashPathEffect,
   Group,
-  Image as SkiaImage,
   Oval,
-  Path as SkiaPath,
   Picture,
   Rect,
   Skia,
+  Image as SkiaImage,
   Line as SkiaLine,
+  Path as SkiaPath,
   Text as SkiaText,
   useFont,
   useImage,
@@ -88,8 +100,8 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
-  applyUserDrawingEditDrag,
   appendUserDrawingPathDragPoint,
+  applyUserDrawingEditDrag,
   beginUserDrawingEditDragAtPoint,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
@@ -108,14 +120,14 @@ import {
   reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   resolveUserDrawingTextEditMetrics,
-  splitUserDrawingTextLines,
   selectUserDrawingById,
   selectUserDrawingsById,
   setUserDrawingImageSource,
   setUserDrawingText,
   setUserDrawingTool,
-  USER_DRAWING_FONT_FAMILIES,
+  splitUserDrawingTextLines,
   updateUserDrawingTextEdit,
+  USER_DRAWING_FONT_FAMILIES,
 } from './drawings';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
@@ -138,23 +150,11 @@ import {
   resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingMeasurementLabelPosition,
-  resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingPriceRangeLabelPosition,
+  resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingRiskRewardLabelPosition,
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
-} from './mobile/utils/drawingRenderModel';
-import type {
-  MobileUserDrawingAnchoredNotePrimitive,
-  MobileUserDrawingAnchoredTextPrimitive,
-  MobileUserDrawingCalloutPrimitive,
-  MobileUserDrawingCommentPrimitive,
-  MobileUserDrawingEmojiPrimitive,
-  MobileUserDrawingImagePrimitive,
-  MobileUserDrawingNotePrimitive,
-  MobileUserDrawingPriceNotePrimitive,
-  MobileUserDrawingStickerPrimitive,
-  MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import {
   setMobileUserDrawingIconName,
@@ -356,8 +356,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
-  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
-    propUserDrawingState ?? createUserDrawingState(),
+  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(
+    () => propUserDrawingState ?? createUserDrawingState(),
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingStateRef = useRef(effectiveUserDrawingState);
@@ -497,7 +497,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return commitUserDrawingStateIfChanged(setUserDrawingImageSource(userDrawingStateRef.current, source, options));
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style, options));
+        return commitUserDrawingStateIfChanged(
+          updateMobileUserDrawingStyle(userDrawingStateRef.current, style, options),
+        );
       },
       setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
@@ -515,19 +517,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         );
       },
       setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(setMobileUserDrawingLocked(userDrawingStateRef.current, locked, options));
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingLocked(userDrawingStateRef.current, locked, options),
+        );
       },
       reorderUserDrawings(action: UserDrawingZOrderAction, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, action, options));
       },
       bringUserDrawingForward(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'bringForward', options));
+        return commitUserDrawingStateIfChanged(
+          reorderUserDrawings(userDrawingStateRef.current, 'bringForward', options),
+        );
       },
       sendUserDrawingBackward(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'sendBackward', options));
+        return commitUserDrawingStateIfChanged(
+          reorderUserDrawings(userDrawingStateRef.current, 'sendBackward', options),
+        );
       },
       bringUserDrawingToFront(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'bringToFront', options));
+        return commitUserDrawingStateIfChanged(
+          reorderUserDrawings(userDrawingStateRef.current, 'bringToFront', options),
+        );
       },
       sendUserDrawingToBack(options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'sendToBack', options));
@@ -751,10 +761,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       height,
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
-      fontFamily: resolveMobileUserDrawingFontFamily(
-        activeUserDrawingTextEditPrimitive.style.fontFamily,
-        Platform.OS,
-      ),
+      fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
@@ -1182,12 +1189,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
       if (effectiveUserDrawingState.activeTool !== 'select') return false;
 
-      const result = beginUserDrawingEditDragAtPoint(
-        effectiveUserDrawingState,
-        { x, y },
-        userDrawingSpacesByPaneId,
-        { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
-      );
+      const result = beginUserDrawingEditDragAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
+        hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+      });
       if (!result.hit || !result.drag) return false;
 
       userDrawingEditDragRef.current = result.drag;
@@ -1296,7 +1300,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setCrosshairVisible(true);
       handleCrosshairMove(x, y);
     },
-    [crosshairVisible, handleCrosshairMove, handleUserDrawingTap, isPointInChartArea, revealResetButtonIfInBottomRegion],
+    [
+      crosshairVisible,
+      handleCrosshairMove,
+      handleUserDrawingTap,
+      isPointInChartArea,
+      revealResetButtonIfInBottomRegion,
+    ],
   );
 
   // Pan gesture for moving crosshair (active only while crosshair is visible)
@@ -1600,8 +1610,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const bracketFont = useFont(null, 12);
   const userDrawingTextFonts = useMemo(() => {
     const fontSizes = [10, 12, 14, 16] as const;
-    const fonts: Partial<Record<UserDrawingFontFamily, Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>>>> =
-      {};
+    const fonts: Partial<
+      Record<UserDrawingFontFamily, Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>>>
+    > = {};
 
     for (const fontFamily of USER_DRAWING_FONT_FAMILIES) {
       const nativeFontFamily = resolveMobileUserDrawingFontFamily(fontFamily, Platform.OS);
@@ -2016,7 +2027,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     path.lineTo(first.x, first.y);
                     path.lineTo(second.x, second.y);
                     path.close();
-                    return <SkiaPath key={`${band.fromRatio}-${band.toRatio}`} path={path} color={primitive.style.fillColor} style="fill" />;
+                    return (
+                      <SkiaPath
+                        key={`${band.fromRatio}-${band.toRatio}`}
+                        path={path}
+                        color={primitive.style.fillColor}
+                        style="fill"
+                      />
+                    );
                   })}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -2034,7 +2052,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'fibFan' || primitive.kind === 'fibSpeedResistanceFan' || primitive.kind === 'gannFan') {
+          if (
+            primitive.kind === 'fibFan' ||
+            primitive.kind === 'fibSpeedResistanceFan' ||
+            primitive.kind === 'gannFan'
+          ) {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
@@ -2057,8 +2079,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   primitive.rays.map((ray) => {
                     if (!ray.label || !ray.labelPoint) return null;
                     const textWidth = font.measureText(ray.label).width;
-                    const x =
-                      ray.end.x >= ray.start.x ? ray.labelPoint.x - textWidth : ray.labelPoint.x;
+                    const x = ray.end.x >= ray.start.x ? ray.labelPoint.x - textWidth : ray.labelPoint.x;
                     return (
                       <SkiaText
                         key={`${ray.ratio}:label`}
@@ -2114,20 +2135,32 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           ) {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
                 {primitive.levels.map((level) => (
-                  <SkiaLine
-                    key={`${primitive.id}:level:${level.ratio}`}
-                    p1={vec(level.start.x, level.start.y)}
-                    p2={vec(level.end.x, level.end.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
+                  <Group key={`${primitive.id}:level:${level.ratio}`}>
+                    <SkiaLine
+                      p1={vec(level.start.x, level.start.y)}
+                      p2={vec(level.end.x, level.end.y)}
+                      color={primitive.style.lineColor}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      style="stroke"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                    {font && (
+                      <SkiaText
+                        x={level.labelPoint.x - font.measureText(level.label).width / 2}
+                        y={level.labelPoint.y}
+                        text={level.label}
+                        color={textColor}
+                        font={font}
+                      />
+                    )}
+                  </Group>
                 ))}
               </Group>
             );
@@ -2136,6 +2169,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'timeCycles') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
@@ -2178,6 +2213,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                         >
                           {dash && <DashPathEffect intervals={dash} />}
                         </SkiaPath>
+                      )}
+                      {font && (
+                        <SkiaText
+                          x={cycle.labelPoint.x - font.measureText(cycle.label).width / 2}
+                          y={cycle.labelPoint.y}
+                          text={cycle.label}
+                          color={textColor}
+                          font={font}
+                        />
                       )}
                     </Group>
                   );
@@ -2225,11 +2269,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.fillColor ?? primitive.style.lineColor}
-                    style="fill"
-                  />
+                  <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -2260,11 +2300,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.fillColor ?? primitive.style.lineColor}
-                    style="fill"
-                  />
+                  <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -3363,7 +3399,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const measuredWidths = splitUserDrawingTextLines(primitive.text).map((line) => font.measureText(line).width);
+            const measuredWidths = splitUserDrawingTextLines(primitive.text).map(
+              (line) => font.measureText(line).width,
+            );
             const layout =
               primitive.kind === 'balloon'
                 ? resolveMobileUserDrawingBalloonLayout(primitive, measuredWidths)
@@ -3671,19 +3709,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style));
             }}
             onUserDrawingTextAlignChange={(textAlign) => {
-              commitUserDrawingStateIfChanged(
-                setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign),
-              );
+              commitUserDrawingStateIfChanged(setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign));
             }}
             onUserDrawingIconNameChange={(iconName) => {
-              commitUserDrawingStateIfChanged(
-                setMobileUserDrawingIconName(userDrawingStateRef.current, iconName),
-              );
+              commitUserDrawingStateIfChanged(setMobileUserDrawingIconName(userDrawingStateRef.current, iconName));
             }}
             onUserDrawingVisibilityChange={(visible) => {
-              commitUserDrawingStateIfChanged(
-                setMobileUserDrawingVisibility(userDrawingStateRef.current, visible),
-              );
+              commitUserDrawingStateIfChanged(setMobileUserDrawingVisibility(userDrawingStateRef.current, visible));
             }}
             onUserDrawingLockedChange={(locked, includeLocked) => {
               commitUserDrawingStateIfChanged(
