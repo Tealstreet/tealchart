@@ -2309,6 +2309,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px monospace');
   });
 
+  it('renders wrapped text labels inside the configured text box width', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'label',
+      kind: 'textLabel',
+      style: { ...style, textWrap: true, textMaxWidth: 60 },
+      point: { time: 50, price: 50 },
+      text: 'Alpha beta gamma',
+      textAlign: 'left',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:20,22,60,56:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:Alpha:26,32:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:beta:26,50:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:gamma:26,68:#111:left:1:12px sans-serif');
+  });
+
   it('renders bold text labels with canvas font weight', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

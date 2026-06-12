@@ -7,6 +7,7 @@ import type {
   UserDrawingLineStyle,
   UserDrawingState,
   UserDrawingTextAlign,
+  UserDrawingTextMaxWidth,
   UserDrawingTool,
 } from './types';
 import type { UserDrawingZOrderAction } from './input';
@@ -19,6 +20,7 @@ import {
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_FONT_SIZES,
   USER_DRAWING_OPACITIES,
+  USER_DRAWING_TEXT_MAX_WIDTHS,
 } from './types';
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
@@ -86,6 +88,17 @@ export interface UserDrawingFontStyleDescriptor {
 export interface UserDrawingTextDecorationDescriptor {
   textUnderline: boolean;
   icon: string;
+  label: string;
+}
+
+export interface UserDrawingTextWrapDescriptor {
+  textWrap: boolean;
+  icon: string;
+  label: string;
+}
+
+export interface UserDrawingTextMaxWidthDescriptor {
+  textMaxWidth: UserDrawingTextMaxWidth;
   label: string;
 }
 
@@ -321,6 +334,17 @@ export const USER_DRAWING_TEXT_DECORATION_DESCRIPTORS: readonly UserDrawingTextD
   { textUnderline: true, icon: 'U', label: 'Underline text' },
 ] as const;
 
+export const USER_DRAWING_TEXT_WRAP_DESCRIPTORS: readonly UserDrawingTextWrapDescriptor[] = [
+  { textWrap: true, icon: '↵', label: 'Wrap text' },
+] as const;
+
+export const USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS: readonly UserDrawingTextMaxWidthDescriptor[] = [
+  ...USER_DRAWING_TEXT_MAX_WIDTHS.map((textMaxWidth) => ({
+    textMaxWidth,
+    label: `${textMaxWidth} pixel text box width`,
+  })),
+];
+
 export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignDescriptor[] = [
   { textAlign: 'left', icon: 'L', label: 'Left text alignment' },
   { textAlign: 'center', icon: 'C', label: 'Center text alignment' },
@@ -456,6 +480,10 @@ export function supportsUserDrawingTextAlignControls(drawing: UserDrawing): bool
   return drawing.kind === 'table' || isUserDrawingTextAnnotation(drawing);
 }
 
+export function supportsUserDrawingTextWrapControls(drawing: UserDrawing): boolean {
+  return isUserDrawingTextAnnotation(drawing);
+}
+
 export function supportsUserDrawingIconControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'icon';
 }
@@ -518,6 +546,8 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fontWeight ?? '',
     selectedDrawing?.style.fontStyle ?? '',
     selectedDrawing?.style.textUnderline ?? '',
+    selectedDrawing?.style.textWrap ?? '',
+    selectedDrawing?.style.textMaxWidth ?? '',
     selectedDrawing && (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing))
       ? selectedDrawing.textAlign
       : '',

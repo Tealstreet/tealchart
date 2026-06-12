@@ -109,8 +109,10 @@ import {
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
   duplicateUserDrawing as duplicateUserDrawingState,
+  DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   handleUserDrawingInput,
   isUserDrawingPathFamilyTool,
+  measureUserDrawingTextLines,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   reorderUserDrawings,
@@ -121,7 +123,6 @@ import {
   setUserDrawingImageSource,
   setUserDrawingText,
   setUserDrawingTool,
-  splitUserDrawingTextLines,
   updateUserDrawingTextEdit,
   USER_DRAWING_FONT_FAMILIES,
 } from './drawings';
@@ -852,7 +853,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (!activeUserDrawingTextEditPrimitive) return null;
     const value = activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text;
     const editMetrics = resolveUserDrawingTextEditMetrics(value);
-    const width = Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
+    const configuredWidth =
+      activeUserDrawingTextEditPrimitive.style.textWrap && activeUserDrawingTextEditPrimitive.style.textMaxWidth
+        ? activeUserDrawingTextEditPrimitive.style.textMaxWidth
+        : undefined;
+    const width = configuredWidth ?? Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
     const height = Math.max(32, Math.min(160, editMetrics.lines.length * 18 + 14));
     const chartRight = dimensions.width - margins.right;
     const left = Math.max(
@@ -3645,13 +3650,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const measuredWidths = splitUserDrawingTextLines(primitive.text).map(
+            const textWrapWidth = primitive.style.textWrap ? primitive.style.textMaxWidth : undefined;
+            const measuredLines = measureUserDrawingTextLines(
+              primitive.text,
               (line) => font.measureText(line).width,
+              textWrapWidth === undefined
+                ? undefined
+                : Math.max(1, textWrapWidth - DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING * 2),
             );
+            const textLines = measuredLines.map((line) => line.text);
+            const measuredWidths = measuredLines.map((line) => line.width);
             const layout =
               textPrimitive.kind === 'balloon'
-                ? resolveMobileUserDrawingBalloonLayout(textPrimitive, measuredWidths)
-                : resolveMobileUserDrawingTextLabelLayout(textPrimitive, measuredWidths);
+                ? resolveMobileUserDrawingBalloonLayout(textPrimitive, measuredWidths, {
+                    lines: textLines,
+                    boxWidth: textWrapWidth,
+                  })
+                : resolveMobileUserDrawingTextLabelLayout(textPrimitive, measuredWidths, {
+                    lines: textLines,
+                    boxWidth: textWrapWidth,
+                  });
             const balloonTailPath = textPrimitive.kind === 'balloon' ? Skia.Path.Make() : null;
             if (balloonTailPath && 'tail' in layout) {
               balloonTailPath.moveTo(layout.tail.left.x, layout.tail.left.y);

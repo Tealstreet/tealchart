@@ -15,10 +15,12 @@ import {
   normalizeUserDrawingFontStyle,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
+  normalizeUserDrawingTextMaxWidth,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
+  USER_DRAWING_TEXT_MAX_WIDTHS,
 } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
@@ -184,6 +186,16 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingOpacity(Number.NaN)).toBe(1);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, opacity: 1.4 })).toMatchObject({
       opacity: 1,
+    });
+  });
+
+  it('normalizes drawing text wrap widths to supported cross-platform values', () => {
+    expect(USER_DRAWING_TEXT_MAX_WIDTHS).toEqual([120, 180, 240]);
+    expect(normalizeUserDrawingTextMaxWidth(90)).toBe(120);
+    expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
+    expect(normalizeUserDrawingTextMaxWidth(260)).toBe(240);
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, textMaxWidth: 190 })).toMatchObject({
+      textMaxWidth: 180,
     });
   });
 

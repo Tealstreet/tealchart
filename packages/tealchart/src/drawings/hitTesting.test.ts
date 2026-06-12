@@ -1303,6 +1303,26 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits wrapped text labels using measured wrapped bounds', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'label',
+      kind: 'textLabel',
+      style: { ...style, textWrap: true, textMaxWidth: 60 },
+      point: { time: 50, price: 50 },
+      text: 'Alpha beta gamma',
+      textAlign: 'left',
+    };
+    const options = {
+      labelWidth: 1,
+      labelHeight: 20,
+      measureTextLabelLine: (_drawing: UserDrawing, line: string) => line.length * 6,
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 79, y: 68 }, space, options)?.drawing.id).toBe('label');
+    expect(hitTestUserDrawing(drawing, { x: 82, y: 68 }, space, options)).toBeNull();
+  });
+
   it('hits note drawings using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

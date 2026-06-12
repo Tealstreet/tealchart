@@ -316,6 +316,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
@@ -325,7 +326,43 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
+
+    topBar.unmount();
+  });
+
+  it('dispatches selected wrapped text label width controls', () => {
+    const onStyle = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-text-wrap-width',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'label' },
+        drawings: [
+          {
+            id: 'label',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid', textWrap: true, textMaxWidth: 180 },
+            point: { time: 1, price: 10 },
+            text: 'note',
+            textAlign: 'center',
+          },
+        ],
+      },
+      onUserDrawingStyleChange: onStyle,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="240 pixel text box width"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 240 });
 
     topBar.unmount();
   });
@@ -375,6 +412,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
@@ -383,6 +421,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).not.toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.unmount();

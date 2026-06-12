@@ -766,6 +766,44 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings[0]?.style.fontFamily).toBe('sans-serif');
   });
 
+  it('restores rich text label style fields', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            fontWeight: 'bold',
+            fontStyle: 'italic',
+            textUnderline: true,
+            textWrap: true,
+            textMaxWidth: 190,
+          },
+          point: { time: 1, price: 10 },
+          text: 'Restored',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]?.style).toMatchObject({
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+      textUnderline: true,
+      textWrap: true,
+      textMaxWidth: 180,
+    });
+  });
+
   it('normalizes restored drawing opacity', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
