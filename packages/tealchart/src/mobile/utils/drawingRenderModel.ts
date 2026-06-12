@@ -819,6 +819,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'priceLabel';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'balloon';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -902,6 +916,7 @@ export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'note' }>;
 export type MobileUserDrawingCalloutPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'callout' }>;
 export type MobileUserDrawingCommentPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'comment' }>;
+export type MobileUserDrawingPriceLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceLabel' }>;
 export type MobileUserDrawingPriceNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceNote' }>;
 export type MobileUserDrawingPinPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pin' }>;
 export type MobileUserDrawingBalloonPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'balloon' }>;
@@ -1878,6 +1893,7 @@ function primitiveFromGeometry(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
       const drawing = geometry.drawing as UserDrawingTextAnnotation;

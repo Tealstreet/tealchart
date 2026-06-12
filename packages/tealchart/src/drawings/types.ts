@@ -75,6 +75,7 @@ export type UserDrawingTool =
   | 'note'
   | 'callout'
   | 'comment'
+  | 'priceLabel'
   | 'priceNote'
   | 'pin'
   | 'icon'
@@ -90,6 +91,7 @@ export type UserDrawingTextAnnotationKind =
   | 'note'
   | 'callout'
   | 'comment'
+  | 'priceLabel'
   | 'priceNote'
   | 'balloon'
   | 'signpost';
@@ -536,6 +538,13 @@ export interface CommentDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
+export interface PriceLabelDrawing extends UserDrawingBase {
+  kind: 'priceLabel';
+  point: UserDrawingAnchor;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
 export interface PriceNoteDrawing extends UserDrawingBase {
   kind: 'priceNote';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -578,6 +587,7 @@ export type UserDrawingTextAnnotation =
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
+  | PriceLabelDrawing
   | PriceNoteDrawing
   | BalloonDrawing
   | SignpostDrawing;
@@ -653,6 +663,7 @@ export type UserDrawing =
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
+  | PriceLabelDrawing
   | PriceNoteDrawing
   | PinDrawing
   | IconDrawing
@@ -848,6 +859,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'crossLine':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'pin':
     case 'icon':
     case 'flagMark':
@@ -871,6 +883,7 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
     drawing.kind === 'note' ||
     drawing.kind === 'callout' ||
     drawing.kind === 'comment' ||
+    drawing.kind === 'priceLabel' ||
     drawing.kind === 'priceNote' ||
     drawing.kind === 'balloon' ||
     drawing.kind === 'signpost'
@@ -1325,6 +1338,7 @@ export function createUserDrawingFromDraft(
       };
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
     case 'textLabel':

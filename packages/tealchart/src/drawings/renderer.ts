@@ -1294,6 +1294,7 @@ export function renderUserDrawing(
       case 'note':
       case 'callout':
       case 'comment':
+      case 'priceLabel':
       case 'priceNote':
       case 'balloon':
       case 'signpost':

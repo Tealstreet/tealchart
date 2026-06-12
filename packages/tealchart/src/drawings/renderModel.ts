@@ -242,6 +242,7 @@ export function resolveUserDrawingHandlePoints(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
     case 'pin':
