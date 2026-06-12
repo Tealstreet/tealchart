@@ -1427,6 +1427,9 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:100,83.75');
     expect(ctx.calls).toContain('lineTo:100,117.5');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0:96,46:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:0.5:96,79.75:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1:96,113.5:#111:right:1:12px sans-serif');
   });
 
   it('renders fib speed resistance fans as one-third fan rays', () => {
@@ -1446,6 +1449,9 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:10,50');
     expect(ctx.calls).toContain('lineTo:100,72.5');
     expect(ctx.calls).toContain('lineTo:100,95');
+    expect(ctx.calls).toContain('fillText:0.333:96,68.5:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:0.667:96,91:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1:96,113.5:#111:right:1:12px sans-serif');
     expect(ctx.calls).toContain('lineTo:100,117.5');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
@@ -1572,6 +1578,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:100,58.4375');
     expect(ctx.calls).toContain('lineTo:100,117.5');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:1/8:96,54.4375:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1/1:96,113.5:#111:right:1:12px sans-serif');
   });
 
   it('renders gann boxes as filled grid and angle boxes', () => {
