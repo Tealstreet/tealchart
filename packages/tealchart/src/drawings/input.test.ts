@@ -1050,7 +1050,11 @@ describe('user drawing input controller', () => {
       ],
     });
 
-    const bold = updateUserDrawingStyle(state, { fontWeight: 'bold', fontStyle: 'italic' }, { now: () => 13 });
+    const bold = updateUserDrawingStyle(
+      state,
+      { fontWeight: 'bold', fontStyle: 'italic', textUnderline: true },
+      { now: () => 13 },
+    );
     const normalized = updateUserDrawingStyle(
       bold,
       { fontWeight: 'heavy' as never, fontStyle: 'oblique' as never },
@@ -1059,7 +1063,7 @@ describe('user drawing input controller', () => {
 
     expect(bold.drawings[0]).toMatchObject({
       updatedAt: 13,
-      style: expect.objectContaining({ fontWeight: 'bold', fontStyle: 'italic' }),
+      style: expect.objectContaining({ fontWeight: 'bold', fontStyle: 'italic', textUnderline: true }),
     });
     expect(normalized.drawings[0]).toMatchObject({
       updatedAt: 14,

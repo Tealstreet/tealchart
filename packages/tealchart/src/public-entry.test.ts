@@ -83,6 +83,7 @@ import type {
   UserDrawingTableCellsInput,
   UserDrawingTableColumnInput,
   UserDrawingTableRowInput,
+  UserDrawingTextDecorationDescriptor,
   UserDrawingTextLabelLayout,
 } from './index';
 import type {
@@ -212,6 +213,7 @@ import {
   USER_DRAWING_ICON_NAMES,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
+  USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
 } from './index';
 import {
   resolveMobileUserDrawingMeasurementLabelPosition,
@@ -1056,6 +1058,7 @@ describe('tealchart public entries', () => {
     const descriptor: UserDrawingFontFamilyDescriptor = USER_DRAWING_FONT_FAMILY_DESCRIPTORS[0]!;
     const styleDescriptor: UserDrawingFontStyleDescriptor = USER_DRAWING_FONT_STYLE_DESCRIPTORS[1]!;
     const weightDescriptor: UserDrawingFontWeightDescriptor = USER_DRAWING_FONT_WEIGHT_DESCRIPTORS[1]!;
+    const underlineDescriptor: UserDrawingTextDecorationDescriptor = USER_DRAWING_TEXT_DECORATION_DESCRIPTORS[0]!;
     expect(fontSize).toBe(12);
     expect(fontFamily).toBe('sans-serif');
     expect(fontStyle).toBe('italic');
@@ -1063,6 +1066,7 @@ describe('tealchart public entries', () => {
     expect(descriptor.fontFamily).toBe('sans-serif');
     expect(styleDescriptor.fontStyle).toBe('italic');
     expect(weightDescriptor.fontWeight).toBe('bold');
+    expect(underlineDescriptor.textUnderline).toBe(true);
     expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
     expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');

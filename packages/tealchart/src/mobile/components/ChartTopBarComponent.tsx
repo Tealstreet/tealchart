@@ -46,6 +46,7 @@ import {
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
+  USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../../drawings';
@@ -606,6 +607,41 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                                   color: active ? accentColor : textSecondaryColor,
                                   fontSize: 11,
                                   fontStyle: descriptor.fontStyle === 'italic' ? 'italic' : 'normal',
+                                },
+                              ]}
+                            >
+                              {descriptor.icon}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+
+                      {USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => {
+                        const active = !!selectedDrawing.style.textUnderline === descriptor.textUnderline;
+                        return (
+                          <Pressable
+                            key={descriptor.label}
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
+                            disabled={!textControlsEnabled}
+                            onPress={() =>
+                              onUserDrawingStyleChange?.({ textUnderline: !selectedDrawing.style.textUnderline })
+                            }
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingButton,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                              !textControlsEnabled && styles.drawingButtonDisabled,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.drawingButtonText,
+                                {
+                                  color: active ? accentColor : textSecondaryColor,
+                                  fontSize: 11,
+                                  textDecorationLine: 'underline',
                                 },
                               ]}
                             >

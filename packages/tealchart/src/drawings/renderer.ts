@@ -1315,6 +1315,24 @@ function renderBarsPatternGeometry(
   }
 }
 
+function renderUserDrawingTextUnderline(
+  ctx: CanvasContext,
+  x: number,
+  y: number,
+  width: number,
+  fontSize: number,
+  color: string,
+): void {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(1, fontSize / 14);
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  const underlineY = y + fontSize * 0.35;
+  ctx.moveTo(x, underlineY);
+  ctx.lineTo(x + width, underlineY);
+  ctx.stroke();
+}
+
 function renderTextLabelGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: UserDrawingTextAnnotationKind }>,
@@ -1393,8 +1411,18 @@ function renderTextLabelGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  for (const line of layout.lines) {
+  for (const [index, line] of layout.lines.entries()) {
     ctx.fillText(line.text, line.x, line.y);
+    if (drawing.style.textUnderline) {
+      renderUserDrawingTextUnderline(
+        ctx,
+        line.x,
+        line.y,
+        lineWidths[index] ?? ctx.measureText(line.text).width,
+        fontSize,
+        ctx.fillStyle,
+      );
+    }
   }
 }
 
@@ -1423,6 +1451,7 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
   ctx.textAlign = drawing.textAlign;
   ctx.textBaseline = 'middle';
   for (const cell of table.cells) {
+    const textWidth = ctx.measureText(cell.text).width;
     const textX =
       drawing.textAlign === 'center'
         ? cell.rect.x + cell.rect.width / 2
@@ -1430,6 +1459,11 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
           ? cell.rect.x + cell.rect.width - 10
           : cell.textPoint.x;
     ctx.fillText(cell.text, textX, cell.textPoint.y);
+    if (drawing.style.textUnderline) {
+      const underlineX =
+        drawing.textAlign === 'center' ? textX - textWidth / 2 : drawing.textAlign === 'right' ? textX - textWidth : textX;
+      renderUserDrawingTextUnderline(ctx, underlineX, cell.textPoint.y, textWidth, fontSize, ctx.fillStyle);
+    }
   }
 }
 

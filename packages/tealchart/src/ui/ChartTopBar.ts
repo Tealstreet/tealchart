@@ -40,6 +40,7 @@ import {
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
+  USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
@@ -898,6 +899,42 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           if (textEnabled) {
             btn.addEventListener('click', () =>
               this.options.onUserDrawingStyleChange?.({ fontStyle: descriptor.fontStyle }),
+            );
+            btn.addEventListener('mouseenter', () => {
+              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+            });
+            btn.addEventListener('mouseleave', () => {
+              if (!isActive) {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text2, #787b86)';
+              }
+            });
+          }
+          group.appendChild(btn);
+        }
+
+        for (const descriptor of USER_DRAWING_TEXT_DECORATION_DESCRIPTORS) {
+          const isActive = !!selectedDrawing.style.textUnderline === descriptor.textUnderline;
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...(isActive ? styles.drawingButtonActive : {}),
+              opacity: textEnabled ? '1' : '0.35',
+              cursor: textEnabled ? 'pointer' : 'default',
+              textDecorationLine: 'underline',
+            },
+            textContent: descriptor.icon,
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !textEnabled;
+          if (textEnabled) {
+            btn.addEventListener('click', () =>
+              this.options.onUserDrawingStyleChange?.({ textUnderline: !selectedDrawing.style.textUnderline }),
             );
             btn.addEventListener('mouseenter', () => {
               if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
