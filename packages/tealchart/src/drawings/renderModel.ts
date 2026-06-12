@@ -250,6 +250,7 @@ export function resolveUserDrawingHandlePoints(
     case 'comment':
     case 'priceLabel':
     case 'emoji':
+    case 'sticker':
     case 'balloon':
     case 'signpost':
     case 'pin':

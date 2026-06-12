@@ -1218,6 +1218,23 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space, { labelWidth: 24, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits sticker drawings using a configurable label box and center handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'sticker',
+      kind: 'sticker',
+      point: { time: 50, price: 50 },
+      text: '★',
+      textAlign: 'center',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 60, y: 50 }, space, { labelWidth: 24, labelHeight: 20 })?.drawing.id).toBe(
+      'sticker',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)).toMatchObject({ handle: 'center' });
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space, { labelWidth: 24, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits comment drawings using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,
