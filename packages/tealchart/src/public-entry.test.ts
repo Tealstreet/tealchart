@@ -285,6 +285,13 @@ describe('tealchart public entries', () => {
       median: { start: { x: 0, y: 5 }, end: { x: 10, y: 5 } },
       upper: { start: { x: 0, y: 0 }, end: { x: 10, y: 0 } },
       lower: { start: { x: 0, y: 10 }, end: { x: 10, y: 10 } },
+      parallels: [{ ratio: 0.25, start: { x: 0, y: 2.5 }, end: { x: 10, y: 2.5 } }],
+      fill: [
+        { x: 0, y: 0 },
+        { x: 10, y: 0 },
+        { x: 10, y: 10 },
+        { x: 0, y: 10 },
+      ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const pitchfanPrimitive: NonNever<MobileUserDrawingPitchfanPrimitive> = {

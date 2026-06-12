@@ -320,6 +320,12 @@ export type MobileUserDrawingPrimitive =
       median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       upper: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       lower: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      parallels: readonly {
+        ratio: number;
+        start: DrawingScreenPoint;
+        end: DrawingScreenPoint;
+      }[];
+      fill: readonly DrawingScreenPoint[];
       style: UserDrawingStyle;
     }
   | {
@@ -1525,6 +1531,12 @@ function primitiveFromGeometry(
         median: geometry.pitchfork.median,
         upper: geometry.pitchfork.upper,
         lower: geometry.pitchfork.lower,
+        parallels: geometry.pitchfork.parallels.map((parallel) => ({
+          ratio: parallel.ratio,
+          start: parallel.segment.start,
+          end: parallel.segment.end,
+        })),
+        fill: geometry.pitchfork.fill.points,
         style: geometry.drawing.style,
       };
     case 'pitchfan':

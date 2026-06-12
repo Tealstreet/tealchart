@@ -135,15 +135,23 @@ export interface DrawingScreenParallelChannel {
   polygon: DrawingScreenPolyline;
 }
 
+export interface DrawingScreenPitchforkParallel {
+  ratio: number;
+  segment: DrawingScreenSegment;
+}
+
 export interface DrawingScreenPitchfork {
   median: DrawingScreenSegment;
   upper: DrawingScreenSegment;
   lower: DrawingScreenSegment;
+  parallels: readonly DrawingScreenPitchforkParallel[];
+  fill: DrawingScreenPolyline;
   origin: DrawingScreenPoint;
   midpoint: DrawingScreenPoint;
 }
 
 export type DrawingPitchforkVariant = 'original' | 'schiff' | 'modifiedSchiff' | 'inside';
+export const PITCHFORK_PARALLEL_RATIOS = [-0.5, 0.25, 0.75, 1.5] as const;
 
 export interface DrawingScreenPitchfanRay {
   ratio: number;
@@ -2401,25 +2409,42 @@ export function resolvePitchforkFromAnchors(
     y: start.y + rayDirection.y,
   });
   const medianThrough = direction.x === 0 && direction.y === 0 ? through(config.origin) : config.midpoint;
+  const parallelSegment = (ratio: number): DrawingScreenPitchforkParallel => {
+    const start = {
+      x: config.upperAnchor.x + (config.lowerAnchor.x - config.upperAnchor.x) * ratio,
+      y: config.upperAnchor.y + (config.lowerAnchor.y - config.upperAnchor.y) * ratio,
+    };
+    return {
+      ratio,
+      segment: resolveRaySegment(start, through(start), space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    };
+  };
+
+  const upper = resolveRaySegment(
+    config.upperAnchor,
+    through(config.upperAnchor),
+    space.chartLeft,
+    space.chartRight,
+    space.pane.top,
+    space.pane.bottom,
+  );
+  const lower = resolveRaySegment(
+    config.lowerAnchor,
+    through(config.lowerAnchor),
+    space.chartLeft,
+    space.chartRight,
+    space.pane.top,
+    space.pane.bottom,
+  );
 
   return {
     median: resolveRaySegment(config.origin, medianThrough, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
-    upper: resolveRaySegment(
-      config.upperAnchor,
-      through(config.upperAnchor),
-      space.chartLeft,
-      space.chartRight,
-      space.pane.top,
-      space.pane.bottom,
-    ),
-    lower: resolveRaySegment(
-      config.lowerAnchor,
-      through(config.lowerAnchor),
-      space.chartLeft,
-      space.chartRight,
-      space.pane.top,
-      space.pane.bottom,
-    ),
+    upper,
+    lower,
+    parallels: PITCHFORK_PARALLEL_RATIOS.map(parallelSegment),
+    fill: {
+      points: [upper.start, upper.end, lower.end, lower.start],
+    },
     origin: config.origin,
     midpoint: config.midpoint,
   };
