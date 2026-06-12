@@ -512,7 +512,91 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingZOrderAction('bringForward')).toBe('bringForward');
     expect(getUserDrawingZOrderAction('deleteSelected')).toBeNull();
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);
-    expect(isUserDrawingToolbarActionEnabled({ ...state, selection: { drawingId: 'h' } }, 'deleteSelected')).toBe(true);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...state,
+          selection: { drawingId: 'h' },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        },
+        'deleteSelected',
+      ),
+    ).toBe(true);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...state,
+          selection: { drawingId: 'h' },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: true,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        },
+        'deleteSelected',
+      ),
+    ).toBe(false);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...state,
+          selection: { drawingId: 'h', drawingIds: ['h', 'r'] },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: true,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+            {
+              id: 'r',
+              kind: 'rectangle',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 2,
+              updatedAt: 2,
+              style: {
+                lineColor: '#fff',
+                lineWidth: 1,
+                lineStyle: 'solid',
+                fillColor: 'rgba(255,255,255,0.12)',
+              },
+              points: [
+                { time: 1, price: 10 },
+                { time: 2, price: 12 },
+              ],
+            },
+          ],
+        },
+        'deleteSelected',
+      ),
+    ).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'duplicateSelected')).toBe(false);
     expect(
       isUserDrawingToolbarActionEnabled(

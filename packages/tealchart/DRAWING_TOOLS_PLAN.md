@@ -1226,6 +1226,14 @@ matching behavior in the same PR for every user-facing drawing feature.
   `includeLocked: true`, while other style controls remain disabled for locked
   drawings.
 
+## Shipped: Locked Drawing Delete Guard
+
+- Shared toolbar enablement now disables delete when the selection contains only
+  locked drawings, matching the existing delete reducer's locked-drawing guard.
+- Web and mobile top bars expose the same disabled delete affordance for
+  locked-only selections while still allowing mixed grouped selections to delete
+  unlocked members.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
