@@ -206,7 +206,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Bold text')).toBeNull();
   });
 
-  it('dispatches selected risk/reward fill visibility without fill color controls', () => {
+  it('dispatches selected risk/reward fill visibility and label text appearance controls', () => {
     const onStyle = vi.fn();
     render(
       <ChartTopBarComponent
@@ -241,10 +241,17 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
+    fireEvent.click(screen.getByLabelText('Green text color'));
+    fireEvent.click(screen.getByLabelText('20 pixel font size'));
+    fireEvent.click(screen.getByLabelText('serif font family'));
     fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
 
+    expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 20 });
+    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
     expect(screen.queryByLabelText('Orange fill color')).toBeNull();
+    expect(screen.queryByLabelText('Bold text')).toBeNull();
   });
 
   it('dispatches hidden selected drawing show control', () => {

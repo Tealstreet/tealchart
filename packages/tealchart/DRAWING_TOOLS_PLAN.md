@@ -1266,6 +1266,14 @@ matching behavior in the same PR for every user-facing drawing feature.
   controls for selected forecast and projection drawings while keeping rich
   text decoration controls limited to text annotations and tables.
 
+## Shipped: Measurement Label Text Appearance Controls
+
+- Shared toolbar eligibility now exposes text color, font size, and font family
+  controls for selected measurement, risk/reward, Fibonacci, Gann, fan, and
+  time-guide drawings whose generated labels already consume those style values.
+- Web and mobile top bars keep those label controls in parity while continuing
+  to hide rich text decoration controls for generated labels.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
