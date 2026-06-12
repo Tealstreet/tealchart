@@ -143,6 +143,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         ],
       };
     case 'xabcdPattern':
+    case 'cypherPattern':
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
@@ -884,12 +885,13 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         bars,
       };
     }
-    case 'xabcdPattern': {
+    case 'xabcdPattern':
+    case 'cypherPattern': {
       const points = parseFivePointDrawing(value);
       return points
         ? {
             ...base,
-            kind: 'xabcdPattern',
+            kind: value.kind,
             points,
           }
         : null;

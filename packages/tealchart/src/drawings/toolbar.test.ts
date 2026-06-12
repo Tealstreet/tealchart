@@ -79,6 +79,7 @@ describe('user drawing toolbar descriptors', () => {
       'trianglePattern',
       'abcdPattern',
       'xabcdPattern',
+      'cypherPattern',
       'threeDrivesPattern',
       'headShouldersPattern',
       'elliottImpulseWave',
@@ -217,6 +218,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('xabcdPattern')).toEqual(
       expect.objectContaining({ tool: 'xabcdPattern', label: 'XABCD pattern' }),
+    );
+    expect(getUserDrawingToolDescriptor('cypherPattern')).toEqual(
+      expect.objectContaining({ tool: 'cypherPattern', label: 'Cypher pattern' }),
     );
     expect(getUserDrawingToolDescriptor('threeDrivesPattern')).toEqual(
       expect.objectContaining({ tool: 'threeDrivesPattern', label: 'Three drives pattern' }),

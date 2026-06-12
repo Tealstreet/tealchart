@@ -299,6 +299,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
         ],
       };
     case 'xabcdPattern':
+    case 'cypherPattern':
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':

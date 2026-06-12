@@ -256,6 +256,7 @@ function hitTestResolvedGeometry(
 
   if (
     geometry.kind === 'xabcdPattern' ||
+    geometry.kind === 'cypherPattern' ||
     geometry.kind === 'threeDrivesPattern' ||
     geometry.kind === 'elliottImpulseWave' ||
     geometry.kind === 'elliottCorrectiveWave' ||
@@ -814,6 +815,7 @@ function hitTestUserDrawingHandle(
       });
       break;
     case 'xabcdPattern':
+    case 'cypherPattern':
     case 'threeDrivesPattern':
     case 'elliottImpulseWave':
     case 'elliottCorrectiveWave':

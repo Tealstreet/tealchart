@@ -1494,6 +1494,40 @@ describe('user drawing input controller', () => {
     expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
+  it('duplicates cypher pattern drawings with deep-cloned five-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'cypher' },
+      drawings: [
+        {
+          id: 'cypher',
+          kind: 'cypherPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 20 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'cypherPattern',
+      createdAt: 20,
+      updatedAt: 20,
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+    });
+    if (next.drawings[1]?.kind !== 'cypherPattern' || state.drawings[0]?.kind !== 'cypherPattern') {
+      throw new Error('expected cypher pattern drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+  });
+
   it('duplicates three drives pattern drawings with deep-cloned five-point payloads', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'three-drives' },

@@ -535,7 +535,7 @@ export type ResolvedUserDrawingGeometry =
       pattern: DrawingScreenTrianglePattern;
     }
   | {
-      kind: 'xabcdPattern';
+      kind: 'xabcdPattern' | 'cypherPattern';
       drawing: UserDrawing;
       pattern: DrawingScreenXabcdPattern;
     }
@@ -2526,8 +2526,9 @@ export function resolveUserDrawingGeometry(
         pattern: resolveTrianglePatternFromAnchors(drawing.points, space),
       };
     case 'xabcdPattern':
+    case 'cypherPattern':
       return {
-        kind: 'xabcdPattern',
+        kind: drawing.kind,
         drawing,
         pattern: resolveXabcdPatternFromAnchors(drawing.points, space),
       };
