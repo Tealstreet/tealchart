@@ -653,6 +653,16 @@ function renderProjectionGeometry(
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'projection' }>,
 ): void {
   const { projection, drawing } = geometry;
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.beginPath();
+    ctx.moveTo(projection.start.x, projection.start.y);
+    ctx.lineTo(projection.pivot.x, projection.pivot.y);
+    ctx.lineTo(projection.target.x, projection.target.y);
+    ctx.closePath();
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fill();
+  }
+
   if (drawing.style.lineVisible !== false) {
     applyStrokeStyle(ctx, drawing);
     ctx.beginPath();
