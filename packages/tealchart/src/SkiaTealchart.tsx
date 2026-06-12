@@ -223,11 +223,17 @@ function UserDrawingSkiaText({
   color: string;
   style: UserDrawingStyle;
 }) {
-  return (
+  const content = (
     <>
       <SkiaText x={x} y={y} text={text} font={font} color={color} />
       {style.fontWeight === 'bold' && <SkiaText x={x + 0.45} y={y} text={text} font={font} color={color} />}
     </>
+  );
+  if (style.fontStyle !== 'italic') return content;
+  return (
+    <Group origin={{ x, y }} transform={[{ skewX: -0.16 }]}>
+      {content}
+    </Group>
   );
 }
 
@@ -851,6 +857,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
       fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
       fontWeight: activeUserDrawingTextEditPrimitive.style.fontWeight === 'bold' ? ('700' as const) : ('400' as const),
+      fontStyle: activeUserDrawingTextEditPrimitive.style.fontStyle === 'italic' ? ('italic' as const) : ('normal' as const),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);

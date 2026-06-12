@@ -151,6 +151,7 @@ export interface UserDrawingStyle {
   fontSize?: number;
   fontFamily?: string;
   fontWeight?: UserDrawingFontWeight;
+  fontStyle?: UserDrawingFontStyle;
 }
 
 export interface UserDrawingBase {
@@ -893,9 +894,11 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
 export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
 export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
+export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
+export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
@@ -913,6 +916,12 @@ export function normalizeUserDrawingFontFamily(fontFamily: string): UserDrawingF
 export function normalizeUserDrawingFontWeight(fontWeight: string): UserDrawingFontWeight {
   return USER_DRAWING_FONT_WEIGHTS.includes(fontWeight as UserDrawingFontWeight)
     ? (fontWeight as UserDrawingFontWeight)
+    : 'normal';
+}
+
+export function normalizeUserDrawingFontStyle(fontStyle: string): UserDrawingFontStyle {
+  return USER_DRAWING_FONT_STYLES.includes(fontStyle as UserDrawingFontStyle)
+    ? (fontStyle as UserDrawingFontStyle)
     : 'normal';
 }
 
@@ -940,11 +949,13 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fontFamily === undefined ? undefined : normalizeUserDrawingFontFamily(style.fontFamily);
   const fontWeight =
     style.fontWeight === undefined ? undefined : normalizeUserDrawingFontWeight(style.fontWeight);
+  const fontStyle = style.fontStyle === undefined ? undefined : normalizeUserDrawingFontStyle(style.fontStyle);
   const opacity = style.opacity === undefined ? undefined : normalizeUserDrawingOpacity(style.opacity);
   if (
     fontSize === style.fontSize &&
     fontFamily === style.fontFamily &&
     fontWeight === style.fontWeight &&
+    fontStyle === style.fontStyle &&
     opacity === style.opacity
   ) {
     return style;
@@ -955,6 +966,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(fontSize === undefined ? {} : { fontSize }),
     ...(fontFamily === undefined ? {} : { fontFamily }),
     ...(fontWeight === undefined ? {} : { fontWeight }),
+    ...(fontStyle === undefined ? {} : { fontStyle }),
     ...(opacity === undefined ? {} : { opacity }),
   };
 }
