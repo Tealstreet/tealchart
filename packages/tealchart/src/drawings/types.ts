@@ -37,6 +37,7 @@ export type UserDrawingTool =
   | 'headShouldersPattern'
   | 'elliottImpulseWave'
   | 'elliottCorrectiveWave'
+  | 'elliottDoubleComboWave'
   | 'elliottTriangleWave'
   | 'anchoredVwap'
   | 'fibRetracement'
@@ -347,6 +348,11 @@ export interface ElliottCorrectiveWaveDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ElliottDoubleComboWaveDrawing extends UserDrawingBase {
+  kind: 'elliottDoubleComboWave';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface ElliottTriangleWaveDrawing extends UserDrawingBase {
   kind: 'elliottTriangleWave';
   points: readonly [
@@ -640,6 +646,7 @@ export type UserDrawing =
   | HeadShouldersPatternDrawing
   | ElliottImpulseWaveDrawing
   | ElliottCorrectiveWaveDrawing
+  | ElliottDoubleComboWaveDrawing
   | ElliottTriangleWaveDrawing
   | AnchoredVwapDrawing
   | FibRetracementDrawing
@@ -847,6 +854,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'shortPosition':
     case 'barsPattern':
     case 'elliottCorrectiveWave':
+    case 'elliottDoubleComboWave':
     case 'path':
     case 'brush':
     case 'highlighter':
@@ -1091,6 +1099,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'elliottCorrectiveWave',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'elliottDoubleComboWave':
+      return {
+        ...base,
+        kind: 'elliottDoubleComboWave',
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'barsPattern': {

@@ -966,6 +966,30 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:C:50,24:#111:center:1:12px sans-serif');
   });
 
+  it('renders Elliott double combo wave drawings as labeled paths', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-double-combo',
+      kind: 'elliottDoubleComboWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:30,70');
+    expect(ctx.calls).toContain('lineTo:50,30');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:W:10,44:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:X:30,64:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Y:50,24:#111:center:1:12px sans-serif');
+  });
+
   it('renders Elliott triangle wave drawings as labeled paths', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

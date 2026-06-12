@@ -1908,6 +1908,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores Elliott double combo wave drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'elliott-double-combo',
+          kind: 'elliottDoubleComboWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'elliott-double-combo',
+      kind: 'elliottDoubleComboWave',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    });
+  });
+
   it('restores Elliott triangle wave drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
