@@ -219,6 +219,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'sticker', icon: '★', label: 'Sticker' },
   { tool: 'balloon', icon: 'B', label: 'Balloon' },
   { tool: 'signpost', icon: 'S', label: 'Signpost' },
+  { tool: 'table', icon: 'TBL', label: 'Table' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
 ] as const;
 
@@ -398,6 +399,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'regressionTrend' ||
     drawing.kind === 'flatTopBottom' ||
     drawing.kind === 'disjointChannel' ||
+    drawing.kind === 'table' ||
     isUserDrawingTextAnnotation(drawing)
   );
 }

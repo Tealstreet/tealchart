@@ -110,6 +110,7 @@ export type {
   MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
   MobileUserDrawingSineLinePrimitive,
+  MobileUserDrawingTablePrimitive,
   MobileUserDrawingTextBounds,
   MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingTrendAngleLabelPosition,

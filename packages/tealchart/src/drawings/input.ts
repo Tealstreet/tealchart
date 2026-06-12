@@ -22,6 +22,7 @@ import {
   normalizeUserDrawingIconName,
   normalizeUserDrawingPanePosition,
   normalizeUserDrawingStyle,
+  normalizeUserDrawingTableCells,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
 import { hitTestUserDrawings } from './hitTesting';
@@ -349,6 +350,13 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'anchoredVolumeProfile':
     case 'pin':
       return { ...base, kind: drawing.kind, point: cloneAnchor(drawing.point) } as UserDrawing;
+    case 'table':
+      return {
+        ...base,
+        kind: 'table',
+        point: cloneAnchor(drawing.point),
+        cells: normalizeUserDrawingTableCells(drawing.cells),
+      };
     case 'icon':
       return { ...base, kind: 'icon', point: cloneAnchor(drawing.point), iconName: drawing.iconName };
     case 'flagMark':

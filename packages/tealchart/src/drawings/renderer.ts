@@ -1389,6 +1389,32 @@ function renderTextLabelGeometry(
   }
 }
 
+function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'table' }>): void {
+  const { drawing, table } = geometry;
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fillRect(table.bounds.x, table.bounds.y, table.bounds.width, table.bounds.height);
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    for (const cell of table.cells) {
+      ctx.strokeRect(cell.rect.x, cell.rect.y, cell.rect.width, cell.rect.height);
+    }
+  }
+
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  for (const cell of table.cells) {
+    ctx.fillText(cell.text, cell.textPoint.x, cell.textPoint.y);
+  }
+}
+
 function renderPinGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'pin' }>,
@@ -1668,6 +1694,9 @@ export function renderUserDrawing(
       case 'balloon':
       case 'signpost':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);
+        break;
+      case 'table':
+        renderTableGeometry(ctx, geometry);
         break;
       case 'pin':
         renderPinGeometry(ctx, geometry, resolvedOptions);

@@ -11,6 +11,7 @@ import type {
   DrawingScreenPoint,
   DrawingScreenRect,
   DrawingScreenSegment,
+  DrawingScreenTable,
   DrawingScreenThreeDrivesPatternLabel,
   DrawingScreenTrianglePatternLabel,
   DrawingScreenXabcdPatternLabel,
@@ -1063,6 +1064,16 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'table';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      table: DrawingScreenTable;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'callout';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -1127,6 +1138,7 @@ export type MobileUserDrawingEmojiPrimitive = Extract<MobileUserDrawingPrimitive
 export type MobileUserDrawingStickerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'sticker' }>;
 export type MobileUserDrawingBalloonPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'balloon' }>;
 export type MobileUserDrawingSignpostPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'signpost' }>;
+export type MobileUserDrawingTablePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'table' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingImagePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'image' }>;
@@ -2285,6 +2297,17 @@ function primitiveFromGeometry(
         editValue: textEditValue ?? null,
         textAlign: callout.textAlign,
         style: callout.style,
+      };
+    case 'table':
+      return {
+        kind: 'table',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        table: geometry.table,
+        style: geometry.drawing.style,
       };
     case 'pin':
       return {
