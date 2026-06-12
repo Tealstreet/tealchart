@@ -2415,6 +2415,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
           if (primitive.kind === 'gannBox' || primitive.kind === 'gannSquare') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
             const path = Skia.Path.Make();
             for (const level of primitive.levels) {
               path.moveTo(level.horizontal.start.x, level.horizontal.start.y);
@@ -2450,6 +2452,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     {dash && <DashPathEffect intervals={dash} />}
                   </SkiaPath>
                 )}
+                {primitive.style.lineVisible !== false &&
+                  font &&
+                  primitive.levels.map((level) => (
+                    <SkiaText
+                      key={`${primitive.id}:level:${level.ratio}:label`}
+                      x={level.labelPoint.x}
+                      y={level.labelPoint.y}
+                      text={level.label}
+                      color={textColor}
+                      font={font}
+                    />
+                  ))}
               </Group>
             );
           }
