@@ -17,7 +17,9 @@ import {
   supportsUserDrawingFillControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
+  supportsUserDrawingRichTextControls,
   supportsUserDrawingTextAlignControls,
+  supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextControls,
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
@@ -538,6 +540,41 @@ describe('user drawing toolbar descriptors', () => {
         kind: 'shortPosition',
       }),
     ).toBe(true);
+  });
+
+  it('separates generated-label text appearance controls from rich text controls', () => {
+    const forecast: UserDrawing = {
+      id: 'forecast',
+      kind: 'forecast',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const projection: UserDrawing = {
+      ...forecast,
+      id: 'projection',
+      kind: 'projection',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    };
+
+    expect(supportsUserDrawingTextAppearanceControls(forecast)).toBe(true);
+    expect(supportsUserDrawingTextAppearanceControls(projection)).toBe(true);
+    expect(supportsUserDrawingTextControls(forecast)).toBe(true);
+    expect(supportsUserDrawingRichTextControls(forecast)).toBe(false);
+    expect(supportsUserDrawingRichTextControls(projection)).toBe(false);
+    expect(supportsUserDrawingTextAlignControls(forecast)).toBe(false);
+    expect(supportsUserDrawingTextWrapControls(projection)).toBe(false);
   });
 
   it('resolves action availability from toolbar-relevant state', () => {

@@ -522,6 +522,19 @@ export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
 }
 
 export function supportsUserDrawingTextStyleControls(drawing: UserDrawing): boolean {
+  return supportsUserDrawingTextAppearanceControls(drawing);
+}
+
+export function supportsUserDrawingTextAppearanceControls(drawing: UserDrawing): boolean {
+  return (
+    drawing.kind === 'forecast' ||
+    drawing.kind === 'projection' ||
+    drawing.kind === 'table' ||
+    isUserDrawingTextAnnotation(drawing)
+  );
+}
+
+export function supportsUserDrawingRichTextControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'table' || isUserDrawingTextAnnotation(drawing);
 }
 
@@ -553,7 +566,7 @@ export function isUserDrawingFillVisibilityToolbarEnabled(state: UserDrawingStat
 
 export function isUserDrawingTextToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
-  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextStyleControls(selectedDrawing);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextAppearanceControls(selectedDrawing);
 }
 
 export function isUserDrawingIconToolbarEnabled(state: UserDrawingState): boolean {

@@ -1257,6 +1257,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   long-position and short-position drawings without showing misleading fill
   color swatches.
 
+## Shipped: Generated Label Text Appearance Controls
+
+- Shared toolbar eligibility now separates text appearance controls from rich
+  text-only controls so generated-label drawings can expose only the style
+  values their renderers consume.
+- Web and mobile top bars expose matching text color, font size, and font family
+  controls for selected forecast and projection drawings while keeping rich
+  text decoration controls limited to text annotations and tables.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
