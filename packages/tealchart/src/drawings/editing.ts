@@ -202,6 +202,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'signpost':
     case 'pin':
     case 'icon':
+    case 'flagMark':
     case 'anchoredVwap':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
   }
@@ -459,6 +460,7 @@ function editDrawingHandle(
     case 'signpost':
     case 'pin':
     case 'icon':
+    case 'flagMark':
     case 'anchoredVwap':
     case 'path':
     case 'brush':

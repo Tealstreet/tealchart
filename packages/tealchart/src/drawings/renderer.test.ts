@@ -1798,6 +1798,25 @@ describe('user drawing renderer', () => {
     expect(ctx.calls.some((call) => call.startsWith('stroke:#f5c542:2:'))).toBe(true);
   });
 
+  it('renders flag mark drawings with shared flag geometry', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'flag',
+      kind: 'flagMark',
+      point: { time: 50, price: 50 },
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:41,41');
+    expect(ctx.calls).toContain('lineTo:59,41');
+    expect(ctx.calls).toContain('lineTo:53.15,50');
+    expect(ctx.calls).toContain('closePath');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls.some((call) => call.startsWith('stroke:#f5c542:2:'))).toBe(true);
+  });
+
   it('renders balloon drawings with a text box and tail', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

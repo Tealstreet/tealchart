@@ -440,6 +440,35 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored flag mark drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'flag',
+          kind: 'flagMark',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'flag',
+      kind: 'flagMark',
+      point: { time: 1, price: 10 },
+    });
+  });
+
   it('preserves restored balloon drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

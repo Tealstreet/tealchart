@@ -2722,11 +2722,12 @@ export function resolveUserDrawingGeometry(
         point: anchorToScreenPoint(drawing.point, space),
       };
     case 'icon':
+    case 'flagMark':
       return {
         kind: 'icon',
         drawing,
         icon: resolveUserDrawingIconGeometry({
-          name: drawing.iconName,
+          name: drawing.kind === 'flagMark' ? 'flag' : drawing.iconName,
           center: anchorToScreenPoint(drawing.point, space),
         }),
       };

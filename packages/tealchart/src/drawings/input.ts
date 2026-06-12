@@ -332,6 +332,8 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
       return { ...base, kind: drawing.kind, point: cloneAnchor(drawing.point) } as UserDrawing;
     case 'icon':
       return { ...base, kind: 'icon', point: cloneAnchor(drawing.point), iconName: drawing.iconName };
+    case 'flagMark':
+      return { ...base, kind: 'flagMark', point: cloneAnchor(drawing.point) };
     case 'textLabel':
     case 'note':
     case 'comment':
