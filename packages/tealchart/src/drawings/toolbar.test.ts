@@ -18,6 +18,7 @@ import {
   supportsUserDrawingTextControls,
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
+  supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -34,6 +35,7 @@ import {
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -752,6 +754,21 @@ describe('user drawing toolbar descriptors', () => {
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
       price: 10,
     };
+    const trendLine = {
+      id: 'trend',
+      kind: 'trendLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ] as const,
+      extend: 'none' as const,
+    };
     const rectangle = {
       id: 'r',
       kind: 'rectangle' as const,
@@ -981,6 +998,14 @@ describe('user drawing toolbar descriptors', () => {
       }),
     ).toBe(true);
     expect(supportsUserDrawingTextControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingTrendLineExtendControls(horizontal)).toBe(false);
+    expect(supportsUserDrawingTrendLineExtendControls(trendLine)).toBe(true);
+    expect(USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.map((descriptor) => descriptor.extend)).toEqual([
+      'none',
+      'left',
+      'right',
+      'both',
+    ]);
     expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
     expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);

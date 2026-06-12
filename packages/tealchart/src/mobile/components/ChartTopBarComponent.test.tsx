@@ -150,6 +150,69 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
+  it('dispatches selected trend-line extension controls only for trend lines', () => {
+    const onExtend = vi.fn();
+    const { rerender } = render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'trend' },
+          drawings: [
+            {
+              id: 'trend',
+              kind: 'trendLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+              points: [
+                { time: 1, price: 10 },
+                { time: 2, price: 12 },
+              ],
+              extend: 'none',
+            },
+          ],
+        }}
+        onUserDrawingTrendLineExtendChange={onExtend}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Extend trend line left'));
+    fireEvent.click(screen.getByLabelText('Extend trend line both ways'));
+    expect(onExtend).toHaveBeenCalledWith('left');
+    expect(onExtend).toHaveBeenCalledWith('both');
+
+    rerender(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'h' },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        }}
+        onUserDrawingTrendLineExtendChange={onExtend}
+      />,
+    );
+    expect(screen.queryByLabelText('Extend trend line left')).toBeNull();
+  });
+
   it('dispatches selected icon library controls without text controls', () => {
     const onIconName = vi.fn();
     render(

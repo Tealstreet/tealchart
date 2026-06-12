@@ -34,6 +34,7 @@ import {
   setUserDrawingText,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
+  setUserDrawingTrendLineExtend,
   setUserDrawingTool,
   setUserDrawingVisibility,
   updateUserDrawingStyle,
@@ -1136,6 +1137,50 @@ describe('user drawing input controller', () => {
 
     const tableAligned = setUserDrawingTextAlign(state, 'right', { drawingId: 'table', now: () => 14 });
     expect(tableAligned.drawings[2]).toMatchObject({ textAlign: 'right', updatedAt: 14 });
+  });
+
+  it('updates selected trend-line extension while respecting locks', () => {
+    const trendLine = {
+      id: 'trend',
+      kind: 'trendLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [anchorA, anchorB] as const,
+      extend: 'none' as const,
+    };
+    const locked = { ...trendLine, id: 'locked', locked: true };
+    const line = {
+      id: 'line',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price: 100,
+    };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'trend' },
+      drawings: [trendLine, locked, line],
+    });
+
+    const selected = setUserDrawingTrendLineExtend(state, 'both', { now: () => 22 });
+    expect(selected.drawings[0]).toMatchObject({ extend: 'both', updatedAt: 22 });
+    expect(setUserDrawingTrendLineExtend(selected, 'both')).toBe(selected);
+    expect(setUserDrawingTrendLineExtend(state, 'right', { drawingId: 'line' })).toBe(state);
+    expect(setUserDrawingTrendLineExtend(state, 'right', { drawingId: 'locked' })).toBe(state);
+
+    const targeted = setUserDrawingTrendLineExtend(state, 'left', {
+      drawingId: 'locked',
+      includeLocked: true,
+      now: () => 23,
+    });
+    expect(targeted.drawings[1]).toMatchObject({ extend: 'left', updatedAt: 23 });
   });
 
   it('updates selected or targeted icon drawings while respecting locks', () => {

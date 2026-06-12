@@ -9,6 +9,7 @@ import type {
   UserDrawingTableColumnInput,
   UserDrawingTableRowInput,
   UserDrawingTextAlign,
+  UserDrawingTrendLineExtend,
 } from '../../drawings';
 
 import {
@@ -23,6 +24,7 @@ import {
   setUserDrawingTableDimensions,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
+  setUserDrawingTrendLineExtend,
   setUserDrawingLocked,
   setUserDrawingVisibility,
   updateUserDrawingStyle,
@@ -58,6 +60,14 @@ export function setMobileUserDrawingTextAlign(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingTextAlign(state, textAlign, options);
+}
+
+export function setMobileUserDrawingTrendLineExtend(
+  state: UserDrawingState,
+  extend: UserDrawingTrendLineExtend,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return setUserDrawingTrendLineExtend(state, extend, options);
 }
 
 export function setMobileUserDrawingTextContent(

@@ -8,6 +8,7 @@ import type {
   UserDrawingIconName,
   UserDrawingStyle,
   UserDrawingTextAlign,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingTextAnnotation,
   UserDrawingPanePosition,
@@ -1080,6 +1081,21 @@ export function setUserDrawingTextAlign(
   return replaceUserDrawing(state, target.index, {
     ...target.drawing,
     textAlign,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
+export function setUserDrawingTrendLineExtend(
+  state: UserDrawingState,
+  extend: UserDrawingTrendLineExtend,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'trendLine' || target.drawing.extend === extend) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    extend,
     updatedAt: options.now?.() ?? Date.now(),
   });
 }
