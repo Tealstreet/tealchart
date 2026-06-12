@@ -100,6 +100,7 @@ export type {
   MobileUserDrawingPriceRangePrimitive,
   MobileUserDrawingPrimitive,
   MobileUserDrawingProjectionPrimitive,
+  MobileUserDrawingSectorPrimitive,
   MobileUserDrawingMeasurementLabelPrimitive,
   MobileUserDrawingMeasurementLabelTarget,
   MobileUserDrawingPriceRangeLabelPosition,

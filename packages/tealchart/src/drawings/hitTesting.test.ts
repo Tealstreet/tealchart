@@ -535,6 +535,25 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits sector fills and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'sector',
+      kind: 'sector',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 42 }, space)?.drawing.id).toBe('sector');
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 20 }, space)).toMatchObject({
+      handle: 'center',
+      pointIndex: 2,
+    });
+  });
+
   it('hits placed bars pattern bounds and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

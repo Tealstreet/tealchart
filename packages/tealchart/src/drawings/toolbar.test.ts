@@ -75,6 +75,7 @@ describe('user drawing toolbar descriptors', () => {
       'shortPosition',
       'forecast',
       'projection',
+      'sector',
       'barsPattern',
       'trianglePattern',
       'abcdPattern',
@@ -218,6 +219,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('projection')).toEqual(
       expect.objectContaining({ tool: 'projection', label: 'Projection' }),
     );
+    expect(getUserDrawingToolDescriptor('sector')).toEqual(expect.objectContaining({ tool: 'sector', label: 'Sector' }));
     expect(getUserDrawingToolDescriptor('signpost')).toEqual(
       expect.objectContaining({ tool: 'signpost', label: 'Signpost' }),
     );
@@ -839,6 +841,18 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square', kind: 'gannSquare' as const })).toBe(true);
     expect(
       supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square-fixed', kind: 'gannSquareFixed' as const }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...rectangle,
+        id: 'sector',
+        kind: 'sector' as const,
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 11 },
+        ],
+      }),
     ).toBe(true);
     expect(
       supportsUserDrawingFillControls({

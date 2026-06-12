@@ -334,6 +334,19 @@ export interface DrawingScreenProjection {
   changeLabel: string;
 }
 
+export interface DrawingScreenSector {
+  origin: DrawingScreenPoint;
+  future: DrawingScreenPoint;
+  target: DrawingScreenPoint;
+  radius: number;
+  startAngle: number;
+  endAngle: number;
+  counterclockwise: boolean;
+  boundaries: readonly [DrawingScreenSegment, DrawingScreenSegment];
+  arcPoints: readonly DrawingScreenPoint[];
+  polygon: DrawingScreenPolyline;
+}
+
 export interface DrawingScreenBarsPatternBar {
   time: number;
   x: number;
@@ -622,6 +635,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'projection';
       drawing: UserDrawing;
       projection: DrawingScreenProjection;
+    }
+  | {
+      kind: 'sector';
+      drawing: UserDrawing;
+      sector: DrawingScreenSector;
     }
   | {
       kind: 'barsPattern';
@@ -1369,6 +1387,55 @@ export function resolveProjectionFromAnchors(
     pivotLabel: `Pivot ${formatForecastPriceLabel(pivotAnchor.price)}`,
     targetLabel: `Target ${formatForecastPriceLabel(targetAnchor.price)}`,
     changeLabel: metrics.label,
+  };
+}
+
+export function resolveSectorFromAnchors(
+  originAnchor: UserDrawingAnchor,
+  futureAnchor: UserDrawingAnchor,
+  targetAnchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenSector {
+  const origin = anchorToScreenPoint(originAnchor, space);
+  const futurePoint = anchorToScreenPoint(futureAnchor, space);
+  const targetPoint = anchorToScreenPoint(targetAnchor, space);
+  const radius = Math.hypot(futurePoint.x - origin.x, futurePoint.y - origin.y);
+  const startAngle = Math.atan2(futurePoint.y - origin.y, futurePoint.x - origin.x);
+  const targetAngle = Math.atan2(targetPoint.y - origin.y, targetPoint.x - origin.x);
+  const clockwiseSweep = normalizeArcAngle(targetAngle - startAngle);
+  const counterclockwise = clockwiseSweep > Math.PI;
+  const sweep = counterclockwise ? -normalizeArcAngle(startAngle - targetAngle) : clockwiseSweep;
+  const endAngle = startAngle + sweep;
+  const future = {
+    x: origin.x + Math.cos(startAngle) * radius,
+    y: origin.y + Math.sin(startAngle) * radius,
+  };
+  const target = {
+    x: origin.x + Math.cos(endAngle) * radius,
+    y: origin.y + Math.sin(endAngle) * radius,
+  };
+  const arcPoints =
+    radius <= 0
+      ? [future, target]
+      : Array.from({ length: ARC_SAMPLE_COUNT + 1 }, (_, index) => {
+          const angle = startAngle + sweep * (index / ARC_SAMPLE_COUNT);
+          return { x: origin.x + Math.cos(angle) * radius, y: origin.y + Math.sin(angle) * radius };
+        });
+
+  return {
+    origin,
+    future,
+    target,
+    radius,
+    startAngle,
+    endAngle,
+    counterclockwise,
+    boundaries: [
+      { start: origin, end: future },
+      { start: origin, end: target },
+    ],
+    arcPoints,
+    polygon: { points: [origin, ...arcPoints] },
   };
 }
 
@@ -3032,6 +3099,12 @@ export function resolveUserDrawingGeometry(
         kind: 'projection',
         drawing,
         projection: resolveProjectionFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
+      };
+    case 'sector':
+      return {
+        kind: 'sector',
+        drawing,
+        sector: resolveSectorFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], space),
       };
     case 'barsPattern':
       return {

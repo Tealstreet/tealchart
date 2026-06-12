@@ -254,6 +254,10 @@ export function resolveUserDrawingHandlePoints(
     case 'elliottTripleComboWave':
     case 'elliottTriangleWave':
       return resolvePolylineFromAnchors(drawing.points, space).points.slice();
+    case 'sector': {
+      const geometry = resolveUserDrawingGeometry(drawing, space);
+      return geometry.kind === 'sector' ? geometry.sector.polygon.points.slice() : [];
+    }
     case 'barsPattern':
       return [anchorToScreenPoint(drawing.points[2], space)];
     case 'regressionTrend':

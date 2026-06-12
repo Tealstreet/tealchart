@@ -754,6 +754,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:+15.00 (+25.00%) / 2 bars, 30 seconds:55,28.5:#111:center:1:12px sans-serif');
   });
 
+  it('renders sectors as filled projection wedges through CanvasContext', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'sector',
+      kind: 'sector',
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 50 },
+        { time: 90, price: 80 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,50');
+    expect(ctx.calls).toContain('arc:10,50,80:1');
+    expect(ctx.calls).toContain('fill');
+    expect(ctx.calls).toContain('lineTo:84.90633420552356,21.910124672928667');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders bars pattern candles through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

@@ -10,6 +10,7 @@ import type {
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
   DrawingScreenRect,
+  DrawingScreenSegment,
   DrawingScreenThreeDrivesPatternLabel,
   DrawingScreenTrianglePatternLabel,
   DrawingScreenXabcdPatternLabel,
@@ -78,6 +79,20 @@ export type MobileUserDrawingPrimitive =
       sourceLabel: string;
       targetLabel: string;
       changeLabel: string;
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'sector';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      origin: DrawingScreenPoint;
+      future: DrawingScreenPoint;
+      target: DrawingScreenPoint;
+      boundaries: readonly [DrawingScreenSegment, DrawingScreenSegment];
+      points: readonly DrawingScreenPoint[];
       style: UserDrawingStyle;
     }
   | {
@@ -1209,6 +1224,7 @@ export type MobileUserDrawingEllipsePrimitive = Extract<MobileUserDrawingPrimiti
 export type MobileUserDrawingInfoLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'infoLine' }>;
 export type MobileUserDrawingForecastPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'forecast' }>;
 export type MobileUserDrawingProjectionPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'projection' }>;
+export type MobileUserDrawingSectorPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'sector' }>;
 export type MobileUserDrawingCrossLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'crossLine' }>;
 export type MobileUserDrawingTrendAnglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'trendAngle' }>;
 export type MobileUserDrawingMeasurementLabelPrimitive = Extract<
@@ -2045,6 +2061,21 @@ function primitiveFromGeometry(
         pivotLabel: geometry.projection.pivotLabel,
         targetLabel: geometry.projection.targetLabel,
         changeLabel: geometry.projection.changeLabel,
+        style: geometry.drawing.style,
+      };
+    case 'sector':
+      return {
+        kind: 'sector',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        origin: geometry.sector.origin,
+        future: geometry.sector.future,
+        target: geometry.sector.target,
+        boundaries: geometry.sector.boundaries,
+        points: geometry.sector.polygon.points,
         style: geometry.drawing.style,
       };
     case 'fibRetracement':
