@@ -1399,6 +1399,7 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
   const { drawing, table } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  const fontWeight = normalizeUserDrawingFontWeight(drawing.style.fontWeight ?? 'normal');
 
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
@@ -1412,7 +1413,7 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
     }
   }
 
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.font = `${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
