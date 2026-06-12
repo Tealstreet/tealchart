@@ -222,6 +222,7 @@ export function resolveUserDrawingHandlePoints(
     case 'trianglePattern':
     case 'abcdPattern':
     case 'xabcdPattern':
+    case 'cypherPattern':
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':

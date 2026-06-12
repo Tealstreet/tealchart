@@ -679,6 +679,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, segment hit testing, whole-drawing moves, duplicate actions, and
   point-index anchor editing use shared drawing behavior on both platforms.
 
+## Shipped: Cypher Pattern Tool
+
+- Shared drawing state supports the five-anchor `cypherPattern` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching X-A-B-C-D connected pattern paths
+  with shared point labels.
+- Selection, segment hit testing, whole-drawing moves, duplicate actions, and
+  point-index anchor editing use shared drawing behavior on both platforms.
+
 ## Shipped: ABCD Pattern Tool
 
 - Shared drawing state supports the four-anchor `abcdPattern` tool and persists

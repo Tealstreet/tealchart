@@ -2595,6 +2595,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'fibSpiral' ||
             primitive.kind === 'abcdPattern' ||
             primitive.kind === 'xabcdPattern' ||
+            primitive.kind === 'cypherPattern' ||
             primitive.kind === 'threeDrivesPattern' ||
             primitive.kind === 'elliottImpulseWave' ||
             primitive.kind === 'elliottCorrectiveWave' ||
@@ -2603,6 +2604,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font =
               primitive.kind === 'xabcdPattern' ||
+              primitive.kind === 'cypherPattern' ||
               primitive.kind === 'abcdPattern' ||
               primitive.kind === 'threeDrivesPattern' ||
               primitive.kind === 'elliottImpulseWave' ||
@@ -2633,6 +2635,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   </SkiaPath>
                 )}
                 {(primitive.kind === 'xabcdPattern' ||
+                  primitive.kind === 'cypherPattern' ||
                   primitive.kind === 'abcdPattern' ||
                   primitive.kind === 'threeDrivesPattern' ||
                   primitive.kind === 'elliottImpulseWave' ||

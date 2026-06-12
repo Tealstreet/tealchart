@@ -32,6 +32,7 @@ export type UserDrawingTool =
   | 'trianglePattern'
   | 'abcdPattern'
   | 'xabcdPattern'
+  | 'cypherPattern'
   | 'threeDrivesPattern'
   | 'headShouldersPattern'
   | 'elliottImpulseWave'
@@ -288,6 +289,17 @@ export interface AbcdPatternDrawing extends UserDrawingBase {
 
 export interface XabcdPatternDrawing extends UserDrawingBase {
   kind: 'xabcdPattern';
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ];
+}
+
+export interface CypherPatternDrawing extends UserDrawingBase {
+  kind: 'cypherPattern';
   points: readonly [
     UserDrawingAnchor,
     UserDrawingAnchor,
@@ -623,6 +635,7 @@ export type UserDrawing =
   | TrianglePatternDrawing
   | AbcdPatternDrawing
   | XabcdPatternDrawing
+  | CypherPatternDrawing
   | ThreeDrivesPatternDrawing
   | HeadShouldersPatternDrawing
   | ElliottImpulseWaveDrawing
@@ -848,6 +861,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'elliottImpulseWave':
     case 'elliottTriangleWave':
     case 'xabcdPattern':
+    case 'cypherPattern':
       return 5;
     case 'horizontalLine':
     case 'verticalLine':
@@ -1107,9 +1121,10 @@ export function createUserDrawingFromDraft(
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!, draft.anchors[3]!],
       };
     case 'xabcdPattern':
+    case 'cypherPattern':
       return {
         ...base,
-        kind: 'xabcdPattern',
+        kind: draft.tool,
         points: [
           draft.anchors[0]!,
           draft.anchors[1]!,

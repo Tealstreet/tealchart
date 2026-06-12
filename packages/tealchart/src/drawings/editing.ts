@@ -146,6 +146,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
         return { ...drawing, points: [points[0]!, points[1]!, points[2]!, points[3]!], updatedAt };
       }
     case 'xabcdPattern':
+    case 'cypherPattern':
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
@@ -332,6 +333,7 @@ function editDrawingHandle(
       drawing.kind === 'elliottCorrectiveWave' ||
       drawing.kind === 'abcdPattern' ||
       drawing.kind === 'xabcdPattern' ||
+      drawing.kind === 'cypherPattern' ||
       drawing.kind === 'threeDrivesPattern' ||
       drawing.kind === 'headShouldersPattern' ||
       drawing.kind === 'elliottImpulseWave' ||
@@ -401,6 +403,7 @@ function editDrawingHandle(
     }
     if (
       drawing.kind === 'xabcdPattern' ||
+      drawing.kind === 'cypherPattern' ||
       drawing.kind === 'threeDrivesPattern' ||
       drawing.kind === 'headShouldersPattern' ||
       drawing.kind === 'elliottImpulseWave' ||
@@ -502,6 +505,7 @@ function editDrawingHandle(
     case 'elliottCorrectiveWave':
     case 'abcdPattern':
     case 'xabcdPattern':
+    case 'cypherPattern':
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
