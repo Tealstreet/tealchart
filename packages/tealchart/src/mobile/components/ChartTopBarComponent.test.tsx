@@ -297,6 +297,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
     fireEvent.click(screen.getByLabelText('Underline text'));
+    fireEvent.click(screen.getByLabelText('Strike-through text'));
     fireEvent.click(screen.getByLabelText('Wrap text'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
@@ -307,6 +308,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
     expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
   });
@@ -391,6 +393,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
     fireEvent.click(screen.getByLabelText('Underline text'));
+    fireEvent.click(screen.getByLabelText('Strike-through text'));
     expect(screen.queryByLabelText('Wrap text')).toBeNull();
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
@@ -400,6 +403,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
     expect(onStyle).not.toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
   });

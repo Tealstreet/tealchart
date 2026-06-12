@@ -543,6 +543,7 @@ export function updateUserDrawingStyle(
       nextStyle.fontWeight === target.drawing.style.fontWeight &&
       nextStyle.fontStyle === target.drawing.style.fontStyle &&
       nextStyle.textUnderline === target.drawing.style.textUnderline &&
+      nextStyle.textLineThrough === target.drawing.style.textLineThrough &&
       nextStyle.textWrap === target.drawing.style.textWrap &&
       nextStyle.textMaxWidth === target.drawing.style.textMaxWidth
     ) {

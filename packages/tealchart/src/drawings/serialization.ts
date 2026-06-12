@@ -347,6 +347,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.fontWeight === 'string') style.fontWeight = value.fontWeight as UserDrawingStyle['fontWeight'];
   if (typeof value.fontStyle === 'string') style.fontStyle = value.fontStyle as UserDrawingStyle['fontStyle'];
   if (typeof value.textUnderline === 'boolean') style.textUnderline = value.textUnderline;
+  if (typeof value.textLineThrough === 'boolean') style.textLineThrough = value.textLineThrough;
   if (typeof value.textWrap === 'boolean') style.textWrap = value.textWrap;
   if (isFiniteNumber(value.textMaxWidth)) style.textMaxWidth = value.textMaxWidth;
   return normalizeUserDrawingStyle(style);

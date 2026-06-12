@@ -697,7 +697,18 @@ describe('user drawing toolbar descriptors', () => {
     ]);
     expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([10, 12, 14, 16]);
     expect(USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => descriptor.fontStyle)).toEqual(['normal', 'italic']);
-    expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.textUnderline)).toEqual([true]);
+    expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.label)).toEqual([
+      'Underline text',
+      'Strike-through text',
+    ]);
+    expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.textUnderline ?? false)).toEqual([
+      true,
+      false,
+    ]);
+    expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.textLineThrough ?? false)).toEqual([
+      false,
+      true,
+    ]);
     expect(USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => descriptor.textWrap)).toEqual([true]);
     expect(USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.textMaxWidth)).toEqual([
       120,
