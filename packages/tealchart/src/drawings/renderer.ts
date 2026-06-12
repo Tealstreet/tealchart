@@ -694,6 +694,18 @@ function renderFibSpeedResistanceArcsGeometry(
   ctx.stroke();
 }
 
+function renderFibArcsGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibArcs' }>,
+): void {
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  for (const arc of geometry.fibArcs.arcs) {
+    ctx.arc(geometry.fibArcs.center.x, geometry.fibArcs.center.y, arc.radius, arc.startAngle, arc.endAngle);
+  }
+  ctx.stroke();
+}
+
 function renderFibWedgeGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibWedge' }>,
@@ -1263,6 +1275,9 @@ export function renderUserDrawing(
         break;
       case 'fibCircles':
         renderFibCirclesGeometry(ctx, geometry);
+        break;
+      case 'fibArcs':
+        renderFibArcsGeometry(ctx, geometry);
         break;
       case 'fibSpeedResistanceArcs':
         renderFibSpeedResistanceArcsGeometry(ctx, geometry);

@@ -796,6 +796,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fib arc levels and endpoint handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-arcs',
+      kind: 'fibArcs',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 75 }, space)?.drawing.id).toBe('fib-arcs');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
+      handle: 'end',
+    });
+  });
+
   it('hits fib circle rings and endpoint handles', () => {
     const drawing: UserDrawing = {
       ...base,
