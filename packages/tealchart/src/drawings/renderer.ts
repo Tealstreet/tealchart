@@ -1037,6 +1037,16 @@ function renderFibSpiralGeometry(
     ctx.lineTo(point.x, point.y);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  for (const label of geometry.fibSpiral.labels) {
+    ctx.fillText(label.text, label.point.x, label.point.y);
+  }
 }
 
 function renderEllipseGeometry(

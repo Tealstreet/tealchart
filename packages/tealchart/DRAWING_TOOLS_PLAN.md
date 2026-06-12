@@ -1030,6 +1030,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching Fibonacci channel level labels
   from the shared model without changing persisted drawing state.
 
+## Shipped: Fibonacci Spiral Labels
+
+- Shared Fibonacci spiral geometry now carries ratio labels at the first three
+  Fibonacci growth radii.
+- Web Canvas and mobile Skia render matching Fibonacci spiral labels from the
+  shared model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

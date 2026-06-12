@@ -1225,6 +1225,10 @@ describe('mobile user drawing render model', () => {
         { x: 50, y: 50 },
         { x: expect.closeTo(10), y: expect.closeTo(114.72) },
       ]),
+      labels: expect.arrayContaining([
+        { text: '1', point: { x: 54, y: 46 } },
+        { text: '1.618', point: { x: expect.closeTo(14), y: expect.closeTo(110.72) } },
+      ]),
     });
   });
 

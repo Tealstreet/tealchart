@@ -6,6 +6,7 @@ import type {
   DrawingScreenElliottImpulseWaveLabel,
   DrawingScreenElliottTriangleWaveLabel,
   DrawingScreenElliottTripleComboWaveLabel,
+  DrawingScreenFibSpiralLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
   DrawingScreenRect,
@@ -484,6 +485,7 @@ export type MobileUserDrawingPrimitive =
       baseRadius: number;
       startAngle: number;
       points: readonly DrawingScreenPoint[];
+      labels: readonly DrawingScreenFibSpiralLabel[];
       style: UserDrawingStyle;
     }
   | {
@@ -1740,6 +1742,7 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibSpiral.baseRadius,
         startAngle: geometry.fibSpiral.startAngle,
         points: geometry.fibSpiral.points,
+        labels: geometry.fibSpiral.labels,
         style: geometry.drawing.style,
       };
     case 'gannFan':
