@@ -695,7 +695,16 @@ describe('user drawing toolbar descriptors', () => {
       'serif',
       'monospace',
     ]);
-    expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([10, 12, 14, 16]);
+    expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([
+      8,
+      10,
+      12,
+      14,
+      16,
+      20,
+      24,
+      32,
+    ]);
     expect(USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => descriptor.fontStyle)).toEqual(['normal', 'italic']);
     expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.label)).toEqual([
       'Underline text',

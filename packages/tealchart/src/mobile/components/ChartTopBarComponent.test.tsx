@@ -293,6 +293,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Blue fill color'));
     fireEvent.click(screen.getByLabelText('Red text color'));
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
+    fireEvent.click(screen.getByLabelText('24 pixel font size'));
     fireEvent.click(screen.getByLabelText('monospace font family'));
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
@@ -304,6 +305,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 24 });
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'monospace' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
