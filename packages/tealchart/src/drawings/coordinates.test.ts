@@ -35,6 +35,7 @@ import type {
   GannBoxDrawing,
   GannFanDrawing,
   GannSquareDrawing,
+  GannSquareFixedDrawing,
   HorizontalRayDrawing,
   ImageDrawing,
   InfoLineDrawing,
@@ -1264,6 +1265,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const gannSquareFixed: GannSquareFixedDrawing = {
+      ...trendLine,
+      id: 'gann-square-fixed',
+      kind: 'gannSquareFixed',
+      points: [
+        { time: 1_000, price: 110 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const path: PathDrawing = {
       ...trendLine,
       id: 'path',
@@ -1963,6 +1973,19 @@ describe('user drawing coordinates', () => {
     });
     expect(resolveUserDrawingGeometry(gannSquare, space)).toMatchObject({
       kind: 'gannSquare',
+      gannBox: {
+        rect: { x: 10, y: 20, width: 100, height: 100 },
+        levels: expect.arrayContaining([
+          expect.objectContaining({
+            ratio: 0.5,
+            horizontal: { start: { x: 10, y: 70 }, end: { x: 110, y: 70 } },
+            vertical: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } },
+          }),
+        ]),
+      },
+    });
+    expect(resolveUserDrawingGeometry(gannSquareFixed, space)).toMatchObject({
+      kind: 'gannSquareFixed',
       gannBox: {
         rect: { x: 10, y: 20, width: 100, height: 100 },
         levels: expect.arrayContaining([

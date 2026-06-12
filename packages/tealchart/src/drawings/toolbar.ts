@@ -184,6 +184,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'gannFan', icon: 'G', label: 'Gann fan' },
   { tool: 'gannBox', icon: '□', label: 'Gann box' },
   { tool: 'gannSquare', icon: '◇', label: 'Gann square' },
+  { tool: 'gannSquareFixed', icon: '◇F', label: 'Gann square fixed' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'curve', icon: '⌒', label: 'Curve' },
   { tool: 'doubleCurve', icon: '≈', label: 'Double curve' },
@@ -388,6 +389,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'fibWedge' ||
     drawing.kind === 'gannBox' ||
     drawing.kind === 'gannSquare' ||
+    drawing.kind === 'gannSquareFixed' ||
     drawing.kind === 'rotatedRectangle' ||
     drawing.kind === 'parallelChannel' ||
     drawing.kind === 'regressionTrend' ||

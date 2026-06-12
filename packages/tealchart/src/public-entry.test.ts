@@ -37,6 +37,7 @@ import type {
   GannBoxDrawing,
   GannFanDrawing,
   GannSquareDrawing,
+  GannSquareFixedDrawing,
   HighlighterDrawing,
   IconDrawing,
   InfoLineDrawing,
@@ -97,6 +98,7 @@ import type {
   MobileUserDrawingGannBoxPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingGannSquarePrimitive,
+  MobileUserDrawingGannSquareFixedPrimitive,
   MobileUserDrawingHighlighterPrimitive,
   MobileUserDrawingIconPrimitive,
   MobileUserDrawingLinePrimitive,
@@ -244,6 +246,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingDatePriceRangePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingRiskRewardPositionPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingGannSquarePrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingGannSquareFixedPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingNotePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingCalloutPrimitive');
@@ -549,6 +552,11 @@ describe('tealchart public entries', () => {
       kind: 'gannSquare',
       id: 'gann-square',
     };
+    const gannSquareFixedPrimitive: NonNever<MobileUserDrawingGannSquareFixedPrimitive> = {
+      ...gannBoxPrimitive,
+      kind: 'gannSquareFixed',
+      id: 'gann-square-fixed',
+    };
     const trendBasedFibTimePrimitive: NonNever<MobileUserDrawingTrendBasedFibTimePrimitive> = {
       ...fibTimeZonePrimitive,
       kind: 'trendBasedFibTime',
@@ -809,6 +817,7 @@ describe('tealchart public entries', () => {
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(gannBoxPrimitive.kind).toBe('gannBox');
     expect(gannSquarePrimitive.kind).toBe('gannSquare');
+    expect(gannSquareFixedPrimitive.kind).toBe('gannSquareFixed');
     expect(linePrimitive.kind).toBe('line');
     expect(curvePrimitive.kind).toBe('curve');
     expect(arcPrimitive.kind).toBe('arc');
@@ -1760,6 +1769,34 @@ describe('tealchart public entries', () => {
     });
 
     expect(drawing.kind).toBe('gannSquare');
+    expect(square.rect.width).toBe(square.rect.height);
+    expect(square.levels).toHaveLength(9);
+    expect(square.angles).toHaveLength(6);
+  });
+
+  it('exports shared drawing fixed gann square types and resolver', () => {
+    const drawing: GannSquareFixedDrawing = {
+      id: 'gann-square-fixed',
+      kind: 'gannSquareFixed',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+    const square = resolveGannSquareFromAnchors(drawing.points[0], drawing.points[1], {
+      viewport: { startTime: 0, endTime: 2, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 100,
+    });
+
+    expect(drawing.kind).toBe('gannSquareFixed');
     expect(square.rect.width).toBe(square.rect.height);
     expect(square.levels).toHaveLength(9);
     expect(square.angles).toHaveLength(6);

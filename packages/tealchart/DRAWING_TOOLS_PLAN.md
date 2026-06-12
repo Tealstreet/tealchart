@@ -593,6 +593,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, grid/angle hit testing, whole-drawing moves, fill controls, and
   square-corner editing use shared drawing behavior on both platforms.
 
+## Shipped: Gann Square Fixed Tool
+
+- Shared drawing state supports the two-anchor `gannSquareFixed` tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching fixed square grids by reusing the
+  shared Gann square geometry resolver.
+- Selection, grid/angle hit testing, whole-drawing moves, fill controls, and
+  square-corner editing use shared drawing behavior on both platforms.
+
 ## Shipped: Curve Tool
 
 - Shared drawing state supports the three-anchor `curve` tool and persists it
