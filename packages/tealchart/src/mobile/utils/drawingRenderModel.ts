@@ -228,6 +228,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'doubleCurve';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      start: DrawingScreenPoint;
+      firstControl: DrawingScreenPoint;
+      secondControl: DrawingScreenPoint;
+      end: DrawingScreenPoint;
+      points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'arc';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -903,6 +917,7 @@ export type MobileUserDrawingPathPrimitive = Extract<MobileUserDrawingPrimitive,
 export type MobileUserDrawingBrushPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'brush' }>;
 export type MobileUserDrawingHighlighterPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'highlighter' }>;
 export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'curve' }>;
+export type MobileUserDrawingDoubleCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'doubleCurve' }>;
 export type MobileUserDrawingArcPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arc' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
@@ -1266,6 +1281,21 @@ function primitiveFromGeometry(
         control: geometry.curve.control,
         end: geometry.curve.end,
         points: geometry.curve.points,
+        style: geometry.drawing.style,
+      };
+    case 'doubleCurve':
+      return {
+        kind: 'doubleCurve',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        start: geometry.doubleCurve.start,
+        firstControl: geometry.doubleCurve.firstControl,
+        secondControl: geometry.doubleCurve.secondControl,
+        end: geometry.doubleCurve.end,
+        points: geometry.doubleCurve.points,
         style: geometry.drawing.style,
       };
     case 'arc':

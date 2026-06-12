@@ -34,6 +34,9 @@ class RecordingCanvasContext implements CanvasContext {
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
     this.calls.push(`quadraticCurveTo:${cpx},${cpy},${x},${y}`);
   }
+  bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
+    this.calls.push(`bezierCurveTo:${cp1x},${cp1y},${cp2x},${cp2y},${x},${y}`);
+  }
   arc(x: number, y: number, radius: number): void {
     this.calls.push(`arc:${x},${y},${radius}:${this.globalAlpha}`);
   }
@@ -1046,6 +1049,27 @@ describe('user drawing renderer', () => {
 
     expect(ctx.calls).toContain('moveTo:10,50');
     expect(ctx.calls).toContain('quadraticCurveTo:50,20,90,50');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
+  it('renders double curve drawings as stroked cubic Bezier curves', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'double-curve',
+      kind: 'doubleCurve',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 80 },
+        { time: 70, price: 20 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('bezierCurveTo:30,20,70,80,90,50');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 

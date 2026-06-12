@@ -107,6 +107,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('projection')).toBe(3);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('curve')).toBe(3);
+    expect(getRequiredAnchorCount('doubleCurve')).toBe(4);
     expect(getRequiredAnchorCount('arc')).toBe(3);
     expect(getRequiredAnchorCount('polyline')).toBe(3);
     expect(getRequiredAnchorCount('pitchfork')).toBe(3);
@@ -739,6 +740,20 @@ describe('user drawing types', () => {
       id: 'curve',
       kind: 'curve',
       points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'doubleCurve', anchors: [anchorA, anchorB, anchorC, anchorD] }), {
+        id: 'double-curve',
+        now: 20,
+      }),
+    ).toMatchObject({
+      id: 'double-curve',
+      kind: 'doubleCurve',
+      points: [anchorA, anchorB, anchorC, anchorD],
       visible: true,
       locked: false,
       createdAt: 20,

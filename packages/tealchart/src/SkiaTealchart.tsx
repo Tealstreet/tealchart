@@ -2558,6 +2558,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'brush' ||
             primitive.kind === 'highlighter' ||
             primitive.kind === 'curve' ||
+            primitive.kind === 'doubleCurve' ||
             primitive.kind === 'arc' ||
             primitive.kind === 'fibSpiral' ||
             primitive.kind === 'abcdPattern' ||

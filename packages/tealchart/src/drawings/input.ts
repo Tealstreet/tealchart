@@ -267,6 +267,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
         kind: drawing.kind,
         points: [cloneAnchor(drawing.points[0]), cloneAnchor(drawing.points[1]), cloneAnchor(drawing.points[2])],
       } as UserDrawing;
+    case 'doubleCurve':
     case 'disjointChannel':
     case 'trianglePattern':
       return {

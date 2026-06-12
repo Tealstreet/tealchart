@@ -14,6 +14,7 @@ import type {
   DatePriceRangeDrawing,
   DateRangeDrawing,
   DisjointChannelDrawing,
+  DoubleCurveDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
   FibChannelDrawing,
@@ -66,6 +67,7 @@ import {
   resolveCurveFromAnchors,
   resolveDateRangeRectFromAnchors,
   resolveDisjointChannelFromAnchors,
+  resolveDoubleCurveFromAnchors,
   resolveExtendedSegment,
   resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
@@ -688,6 +690,25 @@ describe('user drawing coordinates', () => {
     expect(curve.points[24]).toEqual({ x: 110, y: 45 });
   });
 
+  it('resolves double curves as cubic Bezier segments', () => {
+    const doubleCurve = resolveDoubleCurveFromAnchors(
+      { time: 1_000, price: 100 },
+      { time: 1_500, price: 110 },
+      { time: 2_500, price: 90 },
+      { time: 3_000, price: 100 },
+      space,
+    );
+
+    expect(doubleCurve).toMatchObject({
+      start: { x: 10, y: 70 },
+      firstControl: { x: 60, y: 20 },
+      secondControl: { x: 160, y: 120 },
+      end: { x: 210, y: 70 },
+    });
+    expect(doubleCurve.points).toHaveLength(49);
+    expect(doubleCurve.points[24]).toEqual({ x: 110, y: 70 });
+  });
+
   it('resolves circular arcs through start, middle, and end anchors', () => {
     const arc = resolveArcFromAnchors(
       { time: 1_000, price: 94 },
@@ -1099,6 +1120,17 @@ describe('user drawing coordinates', () => {
       points: [
         { time: 1_000, price: 100 },
         { time: 2_000, price: 110 },
+        { time: 3_000, price: 100 },
+      ],
+    };
+    const doubleCurve: DoubleCurveDrawing = {
+      ...trendLine,
+      id: 'double-curve',
+      kind: 'doubleCurve',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 1_500, price: 110 },
+        { time: 2_500, price: 90 },
         { time: 3_000, price: 100 },
       ],
     };
@@ -1731,6 +1763,15 @@ describe('user drawing coordinates', () => {
       curve: {
         start: { x: 10, y: 70 },
         control: { x: 110, y: 20 },
+        end: { x: 210, y: 70 },
+      },
+    });
+    expect(resolveUserDrawingGeometry(doubleCurve, space)).toMatchObject({
+      kind: 'doubleCurve',
+      doubleCurve: {
+        start: { x: 10, y: 70 },
+        firstControl: { x: 60, y: 20 },
+        secondControl: { x: 160, y: 120 },
         end: { x: 210, y: 70 },
       },
     });
