@@ -663,6 +663,8 @@ describe('user drawing toolbar descriptors', () => {
       '#22c55e',
       '#38bdf8',
       '#f43f5e',
+      '#f97316',
+      '#a855f7',
       '#d1d4dc',
     ]);
     expect(USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width)).toEqual([1, 2, 3, 4, 5]);
@@ -687,6 +689,8 @@ describe('user drawing toolbar descriptors', () => {
       'rgba(34, 197, 94, 0.12)',
       'rgba(56, 189, 248, 0.12)',
       'rgba(244, 63, 94, 0.12)',
+      'rgba(249, 115, 22, 0.12)',
+      'rgba(168, 85, 247, 0.12)',
       'rgba(209, 212, 220, 0.12)',
     ]);
     expect(USER_DRAWING_TEXT_COLOR_DESCRIPTORS.map((descriptor) => descriptor.textColor)).toEqual([
@@ -694,6 +698,8 @@ describe('user drawing toolbar descriptors', () => {
       '#22c55e',
       '#38bdf8',
       '#f43f5e',
+      '#f97316',
+      '#a855f7',
       '#d1d4dc',
     ]);
     expect(USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => descriptor.fontFamily)).toEqual([
