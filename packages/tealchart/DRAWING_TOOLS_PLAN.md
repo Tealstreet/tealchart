@@ -254,8 +254,9 @@ matching behavior in the same PR for every user-facing drawing feature.
 
 ## Shipped: Arrow Marks
 
-- Shared drawing state supports single-anchor `arrowMarkUp` and `arrowMarkDown`
-  tools and persists them through layout save/load.
+- Shared drawing state supports single-anchor `arrowMarkLeft`,
+  `arrowMarkRight`, `arrowMarkUp`, and `arrowMarkDown` tools and persists them
+  through layout save/load.
 - Web Canvas and mobile Skia render matching fixed-size filled arrow mark
   polygons from shared geometry.
 - Selection, polygon hit testing, whole-drawing moves, and fill controls use

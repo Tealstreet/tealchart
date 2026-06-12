@@ -131,6 +131,8 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'infoLine', icon: 'i', label: 'Info line' },
   { tool: 'arrowLine', icon: '↗', label: 'Arrow line' },
   { tool: 'arrowMarker', icon: '➤', label: 'Arrow marker' },
+  { tool: 'arrowMarkLeft', icon: '←', label: 'Arrow mark left' },
+  { tool: 'arrowMarkRight', icon: '→', label: 'Arrow mark right' },
   { tool: 'arrowMarkUp', icon: '↑', label: 'Arrow mark up' },
   { tool: 'arrowMarkDown', icon: '↓', label: 'Arrow mark down' },
   { tool: 'ray', icon: '↗', label: 'Ray' },
@@ -355,6 +357,8 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   return (
     drawing.kind === 'icon' ||
     drawing.kind === 'arrowMarker' ||
+    drawing.kind === 'arrowMarkLeft' ||
+    drawing.kind === 'arrowMarkRight' ||
     drawing.kind === 'arrowMarkUp' ||
     drawing.kind === 'arrowMarkDown' ||
     drawing.kind === 'rectangle' ||

@@ -182,6 +182,8 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
       };
     case 'horizontalRay':
     case 'crossLine':
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'pin':
@@ -985,6 +987,8 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
           }
         : null;
     }
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'pin': {

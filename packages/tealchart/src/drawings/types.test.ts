@@ -56,6 +56,8 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('select')).toBe(0);
     expect(getRequiredAnchorCount('horizontalLine')).toBe(1);
     expect(getRequiredAnchorCount('verticalLine')).toBe(1);
+    expect(getRequiredAnchorCount('arrowMarkLeft')).toBe(1);
+    expect(getRequiredAnchorCount('arrowMarkRight')).toBe(1);
     expect(getRequiredAnchorCount('arrowMarkUp')).toBe(1);
     expect(getRequiredAnchorCount('arrowMarkDown')).toBe(1);
     expect(getRequiredAnchorCount('horizontalRay')).toBe(1);
@@ -774,6 +776,16 @@ describe('user drawing types', () => {
     });
     expect(createUserDrawingFromDraft(draft({ tool: 'crossLine', anchors: [anchorA] }), { id: 'cross' })).toMatchObject({
       kind: 'crossLine',
+      point: anchorA,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'arrowMarkLeft', anchors: [anchorA] }), { id: 'left' })).toMatchObject({
+      kind: 'arrowMarkLeft',
+      point: anchorA,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'arrowMarkRight', anchors: [anchorA] }), { id: 'right' }),
+    ).toMatchObject({
+      kind: 'arrowMarkRight',
       point: anchorA,
     });
     expect(createUserDrawingFromDraft(draft({ tool: 'arrowMarkUp', anchors: [anchorA] }), { id: 'up' })).toMatchObject({

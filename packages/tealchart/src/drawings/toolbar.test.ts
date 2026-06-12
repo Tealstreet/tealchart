@@ -55,6 +55,8 @@ describe('user drawing toolbar descriptors', () => {
       'infoLine',
       'arrowLine',
       'arrowMarker',
+      'arrowMarkLeft',
+      'arrowMarkRight',
       'arrowMarkUp',
       'arrowMarkDown',
       'ray',
@@ -344,6 +346,12 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('arrowMarker')).toEqual(
       expect.objectContaining({ tool: 'arrowMarker', label: 'Arrow marker' }),
+    );
+    expect(getUserDrawingToolDescriptor('arrowMarkLeft')).toEqual(
+      expect.objectContaining({ tool: 'arrowMarkLeft', label: 'Arrow mark left' }),
+    );
+    expect(getUserDrawingToolDescriptor('arrowMarkRight')).toEqual(
+      expect.objectContaining({ tool: 'arrowMarkRight', label: 'Arrow mark right' }),
     );
     expect(getUserDrawingToolDescriptor('arrowMarkUp')).toEqual(
       expect.objectContaining({ tool: 'arrowMarkUp', label: 'Arrow mark up' }),

@@ -610,6 +610,28 @@ describe('drawing layout serialization', () => {
       version: 1,
       drawings: [
         {
+          id: 'left',
+          kind: 'arrowMarkLeft',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 0, price: 8 },
+        },
+        {
+          id: 'right',
+          kind: 'arrowMarkRight',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 3, price: 14 },
+        },
+        {
           id: 'up',
           kind: 'arrowMarkUp',
           paneId: 'main',
@@ -635,6 +657,8 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings).toMatchObject([
+      { id: 'left', kind: 'arrowMarkLeft', point: { time: 0, price: 8 } },
+      { id: 'right', kind: 'arrowMarkRight', point: { time: 3, price: 14 } },
       { id: 'up', kind: 'arrowMarkUp', point: { time: 1, price: 10 } },
       { id: 'down', kind: 'arrowMarkDown', point: { time: 2, price: 12 } },
     ]);

@@ -111,6 +111,8 @@ export function resolveUserDrawingHandlePoints(
         { x, y: space.pane.bottom },
       ];
     }
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'horizontalRay':
