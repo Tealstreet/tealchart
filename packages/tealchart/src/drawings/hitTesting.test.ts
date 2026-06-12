@@ -1255,6 +1255,19 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits flag mark drawings by shared flag geometry', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'flag',
+      kind: 'flagMark',
+      point: { time: 50, price: 50 },
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('flag');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 41 }, space)?.drawing.id).toBe('flag');
+    expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { tolerance: 2 })).toBeNull();
+  });
+
   it('hits balloon drawings by text box and tail', () => {
     const drawing: UserDrawing = {
       ...base,

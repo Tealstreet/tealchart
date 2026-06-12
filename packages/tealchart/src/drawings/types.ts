@@ -77,6 +77,7 @@ export type UserDrawingTool =
   | 'priceNote'
   | 'pin'
   | 'icon'
+  | 'flagMark'
   | 'balloon'
   | 'signpost'
   | 'textLabel';
@@ -547,6 +548,11 @@ export interface IconDrawing extends UserDrawingBase {
   iconName: UserDrawingIconName;
 }
 
+export interface FlagMarkDrawing extends UserDrawingBase {
+  kind: 'flagMark';
+  point: UserDrawingAnchor;
+}
+
 export interface BalloonDrawing extends UserDrawingBase {
   kind: 'balloon';
   point: UserDrawingAnchor;
@@ -643,6 +649,7 @@ export type UserDrawing =
   | PriceNoteDrawing
   | PinDrawing
   | IconDrawing
+  | FlagMarkDrawing
   | BalloonDrawing
   | SignpostDrawing
   | TextLabelDrawing;
@@ -835,6 +842,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'comment':
     case 'pin':
     case 'icon':
+    case 'flagMark':
     case 'balloon':
     case 'signpost':
     case 'textLabel':
@@ -1325,6 +1333,12 @@ export function createUserDrawingFromDraft(
         kind: 'icon',
         point: draft.anchors[0]!,
         iconName: normalizeUserDrawingIconName('star'),
+      };
+    case 'flagMark':
+      return {
+        ...base,
+        kind: 'flagMark',
+        point: draft.anchors[0]!,
       };
     case 'callout':
     case 'priceNote':

@@ -24,6 +24,7 @@ import type {
   FibSpeedResistanceFanDrawing,
   FibRetracementDrawing,
   FibTimeZoneDrawing,
+  FlagMarkDrawing,
   ForecastDrawing,
   FibWedgeDrawing,
   FibSpiralDrawing,
@@ -827,6 +828,12 @@ describe('user drawing coordinates', () => {
       text: 'Signal',
       textAlign: 'center',
     };
+    const flagMark: FlagMarkDrawing = {
+      ...trendLine,
+      id: 'flag',
+      kind: 'flagMark',
+      point: { time: 2_000, price: 100 },
+    };
     const extendedLine: ExtendedLineDrawing = {
       ...trendLine,
       id: 'extended',
@@ -1264,6 +1271,20 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(signpost, space)).toMatchObject({
       kind: 'signpost',
       point: { x: 110, y: 70 },
+    });
+    expect(resolveUserDrawingGeometry(flagMark, space)).toMatchObject({
+      kind: 'icon',
+      icon: {
+        name: 'flag',
+        center: { x: 110, y: 70 },
+        points: [
+          { x: 101, y: 61 },
+          { x: 119, y: 61 },
+          { x: 113.15, y: 70 },
+          { x: 119, y: 79 },
+          { x: 101, y: 79 },
+        ],
+      },
     });
     expect(resolveUserDrawingGeometry(extendedLine, space)).toMatchObject({
       kind: 'line',
