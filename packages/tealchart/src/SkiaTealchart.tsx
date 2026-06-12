@@ -1993,16 +1993,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const changeTextBounds = font ? font.measureText(primitive.changeLabel) : { width: 0 };
             const targetTextBounds = font ? font.measureText(primitive.targetLabel) : { width: 0 };
             const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
-            const path = Skia.Path.Make();
-            path.moveTo(primitive.start.x, primitive.start.y);
-            path.lineTo(primitive.pivot.x, primitive.pivot.y);
-            path.lineTo(primitive.target.x, primitive.target.y);
+            const strokePath = Skia.Path.Make();
+            strokePath.moveTo(primitive.start.x, primitive.start.y);
+            strokePath.lineTo(primitive.pivot.x, primitive.pivot.y);
+            strokePath.lineTo(primitive.target.x, primitive.target.y);
+            const fillPath = Skia.Path.Make();
+            fillPath.moveTo(primitive.start.x, primitive.start.y);
+            fillPath.lineTo(primitive.pivot.x, primitive.pivot.y);
+            fillPath.lineTo(primitive.target.x, primitive.target.y);
+            fillPath.close();
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
-                    path={path}
+                    path={strokePath}
                     color={primitive.style.lineColor}
                     strokeWidth={Math.max(1, primitive.style.lineWidth)}
                     style="stroke"
