@@ -2316,13 +2316,23 @@ export function resolveUserDrawingGeometry(
           ) ?? { segment: { start, end }, points: [start] },
       };
     }
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown': {
       const point = anchorToScreenPoint(drawing.point, space);
+      const direction =
+        drawing.kind === 'arrowMarkLeft'
+          ? 'left'
+          : drawing.kind === 'arrowMarkRight'
+            ? 'right'
+            : drawing.kind === 'arrowMarkUp'
+              ? 'up'
+              : 'down';
       return {
         kind: 'arrowMark',
         drawing,
-        mark: resolveDrawingArrowMark(point, drawing.kind === 'arrowMarkUp' ? 'up' : 'down', {
+        mark: resolveDrawingArrowMark(point, direction, {
           height: Math.max(24, drawing.style.lineWidth * 9),
           width: Math.max(18, drawing.style.lineWidth * 7),
           stemWidth: Math.max(7, drawing.style.lineWidth * 3),

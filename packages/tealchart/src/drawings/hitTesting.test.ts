@@ -103,6 +103,18 @@ describe('user drawing hit testing', () => {
   });
 
   it('hits arrow mark bodies and center handles', () => {
+    const left: UserDrawing = {
+      ...base,
+      id: 'left',
+      kind: 'arrowMarkLeft',
+      point: { time: 50, price: 50 },
+    };
+    const right: UserDrawing = {
+      ...base,
+      id: 'right',
+      kind: 'arrowMarkRight',
+      point: { time: 50, price: 50 },
+    };
     const up: UserDrawing = {
       ...base,
       id: 'up',
@@ -116,6 +128,9 @@ describe('user drawing hit testing', () => {
       point: { time: 50, price: 50 },
     };
 
+    expect(hitTestUserDrawing(left, { x: 50, y: 50 }, space)?.handle).toBe('center');
+    expect(hitTestUserDrawing(left, { x: 70, y: 50 }, space)?.drawing.id).toBe('left');
+    expect(hitTestUserDrawing(right, { x: 30, y: 50 }, space)?.drawing.id).toBe('right');
     expect(hitTestUserDrawing(up, { x: 50, y: 50 }, space)?.handle).toBe('center');
     expect(hitTestUserDrawing(up, { x: 50, y: 70 }, space)?.drawing.id).toBe('up');
     expect(hitTestUserDrawing(down, { x: 50, y: 30 }, space)?.drawing.id).toBe('down');
