@@ -349,6 +349,24 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'fibArcs';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      center: DrawingScreenPoint;
+      reference: DrawingScreenPoint;
+      baseRadius: number;
+      arcs: readonly {
+        ratio: number;
+        radius: number;
+        startAngle: number;
+        endAngle: number;
+      }[];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'fibSpeedResistanceArcs';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -991,6 +1009,7 @@ export type MobileUserDrawingFibSpeedResistanceFanPrimitive = Extract<
   { kind: 'fibSpeedResistanceFan' }
 >;
 export type MobileUserDrawingFibCirclesPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibCircles' }>;
+export type MobileUserDrawingFibArcsPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'fibArcs' }>;
 export type MobileUserDrawingFibSpeedResistanceArcsPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'fibSpeedResistanceArcs' }
@@ -1483,6 +1502,25 @@ function primitiveFromGeometry(
         circles: geometry.fibCircles.circles.map((circle) => ({
           ratio: circle.ratio,
           radius: circle.radius,
+        })),
+        style: geometry.drawing.style,
+      };
+    case 'fibArcs':
+      return {
+        kind: 'fibArcs',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        center: geometry.fibArcs.center,
+        reference: geometry.fibArcs.reference,
+        baseRadius: geometry.fibArcs.baseRadius,
+        arcs: geometry.fibArcs.arcs.map((arc) => ({
+          ratio: arc.ratio,
+          radius: arc.radius,
+          startAngle: arc.startAngle,
+          endAngle: arc.endAngle,
         })),
         style: geometry.drawing.style,
       };

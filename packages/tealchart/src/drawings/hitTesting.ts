@@ -295,6 +295,15 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fibArcs') {
+    const distance = Math.min(
+      ...geometry.fibArcs.arcs.map((arc) =>
+        distanceToArcEdge(point, geometry.fibArcs.center, arc.radius, arc.startAngle, arc.endAngle),
+      ),
+    );
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'fibSpeedResistanceArcs') {
     const distance = Math.min(
       ...geometry.fibSpeedResistanceArcs.arcs.map((arc) =>
@@ -669,6 +678,7 @@ function hitTestUserDrawingHandle(
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibArcs':
     case 'fibSpeedResistanceArcs':
     case 'fibCircles':
     case 'fibSpiral':
@@ -683,6 +693,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'fibExtension' ||
         geometry.drawing.kind === 'fibFan' ||
         geometry.drawing.kind === 'fibSpeedResistanceFan' ||
+        geometry.drawing.kind === 'fibArcs' ||
         geometry.drawing.kind === 'fibSpeedResistanceArcs' ||
         geometry.drawing.kind === 'fibCircles' ||
         geometry.drawing.kind === 'fibSpiral' ||

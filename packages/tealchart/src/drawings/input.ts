@@ -230,6 +230,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'fibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
+    case 'fibArcs':
     case 'fibSpeedResistanceArcs':
     case 'fibCircles':
     case 'fibSpiral':

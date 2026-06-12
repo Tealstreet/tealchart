@@ -902,11 +902,20 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Layout serialization, duplication, whole-drawing moves, toolbar descriptors,
   and style/text controls preserve matching web/mobile behavior.
 
+## Shipped: Fibonacci Arcs Tool
+
+- Shared drawing state supports the two-anchor `fibArcs` tool and persists it
+  through layout save/load.
+- Web Canvas and mobile Skia render matching Fibonacci-level semicircular arcs
+  from shared geometry.
+- Selection, arc hit testing, whole-drawing moves, endpoint handle editing, and
+  toolbar descriptors use shared drawing behavior on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
-  Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
+  Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, remaining image/sticker annotation tools, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.

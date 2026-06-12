@@ -937,6 +937,45 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fib arc primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'fib-arcs',
+          kind: 'fibArcs',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 50, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'fibArcs',
+      id: 'fib-arcs',
+      center: { x: 10, y: 50 },
+      reference: { x: 50, y: 80 },
+      baseRadius: 50,
+      arcs: expect.arrayContaining([
+        expect.objectContaining({ ratio: 0.236, radius: 11.799999999999999, startAngle: 0, endAngle: Math.PI }),
+        expect.objectContaining({ ratio: 1, radius: 50, startAngle: 0, endAngle: Math.PI }),
+        expect.objectContaining({ ratio: 2.618, radius: 130.9, startAngle: 0, endAngle: Math.PI }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready fib circle primitives', () => {
     const state: UserDrawingState = {
       version: 1,

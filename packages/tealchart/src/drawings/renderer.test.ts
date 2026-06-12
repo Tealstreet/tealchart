@@ -1367,6 +1367,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders fib arcs as Fibonacci arc levels', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'fib-arcs',
+      kind: 'fibArcs',
+      points: [
+        { time: 10, price: 50 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('arc:10,50,11.799999999999999:1');
+    expect(ctx.calls).toContain('arc:10,50,50:1');
+    expect(ctx.calls).toContain('arc:10,50,130.9:1');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+  });
+
   it('renders fib circles as concentric Fibonacci rings', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
