@@ -897,7 +897,7 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
   fontSize: 12,
 };
 
-export const USER_DRAWING_FONT_SIZES = [8, 10, 12, 14, 16, 20, 24, 32] as const;
+export const USER_DRAWING_FONT_SIZES = [8, 10, 12, 14, 16, 20, 24, 28, 32, 40] as const;
 export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
