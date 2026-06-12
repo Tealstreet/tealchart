@@ -5,6 +5,7 @@ import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor, UserDrawin
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 import type { UserDrawingDateRangeMetrics } from './dateRange';
 import type { UserDrawingIconGeometry } from './iconGeometry';
+import type { UserDrawingInfoLineMetrics } from './infoLine';
 
 import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
 import { resolveUserDrawingDateRangeMetrics } from './dateRange';
@@ -466,6 +467,7 @@ export type ResolvedUserDrawingGeometry =
       kind: 'infoLine';
       drawing: UserDrawing;
       segment: DrawingScreenSegment;
+      infoMetrics: UserDrawingInfoLineMetrics;
     }
   | {
       kind: 'rectangle';
@@ -2285,6 +2287,7 @@ export function resolveUserDrawingGeometry(
         kind: 'infoLine',
         drawing,
         segment: { start, end },
+        infoMetrics: resolveUserDrawingInfoLineMetrics(drawing.points[0], drawing.points[1], space.bars),
       };
     }
     case 'arrowLine': {

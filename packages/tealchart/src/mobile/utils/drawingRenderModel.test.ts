@@ -1750,7 +1750,16 @@ describe('mobile user drawing render model', () => {
       draft: null,
       textEdit: null,
     };
-    const durationSpace = { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } };
+    const durationSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 50, high: 55, low: 45, close: 52, volume: 100 },
+        { time: 40_000, open: 60, high: 65, low: 55, close: 62, volume: 100 },
+        { time: 70_000, open: 75, high: 80, low: 70, close: 77, volume: 100 },
+        { time: 90_000, open: 80, high: 85, low: 75, close: 82, volume: 100 },
+      ],
+    };
 
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
       kind: 'infoLine',
@@ -1759,7 +1768,7 @@ describe('mobile user drawing render model', () => {
       start: { x: 10, y: 50 },
       end: { x: 70, y: 25 },
       labelPoint: { x: 40, y: 33.5 },
-      label: '+25.00 (+50.00%) / 1 minute',
+      label: '+25.00 (+50.00%) / 3 bars, 1 minute',
       style,
     });
   });
