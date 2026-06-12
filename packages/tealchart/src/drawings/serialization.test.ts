@@ -376,6 +376,40 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored emoji drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'emoji',
+          kind: 'emoji',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: '🔥',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'emoji',
+      kind: 'emoji',
+      point: { time: 1, price: 10 },
+      text: '🔥',
+      textAlign: 'center',
+    });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings[0]).toMatchObject({
+      id: 'emoji',
+      kind: 'emoji',
+      text: '🔥',
+    });
+  });
+
   it('preserves restored callout drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

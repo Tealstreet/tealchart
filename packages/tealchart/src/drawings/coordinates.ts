@@ -745,6 +745,7 @@ export type ResolvedUserDrawingGeometry =
         | 'anchoredText'
         | 'anchoredNote'
         | 'priceLabel'
+        | 'emoji'
         | 'balloon'
         | 'signpost';
       drawing: UserDrawing;
@@ -2947,6 +2948,7 @@ export function resolveUserDrawingGeometry(
     case 'note':
     case 'comment':
     case 'priceLabel':
+    case 'emoji':
     case 'balloon':
     case 'signpost':
       return {

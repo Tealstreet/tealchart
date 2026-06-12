@@ -348,6 +348,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'anchoredText':
     case 'anchoredNote':
     case 'priceLabel':
+    case 'emoji':
     case 'balloon':
     case 'signpost':
       if (drawing.kind === 'anchoredText' || drawing.kind === 'anchoredNote') {
