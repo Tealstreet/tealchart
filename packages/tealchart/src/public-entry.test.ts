@@ -21,6 +21,7 @@ import type {
   DrawingScreenBarsPattern,
   DrawingScreenFixedRangeVolumeProfile,
   DrawingScreenRiskRewardPosition,
+  DrawingScreenTable,
   DrawingScreenVolumeProfileGuide,
   DrawingScreenVolumeProfileGuideKind,
   EllipseDrawing,
@@ -58,6 +59,7 @@ import type {
   SectorDrawing,
   ShortPositionDrawing,
   SineLineDrawing,
+  TableDrawing,
   TimeCyclesDrawing,
   TrendAngleDrawing,
   TrendBasedFibTimeDrawing,
@@ -119,6 +121,7 @@ import type {
   MobileUserDrawingRiskRewardPositionPrimitive,
   MobileUserDrawingSectorPrimitive,
   MobileUserDrawingSineLinePrimitive,
+  MobileUserDrawingTablePrimitive,
   MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingTrendBasedFibTimePrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -161,6 +164,7 @@ import {
   resolvePitchforkFromAnchors,
   resolveProjectionFromAnchors,
   resolveSectorFromAnchors,
+  resolveTableFromAnchor,
   resolveRegressionTrendFromAnchors,
   resolveRiskRewardPositionFromAnchors,
   resolveSineLineFromAnchors,
@@ -212,6 +216,7 @@ describe('tealchart public entries', () => {
     expect(resolvePitchforkFromAnchors).toBeTypeOf('function');
     expect(resolvePitchfanFromAnchors).toBeTypeOf('function');
     expect(resolveAnchoredVolumeProfileFromAnchor).toBeTypeOf('function');
+    expect(resolveTableFromAnchor).toBeTypeOf('function');
     expect(resolveAnchoredVwapFromAnchor).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
@@ -264,6 +269,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingPinPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingIconPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBalloonPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTablePrimitive');
   });
 
   it('exports usable native channel primitive aliases', () => {
@@ -812,6 +818,30 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const tablePrimitive: NonNever<MobileUserDrawingTablePrimitive> = {
+      kind: 'table',
+      id: 'table',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      table: {
+        point: { x: 5, y: 5 },
+        bounds: { x: 5, y: 5, width: 56, height: 24 },
+        cells: [
+          {
+            row: 0,
+            column: 0,
+            text: 'Value',
+            rect: { x: 5, y: 5, width: 56, height: 24 },
+            textPoint: { x: 15, y: 17 },
+          },
+        ],
+        columnWidths: [56],
+        rowHeights: [24],
+      },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const anchoredVwapPrimitive: NonNever<MobileUserDrawingAnchoredVwapPrimitive> = {
       kind: 'anchoredVwap',
       id: 'vwap',
@@ -885,6 +915,7 @@ describe('tealchart public entries', () => {
     expect(pinPrimitive.kind).toBe('pin');
     expect(iconPrimitive.kind).toBe('icon');
     expect(balloonPrimitive.kind).toBe('balloon');
+    expect(tablePrimitive.kind).toBe('table');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
     expect(anchoredVolumeProfilePrimitive.kind).toBe('anchoredVolumeProfile');
   });
@@ -1137,6 +1168,30 @@ describe('tealchart public entries', () => {
     };
 
     expect(profile.guides[0]).toMatchObject({ kind: 'pointOfControl', price: 100 });
+  });
+
+  it('exports shared table drawing and screen geometry types', () => {
+    const drawing: TableDrawing = {
+      id: 'table',
+      kind: 'table',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      point: { time: 1, price: 100 },
+      cells: [['Metric', 'Value']],
+    };
+    const table: DrawingScreenTable = resolveTableFromAnchor(drawing.point, drawing.cells, {
+      viewport: { startTime: 0, endTime: 2, priceMin: 90, priceMax: 110 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 90, yMax: 110 },
+      chartLeft: 0,
+      chartRight: 200,
+    });
+
+    expect(table.bounds).toMatchObject({ x: 100, y: 50, width: 118, height: 24 });
+    expect(table.cells[0]?.text).toBe('Metric');
   });
 
   it('exports shared drawing info line helpers', () => {

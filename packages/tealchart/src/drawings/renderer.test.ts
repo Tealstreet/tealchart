@@ -2439,6 +2439,28 @@ describe('user drawing renderer', () => {
     expect(ctx.globalAlpha).toBe(1);
   });
 
+  it('renders table drawings with fill, grid cells, and cell text', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'table',
+      kind: 'table',
+      point: { time: 10, price: 90 },
+      cells: [
+        ['Metric', 'Value'],
+        ['Price', '101.25'],
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,10,124,48:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,10,62,24:#f5c542:1');
+    expect(ctx.calls).toContain('strokeRect:72,34,62,24:#f5c542:1');
+    expect(ctx.calls).toContain('fillText:Metric:20,22:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:101.25:82,46:#111:left:1:12px sans-serif');
+  });
+
   it('does not render selection handles for invisible drawings', () => {
     const ctx = new RecordingCanvasContext();
     const state: UserDrawingState = {

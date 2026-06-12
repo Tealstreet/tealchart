@@ -3625,6 +3625,51 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'table') {
+            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            if (!font) return null;
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <Rect
+                    x={primitive.table.bounds.x}
+                    y={primitive.table.bounds.y}
+                    width={primitive.table.bounds.width}
+                    height={primitive.table.bounds.height}
+                    color={primitive.style.fillColor}
+                  />
+                )}
+                {primitive.style.lineVisible !== false &&
+                  primitive.table.cells.map((cell) => (
+                    <Rect
+                      key={`${primitive.id}:cell:${cell.row}:${cell.column}`}
+                      x={cell.rect.x}
+                      y={cell.rect.y}
+                      width={cell.rect.width}
+                      height={cell.rect.height}
+                      color={primitive.style.lineColor}
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </Rect>
+                  ))}
+                {primitive.table.cells.map((cell) => (
+                  <SkiaText
+                    key={`${primitive.id}:text:${cell.row}:${cell.column}`}
+                    x={cell.textPoint.x}
+                    y={cell.textPoint.y + fontSize / 2 - 2}
+                    text={cell.text}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
+                ))}
+              </Group>
+            );
+          }
+
           if (primitive.kind !== 'handle') return null;
 
           return (

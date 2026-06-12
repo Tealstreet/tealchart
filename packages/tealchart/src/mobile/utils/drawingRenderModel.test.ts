@@ -129,6 +129,59 @@ describe('mobile user drawing render model', () => {
     ]);
   });
 
+  it('returns table primitives for Skia rendering', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 10, price: 90 },
+          cells: [
+            ['Metric', 'Value'],
+            ['Price', '101.25'],
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 5 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'table',
+      id: 'table',
+      selected: true,
+      opacity: 1,
+      clip,
+      table: {
+        bounds: { x: 10, y: 10, width: 124, height: 48 },
+        cells: [
+          { row: 0, column: 0, text: 'Metric', rect: { x: 10, y: 10, width: 62, height: 24 } },
+          { row: 0, column: 1, text: 'Value', rect: { x: 72, y: 10, width: 62, height: 24 } },
+          { row: 1, column: 0, text: 'Price', rect: { x: 10, y: 34, width: 62, height: 24 } },
+          { row: 1, column: 1, text: '101.25', rect: { x: 72, y: 34, width: 62, height: 24 } },
+        ],
+      },
+      style,
+    });
+    expect(model[1]).toMatchObject({
+      kind: 'handle',
+      drawingId: 'table',
+      point: { x: 10, y: 10 },
+      radius: 5,
+    });
+  });
+
   it('returns selected Skia primitives and handles for grouped selections', () => {
     const state: UserDrawingState = {
       version: 1,

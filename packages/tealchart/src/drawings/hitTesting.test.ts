@@ -1827,6 +1827,26 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 90, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits table bodies and the anchor handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'table',
+      kind: 'table',
+      point: { time: 10, price: 90 },
+      cells: [
+        ['Metric', 'Value'],
+        ['Price', '101.25'],
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 20, y: 20 }, space)?.drawing.id).toBe('table');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)).toMatchObject({
+      drawing,
+      handle: 'center',
+    });
+    expect(hitTestUserDrawing(drawing, { x: 130, y: 80 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('does not hit clipped drawing geometry outside its pane bounds', () => {
     const mainSpace: DrawingCoordinateSpace = {
       ...space,

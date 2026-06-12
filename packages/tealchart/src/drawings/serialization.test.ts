@@ -3226,6 +3226,47 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('round-trips table drawings with normalized cell matrices', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          cells: [['Metric'], ['Price', 101.25]],
+        },
+      ],
+    });
+
+    const table = restored?.drawings[0];
+    expect(table).toMatchObject({
+      id: 'table',
+      kind: 'table',
+      point: { time: 1, price: 10 },
+      cells: [
+        ['Metric', ''],
+        ['Price', '101.25'],
+      ],
+    });
+
+    const serialized = serializeUserDrawingStateForLayout(restored);
+    expect(serialized?.drawings[0]).toMatchObject({
+      kind: 'table',
+      cells: [
+        ['Metric', ''],
+        ['Price', '101.25'],
+      ],
+    });
+    expect(serialized?.drawings[0]).not.toBe(table);
+  });
+
   it('compares only committed drawing payloads', () => {
     const previous = createStateWithTransientFields();
     const next = {
