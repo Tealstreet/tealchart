@@ -401,7 +401,9 @@ export type MobileUserDrawingPrimitive =
       baseRadius: number;
       circles: readonly {
         ratio: number;
+        label: string;
         radius: number;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -417,9 +419,11 @@ export type MobileUserDrawingPrimitive =
       baseRadius: number;
       arcs: readonly {
         ratio: number;
+        label: string;
         radius: number;
         startAngle: number;
         endAngle: number;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -435,9 +439,11 @@ export type MobileUserDrawingPrimitive =
       baseRadius: number;
       arcs: readonly {
         ratio: number;
+        label: string;
         radius: number;
         startAngle: number;
         endAngle: number;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -1641,7 +1647,9 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibCircles.baseRadius,
         circles: geometry.fibCircles.circles.map((circle) => ({
           ratio: circle.ratio,
+          label: circle.label,
           radius: circle.radius,
+          labelPoint: circle.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1658,9 +1666,11 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibArcs.baseRadius,
         arcs: geometry.fibArcs.arcs.map((arc) => ({
           ratio: arc.ratio,
+          label: arc.label,
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
+          labelPoint: arc.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1677,9 +1687,11 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibSpeedResistanceArcs.baseRadius,
         arcs: geometry.fibSpeedResistanceArcs.arcs.map((arc) => ({
           ratio: arc.ratio,
+          label: arc.label,
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
+          labelPoint: arc.labelPoint,
         })),
         style: geometry.drawing.style,
       };

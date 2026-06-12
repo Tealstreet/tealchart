@@ -75,16 +75,20 @@ export interface DrawingScreenCircle {
 
 export interface DrawingScreenFibCircle {
   ratio: number;
+  label: string;
   radius: number;
   rect: DrawingScreenRect;
+  labelPoint: DrawingScreenPoint;
 }
 
 export interface DrawingScreenFibArc {
   ratio: number;
+  label: string;
   radius: number;
   startAngle: number;
   endAngle: number;
   rect: DrawingScreenRect;
+  labelPoint: DrawingScreenPoint;
 }
 
 export interface DrawingScreenFibCircles {
@@ -1055,6 +1059,7 @@ export function resolveFibCirclesFromAnchors(
       const radius = baseRadius * ratio;
       return {
         ratio,
+        label: formatFibRetracementRatio(ratio),
         radius,
         rect: {
           x: center.x - radius,
@@ -1062,6 +1067,7 @@ export function resolveFibCirclesFromAnchors(
           width: radius * 2,
           height: radius * 2,
         },
+        labelPoint: resolveFibCircleLabelPoint(center, radius),
       };
     }),
   };
@@ -1086,6 +1092,7 @@ export function resolveFibSpeedResistanceArcsFromAnchors(
       const radius = baseRadius * ratio;
       return {
         ratio,
+        label: formatFibRetracementRatio(ratio),
         radius,
         startAngle,
         endAngle,
@@ -1095,6 +1102,7 @@ export function resolveFibSpeedResistanceArcsFromAnchors(
           width: radius * 2,
           height: radius * 2,
         },
+        labelPoint: resolveFibArcLabelPoint(center, radius, startAngle, endAngle),
       };
     }),
   };
@@ -1119,6 +1127,7 @@ export function resolveFibArcsFromAnchors(
       const radius = baseRadius * ratio;
       return {
         ratio,
+        label: formatFibRetracementRatio(ratio),
         radius,
         startAngle,
         endAngle,
@@ -1128,6 +1137,7 @@ export function resolveFibArcsFromAnchors(
           width: radius * 2,
           height: radius * 2,
         },
+        labelPoint: resolveFibArcLabelPoint(center, radius, startAngle, endAngle),
       };
     }),
   };
@@ -1164,6 +1174,7 @@ export function resolveFibWedgeFromAnchors(
       const radius = baseRadius * ratio;
       return {
         ratio,
+        label: formatFibRetracementRatio(ratio),
         radius,
         startAngle,
         endAngle,
@@ -1173,6 +1184,7 @@ export function resolveFibWedgeFromAnchors(
           width: radius * 2,
           height: radius * 2,
         },
+        labelPoint: resolveFibArcLabelPoint(center, radius, startAngle, endAngle),
       };
     }),
   };
@@ -1751,6 +1763,26 @@ function resolveFanRayLabelPoint(segment: DrawingScreenSegment): DrawingScreenPo
   return {
     x: segment.end.x >= segment.start.x ? segment.end.x - 4 : segment.end.x + 4,
     y: segment.end.y - 4,
+  };
+}
+
+function resolveFibCircleLabelPoint(center: DrawingScreenPoint, radius: number): DrawingScreenPoint {
+  return {
+    x: center.x + radius,
+    y: center.y - 4,
+  };
+}
+
+function resolveFibArcLabelPoint(
+  center: DrawingScreenPoint,
+  radius: number,
+  startAngle: number,
+  endAngle: number,
+): DrawingScreenPoint {
+  const labelAngle = startAngle + (endAngle - startAngle) / 2;
+  return {
+    x: center.x + Math.cos(labelAngle) * radius,
+    y: center.y + Math.sin(labelAngle) * radius - 4,
   };
 }
 
