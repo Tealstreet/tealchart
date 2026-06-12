@@ -315,6 +315,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
@@ -323,6 +324,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
+    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.unmount();
@@ -372,6 +374,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
@@ -379,6 +382,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
+    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.unmount();

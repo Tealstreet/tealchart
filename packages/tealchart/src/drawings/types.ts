@@ -152,6 +152,7 @@ export interface UserDrawingStyle {
   fontFamily?: string;
   fontWeight?: UserDrawingFontWeight;
   fontStyle?: UserDrawingFontStyle;
+  textUnderline?: boolean;
 }
 
 export interface UserDrawingBase {
