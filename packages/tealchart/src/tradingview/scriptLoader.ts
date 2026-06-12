@@ -19,7 +19,7 @@ export interface LoadedPatchedTradingViewScript {
   dispose: () => void;
 }
 
-export async function loadPatchedTradingViewScript(
+export async function createPatchedTradingViewScript(
   options: LoadPatchedTradingViewScriptOptions
 ): Promise<LoadedPatchedTradingViewScript> {
   const documentRef = options.document ?? globalThis.document;
@@ -64,8 +64,6 @@ export async function loadPatchedTradingViewScript(
     element.setAttribute(key, value);
   }
 
-  documentRef.head.appendChild(element);
-
   return {
     element,
     objectUrl,
@@ -75,4 +73,13 @@ export async function loadPatchedTradingViewScript(
       revokeObjectURL(objectUrl);
     },
   };
+}
+
+export async function loadPatchedTradingViewScript(
+  options: LoadPatchedTradingViewScriptOptions
+): Promise<LoadedPatchedTradingViewScript> {
+  const loaded = await createPatchedTradingViewScript(options);
+  const documentRef = options.document ?? globalThis.document;
+  documentRef.head.appendChild(loaded.element);
+  return loaded;
 }
