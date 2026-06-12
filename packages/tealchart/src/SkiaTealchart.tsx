@@ -39,17 +39,8 @@ import type { IndicatorSettingsData } from './mobile/components/IndicatorSetting
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
 import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
 import type {
-  MobileUserDrawingAnchoredNotePrimitive,
-  MobileUserDrawingAnchoredTextPrimitive,
-  MobileUserDrawingCalloutPrimitive,
-  MobileUserDrawingCommentPrimitive,
-  MobileUserDrawingEmojiPrimitive,
   MobileUserDrawingImagePrimitive,
-  MobileUserDrawingNotePrimitive,
-  MobileUserDrawingPriceNotePrimitive,
-  MobileUserDrawingStickerPrimitive,
   MobileUserDrawingTextBoxPrimitive,
-  MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import type { PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
@@ -148,6 +139,7 @@ import {
   importMobileUserDrawingStateFromLayout,
 } from './mobile/utils/drawingPersistence';
 import {
+  isMobileUserDrawingTextBoxPrimitive,
   resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
   resolveMobileUserDrawingMeasurementLabelPosition,
@@ -718,26 +710,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       userDrawingPrimitives.find(
         (
           primitive,
-        ): primitive is
-          | MobileUserDrawingTextLabelPrimitive
-          | MobileUserDrawingNotePrimitive
-          | MobileUserDrawingAnchoredTextPrimitive
-          | MobileUserDrawingAnchoredNotePrimitive
-          | MobileUserDrawingCalloutPrimitive
-          | MobileUserDrawingPriceNotePrimitive
-          | MobileUserDrawingEmojiPrimitive
-          | MobileUserDrawingStickerPrimitive
-          | MobileUserDrawingCommentPrimitive =>
-          (primitive.kind === 'textLabel' ||
-            primitive.kind === 'note' ||
-            primitive.kind === 'anchoredText' ||
-            primitive.kind === 'anchoredNote' ||
-            primitive.kind === 'callout' ||
-            primitive.kind === 'priceLabel' ||
-            primitive.kind === 'priceNote' ||
-            primitive.kind === 'emoji' ||
-            primitive.kind === 'sticker' ||
-            primitive.kind === 'comment') &&
+        ): primitive is MobileUserDrawingTextBoxPrimitive =>
+          isMobileUserDrawingTextBoxPrimitive(primitive) &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
       ),
@@ -3532,20 +3506,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (
-            primitive.kind === 'textLabel' ||
-            primitive.kind === 'note' ||
-            primitive.kind === 'anchoredText' ||
-            primitive.kind === 'anchoredNote' ||
-            primitive.kind === 'callout' ||
-            primitive.kind === 'priceLabel' ||
-            primitive.kind === 'priceNote' ||
-            primitive.kind === 'comment' ||
-            primitive.kind === 'emoji' ||
-            primitive.kind === 'sticker' ||
-            primitive.kind === 'balloon' ||
-            primitive.kind === 'signpost'
-          ) {
+          if (isMobileUserDrawingTextBoxPrimitive(primitive)) {
             const textPrimitive: MobileUserDrawingTextBoxPrimitive = primitive;
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;

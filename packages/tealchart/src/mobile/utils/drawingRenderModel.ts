@@ -1152,6 +1152,25 @@ export type MobileUserDrawingTextBoxPrimitive =
   | MobileUserDrawingCommentPrimitive
   | MobileUserDrawingBalloonPrimitive
   | MobileUserDrawingSignpostPrimitive;
+
+export function isMobileUserDrawingTextBoxPrimitive(
+  primitive: MobileUserDrawingPrimitive,
+): primitive is MobileUserDrawingTextBoxPrimitive {
+  return (
+    primitive.kind === 'textLabel' ||
+    primitive.kind === 'note' ||
+    primitive.kind === 'anchoredText' ||
+    primitive.kind === 'anchoredNote' ||
+    primitive.kind === 'callout' ||
+    primitive.kind === 'priceLabel' ||
+    primitive.kind === 'priceNote' ||
+    primitive.kind === 'emoji' ||
+    primitive.kind === 'sticker' ||
+    primitive.kind === 'comment' ||
+    primitive.kind === 'balloon' ||
+    primitive.kind === 'signpost'
+  );
+}
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
 export type MobileUserDrawingImagePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'image' }>;
