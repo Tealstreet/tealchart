@@ -177,6 +177,9 @@ import type {
   UserDrawingStyleToggleDescriptor,
   DrawingScreenRiskRewardPosition,
   DrawingScreenBarsPattern,
+  DrawingScreenFixedRangeVolumeProfile,
+  DrawingScreenVolumeProfileGuide,
+  DrawingScreenVolumeProfileGuideKind,
 } from './index';
 
 type NonNever<T> = [T] extends [never] ? never : T;
@@ -1022,6 +1025,25 @@ describe('tealchart public entries', () => {
     expect(pattern.bars).toHaveLength(2);
     expect(pattern.bounds.width).toBeGreaterThan(0);
     expect(drawing.kind).toBe('barsPattern');
+  });
+
+  it('exports shared fixed range volume profile guide types', () => {
+    const guideKind: DrawingScreenVolumeProfileGuideKind = 'pointOfControl';
+    const guide: DrawingScreenVolumeProfileGuide = {
+      kind: guideKind,
+      price: 100,
+      volume: 25,
+      segment: { start: { x: 0, y: 10 }, end: { x: 100, y: 10 } },
+    };
+    const profile: DrawingScreenFixedRangeVolumeProfile = {
+      bounds: { x: 0, y: 0, width: 100, height: 50 },
+      bins: [],
+      guides: [guide],
+      maxVolume: 25,
+      totalVolume: 25,
+    };
+
+    expect(profile.guides[0]).toMatchObject({ kind: 'pointOfControl', price: 100 });
   });
 
   it('exports shared drawing info line helpers', () => {

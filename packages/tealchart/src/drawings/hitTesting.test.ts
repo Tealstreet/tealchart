@@ -1209,6 +1209,7 @@ describe('user drawing hit testing', () => {
     };
 
     expect(hitTestUserDrawing(drawing, { x: 50, y: 22 }, profileSpace)?.drawing.id).toBe('volume-profile');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 45 }, profileSpace)?.drawing.id).toBe('volume-profile');
     expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, profileSpace)?.drawing.id).toBe('volume-profile');
     expect(hitTestUserDrawing(drawing, { x: 10, y: 20 }, profileSpace)).toMatchObject({
       handle: 'start',

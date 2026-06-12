@@ -478,9 +478,19 @@ export interface DrawingScreenVolumeProfileBin {
   rect: DrawingScreenRect;
 }
 
+export type DrawingScreenVolumeProfileGuideKind = 'pointOfControl' | 'valueAreaHigh' | 'valueAreaLow';
+
+export interface DrawingScreenVolumeProfileGuide {
+  kind: DrawingScreenVolumeProfileGuideKind;
+  price: number;
+  volume: number;
+  segment: DrawingScreenSegment;
+}
+
 export interface DrawingScreenFixedRangeVolumeProfile {
   bounds: DrawingScreenRect;
   bins: readonly DrawingScreenVolumeProfileBin[];
+  guides: readonly DrawingScreenVolumeProfileGuide[];
   maxVolume: number;
   totalVolume: number;
 }
@@ -2257,6 +2267,73 @@ export function resolveAnchoredVwapFromAnchor(
 }
 
 const FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT = 12;
+const FIXED_RANGE_VOLUME_PROFILE_VALUE_AREA_RATIO = 0.7;
+
+function resolveFixedRangeVolumeProfileGuides(
+  bounds: DrawingScreenRect,
+  bins: readonly DrawingScreenVolumeProfileBin[],
+  maxVolume: number,
+  totalVolume: number,
+): DrawingScreenVolumeProfileGuide[] {
+  if (maxVolume <= 0 || totalVolume <= 0 || bounds.width <= 0) return [];
+
+  const pointOfControlIndex = bins.reduce((bestIndex, bin, index) => {
+    const best = bins[bestIndex]!;
+    return bin.volume > best.volume ? index : bestIndex;
+  }, 0);
+  const pointOfControlBin = bins[pointOfControlIndex]!;
+  const targetVolume = totalVolume * FIXED_RANGE_VOLUME_PROFILE_VALUE_AREA_RATIO;
+  let valueAreaLowIndex = pointOfControlIndex;
+  let valueAreaHighIndex = pointOfControlIndex;
+  let valueAreaVolume = pointOfControlBin.volume;
+
+  while (valueAreaVolume < targetVolume && (valueAreaLowIndex > 0 || valueAreaHighIndex < bins.length - 1)) {
+    const nextLower = valueAreaLowIndex > 0 ? bins[valueAreaLowIndex - 1] : null;
+    const nextHigher = valueAreaHighIndex < bins.length - 1 ? bins[valueAreaHighIndex + 1] : null;
+    if (!nextLower) {
+      valueAreaHighIndex += 1;
+      valueAreaVolume += nextHigher?.volume ?? 0;
+    } else if (!nextHigher) {
+      valueAreaLowIndex -= 1;
+      valueAreaVolume += nextLower.volume;
+    } else if (nextHigher.volume >= nextLower.volume) {
+      valueAreaHighIndex += 1;
+      valueAreaVolume += nextHigher.volume;
+    } else {
+      valueAreaLowIndex -= 1;
+      valueAreaVolume += nextLower.volume;
+    }
+  }
+
+  const xStart = bounds.x;
+  const xEnd = bounds.x + bounds.width;
+  const pointOfControlY = pointOfControlBin.rect.y + pointOfControlBin.rect.height / 2;
+  const valueAreaHighBin = bins[valueAreaHighIndex]!;
+  const valueAreaLowBin = bins[valueAreaLowIndex]!;
+  const valueAreaHighY = valueAreaHighBin.rect.y;
+  const valueAreaLowY = valueAreaLowBin.rect.y + valueAreaLowBin.rect.height;
+
+  return [
+    {
+      kind: 'pointOfControl',
+      price: (pointOfControlBin.priceMin + pointOfControlBin.priceMax) / 2,
+      volume: pointOfControlBin.volume,
+      segment: { start: { x: xStart, y: pointOfControlY }, end: { x: xEnd, y: pointOfControlY } },
+    },
+    {
+      kind: 'valueAreaHigh',
+      price: valueAreaHighBin.priceMax,
+      volume: valueAreaVolume,
+      segment: { start: { x: xStart, y: valueAreaHighY }, end: { x: xEnd, y: valueAreaHighY } },
+    },
+    {
+      kind: 'valueAreaLow',
+      price: valueAreaLowBin.priceMin,
+      volume: valueAreaVolume,
+      segment: { start: { x: xStart, y: valueAreaLowY }, end: { x: xEnd, y: valueAreaLowY } },
+    },
+  ];
+}
 
 export function resolveFixedRangeVolumeProfileFromAnchors(
   first: UserDrawingAnchor,
@@ -2314,6 +2391,7 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
   return {
     bounds,
     bins,
+    guides: resolveFixedRangeVolumeProfileGuides(bounds, bins, maxVolume, totalVolume),
     maxVolume,
     totalVolume,
   };

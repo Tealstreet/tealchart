@@ -1720,6 +1720,26 @@ describe('mobile user drawing render model', () => {
       bounds: { x: 10, y: 20, width: 80, height: 60 },
       maxVolume: 20,
       totalVolume: 35,
+      guides: [
+        {
+          kind: 'pointOfControl',
+          price: 77.5,
+          volume: 20,
+          segment: { start: { x: 10, y: 22.5 }, end: { x: 90, y: 22.5 } },
+        },
+        {
+          kind: 'valueAreaHigh',
+          price: 80,
+          volume: 30,
+          segment: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+        },
+        {
+          kind: 'valueAreaLow',
+          price: 55,
+          volume: 30,
+          segment: { start: { x: 10, y: 45 }, end: { x: 90, y: 45 } },
+        },
+      ],
       bins: expect.arrayContaining([
         expect.objectContaining({
           priceMin: 75,

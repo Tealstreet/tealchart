@@ -2869,6 +2869,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     {dash && <DashPathEffect intervals={dash} />}
                   </Rect>
                 )}
+                {primitive.style.lineVisible !== false &&
+                  primitive.guides.map((guide) => {
+                    const path = Skia.Path.Make();
+                    path.moveTo(guide.segment.start.x, guide.segment.start.y);
+                    path.lineTo(guide.segment.end.x, guide.segment.end.y);
+                    const guideDash = guide.kind === 'pointOfControl' ? null : [4, 3];
+                    return (
+                      <SkiaPath
+                        key={`${primitive.id}:guide:${guide.kind}`}
+                        path={path}
+                        color={primitive.style.lineColor}
+                        style="stroke"
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                        strokeCap="round"
+                        strokeJoin="round"
+                      >
+                        {guideDash && <DashPathEffect intervals={guideDash} />}
+                      </SkiaPath>
+                    );
+                  })}
               </Group>
             );
           }
