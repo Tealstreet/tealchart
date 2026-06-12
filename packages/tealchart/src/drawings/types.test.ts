@@ -192,10 +192,12 @@ describe('user drawing types', () => {
   });
 
   it('normalizes drawing text wrap widths to supported cross-platform values', () => {
-    expect(USER_DRAWING_TEXT_MAX_WIDTHS).toEqual([120, 180, 240]);
+    expect(USER_DRAWING_TEXT_MAX_WIDTHS).toEqual([120, 180, 240, 320, 480]);
     expect(normalizeUserDrawingTextMaxWidth(90)).toBe(120);
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
     expect(normalizeUserDrawingTextMaxWidth(260)).toBe(240);
+    expect(normalizeUserDrawingTextMaxWidth(340)).toBe(320);
+    expect(normalizeUserDrawingTextMaxWidth(440)).toBe(480);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, textMaxWidth: 190 })).toMatchObject({
       textMaxWidth: 180,
     });

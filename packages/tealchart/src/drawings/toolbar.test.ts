@@ -725,6 +725,8 @@ describe('user drawing toolbar descriptors', () => {
       120,
       180,
       240,
+      320,
+      480,
     ]);
     expect(USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => descriptor.textAlign)).toEqual([
       'left',
