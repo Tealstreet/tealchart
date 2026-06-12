@@ -32,11 +32,13 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    expect(screen.getByText('Lines')).toBeTruthy();
-    expect(screen.getByText('Channels')).toBeTruthy();
-    expect(screen.getByText('Gann and Fibonacci')).toBeTruthy();
-    expect(screen.getByLabelText('Rectangle')).toBeTruthy();
+    expect(screen.getByLabelText('Lines drawing tools')).toBeTruthy();
+    expect(screen.getByLabelText('Channels drawing tools')).toBeTruthy();
+    expect(screen.getByLabelText('Gann and Fibonacci drawing tools')).toBeTruthy();
 
+    fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    expect(screen.getByLabelText('Rectangle')).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('Lines drawing tools'));
     fireEvent.click(screen.getByLabelText('Trend line'));
 
     expect(onTool).toHaveBeenCalledWith('trendLine');

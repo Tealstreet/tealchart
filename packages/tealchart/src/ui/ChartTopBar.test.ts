@@ -33,6 +33,12 @@ describe('ChartTopBar drawing toolbar', () => {
     const rectangle = document.querySelector<HTMLButtonElement>('button[aria-label="Rectangle"]');
     const trendLine = document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]');
 
+    const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+
+    expect(linesCategory).not.toBeNull();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
+    linesCategory?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     expect(document.body.textContent).toContain('Lines');
     expect(document.body.textContent).toContain('Channels');
     expect(document.body.textContent).toContain('Gann and Fibonacci');
