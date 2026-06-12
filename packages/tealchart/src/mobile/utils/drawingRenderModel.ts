@@ -707,7 +707,7 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'xabcdPattern';
+      kind: 'xabcdPattern' | 'cypherPattern';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
@@ -982,6 +982,7 @@ export type MobileUserDrawingTrianglePatternPrimitive = Extract<
 >;
 export type MobileUserDrawingAbcdPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'abcdPattern' }>;
 export type MobileUserDrawingXabcdPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'xabcdPattern' }>;
+export type MobileUserDrawingCypherPatternPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'cypherPattern' }>;
 export type MobileUserDrawingThreeDrivesPatternPrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'threeDrivesPattern' }
@@ -1806,8 +1807,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'xabcdPattern':
+    case 'cypherPattern':
       return {
-        kind: 'xabcdPattern',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,

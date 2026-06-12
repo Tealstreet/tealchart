@@ -356,6 +356,7 @@ export type {
   CreateUserDrawingFromDraftOptions,
   CrossLineDrawing,
   CurveDrawing,
+  CypherPatternDrawing,
   CyclicLinesDrawing,
   DatePriceRangeDrawing,
   DateRangeDrawing,

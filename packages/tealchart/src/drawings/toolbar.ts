@@ -155,6 +155,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'trianglePattern', icon: '△', label: 'Triangle pattern' },
   { tool: 'abcdPattern', icon: 'A', label: 'ABCD pattern' },
   { tool: 'xabcdPattern', icon: 'X', label: 'XABCD pattern' },
+  { tool: 'cypherPattern', icon: 'Cy', label: 'Cypher pattern' },
   { tool: 'threeDrivesPattern', icon: '3', label: 'Three drives pattern' },
   { tool: 'headShouldersPattern', icon: 'HS', label: 'Head and shoulders pattern' },
   { tool: 'elliottImpulseWave', icon: '123', label: 'Elliott impulse wave' },

@@ -129,6 +129,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('elliottImpulseWave')).toBe(5);
     expect(getRequiredAnchorCount('elliottTriangleWave')).toBe(5);
     expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
+    expect(getRequiredAnchorCount('cypherPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
   });
@@ -658,6 +659,23 @@ describe('user drawing types', () => {
     ).toMatchObject({
       id: 'xabcd',
       kind: 'xabcdPattern',
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({ tool: 'cypherPattern', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }),
+        {
+          id: 'cypher',
+          now: 20,
+        },
+      ),
+    ).toMatchObject({
+      id: 'cypher',
+      kind: 'cypherPattern',
       points: [anchorA, anchorB, anchorC, anchorD, anchorE],
       visible: true,
       locked: false,

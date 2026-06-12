@@ -453,6 +453,48 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('resolves cypher pattern drawings through XABCD-style geometry', () => {
+    const drawing: UserDrawing = {
+      id: 'cypher',
+      kind: 'cypherPattern',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 1_500, price: 110 },
+        { time: 2_000, price: 95 },
+        { time: 2_500, price: 105 },
+        { time: 3_000, price: 90 },
+      ],
+    };
+
+    expect(resolveUserDrawingGeometry(drawing, space)).toMatchObject({
+      kind: 'cypherPattern',
+      pattern: {
+        polyline: {
+          points: [
+            { x: 10, y: 70 },
+            { x: 60, y: 20 },
+            { x: 110, y: 95 },
+            { x: 160, y: 45 },
+            { x: 210, y: 120 },
+          ],
+        },
+        labels: [
+          { text: 'X', point: { x: 10, y: 70 } },
+          { text: 'A', point: { x: 60, y: 20 } },
+          { text: 'B', point: { x: 110, y: 95 } },
+          { text: 'C', point: { x: 160, y: 45 } },
+          { text: 'D', point: { x: 210, y: 120 } },
+        ],
+      },
+    });
+  });
+
   it('resolves three drives pattern polylines and labels from five anchors', () => {
     expect(
       resolveThreeDrivesPatternFromAnchors(

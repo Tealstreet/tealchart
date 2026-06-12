@@ -2294,6 +2294,73 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves and edits cypher pattern anchors with stable five-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'cypher',
+      kind: 'cypherPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 80 },
+        { time: 30, price: 70 },
+        { time: 40, price: 60 },
+        { time: 50, price: 50 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'cypher' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'cypher' },
+        startPoint: { x: 10, y: 10 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 15 },
+      { now: () => 20 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'cypherPattern',
+      points: [
+        { time: 15, price: 85 },
+        { time: 25, price: 75 },
+        { time: 35, price: 65 },
+        { time: 45, price: 55 },
+        { time: 55, price: 45 },
+      ],
+      updatedAt: 20,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'cypher', handle: 'center', pointIndex: 3 },
+        startPoint: { x: 40, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 45, y: 45 },
+      { now: () => 21 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'cypherPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 20, price: 80 },
+        { time: 30, price: 70 },
+        { time: 45, price: 55 },
+        { time: 50, price: 50 },
+      ],
+      updatedAt: 21,
+    });
+  });
+
   it('moves and edits three drives pattern anchors with stable five-point shape', () => {
     const drawing: UserDrawing = {
       ...base,
