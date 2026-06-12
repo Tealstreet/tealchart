@@ -1,6 +1,7 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type {
   ArcDrawing,
+  AnchoredVolumeProfileDrawing,
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
   ArrowMarkerDrawing,
@@ -2652,6 +2653,96 @@ describe('user drawing coordinates', () => {
             rect: { x: 10, y: 90, width: 20, height: 5 },
           }),
         ]),
+      },
+    });
+  });
+
+  it('resolves anchored volume profile bins from anchor through latest bar', () => {
+    const profileSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 },
+      pane: { ...space.pane, yMin: 0, yMax: 100 },
+      chartLeft: 0,
+      chartRight: 100,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      ],
+    };
+    const drawing: AnchoredVolumeProfileDrawing = {
+      id: 'anchored-profile',
+      kind: 'anchoredVolumeProfile',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: { time: 10, price: 75 },
+    };
+
+    expect(resolveUserDrawingGeometry(drawing, profileSpace)).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      volumeProfile: {
+        bounds: { x: 10, y: 40, width: 90, height: 60 },
+        maxVolume: 20,
+        totalVolume: 35,
+        guides: [
+          {
+            kind: 'pointOfControl',
+            price: 77.5,
+            volume: 20,
+            segment: { start: { x: 10, y: 42.5 }, end: { x: 100, y: 42.5 } },
+          },
+          {
+            kind: 'valueAreaHigh',
+            price: 80,
+            volume: 30,
+            segment: { start: { x: 10, y: 40 }, end: { x: 100, y: 40 } },
+          },
+          {
+            kind: 'valueAreaLow',
+            price: 55,
+            volume: 30,
+            segment: { start: { x: 10, y: 65 }, end: { x: 100, y: 65 } },
+          },
+        ],
+        bins: expect.arrayContaining([
+          expect.objectContaining({
+            priceMin: 75,
+            priceMax: 80,
+            volume: 20,
+            rect: { x: 10, y: 40, width: 90, height: 5 },
+          }),
+          expect.objectContaining({
+            priceMin: 55,
+            priceMax: 60,
+            volume: 10,
+            rect: { x: 10, y: 60, width: 45, height: 5 },
+          }),
+          expect.objectContaining({
+            priceMin: 25,
+            priceMax: 30,
+            volume: 5,
+            rect: { x: 10, y: 90, width: 22.5, height: 5 },
+          }),
+        ]),
+      },
+    });
+
+    expect(
+      resolveUserDrawingGeometry(
+        {
+          ...drawing,
+          point: { time: 120, price: 75 },
+        },
+        profileSpace,
+      ),
+    ).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      volumeProfile: {
+        bounds: { x: 100, width: 0 },
       },
     });
   });

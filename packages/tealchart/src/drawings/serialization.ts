@@ -228,6 +228,13 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: 'anchoredVwap',
         point: { ...drawing.point },
       };
+    case 'anchoredVolumeProfile':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'anchoredVolumeProfile',
+        point: { ...drawing.point },
+      };
     case 'textLabel':
     case 'note':
     case 'comment':
@@ -1105,6 +1112,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'crossLine',
+            point,
+          }
+        : null;
+    }
+    case 'anchoredVolumeProfile': {
+      const point = parseAnchor(value.point);
+      return point
+        ? {
+            ...base,
+            kind: 'anchoredVolumeProfile',
             point,
           }
         : null;

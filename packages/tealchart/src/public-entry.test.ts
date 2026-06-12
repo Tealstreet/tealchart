@@ -1,4 +1,5 @@
 import type {
+  AnchoredVolumeProfileDrawing,
   AnchoredVwapDrawing,
   ArcDrawing,
   ArrowLineDrawing,
@@ -75,6 +76,7 @@ import type {
   UserDrawingTextLabelLayout,
 } from './index';
 import type {
+  MobileUserDrawingAnchoredVolumeProfilePrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingArcPrimitive,
   MobileUserDrawingBalloonPrimitive,
@@ -168,6 +170,7 @@ import {
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
+  resolveAnchoredVolumeProfileFromAnchor,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -208,6 +211,7 @@ describe('tealchart public entries', () => {
     expect(resolveDisjointChannelFromAnchors).toBeTypeOf('function');
     expect(resolvePitchforkFromAnchors).toBeTypeOf('function');
     expect(resolvePitchfanFromAnchors).toBeTypeOf('function');
+    expect(resolveAnchoredVolumeProfileFromAnchor).toBeTypeOf('function');
     expect(resolveAnchoredVwapFromAnchor).toBeTypeOf('function');
     const nativeEntry = readFileSync(resolve(__dirname, 'index.native.ts'), 'utf8');
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
@@ -224,6 +228,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendAngleLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkerPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArrowMarkPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingAnchoredVolumeProfilePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingAnchoredVwapPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingArcPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBarsPatternPrimitive');
@@ -818,6 +823,27 @@ describe('tealchart public entries', () => {
       points: [{ x: 0, y: 5 }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const anchoredVolumeProfilePrimitive: NonNever<MobileUserDrawingAnchoredVolumeProfilePrimitive> = {
+      kind: 'anchoredVolumeProfile',
+      id: 'anchored-volume-profile',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      bounds: { x: 0, y: 0, width: 10, height: 10 },
+      bins: [{ priceMin: 1, priceMax: 2, volume: 10, rect: { x: 0, y: 0, width: 5, height: 2 } }],
+      guides: [
+        {
+          kind: 'pointOfControl',
+          price: 1.5,
+          volume: 10,
+          segment: { start: { x: 0, y: 1 }, end: { x: 10, y: 1 } },
+        },
+      ],
+      maxVolume: 10,
+      totalVolume: 10,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
@@ -860,6 +886,7 @@ describe('tealchart public entries', () => {
     expect(iconPrimitive.kind).toBe('icon');
     expect(balloonPrimitive.kind).toBe('balloon');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
+    expect(anchoredVolumeProfilePrimitive.kind).toBe('anchoredVolumeProfile');
   });
 
   it('exports usable native risk reward label position helpers', () => {
@@ -2213,5 +2240,36 @@ describe('tealchart public entries', () => {
     };
 
     expect(drawing.kind).toBe('anchoredVwap');
+  });
+
+  it('exports shared drawing anchored volume profile types and resolver', () => {
+    const drawing: AnchoredVolumeProfileDrawing = {
+      id: 'anchored-volume-profile',
+      kind: 'anchoredVolumeProfile',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      point: { time: 1, price: 10 },
+    };
+    const profile = resolveAnchoredVolumeProfileFromAnchor(drawing.point, {
+      viewport: { startTime: 0, endTime: 3, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 150,
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 11, volume: 20 },
+        { time: 2, open: 12, high: 16, low: 10, close: 14, volume: 10 },
+      ],
+    });
+
+    expect(drawing.kind).toBe('anchoredVolumeProfile');
+    expect(profile).toMatchObject({
+      bounds: { x: 50, y: 20, width: 100, height: 40 },
+      maxVolume: 20,
+      totalVolume: 30,
+    });
   });
 });

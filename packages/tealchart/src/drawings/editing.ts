@@ -238,6 +238,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'icon':
     case 'flagMark':
     case 'anchoredVwap':
+    case 'anchoredVolumeProfile':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
     case 'anchoredText':
     case 'anchoredNote':
@@ -560,6 +561,7 @@ function editDrawingHandle(
     case 'icon':
     case 'flagMark':
     case 'anchoredVwap':
+    case 'anchoredVolumeProfile':
     case 'path':
     case 'brush':
     case 'highlighter':

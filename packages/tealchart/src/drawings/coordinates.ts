@@ -727,6 +727,11 @@ export type ResolvedUserDrawingGeometry =
       vwap: DrawingScreenAnchoredVwap;
     }
   | {
+      kind: 'anchoredVolumeProfile';
+      drawing: UserDrawing;
+      volumeProfile: DrawingScreenFixedRangeVolumeProfile;
+    }
+  | {
       kind: 'fixedRangeVolumeProfile';
       drawing: UserDrawing;
       volumeProfile: DrawingScreenFixedRangeVolumeProfile;
@@ -2425,6 +2430,15 @@ export function resolveAnchoredVwapFromAnchor(
 const FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT = 12;
 const FIXED_RANGE_VOLUME_PROFILE_VALUE_AREA_RATIO = 0.7;
 
+interface ResolveVolumeProfileOptions {
+  bounds: DrawingScreenRect;
+  startTime: number;
+  endTime: number;
+  priceMin: number;
+  priceMax: number;
+  space: DrawingCoordinateSpace;
+}
+
 function resolveFixedRangeVolumeProfileGuides(
   bounds: DrawingScreenRect,
   bins: readonly DrawingScreenVolumeProfileBin[],
@@ -2508,6 +2522,17 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
   const endTime = Math.max(first.time, second.time);
   const priceMin = Math.min(first.price, second.price);
   const priceMax = Math.max(first.price, second.price);
+  return resolveVolumeProfile({ bounds, startTime, endTime, priceMin, priceMax, space });
+}
+
+function resolveVolumeProfile({
+  bounds,
+  startTime,
+  endTime,
+  priceMin,
+  priceMax,
+  space,
+}: ResolveVolumeProfileOptions): DrawingScreenFixedRangeVolumeProfile {
   const priceRange = priceMax - priceMin;
   const volumes = Array.from({ length: FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT }, () => 0);
 
@@ -2551,6 +2576,36 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
     maxVolume,
     totalVolume,
   };
+}
+
+export function resolveAnchoredVolumeProfileFromAnchor(
+  anchor: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFixedRangeVolumeProfile {
+  const anchorPoint = anchorToScreenPoint(anchor, space);
+  const profileBars = (space.bars ?? []).filter((bar) => bar.time >= anchor.time && bar.volume > 0);
+  const fallbackPriceMin = Math.min(space.pane.yMin, space.pane.yMax);
+  const fallbackPriceMax = Math.max(space.pane.yMin, space.pane.yMax);
+  const priceMin = profileBars.length > 0 ? Math.min(...profileBars.map((bar) => bar.low)) : fallbackPriceMin;
+  const priceMax = profileBars.length > 0 ? Math.max(...profileBars.map((bar) => bar.high)) : fallbackPriceMax;
+  const endTime = profileBars.length > 0 ? Math.max(...profileBars.map((bar) => bar.time)) : space.viewport.endTime;
+  const yTop = priceToDrawingY(priceMax, space);
+  const yBottom = priceToDrawingY(priceMin, space);
+  const bounds = {
+    x: Math.min(anchorPoint.x, space.chartRight),
+    y: Math.min(yTop, yBottom),
+    width: Math.max(0, space.chartRight - anchorPoint.x),
+    height: Math.abs(yBottom - yTop),
+  };
+
+  return resolveVolumeProfile({
+    bounds,
+    startTime: anchor.time,
+    endTime,
+    priceMin,
+    priceMax,
+    space,
+  });
 }
 
 export function resolveParallelChannelFromAnchors(
@@ -3343,6 +3398,12 @@ export function resolveUserDrawingGeometry(
         kind: 'anchoredVwap',
         drawing,
         vwap: resolveAnchoredVwapFromAnchor(drawing.point, space),
+      };
+    case 'anchoredVolumeProfile':
+      return {
+        kind: 'anchoredVolumeProfile',
+        drawing,
+        volumeProfile: resolveAnchoredVolumeProfileFromAnchor(drawing.point, space),
       };
     case 'fixedRangeVolumeProfile':
       return {

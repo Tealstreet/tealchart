@@ -1256,6 +1256,37 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 95, y: 50 }, profileSpace, { tolerance: 1 })).toBeNull();
   });
 
+  it('hits anchored volume profile bins, bounds, and anchor handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'anchored-volume-profile',
+      kind: 'anchoredVolumeProfile',
+      point: { time: 10, price: 75 },
+    };
+    const profileSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 22 }, profileSpace)?.drawing.id).toBe(
+      'anchored-volume-profile',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 45 }, profileSpace)?.drawing.id).toBe(
+      'anchored-volume-profile',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 95, y: 20 }, profileSpace)?.drawing.id).toBe(
+      'anchored-volume-profile',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 25 }, profileSpace)).toMatchObject({
+      handle: 'center',
+    });
+    expect(hitTestUserDrawing(drawing, { x: 95, y: 50 }, profileSpace, { tolerance: 1 })).toBeNull();
+  });
+
   it('hits text labels using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,
