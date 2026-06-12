@@ -31,10 +31,41 @@ export interface TradingViewRenderFrame extends TradingViewSymbolInfo {
   raw?: unknown;
 }
 
+export interface TradingViewCoordinatesPayload {
+  mediaSize?: TradingViewCanvasDimensions;
+  width?: number;
+  height?: number;
+}
+
+export type TradingViewRealBar =
+  | Bar
+  | readonly [time: number | string, open: number | string, high: number | string, low: number | string, close: number | string, volume?: number | string];
+
+export type TradingViewCoordinateBar = Partial<CandleCoordinates> & {
+  center: number;
+};
+
+export interface TradingViewRawRenderFrame extends Partial<TradingViewSymbolInfo> {
+  ctx?: CanvasRenderingContext2D;
+  bars?: readonly Bar[];
+  realBars?: readonly TradingViewRealBar[];
+  candleCoords?: readonly CandleCoordinates[];
+  coordinateBars?: readonly TradingViewCoordinateBar[];
+  coordinates?: TradingViewCoordinatesPayload;
+  chartWidth?: number;
+  chartHeight?: number;
+  priceToCoord?: (price: number) => number;
+  coordToPrice?: (coord: number) => number;
+  studySources?: readonly unknown[];
+  raw?: unknown;
+}
+
+export type TradingViewRenderFrameInput = TradingViewRenderFrame | TradingViewRawRenderFrame;
+
 export interface TradingViewPatchCallbacks {
-  beforeBars?: (frame: TradingViewRenderFrame) => void;
-  afterBars?: (frame: TradingViewRenderFrame) => void;
-  shouldSkipNativeBars?: (frame: TradingViewRenderFrame) => boolean;
+  beforeBars?: (frame: TradingViewRenderFrameInput) => void;
+  afterBars?: (frame: TradingViewRenderFrameInput) => void;
+  shouldSkipNativeBars?: (frame: TradingViewRenderFrameInput) => boolean;
 }
 
 export interface TradingViewPatchHandle {
