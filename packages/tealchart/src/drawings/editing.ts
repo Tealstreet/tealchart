@@ -191,6 +191,8 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'horizontalRay':
     case 'crossLine':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':
@@ -446,6 +448,8 @@ function editDrawingHandle(
     case 'verticalLine':
     case 'horizontalRay':
     case 'crossLine':
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'textLabel':

@@ -476,19 +476,19 @@ describe('user drawing editing', () => {
   it('moves arrow marks by dragging the center handle', () => {
     const drawing: UserDrawing = {
       ...base,
-      id: 'up',
-      kind: 'arrowMarkUp',
+      id: 'left',
+      kind: 'arrowMarkLeft',
       point: { time: 20, price: 60 },
     };
     const state = createUserDrawingState({
       drawings: [drawing],
-      selection: { drawingId: 'up', handle: 'center' },
+      selection: { drawingId: 'left', handle: 'center' },
     });
 
     const next = applyUserDrawingEditDrag(
       state,
       {
-        selection: { drawingId: 'up', handle: 'center' },
+        selection: { drawingId: 'left', handle: 'center' },
         startPoint: { x: 20, y: 40 },
         startDrawing: drawing,
         space,

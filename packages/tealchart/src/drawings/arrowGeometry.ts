@@ -84,7 +84,7 @@ export function resolveDrawingArrowMarker(
 
 export function resolveDrawingArrowMark(
   point: DrawingScreenPoint,
-  direction: 'up' | 'down',
+  direction: 'up' | 'down' | 'left' | 'right',
   options: {
     height?: number;
     width?: number;
@@ -94,8 +94,28 @@ export function resolveDrawingArrowMark(
   const height = options.height ?? 24;
   const halfWidth = (options.width ?? 18) / 2;
   const stemHalfWidth = (options.stemWidth ?? 7) / 2;
-  const sign = direction === 'up' ? -1 : 1;
   const tip = point;
+
+  if (direction === 'left' || direction === 'right') {
+    const sign = direction === 'left' ? 1 : -1;
+    const shoulderX = point.x + sign * height * 0.45;
+    const tailX = point.x + sign * height;
+
+    return {
+      point,
+      points: [
+        tip,
+        { x: shoulderX, y: point.y + halfWidth },
+        { x: shoulderX, y: point.y + stemHalfWidth },
+        { x: tailX, y: point.y + stemHalfWidth },
+        { x: tailX, y: point.y - stemHalfWidth },
+        { x: shoulderX, y: point.y - stemHalfWidth },
+        { x: shoulderX, y: point.y - halfWidth },
+      ],
+    };
+  }
+
+  const sign = direction === 'up' ? -1 : 1;
   const shoulderY = point.y - sign * height * 0.45;
   const tailY = point.y - sign * height;
 

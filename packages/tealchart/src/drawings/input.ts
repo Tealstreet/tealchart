@@ -323,6 +323,8 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
       return { ...base, kind: 'verticalLine', time: drawing.time };
     case 'horizontalRay':
     case 'crossLine':
+    case 'arrowMarkLeft':
+    case 'arrowMarkRight':
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'anchoredVwap':
