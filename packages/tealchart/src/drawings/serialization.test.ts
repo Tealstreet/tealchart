@@ -2669,6 +2669,37 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores fixed range volume profile drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'fixedRangeVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'volume-profile',
+      kind: 'fixedRangeVolumeProfile',
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 110 },
+      ],
+    });
+  });
+
   it('rejects forecast drawings with invalid point counts', () => {
     const baseForecastPayload = {
       id: 'forecast',

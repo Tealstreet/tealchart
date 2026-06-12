@@ -41,6 +41,7 @@ export type UserDrawingTool =
   | 'elliottTripleComboWave'
   | 'elliottTriangleWave'
   | 'anchoredVwap'
+  | 'fixedRangeVolumeProfile'
   | 'fibRetracement'
   | 'fibExtension'
   | 'trendBasedFibExtension'
@@ -396,6 +397,11 @@ export interface AnchoredVwapDrawing extends UserDrawingBase {
   point: UserDrawingAnchor;
 }
 
+export interface FixedRangeVolumeProfileDrawing extends UserDrawingBase {
+  kind: 'fixedRangeVolumeProfile';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface FibRetracementDrawing extends UserDrawingBase {
   kind: 'fibRetracement';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
@@ -719,6 +725,7 @@ export type UserDrawing =
   | ElliottTripleComboWaveDrawing
   | ElliottTriangleWaveDrawing
   | AnchoredVwapDrawing
+  | FixedRangeVolumeProfileDrawing
   | FibRetracementDrawing
   | FibExtensionDrawing
   | TrendBasedFibExtensionDrawing
@@ -917,6 +924,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'sineLine':
     case 'callout':
     case 'priceNote':
+    case 'fixedRangeVolumeProfile':
       return 2;
     case 'triangle':
     case 'curve':
@@ -1310,6 +1318,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'anchoredVwap',
         point: draft.anchors[0]!,
+      };
+    case 'fixedRangeVolumeProfile':
+      return {
+        ...base,
+        kind: 'fixedRangeVolumeProfile',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'fibRetracement':
       return {
