@@ -150,6 +150,7 @@ export interface UserDrawingStyle {
   textColor?: string;
   fontSize?: number;
   fontFamily?: string;
+  fontWeight?: UserDrawingFontWeight;
 }
 
 export interface UserDrawingBase {
@@ -890,8 +891,10 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
 
 export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
 export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
+export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
+export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
@@ -904,6 +907,12 @@ export function normalizeUserDrawingFontFamily(fontFamily: string): UserDrawingF
   return USER_DRAWING_FONT_FAMILIES.includes(fontFamily as UserDrawingFontFamily)
     ? (fontFamily as UserDrawingFontFamily)
     : 'sans-serif';
+}
+
+export function normalizeUserDrawingFontWeight(fontWeight: string): UserDrawingFontWeight {
+  return USER_DRAWING_FONT_WEIGHTS.includes(fontWeight as UserDrawingFontWeight)
+    ? (fontWeight as UserDrawingFontWeight)
+    : 'normal';
 }
 
 export function normalizeUserDrawingOpacity(opacity: number): number {
@@ -928,13 +937,23 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
   const fontSize = style.fontSize === undefined ? undefined : normalizeUserDrawingFontSize(style.fontSize);
   const fontFamily =
     style.fontFamily === undefined ? undefined : normalizeUserDrawingFontFamily(style.fontFamily);
+  const fontWeight =
+    style.fontWeight === undefined ? undefined : normalizeUserDrawingFontWeight(style.fontWeight);
   const opacity = style.opacity === undefined ? undefined : normalizeUserDrawingOpacity(style.opacity);
-  if (fontSize === style.fontSize && fontFamily === style.fontFamily && opacity === style.opacity) return style;
+  if (
+    fontSize === style.fontSize &&
+    fontFamily === style.fontFamily &&
+    fontWeight === style.fontWeight &&
+    opacity === style.opacity
+  ) {
+    return style;
+  }
 
   return {
     ...style,
     ...(fontSize === undefined ? {} : { fontSize }),
     ...(fontFamily === undefined ? {} : { fontFamily }),
+    ...(fontWeight === undefined ? {} : { fontWeight }),
     ...(opacity === undefined ? {} : { opacity }),
   };
 }

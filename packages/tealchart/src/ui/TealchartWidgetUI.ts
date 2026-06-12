@@ -553,6 +553,7 @@ export class TealchartWidgetUI {
         color: drawing.style.textColor ?? drawing.style.lineColor,
         fontSize: `${drawing.style.fontSize ?? 12}px`,
         fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
+        fontWeight: drawing.style.fontWeight === 'bold' ? '700' : '400',
         lineHeight: '18px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.28)',
         pointerEvents: 'auto',
@@ -593,6 +594,7 @@ export class TealchartWidgetUI {
       color: drawing.style.textColor ?? drawing.style.lineColor,
       fontSize: `${drawing.style.fontSize ?? 12}px`,
       fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
+      fontWeight: drawing.style.fontWeight === 'bold' ? '700' : '400',
     });
   }
 
