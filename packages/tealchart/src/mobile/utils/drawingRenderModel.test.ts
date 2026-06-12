@@ -923,9 +923,15 @@ describe('mobile user drawing render model', () => {
       kind: 'fibFan',
       id: 'fib-fan',
       rays: expect.arrayContaining([
-        { ratio: 0, start: { x: 10, y: 50 }, end: { x: 100, y: 50 } },
-        { ratio: 0.5, start: { x: 10, y: 50 }, end: { x: 100, y: 83.75 } },
-        { ratio: 1, start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 } },
+        { ratio: 0, label: '0', start: { x: 10, y: 50 }, end: { x: 100, y: 50 }, labelPoint: { x: 96, y: 46 } },
+        {
+          ratio: 0.5,
+          label: '0.5',
+          start: { x: 10, y: 50 },
+          end: { x: 100, y: 83.75 },
+          labelPoint: { x: 96, y: 79.75 },
+        },
+        { ratio: 1, label: '1', start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 }, labelPoint: { x: 96, y: 113.5 } },
       ]),
     });
   });
@@ -959,9 +965,21 @@ describe('mobile user drawing render model', () => {
       kind: 'fibSpeedResistanceFan',
       id: 'fib-speed-fan',
       rays: [
-        { ratio: 1 / 3, start: { x: 10, y: 50 }, end: { x: 100, y: 72.5 } },
-        { ratio: 2 / 3, start: { x: 10, y: 50 }, end: { x: 100, y: 95 } },
-        { ratio: 1, start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 } },
+        {
+          ratio: 1 / 3,
+          label: '0.333',
+          start: { x: 10, y: 50 },
+          end: { x: 100, y: 72.5 },
+          labelPoint: { x: 96, y: 68.5 },
+        },
+        {
+          ratio: 2 / 3,
+          label: '0.667',
+          start: { x: 10, y: 50 },
+          end: { x: 100, y: 95 },
+          labelPoint: { x: 96, y: 91 },
+        },
+        { ratio: 1, label: '1', start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 }, labelPoint: { x: 96, y: 113.5 } },
       ],
     });
   });
@@ -1195,8 +1213,14 @@ describe('mobile user drawing render model', () => {
       kind: 'gannFan',
       id: 'gann-fan',
       rays: expect.arrayContaining([
-        { ratio: 0.125, start: { x: 10, y: 50 }, end: { x: 100, y: 58.4375 } },
-        { ratio: 1, start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 } },
+        {
+          ratio: 0.125,
+          label: '1/8',
+          start: { x: 10, y: 50 },
+          end: { x: 100, y: 58.4375 },
+          labelPoint: { x: 96, y: 54.4375 },
+        },
+        { ratio: 1, label: '1/1', start: { x: 10, y: 50 }, end: { x: 100, y: 117.5 }, labelPoint: { x: 96, y: 113.5 } },
       ]),
     });
   });
