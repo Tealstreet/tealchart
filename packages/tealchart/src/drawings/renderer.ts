@@ -5,16 +5,20 @@ import type {
   UserDrawing,
   UserDrawingLineStyle,
   UserDrawingPathFamilyKind,
+  UserDrawingState,
   UserDrawingTextAnnotation,
   UserDrawingTextAnnotationKind,
 } from './types';
-import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
+import { resolveUserDrawingGeometry } from './coordinates';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
-import { resolveUserDrawingGeometry } from './coordinates';
-import { resolveUserDrawingBalloonLayout, resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
+import {
+  resolveUserDrawingBalloonLayout,
+  resolveUserDrawingTextLabelLayout,
+  splitUserDrawingTextLines,
+} from './textLayout';
 import { normalizeUserDrawingFontFamily, normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
 
 export interface UserDrawingRenderOptions {
@@ -174,10 +178,7 @@ function renderDoubleCurveGeometry(
   ctx.stroke();
 }
 
-function renderArcGeometry(
-  ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arc' }>,
-): void {
+function renderArcGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arc' }>): void {
   applyStrokeStyle(ctx, geometry.drawing);
   ctx.beginPath();
   if (geometry.arc.radius <= 0) {
@@ -231,7 +232,12 @@ function renderFixedRangeVolumeProfileGeometry(
 
   if (drawing.style.lineVisible !== false) {
     applyStrokeStyle(ctx, drawing);
-    ctx.strokeRect(volumeProfile.bounds.x, volumeProfile.bounds.y, volumeProfile.bounds.width, volumeProfile.bounds.height);
+    ctx.strokeRect(
+      volumeProfile.bounds.x,
+      volumeProfile.bounds.y,
+      volumeProfile.bounds.width,
+      volumeProfile.bounds.height,
+    );
     for (const guide of volumeProfile.guides) {
       ctx.setLineDash(guide.kind === 'pointOfControl' ? [] : [4, 3]);
       ctx.beginPath();
@@ -490,6 +496,16 @@ function renderFibTimeZoneGeometry(
     ctx.lineTo(level.segment.end.x, level.segment.end.y);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const level of levels) {
+    ctx.fillText(level.label, level.labelPoint.x, level.labelPoint.y);
+  }
 }
 
 function renderTimeCyclesGeometry(
@@ -513,6 +529,16 @@ function renderTimeCyclesGeometry(
     }
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const cycle of geometry.timeCycles.cycles) {
+    ctx.fillText(cycle.label, cycle.labelPoint.x, cycle.labelPoint.y);
+  }
 }
 
 function renderSineLineGeometry(
@@ -741,7 +767,10 @@ function renderRectangleGeometry(
   }
 }
 
-function resolveUserDrawingImage(src: string | undefined, options: Required<UserDrawingRenderOptions>): CanvasImageSource | null {
+function resolveUserDrawingImage(
+  src: string | undefined,
+  options: Required<UserDrawingRenderOptions>,
+): CanvasImageSource | null {
   if (!src || typeof Image === 'undefined') return null;
 
   const cached = userDrawingImageCache.get(src);
@@ -807,10 +836,7 @@ function renderImageGeometry(
 ): void {
   const { rect, drawing } = geometry;
   const drawImage = ctx.drawImage?.bind(ctx);
-  const image =
-    drawImage && drawing.kind === 'image'
-      ? resolveUserDrawingImage(drawing.src, options)
-      : null;
+  const image = drawImage && drawing.kind === 'image' ? resolveUserDrawingImage(drawing.src, options) : null;
 
   if (image && drawImage) {
     drawImage(image, rect.x, rect.y, rect.width, rect.height);
@@ -868,7 +894,13 @@ function renderFibSpeedResistanceArcsGeometry(
   applyStrokeStyle(ctx, geometry.drawing);
   ctx.beginPath();
   for (const arc of geometry.fibSpeedResistanceArcs.arcs) {
-    ctx.arc(geometry.fibSpeedResistanceArcs.center.x, geometry.fibSpeedResistanceArcs.center.y, arc.radius, arc.startAngle, arc.endAngle);
+    ctx.arc(
+      geometry.fibSpeedResistanceArcs.center.x,
+      geometry.fibSpeedResistanceArcs.center.y,
+      arc.radius,
+      arc.startAngle,
+      arc.endAngle,
+    );
   }
   ctx.stroke();
 }
@@ -1097,7 +1129,10 @@ function renderRiskRewardPositionGeometry(
 
 function renderFibLevelGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibRetracement' | 'fibExtension' | 'trendBasedFibExtension' }>,
+  geometry: Extract<
+    ResolvedUserDrawingGeometry,
+    { kind: 'fibRetracement' | 'fibExtension' | 'trendBasedFibExtension' }
+  >,
 ): void {
   const { drawing, fib } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);

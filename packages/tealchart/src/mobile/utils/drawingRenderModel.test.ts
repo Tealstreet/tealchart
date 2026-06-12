@@ -397,12 +397,14 @@ describe('mobile user drawing render model', () => {
       style,
     });
     if (!primitive || primitive.kind !== 'trendAngle') throw new Error('expected trend angle primitive');
-    expect(resolveMobileUserDrawingTrendAngleLabelPosition(primitive, { x: 0, y: -10, width: 42, height: 14 })).toEqual({
-      fontSize: 12,
-      fontFamily: 'sans-serif',
-      x: 29,
-      y: 17,
-    });
+    expect(resolveMobileUserDrawingTrendAngleLabelPosition(primitive, { x: 0, y: -10, width: 42, height: 14 })).toEqual(
+      {
+        fontSize: 12,
+        fontFamily: 'sans-serif',
+        x: 29,
+        y: 17,
+      },
+    );
   });
 
   it('returns Skia-ready horizontal ray line primitives', () => {
@@ -1379,8 +1381,24 @@ describe('mobile user drawing render model', () => {
       kind: 'fibTimeZone',
       id: 'fib-time-zone',
       levels: expect.arrayContaining([
-        { ratio: 0, time: 10, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 100 } },
-        { ratio: 1, time: 20, x: 20, start: { x: 20, y: 0 }, end: { x: 20, y: 100 } },
+        {
+          ratio: 0,
+          label: '0',
+          time: 10,
+          x: 10,
+          start: { x: 10, y: 0 },
+          end: { x: 10, y: 100 },
+          labelPoint: { x: 10, y: 96 },
+        },
+        {
+          ratio: 1,
+          label: '1',
+          time: 20,
+          x: 20,
+          start: { x: 20, y: 0 },
+          end: { x: 20, y: 100 },
+          labelPoint: { x: 20, y: 96 },
+        },
       ]),
     });
   });
@@ -1415,8 +1433,24 @@ describe('mobile user drawing render model', () => {
       kind: 'trendBasedFibTime',
       id: 'trend-fib-time',
       levels: expect.arrayContaining([
-        { ratio: 0, time: 30, x: 30, start: { x: 30, y: 0 }, end: { x: 30, y: 100 } },
-        { ratio: 1, time: 40, x: 40, start: { x: 40, y: 0 }, end: { x: 40, y: 100 } },
+        {
+          ratio: 0,
+          label: '0',
+          time: 30,
+          x: 30,
+          start: { x: 30, y: 0 },
+          end: { x: 30, y: 100 },
+          labelPoint: { x: 30, y: 96 },
+        },
+        {
+          ratio: 1,
+          label: '1',
+          time: 40,
+          x: 40,
+          start: { x: 40, y: 0 },
+          end: { x: 40, y: 100 },
+          labelPoint: { x: 40, y: 96 },
+        },
       ]),
     });
   });
@@ -1450,9 +1484,33 @@ describe('mobile user drawing render model', () => {
       kind: 'cyclicLines',
       id: 'cyclic-lines',
       levels: expect.arrayContaining([
-        { ratio: 0, time: 10, x: 10, start: { x: 10, y: 0 }, end: { x: 10, y: 100 } },
-        { ratio: 1, time: 20, x: 20, start: { x: 20, y: 0 }, end: { x: 20, y: 100 } },
-        { ratio: 2, time: 30, x: 30, start: { x: 30, y: 0 }, end: { x: 30, y: 100 } },
+        {
+          ratio: 0,
+          label: '0',
+          time: 10,
+          x: 10,
+          start: { x: 10, y: 0 },
+          end: { x: 10, y: 100 },
+          labelPoint: { x: 10, y: 96 },
+        },
+        {
+          ratio: 1,
+          label: '1',
+          time: 20,
+          x: 20,
+          start: { x: 20, y: 0 },
+          end: { x: 20, y: 100 },
+          labelPoint: { x: 20, y: 96 },
+        },
+        {
+          ratio: 2,
+          label: '2',
+          time: 30,
+          x: 30,
+          start: { x: 30, y: 0 },
+          end: { x: 30, y: 100 },
+          labelPoint: { x: 30, y: 96 },
+        },
       ]),
     });
   });
@@ -1493,6 +1551,8 @@ describe('mobile user drawing render model', () => {
           startBoundary: { start: { x: 10, y: 0 }, end: { x: 10, y: 100 } },
           endBoundary: { start: { x: 20, y: 0 }, end: { x: 20, y: 100 } },
           points: expect.arrayContaining([{ x: 15, y: 20 }]),
+          label: '0',
+          labelPoint: { x: 15, y: 96 },
         }),
       ]),
     });
@@ -1567,7 +1627,9 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[regressionSpace.pane.id, regressionSpace]]))[0]).toMatchObject({
+    expect(
+      resolveMobileUserDrawingRenderModel(state, new Map([[regressionSpace.pane.id, regressionSpace]]))[0],
+    ).toMatchObject({
       kind: 'regressionTrend',
       id: 'regression',
       points: [
@@ -1684,13 +1746,23 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, {
-      ...space,
-      bars: [
-        { time: 50, open: 50, high: 54, low: 48, close: 51, volume: 20 },
-        { time: 90, open: 56, high: 60, low: 54, close: 57, volume: 10 },
-      ],
-    }]]))[0]).toMatchObject({
+    expect(
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 50, open: 50, high: 54, low: 48, close: 51, volume: 20 },
+                { time: 90, open: 56, high: 60, low: 54, close: 57, volume: 10 },
+              ],
+            },
+          ],
+        ]),
+      )[0],
+    ).toMatchObject({
       kind: 'anchoredVwap',
       id: 'vwap',
       anchor: { x: 50, y: 50 },
@@ -1727,17 +1799,22 @@ describe('mobile user drawing render model', () => {
     };
 
     expect(
-      resolveMobileUserDrawingRenderModel(state, new Map([[
-        space.pane.id,
-        {
-          ...space,
-          bars: [
-            { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
-            { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
-            { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+                { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+                { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+              ],
+            },
           ],
-        },
-      ]]))[0],
+        ]),
+      )[0],
     ).toMatchObject({
       kind: 'fixedRangeVolumeProfile',
       id: 'volume-profile',
@@ -2049,7 +2126,9 @@ describe('mobile user drawing render model', () => {
       ],
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+    expect(
+      resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0],
+    ).toMatchObject({
       kind: 'infoLine',
       id: 'info',
       clip,
@@ -2199,7 +2278,9 @@ describe('mobile user drawing render model', () => {
       ],
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+    expect(
+      resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0],
+    ).toMatchObject({
       kind: 'dateRange',
       id: 'date-range',
       clip,
@@ -2245,7 +2326,9 @@ describe('mobile user drawing render model', () => {
       ],
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+    expect(
+      resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0],
+    ).toMatchObject({
       kind: 'datePriceRange',
       id: 'date-price-range',
       clip,
@@ -3385,12 +3468,14 @@ describe('mobile user drawing render model', () => {
     const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
     if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
 
-    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
-      fontSize: 14,
-      fontFamily: 'monospace',
-      x: 8,
-      y: 23,
-    });
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual(
+      {
+        fontSize: 14,
+        fontFamily: 'monospace',
+        x: 8,
+        y: 23,
+      },
+    );
   });
 
   it('falls back to normalized font size when measured price range label height is unavailable', () => {
