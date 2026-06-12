@@ -35,7 +35,7 @@ export type UserDrawingToolbarAction =
   | 'sendToBack'
   | 'cancelDraft'
   | 'clearAll';
-export type UserDrawingStyleToolbarAction = 'hideSelected' | 'lockSelected' | 'unlockSelected';
+export type UserDrawingStyleToolbarAction = 'hideSelected' | 'showSelected' | 'lockSelected' | 'unlockSelected';
 
 export interface UserDrawingToolDescriptor {
   tool: UserDrawingTool;
@@ -436,6 +436,7 @@ export const USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS: readonly UserDrawingStyleTog
 
 export const USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingStyleToolbarActionDescriptor[] = [
   { action: 'hideSelected', icon: '◌', label: 'Hide selected drawing' },
+  { action: 'showSelected', icon: '●', label: 'Show selected drawing' },
   { action: 'lockSelected', icon: '🔒', label: 'Lock selected drawing' },
   { action: 'unlockSelected', icon: '🔓', label: 'Unlock selected drawing' },
 ] as const;
@@ -562,7 +563,12 @@ export function resolveUserDrawingStyleToolbarAction(
       : { enabled: false };
   }
 
-  if (action === 'hideSelected') return { enabled: true, visible: false };
+  if (action === 'hideSelected') {
+    return selectedDrawing.visible ? { enabled: true, visible: false } : { enabled: false };
+  }
+  if (action === 'showSelected') {
+    return !selectedDrawing.visible ? { enabled: true, visible: true } : { enabled: false };
+  }
   if (action === 'lockSelected') return { enabled: true, locked: true };
   return { enabled: false };
 }

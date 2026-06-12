@@ -831,6 +831,7 @@ describe('user drawing toolbar descriptors', () => {
     ]);
     expect(USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
       'hideSelected',
+      'showSelected',
       'lockSelected',
       'unlockSelected',
     ]);
@@ -860,6 +861,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingStyleToolbarEnabled(selected)).toBe(true);
     expect(isUserDrawingStyleToolbarEnabled(locked)).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'hideSelected')).toBe(false);
+    expect(isUserDrawingStyleToolbarActionEnabled(locked, 'showSelected')).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'lockSelected')).toBe(false);
     expect(isUserDrawingStyleToolbarActionEnabled(locked, 'unlockSelected')).toBe(true);
   });
@@ -1281,9 +1283,13 @@ describe('user drawing toolbar descriptors', () => {
       ],
     };
     const locked = { ...selected, drawings: [{ ...selected.drawings[0]!, locked: true }] };
+    const hidden = { ...selected, drawings: [{ ...selected.drawings[0]!, visible: false }] };
 
     expect(resolveUserDrawingStyleToolbarAction(state, 'hideSelected')).toEqual({ enabled: false });
     expect(resolveUserDrawingStyleToolbarAction(selected, 'hideSelected')).toEqual({ enabled: true, visible: false });
+    expect(resolveUserDrawingStyleToolbarAction(selected, 'showSelected')).toEqual({ enabled: false });
+    expect(resolveUserDrawingStyleToolbarAction(hidden, 'hideSelected')).toEqual({ enabled: false });
+    expect(resolveUserDrawingStyleToolbarAction(hidden, 'showSelected')).toEqual({ enabled: true, visible: true });
     expect(resolveUserDrawingStyleToolbarAction(selected, 'lockSelected')).toEqual({ enabled: true, locked: true });
     expect(resolveUserDrawingStyleToolbarAction(selected, 'unlockSelected')).toEqual({ enabled: false });
     expect(resolveUserDrawingStyleToolbarAction(locked, 'unlockSelected')).toEqual({
