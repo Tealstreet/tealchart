@@ -1164,6 +1164,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Native utilities export the mobile single-cell wrapper for host property
   panels and table editors.
 
+## Shipped: Table Dimension Update APIs
+
+- Shared drawing state can resize table row and column dimensions while
+  preserving overlapping cell values and filling new cells with blanks.
+- Web widget and mobile Skia handles expose matching table dimension update
+  methods for host table editors.
+- Native utilities export the mobile dimension wrapper alongside existing
+  full-matrix and single-cell table update helpers.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

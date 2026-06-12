@@ -189,6 +189,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
+  setUserDrawingTableDimensions,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
   splitUserDrawingTextLines,
@@ -220,6 +221,7 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingImageSource).toBeTypeOf('function');
     expect(setUserDrawingTableCell).toBeTypeOf('function');
     expect(setUserDrawingTableCells).toBeTypeOf('function');
+    expect(setUserDrawingTableDimensions).toBeTypeOf('function');
     expect(setUserDrawingTextContent).toBeTypeOf('function');
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
@@ -238,6 +240,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('setMobileUserDrawingImageSource');
     expect(nativeEntry).toContain('setMobileUserDrawingTableCell');
     expect(nativeEntry).toContain('setMobileUserDrawingTableCells');
+    expect(nativeEntry).toContain('setMobileUserDrawingTableDimensions');
     expect(nativeEntry).toContain('setMobileUserDrawingTextContent');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
@@ -1263,6 +1266,12 @@ describe('tealchart public entries', () => {
 
     expect(setUserDrawingTableCells(state, cells).drawings[0]).toMatchObject({ cells: [['Metric', '101.25']] });
     expect(setUserDrawingTableCell(state, 0, 1, cell).drawings[0]).toMatchObject({ cells: [['Metric', '']] });
+    expect(setUserDrawingTableDimensions(state, 2, 2).drawings[0]).toMatchObject({
+      cells: [
+        ['Metric', 'Value'],
+        ['', ''],
+      ],
+    });
   });
 
   it('exports shared drawing info line helpers', () => {
