@@ -2594,7 +2594,7 @@ export function resolveAnchoredVolumeProfileFromAnchor(
   const bounds = {
     x: Math.min(anchorPoint.x, space.chartRight),
     y: Math.min(yTop, yBottom),
-    width: Math.abs(space.chartRight - anchorPoint.x),
+    width: Math.max(0, space.chartRight - anchorPoint.x),
     height: Math.abs(yBottom - yTop),
   };
 

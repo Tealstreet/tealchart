@@ -2730,6 +2730,21 @@ describe('user drawing coordinates', () => {
         ]),
       },
     });
+
+    expect(
+      resolveUserDrawingGeometry(
+        {
+          ...drawing,
+          point: { time: 120, price: 75 },
+        },
+        profileSpace,
+      ),
+    ).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      volumeProfile: {
+        bounds: { x: 100, width: 0 },
+      },
+    });
   });
 
   it('fits regression trend baselines to bar closes in the selected time range', () => {
