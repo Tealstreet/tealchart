@@ -1176,3 +1176,32 @@ export function setUserDrawingTableCell(
     updatedAt: options.now?.() ?? Date.now(),
   });
 }
+
+export function setUserDrawingTableDimensions(
+  state: UserDrawingState,
+  rows: number,
+  columns: number,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table') return state;
+  const table = target.drawing;
+
+  const rowCount = Math.trunc(rows);
+  const columnCount = Math.trunc(columns);
+  if (rowCount < 1 || columnCount < 1 || !Number.isFinite(rowCount) || !Number.isFinite(columnCount)) {
+    return state;
+  }
+
+  const resized = Array.from({ length: rowCount }, (_, rowIndex) =>
+    Array.from({ length: columnCount }, (_, columnIndex) => table.cells[rowIndex]?.[columnIndex] ?? ''),
+  );
+  const nextCells = normalizeUserDrawingTableCells(resized);
+  if (areUserDrawingTableCellsEqual(table.cells, nextCells)) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...table,
+    cells: nextCells,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}

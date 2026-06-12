@@ -14,6 +14,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
+  setUserDrawingTableDimensions,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
   setUserDrawingLocked,
@@ -93,4 +94,13 @@ export function setMobileUserDrawingTableCell(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingTableCell(state, row, column, value, options);
+}
+
+export function setMobileUserDrawingTableDimensions(
+  state: UserDrawingState,
+  rows: number,
+  columns: number,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return setUserDrawingTableDimensions(state, rows, columns, options);
 }

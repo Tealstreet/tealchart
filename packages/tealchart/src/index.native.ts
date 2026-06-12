@@ -160,6 +160,7 @@ export {
   setMobileUserDrawingLocked,
   setMobileUserDrawingTableCell,
   setMobileUserDrawingTableCells,
+  setMobileUserDrawingTableDimensions,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,

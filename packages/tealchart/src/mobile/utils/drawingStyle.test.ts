@@ -9,6 +9,7 @@ import {
   setMobileUserDrawingLocked,
   setMobileUserDrawingTableCell,
   setMobileUserDrawingTableCells,
+  setMobileUserDrawingTableDimensions,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
@@ -226,8 +227,16 @@ describe('mobile drawing style helpers', () => {
       cells: [['Metric', '101.25']],
       updatedAt: 71,
     });
+    expect(setMobileUserDrawingTableDimensions(tableState, 2, 3, { now: () => 72 }).drawings[0]).toMatchObject({
+      cells: [
+        ['Metric', 'Value', ''],
+        ['', '', ''],
+      ],
+      updatedAt: 72,
+    });
     expect(setMobileUserDrawingTableCells(state, [['Ignored']])).toBe(state);
     expect(setMobileUserDrawingTableCell(state, 0, 0, 'Ignored')).toBe(state);
+    expect(setMobileUserDrawingTableDimensions(state, 2, 2)).toBe(state);
   });
 
   it('requires explicit opt-in for locked drawing property changes', () => {

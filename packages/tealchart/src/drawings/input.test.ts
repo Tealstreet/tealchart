@@ -26,6 +26,7 @@ import {
   setUserDrawingLocked,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
+  setUserDrawingTableDimensions,
   setUserDrawingText,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
@@ -1826,6 +1827,53 @@ describe('user drawing input controller', () => {
     expect(setUserDrawingTableCell(next, 0, Number.NaN, 'ignored')).toBe(next);
   });
 
+  it('resizes table drawing dimensions while preserving overlapping cells', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          point: anchorA,
+          textAlign: 'left',
+          cells: [
+            ['Metric', 'Value'],
+            ['Price', '101.25'],
+          ],
+        },
+      ],
+    });
+
+    const expanded = setUserDrawingTableDimensions(state, 3, 3, { now: () => 32 });
+
+    expect(expanded.selection).toEqual({ drawingId: 'table' });
+    expect(expanded.drawings[0]).toMatchObject({
+      id: 'table',
+      kind: 'table',
+      updatedAt: 32,
+      cells: [
+        ['Metric', 'Value', ''],
+        ['Price', '101.25', ''],
+        ['', '', ''],
+      ],
+    });
+    expect(setUserDrawingTableDimensions(expanded, 3, 3)).toBe(expanded);
+
+    expect(setUserDrawingTableDimensions(expanded, 1, 1, { now: () => 33 }).drawings[0]).toMatchObject({
+      updatedAt: 33,
+      cells: [['Metric']],
+    });
+    expect(setUserDrawingTableDimensions(expanded, 0, 2)).toBe(expanded);
+    expect(setUserDrawingTableDimensions(expanded, 2, -1)).toBe(expanded);
+    expect(setUserDrawingTableDimensions(expanded, Number.NaN, 2)).toBe(expanded);
+  });
+
   it('ignores table cell updates for non-table and locked drawings without opt-in', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'line' },
@@ -1859,8 +1907,10 @@ describe('user drawing input controller', () => {
 
     expect(setUserDrawingTableCells(state, [['Ignored']])).toBe(state);
     expect(setUserDrawingTableCell(state, 0, 0, 'Ignored')).toBe(state);
+    expect(setUserDrawingTableDimensions(state, 2, 2)).toBe(state);
     expect(setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table' })).toBe(state);
     expect(setUserDrawingTableCell(state, 0, 0, 'Updated', { drawingId: 'table' })).toBe(state);
+    expect(setUserDrawingTableDimensions(state, 2, 2, { drawingId: 'table' })).toBe(state);
     expect(
       setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table', includeLocked: true }).drawings[1],
     ).toMatchObject({
@@ -1870,6 +1920,14 @@ describe('user drawing input controller', () => {
       setUserDrawingTableCell(state, 0, 1, null, { drawingId: 'table', includeLocked: true }).drawings[1],
     ).toMatchObject({
       cells: [['Metric', '']],
+    });
+    expect(
+      setUserDrawingTableDimensions(state, 2, 2, { drawingId: 'table', includeLocked: true }).drawings[1],
+    ).toMatchObject({
+      cells: [
+        ['Metric', 'Value'],
+        ['', ''],
+      ],
     });
   });
 
