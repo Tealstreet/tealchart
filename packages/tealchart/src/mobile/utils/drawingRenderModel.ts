@@ -510,8 +510,10 @@ export type MobileUserDrawingPrimitive =
       rect: { x: number; y: number; width: number; height: number };
       levels: readonly {
         ratio: number;
+        label: string;
         horizontal: { start: DrawingScreenPoint; end: DrawingScreenPoint };
         vertical: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+        labelPoint: DrawingScreenPoint;
       }[];
       angles: readonly {
         start: DrawingScreenPoint;
@@ -1767,8 +1769,10 @@ function primitiveFromGeometry(
         rect: geometry.gannBox.rect,
         levels: geometry.gannBox.levels.map((level) => ({
           ratio: level.ratio,
+          label: level.label,
           horizontal: level.horizontal,
           vertical: level.vertical,
+          labelPoint: level.labelPoint,
         })),
         angles: geometry.gannBox.angles.map((angle) => ({
           start: angle.start,

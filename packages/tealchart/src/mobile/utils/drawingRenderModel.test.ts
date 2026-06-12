@@ -1301,8 +1301,10 @@ describe('mobile user drawing render model', () => {
       levels: expect.arrayContaining([
         expect.objectContaining({
           ratio: 0.5,
+          label: '0.5',
           horizontal: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
           vertical: { start: { x: 50, y: 20 }, end: { x: 50, y: 80 } },
+          labelPoint: { x: 14, y: 46 },
         }),
       ]),
       angles: expect.arrayContaining([
@@ -1344,8 +1346,10 @@ describe('mobile user drawing render model', () => {
       levels: expect.arrayContaining([
         expect.objectContaining({
           ratio: 0.5,
+          label: '0.5',
           horizontal: { start: { x: 10, y: 50 }, end: { x: 70, y: 50 } },
           vertical: { start: { x: 40, y: 20 }, end: { x: 40, y: 80 } },
+          labelPoint: { x: 14, y: 46 },
         }),
       ]),
     });

@@ -1611,6 +1611,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:50,80');
     expect(ctx.calls).toContain('lineTo:90,80');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0.5:14,46:#111:left:1:12px sans-serif');
   });
 
   it('renders gann squares as filled square grid and angle boxes', () => {
@@ -1633,6 +1634,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:40,20');
     expect(ctx.calls).toContain('lineTo:40,80');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0.5:14,46:#111:left:1:12px sans-serif');
   });
 
   it('renders fib channels as filled Fibonacci level channels', () => {

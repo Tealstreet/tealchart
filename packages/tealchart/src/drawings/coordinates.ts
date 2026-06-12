@@ -250,8 +250,10 @@ export interface DrawingScreenGannFan {
 
 export interface DrawingScreenGannBoxLevel {
   ratio: number;
+  label: string;
   horizontal: DrawingScreenSegment;
   vertical: DrawingScreenSegment;
+  labelPoint: DrawingScreenPoint;
 }
 
 export interface DrawingScreenGannBox {
@@ -2019,8 +2021,10 @@ function resolveGannBoxFromRect(rect: DrawingScreenRect): DrawingScreenGannBox {
     const y = top + rect.height * ratio;
     return {
       ratio,
+      label: formatFibRetracementRatio(ratio),
       horizontal: { start: { x: left, y }, end: { x: right, y } },
       vertical: { start: { x, y: top }, end: { x, y: bottom } },
+      labelPoint: { x: left + 4, y: y - 4 },
     };
   });
 
