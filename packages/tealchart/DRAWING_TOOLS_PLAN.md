@@ -1218,6 +1218,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Expanded Text Font Size Presets
+
+- Shared text style normalization now supports a wider cross-platform font-size
+  preset set from compact labels through larger annotation text.
+- Web and mobile top bars expose the same expanded font-size descriptors, and
+  Canvas/Skia render paths consume the shared normalized values.
+
 ## Shipped: Trend Line Extend Controls
 
 - Shared drawing state exposes normalized trend-line extension choices for
