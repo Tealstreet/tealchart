@@ -200,6 +200,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'priceNote', icon: '$', label: 'Price note' },
   { tool: 'pin', icon: 'P', label: 'Pin' },
   { tool: 'icon', icon: '*', label: 'Icon' },
+  { tool: 'flagMark', icon: '⚑', label: 'Flag mark' },
   { tool: 'balloon', icon: 'B', label: 'Balloon' },
   { tool: 'signpost', icon: 'S', label: 'Signpost' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
@@ -361,6 +362,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'arrowMarkRight' ||
     drawing.kind === 'arrowMarkUp' ||
     drawing.kind === 'arrowMarkDown' ||
+    drawing.kind === 'flagMark' ||
     drawing.kind === 'rectangle' ||
     drawing.kind === 'circle' ||
     drawing.kind === 'ellipse' ||

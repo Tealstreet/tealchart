@@ -66,6 +66,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('comment')).toBe(1);
     expect(getRequiredAnchorCount('pin')).toBe(1);
     expect(getRequiredAnchorCount('icon')).toBe(1);
+    expect(getRequiredAnchorCount('flagMark')).toBe(1);
     expect(getRequiredAnchorCount('balloon')).toBe(1);
     expect(getRequiredAnchorCount('signpost')).toBe(1);
     expect(getRequiredAnchorCount('textLabel')).toBe(1);
@@ -866,6 +867,10 @@ describe('user drawing types', () => {
       kind: 'icon',
       point: anchorA,
       iconName: 'star',
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'flagMark', anchors: [anchorA] }), { id: 'flag' })).toMatchObject({
+      kind: 'flagMark',
+      point: anchorA,
     });
     expect(
       createUserDrawingFromDraft(
