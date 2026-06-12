@@ -1902,6 +1902,37 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'sector') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const path = Skia.Path.Make();
+            const [firstPoint, ...remainingPoints] = primitive.points;
+            if (!firstPoint) return null;
+            path.moveTo(firstPoint.x, firstPoint.y);
+            for (const point of remainingPoints) {
+              path.lineTo(point.x, point.y);
+            }
+            path.close();
+
+            return (
+              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <SkiaPath path={path} color={primitive.style.fillColor} style="fill" />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={path}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'trendAngle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);

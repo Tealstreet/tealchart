@@ -274,6 +274,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'longPosition':
     case 'shortPosition':
     case 'projection':
+    case 'sector':
     case 'elliottCorrectiveWave':
     case 'elliottDoubleComboWave':
       return {

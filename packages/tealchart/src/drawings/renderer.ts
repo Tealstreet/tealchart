@@ -669,6 +669,38 @@ function renderProjectionGeometry(
   ctx.fillText(projection.changeLabel, projection.labelPoint.x, projection.labelPoint.y);
 }
 
+function renderSectorGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'sector' }>): void {
+  const { drawing, sector } = geometry;
+
+  if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
+    ctx.beginPath();
+    ctx.moveTo(sector.origin.x, sector.origin.y);
+    ctx.lineTo(sector.future.x, sector.future.y);
+    if (sector.radius > 0) {
+      ctx.arc(sector.origin.x, sector.origin.y, sector.radius, sector.startAngle, sector.endAngle, sector.counterclockwise);
+    } else {
+      ctx.lineTo(sector.target.x, sector.target.y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = drawing.style.fillColor;
+    ctx.fill();
+  }
+
+  if (drawing.style.lineVisible === false) return;
+
+  applyStrokeStyle(ctx, drawing);
+  ctx.beginPath();
+  ctx.moveTo(sector.boundaries[0].start.x, sector.boundaries[0].start.y);
+  ctx.lineTo(sector.boundaries[0].end.x, sector.boundaries[0].end.y);
+  ctx.moveTo(sector.boundaries[1].start.x, sector.boundaries[1].start.y);
+  ctx.lineTo(sector.boundaries[1].end.x, sector.boundaries[1].end.y);
+  if (sector.radius > 0) {
+    ctx.moveTo(sector.future.x, sector.future.y);
+    ctx.arc(sector.origin.x, sector.origin.y, sector.radius, sector.startAngle, sector.endAngle, sector.counterclockwise);
+  }
+  ctx.stroke();
+}
+
 function renderPatternGeometry(
   ctx: CanvasContext,
   geometry: Extract<
@@ -1503,6 +1535,9 @@ export function renderUserDrawing(
         break;
       case 'projection':
         renderProjectionGeometry(ctx, geometry);
+        break;
+      case 'sector':
+        renderSectorGeometry(ctx, geometry);
         break;
       case 'trianglePattern':
         renderTrianglePatternGeometry(ctx, geometry);

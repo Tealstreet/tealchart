@@ -682,6 +682,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   so web Canvas and mobile Skia render matching `N bars, duration` change
   labels.
 
+## Shipped: Sector Tool
+
+- Shared drawing state supports the three-anchor `sector` forecasting tool and
+  persists it through layout save/load.
+- Web Canvas and mobile Skia render matching filled sector wedges from shared
+  origin, future-time, and projected-price geometry.
+- Selection, fill hit testing, whole-drawing moves, and point-index editing use
+  shared drawing behavior on both platforms.
+
 ## Shipped: Info Line Bar Count Labels
 
 - Info-line geometry resolves shared measurement metrics with loaded chart bars.

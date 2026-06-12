@@ -156,6 +156,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'polyline':
     case 'curve':
     case 'arc':
+    case 'sector':
     case 'elliottCorrectiveWave':
     case 'elliottDoubleComboWave':
       {
@@ -195,6 +196,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'parallelChannel':
     case 'flatTopBottom':
     case 'projection':
+    case 'sector':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
@@ -396,6 +398,7 @@ function editDrawingHandle(
       drawing.kind === 'longPosition' ||
       drawing.kind === 'shortPosition' ||
       drawing.kind === 'projection' ||
+      drawing.kind === 'sector' ||
       drawing.kind === 'elliottCorrectiveWave' ||
       drawing.kind === 'elliottDoubleComboWave' ||
       drawing.kind === 'abcdPattern' ||
@@ -581,6 +584,7 @@ function editDrawingHandle(
     case 'trianglePattern':
     case 'regressionTrend':
     case 'projection':
+    case 'sector':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':

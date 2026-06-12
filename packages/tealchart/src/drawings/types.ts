@@ -28,6 +28,7 @@ export type UserDrawingTool =
   | 'shortPosition'
   | 'forecast'
   | 'projection'
+  | 'sector'
   | 'barsPattern'
   | 'trianglePattern'
   | 'abcdPattern'
@@ -295,6 +296,11 @@ export interface ForecastDrawing extends UserDrawingBase {
 
 export interface ProjectionDrawing extends UserDrawingBase {
   kind: 'projection';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
+export interface SectorDrawing extends UserDrawingBase {
+  kind: 'sector';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
@@ -726,6 +732,7 @@ export type UserDrawing =
   | ShortPositionDrawing
   | ForecastDrawing
   | ProjectionDrawing
+  | SectorDrawing
   | BarsPatternDrawing
   | TrianglePatternDrawing
   | AbcdPatternDrawing
@@ -962,6 +969,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'regressionTrend':
     case 'flatTopBottom':
     case 'projection':
+    case 'sector':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':
@@ -1225,6 +1233,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'projection',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'sector':
+      return {
+        ...base,
+        kind: 'sector',
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
       };
     case 'elliottCorrectiveWave':
