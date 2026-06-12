@@ -3,6 +3,7 @@ import type { UserDrawingState } from '../../drawings';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import { ChartTopBarComponent } from './ChartTopBarComponent';
 
 const baseDrawingState: UserDrawingState = {
@@ -17,6 +18,7 @@ const baseDrawingState: UserDrawingState = {
 describe('ChartTopBarComponent drawing toolbar', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('dispatches selected drawing actions from shared toolbar descriptors', () => {
