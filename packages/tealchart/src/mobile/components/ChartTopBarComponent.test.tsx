@@ -346,9 +346,9 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText('240 pixel text box width'));
+    fireEvent.click(screen.getByLabelText('320 pixel text box width'));
 
-    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 240 });
+    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 320 });
   });
 
   it('dispatches selected table text style controls without text alignment controls', () => {

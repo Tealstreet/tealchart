@@ -1218,6 +1218,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Expanded Text Wrap Width Presets
+
+- Shared text wrap width normalization now supports wider 320px and 480px text
+  boxes for larger annotations.
+- Web and mobile top bars expose the same expanded text box width descriptors,
+  while Canvas/DOM and Skia/RN text layout paths continue to consume the shared
+  normalized `textMaxWidth` style.
+
 ## Shipped: Expanded Text Font Size Presets
 
 - Shared text style normalization now supports a wider cross-platform font-size
