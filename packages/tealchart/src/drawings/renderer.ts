@@ -304,6 +304,18 @@ function renderPolygonGeometry(
   if (geometry.drawing.style.lineVisible !== false) {
     applyStrokeStyle(ctx, geometry.drawing);
     ctx.stroke();
+
+    if (
+      geometry.kind === 'parallelChannel' ||
+      geometry.kind === 'regressionTrend' ||
+      geometry.kind === 'flatTopBottom' ||
+      geometry.kind === 'disjointChannel'
+    ) {
+      ctx.beginPath();
+      ctx.moveTo(geometry.channel.median.start.x, geometry.channel.median.start.y);
+      ctx.lineTo(geometry.channel.median.end.x, geometry.channel.median.end.y);
+      ctx.stroke();
+    }
   }
 }
 

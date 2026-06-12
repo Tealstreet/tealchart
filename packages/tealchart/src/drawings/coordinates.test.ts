@@ -886,6 +886,7 @@ describe('user drawing coordinates', () => {
     ).toEqual({
       base: { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
       parallel: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+      median: { start: { x: 10, y: 35 }, end: { x: 90, y: 35 } },
       polygon: {
         points: [
           { x: 10, y: 50 },
@@ -2362,6 +2363,7 @@ describe('user drawing coordinates', () => {
       channel: {
         base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
         parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },
+        median: { start: { x: 10, y: 45 }, end: { x: 210, y: 45 } },
         polygon: {
           points: [
             { x: 10, y: 70 },
@@ -2377,6 +2379,7 @@ describe('user drawing coordinates', () => {
       channel: {
         base: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
         parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },
+        median: { start: { x: 10, y: 45 }, end: { x: 210, y: 45 } },
         polygon: {
           points: [
             { x: 10, y: 70 },
@@ -2407,6 +2410,7 @@ describe('user drawing coordinates', () => {
       channel: {
         base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
         parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 95 } },
+        median: { start: { x: 10, y: 82.5 }, end: { x: 210, y: 82.5 } },
         polygon: {
           points: [
             { x: 10, y: 70 },
@@ -2422,6 +2426,7 @@ describe('user drawing coordinates', () => {
       channel: {
         base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
         parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 120 } },
+        median: { start: { x: 10, y: 82.5 }, end: { x: 210, y: 70 } },
         polygon: {
           points: [
             { x: 10, y: 70 },
@@ -2445,6 +2450,7 @@ describe('user drawing coordinates', () => {
     ).toEqual({
       base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
       parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 95 } },
+      median: { start: { x: 10, y: 82.5 }, end: { x: 210, y: 82.5 } },
       polygon: {
         points: [
           { x: 10, y: 70 },
@@ -2468,6 +2474,7 @@ describe('user drawing coordinates', () => {
     ).toEqual({
       base: { start: { x: 10, y: 70 }, end: { x: 210, y: 20 } },
       parallel: { start: { x: 10, y: 95 }, end: { x: 210, y: 120 } },
+      median: { start: { x: 10, y: 82.5 }, end: { x: 210, y: 70 } },
       polygon: {
         points: [
           { x: 10, y: 70 },
@@ -2632,6 +2639,7 @@ describe('user drawing coordinates', () => {
       channel: {
         base: { start: { x: 10, y: 60 }, end: { x: 210, y: 40 } },
         parallel: { start: { x: 10, y: 20 }, end: { x: 210, y: 0 } },
+        median: { start: { x: 10, y: 40 }, end: { x: 210, y: 20 } },
         polygon: {
           points: [
             { x: 10, y: 60 },

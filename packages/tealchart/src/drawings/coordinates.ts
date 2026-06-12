@@ -141,6 +141,7 @@ export interface DrawingScreenEllipse {
 export interface DrawingScreenParallelChannel {
   base: DrawingScreenSegment;
   parallel: DrawingScreenSegment;
+  median: DrawingScreenSegment;
   polygon: DrawingScreenPolyline;
 }
 
@@ -2493,10 +2494,15 @@ export function resolveParallelChannelFromAnchors(
   const dy = offsetPoint.y - start.y;
   const parallelStart = { x: start.x + dx, y: start.y + dy };
   const parallelEnd = { x: end.x + dx, y: end.y + dy };
+  const median = {
+    start: { x: start.x + dx / 2, y: start.y + dy / 2 },
+    end: { x: end.x + dx / 2, y: end.y + dy / 2 },
+  };
 
   return {
     base: { start, end },
     parallel: { start: parallelStart, end: parallelEnd },
+    median,
     polygon: {
       points: [start, end, parallelEnd, parallelStart],
     },
@@ -2520,6 +2526,7 @@ export function resolveRotatedRectangleFromAnchors(
     return {
       base: { start, end },
       parallel: { start, end },
+      median: { start, end },
       polygon: { points: [start, end, end, start] },
     };
   }
@@ -2529,10 +2536,15 @@ export function resolveRotatedRectangleFromAnchors(
   const offset = { x: normal.x * widthOffset, y: normal.y * widthOffset };
   const oppositeStart = { x: start.x + offset.x, y: start.y + offset.y };
   const oppositeEnd = { x: end.x + offset.x, y: end.y + offset.y };
+  const median = {
+    start: { x: start.x + offset.x / 2, y: start.y + offset.y / 2 },
+    end: { x: end.x + offset.x / 2, y: end.y + offset.y / 2 },
+  };
 
   return {
     base: { start, end },
     parallel: { start: oppositeStart, end: oppositeEnd },
+    median,
     polygon: {
       points: [start, end, oppositeEnd, oppositeStart],
     },
@@ -2700,10 +2712,12 @@ export function resolveFlatTopBottomFromAnchors(
   const flatPoint = anchorToScreenPoint(flat, space);
   const flatStart = { x: start.x, y: flatPoint.y };
   const flatEnd = { x: end.x, y: flatPoint.y };
+  const medianY = (start.y + flatPoint.y) / 2;
 
   return {
     base: { start, end },
     parallel: { start: flatStart, end: flatEnd },
+    median: { start: { x: start.x, y: medianY }, end: { x: end.x, y: medianY } },
     polygon: {
       points: [start, end, flatEnd, flatStart],
     },
@@ -2725,6 +2739,10 @@ export function resolveDisjointChannelFromAnchors(
   return {
     base: { start, end },
     parallel: { start: oppositeStart, end: oppositeEnd },
+    median: {
+      start: { x: (start.x + oppositeStart.x) / 2, y: (start.y + oppositeStart.y) / 2 },
+      end: { x: (end.x + oppositeEnd.x) / 2, y: (end.y + oppositeEnd.y) / 2 },
+    },
     polygon: {
       points: [start, end, oppositeEnd, oppositeStart],
     },
@@ -2787,10 +2805,15 @@ export function resolveRegressionTrendFromAnchors(
   const dy = offsetPoint.y - start.y;
   const parallelStart = { x: start.x + dx, y: start.y + dy };
   const parallelEnd = { x: end.x + dx, y: end.y + dy };
+  const median = {
+    start: { x: start.x + dx / 2, y: start.y + dy / 2 },
+    end: { x: end.x + dx / 2, y: end.y + dy / 2 },
+  };
 
   return {
     base: { start, end },
     parallel: { start: parallelStart, end: parallelEnd },
+    median,
     polygon: {
       points: [start, end, parallelEnd, parallelStart],
     },

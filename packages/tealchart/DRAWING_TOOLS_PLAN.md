@@ -1037,6 +1037,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching Fibonacci spiral labels from the
   shared model without changing persisted drawing state.
 
+## Shipped: Channel Midlines
+
+- Shared channel geometry now carries median segments for parallel channel,
+  regression trend, flat top/bottom, and disjoint channel tools.
+- Web Canvas and mobile Skia render matching channel midlines from the shared
+  model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
