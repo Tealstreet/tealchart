@@ -19,7 +19,12 @@ import {
   resolveUserDrawingTextLabelLayout,
   splitUserDrawingTextLines,
 } from './textLayout';
-import { normalizeUserDrawingFontFamily, normalizeUserDrawingFontSize, normalizeUserDrawingOpacity } from './types';
+import {
+  normalizeUserDrawingFontFamily,
+  normalizeUserDrawingFontSize,
+  normalizeUserDrawingFontWeight,
+  normalizeUserDrawingOpacity,
+} from './types';
 
 export interface UserDrawingRenderOptions {
   labelPadding?: number;
@@ -1317,10 +1322,11 @@ function renderTextLabelGeometry(
   const { point } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  const fontWeight = normalizeUserDrawingFontWeight(drawing.style.fontWeight ?? 'normal');
   const padding = options.labelPadding;
   const text = drawing.text;
 
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.font = `${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
   const textLines = splitUserDrawingTextLines(text);
   const lineWidths = textLines.map((line) => ctx.measureText(line).width);
   const lineHeight = Math.max(1, options.labelHeight - 2);

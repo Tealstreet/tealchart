@@ -199,6 +199,29 @@ function LoadedUserDrawingSkiaImage({ primitive }: { primitive: MobileUserDrawin
   );
 }
 
+function UserDrawingSkiaText({
+  x,
+  y,
+  text,
+  font,
+  color,
+  style,
+}: {
+  x: number;
+  y: number;
+  text: string;
+  font: ReturnType<typeof Skia.Font>;
+  color: string;
+  style: UserDrawingStyle;
+}) {
+  return (
+    <>
+      <SkiaText x={x} y={y} text={text} font={font} color={color} />
+      {style.fontWeight === 'bold' && <SkiaText x={x + 0.45} y={y} text={text} font={font} color={color} />}
+    </>
+  );
+}
+
 export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
 
 export interface SkiaTealchartHandle {
@@ -752,6 +775,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
       fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
+      fontWeight: activeUserDrawingTextEditPrimitive.style.fontWeight === 'bold' ? ('700' as const) : ('400' as const),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
@@ -3591,13 +3615,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   </>
                 )}
                 {layout.lines.map((line, index) => (
-                  <SkiaText
+                  <UserDrawingSkiaText
                     key={`${primitive.id}:line:${index}`}
                     x={line.x}
                     y={line.y}
                     text={line.text}
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}
+                    style={primitive.style}
                   />
                 ))}
               </Group>

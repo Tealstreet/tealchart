@@ -1023,6 +1023,39 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('normalizes updated text drawing font weights', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: anchorA,
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    const bold = updateUserDrawingStyle(state, { fontWeight: 'bold' }, { now: () => 13 });
+    const normalized = updateUserDrawingStyle(bold, { fontWeight: 'heavy' as never }, { now: () => 14 });
+
+    expect(bold.drawings[0]).toMatchObject({
+      updatedAt: 13,
+      style: expect.objectContaining({ fontWeight: 'bold' }),
+    });
+    expect(normalized.drawings[0]).toMatchObject({
+      updatedAt: 14,
+      style: expect.objectContaining({ fontWeight: 'normal' }),
+    });
+  });
+
   it('updates selected or targeted text drawing alignment while respecting locks', () => {
     const textLabel = {
       id: 'label',
