@@ -23,6 +23,7 @@ import {
 import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingFontStyle,
   normalizeUserDrawingFontWeight,
   normalizeUserDrawingOpacity,
 } from './types';
@@ -1324,11 +1325,11 @@ function renderTextLabelGeometry(
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   const fontWeight = normalizeUserDrawingFontWeight(drawing.style.fontWeight ?? 'normal');
-  const fontStyle = drawing.style.fontStyle === 'italic' ? 'italic ' : '';
+  const fontStyle = normalizeUserDrawingFontStyle(drawing.style.fontStyle ?? 'normal');
   const padding = options.labelPadding;
   const text = drawing.text;
 
-  ctx.font = `${fontStyle}${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
+  ctx.font = `${fontStyle === 'italic' ? 'italic ' : ''}${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
   const textLines = splitUserDrawingTextLines(text);
   const lineWidths = textLines.map((line) => ctx.measureText(line).width);
   const lineHeight = Math.max(1, options.labelHeight - 2);
@@ -1403,7 +1404,7 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   const fontWeight = normalizeUserDrawingFontWeight(drawing.style.fontWeight ?? 'normal');
-  const fontStyle = drawing.style.fontStyle === 'italic' ? 'italic ' : '';
+  const fontStyle = normalizeUserDrawingFontStyle(drawing.style.fontStyle ?? 'normal');
 
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
@@ -1417,7 +1418,7 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
     }
   }
 
-  ctx.font = `${fontStyle}${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
+  ctx.font = `${fontStyle === 'italic' ? 'italic ' : ''}${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = drawing.textAlign;
   ctx.textBaseline = 'middle';
