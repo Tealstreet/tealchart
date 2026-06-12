@@ -21,6 +21,27 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     clearChartStoreCache();
   });
 
+  it('renders categorized drawing tools and dispatches tool changes', () => {
+    const onTool = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'rectangle' }}
+        onUserDrawingToolSelect={onTool}
+      />,
+    );
+
+    expect(screen.getByText('Lines')).toBeTruthy();
+    expect(screen.getByText('Channels')).toBeTruthy();
+    expect(screen.getByText('Gann and Fibonacci')).toBeTruthy();
+    expect(screen.getByLabelText('Rectangle')).toBeTruthy();
+
+    fireEvent.click(screen.getByLabelText('Trend line'));
+
+    expect(onTool).toHaveBeenCalledWith('trendLine');
+  });
+
   it('dispatches selected drawing actions from shared toolbar descriptors', () => {
     const onDuplicate = vi.fn();
     const onDelete = vi.fn();
