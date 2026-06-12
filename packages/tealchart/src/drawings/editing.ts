@@ -151,6 +151,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTripleComboWave':
     case 'elliottTriangleWave':
       {
         const points = movePathAnchors(drawing.points, delta);
@@ -339,6 +340,7 @@ function editDrawingHandle(
       drawing.kind === 'threeDrivesPattern' ||
       drawing.kind === 'headShouldersPattern' ||
       drawing.kind === 'elliottImpulseWave' ||
+      drawing.kind === 'elliottTripleComboWave' ||
       drawing.kind === 'elliottTriangleWave' ||
       drawing.kind === 'callout' ||
       drawing.kind === 'priceNote') &&
@@ -413,6 +415,7 @@ function editDrawingHandle(
       drawing.kind === 'threeDrivesPattern' ||
       drawing.kind === 'headShouldersPattern' ||
       drawing.kind === 'elliottImpulseWave' ||
+      drawing.kind === 'elliottTripleComboWave' ||
       drawing.kind === 'elliottTriangleWave'
     ) {
       return {
@@ -516,6 +519,7 @@ function editDrawingHandle(
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTripleComboWave':
     case 'elliottTriangleWave':
       return drawing;
   }

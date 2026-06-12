@@ -38,6 +38,7 @@ export type UserDrawingTool =
   | 'elliottImpulseWave'
   | 'elliottCorrectiveWave'
   | 'elliottDoubleComboWave'
+  | 'elliottTripleComboWave'
   | 'elliottTriangleWave'
   | 'anchoredVwap'
   | 'fibRetracement'
@@ -353,6 +354,17 @@ export interface ElliottDoubleComboWaveDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface ElliottTripleComboWaveDrawing extends UserDrawingBase {
+  kind: 'elliottTripleComboWave';
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ];
+}
+
 export interface ElliottTriangleWaveDrawing extends UserDrawingBase {
   kind: 'elliottTriangleWave';
   points: readonly [
@@ -647,6 +659,7 @@ export type UserDrawing =
   | ElliottImpulseWaveDrawing
   | ElliottCorrectiveWaveDrawing
   | ElliottDoubleComboWaveDrawing
+  | ElliottTripleComboWaveDrawing
   | ElliottTriangleWaveDrawing
   | AnchoredVwapDrawing
   | FibRetracementDrawing
@@ -867,6 +880,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTripleComboWave':
     case 'elliottTriangleWave':
     case 'xabcdPattern':
     case 'cypherPattern':
@@ -1175,6 +1189,18 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'elliottImpulseWave',
+        points: [
+          draft.anchors[0]!,
+          draft.anchors[1]!,
+          draft.anchors[2]!,
+          draft.anchors[3]!,
+          draft.anchors[4]!,
+        ],
+      };
+    case 'elliottTripleComboWave':
+      return {
+        ...base,
+        kind: 'elliottTripleComboWave',
         points: [
           draft.anchors[0]!,
           draft.anchors[1]!,

@@ -1735,6 +1735,43 @@ describe('user drawing input controller', () => {
     expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
+  it('duplicates Elliott triple combo wave drawings with deep-cloned five-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'elliott-triple-combo' },
+      drawings: [
+        {
+          id: 'elliott-triple-combo',
+          kind: 'elliottTripleComboWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 26 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'elliottTripleComboWave',
+      createdAt: 26,
+      updatedAt: 26,
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+    });
+    if (
+      next.drawings[1]?.kind !== 'elliottTripleComboWave' ||
+      state.drawings[0]?.kind !== 'elliottTripleComboWave'
+    ) {
+      throw new Error('expected Elliott triple combo wave drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+  });
+
   it('duplicates ABCD pattern drawings with deep-cloned four-point payloads', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'abcd' },
