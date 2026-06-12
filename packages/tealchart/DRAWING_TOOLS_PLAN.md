@@ -1209,6 +1209,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Trend Line Extend Controls
+
+- Shared drawing state exposes normalized trend-line extension choices for
+  none, left, right, and both directions.
+- Web widget and mobile Skia handles expose matching public methods for selected
+  trend-line extension updates.
+- Web and mobile top bars expose matching extend controls only for selected
+  trend lines; existing extended-line and ray semantics remain unchanged.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

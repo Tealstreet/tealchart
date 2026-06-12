@@ -118,6 +118,8 @@ export const USER_DRAWING_ICON_NAMES = ['star', 'circle', 'square', 'triangle', 
 export type UserDrawingIconName = (typeof USER_DRAWING_ICON_NAMES)[number];
 
 export type UserDrawingLineStyle = 'solid' | 'dashed' | 'dotted';
+export const USER_DRAWING_TREND_LINE_EXTENDS = ['none', 'left', 'right', 'both'] as const;
+export type UserDrawingTrendLineExtend = (typeof USER_DRAWING_TREND_LINE_EXTENDS)[number];
 
 export type UserDrawingHandleRole = 'start' | 'end' | 'center' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 
@@ -171,7 +173,7 @@ export interface UserDrawingBase {
 export interface TrendLineDrawing extends UserDrawingBase {
   kind: 'trendLine';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
-  extend: 'none' | 'left' | 'right' | 'both';
+  extend: UserDrawingTrendLineExtend;
 }
 
 export interface TrendAngleDrawing extends UserDrawingBase {

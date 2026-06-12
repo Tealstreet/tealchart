@@ -232,6 +232,63 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('dispatches selected trend-line extension controls only for trend lines', () => {
+    const onExtend = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-trend-extend',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'trend' },
+        drawings: [
+          {
+            id: 'trend',
+            kind: 'trendLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            points: [
+              { time: 1, price: 10 },
+              { time: 2, price: 12 },
+            ],
+            extend: 'none',
+          },
+        ],
+      },
+      onUserDrawingTrendLineExtendChange: onExtend,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line both ways"]')?.click();
+    expect(onExtend).toHaveBeenCalledWith('left');
+    expect(onExtend).toHaveBeenCalledWith('both');
+
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          price: 10,
+        },
+      ],
+    });
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
   it('dispatches selected icon library controls without text controls', () => {
     const onIconName = vi.fn();
     const topBar = new ChartTopBar({

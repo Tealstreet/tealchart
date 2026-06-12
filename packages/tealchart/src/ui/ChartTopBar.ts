@@ -5,6 +5,7 @@ import type {
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
 } from '../drawings';
@@ -27,6 +28,7 @@ import {
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
+  supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -44,6 +46,7 @@ import {
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
@@ -91,6 +94,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Callback when selected text-label alignment should change */
   onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
+  /** Callback when selected trend-line extension should change */
+  onUserDrawingTrendLineExtendChange?: (extend: UserDrawingTrendLineExtend) => void;
   /** Callback when selected icon marker shape should change */
   onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Callback when selected drawing visibility should change */
@@ -474,6 +479,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const textStyleSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
     const textAlignSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
     const textWrapSupported = selectedDrawing ? supportsUserDrawingTextWrapControls(selectedDrawing) : false;
+    const trendLineExtendSupported = selectedDrawing
+      ? supportsUserDrawingTrendLineExtendControls(selectedDrawing)
+      : false;
 
     if (selectedDrawing) {
       for (const descriptor of USER_DRAWING_LINE_COLOR_DESCRIPTORS) {
@@ -570,6 +578,43 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           });
         }
         group.appendChild(btn);
+      }
+
+      if (trendLineExtendSupported && selectedDrawing.kind === 'trendLine') {
+        for (const descriptor of USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS) {
+          const isActive = selectedDrawing.extend === descriptor.extend;
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...(isActive ? styles.drawingButtonActive : {}),
+              opacity: styleEnabled ? '1' : '0.35',
+              cursor: styleEnabled ? 'pointer' : 'default',
+            },
+            textContent: descriptor.icon,
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !styleEnabled;
+          if (styleEnabled) {
+            btn.addEventListener('click', () =>
+              this.options.onUserDrawingTrendLineExtendChange?.(descriptor.extend),
+            );
+            btn.addEventListener('mouseenter', () => {
+              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+            });
+            btn.addEventListener('mouseleave', () => {
+              if (!isActive) {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text2, #787b86)';
+              }
+            });
+          }
+          group.appendChild(btn);
+        }
       }
 
       for (const descriptor of USER_DRAWING_OPACITY_DESCRIPTORS) {

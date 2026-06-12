@@ -167,6 +167,7 @@ export {
   setMobileUserDrawingTableDimensions,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
+  setMobileUserDrawingTrendLineExtend,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './mobile/utils/drawingStyle';

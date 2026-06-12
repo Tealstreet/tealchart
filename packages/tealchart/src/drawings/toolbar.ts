@@ -8,6 +8,7 @@ import type {
   UserDrawingState,
   UserDrawingTextAlign,
   UserDrawingTextMaxWidth,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
 } from './types';
 import type { UserDrawingZOrderAction } from './input';
@@ -21,6 +22,7 @@ import {
   USER_DRAWING_FONT_SIZES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
+  USER_DRAWING_TREND_LINE_EXTENDS,
 } from './types';
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
@@ -104,6 +106,12 @@ export interface UserDrawingTextMaxWidthDescriptor {
 
 export interface UserDrawingTextAlignDescriptor {
   textAlign: UserDrawingTextAlign;
+  icon: string;
+  label: string;
+}
+
+export interface UserDrawingTrendLineExtendDescriptor {
+  extend: UserDrawingTrendLineExtend;
   icon: string;
   label: string;
 }
@@ -351,6 +359,20 @@ export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignD
   { textAlign: 'right', icon: 'R', label: 'Right text alignment' },
 ] as const;
 
+export const USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS: readonly UserDrawingTrendLineExtendDescriptor[] =
+  USER_DRAWING_TREND_LINE_EXTENDS.map((extend) => ({
+    extend,
+    icon: extend === 'none' ? '—' : extend === 'left' ? '←' : extend === 'right' ? '→' : '↔',
+    label:
+      extend === 'none'
+        ? 'Do not extend trend line'
+        : extend === 'left'
+          ? 'Extend trend line left'
+          : extend === 'right'
+            ? 'Extend trend line right'
+            : 'Extend trend line both ways',
+  }));
+
 export const USER_DRAWING_ICON_NAME_DESCRIPTORS: readonly UserDrawingIconNameDescriptor[] = USER_DRAWING_ICON_NAMES.map(
   (iconName) => ({
     iconName,
@@ -484,6 +506,10 @@ export function supportsUserDrawingTextWrapControls(drawing: UserDrawing): boole
   return isUserDrawingTextAnnotation(drawing);
 }
 
+export function supportsUserDrawingTrendLineExtendControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'trendLine';
+}
+
 export function supportsUserDrawingIconControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'icon';
 }
@@ -551,6 +577,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing && (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing))
       ? selectedDrawing.textAlign
       : '',
+    selectedDrawing?.kind === 'trendLine' ? selectedDrawing.extend : '',
     selectedDrawing?.kind === 'icon' ? selectedDrawing.iconName : '',
   ].join('|');
 }
