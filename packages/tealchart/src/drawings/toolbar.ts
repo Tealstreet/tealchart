@@ -43,6 +43,12 @@ export interface UserDrawingToolDescriptor {
   label: string;
 }
 
+export interface UserDrawingToolCategoryDescriptor {
+  id: string;
+  label: string;
+  tools: readonly UserDrawingTool[];
+}
+
 export interface UserDrawingToolbarActionDescriptor {
   action: UserDrawingToolbarAction;
   icon: string;
@@ -265,6 +271,155 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'signpost', icon: 'S', label: 'Signpost' },
   { tool: 'table', icon: 'TBL', label: 'Table' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },
+] as const;
+
+export const USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS: readonly UserDrawingToolCategoryDescriptor[] = [
+  {
+    id: 'cursor',
+    label: 'Cursor',
+    tools: ['select'],
+  },
+  {
+    id: 'lines',
+    label: 'Lines',
+    tools: [
+      'trendLine',
+      'ray',
+      'infoLine',
+      'extendedLine',
+      'trendAngle',
+      'horizontalLine',
+      'horizontalRay',
+      'verticalLine',
+      'crossLine',
+      'arrowLine',
+    ],
+  },
+  {
+    id: 'channels',
+    label: 'Channels',
+    tools: ['parallelChannel', 'regressionTrend', 'flatTopBottom', 'disjointChannel'],
+  },
+  {
+    id: 'pitchforks',
+    label: 'Pitchforks',
+    tools: ['pitchfork', 'schiffPitchfork', 'modifiedSchiffPitchfork', 'insidePitchfork', 'pitchfan'],
+  },
+  {
+    id: 'gann-and-fibonacci',
+    label: 'Gann and Fibonacci',
+    tools: [
+      'fibRetracement',
+      'fibExtension',
+      'trendBasedFibExtension',
+      'fibFan',
+      'fibSpeedResistanceFan',
+      'fibArcs',
+      'fibSpeedResistanceArcs',
+      'fibCircles',
+      'fibWedge',
+      'fibSpiral',
+      'fibChannel',
+      'fibTimeZone',
+      'trendBasedFibTime',
+      'gannFan',
+      'gannBox',
+      'gannSquare',
+      'gannSquareFixed',
+    ],
+  },
+  {
+    id: 'patterns',
+    label: 'Patterns',
+    tools: [
+      'barsPattern',
+      'trianglePattern',
+      'abcdPattern',
+      'xabcdPattern',
+      'cypherPattern',
+      'threeDrivesPattern',
+      'headShouldersPattern',
+      'elliottImpulseWave',
+      'elliottCorrectiveWave',
+      'elliottDoubleComboWave',
+      'elliottTripleComboWave',
+      'elliottTriangleWave',
+    ],
+  },
+  {
+    id: 'forecasting-and-measurement',
+    label: 'Forecasting and Measurement',
+    tools: [
+      'priceRange',
+      'dateRange',
+      'datePriceRange',
+      'longPosition',
+      'shortPosition',
+      'forecast',
+      'projection',
+      'sector',
+      'anchoredVwap',
+      'anchoredVolumeProfile',
+      'fixedRangeVolumeProfile',
+    ],
+  },
+  {
+    id: 'geometric-shapes',
+    label: 'Geometric Shapes',
+    tools: [
+      'rectangle',
+      'rotatedRectangle',
+      'circle',
+      'ellipse',
+      'triangle',
+      'curve',
+      'doubleCurve',
+      'arc',
+      'polyline',
+      'sineLine',
+      'cyclicLines',
+      'timeCycles',
+    ],
+  },
+  {
+    id: 'brushes',
+    label: 'Brushes',
+    tools: ['path', 'brush', 'highlighter'],
+  },
+  {
+    id: 'annotations',
+    label: 'Annotations',
+    tools: [
+      'textLabel',
+      'note',
+      'anchoredText',
+      'anchoredNote',
+      'callout',
+      'comment',
+      'priceLabel',
+      'priceNote',
+      'signpost',
+      'table',
+      'balloon',
+    ],
+  },
+  {
+    id: 'icons',
+    label: 'Icons',
+    tools: [
+      'arrowMarker',
+      'arrowMarkLeft',
+      'arrowMarkRight',
+      'arrowMarkUp',
+      'arrowMarkDown',
+      'pin',
+      'icon',
+      'flagMark',
+      'image',
+      'emoji',
+      'sticker',
+    ],
+  },
 ] as const;
 
 export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolbarActionDescriptor[] = [
