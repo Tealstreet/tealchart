@@ -266,6 +266,7 @@ describe('tealchart public entries', () => {
       points: [],
       base: { start: { x: 0, y: 0 }, end: { x: 1, y: 1 } },
       parallel: { start: { x: 0, y: 1 }, end: { x: 1, y: 2 } },
+      median: { start: { x: 0, y: 0.5 }, end: { x: 1, y: 1.5 } },
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const regressionPrimitive: NonNever<MobileUserDrawingRegressionTrendPrimitive> = {
