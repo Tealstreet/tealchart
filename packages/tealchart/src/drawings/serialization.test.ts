@@ -2698,6 +2698,14 @@ describe('drawing layout serialization', () => {
         { time: 2, price: 110 },
       ],
     });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings[0]).toMatchObject({
+      id: 'volume-profile',
+      kind: 'fixedRangeVolumeProfile',
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 110 },
+      ],
+    });
   });
 
   it('rejects forecast drawings with invalid point counts', () => {
