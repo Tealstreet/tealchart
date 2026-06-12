@@ -873,12 +873,21 @@ matching behavior in the same PR for every user-facing drawing feature.
   alignment controls, and style controls use shared text annotation behavior on
   both platforms.
 
+## Shipped: Anchored Annotation Tools
+
+- Shared drawing state supports `anchoredText` and `anchoredNote` with normalized
+  pane positions so annotations stay fixed to the pane during chart pan/zoom.
+- Web Canvas/DOM and mobile Skia render and edit anchored annotations through
+  the shared text annotation style, hit-test, selection, and text-edit pipeline.
+- Layout serialization, duplication, whole-drawing moves, toolbar descriptors,
+  and style/text controls preserve matching web/mobile behavior.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, annotation/icon tools, and additional curved geometry.
+  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, remaining annotation/icon tools, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.

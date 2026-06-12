@@ -1,7 +1,8 @@
 import type { ChartDimensions, PaneInfo } from './coordinates';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import { resolveMobileUserDrawingInputPoint } from './drawingInput';
 
 const dimensions: ChartDimensions = {
@@ -35,6 +36,10 @@ const panes: PaneInfo[] = [
 ];
 
 describe('mobile user drawing input resolver', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('normalizes mobile pane info before resolving anchors', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
@@ -51,6 +56,8 @@ describe('mobile user drawing input resolver', () => {
     ).toEqual({
       paneId: 'macd',
       anchor: { time: 2_000, price: 0 },
+      position: { x: 0.5, y: 0.5 },
+      bars: undefined,
     });
   });
 

@@ -64,6 +64,8 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('note')).toBe(1);
     expect(getRequiredAnchorCount('comment')).toBe(1);
+    expect(getRequiredAnchorCount('anchoredText')).toBe(1);
+    expect(getRequiredAnchorCount('anchoredNote')).toBe(1);
     expect(getRequiredAnchorCount('priceLabel')).toBe(1);
     expect(getRequiredAnchorCount('pin')).toBe(1);
     expect(getRequiredAnchorCount('icon')).toBe(1);
@@ -939,6 +941,38 @@ describe('user drawing types', () => {
       kind: 'signpost',
       point: anchorA,
       text: 'Signal',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'anchoredText',
+          anchors: [anchorA],
+          positions: [{ x: 0.25, y: 0.75 }],
+          text: 'Anchored',
+        }),
+        { id: 'anchored-text' },
+      ),
+    ).toMatchObject({
+      kind: 'anchoredText',
+      position: { x: 0.25, y: 0.75 },
+      text: 'Anchored',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'anchoredNote',
+          anchors: [anchorA],
+          positions: [{ x: 2, y: -1 }],
+          text: 'Pinned',
+        }),
+        { id: 'anchored-note' },
+      ),
+    ).toMatchObject({
+      kind: 'anchoredNote',
+      position: { x: 1, y: 0 },
+      text: 'Pinned',
       textAlign: 'center',
     });
     expect(createUserDrawingFromDraft(draft({ tool: 'pin', anchors: [anchorA] }), { id: 'pin' })).toMatchObject({

@@ -123,6 +123,8 @@ describe('user drawing toolbar descriptors', () => {
       'brush',
       'highlighter',
       'note',
+      'anchoredText',
+      'anchoredNote',
       'callout',
       'comment',
       'priceLabel',
@@ -321,6 +323,12 @@ describe('user drawing toolbar descriptors', () => {
       expect.objectContaining({ tool: 'polyline', label: 'Polyline' }),
     );
     expect(getUserDrawingToolDescriptor('note')).toEqual(expect.objectContaining({ tool: 'note', label: 'Note' }));
+    expect(getUserDrawingToolDescriptor('anchoredText')).toEqual(
+      expect.objectContaining({ tool: 'anchoredText', label: 'Anchored text' }),
+    );
+    expect(getUserDrawingToolDescriptor('anchoredNote')).toEqual(
+      expect.objectContaining({ tool: 'anchoredNote', label: 'Anchored note' }),
+    );
     expect(getUserDrawingToolDescriptor('callout')).toEqual(
       expect.objectContaining({ tool: 'callout', label: 'Callout' }),
     );
@@ -860,6 +868,22 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...textLabel,
+        id: 'anchored-text',
+        kind: 'anchoredText',
+        position: { x: 0.5, y: 0.5 },
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...textLabel,
+        id: 'anchored-note',
+        kind: 'anchoredNote',
+        position: { x: 0.5, y: 0.5 },
+      }),
+    ).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'price-label', kind: 'priceLabel' })).toBe(true);
     expect(
       supportsUserDrawingFillControls({
@@ -890,6 +914,22 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
+    expect(
+      supportsUserDrawingTextControls({
+        ...textLabel,
+        id: 'anchored-text',
+        kind: 'anchoredText',
+        position: { x: 0.5, y: 0.5 },
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingTextControls({
+        ...textLabel,
+        id: 'anchored-note',
+        kind: 'anchoredNote',
+        position: { x: 0.5, y: 0.5 },
+      }),
+    ).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'price-label', kind: 'priceLabel' })).toBe(true);
     expect(
       supportsUserDrawingTextControls({
