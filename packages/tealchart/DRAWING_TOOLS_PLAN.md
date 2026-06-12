@@ -1016,6 +1016,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching Fibonacci wedge level labels from
   the shared model without changing persisted drawing state.
 
+## Shipped: Gann Box Level Labels
+
+- Shared Gann box and Gann square level geometry now carries ratio labels and
+  label points.
+- Web Canvas and mobile Skia render matching Gann grid level labels from the
+  shared model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

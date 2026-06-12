@@ -531,8 +531,10 @@ describe('tealchart public entries', () => {
       levels: [
         {
           ratio: 0.5,
+          label: '0.5',
           horizontal: { start: { x: 0, y: 5 }, end: { x: 10, y: 5 } },
           vertical: { start: { x: 5, y: 0 }, end: { x: 5, y: 10 } },
+          labelPoint: { x: 4, y: 1 },
         },
       ],
       angles: [{ start: { x: 0, y: 0 }, end: { x: 10, y: 10 } }],
