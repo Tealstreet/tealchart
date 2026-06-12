@@ -157,6 +157,8 @@ export interface DrawingScreenPitchfanRay {
   ratio: number;
   target: DrawingScreenPoint;
   segment: DrawingScreenSegment;
+  label?: string;
+  labelPoint?: DrawingScreenPoint;
 }
 
 export interface DrawingScreenPitchfanBand {
@@ -1776,6 +1778,13 @@ export function formatFibRetracementRatio(ratio: number): string {
   return ratio === 0 || ratio === 0.5 || ratio === 1 ? String(ratio) : ratio.toFixed(3);
 }
 
+function resolveFanRayLabelPoint(segment: DrawingScreenSegment): DrawingScreenPoint {
+  return {
+    x: segment.end.x >= segment.start.x ? segment.end.x - 4 : segment.end.x + 4,
+    y: segment.end.y - 4,
+  };
+}
+
 export function resolveFibLevelsFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -1908,6 +1917,12 @@ function resolveFibFanWithLevelsFromAnchors(
         target,
         segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
       };
+    }).map((ray) => {
+      return {
+        ...ray,
+        label: formatFibRetracementRatio(ray.ratio),
+        labelPoint: resolveFanRayLabelPoint(ray.segment),
+      };
     }),
   };
 }
@@ -1933,6 +1948,12 @@ export function resolveGannFanFromAnchors(
         ratio: level.ratio,
         target,
         segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+      };
+    }).map((ray, index) => {
+      return {
+        ...ray,
+        label: GANN_FAN_LEVELS[index]!.label,
+        labelPoint: resolveFanRayLabelPoint(ray.segment),
       };
     }),
   };
