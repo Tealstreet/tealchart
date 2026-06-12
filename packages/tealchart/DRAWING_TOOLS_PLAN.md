@@ -644,6 +644,13 @@ matching behavior in the same PR for every user-facing drawing feature.
   so web Canvas and mobile Skia render matching `N bars, duration` change
   labels.
 
+## Shipped: Info Line Bar Count Labels
+
+- Info-line geometry resolves shared measurement metrics with loaded chart bars.
+- Web Canvas and mobile Skia consume the same info-line geometry label, rendering
+  `N bars, duration` when bars are available and preserving duration-only
+  fallback labels otherwise.
+
 ## Shipped: XABCD Pattern Tool
 
 - Shared drawing state supports the five-anchor `xabcdPattern` tool and
