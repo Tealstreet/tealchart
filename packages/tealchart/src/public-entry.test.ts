@@ -77,6 +77,7 @@ import type {
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
   UserDrawingStyleToggleDescriptor,
+  UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
   UserDrawingTextLabelLayout,
 } from './index';
@@ -186,6 +187,7 @@ import {
   selectUserDrawingsById,
   setUserDrawingIconName,
   setUserDrawingImageSource,
+  setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
@@ -216,6 +218,7 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(setUserDrawingIconName).toBeTypeOf('function');
     expect(setUserDrawingImageSource).toBeTypeOf('function');
+    expect(setUserDrawingTableCell).toBeTypeOf('function');
     expect(setUserDrawingTableCells).toBeTypeOf('function');
     expect(setUserDrawingTextContent).toBeTypeOf('function');
     expect(duplicateUserDrawing).toBeTypeOf('function');
@@ -233,6 +236,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('setMobileUserDrawingTextAlign');
     expect(nativeEntry).toContain('setMobileUserDrawingIconName');
     expect(nativeEntry).toContain('setMobileUserDrawingImageSource');
+    expect(nativeEntry).toContain('setMobileUserDrawingTableCell');
     expect(nativeEntry).toContain('setMobileUserDrawingTableCells');
     expect(nativeEntry).toContain('setMobileUserDrawingTextContent');
     expect(nativeEntry).toContain('resolveMobileUserDrawingInfoLineLabelPosition');
@@ -1247,6 +1251,7 @@ describe('tealchart public entries', () => {
     expect(table.cells[0]?.text).toBe('Metric');
 
     const cells: UserDrawingTableCellsInput = [['Metric', 101.25]];
+    const cell: UserDrawingTableCellInput = null;
     const state = {
       version: 1 as const,
       drawings: [drawing],
@@ -1257,6 +1262,7 @@ describe('tealchart public entries', () => {
     };
 
     expect(setUserDrawingTableCells(state, cells).drawings[0]).toMatchObject({ cells: [['Metric', '101.25']] });
+    expect(setUserDrawingTableCell(state, 0, 1, cell).drawings[0]).toMatchObject({ cells: [['Metric', '']] });
   });
 
   it('exports shared drawing info line helpers', () => {

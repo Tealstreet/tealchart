@@ -29,6 +29,7 @@ import type {
   UserDrawingLineStyle,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
@@ -153,6 +154,7 @@ import {
 import {
   setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTableCell,
   setMobileUserDrawingTableCells,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
@@ -249,6 +251,12 @@ export interface SkiaTealchartHandle {
   setUserDrawingTextContent(text: string, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingImageSource(source: UserDrawingImageSourceInput, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingTableCell(
+    row: number,
+    column: number,
+    value: UserDrawingTableCellInput,
+    options?: UpdateUserDrawingOptions,
+  ): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
@@ -525,6 +533,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
           setMobileUserDrawingTableCells(userDrawingStateRef.current, cells, options),
+        );
+      },
+      setUserDrawingTableCell(
+        row: number,
+        column: number,
+        value: UserDrawingTableCellInput,
+        options: UpdateUserDrawingOptions = {},
+      ): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingTableCell(userDrawingStateRef.current, row, column, value, options),
         );
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
