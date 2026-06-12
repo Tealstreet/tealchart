@@ -1,9 +1,17 @@
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
-import type { UserDrawing, UserDrawingAnchor, UserDrawingHandleRole, UserDrawingSelection, UserDrawingState } from './types';
+import type {
+  UserDrawing,
+  UserDrawingAnchor,
+  UserDrawingHandleRole,
+  UserDrawingPanePosition,
+  UserDrawingSelection,
+  UserDrawingState,
+} from './types';
 
-import { resolveUserDrawingGeometry, screenPointToAnchor } from './coordinates';
+import { resolveUserDrawingGeometry, screenPointToAnchor, screenPointToPanePosition } from './coordinates';
 import { hitTestUserDrawings } from './hitTesting';
 import { getUserDrawingSelectionIds, selectUserDrawing } from './input';
+import { normalizeUserDrawingPanePosition } from './types';
 import type { UserDrawingHitTestOptions } from './hitTesting';
 
 export interface UserDrawingEditDrag {
@@ -34,6 +42,11 @@ interface AnchorDelta {
   price: number;
 }
 
+interface PanePositionDelta {
+  x: number;
+  y: number;
+}
+
 function moveAnchor(anchor: UserDrawingAnchor, delta: AnchorDelta): UserDrawingAnchor {
   return {
     time: anchor.time + delta.time,
@@ -43,6 +56,13 @@ function moveAnchor(anchor: UserDrawingAnchor, delta: AnchorDelta): UserDrawingA
 
 function movePathAnchors(points: readonly UserDrawingAnchor[], delta: AnchorDelta): UserDrawingAnchor[] {
   return points.map((point) => moveAnchor(point, delta));
+}
+
+function movePanePosition(position: UserDrawingPanePosition, delta: PanePositionDelta): UserDrawingPanePosition {
+  return normalizeUserDrawingPanePosition({
+    x: position.x + delta.x,
+    y: position.y + delta.y,
+  });
 }
 
 function shiftRegressionTrendTimeRange(
@@ -210,6 +230,29 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'flagMark':
     case 'anchoredVwap':
       return { ...drawing, point: moveAnchor(drawing.point, delta), updatedAt };
+    case 'anchoredText':
+    case 'anchoredNote':
+      return drawing;
+  }
+}
+
+function moveDrawingByScreenDelta(
+  drawing: UserDrawing,
+  anchorDelta: AnchorDelta,
+  positionDelta: PanePositionDelta,
+  space: DrawingCoordinateSpace,
+  updatedAt: number,
+): UserDrawing {
+  switch (drawing.kind) {
+    case 'anchoredText':
+    case 'anchoredNote':
+      return {
+        ...drawing,
+        position: movePanePosition(drawing.position, positionDelta),
+        updatedAt,
+      };
+    default:
+      return moveDrawing(drawing, anchorDelta, space, updatedAt);
   }
 }
 
@@ -478,6 +521,8 @@ function editDrawingHandle(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'anchoredText':
+    case 'anchoredNote':
     case 'priceLabel':
     case 'balloon':
     case 'signpost':
@@ -546,6 +591,12 @@ export function applyUserDrawingEditDrag(
     time: currentAnchor.time - startAnchor.time,
     price: currentAnchor.price - startAnchor.price,
   };
+  const startPosition = screenPointToPanePosition(drag.startPoint, drag.space);
+  const currentPosition = screenPointToPanePosition(point, drag.space);
+  const positionDelta = {
+    x: currentPosition.x - startPosition.x,
+    y: currentPosition.y - startPosition.y,
+  };
   if (isWholeDrawingDrag(drag.selection) && drag.startDrawings && drag.startDrawings.length > 1) {
     const startDrawingsById = new Map(drag.startDrawings.map((drawing) => [drawing.id, drawing]));
     let changed = false;
@@ -553,7 +604,7 @@ export function applyUserDrawingEditDrag(
       const startDrawing = startDrawingsById.get(drawing.id);
       if (!startDrawing) return drawing;
       changed = true;
-      return moveDrawing(startDrawing, delta, drag.space, updatedAt);
+      return moveDrawingByScreenDelta(startDrawing, delta, positionDelta, drag.space, updatedAt);
     });
 
     if (!changed) return state;
@@ -570,7 +621,7 @@ export function applyUserDrawingEditDrag(
   const nextDrawing =
     drag.selection.pointIndex !== undefined || (drag.selection.handle && drag.selection.handle !== 'center')
       ? editDrawingHandle(drag.startDrawing, drag.selection.handle, drag.selection.pointIndex, currentAnchor, updatedAt)
-      : moveDrawing(drag.startDrawing, delta, drag.space, updatedAt);
+      : moveDrawingByScreenDelta(drag.startDrawing, delta, positionDelta, drag.space, updatedAt);
 
   if (nextDrawing === state.drawings[drawingIndex]) return state;
 

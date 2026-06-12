@@ -4,13 +4,14 @@ import type {
   UserDrawingAnchor,
   UserDrawingBase,
   UserDrawingLineStyle,
+  UserDrawingPanePosition,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAnnotation,
 } from './types';
 
 import { createUserDrawingState } from './input';
-import { normalizeUserDrawingIconName, normalizeUserDrawingStyle } from './types';
+import { normalizeUserDrawingIconName, normalizeUserDrawingPanePosition, normalizeUserDrawingStyle } from './types';
 
 function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
   switch (drawing.kind) {
@@ -216,9 +217,19 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'anchoredText':
+    case 'anchoredNote':
     case 'priceLabel':
     case 'balloon':
     case 'signpost':
+      if (drawing.kind === 'anchoredText' || drawing.kind === 'anchoredNote') {
+        return {
+          ...drawing,
+          style: { ...drawing.style },
+          kind: drawing.kind,
+          position: { ...drawing.position },
+        };
+      }
       return {
         ...drawing,
         style: { ...drawing.style },
@@ -251,6 +262,11 @@ function isLineStyle(value: unknown): value is UserDrawingLineStyle {
 function parseAnchor(value: unknown): UserDrawingAnchor | null {
   if (!isRecord(value) || !isFiniteNumber(value.time) || !isFiniteNumber(value.price)) return null;
   return { time: value.time, price: value.price };
+}
+
+function parsePanePosition(value: unknown): UserDrawingPanePosition | null {
+  if (!isRecord(value) || !isFiniteNumber(value.x) || !isFiniteNumber(value.y)) return null;
+  return normalizeUserDrawingPanePosition({ x: value.x, y: value.y });
 }
 
 function parseBarsPatternBar(value: unknown): BarsPatternBarSnapshot | null {
@@ -1057,6 +1073,22 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ...base,
         kind: value.kind,
         point,
+        text: value.text,
+        textAlign,
+      };
+    }
+    case 'anchoredText':
+    case 'anchoredNote': {
+      const position = parsePanePosition(value.position);
+      if (!position || typeof value.text !== 'string') return null;
+      const textAlign: UserDrawingTextAnnotation['textAlign'] =
+        value.textAlign === 'left' || value.textAlign === 'right' || value.textAlign === 'center'
+          ? value.textAlign
+          : 'center';
+      return {
+        ...base,
+        kind: value.kind,
+        position,
         text: value.text,
         textAlign,
       };

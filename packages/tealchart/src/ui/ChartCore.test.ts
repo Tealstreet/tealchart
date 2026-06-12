@@ -346,15 +346,17 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
     expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
     expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
-    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith({
+    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(expect.objectContaining({
       paneId: 'main',
       anchor: { time: expect.any(Number), price: expect.any(Number) },
-    });
+      position: { x: expect.any(Number), y: expect.any(Number) },
+    }));
     expect(testCore.handleUserDrawingDragMove(120, 110)).toBe(true);
-    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith({
+    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(expect.objectContaining({
       paneId: 'main',
       anchor: { time: expect.any(Number), price: expect.any(Number) },
-    });
+      position: { x: expect.any(Number), y: expect.any(Number) },
+    }));
     testCore.handleUserDrawingDragEnd();
     expect(onUserDrawingPathDragEnd).toHaveBeenCalledTimes(1);
 

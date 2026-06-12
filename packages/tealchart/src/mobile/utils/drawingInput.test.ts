@@ -51,6 +51,8 @@ describe('mobile user drawing input resolver', () => {
     ).toEqual({
       paneId: 'macd',
       anchor: { time: 2_000, price: 0 },
+      position: { x: 0.5, y: 0.5 },
+      bars: undefined,
     });
   });
 

@@ -199,6 +199,8 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'brush', icon: '✎', label: 'Brush' },
   { tool: 'highlighter', icon: '▰', label: 'Highlighter' },
   { tool: 'note', icon: 'N', label: 'Note' },
+  { tool: 'anchoredText', icon: 'AT', label: 'Anchored text' },
+  { tool: 'anchoredNote', icon: 'AN', label: 'Anchored note' },
   { tool: 'callout', icon: 'C', label: 'Callout' },
   { tool: 'comment', icon: '!', label: 'Comment' },
   { tool: 'priceLabel', icon: 'PL', label: 'Price label' },

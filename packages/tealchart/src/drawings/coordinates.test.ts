@@ -91,6 +91,7 @@ import {
   resolveElliottTripleComboWaveFromAnchors,
   resolveElliottTriangleWaveFromAnchors,
   resolveHeadShouldersPatternFromAnchors,
+  panePositionToScreenPoint,
   resolveThreeDrivesPatternFromAnchors,
   resolveTrianglePatternFromAnchors,
   resolveXabcdPatternFromAnchors,
@@ -166,6 +167,7 @@ describe('user drawing coordinates', () => {
     ).toEqual({
       paneId: 'rsi',
       anchor: { time: 2_000, price: 50 },
+      position: { x: 0.5, y: 0.5 },
     });
   });
 
@@ -213,7 +215,12 @@ describe('user drawing coordinates', () => {
     ).toEqual({
       paneId: 'main',
       anchor: { time: 2_000, price: 100 },
+      position: { x: 0.5, y: 0.5 },
     });
+  });
+
+  it('converts normalized pane positions to screen points', () => {
+    expect(panePositionToScreenPoint({ x: 0.25, y: 0.75 }, space)).toEqual({ x: 60, y: 95 });
   });
 
   it('extends non-vertical segments to chart bounds', () => {
@@ -1414,6 +1421,27 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(signpost, space)).toMatchObject({
       kind: 'signpost',
       point: { x: 110, y: 70 },
+    });
+    expect(
+      resolveUserDrawingGeometry(
+        {
+          id: 'anchored-text',
+          kind: 'anchoredText',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          position: { x: 0.25, y: 0.75 },
+          text: 'Anchored',
+          textAlign: 'center',
+        },
+        space,
+      ),
+    ).toMatchObject({
+      kind: 'anchoredText',
+      point: { x: 60, y: 95 },
     });
     expect(resolveUserDrawingGeometry(priceLabel, space)).toMatchObject({
       kind: 'priceLabel',

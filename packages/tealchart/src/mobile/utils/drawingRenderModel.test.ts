@@ -3274,6 +3274,67 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('preserves anchored annotation position, text, and alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'anchored-text',
+          kind: 'anchoredText',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          position: { x: 0.25, y: 0.75 },
+          text: 'Anchored text',
+          textAlign: 'right',
+        },
+        {
+          id: 'anchored-note',
+          kind: 'anchoredNote',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          position: { x: 0.75, y: 0.25 },
+          text: 'Anchored note',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toMatchObject([
+      {
+        kind: 'anchoredText',
+        id: 'anchored-text',
+        clip,
+        point: { x: 25, y: 75 },
+        text: 'Anchored text',
+        editing: false,
+        editValue: null,
+        textAlign: 'right',
+      },
+      {
+        kind: 'anchoredNote',
+        id: 'anchored-note',
+        clip,
+        point: { x: 75, y: 25 },
+        text: 'Anchored note',
+        editing: false,
+        editValue: null,
+        textAlign: 'left',
+      },
+    ]);
+  });
+
   it('preserves price label text and alignment in mobile primitives', () => {
     const state: UserDrawingState = {
       version: 1,
