@@ -446,6 +446,16 @@ function renderGannBoxGeometry(
     ctx.lineTo(angle.end.x, angle.end.y);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  for (const level of gannBox.levels) {
+    ctx.fillText(level.label, level.labelPoint.x, level.labelPoint.y);
+  }
 }
 
 function renderFibChannelGeometry(
