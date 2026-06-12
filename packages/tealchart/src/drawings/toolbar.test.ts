@@ -6,13 +6,16 @@ import {
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
+  isUserDrawingFillVisibilityToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
   resolveUserDrawingStyleToolbarAction,
+  supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
+  supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextControls,
@@ -39,7 +42,7 @@ import {
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
-import type { UserDrawingState } from './types';
+import type { UserDrawing, UserDrawingState } from './types';
 
 const state: UserDrawingState = {
   version: 1,
@@ -494,6 +497,45 @@ describe('user drawing toolbar descriptors', () => {
           { time: 1, price: 10 },
           { time: 2, price: 12 },
         ],
+      }),
+    ).toBe(true);
+  });
+
+  it('separates fill color controls from fill visibility controls for risk/reward positions', () => {
+    const longPosition: UserDrawing = {
+      id: 'long',
+      kind: 'longPosition' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 2, price: 8 },
+      ],
+    };
+    const state: UserDrawingState = {
+      version: 1 as const,
+      activeTool: 'select' as const,
+      selection: { drawingId: 'long' },
+      drawings: [longPosition],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(supportsUserDrawingFillColorControls(longPosition)).toBe(false);
+    expect(supportsUserDrawingFillControls(longPosition)).toBe(false);
+    expect(supportsUserDrawingFillVisibilityControls(longPosition)).toBe(true);
+    expect(isUserDrawingFillToolbarEnabled(state)).toBe(false);
+    expect(isUserDrawingFillVisibilityToolbarEnabled(state)).toBe(true);
+    expect(
+      supportsUserDrawingFillVisibilityControls({
+        ...longPosition,
+        id: 'short',
+        kind: 'shortPosition',
       }),
     ).toBe(true);
   });

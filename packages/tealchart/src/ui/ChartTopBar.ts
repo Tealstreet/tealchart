@@ -18,12 +18,14 @@ import {
   getUserDrawingZOrderAction,
   getSelectedUserDrawing,
   isUserDrawingFillToolbarEnabled,
+  isUserDrawingFillVisibilityToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
-  supportsUserDrawingFillControls,
+  supportsUserDrawingFillColorControls,
+  supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextStyleControls,
@@ -471,10 +473,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
     const styleEnabled = state ? isUserDrawingStyleToolbarEnabled(state) : false;
-    const fillEnabled = state ? isUserDrawingFillToolbarEnabled(state) : false;
+    const fillColorEnabled = state ? isUserDrawingFillToolbarEnabled(state) : false;
+    const fillVisibilityEnabled = state ? isUserDrawingFillVisibilityToolbarEnabled(state) : false;
     const iconEnabled = state ? isUserDrawingIconToolbarEnabled(state) : false;
     const textEnabled = state ? isUserDrawingTextToolbarEnabled(state) : false;
-    const fillSupported = selectedDrawing ? supportsUserDrawingFillControls(selectedDrawing) : false;
+    const fillColorSupported = selectedDrawing ? supportsUserDrawingFillColorControls(selectedDrawing) : false;
+    const fillVisibilitySupported = selectedDrawing ? supportsUserDrawingFillVisibilityControls(selectedDrawing) : false;
     const iconSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
     const textStyleSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
     const textAlignSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
@@ -687,7 +691,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
       group.appendChild(this.createElement('div', { style: styles.divider }));
 
-      if (fillSupported) {
+      if (fillColorSupported) {
         for (const descriptor of USER_DRAWING_FILL_COLOR_DESCRIPTORS) {
           const isActive = selectedDrawing.style.fillColor?.toLowerCase() === descriptor.fillColor.toLowerCase();
           const btn = this.createElement('button', {
@@ -695,8 +699,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
               ...styles.drawingButton,
               ...styles.drawingSwatch,
               backgroundColor: descriptor.fillColor,
-              opacity: fillEnabled ? '1' : '0.35',
-              cursor: fillEnabled ? 'pointer' : 'default',
+              opacity: fillColorEnabled ? '1' : '0.35',
+              cursor: fillColorEnabled ? 'pointer' : 'default',
               outline: isActive ? '2px solid var(--accent, #2962ff)' : 'none',
             },
             attributes: {
@@ -706,23 +710,25 @@ export class ChartTopBar extends Component<ChartTopBarState> {
               'aria-pressed': isActive ? 'true' : 'false',
             },
           });
-          btn.disabled = !fillEnabled;
-          if (fillEnabled) {
+          btn.disabled = !fillColorEnabled;
+          if (fillColorEnabled) {
             btn.addEventListener('click', () =>
               this.options.onUserDrawingStyleChange?.({ fillColor: descriptor.fillColor }),
             );
           }
           group.appendChild(btn);
         }
+      }
 
+      if (fillVisibilitySupported) {
         const fillToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find((descriptor) => descriptor.style === 'fillVisible')!;
         const fillVisible = selectedDrawing.style.fillVisible !== false;
         const fillBtn = this.createElement('button', {
           style: {
             ...styles.drawingButton,
             ...(fillVisible ? styles.drawingButtonActive : {}),
-            opacity: fillEnabled ? '1' : '0.35',
-            cursor: fillEnabled ? 'pointer' : 'default',
+            opacity: fillVisibilityEnabled ? '1' : '0.35',
+            cursor: fillVisibilityEnabled ? 'pointer' : 'default',
           },
           textContent: fillToggle.icon,
           attributes: {
@@ -732,8 +738,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             'aria-pressed': fillVisible ? 'true' : 'false',
           },
         });
-        fillBtn.disabled = !fillEnabled;
-        if (fillEnabled) {
+        fillBtn.disabled = !fillVisibilityEnabled;
+        if (fillVisibilityEnabled) {
           fillBtn.addEventListener('click', () =>
             this.options.onUserDrawingStyleChange?.({ fillVisible: !fillVisible }),
           );

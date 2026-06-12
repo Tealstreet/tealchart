@@ -1248,6 +1248,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching selected projection fill controls
   through the shared toolbar eligibility helper.
 
+## Shipped: Risk/Reward Fill Toggle Controls
+
+- Shared toolbar eligibility now separates fill-color controls from
+  fill-visibility controls so tools with fixed semantic fills can expose only
+  the relevant toggle.
+- Web and mobile top bars expose matching fill visibility toggles for selected
+  long-position and short-position drawings without showing misleading fill
+  color swatches.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
