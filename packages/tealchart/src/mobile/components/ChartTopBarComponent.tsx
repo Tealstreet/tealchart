@@ -711,7 +711,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                               disabled={!textControlsEnabled}
                               onPress={() =>
                                 onUserDrawingStyleChange?.({
-                                  textWrap: !selectedDrawing.style.textWrap,
+                                  textWrap: descriptor.textWrap,
                                   textMaxWidth: selectedDrawing.style.textMaxWidth ?? 180,
                                 })
                               }
