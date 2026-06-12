@@ -68,6 +68,8 @@ import type {
   UserDrawingFontFamily,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSize,
+  UserDrawingFontStyle,
+  UserDrawingFontStyleDescriptor,
   UserDrawingFontWeight,
   UserDrawingFontWeightDescriptor,
   UserDrawingHitTestTextMeasure,
@@ -144,6 +146,7 @@ import {
   formatUserDrawingDateRangeBars,
   getUserDrawingSelectionIds,
   normalizeUserDrawingFontFamily,
+  normalizeUserDrawingFontStyle,
   normalizeUserDrawingFontWeight,
   normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
@@ -201,6 +204,8 @@ import {
   splitUserDrawingTextLines,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
+  USER_DRAWING_FONT_STYLE_DESCRIPTORS,
+  USER_DRAWING_FONT_STYLES,
   USER_DRAWING_FONT_WEIGHT_DESCRIPTORS,
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
@@ -1046,15 +1051,20 @@ describe('tealchart public entries', () => {
   it('exports shared drawing font-family helpers', () => {
     const fontSize: UserDrawingFontSize = 12;
     const fontFamily: UserDrawingFontFamily = USER_DRAWING_FONT_FAMILIES[0]!;
+    const fontStyle: UserDrawingFontStyle = USER_DRAWING_FONT_STYLES[1]!;
     const fontWeight: UserDrawingFontWeight = USER_DRAWING_FONT_WEIGHTS[1]!;
     const descriptor: UserDrawingFontFamilyDescriptor = USER_DRAWING_FONT_FAMILY_DESCRIPTORS[0]!;
+    const styleDescriptor: UserDrawingFontStyleDescriptor = USER_DRAWING_FONT_STYLE_DESCRIPTORS[1]!;
     const weightDescriptor: UserDrawingFontWeightDescriptor = USER_DRAWING_FONT_WEIGHT_DESCRIPTORS[1]!;
     expect(fontSize).toBe(12);
     expect(fontFamily).toBe('sans-serif');
+    expect(fontStyle).toBe('italic');
     expect(fontWeight).toBe('bold');
     expect(descriptor.fontFamily).toBe('sans-serif');
+    expect(styleDescriptor.fontStyle).toBe('italic');
     expect(weightDescriptor.fontWeight).toBe('bold');
     expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
+    expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
   });
 

@@ -539,7 +539,8 @@ export function updateUserDrawingStyle(
       nextStyle.textColor === target.drawing.style.textColor &&
       nextStyle.fontSize === target.drawing.style.fontSize &&
       nextStyle.fontFamily === target.drawing.style.fontFamily &&
-      nextStyle.fontWeight === target.drawing.style.fontWeight
+      nextStyle.fontWeight === target.drawing.style.fontWeight &&
+      nextStyle.fontStyle === target.drawing.style.fontStyle
     ) {
       continue;
     }

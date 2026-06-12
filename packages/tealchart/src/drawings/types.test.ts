@@ -12,9 +12,11 @@ import {
   isDrawingDraftReady,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingFontStyle,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
   USER_DRAWING_FONT_FAMILIES,
+  USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
@@ -162,6 +164,15 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingFontFamily('Papyrus')).toBe('sans-serif');
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, fontFamily: 'fantasy' })).toMatchObject({
       fontFamily: 'sans-serif',
+    });
+  });
+
+  it('normalizes drawing font styles to supported cross-platform values', () => {
+    expect(USER_DRAWING_FONT_STYLES).toEqual(['normal', 'italic']);
+    expect(normalizeUserDrawingFontStyle('italic')).toBe('italic');
+    expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, fontStyle: 'oblique' as never })).toMatchObject({
+      fontStyle: 'normal',
     });
   });
 
