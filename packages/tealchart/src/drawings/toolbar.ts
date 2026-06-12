@@ -405,6 +405,8 @@ export const USER_DRAWING_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthD
   { width: 1, label: '1 pixel line width' },
   { width: 2, label: '2 pixel line width' },
   { width: 3, label: '3 pixel line width' },
+  { width: 4, label: '4 pixel line width' },
+  { width: 5, label: '5 pixel line width' },
 ] as const;
 
 export const USER_DRAWING_LINE_STYLE_DESCRIPTORS: readonly UserDrawingLineStyleDescriptor[] = [

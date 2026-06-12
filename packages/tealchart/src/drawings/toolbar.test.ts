@@ -665,7 +665,7 @@ describe('user drawing toolbar descriptors', () => {
       '#f43f5e',
       '#d1d4dc',
     ]);
-    expect(USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width)).toEqual([1, 2, 3]);
+    expect(USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width)).toEqual([1, 2, 3, 4, 5]);
     expect(USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => descriptor.lineStyle)).toEqual([
       'solid',
       'dashed',
