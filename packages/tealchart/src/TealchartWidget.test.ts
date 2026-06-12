@@ -1007,6 +1007,44 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('applies public table cell commands through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'table' },
+        drawings: [
+          {
+            id: 'table',
+            kind: 'table',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            point: { time: 50, price: 50 },
+            cells: [['Metric', 'Value']],
+          },
+        ],
+      });
+
+      expect(widget.setUserDrawingTableCells([['Metric', 'Value'], ['Price', 101.25]])).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        cells: [
+          ['Metric', 'Value'],
+          ['Price', '101.25'],
+        ],
+      });
+      expect(widget.setUserDrawingTableCells([['Metric', 'Value'], ['Price', '101.25']])).toBe(false);
+      expect(onChange).toHaveBeenCalled();
+    });
+
     it('applies public text drawing edit commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

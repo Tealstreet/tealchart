@@ -1110,6 +1110,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Public-entry coverage verifies native host integrations can import the full
   mobile drawing primitive surface without reaching into internal utility paths.
 
+## Shipped: Table Cell Update APIs
+
+- Shared drawing state can update table cell matrices through the same selected
+  or explicit drawing target contract used by image and style updates.
+- Web widget and mobile Skia handles expose matching table cell update methods,
+  and native utilities export the mobile wrapper for host property panels.
+- Cell updates reuse the bounded table normalizer, preserving stable drawing IDs
+  while stringifying mixed host values consistently across web and mobile.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
@@ -1118,7 +1127,7 @@ matching behavior in the same PR for every user-facing drawing feature.
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
-- Rich text label controls, table cell editing, and multiline editor polish.
+- Rich text label controls, richer table editing UI, and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.
