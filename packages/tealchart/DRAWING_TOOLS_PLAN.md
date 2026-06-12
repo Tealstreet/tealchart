@@ -1088,6 +1088,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - The shared mobile render model exposes signposts as typed text-box primitives,
   keeping future text annotation parity work on one helper path.
 
+## Shipped: Mobile Text Annotation Editor Parity
+
+- Mobile Skia now uses one shared text-box primitive predicate for text
+  annotation rendering and active text editor attachment.
+- Balloon and signpost drawings can surface the mobile text editor when host
+  apps start text editing through the shared drawing state/API.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
