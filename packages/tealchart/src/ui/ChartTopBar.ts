@@ -213,6 +213,96 @@ const styles = {
     fontWeight: '700',
   } as Partial<CSSStyleDeclaration>,
 
+  drawingToolRail: {
+    position: 'absolute',
+    top: '40px',
+    left: '8px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 4px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: '6px',
+    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.96))',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+    zIndex: '7',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolRailItem: {
+    position: 'relative',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolCategoryButton: {
+    width: '32px',
+    height: '32px',
+    border: 'none',
+    borderRadius: '5px',
+    backgroundColor: 'transparent',
+    color: 'var(--text2, #787b86)',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    lineHeight: '32px',
+    padding: '0',
+    textAlign: 'center',
+    transition: 'background-color 0.15s, color 0.15s',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyout: {
+    position: 'absolute',
+    top: '0',
+    left: '40px',
+    display: 'none',
+    minWidth: '240px',
+    maxHeight: '420px',
+    overflowY: 'auto',
+    padding: '10px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: '6px',
+    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.32)',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutTitle: {
+    color: 'var(--text2, #787b86)',
+    fontSize: '11px',
+    fontWeight: '600',
+    letterSpacing: '0',
+    textTransform: 'uppercase',
+    marginBottom: '6px',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutButton: {
+    display: 'grid',
+    gridTemplateColumns: '28px 1fr',
+    alignItems: 'center',
+    columnGap: '8px',
+    width: '100%',
+    minHeight: '32px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: 'var(--text, #d1d4dc)',
+    cursor: 'pointer',
+    fontSize: '13px',
+    padding: '4px 8px',
+    textAlign: 'left',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutIcon: {
+    color: 'var(--text2, #787b86)',
+    fontSize: '13px',
+    fontWeight: '600',
+    textAlign: 'center',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutLabel: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  } as Partial<CSSStyleDeclaration>,
+
   drawingGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -289,6 +379,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private timeframeButtons: Map<string, HTMLButtonElement> = new Map();
   private indicatorsBtn: HTMLButtonElement | null = null;
   private layoutSelector: LayoutSelector | null = null;
+  private drawingToolRailEl: HTMLElement | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -325,6 +416,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   protected onUnmount(): void {
+    this.removeDrawingToolRail();
     this.layoutSelector?.dispose();
     this.layoutSelector = null;
   }
@@ -335,6 +427,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   protected render(): void {
     this.el.innerHTML = '';
+    this.removeDrawingToolRail();
     this.timeframeButtons.clear();
 
     // Symbol section
@@ -455,35 +548,63 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
   }
 
-  private renderDrawingToolbar(): HTMLElement {
-    const group = this.createElement('div', { style: styles.drawingGroup });
-    const state = this.options.userDrawingState;
-    const activeTool = state?.activeTool ?? 'select';
+  private removeDrawingToolRail(): void {
+    this.drawingToolRailEl?.remove();
+    this.drawingToolRailEl = null;
+  }
+
+  private renderDrawingToolRail(activeTool: UserDrawingTool): void {
+    const rail = this.createElement('div', {
+      style: styles.drawingToolRail,
+      attributes: {
+        'aria-label': 'Drawing tool categories',
+      },
+    });
 
     for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
-      const categoryGroup = this.createElement('div', {
-        style: styles.drawingToolCategory,
+      const activeCategory = category.tools.includes(activeTool);
+      const firstTool = getUserDrawingToolDescriptor(category.tools[0]!);
+      const railItem = this.createElement('div', {
+        style: styles.drawingToolRailItem,
+      });
+      const categoryButton = this.createElement('button', {
+        style: {
+          ...styles.drawingToolCategoryButton,
+          ...(activeCategory ? styles.drawingButtonActive : {}),
+        },
+        textContent: firstTool.icon,
         attributes: {
-          role: 'group',
+          type: 'button',
+          title: category.label,
           'aria-label': `${category.label} drawing tools`,
+          'aria-expanded': 'false',
         },
       });
-      categoryGroup.appendChild(
-        this.createElement('span', {
-          style: styles.drawingToolCategoryLabel,
-          textContent: category.label,
-        }),
-      );
+      const flyout = this.createElement('div', { style: styles.drawingToolFlyout });
+      flyout.appendChild(this.createElement('div', { style: styles.drawingToolFlyoutTitle, textContent: category.label }));
+      const showFlyout = () => {
+        flyout.style.display = 'block';
+        categoryButton.setAttribute('aria-expanded', 'true');
+      };
+      const hideFlyout = () => {
+        flyout.style.display = 'none';
+        categoryButton.setAttribute('aria-expanded', 'false');
+      };
+      categoryButton.addEventListener('click', () => {
+        if (flyout.style.display === 'block') hideFlyout();
+        else showFlyout();
+      });
+      railItem.addEventListener('mouseenter', showFlyout);
+      railItem.addEventListener('mouseleave', hideFlyout);
 
       for (const tool of category.tools) {
         const descriptor = getUserDrawingToolDescriptor(tool);
         const isActive = activeTool === descriptor.tool;
         const btn = this.createElement('button', {
           style: {
-            ...styles.drawingButton,
+            ...styles.drawingToolFlyoutButton,
             ...(isActive ? styles.drawingButtonActive : {}),
           },
-          textContent: descriptor.icon,
           attributes: {
             type: 'button',
             title: descriptor.label,
@@ -491,22 +612,39 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             'aria-pressed': isActive ? 'true' : 'false',
           },
         });
-        btn.addEventListener('click', () => this.options.onUserDrawingToolSelect?.(descriptor.tool));
+        btn.appendChild(this.createElement('span', { style: styles.drawingToolFlyoutIcon, textContent: descriptor.icon }));
+        btn.appendChild(this.createElement('span', { style: styles.drawingToolFlyoutLabel, textContent: descriptor.label }));
+        btn.addEventListener('click', () => {
+          this.options.onUserDrawingToolSelect?.(descriptor.tool);
+          hideFlyout();
+        });
         btn.addEventListener('mouseenter', () => {
           if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
         });
         btn.addEventListener('mouseleave', () => {
           if (!isActive) {
             btn.style.backgroundColor = 'transparent';
-            btn.style.color = 'var(--text2, #787b86)';
+            btn.style.color = 'var(--text, #d1d4dc)';
           }
         });
-        categoryGroup.appendChild(btn);
+        flyout.appendChild(btn);
       }
 
-      group.appendChild(categoryGroup);
+      railItem.appendChild(categoryButton);
+      railItem.appendChild(flyout);
+      rail.appendChild(railItem);
     }
 
+    this.drawingToolRailEl = rail;
+    (this.el.parentElement ?? this.el).appendChild(rail);
+  }
+
+  private renderDrawingToolbar(): HTMLElement {
+    const group = this.createElement('div', { style: styles.drawingGroup });
+    const state = this.options.userDrawingState;
+    const activeTool = state?.activeTool ?? 'select';
+
+    this.renderDrawingToolRail(activeTool);
     group.appendChild(this.createElement('div', { style: styles.divider }));
 
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;

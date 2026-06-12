@@ -152,6 +152,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     // Internal state for immediate visual feedback (like web's nanostores pattern)
     // This makes the component work both controlled and uncontrolled
     const [internalInterval, setInternalInterval] = useState(interval);
+    const [expandedDrawingCategoryId, setExpandedDrawingCategoryId] = useState<string | null>(null);
 
     // Sync internal state when prop changes (controlled mode)
     useEffect(() => {
@@ -191,9 +192,77 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const trendLineExtendControlsSupported = selectedDrawing
       ? supportsUserDrawingTrendLineExtendControls(selectedDrawing)
       : false;
+    const expandedDrawingCategory =
+      userDrawingState && expandedDrawingCategoryId
+        ? USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.id === expandedDrawingCategoryId)
+        : null;
 
     return (
       <View style={[styles.container, { backgroundColor }]}>
+        {userDrawingState && (
+          <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
+            {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
+              const activeCategory = category.tools.includes(userDrawingState.activeTool);
+              const firstTool = getUserDrawingToolDescriptor(category.tools[0]!);
+              const expanded = expandedDrawingCategoryId === category.id;
+              return (
+                <Pressable
+                  key={category.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${category.label} drawing tools`}
+                  accessibilityState={{ expanded, selected: activeCategory }}
+                  onPress={() => setExpandedDrawingCategoryId(expanded ? null : category.id)}
+                  style={({ pressed }: PressableStyleState) => [
+                    styles.drawingToolCategoryButton,
+                    activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                    pressed && !activeCategory && styles.drawingButtonPressed,
+                  ]}
+                >
+                  <Text style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}>
+                    {firstTool.icon}
+                  </Text>
+                </Pressable>
+              );
+            })}
+
+            {expandedDrawingCategory && (
+              <View style={styles.drawingToolFlyout} accessibilityLabel={`${expandedDrawingCategory.label} tools`}>
+                <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
+                  {expandedDrawingCategory.label}
+                </Text>
+                {expandedDrawingCategory.tools.map((tool) => {
+                  const descriptor = getUserDrawingToolDescriptor(tool);
+                  const active = userDrawingState.activeTool === descriptor.tool;
+                  return (
+                    <Pressable
+                      key={descriptor.tool}
+                      accessibilityRole="button"
+                      accessibilityLabel={descriptor.label}
+                      accessibilityState={{ selected: active }}
+                      onPress={() => {
+                        onUserDrawingToolSelect?.(descriptor.tool);
+                        setExpandedDrawingCategoryId(null);
+                      }}
+                      style={({ pressed }: PressableStyleState) => [
+                        styles.drawingToolFlyoutButton,
+                        active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                        pressed && !active && styles.drawingButtonPressed,
+                      ]}
+                    >
+                      <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
+                        {descriptor.icon}
+                      </Text>
+                      <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
+                        {descriptor.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Symbol display (only shown if symbol is provided) */}
         {symbol ? (
           <>
@@ -247,44 +316,6 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.drawingContainer}
             >
-              {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => (
-                <View
-                  key={category.id}
-                  accessibilityLabel={`${category.label} drawing tools`}
-                  style={styles.drawingToolCategory}
-                >
-                  <Text style={[styles.drawingToolCategoryLabel, { color: textSecondaryColor }]}>
-                    {category.label}
-                  </Text>
-                  {category.tools.map((tool) => {
-                    const descriptor = getUserDrawingToolDescriptor(tool);
-                    const active = userDrawingState.activeTool === descriptor.tool;
-                    return (
-                      <Pressable
-                        key={descriptor.tool}
-                        accessibilityRole="button"
-                        accessibilityLabel={descriptor.label}
-                        accessibilityState={{ selected: active }}
-                        onPress={() => onUserDrawingToolSelect?.(descriptor.tool)}
-                        style={({ pressed }: PressableStyleState) => [
-                          styles.drawingButton,
-                          active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                          pressed && !active && styles.drawingButtonPressed,
-                        ]}
-                      >
-                        <Text
-                          style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
-                        >
-                          {descriptor.icon}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              ))}
-
-              <View style={styles.innerDivider} />
-
               {selectedDrawing && (
                 <>
                   {USER_DRAWING_LINE_COLOR_DESCRIPTORS.map((descriptor) => {
@@ -1019,17 +1050,61 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  drawingToolCategory: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    flexShrink: 0,
+  drawingToolRail: {
+    position: 'absolute',
+    top: TOP_BAR_HEIGHT + 8,
+    left: 8,
+    zIndex: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#363a45',
+    borderRadius: 6,
+    backgroundColor: 'rgba(19, 23, 34, 0.96)',
+    gap: 4,
   },
-  drawingToolCategoryLabel: {
-    fontSize: 10,
+  drawingToolCategoryButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  drawingToolFlyout: {
+    position: 'absolute',
+    top: 0,
+    left: 42,
+    width: 250,
+    maxHeight: 420,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#363a45',
+    borderRadius: 6,
+    backgroundColor: 'rgba(19, 23, 34, 0.98)',
+  },
+  drawingToolFlyoutTitle: {
+    fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
-    marginRight: 2,
+    marginBottom: 6,
+  },
+  drawingToolFlyoutButton: {
+    minHeight: 34,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 8,
+  },
+  drawingToolFlyoutIcon: {
+    width: 28,
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  drawingToolFlyoutLabel: {
+    flex: 1,
+    fontSize: 13,
   },
   drawingButton: {
     width: 28,
