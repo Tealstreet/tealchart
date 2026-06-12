@@ -528,6 +528,7 @@ function renderPatternGeometry(
         | 'threeDrivesPattern'
         | 'elliottImpulseWave'
         | 'elliottCorrectiveWave'
+        | 'elliottDoubleComboWave'
         | 'elliottTriangleWave';
     }
   >,
@@ -1203,6 +1204,7 @@ export function renderUserDrawing(
         renderPatternGeometry(ctx, geometry);
         break;
       case 'elliottCorrectiveWave':
+      case 'elliottDoubleComboWave':
         renderPatternGeometry(ctx, geometry);
         break;
       case 'elliottTriangleWave':

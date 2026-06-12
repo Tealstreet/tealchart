@@ -2707,6 +2707,53 @@ describe('mobile user drawing render model', () => {
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(3);
   });
 
+  it('returns Skia-ready Elliott double combo wave primitives with labels and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'elliott-double-combo' },
+      drawings: [
+        {
+          id: 'elliott-double-combo',
+          kind: 'elliottDoubleComboWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 30, price: 30 },
+            { time: 50, price: 70 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'elliottDoubleComboWave',
+      id: 'elliott-double-combo',
+      clip,
+      points: [
+        { x: 10, y: 50 },
+        { x: 30, y: 70 },
+        { x: 50, y: 30 },
+      ],
+      labels: [
+        { text: 'W', point: { x: 10, y: 50 } },
+        { text: 'X', point: { x: 30, y: 70 } },
+        { text: 'Y', point: { x: 50, y: 30 } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(3);
+  });
+
   it('returns Skia-ready Elliott triangle wave primitives with labels and handles', () => {
     const state: UserDrawingState = {
       version: 1,
