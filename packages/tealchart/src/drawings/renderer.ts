@@ -665,6 +665,37 @@ function renderRectangleGeometry(
   }
 }
 
+function renderImageGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'image' }>,
+): void {
+  const { rect, drawing } = geometry;
+  if (drawing.style.fillVisible !== false) {
+    ctx.fillStyle = drawing.style.fillColor ?? 'rgba(127, 127, 127, 0.12)';
+    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  if (drawing.style.lineVisible !== false) {
+    applyStrokeStyle(ctx, drawing);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.beginPath();
+    ctx.moveTo(rect.x, rect.y);
+    ctx.lineTo(rect.x + rect.width, rect.y + rect.height);
+    ctx.moveTo(rect.x + rect.width, rect.y);
+    ctx.lineTo(rect.x, rect.y + rect.height);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.font = `${normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12)}px ${normalizeUserDrawingFontFamily(
+    drawing.style.fontFamily ?? 'sans-serif',
+  )}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const label = drawing.kind === 'image' && drawing.src ? drawing.alt || 'Image' : 'Image';
+  ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2);
+}
+
 function renderCircleGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'circle' }>,
@@ -1291,6 +1322,9 @@ export function renderUserDrawing(
         break;
       case 'rectangle':
         renderRectangleGeometry(ctx, geometry);
+        break;
+      case 'image':
+        renderImageGeometry(ctx, geometry);
         break;
       case 'circle':
         renderCircleGeometry(ctx, geometry);

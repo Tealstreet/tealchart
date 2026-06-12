@@ -609,6 +609,55 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored image annotations', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'image',
+          kind: 'image',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 20 },
+          ],
+          src: 'https://example.test/chart.png',
+          alt: 'Chart snapshot',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'image',
+      kind: 'image',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 20 },
+      ],
+      src: 'https://example.test/chart.png',
+      alt: 'Chart snapshot',
+    });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings[0]).toMatchObject({
+      id: 'image',
+      kind: 'image',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 20 },
+      ],
+      src: 'https://example.test/chart.png',
+      alt: 'Chart snapshot',
+    });
+  });
+
   it('preserves restored flag mark drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

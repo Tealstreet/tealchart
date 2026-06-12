@@ -75,6 +75,15 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: drawing.kind,
         points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
       };
+    case 'image':
+      return {
+        ...drawing,
+        style: { ...drawing.style },
+        kind: 'image',
+        points: [{ ...drawing.points[0] }, { ...drawing.points[1] }],
+        src: drawing.src,
+        alt: drawing.alt,
+      };
     case 'triangle':
     case 'curve':
     case 'arc':
@@ -470,6 +479,18 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
             ...base,
             kind: 'rectangle',
             points,
+          }
+        : null;
+    }
+    case 'image': {
+      const points = parseTwoPointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'image',
+            points,
+            src: typeof value.src === 'string' ? value.src : '',
+            alt: typeof value.alt === 'string' ? value.alt : 'Image placeholder',
           }
         : null;
     }

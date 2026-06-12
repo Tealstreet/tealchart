@@ -88,6 +88,7 @@ export type UserDrawingTool =
   | 'pin'
   | 'icon'
   | 'flagMark'
+  | 'image'
   | 'emoji'
   | 'sticker'
   | 'balloon'
@@ -237,6 +238,13 @@ export interface VerticalLineDrawing extends UserDrawingBase {
 export interface RectangleDrawing extends UserDrawingBase {
   kind: 'rectangle';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
+export interface ImageDrawing extends UserDrawingBase {
+  kind: 'image';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+  src: string;
+  alt: string;
 }
 
 export interface CircleDrawing extends UserDrawingBase {
@@ -769,6 +777,7 @@ export type UserDrawing =
   | PinDrawing
   | IconDrawing
   | FlagMarkDrawing
+  | ImageDrawing
   | EmojiDrawing
   | StickerDrawing
   | BalloonDrawing
@@ -901,6 +910,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'arrowMarker':
     case 'ray':
     case 'rectangle':
+    case 'image':
     case 'circle':
     case 'ellipse':
     case 'priceRange':
@@ -1145,6 +1155,14 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'rectangle',
         points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'image':
+      return {
+        ...base,
+        kind: 'image',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+        src: draft.text ?? '',
+        alt: draft.text ? 'Image' : 'Image placeholder',
       };
     case 'circle':
       return {

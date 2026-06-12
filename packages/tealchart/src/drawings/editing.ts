@@ -123,6 +123,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'ray':
       return { ...drawing, points: [moveAnchor(drawing.points[0], delta), moveAnchor(drawing.points[1], delta)], updatedAt };
     case 'rectangle':
+    case 'image':
     case 'circle':
     case 'ellipse':
     case 'priceRange':
@@ -304,7 +305,7 @@ function editLineEndpoint(
 function editRectangleCorner(
   drawing: Extract<
     UserDrawing,
-    { kind: 'rectangle' | 'circle' | 'ellipse' | 'priceRange' | 'datePriceRange' | 'gannBox' | 'gannSquare' }
+    { kind: 'rectangle' | 'image' | 'circle' | 'ellipse' | 'priceRange' | 'datePriceRange' | 'gannBox' | 'gannSquare' }
   >,
   handle: UserDrawingHandleRole,
   anchor: UserDrawingAnchor,
@@ -511,6 +512,7 @@ function editDrawingHandle(
     case 'priceNote':
       return editLineEndpoint(drawing, handle, anchor, updatedAt);
     case 'rectangle':
+    case 'image':
     case 'circle':
     case 'ellipse':
     case 'priceRange':
