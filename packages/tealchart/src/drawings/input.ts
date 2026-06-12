@@ -66,6 +66,11 @@ export interface UserDrawingTextEditOptions {
   now?: () => number;
 }
 
+export interface UserDrawingImageSourceInput {
+  src: string;
+  alt?: string;
+}
+
 export interface UpdateUserDrawingOptions {
   drawingId?: string;
   includeLocked?: boolean;
@@ -1043,6 +1048,25 @@ export function setUserDrawingIconName(
   return replaceUserDrawing(state, target.index, {
     ...target.drawing,
     iconName: nextIconName,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
+export function setUserDrawingImageSource(
+  state: UserDrawingState,
+  source: UserDrawingImageSourceInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'image') return state;
+
+  const nextAlt = source.alt ?? target.drawing.alt;
+  if (target.drawing.src === source.src && target.drawing.alt === nextAlt) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    src: source.src,
+    alt: nextAlt,
     updatedAt: options.now?.() ?? Date.now(),
   });
 }
