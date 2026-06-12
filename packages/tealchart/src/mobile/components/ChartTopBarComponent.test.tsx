@@ -156,6 +156,42 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
+  it('dispatches hidden selected drawing show control', () => {
+    const onVisibility = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'h' },
+          drawings: [
+            {
+              id: 'h',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: false,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        }}
+        onUserDrawingVisibilityChange={onVisibility}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Hide selected drawing'));
+    fireEvent.click(screen.getByLabelText('Show selected drawing'));
+
+    expect((screen.getByLabelText('Hide selected drawing') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Show selected drawing') as HTMLButtonElement).disabled).toBe(false);
+    expect(onVisibility).toHaveBeenCalledTimes(1);
+    expect(onVisibility).toHaveBeenCalledWith(true);
+  });
+
   it('dispatches selected trend-line extension controls only for trend lines', () => {
     const onExtend = vi.fn();
     const { rerender } = render(
