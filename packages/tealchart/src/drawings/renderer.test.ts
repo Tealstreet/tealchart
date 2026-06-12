@@ -1020,6 +1020,29 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:E:90,49.00000000000001:#111:center:1:12px sans-serif');
   });
 
+  it('renders Elliott triple combo wave drawings as labeled paths', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-triple-combo',
+      kind: 'elliottTripleComboWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 70 },
+        { time: 50, price: 40 },
+        { time: 70, price: 60 },
+        { time: 90, price: 45 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,50');
+    expect(ctx.calls).toContain('lineTo:90,55.00000000000001');
+    expect(ctx.calls).toContain('fillText:W:10,44:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Z:90,49.00000000000001:#111:center:1:12px sans-serif');
+  });
+
   it('renders ABCD pattern drawings as labeled stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

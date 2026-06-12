@@ -128,6 +128,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('threeDrivesPattern')).toBe(5);
     expect(getRequiredAnchorCount('headShouldersPattern')).toBe(5);
     expect(getRequiredAnchorCount('elliottImpulseWave')).toBe(5);
+    expect(getRequiredAnchorCount('elliottTripleComboWave')).toBe(5);
     expect(getRequiredAnchorCount('elliottTriangleWave')).toBe(5);
     expect(getRequiredAnchorCount('xabcdPattern')).toBe(5);
     expect(getRequiredAnchorCount('cypherPattern')).toBe(5);
@@ -708,6 +709,23 @@ describe('user drawing types', () => {
     ).toMatchObject({
       id: 'three-drives',
       kind: 'threeDrivesPattern',
+      points: [anchorA, anchorB, anchorC, anchorD, anchorE],
+      visible: true,
+      locked: false,
+      createdAt: 24,
+      updatedAt: 24,
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({ tool: 'elliottTripleComboWave', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }),
+        {
+          id: 'elliott-triple-combo',
+          now: 24,
+        },
+      ),
+    ).toMatchObject({
+      id: 'elliott-triple-combo',
+      kind: 'elliottTripleComboWave',
       points: [anchorA, anchorB, anchorC, anchorD, anchorE],
       visible: true,
       locked: false,

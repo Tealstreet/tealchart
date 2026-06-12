@@ -2807,6 +2807,59 @@ describe('mobile user drawing render model', () => {
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
   });
 
+  it('returns Skia-ready Elliott triple combo wave primitives with labels and handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'elliott-triple-combo' },
+      drawings: [
+        {
+          id: 'elliott-triple-combo',
+          kind: 'elliottTripleComboWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 30, price: 70 },
+            { time: 50, price: 40 },
+            { time: 70, price: 60 },
+            { time: 90, price: 45 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'elliottTripleComboWave',
+      id: 'elliott-triple-combo',
+      clip,
+      points: [
+        { x: 10, y: 50 },
+        { x: 30, y: 30 },
+        { x: 50, y: 60 },
+        { x: 70, y: 40 },
+        { x: 90, y: expect.closeTo(55) },
+      ],
+      labels: [
+        { text: 'W', point: { x: 10, y: 50 } },
+        { text: 'X', point: { x: 30, y: 30 } },
+        { text: 'Y', point: { x: 50, y: 60 } },
+        { text: 'X', point: { x: 70, y: 40 } },
+        { text: 'Z', point: { x: 90, y: expect.closeTo(55) } },
+      ],
+      style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(5);
+  });
+
   it('returns Skia-ready ABCD pattern primitives with labels and handles', () => {
     const state: UserDrawingState = {
       version: 1,

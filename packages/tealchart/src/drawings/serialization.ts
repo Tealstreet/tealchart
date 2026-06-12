@@ -148,6 +148,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'threeDrivesPattern':
     case 'headShouldersPattern':
     case 'elliottImpulseWave':
+    case 'elliottTripleComboWave':
     case 'elliottTriangleWave':
       return {
         ...drawing,
@@ -923,6 +924,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'elliottImpulseWave',
+            points,
+          }
+        : null;
+    }
+    case 'elliottTripleComboWave': {
+      const points = parseFivePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'elliottTripleComboWave',
             points,
           }
         : null;

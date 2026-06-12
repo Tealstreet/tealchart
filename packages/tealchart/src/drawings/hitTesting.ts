@@ -261,6 +261,7 @@ function hitTestResolvedGeometry(
     geometry.kind === 'elliottImpulseWave' ||
     geometry.kind === 'elliottCorrectiveWave' ||
     geometry.kind === 'elliottDoubleComboWave' ||
+    geometry.kind === 'elliottTripleComboWave' ||
     geometry.kind === 'elliottTriangleWave'
   ) {
     const distance = distanceToPolyline(point, geometry.pattern.polyline.points);
@@ -821,6 +822,7 @@ function hitTestUserDrawingHandle(
     case 'elliottImpulseWave':
     case 'elliottCorrectiveWave':
     case 'elliottDoubleComboWave':
+    case 'elliottTripleComboWave':
     case 'elliottTriangleWave':
     case 'headShouldersPattern':
       geometry.pattern.polyline.points.forEach((patternPoint, pointIndex) => {

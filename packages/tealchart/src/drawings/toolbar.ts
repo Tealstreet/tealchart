@@ -161,6 +161,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'elliottImpulseWave', icon: '123', label: 'Elliott impulse wave' },
   { tool: 'elliottCorrectiveWave', icon: 'ABC', label: 'Elliott corrective wave' },
   { tool: 'elliottDoubleComboWave', icon: 'WXY', label: 'Elliott double combo wave' },
+  { tool: 'elliottTripleComboWave', icon: 'WXYXZ', label: 'Elliott triple combo wave' },
   { tool: 'elliottTriangleWave', icon: 'ABCDE', label: 'Elliott triangle wave' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
