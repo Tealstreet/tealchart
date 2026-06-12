@@ -28,6 +28,7 @@ import {
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+  USER_DRAWING_FONT_WEIGHT_DESCRIPTORS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
@@ -822,6 +823,42 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           if (textEnabled) {
             btn.addEventListener('click', () =>
               this.options.onUserDrawingStyleChange?.({ fontFamily: descriptor.fontFamily }),
+            );
+            btn.addEventListener('mouseenter', () => {
+              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+            });
+            btn.addEventListener('mouseleave', () => {
+              if (!isActive) {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text2, #787b86)';
+              }
+            });
+          }
+          group.appendChild(btn);
+        }
+
+        for (const descriptor of USER_DRAWING_FONT_WEIGHT_DESCRIPTORS) {
+          const isActive = (selectedDrawing.style.fontWeight ?? 'normal') === descriptor.fontWeight;
+          const btn = this.createElement('button', {
+            style: {
+              ...styles.drawingButton,
+              ...(isActive ? styles.drawingButtonActive : {}),
+              opacity: textEnabled ? '1' : '0.35',
+              cursor: textEnabled ? 'pointer' : 'default',
+              fontWeight: descriptor.fontWeight === 'bold' ? '700' : '400',
+            },
+            textContent: descriptor.icon,
+            attributes: {
+              type: 'button',
+              title: descriptor.label,
+              'aria-label': descriptor.label,
+              'aria-pressed': isActive ? 'true' : 'false',
+            },
+          });
+          btn.disabled = !textEnabled;
+          if (textEnabled) {
+            btn.addEventListener('click', () =>
+              this.options.onUserDrawingStyleChange?.({ fontWeight: descriptor.fontWeight }),
             );
             btn.addEventListener('mouseenter', () => {
               if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);

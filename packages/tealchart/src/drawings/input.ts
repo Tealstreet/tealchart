@@ -533,7 +533,8 @@ export function updateUserDrawingStyle(
       nextStyle.fillColor === target.drawing.style.fillColor &&
       nextStyle.textColor === target.drawing.style.textColor &&
       nextStyle.fontSize === target.drawing.style.fontSize &&
-      nextStyle.fontFamily === target.drawing.style.fontFamily
+      nextStyle.fontFamily === target.drawing.style.fontFamily &&
+      nextStyle.fontWeight === target.drawing.style.fontWeight
     ) {
       continue;
     }

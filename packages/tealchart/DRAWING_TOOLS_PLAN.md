@@ -1128,6 +1128,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Text-content updates preserve drawing IDs, respect locked drawings unless
   explicitly included, and clear active edit drafts for the updated drawing.
 
+## Shipped: Text Weight Controls
+
+- Shared drawing style now normalizes `fontWeight` for text annotations and
+  exposes shared normal/bold toolbar descriptors for host integrations.
+- Web Canvas text annotations, the DOM inline editor, mobile Skia text
+  annotations, and the React Native inline editor all honor the same bold style.
+- Web and mobile top bars dispatch matching font-weight updates through the
+  existing selected-drawing style callback.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
@@ -1136,7 +1145,8 @@ matching behavior in the same PR for every user-facing drawing feature.
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
-- Rich text label controls, richer table editing UI, and multiline editor polish.
+- Additional rich text label controls, richer table editing UI, and multiline
+  editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.
