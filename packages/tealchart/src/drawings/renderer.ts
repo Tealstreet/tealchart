@@ -232,6 +232,14 @@ function renderFixedRangeVolumeProfileGeometry(
   if (drawing.style.lineVisible !== false) {
     applyStrokeStyle(ctx, drawing);
     ctx.strokeRect(volumeProfile.bounds.x, volumeProfile.bounds.y, volumeProfile.bounds.width, volumeProfile.bounds.height);
+    for (const guide of volumeProfile.guides) {
+      ctx.setLineDash(guide.kind === 'pointOfControl' ? [] : [4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(guide.segment.start.x, guide.segment.start.y);
+      ctx.lineTo(guide.segment.end.x, guide.segment.end.y);
+      ctx.stroke();
+    }
+    ctx.setLineDash(dashForLineStyle(drawing.style.lineStyle));
   }
 }
 

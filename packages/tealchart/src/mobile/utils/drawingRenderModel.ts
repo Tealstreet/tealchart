@@ -296,6 +296,15 @@ export type MobileUserDrawingPrimitive =
         volume: number;
         rect: DrawingScreenRect;
       }[];
+      guides: readonly {
+        kind: 'pointOfControl' | 'valueAreaHigh' | 'valueAreaLow';
+        price: number;
+        volume: number;
+        segment: {
+          start: DrawingScreenPoint;
+          end: DrawingScreenPoint;
+        };
+      }[];
       maxVolume: number;
       totalVolume: number;
       style: UserDrawingStyle;
@@ -1510,6 +1519,7 @@ function primitiveFromGeometry(
           volume: bin.volume,
           rect: bin.rect,
         })),
+        guides: geometry.volumeProfile.guides,
         maxVolume: geometry.volumeProfile.maxVolume,
         totalVolume: geometry.volumeProfile.totalVolume,
         style: geometry.drawing.style,
