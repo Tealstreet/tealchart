@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 
 import { clearChartStoreCache } from './state/chartState';
 import {
+  formatUserDrawingDateRangeBars,
   formatTrendAngleDegrees,
   duplicateUserDrawing,
   getUserDrawingSelectionIds,
@@ -896,6 +897,7 @@ describe('tealchart public entries', () => {
     };
 
     expect(metrics.label).toBe('1 minute');
+    expect(formatUserDrawingDateRangeBars(2)).toBe('2 bars');
     expect(drawing.kind).toBe('dateRange');
   });
 

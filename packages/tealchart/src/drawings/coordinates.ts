@@ -3,9 +3,11 @@ import type { UserDrawingInputPoint } from './input';
 import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor, UserDrawingPathFamilyKind } from './types';
 
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
+import type { UserDrawingDateRangeMetrics } from './dateRange';
 import type { UserDrawingIconGeometry } from './iconGeometry';
 
 import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
+import { resolveUserDrawingDateRangeMetrics } from './dateRange';
 import { resolveUserDrawingIconGeometry } from './iconGeometry';
 import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
@@ -489,11 +491,13 @@ export type ResolvedUserDrawingGeometry =
       kind: 'datePriceRange';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
+      dateMetrics: UserDrawingDateRangeMetrics;
     }
   | {
       kind: 'dateRange';
       drawing: UserDrawing;
       rect: DrawingScreenRect;
+      dateMetrics: UserDrawingDateRangeMetrics;
     }
   | {
       kind: 'longPosition' | 'shortPosition';
@@ -2396,12 +2400,14 @@ export function resolveUserDrawingGeometry(
         kind: 'datePriceRange',
         drawing,
         rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
+        dateMetrics: resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1], space.bars),
       };
     case 'dateRange':
       return {
         kind: 'dateRange',
         drawing,
         rect: resolveDateRangeRectFromAnchors(drawing.points[0], drawing.points[1], space),
+        dateMetrics: resolveUserDrawingDateRangeMetrics(drawing.points[0], drawing.points[1], space.bars),
       };
     case 'longPosition':
     case 'shortPosition':

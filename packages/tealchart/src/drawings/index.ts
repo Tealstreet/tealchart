@@ -160,7 +160,11 @@ export type {
   TrianglePatternLabel,
   XabcdPatternLabel,
 } from './coordinates';
-export { formatUserDrawingDateRangeDuration, resolveUserDrawingDateRangeMetrics } from './dateRange';
+export {
+  formatUserDrawingDateRangeBars,
+  formatUserDrawingDateRangeDuration,
+  resolveUserDrawingDateRangeMetrics,
+} from './dateRange';
 export type { UserDrawingDateRangeMetrics } from './dateRange';
 export { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 export type {

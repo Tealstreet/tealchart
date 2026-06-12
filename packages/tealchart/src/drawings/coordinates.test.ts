@@ -1271,10 +1271,26 @@ describe('user drawing coordinates', () => {
     expect(resolveUserDrawingGeometry(dateRange, space)).toMatchObject({
       kind: 'dateRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
+      dateMetrics: { deltaMs: 2_000, barCount: null, label: '2 seconds' },
     });
     expect(resolveUserDrawingGeometry(datePriceRange, space)).toMatchObject({
       kind: 'datePriceRange',
       rect: { x: 10, y: 20, width: 200, height: 100 },
+      dateMetrics: { deltaMs: 2_000, barCount: null, label: '2 seconds' },
+    });
+    expect(
+      resolveUserDrawingGeometry(dateRange, {
+        ...space,
+        bars: [
+          { time: 1_000, open: 100, high: 105, low: 95, close: 102, volume: 100 },
+          { time: 2_000, open: 102, high: 106, low: 98, close: 104, volume: 100 },
+          { time: 3_000, open: 104, high: 108, low: 100, close: 106, volume: 100 },
+          { time: 4_000, open: 106, high: 110, low: 102, close: 108, volume: 100 },
+        ],
+      }),
+    ).toMatchObject({
+      kind: 'dateRange',
+      dateMetrics: { deltaMs: 2_000, barCount: 3, label: '3 bars, 2 seconds' },
     });
     expect(resolveUserDrawingGeometry(forecast, space)).toMatchObject({
       kind: 'forecast',
