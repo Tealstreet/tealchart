@@ -215,6 +215,8 @@ function UserDrawingSkiaText({
   font,
   color,
   style,
+  underlineWidth,
+  fontSize,
 }: {
   x: number;
   y: number;
@@ -222,11 +224,21 @@ function UserDrawingSkiaText({
   font: ReturnType<typeof Skia.Font>;
   color: string;
   style: UserDrawingStyle;
+  underlineWidth?: number;
+  fontSize?: number;
 }) {
   const content = (
     <>
       <SkiaText x={x} y={y} text={text} font={font} color={color} />
       {style.fontWeight === 'bold' && <SkiaText x={x + 0.45} y={y} text={text} font={font} color={color} />}
+      {style.textUnderline && (
+        <SkiaLine
+          p1={vec(x, y + (fontSize ?? 12) * 0.18)}
+          p2={vec(x + (underlineWidth ?? font.measureText(text).width), y + (fontSize ?? 12) * 0.18)}
+          color={color}
+          strokeWidth={Math.max(1, (fontSize ?? 12) / 14)}
+        />
+      )}
     </>
   );
   if (style.fontStyle !== 'italic') return content;
@@ -858,6 +870,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
       fontWeight: activeUserDrawingTextEditPrimitive.style.fontWeight === 'bold' ? ('700' as const) : ('400' as const),
       fontStyle: activeUserDrawingTextEditPrimitive.style.fontStyle === 'italic' ? ('italic' as const) : ('normal' as const),
+      textDecorationLine: activeUserDrawingTextEditPrimitive.style.textUnderline ? ('underline' as const) : ('none' as const),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
@@ -3705,6 +3718,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}
                     style={primitive.style}
+                    underlineWidth={font.measureText(line.text).width}
+                    fontSize={fontSize}
                   />
                 ))}
               </Group>
@@ -3759,6 +3774,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       font={font}
                       color={primitive.style.textColor ?? primitive.style.lineColor}
                       style={primitive.style}
+                      underlineWidth={textWidth}
+                      fontSize={fontSize}
                     />
                   );
                 })}

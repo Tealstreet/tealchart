@@ -233,6 +233,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('monospace font family'));
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
+    fireEvent.click(screen.getByLabelText('Underline text'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
@@ -241,6 +242,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'monospace' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
+    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
     expect(onTextAlign).toHaveBeenCalledWith('right');
   });
 
@@ -289,6 +291,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('serif font family'));
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
+    fireEvent.click(screen.getByLabelText('Underline text'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
@@ -296,6 +299,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
+    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
     expect(onTextAlign).toHaveBeenCalledWith('right');
   });
 

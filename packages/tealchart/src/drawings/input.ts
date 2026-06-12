@@ -540,7 +540,8 @@ export function updateUserDrawingStyle(
       nextStyle.fontSize === target.drawing.style.fontSize &&
       nextStyle.fontFamily === target.drawing.style.fontFamily &&
       nextStyle.fontWeight === target.drawing.style.fontWeight &&
-      nextStyle.fontStyle === target.drawing.style.fontStyle
+      nextStyle.fontStyle === target.drawing.style.fontStyle &&
+      nextStyle.textUnderline === target.drawing.style.textUnderline
     ) {
       continue;
     }
