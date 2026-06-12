@@ -169,7 +169,7 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="Green line color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Purple line color"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="5 pixel line width"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Dashed line style"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="10 percent opacity"]')?.click();
@@ -177,7 +177,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]')?.click();
 
-    expect(onStyle).toHaveBeenCalledWith({ lineColor: '#22c55e' });
+    expect(onStyle).toHaveBeenCalledWith({ lineColor: '#a855f7' });
     expect(onStyle).toHaveBeenCalledWith({ lineWidth: 5 });
     expect(onStyle).toHaveBeenCalledWith({ lineStyle: 'dashed' });
     expect(onStyle).toHaveBeenCalledWith({ opacity: 0.1 });
@@ -366,8 +366,8 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="Blue fill color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Red text color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Purple text color"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="24 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
@@ -378,8 +378,8 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
-    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
-    expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
+    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ textColor: '#a855f7' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 24 });
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });

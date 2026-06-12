@@ -295,6 +295,8 @@ export const USER_DRAWING_LINE_COLOR_DESCRIPTORS: readonly UserDrawingLineColorD
   { color: '#22c55e', label: 'Green line color' },
   { color: '#38bdf8', label: 'Blue line color' },
   { color: '#f43f5e', label: 'Red line color' },
+  { color: '#f97316', label: 'Orange line color' },
+  { color: '#a855f7', label: 'Purple line color' },
   { color: '#d1d4dc', label: 'Light line color' },
 ] as const;
 
@@ -303,6 +305,8 @@ export const USER_DRAWING_FILL_COLOR_DESCRIPTORS: readonly UserDrawingFillColorD
   { fillColor: 'rgba(34, 197, 94, 0.12)', label: 'Green fill color' },
   { fillColor: 'rgba(56, 189, 248, 0.12)', label: 'Blue fill color' },
   { fillColor: 'rgba(244, 63, 94, 0.12)', label: 'Red fill color' },
+  { fillColor: 'rgba(249, 115, 22, 0.12)', label: 'Orange fill color' },
+  { fillColor: 'rgba(168, 85, 247, 0.12)', label: 'Purple fill color' },
   { fillColor: 'rgba(209, 212, 220, 0.12)', label: 'Light fill color' },
 ] as const;
 
@@ -311,6 +315,8 @@ export const USER_DRAWING_TEXT_COLOR_DESCRIPTORS: readonly UserDrawingTextColorD
   { textColor: '#22c55e', label: 'Green text color' },
   { textColor: '#38bdf8', label: 'Blue text color' },
   { textColor: '#f43f5e', label: 'Red text color' },
+  { textColor: '#f97316', label: 'Orange text color' },
+  { textColor: '#a855f7', label: 'Purple text color' },
   { textColor: '#d1d4dc', label: 'Light text color' },
 ] as const;
 
