@@ -2570,6 +2570,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'fibWedge') {
             if (primitive.style.lineVisible === false && primitive.style.fillVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
             const boundaryPath = Skia.Path.Make();
             for (const boundary of primitive.boundaries) {
               boundaryPath.moveTo(boundary.start.x, boundary.start.y);
@@ -2629,16 +2631,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                         false,
                       );
                       return (
-                        <SkiaPath
-                          key={`${primitive.id}:arc:${arc.ratio}`}
-                          path={path}
-                          color={primitive.style.lineColor}
-                          style="stroke"
-                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                          strokeCap="round"
-                        >
-                          {dash && <DashPathEffect intervals={dash} />}
-                        </SkiaPath>
+                        <Group key={`${primitive.id}:arc:${arc.ratio}`}>
+                          <SkiaPath
+                            path={path}
+                            color={primitive.style.lineColor}
+                            style="stroke"
+                            strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                            strokeCap="round"
+                          >
+                            {dash && <DashPathEffect intervals={dash} />}
+                          </SkiaPath>
+                          {font && (
+                            <SkiaText
+                              x={arc.labelPoint.x - font.measureText(arc.label).width / 2}
+                              y={arc.labelPoint.y}
+                              text={arc.label}
+                              color={textColor}
+                              font={font}
+                            />
+                          )}
+                        </Group>
                       );
                     })}
                   </>

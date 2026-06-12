@@ -460,9 +460,11 @@ export type MobileUserDrawingPrimitive =
       baseRadius: number;
       arcs: readonly {
         ratio: number;
+        label: string;
         radius: number;
         startAngle: number;
         endAngle: number;
+        labelPoint: DrawingScreenPoint;
       }[];
       boundaries: readonly {
         start: DrawingScreenPoint;
@@ -1709,9 +1711,11 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibWedge.baseRadius,
         arcs: geometry.fibWedge.arcs.map((arc) => ({
           ratio: arc.ratio,
+          label: arc.label,
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
+          labelPoint: arc.labelPoint,
         })),
         boundaries: geometry.fibWedge.boundaries.map((boundary) => ({
           start: boundary.start,
