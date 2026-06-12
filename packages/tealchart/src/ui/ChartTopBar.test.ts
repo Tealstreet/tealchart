@@ -314,6 +314,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
@@ -321,6 +322,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
+    expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.unmount();
@@ -369,12 +371,14 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
+    expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.unmount();

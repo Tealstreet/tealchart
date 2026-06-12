@@ -35,6 +35,7 @@ import {
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+  USER_DRAWING_FONT_STYLE_DESCRIPTORS,
   USER_DRAWING_FONT_WEIGHT_DESCRIPTORS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
@@ -572,6 +573,39 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                                   color: active ? accentColor : textSecondaryColor,
                                   fontSize: 11,
                                   fontWeight: descriptor.fontWeight === 'bold' ? '700' : '400',
+                                },
+                              ]}
+                            >
+                              {descriptor.icon}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+
+                      {USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => {
+                        const active = (selectedDrawing.style.fontStyle ?? 'normal') === descriptor.fontStyle;
+                        return (
+                          <Pressable
+                            key={descriptor.fontStyle}
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
+                            disabled={!textControlsEnabled}
+                            onPress={() => onUserDrawingStyleChange?.({ fontStyle: descriptor.fontStyle })}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingButton,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                              !textControlsEnabled && styles.drawingButtonDisabled,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.drawingButtonText,
+                                {
+                                  color: active ? accentColor : textSecondaryColor,
+                                  fontSize: 11,
+                                  fontStyle: descriptor.fontStyle === 'italic' ? 'italic' : 'normal',
                                 },
                               ]}
                             >

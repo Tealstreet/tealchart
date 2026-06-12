@@ -1,6 +1,7 @@
 import type {
   UserDrawing,
   UserDrawingFontFamily,
+  UserDrawingFontStyle,
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
@@ -14,6 +15,7 @@ import {
   USER_DRAWING_ICON_NAMES,
   isUserDrawingTextAnnotation,
   USER_DRAWING_FONT_FAMILIES,
+  USER_DRAWING_FONT_STYLES,
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_FONT_SIZES,
   USER_DRAWING_OPACITIES,
@@ -71,6 +73,12 @@ export interface UserDrawingFontFamilyDescriptor {
 
 export interface UserDrawingFontWeightDescriptor {
   fontWeight: UserDrawingFontWeight;
+  icon: string;
+  label: string;
+}
+
+export interface UserDrawingFontStyleDescriptor {
+  fontStyle: UserDrawingFontStyle;
   icon: string;
   label: string;
 }
@@ -296,6 +304,13 @@ export const USER_DRAWING_FONT_WEIGHT_DESCRIPTORS: readonly UserDrawingFontWeigh
     label: fontWeight === 'bold' ? 'Bold text' : 'Normal text',
   }));
 
+export const USER_DRAWING_FONT_STYLE_DESCRIPTORS: readonly UserDrawingFontStyleDescriptor[] =
+  USER_DRAWING_FONT_STYLES.map((fontStyle) => ({
+    fontStyle,
+    icon: fontStyle === 'italic' ? 'I' : 'R',
+    label: fontStyle === 'italic' ? 'Italic text' : 'Regular text',
+  }));
+
 export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignDescriptor[] = [
   { textAlign: 'left', icon: 'L', label: 'Left text alignment' },
   { textAlign: 'center', icon: 'C', label: 'Center text alignment' },
@@ -491,6 +506,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fontSize ?? '',
     selectedDrawing?.style.fontFamily ?? '',
     selectedDrawing?.style.fontWeight ?? '',
+    selectedDrawing?.style.fontStyle ?? '',
     selectedDrawing && (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing))
       ? selectedDrawing.textAlign
       : '',
