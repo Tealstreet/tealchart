@@ -78,6 +78,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
     case 'arc':
     case 'fibWedge':
     case 'fibChannel':
+    case 'trendBasedFibExtension':
     case 'trendBasedFibTime':
     case 'pitchfork':
     case 'schiffPitchfork':
@@ -544,6 +545,16 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
         ? {
             ...base,
             kind: 'fibExtension',
+            points,
+          }
+        : null;
+    }
+    case 'trendBasedFibExtension': {
+      const points = parseThreePointDrawing(value);
+      return points
+        ? {
+            ...base,
+            kind: 'trendBasedFibExtension',
             points,
           }
         : null;

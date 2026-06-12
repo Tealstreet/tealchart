@@ -316,6 +316,16 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, level-line hit testing, endpoint editing, and whole-drawing moves
   use shared drawing behavior on both platforms.
 
+## Shipped: Trend-Based Fibonacci Extension Tool
+
+- Shared drawing state supports the three-anchor `trendBasedFibExtension` tool
+  and persists it through layout save/load.
+- Web Canvas and mobile Skia render matching projected Fibonacci extension
+  levels from the first trend leg, anchored at the retrace point, using shared
+  screen-space geometry.
+- Selection, level-line hit testing, whole-drawing moves, and point-index
+  handle editing use shared drawing behavior on both platforms.
+
 ## Shipped: Horizontal Ray Tool
 
 - Shared drawing state supports the single-anchor `horizontalRay` tool and
@@ -886,7 +896,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
-  Fibonacci tools beyond retracement/extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
+  Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, remaining annotation/icon tools, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.

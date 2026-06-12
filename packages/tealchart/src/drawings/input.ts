@@ -250,6 +250,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'arc':
     case 'fibWedge':
     case 'fibChannel':
+    case 'trendBasedFibExtension':
     case 'trendBasedFibTime':
     case 'polyline':
     case 'pitchfork':

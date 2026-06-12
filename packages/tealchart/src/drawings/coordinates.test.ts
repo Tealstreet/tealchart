@@ -29,6 +29,7 @@ import type {
   ForecastDrawing,
   FibWedgeDrawing,
   FibSpiralDrawing,
+  TrendBasedFibExtensionDrawing,
   TrendBasedFibTimeDrawing,
   GannBoxDrawing,
   GannFanDrawing,
@@ -72,6 +73,7 @@ import {
   resolveExtendedSegment,
   resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
+  resolveTrendBasedFibExtensionFromAnchors,
   resolveFlatTopBottomFromAnchors,
   resolvePitchforkFromAnchors,
   resolvePitchfanFromAnchors,
@@ -409,6 +411,29 @@ describe('user drawing coordinates', () => {
       { ratio: 2.618, label: '2.618', price: 142.36 },
     ]);
     expect(extension.levels[3]?.segment).toEqual({ start: { x: 10, y: 20 }, end: { x: 210, y: 20 } });
+  });
+
+  it('resolves trend-based Fibonacci extension levels from a trend leg and retrace anchor', () => {
+    const extension = resolveTrendBasedFibExtensionFromAnchors(
+      { time: 1_000, price: 90 },
+      { time: 2_000, price: 110 },
+      { time: 3_000, price: 100 },
+      space,
+    );
+
+    expect(extension.rect).toEqual({ x: 10, y: expect.closeTo(-191.8), width: 200, height: expect.closeTo(311.8) });
+    expect(extension.levels.map(({ ratio, label, price }) => ({ ratio, label, price }))).toEqual([
+      { ratio: 0, label: '0', price: 100 },
+      { ratio: 0.382, label: '0.382', price: 107.64 },
+      { ratio: 0.618, label: '0.618', price: 112.36 },
+      { ratio: 1, label: '1', price: 120 },
+      { ratio: 1.272, label: '1.272', price: 125.44 },
+      { ratio: 1.414, label: '1.414', price: 128.28 },
+      { ratio: 1.618, label: '1.618', price: 132.36 },
+      { ratio: 2, label: '2.000', price: 140 },
+      { ratio: 2.618, label: '2.618', price: 152.36 },
+    ]);
+    expect(extension.levels[0]?.segment).toEqual({ start: { x: 10, y: 70 }, end: { x: 210, y: 70 } });
   });
 
   it('resolves polylines from ordered anchors', () => {
@@ -1063,6 +1088,16 @@ describe('user drawing coordinates', () => {
         { time: 3_000, price: 110 },
       ],
     };
+    const trendBasedFibExtension: TrendBasedFibExtensionDrawing = {
+      ...trendLine,
+      id: 'trend-fib-ext',
+      kind: 'trendBasedFibExtension',
+      points: [
+        { time: 1_000, price: 90 },
+        { time: 2_000, price: 110 },
+        { time: 3_000, price: 100 },
+      ],
+    };
     const fibFan: FibFanDrawing = {
       ...trendLine,
       id: 'fib-fan',
@@ -1639,6 +1674,23 @@ describe('user drawing coordinates', () => {
           { ratio: 1.618, label: '1.618', price: 122.36, y: -41.8 },
           { ratio: 2, label: '2.000', price: 130, y: -80 },
           { ratio: 2.618, label: '2.618', price: 142.36, y: expect.closeTo(-141.8) },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(trendBasedFibExtension, space)).toMatchObject({
+      kind: 'trendBasedFibExtension',
+      fib: {
+        rect: { x: 10, y: expect.closeTo(-191.8), width: 200, height: expect.closeTo(311.8) },
+        levels: [
+          { ratio: 0, label: '0', price: 100, y: 70 },
+          { ratio: 0.382, label: '0.382', price: 107.64, y: expect.closeTo(31.8) },
+          { ratio: 0.618, label: '0.618', price: 112.36, y: expect.closeTo(8.2) },
+          { ratio: 1, label: '1', price: 120, y: -30 },
+          { ratio: 1.272, label: '1.272', price: 125.44, y: expect.closeTo(-57.2) },
+          { ratio: 1.414, label: '1.414', price: 128.28, y: expect.closeTo(-71.4) },
+          { ratio: 1.618, label: '1.618', price: 132.36, y: expect.closeTo(-91.8) },
+          { ratio: 2, label: '2.000', price: 140, y: -130 },
+          { ratio: 2.618, label: '2.618', price: 152.36, y: expect.closeTo(-191.8) },
         ],
       },
     });
