@@ -33,6 +33,9 @@ describe('ChartTopBar drawing toolbar', () => {
     const rectangle = document.querySelector<HTMLButtonElement>('button[aria-label="Rectangle"]');
     const trendLine = document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]');
 
+    expect(document.body.textContent).toContain('Lines');
+    expect(document.body.textContent).toContain('Channels');
+    expect(document.body.textContent).toContain('Gann and Fibonacci');
     expect(rectangle?.getAttribute('aria-pressed')).toBe('true');
     trendLine?.click();
     expect(onTool).toHaveBeenCalledWith('trendLine');
