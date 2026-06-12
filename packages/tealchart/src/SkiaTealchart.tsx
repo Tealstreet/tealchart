@@ -3660,17 +3660,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       {dash && <DashPathEffect intervals={dash} />}
                     </Rect>
                   ))}
-                {primitive.table.cells.map((cell) => (
-                  <UserDrawingSkiaText
-                    key={`${primitive.id}:text:${cell.row}:${cell.column}`}
-                    x={cell.textPoint.x}
-                    y={cell.textPoint.y + fontSize / 2 - 2}
-                    text={cell.text}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                    style={primitive.style}
-                  />
-                ))}
+                {primitive.table.cells.map((cell) => {
+                  const textWidth = font.measureText(cell.text).width;
+                  const textX =
+                    primitive.textAlign === 'center'
+                      ? cell.rect.x + cell.rect.width / 2 - textWidth / 2
+                      : primitive.textAlign === 'right'
+                        ? cell.rect.x + cell.rect.width - 10 - textWidth
+                        : cell.textPoint.x;
+                  return (
+                    <UserDrawingSkiaText
+                      key={`${primitive.id}:text:${cell.row}:${cell.column}`}
+                      x={textX}
+                      y={cell.textPoint.y + fontSize / 2 - 2}
+                      text={cell.text}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                      style={primitive.style}
+                    />
+                  );
+                })}
               </Group>
             );
           }

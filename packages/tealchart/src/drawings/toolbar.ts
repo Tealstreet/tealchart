@@ -428,7 +428,7 @@ export function supportsUserDrawingTextStyleControls(drawing: UserDrawing): bool
 }
 
 export function supportsUserDrawingTextAlignControls(drawing: UserDrawing): boolean {
-  return isUserDrawingTextAnnotation(drawing);
+  return drawing.kind === 'table' || isUserDrawingTextAnnotation(drawing);
 }
 
 export function supportsUserDrawingIconControls(drawing: UserDrawing): boolean {
@@ -491,7 +491,9 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fontSize ?? '',
     selectedDrawing?.style.fontFamily ?? '',
     selectedDrawing?.style.fontWeight ?? '',
-    selectedDrawing && isUserDrawingTextAnnotation(selectedDrawing) ? selectedDrawing.textAlign : '',
+    selectedDrawing && (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing))
+      ? selectedDrawing.textAlign
+      : '',
     selectedDrawing?.kind === 'icon' ? selectedDrawing.iconName : '',
   ].join('|');
 }

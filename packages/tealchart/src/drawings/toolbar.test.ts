@@ -920,6 +920,7 @@ describe('user drawing toolbar descriptors', () => {
         id: 'table',
         kind: 'table',
         point: { time: 1, price: 10 },
+        textAlign: 'left',
         cells: [['Metric', 'Value']],
       }),
     ).toBe(true);
@@ -976,6 +977,7 @@ describe('user drawing toolbar descriptors', () => {
         id: 'table',
         kind: 'table',
         point: { time: 1, price: 10 },
+        textAlign: 'left',
         cells: [['Metric', 'Value']],
       }),
     ).toBe(true);
@@ -985,6 +987,7 @@ describe('user drawing toolbar descriptors', () => {
         id: 'table',
         kind: 'table',
         point: { time: 1, price: 10 },
+        textAlign: 'left',
         cells: [['Metric', 'Value']],
       }),
     ).toBe(true);
@@ -994,9 +997,10 @@ describe('user drawing toolbar descriptors', () => {
         id: 'table',
         kind: 'table',
         point: { time: 1, price: 10 },
+        textAlign: 'left',
         cells: [['Metric', 'Value']],
       }),
-    ).toBe(false);
+    ).toBe(true);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextAlignControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
@@ -1059,6 +1063,7 @@ describe('user drawing toolbar descriptors', () => {
             id: 'table',
             kind: 'table',
             point: { time: 1, price: 10 },
+            textAlign: 'left',
             cells: [['Metric', 'Value']],
           },
         ],

@@ -584,7 +584,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       {textAlignControlsSupported &&
                         USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => {
                           const active =
-                            isUserDrawingTextAnnotation(selectedDrawing) &&
+                            (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing)) &&
                             selectedDrawing.textAlign === descriptor.textAlign;
                           return (
                             <Pressable
