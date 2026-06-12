@@ -1137,6 +1137,16 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars dispatch matching font-weight updates through the
   existing selected-drawing style callback.
 
+## Shipped: Table Text Style Controls
+
+- Shared toolbar predicates now expose table text style controls separately
+  from text-annotation-only alignment controls.
+- Web Canvas and mobile Skia table rendering both honor table font weight in
+  addition to existing text color, font size, and font family style values.
+- Web and mobile top bars dispatch matching table text color, font size, font
+  family, and font-weight updates while keeping text alignment hidden for
+  tables.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

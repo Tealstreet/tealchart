@@ -14,7 +14,9 @@ import {
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillControls,
   supportsUserDrawingIconControls,
+  supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextControls,
+  supportsUserDrawingTextStyleControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -968,7 +970,35 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
     expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
     expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);
+    expect(
+      supportsUserDrawingTextControls({
+        ...textLabel,
+        id: 'table',
+        kind: 'table',
+        point: { time: 1, price: 10 },
+        cells: [['Metric', 'Value']],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingTextStyleControls({
+        ...textLabel,
+        id: 'table',
+        kind: 'table',
+        point: { time: 1, price: 10 },
+        cells: [['Metric', 'Value']],
+      }),
+    ).toBe(true);
+    expect(
+      supportsUserDrawingTextAlignControls({
+        ...textLabel,
+        id: 'table',
+        kind: 'table',
+        point: { time: 1, price: 10 },
+        cells: [['Metric', 'Value']],
+      }),
+    ).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
+    expect(supportsUserDrawingTextAlignControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
     expect(
@@ -1019,6 +1049,21 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingTextToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] })).toBe(
       false,
     );
+    expect(
+      isUserDrawingTextToolbarEnabled({
+        ...state,
+        selection: { drawingId: 'table' },
+        drawings: [
+          {
+            ...textLabel,
+            id: 'table',
+            kind: 'table',
+            point: { time: 1, price: 10 },
+            cells: [['Metric', 'Value']],
+          },
+        ],
+      }),
+    ).toBe(true);
     expect(isUserDrawingTextToolbarEnabled({ ...state, selection: { drawingId: 't' }, drawings: [textLabel] })).toBe(
       true,
     );

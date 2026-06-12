@@ -242,6 +242,58 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onTextAlign).toHaveBeenCalledWith('right');
   });
 
+  it('dispatches selected table text style controls without text alignment controls', () => {
+    const onStyle = vi.fn();
+    const onTextAlign = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'table' },
+          drawings: [
+            {
+              id: 'table',
+              kind: 'table',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: {
+                lineColor: '#f5c542',
+                lineWidth: 1,
+                lineStyle: 'solid',
+                fillColor: 'rgba(245, 197, 66, 0.12)',
+                textColor: '#f5c542',
+                fontSize: 12,
+                fontFamily: 'sans-serif',
+                fontWeight: 'normal',
+              },
+              point: { time: 1, price: 10 },
+              cells: [['Metric', 'Value']],
+            },
+          ],
+        }}
+        onUserDrawingStyleChange={onStyle}
+        onUserDrawingTextAlignChange={onTextAlign}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Red text color'));
+    fireEvent.click(screen.getByLabelText('16 pixel font size'));
+    fireEvent.click(screen.getByLabelText('serif font family'));
+    fireEvent.click(screen.getByLabelText('Bold text'));
+
+    expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
+    expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
+    expect(screen.queryByLabelText('Right text alignment')).toBeNull();
+    expect(onTextAlign).not.toHaveBeenCalled();
+  });
+
   it('disables locked selected drawing fill and text controls', () => {
     const onStyle = vi.fn();
     const onTextAlign = vi.fn();

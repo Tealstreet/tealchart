@@ -3661,13 +3661,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     </Rect>
                   ))}
                 {primitive.table.cells.map((cell) => (
-                  <SkiaText
+                  <UserDrawingSkiaText
                     key={`${primitive.id}:text:${cell.row}:${cell.column}`}
                     x={cell.textPoint.x}
                     y={cell.textPoint.y + fontSize / 2 - 2}
                     text={cell.text}
                     font={font}
                     color={primitive.style.textColor ?? primitive.style.lineColor}
+                    style={primitive.style}
                   />
                 ))}
               </Group>
