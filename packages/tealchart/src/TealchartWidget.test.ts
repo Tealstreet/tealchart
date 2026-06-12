@@ -1060,6 +1060,19 @@ describe('TealchartWidget', () => {
         ],
       });
       expect(widget.setUserDrawingTableDimensions(3, 3)).toBe(false);
+      expect(widget.insertUserDrawingTableRow(1, ['Volume', 10_000, 'Spot'])).toBe(true);
+      expect(widget.deleteUserDrawingTableColumn(2)).toBe(true);
+      expect(widget.insertUserDrawingTableColumn(1, ['Type', 'Total', 'Spot'])).toBe(true);
+      expect(widget.deleteUserDrawingTableRow(3)).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        cells: [
+          ['Metric', 'Type', 'Value'],
+          ['Volume', 'Total', '10000'],
+          ['Price', 'Spot', '102.5'],
+        ],
+      });
+      expect(widget.deleteUserDrawingTableRow(10)).toBe(false);
+      expect(widget.insertUserDrawingTableColumn(Number.NaN)).toBe(false);
       expect(onChange).toHaveBeenCalled();
     });
 

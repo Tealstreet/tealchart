@@ -1173,6 +1173,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Native utilities export the mobile dimension wrapper alongside existing
   full-matrix and single-cell table update helpers.
 
+## Shipped: Table Row and Column Mutation APIs
+
+- Shared drawing state can insert or delete table rows and columns while
+  preserving existing cell values and respecting table bounds.
+- Web widget and mobile Skia handles expose matching row and column mutation
+  methods for host table editors.
+- Native utilities export the mobile row and column wrappers alongside existing
+  table cell and dimension helpers.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
