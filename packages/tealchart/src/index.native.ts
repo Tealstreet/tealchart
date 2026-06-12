@@ -155,6 +155,10 @@ export type {
   ResolveMobileUserDrawingRenderModelOptions,
 } from './mobile/utils/drawingRenderModel';
 export {
+  deleteMobileUserDrawingTableColumn,
+  deleteMobileUserDrawingTableRow,
+  insertMobileUserDrawingTableColumn,
+  insertMobileUserDrawingTableRow,
   setMobileUserDrawingIconName,
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,

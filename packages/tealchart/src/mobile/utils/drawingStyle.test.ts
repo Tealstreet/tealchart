@@ -4,6 +4,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../../state/chartState';
 import {
+  deleteMobileUserDrawingTableColumn,
+  deleteMobileUserDrawingTableRow,
+  insertMobileUserDrawingTableColumn,
+  insertMobileUserDrawingTableRow,
   setMobileUserDrawingIconName,
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
@@ -234,9 +238,35 @@ describe('mobile drawing style helpers', () => {
       ],
       updatedAt: 72,
     });
+    expect(insertMobileUserDrawingTableRow(tableState, 1, ['Price', 101.25], { now: () => 73 }).drawings[0])
+      .toMatchObject({
+        cells: [
+          ['Metric', 'Value'],
+          ['Price', '101.25'],
+        ],
+        updatedAt: 73,
+      });
+    expect(insertMobileUserDrawingTableColumn(tableState, 1, ['Type'], { now: () => 74 }).drawings[0])
+      .toMatchObject({
+        cells: [['Metric', 'Type', 'Value']],
+        updatedAt: 74,
+      });
+    const twoByTwo = setMobileUserDrawingTableDimensions(tableState, 2, 2);
+    expect(deleteMobileUserDrawingTableRow(twoByTwo, 1, { now: () => 75 }).drawings[0]).toMatchObject({
+      cells: [['Metric', 'Value']],
+      updatedAt: 75,
+    });
+    expect(deleteMobileUserDrawingTableColumn(twoByTwo, 1, { now: () => 76 }).drawings[0]).toMatchObject({
+      cells: [['Metric'], ['']],
+      updatedAt: 76,
+    });
     expect(setMobileUserDrawingTableCells(state, [['Ignored']])).toBe(state);
     expect(setMobileUserDrawingTableCell(state, 0, 0, 'Ignored')).toBe(state);
     expect(setMobileUserDrawingTableDimensions(state, 2, 2)).toBe(state);
+    expect(insertMobileUserDrawingTableRow(state, 0)).toBe(state);
+    expect(deleteMobileUserDrawingTableRow(state, 0)).toBe(state);
+    expect(insertMobileUserDrawingTableColumn(state, 0)).toBe(state);
+    expect(deleteMobileUserDrawingTableColumn(state, 0)).toBe(state);
   });
 
   it('requires explicit opt-in for locked drawing property changes', () => {
