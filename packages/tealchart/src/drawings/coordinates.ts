@@ -1,4 +1,8 @@
 import type { Bar, ChartMargins, ComputedPane, Viewport } from '../types';
+import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
+import type { UserDrawingDateRangeMetrics } from './dateRange';
+import type { UserDrawingIconGeometry } from './iconGeometry';
+import type { UserDrawingInfoLineMetrics } from './infoLine';
 import type { UserDrawingInputPoint } from './input';
 import type {
   BarsPatternBarSnapshot,
@@ -7,11 +11,6 @@ import type {
   UserDrawingPanePosition,
   UserDrawingPathFamilyKind,
 } from './types';
-
-import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
-import type { UserDrawingDateRangeMetrics } from './dateRange';
-import type { UserDrawingIconGeometry } from './iconGeometry';
-import type { UserDrawingInfoLineMetrics } from './infoLine';
 
 import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
 import { resolveUserDrawingDateRangeMetrics } from './dateRange';
@@ -195,9 +194,11 @@ export interface DrawingScreenFibChannel {
 
 export interface DrawingScreenFibTimeZoneLevel {
   ratio: number;
+  label: string;
   time: number;
   x: number;
   segment: DrawingScreenSegment;
+  labelPoint: DrawingScreenPoint;
 }
 
 export interface DrawingScreenFibTimeZone {
@@ -214,11 +215,13 @@ export interface DrawingScreenCyclicLines {
 
 export interface DrawingScreenTimeCycle {
   ratio: number;
+  label: string;
   startTime: number;
   endTime: number;
   startBoundary: DrawingScreenSegment;
   endBoundary: DrawingScreenSegment;
   points: readonly DrawingScreenPoint[];
+  labelPoint: DrawingScreenPoint;
 }
 
 export interface DrawingScreenTimeCycles {
@@ -868,7 +871,10 @@ export function screenPointToAnchor(point: DrawingScreenPoint, space: DrawingCoo
   };
 }
 
-export function panePositionToScreenPoint(position: UserDrawingPanePosition, space: DrawingCoordinateSpace): DrawingScreenPoint {
+export function panePositionToScreenPoint(
+  position: UserDrawingPanePosition,
+  space: DrawingCoordinateSpace,
+): DrawingScreenPoint {
   const normalized = normalizeUserDrawingPanePosition(position);
   return {
     x: space.chartLeft + (space.chartRight - space.chartLeft) * normalized.x,
@@ -876,7 +882,10 @@ export function panePositionToScreenPoint(position: UserDrawingPanePosition, spa
   };
 }
 
-export function screenPointToPanePosition(point: DrawingScreenPoint, space: DrawingCoordinateSpace): UserDrawingPanePosition {
+export function screenPointToPanePosition(
+  point: DrawingScreenPoint,
+  space: DrawingCoordinateSpace,
+): UserDrawingPanePosition {
   const width = space.chartRight - space.chartLeft;
   const height = space.pane.height;
   return normalizeUserDrawingPanePosition({
@@ -894,7 +903,9 @@ export function resolveUserDrawingInputPoint({
 }: ResolveUserDrawingInputPointOptions): UserDrawingInputPoint | null {
   if (chartRight <= chartLeft || point.x < chartLeft || point.x >= chartRight) return null;
 
-  const pane = panes.find((candidate) => candidate.height > 0 && point.y >= candidate.top && point.y < candidate.bottom);
+  const pane = panes.find(
+    (candidate) => candidate.height > 0 && point.y >= candidate.top && point.y < candidate.bottom,
+  );
   if (!pane) return null;
 
   return {
@@ -1133,7 +1144,10 @@ export function resolveFibWedgeFromAnchors(
   const upper = anchorToScreenPoint(third, space);
   const startAngle = Math.atan2(lower.y - center.y, lower.x - center.x);
   const endAngle = Math.atan2(upper.y - center.y, upper.x - center.x);
-  const baseRadius = Math.max(Math.hypot(lower.x - center.x, lower.y - center.y), Math.hypot(upper.x - center.x, upper.y - center.y));
+  const baseRadius = Math.max(
+    Math.hypot(lower.x - center.x, lower.y - center.y),
+    Math.hypot(upper.x - center.x, upper.y - center.y),
+  );
 
   return {
     center,
@@ -1361,13 +1375,7 @@ export function resolveTrianglePatternFromAnchors(
 }
 
 export function resolveXabcdPatternFromAnchors(
-  points: readonly [
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-  ],
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   space: DrawingCoordinateSpace,
 ): DrawingScreenXabcdPattern {
   const polyline = resolvePolylineFromAnchors(points, space);
@@ -1381,13 +1389,7 @@ export function resolveXabcdPatternFromAnchors(
 }
 
 export function resolveThreeDrivesPatternFromAnchors(
-  points: readonly [
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-  ],
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   space: DrawingCoordinateSpace,
 ): DrawingScreenThreeDrivesPattern {
   const polyline = resolvePolylineFromAnchors(points, space);
@@ -1401,13 +1403,7 @@ export function resolveThreeDrivesPatternFromAnchors(
 }
 
 export function resolveHeadShouldersPatternFromAnchors(
-  points: readonly [
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-  ],
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   space: DrawingCoordinateSpace,
 ): DrawingScreenHeadShouldersPattern {
   const polyline = resolvePolylineFromAnchors(points, space);
@@ -1423,13 +1419,7 @@ export function resolveHeadShouldersPatternFromAnchors(
 }
 
 export function resolveElliottImpulseWaveFromAnchors(
-  points: readonly [
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-  ],
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   space: DrawingCoordinateSpace,
 ): DrawingScreenElliottImpulseWave {
   const polyline = resolvePolylineFromAnchors(points, space);
@@ -1471,13 +1461,7 @@ export function resolveElliottDoubleComboWaveFromAnchors(
 }
 
 export function resolveElliottTripleComboWaveFromAnchors(
-  points: readonly [
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-  ],
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   space: DrawingCoordinateSpace,
 ): DrawingScreenElliottTripleComboWave {
   const polyline = resolvePolylineFromAnchors(points, space);
@@ -1491,13 +1475,7 @@ export function resolveElliottTripleComboWaveFromAnchors(
 }
 
 export function resolveElliottTriangleWaveFromAnchors(
-  points: readonly [
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-    UserDrawingAnchor,
-  ],
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor],
   space: DrawingCoordinateSpace,
 ): DrawingScreenElliottTriangleWave {
   const polyline = resolvePolylineFromAnchors(points, space);
@@ -1604,10 +1582,7 @@ function resolveCircumcenter(
   end: DrawingScreenPoint,
 ): DrawingScreenPoint | null {
   const determinant =
-    2 *
-    (start.x * (through.y - end.y) +
-      through.x * (end.y - start.y) +
-      end.x * (start.y - through.y));
+    2 * (start.x * (through.y - end.y) + through.x * (end.y - start.y) + end.x * (start.y - through.y));
   if (Math.abs(determinant) < 1e-6) return null;
 
   const startLength = start.x * start.x + start.y * start.y;
@@ -1615,14 +1590,10 @@ function resolveCircumcenter(
   const endLength = end.x * end.x + end.y * end.y;
   return {
     x:
-      (startLength * (through.y - end.y) +
-        throughLength * (end.y - start.y) +
-        endLength * (start.y - through.y)) /
+      (startLength * (through.y - end.y) + throughLength * (end.y - start.y) + endLength * (start.y - through.y)) /
       determinant,
     y:
-      (startLength * (end.x - through.x) +
-        throughLength * (start.x - end.x) +
-        endLength * (through.x - start.x)) /
+      (startLength * (end.x - through.x) + throughLength * (start.x - end.x) + endLength * (through.x - start.x)) /
       determinant,
   };
 }
@@ -1642,9 +1613,7 @@ export function resolveArcFromAnchors(
   const throughAngle = Math.atan2(through.y - center.y, through.x - center.x);
   const endAngle = Math.atan2(end.y - center.y, end.x - center.x);
   const counterclockwise = !isAngleOnClockwiseSweep(startAngle, throughAngle, endAngle);
-  const sweep = counterclockwise
-    ? -normalizeArcAngle(startAngle - endAngle)
-    : normalizeArcAngle(endAngle - startAngle);
+  const sweep = counterclockwise ? -normalizeArcAngle(startAngle - endAngle) : normalizeArcAngle(endAngle - startAngle);
   const points =
     radius <= 0
       ? [start, through, end]
@@ -1785,6 +1754,13 @@ function resolveFanRayLabelPoint(segment: DrawingScreenSegment): DrawingScreenPo
   };
 }
 
+function resolveVerticalTimeGuideLabelPoint(x: number, space: DrawingCoordinateSpace): DrawingScreenPoint {
+  return {
+    x,
+    y: Math.max(space.pane.top + 12, space.pane.bottom - 4),
+  };
+}
+
 export function resolveFibLevelsFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
@@ -1907,23 +1883,32 @@ function resolveFibFanWithLevelsFromAnchors(
     origin,
     targetStart,
     targetEnd,
-    rays: levels.map((ratio) => {
-      const target = {
-        x: targetEnd.x,
-        y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
-      };
-      return {
-        ratio,
-        target,
-        segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
-      };
-    }).map((ray) => {
-      return {
-        ...ray,
-        label: formatFibRetracementRatio(ray.ratio),
-        labelPoint: resolveFanRayLabelPoint(ray.segment),
-      };
-    }),
+    rays: levels
+      .map((ratio) => {
+        const target = {
+          x: targetEnd.x,
+          y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
+        };
+        return {
+          ratio,
+          target,
+          segment: resolveRaySegment(
+            origin,
+            target,
+            space.chartLeft,
+            space.chartRight,
+            space.pane.top,
+            space.pane.bottom,
+          ),
+        };
+      })
+      .map((ray) => {
+        return {
+          ...ray,
+          label: formatFibRetracementRatio(ray.ratio),
+          labelPoint: resolveFanRayLabelPoint(ray.segment),
+        };
+      }),
   };
 }
 
@@ -1947,7 +1932,14 @@ export function resolveGannFanFromAnchors(
       return {
         ratio: level.ratio,
         target,
-        segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+        segment: resolveRaySegment(
+          origin,
+          target,
+          space.chartLeft,
+          space.chartRight,
+          space.pane.top,
+          space.pane.bottom,
+        ),
       };
     }).map((ray, index) => {
       return {
@@ -2055,9 +2047,11 @@ export function resolveFibTimeZoneFromAnchors(
       const x = timeToDrawingX(time, space);
       return {
         ratio,
+        label: formatFibRetracementRatio(ratio),
         time,
         x,
         segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+        labelPoint: resolveVerticalTimeGuideLabelPoint(x, space),
       };
     }),
   };
@@ -2077,9 +2071,11 @@ export function resolveTrendBasedFibTimeFromAnchors(
       const x = timeToDrawingX(time, space);
       return {
         ratio,
+        label: formatFibRetracementRatio(ratio),
         time,
         x,
         segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+        labelPoint: resolveVerticalTimeGuideLabelPoint(x, space),
       };
     }),
   };
@@ -2100,9 +2096,11 @@ export function resolveCyclicLinesFromAnchors(
       levels: [
         {
           ratio: 0,
+          label: '0',
           time: first.time,
           x,
           segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+          labelPoint: resolveVerticalTimeGuideLabelPoint(x, space),
         },
       ],
     };
@@ -2126,9 +2124,11 @@ export function resolveCyclicLinesFromAnchors(
     const x = timeToDrawingX(time, space);
     levels.push({
       ratio: index,
+      label: String(index),
       time,
       x,
       segment: { start: { x, y: space.pane.top }, end: { x, y: space.pane.bottom } },
+      labelPoint: resolveVerticalTimeGuideLabelPoint(x, space),
     });
   }
 
@@ -2190,11 +2190,13 @@ export function resolveTimeCyclesFromAnchors(
     }
     return {
       ratio,
+      label: String(ratio),
       startTime,
       endTime,
       startBoundary: { start: { x: startX, y: space.pane.top }, end: { x: startX, y: space.pane.bottom } },
       endBoundary: { start: { x: endX, y: space.pane.top }, end: { x: endX, y: space.pane.bottom } },
       points,
+      labelPoint: resolveVerticalTimeGuideLabelPoint(startX + (endX - startX) / 2, space),
     };
   });
 
@@ -2522,7 +2524,14 @@ export function resolvePitchforkFromAnchors(
     };
     return {
       ratio,
-      segment: resolveRaySegment(start, through(start), space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+      segment: resolveRaySegment(
+        start,
+        through(start),
+        space.chartLeft,
+        space.chartRight,
+        space.pane.top,
+        space.pane.bottom,
+      ),
     };
   };
 
@@ -2544,7 +2553,14 @@ export function resolvePitchforkFromAnchors(
   );
 
   return {
-    median: resolveRaySegment(config.origin, medianThrough, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    median: resolveRaySegment(
+      config.origin,
+      medianThrough,
+      space.chartLeft,
+      space.chartRight,
+      space.pane.top,
+      space.pane.bottom,
+    ),
     upper,
     lower,
     parallels: PITCHFORK_PARALLEL_RATIOS.map(parallelSegment),
@@ -2691,11 +2707,7 @@ export function resolveRegressionTrendFromAnchors(
   const startTime = Math.min(first.time, second.time);
   const endTime = Math.max(first.time, second.time);
   const regressionBars = (space.bars ?? []).filter(
-    (bar) =>
-      bar.time >= startTime &&
-      bar.time <= endTime &&
-      Number.isFinite(bar.time) &&
-      Number.isFinite(bar.close),
+    (bar) => bar.time >= startTime && bar.time <= endTime && Number.isFinite(bar.time) && Number.isFinite(bar.close),
   );
 
   if (regressionBars.length < 2) {
@@ -2786,15 +2798,14 @@ export function resolveUserDrawingGeometry(
       return {
         kind: 'arrowMarker',
         drawing,
-        marker:
-          resolveDrawingArrowMarker(
-            { start, end },
-            {
-              headLength: Math.max(22, drawing.style.lineWidth * 8),
-              headWidth: Math.max(18, drawing.style.lineWidth * 7),
-              tailWidth: Math.max(7, drawing.style.lineWidth * 3),
-            },
-          ) ?? { segment: { start, end }, points: [start] },
+        marker: resolveDrawingArrowMarker(
+          { start, end },
+          {
+            headLength: Math.max(22, drawing.style.lineWidth * 8),
+            headWidth: Math.max(18, drawing.style.lineWidth * 7),
+            tailWidth: Math.max(7, drawing.style.lineWidth * 3),
+          },
+        ) ?? { segment: { start, end }, points: [start] },
       };
     }
     case 'arrowMarkLeft':

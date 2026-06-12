@@ -1,12 +1,12 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type {
+  ArcDrawing,
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
+  ArrowMarkerDrawing,
   ArrowMarkLeftDrawing,
   ArrowMarkRightDrawing,
   ArrowMarkUpDrawing,
-  ArrowMarkerDrawing,
-  ArcDrawing,
   CircleDrawing,
   CrossLineDrawing,
   CurveDrawing,
@@ -19,29 +19,27 @@ import type {
   ExtendedLineDrawing,
   FibArcsDrawing,
   FibChannelDrawing,
-  FibExtensionDrawing,
   FibCirclesDrawing,
+  FibExtensionDrawing,
   FibFanDrawing,
+  FibRetracementDrawing,
   FibSpeedResistanceArcsDrawing,
   FibSpeedResistanceFanDrawing,
-  FibRetracementDrawing,
-  FibTimeZoneDrawing,
-  FlagMarkDrawing,
-  ForecastDrawing,
-  FibWedgeDrawing,
   FibSpiralDrawing,
-  TrendBasedFibExtensionDrawing,
-  TrendBasedFibTimeDrawing,
+  FibTimeZoneDrawing,
+  FibWedgeDrawing,
+  FixedRangeVolumeProfileDrawing,
+  FlagMarkDrawing,
+  FlatTopBottomDrawing,
+  ForecastDrawing,
   GannBoxDrawing,
   GannFanDrawing,
   GannSquareDrawing,
-  FlatTopBottomDrawing,
-  FixedRangeVolumeProfileDrawing,
   HorizontalRayDrawing,
   ImageDrawing,
   InfoLineDrawing,
-  PathDrawing,
   ParallelChannelDrawing,
+  PathDrawing,
   PitchforkDrawing,
   PriceLabelDrawing,
   PriceRangeDrawing,
@@ -51,9 +49,11 @@ import type {
   SignpostDrawing,
   SineLineDrawing,
   TimeCyclesDrawing,
-  TriangleDrawing,
   TrendAngleDrawing,
+  TrendBasedFibExtensionDrawing,
+  TrendBasedFibTimeDrawing,
   TrendLineDrawing,
+  TriangleDrawing,
   UserDrawing,
   UserDrawingStyle,
 } from './types';
@@ -65,7 +65,9 @@ import {
   anchorToScreenPoint,
   drawingXToTime,
   drawingYToPrice,
+  panePositionToScreenPoint,
   priceToDrawingY,
+  resolveAbcdPatternFromAnchors,
   resolveAnchoredVwapFromAnchor,
   resolveArcFromAnchors,
   resolveBarsPatternFromAnchors,
@@ -73,32 +75,30 @@ import {
   resolveDateRangeRectFromAnchors,
   resolveDisjointChannelFromAnchors,
   resolveDoubleCurveFromAnchors,
+  resolveElliottCorrectiveWaveFromAnchors,
+  resolveElliottDoubleComboWaveFromAnchors,
+  resolveElliottImpulseWaveFromAnchors,
+  resolveElliottTriangleWaveFromAnchors,
+  resolveElliottTripleComboWaveFromAnchors,
   resolveExtendedSegment,
   resolveFibExtensionFromAnchors,
   resolveFibRetracementFromAnchors,
-  resolveTrendBasedFibExtensionFromAnchors,
   resolveFlatTopBottomFromAnchors,
-  resolvePitchforkFromAnchors,
+  resolveHeadShouldersPatternFromAnchors,
   resolvePitchfanFromAnchors,
+  resolvePitchforkFromAnchors,
   resolvePolylineFromAnchors,
   resolveRaySegment,
   resolveRectFromAnchors,
   resolveRiskRewardPositionFromAnchors,
   resolveRotatedRectangleFromAnchors,
+  resolveThreeDrivesPatternFromAnchors,
   resolveTrendAngleFromSegment,
+  resolveTrendBasedFibExtensionFromAnchors,
+  resolveTrianglePatternFromAnchors,
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
-  resolveAbcdPatternFromAnchors,
-  resolveElliottCorrectiveWaveFromAnchors,
-  resolveElliottDoubleComboWaveFromAnchors,
-  resolveElliottImpulseWaveFromAnchors,
-  resolveElliottTripleComboWaveFromAnchors,
-  resolveElliottTriangleWaveFromAnchors,
-  resolveHeadShouldersPatternFromAnchors,
-  panePositionToScreenPoint,
-  resolveThreeDrivesPatternFromAnchors,
-  resolveTrianglePatternFromAnchors,
   resolveXabcdPatternFromAnchors,
   screenPointToAnchor,
   timeToDrawingX,
@@ -370,7 +370,11 @@ describe('user drawing coordinates', () => {
   });
 
   it('resolves Fibonacci retracement levels from two anchors', () => {
-    const retracement = resolveFibRetracementFromAnchors({ time: 1_000, price: 90 }, { time: 3_000, price: 110 }, space);
+    const retracement = resolveFibRetracementFromAnchors(
+      { time: 1_000, price: 90 },
+      { time: 3_000, price: 110 },
+      space,
+    );
 
     expect(retracement.rect).toEqual({ x: 10, y: 20, width: 200, height: 100 });
     expect(retracement.levels.map(({ ratio, label, price }) => ({ ratio, label, price }))).toEqual([
@@ -1782,9 +1786,24 @@ describe('user drawing coordinates', () => {
         reference: { x: 110, y: 120 },
         baseRadius: expect.closeTo(111.8),
         arcs: [
-          expect.objectContaining({ ratio: 1 / 3, radius: expect.closeTo(37.27), startAngle: 0, endAngle: expect.closeTo(0.46) }),
-          expect.objectContaining({ ratio: 2 / 3, radius: expect.closeTo(74.54), startAngle: 0, endAngle: expect.closeTo(0.46) }),
-          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: expect.closeTo(0.46) }),
+          expect.objectContaining({
+            ratio: 1 / 3,
+            radius: expect.closeTo(37.27),
+            startAngle: 0,
+            endAngle: expect.closeTo(0.46),
+          }),
+          expect.objectContaining({
+            ratio: 2 / 3,
+            radius: expect.closeTo(74.54),
+            startAngle: 0,
+            endAngle: expect.closeTo(0.46),
+          }),
+          expect.objectContaining({
+            ratio: 1,
+            radius: expect.closeTo(111.8),
+            startAngle: 0,
+            endAngle: expect.closeTo(0.46),
+          }),
         ],
       },
     });
@@ -1825,9 +1844,24 @@ describe('user drawing coordinates', () => {
           { start: { x: 10, y: 70 }, end: { x: 110, y: 120 } },
         ],
         arcs: expect.arrayContaining([
-          expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39), startAngle: 0, endAngle: expect.closeTo(0.46) }),
-          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: expect.closeTo(0.46) }),
-          expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7), startAngle: 0, endAngle: expect.closeTo(0.46) }),
+          expect.objectContaining({
+            ratio: 0.236,
+            radius: expect.closeTo(26.39),
+            startAngle: 0,
+            endAngle: expect.closeTo(0.46),
+          }),
+          expect.objectContaining({
+            ratio: 1,
+            radius: expect.closeTo(111.8),
+            startAngle: 0,
+            endAngle: expect.closeTo(0.46),
+          }),
+          expect.objectContaining({
+            ratio: 2.618,
+            radius: expect.closeTo(292.7),
+            startAngle: 0,
+            endAngle: expect.closeTo(0.46),
+          }),
         ]),
       },
     });
@@ -1924,39 +1958,115 @@ describe('user drawing coordinates', () => {
         ]),
       },
     });
-    expect(resolveUserDrawingGeometry(fibTimeZone, space)).toMatchObject({
-      kind: 'fibTimeZone',
-      fibTimeZone: {
-        levels: expect.arrayContaining([
-          { ratio: 0, time: 1_000, x: 10, segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } } },
-          { ratio: 1, time: 2_000, x: 110, segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } } },
-          { ratio: 2, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
-        ]),
-      },
-    });
-    expect(resolveUserDrawingGeometry(trendBasedFibTime, space)).toMatchObject({
-      kind: 'trendBasedFibTime',
-      trendBasedFibTime: {
-        levels: expect.arrayContaining([
-          { ratio: 0, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
-          { ratio: 1, time: 4_000, x: 310, segment: { start: { x: 310, y: 20 }, end: { x: 310, y: 120 } } },
-          { ratio: 2, time: 5_000, x: 410, segment: { start: { x: 410, y: 20 }, end: { x: 410, y: 120 } } },
-        ]),
-      },
-    });
-    expect(resolveUserDrawingGeometry(cyclicLines, space)).toMatchObject({
-      kind: 'cyclicLines',
-      cyclicLines: {
-        interval: 500,
-        levels: expect.arrayContaining([
-          { ratio: -1, time: 1_000, x: 10, segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } } },
-          { ratio: 0, time: 1_500, x: 60, segment: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } } },
-          { ratio: 1, time: 2_000, x: 110, segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } } },
-          { ratio: 3, time: 3_000, x: 210, segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } } },
-        ]),
-      },
-    });
-    expect(resolveUserDrawingGeometry(timeCycles, space)).toMatchObject({
+    const fibTimeZoneGeometry = resolveUserDrawingGeometry(fibTimeZone, space);
+    expect(fibTimeZoneGeometry).toMatchObject({ kind: 'fibTimeZone' });
+    if (fibTimeZoneGeometry?.kind !== 'fibTimeZone') throw new Error('expected fib time zone geometry');
+    expect(fibTimeZoneGeometry.fibTimeZone.levels).toEqual(
+      expect.arrayContaining([
+        {
+          ratio: 0,
+          label: '0',
+          time: 1_000,
+          x: 10,
+          segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } },
+          labelPoint: { x: 10, y: 116 },
+        },
+        {
+          ratio: 1,
+          label: '1',
+          time: 2_000,
+          x: 110,
+          segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
+          labelPoint: { x: 110, y: 116 },
+        },
+        {
+          ratio: 2,
+          label: '2.000',
+          time: 3_000,
+          x: 210,
+          segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } },
+          labelPoint: { x: 210, y: 116 },
+        },
+      ]),
+    );
+
+    const trendBasedFibTimeGeometry = resolveUserDrawingGeometry(trendBasedFibTime, space);
+    expect(trendBasedFibTimeGeometry).toMatchObject({ kind: 'trendBasedFibTime' });
+    if (trendBasedFibTimeGeometry?.kind !== 'trendBasedFibTime') {
+      throw new Error('expected trend-based fib time geometry');
+    }
+    expect(trendBasedFibTimeGeometry.trendBasedFibTime.levels).toEqual(
+      expect.arrayContaining([
+        {
+          ratio: 0,
+          label: '0',
+          time: 3_000,
+          x: 210,
+          segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } },
+          labelPoint: { x: 210, y: 116 },
+        },
+        {
+          ratio: 1,
+          label: '1',
+          time: 4_000,
+          x: 310,
+          segment: { start: { x: 310, y: 20 }, end: { x: 310, y: 120 } },
+          labelPoint: { x: 310, y: 116 },
+        },
+        {
+          ratio: 2,
+          label: '2.000',
+          time: 5_000,
+          x: 410,
+          segment: { start: { x: 410, y: 20 }, end: { x: 410, y: 120 } },
+          labelPoint: { x: 410, y: 116 },
+        },
+      ]),
+    );
+
+    const cyclicLinesGeometry = resolveUserDrawingGeometry(cyclicLines, space);
+    expect(cyclicLinesGeometry).toMatchObject({ kind: 'cyclicLines' });
+    if (cyclicLinesGeometry?.kind !== 'cyclicLines') throw new Error('expected cyclic lines geometry');
+    expect(cyclicLinesGeometry.cyclicLines).toMatchObject({ interval: 500 });
+    expect(cyclicLinesGeometry.cyclicLines.levels).toEqual(
+      expect.arrayContaining([
+        {
+          ratio: -1,
+          label: '-1',
+          time: 1_000,
+          x: 10,
+          segment: { start: { x: 10, y: 20 }, end: { x: 10, y: 120 } },
+          labelPoint: { x: 10, y: 116 },
+        },
+        {
+          ratio: 0,
+          label: '0',
+          time: 1_500,
+          x: 60,
+          segment: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } },
+          labelPoint: { x: 60, y: 116 },
+        },
+        {
+          ratio: 1,
+          label: '1',
+          time: 2_000,
+          x: 110,
+          segment: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
+          labelPoint: { x: 110, y: 116 },
+        },
+        {
+          ratio: 3,
+          label: '3',
+          time: 3_000,
+          x: 210,
+          segment: { start: { x: 210, y: 20 }, end: { x: 210, y: 120 } },
+          labelPoint: { x: 210, y: 116 },
+        },
+      ]),
+    );
+
+    const timeCyclesGeometry = resolveUserDrawingGeometry(timeCycles, space);
+    expect(timeCyclesGeometry).toMatchObject({
       kind: 'timeCycles',
       timeCycles: {
         baseline: { x: 60, y: 70 },
@@ -1970,13 +2080,21 @@ describe('user drawing coordinates', () => {
             startBoundary: { start: { x: 60, y: 20 }, end: { x: 60, y: 120 } },
             endBoundary: { start: { x: 110, y: 20 }, end: { x: 110, y: 120 } },
             points: expect.arrayContaining([{ x: 85, y: 20 }]),
+            label: '0',
+            labelPoint: { x: 85, y: 116 },
           }),
         ]),
       },
     });
     expect(
       resolveUserDrawingGeometry(
-        { ...timeCycles, points: [{ time: 2_000, price: 100 }, { time: 1_500, price: 110 }] },
+        {
+          ...timeCycles,
+          points: [
+            { time: 2_000, price: 100 },
+            { time: 1_500, price: 110 },
+          ],
+        },
         space,
       ),
     ).toMatchObject({
@@ -2058,7 +2176,9 @@ describe('user drawing coordinates', () => {
         ],
       },
     });
-    expect(resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space)).toMatchObject({
+    expect(
+      resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space),
+    ).toMatchObject({
       median: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
       upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 20 } },
       lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
@@ -2087,52 +2207,54 @@ describe('user drawing coordinates', () => {
         midpoint: { x: 110, y: 70 },
       },
     });
-    expect(resolvePitchfanFromAnchors(pitchfan.points[0], pitchfan.points[1], pitchfan.points[2], space)).toMatchObject({
-      origin: { x: 10, y: 70 },
-      targetStart: { x: 110, y: 20 },
-      targetEnd: { x: 110, y: 120 },
-      rays: [
-        { ratio: 0, target: { x: 110, y: 20 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: -30 } } },
-        {
-          ratio: 0.236,
-          target: { x: 110, y: expect.closeTo(43.6) },
-          segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(17.2) } },
-        },
-        {
-          ratio: 0.382,
-          target: { x: 110, y: expect.closeTo(58.2) },
-          segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(46.4) } },
-        },
-        { ratio: 0.5, target: { x: 110, y: 70 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
-        { ratio: 0.618, target: { x: 110, y: 81.8 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 93.6 } } },
-        {
-          ratio: 0.786,
-          target: { x: 110, y: expect.closeTo(98.6) },
-          segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(127.2) } },
-        },
-        { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
-      ],
-      bands: expect.arrayContaining([
-        {
-          fromRatio: 0,
-          toRatio: 0.236,
-          points: [
-            { x: 10, y: 70 },
-            { x: 210, y: -30 },
-            { x: 210, y: expect.closeTo(17.2) },
-          ],
-        },
-        {
-          fromRatio: 0.5,
-          toRatio: 0.618,
-          points: [
-            { x: 10, y: 70 },
-            { x: 210, y: 70 },
-            { x: 210, y: expect.closeTo(93.6) },
-          ],
-        },
-      ]),
-    });
+    expect(resolvePitchfanFromAnchors(pitchfan.points[0], pitchfan.points[1], pitchfan.points[2], space)).toMatchObject(
+      {
+        origin: { x: 10, y: 70 },
+        targetStart: { x: 110, y: 20 },
+        targetEnd: { x: 110, y: 120 },
+        rays: [
+          { ratio: 0, target: { x: 110, y: 20 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: -30 } } },
+          {
+            ratio: 0.236,
+            target: { x: 110, y: expect.closeTo(43.6) },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(17.2) } },
+          },
+          {
+            ratio: 0.382,
+            target: { x: 110, y: expect.closeTo(58.2) },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(46.4) } },
+          },
+          { ratio: 0.5, target: { x: 110, y: 70 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
+          { ratio: 0.618, target: { x: 110, y: 81.8 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 93.6 } } },
+          {
+            ratio: 0.786,
+            target: { x: 110, y: expect.closeTo(98.6) },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(127.2) } },
+          },
+          { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+        ],
+        bands: expect.arrayContaining([
+          {
+            fromRatio: 0,
+            toRatio: 0.236,
+            points: [
+              { x: 10, y: 70 },
+              { x: 210, y: -30 },
+              { x: 210, y: expect.closeTo(17.2) },
+            ],
+          },
+          {
+            fromRatio: 0.5,
+            toRatio: 0.618,
+            points: [
+              { x: 10, y: 70 },
+              { x: 210, y: 70 },
+              { x: 210, y: expect.closeTo(93.6) },
+            ],
+          },
+        ]),
+      },
+    );
     expect(resolveUserDrawingGeometry(pitchfan, space)).toMatchObject({ kind: 'pitchfan' });
     expect(
       resolvePitchforkFromAnchors(
@@ -2147,7 +2269,9 @@ describe('user drawing coordinates', () => {
       lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
       midpoint: { x: 110, y: 70 },
     });
-    expect(resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'schiff')).toMatchObject({
+    expect(
+      resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'schiff'),
+    ).toMatchObject({
       median: { start: { x: 10, y: 45 }, end: { x: 210, y: 95 } },
       upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 45 } },
       lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 145 } },
@@ -2155,7 +2279,13 @@ describe('user drawing coordinates', () => {
       midpoint: { x: 110, y: 70 },
     });
     expect(
-      resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'modifiedSchiff'),
+      resolvePitchforkFromAnchors(
+        pitchfork.points[0],
+        pitchfork.points[1],
+        pitchfork.points[2],
+        space,
+        'modifiedSchiff',
+      ),
     ).toMatchObject({
       median: { start: { x: 60, y: 45 }, end: { x: 210, y: 120 } },
       upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 70 } },
@@ -2163,7 +2293,9 @@ describe('user drawing coordinates', () => {
       origin: { x: 60, y: 45 },
       midpoint: { x: 110, y: 70 },
     });
-    expect(resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'inside')).toMatchObject({
+    expect(
+      resolvePitchforkFromAnchors(pitchfork.points[0], pitchfork.points[1], pitchfork.points[2], space, 'inside'),
+    ).toMatchObject({
       median: { start: { x: 60, y: 45 }, end: { x: 210, y: 270 } },
       upper: { start: { x: 10, y: 70 }, end: { x: 210, y: 370 } },
       lower: { start: { x: 110, y: 20 }, end: { x: 210, y: 170 } },
