@@ -421,9 +421,9 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="240 pixel text box width"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="320 pixel text box width"]')?.click();
 
-    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 240 });
+    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 320 });
 
     topBar.unmount();
   });
