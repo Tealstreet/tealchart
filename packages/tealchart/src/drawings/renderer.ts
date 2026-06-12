@@ -435,7 +435,7 @@ function renderGannFanGeometry(
 
 function renderGannBoxGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'gannBox' | 'gannSquare' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'gannBox' | 'gannSquare' | 'gannSquareFixed' }>,
 ): void {
   const { drawing, gannBox } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
@@ -803,10 +803,11 @@ function resolveUserDrawingImage(
   src: string | undefined,
   options: Required<UserDrawingRenderOptions>,
 ): CanvasImageSource | null {
-  if (!src || typeof Image === 'undefined') return null;
+  if (!src) return null;
 
   const cached = userDrawingImageCache.get(src);
   if (cached?.status === 'loaded') return cached.image ?? null;
+  if (typeof Image === 'undefined') return null;
   if (cached) {
     if (cached.status === 'loading') {
       cached.onLoad = options.onImageLoad;
@@ -1480,6 +1481,7 @@ export function renderUserDrawing(
         break;
       case 'gannBox':
       case 'gannSquare':
+      case 'gannSquareFixed':
         renderGannBoxGeometry(ctx, geometry);
         break;
       case 'fibChannel':

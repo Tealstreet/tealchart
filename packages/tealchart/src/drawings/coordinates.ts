@@ -809,6 +809,11 @@ export type ResolvedUserDrawingGeometry =
       gannBox: DrawingScreenGannBox;
     }
   | {
+      kind: 'gannSquareFixed';
+      drawing: UserDrawing;
+      gannBox: DrawingScreenGannBox;
+    }
+  | {
       kind: 'parallelChannel' | 'regressionTrend' | 'flatTopBottom' | 'disjointChannel' | 'rotatedRectangle';
       drawing: UserDrawing;
       channel: DrawingScreenParallelChannel;
@@ -3218,6 +3223,12 @@ export function resolveUserDrawingGeometry(
     case 'gannSquare':
       return {
         kind: 'gannSquare',
+        drawing,
+        gannBox: resolveGannSquareFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'gannSquareFixed':
+      return {
+        kind: 'gannSquareFixed',
         drawing,
         gannBox: resolveGannSquareFromAnchors(drawing.points[0], drawing.points[1], space),
       };

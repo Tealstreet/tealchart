@@ -938,6 +938,23 @@ describe('user drawing hit testing', () => {
     });
   });
 
+  it('hits fixed gann square grids and corner handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'gann-square-fixed',
+      kind: 'gannSquareFixed',
+      points: [
+        { time: 10, price: 80 },
+        { time: 50, price: 20 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)?.drawing.id).toBe('gann-square-fixed');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 80 }, space)).toMatchObject({
+      handle: 'bottomRight',
+    });
+  });
+
   it('hits fib channel fills, levels, and point-index handles', () => {
     const drawing: UserDrawing = {
       ...base,

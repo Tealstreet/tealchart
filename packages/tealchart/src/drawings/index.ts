@@ -406,6 +406,7 @@ export type {
   GannBoxDrawing,
   GannFanDrawing,
   GannSquareDrawing,
+  GannSquareFixedDrawing,
   FlatTopBottomDrawing,
   HeadShouldersPatternDrawing,
   HighlighterDrawing,
