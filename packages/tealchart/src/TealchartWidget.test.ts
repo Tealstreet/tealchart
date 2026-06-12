@@ -965,6 +965,48 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('applies public image source commands through the widget state owner', () => {
+      const datafeed = createMockDatafeed();
+      const onChange = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingStateChange: onChange });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'image' },
+        drawings: [
+          {
+            id: 'image',
+            kind: 'image',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 40, price: 40 },
+              { time: 60, price: 60 },
+            ],
+            src: '',
+            alt: 'Image',
+          },
+        ],
+      });
+
+      expect(widget.setUserDrawingImageSource({ src: 'https://example.test/chart.png', alt: 'Chart snapshot' })).toBe(
+        true,
+      );
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        src: 'https://example.test/chart.png',
+        alt: 'Chart snapshot',
+      });
+      expect(widget.setUserDrawingImageSource({ src: 'https://example.test/chart.png' })).toBe(false);
+      expect(onChange).toHaveBeenCalled();
+    });
+
     it('applies public text drawing edit commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

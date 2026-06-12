@@ -22,6 +22,7 @@ import {
   selectUserDrawingsById,
   selectUserDrawing,
   setUserDrawingIconName,
+  setUserDrawingImageSource,
   setUserDrawingLocked,
   setUserDrawingText,
   setUserDrawingTextAlign,
@@ -1035,6 +1036,59 @@ describe('user drawing input controller', () => {
       now: () => 13,
     });
     expect(targeted.drawings[1]).toMatchObject({ iconName: 'arrowUp', updatedAt: 13 });
+  });
+
+  it('updates image sources for selected or targeted image drawings', () => {
+    const image = {
+      id: 'image',
+      kind: 'image' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [anchorA, anchorB] as const,
+      src: '',
+      alt: 'Image',
+    };
+    const locked = { ...image, id: 'locked', locked: true };
+    const line = {
+      id: 'line',
+      kind: 'horizontalLine' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      price: 100,
+    };
+    const state = createUserDrawingState({
+      selection: { drawingId: 'image' },
+      drawings: [image, locked, line],
+    });
+
+    const selected = setUserDrawingImageSource(
+      state,
+      { src: 'https://example.test/chart.png', alt: 'Chart snapshot' },
+      { now: () => 14 },
+    );
+    expect(selected.drawings[0]).toMatchObject({
+      src: 'https://example.test/chart.png',
+      alt: 'Chart snapshot',
+      updatedAt: 14,
+    });
+    expect(setUserDrawingImageSource(selected, { src: 'https://example.test/chart.png' })).toBe(selected);
+    expect(setUserDrawingImageSource(state, { src: 'ignored.png' }, { drawingId: 'line' })).toBe(state);
+    expect(setUserDrawingImageSource(state, { src: 'ignored.png' }, { drawingId: 'locked' })).toBe(state);
+
+    const targeted = setUserDrawingImageSource(
+      state,
+      { src: 'locked.png' },
+      { drawingId: 'locked', includeLocked: true, now: () => 15 },
+    );
+    expect(targeted.drawings[1]).toMatchObject({ src: 'locked.png', alt: 'Image', updatedAt: 15 });
   });
 
   it('updates targeted drawing style and respects locked drawings by default', () => {
