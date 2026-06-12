@@ -2081,7 +2081,17 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    const barSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 55, low: 45, close: 52, volume: 100 },
+        { time: 40, open: 60, high: 65, low: 55, close: 62, volume: 100 },
+        { time: 70, open: 75, high: 80, low: 70, close: 77, volume: 100 },
+        { time: 90, open: 80, high: 85, low: 75, close: 82, volume: 100 },
+      ],
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[barSpace.pane.id, barSpace]]))[0]).toMatchObject({
       kind: 'forecast',
       id: 'forecast',
       clip,
@@ -2090,7 +2100,7 @@ describe('mobile user drawing render model', () => {
       labelPoint: { x: 40, y: 33.5 },
       sourceLabel: 'Source 50.00',
       targetLabel: 'Target 75.00',
-      changeLabel: '+25.00 (+50.00%) / 60 ms',
+      changeLabel: '+25.00 (+50.00%) / 3 bars, 60 ms',
       style,
     });
   });
@@ -2121,7 +2131,17 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    const barSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 10, open: 50, high: 55, low: 45, close: 52, volume: 100 },
+        { time: 40, open: 60, high: 65, low: 55, close: 62, volume: 100 },
+        { time: 70, open: 75, high: 80, low: 70, close: 77, volume: 100 },
+        { time: 90, open: 80, high: 85, low: 75, close: 82, volume: 100 },
+      ],
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[barSpace.pane.id, barSpace]]))[0]).toMatchObject({
       kind: 'projection',
       id: 'projection',
       clip,
@@ -2132,7 +2152,7 @@ describe('mobile user drawing render model', () => {
       startLabel: 'Start 50.00',
       pivotLabel: 'Pivot 60.00',
       targetLabel: 'Target 75.00',
-      changeLabel: '+15.00 (+25.00%) / 30 ms',
+      changeLabel: '+15.00 (+25.00%) / 2 bars, 30 ms',
       style,
     });
   });

@@ -1319,6 +1319,27 @@ describe('user drawing coordinates', () => {
         changeLabel: '+5.00 (+4.76%) / 500 ms',
       },
     });
+    const barSpace: DrawingCoordinateSpace = {
+      ...space,
+      bars: [
+        { time: 1_000, open: 100, high: 105, low: 95, close: 102, volume: 100 },
+        { time: 1_500, open: 102, high: 106, low: 98, close: 104, volume: 100 },
+        { time: 2_000, open: 104, high: 108, low: 100, close: 106, volume: 100 },
+        { time: 2_500, open: 106, high: 110, low: 102, close: 108, volume: 100 },
+      ],
+    };
+    expect(resolveUserDrawingGeometry(forecast, barSpace)).toMatchObject({
+      kind: 'forecast',
+      forecast: {
+        changeLabel: '+10.00 (+10.00%) / 3 bars, 1 second',
+      },
+    });
+    expect(resolveUserDrawingGeometry(projection, barSpace)).toMatchObject({
+      kind: 'projection',
+      projection: {
+        changeLabel: '+5.00 (+4.76%) / 2 bars, 500 ms',
+      },
+    });
     expect(resolveUserDrawingGeometry(fibRetracement, space)).toMatchObject({
       kind: 'fibRetracement',
       fib: {
