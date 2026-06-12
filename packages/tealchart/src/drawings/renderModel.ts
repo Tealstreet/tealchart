@@ -86,6 +86,7 @@ export function resolveUserDrawingHandlePoints(
     case 'ray':
     case 'fibRetracement':
     case 'fibExtension':
+    case 'trendBasedFibExtension':
     case 'fibFan':
     case 'fibSpeedResistanceFan':
     case 'fibSpeedResistanceArcs':

@@ -1698,6 +1698,51 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready trend-based Fibonacci extension primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'trend-fib-ext',
+          kind: 'trendBasedFibExtension',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 20 },
+            { time: 50, price: 80 },
+            { time: 90, price: 50 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'trendBasedFibExtension',
+      id: 'trend-fib-ext',
+      levels: expect.arrayContaining([
+        { ratio: 0, label: '0 50.00', price: 50, start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
+        { ratio: 0.382, label: '0.382 72.92', price: 72.92, start: { x: 10, y: 27.08 }, end: { x: 90, y: 27.08 } },
+        {
+          ratio: 0.618,
+          label: '0.618 87.08',
+          price: 87.08,
+          start: { x: 10, y: expect.closeTo(12.92) },
+          end: { x: 90, y: expect.closeTo(12.92) },
+        },
+        { ratio: 1, label: '1 110.00', price: 110, start: { x: 10, y: -10 }, end: { x: 90, y: -10 } },
+      ]),
+      style,
+    });
+  });
+
   it('returns Skia-ready extended line segments to chart bounds', () => {
     const extended: ExtendedLineDrawing = {
       id: 'extended',

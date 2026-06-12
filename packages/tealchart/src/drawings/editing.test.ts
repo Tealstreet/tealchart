@@ -2242,6 +2242,44 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('edits trend-based Fibonacci extension anchor handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'trend-fib-ext',
+      kind: 'trendBasedFibExtension',
+      points: [
+        { time: 10, price: 20 },
+        { time: 50, price: 80 },
+        { time: 90, price: 50 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'trend-fib-ext', handle: 'center', pointIndex: 2 },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'trend-fib-ext', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 90, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 80, y: 60 },
+      { now: () => 16 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      points: [
+        { time: 10, price: 20 },
+        { time: 50, price: 80 },
+        { time: 80, price: 40 },
+      ],
+      updatedAt: 16,
+    });
+  });
+
   it('moves horizontal, vertical, horizontal ray, cross line, and text drawings on their editable axis', () => {
     const horizontal: UserDrawing = { ...base, id: 'h', kind: 'horizontalLine', price: 50 };
     const vertical: UserDrawing = { ...base, id: 'v', kind: 'verticalLine', time: 50 };

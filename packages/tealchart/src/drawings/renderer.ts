@@ -906,7 +906,7 @@ function renderRiskRewardPositionGeometry(
 
 function renderFibLevelGeometry(
   ctx: CanvasContext,
-  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibRetracement' | 'fibExtension' }>,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibRetracement' | 'fibExtension' | 'trendBasedFibExtension' }>,
 ): void {
   const { drawing, fib } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
@@ -1291,6 +1291,7 @@ export function renderUserDrawing(
         break;
       case 'fibRetracement':
       case 'fibExtension':
+      case 'trendBasedFibExtension':
         renderFibLevelGeometry(ctx, geometry);
         break;
       case 'barsPattern':

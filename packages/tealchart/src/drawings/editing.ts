@@ -180,6 +180,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'triangle':
     case 'fibWedge':
     case 'fibChannel':
+    case 'trendBasedFibExtension':
     case 'trendBasedFibTime':
     case 'pitchfork':
     case 'schiffPitchfork':
@@ -360,6 +361,7 @@ function editDrawingHandle(
       drawing.kind === 'arc' ||
       drawing.kind === 'triangle' ||
       drawing.kind === 'fibWedge' ||
+      drawing.kind === 'trendBasedFibExtension' ||
       drawing.kind === 'trendBasedFibTime' ||
       drawing.kind === 'pitchfork' ||
       drawing.kind === 'schiffPitchfork' ||
@@ -540,6 +542,7 @@ function editDrawingHandle(
     case 'triangle':
     case 'fibWedge':
     case 'fibChannel':
+    case 'trendBasedFibExtension':
     case 'trendBasedFibTime':
     case 'pitchfork':
     case 'schiffPitchfork':
