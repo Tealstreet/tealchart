@@ -1545,6 +1545,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('arc:10,50,50:1');
     expect(ctx.calls).toContain('arc:10,50,130.9:1');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls.some((call) => call.startsWith('fillText:0.236:21.'))).toBe(true);
+    expect(ctx.calls.some((call) => call.startsWith('fillText:1:57.'))).toBe(true);
   });
 
   it('renders fib spirals as Fibonacci growth paths', () => {

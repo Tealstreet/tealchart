@@ -1170,8 +1170,20 @@ describe('mobile user drawing render model', () => {
         { start: { x: 10, y: 50 }, end: { x: 50, y: 80 } },
       ],
       arcs: expect.arrayContaining([
-        expect.objectContaining({ ratio: 0.236, radius: 11.799999999999999, startAngle: 0 }),
-        expect.objectContaining({ ratio: 1, radius: 50, startAngle: 0 }),
+        expect.objectContaining({
+          ratio: 0.236,
+          label: '0.236',
+          radius: 11.799999999999999,
+          startAngle: 0,
+          labelPoint: { x: expect.closeTo(21.19), y: expect.closeTo(49.73) },
+        }),
+        expect.objectContaining({
+          ratio: 1,
+          label: '1',
+          radius: 50,
+          startAngle: 0,
+          labelPoint: { x: expect.closeTo(57.43), y: expect.closeTo(61.81) },
+        }),
         expect.objectContaining({ ratio: 2.618, radius: 130.9, startAngle: 0 }),
       ]),
     });
