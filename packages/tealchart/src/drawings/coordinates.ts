@@ -117,12 +117,18 @@ export interface DrawingScreenFibWedge {
   boundaries: readonly [DrawingScreenSegment, DrawingScreenSegment];
 }
 
+export interface DrawingScreenFibSpiralLabel {
+  text: string;
+  point: DrawingScreenPoint;
+}
+
 export interface DrawingScreenFibSpiral {
   center: DrawingScreenPoint;
   reference: DrawingScreenPoint;
   baseRadius: number;
   startAngle: number;
   points: readonly DrawingScreenPoint[];
+  labels: readonly DrawingScreenFibSpiralLabel[];
 }
 
 export interface DrawingScreenEllipse {
@@ -1211,6 +1217,18 @@ export function resolveFibSpiralFromAnchors(
       y: center.y + Math.sin(angle) * radius,
     };
   });
+  const labels = FIB_SPIRAL_LABEL_LEVELS.map((ratio) => {
+    const step = (Math.log(ratio) / Math.log(FIB_SPIRAL_GROWTH)) * (Math.PI / 2);
+    const angle = startAngle + step;
+    const point = {
+      x: center.x + Math.cos(angle) * baseRadius * ratio,
+      y: center.y + Math.sin(angle) * baseRadius * ratio,
+    };
+    return {
+      point: { x: point.x + 4, y: point.y - 4 },
+      text: formatFibRetracementRatio(ratio),
+    };
+  });
 
   return {
     center,
@@ -1218,6 +1236,7 @@ export function resolveFibSpiralFromAnchors(
     baseRadius,
     startAngle,
     points,
+    labels,
   };
 }
 
@@ -1733,6 +1752,7 @@ export const FIB_SPEED_RESISTANCE_ARC_LEVELS = [1 / 3, 2 / 3, 1] as const;
 export const FIB_CIRCLE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
 export const FIB_WEDGE_LEVELS = [0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618] as const;
 export const FIB_SPIRAL_GROWTH = 1.618033988749895;
+export const FIB_SPIRAL_LABEL_LEVELS = [1, 1.618, 2.618] as const;
 export const FIB_SPIRAL_TURNS = 4;
 export const FIB_SPIRAL_SEGMENTS_PER_TURN = 64;
 export const FIB_SPIRAL_STEPS = Array.from(
