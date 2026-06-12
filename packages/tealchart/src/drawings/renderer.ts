@@ -485,6 +485,16 @@ function renderFibChannelGeometry(
     ctx.lineTo(level.segment.end.x, level.segment.end.y);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  for (const level of geometry.fibChannel.levels) {
+    ctx.fillText(level.label, level.labelPoint.x, level.labelPoint.y);
+  }
 }
 
 function renderFibTimeZoneGeometry(

@@ -1023,6 +1023,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching Gann grid level labels from the
   shared model without changing persisted drawing state.
 
+## Shipped: Fibonacci Channel Labels
+
+- Shared Fibonacci channel level geometry now carries ratio labels and label
+  points.
+- Web Canvas and mobile Skia render matching Fibonacci channel level labels
+  from the shared model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
