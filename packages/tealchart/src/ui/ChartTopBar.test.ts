@@ -188,6 +188,45 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('dispatches hidden selected drawing show control', () => {
+    const onVisibility = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-hidden-drawing-style',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: false,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      onUserDrawingVisibilityChange: onVisibility,
+    });
+    topBar.mount(document.body);
+
+    const hide = document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]');
+    const show = document.querySelector<HTMLButtonElement>('button[aria-label="Show selected drawing"]');
+    expect(hide?.disabled).toBe(true);
+    expect(show?.disabled).toBe(false);
+    hide?.click();
+    show?.click();
+
+    expect(onVisibility).toHaveBeenCalledTimes(1);
+    expect(onVisibility).toHaveBeenCalledWith(true);
+
+    topBar.unmount();
+  });
+
   it('dispatches selected rectangle fill style controls', () => {
     const onStyle = vi.fn();
     const topBar = new ChartTopBar({
