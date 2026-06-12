@@ -24,6 +24,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingTableCells,
   setUserDrawingText,
   setUserDrawingTextAlign,
   setUserDrawingTool,
@@ -1639,6 +1640,82 @@ describe('user drawing input controller', () => {
     expect(next.drawings[1].point).not.toBe(state.drawings[0].point);
     expect(next.drawings[1].cells).not.toBe(state.drawings[0].cells);
     expect(next.drawings[1].cells[0]).not.toBe(state.drawings[0].cells[0]);
+  });
+
+  it('updates table drawing cells with normalized matrices', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          point: anchorA,
+          cells: [
+            ['Metric', 'Value'],
+            ['Price', '101.25'],
+          ],
+        },
+      ],
+    });
+
+    const next = setUserDrawingTableCells(state, [['Metric', 'Value'], ['Volume']], { now: () => 30 });
+
+    expect(next.selection).toEqual({ drawingId: 'table' });
+    expect(next.drawings[0]).toMatchObject({
+      id: 'table',
+      kind: 'table',
+      updatedAt: 30,
+      cells: [
+        ['Metric', 'Value'],
+        ['Volume', ''],
+      ],
+    });
+    expect(setUserDrawingTableCells(next, [['Metric', 'Value'], ['Volume', '']])).toBe(next);
+  });
+
+  it('ignores table cell updates for non-table and locked drawings without opt-in', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'line' },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          point: anchorA,
+          cells: [['Metric', 'Value']],
+        },
+      ],
+    });
+
+    expect(setUserDrawingTableCells(state, [['Ignored']])).toBe(state);
+    expect(setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table' })).toBe(state);
+    expect(
+      setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table', includeLocked: true }).drawings[1],
+    ).toMatchObject({
+      cells: [['Updated']],
+    });
   });
 
   it('duplicates XABCD pattern drawings with deep-cloned five-point payloads', () => {

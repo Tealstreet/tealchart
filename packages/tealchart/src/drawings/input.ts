@@ -72,6 +72,8 @@ export interface UserDrawingImageSourceInput {
   alt?: string;
 }
 
+export type UserDrawingTableCellsInput = readonly (readonly unknown[])[];
+
 export interface UpdateUserDrawingOptions {
   drawingId?: string;
   includeLocked?: boolean;
@@ -1078,6 +1080,36 @@ export function setUserDrawingImageSource(
     ...target.drawing,
     src: source.src,
     alt: nextAlt,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
+function areUserDrawingTableCellsEqual(
+  left: readonly (readonly string[])[],
+  right: readonly (readonly string[])[],
+): boolean {
+  if (left.length !== right.length) return false;
+
+  return left.every((row, rowIndex) => {
+    const nextRow = right[rowIndex];
+    return !!nextRow && row.length === nextRow.length && row.every((cell, cellIndex) => cell === nextRow[cellIndex]);
+  });
+}
+
+export function setUserDrawingTableCells(
+  state: UserDrawingState,
+  cells: UserDrawingTableCellsInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table') return state;
+
+  const nextCells = normalizeUserDrawingTableCells(cells);
+  if (areUserDrawingTableCellsEqual(target.drawing.cells, nextCells)) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    cells: nextCells,
     updatedAt: options.now?.() ?? Date.now(),
   });
 }

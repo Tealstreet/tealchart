@@ -7,6 +7,7 @@ import {
   setMobileUserDrawingIconName,
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTableCells,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
@@ -155,6 +156,39 @@ describe('mobile drawing style helpers', () => {
       updatedAt: 60,
     });
     expect(setMobileUserDrawingImageSource(state, { src: 'ignored.png' })).toBe(state);
+  });
+
+  it('updates selected table cells through the shared reducer contract', () => {
+    const tableState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: state.drawings[0]!.style,
+          point: { time: 1, price: 100 },
+          cells: [['Metric', 'Value']],
+        },
+      ],
+    };
+
+    expect(
+      setMobileUserDrawingTableCells(tableState, [['Metric', 'Value'], ['Price', 101.25]], { now: () => 70 })
+        .drawings[0],
+    ).toMatchObject({
+      cells: [
+        ['Metric', 'Value'],
+        ['Price', '101.25'],
+      ],
+      updatedAt: 70,
+    });
+    expect(setMobileUserDrawingTableCells(state, [['Ignored']])).toBe(state);
   });
 
   it('requires explicit opt-in for locked drawing property changes', () => {
