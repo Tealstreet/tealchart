@@ -22,6 +22,7 @@ export interface UserDrawingRenderOptions {
   labelHeight?: number;
   selectionHandleRadius?: number;
   draftOpacity?: number;
+  onImageLoad?: () => void;
 }
 
 const DEFAULT_LABEL_PADDING = 6;
@@ -34,6 +35,22 @@ const RISK_REWARD_PROFIT_STROKE = '#22c55e';
 const RISK_REWARD_RISK_STROKE = '#f43f5e';
 const BARS_PATTERN_UP_COLOR = '#22c55e';
 const BARS_PATTERN_DOWN_COLOR = '#f43f5e';
+
+interface UserDrawingImageCacheRecord {
+  status: 'loading' | 'loaded' | 'error';
+  image?: CanvasImageSource;
+  onLoad?: () => void;
+}
+
+const userDrawingImageCache = new Map<string, UserDrawingImageCacheRecord>();
+
+export function clearUserDrawingImageCache(): void {
+  userDrawingImageCache.clear();
+}
+
+export function primeUserDrawingImageCacheForTest(src: string, image: CanvasImageSource): void {
+  userDrawingImageCache.set(src, { status: 'loaded', image });
+}
 
 function dashForLineStyle(style: UserDrawingLineStyle): number[] {
   switch (style) {
@@ -665,7 +682,35 @@ function renderRectangleGeometry(
   }
 }
 
-function renderImageGeometry(
+function resolveUserDrawingImage(src: string | undefined, options: Required<UserDrawingRenderOptions>): CanvasImageSource | null {
+  if (!src || typeof Image === 'undefined') return null;
+
+  const cached = userDrawingImageCache.get(src);
+  if (cached?.status === 'loaded') return cached.image ?? null;
+  if (cached) {
+    if (cached.status === 'loading') {
+      cached.onLoad = options.onImageLoad;
+    }
+    return null;
+  }
+
+  const image = new Image();
+  const record: UserDrawingImageCacheRecord = { status: 'loading', image, onLoad: options.onImageLoad };
+  userDrawingImageCache.set(src, record);
+
+  image.onload = () => {
+    record.status = 'loaded';
+    record.onLoad?.();
+  };
+  image.onerror = () => {
+    record.status = 'error';
+  };
+  image.src = src;
+
+  return null;
+}
+
+function renderImagePlaceholder(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'image' }>,
 ): void {
@@ -694,6 +739,31 @@ function renderImageGeometry(
   ctx.textBaseline = 'middle';
   const label = drawing.kind === 'image' && drawing.src ? drawing.alt || 'Image' : 'Image';
   ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2);
+}
+
+function renderImageGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'image' }>,
+  options: Required<UserDrawingRenderOptions>,
+): void {
+  const { rect, drawing } = geometry;
+  const drawImage = ctx.drawImage?.bind(ctx);
+  const image =
+    drawImage && drawing.kind === 'image'
+      ? resolveUserDrawingImage(drawing.src, options)
+      : null;
+
+  if (image && drawImage) {
+    drawImage(image, rect.x, rect.y, rect.width, rect.height);
+
+    if (drawing.style.lineVisible !== false) {
+      applyStrokeStyle(ctx, drawing);
+      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    }
+    return;
+  }
+
+  renderImagePlaceholder(ctx, geometry);
 }
 
 function renderCircleGeometry(
@@ -1171,6 +1241,7 @@ export function renderUserDrawing(
     labelHeight: options.labelHeight ?? DEFAULT_LABEL_HEIGHT,
     selectionHandleRadius: options.selectionHandleRadius ?? DEFAULT_SELECTION_HANDLE_RADIUS,
     draftOpacity: options.draftOpacity ?? DEFAULT_DRAFT_OPACITY,
+    onImageLoad: options.onImageLoad ?? (() => {}),
   };
   const geometry = resolveUserDrawingGeometry(drawing, space);
 
@@ -1324,7 +1395,7 @@ export function renderUserDrawing(
         renderRectangleGeometry(ctx, geometry);
         break;
       case 'image':
-        renderImageGeometry(ctx, geometry);
+        renderImageGeometry(ctx, geometry, resolvedOptions);
         break;
       case 'circle':
         renderCircleGeometry(ctx, geometry);
@@ -1416,6 +1487,7 @@ export function renderUserDrawingLayer(
     labelHeight: options.labelHeight ?? DEFAULT_LABEL_HEIGHT,
     selectionHandleRadius: options.selectionHandleRadius ?? DEFAULT_SELECTION_HANDLE_RADIUS,
     draftOpacity: options.draftOpacity ?? DEFAULT_DRAFT_OPACITY,
+    onImageLoad: options.onImageLoad ?? (() => {}),
   };
 
   const entries = resolveUserDrawingRenderEntries(state, options);

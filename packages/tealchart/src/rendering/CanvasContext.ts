@@ -106,6 +106,9 @@ export interface CanvasContext {
   /** Draw filled text */
   fillText(text: string, x: number, y: number): void;
 
+  /** Draw an image into a destination rectangle when supported */
+  drawImage?(image: CanvasImageSource, x: number, y: number, width: number, height: number): void;
+
   // ==========================================================================
   // State Management
   // ==========================================================================
