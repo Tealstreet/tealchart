@@ -1024,6 +1024,7 @@ describe('tealchart public entries', () => {
     };
 
     expect(metrics.label).toBe('+25.00 (+25.00%) / 1 minute');
+    expect(metrics.barCount).toBeNull();
     expect(drawing.kind).toBe('infoLine');
   });
 

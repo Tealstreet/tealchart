@@ -1091,7 +1091,7 @@ export function resolveForecastFromAnchors(
 ): DrawingScreenForecast {
   const source = anchorToScreenPoint(sourceAnchor, space);
   const target = anchorToScreenPoint(targetAnchor, space);
-  const metrics = resolveUserDrawingInfoLineMetrics(sourceAnchor, targetAnchor);
+  const metrics = resolveUserDrawingInfoLineMetrics(sourceAnchor, targetAnchor, space.bars);
 
   return {
     source,
@@ -1116,7 +1116,7 @@ export function resolveProjectionFromAnchors(
   const start = anchorToScreenPoint(startAnchor, space);
   const pivot = anchorToScreenPoint(pivotAnchor, space);
   const target = anchorToScreenPoint(targetAnchor, space);
-  const metrics = resolveUserDrawingInfoLineMetrics(pivotAnchor, targetAnchor);
+  const metrics = resolveUserDrawingInfoLineMetrics(pivotAnchor, targetAnchor, space.bars);
 
   return {
     start,
