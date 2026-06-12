@@ -1081,6 +1081,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Public web/native exports expose table drawing geometry and the mobile table
   primitive for host toolbar and render integrations.
 
+## Shipped: Signpost Mobile Render Parity
+
+- Mobile Skia now renders signpost drawings through the same text-box layout
+  path as web Canvas signpost rendering.
+- The shared mobile render model exposes signposts as typed text-box primitives,
+  keeping future text annotation parity work on one helper path.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
