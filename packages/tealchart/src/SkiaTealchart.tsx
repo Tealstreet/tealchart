@@ -184,6 +184,15 @@ const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
 
+type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
+
+function resolveUserDrawingTextDecorationLine(style: UserDrawingStyle): UserDrawingTextDecorationLine {
+  if (style.textUnderline && style.textLineThrough) return 'underline line-through';
+  if (style.textUnderline) return 'underline';
+  if (style.textLineThrough) return 'line-through';
+  return 'none';
+}
+
 function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): number[] | null {
   switch (lineStyle) {
     case 'dashed':
@@ -230,16 +239,26 @@ function UserDrawingSkiaText({
   underlineWidth?: number;
   fontSize?: number;
 }) {
+  const decorationWidth = underlineWidth ?? font.measureText(text).width;
+  const resolvedFontSize = fontSize ?? 12;
   const content = (
     <>
       <SkiaText x={x} y={y} text={text} font={font} color={color} />
       {style.fontWeight === 'bold' && <SkiaText x={x + 0.45} y={y} text={text} font={font} color={color} />}
       {style.textUnderline && (
         <SkiaLine
-          p1={vec(x, y + (fontSize ?? 12) * 0.18)}
-          p2={vec(x + (underlineWidth ?? font.measureText(text).width), y + (fontSize ?? 12) * 0.18)}
+          p1={vec(x, y + resolvedFontSize * 0.18)}
+          p2={vec(x + decorationWidth, y + resolvedFontSize * 0.18)}
           color={color}
-          strokeWidth={Math.max(1, (fontSize ?? 12) / 14)}
+          strokeWidth={Math.max(1, resolvedFontSize / 14)}
+        />
+      )}
+      {style.textLineThrough && (
+        <SkiaLine
+          p1={vec(x, y - resolvedFontSize * 0.32)}
+          p2={vec(x + decorationWidth, y - resolvedFontSize * 0.32)}
+          color={color}
+          strokeWidth={Math.max(1, resolvedFontSize / 14)}
         />
       )}
     </>
@@ -886,7 +905,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
       fontWeight: activeUserDrawingTextEditPrimitive.style.fontWeight === 'bold' ? ('700' as const) : ('400' as const),
       fontStyle: activeUserDrawingTextEditPrimitive.style.fontStyle === 'italic' ? ('italic' as const) : ('normal' as const),
-      textDecorationLine: activeUserDrawingTextEditPrimitive.style.textUnderline ? ('underline' as const) : ('none' as const),
+      textDecorationLine: resolveUserDrawingTextDecorationLine(activeUserDrawingTextEditPrimitive.style),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
   }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);

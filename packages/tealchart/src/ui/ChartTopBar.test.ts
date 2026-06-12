@@ -373,6 +373,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Strike-through text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
@@ -383,6 +384,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
     expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 
@@ -469,6 +471,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Strike-through text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
 
@@ -478,6 +481,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
     expect(onStyle).not.toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
 

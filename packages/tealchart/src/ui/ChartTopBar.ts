@@ -963,14 +963,15 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         }
 
         for (const descriptor of USER_DRAWING_TEXT_DECORATION_DESCRIPTORS) {
-          const isActive = !!selectedDrawing.style.textUnderline === descriptor.textUnderline;
+          const isUnderline = descriptor.textUnderline === true;
+          const isActive = isUnderline ? !!selectedDrawing.style.textUnderline : !!selectedDrawing.style.textLineThrough;
           const btn = this.createElement('button', {
             style: {
               ...styles.drawingButton,
               ...(isActive ? styles.drawingButtonActive : {}),
               opacity: textEnabled ? '1' : '0.35',
               cursor: textEnabled ? 'pointer' : 'default',
-              textDecorationLine: 'underline',
+              textDecorationLine: isUnderline ? 'underline' : 'line-through',
             },
             textContent: descriptor.icon,
             attributes: {
@@ -983,7 +984,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           btn.disabled = !textEnabled;
           if (textEnabled) {
             btn.addEventListener('click', () =>
-              this.options.onUserDrawingStyleChange?.({ textUnderline: !selectedDrawing.style.textUnderline }),
+              this.options.onUserDrawingStyleChange?.(
+                isUnderline
+                  ? { textUnderline: !selectedDrawing.style.textUnderline }
+                  : { textLineThrough: !selectedDrawing.style.textLineThrough },
+              ),
             );
             btn.addEventListener('mouseenter', () => {
               if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
