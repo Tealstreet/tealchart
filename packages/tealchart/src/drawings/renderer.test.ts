@@ -1474,6 +1474,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('arc:10,50,33.33333333333333:1');
     expect(ctx.calls).toContain('arc:10,50,50:1');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls.some((call) => call.startsWith('fillText:0.333:25.'))).toBe(true);
+    expect(ctx.calls.some((call) => call.startsWith('fillText:1:57.'))).toBe(true);
   });
 
   it('renders fib arcs as Fibonacci arc levels', () => {
@@ -1494,6 +1496,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('arc:10,50,50:1');
     expect(ctx.calls).toContain('arc:10,50,130.9:1');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0.236:10,57.8:#111:center:1:12px sans-serif');
+    expect(ctx.calls.some((call) => call.startsWith('fillText:1:10.000000000000004,96:'))).toBe(true);
   });
 
   it('renders fib circles as concentric Fibonacci rings', () => {
@@ -1514,6 +1518,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('arc:10,50,50:1');
     expect(ctx.calls).toContain('arc:10,50,130.9:1');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:1:60,46:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:2.618:140.9,46:#111:center:1:12px sans-serif');
   });
 
   it('renders fib wedges as filled Fibonacci arc wedges', () => {
