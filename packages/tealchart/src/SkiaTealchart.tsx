@@ -3038,7 +3038,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'fixedRangeVolumeProfile') {
+          if (primitive.kind === 'anchoredVolumeProfile' || primitive.kind === 'fixedRangeVolumeProfile') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const fillColor = primitive.style.fillColor ?? primitive.style.lineColor;
 

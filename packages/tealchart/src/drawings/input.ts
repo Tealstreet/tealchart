@@ -346,6 +346,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'arrowMarkUp':
     case 'arrowMarkDown':
     case 'anchoredVwap':
+    case 'anchoredVolumeProfile':
     case 'pin':
       return { ...base, kind: drawing.kind, point: cloneAnchor(drawing.point) } as UserDrawing;
     case 'icon':

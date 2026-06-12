@@ -1981,6 +1981,39 @@ describe('user drawing renderer', () => {
     expect(ctx.calls.filter((call) => call === 'stroke:#f5c542:2:4,3:1')).toHaveLength(2);
   });
 
+  it('renders anchored volume profiles as shared volume bins', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'anchored-volume-profile',
+      kind: 'anchoredVolumeProfile',
+      point: { time: 10, price: 75 },
+    };
+
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      ],
+    });
+
+    expect(ctx.calls).toContain('fillRect:10,20,90,5:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillRect:10,40,45,5:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillRect:10,70,22.5,5:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,20,90,60:#f5c542:1');
+    expect(ctx.calls).toContain('moveTo:10,22.5');
+    expect(ctx.calls).toContain('lineTo:100,22.5');
+    expect(ctx.calls).toContain('stroke:#f5c542:2::1');
+    expect(ctx.calls).toContain('moveTo:10,20');
+    expect(ctx.calls).toContain('lineTo:100,20');
+    expect(ctx.calls).toContain('moveTo:10,45');
+    expect(ctx.calls).toContain('lineTo:100,45');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:4,3:1');
+    expect(ctx.calls.filter((call) => call === 'stroke:#f5c542:2:4,3:1')).toHaveLength(2);
+  });
+
   it('requires explicit fill colors for parallel channel fills', () => {
     const ctx = new RecordingCanvasContext();
     const { fillColor: _fillColor, ...styleWithoutFillColor } = style;

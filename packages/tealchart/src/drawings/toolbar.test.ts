@@ -89,6 +89,7 @@ describe('user drawing toolbar descriptors', () => {
       'elliottTripleComboWave',
       'elliottTriangleWave',
       'anchoredVwap',
+      'anchoredVolumeProfile',
       'fixedRangeVolumeProfile',
       'fibRetracement',
       'fibExtension',
@@ -271,6 +272,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('anchoredVwap')).toEqual(
       expect.objectContaining({ tool: 'anchoredVwap', label: 'Anchored VWAP' }),
+    );
+    expect(getUserDrawingToolDescriptor('anchoredVolumeProfile')).toEqual(
+      expect.objectContaining({ tool: 'anchoredVolumeProfile', label: 'Anchored volume profile' }),
     );
     expect(getUserDrawingToolDescriptor('fibExtension')).toEqual(
       expect.objectContaining({ tool: 'fibExtension', label: 'Fib extension' }),
