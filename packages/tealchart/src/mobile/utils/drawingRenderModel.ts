@@ -8,6 +8,7 @@ import type {
   DrawingScreenElliottTriangleWaveLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
+  DrawingScreenRect,
   DrawingScreenThreeDrivesPatternLabel,
   DrawingScreenTrianglePatternLabel,
   DrawingScreenXabcdPatternLabel,
@@ -267,6 +268,24 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       anchor: DrawingScreenPoint;
       points: readonly DrawingScreenPoint[];
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'fixedRangeVolumeProfile';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      bounds: DrawingScreenRect;
+      bins: readonly {
+        priceMin: number;
+        priceMax: number;
+        volume: number;
+        rect: DrawingScreenRect;
+      }[];
+      maxVolume: number;
+      totalVolume: number;
       style: UserDrawingStyle;
     }
   | {
@@ -1015,6 +1034,10 @@ export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive
 export type MobileUserDrawingDoubleCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'doubleCurve' }>;
 export type MobileUserDrawingArcPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arc' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
+export type MobileUserDrawingFixedRangeVolumeProfilePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'fixedRangeVolumeProfile' }
+>;
 export type MobileUserDrawingTrianglePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'triangle' }>;
 export type MobileUserDrawingPitchforkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfork' }>;
 export type MobileUserDrawingPitchfanPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pitchfan' }>;
@@ -1433,6 +1456,25 @@ function primitiveFromGeometry(
         clip,
         anchor: geometry.vwap.anchor,
         points: geometry.vwap.points,
+        style: geometry.drawing.style,
+      };
+    case 'fixedRangeVolumeProfile':
+      return {
+        kind: 'fixedRangeVolumeProfile',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        bounds: geometry.volumeProfile.bounds,
+        bins: geometry.volumeProfile.bins.map((bin) => ({
+          priceMin: bin.priceMin,
+          priceMax: bin.priceMax,
+          volume: bin.volume,
+          rect: bin.rect,
+        })),
+        maxVolume: geometry.volumeProfile.maxVolume,
+        totalVolume: geometry.volumeProfile.totalVolume,
         style: geometry.drawing.style,
       };
     case 'triangle':

@@ -128,6 +128,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'priceRange':
     case 'datePriceRange':
     case 'forecast':
+    case 'fixedRangeVolumeProfile':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
@@ -273,6 +274,7 @@ function editLineEndpoint(
         | 'arrowMarker'
         | 'ray'
         | 'forecast'
+        | 'fixedRangeVolumeProfile'
         | 'fibRetracement'
         | 'fibExtension'
         | 'fibFan'
@@ -491,6 +493,7 @@ function editDrawingHandle(
     case 'arrowMarker':
     case 'ray':
     case 'forecast':
+    case 'fixedRangeVolumeProfile':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':

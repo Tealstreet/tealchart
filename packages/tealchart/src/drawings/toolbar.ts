@@ -164,6 +164,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'elliottTripleComboWave', icon: 'WXYXZ', label: 'Elliott triple combo wave' },
   { tool: 'elliottTriangleWave', icon: 'ABCDE', label: 'Elliott triangle wave' },
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
+  { tool: 'fixedRangeVolumeProfile', icon: 'VP', label: 'Fixed range volume profile' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
   { tool: 'trendBasedFibExtension', icon: 'TBE', label: 'Trend-based fib extension' },

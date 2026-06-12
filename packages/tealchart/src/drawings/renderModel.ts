@@ -98,6 +98,7 @@ export function resolveUserDrawingHandlePoints(
     case 'timeCycles':
     case 'sineLine':
     case 'forecast':
+    case 'fixedRangeVolumeProfile':
     case 'gannFan':
       return drawing.points.map((point) => anchorToScreenPoint(point, space));
     case 'horizontalLine': {

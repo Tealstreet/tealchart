@@ -88,6 +88,7 @@ describe('user drawing toolbar descriptors', () => {
       'elliottTripleComboWave',
       'elliottTriangleWave',
       'anchoredVwap',
+      'fixedRangeVolumeProfile',
       'fibRetracement',
       'fibExtension',
       'trendBasedFibExtension',
@@ -272,6 +273,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('trendBasedFibExtension')).toEqual(
       expect.objectContaining({ tool: 'trendBasedFibExtension', label: 'Trend-based fib extension' }),
+    );
+    expect(getUserDrawingToolDescriptor('fixedRangeVolumeProfile')).toEqual(
+      expect.objectContaining({ tool: 'fixedRangeVolumeProfile', label: 'Fixed range volume profile' }),
     );
     expect(getUserDrawingToolDescriptor('fibFan')).toEqual(
       expect.objectContaining({ tool: 'fibFan', label: 'Fib fan' }),
