@@ -703,7 +703,9 @@ describe('user drawing toolbar descriptors', () => {
       16,
       20,
       24,
+      28,
       32,
+      40,
     ]);
     expect(USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => descriptor.fontStyle)).toEqual(['normal', 'italic']);
     expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.label)).toEqual([
