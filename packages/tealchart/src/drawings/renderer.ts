@@ -297,6 +297,20 @@ function renderPitchforkGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'pitchfork' }>,
 ): void {
+  if (geometry.drawing.style.fillVisible !== false && geometry.drawing.style.fillColor) {
+    ctx.fillStyle = geometry.drawing.style.fillColor;
+    ctx.beginPath();
+    const [first, ...rest] = geometry.pitchfork.fill.points;
+    if (first) {
+      ctx.moveTo(first.x, first.y);
+      for (const point of rest) {
+        ctx.lineTo(point.x, point.y);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
   if (geometry.drawing.style.lineVisible === false) return;
 
   applyStrokeStyle(ctx, geometry.drawing);
@@ -307,6 +321,10 @@ function renderPitchforkGeometry(
   ctx.lineTo(geometry.pitchfork.upper.end.x, geometry.pitchfork.upper.end.y);
   ctx.moveTo(geometry.pitchfork.lower.start.x, geometry.pitchfork.lower.start.y);
   ctx.lineTo(geometry.pitchfork.lower.end.x, geometry.pitchfork.lower.end.y);
+  for (const parallel of geometry.pitchfork.parallels) {
+    ctx.moveTo(parallel.segment.start.x, parallel.segment.start.y);
+    ctx.lineTo(parallel.segment.end.x, parallel.segment.end.y);
+  }
   ctx.stroke();
 }
 

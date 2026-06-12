@@ -718,11 +718,13 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space)?.drawing.id).toBe('pitchfork');
     expect(hitTestUserDrawing(drawing, { x: 70, y: 20 }, space)?.drawing.id).toBe('pitchfork');
     expect(hitTestUserDrawing(drawing, { x: 70, y: 80 }, space)?.drawing.id).toBe('pitchfork');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 35 }, space)?.drawing.id).toBe('pitchfork');
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 65 }, space)?.drawing.id).toBe('pitchfork');
     expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space)).toMatchObject({
       handle: 'center',
       pointIndex: 1,
     });
-    expect(hitTestUserDrawing(drawing, { x: 70, y: 65 }, space, { tolerance: 4 })).toBeNull();
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 58 }, space, { tolerance: 4 })).toBeNull();
   });
 
   it('hits pitchfork variant tines and point-index handles', () => {

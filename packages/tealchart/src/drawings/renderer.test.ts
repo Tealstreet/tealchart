@@ -1331,7 +1331,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
-  it('renders pitchforks as three parallel rays', () => {
+  it('renders pitchforks with filled bands and extra parallel rays', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
       ...base,
@@ -1352,7 +1352,11 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:100,20');
     expect(ctx.calls).toContain('moveTo:50,80');
     expect(ctx.calls).toContain('lineTo:100,80');
-    expect(ctx.calls).not.toContain('fill');
+    expect(ctx.calls).toContain('moveTo:50,35');
+    expect(ctx.calls).toContain('lineTo:100,35');
+    expect(ctx.calls).toContain('moveTo:50,65');
+    expect(ctx.calls).toContain('lineTo:100,65');
+    expect(ctx.calls).toContain('fill');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 

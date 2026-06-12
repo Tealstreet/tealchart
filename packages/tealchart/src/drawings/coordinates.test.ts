@@ -2032,6 +2032,20 @@ describe('user drawing coordinates', () => {
       median: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
       upper: { start: { x: 110, y: 20 }, end: { x: 210, y: 20 } },
       lower: { start: { x: 110, y: 120 }, end: { x: 210, y: 120 } },
+      parallels: [
+        { ratio: -0.5, segment: { start: { x: 110, y: -30 }, end: { x: 210, y: -30 } } },
+        { ratio: 0.25, segment: { start: { x: 110, y: 45 }, end: { x: 210, y: 45 } } },
+        { ratio: 0.75, segment: { start: { x: 110, y: 95 }, end: { x: 210, y: 95 } } },
+        { ratio: 1.5, segment: { start: { x: 110, y: 170 }, end: { x: 210, y: 170 } } },
+      ],
+      fill: {
+        points: [
+          { x: 110, y: 20 },
+          { x: 210, y: 20 },
+          { x: 210, y: 120 },
+          { x: 110, y: 120 },
+        ],
+      },
       midpoint: { x: 110, y: 70 },
     });
     expect(resolveUserDrawingGeometry(pitchfork, space)).toMatchObject({
