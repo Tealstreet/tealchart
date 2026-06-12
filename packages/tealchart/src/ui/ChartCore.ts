@@ -1950,7 +1950,9 @@ export class ChartCore {
     );
 
     if (this.userDrawingState) {
-      renderUserDrawingLayer(this.canvasContext, this.userDrawingState, this.getUserDrawingSpaces(vp));
+      renderUserDrawingLayer(this.canvasContext, this.userDrawingState, this.getUserDrawingSpaces(vp), {
+        onImageLoad: () => this.scheduleRender(),
+      });
     }
   }
 
