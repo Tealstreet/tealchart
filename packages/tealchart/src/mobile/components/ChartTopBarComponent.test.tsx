@@ -422,6 +422,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     const onStyle = vi.fn();
     const onTextAlign = vi.fn();
     const onLocked = vi.fn();
+    const onDeleteSelected = vi.fn();
     render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
@@ -455,9 +456,11 @@ describe('ChartTopBarComponent drawing toolbar', () => {
         onUserDrawingStyleChange={onStyle}
         onUserDrawingTextAlignChange={onTextAlign}
         onUserDrawingLockedChange={onLocked}
+        onUserDrawingDeleteSelected={onDeleteSelected}
       />,
     );
 
+    fireEvent.click(screen.getByLabelText('Delete selected drawing'));
     fireEvent.click(screen.getByLabelText('Green fill color'));
     fireEvent.click(screen.getByLabelText('75 percent opacity'));
     fireEvent.click(screen.getByLabelText('Toggle drawing border'));
@@ -476,9 +479,11 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect((screen.getByLabelText('16 pixel font size') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('monospace font family') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Right text alignment') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Delete selected drawing') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Unlock selected drawing') as HTMLButtonElement).disabled).toBe(false);
     expect(onStyle).not.toHaveBeenCalled();
     expect(onTextAlign).not.toHaveBeenCalled();
+    expect(onDeleteSelected).not.toHaveBeenCalled();
     expect(onLocked).toHaveBeenCalledWith(false, true);
   });
 });
