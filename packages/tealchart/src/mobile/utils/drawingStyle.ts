@@ -1,6 +1,7 @@
 import type {
   UpdateUserDrawingOptions,
   UserDrawingIconName,
+  UserDrawingImageSourceInput,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -8,6 +9,7 @@ import type {
 
 import {
   setUserDrawingIconName,
+  setUserDrawingImageSource,
   setUserDrawingTextAlign,
   setUserDrawingLocked,
   setUserDrawingVisibility,
@@ -52,4 +54,12 @@ export function setMobileUserDrawingIconName(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingIconName(state, iconName, options);
+}
+
+export function setMobileUserDrawingImageSource(
+  state: UserDrawingState,
+  source: UserDrawingImageSourceInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return setUserDrawingImageSource(state, source, options);
 }

@@ -953,6 +953,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - The shared image annotation state, hit testing, editing, serialization, and
   toolbar behavior remain unchanged across web and mobile.
 
+## Shipped: Image Source API
+
+- Shared drawing reducers can replace an image annotation `src` and optional
+  `alt` metadata while preserving drawing IDs, lock semantics, and no-op state
+  identity.
+- Web widget APIs and mobile Skia imperative handles expose matching image
+  source replacement behavior for host app upload and asset-picker flows.
+
 ## Shipped: Pitchfork Parallel Lines and Fill
 
 - Shared pitchfork geometry now derives TradingView-style inner/outer parallel
@@ -976,7 +984,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image source/upload lifecycle controls, and additional curved geometry.
+  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.

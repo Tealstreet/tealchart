@@ -116,6 +116,7 @@ export type {
 } from './mobile/utils/drawingRenderModel';
 export {
   setMobileUserDrawingIconName,
+  setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
