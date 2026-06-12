@@ -324,7 +324,7 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
-  it('dispatches selected risk/reward fill visibility without fill color controls', () => {
+  it('dispatches selected risk/reward fill visibility and label text appearance controls', () => {
     const onStyle = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-risk-reward-fill-visibility',
@@ -359,11 +359,20 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="20 pixel font size"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing fill"]')?.click();
 
     expect(onStyle).not.toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 20 });
+    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
+    expect(onStyle).not.toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')).toBeNull();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')).toBeNull();
 
     topBar.unmount();
   });
