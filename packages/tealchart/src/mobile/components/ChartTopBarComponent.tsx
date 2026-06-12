@@ -14,6 +14,7 @@ import type {
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
 } from '../../drawings';
@@ -33,6 +34,7 @@ import {
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
+  supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -50,6 +52,7 @@ import {
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../../drawings';
@@ -94,6 +97,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Callback when selected text-label alignment should change */
   onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
+  /** Callback when selected trend-line extension should change */
+  onUserDrawingTrendLineExtendChange?: (extend: UserDrawingTrendLineExtend) => void;
   /** Callback when selected icon marker shape should change */
   onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Callback when selected drawing visibility should change */
@@ -126,6 +131,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingZOrderChange,
     onUserDrawingStyleChange,
     onUserDrawingTextAlignChange,
+    onUserDrawingTrendLineExtendChange,
     onUserDrawingIconNameChange,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
@@ -169,6 +175,9 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const textStyleControlsSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
     const textAlignControlsSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
     const textWrapControlsSupported = selectedDrawing ? supportsUserDrawingTextWrapControls(selectedDrawing) : false;
+    const trendLineExtendControlsSupported = selectedDrawing
+      ? supportsUserDrawingTrendLineExtendControls(selectedDrawing)
+      : false;
 
     return (
       <View style={[styles.container, { backgroundColor }]}>
@@ -330,6 +339,34 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       </Pressable>
                     );
                   })}
+
+                  {trendLineExtendControlsSupported &&
+                    selectedDrawing.kind === 'trendLine' &&
+                    USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.map((descriptor) => {
+                      const active = selectedDrawing.extend === descriptor.extend;
+                      return (
+                        <Pressable
+                          key={descriptor.extend}
+                          accessibilityRole="button"
+                          accessibilityLabel={descriptor.label}
+                          accessibilityState={{ disabled: !styleControlsEnabled, selected: active }}
+                          disabled={!styleControlsEnabled}
+                          onPress={() => onUserDrawingTrendLineExtendChange?.(descriptor.extend)}
+                          style={({ pressed }: PressableStyleState) => [
+                            styles.drawingButton,
+                            active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                            styleControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                            !styleControlsEnabled && styles.drawingButtonDisabled,
+                          ]}
+                        >
+                          <Text
+                            style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
+                          >
+                            {descriptor.icon}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
 
                   {USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => {
                     const active = (selectedDrawing.style.opacity ?? 1) === descriptor.opacity;

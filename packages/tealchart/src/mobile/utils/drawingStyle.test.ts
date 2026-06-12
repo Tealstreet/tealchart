@@ -16,6 +16,7 @@ import {
   setMobileUserDrawingTableDimensions,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
+  setMobileUserDrawingTrendLineExtend,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './drawingStyle';
@@ -98,6 +99,36 @@ describe('mobile drawing style helpers', () => {
       updatedAt: 40,
     });
     expect(setMobileUserDrawingTextAlign(state, 'right')).toBe(state);
+  });
+
+  it('updates selected trend-line extension through the shared reducer contract', () => {
+    const trendState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'trend' },
+      drawings: [
+        {
+          id: 'trend',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: state.drawings[0]!.style,
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 102 },
+          ],
+          extend: 'none',
+        },
+      ],
+    };
+
+    expect(setMobileUserDrawingTrendLineExtend(trendState, 'right', { now: () => 42 }).drawings[0]).toMatchObject({
+      extend: 'right',
+      updatedAt: 42,
+    });
+    expect(setMobileUserDrawingTrendLineExtend(state, 'right')).toBe(state);
   });
 
   it('updates selected text content through the shared reducer contract', () => {

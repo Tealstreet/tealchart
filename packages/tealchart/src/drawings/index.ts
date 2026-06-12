@@ -240,6 +240,7 @@ export {
   setUserDrawingText,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
+  setUserDrawingTrendLineExtend,
   setUserDrawingTool,
   setUserDrawingVisibility,
   updateUserDrawingStyle,
@@ -336,6 +337,7 @@ export {
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
+  USER_DRAWING_TREND_LINE_EXTENDS,
 } from './types';
 export {
   getSelectedUserDrawing,
@@ -355,6 +357,7 @@ export {
   supportsUserDrawingTextControls,
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
+  supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -372,6 +375,7 @@ export {
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -395,6 +399,7 @@ export type {
   UserDrawingTextDecorationDescriptor,
   UserDrawingTextMaxWidthDescriptor,
   UserDrawingTextWrapDescriptor,
+  UserDrawingTrendLineExtendDescriptor,
   UserDrawingToolbarAction,
   UserDrawingToolbarActionDescriptor,
   UserDrawingToolDescriptor,
@@ -496,6 +501,7 @@ export type {
   UserDrawingTextAnnotation,
   UserDrawingTextAnnotationKind,
   UserDrawingTextMaxWidth,
+  UserDrawingTrendLineExtend,
   UserDrawingPathFamilyKind,
   UserDrawingLineStyle,
   UserDrawingSelection,

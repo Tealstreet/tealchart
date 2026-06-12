@@ -12,6 +12,7 @@ import type {
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
+  UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
 } from '../drawings';
@@ -161,6 +162,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingStyleChange?: (style: Partial<UserDrawingStyle>) => void;
   /** Called when the top bar should update selected text-label alignment */
   onUserDrawingTextAlignChange?: (textAlign: UserDrawingTextAlign) => void;
+  /** Called when the top bar should update selected trend-line extension */
+  onUserDrawingTrendLineExtendChange?: (extend: UserDrawingTrendLineExtend) => void;
   /** Called when the top bar should update selected icon marker shape */
   onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Called when the top bar should update selected drawing visibility */
@@ -282,6 +285,7 @@ export class TealchartWidgetUI {
         onUserDrawingZOrderChange: options.onUserDrawingZOrderChange,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,
         onUserDrawingTextAlignChange: options.onUserDrawingTextAlignChange,
+        onUserDrawingTrendLineExtendChange: options.onUserDrawingTrendLineExtendChange,
         onUserDrawingIconNameChange: options.onUserDrawingIconNameChange,
         onUserDrawingVisibilityChange: options.onUserDrawingVisibilityChange,
         onUserDrawingLockedChange: options.onUserDrawingLockedChange,
