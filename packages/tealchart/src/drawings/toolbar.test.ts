@@ -567,9 +567,42 @@ describe('user drawing toolbar descriptors', () => {
         { time: 3, price: 11 },
       ],
     };
+    const generatedLabelKinds = [
+      'infoLine',
+      'trendAngle',
+      'priceRange',
+      'dateRange',
+      'datePriceRange',
+      'longPosition',
+      'shortPosition',
+      'fibRetracement',
+      'fibExtension',
+      'trendBasedFibExtension',
+      'fibFan',
+      'fibSpeedResistanceFan',
+      'fibChannel',
+      'fibTimeZone',
+      'trendBasedFibTime',
+      'cyclicLines',
+      'timeCycles',
+      'gannFan',
+      'gannBox',
+      'gannSquare',
+      'gannSquareFixed',
+      'fibCircles',
+      'fibArcs',
+      'fibSpeedResistanceArcs',
+      'fibWedge',
+      'fibSpiral',
+    ] as const;
 
     expect(supportsUserDrawingTextAppearanceControls(forecast)).toBe(true);
     expect(supportsUserDrawingTextAppearanceControls(projection)).toBe(true);
+    for (const kind of generatedLabelKinds) {
+      const drawing = { ...projection, id: kind, kind } as UserDrawing;
+      expect(supportsUserDrawingTextAppearanceControls(drawing)).toBe(true);
+      expect(supportsUserDrawingRichTextControls(drawing)).toBe(false);
+    }
     expect(supportsUserDrawingTextControls(forecast)).toBe(true);
     expect(supportsUserDrawingRichTextControls(forecast)).toBe(false);
     expect(supportsUserDrawingRichTextControls(projection)).toBe(false);
@@ -1221,9 +1254,12 @@ describe('user drawing toolbar descriptors', () => {
       'right',
       'both',
     ]);
-    expect(supportsUserDrawingTextControls(priceRange)).toBe(false);
-    expect(supportsUserDrawingTextControls(dateRange)).toBe(false);
-    expect(supportsUserDrawingTextControls(datePriceRange)).toBe(false);
+    expect(supportsUserDrawingTextControls(priceRange)).toBe(true);
+    expect(supportsUserDrawingTextControls(dateRange)).toBe(true);
+    expect(supportsUserDrawingTextControls(datePriceRange)).toBe(true);
+    expect(supportsUserDrawingRichTextControls(priceRange)).toBe(false);
+    expect(supportsUserDrawingRichTextControls(dateRange)).toBe(false);
+    expect(supportsUserDrawingRichTextControls(datePriceRange)).toBe(false);
     expect(
       supportsUserDrawingTextControls({
         ...textLabel,

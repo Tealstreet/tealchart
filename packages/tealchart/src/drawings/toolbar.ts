@@ -526,13 +526,40 @@ export function supportsUserDrawingTextStyleControls(drawing: UserDrawing): bool
 }
 
 export function supportsUserDrawingTextAppearanceControls(drawing: UserDrawing): boolean {
-  return (
-    drawing.kind === 'forecast' ||
-    drawing.kind === 'projection' ||
-    drawing.kind === 'table' ||
-    isUserDrawingTextAnnotation(drawing)
-  );
+  return GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS.has(drawing.kind) || isUserDrawingTextAnnotation(drawing);
 }
+
+const GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS = new Set<UserDrawing['kind']>([
+  'table',
+  'infoLine',
+  'trendAngle',
+  'priceRange',
+  'dateRange',
+  'datePriceRange',
+  'longPosition',
+  'shortPosition',
+  'forecast',
+  'projection',
+  'fibRetracement',
+  'fibExtension',
+  'trendBasedFibExtension',
+  'fibFan',
+  'fibSpeedResistanceFan',
+  'fibChannel',
+  'fibTimeZone',
+  'trendBasedFibTime',
+  'cyclicLines',
+  'timeCycles',
+  'gannFan',
+  'gannBox',
+  'gannSquare',
+  'gannSquareFixed',
+  'fibCircles',
+  'fibArcs',
+  'fibSpeedResistanceArcs',
+  'fibWedge',
+  'fibSpiral',
+]);
 
 export function supportsUserDrawingRichTextControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'table' || isUserDrawingTextAnnotation(drawing);
