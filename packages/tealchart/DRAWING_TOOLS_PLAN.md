@@ -1144,8 +1144,16 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia table rendering both honor table font weight in
   addition to existing text color, font size, and font family style values.
 - Web and mobile top bars dispatch matching table text color, font size, font
-  family, and font-weight updates while keeping text alignment hidden for
-  tables.
+  family, and font-weight updates.
+
+## Shipped: Table Text Alignment Controls
+
+- Table drawings now persist a left, center, or right text alignment value
+  through the shared drawing state and layout serializer.
+- The existing web widget and mobile Skia text-alignment APIs update selected
+  or targeted tables in addition to text annotations.
+- Web Canvas and mobile Skia render matching table cell text alignment, and
+  both top bars expose the same alignment controls for selected tables.
 
 ## Known Gaps
 

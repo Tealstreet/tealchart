@@ -1029,6 +1029,7 @@ describe('TealchartWidget', () => {
               lineStyle: 'solid',
             },
             point: { time: 50, price: 50 },
+            textAlign: 'left',
             cells: [['Metric', 'Value']],
           },
         ],

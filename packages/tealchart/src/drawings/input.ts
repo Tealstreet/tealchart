@@ -358,6 +358,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
         kind: 'table',
         point: cloneAnchor(drawing.point),
         cells: normalizeUserDrawingTableCells(drawing.cells),
+        textAlign: drawing.textAlign,
       };
     case 'icon':
       return { ...base, kind: 'icon', point: cloneAnchor(drawing.point), iconName: drawing.iconName };
@@ -1060,7 +1061,13 @@ export function setUserDrawingTextAlign(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   const target = findUserDrawingForUpdate(state, options);
-  if (!target || !isUserDrawingTextAnnotation(target.drawing) || target.drawing.textAlign === textAlign) return state;
+  if (
+    !target ||
+    (target.drawing.kind !== 'table' && !isUserDrawingTextAnnotation(target.drawing)) ||
+    target.drawing.textAlign === textAlign
+  ) {
+    return state;
+  }
 
   return replaceUserDrawing(state, target.index, {
     ...target.drawing,

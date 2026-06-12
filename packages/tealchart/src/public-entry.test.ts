@@ -870,6 +870,7 @@ describe('tealchart public entries', () => {
       selected: false,
       opacity: 1,
       clip,
+      textAlign: 'left',
       table: {
         point: { x: 5, y: 5 },
         bounds: { x: 5, y: 5, width: 56, height: 24 },
@@ -1232,6 +1233,7 @@ describe('tealchart public entries', () => {
       updatedAt: 1,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
       point: { time: 1, price: 100 },
+      textAlign: 'left',
       cells: [['Metric', 'Value']],
     };
     const table: DrawingScreenTable = resolveTableFromAnchor(drawing.point, drawing.cells, {

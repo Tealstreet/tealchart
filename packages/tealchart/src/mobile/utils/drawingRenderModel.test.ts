@@ -146,6 +146,7 @@ describe('mobile user drawing render model', () => {
           updatedAt: 1,
           style,
           point: { time: 10, price: 90 },
+          textAlign: 'center',
           cells: [
             ['Metric', 'Value'],
             ['Price', '101.25'],
@@ -173,6 +174,7 @@ describe('mobile user drawing render model', () => {
           { row: 1, column: 1, text: '101.25', rect: { x: 72, y: 34, width: 62, height: 24 } },
         ],
       },
+      textAlign: 'center',
       style,
     });
     expect(model[1]).toMatchObject({
@@ -4381,6 +4383,7 @@ describe('mobile user drawing render model', () => {
           updatedAt: 1,
           style,
           point: { time: 10, price: 90 },
+          textAlign: 'left',
           cells: [['A']],
         },
       ],

@@ -1833,6 +1833,7 @@ describe('user drawing hit testing', () => {
       id: 'table',
       kind: 'table',
       point: { time: 10, price: 90 },
+      textAlign: 'left',
       cells: [
         ['Metric', 'Value'],
         ['Price', '101.25'],

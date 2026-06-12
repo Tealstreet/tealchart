@@ -272,6 +272,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
                 fontWeight: 'normal',
               },
               point: { time: 1, price: 10 },
+              textAlign: 'left',
               cells: [['Metric', 'Value']],
             },
           ],
@@ -285,13 +286,13 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
     fireEvent.click(screen.getByLabelText('serif font family'));
     fireEvent.click(screen.getByLabelText('Bold text'));
+    fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
-    expect(screen.queryByLabelText('Right text alignment')).toBeNull();
-    expect(onTextAlign).not.toHaveBeenCalled();
+    expect(onTextAlign).toHaveBeenCalledWith('right');
   });
 
   it('disables locked selected drawing fill and text controls', () => {
