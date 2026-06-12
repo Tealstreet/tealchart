@@ -2463,6 +2463,7 @@ describe('user drawing renderer', () => {
       id: 'table',
       kind: 'table',
       point: { time: 10, price: 90 },
+      textAlign: 'right',
       style: { ...base.style, fontWeight: 'bold' },
       cells: [
         ['Metric', 'Value'],
@@ -2475,8 +2476,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillRect:10,10,124,48:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('strokeRect:10,10,62,24:#f5c542:1');
     expect(ctx.calls).toContain('strokeRect:72,34,62,24:#f5c542:1');
-    expect(ctx.calls).toContain('fillText:Metric:20,22:#111:left:1:bold 12px sans-serif');
-    expect(ctx.calls).toContain('fillText:101.25:82,46:#111:left:1:bold 12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Metric:62,22:#111:right:1:bold 12px sans-serif');
+    expect(ctx.calls).toContain('fillText:101.25:124,46:#111:right:1:bold 12px sans-serif');
   });
 
   it('does not render selection handles for invisible drawings', () => {

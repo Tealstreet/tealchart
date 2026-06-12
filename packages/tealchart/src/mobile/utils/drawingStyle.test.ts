@@ -205,6 +205,7 @@ describe('mobile drawing style helpers', () => {
           updatedAt: 1,
           style: state.drawings[0]!.style,
           point: { time: 1, price: 100 },
+          textAlign: 'left',
           cells: [['Metric', 'Value']],
         },
       ],

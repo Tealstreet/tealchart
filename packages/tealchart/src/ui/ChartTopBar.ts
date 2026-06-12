@@ -877,7 +877,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
         if (textAlignSupported) {
           for (const descriptor of USER_DRAWING_TEXT_ALIGN_DESCRIPTORS) {
-            const isActive = isUserDrawingTextAnnotation(selectedDrawing) && selectedDrawing.textAlign === descriptor.textAlign;
+            const isActive =
+              (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing)) &&
+              selectedDrawing.textAlign === descriptor.textAlign;
             const btn = this.createElement('button', {
               style: {
                 ...styles.drawingButton,

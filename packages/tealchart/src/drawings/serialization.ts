@@ -7,6 +7,7 @@ import type {
   UserDrawingPanePosition,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTextAlign,
   UserDrawingTextAnnotation,
 } from './types';
 
@@ -247,6 +248,7 @@ function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
         kind: 'table',
         point: { ...drawing.point },
         cells: normalizeUserDrawingTableCells(drawing.cells),
+        textAlign: drawing.textAlign,
       };
     case 'textLabel':
     case 'note':
@@ -1141,12 +1143,15 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
     }
     case 'table': {
       const point = parseAnchor(value.point);
+      const textAlign: UserDrawingTextAlign =
+        value.textAlign === 'center' || value.textAlign === 'right' ? value.textAlign : 'left';
       return point
         ? {
             ...base,
             kind: 'table',
             point,
             cells: normalizeUserDrawingTableCells(Array.isArray(value.cells) ? value.cells : undefined),
+            textAlign,
           }
         : null;
     }
