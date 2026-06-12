@@ -1184,6 +1184,23 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 80, y: 50 }, space, { labelWidth: 50, labelHeight: 20 })).toBeNull();
   });
 
+  it('hits emoji drawings using a configurable label box and center handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'emoji',
+      kind: 'emoji',
+      point: { time: 50, price: 50 },
+      text: '🔥',
+      textAlign: 'center',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 60, y: 50 }, space, { labelWidth: 24, labelHeight: 20 })?.drawing.id).toBe(
+      'emoji',
+    );
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space)).toMatchObject({ handle: 'center' });
+    expect(hitTestUserDrawing(drawing, { x: 70, y: 50 }, space, { labelWidth: 24, labelHeight: 20 })).toBeNull();
+  });
+
   it('hits comment drawings using a configurable label box', () => {
     const drawing: UserDrawing = {
       ...base,

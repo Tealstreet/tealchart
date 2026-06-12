@@ -137,6 +137,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('cypherPattern')).toBe(5);
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
+    expect(getRequiredAnchorCount('emoji')).toBe(1);
   });
 
   it('normalizes drawing font sizes to supported cross-platform values', () => {
@@ -1002,6 +1003,20 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'flagMark', anchors: [anchorA] }), { id: 'flag' })).toMatchObject({
       kind: 'flagMark',
       point: anchorA,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'emoji', anchors: [anchorA] }), { id: 'emoji' })).toMatchObject({
+      kind: 'emoji',
+      point: anchorA,
+      text: '👍',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'emoji', anchors: [anchorA], text: '🔥' }), { id: 'emoji-fire' }),
+    ).toMatchObject({
+      kind: 'emoji',
+      point: anchorA,
+      text: '🔥',
+      textAlign: 'center',
     });
     expect(
       createUserDrawingFromDraft(

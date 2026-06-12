@@ -354,6 +354,7 @@ function hitTestResolvedGeometry(
     geometry.kind === 'anchoredNote' ||
     geometry.kind === 'priceLabel' ||
     geometry.kind === 'priceNote' ||
+    geometry.kind === 'emoji' ||
     geometry.kind === 'balloon' ||
     geometry.kind === 'signpost'
   ) {
@@ -860,6 +861,7 @@ function hitTestUserDrawingHandle(
     case 'anchoredText':
     case 'anchoredNote':
     case 'priceLabel':
+    case 'emoji':
     case 'signpost':
       handles.push({ handle: 'center', point: geometry.point });
       break;

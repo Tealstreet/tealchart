@@ -863,6 +863,20 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'emoji';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'balloon';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -951,6 +965,7 @@ export type MobileUserDrawingAnchoredNotePrimitive = Extract<MobileUserDrawingPr
 export type MobileUserDrawingPriceLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceLabel' }>;
 export type MobileUserDrawingPriceNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceNote' }>;
 export type MobileUserDrawingPinPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pin' }>;
+export type MobileUserDrawingEmojiPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'emoji' }>;
 export type MobileUserDrawingBalloonPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'balloon' }>;
 export type MobileUserDrawingSignpostPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'signpost' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
@@ -1945,6 +1960,7 @@ function primitiveFromGeometry(
     case 'anchoredText':
     case 'anchoredNote':
     case 'priceLabel':
+    case 'emoji':
     case 'balloon':
     case 'signpost':
       const drawing = geometry.drawing as UserDrawingTextAnnotation;
