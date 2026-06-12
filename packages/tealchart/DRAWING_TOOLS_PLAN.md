@@ -953,10 +953,19 @@ matching behavior in the same PR for every user-facing drawing feature.
 - The shared image annotation state, hit testing, editing, serialization, and
   toolbar behavior remain unchanged across web and mobile.
 
+## Shipped: Pitchfork Parallel Lines and Fill
+
+- Shared pitchfork geometry now derives TradingView-style inner/outer parallel
+  line sets and a fill band from the existing three-anchor pitchfork state.
+- Web Canvas and mobile Skia render matching pitchfork fill and extra parallel
+  rays while preserving existing pitchfork variants, editing, and serialization.
+- Hit testing includes the added pitchfork parallel rays on both web and mobile
+  through the shared geometry/render-model path.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
+- TradingView pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image source/upload lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count

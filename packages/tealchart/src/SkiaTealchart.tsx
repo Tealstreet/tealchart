@@ -1948,38 +1948,45 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           }
 
           if (primitive.kind === 'pitchfork') {
-            if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const fillPath = Skia.Path.Make();
+            const [firstFillPoint, ...remainingFillPoints] = primitive.fill;
+            if (firstFillPoint) {
+              fillPath.moveTo(firstFillPoint.x, firstFillPoint.y);
+              for (const point of remainingFillPoints) {
+                fillPath.lineTo(point.x, point.y);
+              }
+              fillPath.close();
+            }
+            const linePath = Skia.Path.Make();
+            linePath.moveTo(primitive.median.start.x, primitive.median.start.y);
+            linePath.lineTo(primitive.median.end.x, primitive.median.end.y);
+            linePath.moveTo(primitive.upper.start.x, primitive.upper.start.y);
+            linePath.lineTo(primitive.upper.end.x, primitive.upper.end.y);
+            linePath.moveTo(primitive.lower.start.x, primitive.lower.start.y);
+            linePath.lineTo(primitive.lower.end.x, primitive.lower.end.y);
+            for (const parallel of primitive.parallels) {
+              linePath.moveTo(parallel.start.x, parallel.start.y);
+              linePath.lineTo(parallel.end.x, parallel.end.y);
+            }
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                <SkiaLine
-                  p1={vec(primitive.median.start.x, primitive.median.start.y)}
-                  p2={vec(primitive.median.end.x, primitive.median.end.y)}
-                  color={primitive.style.lineColor}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
-                <SkiaLine
-                  p1={vec(primitive.upper.start.x, primitive.upper.start.y)}
-                  p2={vec(primitive.upper.end.x, primitive.upper.end.y)}
-                  color={primitive.style.lineColor}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
-                <SkiaLine
-                  p1={vec(primitive.lower.start.x, primitive.lower.start.y)}
-                  p2={vec(primitive.lower.end.x, primitive.lower.end.y)}
-                  color={primitive.style.lineColor}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
+                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
+                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={linePath}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
               </Group>
             );
           }
