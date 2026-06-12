@@ -1979,10 +1979,30 @@ describe('user drawing coordinates', () => {
           ],
         },
         levels: expect.arrayContaining([
-          { ratio: 0, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
-          { ratio: 0.5, segment: { start: { x: 10, y: 45 }, end: { x: 210, y: 45 } } },
-          { ratio: 1, segment: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } } },
-          { ratio: 2, segment: { start: { x: 10, y: -30 }, end: { x: 210, y: -30 } } },
+          expect.objectContaining({
+            ratio: 0,
+            label: '0',
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+            labelPoint: { x: 214, y: 66 },
+          }),
+          expect.objectContaining({
+            ratio: 0.5,
+            label: '0.5',
+            segment: { start: { x: 10, y: 45 }, end: { x: 210, y: 45 } },
+            labelPoint: { x: 214, y: 41 },
+          }),
+          expect.objectContaining({
+            ratio: 1,
+            label: '1',
+            segment: { start: { x: 10, y: 20 }, end: { x: 210, y: 20 } },
+            labelPoint: { x: 214, y: 16 },
+          }),
+          expect.objectContaining({
+            ratio: 2,
+            label: '2.000',
+            segment: { start: { x: 10, y: -30 }, end: { x: 210, y: -30 } },
+            labelPoint: { x: 214, y: -34 },
+          }),
         ]),
       },
     });

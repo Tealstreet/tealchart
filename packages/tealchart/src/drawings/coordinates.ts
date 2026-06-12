@@ -187,7 +187,9 @@ export interface DrawingScreenFibFan {
 
 export interface DrawingScreenFibChannelLevel {
   ratio: number;
+  label: string;
   segment: DrawingScreenSegment;
+  labelPoint: DrawingScreenPoint;
 }
 
 export interface DrawingScreenFibChannel {
@@ -2059,7 +2061,9 @@ export function resolveFibChannelFromAnchors(
   });
   const levels = FIB_CHANNEL_LEVELS.map((ratio) => ({
     ratio,
+    label: formatFibRetracementRatio(ratio),
     segment: levelSegment(ratio),
+    labelPoint: { x: end.x + dx * ratio + 4, y: end.y + dy * ratio - 4 },
   }));
   const outer = levelSegment(1);
 

@@ -2097,6 +2097,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
           if (primitive.kind === 'fibChannel') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             const path = Skia.Path.Make();
             const [firstPoint, ...remainingPoints] = primitive.points;
             if (!firstPoint) return null;
@@ -2123,6 +2124,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     >
                       {dash && <DashPathEffect intervals={dash} />}
                     </SkiaLine>
+                  ))}
+                {primitive.style.lineVisible !== false &&
+                  primitive.levels.map((level) => (
+                    <SkiaText
+                      key={`${primitive.id}:level-label:${level.ratio}`}
+                      x={level.labelPoint.x}
+                      y={level.labelPoint.y}
+                      text={level.label}
+                      font={font}
+                      color={primitive.style.textColor ?? primitive.style.lineColor}
+                    />
                   ))}
               </Group>
             );

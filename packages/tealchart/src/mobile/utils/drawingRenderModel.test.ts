@@ -1391,9 +1391,9 @@ describe('mobile user drawing render model', () => {
         { x: 10, y: 20 },
       ],
       levels: expect.arrayContaining([
-        { ratio: 0, start: { x: 10, y: 50 }, end: { x: 90, y: 50 } },
-        { ratio: 0.5, start: { x: 10, y: 35 }, end: { x: 90, y: 35 } },
-        { ratio: 1, start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+        { ratio: 0, label: '0', start: { x: 10, y: 50 }, end: { x: 90, y: 50 }, labelPoint: { x: 94, y: 46 } },
+        { ratio: 0.5, label: '0.5', start: { x: 10, y: 35 }, end: { x: 90, y: 35 }, labelPoint: { x: 94, y: 31 } },
+        { ratio: 1, label: '1', start: { x: 10, y: 20 }, end: { x: 90, y: 20 }, labelPoint: { x: 94, y: 16 } },
       ]),
     });
   });

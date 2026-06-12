@@ -406,7 +406,9 @@ describe('tealchart public entries', () => {
         { x: 10, y: 0 },
         { x: 0, y: 0 },
       ],
-      levels: [{ ratio: 0.5, start: { x: 0, y: 3 }, end: { x: 10, y: 3 } }],
+      levels: [
+        { ratio: 0.5, label: '0.5', start: { x: 0, y: 3 }, end: { x: 10, y: 3 }, labelPoint: { x: 14, y: -1 } },
+      ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const fibTimeZonePrimitive: NonNever<MobileUserDrawingFibTimeZonePrimitive> = {

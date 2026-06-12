@@ -1658,6 +1658,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:90,50');
     expect(ctx.calls).toContain('lineTo:90,20');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0.5:94,31:#111:left:1:12px sans-serif');
   });
 
   it('renders fib time zones as vertical Fibonacci time levels', () => {
