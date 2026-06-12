@@ -965,9 +965,9 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
   );
 }
 
-export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor {
+export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor | null {
   if (drawing.kind === 'anchoredText' || drawing.kind === 'anchoredNote') {
-    return { time: drawing.position.x, price: drawing.position.y };
+    return null;
   }
   return drawing.kind === 'callout' || drawing.kind === 'priceNote' ? drawing.points[1] : drawing.point;
 }

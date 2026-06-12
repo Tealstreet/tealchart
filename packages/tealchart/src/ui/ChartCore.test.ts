@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
 import { DIRTY } from '../rendering/RenderScheduler';
+import { clearChartStoreCache } from '../state/chartState';
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
@@ -117,6 +118,7 @@ describe('ChartCore viewport management', () => {
   });
 
   afterEach(() => {
+    clearChartStoreCache();
     document.body.innerHTML = '';
   });
 

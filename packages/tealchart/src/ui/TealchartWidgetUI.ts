@@ -515,10 +515,17 @@ export class TealchartWidgetUI {
       return;
     }
 
+    const textAnchor = getUserDrawingTextAnnotationPoint(drawing);
     const point =
       drawing.kind === 'anchoredText' || drawing.kind === 'anchoredNote'
         ? panePositionToScreenPoint(drawing.position, space)
-        : anchorToScreenPoint(getUserDrawingTextAnnotationPoint(drawing), space);
+        : textAnchor
+          ? anchorToScreenPoint(textAnchor, space)
+          : null;
+    if (!point) {
+      this.removeUserDrawingTextEditor();
+      return;
+    }
     const editMetrics = resolveUserDrawingTextEditMetrics(textEdit.value);
     const width = Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
     const height = Math.max(28, Math.min(160, editMetrics.lines.length * 18 + 10));
