@@ -34,8 +34,11 @@ describe('ChartTopBar drawing toolbar', () => {
     const trendLine = document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]');
 
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    const categoryRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
 
     expect(linesCategory).not.toBeNull();
+    expect(categoryRail).not.toBeNull();
+    expect(topBar.getElement().contains(categoryRail)).toBe(false);
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
     linesCategory?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
