@@ -83,6 +83,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('arrowMarker')).toBe(2);
     expect(getRequiredAnchorCount('ray')).toBe(2);
     expect(getRequiredAnchorCount('rectangle')).toBe(2);
+    expect(getRequiredAnchorCount('image')).toBe(2);
     expect(getRequiredAnchorCount('circle')).toBe(2);
     expect(getRequiredAnchorCount('ellipse')).toBe(2);
     expect(getRequiredAnchorCount('priceRange')).toBe(2);
@@ -291,6 +292,17 @@ describe('user drawing types', () => {
       id: 'date-price-range',
       kind: 'datePriceRange',
       points: [anchorA, anchorB],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'image', text: 'https://example.test/chart.png' }), { id: 'image', now: 20 })).toMatchObject({
+      id: 'image',
+      kind: 'image',
+      points: [anchorA, anchorB],
+      src: 'https://example.test/chart.png',
+      alt: 'Image',
       visible: true,
       locked: false,
       createdAt: 20,

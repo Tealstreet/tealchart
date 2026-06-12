@@ -475,6 +475,31 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542:1');
   });
 
+  it('renders image annotations as placeholder frames', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'image',
+      kind: 'image',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      src: 'https://example.test/chart.png',
+      alt: 'Chart snapshot',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542:1');
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:90,90');
+    expect(ctx.calls).toContain('moveTo:90,10');
+    expect(ctx.calls).toContain('lineTo:10,90');
+    expect(ctx.calls).toContain('fillText:Chart snapshot:50,50:#111:center:1:12px sans-serif');
+  });
+
   it('renders price ranges with a centered delta label', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
