@@ -139,6 +139,24 @@ function renderCurveGeometry(
   ctx.stroke();
 }
 
+function renderDoubleCurveGeometry(
+  ctx: CanvasContext,
+  geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'doubleCurve' }>,
+): void {
+  applyStrokeStyle(ctx, geometry.drawing);
+  ctx.beginPath();
+  ctx.moveTo(geometry.doubleCurve.start.x, geometry.doubleCurve.start.y);
+  ctx.bezierCurveTo(
+    geometry.doubleCurve.firstControl.x,
+    geometry.doubleCurve.firstControl.y,
+    geometry.doubleCurve.secondControl.x,
+    geometry.doubleCurve.secondControl.y,
+    geometry.doubleCurve.end.x,
+    geometry.doubleCurve.end.y,
+  );
+  ctx.stroke();
+}
+
 function renderArcGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'arc' }>,
@@ -1214,6 +1232,11 @@ export function renderUserDrawing(
       case 'curve':
         if (drawing.style.lineVisible !== false) {
           renderCurveGeometry(ctx, geometry);
+        }
+        break;
+      case 'doubleCurve':
+        if (drawing.style.lineVisible !== false) {
+          renderDoubleCurveGeometry(ctx, geometry);
         }
         break;
       case 'arc':

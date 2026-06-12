@@ -180,6 +180,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'gannSquare', icon: '◇', label: 'Gann square' },
   { tool: 'triangle', icon: '△', label: 'Triangle' },
   { tool: 'curve', icon: '⌒', label: 'Curve' },
+  { tool: 'doubleCurve', icon: '≈', label: 'Double curve' },
   { tool: 'arc', icon: '◜', label: 'Arc' },
   { tool: 'polyline', icon: '⌁', label: 'Polyline' },
   { tool: 'pitchfork', icon: 'Ψ', label: 'Pitchfork' },

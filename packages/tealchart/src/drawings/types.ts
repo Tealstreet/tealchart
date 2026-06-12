@@ -57,6 +57,7 @@ export type UserDrawingTool =
   | 'gannSquare'
   | 'triangle'
   | 'curve'
+  | 'doubleCurve'
   | 'arc'
   | 'polyline'
   | 'pitchfork'
@@ -443,6 +444,11 @@ export interface CurveDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface DoubleCurveDrawing extends UserDrawingBase {
+  kind: 'doubleCurve';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface ArcDrawing extends UserDrawingBase {
   kind: 'arc';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -632,6 +638,7 @@ export type UserDrawing =
   | GannSquareDrawing
   | TriangleDrawing
   | CurveDrawing
+  | DoubleCurveDrawing
   | ArcDrawing
   | PolylineDrawing
   | PitchforkDrawing
@@ -820,6 +827,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'brush':
     case 'highlighter':
       return 3;
+    case 'doubleCurve':
     case 'disjointChannel':
     case 'trianglePattern':
     case 'abcdPattern':
@@ -1258,6 +1266,12 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: 'curve',
         points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!],
+      };
+    case 'doubleCurve':
+      return {
+        ...base,
+        kind: 'doubleCurve',
+        points: [draft.anchors[0]!, draft.anchors[1]!, draft.anchors[2]!, draft.anchors[3]!],
       };
     case 'arc':
       return {

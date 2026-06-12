@@ -72,6 +72,7 @@ type SkPath = {
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
   quadTo(cpx: number, cpy: number, x: number, y: number): void;
+  cubicTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void;
   arcToOval(oval: SkRect, startAngle: number, sweepAngle: number, forceMoveTo: boolean): void;
   addRect(rect: SkRect): void;
   addRRect(rrect: SkRRect): void;
@@ -292,6 +293,10 @@ export class SkiaCanvasContext implements CanvasContext {
 
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
     this.currentPath.quadTo(cpx, cpy, x, y);
+  }
+
+  bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
+    this.currentPath.cubicTo(cp1x, cp1y, cp2x, cp2y, x, y);
   }
 
   arc(

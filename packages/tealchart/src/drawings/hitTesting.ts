@@ -411,6 +411,11 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'doubleCurve') {
+    const distance = distanceToPolyline(point, geometry.doubleCurve.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'arc') {
     const distance = distanceToPolyline(point, geometry.arc.points);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
@@ -692,6 +697,13 @@ function hitTestUserDrawingHandle(
       break;
     case 'curve':
       if (geometry.drawing.kind === 'curve') {
+        geometry.drawing.points.forEach((anchor, pointIndex) => {
+          handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
+        });
+      }
+      break;
+    case 'doubleCurve':
+      if (geometry.drawing.kind === 'doubleCurve') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });
