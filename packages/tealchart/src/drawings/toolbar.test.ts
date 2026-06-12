@@ -17,6 +17,7 @@ import {
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextControls,
   supportsUserDrawingTextStyleControls,
+  supportsUserDrawingTextWrapControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -31,6 +32,8 @@ import {
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
+  USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
+  USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -693,6 +696,12 @@ describe('user drawing toolbar descriptors', () => {
     expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([10, 12, 14, 16]);
     expect(USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => descriptor.fontStyle)).toEqual(['normal', 'italic']);
     expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.textUnderline)).toEqual([true]);
+    expect(USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => descriptor.textWrap)).toEqual([true]);
+    expect(USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.textMaxWidth)).toEqual([
+      120,
+      180,
+      240,
+    ]);
     expect(USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => descriptor.textAlign)).toEqual([
       'left',
       'center',
@@ -1005,8 +1014,19 @@ describe('user drawing toolbar descriptors', () => {
         cells: [['Metric', 'Value']],
       }),
     ).toBe(true);
+    expect(
+      supportsUserDrawingTextWrapControls({
+        ...textLabel,
+        id: 'table',
+        kind: 'table',
+        point: { time: 1, price: 10 },
+        textAlign: 'left',
+        cells: [['Metric', 'Value']],
+      }),
+    ).toBe(false);
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextAlignControls(textLabel)).toBe(true);
+    expect(supportsUserDrawingTextWrapControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
     expect(

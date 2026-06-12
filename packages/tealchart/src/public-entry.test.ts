@@ -75,6 +75,7 @@ import type {
   UserDrawingHitTestTextMeasure,
   UserDrawingIconNameDescriptor,
   UserDrawingInfoLineMetrics,
+  UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
@@ -85,6 +86,9 @@ import type {
   UserDrawingTableRowInput,
   UserDrawingTextDecorationDescriptor,
   UserDrawingTextLabelLayout,
+  UserDrawingTextMaxWidth,
+  UserDrawingTextMaxWidthDescriptor,
+  UserDrawingTextWrapDescriptor,
 } from './index';
 import type {
   MobileUserDrawingAnchoredVolumeProfilePrimitive,
@@ -151,6 +155,7 @@ import {
   normalizeUserDrawingFontWeight,
   normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
+  normalizeUserDrawingTextMaxWidth,
   resolveAnchoredVwapFromAnchor,
   resolveArcFromAnchors,
   resolveBarsPatternFromAnchors,
@@ -187,6 +192,7 @@ import {
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
   resolveAnchoredVolumeProfileFromAnchor,
+  measureUserDrawingTextLines,
   resolveUserDrawingTextEditMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -214,6 +220,9 @@ import {
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
+  USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
+  USER_DRAWING_TEXT_MAX_WIDTHS,
+  USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
 } from './index';
 import {
   resolveMobileUserDrawingMeasurementLabelPosition,
@@ -1059,6 +1068,9 @@ describe('tealchart public entries', () => {
     const styleDescriptor: UserDrawingFontStyleDescriptor = USER_DRAWING_FONT_STYLE_DESCRIPTORS[1]!;
     const weightDescriptor: UserDrawingFontWeightDescriptor = USER_DRAWING_FONT_WEIGHT_DESCRIPTORS[1]!;
     const underlineDescriptor: UserDrawingTextDecorationDescriptor = USER_DRAWING_TEXT_DECORATION_DESCRIPTORS[0]!;
+    const wrapDescriptor: UserDrawingTextWrapDescriptor = USER_DRAWING_TEXT_WRAP_DESCRIPTORS[0]!;
+    const maxWidth: UserDrawingTextMaxWidth = USER_DRAWING_TEXT_MAX_WIDTHS[1]!;
+    const maxWidthDescriptor: UserDrawingTextMaxWidthDescriptor = USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS[1]!;
     expect(fontSize).toBe(12);
     expect(fontFamily).toBe('sans-serif');
     expect(fontStyle).toBe('italic');
@@ -1067,9 +1079,13 @@ describe('tealchart public entries', () => {
     expect(styleDescriptor.fontStyle).toBe('italic');
     expect(weightDescriptor.fontWeight).toBe('bold');
     expect(underlineDescriptor.textUnderline).toBe(true);
+    expect(wrapDescriptor.textWrap).toBe(true);
+    expect(maxWidth).toBe(180);
+    expect(maxWidthDescriptor.textMaxWidth).toBe(180);
     expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
     expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
+    expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
   });
 
   it('exports shared drawing text layout helpers', () => {
@@ -1080,8 +1096,10 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       lineWidths: [6, 6],
     });
+    const measuredLine: UserDrawingMeasuredTextLine = measureUserDrawingTextLines('Alpha beta', (line) => line.length, 6)[0]!;
 
     expect(splitUserDrawingTextLines('A\nB')).toEqual(['A', 'B']);
+    expect(measuredLine.text).toBe('Alpha');
     expect(measureTextLabelLine).toBeTypeOf('function');
     expect(resolveUserDrawingTextEditMetrics('A\nB').longestLineLength).toBe(1);
     expect(layout.lines).toHaveLength(2);
