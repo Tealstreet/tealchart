@@ -1234,6 +1234,13 @@ matching behavior in the same PR for every user-facing drawing feature.
   locked-only selections while still allowing mixed grouped selections to delete
   unlocked members.
 
+## Shipped: Hidden Drawing Show Control
+
+- Shared selected-drawing style actions now include an explicit show action for
+  hidden selected drawings, matching the existing targeted visibility reducer.
+- Web and mobile top bars expose the same show-selected affordance for host apps
+  that select hidden drawings through external drawing lists or APIs.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
