@@ -2309,6 +2309,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px monospace');
   });
 
+  it('renders bold text labels with canvas font weight', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'label',
+      kind: 'textLabel',
+      style: { ...style, fontWeight: 'bold' },
+      point: { time: 50, price: 50 },
+      text: 'Note',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:bold 12px sans-serif');
+  });
+
   it('normalizes unsupported text label font families', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
