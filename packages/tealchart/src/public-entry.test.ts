@@ -369,7 +369,7 @@ describe('tealchart public entries', () => {
       lower: { x: 10, y: 5 },
       upper: { x: 10, y: 10 },
       baseRadius: 5,
-      arcs: [{ ratio: 1, radius: 5, startAngle: 0, endAngle: 1 }],
+      arcs: [{ ratio: 1, label: '1', radius: 5, startAngle: 0, endAngle: 1, labelPoint: { x: 8, y: 8 } }],
       boundaries: [
         { start: { x: 5, y: 5 }, end: { x: 10, y: 5 } },
         { start: { x: 5, y: 5 }, end: { x: 10, y: 10 } },
