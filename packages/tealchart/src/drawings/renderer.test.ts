@@ -572,14 +572,23 @@ describe('user drawing renderer', () => {
       ],
     };
 
-    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 50, high: 55, low: 45, close: 52, volume: 100 },
+        { time: 40_000, open: 60, high: 65, low: 55, close: 62, volume: 100 },
+        { time: 70_000, open: 75, high: 80, low: 70, close: 77, volume: 100 },
+        { time: 90_000, open: 80, high: 85, low: 75, close: 82, volume: 100 },
+      ],
+    });
 
     expect(ctx.calls).toContain('moveTo:10,50');
     expect(ctx.calls).toContain('lineTo:70,25');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
     expect(ctx.calls).toContain('fillText:Source 50.00:14,46:#111:left:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:Target 75.00:66,21:#111:right:1:12px sans-serif');
-    expect(ctx.calls).toContain('fillText:+25.00 (+50.00%) / 1 minute:40,33.5:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:+25.00 (+50.00%) / 3 bars, 1 minute:40,33.5:#111:center:1:12px sans-serif');
   });
 
   it('renders projection paths and labels through CanvasContext', () => {
@@ -595,7 +604,16 @@ describe('user drawing renderer', () => {
       ],
     };
 
-    renderUserDrawing(ctx, drawing, { ...space, viewport: { ...space.viewport, startTime: 0, endTime: 100_000 } });
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 50, high: 55, low: 45, close: 52, volume: 100 },
+        { time: 40_000, open: 60, high: 65, low: 55, close: 62, volume: 100 },
+        { time: 70_000, open: 75, high: 80, low: 70, close: 77, volume: 100 },
+        { time: 90_000, open: 80, high: 85, low: 75, close: 82, volume: 100 },
+      ],
+    });
 
     expect(ctx.calls).toContain('moveTo:10,50');
     expect(ctx.calls).toContain('lineTo:40,40');
@@ -604,7 +622,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Start 50.00:14,46:#111:left:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:Pivot 60.00:44,36:#111:left:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:Target 75.00:66,21:#111:right:1:12px sans-serif');
-    expect(ctx.calls).toContain('fillText:+15.00 (+25.00%) / 30 seconds:55,28.5:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:+15.00 (+25.00%) / 2 bars, 30 seconds:55,28.5:#111:center:1:12px sans-serif');
   });
 
   it('renders bars pattern candles through CanvasContext', () => {

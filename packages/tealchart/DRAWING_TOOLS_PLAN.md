@@ -636,6 +636,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, two-leg hit testing, whole-drawing moves, and point-index anchor
   editing use shared drawing behavior on both platforms.
 
+## Shipped: Forecast and Projection Bar Count Labels
+
+- Shared info-line metrics can include inclusive bar counts from loaded chart
+  bars while preserving duration-only labels when no bar data is available.
+- Forecast and projection geometry pass chart bars through the shared metrics,
+  so web Canvas and mobile Skia render matching `N bars, duration` change
+  labels.
+
 ## Shipped: XABCD Pattern Tool
 
 - Shared drawing state supports the five-anchor `xabcdPattern` tool and
