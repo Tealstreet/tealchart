@@ -24,7 +24,6 @@ import {
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
   resolveUserDrawingBalloonLayout,
-  resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingGeometry,
@@ -1137,9 +1136,6 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'infoLine': {
-      const drawing = geometry.drawing;
-      const label =
-        drawing.kind === 'infoLine' ? resolveUserDrawingInfoLineMetrics(drawing.points[0], drawing.points[1]).label : '';
       return {
         kind: 'infoLine',
         id: geometry.drawing.id,
@@ -1153,7 +1149,7 @@ function primitiveFromGeometry(
           x: (geometry.segment.start.x + geometry.segment.end.x) / 2,
           y: (geometry.segment.start.y + geometry.segment.end.y) / 2 - 4,
         },
-        label,
+        label: geometry.infoMetrics.label,
         style: geometry.drawing.style,
       };
     }
