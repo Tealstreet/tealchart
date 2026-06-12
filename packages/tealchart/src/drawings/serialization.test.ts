@@ -785,6 +785,7 @@ describe('drawing layout serialization', () => {
             fontWeight: 'bold',
             fontStyle: 'italic',
             textUnderline: true,
+            textLineThrough: true,
             textWrap: true,
             textMaxWidth: 190,
           },
@@ -799,6 +800,7 @@ describe('drawing layout serialization', () => {
       fontWeight: 'bold',
       fontStyle: 'italic',
       textUnderline: true,
+      textLineThrough: true,
       textWrap: true,
       textMaxWidth: 180,
     });

@@ -2335,7 +2335,7 @@ describe('user drawing renderer', () => {
       ...base,
       id: 'label',
       kind: 'textLabel',
-      style: { ...style, fontWeight: 'bold', fontStyle: 'italic', textUnderline: true },
+      style: { ...style, fontWeight: 'bold', fontStyle: 'italic', textUnderline: true, textLineThrough: true },
       point: { time: 50, price: 50 },
       text: 'Note',
       textAlign: 'center',
@@ -2345,6 +2345,7 @@ describe('user drawing renderer', () => {
 
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:italic bold 12px sans-serif');
     expect(ctx.calls).toContain('lineTo:62,54.2');
+    expect(ctx.calls).toContain('lineTo:62,46.4');
     expect(ctx.calls).toContain('stroke:#111:1::1');
   });
 
@@ -2486,7 +2487,7 @@ describe('user drawing renderer', () => {
       kind: 'table',
       point: { time: 10, price: 90 },
       textAlign: 'right',
-      style: { ...base.style, fontWeight: 'bold', fontStyle: 'italic', textUnderline: true },
+      style: { ...base.style, fontWeight: 'bold', fontStyle: 'italic', textUnderline: true, textLineThrough: true },
       cells: [
         ['Metric', 'Value'],
         ['Price', '101.25'],
@@ -2501,6 +2502,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Metric:62,22:#111:right:1:italic bold 12px sans-serif');
     expect(ctx.calls).toContain('fillText:101.25:124,46:#111:right:1:italic bold 12px sans-serif');
     expect(ctx.calls).toContain('lineTo:62,26.2');
+    expect(ctx.calls).toContain('lineTo:62,18.4');
     expect(ctx.calls).toContain('stroke:#111:1::1');
   });
 
