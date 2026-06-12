@@ -7,6 +7,7 @@ import {
   setMobileUserDrawingIconName,
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTableCell,
   setMobileUserDrawingTableCells,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
@@ -221,7 +222,12 @@ describe('mobile drawing style helpers', () => {
       ],
       updatedAt: 70,
     });
+    expect(setMobileUserDrawingTableCell(tableState, 0, 1, 101.25, { now: () => 71 }).drawings[0]).toMatchObject({
+      cells: [['Metric', '101.25']],
+      updatedAt: 71,
+    });
     expect(setMobileUserDrawingTableCells(state, [['Ignored']])).toBe(state);
+    expect(setMobileUserDrawingTableCell(state, 0, 0, 'Ignored')).toBe(state);
   });
 
   it('requires explicit opt-in for locked drawing property changes', () => {

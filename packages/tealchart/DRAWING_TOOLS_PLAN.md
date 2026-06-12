@@ -1155,6 +1155,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching table cell text alignment, and
   both top bars expose the same alignment controls for selected tables.
 
+## Shipped: Table Single-Cell Update APIs
+
+- Shared drawing state can update one existing table cell while preserving the
+  table matrix shape, drawing ID, and normalizer semantics.
+- Web widget and mobile Skia handles expose matching single-cell table update
+  methods alongside the existing full-matrix update APIs.
+- Native utilities export the mobile single-cell wrapper for host property
+  panels and table editors.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

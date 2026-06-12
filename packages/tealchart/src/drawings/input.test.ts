@@ -24,6 +24,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingText,
   setUserDrawingTextContent,
@@ -1784,6 +1785,47 @@ describe('user drawing input controller', () => {
     expect(setUserDrawingTableCells(next, [['Metric', 'Value'], ['Volume', '']])).toBe(next);
   });
 
+  it('updates a single existing table cell while preserving the matrix shape', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          point: anchorA,
+          textAlign: 'left',
+          cells: [
+            ['Metric', 'Value'],
+            ['Price', '101.25'],
+          ],
+        },
+      ],
+    });
+
+    const next = setUserDrawingTableCell(state, 1, 1, 102.5, { now: () => 31 });
+
+    expect(next.selection).toEqual({ drawingId: 'table' });
+    expect(next.drawings[0]).toMatchObject({
+      id: 'table',
+      kind: 'table',
+      updatedAt: 31,
+      cells: [
+        ['Metric', 'Value'],
+        ['Price', '102.5'],
+      ],
+    });
+    expect(setUserDrawingTableCell(next, 1, 1, '102.5')).toBe(next);
+    expect(setUserDrawingTableCell(next, 4, 0, 'ignored')).toBe(next);
+    expect(setUserDrawingTableCell(next, -1, 0, 'ignored')).toBe(next);
+    expect(setUserDrawingTableCell(next, 0, Number.NaN, 'ignored')).toBe(next);
+  });
+
   it('ignores table cell updates for non-table and locked drawings without opt-in', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'line' },
@@ -1816,11 +1858,18 @@ describe('user drawing input controller', () => {
     });
 
     expect(setUserDrawingTableCells(state, [['Ignored']])).toBe(state);
+    expect(setUserDrawingTableCell(state, 0, 0, 'Ignored')).toBe(state);
     expect(setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table' })).toBe(state);
+    expect(setUserDrawingTableCell(state, 0, 0, 'Updated', { drawingId: 'table' })).toBe(state);
     expect(
       setUserDrawingTableCells(state, [['Updated']], { drawingId: 'table', includeLocked: true }).drawings[1],
     ).toMatchObject({
       cells: [['Updated']],
+    });
+    expect(
+      setUserDrawingTableCell(state, 0, 1, null, { drawingId: 'table', includeLocked: true }).drawings[1],
+    ).toMatchObject({
+      cells: [['Metric', '']],
     });
   });
 
