@@ -1051,6 +1051,15 @@ describe('TealchartWidget', () => {
         ],
       });
       expect(widget.setUserDrawingTableCell(1, 1, '102.5')).toBe(false);
+      expect(widget.setUserDrawingTableDimensions(3, 3)).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        cells: [
+          ['Metric', 'Value', ''],
+          ['Price', '102.5', ''],
+          ['', '', ''],
+        ],
+      });
+      expect(widget.setUserDrawingTableDimensions(3, 3)).toBe(false);
       expect(onChange).toHaveBeenCalled();
     });
 
