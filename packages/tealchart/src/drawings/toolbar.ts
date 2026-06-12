@@ -198,6 +198,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'note', icon: 'N', label: 'Note' },
   { tool: 'callout', icon: 'C', label: 'Callout' },
   { tool: 'comment', icon: '!', label: 'Comment' },
+  { tool: 'priceLabel', icon: 'PL', label: 'Price label' },
   { tool: 'priceNote', icon: '$', label: 'Price note' },
   { tool: 'pin', icon: 'P', label: 'Pin' },
   { tool: 'icon', icon: '*', label: 'Icon' },

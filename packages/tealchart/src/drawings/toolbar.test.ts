@@ -122,6 +122,7 @@ describe('user drawing toolbar descriptors', () => {
       'note',
       'callout',
       'comment',
+      'priceLabel',
       'priceNote',
       'pin',
       'icon',
@@ -313,6 +314,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('comment')).toEqual(
       expect.objectContaining({ tool: 'comment', label: 'Comment' }),
+    );
+    expect(getUserDrawingToolDescriptor('priceLabel')).toEqual(
+      expect.objectContaining({ tool: 'priceLabel', label: 'Price label' }),
     );
     expect(getUserDrawingToolDescriptor('priceNote')).toEqual(
       expect.objectContaining({ tool: 'priceNote', label: 'Price note' }),
@@ -844,6 +848,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...textLabel, id: 'price-label', kind: 'priceLabel' })).toBe(true);
     expect(
       supportsUserDrawingFillControls({
         ...textLabel,
@@ -873,6 +878,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingTextControls(textLabel)).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
+    expect(supportsUserDrawingTextControls({ ...textLabel, id: 'price-label', kind: 'priceLabel' })).toBe(true);
     expect(
       supportsUserDrawingTextControls({
         ...textLabel,

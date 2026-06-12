@@ -788,6 +788,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Selection, hit testing, whole-drawing moves, text editing, alignment controls,
   and style controls use shared text annotation behavior on both platforms.
 
+## Shipped: Price Label Tool
+
+- Shared drawing state supports the single-anchor `priceLabel` annotation and
+  persists text, alignment, and style through layout save/load.
+- Web Canvas and mobile Skia render matching price-label text boxes from shared
+  text annotation layout.
+- Selection, hit testing, whole-drawing moves, text editing, alignment controls,
+  and style controls use shared text annotation behavior on both platforms.
+
 ## Shipped: Price Note Tool
 
 - Shared drawing state supports two-anchor `priceNote` annotations: one price
