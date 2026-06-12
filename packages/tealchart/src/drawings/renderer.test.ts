@@ -1803,6 +1803,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
   });
 
+  it('renders emoji drawings with measured boxes', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'emoji',
+      kind: 'emoji',
+      point: { time: 50, price: 50 },
+      text: '🔥',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:38,40,24,20:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:🔥:44,50:#111:left:1:12px sans-serif');
+  });
+
   it('renders comment drawings with measured boxes', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

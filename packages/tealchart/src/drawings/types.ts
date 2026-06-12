@@ -86,6 +86,7 @@ export type UserDrawingTool =
   | 'pin'
   | 'icon'
   | 'flagMark'
+  | 'emoji'
   | 'balloon'
   | 'signpost'
   | 'textLabel';
@@ -101,6 +102,7 @@ export type UserDrawingTextAnnotationKind =
   | 'anchoredNote'
   | 'priceLabel'
   | 'priceNote'
+  | 'emoji'
   | 'balloon'
   | 'signpost';
 export const USER_DRAWING_ICON_NAMES = ['star', 'circle', 'square', 'triangle', 'flag', 'arrowUp', 'arrowDown'] as const;
@@ -627,6 +629,13 @@ export interface FlagMarkDrawing extends UserDrawingBase {
   point: UserDrawingAnchor;
 }
 
+export interface EmojiDrawing extends UserDrawingBase {
+  kind: 'emoji';
+  point: UserDrawingAnchor;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
 export interface BalloonDrawing extends UserDrawingBase {
   kind: 'balloon';
   point: UserDrawingAnchor;
@@ -650,6 +659,7 @@ export type UserDrawingTextAnnotation =
   | AnchoredNoteDrawing
   | PriceLabelDrawing
   | PriceNoteDrawing
+  | EmojiDrawing
   | BalloonDrawing
   | SignpostDrawing;
 
@@ -735,6 +745,7 @@ export type UserDrawing =
   | PinDrawing
   | IconDrawing
   | FlagMarkDrawing
+  | EmojiDrawing
   | BalloonDrawing
   | SignpostDrawing
   | TextLabelDrawing;
@@ -944,6 +955,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'pin':
     case 'icon':
     case 'flagMark':
+    case 'emoji':
     case 'balloon':
     case 'signpost':
     case 'textLabel':
@@ -968,6 +980,7 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
     drawing.kind === 'anchoredNote' ||
     drawing.kind === 'priceLabel' ||
     drawing.kind === 'priceNote' ||
+    drawing.kind === 'emoji' ||
     drawing.kind === 'balloon' ||
     drawing.kind === 'signpost'
   );
@@ -1450,6 +1463,7 @@ export function createUserDrawingFromDraft(
     case 'note':
     case 'comment':
     case 'priceLabel':
+    case 'emoji':
     case 'balloon':
     case 'signpost':
     case 'textLabel':
@@ -1457,7 +1471,7 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: draft.tool,
         point: draft.anchors[0]!,
-        text: draft.text ?? '',
+        text: draft.text ?? (draft.tool === 'emoji' ? '👍' : ''),
         textAlign: 'center',
       };
     case 'anchoredText':

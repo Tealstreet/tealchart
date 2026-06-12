@@ -145,6 +145,7 @@ import type {
   MobileUserDrawingAnchoredTextPrimitive,
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
+  MobileUserDrawingEmojiPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPriceNotePrimitive,
   MobileUserDrawingTextLabelPrimitive,
@@ -687,6 +688,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           | MobileUserDrawingAnchoredNotePrimitive
           | MobileUserDrawingCalloutPrimitive
           | MobileUserDrawingPriceNotePrimitive
+          | MobileUserDrawingEmojiPrimitive
           | MobileUserDrawingCommentPrimitive =>
           (primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
@@ -695,6 +697,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'callout' ||
             primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
+            primitive.kind === 'emoji' ||
             primitive.kind === 'comment') &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
@@ -3146,6 +3149,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
             primitive.kind === 'comment' ||
+            primitive.kind === 'emoji' ||
             primitive.kind === 'balloon'
           ) {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);

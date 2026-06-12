@@ -209,6 +209,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'pin', icon: 'P', label: 'Pin' },
   { tool: 'icon', icon: '*', label: 'Icon' },
   { tool: 'flagMark', icon: '⚑', label: 'Flag mark' },
+  { tool: 'emoji', icon: '☺', label: 'Emoji' },
   { tool: 'balloon', icon: 'B', label: 'Balloon' },
   { tool: 'signpost', icon: 'S', label: 'Signpost' },
   { tool: 'textLabel', icon: 'T', label: 'Text label' },

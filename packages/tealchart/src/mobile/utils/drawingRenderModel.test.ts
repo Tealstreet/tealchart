@@ -3283,6 +3283,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('preserves emoji text and alignment in mobile primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'emoji',
+          kind: 'emoji',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: '🔥',
+          textAlign: 'center',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'emoji',
+      id: 'emoji',
+      clip,
+      point: { x: 50, y: 50 },
+      text: '🔥',
+      editing: false,
+      editValue: null,
+      textAlign: 'center',
+    });
+  });
+
   it('preserves comment text and alignment in mobile primitives', () => {
     const state: UserDrawingState = {
       version: 1,
