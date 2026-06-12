@@ -86,6 +86,7 @@ import {
   resolveUserDrawingInputPointFromChart,
   resolveAbcdPatternFromAnchors,
   resolveElliottCorrectiveWaveFromAnchors,
+  resolveElliottDoubleComboWaveFromAnchors,
   resolveElliottImpulseWaveFromAnchors,
   resolveElliottTriangleWaveFromAnchors,
   resolveHeadShouldersPatternFromAnchors,
@@ -614,6 +615,32 @@ describe('user drawing coordinates', () => {
         { text: 'A', point: { x: 10, y: 70 } },
         { text: 'B', point: { x: 60, y: 170 } },
         { text: 'C', point: { x: 110, y: -30 } },
+      ],
+    });
+  });
+
+  it('resolves Elliott double combo wave polylines and labels from three anchors', () => {
+    expect(
+      resolveElliottDoubleComboWaveFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 80 },
+          { time: 2_000, price: 120 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: 170 },
+          { x: 110, y: -30 },
+        ],
+      },
+      labels: [
+        { text: 'W', point: { x: 10, y: 70 } },
+        { text: 'X', point: { x: 60, y: 170 } },
+        { text: 'Y', point: { x: 110, y: -30 } },
       ],
     });
   });

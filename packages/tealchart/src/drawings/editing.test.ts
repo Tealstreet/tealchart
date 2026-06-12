@@ -2623,6 +2623,67 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves and edits Elliott double combo wave anchors with stable three-point shape', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'elliott-double-combo',
+      kind: 'elliottDoubleComboWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: 50, price: 70 },
+      ],
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'elliott-double-combo' },
+    });
+
+    const moved = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'elliott-double-combo' },
+        startPoint: { x: 10, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 15, y: 55 },
+      { now: () => 30 },
+    ).drawings[0];
+
+    expect(moved).toMatchObject({
+      kind: 'elliottDoubleComboWave',
+      points: [
+        { time: 15, price: expect.closeTo(45) },
+        { time: 35, price: expect.closeTo(25) },
+        { time: 55, price: 65 },
+      ],
+      updatedAt: 30,
+    });
+
+    const edited = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'elliott-double-combo', handle: 'center', pointIndex: 2 },
+        startPoint: { x: 50, y: 30 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 55, y: 35 },
+      { now: () => 31 },
+    ).drawings[0];
+
+    expect(edited).toMatchObject({
+      kind: 'elliottDoubleComboWave',
+      points: [
+        { time: 10, price: 50 },
+        { time: 30, price: 30 },
+        { time: expect.closeTo(55), price: 65 },
+      ],
+      updatedAt: 31,
+    });
+  });
+
   it('moves and edits Elliott triangle wave anchors with stable five-point shape', () => {
     const drawing: UserDrawing = {
       ...base,

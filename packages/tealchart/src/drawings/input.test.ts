@@ -1664,6 +1664,43 @@ describe('user drawing input controller', () => {
     expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
+  it('duplicates Elliott double combo wave drawings with deep-cloned three-point payloads', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'elliott-double-combo' },
+      drawings: [
+        {
+          id: 'elliott-double-combo',
+          kind: 'elliottDoubleComboWave',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          points: [anchorA, anchorB, anchorC],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 25 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'elliottDoubleComboWave',
+      createdAt: 25,
+      updatedAt: 25,
+      points: [anchorA, anchorB, anchorC],
+    });
+    if (
+      next.drawings[1]?.kind !== 'elliottDoubleComboWave' ||
+      state.drawings[0]?.kind !== 'elliottDoubleComboWave'
+    ) {
+      throw new Error('expected Elliott double combo wave drawings');
+    }
+    expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
+  });
+
   it('duplicates Elliott triangle wave drawings with deep-cloned five-point payloads', () => {
     const state = createUserDrawingState({
       selection: { drawingId: 'elliott-triangle' },

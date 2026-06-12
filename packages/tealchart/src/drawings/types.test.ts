@@ -121,6 +121,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('regressionTrend')).toBe(3);
     expect(getRequiredAnchorCount('flatTopBottom')).toBe(3);
     expect(getRequiredAnchorCount('elliottCorrectiveWave')).toBe(3);
+    expect(getRequiredAnchorCount('elliottDoubleComboWave')).toBe(3);
     expect(getRequiredAnchorCount('disjointChannel')).toBe(4);
     expect(getRequiredAnchorCount('trianglePattern')).toBe(4);
     expect(getRequiredAnchorCount('abcdPattern')).toBe(4);
@@ -650,6 +651,20 @@ describe('user drawing types', () => {
       locked: false,
       createdAt: 23,
       updatedAt: 23,
+    });
+    expect(
+      createUserDrawingFromDraft(draft({ tool: 'elliottDoubleComboWave', anchors: [anchorA, anchorB, anchorC] }), {
+        id: 'elliott-double-combo',
+        now: 24,
+      }),
+    ).toMatchObject({
+      id: 'elliott-double-combo',
+      kind: 'elliottDoubleComboWave',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 24,
+      updatedAt: 24,
     });
     expect(
       createUserDrawingFromDraft(draft({ tool: 'xabcdPattern', anchors: [anchorA, anchorB, anchorC, anchorD, anchorE] }), {
