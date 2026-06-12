@@ -159,11 +159,18 @@ export interface DrawingScreenPitchfanRay {
   segment: DrawingScreenSegment;
 }
 
+export interface DrawingScreenPitchfanBand {
+  fromRatio: number;
+  toRatio: number;
+  points: readonly [DrawingScreenPoint, DrawingScreenPoint, DrawingScreenPoint];
+}
+
 export interface DrawingScreenPitchfan {
   origin: DrawingScreenPoint;
   targetStart: DrawingScreenPoint;
   targetEnd: DrawingScreenPoint;
   rays: readonly DrawingScreenPitchfanRay[];
+  bands: readonly DrawingScreenPitchfanBand[];
 }
 
 export interface DrawingScreenFibFan {
@@ -2462,21 +2469,35 @@ export function resolvePitchfanFromAnchors(
   const targetStart = anchorToScreenPoint(second, space);
   const targetEnd = anchorToScreenPoint(third, space);
 
+  const rays = PITCHFAN_LEVELS.map((ratio) => {
+    const target = {
+      x: targetEnd.x,
+      y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
+    };
+    return {
+      ratio,
+      target,
+      segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
+    };
+  });
+  const bands: DrawingScreenPitchfanBand[] = [];
+  for (let index = 0; index < rays.length - 1; index += 1) {
+    const ray = rays[index];
+    const nextRay = rays[index + 1];
+    if (!ray || !nextRay) continue;
+    bands.push({
+      fromRatio: ray.ratio,
+      toRatio: nextRay.ratio,
+      points: [origin, ray.segment.end, nextRay.segment.end],
+    });
+  }
+
   return {
     origin,
     targetStart,
     targetEnd,
-    rays: PITCHFAN_LEVELS.map((ratio) => {
-      const target = {
-        x: targetEnd.x,
-        y: targetStart.y + (targetEnd.y - targetStart.y) * ratio,
-      };
-      return {
-        ratio,
-        target,
-        segment: resolveRaySegment(origin, target, space.chartLeft, space.chartRight, space.pane.top, space.pane.bottom),
-      };
-    }),
+    rays,
+    bands,
   };
 }
 
