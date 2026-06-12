@@ -1088,11 +1088,14 @@ describe('TealchartWidget', () => {
 
       expect(widget.setUserDrawingText('label', 'Direct')).toBe(true);
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ text: 'Direct' });
+      expect(widget.setUserDrawingTextContent('Selected direct')).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ text: 'Selected direct' });
+      expect(widget.setUserDrawingTextContent('Selected direct')).toBe(false);
 
       expect(widget.beginUserDrawingTextEdit('label')).toBe(true);
       expect(widget.updateUserDrawingTextEdit('Draft')).toBe(true);
       expect(widget.cancelUserDrawingTextEdit()).toBe(true);
-      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ text: 'Direct' });
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ text: 'Selected direct' });
       expect(onChange).toHaveBeenCalled();
     });
 

@@ -1119,6 +1119,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Cell updates reuse the bounded table normalizer, preserving stable drawing IDs
   while stringifying mixed host values consistently across web and mobile.
 
+## Shipped: Text Content Update APIs
+
+- Shared drawing state can update selected or explicitly targeted text
+  annotation content without opening the inline editor.
+- Web widget and mobile Skia handles expose matching text-content update methods,
+  and native utilities export the mobile wrapper for host property panels.
+- Text-content updates preserve drawing IDs, respect locked drawings unless
+  explicitly included, and clear active edit drafts for the updated drawing.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

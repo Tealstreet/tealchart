@@ -185,6 +185,7 @@ export {
   setUserDrawingLocked,
   setUserDrawingTableCells,
   setUserDrawingText,
+  setUserDrawingTextContent,
   setUserDrawingTextAlign,
   setUserDrawingTool,
   setUserDrawingVisibility,

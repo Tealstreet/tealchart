@@ -8,6 +8,7 @@ import {
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
   setMobileUserDrawingTableCells,
+  setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
@@ -91,6 +92,37 @@ describe('mobile drawing style helpers', () => {
       updatedAt: 40,
     });
     expect(setMobileUserDrawingTextAlign(state, 'right')).toBe(state);
+  });
+
+  it('updates selected text content through the shared reducer contract', () => {
+    const textState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'label' },
+      textEdit: { drawingId: 'label', value: 'Draft', originalValue: 'Note', startedAt: 2 },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: state.drawings[0]!.style,
+          point: { time: 1, price: 100 },
+          text: 'Note',
+          textAlign: 'left',
+        },
+      ],
+    };
+
+    const updated = setMobileUserDrawingTextContent(textState, 'Mobile note', { now: () => 45 });
+    expect(updated.textEdit).toBeNull();
+    expect(updated.drawings[0]).toMatchObject({
+      text: 'Mobile note',
+      updatedAt: 45,
+    });
+    expect(setMobileUserDrawingTextContent(state, 'Ignored')).toBe(state);
   });
 
   it('updates selected icon name through the shared reducer contract', () => {
