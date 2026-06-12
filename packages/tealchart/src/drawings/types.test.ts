@@ -139,6 +139,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('path')).toBe(3);
     expect(getRequiredAnchorCount('highlighter')).toBe(3);
     expect(getRequiredAnchorCount('emoji')).toBe(1);
+    expect(getRequiredAnchorCount('sticker')).toBe(1);
   });
 
   it('normalizes drawing font sizes to supported cross-platform values', () => {
@@ -1028,6 +1029,12 @@ describe('user drawing types', () => {
       kind: 'emoji',
       point: anchorA,
       text: '🔥',
+      textAlign: 'center',
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'sticker', anchors: [anchorA] }), { id: 'sticker' })).toMatchObject({
+      kind: 'sticker',
+      point: anchorA,
+      text: '★',
       textAlign: 'center',
     });
     expect(
