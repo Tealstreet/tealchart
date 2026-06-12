@@ -24,12 +24,14 @@ import {
   getUserDrawingZOrderAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingFillToolbarEnabled,
+  isUserDrawingFillVisibilityToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
   resolveUserDrawingStyleToolbarAction,
-  supportsUserDrawingFillControls,
+  supportsUserDrawingFillColorControls,
+  supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextStyleControls,
@@ -167,10 +169,16 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
     const selectedDrawing = userDrawingState ? getSelectedUserDrawing(userDrawingState) : null;
     const styleControlsEnabled = userDrawingState ? isUserDrawingStyleToolbarEnabled(userDrawingState) : false;
-    const fillControlsEnabled = userDrawingState ? isUserDrawingFillToolbarEnabled(userDrawingState) : false;
+    const fillColorControlsEnabled = userDrawingState ? isUserDrawingFillToolbarEnabled(userDrawingState) : false;
+    const fillVisibilityControlsEnabled = userDrawingState
+      ? isUserDrawingFillVisibilityToolbarEnabled(userDrawingState)
+      : false;
     const iconControlsEnabled = userDrawingState ? isUserDrawingIconToolbarEnabled(userDrawingState) : false;
     const textControlsEnabled = userDrawingState ? isUserDrawingTextToolbarEnabled(userDrawingState) : false;
-    const fillControlsSupported = selectedDrawing ? supportsUserDrawingFillControls(selectedDrawing) : false;
+    const fillColorControlsSupported = selectedDrawing ? supportsUserDrawingFillColorControls(selectedDrawing) : false;
+    const fillVisibilityControlsSupported = selectedDrawing
+      ? supportsUserDrawingFillVisibilityControls(selectedDrawing)
+      : false;
     const iconControlsSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
     const textStyleControlsSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
     const textAlignControlsSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
@@ -425,56 +433,58 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
                   <View style={styles.innerDivider} />
 
-                  {fillControlsSupported && (
+                  {(fillColorControlsSupported || fillVisibilityControlsSupported) && (
                     <>
-                      {USER_DRAWING_FILL_COLOR_DESCRIPTORS.map((descriptor) => {
-                        const active =
-                          selectedDrawing.style.fillColor?.toLowerCase() === descriptor.fillColor.toLowerCase();
-                        return (
-                          <Pressable
-                            key={descriptor.fillColor}
-                            accessibilityRole="button"
-                            accessibilityLabel={descriptor.label}
-                            accessibilityState={{ disabled: !fillControlsEnabled, selected: active }}
-                            disabled={!fillControlsEnabled}
-                            onPress={() => onUserDrawingStyleChange?.({ fillColor: descriptor.fillColor })}
-                            style={[
-                              styles.drawingSwatchButton,
-                              { backgroundColor: descriptor.fillColor },
-                              active && [styles.drawingSwatchButtonActive, { borderColor: accentColor }],
-                              !fillControlsEnabled && styles.drawingButtonDisabled,
-                            ]}
-                          />
-                        );
-                      })}
+                      {fillColorControlsSupported &&
+                        USER_DRAWING_FILL_COLOR_DESCRIPTORS.map((descriptor) => {
+                          const active =
+                            selectedDrawing.style.fillColor?.toLowerCase() === descriptor.fillColor.toLowerCase();
+                          return (
+                            <Pressable
+                              key={descriptor.fillColor}
+                              accessibilityRole="button"
+                              accessibilityLabel={descriptor.label}
+                              accessibilityState={{ disabled: !fillColorControlsEnabled, selected: active }}
+                              disabled={!fillColorControlsEnabled}
+                              onPress={() => onUserDrawingStyleChange?.({ fillColor: descriptor.fillColor })}
+                              style={[
+                                styles.drawingSwatchButton,
+                                { backgroundColor: descriptor.fillColor },
+                                active && [styles.drawingSwatchButtonActive, { borderColor: accentColor }],
+                                !fillColorControlsEnabled && styles.drawingButtonDisabled,
+                              ]}
+                            />
+                          );
+                        })}
 
-                      {USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.filter(
-                        (descriptor) => descriptor.style === 'fillVisible',
-                      ).map((descriptor) => {
-                        const active = selectedDrawing.style.fillVisible !== false;
-                        return (
-                          <Pressable
-                            key={descriptor.style}
-                            accessibilityRole="button"
-                            accessibilityLabel={descriptor.label}
-                            accessibilityState={{ disabled: !fillControlsEnabled, selected: active }}
-                            disabled={!fillControlsEnabled}
-                            onPress={() => onUserDrawingStyleChange?.({ fillVisible: !active })}
-                            style={({ pressed }: PressableStyleState) => [
-                              styles.drawingButton,
-                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                              fillControlsEnabled && pressed && !active && styles.drawingButtonPressed,
-                              !fillControlsEnabled && styles.drawingButtonDisabled,
-                            ]}
-                          >
-                            <Text
-                              style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
+                      {fillVisibilityControlsSupported &&
+                        USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.filter(
+                          (descriptor) => descriptor.style === 'fillVisible',
+                        ).map((descriptor) => {
+                          const active = selectedDrawing.style.fillVisible !== false;
+                          return (
+                            <Pressable
+                              key={descriptor.style}
+                              accessibilityRole="button"
+                              accessibilityLabel={descriptor.label}
+                              accessibilityState={{ disabled: !fillVisibilityControlsEnabled, selected: active }}
+                              disabled={!fillVisibilityControlsEnabled}
+                              onPress={() => onUserDrawingStyleChange?.({ fillVisible: !active })}
+                              style={({ pressed }: PressableStyleState) => [
+                                styles.drawingButton,
+                                active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                                fillVisibilityControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                                !fillVisibilityControlsEnabled && styles.drawingButtonDisabled,
+                              ]}
                             >
-                              {descriptor.icon}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
+                              <Text
+                                style={[styles.drawingButtonText, { color: active ? accentColor : textSecondaryColor }]}
+                              >
+                                {descriptor.icon}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
 
                       <View style={styles.innerDivider} />
                     </>

@@ -316,6 +316,50 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('dispatches selected risk/reward fill visibility without fill color controls', () => {
+    const onStyle = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-risk-reward-fill-visibility',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'long' },
+        drawings: [
+          {
+            id: 'long',
+            kind: 'longPosition',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 1, price: 10 },
+              { time: 2, price: 12 },
+              { time: 2, price: 8 },
+            ],
+          },
+        ],
+      },
+      onUserDrawingStyleChange: onStyle,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing fill"]')?.click();
+
+    expect(onStyle).not.toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
   it('dispatches selected trend-line extension controls only for trend lines', () => {
     const onExtend = vi.fn();
     const topBar = new ChartTopBar({
