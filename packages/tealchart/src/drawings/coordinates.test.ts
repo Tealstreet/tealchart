@@ -36,6 +36,7 @@ import type {
   GannFanDrawing,
   GannSquareDrawing,
   FlatTopBottomDrawing,
+  FixedRangeVolumeProfileDrawing,
   HorizontalRayDrawing,
   InfoLineDrawing,
   PathDrawing,
@@ -2251,6 +2252,65 @@ describe('user drawing coordinates', () => {
           { x: 110, y: expect.closeTo(66.6667) },
           { x: 210, y: expect.closeTo(61.6667) },
         ],
+      },
+    });
+  });
+
+  it('resolves fixed range volume profile bins from selected bars', () => {
+    const profileSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 },
+      pane: { ...space.pane, yMin: 0, yMax: 100 },
+      chartLeft: 0,
+      chartRight: 100,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+        { time: 110, open: 70, high: 80, low: 70, close: 75, volume: 100 },
+      ],
+    };
+    const drawing: FixedRangeVolumeProfileDrawing = {
+      id: 'profile',
+      kind: 'fixedRangeVolumeProfile',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [
+        { time: 10, price: 80 },
+        { time: 90, price: 20 },
+      ],
+    };
+
+    expect(resolveUserDrawingGeometry(drawing, profileSpace)).toMatchObject({
+      kind: 'fixedRangeVolumeProfile',
+      volumeProfile: {
+        bounds: { x: 10, y: 40, width: 80, height: 60 },
+        maxVolume: 20,
+        totalVolume: 35,
+        bins: expect.arrayContaining([
+          expect.objectContaining({
+            priceMin: 75,
+            priceMax: 80,
+            volume: 20,
+            rect: { x: 10, y: 40, width: 80, height: 5 },
+          }),
+          expect.objectContaining({
+            priceMin: 55,
+            priceMax: 60,
+            volume: 10,
+            rect: { x: 10, y: 60, width: 40, height: 5 },
+          }),
+          expect.objectContaining({
+            priceMin: 25,
+            priceMax: 30,
+            volume: 5,
+            rect: { x: 10, y: 90, width: 20, height: 5 },
+          }),
+        ]),
       },
     });
   });

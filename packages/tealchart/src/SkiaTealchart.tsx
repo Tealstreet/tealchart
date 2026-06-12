@@ -2707,6 +2707,43 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'fixedRangeVolumeProfile') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const fillColor = primitive.style.fillColor ?? primitive.style.lineColor;
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false &&
+                  primitive.bins.map((bin) =>
+                    bin.volume > 0 && bin.rect.width > 0 && bin.rect.height > 0 ? (
+                      <Rect
+                        key={`${primitive.id}:bin:${bin.priceMin}:${bin.priceMax}`}
+                        x={bin.rect.x}
+                        y={bin.rect.y}
+                        width={bin.rect.width}
+                        height={bin.rect.height}
+                        color={fillColor}
+                        style="fill"
+                      />
+                    ) : null,
+                  )}
+                {primitive.style.lineVisible !== false && (
+                  <Rect
+                    x={primitive.bounds.x}
+                    y={primitive.bounds.y}
+                    width={primitive.bounds.width}
+                    height={primitive.bounds.height}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </Rect>
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'triangle') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();

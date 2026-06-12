@@ -135,6 +135,26 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fixed range volume profiles from two anchors', () => {
+    const options = { createId: () => 'volume-profile', now: () => 21 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fixedRangeVolumeProfile'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'volume-profile' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'volume-profile',
+      kind: 'fixedRangeVolumeProfile',
+      points: [anchorA, anchorB],
+      createdAt: 21,
+      updatedAt: 21,
+    });
+  });
+
   it('commits single-anchor drawings immediately', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'horizontalLine');
     const next = handleUserDrawingInput(state, { paneId: 'main', anchor: anchorA }, { createId: () => 'h' });

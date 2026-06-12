@@ -228,6 +228,15 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'fixedRangeVolumeProfile') {
+    const insideBin = geometry.volumeProfile.bins.some(
+      (bin) => bin.volume > 0 && pointInRect(point, bin.rect),
+    );
+    if (insideBin) return { drawing: geometry.drawing, distance: 0 };
+    const distance = distanceToRectEdge(point, geometry.volumeProfile.bounds);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'projection') {
     const distance = Math.min(
       distanceToSegment(point, geometry.projection.baseSegment),
@@ -688,6 +697,7 @@ function hitTestUserDrawingHandle(
     case 'timeCycles':
     case 'sineLine':
     case 'forecast':
+    case 'fixedRangeVolumeProfile':
     case 'gannFan':
       if (
         geometry.drawing.kind === 'fibRetracement' ||
@@ -703,6 +713,7 @@ function hitTestUserDrawingHandle(
         geometry.drawing.kind === 'timeCycles' ||
         geometry.drawing.kind === 'sineLine' ||
         geometry.drawing.kind === 'forecast' ||
+        geometry.drawing.kind === 'fixedRangeVolumeProfile' ||
         geometry.drawing.kind === 'gannFan'
       ) {
         handles.push(

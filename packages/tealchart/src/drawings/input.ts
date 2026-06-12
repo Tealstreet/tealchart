@@ -226,6 +226,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'dateRange':
     case 'datePriceRange':
     case 'forecast':
+    case 'fixedRangeVolumeProfile':
     case 'fibRetracement':
     case 'fibExtension':
     case 'fibFan':
