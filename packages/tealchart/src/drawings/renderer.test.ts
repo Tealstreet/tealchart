@@ -1895,6 +1895,15 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillRect:10,40,40,5:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('fillRect:10,70,20,5:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('strokeRect:10,20,80,60:#f5c542:1');
+    expect(ctx.calls).toContain('moveTo:10,22.5');
+    expect(ctx.calls).toContain('lineTo:90,22.5');
+    expect(ctx.calls).toContain('stroke:#f5c542:2::1');
+    expect(ctx.calls).toContain('moveTo:10,20');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('moveTo:10,45');
+    expect(ctx.calls).toContain('lineTo:90,45');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:4,3:1');
+    expect(ctx.calls.filter((call) => call === 'stroke:#f5c542:2:4,3:1')).toHaveLength(2);
   });
 
   it('requires explicit fill colors for parallel channel fills', () => {

@@ -932,6 +932,15 @@ matching behavior in the same PR for every user-facing drawing feature.
   editing, and toolbar descriptors use shared drawing behavior on both
   platforms.
 
+## Shipped: Fixed Range Volume Profile Guides
+
+- Shared fixed-range volume profile geometry derives point-of-control and
+  70-percent value-area high/low guide lines from the existing volume bins.
+- Web Canvas and mobile Skia render matching POC and value-area guide overlays
+  without changing persisted drawing state.
+- Hit testing includes the added guide segments through the shared geometry
+  path on both platforms.
+
 ## Shipped: Image Annotation Contract
 
 - Shared drawing state supports the two-anchor `image` annotation with

@@ -234,7 +234,11 @@ function hitTestResolvedGeometry(
       (bin) => bin.volume > 0 && pointInRect(point, bin.rect),
     );
     if (insideBin) return { drawing: geometry.drawing, distance: 0 };
-    const distance = distanceToRectEdge(point, geometry.volumeProfile.bounds);
+    const guideDistance = Math.min(
+      Number.POSITIVE_INFINITY,
+      ...geometry.volumeProfile.guides.map((guide) => distanceToSegment(point, guide.segment)),
+    );
+    const distance = Math.min(guideDistance, distanceToRectEdge(point, geometry.volumeProfile.bounds));
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
