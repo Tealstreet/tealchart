@@ -633,6 +633,7 @@ export type MobileUserDrawingPrimitive =
       points: readonly DrawingScreenPoint[];
       base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       style: UserDrawingStyle;
     }
   | {
@@ -645,6 +646,7 @@ export type MobileUserDrawingPrimitive =
       points: readonly DrawingScreenPoint[];
       base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       style: UserDrawingStyle;
     }
   | {
@@ -657,6 +659,7 @@ export type MobileUserDrawingPrimitive =
       points: readonly DrawingScreenPoint[];
       base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       style: UserDrawingStyle;
     }
   | {
@@ -669,6 +672,7 @@ export type MobileUserDrawingPrimitive =
       points: readonly DrawingScreenPoint[];
       base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       style: UserDrawingStyle;
     }
   | {
@@ -681,6 +685,7 @@ export type MobileUserDrawingPrimitive =
       points: readonly DrawingScreenPoint[];
       base: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       parallel: { start: DrawingScreenPoint; end: DrawingScreenPoint };
+      median: { start: DrawingScreenPoint; end: DrawingScreenPoint };
       style: UserDrawingStyle;
     }
   | {
@@ -1906,6 +1911,7 @@ function primitiveFromGeometry(
         points: geometry.channel.polygon.points,
         base: geometry.channel.base,
         parallel: geometry.channel.parallel,
+        median: geometry.channel.median,
         style: geometry.drawing.style,
       };
     case 'priceRange': {

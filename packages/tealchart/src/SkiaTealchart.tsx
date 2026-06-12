@@ -2294,6 +2294,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     {dash && <DashPathEffect intervals={dash} />}
                   </SkiaPath>
                 )}
+                {primitive.style.lineVisible !== false && primitive.kind !== 'rotatedRectangle' && (
+                  <SkiaLine
+                    p1={vec(primitive.median.start.x, primitive.median.start.y)}
+                    p2={vec(primitive.median.end.x, primitive.median.end.y)}
+                    color={primitive.style.lineColor}
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    style="stroke"
+                    strokeCap="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaLine>
+                )}
               </Group>
             );
           }
