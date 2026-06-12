@@ -1095,6 +1095,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Balloon and signpost drawings can surface the mobile text editor when host
   apps start text editing through the shared drawing state/API.
 
+## Shipped: Native Text Annotation Helper Exports
+
+- The native entrypoint now exports the mobile text-box predicate, text label
+  layout helper, and text-box primitive alias used by host Skia integrations.
+- Mobile host apps can consume the same text annotation helper surface that
+  SkiaTealchart uses internally for drawing text-box parity.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
