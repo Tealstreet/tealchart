@@ -16,9 +16,9 @@ import { resolveUserDrawingGeometry } from './coordinates';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import {
+  measureUserDrawingTextLines,
   resolveUserDrawingBalloonLayout,
   resolveUserDrawingTextLabelLayout,
-  splitUserDrawingTextLines,
 } from './textLayout';
 import {
   normalizeUserDrawingFontFamily,
@@ -1348,9 +1348,15 @@ function renderTextLabelGeometry(
   const text = drawing.text;
 
   ctx.font = `${fontStyle === 'italic' ? 'italic ' : ''}${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
-  const textLines = splitUserDrawingTextLines(text);
-  const lineWidths = textLines.map((line) => ctx.measureText(line).width);
   const lineHeight = Math.max(1, options.labelHeight - 2);
+  const wrapWidth = drawing.style.textWrap ? drawing.style.textMaxWidth : undefined;
+  const measuredLines = measureUserDrawingTextLines(
+    text,
+    (line) => ctx.measureText(line).width,
+    wrapWidth === undefined ? undefined : Math.max(1, wrapWidth - padding * 2),
+  );
+  const textLines = measuredLines.map((line) => line.text);
+  const lineWidths = measuredLines.map((line) => line.width);
   const balloonLayout =
     geometry.kind === 'balloon'
       ? resolveUserDrawingBalloonLayout({
@@ -1358,6 +1364,8 @@ function renderTextLabelGeometry(
           point,
           textAlign: drawing.textAlign,
           lineWidths,
+          lines: textLines,
+          boxWidth: wrapWidth,
           labelPadding: padding,
           lineHeight,
         })
@@ -1369,6 +1377,8 @@ function renderTextLabelGeometry(
       point,
       textAlign: drawing.textAlign,
       lineWidths,
+      lines: textLines,
+      boxWidth: wrapWidth,
       labelPadding: padding,
       lineHeight,
     });

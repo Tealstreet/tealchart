@@ -153,6 +153,8 @@ export interface UserDrawingStyle {
   fontWeight?: UserDrawingFontWeight;
   fontStyle?: UserDrawingFontStyle;
   textUnderline?: boolean;
+  textWrap?: boolean;
+  textMaxWidth?: number;
 }
 
 export interface UserDrawingBase {
@@ -896,10 +898,12 @@ export const USER_DRAWING_FONT_SIZES = [10, 12, 14, 16] as const;
 export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
+export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240] as const;
 export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
+export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
@@ -931,6 +935,13 @@ export function normalizeUserDrawingOpacity(opacity: number): number {
   return Math.max(0, Math.min(1, opacity));
 }
 
+export function normalizeUserDrawingTextMaxWidth(textMaxWidth: number): UserDrawingTextMaxWidth {
+  if (!Number.isFinite(textMaxWidth)) return 180;
+  return USER_DRAWING_TEXT_MAX_WIDTHS.reduce((nearest, candidate) =>
+    Math.abs(candidate - textMaxWidth) < Math.abs(nearest - textMaxWidth) ? candidate : nearest,
+  );
+}
+
 export function normalizeUserDrawingIconName(iconName: unknown): UserDrawingIconName {
   return USER_DRAWING_ICON_NAMES.includes(iconName as UserDrawingIconName)
     ? (iconName as UserDrawingIconName)
@@ -952,12 +963,15 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fontWeight === undefined ? undefined : normalizeUserDrawingFontWeight(style.fontWeight);
   const fontStyle = style.fontStyle === undefined ? undefined : normalizeUserDrawingFontStyle(style.fontStyle);
   const opacity = style.opacity === undefined ? undefined : normalizeUserDrawingOpacity(style.opacity);
+  const textMaxWidth =
+    style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
   if (
     fontSize === style.fontSize &&
     fontFamily === style.fontFamily &&
     fontWeight === style.fontWeight &&
     fontStyle === style.fontStyle &&
-    opacity === style.opacity
+    opacity === style.opacity &&
+    textMaxWidth === style.textMaxWidth
   ) {
     return style;
   }
@@ -969,6 +983,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(fontWeight === undefined ? {} : { fontWeight }),
     ...(fontStyle === undefined ? {} : { fontStyle }),
     ...(opacity === undefined ? {} : { opacity }),
+    ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
   };
 }
 

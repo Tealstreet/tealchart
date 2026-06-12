@@ -527,7 +527,8 @@ export class TealchartWidgetUI {
       return;
     }
     const editMetrics = resolveUserDrawingTextEditMetrics(textEdit.value);
-    const width = Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
+    const configuredWidth = drawing.style.textWrap && drawing.style.textMaxWidth ? drawing.style.textMaxWidth : undefined;
+    const width = configuredWidth ?? Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
     const height = Math.max(28, Math.min(160, editMetrics.lines.length * 18 + 10));
     const chartWidth = this.chartArea.clientWidth || this.rootEl.clientWidth || 0;
     const left = Math.max(space.chartLeft, Math.min(point.x - width / 2, Math.max(space.chartLeft, chartWidth - width - 8)));

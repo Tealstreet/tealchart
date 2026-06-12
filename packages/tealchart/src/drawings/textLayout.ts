@@ -33,6 +33,8 @@ export interface ResolveUserDrawingTextLabelLayoutOptions {
   point: DrawingScreenPoint;
   textAlign: UserDrawingTextAlign;
   lineWidths: readonly number[];
+  lines?: readonly string[];
+  boxWidth?: number;
   labelPadding?: number;
   lineHeight?: number;
 }
@@ -46,9 +48,53 @@ export const DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING = 6;
 export const DEFAULT_USER_DRAWING_TEXT_LINE_HEIGHT = 18;
 const LABEL_VERTICAL_EXTRA = 2;
 
+export interface UserDrawingMeasuredTextLine {
+  text: string;
+  width: number;
+}
+
 export function splitUserDrawingTextLines(text: string): string[] {
   const lines = text.split(/\r\n|\n|\r/);
   return lines.length === 0 ? [''] : lines;
+}
+
+export function measureUserDrawingTextLines(
+  text: string,
+  measureText: (line: string) => number,
+  maxLineWidth?: number,
+): UserDrawingMeasuredTextLine[] {
+  const wrappedLines: UserDrawingMeasuredTextLine[] = [];
+  const boundedMaxLineWidth =
+    maxLineWidth === undefined || !Number.isFinite(maxLineWidth) ? undefined : Math.max(1, maxLineWidth);
+
+  for (const sourceLine of splitUserDrawingTextLines(text)) {
+    if (sourceLine.length === 0) {
+      wrappedLines.push({ text: '', width: 0 });
+      continue;
+    }
+
+    if (boundedMaxLineWidth === undefined || measureText(sourceLine) <= boundedMaxLineWidth) {
+      wrappedLines.push({ text: sourceLine, width: Math.max(0, measureText(sourceLine)) });
+      continue;
+    }
+
+    let currentLine = '';
+    for (const token of sourceLine.split(/(\s+)/).filter((part) => part.length > 0)) {
+      const candidate = `${currentLine}${token}`;
+      if (currentLine.length > 0 && measureText(candidate) > boundedMaxLineWidth) {
+        const line = currentLine.trimEnd();
+        wrappedLines.push({ text: line, width: Math.max(0, measureText(line)) });
+        currentLine = token.trimStart();
+      } else {
+        currentLine = candidate;
+      }
+    }
+
+    const finalLine = currentLine.trimEnd();
+    wrappedLines.push({ text: finalLine, width: Math.max(0, measureText(finalLine)) });
+  }
+
+  return wrappedLines.length === 0 ? [{ text: '', width: 0 }] : wrappedLines;
 }
 
 export function resolveUserDrawingTextEditMetrics(text: string): UserDrawingTextEditMetrics {
@@ -64,13 +110,15 @@ export function resolveUserDrawingTextLabelLayout({
   point,
   textAlign,
   lineWidths,
+  lines: measuredLines,
+  boxWidth,
   labelPadding = DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   lineHeight = DEFAULT_USER_DRAWING_TEXT_LINE_HEIGHT,
 }: ResolveUserDrawingTextLabelLayoutOptions): UserDrawingTextLabelLayout {
-  const lines = splitUserDrawingTextLines(text);
+  const lines = measuredLines ?? splitUserDrawingTextLines(text);
   const widths = lines.map((_, index) => Math.max(0, lineWidths[index] ?? 0));
   const maxLineWidth = Math.max(0, ...widths);
-  const width = Math.ceil(maxLineWidth + labelPadding * 2);
+  const width = Math.ceil(Math.max(maxLineWidth + labelPadding * 2, boxWidth ?? 0));
   const height = lines.length * lineHeight + LABEL_VERTICAL_EXTRA;
   const x = point.x - width / 2;
   const y = point.y - height / 2;
@@ -103,15 +151,17 @@ export function resolveUserDrawingBalloonLayout({
   point,
   textAlign,
   lineWidths,
+  lines: measuredLines,
+  boxWidth,
   labelPadding = DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   lineHeight = DEFAULT_USER_DRAWING_TEXT_LINE_HEIGHT,
   tailLength = Math.max(10, lineHeight * 0.6),
   tailWidth = Math.max(10, lineHeight * 0.7),
 }: ResolveUserDrawingBalloonLayoutOptions): UserDrawingBalloonLayout {
-  const lines = splitUserDrawingTextLines(text);
+  const lines = measuredLines ?? splitUserDrawingTextLines(text);
   const widths = lines.map((_, index) => Math.max(0, lineWidths[index] ?? 0));
   const maxLineWidth = Math.max(0, ...widths);
-  const width = Math.ceil(maxLineWidth + labelPadding * 2);
+  const width = Math.ceil(Math.max(maxLineWidth + labelPadding * 2, boxWidth ?? 0));
   const height = lines.length * lineHeight + LABEL_VERTICAL_EXTRA;
   const box = {
     x: point.x - width / 2,

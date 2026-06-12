@@ -4573,4 +4573,46 @@ describe('mobile user drawing render model', () => {
       ],
     });
   });
+
+  it('resolves wrapped text label layout for Skia rendering', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, textWrap: true, textMaxWidth: 60 },
+          point: { time: 50, price: 50 },
+          text: 'Alpha beta gamma',
+          textAlign: 'left',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+    if (!primitive || primitive.kind !== 'textLabel') throw new Error('expected text label primitive');
+
+    expect(
+      resolveMobileUserDrawingTextLabelLayout(primitive, [30, 24, 30], {
+        lines: ['Alpha', 'beta', 'gamma'],
+        boxWidth: 60,
+      }),
+    ).toMatchObject({
+      labelHeight: 56,
+      box: { x: 20, y: 22, width: 60, height: 56 },
+      lines: [
+        { text: 'Alpha', width: 30, x: 26, y: 32 },
+        { text: 'beta', width: 24, x: 26, y: 50 },
+        { text: 'gamma', width: 30, x: 26, y: 68 },
+      ],
+    });
+  });
 });

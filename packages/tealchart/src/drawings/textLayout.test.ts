@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveUserDrawingTextEditMetrics, resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
+import {
+  measureUserDrawingTextLines,
+  resolveUserDrawingTextEditMetrics,
+  resolveUserDrawingTextLabelLayout,
+  splitUserDrawingTextLines,
+} from './textLayout';
 
 describe('user drawing text layout', () => {
   it('splits text labels into platform-stable lines', () => {
@@ -12,6 +17,35 @@ describe('user drawing text layout', () => {
     expect(resolveUserDrawingTextEditMetrics('A\nLonger')).toEqual({
       lines: ['A', 'Longer'],
       longestLineLength: 6,
+    });
+  });
+
+  it('wraps measured text lines to a bounded box width', () => {
+    const measured = measureUserDrawingTextLines('Alpha beta gamma', (line) => line.length * 6, 48);
+    expect(measured).toEqual([
+      { text: 'Alpha', width: 30 },
+      { text: 'beta', width: 24 },
+      { text: 'gamma', width: 30 },
+    ]);
+
+    expect(
+      resolveUserDrawingTextLabelLayout({
+        text: 'Alpha beta gamma',
+        point: { x: 100, y: 50 },
+        textAlign: 'left',
+        lines: measured.map((line) => line.text),
+        lineWidths: measured.map((line) => line.width),
+        boxWidth: 60,
+        labelPadding: 6,
+        lineHeight: 18,
+      }),
+    ).toMatchObject({
+      box: { x: 70, y: 22, width: 60, height: 56 },
+      lines: [
+        { text: 'Alpha', width: 30, x: 76, y: 32 },
+        { text: 'beta', width: 24, x: 76, y: 50 },
+        { text: 'gamma', width: 30, x: 76, y: 68 },
+      ],
     });
   });
 
