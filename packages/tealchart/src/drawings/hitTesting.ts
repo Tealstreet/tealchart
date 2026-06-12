@@ -347,6 +347,7 @@ function hitTestResolvedGeometry(
     geometry.kind === 'note' ||
     geometry.kind === 'callout' ||
     geometry.kind === 'comment' ||
+    geometry.kind === 'priceLabel' ||
     geometry.kind === 'priceNote' ||
     geometry.kind === 'balloon' ||
     geometry.kind === 'signpost'
@@ -837,6 +838,7 @@ function hitTestUserDrawingHandle(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'signpost':
       handles.push({ handle: 'center', point: geometry.point });
       break;

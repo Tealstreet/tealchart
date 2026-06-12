@@ -64,6 +64,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('crossLine')).toBe(1);
     expect(getRequiredAnchorCount('note')).toBe(1);
     expect(getRequiredAnchorCount('comment')).toBe(1);
+    expect(getRequiredAnchorCount('priceLabel')).toBe(1);
     expect(getRequiredAnchorCount('pin')).toBe(1);
     expect(getRequiredAnchorCount('icon')).toBe(1);
     expect(getRequiredAnchorCount('flagMark')).toBe(1);
@@ -857,6 +858,21 @@ describe('user drawing types', () => {
       kind: 'comment',
       point: anchorA,
       text: 'Comment',
+      textAlign: 'center',
+    });
+    expect(
+      createUserDrawingFromDraft(
+        draft({
+          tool: 'priceLabel',
+          anchors: [anchorA],
+          text: 'Price label',
+        }),
+        { id: 'price-label' },
+      ),
+    ).toMatchObject({
+      kind: 'priceLabel',
+      point: anchorA,
+      text: 'Price label',
       textAlign: 'center',
     });
     expect(

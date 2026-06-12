@@ -199,6 +199,7 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
     case 'pin':
@@ -465,6 +466,7 @@ function editDrawingHandle(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
     case 'pin':

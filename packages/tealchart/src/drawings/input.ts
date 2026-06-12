@@ -338,6 +338,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'priceLabel':
     case 'balloon':
     case 'signpost':
       return {
