@@ -942,12 +942,23 @@ matching behavior in the same PR for every user-facing drawing feature.
   serialization, duplication, and toolbar descriptors use shared drawing
   behavior on both platforms.
 
+## Shipped: Loaded Image Annotation Rendering
+
+- Web Canvas image annotations load and cache their `src` asset, request a chart
+  redraw when loading completes, and retain placeholder rendering for empty,
+  unsupported, or failed images.
+- Mobile Skia image annotations use the same `src`/`alt` primitive contract and
+  render loaded assets over the matching placeholder frame with the styled border
+  preserved.
+- The shared image annotation state, hit testing, editing, serialization, and
+  toolbar behavior remain unchanged across web and mobile.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, loaded remote/local image rendering, and additional curved geometry.
+  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image source/upload lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.

@@ -2,10 +2,16 @@ import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawing, UserDrawingState, UserDrawingStyle } from './types';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
-import { renderUserDrawing, renderUserDrawingLayer, renderUserDrawings } from './renderer';
+import {
+  clearUserDrawingImageCache,
+  primeUserDrawingImageCacheForTest,
+  renderUserDrawing,
+  renderUserDrawingLayer,
+  renderUserDrawings,
+} from './renderer';
 
 class RecordingCanvasContext implements CanvasContext {
   fillStyle: string | CanvasGradient | CanvasPattern = '#000';
@@ -63,6 +69,10 @@ class RecordingCanvasContext implements CanvasContext {
   }
   fillText(text: string, x: number, y: number): void {
     this.calls.push(`fillText:${text}:${x},${y}:${this.fillStyle}:${this.textAlign}:${this.globalAlpha}:${this.font}`);
+  }
+  drawImage(image: CanvasImageSource, x: number, y: number, width: number, height: number): void {
+    const source = (image as { src?: string }).src ?? 'image';
+    this.calls.push(`drawImage:${source}:${x},${y},${width},${height}:${this.globalAlpha}`);
   }
   save(): void {
     this.stateStack.push({ globalAlpha: this.globalAlpha, lineDash: [...this.lineDash] });
@@ -137,6 +147,8 @@ const base = {
 describe('user drawing renderer', () => {
   afterEach(() => {
     clearChartStoreCache();
+    clearUserDrawingImageCache();
+    vi.unstubAllGlobals();
   });
 
   it('renders line drawings through CanvasContext', () => {
@@ -498,6 +510,66 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:90,10');
     expect(ctx.calls).toContain('lineTo:10,90');
     expect(ctx.calls).toContain('fillText:Chart snapshot:50,50:#111:center:1:12px sans-serif');
+  });
+
+  it('renders loaded image annotations through CanvasContext drawImage', () => {
+    const ctx = new RecordingCanvasContext();
+    const src = 'https://example.test/chart.png';
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'image',
+      kind: 'image',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      src,
+      alt: 'Chart snapshot',
+    };
+    primeUserDrawingImageCacheForTest(src, { src } as unknown as CanvasImageSource);
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('drawImage:https://example.test/chart.png:10,10,80,80:1');
+    expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542:1');
+    expect(ctx.calls).not.toContain('fillText:Chart snapshot:50,50:#111:center:1:12px sans-serif');
+  });
+
+  it('requests a redraw when a pending image annotation finishes loading', () => {
+    const ctx = new RecordingCanvasContext();
+    const src = 'https://example.test/chart.png';
+    const createdImages: Array<{ src: string; onload: (() => void) | null; onerror: (() => void) | null }> = [];
+    const onImageLoad = vi.fn();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'image',
+      kind: 'image',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      src,
+      alt: 'Chart snapshot',
+    };
+
+    vi.stubGlobal(
+      'Image',
+      class {
+        src = '';
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+
+        constructor() {
+          createdImages.push(this);
+        }
+      },
+    );
+
+    renderUserDrawing(ctx, drawing, space, { onImageLoad });
+    createdImages[0]?.onload?.();
+
+    expect(ctx.calls).toContain('fillText:Chart snapshot:50,50:#111:center:1:12px sans-serif');
+    expect(onImageLoad).toHaveBeenCalledOnce();
   });
 
   it('renders price ranges with a centered delta label', () => {

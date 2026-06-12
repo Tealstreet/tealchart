@@ -178,6 +178,10 @@ export class WebCanvasContext implements CanvasContext {
     this.ctx.fillText(text, x, y);
   }
 
+  drawImage(image: CanvasImageSource, x: number, y: number, width: number, height: number): void {
+    this.ctx.drawImage(image, x, y, width, height);
+  }
+
   // ==========================================================================
   // State Management
   // ==========================================================================
