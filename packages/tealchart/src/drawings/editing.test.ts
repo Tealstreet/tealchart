@@ -726,6 +726,39 @@ describe('user drawing editing', () => {
     });
   });
 
+  it('moves stickers by dragging the center handle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'sticker',
+      kind: 'sticker',
+      point: { time: 20, price: 60 },
+      text: '★',
+      textAlign: 'center',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'sticker', handle: 'center' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'sticker', handle: 'center' },
+        startPoint: { x: 20, y: 40 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 70, y: 30 },
+      { now: () => 3 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      point: { time: 70, price: 70 },
+      text: '★',
+      updatedAt: 3,
+    });
+  });
+
   it('moves signposts by dragging the center handle', () => {
     const drawing: UserDrawing = {
       ...base,

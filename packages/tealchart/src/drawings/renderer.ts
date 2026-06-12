@@ -1321,6 +1321,7 @@ export function renderUserDrawing(
       case 'priceLabel':
       case 'priceNote':
       case 'emoji':
+      case 'sticker':
       case 'balloon':
       case 'signpost':
         renderTextLabelGeometry(ctx, geometry, resolvedOptions);

@@ -148,6 +148,7 @@ import type {
   MobileUserDrawingEmojiPrimitive,
   MobileUserDrawingNotePrimitive,
   MobileUserDrawingPriceNotePrimitive,
+  MobileUserDrawingStickerPrimitive,
   MobileUserDrawingTextLabelPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import {
@@ -689,6 +690,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           | MobileUserDrawingCalloutPrimitive
           | MobileUserDrawingPriceNotePrimitive
           | MobileUserDrawingEmojiPrimitive
+          | MobileUserDrawingStickerPrimitive
           | MobileUserDrawingCommentPrimitive =>
           (primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
@@ -698,6 +700,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
             primitive.kind === 'emoji' ||
+            primitive.kind === 'sticker' ||
             primitive.kind === 'comment') &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
@@ -3150,6 +3153,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'priceNote' ||
             primitive.kind === 'comment' ||
             primitive.kind === 'emoji' ||
+            primitive.kind === 'sticker' ||
             primitive.kind === 'balloon'
           ) {
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);

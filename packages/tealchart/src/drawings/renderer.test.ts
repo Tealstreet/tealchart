@@ -1840,6 +1840,23 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:🔥:44,50:#111:left:1:12px sans-serif');
   });
 
+  it('renders sticker drawings with measured boxes', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'sticker',
+      kind: 'sticker',
+      point: { time: 50, price: 50 },
+      text: '★',
+      textAlign: 'center',
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:41,40,18,20:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:★:47,50:#111:left:1:12px sans-serif');
+  });
+
   it('renders comment drawings with measured boxes', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

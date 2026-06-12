@@ -883,6 +883,17 @@ matching behavior in the same PR for every user-facing drawing feature.
   controls, and style controls use shared text annotation behavior on both
   platforms.
 
+## Shipped: Sticker Tool
+
+- Shared drawing state supports the single-anchor `sticker` annotation with a
+  default star sticker and persists sticker text, alignment, and style through
+  layout save/load.
+- Web Canvas and mobile Skia render matching sticker text annotations through
+  the shared text annotation geometry and render-model pipeline.
+- Selection, text-box hit testing, whole-drawing moves, text editing, alignment
+  controls, and style controls use shared text annotation behavior on both
+  platforms.
+
 ## Shipped: Balloon Tool
 
 - Shared drawing state supports the single-anchor `balloon` text annotation and
@@ -916,7 +927,7 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Full TradingView-style drawing toolbar organization and overflow menus.
 - TradingView pitchfork/pitchfan extra line sets/backgrounds, advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
-  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, remaining image/sticker annotation tools, and additional curved geometry.
+  Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, volume profile tools, remaining image annotation tools, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
 - Rich text label controls and multiline editor polish.
