@@ -88,6 +88,7 @@ import {
   resolveElliottCorrectiveWaveFromAnchors,
   resolveElliottDoubleComboWaveFromAnchors,
   resolveElliottImpulseWaveFromAnchors,
+  resolveElliottTripleComboWaveFromAnchors,
   resolveElliottTriangleWaveFromAnchors,
   resolveHeadShouldersPatternFromAnchors,
   resolveThreeDrivesPatternFromAnchors,
@@ -641,6 +642,38 @@ describe('user drawing coordinates', () => {
         { text: 'W', point: { x: 10, y: 70 } },
         { text: 'X', point: { x: 60, y: 170 } },
         { text: 'Y', point: { x: 110, y: -30 } },
+      ],
+    });
+  });
+
+  it('resolves Elliott triple combo wave polylines and labels from five anchors', () => {
+    expect(
+      resolveElliottTripleComboWaveFromAnchors(
+        [
+          { time: 1_000, price: 100 },
+          { time: 1_500, price: 120 },
+          { time: 2_000, price: 90 },
+          { time: 2_500, price: 110 },
+          { time: 3_000, price: 80 },
+        ],
+        space,
+      ),
+    ).toEqual({
+      polyline: {
+        points: [
+          { x: 10, y: 70 },
+          { x: 60, y: -30 },
+          { x: 110, y: 120 },
+          { x: 160, y: 20 },
+          { x: 210, y: 170 },
+        ],
+      },
+      labels: [
+        { text: 'W', point: { x: 10, y: 70 } },
+        { text: 'X', point: { x: 60, y: -30 } },
+        { text: 'Y', point: { x: 110, y: 120 } },
+        { text: 'X', point: { x: 160, y: 20 } },
+        { text: 'Z', point: { x: 210, y: 170 } },
       ],
     });
   });

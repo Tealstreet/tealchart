@@ -2600,6 +2600,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             primitive.kind === 'elliottImpulseWave' ||
             primitive.kind === 'elliottCorrectiveWave' ||
             primitive.kind === 'elliottDoubleComboWave' ||
+            primitive.kind === 'elliottTripleComboWave' ||
             primitive.kind === 'elliottTriangleWave'
           ) {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
@@ -2611,6 +2612,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               primitive.kind === 'elliottImpulseWave' ||
               primitive.kind === 'elliottCorrectiveWave' ||
               primitive.kind === 'elliottDoubleComboWave' ||
+              primitive.kind === 'elliottTripleComboWave' ||
               primitive.kind === 'elliottTriangleWave'
                 ? getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily)
                 : null;
@@ -2643,6 +2645,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   primitive.kind === 'elliottImpulseWave' ||
                   primitive.kind === 'elliottCorrectiveWave' ||
                   primitive.kind === 'elliottDoubleComboWave' ||
+                  primitive.kind === 'elliottTripleComboWave' ||
                   primitive.kind === 'elliottTriangleWave') &&
                   font &&
                   primitive.labels.map((label) => {

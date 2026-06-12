@@ -4,6 +4,7 @@ import type {
   DrawingScreenElliottCorrectiveWaveLabel,
   DrawingScreenElliottDoubleComboWaveLabel,
   DrawingScreenElliottImpulseWaveLabel,
+  DrawingScreenElliottTripleComboWaveLabel,
   DrawingScreenElliottTriangleWaveLabel,
   DrawingScreenHeadShouldersPatternLabel,
   DrawingScreenPoint,
@@ -752,14 +753,14 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
-      kind: 'elliottTriangleWave';
+      kind: 'elliottTriangleWave' | 'elliottTripleComboWave';
       id: string;
       phase: UserDrawingRenderPhase;
       selected: boolean;
       opacity: number;
       clip: MobileUserDrawingClipRect;
       points: readonly DrawingScreenPoint[];
-      labels: readonly DrawingScreenElliottTriangleWaveLabel[];
+      labels: readonly (DrawingScreenElliottTriangleWaveLabel | DrawingScreenElliottTripleComboWaveLabel)[];
       style: UserDrawingStyle;
     }
   | {
@@ -1007,6 +1008,10 @@ export type MobileUserDrawingElliottDoubleComboWavePrimitive = Extract<
 export type MobileUserDrawingElliottTriangleWavePrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'elliottTriangleWave' }
+>;
+export type MobileUserDrawingElliottTripleComboWavePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'elliottTripleComboWave' }
 >;
 export type MobileUserDrawingArrowMarkerPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMarker' }>;
 export type MobileUserDrawingArrowMarkPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arrowMark' }>;
@@ -1862,8 +1867,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'elliottTriangleWave':
+    case 'elliottTripleComboWave':
       return {
-        kind: 'elliottTriangleWave',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,
