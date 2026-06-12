@@ -2486,21 +2486,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'fibCircles') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.circles.map((circle) => (
-                  <Circle
-                    key={`${primitive.id}:circle:${circle.ratio}`}
-                    cx={primitive.center.x}
-                    cy={primitive.center.y}
-                    r={circle.radius}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Circle>
+                  <Group key={`${primitive.id}:circle:${circle.ratio}`}>
+                    <Circle
+                      cx={primitive.center.x}
+                      cy={primitive.center.y}
+                      r={circle.radius}
+                      color={primitive.style.lineColor}
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </Circle>
+                    {font && (
+                      <SkiaText
+                        x={circle.labelPoint.x - font.measureText(circle.label).width / 2}
+                        y={circle.labelPoint.y}
+                        text={circle.label}
+                        color={textColor}
+                        font={font}
+                      />
+                    )}
+                  </Group>
                 ))}
               </Group>
             );
@@ -2509,6 +2521,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'fibArcs' || primitive.kind === 'fibSpeedResistanceArcs') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
@@ -2528,15 +2542,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     false,
                   );
                   return (
-                    <SkiaPath
-                      key={`${primitive.id}:arc:${arc.ratio}`}
-                      path={path}
-                      color={primitive.style.lineColor}
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaPath>
+                    <Group key={`${primitive.id}:arc:${arc.ratio}`}>
+                      <SkiaPath
+                        path={path}
+                        color={primitive.style.lineColor}
+                        style="stroke"
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      >
+                        {dash && <DashPathEffect intervals={dash} />}
+                      </SkiaPath>
+                      {font && (
+                        <SkiaText
+                          x={arc.labelPoint.x - font.measureText(arc.label).width / 2}
+                          y={arc.labelPoint.y}
+                          text={arc.label}
+                          color={textColor}
+                          font={font}
+                        />
+                      )}
+                    </Group>
                   );
                 })}
               </Group>

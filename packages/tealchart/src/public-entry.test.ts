@@ -343,7 +343,7 @@ describe('tealchart public entries', () => {
       center: { x: 5, y: 5 },
       reference: { x: 10, y: 10 },
       baseRadius: 5,
-      arcs: [{ ratio: 1, radius: 5, startAngle: 0, endAngle: 1 }],
+      arcs: [{ ratio: 1, label: '1', radius: 5, startAngle: 0, endAngle: 1, labelPoint: { x: 8, y: 8 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const fibCirclesPrimitive: NonNever<MobileUserDrawingFibCirclesPrimitive> = {
@@ -355,7 +355,7 @@ describe('tealchart public entries', () => {
       clip,
       center: { x: 5, y: 5 },
       baseRadius: 10,
-      circles: [{ ratio: 1, radius: 10 }],
+      circles: [{ ratio: 1, label: '1', radius: 10, labelPoint: { x: 15, y: 1 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const fibWedgePrimitive: NonNever<MobileUserDrawingFibWedgePrimitive> = {
@@ -1588,6 +1588,10 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibSpeedResistanceArcs');
     expect(arcs.arcs.map((arc) => arc.ratio)).toEqual([1 / 3, 2 / 3, 1]);
+    expect(arcs.arcs[0]).toMatchObject({
+      label: '0.333',
+      labelPoint: { x: expect.any(Number), y: expect.any(Number) },
+    });
   });
 
   it('exports shared drawing fib circle types and resolver', () => {
@@ -1614,6 +1618,10 @@ describe('tealchart public entries', () => {
 
     expect(drawing.kind).toBe('fibCircles');
     expect(circles.circles.map((circle) => circle.ratio)).toEqual([0.236, 0.382, 0.5, 0.618, 1, 1.618, 2.618]);
+    expect(circles.circles[4]).toMatchObject({
+      label: '1',
+      labelPoint: { x: expect.any(Number), y: expect.any(Number) },
+    });
   });
 
   it('exports shared drawing fib wedge types and resolver', () => {

@@ -1018,9 +1018,21 @@ describe('mobile user drawing render model', () => {
       reference: { x: 50, y: 80 },
       baseRadius: 50,
       arcs: expect.arrayContaining([
-        expect.objectContaining({ ratio: 1 / 3, radius: expect.closeTo(50 / 3), startAngle: 0 }),
+        expect.objectContaining({
+          ratio: 1 / 3,
+          label: '0.333',
+          radius: expect.closeTo(50 / 3),
+          startAngle: 0,
+          labelPoint: { x: expect.closeTo(25.81), y: expect.closeTo(51.27) },
+        }),
         expect.objectContaining({ ratio: 2 / 3, radius: expect.closeTo(100 / 3), startAngle: 0 }),
-        expect.objectContaining({ ratio: 1, radius: 50, startAngle: 0 }),
+        expect.objectContaining({
+          ratio: 1,
+          label: '1',
+          radius: 50,
+          startAngle: 0,
+          labelPoint: { x: expect.closeTo(57.43), y: expect.closeTo(61.81) },
+        }),
       ]),
     });
   });
@@ -1050,18 +1062,36 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    const primitive = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0];
+    expect(primitive).toMatchObject({
       kind: 'fibArcs',
       id: 'fib-arcs',
       center: { x: 10, y: 50 },
       reference: { x: 50, y: 80 },
       baseRadius: 50,
-      arcs: expect.arrayContaining([
-        expect.objectContaining({ ratio: 0.236, radius: 11.799999999999999, startAngle: 0, endAngle: Math.PI }),
-        expect.objectContaining({ ratio: 1, radius: 50, startAngle: 0, endAngle: Math.PI }),
+    });
+    if (!primitive || primitive.kind !== 'fibArcs') throw new Error('expected fib arcs primitive');
+    expect(primitive.arcs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          ratio: 0.236,
+          label: '0.236',
+          radius: 11.799999999999999,
+          startAngle: 0,
+          endAngle: Math.PI,
+          labelPoint: { x: expect.closeTo(10), y: 57.8 },
+        }),
+        expect.objectContaining({
+          ratio: 1,
+          label: '1',
+          radius: 50,
+          startAngle: 0,
+          endAngle: Math.PI,
+          labelPoint: { x: expect.closeTo(10), y: 96 },
+        }),
         expect.objectContaining({ ratio: 2.618, radius: 130.9, startAngle: 0, endAngle: Math.PI }),
       ]),
-    });
+    );
   });
 
   it('returns Skia-ready fib circle primitives', () => {
@@ -1095,9 +1125,9 @@ describe('mobile user drawing render model', () => {
       center: { x: 10, y: 50 },
       baseRadius: 50,
       circles: expect.arrayContaining([
-        { ratio: 0.236, radius: 11.799999999999999 },
-        { ratio: 1, radius: 50 },
-        { ratio: 2.618, radius: 130.9 },
+        { ratio: 0.236, label: '0.236', radius: 11.799999999999999, labelPoint: { x: 21.799999999999997, y: 46 } },
+        { ratio: 1, label: '1', radius: 50, labelPoint: { x: 60, y: 46 } },
+        { ratio: 2.618, label: '2.618', radius: 130.9, labelPoint: { x: 140.9, y: 46 } },
       ]),
     });
   });

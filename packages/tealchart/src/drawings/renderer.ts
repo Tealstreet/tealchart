@@ -883,6 +883,16 @@ function renderFibCirclesGeometry(
     ctx.arc(geometry.fibCircles.center.x, geometry.fibCircles.center.y, circle.radius, 0, Math.PI * 2);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const circle of geometry.fibCircles.circles) {
+    ctx.fillText(circle.label, circle.labelPoint.x, circle.labelPoint.y);
+  }
 }
 
 function renderFibSpeedResistanceArcsGeometry(
@@ -903,18 +913,40 @@ function renderFibSpeedResistanceArcsGeometry(
     );
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const arc of geometry.fibSpeedResistanceArcs.arcs) {
+    ctx.fillText(arc.label, arc.labelPoint.x, arc.labelPoint.y);
+  }
 }
 
 function renderFibArcsGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibArcs' }>,
 ): void {
+  if (geometry.drawing.style.lineVisible === false) return;
+
   applyStrokeStyle(ctx, geometry.drawing);
   ctx.beginPath();
   for (const arc of geometry.fibArcs.arcs) {
     ctx.arc(geometry.fibArcs.center.x, geometry.fibArcs.center.y, arc.radius, arc.startAngle, arc.endAngle);
   }
   ctx.stroke();
+
+  const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+  const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (const arc of geometry.fibArcs.arcs) {
+    ctx.fillText(arc.label, arc.labelPoint.x, arc.labelPoint.y);
+  }
 }
 
 function renderFibWedgeGeometry(
