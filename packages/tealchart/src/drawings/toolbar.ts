@@ -169,6 +169,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'trendBasedFibExtension', icon: 'TBE', label: 'Trend-based fib extension' },
   { tool: 'fibFan', icon: 'F', label: 'Fib fan' },
   { tool: 'fibSpeedResistanceFan', icon: 'S', label: 'Fib speed resistance fan' },
+  { tool: 'fibArcs', icon: 'A', label: 'Fib arcs' },
   { tool: 'fibSpeedResistanceArcs', icon: 'A', label: 'Fib speed resistance arcs' },
   { tool: 'fibCircles', icon: 'O', label: 'Fib circles' },
   { tool: 'fibWedge', icon: 'W', label: 'Fib wedge' },

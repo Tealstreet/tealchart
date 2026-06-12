@@ -101,6 +101,8 @@ export interface DrawingScreenFibSpeedResistanceArcs {
   arcs: readonly DrawingScreenFibArc[];
 }
 
+export type DrawingScreenFibArcs = DrawingScreenFibSpeedResistanceArcs;
+
 export interface DrawingScreenFibWedge {
   center: DrawingScreenPoint;
   lower: DrawingScreenPoint;
@@ -668,6 +670,11 @@ export type ResolvedUserDrawingGeometry =
       fibSpeedResistanceFan: DrawingScreenFibFan;
     }
   | {
+      kind: 'fibArcs';
+      drawing: UserDrawing;
+      fibArcs: DrawingScreenFibArcs;
+    }
+  | {
       kind: 'fibSpeedResistanceArcs';
       drawing: UserDrawing;
       fibSpeedResistanceArcs: DrawingScreenFibSpeedResistanceArcs;
@@ -1013,6 +1020,39 @@ export function resolveFibSpeedResistanceArcsFromAnchors(
     reference,
     baseRadius,
     arcs: FIB_SPEED_RESISTANCE_ARC_LEVELS.map((ratio) => {
+      const radius = baseRadius * ratio;
+      return {
+        ratio,
+        radius,
+        startAngle,
+        endAngle,
+        rect: {
+          x: center.x - radius,
+          y: center.y - radius,
+          width: radius * 2,
+          height: radius * 2,
+        },
+      };
+    }),
+  };
+}
+
+export function resolveFibArcsFromAnchors(
+  first: UserDrawingAnchor,
+  second: UserDrawingAnchor,
+  space: DrawingCoordinateSpace,
+): DrawingScreenFibArcs {
+  const center = anchorToScreenPoint(first, space);
+  const reference = anchorToScreenPoint(second, space);
+  const baseRadius = Math.hypot(reference.x - center.x, reference.y - center.y);
+  const startAngle = reference.y >= center.y ? 0 : Math.PI;
+  const endAngle = startAngle + Math.PI;
+
+  return {
+    center,
+    reference,
+    baseRadius,
+    arcs: FIB_CIRCLE_LEVELS.map((ratio) => {
       const radius = baseRadius * ratio;
       return {
         ratio,
@@ -2758,6 +2798,12 @@ export function resolveUserDrawingGeometry(
         kind: 'fibSpeedResistanceFan',
         drawing,
         fibSpeedResistanceFan: resolveFibSpeedResistanceFanFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'fibArcs':
+      return {
+        kind: 'fibArcs',
+        drawing,
+        fibArcs: resolveFibArcsFromAnchors(drawing.points[0], drawing.points[1], space),
       };
     case 'fibSpeedResistanceArcs':
       return {

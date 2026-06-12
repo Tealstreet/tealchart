@@ -226,8 +226,28 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits fib arc drawings from two anchors', () => {
+    const options = { createId: () => 'fib-arcs', now: () => 25 };
+    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibArcs'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(first.drawings).toEqual([]);
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'fib-arcs' });
+    expect(second.drawings[0]).toMatchObject({
+      id: 'fib-arcs',
+      kind: 'fibArcs',
+      points: [anchorA, anchorB],
+      createdAt: 25,
+      updatedAt: 25,
+    });
+  });
+
   it('commits fib circle drawings from two anchors', () => {
-    const options = { createId: () => 'fib-circles', now: () => 25 };
+    const options = { createId: () => 'fib-circles', now: () => 26 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fibCircles'), {
       paneId: 'main',
       anchor: anchorA,
@@ -241,8 +261,8 @@ describe('user drawing input controller', () => {
       id: 'fib-circles',
       kind: 'fibCircles',
       points: [anchorA, anchorB],
-      createdAt: 25,
-      updatedAt: 25,
+      createdAt: 26,
+      updatedAt: 26,
     });
   });
 

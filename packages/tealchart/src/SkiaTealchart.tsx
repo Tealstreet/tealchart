@@ -2320,7 +2320,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
-          if (primitive.kind === 'fibSpeedResistanceArcs') {
+          if (primitive.kind === 'fibArcs' || primitive.kind === 'fibSpeedResistanceArcs') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
 

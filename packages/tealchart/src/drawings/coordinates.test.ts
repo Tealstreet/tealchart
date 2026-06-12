@@ -17,6 +17,7 @@ import type {
   DoubleCurveDrawing,
   EllipseDrawing,
   ExtendedLineDrawing,
+  FibArcsDrawing,
   FibChannelDrawing,
   FibExtensionDrawing,
   FibCirclesDrawing,
@@ -1116,6 +1117,15 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 90 },
       ],
     };
+    const fibArcs: FibArcsDrawing = {
+      ...trendLine,
+      id: 'fib-arcs',
+      kind: 'fibArcs',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 90 },
+      ],
+    };
     const fibSpeedResistanceArcs: FibSpeedResistanceArcsDrawing = {
       ...trendLine,
       id: 'fib-speed-arcs',
@@ -1743,6 +1753,19 @@ describe('user drawing coordinates', () => {
           expect.objectContaining({ ratio: 2 / 3, radius: expect.closeTo(74.54), startAngle: 0, endAngle: expect.closeTo(0.46) }),
           expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: expect.closeTo(0.46) }),
         ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(fibArcs, space)).toMatchObject({
+      kind: 'fibArcs',
+      fibArcs: {
+        center: { x: 10, y: 70 },
+        reference: { x: 110, y: 120 },
+        baseRadius: expect.closeTo(111.8),
+        arcs: expect.arrayContaining([
+          expect.objectContaining({ ratio: 0.236, radius: expect.closeTo(26.39), startAngle: 0, endAngle: Math.PI }),
+          expect.objectContaining({ ratio: 1, radius: expect.closeTo(111.8), startAngle: 0, endAngle: Math.PI }),
+          expect.objectContaining({ ratio: 2.618, radius: expect.closeTo(292.7), startAngle: 0, endAngle: Math.PI }),
+        ]),
       },
     });
     expect(resolveUserDrawingGeometry(fibCircles, space)).toMatchObject({
