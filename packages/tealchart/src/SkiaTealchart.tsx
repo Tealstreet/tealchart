@@ -29,6 +29,7 @@ import type {
   UserDrawingLineStyle,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTableCellsInput,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
   UserDrawingTool,
@@ -152,6 +153,7 @@ import {
 import {
   setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTableCells,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
@@ -221,6 +223,7 @@ export interface SkiaTealchartHandle {
   cancelUserDrawingTextEdit(): boolean;
   setUserDrawingText(drawingId: string, text: string): boolean;
   setUserDrawingImageSource(source: UserDrawingImageSourceInput, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options?: UpdateUserDrawingOptions): boolean;
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
@@ -488,6 +491,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(setUserDrawingImageSource(userDrawingStateRef.current, source, options));
+      },
+      setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options: UpdateUserDrawingOptions = {}): boolean {
+        return commitUserDrawingStateIfChanged(
+          setMobileUserDrawingTableCells(userDrawingStateRef.current, cells, options),
+        );
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
         return commitUserDrawingStateIfChanged(
