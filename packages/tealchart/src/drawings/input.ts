@@ -73,6 +73,7 @@ export interface UserDrawingImageSourceInput {
 }
 
 export type UserDrawingTableCellsInput = readonly (readonly unknown[])[];
+export type UserDrawingTableCellInput = unknown;
 
 export interface UpdateUserDrawingOptions {
   drawingId?: string;
@@ -1133,6 +1134,41 @@ export function setUserDrawingTableCells(
 
   const nextCells = normalizeUserDrawingTableCells(cells);
   if (areUserDrawingTableCellsEqual(target.drawing.cells, nextCells)) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    cells: nextCells,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
+}
+
+export function setUserDrawingTableCell(
+  state: UserDrawingState,
+  row: number,
+  column: number,
+  value: UserDrawingTableCellInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, options);
+  if (!target || target.drawing.kind !== 'table') return state;
+
+  const rowIndex = Math.trunc(row);
+  const columnIndex = Math.trunc(column);
+  if (
+    rowIndex < 0 ||
+    columnIndex < 0 ||
+    !Number.isFinite(rowIndex) ||
+    !Number.isFinite(columnIndex) ||
+    target.drawing.cells[rowIndex]?.[columnIndex] === undefined
+  ) {
+    return state;
+  }
+
+  const normalizedValue = normalizeUserDrawingTableCells([[value]])[0]?.[0] ?? '';
+  if (target.drawing.cells[rowIndex]?.[columnIndex] === normalizedValue) return state;
+
+  const nextCells = target.drawing.cells.map((cellsRow) => cellsRow.slice());
+  nextCells[rowIndex]![columnIndex] = normalizedValue;
 
   return replaceUserDrawing(state, target.index, {
     ...target.drawing,

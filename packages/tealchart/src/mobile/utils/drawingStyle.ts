@@ -4,6 +4,7 @@ import type {
   UserDrawingImageSourceInput,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
   UserDrawingTextAlign,
 } from '../../drawings';
@@ -11,6 +12,7 @@ import type {
 import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
+  setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingTextContent,
   setUserDrawingTextAlign,
@@ -81,4 +83,14 @@ export function setMobileUserDrawingTableCells(
   options: UpdateUserDrawingOptions = {},
 ): UserDrawingState {
   return setUserDrawingTableCells(state, cells, options);
+}
+
+export function setMobileUserDrawingTableCell(
+  state: UserDrawingState,
+  row: number,
+  column: number,
+  value: UserDrawingTableCellInput,
+  options: UpdateUserDrawingOptions = {},
+): UserDrawingState {
+  return setUserDrawingTableCell(state, row, column, value, options);
 }

@@ -158,6 +158,7 @@ export {
   setMobileUserDrawingIconName,
   setMobileUserDrawingImageSource,
   setMobileUserDrawingLocked,
+  setMobileUserDrawingTableCell,
   setMobileUserDrawingTableCells,
   setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
