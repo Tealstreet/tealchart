@@ -531,8 +531,10 @@ export type MobileUserDrawingPrimitive =
       points: readonly DrawingScreenPoint[];
       levels: readonly {
         ratio: number;
+        label: string;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        labelPoint: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -1791,8 +1793,10 @@ function primitiveFromGeometry(
         points: geometry.fibChannel.polygon.points,
         levels: geometry.fibChannel.levels.map((level) => ({
           ratio: level.ratio,
+          label: level.label,
           start: level.segment.start,
           end: level.segment.end,
+          labelPoint: level.labelPoint,
         })),
         style: geometry.drawing.style,
       };
