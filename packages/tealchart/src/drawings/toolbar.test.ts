@@ -732,7 +732,7 @@ describe('user drawing toolbar descriptors', () => {
       false,
       true,
     ]);
-    expect(USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => descriptor.textWrap)).toEqual([true]);
+    expect(USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => descriptor.textWrap)).toEqual([false, true]);
     expect(USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.textMaxWidth)).toEqual([
       120,
       180,

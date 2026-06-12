@@ -1218,6 +1218,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Text Wrap Off Control
+
+- Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
+  for text annotations.
+- Web and mobile top bars apply the descriptor target state instead of an
+  implicit toggle, so wrapped text labels can be unwrapped consistently while
+  preserving their text-box width preset.
+
 ## Shipped: Expanded Color Presets
 
 - Shared line, fill, and text color descriptors now include orange and purple
