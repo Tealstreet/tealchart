@@ -1182,6 +1182,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Native utilities export the mobile row and column wrappers alongside existing
   table cell and dimension helpers.
 
+## Shipped: Italic Text Style Controls
+
+- Shared drawing style now normalizes `fontStyle` for text annotations and
+  tables using the same state update path as font weight.
+- Web Canvas and mobile Skia render italic text style from the shared drawing
+  style model, and inline text editors mirror the selected style.
+- Web and mobile top bars expose matching regular/italic controls for selected
+  text annotations and tables.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

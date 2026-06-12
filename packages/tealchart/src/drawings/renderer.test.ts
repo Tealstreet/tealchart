@@ -2315,7 +2315,7 @@ describe('user drawing renderer', () => {
       ...base,
       id: 'label',
       kind: 'textLabel',
-      style: { ...style, fontWeight: 'bold' },
+      style: { ...style, fontWeight: 'bold', fontStyle: 'italic' },
       point: { time: 50, price: 50 },
       text: 'Note',
       textAlign: 'center',
@@ -2323,7 +2323,7 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:bold 12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:italic bold 12px sans-serif');
   });
 
   it('normalizes unsupported text label font families', () => {
@@ -2464,7 +2464,7 @@ describe('user drawing renderer', () => {
       kind: 'table',
       point: { time: 10, price: 90 },
       textAlign: 'right',
-      style: { ...base.style, fontWeight: 'bold' },
+      style: { ...base.style, fontWeight: 'bold', fontStyle: 'italic' },
       cells: [
         ['Metric', 'Value'],
         ['Price', '101.25'],
@@ -2476,8 +2476,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillRect:10,10,124,48:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('strokeRect:10,10,62,24:#f5c542:1');
     expect(ctx.calls).toContain('strokeRect:72,34,62,24:#f5c542:1');
-    expect(ctx.calls).toContain('fillText:Metric:62,22:#111:right:1:bold 12px sans-serif');
-    expect(ctx.calls).toContain('fillText:101.25:124,46:#111:right:1:bold 12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Metric:62,22:#111:right:1:italic bold 12px sans-serif');
+    expect(ctx.calls).toContain('fillText:101.25:124,46:#111:right:1:italic bold 12px sans-serif');
   });
 
   it('does not render selection handles for invisible drawings', () => {
