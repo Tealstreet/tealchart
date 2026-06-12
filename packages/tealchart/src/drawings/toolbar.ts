@@ -471,7 +471,7 @@ export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boole
   return selectedDrawing !== null && !selectedDrawing.locked;
 }
 
-export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
+export function supportsUserDrawingFillColorControls(drawing: UserDrawing): boolean {
   return (
     drawing.kind === 'icon' ||
     drawing.kind === 'image' ||
@@ -505,6 +505,18 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
   );
 }
 
+export function supportsUserDrawingFillVisibilityControls(drawing: UserDrawing): boolean {
+  return (
+    supportsUserDrawingFillColorControls(drawing) ||
+    drawing.kind === 'longPosition' ||
+    drawing.kind === 'shortPosition'
+  );
+}
+
+export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
+  return supportsUserDrawingFillColorControls(drawing);
+}
+
 export function supportsUserDrawingTextControls(drawing: UserDrawing): boolean {
   return supportsUserDrawingTextStyleControls(drawing);
 }
@@ -531,7 +543,12 @@ export function supportsUserDrawingIconControls(drawing: UserDrawing): boolean {
 
 export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
-  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillControls(selectedDrawing);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillColorControls(selectedDrawing);
+}
+
+export function isUserDrawingFillVisibilityToolbarEnabled(state: UserDrawingState): boolean {
+  const selectedDrawing = getSelectedUserDrawing(state);
+  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillVisibilityControls(selectedDrawing);
 }
 
 export function isUserDrawingTextToolbarEnabled(state: UserDrawingState): boolean {

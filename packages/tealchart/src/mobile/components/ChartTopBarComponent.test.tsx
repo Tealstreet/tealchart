@@ -200,6 +200,47 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
+  it('dispatches selected risk/reward fill visibility without fill color controls', () => {
+    const onStyle = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'long' },
+          drawings: [
+            {
+              id: 'long',
+              kind: 'longPosition',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: {
+                lineColor: '#f5c542',
+                lineWidth: 1,
+                lineStyle: 'solid',
+              },
+              points: [
+                { time: 1, price: 10 },
+                { time: 2, price: 12 },
+                { time: 2, price: 8 },
+              ],
+            },
+          ],
+        }}
+        onUserDrawingStyleChange={onStyle}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
+
+    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
+    expect(screen.queryByLabelText('Orange fill color')).toBeNull();
+  });
+
   it('dispatches hidden selected drawing show control', () => {
     const onVisibility = vi.fn();
     render(
