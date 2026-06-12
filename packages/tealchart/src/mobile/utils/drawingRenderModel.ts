@@ -821,6 +821,34 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'anchoredText';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
+      kind: 'anchoredNote';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      point: DrawingScreenPoint;
+      text: string;
+      editing: boolean;
+      editValue: string | null;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'priceLabel';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -918,6 +946,8 @@ export type MobileUserDrawingTextLabelPrimitive = Extract<MobileUserDrawingPrimi
 export type MobileUserDrawingNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'note' }>;
 export type MobileUserDrawingCalloutPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'callout' }>;
 export type MobileUserDrawingCommentPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'comment' }>;
+export type MobileUserDrawingAnchoredTextPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredText' }>;
+export type MobileUserDrawingAnchoredNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredNote' }>;
 export type MobileUserDrawingPriceLabelPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceLabel' }>;
 export type MobileUserDrawingPriceNotePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceNote' }>;
 export type MobileUserDrawingPinPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'pin' }>;
@@ -1907,6 +1937,8 @@ function primitiveFromGeometry(
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'anchoredText':
+    case 'anchoredNote':
     case 'priceLabel':
     case 'balloon':
     case 'signpost':

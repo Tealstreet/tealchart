@@ -1300,6 +1300,8 @@ export function renderUserDrawing(
       case 'note':
       case 'callout':
       case 'comment':
+      case 'anchoredText':
+      case 'anchoredNote':
       case 'priceLabel':
       case 'priceNote':
       case 'balloon':

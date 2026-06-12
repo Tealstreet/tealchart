@@ -1,6 +1,12 @@
 import type { Bar, ChartMargins, ComputedPane, Viewport } from '../types';
 import type { UserDrawingInputPoint } from './input';
-import type { BarsPatternBarSnapshot, UserDrawing, UserDrawingAnchor, UserDrawingPathFamilyKind } from './types';
+import type {
+  BarsPatternBarSnapshot,
+  UserDrawing,
+  UserDrawingAnchor,
+  UserDrawingPanePosition,
+  UserDrawingPathFamilyKind,
+} from './types';
 
 import type { DrawingArrowMark, DrawingArrowMarker } from './arrowGeometry';
 import type { UserDrawingDateRangeMetrics } from './dateRange';
@@ -12,6 +18,7 @@ import { resolveUserDrawingDateRangeMetrics } from './dateRange';
 import { resolveUserDrawingIconGeometry } from './iconGeometry';
 import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
+import { normalizeUserDrawingPanePosition } from './types';
 
 export interface DrawingScreenPoint {
   x: number;
@@ -731,7 +738,15 @@ export type ResolvedUserDrawingGeometry =
       channel: DrawingScreenParallelChannel;
     }
   | {
-      kind: 'textLabel' | 'note' | 'comment' | 'priceLabel' | 'balloon' | 'signpost';
+      kind:
+        | 'textLabel'
+        | 'note'
+        | 'comment'
+        | 'anchoredText'
+        | 'anchoredNote'
+        | 'priceLabel'
+        | 'balloon'
+        | 'signpost';
       drawing: UserDrawing;
       point: DrawingScreenPoint;
     }
@@ -793,6 +808,23 @@ export function screenPointToAnchor(point: DrawingScreenPoint, space: DrawingCoo
   };
 }
 
+export function panePositionToScreenPoint(position: UserDrawingPanePosition, space: DrawingCoordinateSpace): DrawingScreenPoint {
+  const normalized = normalizeUserDrawingPanePosition(position);
+  return {
+    x: space.chartLeft + (space.chartRight - space.chartLeft) * normalized.x,
+    y: space.pane.top + space.pane.height * normalized.y,
+  };
+}
+
+export function screenPointToPanePosition(point: DrawingScreenPoint, space: DrawingCoordinateSpace): UserDrawingPanePosition {
+  const width = space.chartRight - space.chartLeft;
+  const height = space.pane.height;
+  return normalizeUserDrawingPanePosition({
+    x: width === 0 ? 0.5 : (point.x - space.chartLeft) / width,
+    y: height === 0 ? 0.5 : (point.y - space.pane.top) / height,
+  });
+}
+
 export function resolveUserDrawingInputPoint({
   point,
   viewport,
@@ -808,6 +840,12 @@ export function resolveUserDrawingInputPoint({
   return {
     paneId: pane.id,
     anchor: screenPointToAnchor(point, {
+      viewport,
+      pane,
+      chartLeft,
+      chartRight,
+    }),
+    position: screenPointToPanePosition(point, {
       viewport,
       pane,
       chartLeft,
@@ -2869,6 +2907,13 @@ export function resolveUserDrawingGeometry(
         kind: drawing.kind,
         drawing,
         point: anchorToScreenPoint(drawing.point, space),
+      };
+    case 'anchoredText':
+    case 'anchoredNote':
+      return {
+        kind: drawing.kind,
+        drawing,
+        point: panePositionToScreenPoint(drawing.position, space),
       };
     case 'pin':
       return {

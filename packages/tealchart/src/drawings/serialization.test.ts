@@ -275,6 +275,59 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored anchored annotation drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'anchored-text',
+          kind: 'anchoredText',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          position: { x: 0.25, y: 0.75 },
+          text: 'Restored anchored text',
+          textAlign: 'right',
+        },
+        {
+          id: 'anchored-note',
+          kind: 'anchoredNote',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          position: { x: 2, y: -1 },
+          text: 'Restored anchored note',
+          textAlign: 'left',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'anchored-text',
+      kind: 'anchoredText',
+      position: { x: 0.25, y: 0.75 },
+      text: 'Restored anchored text',
+      textAlign: 'right',
+    });
+    expect(restored?.drawings[1]).toMatchObject({
+      id: 'anchored-note',
+      kind: 'anchoredNote',
+      position: { x: 1, y: 0 },
+      text: 'Restored anchored note',
+      textAlign: 'left',
+    });
+  });
+
   it('preserves restored signpost drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

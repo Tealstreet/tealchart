@@ -112,6 +112,39 @@ describe('user drawing editing', () => {
     expect(next.selection).toEqual({ drawingId: 'line' });
   });
 
+  it('moves anchored annotations by normalized pane delta', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'anchored-text',
+      kind: 'anchoredText',
+      position: { x: 0.5, y: 0.5 },
+      text: 'Anchored',
+      textAlign: 'center',
+    };
+    const state = createUserDrawingState({
+      drawings: [drawing],
+      selection: { drawingId: 'anchored-text' },
+    });
+
+    const next = applyUserDrawingEditDrag(
+      state,
+      {
+        selection: { drawingId: 'anchored-text' },
+        startPoint: { x: 50, y: 50 },
+        startDrawing: drawing,
+        space,
+      },
+      { x: 65, y: 20 },
+      { now: () => 2 },
+    );
+
+    expect(next.drawings[0]).toMatchObject({
+      kind: 'anchoredText',
+      position: { x: 0.65, y: 0.2 },
+      updatedAt: 2,
+    });
+  });
+
   it('preserves grouped selection when a selected drawing body drag begins', () => {
     const first: UserDrawing = {
       ...base,

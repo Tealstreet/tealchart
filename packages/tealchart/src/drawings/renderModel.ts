@@ -3,6 +3,7 @@ import type { UserDrawing, UserDrawingAnchor, UserDrawingState } from './types';
 
 import {
   anchorToScreenPoint,
+  panePositionToScreenPoint,
   priceToDrawingY,
   resolveDateRangeRectFromAnchors,
   resolveCircleFromAnchors,
@@ -250,5 +251,8 @@ export function resolveUserDrawingHandlePoints(
     case 'signpost':
     case 'pin':
       return [anchorToScreenPoint(drawing.point, space)];
+    case 'anchoredText':
+    case 'anchoredNote':
+      return [panePositionToScreenPoint(drawing.position, space)];
   }
 }

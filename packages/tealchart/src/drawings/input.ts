@@ -10,6 +10,7 @@ import type {
   UserDrawingTextAlign,
   UserDrawingTool,
   UserDrawingTextAnnotation,
+  UserDrawingPanePosition,
 } from './types';
 
 import {
@@ -19,6 +20,7 @@ import {
   isUserDrawingPathFamilyTool,
   isUserDrawingTextAnnotation,
   normalizeUserDrawingIconName,
+  normalizeUserDrawingPanePosition,
   normalizeUserDrawingStyle,
   USER_DRAWING_SCHEMA_VERSION,
 } from './types';
@@ -29,6 +31,7 @@ import type { UserDrawingHitTestOptions } from './hitTesting';
 export interface UserDrawingInputPoint {
   paneId: string;
   anchor: UserDrawingAnchor;
+  position?: UserDrawingPanePosition;
   bars?: readonly BarsPatternBarSnapshot[];
 }
 
@@ -341,9 +344,20 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
     case 'textLabel':
     case 'note':
     case 'comment':
+    case 'anchoredText':
+    case 'anchoredNote':
     case 'priceLabel':
     case 'balloon':
     case 'signpost':
+      if (drawing.kind === 'anchoredText' || drawing.kind === 'anchoredNote') {
+        return {
+          ...base,
+          kind: drawing.kind,
+          position: normalizeUserDrawingPanePosition(drawing.position),
+          text: drawing.text,
+          textAlign: drawing.textAlign,
+        };
+      }
       return {
         ...base,
         kind: drawing.kind,
@@ -735,6 +749,9 @@ export function handleUserDrawingInput(
       ? {
           ...state.draft,
           anchors: [...state.draft.anchors, point.anchor],
+          positions: point.position
+            ? [...(state.draft.positions ?? []), normalizeUserDrawingPanePosition(point.position)]
+            : state.draft.positions,
           text: options.text ?? state.draft.text,
           barsPatternBars: state.activeTool === 'barsPattern' ? point.bars ?? state.draft.barsPatternBars : undefined,
         }
@@ -742,6 +759,7 @@ export function handleUserDrawingInput(
           tool: state.activeTool,
           paneId: point.paneId,
           anchors: [point.anchor],
+          positions: point.position ? [normalizeUserDrawingPanePosition(point.position)] : undefined,
           style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
           text: options.text,
           barsPatternBars: state.activeTool === 'barsPattern' ? point.bars : undefined,

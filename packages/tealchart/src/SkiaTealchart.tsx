@@ -141,6 +141,8 @@ import {
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import type {
+  MobileUserDrawingAnchoredNotePrimitive,
+  MobileUserDrawingAnchoredTextPrimitive,
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingNotePrimitive,
@@ -681,11 +683,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         ): primitive is
           | MobileUserDrawingTextLabelPrimitive
           | MobileUserDrawingNotePrimitive
+          | MobileUserDrawingAnchoredTextPrimitive
+          | MobileUserDrawingAnchoredNotePrimitive
           | MobileUserDrawingCalloutPrimitive
           | MobileUserDrawingPriceNotePrimitive
           | MobileUserDrawingCommentPrimitive =>
           (primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
+            primitive.kind === 'anchoredText' ||
+            primitive.kind === 'anchoredNote' ||
             primitive.kind === 'callout' ||
             primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
@@ -1334,6 +1340,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           selection.hit &&
           (selectedDrawing?.kind === 'textLabel' ||
             selectedDrawing?.kind === 'note' ||
+            selectedDrawing?.kind === 'anchoredText' ||
+            selectedDrawing?.kind === 'anchoredNote' ||
             selectedDrawing?.kind === 'callout' ||
             selectedDrawing?.kind === 'priceLabel' ||
             selectedDrawing?.kind === 'priceNote' ||
@@ -3128,6 +3136,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (
             primitive.kind === 'textLabel' ||
             primitive.kind === 'note' ||
+            primitive.kind === 'anchoredText' ||
+            primitive.kind === 'anchoredNote' ||
             primitive.kind === 'callout' ||
             primitive.kind === 'priceLabel' ||
             primitive.kind === 'priceNote' ||
