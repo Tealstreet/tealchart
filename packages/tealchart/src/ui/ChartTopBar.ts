@@ -213,10 +213,6 @@ const styles = {
     fontWeight: '700',
   } as Partial<CSSStyleDeclaration>,
 
-  drawingToolbarRoot: {
-    display: 'contents',
-  } as Partial<CSSStyleDeclaration>,
-
   drawingToolRail: {
     position: 'absolute',
     top: '40px',
@@ -383,6 +379,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private timeframeButtons: Map<string, HTMLButtonElement> = new Map();
   private indicatorsBtn: HTMLButtonElement | null = null;
   private layoutSelector: LayoutSelector | null = null;
+  private drawingToolRailEl: HTMLElement | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -419,6 +416,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   protected onUnmount(): void {
+    this.removeDrawingToolRail();
     this.layoutSelector?.dispose();
     this.layoutSelector = null;
   }
@@ -429,6 +427,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   protected render(): void {
     this.el.innerHTML = '';
+    this.removeDrawingToolRail();
     this.timeframeButtons.clear();
 
     // Symbol section
@@ -549,17 +548,18 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
   }
 
-  private renderDrawingToolbar(): HTMLElement {
-    const root = this.createElement('div', { style: styles.drawingToolbarRoot });
+  private removeDrawingToolRail(): void {
+    this.drawingToolRailEl?.remove();
+    this.drawingToolRailEl = null;
+  }
+
+  private renderDrawingToolRail(activeTool: UserDrawingTool): void {
     const rail = this.createElement('div', {
       style: styles.drawingToolRail,
       attributes: {
         'aria-label': 'Drawing tool categories',
       },
     });
-    const group = this.createElement('div', { style: styles.drawingGroup });
-    const state = this.options.userDrawingState;
-    const activeTool = state?.activeTool ?? 'select';
 
     for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
       const activeCategory = category.tools.includes(activeTool);
@@ -624,7 +624,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         btn.addEventListener('mouseleave', () => {
           if (!isActive) {
             btn.style.backgroundColor = 'transparent';
-            btn.style.color = 'var(--text2, #787b86)';
+            btn.style.color = 'var(--text, #d1d4dc)';
           }
         });
         flyout.appendChild(btn);
@@ -635,7 +635,16 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       rail.appendChild(railItem);
     }
 
-    root.appendChild(rail);
+    this.drawingToolRailEl = rail;
+    (this.el.parentElement ?? this.el).appendChild(rail);
+  }
+
+  private renderDrawingToolbar(): HTMLElement {
+    const group = this.createElement('div', { style: styles.drawingGroup });
+    const state = this.options.userDrawingState;
+    const activeTool = state?.activeTool ?? 'select';
+
+    this.renderDrawingToolRail(activeTool);
     group.appendChild(this.createElement('div', { style: styles.divider }));
 
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
@@ -1372,8 +1381,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       group.appendChild(btn);
     }
 
-    root.appendChild(group);
-    return root;
+    return group;
   }
 
   // ============================================================================
