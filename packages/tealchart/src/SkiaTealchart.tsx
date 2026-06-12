@@ -2553,12 +2553,42 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'doubleCurve') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const path = Skia.Path.Make();
+            path.moveTo(primitive.start.x, primitive.start.y);
+            path.cubicTo(
+              primitive.firstControl.x,
+              primitive.firstControl.y,
+              primitive.secondControl.x,
+              primitive.secondControl.y,
+              primitive.end.x,
+              primitive.end.y,
+            );
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.lineVisible !== false && (
+                  <SkiaPath
+                    path={path}
+                    color={primitive.style.lineColor}
+                    style="stroke"
+                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    strokeCap="round"
+                    strokeJoin="round"
+                  >
+                    {dash && <DashPathEffect intervals={dash} />}
+                  </SkiaPath>
+                )}
+              </Group>
+            );
+          }
+
           if (
             primitive.kind === 'path' ||
             primitive.kind === 'brush' ||
             primitive.kind === 'highlighter' ||
             primitive.kind === 'curve' ||
-            primitive.kind === 'doubleCurve' ||
             primitive.kind === 'arc' ||
             primitive.kind === 'fibSpiral' ||
             primitive.kind === 'abcdPattern' ||

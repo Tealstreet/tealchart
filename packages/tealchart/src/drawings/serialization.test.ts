@@ -2014,6 +2014,46 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('rejects double curve drawings with invalid point counts', () => {
+    const payload = (points: unknown[]) => ({
+      version: 1,
+      drawings: [
+        {
+          id: 'double-curve',
+          kind: 'doubleCurve',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points,
+        },
+      ],
+    });
+
+    expect(
+      deserializeUserDrawingStateFromLayout(
+        payload([
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 8 },
+        ]),
+      )?.drawings ?? [],
+    ).toEqual([]);
+    expect(
+      deserializeUserDrawingStateFromLayout(
+        payload([
+          { time: 1, price: 10 },
+          { time: 2, price: 12 },
+          { time: 3, price: 8 },
+          { time: 4, price: 10 },
+          { time: 5, price: 9 },
+        ]),
+      )?.drawings ?? [],
+    ).toEqual([]);
+  });
+
   it('restores arc drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
