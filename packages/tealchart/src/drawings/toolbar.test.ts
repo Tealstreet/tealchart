@@ -41,6 +41,7 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
+  USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -163,6 +164,38 @@ describe('user drawing toolbar descriptors', () => {
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
       USER_DRAWING_TOOL_DESCRIPTORS.length,
     );
+  });
+
+  it('groups every supported drawing tool into sidebar categories once', () => {
+    const categorizedTools = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.flatMap((category) => category.tools);
+    expect(categorizedTools).toHaveLength(USER_DRAWING_TOOL_DESCRIPTORS.length);
+    expect(new Set(categorizedTools).size).toBe(categorizedTools.length);
+    expect(new Set(categorizedTools)).toEqual(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)));
+    expect(USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => category.label)).toEqual([
+      'Cursor',
+      'Lines',
+      'Channels',
+      'Pitchforks',
+      'Gann and Fibonacci',
+      'Patterns',
+      'Forecasting and Measurement',
+      'Geometric Shapes',
+      'Brushes',
+      'Annotations',
+      'Icons',
+    ]);
+    expect(USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.id === 'lines')?.tools).toEqual([
+      'trendLine',
+      'ray',
+      'infoLine',
+      'extendedLine',
+      'trendAngle',
+      'horizontalLine',
+      'horizontalRay',
+      'verticalLine',
+      'crossLine',
+      'arrowLine',
+    ]);
   });
 
   it('provides compact icons and accessible labels for tools and actions', () => {

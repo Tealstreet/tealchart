@@ -381,6 +381,7 @@ export {
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
+  USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -407,6 +408,7 @@ export type {
   UserDrawingTrendLineExtendDescriptor,
   UserDrawingToolbarAction,
   UserDrawingToolbarActionDescriptor,
+  UserDrawingToolCategoryDescriptor,
   UserDrawingToolDescriptor,
 } from './toolbar';
 export type {
