@@ -143,6 +143,7 @@ describe('user drawing toolbar descriptors', () => {
       'sticker',
       'balloon',
       'signpost',
+      'table',
       'textLabel',
     ]);
     expect(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)).size).toBe(
@@ -911,6 +912,15 @@ describe('user drawing toolbar descriptors', () => {
     expect(supportsUserDrawingFillControls(dateRange)).toBe(true);
     expect(supportsUserDrawingFillControls(datePriceRange)).toBe(true);
     expect(supportsUserDrawingFillControls(textLabel)).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({
+        ...textLabel,
+        id: 'table',
+        kind: 'table',
+        point: { time: 1, price: 10 },
+        cells: [['Metric', 'Value']],
+      }),
+    ).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'note', kind: 'note' })).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'comment', kind: 'comment' })).toBe(true);
     expect(

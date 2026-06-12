@@ -1071,6 +1071,16 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching channel midlines from the shared
   model without changing persisted drawing state.
 
+## Shipped: Table Drawing Tool
+
+- Shared drawing state supports the one-anchor `table` tool with bounded,
+  normalized cell matrices, stable IDs, persistence, duplication, hit testing,
+  and anchor movement.
+- Web Canvas and mobile Skia render matching table fill, border grid, and cell
+  text from shared deterministic table geometry.
+- Public web/native exports expose table drawing geometry and the mobile table
+  primitive for host toolbar and render integrations.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
@@ -1079,7 +1089,7 @@ matching behavior in the same PR for every user-facing drawing feature.
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count
   price/date ranges, risk/reward positions, and bars pattern.
-- Rich text label controls and multiline editor polish.
+- Rich text label controls, table cell editing, and multiline editor polish.
 - More complete style controls, including per-tool property panels.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.

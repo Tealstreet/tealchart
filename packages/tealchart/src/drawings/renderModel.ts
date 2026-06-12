@@ -123,6 +123,7 @@ export function resolveUserDrawingHandlePoints(
     case 'crossLine':
     case 'anchoredVwap':
     case 'anchoredVolumeProfile':
+    case 'table':
     case 'icon':
     case 'flagMark':
       return [anchorToScreenPoint(drawing.point, space)];

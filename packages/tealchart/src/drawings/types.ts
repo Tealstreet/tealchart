@@ -96,6 +96,7 @@ export type UserDrawingTool =
   | 'sticker'
   | 'balloon'
   | 'signpost'
+  | 'table'
   | 'textLabel';
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
@@ -697,6 +698,12 @@ export interface SignpostDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
+export interface TableDrawing extends UserDrawingBase {
+  kind: 'table';
+  point: UserDrawingAnchor;
+  cells: readonly (readonly string[])[];
+}
+
 export type UserDrawingTextAnnotation =
   | TextLabelDrawing
   | NoteDrawing
@@ -710,6 +717,35 @@ export type UserDrawingTextAnnotation =
   | StickerDrawing
   | BalloonDrawing
   | SignpostDrawing;
+
+export const DEFAULT_USER_DRAWING_TABLE_CELLS: readonly (readonly string[])[] = [
+  ['Label', 'Value'],
+  ['Price', ''],
+] as const;
+
+const MAX_USER_DRAWING_TABLE_ROWS = 12;
+const MAX_USER_DRAWING_TABLE_COLUMNS = 8;
+
+export function normalizeUserDrawingTableCells(cells?: readonly (readonly unknown[])[] | null): readonly (readonly string[])[] {
+  if (!cells || cells.length === 0) return DEFAULT_USER_DRAWING_TABLE_CELLS.map((row) => row.slice());
+
+  const rows = cells.slice(0, MAX_USER_DRAWING_TABLE_ROWS);
+  const maxColumns = Math.max(
+    1,
+    Math.min(
+      MAX_USER_DRAWING_TABLE_COLUMNS,
+      rows.reduce((max, row) => Math.max(max, Array.isArray(row) ? row.length : 0), 0),
+    ),
+  );
+
+  return rows.map((row) => {
+    const source = Array.isArray(row) ? row : [];
+    return Array.from({ length: maxColumns }, (_, index) => {
+      const value = source[index];
+      return typeof value === 'string' ? value : value == null ? '' : String(value);
+    });
+  });
+}
 
 export type UserDrawing =
   | TrendLineDrawing
@@ -803,6 +839,7 @@ export type UserDrawing =
   | StickerDrawing
   | BalloonDrawing
   | SignpostDrawing
+  | TableDrawing
   | TextLabelDrawing;
 
 export interface UserDrawingDraft {
@@ -1019,6 +1056,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'sticker':
     case 'balloon':
     case 'signpost':
+    case 'table':
     case 'textLabel':
     case 'anchoredVwap':
     case 'anchoredVolumeProfile':
@@ -1575,6 +1613,13 @@ export function createUserDrawingFromDraft(
         point: draft.anchors[0]!,
         text: draft.text ?? (draft.tool === 'emoji' ? '👍' : draft.tool === 'sticker' ? '★' : ''),
         textAlign: 'center',
+      };
+    case 'table':
+      return {
+        ...base,
+        kind: 'table',
+        point: draft.anchors[0]!,
+        cells: normalizeUserDrawingTableCells(),
       };
     case 'anchoredText':
     case 'anchoredNote':

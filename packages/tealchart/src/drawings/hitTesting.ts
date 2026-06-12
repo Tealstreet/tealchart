@@ -258,6 +258,14 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'table') {
+    if (pointInRect(point, geometry.table.bounds)) {
+      return { drawing: geometry.drawing, distance: 0 };
+    }
+    const distance = distanceToRectEdge(point, geometry.table.bounds);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'trianglePattern') {
     const distance = pointInPolygon(point, geometry.pattern.polygon.points)
       ? 0
@@ -923,6 +931,9 @@ function hitTestUserDrawingHandle(
       break;
     case 'pin':
       handles.push({ handle: 'center', point: geometry.point });
+      break;
+    case 'table':
+      handles.push({ handle: 'center', point: geometry.table.point });
       break;
     case 'icon':
       handles.push({ handle: 'center', point: geometry.icon.center });

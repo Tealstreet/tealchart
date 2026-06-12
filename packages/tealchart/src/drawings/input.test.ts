@@ -156,6 +156,28 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('commits table drawings from a single anchor with default cells', () => {
+    const options = { createId: () => 'table', now: () => 23 };
+    const next = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'table'), {
+      paneId: 'main',
+      anchor: anchorA,
+    }, options);
+
+    expect(next.draft).toBeNull();
+    expect(next.selection).toEqual({ drawingId: 'table' });
+    expect(next.drawings[0]).toMatchObject({
+      id: 'table',
+      kind: 'table',
+      point: anchorA,
+      cells: [
+        ['Label', 'Value'],
+        ['Price', ''],
+      ],
+      createdAt: 23,
+      updatedAt: 23,
+    });
+  });
+
   it('commits image annotations from two anchors', () => {
     const options = { createId: () => 'image', now: () => 22 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'image'), {
@@ -1574,6 +1596,49 @@ describe('user drawing input controller', () => {
     expect(next.drawings[1].style).not.toBe(state.drawings[0].style);
     expect(next.drawings[1].points[0]).not.toBe(state.drawings[0].points[0]);
     expect(next.drawings[1].bars[0]).not.toBe(state.drawings[0].bars[0]);
+  });
+
+  it('duplicates table drawings with deep-cloned cell matrices', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'table' },
+      drawings: [
+        {
+          id: 'table',
+          kind: 'table',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style,
+          point: anchorA,
+          cells: [
+            ['Metric', 'Value'],
+            ['Price', '101.25'],
+          ],
+        },
+      ],
+    });
+
+    const next = duplicateUserDrawing(state, { createId: () => 'copy', now: () => 21 });
+
+    expect(next.drawings[1]).toMatchObject({
+      id: 'copy',
+      kind: 'table',
+      createdAt: 21,
+      updatedAt: 21,
+      point: anchorA,
+      cells: [
+        ['Metric', 'Value'],
+        ['Price', '101.25'],
+      ],
+    });
+    if (next.drawings[1]?.kind !== 'table' || state.drawings[0]?.kind !== 'table') {
+      throw new Error('expected table drawings');
+    }
+    expect(next.drawings[1].point).not.toBe(state.drawings[0].point);
+    expect(next.drawings[1].cells).not.toBe(state.drawings[0].cells);
+    expect(next.drawings[1].cells[0]).not.toBe(state.drawings[0].cells[0]);
   });
 
   it('duplicates XABCD pattern drawings with deep-cloned five-point payloads', () => {

@@ -17,7 +17,7 @@ import { resolveUserDrawingDateRangeMetrics } from './dateRange';
 import { resolveUserDrawingIconGeometry } from './iconGeometry';
 import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
-import { normalizeUserDrawingPanePosition } from './types';
+import { normalizeUserDrawingFontSize, normalizeUserDrawingPanePosition, normalizeUserDrawingTableCells } from './types';
 
 export interface DrawingScreenPoint {
   x: number;
@@ -65,6 +65,22 @@ export interface DrawingScreenRect {
   y: number;
   width: number;
   height: number;
+}
+
+export interface DrawingScreenTableCell {
+  row: number;
+  column: number;
+  text: string;
+  rect: DrawingScreenRect;
+  textPoint: DrawingScreenPoint;
+}
+
+export interface DrawingScreenTable {
+  point: DrawingScreenPoint;
+  bounds: DrawingScreenRect;
+  cells: readonly DrawingScreenTableCell[];
+  columnWidths: readonly number[];
+  rowHeights: readonly number[];
 }
 
 export interface DrawingScreenCircle {
@@ -862,6 +878,11 @@ export type ResolvedUserDrawingGeometry =
       point: DrawingScreenPoint;
     }
   | {
+      kind: 'table';
+      drawing: UserDrawing;
+      table: DrawingScreenTable;
+    }
+  | {
       kind: 'icon';
       drawing: UserDrawing;
       icon: UserDrawingIconGeometry;
@@ -885,6 +906,59 @@ export function drawingXToTime(x: number, space: DrawingCoordinateSpace): number
   if (width === 0) return space.viewport.startTime;
   const ratio = (x - space.chartLeft) / width;
   return space.viewport.startTime + ratio * (space.viewport.endTime - space.viewport.startTime);
+}
+
+const TABLE_CELL_HORIZONTAL_PADDING = 10;
+const TABLE_CELL_VERTICAL_PADDING = 6;
+const TABLE_MIN_COLUMN_WIDTH = 56;
+
+export function resolveTableFromAnchor(
+  point: UserDrawingAnchor,
+  cells: readonly (readonly unknown[])[],
+  space: DrawingCoordinateSpace,
+  fontSize = 12,
+): DrawingScreenTable {
+  const screenPoint = anchorToScreenPoint(point, space);
+  const normalizedCells = normalizeUserDrawingTableCells(cells);
+  const rowCount = normalizedCells.length;
+  const columnCount = normalizedCells.reduce((max, row) => Math.max(max, row.length), 0);
+  const textSize = normalizeUserDrawingFontSize(fontSize);
+  const characterWidth = Math.max(6, textSize * 0.58);
+  const rowHeight = Math.max(24, textSize + TABLE_CELL_VERTICAL_PADDING * 2);
+  const columnWidths = Array.from({ length: columnCount }, (_, column) => {
+    const longest = normalizedCells.reduce((max, row) => Math.max(max, row[column]?.length ?? 0), 0);
+    return Math.max(TABLE_MIN_COLUMN_WIDTH, Math.ceil(longest * characterWidth + TABLE_CELL_HORIZONTAL_PADDING * 2));
+  });
+  const rowHeights = Array.from({ length: rowCount }, () => rowHeight);
+  const tableCells: DrawingScreenTableCell[] = [];
+
+  let y = screenPoint.y;
+  for (let row = 0; row < rowCount; row += 1) {
+    let x = screenPoint.x;
+    for (let column = 0; column < columnCount; column += 1) {
+      const width = columnWidths[column] ?? TABLE_MIN_COLUMN_WIDTH;
+      const height = rowHeights[row] ?? rowHeight;
+      tableCells.push({
+        row,
+        column,
+        text: normalizedCells[row]?.[column] ?? '',
+        rect: { x, y, width, height },
+        textPoint: { x: x + TABLE_CELL_HORIZONTAL_PADDING, y: y + height / 2 },
+      });
+      x += width;
+    }
+    y += rowHeights[row] ?? rowHeight;
+  }
+
+  const width = columnWidths.reduce((sum, value) => sum + value, 0);
+  const height = rowHeights.reduce((sum, value) => sum + value, 0);
+  return {
+    point: screenPoint,
+    bounds: { x: screenPoint.x, y: screenPoint.y, width, height },
+    cells: tableCells,
+    columnWidths,
+    rowHeights,
+  };
 }
 
 export function priceToDrawingY(price: number, space: DrawingCoordinateSpace): number {
@@ -3499,6 +3573,12 @@ export function resolveUserDrawingGeometry(
         kind: 'pin',
         drawing,
         point: anchorToScreenPoint(drawing.point, space),
+      };
+    case 'table':
+      return {
+        kind: 'table',
+        drawing,
+        table: resolveTableFromAnchor(drawing.point, drawing.cells, space, drawing.style.fontSize),
       };
     case 'icon':
     case 'flagMark':
