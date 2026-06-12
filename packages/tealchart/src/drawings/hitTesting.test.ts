@@ -202,6 +202,25 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 60 }, space, { tolerance: 1 })).toBeNull();
   });
 
+  it('hits trend-based Fibonacci extension levels and point-index handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'trend-fib-ext',
+      kind: 'trendBasedFibExtension',
+      points: [
+        { time: 10, price: 20 },
+        { time: 50, price: 80 },
+        { time: 90, price: 50 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 80 }, space)).toMatchObject({ handle: 'center', pointIndex: 0 });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 20 }, space)).toMatchObject({ handle: 'center', pointIndex: 1 });
+    expect(hitTestUserDrawing(drawing, { x: 90, y: 50 }, space)).toMatchObject({ handle: 'center', pointIndex: 2 });
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 27.08 }, space)?.drawing.id).toBe('trend-fib-ext');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 35 }, space, { tolerance: 1 })).toBeNull();
+  });
+
   it('hits vertical extended line drawings across the pane', () => {
     const drawing: UserDrawing = {
       ...base,

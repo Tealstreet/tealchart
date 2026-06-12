@@ -166,6 +166,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'anchoredVwap', icon: '∿', label: 'Anchored VWAP' },
   { tool: 'fibRetracement', icon: 'F', label: 'Fib retracement' },
   { tool: 'fibExtension', icon: 'E', label: 'Fib extension' },
+  { tool: 'trendBasedFibExtension', icon: 'TBE', label: 'Trend-based fib extension' },
   { tool: 'fibFan', icon: 'F', label: 'Fib fan' },
   { tool: 'fibSpeedResistanceFan', icon: 'S', label: 'Fib speed resistance fan' },
   { tool: 'fibSpeedResistanceArcs', icon: 'A', label: 'Fib speed resistance arcs' },

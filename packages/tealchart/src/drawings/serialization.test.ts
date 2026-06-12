@@ -1154,6 +1154,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores trend-based Fibonacci extension drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'trend-fib-ext',
+          kind: 'trendBasedFibExtension',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'trend-fib-ext',
+      kind: 'trendBasedFibExtension',
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+        { time: 3, price: 11 },
+      ],
+    });
+  });
+
   it('restores Fibonacci fan drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

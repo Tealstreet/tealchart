@@ -46,6 +46,7 @@ export {
   resolveFibChannelFromAnchors,
   resolveFibLevelsFromAnchors,
   resolveFibRetracementFromAnchors,
+  resolveTrendBasedFibExtensionFromAnchors,
   resolveFibTimeZoneFromAnchors,
   resolveCyclicLinesFromAnchors,
   resolveTimeCyclesFromAnchors,
