@@ -2,6 +2,8 @@ import type { DrawingCoordinateSpace } from './coordinates';
 import type {
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
+  ArrowMarkLeftDrawing,
+  ArrowMarkRightDrawing,
   ArrowMarkUpDrawing,
   ArrowMarkerDrawing,
   ArcDrawing,
@@ -793,6 +795,18 @@ describe('user drawing coordinates', () => {
       id: 'marker',
       kind: 'arrowMarker',
     };
+    const arrowMarkLeft: ArrowMarkLeftDrawing = {
+      ...trendLine,
+      id: 'mark-left',
+      kind: 'arrowMarkLeft',
+      point: { time: 2_000, price: 100 },
+    };
+    const arrowMarkRight: ArrowMarkRightDrawing = {
+      ...trendLine,
+      id: 'mark-right',
+      kind: 'arrowMarkRight',
+      point: { time: 2_000, price: 100 },
+    };
     const arrowMarkUp: ArrowMarkUpDrawing = {
       ...trendLine,
       id: 'mark-up',
@@ -1184,6 +1198,36 @@ describe('user drawing coordinates', () => {
           { x: 10, y: 73.5 },
           { x: 10, y: 66.5 },
           { x: 188, y: 61 },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(arrowMarkLeft, space)).toMatchObject({
+      kind: 'arrowMark',
+      mark: {
+        point: { x: 110, y: 70 },
+        points: [
+          { x: 110, y: 70 },
+          { x: 120.8, y: 79 },
+          { x: 120.8, y: 73.5 },
+          { x: 134, y: 73.5 },
+          { x: 134, y: 66.5 },
+          { x: 120.8, y: 66.5 },
+          { x: 120.8, y: 61 },
+        ],
+      },
+    });
+    expect(resolveUserDrawingGeometry(arrowMarkRight, space)).toMatchObject({
+      kind: 'arrowMark',
+      mark: {
+        point: { x: 110, y: 70 },
+        points: [
+          { x: 110, y: 70 },
+          { x: 99.2, y: 79 },
+          { x: 99.2, y: 73.5 },
+          { x: 86, y: 73.5 },
+          { x: 86, y: 66.5 },
+          { x: 99.2, y: 66.5 },
+          { x: 99.2, y: 61 },
         ],
       },
     });

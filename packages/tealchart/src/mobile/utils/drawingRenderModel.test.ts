@@ -477,6 +477,17 @@ describe('mobile user drawing render model', () => {
       selection: null,
       drawings: [
         {
+          id: 'left',
+          kind: 'arrowMarkLeft',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+        },
+        {
           id: 'up',
           kind: 'arrowMarkUp',
           paneId: 'main',
@@ -492,19 +503,34 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
-      kind: 'arrowMark',
-      id: 'up',
-      points: [
-        { x: 50, y: 50 },
-        { x: 59, y: 60.8 },
-        { x: 53.5, y: 60.8 },
-        { x: 53.5, y: 74 },
-        { x: 46.5, y: 74 },
-        { x: 46.5, y: 60.8 },
-        { x: 41, y: 60.8 },
-      ],
-    });
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toMatchObject([
+      {
+        kind: 'arrowMark',
+        id: 'left',
+        points: [
+          { x: 50, y: 50 },
+          { x: 60.8, y: 59 },
+          { x: 60.8, y: 53.5 },
+          { x: 74, y: 53.5 },
+          { x: 74, y: 46.5 },
+          { x: 60.8, y: 46.5 },
+          { x: 60.8, y: 41 },
+        ],
+      },
+      {
+        kind: 'arrowMark',
+        id: 'up',
+        points: [
+          { x: 50, y: 50 },
+          { x: 59, y: 60.8 },
+          { x: 53.5, y: 60.8 },
+          { x: 53.5, y: 74 },
+          { x: 46.5, y: 74 },
+          { x: 46.5, y: 60.8 },
+          { x: 41, y: 60.8 },
+        ],
+      },
+    ]);
   });
 
   it('returns Skia-ready circle primitives', () => {
