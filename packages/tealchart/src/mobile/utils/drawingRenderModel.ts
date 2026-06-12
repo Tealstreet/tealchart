@@ -299,6 +299,33 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'anchoredVolumeProfile';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      bounds: DrawingScreenRect;
+      bins: readonly {
+        priceMin: number;
+        priceMax: number;
+        volume: number;
+        rect: DrawingScreenRect;
+      }[];
+      guides: readonly {
+        kind: 'pointOfControl' | 'valueAreaHigh' | 'valueAreaLow';
+        price: number;
+        volume: number;
+        segment: {
+          start: DrawingScreenPoint;
+          end: DrawingScreenPoint;
+        };
+      }[];
+      maxVolume: number;
+      totalVolume: number;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'fixedRangeVolumeProfile';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -1115,6 +1142,10 @@ export type MobileUserDrawingCurvePrimitive = Extract<MobileUserDrawingPrimitive
 export type MobileUserDrawingDoubleCurvePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'doubleCurve' }>;
 export type MobileUserDrawingArcPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'arc' }>;
 export type MobileUserDrawingAnchoredVwapPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'anchoredVwap' }>;
+export type MobileUserDrawingAnchoredVolumeProfilePrimitive = Extract<
+  MobileUserDrawingPrimitive,
+  { kind: 'anchoredVolumeProfile' }
+>;
 export type MobileUserDrawingFixedRangeVolumeProfilePrimitive = Extract<
   MobileUserDrawingPrimitive,
   { kind: 'fixedRangeVolumeProfile' }
@@ -1568,9 +1599,10 @@ function primitiveFromGeometry(
         points: geometry.vwap.points,
         style: geometry.drawing.style,
       };
+    case 'anchoredVolumeProfile':
     case 'fixedRangeVolumeProfile':
       return {
-        kind: 'fixedRangeVolumeProfile',
+        kind: geometry.kind,
         id: geometry.drawing.id,
         phase,
         selected,
