@@ -135,6 +135,7 @@ describe('user drawing toolbar descriptors', () => {
       'pin',
       'icon',
       'flagMark',
+      'image',
       'emoji',
       'sticker',
       'balloon',
@@ -360,6 +361,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('flagMark')).toEqual(
       expect.objectContaining({ tool: 'flagMark', label: 'Flag mark' }),
     );
+    expect(getUserDrawingToolDescriptor('image')).toEqual(expect.objectContaining({ tool: 'image', label: 'Image' }));
     expect(getUserDrawingToolDescriptor('emoji')).toEqual(expect.objectContaining({ tool: 'emoji', label: 'Emoji' }));
     expect(getUserDrawingToolDescriptor('sticker')).toEqual(
       expect.objectContaining({ tool: 'sticker', label: 'Sticker' }),

@@ -163,6 +163,18 @@ export type MobileUserDrawingPrimitive =
       style: UserDrawingStyle;
     }
   | {
+      kind: 'image';
+      id: string;
+      phase: UserDrawingRenderPhase;
+      selected: boolean;
+      opacity: number;
+      clip: MobileUserDrawingClipRect;
+      rect: { x: number; y: number; width: number; height: number };
+      src: string;
+      alt: string;
+      style: UserDrawingStyle;
+    }
+  | {
       kind: 'circle';
       id: string;
       phase: UserDrawingRenderPhase;
@@ -1022,6 +1034,7 @@ export type MobileUserDrawingBalloonPrimitive = Extract<MobileUserDrawingPrimiti
 export type MobileUserDrawingSignpostPrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'signpost' }>;
 export type MobileUserDrawingLinePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'line' }>;
 export type MobileUserDrawingPriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'priceRange' }>;
+export type MobileUserDrawingImagePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'image' }>;
 export type MobileUserDrawingDatePriceRangePrimitive = Extract<MobileUserDrawingPrimitive, { kind: 'datePriceRange' }>;
 export type MobileUserDrawingRiskRewardPositionPrimitive = Extract<
   MobileUserDrawingPrimitive,
@@ -1359,6 +1372,19 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rect: geometry.rect,
+        style: geometry.drawing.style,
+      };
+    case 'image':
+      return {
+        kind: 'image',
+        id: geometry.drawing.id,
+        phase,
+        selected,
+        opacity,
+        clip,
+        rect: geometry.rect,
+        src: geometry.drawing.kind === 'image' ? geometry.drawing.src : '',
+        alt: geometry.drawing.kind === 'image' ? geometry.drawing.alt : 'Image placeholder',
         style: geometry.drawing.style,
       };
     case 'circle':

@@ -532,6 +532,11 @@ export type ResolvedUserDrawingGeometry =
       rect: DrawingScreenRect;
     }
   | {
+      kind: 'image';
+      drawing: UserDrawing;
+      rect: DrawingScreenRect;
+    }
+  | {
       kind: 'circle';
       drawing: UserDrawing;
       circle: DrawingScreenCircle;
@@ -2718,6 +2723,12 @@ export function resolveUserDrawingGeometry(
     case 'rectangle':
       return {
         kind: 'rectangle',
+        drawing,
+        rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
+      };
+    case 'image':
+      return {
+        kind: 'image',
         drawing,
         rect: resolveRectFromAnchors(drawing.points[0], drawing.points[1], space),
       };

@@ -344,6 +344,24 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits image annotation edges and corner handles', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'image',
+      kind: 'image',
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+      src: '',
+      alt: 'Image placeholder',
+    };
+
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 10 }, space)?.drawing.id).toBe('image');
+    expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('topLeft');
+    expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits circle edges and corner handles', () => {
     const drawing: UserDrawing = {
       ...base,

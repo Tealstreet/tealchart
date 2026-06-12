@@ -2230,6 +2230,68 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             );
           }
 
+          if (primitive.kind === 'image') {
+            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
+            const label = primitive.src ? primitive.alt || 'Image' : 'Image';
+            const textBounds = font ? font.measureText(label) : { width: 0 };
+
+            return (
+              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                {primitive.style.fillVisible !== false && (
+                  <Rect
+                    x={primitive.rect.x}
+                    y={primitive.rect.y}
+                    width={primitive.rect.width}
+                    height={primitive.rect.height}
+                    color={primitive.style.fillColor ?? 'rgba(127, 127, 127, 0.12)'}
+                    style="fill"
+                  />
+                )}
+                {primitive.style.lineVisible !== false && (
+                  <>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.lineColor}
+                      style="stroke"
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </Rect>
+                    <SkiaLine
+                      p1={vec(primitive.rect.x, primitive.rect.y)}
+                      p2={vec(primitive.rect.x + primitive.rect.width, primitive.rect.y + primitive.rect.height)}
+                      color={primitive.style.lineColor}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                    <SkiaLine
+                      p1={vec(primitive.rect.x + primitive.rect.width, primitive.rect.y)}
+                      p2={vec(primitive.rect.x, primitive.rect.y + primitive.rect.height)}
+                      color={primitive.style.lineColor}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaLine>
+                  </>
+                )}
+                {font && (
+                  <SkiaText
+                    x={primitive.rect.x + primitive.rect.width / 2 - textBounds.width / 2}
+                    y={primitive.rect.y + primitive.rect.height / 2 + 4}
+                    text={label}
+                    font={font}
+                    color={primitive.style.textColor ?? primitive.style.lineColor}
+                  />
+                )}
+              </Group>
+            );
+          }
+
           if (primitive.kind === 'gannBox' || primitive.kind === 'gannSquare') {
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const path = Skia.Path.Make();
