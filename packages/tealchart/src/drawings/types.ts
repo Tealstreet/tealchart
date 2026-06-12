@@ -78,6 +78,8 @@ export type UserDrawingTool =
   | 'note'
   | 'callout'
   | 'comment'
+  | 'anchoredText'
+  | 'anchoredNote'
   | 'priceLabel'
   | 'priceNote'
   | 'pin'
@@ -94,6 +96,8 @@ export type UserDrawingTextAnnotationKind =
   | 'note'
   | 'callout'
   | 'comment'
+  | 'anchoredText'
+  | 'anchoredNote'
   | 'priceLabel'
   | 'priceNote'
   | 'balloon'
@@ -108,6 +112,11 @@ export type UserDrawingHandleRole = 'start' | 'end' | 'center' | 'topLeft' | 'to
 export interface UserDrawingAnchor {
   time: number;
   price: number;
+}
+
+export interface UserDrawingPanePosition {
+  x: number;
+  y: number;
 }
 
 export interface BarsPatternBarSnapshot {
@@ -568,6 +577,20 @@ export interface CommentDrawing extends UserDrawingBase {
   textAlign: UserDrawingTextAlign;
 }
 
+export interface AnchoredTextDrawing extends UserDrawingBase {
+  kind: 'anchoredText';
+  position: UserDrawingPanePosition;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
+export interface AnchoredNoteDrawing extends UserDrawingBase {
+  kind: 'anchoredNote';
+  position: UserDrawingPanePosition;
+  text: string;
+  textAlign: UserDrawingTextAlign;
+}
+
 export interface PriceLabelDrawing extends UserDrawingBase {
   kind: 'priceLabel';
   point: UserDrawingAnchor;
@@ -617,6 +640,8 @@ export type UserDrawingTextAnnotation =
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
+  | AnchoredTextDrawing
+  | AnchoredNoteDrawing
   | PriceLabelDrawing
   | PriceNoteDrawing
   | BalloonDrawing
@@ -696,6 +721,8 @@ export type UserDrawing =
   | NoteDrawing
   | CalloutDrawing
   | CommentDrawing
+  | AnchoredTextDrawing
+  | AnchoredNoteDrawing
   | PriceLabelDrawing
   | PriceNoteDrawing
   | PinDrawing
@@ -709,6 +736,7 @@ export interface UserDrawingDraft {
   tool: UserDrawingTool;
   paneId: string;
   anchors: readonly UserDrawingAnchor[];
+  positions?: readonly UserDrawingPanePosition[];
   style: UserDrawingStyle;
   text?: string;
   barsPatternBars?: readonly BarsPatternBarSnapshot[];
@@ -777,6 +805,13 @@ export function normalizeUserDrawingIconName(iconName: unknown): UserDrawingIcon
   return USER_DRAWING_ICON_NAMES.includes(iconName as UserDrawingIconName)
     ? (iconName as UserDrawingIconName)
     : 'star';
+}
+
+export function normalizeUserDrawingPanePosition(position: UserDrawingPanePosition): UserDrawingPanePosition {
+  return {
+    x: Number.isFinite(position.x) ? Math.max(0, Math.min(1, position.x)) : 0.5,
+    y: Number.isFinite(position.y) ? Math.max(0, Math.min(1, position.y)) : 0.5,
+  };
 }
 
 export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingStyle {
@@ -895,6 +930,8 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'crossLine':
     case 'note':
     case 'comment':
+    case 'anchoredText':
+    case 'anchoredNote':
     case 'priceLabel':
     case 'pin':
     case 'icon':
@@ -919,6 +956,8 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
     drawing.kind === 'note' ||
     drawing.kind === 'callout' ||
     drawing.kind === 'comment' ||
+    drawing.kind === 'anchoredText' ||
+    drawing.kind === 'anchoredNote' ||
     drawing.kind === 'priceLabel' ||
     drawing.kind === 'priceNote' ||
     drawing.kind === 'balloon' ||
@@ -926,7 +965,10 @@ export function isUserDrawingTextAnnotation(drawing: UserDrawing): drawing is Us
   );
 }
 
-export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor {
+export function getUserDrawingTextAnnotationPoint(drawing: UserDrawingTextAnnotation): UserDrawingAnchor | null {
+  if (drawing.kind === 'anchoredText' || drawing.kind === 'anchoredNote') {
+    return null;
+  }
   return drawing.kind === 'callout' || drawing.kind === 'priceNote' ? drawing.points[1] : drawing.point;
 }
 
@@ -1401,6 +1443,15 @@ export function createUserDrawingFromDraft(
         ...base,
         kind: draft.tool,
         point: draft.anchors[0]!,
+        text: draft.text ?? '',
+        textAlign: 'center',
+      };
+    case 'anchoredText':
+    case 'anchoredNote':
+      return {
+        ...base,
+        kind: draft.tool,
+        position: normalizeUserDrawingPanePosition(draft.positions?.[0] ?? { x: 0.5, y: 0.5 }),
         text: draft.text ?? '',
         textAlign: 'center',
       };
