@@ -47,6 +47,7 @@ import type {
   ProjectionDrawing,
   RectangleDrawing,
   RegressionTrendDrawing,
+  SectorDrawing,
   SignpostDrawing,
   SineLineDrawing,
   TimeCyclesDrawing,
@@ -1090,6 +1091,16 @@ describe('user drawing coordinates', () => {
         { time: 2_000, price: 110 },
       ],
     };
+    const sector: SectorDrawing = {
+      ...trendLine,
+      id: 'sector',
+      kind: 'sector',
+      points: [
+        { time: 1_000, price: 100 },
+        { time: 2_000, price: 100 },
+        { time: 2_000, price: 110 },
+      ],
+    };
     const fibRetracement: FibRetracementDrawing = {
       ...trendLine,
       id: 'fib',
@@ -1662,6 +1673,19 @@ describe('user drawing coordinates', () => {
         pivotLabel: 'Pivot 105.00',
         targetLabel: 'Target 110.00',
         changeLabel: '+5.00 (+4.76%) / 500 ms',
+      },
+    });
+    expect(resolveUserDrawingGeometry(sector, space)).toMatchObject({
+      kind: 'sector',
+      sector: {
+        origin: { x: 10, y: 70 },
+        future: { x: 110, y: 70 },
+        target: { x: 99.44271909999159, y: 25.278640450004204 },
+        radius: 100,
+        boundaries: [
+          { start: { x: 10, y: 70 }, end: { x: 110, y: 70 } },
+          { start: { x: 10, y: 70 }, end: { x: 99.44271909999159, y: 25.278640450004204 } },
+        ],
       },
     });
     const barSpace: DrawingCoordinateSpace = {

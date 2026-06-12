@@ -465,6 +465,13 @@ function hitTestResolvedGeometry(
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
 
+  if (geometry.kind === 'sector') {
+    const distance = pointInPolygon(point, geometry.sector.polygon.points)
+      ? 0
+      : distanceToClosedPolyline(point, geometry.sector.polygon.points);
+    return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
+  }
+
   if (geometry.kind === 'pitchfork') {
     const distance = Math.min(
       distanceToSegment(point, geometry.pitchfork.median),
@@ -752,7 +759,8 @@ function hitTestUserDrawingHandle(
       }
       break;
     case 'arc':
-      if (geometry.drawing.kind === 'arc') {
+    case 'sector':
+      if (geometry.drawing.kind === 'arc' || geometry.drawing.kind === 'sector') {
         geometry.drawing.points.forEach((anchor, pointIndex) => {
           handles.push({ handle: 'center', point: anchorToScreenPoint(anchor, space), pointIndex });
         });
