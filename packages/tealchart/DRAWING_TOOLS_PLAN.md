@@ -1191,6 +1191,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching regular/italic controls for selected
   text annotations and tables.
 
+## Shipped: Underline Text Style Controls
+
+- Shared drawing style now supports underline decoration for text annotations
+  and tables through the same selected-drawing style update path.
+- Web Canvas and mobile Skia render underline segments using measured text
+  widths, and inline editors mirror the selected underline style.
+- Web and mobile top bars expose matching underline toggles for selected text
+  annotations and tables.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

@@ -364,6 +364,7 @@ export {
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
+  USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
@@ -384,6 +385,7 @@ export type {
   UserDrawingStyleToolbarActionDescriptor,
   UserDrawingTextAlignDescriptor,
   UserDrawingTextColorDescriptor,
+  UserDrawingTextDecorationDescriptor,
   UserDrawingToolbarAction,
   UserDrawingToolbarActionDescriptor,
   UserDrawingToolDescriptor,

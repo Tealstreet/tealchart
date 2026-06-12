@@ -83,6 +83,12 @@ export interface UserDrawingFontStyleDescriptor {
   label: string;
 }
 
+export interface UserDrawingTextDecorationDescriptor {
+  textUnderline: boolean;
+  icon: string;
+  label: string;
+}
+
 export interface UserDrawingTextAlignDescriptor {
   textAlign: UserDrawingTextAlign;
   icon: string;
@@ -311,6 +317,10 @@ export const USER_DRAWING_FONT_STYLE_DESCRIPTORS: readonly UserDrawingFontStyleD
     label: fontStyle === 'italic' ? 'Italic text' : 'Regular text',
   }));
 
+export const USER_DRAWING_TEXT_DECORATION_DESCRIPTORS: readonly UserDrawingTextDecorationDescriptor[] = [
+  { textUnderline: true, icon: 'U', label: 'Underline text' },
+] as const;
+
 export const USER_DRAWING_TEXT_ALIGN_DESCRIPTORS: readonly UserDrawingTextAlignDescriptor[] = [
   { textAlign: 'left', icon: 'L', label: 'Left text alignment' },
   { textAlign: 'center', icon: 'C', label: 'Center text alignment' },
@@ -507,6 +517,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fontFamily ?? '',
     selectedDrawing?.style.fontWeight ?? '',
     selectedDrawing?.style.fontStyle ?? '',
+    selectedDrawing?.style.textUnderline ?? '',
     selectedDrawing && (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing))
       ? selectedDrawing.textAlign
       : '',
