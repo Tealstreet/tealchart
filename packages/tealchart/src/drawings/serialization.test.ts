@@ -410,6 +410,40 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('preserves restored sticker drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'sticker',
+          kind: 'sticker',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: '★',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'sticker',
+      kind: 'sticker',
+      point: { time: 1, price: 10 },
+      text: '★',
+      textAlign: 'center',
+    });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings[0]).toMatchObject({
+      id: 'sticker',
+      kind: 'sticker',
+      text: '★',
+    });
+  });
+
   it('preserves restored callout drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

@@ -135,6 +135,7 @@ describe('user drawing toolbar descriptors', () => {
       'icon',
       'flagMark',
       'emoji',
+      'sticker',
       'balloon',
       'signpost',
       'textLabel',
@@ -356,6 +357,9 @@ describe('user drawing toolbar descriptors', () => {
       expect.objectContaining({ tool: 'flagMark', label: 'Flag mark' }),
     );
     expect(getUserDrawingToolDescriptor('emoji')).toEqual(expect.objectContaining({ tool: 'emoji', label: 'Emoji' }));
+    expect(getUserDrawingToolDescriptor('sticker')).toEqual(
+      expect.objectContaining({ tool: 'sticker', label: 'Sticker' }),
+    );
     expect(getUserDrawingToolDescriptor('balloon')).toEqual(
       expect.objectContaining({ tool: 'balloon', label: 'Balloon' }),
     );
@@ -896,6 +900,7 @@ describe('user drawing toolbar descriptors', () => {
     ).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'price-label', kind: 'priceLabel' })).toBe(true);
     expect(supportsUserDrawingFillControls({ ...textLabel, id: 'emoji', kind: 'emoji', text: '👍' })).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...textLabel, id: 'sticker', kind: 'sticker', text: '★' })).toBe(true);
     expect(
       supportsUserDrawingFillControls({
         ...textLabel,
@@ -943,6 +948,7 @@ describe('user drawing toolbar descriptors', () => {
     ).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'price-label', kind: 'priceLabel' })).toBe(true);
     expect(supportsUserDrawingTextControls({ ...textLabel, id: 'emoji', kind: 'emoji', text: '👍' })).toBe(true);
+    expect(supportsUserDrawingTextControls({ ...textLabel, id: 'sticker', kind: 'sticker', text: '★' })).toBe(true);
     expect(
       supportsUserDrawingTextControls({
         ...textLabel,
