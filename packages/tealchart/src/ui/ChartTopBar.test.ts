@@ -526,9 +526,12 @@ describe('ChartTopBar drawing toolbar', () => {
     const lock = document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]');
     expect(lock?.disabled).toBe(true);
     lock?.click();
+    const unlock = document.querySelector<HTMLButtonElement>('button[aria-label="Unlock selected drawing"]');
+    expect(unlock?.disabled).toBe(false);
+    unlock?.click();
 
     expect(onStyle).not.toHaveBeenCalled();
-    expect(onLocked).not.toHaveBeenCalled();
+    expect(onLocked).toHaveBeenCalledWith(false, true);
 
     topBar.unmount();
   });

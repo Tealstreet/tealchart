@@ -421,6 +421,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
   it('disables locked selected drawing fill and text controls', () => {
     const onStyle = vi.fn();
     const onTextAlign = vi.fn();
+    const onLocked = vi.fn();
     render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
@@ -453,6 +454,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
         }}
         onUserDrawingStyleChange={onStyle}
         onUserDrawingTextAlignChange={onTextAlign}
+        onUserDrawingLockedChange={onLocked}
       />,
     );
 
@@ -464,6 +466,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
     fireEvent.click(screen.getByLabelText('monospace font family'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
+    fireEvent.click(screen.getByLabelText('Unlock selected drawing'));
 
     expect((screen.getByLabelText('Green fill color') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('75 percent opacity') as HTMLButtonElement).disabled).toBe(true);
@@ -473,7 +476,9 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect((screen.getByLabelText('16 pixel font size') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('monospace font family') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Right text alignment') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Unlock selected drawing') as HTMLButtonElement).disabled).toBe(false);
     expect(onStyle).not.toHaveBeenCalled();
     expect(onTextAlign).not.toHaveBeenCalled();
+    expect(onLocked).toHaveBeenCalledWith(false, true);
   });
 });

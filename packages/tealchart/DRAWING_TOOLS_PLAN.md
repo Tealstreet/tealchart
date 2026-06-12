@@ -1218,6 +1218,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Locked Drawing Unlock Control
+
+- Shared selected-drawing style actions now include an explicit unlock action
+  for locked selections.
+- Web and mobile top bars dispatch the same `locked: false` update with
+  `includeLocked: true`, while other style controls remain disabled for locked
+  drawings.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
