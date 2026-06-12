@@ -155,6 +155,7 @@ export interface UserDrawingStyle {
   fontWeight?: UserDrawingFontWeight;
   fontStyle?: UserDrawingFontStyle;
   textUnderline?: boolean;
+  textLineThrough?: boolean;
   textWrap?: boolean;
   textMaxWidth?: number;
 }

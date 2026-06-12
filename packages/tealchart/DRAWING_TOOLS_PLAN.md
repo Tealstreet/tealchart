@@ -136,6 +136,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Mobile Skia renders text-label fill, stroke, text color, and normalized font
   size in parity with web Canvas.
 
+## Shipped: Text Decoration Controls
+
+- Shared drawing style and layout serialization preserve underline and
+  strike-through text decoration flags.
+- Web top bar and mobile top bar expose matching underline and strike-through
+  controls for text annotations and table drawings.
+- Web Canvas, DOM text editing, mobile Skia, and React Native text editing
+  render matching text decoration states.
+
 ## Shipped: Text Alignment Controls
 
 - Shared toolbar descriptors and reducers update text-label left, center, and

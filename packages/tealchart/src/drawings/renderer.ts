@@ -1315,6 +1315,25 @@ function renderBarsPatternGeometry(
   }
 }
 
+function renderUserDrawingTextDecorationLine(
+  ctx: CanvasContext,
+  x: number,
+  y: number,
+  width: number,
+  fontSize: number,
+  color: string,
+  yOffset: number,
+): void {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(1, fontSize / 14);
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  const lineY = y + yOffset;
+  ctx.moveTo(x, lineY);
+  ctx.lineTo(x + width, lineY);
+  ctx.stroke();
+}
+
 function renderUserDrawingTextUnderline(
   ctx: CanvasContext,
   x: number,
@@ -1323,14 +1342,18 @@ function renderUserDrawingTextUnderline(
   fontSize: number,
   color: string,
 ): void {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(1, fontSize / 14);
-  ctx.setLineDash([]);
-  ctx.beginPath();
-  const underlineY = y + fontSize * 0.35;
-  ctx.moveTo(x, underlineY);
-  ctx.lineTo(x + width, underlineY);
-  ctx.stroke();
+  renderUserDrawingTextDecorationLine(ctx, x, y, width, fontSize, color, fontSize * 0.35);
+}
+
+function renderUserDrawingTextLineThrough(
+  ctx: CanvasContext,
+  x: number,
+  y: number,
+  width: number,
+  fontSize: number,
+  color: string,
+): void {
+  renderUserDrawingTextDecorationLine(ctx, x, y, width, fontSize, color, -fontSize * 0.3);
 }
 
 function renderTextLabelGeometry(
@@ -1433,6 +1456,16 @@ function renderTextLabelGeometry(
         ctx.fillStyle,
       );
     }
+    if (drawing.style.textLineThrough) {
+      renderUserDrawingTextLineThrough(
+        ctx,
+        line.x,
+        line.y,
+        lineWidths[index] ?? ctx.measureText(line.text).width,
+        fontSize,
+        ctx.fillStyle,
+      );
+    }
   }
 }
 
@@ -1473,6 +1506,11 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
       const underlineX =
         drawing.textAlign === 'center' ? textX - textWidth / 2 : drawing.textAlign === 'right' ? textX - textWidth : textX;
       renderUserDrawingTextUnderline(ctx, underlineX, cell.textPoint.y, textWidth, fontSize, ctx.fillStyle);
+    }
+    if (drawing.style.textLineThrough) {
+      const lineThroughX =
+        drawing.textAlign === 'center' ? textX - textWidth / 2 : drawing.textAlign === 'right' ? textX - textWidth : textX;
+      renderUserDrawingTextLineThrough(ctx, lineThroughX, cell.textPoint.y, textWidth, fontSize, ctx.fillStyle);
     }
   }
 }

@@ -88,7 +88,8 @@ export interface UserDrawingFontStyleDescriptor {
 }
 
 export interface UserDrawingTextDecorationDescriptor {
-  textUnderline: boolean;
+  textUnderline?: boolean;
+  textLineThrough?: boolean;
   icon: string;
   label: string;
 }
@@ -340,6 +341,7 @@ export const USER_DRAWING_FONT_STYLE_DESCRIPTORS: readonly UserDrawingFontStyleD
 
 export const USER_DRAWING_TEXT_DECORATION_DESCRIPTORS: readonly UserDrawingTextDecorationDescriptor[] = [
   { textUnderline: true, icon: 'U', label: 'Underline text' },
+  { textLineThrough: true, icon: 'S', label: 'Strike-through text' },
 ] as const;
 
 export const USER_DRAWING_TEXT_WRAP_DESCRIPTORS: readonly UserDrawingTextWrapDescriptor[] = [
@@ -572,6 +574,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.fontWeight ?? '',
     selectedDrawing?.style.fontStyle ?? '',
     selectedDrawing?.style.textUnderline ?? '',
+    selectedDrawing?.style.textLineThrough ?? '',
     selectedDrawing?.style.textWrap ?? '',
     selectedDrawing?.style.textMaxWidth ?? '',
     selectedDrawing && (selectedDrawing.kind === 'table' || isUserDrawingTextAnnotation(selectedDrawing))

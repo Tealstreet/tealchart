@@ -49,6 +49,16 @@ import { IndicatorPaneLegend } from './IndicatorPaneLegend';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import { IndicatorsModal } from './IndicatorsModal';
 
+function resolveUserDrawingTextDecorationLine(style: {
+  textUnderline?: boolean;
+  textLineThrough?: boolean;
+}): string {
+  if (style.textUnderline && style.textLineThrough) return 'underline line-through';
+  if (style.textUnderline) return 'underline';
+  if (style.textLineThrough) return 'line-through';
+  return 'none';
+}
+
 /**
  * TealchartWidgetUI - Vanilla DOM UI layer for TealchartWidget
  *
@@ -560,7 +570,7 @@ export class TealchartWidgetUI {
         fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
         fontWeight: drawing.style.fontWeight === 'bold' ? '700' : '400',
         fontStyle: drawing.style.fontStyle === 'italic' ? 'italic' : 'normal',
-        textDecorationLine: drawing.style.textUnderline ? 'underline' : 'none',
+        textDecorationLine: resolveUserDrawingTextDecorationLine(drawing.style),
         lineHeight: '18px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.28)',
         pointerEvents: 'auto',
@@ -603,7 +613,7 @@ export class TealchartWidgetUI {
       fontFamily: drawing.style.fontFamily ?? 'var(--tc-font-family, inherit)',
       fontWeight: drawing.style.fontWeight === 'bold' ? '700' : '400',
       fontStyle: drawing.style.fontStyle === 'italic' ? 'italic' : 'normal',
-      textDecorationLine: drawing.style.textUnderline ? 'underline' : 'none',
+      textDecorationLine: resolveUserDrawingTextDecorationLine(drawing.style),
     });
   }
 

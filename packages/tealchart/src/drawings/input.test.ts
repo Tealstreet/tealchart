@@ -1053,7 +1053,14 @@ describe('user drawing input controller', () => {
 
     const bold = updateUserDrawingStyle(
       state,
-      { fontWeight: 'bold', fontStyle: 'italic', textUnderline: true, textWrap: true, textMaxWidth: 190 },
+      {
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        textUnderline: true,
+        textLineThrough: true,
+        textWrap: true,
+        textMaxWidth: 190,
+      },
       { now: () => 13 },
     );
     const normalized = updateUserDrawingStyle(
@@ -1068,6 +1075,7 @@ describe('user drawing input controller', () => {
         fontWeight: 'bold',
         fontStyle: 'italic',
         textUnderline: true,
+        textLineThrough: true,
         textWrap: true,
         textMaxWidth: 180,
       }),

@@ -658,7 +658,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       })}
 
                       {USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => {
-                        const active = !!selectedDrawing.style.textUnderline === descriptor.textUnderline;
+                        const isUnderline = descriptor.textUnderline === true;
+                        const active = isUnderline
+                          ? !!selectedDrawing.style.textUnderline
+                          : !!selectedDrawing.style.textLineThrough;
                         return (
                           <Pressable
                             key={descriptor.label}
@@ -667,7 +670,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                             accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
                             disabled={!textControlsEnabled}
                             onPress={() =>
-                              onUserDrawingStyleChange?.({ textUnderline: !selectedDrawing.style.textUnderline })
+                              onUserDrawingStyleChange?.(
+                                isUnderline
+                                  ? { textUnderline: !selectedDrawing.style.textUnderline }
+                                  : { textLineThrough: !selectedDrawing.style.textLineThrough },
+                              )
                             }
                             style={({ pressed }: PressableStyleState) => [
                               styles.drawingButton,
@@ -682,7 +689,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                                 {
                                   color: active ? accentColor : textSecondaryColor,
                                   fontSize: 11,
-                                  textDecorationLine: 'underline',
+                                  textDecorationLine: isUnderline ? 'underline' : 'line-through',
                                 },
                               ]}
                             >
