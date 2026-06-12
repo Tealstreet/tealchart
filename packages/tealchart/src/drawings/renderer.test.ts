@@ -1566,6 +1566,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:50,50');
     expect(ctx.calls.some((call) => call.startsWith('lineTo:') && call.includes('114.721'))).toBe(true);
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:1:54,46:#111:left:1:12px sans-serif');
   });
 
   it('renders gann fans as ratio fan rays', () => {

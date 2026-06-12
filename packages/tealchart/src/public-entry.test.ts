@@ -391,6 +391,7 @@ describe('tealchart public entries', () => {
         { x: 10, y: 5 },
         { x: 5, y: 10 },
       ],
+      labels: [{ text: '1', point: { x: 14, y: 1 } }],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const fibChannelPrimitive: NonNever<MobileUserDrawingFibChannelPrimitive> = {

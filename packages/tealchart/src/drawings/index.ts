@@ -133,6 +133,7 @@ export type {
   DrawingScreenFibSpeedResistanceArcs,
   DrawingScreenFibWedge,
   DrawingScreenFibSpiral,
+  DrawingScreenFibSpiralLabel,
   DrawingScreenFibLevel,
   DrawingScreenFibLevels,
   DrawingScreenFibFan,

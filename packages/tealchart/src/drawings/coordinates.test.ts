@@ -1904,6 +1904,13 @@ describe('user drawing coordinates', () => {
           { x: 110, y: 70 },
           { x: expect.closeTo(10), y: expect.closeTo(231.8) },
         ]),
+        labels: expect.arrayContaining([
+          expect.objectContaining({ text: '1', point: { x: 114, y: 66 } }),
+          expect.objectContaining({
+            text: '1.618',
+            point: { x: expect.closeTo(14.01), y: expect.closeTo(227.8) },
+          }),
+        ]),
       },
     });
     expect(resolveUserDrawingGeometry(gannFan, space)).toMatchObject({
