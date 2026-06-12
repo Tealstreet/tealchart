@@ -81,6 +81,7 @@ export type {
   MobileUserDrawingGannBoxPrimitive,
   MobileUserDrawingGannFanPrimitive,
   MobileUserDrawingGannSquarePrimitive,
+  MobileUserDrawingGannSquareFixedPrimitive,
   MobileUserDrawingHighlighterPrimitive,
   MobileUserDrawingIconPrimitive,
   MobileUserDrawingInfoLineLabelPosition,

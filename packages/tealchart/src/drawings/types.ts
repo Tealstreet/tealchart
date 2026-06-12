@@ -61,6 +61,7 @@ export type UserDrawingTool =
   | 'gannFan'
   | 'gannBox'
   | 'gannSquare'
+  | 'gannSquareFixed'
   | 'triangle'
   | 'curve'
   | 'doubleCurve'
@@ -475,6 +476,11 @@ export interface GannSquareDrawing extends UserDrawingBase {
   points: readonly [UserDrawingAnchor, UserDrawingAnchor];
 }
 
+export interface GannSquareFixedDrawing extends UserDrawingBase {
+  kind: 'gannSquareFixed';
+  points: readonly [UserDrawingAnchor, UserDrawingAnchor];
+}
+
 export interface FibChannelDrawing extends UserDrawingBase {
   kind: 'fibChannel';
   points: readonly [UserDrawingAnchor, UserDrawingAnchor, UserDrawingAnchor];
@@ -753,6 +759,7 @@ export type UserDrawing =
   | GannFanDrawing
   | GannBoxDrawing
   | GannSquareDrawing
+  | GannSquareFixedDrawing
   | TriangleDrawing
   | CurveDrawing
   | DoubleCurveDrawing
@@ -928,6 +935,7 @@ export function getRequiredAnchorCount(tool: UserDrawingTool): number {
     case 'gannFan':
     case 'gannBox':
     case 'gannSquare':
+    case 'gannSquareFixed':
     case 'fibTimeZone':
     case 'cyclicLines':
     case 'timeCycles':
@@ -1419,6 +1427,12 @@ export function createUserDrawingFromDraft(
       return {
         ...base,
         kind: 'gannSquare',
+        points: [draft.anchors[0]!, draft.anchors[1]!],
+      };
+    case 'gannSquareFixed':
+      return {
+        ...base,
+        kind: 'gannSquareFixed',
         points: [draft.anchors[0]!, draft.anchors[1]!],
       };
     case 'fibTimeZone':

@@ -108,6 +108,7 @@ describe('user drawing toolbar descriptors', () => {
       'gannFan',
       'gannBox',
       'gannSquare',
+      'gannSquareFixed',
       'triangle',
       'curve',
       'doubleCurve',
@@ -325,6 +326,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('gannSquare')).toEqual(
       expect.objectContaining({ tool: 'gannSquare', label: 'Gann square' }),
+    );
+    expect(getUserDrawingToolDescriptor('gannSquareFixed')).toEqual(
+      expect.objectContaining({ tool: 'gannSquareFixed', label: 'Gann square fixed' }),
     );
     expect(getUserDrawingToolDescriptor('triangle')).toEqual(
       expect.objectContaining({ tool: 'triangle', label: 'Triangle' }),
@@ -833,6 +837,9 @@ describe('user drawing toolbar descriptors', () => {
     ).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-box', kind: 'gannBox' as const })).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square', kind: 'gannSquare' as const })).toBe(true);
+    expect(
+      supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square-fixed', kind: 'gannSquareFixed' as const }),
+    ).toBe(true);
     expect(
       supportsUserDrawingFillControls({
         ...rectangle,
