@@ -302,6 +302,17 @@ describe('tealchart public entries', () => {
       opacity: 1,
       clip,
       rays: [{ ratio: 0.5, start: { x: 0, y: 5 }, end: { x: 10, y: 5 } }],
+      bands: [
+        {
+          fromRatio: 0,
+          toRatio: 0.5,
+          points: [
+            { x: 0, y: 0 },
+            { x: 10, y: 0 },
+            { x: 10, y: 5 },
+          ],
+        },
+      ],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const fibFanPrimitive: NonNever<MobileUserDrawingFibFanPrimitive> = {

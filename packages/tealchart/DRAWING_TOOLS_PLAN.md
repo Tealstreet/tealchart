@@ -962,10 +962,19 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Hit testing includes the added pitchfork parallel rays on both web and mobile
   through the shared geometry/render-model path.
 
+## Shipped: Pitchfan Background Bands
+
+- Shared pitchfan geometry now derives filled Fibonacci fan bands between the
+  existing pitchfan rays without changing persisted drawing state.
+- Web Canvas and mobile Skia render matching pitchfan background bands behind
+  the existing fan rays.
+- Pitchfan selection remains line-based to avoid broad accidental background
+  hits while preserving existing editing and serialization behavior.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.
-- TradingView pitchfan extra line sets/backgrounds, advanced
+- TradingView advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image source/upload lifecycle controls, and additional curved geometry.
 - Additional TradingView measurement tool polish beyond current bar-count

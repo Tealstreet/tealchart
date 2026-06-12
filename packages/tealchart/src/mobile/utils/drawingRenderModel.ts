@@ -340,6 +340,11 @@ export type MobileUserDrawingPrimitive =
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
       }[];
+      bands: readonly {
+        fromRatio: number;
+        toRatio: number;
+        points: readonly [DrawingScreenPoint, DrawingScreenPoint, DrawingScreenPoint];
+      }[];
       style: UserDrawingStyle;
     }
   | {
@@ -1552,6 +1557,7 @@ function primitiveFromGeometry(
           start: ray.segment.start,
           end: ray.segment.end,
         })),
+        bands: geometry.pitchfan.bands,
         style: geometry.drawing.style,
       };
     case 'fibFan':
