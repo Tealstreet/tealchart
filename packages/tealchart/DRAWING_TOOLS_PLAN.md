@@ -1200,6 +1200,15 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching underline toggles for selected text
   annotations and tables.
 
+## Shipped: Text Wrap Controls
+
+- Shared drawing style now supports text-annotation wrapping with normalized
+  cross-platform text box width presets.
+- Web Canvas, hit testing, DOM inline editing, mobile Skia, and React Native
+  inline editing use the same measured wrapped-line layout model.
+- Web and mobile top bars expose matching wrap toggles and width presets for
+  selected text annotations while leaving table sizing semantics unchanged.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

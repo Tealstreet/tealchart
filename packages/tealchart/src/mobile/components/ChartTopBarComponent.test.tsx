@@ -234,6 +234,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
     fireEvent.click(screen.getByLabelText('Underline text'));
+    fireEvent.click(screen.getByLabelText('Wrap text'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(56, 189, 248, 0.12)' });
@@ -243,7 +244,42 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
+  });
+
+  it('dispatches selected wrapped text label width controls', () => {
+    const onStyle = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'text' },
+          drawings: [
+            {
+              id: 'text',
+              kind: 'textLabel',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid', textWrap: true, textMaxWidth: 180 },
+              point: { time: 1, price: 10 },
+              text: 'note',
+              textAlign: 'center',
+            },
+          ],
+        }}
+        onUserDrawingStyleChange={onStyle}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('240 pixel text box width'));
+
+    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 240 });
   });
 
   it('dispatches selected table text style controls without text alignment controls', () => {
@@ -292,6 +328,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Bold text'));
     fireEvent.click(screen.getByLabelText('Italic text'));
     fireEvent.click(screen.getByLabelText('Underline text'));
+    expect(screen.queryByLabelText('Wrap text')).toBeNull();
     fireEvent.click(screen.getByLabelText('Right text alignment'));
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
@@ -300,6 +337,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).not.toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
     expect(onTextAlign).toHaveBeenCalledWith('right');
   });
 

@@ -26,6 +26,7 @@ import {
   supportsUserDrawingIconControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextStyleControls,
+  supportsUserDrawingTextWrapControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -41,6 +42,8 @@ import {
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
+  USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
+  USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
@@ -470,6 +473,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const iconSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
     const textStyleSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
     const textAlignSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
+    const textWrapSupported = selectedDrawing ? supportsUserDrawingTextWrapControls(selectedDrawing) : false;
 
     if (selectedDrawing) {
       for (const descriptor of USER_DRAWING_LINE_COLOR_DESCRIPTORS) {
@@ -947,6 +951,84 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             });
           }
           group.appendChild(btn);
+        }
+
+        if (textWrapSupported) {
+          for (const descriptor of USER_DRAWING_TEXT_WRAP_DESCRIPTORS) {
+            const isActive = !!selectedDrawing.style.textWrap === descriptor.textWrap;
+            const btn = this.createElement('button', {
+              style: {
+                ...styles.drawingButton,
+                ...(isActive ? styles.drawingButtonActive : {}),
+                opacity: textEnabled ? '1' : '0.35',
+                cursor: textEnabled ? 'pointer' : 'default',
+                fontSize: '11px',
+              },
+              textContent: descriptor.icon,
+              attributes: {
+                type: 'button',
+                title: descriptor.label,
+                'aria-label': descriptor.label,
+                'aria-pressed': isActive ? 'true' : 'false',
+              },
+            });
+            btn.disabled = !textEnabled;
+            if (textEnabled) {
+              btn.addEventListener('click', () =>
+                this.options.onUserDrawingStyleChange?.({
+                  textWrap: !selectedDrawing.style.textWrap,
+                  textMaxWidth: selectedDrawing.style.textMaxWidth ?? 180,
+                }),
+              );
+              btn.addEventListener('mouseenter', () => {
+                if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+              });
+              btn.addEventListener('mouseleave', () => {
+                if (!isActive) {
+                  btn.style.backgroundColor = 'transparent';
+                  btn.style.color = 'var(--text2, #787b86)';
+                }
+              });
+            }
+            group.appendChild(btn);
+          }
+
+          for (const descriptor of USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS) {
+            const isActive = (selectedDrawing.style.textMaxWidth ?? 180) === descriptor.textMaxWidth;
+            const widthEnabled = textEnabled && selectedDrawing.style.textWrap === true;
+            const btn = this.createElement('button', {
+              style: {
+                ...styles.drawingButton,
+                ...(isActive ? styles.drawingButtonActive : {}),
+                opacity: widthEnabled ? '1' : '0.35',
+                cursor: widthEnabled ? 'pointer' : 'default',
+                fontSize: '10px',
+              },
+              textContent: String(descriptor.textMaxWidth),
+              attributes: {
+                type: 'button',
+                title: descriptor.label,
+                'aria-label': descriptor.label,
+                'aria-pressed': isActive ? 'true' : 'false',
+              },
+            });
+            btn.disabled = !widthEnabled;
+            if (widthEnabled) {
+              btn.addEventListener('click', () =>
+                this.options.onUserDrawingStyleChange?.({ textMaxWidth: descriptor.textMaxWidth }),
+              );
+              btn.addEventListener('mouseenter', () => {
+                if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+              });
+              btn.addEventListener('mouseleave', () => {
+                if (!isActive) {
+                  btn.style.backgroundColor = 'transparent';
+                  btn.style.color = 'var(--text2, #787b86)';
+                }
+              });
+            }
+            group.appendChild(btn);
+          }
         }
 
         if (textAlignSupported) {

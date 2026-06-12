@@ -344,6 +344,11 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.textColor === 'string') style.textColor = value.textColor;
   if (isFiniteNumber(value.fontSize)) style.fontSize = value.fontSize;
   if (typeof value.fontFamily === 'string') style.fontFamily = value.fontFamily;
+  if (typeof value.fontWeight === 'string') style.fontWeight = value.fontWeight as UserDrawingStyle['fontWeight'];
+  if (typeof value.fontStyle === 'string') style.fontStyle = value.fontStyle as UserDrawingStyle['fontStyle'];
+  if (typeof value.textUnderline === 'boolean') style.textUnderline = value.textUnderline;
+  if (typeof value.textWrap === 'boolean') style.textWrap = value.textWrap;
+  if (isFiniteNumber(value.textMaxWidth)) style.textMaxWidth = value.textMaxWidth;
   return normalizeUserDrawingStyle(style);
 }
 

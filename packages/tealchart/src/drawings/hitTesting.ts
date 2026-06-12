@@ -8,7 +8,7 @@ import type {
 import type { UserDrawing, UserDrawingHandleRole, UserDrawingTextAnnotation } from './types';
 
 import { anchorToScreenPoint, resolveUserDrawingGeometry } from './coordinates';
-import { resolveUserDrawingBalloonLayout, resolveUserDrawingTextLabelLayout, splitUserDrawingTextLines } from './textLayout';
+import { measureUserDrawingTextLines, resolveUserDrawingBalloonLayout, resolveUserDrawingTextLabelLayout } from './textLayout';
 
 export interface UserDrawingHitTestOptions {
   tolerance?: number;
@@ -391,9 +391,15 @@ function hitTestResolvedGeometry(
     geometry.kind === 'signpost'
   ) {
     const drawing = geometry.drawing as UserDrawingTextAnnotation;
-    const lines = splitUserDrawingTextLines(drawing.text);
-    const lineWidths = lines.map((line) => Math.max(0, options.measureTextLabelLine?.(drawing, line) ?? line.length * 6));
     const lineHeight = Math.max(1, options.labelHeight - 2);
+    const wrapWidth = drawing.style.textWrap ? drawing.style.textMaxWidth : undefined;
+    const measuredLines = measureUserDrawingTextLines(
+      drawing.text,
+      (line) => Math.max(0, options.measureTextLabelLine?.(drawing, line) ?? line.length * 6),
+      wrapWidth === undefined ? undefined : Math.max(1, wrapWidth - 12),
+    );
+    const lines = measuredLines.map((line) => line.text);
+    const lineWidths = measuredLines.map((line) => line.width);
     const balloonLayout =
       geometry.kind === 'balloon'
         ? resolveUserDrawingBalloonLayout({
@@ -401,6 +407,8 @@ function hitTestResolvedGeometry(
             point: geometry.point,
             textAlign: drawing.textAlign,
             lineWidths,
+            lines,
+            boxWidth: wrapWidth,
             labelPadding: 6,
             lineHeight,
           })
@@ -412,6 +420,8 @@ function hitTestResolvedGeometry(
         point: geometry.point,
         textAlign: drawing.textAlign,
         lineWidths,
+        lines,
+        boxWidth: wrapWidth,
         labelPadding: 6,
         lineHeight,
       });

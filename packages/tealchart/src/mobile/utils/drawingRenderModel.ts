@@ -2417,19 +2417,23 @@ export function resolveMobileUserDrawingTextLabelLayout(
   options: {
     labelPadding?: number;
     labelHeight?: number;
+    lines?: readonly string[];
+    boxWidth?: number;
   } = {},
 ): MobileUserDrawingTextLabelLayout {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
   const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
-  const lines = splitUserDrawingTextLines(primitive.text);
+  const lines = options.lines ?? splitUserDrawingTextLines(primitive.text);
   const lineWidths = Array.isArray(measuredTextWidth) ? measuredTextWidth : lines.map(() => measuredTextWidth);
   const layout = resolveUserDrawingTextLabelLayout({
     text: primitive.text,
     point: primitive.point,
     textAlign: primitive.textAlign,
     lineWidths,
+    lines,
+    boxWidth: options.boxWidth,
     labelPadding,
     lineHeight: Math.max(1, labelHeight - 2),
   });
@@ -2452,19 +2456,23 @@ export function resolveMobileUserDrawingBalloonLayout(
   options: {
     labelPadding?: number;
     labelHeight?: number;
+    lines?: readonly string[];
+    boxWidth?: number;
   } = {},
 ): MobileUserDrawingBalloonLayout {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const labelPadding = options.labelPadding ?? DEFAULT_TEXT_LABEL_PADDING;
   const labelHeight = options.labelHeight ?? DEFAULT_TEXT_LABEL_HEIGHT;
-  const lines = splitUserDrawingTextLines(primitive.text);
+  const lines = options.lines ?? splitUserDrawingTextLines(primitive.text);
   const lineWidths = Array.isArray(measuredTextWidth) ? measuredTextWidth : lines.map(() => measuredTextWidth);
   const layout = resolveUserDrawingBalloonLayout({
     text: primitive.text,
     point: primitive.point,
     textAlign: primitive.textAlign,
     lineWidths,
+    lines,
+    boxWidth: options.boxWidth,
     labelPadding,
     lineHeight: Math.max(1, labelHeight - 2),
   });

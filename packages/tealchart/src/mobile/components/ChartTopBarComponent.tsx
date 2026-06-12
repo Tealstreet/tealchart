@@ -32,6 +32,7 @@ import {
   supportsUserDrawingIconControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextStyleControls,
+  supportsUserDrawingTextWrapControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -47,6 +48,8 @@ import {
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
+  USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
+  USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../../drawings';
@@ -165,6 +168,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const iconControlsSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
     const textStyleControlsSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
     const textAlignControlsSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
+    const textWrapControlsSupported = selectedDrawing ? supportsUserDrawingTextWrapControls(selectedDrawing) : false;
 
     return (
       <View style={[styles.container, { backgroundColor }]}>
@@ -650,6 +654,72 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                           </Pressable>
                         );
                       })}
+
+                      {textWrapControlsSupported &&
+                        USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => {
+                          const active = !!selectedDrawing.style.textWrap === descriptor.textWrap;
+                          return (
+                            <Pressable
+                              key={descriptor.label}
+                              accessibilityRole="button"
+                              accessibilityLabel={descriptor.label}
+                              accessibilityState={{ disabled: !textControlsEnabled, selected: active }}
+                              disabled={!textControlsEnabled}
+                              onPress={() =>
+                                onUserDrawingStyleChange?.({
+                                  textWrap: !selectedDrawing.style.textWrap,
+                                  textMaxWidth: selectedDrawing.style.textMaxWidth ?? 180,
+                                })
+                              }
+                              style={({ pressed }: PressableStyleState) => [
+                                styles.drawingButton,
+                                active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                                textControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                                !textControlsEnabled && styles.drawingButtonDisabled,
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.drawingButtonText,
+                                  { color: active ? accentColor : textSecondaryColor, fontSize: 11 },
+                                ]}
+                              >
+                                {descriptor.icon}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+
+                      {textWrapControlsSupported &&
+                        USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => {
+                          const active = (selectedDrawing.style.textMaxWidth ?? 180) === descriptor.textMaxWidth;
+                          const widthEnabled = textControlsEnabled && selectedDrawing.style.textWrap === true;
+                          return (
+                            <Pressable
+                              key={descriptor.textMaxWidth}
+                              accessibilityRole="button"
+                              accessibilityLabel={descriptor.label}
+                              accessibilityState={{ disabled: !widthEnabled, selected: active }}
+                              disabled={!widthEnabled}
+                              onPress={() => onUserDrawingStyleChange?.({ textMaxWidth: descriptor.textMaxWidth })}
+                              style={({ pressed }: PressableStyleState) => [
+                                styles.drawingButton,
+                                active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                                widthEnabled && pressed && !active && styles.drawingButtonPressed,
+                                !widthEnabled && styles.drawingButtonDisabled,
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.drawingButtonText,
+                                  { color: active ? accentColor : textSecondaryColor, fontSize: 10 },
+                                ]}
+                              >
+                                {descriptor.textMaxWidth}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
 
                       {textAlignControlsSupported &&
                         USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => {
