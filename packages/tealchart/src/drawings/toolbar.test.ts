@@ -85,6 +85,7 @@ describe('user drawing toolbar descriptors', () => {
       'elliottImpulseWave',
       'elliottCorrectiveWave',
       'elliottDoubleComboWave',
+      'elliottTripleComboWave',
       'elliottTriangleWave',
       'anchoredVwap',
       'fibRetracement',
@@ -237,6 +238,9 @@ describe('user drawing toolbar descriptors', () => {
     );
     expect(getUserDrawingToolDescriptor('elliottDoubleComboWave')).toEqual(
       expect.objectContaining({ tool: 'elliottDoubleComboWave', label: 'Elliott double combo wave' }),
+    );
+    expect(getUserDrawingToolDescriptor('elliottTripleComboWave')).toEqual(
+      expect.objectContaining({ tool: 'elliottTripleComboWave', label: 'Elliott triple combo wave' }),
     );
     expect(getUserDrawingToolDescriptor('elliottTriangleWave')).toEqual(
       expect.objectContaining({ tool: 'elliottTriangleWave', label: 'Elliott triangle wave' }),

@@ -416,6 +416,19 @@ export interface DrawingScreenElliottDoubleComboWave {
   labels: readonly DrawingScreenElliottDoubleComboWaveLabel[];
 }
 
+export const ELLIOTT_TRIPLE_COMBO_WAVE_LABELS = ['W', 'X', 'Y', 'X', 'Z'] as const;
+export type ElliottTripleComboWaveLabel = (typeof ELLIOTT_TRIPLE_COMBO_WAVE_LABELS)[number];
+
+export interface DrawingScreenElliottTripleComboWaveLabel {
+  text: ElliottTripleComboWaveLabel;
+  point: DrawingScreenPoint;
+}
+
+export interface DrawingScreenElliottTripleComboWave {
+  polyline: DrawingScreenPolyline;
+  labels: readonly DrawingScreenElliottTripleComboWaveLabel[];
+}
+
 export const ELLIOTT_TRIANGLE_WAVE_LABELS = ['A', 'B', 'C', 'D', 'E'] as const;
 export type ElliottTriangleWaveLabel = (typeof ELLIOTT_TRIANGLE_WAVE_LABELS)[number];
 
@@ -576,6 +589,11 @@ export type ResolvedUserDrawingGeometry =
       kind: 'elliottDoubleComboWave';
       drawing: UserDrawing;
       pattern: DrawingScreenElliottDoubleComboWave;
+    }
+  | {
+      kind: 'elliottTripleComboWave';
+      drawing: UserDrawing;
+      pattern: DrawingScreenElliottTripleComboWave;
     }
   | {
       kind: 'elliottTriangleWave';
@@ -1316,6 +1334,26 @@ export function resolveElliottDoubleComboWaveFromAnchors(
     polyline,
     labels: polyline.points.map((point, index) => ({
       text: ELLIOTT_DOUBLE_COMBO_WAVE_LABELS[index]!,
+      point,
+    })),
+  };
+}
+
+export function resolveElliottTripleComboWaveFromAnchors(
+  points: readonly [
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+    UserDrawingAnchor,
+  ],
+  space: DrawingCoordinateSpace,
+): DrawingScreenElliottTripleComboWave {
+  const polyline = resolvePolylineFromAnchors(points, space);
+  return {
+    polyline,
+    labels: polyline.points.map((point, index) => ({
+      text: ELLIOTT_TRIPLE_COMBO_WAVE_LABELS[index]!,
       point,
     })),
   };
@@ -2593,6 +2631,12 @@ export function resolveUserDrawingGeometry(
         kind: 'elliottDoubleComboWave',
         drawing,
         pattern: resolveElliottDoubleComboWaveFromAnchors(drawing.points, space),
+      };
+    case 'elliottTripleComboWave':
+      return {
+        kind: 'elliottTripleComboWave',
+        drawing,
+        pattern: resolveElliottTripleComboWaveFromAnchors(drawing.points, space),
       };
     case 'elliottTriangleWave':
       return {

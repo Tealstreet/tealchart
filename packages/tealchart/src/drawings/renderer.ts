@@ -529,6 +529,7 @@ function renderPatternGeometry(
         | 'elliottImpulseWave'
         | 'elliottCorrectiveWave'
         | 'elliottDoubleComboWave'
+        | 'elliottTripleComboWave'
         | 'elliottTriangleWave';
     }
   >,
@@ -1205,6 +1206,7 @@ export function renderUserDrawing(
         break;
       case 'elliottCorrectiveWave':
       case 'elliottDoubleComboWave':
+      case 'elliottTripleComboWave':
         renderPatternGeometry(ctx, geometry);
         break;
       case 'elliottTriangleWave':
