@@ -995,6 +995,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web Canvas and mobile Skia render matching fan labels from the shared ray
   model without changing persisted drawing state.
 
+## Shipped: Time Guide Labels
+
+- Shared time-guide geometry now carries bottom-aligned labels for Fibonacci
+  time zones, trend-based Fibonacci time zones, cyclic lines, and time cycles.
+- Web Canvas and mobile Skia render matching time guide labels from the shared
+  model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

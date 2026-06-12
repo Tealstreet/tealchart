@@ -1669,6 +1669,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:20,0');
     expect(ctx.calls).toContain('lineTo:20,100');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0:10,96:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1:20,96:#111:center:1:12px sans-serif');
   });
 
   it('renders trend-based fib time as projected vertical Fibonacci time levels', () => {
@@ -1691,6 +1693,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:40,0');
     expect(ctx.calls).toContain('lineTo:40,100');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0:30,96:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1:40,96:#111:center:1:12px sans-serif');
   });
 
   it('renders cyclic lines as repeated vertical time levels', () => {
@@ -1714,6 +1718,8 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:20,0');
     expect(ctx.calls).toContain('lineTo:20,100');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0:10,96:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:1:20,96:#111:center:1:12px sans-serif');
   });
 
   it('renders time cycles as repeated vertical boundaries and sampled arcs', () => {
@@ -1737,6 +1743,7 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('moveTo:10,50');
     expect(ctx.calls).toContain('lineTo:15,20');
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('fillText:0:15,96:#111:center:1:12px sans-serif');
   });
 
   it('renders sine lines as sampled wave paths', () => {
