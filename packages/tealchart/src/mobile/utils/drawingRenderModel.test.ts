@@ -787,6 +787,18 @@ describe('mobile user drawing render model', () => {
       median: { start: { x: 10, y: 50 }, end: { x: 100, y: 50 } },
       upper: { start: { x: 50, y: 20 }, end: { x: 100, y: 20 } },
       lower: { start: { x: 50, y: 80 }, end: { x: 100, y: 80 } },
+      parallels: [
+        { ratio: -0.5, start: { x: 50, y: -10 }, end: { x: 100, y: -10 } },
+        { ratio: 0.25, start: { x: 50, y: 35 }, end: { x: 100, y: 35 } },
+        { ratio: 0.75, start: { x: 50, y: 65 }, end: { x: 100, y: 65 } },
+        { ratio: 1.5, start: { x: 50, y: 110 }, end: { x: 100, y: 110 } },
+      ],
+      fill: [
+        { x: 50, y: 20 },
+        { x: 100, y: 20 },
+        { x: 100, y: 80 },
+        { x: 50, y: 80 },
+      ],
     });
   });
 

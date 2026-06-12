@@ -466,6 +466,7 @@ function hitTestResolvedGeometry(
       distanceToSegment(point, geometry.pitchfork.median),
       distanceToSegment(point, geometry.pitchfork.upper),
       distanceToSegment(point, geometry.pitchfork.lower),
+      ...geometry.pitchfork.parallels.map((parallel) => distanceToSegment(point, parallel.segment)),
     );
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
