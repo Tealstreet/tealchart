@@ -2633,6 +2633,43 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready sector primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'sector',
+          kind: 'sector',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 50 },
+            { time: 90, price: 80 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'sector',
+      id: 'sector',
+      clip,
+      origin: { x: 10, y: 50 },
+      future: { x: 90, y: 50 },
+      points: expect.arrayContaining([{ x: 10, y: 50 }]),
+      style,
+    });
+  });
+
   it('returns Skia-ready bars pattern primitives from source bars', () => {
     const state: UserDrawingState = {
       version: 1,

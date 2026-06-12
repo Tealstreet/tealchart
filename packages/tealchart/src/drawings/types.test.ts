@@ -113,6 +113,7 @@ describe('user drawing types', () => {
     expect(getRequiredAnchorCount('fibChannel')).toBe(3);
     expect(getRequiredAnchorCount('trendBasedFibTime')).toBe(3);
     expect(getRequiredAnchorCount('projection')).toBe(3);
+    expect(getRequiredAnchorCount('sector')).toBe(3);
     expect(getRequiredAnchorCount('triangle')).toBe(3);
     expect(getRequiredAnchorCount('curve')).toBe(3);
     expect(getRequiredAnchorCount('doubleCurve')).toBe(4);
@@ -535,6 +536,15 @@ describe('user drawing types', () => {
     expect(createUserDrawingFromDraft(draft({ tool: 'projection', anchors: [anchorA, anchorB, anchorC] }), { id: 'projection', now: 20 })).toMatchObject({
       id: 'projection',
       kind: 'projection',
+      points: [anchorA, anchorB, anchorC],
+      visible: true,
+      locked: false,
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    expect(createUserDrawingFromDraft(draft({ tool: 'sector', anchors: [anchorA, anchorB, anchorC] }), { id: 'sector', now: 20 })).toMatchObject({
+      id: 'sector',
+      kind: 'sector',
       points: [anchorA, anchorB, anchorC],
       visible: true,
       locked: false,

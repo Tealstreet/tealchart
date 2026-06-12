@@ -54,6 +54,7 @@ import type {
   ProjectionDrawing,
   RegressionTrendDrawing,
   RotatedRectangleDrawing,
+  SectorDrawing,
   ShortPositionDrawing,
   SineLineDrawing,
   TimeCyclesDrawing,
@@ -114,6 +115,7 @@ import type {
   MobileUserDrawingRegressionTrendPrimitive,
   MobileUserDrawingRiskRewardLabelPosition,
   MobileUserDrawingRiskRewardPositionPrimitive,
+  MobileUserDrawingSectorPrimitive,
   MobileUserDrawingSineLinePrimitive,
   MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingTrendBasedFibTimePrimitive,
@@ -156,6 +158,7 @@ import {
   resolvePitchfanFromAnchors,
   resolvePitchforkFromAnchors,
   resolveProjectionFromAnchors,
+  resolveSectorFromAnchors,
   resolveRegressionTrendFromAnchors,
   resolveRiskRewardPositionFromAnchors,
   resolveSineLineFromAnchors,
@@ -234,6 +237,7 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingSineLinePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingForecastPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingProjectionPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingSectorPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingEllipsePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrendAnglePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePrimitive');
@@ -527,6 +531,27 @@ describe('tealchart public entries', () => {
       changeLabel: '+5.00 (+33.33%) / 1 second',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const sectorPrimitive: NonNever<MobileUserDrawingSectorPrimitive> = {
+      kind: 'sector',
+      id: 'sector',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      origin: { x: 0, y: 10 },
+      future: { x: 10, y: 10 },
+      target: { x: 10, y: 0 },
+      boundaries: [
+        { start: { x: 0, y: 10 }, end: { x: 10, y: 10 } },
+        { start: { x: 0, y: 10 }, end: { x: 10, y: 0 } },
+      ],
+      points: [
+        { x: 0, y: 10 },
+        { x: 10, y: 10 },
+        { x: 10, y: 0 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const gannBoxPrimitive: NonNever<MobileUserDrawingGannBoxPrimitive> = {
       kind: 'gannBox',
       id: 'gann-box',
@@ -813,6 +838,7 @@ describe('tealchart public entries', () => {
     expect(sineLinePrimitive.kind).toBe('sineLine');
     expect(forecastPrimitive.kind).toBe('forecast');
     expect(projectionPrimitive.kind).toBe('projection');
+    expect(sectorPrimitive.kind).toBe('sector');
     expect(trendBasedFibTimePrimitive.kind).toBe('trendBasedFibTime');
     expect(gannFanPrimitive.kind).toBe('gannFan');
     expect(gannBoxPrimitive.kind).toBe('gannBox');
@@ -2031,6 +2057,38 @@ describe('tealchart public entries', () => {
       targetLabel: 'Target 20.00',
       changeLabel: '+5.00 (+33.33%) / 1 ms',
     });
+  });
+
+  it('exports shared drawing sector types and resolver', () => {
+    const drawing: SectorDrawing = {
+      id: 'sector',
+      kind: 'sector',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+      points: [
+        { time: 1, price: 10 },
+        { time: 3, price: 10 },
+        { time: 3, price: 20 },
+      ],
+    };
+    const sector = resolveSectorFromAnchors(drawing.points[0], drawing.points[1], drawing.points[2], {
+      viewport: { startTime: 0, endTime: 3, priceMin: 0, priceMax: 20 },
+      pane: { id: 'main', top: 0, height: 100, bottom: 100, yMin: 0, yMax: 20 },
+      chartLeft: 0,
+      chartRight: 150,
+    });
+
+    expect(drawing.kind).toBe('sector');
+    expect(sector).toMatchObject({
+      origin: { x: 50, y: 50 },
+      future: { x: 150, y: 50 },
+      radius: 100,
+    });
+    expect(sector.polygon.points[0]).toEqual({ x: 50, y: 50 });
   });
 
   it('exports shared drawing trend-based fib time types and resolver', () => {

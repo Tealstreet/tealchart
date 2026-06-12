@@ -151,6 +151,7 @@ export const USER_DRAWING_TOOL_DESCRIPTORS: readonly UserDrawingToolDescriptor[]
   { tool: 'shortPosition', icon: 'S', label: 'Short position' },
   { tool: 'forecast', icon: '↗', label: 'Forecast' },
   { tool: 'projection', icon: '⌁', label: 'Projection' },
+  { tool: 'sector', icon: '◔', label: 'Sector' },
   { tool: 'barsPattern', icon: '▥', label: 'Bars pattern' },
   { tool: 'trianglePattern', icon: '△', label: 'Triangle pattern' },
   { tool: 'abcdPattern', icon: 'A', label: 'ABCD pattern' },
@@ -384,6 +385,7 @@ export function supportsUserDrawingFillControls(drawing: UserDrawing): boolean {
     drawing.kind === 'priceRange' ||
     drawing.kind === 'dateRange' ||
     drawing.kind === 'datePriceRange' ||
+    drawing.kind === 'sector' ||
     drawing.kind === 'triangle' ||
     drawing.kind === 'trianglePattern' ||
     drawing.kind === 'fibWedge' ||

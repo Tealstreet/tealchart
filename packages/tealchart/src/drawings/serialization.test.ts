@@ -2862,6 +2862,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores sector drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'sector',
+          kind: 'sector',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 100 },
+            { time: 2, price: 110 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'sector',
+      kind: 'sector',
+      points: [
+        { time: 1, price: 100 },
+        { time: 2, price: 100 },
+        { time: 2, price: 110 },
+      ],
+    });
+  });
+
   it('restores bars pattern drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
