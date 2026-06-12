@@ -27,8 +27,9 @@ import {
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
+  supportsUserDrawingRichTextControls,
   supportsUserDrawingTextAlignControls,
-  supportsUserDrawingTextStyleControls,
+  supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
@@ -480,7 +481,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const fillColorSupported = selectedDrawing ? supportsUserDrawingFillColorControls(selectedDrawing) : false;
     const fillVisibilitySupported = selectedDrawing ? supportsUserDrawingFillVisibilityControls(selectedDrawing) : false;
     const iconSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
-    const textStyleSupported = selectedDrawing ? supportsUserDrawingTextStyleControls(selectedDrawing) : false;
+    const textAppearanceSupported = selectedDrawing ? supportsUserDrawingTextAppearanceControls(selectedDrawing) : false;
+    const richTextSupported = selectedDrawing ? supportsUserDrawingRichTextControls(selectedDrawing) : false;
     const textAlignSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
     const textWrapSupported = selectedDrawing ? supportsUserDrawingTextWrapControls(selectedDrawing) : false;
     const trendLineExtendSupported = selectedDrawing
@@ -796,7 +798,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         group.appendChild(this.createElement('div', { style: styles.divider }));
       }
 
-      if (textStyleSupported) {
+      if (textAppearanceSupported) {
         for (const descriptor of USER_DRAWING_TEXT_COLOR_DESCRIPTORS) {
           const isActive = selectedDrawing.style.textColor?.toLowerCase() === descriptor.textColor.toLowerCase();
           const btn = this.createElement('button', {
@@ -896,117 +898,121 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           group.appendChild(btn);
         }
 
-        for (const descriptor of USER_DRAWING_FONT_WEIGHT_DESCRIPTORS) {
-          const isActive = (selectedDrawing.style.fontWeight ?? 'normal') === descriptor.fontWeight;
-          const btn = this.createElement('button', {
-            style: {
-              ...styles.drawingButton,
-              ...(isActive ? styles.drawingButtonActive : {}),
-              opacity: textEnabled ? '1' : '0.35',
-              cursor: textEnabled ? 'pointer' : 'default',
-              fontWeight: descriptor.fontWeight === 'bold' ? '700' : '400',
-            },
-            textContent: descriptor.icon,
-            attributes: {
-              type: 'button',
-              title: descriptor.label,
-              'aria-label': descriptor.label,
-              'aria-pressed': isActive ? 'true' : 'false',
-            },
-          });
-          btn.disabled = !textEnabled;
-          if (textEnabled) {
-            btn.addEventListener('click', () =>
-              this.options.onUserDrawingStyleChange?.({ fontWeight: descriptor.fontWeight }),
-            );
-            btn.addEventListener('mouseenter', () => {
-              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+        if (richTextSupported) {
+          for (const descriptor of USER_DRAWING_FONT_WEIGHT_DESCRIPTORS) {
+            const isActive = (selectedDrawing.style.fontWeight ?? 'normal') === descriptor.fontWeight;
+            const btn = this.createElement('button', {
+              style: {
+                ...styles.drawingButton,
+                ...(isActive ? styles.drawingButtonActive : {}),
+                opacity: textEnabled ? '1' : '0.35',
+                cursor: textEnabled ? 'pointer' : 'default',
+                fontWeight: descriptor.fontWeight === 'bold' ? '700' : '400',
+              },
+              textContent: descriptor.icon,
+              attributes: {
+                type: 'button',
+                title: descriptor.label,
+                'aria-label': descriptor.label,
+                'aria-pressed': isActive ? 'true' : 'false',
+              },
             });
-            btn.addEventListener('mouseleave', () => {
-              if (!isActive) {
-                btn.style.backgroundColor = 'transparent';
-                btn.style.color = 'var(--text2, #787b86)';
-              }
-            });
+            btn.disabled = !textEnabled;
+            if (textEnabled) {
+              btn.addEventListener('click', () =>
+                this.options.onUserDrawingStyleChange?.({ fontWeight: descriptor.fontWeight }),
+              );
+              btn.addEventListener('mouseenter', () => {
+                if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+              });
+              btn.addEventListener('mouseleave', () => {
+                if (!isActive) {
+                  btn.style.backgroundColor = 'transparent';
+                  btn.style.color = 'var(--text2, #787b86)';
+                }
+              });
+            }
+            group.appendChild(btn);
           }
-          group.appendChild(btn);
-        }
 
-        for (const descriptor of USER_DRAWING_FONT_STYLE_DESCRIPTORS) {
-          const isActive = (selectedDrawing.style.fontStyle ?? 'normal') === descriptor.fontStyle;
-          const btn = this.createElement('button', {
-            style: {
-              ...styles.drawingButton,
-              ...(isActive ? styles.drawingButtonActive : {}),
-              opacity: textEnabled ? '1' : '0.35',
-              cursor: textEnabled ? 'pointer' : 'default',
-              fontStyle: descriptor.fontStyle === 'italic' ? 'italic' : 'normal',
-            },
-            textContent: descriptor.icon,
-            attributes: {
-              type: 'button',
-              title: descriptor.label,
-              'aria-label': descriptor.label,
-              'aria-pressed': isActive ? 'true' : 'false',
-            },
-          });
-          btn.disabled = !textEnabled;
-          if (textEnabled) {
-            btn.addEventListener('click', () =>
-              this.options.onUserDrawingStyleChange?.({ fontStyle: descriptor.fontStyle }),
-            );
-            btn.addEventListener('mouseenter', () => {
-              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+          for (const descriptor of USER_DRAWING_FONT_STYLE_DESCRIPTORS) {
+            const isActive = (selectedDrawing.style.fontStyle ?? 'normal') === descriptor.fontStyle;
+            const btn = this.createElement('button', {
+              style: {
+                ...styles.drawingButton,
+                ...(isActive ? styles.drawingButtonActive : {}),
+                opacity: textEnabled ? '1' : '0.35',
+                cursor: textEnabled ? 'pointer' : 'default',
+                fontStyle: descriptor.fontStyle === 'italic' ? 'italic' : 'normal',
+              },
+              textContent: descriptor.icon,
+              attributes: {
+                type: 'button',
+                title: descriptor.label,
+                'aria-label': descriptor.label,
+                'aria-pressed': isActive ? 'true' : 'false',
+              },
             });
-            btn.addEventListener('mouseleave', () => {
-              if (!isActive) {
-                btn.style.backgroundColor = 'transparent';
-                btn.style.color = 'var(--text2, #787b86)';
-              }
-            });
+            btn.disabled = !textEnabled;
+            if (textEnabled) {
+              btn.addEventListener('click', () =>
+                this.options.onUserDrawingStyleChange?.({ fontStyle: descriptor.fontStyle }),
+              );
+              btn.addEventListener('mouseenter', () => {
+                if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+              });
+              btn.addEventListener('mouseleave', () => {
+                if (!isActive) {
+                  btn.style.backgroundColor = 'transparent';
+                  btn.style.color = 'var(--text2, #787b86)';
+                }
+              });
+            }
+            group.appendChild(btn);
           }
-          group.appendChild(btn);
-        }
 
-        for (const descriptor of USER_DRAWING_TEXT_DECORATION_DESCRIPTORS) {
-          const isUnderline = descriptor.textUnderline === true;
-          const isActive = isUnderline ? !!selectedDrawing.style.textUnderline : !!selectedDrawing.style.textLineThrough;
-          const btn = this.createElement('button', {
-            style: {
-              ...styles.drawingButton,
-              ...(isActive ? styles.drawingButtonActive : {}),
-              opacity: textEnabled ? '1' : '0.35',
-              cursor: textEnabled ? 'pointer' : 'default',
-              textDecorationLine: isUnderline ? 'underline' : 'line-through',
-            },
-            textContent: descriptor.icon,
-            attributes: {
-              type: 'button',
-              title: descriptor.label,
-              'aria-label': descriptor.label,
-              'aria-pressed': isActive ? 'true' : 'false',
-            },
-          });
-          btn.disabled = !textEnabled;
-          if (textEnabled) {
-            btn.addEventListener('click', () =>
-              this.options.onUserDrawingStyleChange?.(
-                isUnderline
-                  ? { textUnderline: !selectedDrawing.style.textUnderline }
-                  : { textLineThrough: !selectedDrawing.style.textLineThrough },
-              ),
-            );
-            btn.addEventListener('mouseenter', () => {
-              if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+          for (const descriptor of USER_DRAWING_TEXT_DECORATION_DESCRIPTORS) {
+            const isUnderline = descriptor.textUnderline === true;
+            const isActive = isUnderline
+              ? !!selectedDrawing.style.textUnderline
+              : !!selectedDrawing.style.textLineThrough;
+            const btn = this.createElement('button', {
+              style: {
+                ...styles.drawingButton,
+                ...(isActive ? styles.drawingButtonActive : {}),
+                opacity: textEnabled ? '1' : '0.35',
+                cursor: textEnabled ? 'pointer' : 'default',
+                textDecorationLine: isUnderline ? 'underline' : 'line-through',
+              },
+              textContent: descriptor.icon,
+              attributes: {
+                type: 'button',
+                title: descriptor.label,
+                'aria-label': descriptor.label,
+                'aria-pressed': isActive ? 'true' : 'false',
+              },
             });
-            btn.addEventListener('mouseleave', () => {
-              if (!isActive) {
-                btn.style.backgroundColor = 'transparent';
-                btn.style.color = 'var(--text2, #787b86)';
-              }
-            });
+            btn.disabled = !textEnabled;
+            if (textEnabled) {
+              btn.addEventListener('click', () =>
+                this.options.onUserDrawingStyleChange?.(
+                  isUnderline
+                    ? { textUnderline: !selectedDrawing.style.textUnderline }
+                    : { textLineThrough: !selectedDrawing.style.textLineThrough },
+                ),
+              );
+              btn.addEventListener('mouseenter', () => {
+                if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+              });
+              btn.addEventListener('mouseleave', () => {
+                if (!isActive) {
+                  btn.style.backgroundColor = 'transparent';
+                  btn.style.color = 'var(--text2, #787b86)';
+                }
+              });
+            }
+            group.appendChild(btn);
           }
-          group.appendChild(btn);
         }
 
         if (textWrapSupported) {
