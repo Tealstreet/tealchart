@@ -988,6 +988,13 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Pitchfan selection remains line-based to avoid broad accidental background
   hits while preserving existing editing and serialization behavior.
 
+## Shipped: Fan Level Labels
+
+- Shared fan-ray geometry now carries ratio labels and screen label points for
+  Fibonacci fan, Fibonacci speed-resistance fan, and Gann fan tools.
+- Web Canvas and mobile Skia render matching fan labels from the shared ray
+  model without changing persisted drawing state.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar organization and overflow menus.

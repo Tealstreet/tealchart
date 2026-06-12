@@ -2037,6 +2037,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (primitive.kind === 'fibFan' || primitive.kind === 'fibSpeedResistanceFan' || primitive.kind === 'gannFan') {
             if (primitive.style.lineVisible === false) return null;
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
 
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
@@ -2052,6 +2053,23 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     {dash && <DashPathEffect intervals={dash} />}
                   </SkiaLine>
                 ))}
+                {font &&
+                  primitive.rays.map((ray) => {
+                    if (!ray.label || !ray.labelPoint) return null;
+                    const textWidth = font.measureText(ray.label).width;
+                    const x =
+                      ray.end.x >= ray.start.x ? ray.labelPoint.x - textWidth : ray.labelPoint.x;
+                    return (
+                      <SkiaText
+                        key={`${ray.ratio}:label`}
+                        x={x}
+                        y={ray.labelPoint.y}
+                        text={ray.label}
+                        font={font}
+                        color={primitive.style.textColor ?? primitive.style.lineColor}
+                      />
+                    );
+                  })}
               </Group>
             );
           }

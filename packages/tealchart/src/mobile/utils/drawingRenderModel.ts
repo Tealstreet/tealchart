@@ -348,6 +348,8 @@ export type MobileUserDrawingPrimitive =
         ratio: number;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        label?: string;
+        labelPoint?: DrawingScreenPoint;
       }[];
       bands: readonly {
         fromRatio: number;
@@ -367,6 +369,8 @@ export type MobileUserDrawingPrimitive =
         ratio: number;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        label?: string;
+        labelPoint?: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -381,6 +385,8 @@ export type MobileUserDrawingPrimitive =
         ratio: number;
         start: DrawingScreenPoint;
         end: DrawingScreenPoint;
+        label?: string;
+        labelPoint?: DrawingScreenPoint;
       }[];
       style: UserDrawingStyle;
     }
@@ -1582,6 +1588,8 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
+          label: ray.label,
+          labelPoint: ray.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1597,6 +1605,8 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
+          label: ray.label,
+          labelPoint: ray.labelPoint,
         })),
         style: geometry.drawing.style,
       };
@@ -1705,6 +1715,8 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
+          label: ray.label,
+          labelPoint: ray.labelPoint,
         })),
         style: geometry.drawing.style,
       };

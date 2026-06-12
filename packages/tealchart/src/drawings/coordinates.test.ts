@@ -1728,13 +1728,27 @@ describe('user drawing coordinates', () => {
         targetStart: { x: 110, y: 70 },
         targetEnd: { x: 110, y: 120 },
         rays: expect.arrayContaining([
-          { ratio: 0, target: { x: 110, y: 70 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } } },
+          {
+            ratio: 0,
+            label: '0',
+            target: { x: 110, y: 70 },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 70 } },
+            labelPoint: { x: 206, y: 66 },
+          },
           {
             ratio: 0.5,
+            label: '0.5',
             target: { x: 110, y: 95 },
             segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 120 } },
+            labelPoint: { x: 206, y: 116 },
           },
-          { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
+          {
+            ratio: 1,
+            label: '1',
+            target: { x: 110, y: 120 },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } },
+            labelPoint: { x: 206, y: 166 },
+          },
         ]),
       },
     });
@@ -1747,8 +1761,10 @@ describe('user drawing coordinates', () => {
         rays: [
           {
             ratio: 1 / 3,
+            label: '0.333',
             target: { x: 110, y: expect.closeTo(86.67) },
             segment: { start: { x: 10, y: 70 }, end: { x: 210, y: expect.closeTo(103.33) } },
+            labelPoint: { x: 206, y: expect.closeTo(99.33) },
           },
           {
             ratio: 2 / 3,
@@ -1836,11 +1852,25 @@ describe('user drawing coordinates', () => {
         rays: expect.arrayContaining([
           {
             ratio: 0.125,
+            label: '1/8',
             target: { x: 110, y: 76.25 },
             segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 82.5 } },
+            labelPoint: { x: 206, y: 78.5 },
           },
-          { ratio: 1, target: { x: 110, y: 120 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } } },
-          { ratio: 2, target: { x: 110, y: 170 }, segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 270 } } },
+          {
+            ratio: 1,
+            label: '1/1',
+            target: { x: 110, y: 120 },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 170 } },
+            labelPoint: { x: 206, y: 166 },
+          },
+          {
+            ratio: 2,
+            label: '2/1',
+            target: { x: 110, y: 170 },
+            segment: { start: { x: 10, y: 70 }, end: { x: 210, y: 270 } },
+            labelPoint: { x: 206, y: 266 },
+          },
         ]),
       },
     });

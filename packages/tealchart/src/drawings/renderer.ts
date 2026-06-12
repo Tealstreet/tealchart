@@ -368,9 +368,10 @@ function renderFibFanGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'fibFan' | 'fibSpeedResistanceFan' }>,
 ): void {
-  if (geometry.drawing.style.lineVisible === false) return;
+  const { drawing } = geometry;
+  if (drawing.style.lineVisible === false) return;
 
-  applyStrokeStyle(ctx, geometry.drawing);
+  applyStrokeStyle(ctx, drawing);
   const rays = geometry.kind === 'fibFan' ? geometry.fibFan.rays : geometry.fibSpeedResistanceFan.rays;
   ctx.beginPath();
   for (const ray of rays) {
@@ -378,21 +379,40 @@ function renderFibFanGeometry(
     ctx.lineTo(ray.segment.end.x, ray.segment.end.y);
   }
   ctx.stroke();
+
+  ctx.font = `${normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12)}px ${normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif')}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textBaseline = 'bottom';
+  for (const ray of rays) {
+    if (!ray.label || !ray.labelPoint) continue;
+    ctx.textAlign = ray.segment.end.x >= ray.segment.start.x ? 'right' : 'left';
+    ctx.fillText(ray.label, ray.labelPoint.x, ray.labelPoint.y);
+  }
 }
 
 function renderGannFanGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'gannFan' }>,
 ): void {
-  if (geometry.drawing.style.lineVisible === false) return;
+  const { drawing } = geometry;
+  if (drawing.style.lineVisible === false) return;
 
-  applyStrokeStyle(ctx, geometry.drawing);
+  applyStrokeStyle(ctx, drawing);
   ctx.beginPath();
   for (const ray of geometry.gannFan.rays) {
     ctx.moveTo(ray.segment.start.x, ray.segment.start.y);
     ctx.lineTo(ray.segment.end.x, ray.segment.end.y);
   }
   ctx.stroke();
+
+  ctx.font = `${normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12)}px ${normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif')}`;
+  ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
+  ctx.textBaseline = 'bottom';
+  for (const ray of geometry.gannFan.rays) {
+    if (!ray.label || !ray.labelPoint) continue;
+    ctx.textAlign = ray.segment.end.x >= ray.segment.start.x ? 'right' : 'left';
+    ctx.fillText(ray.label, ray.labelPoint.x, ray.labelPoint.y);
+  }
 }
 
 function renderGannBoxGeometry(
