@@ -11,7 +11,6 @@ import type {
 import type { UserDrawingState } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
-import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
 import { resolveUserDrawingGeometry } from './coordinates';
@@ -432,7 +431,7 @@ function renderInfoLineGeometry(
   if (geometry.drawing.kind !== 'infoLine') return;
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
-  const label = resolveUserDrawingInfoLineMetrics(geometry.drawing.points[0], geometry.drawing.points[1]).label;
+  const label = geometry.infoMetrics.label;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = geometry.drawing.style.textColor ?? geometry.drawing.style.lineColor;
