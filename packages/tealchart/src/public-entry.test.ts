@@ -122,6 +122,7 @@ import type {
   MobileUserDrawingSectorPrimitive,
   MobileUserDrawingSineLinePrimitive,
   MobileUserDrawingTablePrimitive,
+  MobileUserDrawingTextBoxPrimitive,
   MobileUserDrawingTimeCyclesPrimitive,
   MobileUserDrawingTrendBasedFibTimePrimitive,
 } from './mobile/utils/drawingRenderModel';
@@ -226,6 +227,8 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('resolveMobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingRiskRewardLabelPosition');
     expect(nativeEntry).toContain('resolveMobileUserDrawingTrendAngleLabelPosition');
+    expect(nativeEntry).toContain('resolveMobileUserDrawingTextLabelLayout');
+    expect(nativeEntry).toContain('isMobileUserDrawingTextBoxPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingInfoLineLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelPosition');
     expect(nativeEntry).toContain('MobileUserDrawingMeasurementLabelTarget');
@@ -269,6 +272,9 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingPinPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingIconPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingBalloonPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingSignpostPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTextBoxPrimitive');
+    expect(nativeEntry).toContain('MobileUserDrawingTextLabelLayout');
     expect(nativeEntry).toContain('MobileUserDrawingTablePrimitive');
   });
 
@@ -818,6 +824,7 @@ describe('tealchart public entries', () => {
       textAlign: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const textBoxPrimitive: NonNever<MobileUserDrawingTextBoxPrimitive> = balloonPrimitive;
     const tablePrimitive: NonNever<MobileUserDrawingTablePrimitive> = {
       kind: 'table',
       id: 'table',
@@ -915,6 +922,7 @@ describe('tealchart public entries', () => {
     expect(pinPrimitive.kind).toBe('pin');
     expect(iconPrimitive.kind).toBe('icon');
     expect(balloonPrimitive.kind).toBe('balloon');
+    expect(textBoxPrimitive.kind).toBe('balloon');
     expect(tablePrimitive.kind).toBe('table');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
     expect(anchoredVolumeProfilePrimitive.kind).toBe('anchoredVolumeProfile');
