@@ -141,11 +141,13 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     );
 
     fireEvent.click(screen.getByLabelText('Green fill color'));
+    fireEvent.click(screen.getByLabelText('5 pixel line width'));
     fireEvent.click(screen.getByLabelText('75 percent opacity'));
     fireEvent.click(screen.getByLabelText('Toggle drawing border'));
     fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
 
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ lineWidth: 5 });
     expect(onStyle).toHaveBeenCalledWith({ opacity: 0.75 });
     expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
     expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });

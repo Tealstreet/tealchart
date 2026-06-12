@@ -1218,6 +1218,14 @@ matching behavior in the same PR for every user-facing drawing feature.
 - Web and mobile top bars expose matching wrap toggles and width presets for
   selected text annotations while leaving table sizing semantics unchanged.
 
+## Shipped: Expanded Line Width Presets
+
+- Shared selected-drawing stroke width descriptors now expose 1px through 5px
+  line-width presets.
+- Web and mobile top bars dispatch the same expanded line-width controls, while
+  Canvas and Skia renderers continue to consume the existing shared `lineWidth`
+  style value.
+
 ## Shipped: Expanded Text Wrap Width Presets
 
 - Shared text wrap width normalization now supports wider 320px and 480px text
