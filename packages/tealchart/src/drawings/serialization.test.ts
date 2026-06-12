@@ -3240,6 +3240,7 @@ describe('drawing layout serialization', () => {
           updatedAt: 2,
           style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
           point: { time: 1, price: 10 },
+          textAlign: 'right',
           cells: [['Metric'], ['Price', 101.25]],
         },
       ],
@@ -3250,6 +3251,7 @@ describe('drawing layout serialization', () => {
       id: 'table',
       kind: 'table',
       point: { time: 1, price: 10 },
+      textAlign: 'right',
       cells: [
         ['Metric', ''],
         ['Price', '101.25'],
@@ -3259,6 +3261,7 @@ describe('drawing layout serialization', () => {
     const serialized = serializeUserDrawingStateForLayout(restored);
     expect(serialized?.drawings[0]).toMatchObject({
       kind: 'table',
+      textAlign: 'right',
       cells: [
         ['Metric', ''],
         ['Price', '101.25'],

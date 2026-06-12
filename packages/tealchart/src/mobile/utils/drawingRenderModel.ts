@@ -21,6 +21,7 @@ import type {
   UserDrawingRenderPhase,
   UserDrawingState,
   UserDrawingStyle,
+  TableDrawing,
   UserDrawingTextAnnotation,
 } from '../../drawings';
 
@@ -1071,6 +1072,7 @@ export type MobileUserDrawingPrimitive =
       opacity: number;
       clip: MobileUserDrawingClipRect;
       table: DrawingScreenTable;
+      textAlign: UserDrawingTextAnnotation['textAlign'];
       style: UserDrawingStyle;
     }
   | {
@@ -2339,6 +2341,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         table: geometry.table,
+        textAlign: (geometry.drawing as TableDrawing).textAlign,
         style: geometry.drawing.style,
       };
     case 'pin':

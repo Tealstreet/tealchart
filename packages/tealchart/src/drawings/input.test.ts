@@ -175,6 +175,7 @@ describe('user drawing input controller', () => {
         ['Label', 'Value'],
         ['Price', ''],
       ],
+      textAlign: 'left',
       createdAt: 23,
       updatedAt: 23,
     });
@@ -1071,6 +1072,19 @@ describe('user drawing input controller', () => {
       textAlign: 'left' as const,
     };
     const locked = { ...textLabel, id: 'locked', locked: true };
+    const table = {
+      id: 'table',
+      kind: 'table' as const,
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      point: anchorA,
+      cells: [['Metric', 'Value']],
+      textAlign: 'left' as const,
+    };
     const line = {
       id: 'line',
       kind: 'horizontalLine' as const,
@@ -1084,7 +1098,7 @@ describe('user drawing input controller', () => {
     };
     const state = createUserDrawingState({
       selection: { drawingId: 'label' },
-      drawings: [textLabel, locked, line],
+      drawings: [textLabel, locked, table, line],
     });
 
     const selected = setUserDrawingTextAlign(state, 'center', { now: () => 12 });
@@ -1099,6 +1113,9 @@ describe('user drawing input controller', () => {
       now: () => 13,
     });
     expect(targeted.drawings[1]).toMatchObject({ textAlign: 'right', updatedAt: 13 });
+
+    const tableAligned = setUserDrawingTextAlign(state, 'right', { drawingId: 'table', now: () => 14 });
+    expect(tableAligned.drawings[2]).toMatchObject({ textAlign: 'right', updatedAt: 14 });
   });
 
   it('updates selected or targeted icon drawings while respecting locks', () => {
@@ -1697,6 +1714,7 @@ describe('user drawing input controller', () => {
           updatedAt: 2,
           style,
           point: anchorA,
+          textAlign: 'right',
           cells: [
             ['Metric', 'Value'],
             ['Price', '101.25'],
@@ -1713,6 +1731,7 @@ describe('user drawing input controller', () => {
       createdAt: 21,
       updatedAt: 21,
       point: anchorA,
+      textAlign: 'right',
       cells: [
         ['Metric', 'Value'],
         ['Price', '101.25'],
@@ -1740,6 +1759,7 @@ describe('user drawing input controller', () => {
           updatedAt: 2,
           style,
           point: anchorA,
+          textAlign: 'left',
           cells: [
             ['Metric', 'Value'],
             ['Price', '101.25'],
@@ -1755,6 +1775,7 @@ describe('user drawing input controller', () => {
       id: 'table',
       kind: 'table',
       updatedAt: 30,
+      textAlign: 'left',
       cells: [
         ['Metric', 'Value'],
         ['Volume', ''],
@@ -1788,6 +1809,7 @@ describe('user drawing input controller', () => {
           updatedAt: 2,
           style,
           point: anchorA,
+          textAlign: 'left',
           cells: [['Metric', 'Value']],
         },
       ],

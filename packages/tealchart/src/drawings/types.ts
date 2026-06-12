@@ -703,6 +703,7 @@ export interface TableDrawing extends UserDrawingBase {
   kind: 'table';
   point: UserDrawingAnchor;
   cells: readonly (readonly string[])[];
+  textAlign: UserDrawingTextAlign;
 }
 
 export type UserDrawingTextAnnotation =
@@ -1639,6 +1640,7 @@ export function createUserDrawingFromDraft(
         kind: 'table',
         point: draft.anchors[0]!,
         cells: normalizeUserDrawingTableCells(),
+        textAlign: 'left',
       };
     case 'anchoredText':
     case 'anchoredNote':

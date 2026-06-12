@@ -6,6 +6,7 @@ import type {
   UserDrawingLineStyle,
   UserDrawingPathFamilyKind,
   UserDrawingState,
+  TableDrawing,
   UserDrawingTextAnnotation,
   UserDrawingTextAnnotationKind,
 } from './types';
@@ -1396,7 +1397,8 @@ function renderTextLabelGeometry(
 }
 
 function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'table' }>): void {
-  const { drawing, table } = geometry;
+  const drawing = geometry.drawing as TableDrawing;
+  const { table } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   const fontWeight = normalizeUserDrawingFontWeight(drawing.style.fontWeight ?? 'normal');
@@ -1415,10 +1417,16 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
 
   ctx.font = `${fontWeight === 'bold' ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
-  ctx.textAlign = 'left';
+  ctx.textAlign = drawing.textAlign;
   ctx.textBaseline = 'middle';
   for (const cell of table.cells) {
-    ctx.fillText(cell.text, cell.textPoint.x, cell.textPoint.y);
+    const textX =
+      drawing.textAlign === 'center'
+        ? cell.rect.x + cell.rect.width / 2
+        : drawing.textAlign === 'right'
+          ? cell.rect.x + cell.rect.width - 10
+          : cell.textPoint.x;
+    ctx.fillText(cell.text, textX, cell.textPoint.y);
   }
 }
 
