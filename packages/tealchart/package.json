@@ -10,6 +10,7 @@
     ".": "./src/index.ts",
     "./jailbreak": "./src/jailbreak/index.ts",
     "./native": "./src/index.native.ts",
+    "./tradingview": "./src/tradingview/index.ts",
     "./src/*": "./src/*"
   },
   "scripts": {
