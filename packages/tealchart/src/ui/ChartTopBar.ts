@@ -109,6 +109,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingVisibilityChange?: (visible: boolean) => void;
   /** Callback when selected drawing locked state should change */
   onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
+  /** Callback when selected drawing properties should open */
+  onUserDrawingPropertiesOpen?: () => void;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
   /** Optional overlay root for drawing rail/flyout DOM. Falls back to the top bar parent. */
@@ -125,7 +127,7 @@ interface ChartTopBarState {
 // Styles
 // ============================================================================
 
-const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 280;
+const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
 const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 40;
 
 const styles = {
@@ -316,7 +318,7 @@ const styles = {
     position: 'absolute',
     display: 'flex',
     alignItems: 'center',
-    gap: '4px',
+    gap: '3px',
     width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
     boxSizing: 'border-box',
     padding: '4px',
@@ -599,6 +601,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private handleSelectedActionSurfaceItemClick(item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number]): void {
+    if (item.command.type === 'openProperties') {
+      this.options.onUserDrawingPropertiesOpen?.();
+      return;
+    }
+
     if (item.command.type === 'styleAction') {
       if (item.command.visible !== undefined) {
         this.options.onUserDrawingVisibilityChange?.(item.command.visible);
