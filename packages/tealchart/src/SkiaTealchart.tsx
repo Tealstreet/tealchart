@@ -486,6 +486,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingStateRef = useRef(effectiveUserDrawingState);
   const userDrawingHistoryRef = useRef<UserDrawingCommandHistory>(createUserDrawingCommandHistory());
   const userDrawingClipboardRef = useRef<UserDrawingClipboard | null>(null);
+  const userDrawingSpacesByPaneIdRef = useRef<ReadonlyMap<string, DrawingCoordinateSpace>>(new Map());
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
@@ -621,6 +622,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           {
             clipboard: userDrawingClipboardRef.current,
             createId: createUserDrawingId,
+            spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
             setClipboard: (clipboard) => {
               userDrawingClipboardRef.current = clipboard;
             },
@@ -1027,6 +1029,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       ]),
     );
   }, [bars, dimensions.width, margins.left, margins.right, userDrawingInputPanes, viewport]);
+  userDrawingSpacesByPaneIdRef.current = userDrawingSpacesByPaneId;
 
   const userDrawingPrimitives = useMemo(
     () =>

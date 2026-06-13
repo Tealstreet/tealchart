@@ -13,12 +13,14 @@ export type UserDrawingKeyboardActionType =
   | 'redo'
   | 'copySelected'
   | 'paste'
+  | 'nudge'
   | 'deleteSelected'
   | 'cancelDraft';
 
 export interface UserDrawingKeyboardAction {
   type: UserDrawingKeyboardActionType;
   preventDefault: boolean;
+  delta?: { x: number; y: number };
 }
 
 function hasPrimaryModifier(input: UserDrawingKeyboardInput): boolean {
@@ -53,6 +55,14 @@ export function resolveUserDrawingKeyboardAction(
 
   if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'v') {
     return { type: 'paste', preventDefault: true };
+  }
+
+  const nudgeStep = input.shiftKey === true ? 10 : 1;
+  if (!input.ctrlKey && !input.metaKey && !input.altKey && state.selection) {
+    if (input.key === 'ArrowLeft') return { type: 'nudge', delta: { x: -nudgeStep, y: 0 }, preventDefault: true };
+    if (input.key === 'ArrowRight') return { type: 'nudge', delta: { x: nudgeStep, y: 0 }, preventDefault: true };
+    if (input.key === 'ArrowUp') return { type: 'nudge', delta: { x: 0, y: -nudgeStep }, preventDefault: true };
+    if (input.key === 'ArrowDown') return { type: 'nudge', delta: { x: 0, y: nudgeStep }, preventDefault: true };
   }
 
   if ((input.key === 'Delete' || input.key === 'Backspace') && !hasAnyModifier(input) && state.selection) {

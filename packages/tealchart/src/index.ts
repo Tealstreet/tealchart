@@ -195,6 +195,7 @@ export {
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
   resolveUserDrawingKeyboardAction,
+  nudgeUserDrawingSelection,
   screenPointToAnchor,
   setUserDrawingIconName,
   setUserDrawingImageSource,
