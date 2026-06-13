@@ -162,7 +162,7 @@ export interface ChartLineLabel {
   offsetPercent: number;
   /** Text segments rendered as separate styled boxes */
   segments: ChartLabelSegment[];
-  /** Interactive buttons (cancel, close, reverse) */
+  /** Interactive buttons (built-ins and custom chart trading actions) */
   buttons?: ChartLabelButton[];
 }
 
@@ -187,7 +187,9 @@ export interface ChartLabelSegment {
  */
 export interface ChartLabelButton {
   /** Button type for click handling */
-  type: 'cancel' | 'close' | 'reverse' | 'tp' | 'sl';
+  type: 'cancel' | 'close' | 'reverse' | 'tp' | 'sl' | 'action';
+  /** Custom action ID when type is action */
+  actionId?: string;
   /** Icon character to display (e.g., 'X', '↩', 'TP', 'SL') */
   icon: string;
   /** Background color */
@@ -869,6 +871,7 @@ export interface OrderLineRenderData {
   // TEALSTREET: Bracket state
   brackets: BracketConfig | null;
   partialEnabled: boolean;
+  actions?: ChartLabelButton[];
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
     onTPClick?: () => void;
@@ -928,6 +931,7 @@ export interface PositionLineRenderData {
   brackets: BracketConfig | null;
   partialEnabled: boolean;
   positionData: PositionData | null;
+  actions?: ChartLabelButton[];
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
     onTPClick?: () => void;
@@ -1064,6 +1068,7 @@ export interface PositionLineCallbacks {
 export interface InternalOrderLineAdapter extends FullOrderLineAdapter {
   _getRenderData(): OrderLineRenderData;
   _getCallbacks(): OrderLineCallbacks;
+  setActions(actions: ChartLabelButton[]): this;
   // TradingView API compatibility (no-op)
   setBodyFont(font: string): this;
   setQuantityFont(font: string): this;
@@ -1076,6 +1081,7 @@ export interface InternalOrderLineAdapter extends FullOrderLineAdapter {
 export interface InternalPositionLineAdapter extends FullPositionLineAdapter {
   _getRenderData(): PositionLineRenderData;
   _getCallbacks(): PositionLineCallbacks;
+  setActions(actions: ChartLabelButton[]): this;
   // TradingView API compatibility (no-op)
   setBodyFont(font: string): this;
   setQuantityFont(font: string): this;

@@ -497,4 +497,94 @@ describe('TealchartApi trading intents', () => {
       brackets: { takeProfit: 12 },
     });
   });
+
+  it('maps custom trading actions to render buttons and line action intents', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const intents = collectTradingIntents(api);
+
+    api.setTradingState({
+      orders: [
+        {
+          kind: 'order',
+          id: 'order',
+          price: 10,
+          actions: [
+            { id: 'cancel', label: 'Cancel' },
+            { id: 'amend', label: 'Amend', icon: 'A', tooltip: 'Amend order' },
+            { id: 'disabled-action', label: 'Disabled', disabled: true },
+          ],
+          style: {
+            actionBackgroundColor: '#111111',
+            actionIconColor: '#eeeeee',
+            actionBorderColor: '#222222',
+          },
+        },
+      ],
+      positions: [
+        {
+          kind: 'position',
+          id: 'position',
+          price: 20,
+          actions: [
+            { id: 'close', label: 'Close' },
+            { id: 'protect', label: 'Protect' },
+            { id: 'disabled-position-action', label: 'Disabled', disabled: true },
+          ],
+        },
+      ],
+    });
+
+    expect(api.getOrderLinesRenderData()[0].actions).toEqual([
+      {
+        type: 'action',
+        actionId: 'amend',
+        icon: 'A',
+        backgroundColor: '#111111',
+        iconColor: '#eeeeee',
+        borderColor: '#222222',
+        tooltip: 'Amend order',
+      },
+    ]);
+    expect(api.getPositionLinesRenderData()[0].actions).toEqual([
+      {
+        type: 'action',
+        actionId: 'protect',
+        icon: 'PR',
+        backgroundColor: 'rgba(76, 175, 80, 0.75)',
+        iconColor: '#FFFFFF',
+        borderColor: '#4CAF50',
+        tooltip: 'Protect',
+      },
+    ]);
+
+    api.triggerLineAction('chart_trading_order_order', 'amend');
+
+    expect(intents).toEqual([
+      {
+        type: 'line.action',
+        lineId: 'chart_trading_order_order',
+        actionId: 'amend',
+        source: 'native-line',
+      },
+    ]);
+  });
+
+  it('removes custom action render buttons when actions are omitted', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+
+    api.setTradingState({
+      orders: [{ kind: 'order', id: 'order', price: 10, actions: [{ id: 'amend', label: 'Amend' }] }],
+      positions: [{ kind: 'position', id: 'position', price: 20, actions: [{ id: 'protect', label: 'Protect' }] }],
+    });
+    expect(api.getOrderLinesRenderData()[0].actions).toHaveLength(1);
+    expect(api.getPositionLinesRenderData()[0].actions).toHaveLength(1);
+
+    api.setTradingState({
+      orders: [{ kind: 'order', id: 'order', price: 10 }],
+      positions: [{ kind: 'position', id: 'position', price: 20 }],
+    });
+
+    expect(api.getOrderLinesRenderData()[0].actions).toEqual([]);
+    expect(api.getPositionLinesRenderData()[0].actions).toEqual([]);
+  });
 });

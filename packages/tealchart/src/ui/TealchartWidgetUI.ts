@@ -123,6 +123,8 @@ export interface TealchartWidgetUIOptions {
   onPositionClose?: (positionId: string) => void;
   /** Callback when position is reversed */
   onPositionReverse?: (positionId: string) => void;
+  /** Callback when custom chart trading action is clicked */
+  onLineAction?: (lineId: string, actionId: string) => void;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */
@@ -389,6 +391,7 @@ export class TealchartWidgetUI {
       onOrderCancel: this.options.onOrderCancel,
       onPositionClose: this.options.onPositionClose,
       onPositionReverse: this.options.onPositionReverse,
+      onLineAction: this.options.onLineAction,
       onContextMenu: this.options.onContextMenu,
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,

@@ -92,6 +92,8 @@ export interface ChartCoreOptions {
   onPositionClose?: (positionId: string) => void;
   /** Callback when position reverse button clicked */
   onPositionReverse?: (positionId: string) => void;
+  /** Callback when custom chart trading action button clicked */
+  onLineAction?: (lineId: string, actionId: string) => void;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */
@@ -279,6 +281,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             },
           ]
         : []),
+      ...(order.actions ?? []),
     ],
   };
 
@@ -409,6 +412,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             },
           ]
         : []),
+      ...(position.actions ?? []),
     ],
   };
 
@@ -667,6 +671,7 @@ export class ChartCore {
           onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
           onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
           onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
+          onLineAction: (lineId, actionId) => this.options.onLineAction?.(lineId, actionId),
           onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
             this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
           },

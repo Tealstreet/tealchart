@@ -1031,6 +1031,9 @@ export class TealchartWidget {
       onPositionReverse: (positionId) => {
         this._chartApi.triggerPositionReverse(positionId);
       },
+      onLineAction: (lineId, actionId) => {
+        this._chartApi.triggerLineAction(lineId, actionId);
+      },
       onContextMenu: this._contextMenuCallback || undefined,
       onMouseDown: () => {
         this._eventEmitter.emit('mouse_down');

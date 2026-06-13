@@ -10,6 +10,7 @@ import type {
   ChartTradingIntent,
   ChartTradingIntentHandler,
   ChartTradingLineStyle,
+  ChartTradingAction,
   ChartTradingOrderLine,
   ChartTradingPositionLine,
   ChartTradingState,
@@ -31,6 +32,7 @@ import {
   ITimeScaleApi,
   OrderLineOptions,
   OrderLineRenderData,
+  ChartLabelButton,
   PositionData,
   PositionLineOptions,
   PositionLineRenderData,
@@ -388,6 +390,7 @@ export class TealchartApi {
     adapter.setQuantityShort?.(quantity);
     adapter.setBrackets?.(this._toBracketConfig(order.brackets));
     adapter.setPartialEnabled?.(order.partialEnabled === true);
+    adapter.setActions(this._toRenderActions(order.actions, style, 'rgba(33, 150, 243, 0.75)', '#2196F3'));
 
     if (editable) {
       adapter.onMove(() => {});
@@ -428,6 +431,7 @@ export class TealchartApi {
     });
     adapter.setBrackets?.(this._toBracketConfig(position.brackets));
     adapter.setPartialEnabled?.(position.partialEnabled === true);
+    adapter.setActions(this._toRenderActions(position.actions, style, 'rgba(76, 175, 80, 0.75)', '#4CAF50'));
 
     if (closeable) {
       adapter.onClose(() => {});
@@ -457,6 +461,29 @@ export class TealchartApi {
       takeProfit: brackets.takeProfit,
       stopLoss: brackets.stopLoss,
     };
+  }
+
+  private _toRenderActions(
+    actions: readonly ChartTradingAction[] | undefined,
+    style: ChartTradingLineStyle | undefined,
+    defaultBackgroundColor: string,
+    defaultBorderColor: string,
+  ): ChartLabelButton[] {
+    return (actions ?? [])
+      .filter((action) => !action.disabled && !this._isBuiltInTradingAction(action.id))
+      .map((action) => ({
+        type: 'action' as const,
+        actionId: action.id,
+        icon: action.icon ?? action.label.slice(0, 2).toUpperCase(),
+        backgroundColor: style?.actionBackgroundColor ?? defaultBackgroundColor,
+        iconColor: style?.actionIconColor ?? '#FFFFFF',
+        borderColor: style?.actionBorderColor ?? style?.lineColor ?? defaultBorderColor,
+        tooltip: action.tooltip ?? action.label,
+      }));
+  }
+
+  private _isBuiltInTradingAction(actionId: string): boolean {
+    return actionId === 'cancel' || actionId === 'close' || actionId === 'reverse';
   }
 
   private _formatTradingQuantity(quantity: string | number | undefined): string {
@@ -661,6 +688,7 @@ export class TealchartApi {
       modifyTooltip: 'Modify',
       brackets: null,
       partialEnabled: false,
+      actions: [],
     };
 
     // Callbacks (not part of render data)
@@ -907,6 +935,11 @@ export class TealchartApi {
         data.partialEnabled = enabled;
         return this;
       },
+      setActions(actions: ChartLabelButton[]) {
+        data.actions = actions;
+        notifyChange();
+        return this;
+      },
       setPnlCalculator(calculator: (price: number, percent: number) => string) {
         _pnlCalculator = calculator;
         return this;
@@ -1040,6 +1073,7 @@ export class TealchartApi {
       brackets: null,
       partialEnabled: false,
       positionData: null,
+      actions: [],
     };
 
     // Callbacks (not part of render data)
@@ -1329,6 +1363,11 @@ export class TealchartApi {
       },
       setPartialEnabled(enabled: boolean) {
         data.partialEnabled = enabled;
+        return this;
+      },
+      setActions(actions: ChartLabelButton[]) {
+        data.actions = actions;
+        notifyChange();
         return this;
       },
       setPnlCalculator(calculator: (price: number, percent: number) => string) {
@@ -1958,6 +1997,18 @@ export class TealchartApi {
         callbacks.onReverse();
       }
     }
+  }
+
+  /**
+   * @internal Trigger a custom chart trading line action.
+   */
+  triggerLineAction(lineId: string, actionId: string): void {
+    this.emitTradingIntent({
+      type: 'line.action',
+      lineId,
+      actionId,
+      source: 'native-line',
+    });
   }
 
   /**

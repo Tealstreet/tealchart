@@ -37,6 +37,8 @@ export interface PriceLineManagerOptions {
   onPositionClose?: (positionId: string) => void;
   /** Callback when position reverse button is clicked */
   onPositionReverse?: (positionId: string) => void;
+  /** Callback when a custom chart trading action button is clicked */
+  onLineAction?: (lineId: string, actionId: string) => void;
   /** Callback when TP button drag ends */
   onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Callback when SL button drag ends */
@@ -711,7 +713,7 @@ export class PriceLineManager {
       }
       chartLabelWidth = segmentsWidth + tpslGap;
       for (const button of orderedButtons) {
-        chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
+        chartLabelWidth += button.type === 'tp' || button.type === 'sl' || button.type === 'action' ? 24 : 16;
       }
 
       const lineLength = bound.lineLength ?? 100;
@@ -885,7 +887,7 @@ export class PriceLineManager {
       for (let i = 0; i < orderedButtons.length; i++) {
         const button = orderedButtons[i];
         const isTPSL = button.type === 'tp' || button.type === 'sl';
-        const buttonWidth = isTPSL ? 24 : 16;
+        const buttonWidth = isTPSL || button.type === 'action' ? 24 : 16;
         const prevButton = orderedButtons[i - 1];
         const nextButton = orderedButtons[i + 1];
         const startsTPSLGroup = isTPSL && prevButton && prevButton.type !== 'tp' && prevButton.type !== 'sl';
@@ -1135,6 +1137,43 @@ export class PriceLineManager {
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
             this.options.onPositionReverse?.(bound.lineId);
+            this.options.onCursorChange?.('crosshair');
+          });
+          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
+          buttonGroup.add(hitRect);
+        } else if (button.type === 'action') {
+          const actionText = new Konva.Text({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: buttonWidth,
+            height: LABEL_HEIGHT,
+            text: button.icon,
+            fontSize: 11,
+            fontFamily,
+            fill: button.iconColor,
+            align: 'center',
+            verticalAlign: 'middle',
+            listening: false,
+          });
+          buttonGroup.add(actionText);
+          refs.buttonTexts.push(actionText);
+          refs.buttonIcons.push(undefined);
+
+          const hitRect = new Konva.Rect({
+            x: currentX - 2,
+            y: lineY - TOUCH_TARGET_HEIGHT / 2,
+            width: buttonWidth + 4,
+            height: TOUCH_TARGET_HEIGHT,
+            fill: 'rgba(0, 0, 0, 0.01)',
+            listening: true,
+          });
+
+          hitRect.on('mousedown touchstart', (e) => {
+            e.cancelBubble = true;
+            if (button.actionId) {
+              this.options.onLineAction?.(bound.lineId, button.actionId);
+            }
             this.options.onCursorChange?.('crosshair');
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
