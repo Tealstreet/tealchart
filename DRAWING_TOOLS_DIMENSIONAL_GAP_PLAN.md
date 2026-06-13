@@ -206,6 +206,11 @@ Phase 1: Placement mode registry
   three-anchor tools, with web Canvas and mobile Skia continuing through the
   normal final click/tap commit path: `triangle`, `curve`, `arc`, `polyline`,
   and `rotatedRectangle`.
+- Status: shared placement drag now also seeds the first two anchors for
+  channel and pitchfork three-anchor tools, with web Canvas and mobile Skia
+  continuing through the normal final click/tap commit path: `parallelChannel`,
+  `regressionTrend`, `flatTopBottom`, `pitchfork`, `schiffPitchfork`,
+  `modifiedSchiffPitchfork`, `insidePitchfork`, and `pitchfan`.
 
 Phase 2: Draft lifecycle
 

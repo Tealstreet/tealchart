@@ -50,6 +50,14 @@ const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'arc',
   'polyline',
   'rotatedRectangle',
+  'parallelChannel',
+  'regressionTrend',
+  'flatTopBottom',
+  'pitchfork',
+  'schiffPitchfork',
+  'modifiedSchiffPitchfork',
+  'insidePitchfork',
+  'pitchfan',
 ]);
 
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {

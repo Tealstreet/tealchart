@@ -61,18 +61,20 @@ export function resolveUserDrawingRenderEntries(
   if (!state.draft) return entries;
 
   const requiredAnchorCount = getRequiredAnchorCount(state.draft.tool);
+  const placementMode = getUserDrawingPlacementMode(state.draft.tool);
   let draftAnchors = state.draft.anchors;
   if (state.draft.anchors.length < requiredAnchorCount && options.draftPreviewAnchor) {
     draftAnchors = [...state.draft.anchors, options.draftPreviewAnchor];
-  } else if (
-    state.draft.anchors.length >= 2 &&
-    state.draft.anchors.length < requiredAnchorCount &&
-    getUserDrawingPlacementMode(state.draft.tool) === 'dragSeed'
+  }
+  if (
+    draftAnchors.length >= 2 &&
+    draftAnchors.length < requiredAnchorCount &&
+    placementMode === 'dragSeed'
   ) {
-    const terminalAnchor = state.draft.anchors[state.draft.anchors.length - 1]!;
+    const terminalAnchor = draftAnchors[draftAnchors.length - 1]!;
     draftAnchors = [
-      ...state.draft.anchors,
-      ...Array.from({ length: requiredAnchorCount - state.draft.anchors.length }, () => terminalAnchor),
+      ...draftAnchors,
+      ...Array.from({ length: requiredAnchorCount - draftAnchors.length }, () => terminalAnchor),
     ];
   }
 

@@ -80,9 +80,9 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Lines | `horizontalLine`, `verticalLine`, `horizontalRay`, `crossLine` | 1 | `one-point` | `partial` | Command history, selected toolbar |
 | Lines | `arrowMarker` | 2 | `two-point-drag-click` | `partial` | Selected toolbar |
 | Lines | `arrowMarkLeft`, `arrowMarkRight`, `arrowMarkUp`, `arrowMarkDown` | 1 | `one-point` | `partial` | Selected toolbar, object tree |
-| Channels | `parallelChannel`, `regressionTrend`, `flatTopBottom` | 3 | `multi-point-click` | `partial` | Placement previews, command history |
+| Channels | `parallelChannel`, `regressionTrend`, `flatTopBottom` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Channels | `disjointChannel` | 4 | `multi-point-click` | `partial` | Placement previews, object tree |
-| Pitchforks | `pitchfork`, `schiffPitchfork`, `modifiedSchiffPitchfork`, `insidePitchfork`, `pitchfan` | 3 | `multi-point-click` | `partial` | Placement previews, style/property surface |
+| Pitchforks | `pitchfork`, `schiffPitchfork`, `modifiedSchiffPitchfork`, `insidePitchfork`, `pitchfan` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Style/property surface, richer multi-point previews |
 | Gann/Fibonacci | `fibRetracement`, `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`, `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`, `gannSquare`, `gannSquareFixed`, `fibTimeZone` | 2 | `two-point-drag-click` | `partial` | Properties |
 | Gann/Fibonacci | `trendBasedFibExtension`, `fibWedge`, `fibChannel`, `trendBasedFibTime` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
 | Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Shift constraints for cycle/wave tools |
