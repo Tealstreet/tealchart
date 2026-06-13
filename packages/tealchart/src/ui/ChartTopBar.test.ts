@@ -297,6 +297,39 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onVisibility).toHaveBeenCalledWith(false);
     expect(onLocked).toHaveBeenCalledWith(true, undefined);
 
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'rect' },
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            fillColor: 'rgba(245, 197, 66, 0.12)',
+          },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing fill color to rgba(34, 197, 94, 0.12)"]')
+      ?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing fill"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
+    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
+
     topBar.unmount();
   });
 
