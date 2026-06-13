@@ -1,7 +1,7 @@
 import type { UserDrawingCommand, UserDrawingCommandSource } from './commands';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
 import type { UserDrawingHitResult, UserDrawingHitTestOptions } from './hitTesting';
-import type { UserDrawingState, UserDrawingTextAnnotation } from './types';
+import type { UserDrawing, UserDrawingState, UserDrawingTextAnnotation } from './types';
 
 import { hitTestUserDrawings } from './hitTesting';
 import { isUserDrawingTextAnnotation } from './types';
@@ -19,6 +19,7 @@ export type UserDrawingEditIntent =
   | {
       type: 'properties';
       drawingId: string;
+      drawing: UserDrawing;
       hit: UserDrawingHitResult;
       commands: readonly UserDrawingCommand[];
     }
@@ -36,6 +37,38 @@ export type UserDrawingEditIntent =
 export interface ResolveUserDrawingEditIntentOptions {
   hitTest?: UserDrawingHitTestOptions;
   source?: Extract<UserDrawingCommandSource, 'pointer' | 'touch' | 'api'>;
+}
+
+export interface UserDrawingPropertiesIntent {
+  type: 'properties';
+  drawingId: string;
+  drawing: UserDrawing;
+  selected: boolean;
+  editable: boolean;
+}
+
+export interface ResolveUserDrawingPropertiesIntentOptions {
+  drawingId?: string;
+}
+
+export function resolveUserDrawingPropertiesIntent(
+  state: UserDrawingState,
+  options: ResolveUserDrawingPropertiesIntentOptions = {},
+): UserDrawingPropertiesIntent | null {
+  const drawingId = options.drawingId ?? state.selection?.drawingId;
+  if (!drawingId) return null;
+
+  const drawing = state.drawings.find((candidate) => candidate.id === drawingId);
+  if (!drawing) return null;
+
+  const selectedIds = state.selection?.drawingIds ?? (state.selection ? [state.selection.drawingId] : []);
+  return {
+    type: 'properties',
+    drawingId,
+    drawing,
+    selected: selectedIds.includes(drawingId),
+    editable: !drawing.locked,
+  };
 }
 
 export function resolveUserDrawingEditIntentAtPoint(
@@ -86,6 +119,7 @@ export function resolveUserDrawingEditIntentAtPoint(
   return {
     type: 'properties',
     drawingId: hit.drawing.id,
+    drawing: hit.drawing,
     hit,
     commands,
   };
