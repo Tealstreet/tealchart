@@ -79,6 +79,9 @@ import type {
   UserDrawingInfoLineMetrics,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
+  ResolveUserDrawingEditIntentOptions,
+  UserDrawingEditIntent,
+  UserDrawingEditIntentKind,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
@@ -196,6 +199,7 @@ import {
   resolveTimeCyclesFromAnchors,
   resolveTrendBasedFibTimeFromAnchors,
   resolveUserDrawingDateRangeMetrics,
+  resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
@@ -298,6 +302,7 @@ describe('tealchart public entries', () => {
     ]);
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
+    expect(resolveUserDrawingEditIntentAtPoint).toBeTypeOf('function');
     expect(resolveUserDrawingObjectTreeModel).toBeTypeOf('function');
     expect(resolveUserDrawingObjectTreeActionCommands).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
@@ -435,6 +440,21 @@ describe('tealchart public entries', () => {
 
     expect(model.rows[0]).toBe(row);
     expect(action.type).toBe('duplicate');
+  });
+
+  it('exports drawing edit intent public types', () => {
+    const kind: NonNever<UserDrawingEditIntentKind> = 'properties';
+    const options: NonNever<ResolveUserDrawingEditIntentOptions> = {
+      source: 'pointer',
+    };
+    const intent: NonNever<UserDrawingEditIntent> = {
+      type: 'pane',
+      commands: [],
+    };
+
+    expect(kind).toBe('properties');
+    expect(options.source).toBe('pointer');
+    expect(intent.type).toBe('pane');
   });
 
   it('exports usable native channel primitive aliases', () => {
