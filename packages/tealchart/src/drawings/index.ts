@@ -313,9 +313,13 @@ export type { ResolveUserDrawingIconGeometryOptions, UserDrawingIconGeometry } f
 export {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
+  resolveUserDrawingScreenBounds,
+  resolveUserDrawingSelectionActionAnchor,
 } from './renderModel';
 export type {
   ResolveUserDrawingRenderEntriesOptions,
+  ResolveUserDrawingSelectionActionAnchorOptions,
+  UserDrawingSelectionActionAnchor,
   UserDrawingRenderEntry,
   UserDrawingRenderPhase,
 } from './renderModel';

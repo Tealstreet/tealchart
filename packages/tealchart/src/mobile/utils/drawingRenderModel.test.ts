@@ -2,6 +2,7 @@ import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, Use
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { resolveUserDrawingSelectionActionAnchor } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
   isMobileUserDrawingTextBoxPrimitive,
@@ -128,6 +129,40 @@ describe('mobile user drawing render model', () => {
         radius: 6,
       },
     ]);
+  });
+
+  it('shares selected action anchor geometry with Skia render spaces', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'rect' },
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveUserDrawingSelectionActionAnchor(state, new Map([[space.pane.id, space]]), { padding: 4, minTargetSize: 16 })).toEqual({
+      anchor: { x: 50, y: 6 },
+      bounds: { x: 6, y: 6, width: 88, height: 88 },
+      drawingIds: ['rect'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    });
   });
 
   it('returns table primitives for Skia rendering', () => {

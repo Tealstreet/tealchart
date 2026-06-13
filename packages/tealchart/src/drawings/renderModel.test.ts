@@ -4,7 +4,12 @@ import type { UserDrawingState, UserDrawingStyle } from './types';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
-import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
+import {
+  resolveUserDrawingHandlePoints,
+  resolveUserDrawingRenderEntries,
+  resolveUserDrawingScreenBounds,
+  resolveUserDrawingSelectionActionAnchor,
+} from './renderModel';
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -29,6 +34,18 @@ const space: DrawingCoordinateSpace = {
   },
   chartLeft: 0,
   chartRight: 100,
+};
+
+const lowerPaneSpace: DrawingCoordinateSpace = {
+  ...space,
+  pane: {
+    id: 'macd',
+    top: 100,
+    height: 80,
+    bottom: 180,
+    yMin: -10,
+    yMax: 10,
+  },
 };
 
 describe('user drawing render model', () => {
@@ -403,5 +420,240 @@ describe('user drawing render model', () => {
       { x: 50, y: 50 },
       { x: 90, y: 10 },
     ]);
+  });
+
+  it('resolves padded screen bounds for selected rectangle geometry', () => {
+    expect(
+      resolveUserDrawingScreenBounds(
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+        space,
+        { padding: 4, minTargetSize: 16 },
+      ),
+    ).toEqual({ x: 6, y: 6, width: 88, height: 88 });
+  });
+
+  it('keeps single-anchor selection action targets usable', () => {
+    expect(
+      resolveUserDrawingScreenBounds(
+        {
+          id: 'label',
+          kind: 'priceLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 50, price: 50 },
+          text: 'Entry',
+          textAlign: 'center',
+        },
+        space,
+        { padding: 4, minTargetSize: 20 },
+      ),
+    ).toEqual({ x: 40, y: 40, width: 20, height: 20 });
+  });
+
+  it('uses rendered geometry bounds for extended line selections', () => {
+    expect(
+      resolveUserDrawingScreenBounds(
+        {
+          id: 'extended',
+          kind: 'extendedLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 25, price: 75 },
+            { time: 75, price: 25 },
+          ],
+        },
+        space,
+        { padding: 0, minTargetSize: 0 },
+      ),
+    ).toEqual({ x: 0, y: 0, width: 100, height: 100 });
+  });
+
+  it('resolves selection action anchor from visible selected drawings', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'rect' },
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveUserDrawingSelectionActionAnchor(state, { main: space }, { padding: 4, minTargetSize: 16 })).toEqual({
+      anchor: { x: 50, y: 6 },
+      bounds: { x: 6, y: 6, width: 88, height: 88 },
+      drawingIds: ['rect'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    });
+  });
+
+  it('resolves grouped selection action bounds across panes', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'line', drawingIds: ['line', 'marker'] },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 20, price: 80 },
+          ],
+          extend: 'none',
+        },
+        {
+          id: 'marker',
+          kind: 'arrowMarkUp',
+          paneId: 'macd',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 90, price: 0 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveUserDrawingSelectionActionAnchor(
+        state,
+        new Map([
+          ['main', space],
+          ['macd', lowerPaneSpace],
+        ]),
+        { padding: 2, minTargetSize: 12 },
+      ),
+    ).toEqual({
+      anchor: { x: 54.5, y: 8 },
+      bounds: { x: 8, y: 8, width: 93, height: 158 },
+      drawingIds: ['line', 'marker'],
+      paneIds: ['main', 'macd'],
+      primaryPaneId: 'main',
+    });
+  });
+
+  it('preserves grouped selection order for drawing ids and primary pane', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'marker', drawingIds: ['marker', 'line'] },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 20, price: 80 },
+          ],
+          extend: 'none',
+        },
+        {
+          id: 'marker',
+          kind: 'arrowMarkUp',
+          paneId: 'macd',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 90, price: 0 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveUserDrawingSelectionActionAnchor(
+        state,
+        new Map([
+          ['main', space],
+          ['macd', lowerPaneSpace],
+        ]),
+        { padding: 2, minTargetSize: 12 },
+      ),
+    ).toMatchObject({
+      drawingIds: ['marker', 'line'],
+      paneIds: ['macd', 'main'],
+      primaryPaneId: 'macd',
+    });
+  });
+
+  it('does not resolve selection action anchors for hidden selected drawings', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'hidden' },
+      drawings: [
+        {
+          id: 'hidden',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: false,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveUserDrawingSelectionActionAnchor(state, { main: space })).toBeNull();
   });
 });
