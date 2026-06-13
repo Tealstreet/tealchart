@@ -367,6 +367,68 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('shows drawing context menu items before falling back to the chart context menu', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const drawingClick = vi.fn();
+    const fallbackClick = vi.fn();
+    const onContextMenu = vi.fn(() => [
+      { position: 'top' as const, text: 'Fallback action', click: fallbackClick },
+    ]);
+    const onUserDrawingContextMenu = vi.fn(() => [
+      { position: 'top' as const, text: 'Duplicate selected drawing', click: drawingClick },
+      { position: 'bottom' as const, text: 'Disabled drawing action', click: vi.fn(), enabled: false },
+    ]);
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu,
+      onUserDrawingContextMenu,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'h' },
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const testCore = core as unknown as {
+      handleContextMenu(screenX: number, screenY: number, price: number, time: number): void;
+    };
+
+    testCore.handleContextMenu(100, 100, 10, 20);
+
+    expect(onUserDrawingContextMenu).toHaveBeenCalledWith({ x: 100, y: 100 }, expect.any(Map));
+    expect(onContextMenu).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain('Duplicate selected drawing');
+    expect(document.body.textContent).not.toContain('Fallback action');
+    const duplicateItem = [...document.body.querySelectorAll<HTMLElement>('div')].find(
+      (el) => el.textContent === 'Duplicate selected drawing',
+    );
+    duplicateItem?.click();
+    expect(drawingClick).toHaveBeenCalledTimes(1);
+
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+    onUserDrawingContextMenu.mockReturnValueOnce([]);
+
+    testCore.handleContextMenu(120, 120, 11, 21);
+
+    expect(onContextMenu).toHaveBeenCalledWith(21, 11);
+    expect(document.body.textContent).toContain('Fallback action');
+
+    core.dispose();
+  });
+
   it('applies constrained placement options through ChartCore preview and commit', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingPlacementDragStart = vi.fn(() => true);

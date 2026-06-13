@@ -310,6 +310,12 @@ export {
   resolveUserDrawingIconGeometry,
 } from './iconGeometry';
 export type { ResolveUserDrawingIconGeometryOptions, UserDrawingIconGeometry } from './iconGeometry';
+export { resolveUserDrawingContextActionsAtPoint } from './contextActions';
+export type {
+  ResolveUserDrawingContextActionsAtPointOptions,
+  UserDrawingContextActionItem,
+  UserDrawingContextActionsAtPointResult,
+} from './contextActions';
 export {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,

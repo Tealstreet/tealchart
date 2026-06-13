@@ -335,20 +335,27 @@ Phase 3: Dismissal and focus
 
 ### Epic 4.4: Drawing Context Menu
 
+Status: initial drawing context menu shipped for duplicate, delete, z-order,
+visibility, and lock/unlock actions. Web right-click and mobile Skia long-press
+consume the same shared context-action resolver and preserve existing chart
+context menu behavior when no drawing is hit.
+
 Phase 1: Shared context action resolution
 
-- Hit-test the pointer/touch point.
-- Select the target if needed, then resolve context actions from shared state.
+- Status: pointer/touch hit-testing selects the target drawing when needed and
+  flattens the shared selected-action surface into context menu action items.
 
 Phase 2: Web right-click menu
 
-- Show drawing actions on right-click over a drawing.
-- Preserve existing chart context menu behavior outside drawings.
+- Status: right-click over a drawing shows drawing actions before falling back
+  to the app-provided chart context menu outside drawings.
 
 Phase 3: Mobile long-press menu
 
-- Show matching drawing actions on long-press over a drawing.
-- Preserve existing mobile context menu behavior outside drawings.
+- Status: long-press over a drawing in Skia select mode opens the native mobile
+  context menu with matching drawing actions and command semantics.
+- Future work: add richer text/style-specific context actions after the style
+  popover model moves out of the top bar on both platforms.
 
 ## Gap 5: Object Tree and Layer Management
 

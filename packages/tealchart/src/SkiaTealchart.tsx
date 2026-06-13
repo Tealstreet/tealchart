@@ -113,6 +113,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
+  resolveUserDrawingContextActionsAtPoint,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -1700,6 +1701,83 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     ],
   );
 
+  const handleUserDrawingContextMenu = useCallback(
+    (x: number, y: number) => {
+      if (!viewport || effectiveUserDrawingState.activeTool !== 'select' || !isPointInChartArea(x, y)) return false;
+
+      const result = resolveUserDrawingContextActionsAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
+        hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+      });
+      if (!result.hit) return false;
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+      }
+
+      setContextMenuItems(
+        result.items.map((item): ContextMenuItem => ({
+          position: item.groupId === 'visibility' ? 'bottom' : 'top',
+          text: item.label,
+          enabled: item.enabled,
+          click: () => {
+            if (!item.enabled) return;
+            if (item.command.type === 'styleAction') {
+              if (item.command.visible !== undefined) {
+                dispatchUserDrawingCommandToState({
+                  type: 'setVisibility',
+                  visible: item.command.visible,
+                  meta: { source: 'contextMenu' },
+                });
+              }
+              if (item.command.locked !== undefined) {
+                dispatchUserDrawingCommandToState({
+                  type: 'setLocked',
+                  locked: item.command.locked,
+                  options: { includeLocked: item.command.includeLocked },
+                  meta: { source: 'contextMenu' },
+                });
+              }
+              return;
+            }
+            if (item.command.action === 'duplicateSelected') {
+              dispatchUserDrawingCommandToState({
+                type: 'duplicate',
+                options: { createId: createUserDrawingId },
+                meta: { source: 'contextMenu' },
+              });
+            } else if (item.command.action === 'deleteSelected') {
+              dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'contextMenu' } });
+            } else {
+              dispatchUserDrawingCommandToState({
+                type: 'reorder',
+                action: item.command.action,
+                meta: { source: 'contextMenu' },
+              });
+            }
+          },
+        })),
+      );
+      setContextMenuPosition({
+        x,
+        y,
+        price: yToPrice(y, viewport, chartDimensions),
+        time: xToTime(x, viewport, chartDimensions),
+      });
+      setContextMenuVisible(true);
+      return true;
+    },
+    [
+      chartDimensions,
+      commitUserDrawingState,
+      createUserDrawingId,
+      dispatchUserDrawingCommandToState,
+      effectiveUserDrawingState,
+      isPointInChartArea,
+      measureUserDrawingTextLabelLine,
+      userDrawingSpacesByPaneId,
+      viewport,
+    ],
+  );
+
   // Double-tap gesture for pane maximize/restore
   const doubleTapGesture = useMemo(
     () =>
@@ -1719,10 +1797,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [additiveTapGesture, doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
   );
 
+  const drawingContextMenuGesture = useMemo(
+    () =>
+      Gesture.LongPress()
+        .enabled(effectiveUserDrawingState.activeTool === 'select')
+        .minDuration(500)
+        .maxDistance(10)
+        .onStart((event) => {
+          runOnJS(handleUserDrawingContextMenu)(event.x, event.y);
+        }),
+    [effectiveUserDrawingState.activeTool, handleUserDrawingContextMenu],
+  );
+
   // Combine all gestures
   const allGestures = useMemo(
-    () => Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
-    [composedGesture, crosshairPanGesture, tapOrDoubleTapGesture],
+    () =>
+      Gesture.Simultaneous(
+        drawingContextMenuGesture,
+        Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
+      ),
+    [composedGesture, crosshairPanGesture, drawingContextMenuGesture, tapOrDoubleTapGesture],
   );
 
   // ==========================================================================

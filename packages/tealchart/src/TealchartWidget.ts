@@ -12,6 +12,7 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingContextActionItem,
   UserDrawingEditDrag,
   UserDrawingCommandHistory,
   UserDrawingHandleRole,
@@ -53,6 +54,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
+  resolveUserDrawingContextActionsAtPoint,
   serializeUserDrawingStateForLayout,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
 } from './drawings';
@@ -76,6 +78,7 @@ import type { ChartThemeInput } from './theme';
 import {
   Bar,
   ChartOverrides,
+  ContextMenuItem,
   ContextMenuCallback,
   DEFAULT_RENDER_OPTIONS,
   GapDetectionErrorState,
@@ -1024,6 +1027,7 @@ export class TealchartWidget {
       onUserDrawingSelection: (point, spacesByPaneId, options) =>
         this._handleUserDrawingSelection(point, spacesByPaneId, options),
       onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
+      onUserDrawingContextMenu: (point, spacesByPaneId) => this._handleUserDrawingContextMenu(point, spacesByPaneId),
       onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
       onUserDrawingPlacementDragStart: (point) => this._handleUserDrawingPlacementDragStart(point),
@@ -2555,6 +2559,50 @@ export class TealchartWidget {
     this._userDrawingEditDrag = result.editDrag;
     this.setUserDrawingState(result.state, { preserveHistory: true });
     return true;
+  }
+
+  private _handleUserDrawingContextMenu(
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ): ContextMenuItem[] {
+    if (this._userDrawingState.activeTool !== 'select') return [];
+
+    const result = resolveUserDrawingContextActionsAtPoint(this._userDrawingState, point, spacesByPaneId, {
+      hitTest: this._getUserDrawingHitTestOptions(),
+    });
+    if (!result.hit) return [];
+    if (result.changed) {
+      this.setUserDrawingState(result.state, { preserveHistory: true });
+    }
+
+    return result.items.map((item) => ({
+      position: item.groupId === 'visibility' ? 'bottom' : 'top',
+      text: item.label,
+      enabled: item.enabled,
+      click: () => this._dispatchUserDrawingContextAction(item),
+    }));
+  }
+
+  private _dispatchUserDrawingContextAction(item: UserDrawingContextActionItem): void {
+    if (!item.enabled) return;
+    const { command } = item;
+    if (command.type === 'styleAction') {
+      if (command.visible !== undefined) {
+        this.setUserDrawingVisibility(command.visible);
+      }
+      if (command.locked !== undefined) {
+        this.setUserDrawingLocked(command.locked, { includeLocked: command.includeLocked });
+      }
+      return;
+    }
+
+    if (command.action === 'duplicateSelected') {
+      this.duplicateSelectedUserDrawing();
+    } else if (command.action === 'deleteSelected') {
+      this.deleteSelectedUserDrawing();
+    } else {
+      this.reorderUserDrawings(command.action);
+    }
   }
 
   private _handleUserDrawingEditMove(point: DrawingScreenPoint): boolean {
