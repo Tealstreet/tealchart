@@ -157,6 +157,7 @@ import {
   isMobileCrosshairPanGestureEnabled,
 } from './mobile/utils/drawingGestureMode';
 import {
+  resolveMobileUserDrawingDuplicateEditDragEnabled,
   resolveMobileUserDrawingInputPoint,
   resolveMobileUserDrawingPlacementConstraintEnabled,
 } from './mobile/utils/drawingInput';
@@ -304,6 +305,9 @@ export interface SkiaTealchartHandle {
   duplicateUserDrawing(drawingId?: string): boolean;
   duplicateSelectedUserDrawing(): boolean;
   beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean;
+  setUserDrawingDuplicateEditDrag(duplicate: boolean): void;
+  clearUserDrawingDuplicateEditDrag(): void;
+  isUserDrawingDuplicateEditDragEnabled(): boolean;
   setUserDrawingPlacementConstraint(constrained: boolean): void;
   clearUserDrawingPlacementConstraint(): void;
   isUserDrawingPlacementConstrained(): boolean;
@@ -408,6 +412,8 @@ export interface SkiaTealchartProps {
   onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   /** Constrain two-anchor drawing placement drags to square or 45-degree geometry for touch toolbars. */
   constrainUserDrawingPlacement?: boolean;
+  /** Duplicate the selected drawing whenever a touch edit drag starts; host toolbars can expose this as a held modifier mode. */
+  duplicateUserDrawingOnEditDrag?: boolean;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when order price is changed via drag */
@@ -467,6 +473,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onUserDrawingObjectTreeOpen,
     onUserDrawingPropertiesOpen,
     constrainUserDrawingPlacement = false,
+    duplicateUserDrawingOnEditDrag = false,
     onSwipeBlockChange,
     onOrderMove,
     onOrderCancel,
@@ -507,6 +514,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingPlacementDragStartPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
+  const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
@@ -764,6 +772,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         userDrawingEditDragTransactionKeyRef.current = transactionKey;
         return true;
       },
+      setUserDrawingDuplicateEditDrag(duplicate: boolean): void {
+        userDrawingDuplicateEditDragOverrideRef.current = duplicate;
+      },
+      clearUserDrawingDuplicateEditDrag(): void {
+        userDrawingDuplicateEditDragOverrideRef.current = null;
+      },
+      isUserDrawingDuplicateEditDragEnabled(): boolean {
+        return resolveMobileUserDrawingDuplicateEditDragEnabled({
+          propDuplicate: duplicateUserDrawingOnEditDrag,
+          overrideDuplicate: userDrawingDuplicateEditDragOverrideRef.current,
+        });
+      },
       setUserDrawingPlacementConstraint(constrained: boolean): void {
         userDrawingPlacementConstraintOverrideRef.current = constrained;
       },
@@ -975,6 +995,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingState,
       constrainUserDrawingPlacement,
       createUserDrawingId,
+      duplicateUserDrawingOnEditDrag,
       dispatchUserDrawingCommandToState,
       dispatchUserDrawingCommandToStateWithResult,
       notifyUserDrawingCommand,
@@ -1670,21 +1691,36 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
       if (effectiveUserDrawingState.activeTool !== 'select') return false;
 
-      const transactionKey = `edit-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
-      const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
-        type: 'beginEditDragAtPoint',
-        point: { x, y },
-        spacesByPaneId: userDrawingSpacesByPaneId,
-        options: {
-          hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-        },
-        meta: { source: 'touch', transactionKey },
+      const duplicateEditDrag = resolveMobileUserDrawingDuplicateEditDragEnabled({
+        propDuplicate: duplicateUserDrawingOnEditDrag,
+        overrideDuplicate: userDrawingDuplicateEditDragOverrideRef.current,
       });
+      const transactionKey = `${duplicateEditDrag ? 'duplicate-drag' : 'edit-drag'}-${++userDrawingEditDragTransactionCounterRef.current}`;
+      const result = duplicateEditDrag
+        ? dispatchUserDrawingCommandToStateWithResult({
+            type: 'beginDuplicateEditDragAtPoint',
+            point: { x, y },
+            spacesByPaneId: userDrawingSpacesByPaneId,
+            options: {
+              createId: createUserDrawingId,
+              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+            },
+            meta: { source: 'touch', transactionKey },
+          })
+        : dispatchUserDrawingCommand(effectiveUserDrawingState, {
+            type: 'beginEditDragAtPoint',
+            point: { x, y },
+            spacesByPaneId: userDrawingSpacesByPaneId,
+            options: {
+              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+            },
+            meta: { source: 'touch', transactionKey },
+          });
       if (!result.hit || !result.editDrag) return false;
 
       userDrawingEditDragRef.current = result.editDrag;
       userDrawingEditDragTransactionKeyRef.current = transactionKey;
-      if (result.changed) {
+      if (!duplicateEditDrag && result.changed) {
         commitUserDrawingState(result.state);
         const event = createUserDrawingCommandEvent(effectiveUserDrawingState, result);
         if (event) {
@@ -1696,7 +1732,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [
       chartDimensions,
       commitUserDrawingState,
+      createUserDrawingId,
+      duplicateUserDrawingOnEditDrag,
       dispatchUserDrawingCommandToState,
+      dispatchUserDrawingCommandToStateWithResult,
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,

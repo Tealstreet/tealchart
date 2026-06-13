@@ -21,11 +21,23 @@ export interface ResolveMobileUserDrawingPlacementConstraintOptions {
   overrideConstrained?: boolean | null;
 }
 
+export interface ResolveMobileUserDrawingDuplicateEditDragOptions {
+  propDuplicate?: boolean;
+  overrideDuplicate?: boolean | null;
+}
+
 export function resolveMobileUserDrawingPlacementConstraintEnabled({
   propConstrained = false,
   overrideConstrained = null,
 }: ResolveMobileUserDrawingPlacementConstraintOptions): boolean {
   return overrideConstrained ?? propConstrained;
+}
+
+export function resolveMobileUserDrawingDuplicateEditDragEnabled({
+  propDuplicate = false,
+  overrideDuplicate = null,
+}: ResolveMobileUserDrawingDuplicateEditDragOptions): boolean {
+  return overrideDuplicate ?? propDuplicate;
 }
 
 export function resolveMobileUserDrawingInputPoint({
