@@ -31,29 +31,29 @@ Sources:
 | --- | --- | --- | --- | --- | --- |
 | Tool/category inventory | Roadmap added; matrix now tracks categories | Same source doc | Same source doc | `partial` | Gap 1 |
 | Active tool selection | Tool descriptors and state exist | Left rail/top controls exist | Mobile top/toolbar controls exist | `shipped` | Gap 4 polish |
-| Click/tap anchor placement | Draft reducer exists | Click/tap creates anchors | Tap creates anchors | `partial` | Gap 3 |
-| Drag-to-draw placement | Path family only | Path drag only; shape drag missing | Path/tap support partial; shape drag missing | `partial` | Gap 3 |
-| Draft preview | Render model supports preview anchor | Preview plumbing exists but not general gesture-driven placement | Skia render model supports preview entries | `partial` | Gap 3 |
+| Click/tap anchor placement | Draft reducer exists | Click/tap creates anchors | Tap creates anchors | `partial` | Gap 3 tool expansion |
+| Drag-to-draw placement | Shared two-anchor placement commands exist for first proof tools | Web drag creates exact anchors for first proof tools | Mobile touch drag creates exact anchors for first proof tools | `partial` | Gap 3 tool expansion |
+| Draft preview | Render model supports preview anchors | Canvas draft previews exist for first proof tools | Skia render model supports matching preview entries | `partial` | Gap 3 tool expansion |
 | Selection and hit testing | Shared hit testing and selection state exist | Click/tap selection exists | Tap selection exists | `shipped` | Gap 4 |
 | Multi-select | Group selection state exists | Modifier selection exists | Two-finger additive selection exists | `shipped` | Gap 5 |
 | Handle editing | Shared edit helpers exist | Select-mode handle drag exists | Select-mode handle drag exists | `shipped` | Gap 6 polish |
 | Whole-object move | Shared edit helpers exist | Select-mode whole drag exists | Select-mode whole drag exists | `shipped` | Gap 7 duplicate-drag |
-| Duplicate action | Shared reducer exists | API/top-bar action exists | Handle/top-bar action exists | `partial` | Gap 4, Gap 7 |
-| Shift+drag duplicate | No command/gesture transaction yet | Missing | Needs mobile equivalent | `missing` | Gap 7 |
-| Delete selected | Shared reducer exists | API/top-bar/keyboard Delete exists | Handle/top-bar action exists | `partial` | Gap 2, Gap 4 |
-| Z-order actions | Shared reducer exists | API/top-bar action exists | Handle/top-bar action exists | `partial` | Gap 4, Gap 5 |
-| Lock/hide | Shared reducers exist | API/top-bar style controls exist | Handle/top-bar controls exist | `partial` | Gap 4, Gap 5 |
-| Style controls | Shared descriptors/reducers exist | Top-bar controls exist | Top-bar controls exist | `partial` | Gap 4, Gap 6 |
-| Floating selected toolbar | Descriptors exist but surface model missing | Actions currently live in top bar | Actions currently live in top bar/sibling controls | `missing` | Gap 4 |
-| Drawing context menu | Reducers/actions exist | General context menu exists; drawing-specific menu incomplete | Mobile context menu exists; drawing-specific menu incomplete | `missing` | Gap 4 |
-| Object tree | No row model yet | Missing | Missing | `missing` | Gap 5 |
-| Double-click/double-tap edit | Text edit reducers exist | Text double-click editor exists for text labels | Text double-tap editor exists for text labels | `partial` | Gap 6 |
-| Undo/redo | No drawing history stack yet | `Ctrl/Cmd+Z` drawing undo missing | Handle/API undo missing | `missing` | Gap 2 |
-| Command transactions | Reducers exist but no command envelope | APIs call reducers directly | Handles call reducers directly | `missing` | Gap 2 |
-| Keyboard shortcuts | Some Delete behavior exists | Delete/Backspace partial | Hardware keyboard coverage missing | `partial` | Gap 7 |
-| Public APIs | Many widget APIs exist | Web API coverage broad | Mobile handle coverage broad | `partial` | Gap 8 |
-| Event subscriptions | General widget/event infrastructure exists | Drawing command events incomplete | Drawing command events incomplete | `missing` | Gap 8 |
-| Persistence | Committed drawing state persists; transient state cleared | Layout save/load includes drawings | Mobile import/export exists | `partial` | Gap 8 |
+| Duplicate action | Shared command and reducer exist | API, toolbar/context, keyboard, and Shift-drag paths exist | Handle, action/context, keyboard, and duplicate-drag handle paths exist | `shipped` | Gap 4/7 polish |
+| Shift+drag duplicate | Shared duplicate edit-drag transaction exists | Shift+drag duplicate-and-move exists in select mode | Mobile duplicate-drag handle equivalent exists | `shipped` | Gap 7 polish |
+| Delete selected | Shared command and reducer exist | API, toolbar/context, and keyboard Delete exist | Handle, toolbar/context, and keyboard adapter paths exist | `shipped` | Gap 4 polish |
+| Z-order actions | Shared command and object-tree action models exist | API, toolbar/context, and object-tree dispatch exist | Handle, toolbar/context, and object-tree dispatch exist | `shipped` | Gap 5 polish |
+| Lock/hide | Shared reducers and selected-action descriptors exist | API, floating toolbar/context, and object-tree dispatch exist | Handle, action strip/context, and object-tree dispatch exist | `shipped` | Gap 4/5 polish |
+| Style controls | Shared descriptors/reducers/properties surface exist | Top-bar and properties-surface command paths exist | Top-bar/handle and properties-surface command paths exist | `partial` | Gap 4, Gap 6 polish |
+| Floating selected toolbar | Shared selected-action surface and anchor model exist | Floating toolbar exists for initial selected actions | Anchored mobile action strip exists for matching initial actions | `partial` | Gap 4 polish |
+| Drawing context menu | Shared context-action resolver exists | Drawing right-click menu exists for initial actions | Drawing long-press menu exists for matching initial actions | `partial` | Gap 4 polish |
+| Object tree | Shared row/action model exists | App-owned open/dispatch APIs exist | Matching handle/prop open and dispatch APIs exist | `partial` | Gap 5 polish |
+| Double-click/double-tap edit | Shared edit-intent and text/property commands exist | Text editor and properties-surface command path exist | Text editor and properties-surface handle path exist | `partial` | Gap 6 polish |
+| Undo/redo | Drawing command history stack exists for committed command mutations | Ctrl/Cmd+Z/redo and APIs exist for committed command history | Imperative handle and keyboard adapter paths exist for committed command history | `partial` | Gap 2 validation |
+| Command transactions | Shared command envelope and history grouping exist | Widget APIs and gestures dispatch commands | Skia handles/adapters dispatch commands | `shipped` | Gap 2 polish |
+| Keyboard shortcuts | Shared keyboard action map exists | Delete/Escape/undo/redo/copy/paste/select-all/duplicate/nudge exist | Host-level hardware-keyboard adapter support exists for matching actions | `partial` | Gap 7 polish |
+| Public APIs | Shared command/API concepts exist | Web API coverage broad | Mobile handle coverage broad | `partial` | Gap 8 polish |
+| Event subscriptions | Shared command-event shape exists; direct state replacement/import remains silent | `onUserDrawingCommand` and subscription event exist for command dispatch | `onUserDrawingCommand` prop and command utility event path exist for command dispatch | `partial` | Gap 8 polish |
+| Persistence | Versioned committed drawing layout schema exists | Layout save/load includes migrated drawings | Mobile import/export uses same unknown-safe schema | `shipped` | Gap 8 polish |
 | Visual parity evidence | Tests exist across render/input pieces; manual visual evidence checklist exists | Canvas tests exist plus desktop/narrow-desktop checklist | Skia render-model tests exist plus portrait/landscape checklist | `partial` | Gap 8 |
 
 ## Placement Mode Legend
