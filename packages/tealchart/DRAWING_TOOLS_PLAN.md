@@ -3,6 +3,12 @@
 This tracks user markup work for Tealchart. Web Canvas and mobile Skia must land
 matching behavior in the same PR for every user-facing drawing feature.
 
+Detailed capability status and the ordered foundational roadmap now live in the
+repo-root `DRAWING_TOOLS_CAPABILITY_MATRIX.md` and
+`DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`. Use those docs before adding more
+drawing shapes so interaction, command, history, toolbar, context-menu, and
+object-tree gaps stay visible.
+
 ## Shipped
 
 - Shared drawing geometry, render model, hit testing, input draft state, and
