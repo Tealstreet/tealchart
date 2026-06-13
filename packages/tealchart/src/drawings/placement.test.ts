@@ -79,6 +79,15 @@ const dragSeedTools: UserDrawingTool[] = [
   'elliottDoubleComboWave',
   'doubleCurve',
   'disjointChannel',
+  'trianglePattern',
+  'abcdPattern',
+  'xabcdPattern',
+  'cypherPattern',
+  'threeDrivesPattern',
+  'headShouldersPattern',
+  'elliottImpulseWave',
+  'elliottTripleComboWave',
+  'elliottTriangleWave',
 ];
 
 function point(time: number, price: number): UserDrawingInputPoint {
@@ -104,6 +113,8 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('longPosition')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('elliottCorrectiveWave')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('doubleCurve')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('trianglePattern')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('xabcdPattern')).toBe('dragSeed');
   });
 
   it('classifies supported two-anchor tools as drag placement tools', () => {
@@ -121,8 +132,8 @@ describe('user drawing placement modes', () => {
   });
 
   it('keeps unsupported multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
-    expect(isUserDrawingDragPlacementTool('trianglePattern')).toBe(false);
-    expect(getUserDrawingPlacementMode('trianglePattern')).toBe('click');
+    expect(isUserDrawingDragPlacementTool('barsPattern')).toBe(false);
+    expect(getUserDrawingPlacementMode('barsPattern')).toBe('click');
   });
 
   it('constrains shape placement drags to a visual square', () => {
