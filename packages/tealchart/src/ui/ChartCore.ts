@@ -122,6 +122,7 @@ export interface ChartCoreOptions {
   onUserDrawingEditStart?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+    options?: DrawingDragEventOptions,
   ) => boolean;
   /** Called when select-mode context menu input may target a user drawing */
   onUserDrawingContextMenu?: (
@@ -1640,7 +1641,7 @@ export class ChartCore {
     const chartRight = this.options.width - this.margins.right;
     if (x < chartLeft || x >= chartRight || !this.getPaneAtY(y)) return false;
 
-    return this.options.onUserDrawingEditStart?.({ x, y }, this.getUserDrawingSpaces(this.viewport)) === true;
+    return this.options.onUserDrawingEditStart?.({ x, y }, this.getUserDrawingSpaces(this.viewport), options) === true;
   }
 
   private handleUserDrawingDragPending(x: number, y: number): boolean {

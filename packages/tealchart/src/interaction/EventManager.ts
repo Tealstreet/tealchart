@@ -100,6 +100,7 @@ export interface DrawingInputEventOptions {
 
 export interface DrawingDragEventOptions {
   constrainedPlacement?: boolean;
+  duplicateOnDrag?: boolean;
 }
 
 export type DrawingInputResult = boolean | DrawingInputHandledResult;
@@ -113,7 +114,7 @@ function allowsPaneDoubleClick(result: DrawingInputResult | undefined): boolean 
 }
 
 function getMouseDrawingDragOptions(e: MouseEvent): DrawingDragEventOptions | undefined {
-  return e.shiftKey ? { constrainedPlacement: true } : undefined;
+  return e.shiftKey ? { constrainedPlacement: true, duplicateOnDrag: true } : undefined;
 }
 
 function invokeDrawingDragCallback(
@@ -460,7 +461,7 @@ export class EventManager {
   private _pendingEventType: 'none' | 'move' | 'drag' | 'touchmove' | 'leave' | 'docmove' = 'none';
   private _pendingMouseClientX = 0;
   private _pendingMouseClientY = 0;
-  private _pendingMouseConstrainedPlacement = false;
+  private _pendingMouseDrawingDragOptions: DrawingDragEventOptions | undefined;
   private _pendingTouchEvent: TouchEvent | null = null;
   private _inputRafId: number | null = null;
 
@@ -573,7 +574,7 @@ export class EventManager {
     // Store coordinates and defer to RAF
     this._pendingMouseClientX = e.clientX;
     this._pendingMouseClientY = e.clientY;
-    this._pendingMouseConstrainedPlacement = e.shiftKey;
+    this._pendingMouseDrawingDragOptions = getMouseDrawingDragOptions(e);
     this._pendingEventType = 'drag';
     this.scheduleInputProcessing();
   }
@@ -595,7 +596,7 @@ export class EventManager {
       const distance = Math.hypot(x - this.state.dragStartX, y - this.state.dragStartY);
       if (distance < 5) return;
 
-      const options = this._pendingMouseConstrainedPlacement ? { constrainedPlacement: true } : undefined;
+      const options = this._pendingMouseDrawingDragOptions;
       if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', options)) {
         this.state.dragMode = 'drawing';
         this.callbacks.onCursorChange?.('move');
@@ -611,7 +612,7 @@ export class EventManager {
         x,
         y,
         'mouse',
-        this._pendingMouseConstrainedPlacement ? { constrainedPlacement: true } : undefined,
+        this._pendingMouseDrawingDragOptions,
       );
       this.scheduleRender();
       return;
@@ -717,7 +718,7 @@ export class EventManager {
     this.state.dragStartPaneYRange = null;
     this.state.dragStartPaneHeight = 0;
     this.state.draggedDivider = null;
-    this._pendingMouseConstrainedPlacement = false;
+    this._pendingMouseDrawingDragOptions = undefined;
 
     // Remove window listeners
     window.removeEventListener('mousemove', this.boundWindowMouseMove);

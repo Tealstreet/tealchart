@@ -168,6 +168,52 @@ describe('user drawing command history', () => {
     expect(undo.state.drawings[0]).toEqual(editStart.state.drawings[0]);
   });
 
+  it('coalesces duplicate edit-drag start and moves into one undo entry', () => {
+    let state = createUserDrawingState();
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setActiveTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'line', now: () => 30, style },
+      meta: { source: 'pointer' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'line', now: () => 31, style },
+      meta: { source: 'pointer' },
+    }));
+    expect(history.undoStack).toHaveLength(1);
+
+    const duplicateStart = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'beginDuplicateEditDragAtPoint',
+      point: { x: 150, y: 150 },
+      spacesByPaneId,
+      options: { createId: () => 'line-copy', now: () => 40 },
+      meta: { source: 'pointer', transactionKey: 'duplicate-drag' },
+    });
+    expect(duplicateStart.history.undoStack).toHaveLength(2);
+    expect(duplicateStart.editDrag?.startDrawing.id).toBe('line-copy');
+    if (!duplicateStart.editDrag) throw new Error('expected duplicate edit drag');
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(duplicateStart.state, duplicateStart.history, {
+      type: 'applyEditDrag',
+      drag: duplicateStart.editDrag,
+      point: { x: 170, y: 130 },
+      meta: { source: 'pointer', transactionKey: 'duplicate-drag' },
+    }));
+
+    expect(history.undoStack).toHaveLength(2);
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
   it('bounds undo stack capacity', () => {
     let state = createUserDrawingState();
     let history = createUserDrawingCommandHistory({ capacity: 1 });

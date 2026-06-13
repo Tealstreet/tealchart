@@ -85,6 +85,7 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
       return false;
     case 'handleInput':
     case 'applyEditDrag':
+    case 'beginDuplicateEditDragAtPoint':
     case 'nudge':
     case 'delete':
     case 'duplicate':
