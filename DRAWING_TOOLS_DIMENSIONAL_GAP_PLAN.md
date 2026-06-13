@@ -460,6 +460,9 @@ Phase 1: Minimal panel surface
 - Status: app-owned web panel integration is exposed through widget APIs for
   resolving and opening the shared object-tree model, with an
   `onUserDrawingObjectTreeOpen` callback for toolbar/sidebar hosts.
+- Status: the selected drawing floating toolbar and drawing right-click context
+  menu now include a shared object-tree open action that calls the same
+  app-owned object-tree callback.
 
 Phase 2: Row actions
 
@@ -482,6 +485,9 @@ Phase 1: Mobile panel/sheet
 - Status: mobile Skia exposes matching handle methods and an
   `onUserDrawingObjectTreeOpen` prop so app-owned sheets can use the same row
   model as web.
+- Status: the mobile selected action strip and drawing long-press context menu
+  now include the same shared object-tree open action and resolve the current
+  row model for app-owned sheets.
 
 Phase 2: Row actions
 
