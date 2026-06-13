@@ -1626,6 +1626,9 @@ describe('user drawing toolbar descriptors', () => {
             lineStyle: 'solid' as const,
             textColor: '#f5c542',
             fontSize: 14,
+            fontFamily: 'sans-serif',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
           },
           point: { time: 1, price: 10 },
           text: 'Note',
@@ -1651,6 +1654,18 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { fontSize: 16 } },
     });
+    expect(styleItems.find((item) => item.id === 'fontFamily:serif')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
+    });
+    expect(styleItems.find((item) => item.id === 'fontWeight:bold')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontWeight: 'bold' } },
+    });
+    expect(styleItems.find((item) => item.id === 'fontStyle:italic')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontStyle: 'italic' } },
+    });
 
     const defaultSized = {
       ...selected,
@@ -1668,6 +1683,58 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { fontSize: 14 } },
     });
+    expect(defaultSizeItems.find((item) => item.id === 'fontFamily:serif')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
+    });
+  });
+
+  it('omits rich text weight and style actions for generated-label drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'range' },
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            textColor: '#f5c542',
+            fontSize: 14,
+            fontFamily: 'sans-serif',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+          },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(styleItems.find((item) => item.id === 'textColor:#22c55e')).toMatchObject({
+      command: { type: 'updateStyle', style: { textColor: '#22c55e' } },
+    });
+    expect(styleItems.find((item) => item.id === 'fontSize:increase')).toMatchObject({
+      command: { type: 'updateStyle', style: { fontSize: 16 } },
+    });
+    expect(styleItems.find((item) => item.id === 'fontFamily:serif')).toMatchObject({
+      command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
+    });
+    expect(styleItems.some((item) => item.id.startsWith('fontWeight:'))).toBe(false);
+    expect(styleItems.some((item) => item.id.startsWith('fontStyle:'))).toBe(false);
   });
 
   it('clamps selected action surfaces inside shared safe viewport insets', () => {

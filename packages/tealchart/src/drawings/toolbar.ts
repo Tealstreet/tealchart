@@ -26,6 +26,7 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingFontFamily,
 } from './types';
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
@@ -796,6 +797,25 @@ function getAdjacentUserDrawingFontSize(drawing: UserDrawing, direction: -1 | 1)
   return sizes[currentIndex + direction] ?? null;
 }
 
+function getNextUserDrawingFontFamily(drawing: UserDrawing): UserDrawingFontFamily {
+  const families = USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => descriptor.fontFamily);
+  const currentFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
+  const currentIndex = families.indexOf(currentFamily);
+  return families[currentIndex >= 0 ? (currentIndex + 1) % families.length : 0]!;
+}
+
+function getNextUserDrawingFontWeight(drawing: UserDrawing): UserDrawingFontWeight {
+  const weights = USER_DRAWING_FONT_WEIGHT_DESCRIPTORS.map((descriptor) => descriptor.fontWeight);
+  const currentIndex = weights.indexOf(drawing.style.fontWeight ?? 'normal');
+  return weights[currentIndex >= 0 ? (currentIndex + 1) % weights.length : 0]!;
+}
+
+function getNextUserDrawingFontStyle(drawing: UserDrawing): UserDrawingFontStyle {
+  const styles = USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => descriptor.fontStyle);
+  const currentIndex = styles.indexOf(drawing.style.fontStyle ?? 'normal');
+  return styles[currentIndex >= 0 ? (currentIndex + 1) % styles.length : 0]!;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -815,6 +835,10 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const nextTextColor = textEnabled ? getNextUserDrawingTextColor(selectedDrawing) : null;
   const smallerFontSize = textEnabled ? getAdjacentUserDrawingFontSize(selectedDrawing, -1) : null;
   const largerFontSize = textEnabled ? getAdjacentUserDrawingFontSize(selectedDrawing, 1) : null;
+  const richTextEnabled = textEnabled && supportsUserDrawingRichTextControls(selectedDrawing);
+  const nextFontFamily = textEnabled ? getNextUserDrawingFontFamily(selectedDrawing) : null;
+  const nextFontWeight = richTextEnabled ? getNextUserDrawingFontWeight(selectedDrawing) : null;
+  const nextFontStyle = richTextEnabled ? getNextUserDrawingFontStyle(selectedDrawing) : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -862,6 +886,33 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'updateStyle', style: largerFontSize === null ? {} : { fontSize: largerFontSize } },
       }
     : null;
+  const fontFamilyItem: UserDrawingSelectedActionSurfaceItem | null = nextFontFamily
+    ? {
+        id: `fontFamily:${nextFontFamily}`,
+        icon: USER_DRAWING_FONT_FAMILY_DESCRIPTORS.find((descriptor) => descriptor.fontFamily === nextFontFamily)!.icon,
+        label: `Cycle selected drawing font family to ${nextFontFamily}`,
+        enabled: textEnabled,
+        command: { type: 'updateStyle', style: { fontFamily: nextFontFamily } },
+      }
+    : null;
+  const fontWeightItem: UserDrawingSelectedActionSurfaceItem | null = nextFontWeight
+    ? {
+        id: `fontWeight:${nextFontWeight}`,
+        icon: USER_DRAWING_FONT_WEIGHT_DESCRIPTORS.find((descriptor) => descriptor.fontWeight === nextFontWeight)!.icon,
+        label: `Cycle selected drawing font weight to ${nextFontWeight}`,
+        enabled: textEnabled,
+        command: { type: 'updateStyle', style: { fontWeight: nextFontWeight } },
+      }
+    : null;
+  const fontStyleItem: UserDrawingSelectedActionSurfaceItem | null = nextFontStyle
+    ? {
+        id: `fontStyle:${nextFontStyle}`,
+        icon: USER_DRAWING_FONT_STYLE_DESCRIPTORS.find((descriptor) => descriptor.fontStyle === nextFontStyle)!.icon,
+        label: `Cycle selected drawing font style to ${nextFontStyle}`,
+        enabled: textEnabled,
+        command: { type: 'updateStyle', style: { fontStyle: nextFontStyle } },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -901,6 +952,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(textColorItem ? [textColorItem] : []),
       ...(smallerFontSizeItem ? [smallerFontSizeItem] : []),
       ...(largerFontSizeItem ? [largerFontSizeItem] : []),
+      ...(fontFamilyItem ? [fontFamilyItem] : []),
+      ...(fontWeightItem ? [fontWeightItem] : []),
+      ...(fontStyleItem ? [fontStyleItem] : []),
     ],
   };
 }
