@@ -1511,6 +1511,8 @@ describe('user drawing toolbar descriptors', () => {
       ['lineWidth:decrease', false, { type: 'updateStyle', style: {} }, undefined],
       ['lineWidth:increase', true, { type: 'updateStyle', style: { lineWidth: 2 } }, undefined],
       ['lineStyle:dashed', true, { type: 'updateStyle', style: { lineStyle: 'dashed' } }, undefined],
+      ['opacity:0.75', true, { type: 'updateStyle', style: { opacity: 0.75 } }, undefined],
+      ['lineVisible:toggle', true, { type: 'updateStyle', style: { lineVisible: false } }, undefined],
     ]);
     expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
       ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
@@ -1600,6 +1602,14 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { fillColor: 'rgba(34, 197, 94, 0.12)' } },
       swatchColor: 'rgba(34, 197, 94, 0.12)',
+    });
+    expect(styleItems.find((item) => item.id === 'opacity:0.75')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { opacity: 0.75 } },
+    });
+    expect(styleItems.find((item) => item.id === 'lineVisible:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { lineVisible: false } },
     });
     expect(styleItems.find((item) => item.id === 'fillVisible:toggle')).toMatchObject({
       enabled: true,
