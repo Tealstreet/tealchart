@@ -377,6 +377,8 @@ export interface SkiaTealchartProps {
   onPositionClose?: (positionId: string) => void;
   /** Called when position is reversed */
   onPositionReverse?: (positionId: string) => void;
+  /** Called when a custom order or position line action is pressed */
+  onLineAction?: (lineId: string, actionId: string) => void;
   /** Price precision for display */
   pricePrecision?: number;
   // ===========================================================================
@@ -427,6 +429,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onOrderCancel,
     onPositionClose,
     onPositionReverse,
+    onLineAction,
     pricePrecision = 2,
     // Top bar props
     showTopBar = true,
@@ -3955,6 +3958,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               useNarrowText={dimensions.width < 400}
               onPriceChange={onOrderMove}
               onCancel={onOrderCancel}
+              onLineAction={onLineAction}
               onTPMovePreview={handleOrderTPMove}
               onSLMovePreview={handleOrderSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
@@ -3973,6 +3977,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               useNarrowText={dimensions.width < 400}
               onClose={onPositionClose}
               onReverse={onPositionReverse}
+              onLineAction={onLineAction}
               onTPMovePreview={handleTPMove}
               onSLMovePreview={handleSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}

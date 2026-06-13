@@ -8,7 +8,7 @@
  * - TP/SL buttons (draggable for bracket orders)
  */
 
-import type { PositionLineRenderData, Viewport } from '../../types';
+import type { ChartLabelButton, PositionLineRenderData, Viewport } from '../../types';
 import type { ChartDimensions } from '../utils/coordinates';
 
 import React, { useCallback, useMemo } from 'react';
@@ -35,6 +35,8 @@ export interface PositionLineComponentProps {
   onClose?: (positionId: string) => void;
   /** Callback when position is reversed (fallback if no adapter callback) */
   onReverse?: (positionId: string) => void;
+  /** Callback when a custom line action is pressed */
+  onLineAction?: (lineId: string, actionId: string) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (positionId: string, price: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -57,6 +59,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   useNarrowText = false,
   onClose,
   onReverse,
+  onLineAction,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
@@ -91,6 +94,15 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       }
     }
   }, [onReverse, position.id, position.reversible, position.callbacks]);
+
+  const handleLineAction = useCallback(
+    (action: ChartLabelButton) => {
+      if (action.actionId) {
+        onLineAction?.(position.id, action.actionId);
+      }
+    },
+    [onLineAction, position.id],
+  );
 
   // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {
@@ -294,6 +306,10 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
 
   // Whether to show TP/SL buttons
   const showBrackets = position.brackets !== null;
+  const customActions = useMemo(
+    () => (position.actions ?? []).filter((action) => action.type === 'action' && action.actionId),
+    [position.actions],
+  );
 
   return (
     <View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }]}>
@@ -421,8 +437,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                 backgroundColor: position.closeButtonBackgroundColor,
                 borderColor: position.closeButtonBorderColor,
                 opacity: pressed ? 0.7 : 1,
-                borderTopRightRadius: position.reversible ? 0 : 2,
-                borderBottomRightRadius: position.reversible ? 0 : 2,
+                borderTopRightRadius: position.reversible || customActions.length > 0 ? 0 : 2,
+                borderBottomRightRadius: position.reversible || customActions.length > 0 ? 0 : 2,
               },
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
@@ -442,8 +458,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                 borderColor: position.reverseButtonBorderColor,
                 borderLeftWidth: 0,
                 opacity: pressed ? 0.7 : 1,
-                borderTopRightRadius: 2,
-                borderBottomRightRadius: 2,
+                borderTopRightRadius: customActions.length > 0 ? 0 : 2,
+                borderBottomRightRadius: customActions.length > 0 ? 0 : 2,
               },
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
@@ -451,6 +467,26 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>⇄</Text>
           </Pressable>
         )}
+
+        {customActions.map((action, index) => (
+          <Pressable
+            key={action.actionId}
+            onPress={() => handleLineAction(action)}
+            style={({ pressed }) => [
+              styles.customActionButton,
+              {
+                backgroundColor: action.backgroundColor,
+                borderColor: action.borderColor,
+                opacity: pressed ? 0.7 : 1,
+                borderTopRightRadius: index === customActions.length - 1 ? 2 : 0,
+                borderBottomRightRadius: index === customActions.length - 1 ? 2 : 0,
+              },
+            ]}
+            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
+          >
+            <Text style={[styles.customActionIcon, { color: action.iconColor }]}>{action.icon}</Text>
+          </Pressable>
+        ))}
       </View>
 
       {/* Horizontal line - right segment */}
@@ -547,6 +583,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     lineHeight: 14,
+  },
+  customActionButton: {
+    width: TP_SL_BUTTON_WIDTH,
+    height: LABEL_HEIGHT,
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  customActionIcon: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    lineHeight: 11,
   },
   priceAxisLabel: {
     position: 'absolute',

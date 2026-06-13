@@ -9,7 +9,7 @@
  * - Invisible 44px drag handle for touch-friendly dragging
  */
 
-import type { OrderLineRenderData, Viewport } from '../../types';
+import type { ChartLabelButton, OrderLineRenderData, Viewport } from '../../types';
 import type { ChartDimensions } from '../utils/coordinates';
 
 import React, { useCallback, useMemo } from 'react';
@@ -36,6 +36,8 @@ export interface OrderLineComponentProps {
   onPriceChange?: (orderId: string, newPrice: number) => void;
   /** Callback when order is cancelled (fallback if no adapter callback) */
   onCancel?: (orderId: string) => void;
+  /** Callback when a custom line action is pressed */
+  onLineAction?: (lineId: string, actionId: string) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (orderId: string, price: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -57,6 +59,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   useNarrowText = false,
   onPriceChange,
   onCancel,
+  onLineAction,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
@@ -95,6 +98,15 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       }
     }
   }, [onCancel, order.id, order.cancellable, order.callbacks]);
+
+  const handleLineAction = useCallback(
+    (action: ChartLabelButton) => {
+      if (action.actionId) {
+        onLineAction?.(order.id, action.actionId);
+      }
+    },
+    [onLineAction, order.id],
+  );
 
   // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {
@@ -312,6 +324,10 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
   // Whether to show TP/SL buttons
   const showBrackets = order.brackets !== null;
+  const customActions = useMemo(
+    () => (order.actions ?? []).filter((action) => action.type === 'action' && action.actionId),
+    [order.actions],
+  );
 
   return (
     <Animated.View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }, animatedContainerStyle]}>
@@ -395,6 +411,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                 backgroundColor: order.cancelButtonBackgroundColor,
                 borderColor: order.cancelButtonBorderColor,
                 opacity: pressed ? 0.7 : 1,
+                borderTopRightRadius: customActions.length > 0 && !showBrackets ? 0 : 2,
+                borderBottomRightRadius: customActions.length > 0 && !showBrackets ? 0 : 2,
               },
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
@@ -441,6 +459,26 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             </GestureDetector>
           </View>
         )}
+
+        {customActions.map((action, index) => (
+          <Pressable
+            key={action.actionId}
+            onPress={() => handleLineAction(action)}
+            style={({ pressed }) => [
+              styles.customActionButton,
+              {
+                backgroundColor: action.backgroundColor,
+                borderColor: action.borderColor,
+                opacity: pressed ? 0.7 : 1,
+                borderTopRightRadius: index === customActions.length - 1 ? 2 : 0,
+                borderBottomRightRadius: index === customActions.length - 1 ? 2 : 0,
+              },
+            ]}
+            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
+          >
+            <Text style={[styles.customActionIcon, { color: action.iconColor }]}>{action.icon}</Text>
+          </Pressable>
+        ))}
       </View>
 
       {/* Horizontal line - right segment (from label to price axis) */}
@@ -541,6 +579,19 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 2,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  customActionButton: {
+    width: TP_SL_BUTTON_WIDTH,
+    height: LABEL_HEIGHT,
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  customActionIcon: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    lineHeight: 11,
   },
   cancelIcon: {
     fontSize: 14,
