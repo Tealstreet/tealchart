@@ -9,6 +9,7 @@ export type UserDrawingPlacementMode = 'select' | 'click' | 'dragTwoAnchor' | 'p
 
 const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'trendLine',
+  'trendAngle',
   'extendedLine',
   'infoLine',
   'arrowLine',
@@ -67,6 +68,7 @@ export interface ResolveUserDrawingPlacementConstraintOptions {
 const SHAPE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>(['rectangle', 'circle', 'ellipse']);
 const LINE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>([
   'trendLine',
+  'trendAngle',
   'extendedLine',
   'infoLine',
   'arrowLine',

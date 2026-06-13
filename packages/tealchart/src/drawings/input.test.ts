@@ -51,6 +51,7 @@ const anchorC = { time: 2_000, price: 95 };
 const anchorD = { time: 3_000, price: 115 };
 const anchorE = { time: 4_000, price: 105 };
 const expandedDragPlacementTools: UserDrawingTool[] = [
+  'trendAngle',
   'priceRange',
   'dateRange',
   'datePriceRange',
