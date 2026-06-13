@@ -880,6 +880,7 @@ export interface OrderLineRenderData {
     onSLMove?: (price: number, partialPercent?: number) => void;
     onTPMoveEnd?: (price: number, partialPercent?: number) => void;
     onSLMoveEnd?: (price: number, partialPercent?: number) => void;
+    onMove?: (price: number) => void;
     onCancel?: () => void;
   };
 }

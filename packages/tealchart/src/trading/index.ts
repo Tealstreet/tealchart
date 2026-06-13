@@ -28,3 +28,10 @@ export type {
   ChartTradingProfitState,
   ChartTradingState,
 } from './types';
+
+export {
+  chartTradingLineId,
+  chartTradingStateToRenderData,
+  isChartTradingLineId,
+} from './renderData';
+export type { ChartTradingRenderData } from './renderData';

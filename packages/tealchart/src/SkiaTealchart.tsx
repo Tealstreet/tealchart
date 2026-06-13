@@ -49,6 +49,7 @@ import type {
 } from './mobile/utils/drawingRenderModel';
 import type { PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { ChartTradingIntentHandler, ChartTradingState } from './trading';
 import type {
   ChartMargins,
   ContextMenuItem,
@@ -174,6 +175,7 @@ import {
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
+import { chartTradingStateToRenderData, isChartTradingLineId } from './trading';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
@@ -355,6 +357,10 @@ export interface SkiaTealchartProps {
   orderLines?: OrderLineRenderData[];
   /** Position lines to render (open positions with PnL) */
   positionLines?: PositionLineRenderData[];
+  /** High-level chart trading state rendered as mobile order, position, and execution lines */
+  tradingState?: ChartTradingState;
+  /** Called when chart trading interactions request an OMS/exchange side effect */
+  onTradingIntent?: ChartTradingIntentHandler;
   /** Map from plotId to style overrides */
   plotStyleOverrides?: Map<string, PlotStyleOverride>;
   /** Called when viewport changes */
@@ -418,6 +424,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     priceLines,
     orderLines,
     positionLines,
+    tradingState,
+    onTradingIntent,
     plotStyleOverrides,
     onViewportChange,
     onContextMenu,
@@ -986,6 +994,38 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     return lastTradeLine ? [...nonLastTradeLines, lastTradeLine] : nonLastTradeLines;
   }, [bars, interval, priceLines, pricePrecision, fullRenderOptions.upColor, fullRenderOptions.downColor]);
 
+  const chartTradingRenderData = useMemo(
+    () => chartTradingStateToRenderData(tradingState, onTradingIntent),
+    [onTradingIntent, tradingState],
+  );
+
+  const effectiveOrderLines = useMemo(
+    () => [...(orderLines ?? []), ...chartTradingRenderData.orderLines],
+    [chartTradingRenderData.orderLines, orderLines],
+  );
+
+  const effectivePositionLines = useMemo(
+    () => [...(positionLines ?? []), ...chartTradingRenderData.positionLines],
+    [chartTradingRenderData.positionLines, positionLines],
+  );
+
+  const handleLineActionIntent = useCallback(
+    (lineId: string, actionId: string) => {
+      if (isChartTradingLineId(lineId)) {
+        onTradingIntent?.({
+          type: 'line.action',
+          lineId,
+          actionId,
+          source: 'native-line',
+        });
+        return;
+      }
+
+      onLineAction?.(lineId, actionId);
+    },
+    [onLineAction, onTradingIntent],
+  );
+
   // ==========================================================================
   // Gestures (using unified hook)
   // ==========================================================================
@@ -1111,7 +1151,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleTPMove = useCallback(
     (positionId: string, price: number) => {
-      const pos = positionLines?.find((p) => p.id === positionId || p.positionId === positionId);
+      const pos = effectivePositionLines.find((p) => p.id === positionId || p.positionId === positionId);
       if (pos?.positionData) {
         setBracketDragState({
           type: 'tp',
@@ -1123,12 +1163,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       }
     },
-    [positionLines],
+    [effectivePositionLines],
   );
 
   const handleSLMove = useCallback(
     (positionId: string, price: number) => {
-      const pos = positionLines?.find((p) => p.id === positionId || p.positionId === positionId);
+      const pos = effectivePositionLines.find((p) => p.id === positionId || p.positionId === positionId);
       if (pos?.positionData) {
         setBracketDragState({
           type: 'sl',
@@ -1140,13 +1180,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       }
     },
-    [positionLines],
+    [effectivePositionLines],
   );
 
   // Order TP/SL drag move handlers (for Skia bracket preview)
   const handleOrderTPMove = useCallback(
     (orderId: string, price: number) => {
-      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+      const order = effectiveOrderLines.find((o) => o.id === orderId || o.orderId === orderId);
       if (order) {
         setBracketDragState({
           type: 'tp',
@@ -1158,12 +1198,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       }
     },
-    [orderLines],
+    [effectiveOrderLines],
   );
 
   const handleOrderSLMove = useCallback(
     (orderId: string, price: number) => {
-      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+      const order = effectiveOrderLines.find((o) => o.id === orderId || o.orderId === orderId);
       if (order) {
         setBracketDragState({
           type: 'sl',
@@ -1175,7 +1215,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       }
     },
-    [orderLines],
+    [effectiveOrderLines],
   );
 
   const handleTPSLDragEnd = useCallback(() => {
@@ -1607,7 +1647,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     const labelHeight = 20;
 
     // Add order line labels
-    orderLines?.forEach((order) => {
+    effectiveOrderLines.forEach((order) => {
       bounds.push({
         id: `order-${order.id}`,
         originalY: priceToY(order.price, viewport, chartDimensions),
@@ -1618,7 +1658,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
 
     // Add position line labels
-    positionLines?.forEach((pos) => {
+    effectivePositionLines.forEach((pos) => {
       bounds.push({
         id: `position-${pos.id}`,
         originalY: priceToY(pos.price, viewport, chartDimensions),
@@ -1629,7 +1669,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
 
     return bounds;
-  }, [viewport, chartDimensions, orderLines, positionLines]);
+  }, [viewport, chartDimensions, effectiveOrderLines, effectivePositionLines]);
 
   // Resolve collisions
   useLabelCollision(labelBoundsInput);
@@ -1689,7 +1729,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           undefined,
           plotStyleOverrides,
           undefined,
-          undefined,
+          chartTradingRenderData.executionLines,
           drawings,
         );
 
@@ -1708,6 +1748,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     effectivePriceLines,
     plots,
     drawings,
+    chartTradingRenderData.executionLines,
     unifiedPaneLayout,
     indicatorPaneInfo,
     plotStyleOverrides,
@@ -3948,7 +3989,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
         {/* Order lines */}
         {viewport &&
-          orderLines?.map((order) => (
+          effectiveOrderLines.map((order) => (
             <OrderLineComponent
               key={order.id}
               order={order}
@@ -3958,7 +3999,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               useNarrowText={dimensions.width < 400}
               onPriceChange={onOrderMove}
               onCancel={onOrderCancel}
-              onLineAction={onLineAction}
+              onLineAction={handleLineActionIntent}
               onTPMovePreview={handleOrderTPMove}
               onSLMovePreview={handleOrderSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
@@ -3967,7 +4008,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
         {/* Position lines */}
         {viewport &&
-          positionLines?.map((position) => (
+          effectivePositionLines.map((position) => (
             <PositionLineComponent
               key={position.id}
               position={position}
@@ -3977,7 +4018,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               useNarrowText={dimensions.width < 400}
               onClose={onPositionClose}
               onReverse={onPositionReverse}
-              onLineAction={onLineAction}
+              onLineAction={handleLineActionIntent}
               onTPMovePreview={handleTPMove}
               onSLMovePreview={handleSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}

@@ -21,7 +21,7 @@ UI layer.
 ## React Props
 
 Consumers that use the Premys `TealChart` wrapper pass the same props to the
-canvas and TradingView backends:
+web canvas, TradingView, and native Skia backends:
 
 ```tsx
 import type {
@@ -161,10 +161,11 @@ percentage bands on the canvas and TradingView backends:
 
 ## Backend Parity
 
-The canvas backend uses Tealchart's native interactive line layer. The
-TradingView backend uses the runtime patch to draw on the TradingView chart
-canvas and a pointer hit layer on the chart container. Both backends emit the
-same `ChartTradingIntent` union for the same high-level gestures.
+The web canvas and native Skia backends use Tealchart's native interactive line
+layers. The TradingView backend uses the runtime patch to draw on the
+TradingView chart canvas and a pointer hit layer on the chart container. All
+backends emit the same `ChartTradingIntent` union for the same high-level
+gestures.
 
 Known backend differences:
 

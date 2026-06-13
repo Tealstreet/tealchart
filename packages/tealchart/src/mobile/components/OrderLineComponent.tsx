@@ -85,11 +85,15 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   // Handle price change callback
   const handlePriceChange = useCallback(
     (newPrice: number) => {
-      if (onPriceChange && order.editable) {
+      if (!order.editable) return;
+
+      if (order.callbacks?.onMove) {
+        order.callbacks.onMove(newPrice);
+      } else if (onPriceChange) {
         onPriceChange(order.id, newPrice);
       }
     },
-    [onPriceChange, order.id, order.editable],
+    [onPriceChange, order.id, order.editable, order.callbacks],
   );
 
   // Handle cancel callback — fire directly from adapter callbacks
