@@ -76,6 +76,7 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'selectAtPoint':
     case 'beginEditDragAtPoint':
     case 'cancelDraft':
+    case 'beginPlacementDrag':
     case 'beginPathDrag':
     case 'appendPathDragPoint':
     case 'beginTextEdit':
@@ -87,6 +88,7 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'delete':
     case 'duplicate':
     case 'clear':
+    case 'commitPlacementDrag':
     case 'commitPathDrag':
     case 'commitTextEdit':
     case 'setText':

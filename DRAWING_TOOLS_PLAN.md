@@ -27,6 +27,8 @@
   mobile.
 - Drawing-only undo/redo history for committed command mutations, with web
   keyboard/API controls and mobile Skia imperative handle controls.
+- Initial two-anchor drag-to-draw placement for core line/shape tools on both
+  web Canvas and mobile Skia, backed by the shared drawing command layer.
 
 ## Known Gaps
 
