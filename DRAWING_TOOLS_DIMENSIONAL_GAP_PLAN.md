@@ -225,6 +225,12 @@ Phase 1: Placement mode registry
   path: `projection`, `sector`, `longPosition`, `shortPosition`,
   `elliottCorrectiveWave`, and `elliottDoubleComboWave`. `barsPattern` remains
   special because it requires source-bar payloads.
+- Status: shared placement drag now also seeds the first two anchors for
+  supported four- and five-anchor pattern tools, with web Canvas and mobile
+  Skia continuing through the normal remaining click/tap commit path:
+  `trianglePattern`, `abcdPattern`, `xabcdPattern`, `cypherPattern`,
+  `threeDrivesPattern`, `headShouldersPattern`, `elliottImpulseWave`,
+  `elliottTripleComboWave`, and `elliottTriangleWave`.
 
 Phase 2: Draft lifecycle
 
