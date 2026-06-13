@@ -86,6 +86,7 @@ export class TradingViewTradingBridge {
   private lastFrame: TradingViewRenderFrame | null = null;
   private hitTargets: HitTarget[] = [];
   private activeDrag: ActiveDrag | null = null;
+  private activePointerId: number | null = null;
   private readonly listeners = new Set<ChartTradingIntentHandler>();
   private attachedElement: HTMLElement | null = null;
   private detachListeners: (() => void) | null = null;
@@ -133,6 +134,7 @@ export class TradingViewTradingBridge {
       element.style.cursor = hit.cursor;
       claimPointerEvent(event);
       capturePointer(element, event);
+      this.activePointerId = typeof event.pointerId === 'number' ? event.pointerId : null;
       this.handleHitStart(hit, point);
     };
     const onPointerMove = (event: PointerEvent) => {
@@ -167,6 +169,7 @@ export class TradingViewTradingBridge {
       }
       this.activeDrag = null;
       releasePointer(element, event);
+      this.activePointerId = null;
       element.style.cursor = point ? this.findHit(point)?.cursor ?? '' : '';
     };
     const onPointerCancel = (event: PointerEvent) => {
@@ -174,6 +177,15 @@ export class TradingViewTradingBridge {
       claimPointerEvent(event);
       this.activeDrag = null;
       releasePointer(element, event);
+      this.activePointerId = null;
+      element.style.cursor = '';
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || !this.activeDrag) return;
+      claimKeyboardEvent(event);
+      this.activeDrag = null;
+      releasePointerId(element, this.activePointerId);
+      this.activePointerId = null;
       element.style.cursor = '';
     };
     const onPointerLeave = () => {
@@ -188,6 +200,7 @@ export class TradingViewTradingBridge {
     element.addEventListener('lostpointercapture', onPointerCancel, { capture: true });
     element.addEventListener('pointerleave', onPointerLeave, { capture: true });
     window.addEventListener('pointerup', onPointerUp, { capture: true });
+    window.addEventListener('keydown', onKeyDown, { capture: true });
 
     this.detachListeners = () => {
       element.removeEventListener('pointerdown', onPointerDown, { capture: true });
@@ -196,6 +209,7 @@ export class TradingViewTradingBridge {
       element.removeEventListener('lostpointercapture', onPointerCancel, { capture: true });
       element.removeEventListener('pointerleave', onPointerLeave, { capture: true });
       window.removeEventListener('pointerup', onPointerUp, { capture: true });
+      window.removeEventListener('keydown', onKeyDown, { capture: true });
       if (this.attachedElement === element) {
         element.style.cursor = '';
       }
@@ -209,6 +223,7 @@ export class TradingViewTradingBridge {
     this.detachListeners = null;
     this.attachedElement = null;
     this.activeDrag = null;
+    this.activePointerId = null;
   }
 
   destroy(): void {
@@ -646,6 +661,12 @@ function claimPointerEvent(event: PointerEvent): void {
   event.stopImmediatePropagation();
 }
 
+function claimKeyboardEvent(event: KeyboardEvent): void {
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+}
+
 function capturePointer(element: HTMLElement, event: PointerEvent): void {
   if (typeof event.pointerId !== 'number' || typeof element.setPointerCapture !== 'function') return;
   element.setPointerCapture(event.pointerId);
@@ -653,9 +674,14 @@ function capturePointer(element: HTMLElement, event: PointerEvent): void {
 
 function releasePointer(element: HTMLElement, event: PointerEvent): void {
   if (typeof event.pointerId !== 'number' || typeof element.releasePointerCapture !== 'function') return;
-  if (typeof element.hasPointerCapture === 'function' && !element.hasPointerCapture(event.pointerId)) return;
+  releasePointerId(element, event.pointerId);
+}
+
+function releasePointerId(element: HTMLElement, pointerId: number | null): void {
+  if (pointerId == null || typeof element.releasePointerCapture !== 'function') return;
+  if (typeof element.hasPointerCapture === 'function' && !element.hasPointerCapture(pointerId)) return;
   try {
-    element.releasePointerCapture(event.pointerId);
+    element.releasePointerCapture(pointerId);
   } catch {
     // Browsers can report lost capture before pointerup; cleanup should still proceed.
   }

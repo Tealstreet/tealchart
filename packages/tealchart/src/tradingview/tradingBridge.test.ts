@@ -385,6 +385,40 @@ describe('TradingViewTradingBridge', () => {
     expect(onIntent).not.toHaveBeenCalled();
   });
 
+  it('clears active drags on Escape without committing later pointerups', () => {
+    const onIntent = vi.fn();
+    const releasePointerCapture = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+    const container = document.createElement('div');
+    container.getBoundingClientRect = vi.fn(() => domRect({ left: 0, top: 0, width: 500, height: 300 }));
+    container.releasePointerCapture = releasePointerCapture;
+    const ctx = createRecordingContext(domRect({ left: 50, top: 30, width: 400, height: 200 }));
+
+    bridge.draw(frame(ctx));
+    const detach = bridge.attach(container);
+
+    container.dispatchEvent(pointerMouseEvent('pointerdown', { clientX: 80, clientY: 130, pointerId: 7 }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    window.dispatchEvent(pointerMouseEvent('pointerup', { clientX: 80, clientY: 110, pointerId: 7 }));
+    detach();
+
+    expect(releasePointerCapture).toHaveBeenCalledWith(7);
+    expect(onIntent).not.toHaveBeenCalled();
+  });
+
   it('preserves active drags through editable order state refreshes', () => {
     const onIntent = vi.fn();
     const bridge = new TradingViewTradingBridge({
