@@ -2,6 +2,7 @@ import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 
+import { computeTopLeftLegendRect, rect, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { safeToFixed } from '../utils/safeNumber';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
@@ -77,11 +78,13 @@ interface IndicatorListElements {
 // Styles
 // ============================================================================
 
+const legendOrigin = computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, rect(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER));
+
 const styles = {
   container: {
     position: 'absolute',
-    top: '40px',
-    left: '12px',
+    top: `${legendOrigin?.y ?? 40}px`,
+    left: `${legendOrigin?.x ?? 12}px`,
     zIndex: '4',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '12px',
