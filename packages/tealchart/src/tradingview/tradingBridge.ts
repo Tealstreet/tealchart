@@ -127,6 +127,7 @@ export class TradingViewTradingBridge {
     this.attachedElement = element;
 
     const onPointerDown = (event: PointerEvent) => {
+      if (this.activeDrag) return;
       const point = this.eventPoint(event);
       if (!point) return;
       const hit = this.findHit(point);
@@ -139,6 +140,7 @@ export class TradingViewTradingBridge {
     };
     const onPointerMove = (event: PointerEvent) => {
       if (this.activeDrag) {
+        if (!this.isActivePointerEvent(event)) return;
         const point = this.eventPoint(event, { allowOutside: true });
         element.style.cursor = 'ns-resize';
         claimPointerEvent(event);
@@ -158,6 +160,7 @@ export class TradingViewTradingBridge {
       element.style.cursor = '';
     };
     const onPointerUp = (event: PointerEvent) => {
+      if (this.activeDrag && !this.isActivePointerEvent(event)) return;
       const point = this.activeDrag ? this.eventPoint(event, { allowOutside: true }) : this.eventPoint(event);
       const activeDrag = this.activeDrag;
       const hit = point ? this.findHit(point) : null;
@@ -174,6 +177,7 @@ export class TradingViewTradingBridge {
     };
     const onPointerCancel = (event: PointerEvent) => {
       if (!this.activeDrag) return;
+      if (!this.isActivePointerEvent(event)) return;
       claimPointerEvent(event);
       this.activeDrag = null;
       releasePointer(element, event);
@@ -526,6 +530,10 @@ export class TradingViewTradingBridge {
       if (target && contains(target.rect, point)) return target;
     }
     return null;
+  }
+
+  private isActivePointerEvent(event: PointerEvent): boolean {
+    return this.activePointerId == null || event.pointerId === this.activePointerId;
   }
 
   private handleHitStart(hit: HitTarget, point: Point): void {

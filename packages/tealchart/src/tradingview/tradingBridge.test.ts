@@ -419,6 +419,98 @@ describe('TradingViewTradingBridge', () => {
     expect(onIntent).not.toHaveBeenCalled();
   });
 
+  it('ignores non-active pointer events during order drags', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+    const container = document.createElement('div');
+    container.getBoundingClientRect = vi.fn(() => domRect({ left: 0, top: 0, width: 500, height: 300 }));
+    const ctx = createRecordingContext(domRect({ left: 50, top: 30, width: 400, height: 200 }));
+
+    bridge.draw(frame(ctx));
+    const detach = bridge.attach(container);
+
+    container.dispatchEvent(pointerMouseEvent('pointerdown', { clientX: 80, clientY: 130, pointerId: 7 }));
+    window.dispatchEvent(pointerMouseEvent('pointerup', { clientX: 80, clientY: 110, pointerId: 8 }));
+    expect(onIntent).not.toHaveBeenCalled();
+
+    window.dispatchEvent(pointerMouseEvent('pointerup', { clientX: 80, clientY: 110, pointerId: 7 }));
+    detach();
+
+    expect(onIntent).toHaveBeenCalledTimes(1);
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'order.move.commit',
+      source: 'tradingview-bridge',
+      orderId: 'external-order-1',
+      lineId: 'chart_trading_order_order-1',
+      price: 120,
+    });
+  });
+
+  it('ignores non-active pointer events during bracket drags', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        positions: [
+          {
+            kind: 'position',
+            id: 'position-1',
+            positionId: 'external-position-1',
+            price: 100,
+            brackets: { stopLoss: 90 },
+          },
+        ],
+      },
+      onIntent,
+    });
+    const container = document.createElement('div');
+    container.getBoundingClientRect = vi.fn(() => domRect({ left: 0, top: 0, width: 500, height: 300 }));
+    const ctx = createRecordingContext(domRect({ left: 0, top: 0, width: 400, height: 200 }));
+
+    bridge.draw(frame(ctx));
+    const detach = bridge.attach(container);
+
+    container.dispatchEvent(pointerMouseEvent('pointerdown', { clientX: 330, clientY: 100, pointerId: 7 }));
+    container.dispatchEvent(pointerMouseEvent('pointermove', { clientX: 330, clientY: 80, pointerId: 8 }));
+    container.dispatchEvent(pointerMouseEvent('pointercancel', { clientX: 330, clientY: 80, pointerId: 8 }));
+    expect(onIntent).not.toHaveBeenCalled();
+
+    container.dispatchEvent(pointerMouseEvent('pointermove', { clientX: 330, clientY: 80, pointerId: 7 }));
+    window.dispatchEvent(pointerMouseEvent('pointerup', { clientX: 330, clientY: 70, pointerId: 7 }));
+    detach();
+
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'bracket.sl.preview',
+      source: 'tradingview-bridge',
+      ownerType: 'position',
+      ownerId: 'external-position-1',
+      lineId: 'chart_trading_position_position-1',
+      price: 120,
+      partialPercent: 100,
+    });
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'bracket.sl.commit',
+      source: 'tradingview-bridge',
+      ownerType: 'position',
+      ownerId: 'external-position-1',
+      lineId: 'chart_trading_position_position-1',
+      price: 130,
+      partialPercent: 100,
+    });
+  });
+
   it('preserves active drags through editable order state refreshes', () => {
     const onIntent = vi.fn();
     const bridge = new TradingViewTradingBridge({
