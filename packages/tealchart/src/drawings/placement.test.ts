@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingInputPoint } from './input';
+import type { UserDrawingTool } from './types';
 
 import {
   getUserDrawingPlacementMode,
@@ -15,6 +16,24 @@ const space: DrawingCoordinateSpace = {
   chartLeft: 0,
   chartRight: 100,
 };
+
+const dragTwoAnchorTools: UserDrawingTool[] = [
+  'trendLine',
+  'extendedLine',
+  'infoLine',
+  'arrowLine',
+  'arrowMarker',
+  'ray',
+  'rectangle',
+  'circle',
+  'ellipse',
+  'priceRange',
+  'dateRange',
+  'datePriceRange',
+  'forecast',
+  'callout',
+  'priceNote',
+];
 
 function point(time: number, price: number): UserDrawingInputPoint {
   return {
@@ -31,6 +50,13 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('rectangle')).toBe('dragTwoAnchor');
     expect(getUserDrawingPlacementMode('trendLine')).toBe('dragTwoAnchor');
     expect(getUserDrawingPlacementMode('ellipse')).toBe('dragTwoAnchor');
+  });
+
+  it('classifies supported two-anchor tools as drag placement tools', () => {
+    for (const tool of dragTwoAnchorTools) {
+      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(true);
+      expect(getUserDrawingPlacementMode(tool), tool).toBe('dragTwoAnchor');
+    }
   });
 
   it('keeps multi-anchor tools in click placement until they get dedicated gesture semantics', () => {

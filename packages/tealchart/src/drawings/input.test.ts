@@ -43,12 +43,21 @@ import {
   updateUserDrawingTextEdit,
 } from './input';
 import type { DrawingCoordinateSpace } from './coordinates';
+import type { UserDrawingTool } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
 const anchorC = { time: 2_000, price: 95 };
 const anchorD = { time: 3_000, price: 115 };
 const anchorE = { time: 4_000, price: 105 };
+const expandedDragPlacementTools: UserDrawingTool[] = [
+  'priceRange',
+  'dateRange',
+  'datePriceRange',
+  'forecast',
+  'callout',
+  'priceNote',
+];
 const space: DrawingCoordinateSpace = {
   viewport: {
     startTime: 0,
@@ -176,6 +185,30 @@ describe('user drawing input controller', () => {
       kind: 'rectangle',
       points: [anchorA, anchorB],
     });
+  });
+
+  it('commits expanded two-anchor tools through drag placement', () => {
+    for (const tool of expandedDragPlacementTools) {
+      const started = beginUserDrawingPlacementDrag(
+        setUserDrawingTool(createUserDrawingState(), tool),
+        { paneId: 'main', anchor: anchorA },
+        { now: () => 10, style, text: 'Draft label' },
+      );
+      const committed = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorB }, {
+        createId: () => `drag-${tool}`,
+        now: () => 11,
+        style,
+        text: 'Draft label',
+      });
+
+      expect(committed.draft, tool).toBeNull();
+      expect(committed.selection, tool).toEqual({ drawingId: `drag-${tool}` });
+      expect(committed.drawings[0], tool).toMatchObject({
+        id: `drag-${tool}`,
+        kind: tool,
+        points: [anchorA, anchorB],
+      });
+    }
   });
 
   it('ignores drag placement commands for tools without drag placement semantics', () => {

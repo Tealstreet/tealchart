@@ -17,6 +17,12 @@ const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'rectangle',
   'circle',
   'ellipse',
+  'priceRange',
+  'dateRange',
+  'datePriceRange',
+  'forecast',
+  'callout',
+  'priceNote',
 ]);
 
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {
