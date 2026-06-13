@@ -22,6 +22,7 @@ const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'dateRange',
   'datePriceRange',
   'forecast',
+  'fixedRangeVolumeProfile',
   'callout',
   'priceNote',
   'image',

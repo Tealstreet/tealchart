@@ -30,6 +30,7 @@ const expandedDragPlacementTools: UserDrawingTool[] = [
   'dateRange',
   'datePriceRange',
   'forecast',
+  'fixedRangeVolumeProfile',
   'callout',
   'priceNote',
   'image',

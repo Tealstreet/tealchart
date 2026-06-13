@@ -32,6 +32,7 @@ const dragTwoAnchorTools: UserDrawingTool[] = [
   'dateRange',
   'datePriceRange',
   'forecast',
+  'fixedRangeVolumeProfile',
   'callout',
   'priceNote',
   'image',
