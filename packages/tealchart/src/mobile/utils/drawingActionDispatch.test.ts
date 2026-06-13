@@ -180,6 +180,15 @@ describe('mobile drawing action dispatch', () => {
       },
     );
     dispatchMobileUserDrawingActionCommand(
+      { type: 'setTrendLineExtend', extend: 'left' },
+      {
+        state: createSelectedState(),
+        source: 'contextMenu',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
       { type: 'toolbarAction', action: 'duplicateSelected' },
       {
         state: createSelectedState(),
@@ -223,6 +232,11 @@ describe('mobile drawing action dispatch', () => {
       type: 'setTextAlign',
       textAlign: 'right',
       meta: { source: 'toolbar' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'setTrendLineExtend',
+      extend: 'left',
+      meta: { source: 'contextMenu' },
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',

@@ -327,8 +327,9 @@ Phase 1: Action availability model
 - Status: properties, quick line color/width/style changes, quick fill color
   and fill visibility changes, quick text color/font-size/family/weight/style
   changes plus rich-text underline/strike-through/wrap, wrapped text-width, and
-  text-alignment controls, duplicate, delete, lock, hide/show, unlock, and
-  z-order action descriptors resolve from shared drawing state.
+  text-alignment controls, quick trend-line extension controls, duplicate,
+  delete, lock, hide/show, unlock, and z-order action descriptors resolve from
+  shared drawing state.
 - Status: text-capable drawings now expose a shared selected/context action for
   starting text edit on both web Canvas and mobile Skia.
 - Future work: add richer typography, geometry, and tool-specific actions to
@@ -350,8 +351,8 @@ Phase 3: Command dispatch
 ### Epic 4.2: Web Floating Toolbar
 
 Status: initial selected-object floating toolbar shipped for properties, text
-edit, quick stroke/fill/text appearance style, text alignment, duplicate,
-delete, z-order, visibility, and lock/unlock actions.
+edit, quick stroke/fill/text appearance style, text alignment, trend-line
+extension, duplicate, delete, z-order, visibility, and lock/unlock actions.
 The surface is positioned from the shared selection action anchor model and
 dispatches existing drawing commands or app-owned properties UI. Rich
 text/tool-specific style controls still live in the top bar/properties
@@ -368,8 +369,9 @@ Phase 2: Initial actions
   color/width/style changes, quick fill color and fill visibility changes,
   quick text color/font-size/family/weight/style changes plus rich-text
   underline/strike-through/wrap, wrapped text-width, and text-alignment
-  controls, duplicate, delete, z-order, hide/show, and lock/unlock actions
-  moved out of the top bar into the floating toolbar for selected drawings.
+  controls, quick trend-line extension controls, duplicate, delete, z-order,
+  hide/show, and lock/unlock actions moved out of the top bar into the floating
+  toolbar for selected drawings.
 - Future work: migrate richer typography/tool-specific style actions after the
   style-control grouping is ready for both web and mobile.
 
@@ -383,8 +385,9 @@ Phase 3: Dismissal and focus
 Status: initial anchored mobile action strip shipped for the same selected
 object actions as web, including the shared properties-open and text-edit entry
 points plus quick stroke/fill/text appearance style and text-alignment
-controls. It consumes the shared selected-action descriptors and selection
-action anchor model in the Skia chart component.
+controls plus trend-line extension controls. It consumes the shared
+selected-action descriptors and selection action anchor model in the Skia chart
+component.
 
 Phase 1: Native surface primitive
 
@@ -397,9 +400,10 @@ Phase 2: Initial actions
   color/width/style changes, quick fill color and fill visibility changes,
   quick text color/font-size/family/weight/style changes plus rich-text
   underline/strike-through/wrap, wrapped text-width, and text-alignment
-  controls, duplicate, delete, z-order, hide/show, and lock/unlock actions
-  expose the same selected-action descriptors as web and dispatch existing
-  mobile drawing commands or app-owned properties UI.
+  controls plus quick trend-line extension controls, duplicate, delete,
+  z-order, hide/show, and lock/unlock actions expose the same selected-action
+  descriptors as web and dispatch existing mobile drawing commands or app-owned
+  properties UI.
 
 Phase 3: Dismissal and focus
 

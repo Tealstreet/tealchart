@@ -2857,6 +2857,11 @@ export class TealchartWidget {
       return;
     }
 
+    if (command.type === 'setTrendLineExtend') {
+      this.setUserDrawingTrendLineExtend(command.extend);
+      return;
+    }
+
     if (command.type === 'toolbarAction') {
       if (command.action === 'duplicateSelected') {
         this.duplicateSelectedUserDrawing();
