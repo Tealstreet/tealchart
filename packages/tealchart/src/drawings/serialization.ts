@@ -21,6 +21,7 @@ import {
 } from './types';
 
 export const USER_DRAWING_LAYOUT_SCHEMA_VERSION = USER_DRAWING_SCHEMA_VERSION;
+const LEGACY_VERSIONLESS_USER_DRAWING_LAYOUT_SCHEMA_VERSION = 1;
 
 function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
   switch (drawing.kind) {
@@ -1257,7 +1258,7 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
 
 export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDrawingState | undefined {
   if (!isRecord(state) || !Array.isArray(state.drawings)) return undefined;
-  const layoutVersion = isFiniteNumber(state.version) ? state.version : USER_DRAWING_LAYOUT_SCHEMA_VERSION;
+  const layoutVersion = isFiniteNumber(state.version) ? state.version : LEGACY_VERSIONLESS_USER_DRAWING_LAYOUT_SCHEMA_VERSION;
   if (layoutVersion > USER_DRAWING_LAYOUT_SCHEMA_VERSION) return undefined;
 
   const drawings = state.drawings.map(parseUserDrawing).filter((drawing): drawing is UserDrawing => drawing !== null);
