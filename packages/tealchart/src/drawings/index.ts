@@ -430,6 +430,7 @@ export {
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
+export { resolveUserDrawingObjectTreeModel } from './objectTree';
 export type {
   UserDrawingFillColorDescriptor,
   UserDrawingFontFamilyDescriptor,
@@ -462,6 +463,12 @@ export type {
   UserDrawingToolCategoryDescriptor,
   UserDrawingToolDescriptor,
 } from './toolbar';
+export type {
+  UserDrawingObjectTreeModel,
+  UserDrawingObjectTreeOptions,
+  UserDrawingObjectTreeOrder,
+  UserDrawingObjectTreeRow,
+} from './objectTree';
 export type {
   AbcdPatternDrawing,
   ArrowLineDrawing,
