@@ -1565,6 +1565,48 @@ describe('user drawing toolbar descriptors', () => {
     ).toMatchObject({ enabled: false });
   });
 
+  it('resolves selected fill style actions for fill-capable drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'rect' },
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            fillColor: 'rgba(245, 197, 66, 0.12)',
+          },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(styleItems.find((item) => item.id === 'fillColor:rgba(34, 197, 94, 0.12)')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fillColor: 'rgba(34, 197, 94, 0.12)' } },
+      swatchColor: 'rgba(34, 197, 94, 0.12)',
+    });
+    expect(styleItems.find((item) => item.id === 'fillVisible:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fillVisible: false } },
+    });
+  });
+
   it('clamps selected action surfaces inside shared safe viewport insets', () => {
     expect(
       resolveUserDrawingActionSurfacePosition({

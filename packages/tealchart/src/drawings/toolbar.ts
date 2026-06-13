@@ -768,6 +768,15 @@ function getNextUserDrawingLineStyle(drawing: UserDrawing): UserDrawingLineStyle
   return styles[currentIndex >= 0 ? (currentIndex + 1) % styles.length : 0]!;
 }
 
+function getNextUserDrawingFillColor(drawing: UserDrawing): string {
+  const currentFillColor = drawing.style.fillColor?.toLowerCase();
+  const currentIndex = USER_DRAWING_FILL_COLOR_DESCRIPTORS.findIndex(
+    (descriptor) => descriptor.fillColor.toLowerCase() === currentFillColor,
+  );
+  const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % USER_DRAWING_FILL_COLOR_DESCRIPTORS.length : 0;
+  return USER_DRAWING_FILL_COLOR_DESCRIPTORS[nextIndex]!.fillColor;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -775,10 +784,33 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   if (!selectedDrawing) return null;
 
   const styleEnabled = isUserDrawingStyleToolbarEnabled(state);
+  const fillColorEnabled = isUserDrawingFillToolbarEnabled(state);
+  const fillVisibilityEnabled = isUserDrawingFillVisibilityToolbarEnabled(state);
   const nextLineColor = getNextUserDrawingLineColor(selectedDrawing);
   const thinnerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, -1);
   const thickerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, 1);
   const nextLineStyle = getNextUserDrawingLineStyle(selectedDrawing);
+  const nextFillColor = fillColorEnabled ? getNextUserDrawingFillColor(selectedDrawing) : null;
+  const nextFillVisible = selectedDrawing.style.fillVisible === false;
+  const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
+    ? {
+        id: `fillColor:${nextFillColor}`,
+        icon: '',
+        label: `Cycle selected drawing fill color to ${nextFillColor}`,
+        enabled: fillColorEnabled,
+        command: { type: 'updateStyle', style: { fillColor: nextFillColor } },
+        swatchColor: nextFillColor,
+      }
+    : null;
+  const fillVisibilityItem: UserDrawingSelectedActionSurfaceItem | null = fillVisibilityEnabled
+    ? {
+        id: 'fillVisible:toggle',
+        icon: '◩',
+        label: nextFillVisible ? 'Show selected drawing fill' : 'Hide selected drawing fill',
+        enabled: fillVisibilityEnabled,
+        command: { type: 'updateStyle', style: { fillVisible: nextFillVisible } },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -813,6 +845,8 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         enabled: styleEnabled,
         command: { type: 'updateStyle', style: { lineStyle: nextLineStyle } },
       },
+      ...(fillColorItem ? [fillColorItem] : []),
+      ...(fillVisibilityItem ? [fillVisibilityItem] : []),
     ],
   };
 }

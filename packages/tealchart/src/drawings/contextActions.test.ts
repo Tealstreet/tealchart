@@ -107,6 +107,46 @@ describe('user drawing context actions', () => {
     expect(result.items.find((item) => item.id === 'sendToBack')?.enabled).toBe(false);
   });
 
+  it('includes selected fill style actions for fill-capable context targets', () => {
+    const result = resolveUserDrawingContextActionsAtPoint(
+      {
+        ...state,
+        drawings: [
+          {
+            id: 'rect',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              ...style,
+              fillColor: 'rgba(245, 197, 66, 0.12)',
+            },
+            points: [
+              { time: 25, price: 75 },
+              { time: 75, price: 25 },
+            ],
+          },
+        ],
+      },
+      { x: 25, y: 50 },
+      new Map([['main', space]]),
+    );
+
+    expect(result.items.find((item) => item.id === 'fillColor:rgba(34, 197, 94, 0.12)')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fillColor: 'rgba(34, 197, 94, 0.12)' } },
+    });
+    expect(result.items.find((item) => item.id === 'fillVisible:toggle')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fillVisible: false } },
+    });
+  });
+
   it('keeps state unchanged when no drawing is hit', () => {
     const result = resolveUserDrawingContextActionsAtPoint(state, { x: 50, y: 5 }, new Map([['main', space]]));
 
