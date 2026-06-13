@@ -24,6 +24,8 @@ import type {
   DrawingScreenTable,
   DrawingScreenVolumeProfileGuide,
   DrawingScreenVolumeProfileGuideKind,
+  ChartGeometrySnapshot,
+  Rect,
   EllipseDrawing,
   ExtendedLineDrawing,
   FibChannelDrawing,
@@ -146,6 +148,9 @@ import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  WEB_CHART_CHROME_METRICS,
+  computeChartGeometry,
+  computeTopLeftLegendRect,
   duplicateUserDrawing,
   formatTrendAngleDegrees,
   formatUserDrawingDateRangeBars,
@@ -238,6 +243,28 @@ type NonNever<T> = [T] extends [never] ? never : T;
 describe('tealchart public entries', () => {
   afterEach(() => {
     clearChartStoreCache();
+  });
+
+  it('exports shared chart geometry helpers for external chrome layout', () => {
+    const snapshot: ChartGeometrySnapshot = computeChartGeometry({
+      width: 500,
+      height: 320,
+      margins: { top: WEB_CHART_CHROME_METRICS.topBarHeight, right: 60, bottom: 26, left: 0 },
+      paneLayout: {
+        timeAxisHeight: 26,
+        panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 0, yMax: 100, fixedRange: false }],
+      },
+      topBarHeight: WEB_CHART_CHROME_METRICS.topBarHeight,
+      leftToolRailWidth: WEB_CHART_CHROME_METRICS.leftToolRailWidth,
+      topLeftLegend: true,
+      chromeMetrics: WEB_CHART_CHROME_METRICS,
+    });
+    const legendRect: Rect | null = computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, snapshot.root);
+
+    expect(snapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 32 });
+    expect(snapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
+    expect(snapshot.chrome.topLeftLegend).toEqual({ x: 12, y: 40, width: 480, height: 44 });
+    expect(legendRect).toEqual(snapshot.chrome.topLeftLegend);
   });
 
   it('exports shared and native drawing text alignment helpers', () => {
