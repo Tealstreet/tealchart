@@ -542,6 +542,8 @@ Phase 1: Action registry
 - Shipped shared copy/paste keyboard actions backed by transient adapter
   clipboards and undoable paste commands.
 - Shipped shared select-all keyboard action for committed user drawings.
+- Shipped shared duplicate-selected keyboard action backed by undoable duplicate
+  commands.
 
 Phase 2: Focus rules
 
@@ -562,6 +564,8 @@ Phase 1: Core shortcuts
 - Shipped Ctrl/Cmd+C copy selected drawing and Ctrl/Cmd+V paste object on web
   while chart keyboard ownership is active.
 - Shipped Ctrl/Cmd+A select all committed drawings on web while chart keyboard
+  ownership is active.
+- Shipped Ctrl/Cmd+D duplicate selected drawings on web while chart keyboard
   ownership is active.
 
 Phase 2: Modifier drag
@@ -589,6 +593,8 @@ Phase 1: Hardware keyboard support
   Arrow-key nudge using the same shared coordinate-space command.
 - Shipped mobile command utility and Skia handle support for hardware-keyboard
   select all using the shared selection command.
+- Shipped mobile command utility and Skia handle support for hardware-keyboard
+  duplicate selected using the shared duplicate command.
 
 Phase 2: Touch-native duplicate workflow
 

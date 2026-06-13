@@ -13,6 +13,7 @@ export type UserDrawingKeyboardActionType =
   | 'redo'
   | 'copySelected'
   | 'paste'
+  | 'duplicateSelected'
   | 'nudge'
   | 'selectAll'
   | 'deleteSelected'
@@ -52,6 +53,10 @@ export function resolveUserDrawingKeyboardAction(
 
   if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'c' && state.selection) {
     return { type: 'copySelected', preventDefault: true };
+  }
+
+  if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'd' && state.selection) {
+    return { type: 'duplicateSelected', preventDefault: true };
   }
 
   if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'v') {
