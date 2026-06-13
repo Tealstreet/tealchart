@@ -131,6 +131,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onZOrder = vi.fn();
     const onProperties = vi.fn();
     const onObjectTree = vi.fn();
+    const onTextEdit = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-actions',
       symbol: 'BTCUSDT',
@@ -189,6 +190,7 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingZOrderChange: onZOrder,
       onUserDrawingPropertiesOpen: onProperties,
       onUserDrawingObjectTreeOpen: onObjectTree,
+      onUserDrawingTextEditOpen: onTextEdit,
     });
     topBar.mount(document.body);
 
@@ -213,6 +215,28 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onZOrder).toHaveBeenCalledWith('sendBackward');
     expect(onZOrder).toHaveBeenCalledWith('bringToFront');
     expect(onZOrder).toHaveBeenCalledWith('sendToBack');
+
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+    document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.click();
+    expect(onTextEdit).toHaveBeenCalledWith('label');
 
     topBar.setUserDrawingState(baseDrawingState);
 

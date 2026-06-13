@@ -41,7 +41,8 @@ export type UserDrawingSelectedActionSurfaceAction =
   | Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>
   | UserDrawingStyleToolbarAction
   | 'openProperties'
-  | 'openObjectTree';
+  | 'openObjectTree'
+  | 'editText';
 export type UserDrawingSelectedActionSurfaceGroupId = 'primary' | 'style' | 'arrange' | 'visibility';
 export type UserDrawingSelectedActionSurfaceCommand =
   | {
@@ -49,6 +50,10 @@ export type UserDrawingSelectedActionSurfaceCommand =
     }
   | {
       type: 'openObjectTree';
+    }
+  | {
+      type: 'editText';
+      drawingId: string;
     }
   | {
       type: 'updateStyle';
@@ -679,6 +684,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
         command: { type: 'openObjectTree' },
       },
       {
+        id: 'editText',
+        icon: 'T',
+        label: 'Edit drawing text',
+        enabled: false,
+        command: { type: 'editText', drawingId: '' },
+      },
+      {
         ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[0]!,
         id: 'duplicateSelected',
         enabled: false,
@@ -858,6 +870,14 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
           return {
             ...item,
             enabled: state.drawings.length > 0,
+          };
+        }
+        if (item.command.type === 'editText') {
+          const enabled = selectedDrawing !== null && isUserDrawingTextAnnotation(selectedDrawing) && !selectedDrawing.locked;
+          return {
+            ...item,
+            enabled,
+            command: { type: 'editText', drawingId: selectedDrawing?.id ?? '' },
           };
         }
         if (item.command.type === 'updateStyle') {
