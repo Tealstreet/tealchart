@@ -222,6 +222,12 @@ export type {
   UserDrawingCommandMetadata,
   UserDrawingCommandSource,
 } from './commands';
+export { resolveUserDrawingKeyboardAction } from './keyboard';
+export type {
+  UserDrawingKeyboardAction,
+  UserDrawingKeyboardActionType,
+  UserDrawingKeyboardInput,
+} from './keyboard';
 export {
   canRedoUserDrawingCommand,
   canUndoUserDrawingCommand,
