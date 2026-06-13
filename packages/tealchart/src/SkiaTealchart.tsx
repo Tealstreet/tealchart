@@ -160,6 +160,7 @@ import {
   setMobileUserDrawingVisibility,
   updateMobileUserDrawingStyle,
 } from './mobile/utils/drawingStyle';
+import { commitMobileUserDrawingHandleCommand } from './mobile/utils/drawingCommands';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -483,11 +484,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const dispatchUserDrawingCommandToState = useCallback(
     (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => {
-      const result = dispatchUserDrawingCommand(userDrawingStateRef.current, command);
-      commitUserDrawingStateIfChanged(result.state);
-      return result.changed;
+      return commitMobileUserDrawingHandleCommand(userDrawingStateRef.current, command, commitUserDrawingState);
     },
-    [commitUserDrawingStateIfChanged],
+    [commitUserDrawingState],
   );
 
   // Create indicator manager (stable ref)

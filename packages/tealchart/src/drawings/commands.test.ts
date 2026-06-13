@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import { dispatchUserDrawingCommand } from './commands';
 import {
+  appendUserDrawingPathDragPoint,
+  beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
+  commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing,
@@ -10,8 +13,15 @@ import {
   handleUserDrawingInput,
   reorderUserDrawings,
   selectUserDrawingById,
+  setUserDrawingIconName,
+  setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingTableCell,
+  setUserDrawingTableDimensions,
+  setUserDrawingTextAlign,
   setUserDrawingTool,
+  setUserDrawingTrendLineExtend,
+  setUserDrawingVisibility,
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
@@ -39,6 +49,14 @@ function createStateWithTextLabel(): UserDrawingState {
     setUserDrawingTool(createUserDrawingState(), 'textLabel'),
     { paneId: 'main', anchor: anchorA },
     { createId: () => 'label', now: () => 20, style, text: 'Initial' },
+  );
+}
+
+function createStateWithTable(): UserDrawingState {
+  return handleUserDrawingInput(
+    setUserDrawingTool(createUserDrawingState(), 'table'),
+    { paneId: 'main', anchor: anchorA },
+    { createId: () => 'table', now: () => 25, style },
   );
 }
 
@@ -138,6 +156,104 @@ describe('user drawing command dispatch', () => {
     expect(dispatchUserDrawingCommand(editing, { type: 'updateTextEdit', value: 'Changed' }).state).toEqual(updated);
     expect(dispatchUserDrawingCommand(updated, { type: 'commitTextEdit', options: { now: () => 51 } }).state).toEqual(
       commitUserDrawingTextEdit(updated, { now: () => 51 }),
+    );
+  });
+
+  it('wraps path drag lifecycle reducers', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'path');
+    const firstPoint = { paneId: 'main', anchor: anchorA };
+    const secondPoint = { paneId: 'main', anchor: anchorB };
+    const started = beginUserDrawingPathDrag(state, firstPoint, { now: () => 60, style });
+    const appended = appendUserDrawingPathDragPoint(started, secondPoint);
+
+    expect(
+      dispatchUserDrawingCommand(state, {
+        type: 'beginPathDrag',
+        point: firstPoint,
+        options: { now: () => 60, style },
+      }).state,
+    ).toEqual(started);
+    expect(dispatchUserDrawingCommand(started, { type: 'appendPathDragPoint', point: secondPoint }).state).toEqual(appended);
+    expect(
+      dispatchUserDrawingCommand(appended, {
+        type: 'commitPathDrag',
+        options: { createId: () => 'path-1', now: () => 61, style },
+      }).state,
+    ).toEqual(commitUserDrawingPathDrag(appended, { createId: () => 'path-1', now: () => 61, style }));
+  });
+
+  it('wraps image, table, text alignment, icon, and visibility reducers', () => {
+    const imageState: UserDrawingState = {
+      ...createUserDrawingState(),
+      selection: { drawingId: 'image' },
+      drawings: [
+        {
+          id: 'image',
+          kind: 'image',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [anchorA, anchorB],
+          src: '',
+          alt: '',
+        },
+      ],
+    };
+    expect(
+      dispatchUserDrawingCommand(imageState, {
+        type: 'setImageSource',
+        source: { src: 'chart.png', alt: 'Chart' },
+        options: { now: () => 70 },
+      }).state,
+    ).toEqual(setUserDrawingImageSource(imageState, { src: 'chart.png', alt: 'Chart' }, { now: () => 70 }));
+
+    const tableState = createStateWithTable();
+    expect(
+      dispatchUserDrawingCommand(tableState, {
+        type: 'setTableCell',
+        row: 0,
+        column: 0,
+        value: 'Metric',
+        options: { now: () => 71 },
+      }).state,
+    ).toEqual(setUserDrawingTableCell(tableState, 0, 0, 'Metric', { now: () => 71 }));
+    expect(
+      dispatchUserDrawingCommand(tableState, {
+        type: 'setTableDimensions',
+        rows: 2,
+        columns: 2,
+        options: { now: () => 72 },
+      }).state,
+    ).toEqual(setUserDrawingTableDimensions(tableState, 2, 2, { now: () => 72 }));
+
+    const textState = createStateWithTextLabel();
+    expect(dispatchUserDrawingCommand(textState, { type: 'setTextAlign', textAlign: 'right', options: { now: () => 73 } }).state).toEqual(
+      setUserDrawingTextAlign(textState, 'right', { now: () => 73 }),
+    );
+
+    const trendState = createStateWithTrendLine();
+    expect(
+      dispatchUserDrawingCommand(trendState, {
+        type: 'setTrendLineExtend',
+        extend: 'right',
+        options: { now: () => 74 },
+      }).state,
+    ).toEqual(setUserDrawingTrendLineExtend(trendState, 'right', { now: () => 74 }));
+
+    const iconState = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'icon'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'icon', now: () => 75, style },
+    );
+    expect(dispatchUserDrawingCommand(iconState, { type: 'setIconName', iconName: 'arrowDown', options: { now: () => 76 } }).state).toEqual(
+      setUserDrawingIconName(iconState, 'arrowDown', { now: () => 76 }),
+    );
+
+    expect(dispatchUserDrawingCommand(trendState, { type: 'setVisibility', visible: false, options: { now: () => 77 } }).state).toEqual(
+      setUserDrawingVisibility(trendState, false, { now: () => 77 }),
     );
   });
 
