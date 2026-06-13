@@ -80,6 +80,15 @@ export function dispatchMobileUserDrawingActionCommand(
     return true;
   }
 
+  if (command.type === 'setTrendLineExtend') {
+    options.dispatchUserDrawingCommand({
+      type: 'setTrendLineExtend',
+      extend: command.extend,
+      meta: { source: options.source },
+    });
+    return true;
+  }
+
   if (command.type === 'toolbarAction') {
     if (command.action === 'duplicateSelected') {
       options.dispatchUserDrawingCommand({

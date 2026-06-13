@@ -635,14 +635,17 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingTrendLineExtendChange: onExtend,
     });
     topBar.mount(document.body);
 
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected trend line extension to left"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line both ways"]')?.click();
-    expect(onExtend).toHaveBeenCalledWith('left');
-    expect(onExtend).toHaveBeenCalledWith('both');
+    expect(onExtend).toHaveBeenNthCalledWith(1, 'left');
+    expect(onExtend).toHaveBeenNthCalledWith(2, 'left');
+    expect(onExtend).toHaveBeenNthCalledWith(3, 'both');
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
