@@ -119,7 +119,6 @@ import {
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
-  resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
@@ -148,6 +147,7 @@ import {
   isMobileCrosshairPanGestureEnabled,
 } from './mobile/utils/drawingGestureMode';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/drawingEditIntent';
 import {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
@@ -1697,27 +1697,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
       if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
-        const intent = resolveUserDrawingEditIntentAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
+        const result = resolveMobileUserDrawingDoubleTapEditIntent(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
           source: 'touch',
           hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
         });
 
-        if (intent.type !== 'pane') {
-          let nextState = effectiveUserDrawingState;
-          let changed = false;
-          for (const command of intent.commands) {
-            const result = dispatchUserDrawingCommand(nextState, command);
-            nextState = result.state;
-            changed = result.changed || changed;
+        if (result.intent.type !== 'pane') {
+          if (result.changed) {
+            commitUserDrawingState(result.state);
           }
-          if (changed) {
-            commitUserDrawingState(nextState);
-          }
-          if (intent.type === 'properties') {
-            const propertiesIntent = resolveUserDrawingPropertiesIntent(nextState, { drawingId: intent.drawingId });
-            if (propertiesIntent) {
-              onUserDrawingPropertiesOpen?.(propertiesIntent);
-            }
+          if (result.propertiesIntent) {
+            onUserDrawingPropertiesOpen?.(result.propertiesIntent);
           }
           return;
         }
