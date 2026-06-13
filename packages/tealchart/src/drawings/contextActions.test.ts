@@ -85,6 +85,8 @@ describe('user drawing context actions', () => {
       ['lineWidth:decrease', 'style', true, { type: 'updateStyle', style: { lineWidth: 1 } }],
       ['lineWidth:increase', 'style', true, { type: 'updateStyle', style: { lineWidth: 3 } }],
       ['lineStyle:dashed', 'style', true, { type: 'updateStyle', style: { lineStyle: 'dashed' } }],
+      ['opacity:0.75', 'style', true, { type: 'updateStyle', style: { opacity: 0.75 } }],
+      ['lineVisible:toggle', 'style', true, { type: 'updateStyle', style: { lineVisible: false } }],
       ['bringForward', 'arrange', false, { type: 'toolbarAction', action: 'bringForward' }],
       ['sendBackward', 'arrange', true, { type: 'toolbarAction', action: 'sendBackward' }],
       ['bringToFront', 'arrange', false, { type: 'toolbarAction', action: 'bringToFront' }],
