@@ -57,6 +57,45 @@ describe('TradingView frame bridge', () => {
     expect('settings' in (args ?? {})).toBe(false);
   });
 
+  it('derives price coordinates from current candle coordinates instead of stale raw callbacks', () => {
+    const normalized = normalizeTradingViewRenderFrame({
+      ...frame(),
+      realBars: [
+        [1710000000, 90, 110, 90, 100, 100],
+        [1710000060, 100, 120, 100, 110, 100],
+      ],
+      coordinateBars: [
+        { center: 10, high: 20, low: 100 },
+        { center: 20, high: -20, low: 60 },
+      ],
+      priceToCoord: vi.fn(() => 999),
+      coordToPrice: vi.fn(() => 999),
+    });
+
+    expect(normalized?.priceToCoord(105)).toBeCloseTo(40);
+    expect(normalized?.coordToPrice(40)).toBeCloseTo(105);
+  });
+
+  it('supports log-like current candle coordinate mappings', () => {
+    const priceToCoord = (price: number) => 240 - 40 * Math.log(price);
+    const normalized = normalizeTradingViewRenderFrame({
+      ...frame(),
+      realBars: [
+        [1710000000, 2, 4, 2, 3, 100],
+        [1710000060, 4, 8, 4, 6, 100],
+      ],
+      coordinateBars: [
+        { center: 10, high: priceToCoord(4), low: priceToCoord(2) },
+        { center: 20, high: priceToCoord(8), low: priceToCoord(4) },
+      ],
+      priceToCoord: vi.fn(() => 999),
+      coordToPrice: vi.fn(() => 999),
+    });
+
+    expect(normalized?.priceToCoord(6)).toBeCloseTo(priceToCoord(6));
+    expect(normalized?.coordToPrice(priceToCoord(6))).toBeCloseTo(6);
+  });
+
   it('returns null for incomplete frames', () => {
     expect(normalizeTradingViewRenderFrame({})).toBeNull();
   });

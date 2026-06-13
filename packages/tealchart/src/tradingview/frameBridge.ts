@@ -23,6 +23,7 @@ export function normalizeTradingViewRenderFrame(
   if (!bars.length || !candleCoords.length) {
     return null;
   }
+  const framePriceScale = deriveFramePriceScale(bars, candleCoords);
 
   return {
     ctx: rawFrame.ctx,
@@ -33,8 +34,8 @@ export function normalizeTradingViewRenderFrame(
     resolutionString: rawFrame.resolutionString ?? '',
     chartWidth: rawFrame.chartWidth ?? rawFrame.coordinates?.mediaSize?.width ?? rawFrame.coordinates?.width ?? 0,
     chartHeight: rawFrame.chartHeight ?? rawFrame.coordinates?.mediaSize?.height ?? rawFrame.coordinates?.height ?? 0,
-    priceToCoord: rawFrame.priceToCoord,
-    coordToPrice: rawFrame.coordToPrice,
+    priceToCoord: framePriceScale?.priceToCoord ?? rawFrame.priceToCoord,
+    coordToPrice: framePriceScale?.coordToPrice ?? rawFrame.coordToPrice,
     studySources: rawFrame.studySources ?? [],
     coordinates: rawFrame.coordinates?.mediaSize ?? toDimensions(rawFrame.coordinates),
     raw: rawFrame.raw ?? frame,
@@ -118,6 +119,89 @@ function normalizeCandleCoords(
 function normalizeEpochToMilliseconds(time: number): number {
   if (!Number.isFinite(time)) return time;
   return time < 10_000_000_000 ? time * 1000 : time;
+}
+
+interface PriceScaleModel {
+  priceToCoord: (price: number) => number;
+  coordToPrice: (coord: number) => number;
+  error: number;
+}
+
+function deriveFramePriceScale(
+  bars: readonly Bar[],
+  candleCoords: readonly TradingViewRenderFrame['candleCoords'][number][]
+): Pick<PriceScaleModel, 'priceToCoord' | 'coordToPrice'> | null {
+  const samples: Array<{ price: number; coord: number }> = [];
+  const count = Math.min(bars.length, candleCoords.length);
+
+  for (let index = 0; index < count; index += 1) {
+    const bar = bars[index];
+    const coord = candleCoords[index];
+    if (!bar || !coord) continue;
+    addPriceCoordSample(samples, bar.high, coord.high);
+    addPriceCoordSample(samples, bar.low, coord.low);
+  }
+
+  const linear = fitPriceScaleModel(samples, (price) => price, (value) => value);
+  const log = samples.every((sample) => sample.price > 0)
+    ? fitPriceScaleModel(samples, Math.log, Math.exp)
+    : null;
+  const model = log && (!linear || log.error < linear.error) ? log : linear;
+
+  return model
+    ? {
+        priceToCoord: model.priceToCoord,
+        coordToPrice: model.coordToPrice,
+      }
+    : null;
+}
+
+function addPriceCoordSample(
+  samples: Array<{ price: number; coord: number }>,
+  price: number,
+  coord: number
+): void {
+  if (!Number.isFinite(price) || !Number.isFinite(coord)) return;
+  samples.push({ price, coord });
+}
+
+function fitPriceScaleModel(
+  samples: readonly { price: number; coord: number }[],
+  toDomain: (price: number) => number,
+  fromDomain: (value: number) => number
+): PriceScaleModel | null {
+  const points = samples
+    .map((sample) => ({ x: toDomain(sample.price), y: sample.coord }))
+    .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+  if (points.length < 2) return null;
+
+  let sumX = 0;
+  let sumY = 0;
+  let sumXX = 0;
+  let sumXY = 0;
+  for (const point of points) {
+    sumX += point.x;
+    sumY += point.y;
+    sumXX += point.x * point.x;
+    sumXY += point.x * point.y;
+  }
+
+  const denominator = points.length * sumXX - sumX * sumX;
+  if (Math.abs(denominator) < 1e-9) return null;
+
+  const slope = (points.length * sumXY - sumX * sumY) / denominator;
+  if (!Number.isFinite(slope) || Math.abs(slope) < 1e-9) return null;
+
+  const intercept = (sumY - slope * sumX) / points.length;
+  const error =
+    points.reduce((total, point) => total + Math.abs(slope * point.x + intercept - point.y), 0) /
+    points.length;
+
+  return {
+    error,
+    priceToCoord: (price) => slope * toDomain(price) + intercept,
+    coordToPrice: (coord) => fromDomain((coord - intercept) / slope),
+  };
 }
 
 function toDimensions(
