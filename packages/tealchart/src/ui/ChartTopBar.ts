@@ -318,7 +318,7 @@ const styles = {
     position: 'absolute',
     display: 'flex',
     alignItems: 'center',
-    gap: '4px',
+    gap: '3px',
     width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
     boxSizing: 'border-box',
     padding: '4px',
