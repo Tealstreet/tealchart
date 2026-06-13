@@ -68,6 +68,10 @@ export type UserDrawingSelectedActionSurfaceCommand =
       textAlign: UserDrawingTextAlign;
     }
   | {
+      type: 'setTrendLineExtend';
+      extend: UserDrawingTrendLineExtend;
+    }
+  | {
       type: 'toolbarAction';
       action: Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>;
     }
@@ -836,6 +840,13 @@ function getNextUserDrawingTextAlign(drawing: UserDrawing): UserDrawingTextAlign
   return aligns[currentIndex >= 0 ? (currentIndex + 1) % aligns.length : 0]!;
 }
 
+function getNextUserDrawingTrendLineExtend(drawing: UserDrawing): UserDrawingTrendLineExtend | null {
+  if (drawing.kind !== 'trendLine') return null;
+  const extensions = USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.map((descriptor) => descriptor.extend);
+  const currentIndex = extensions.indexOf(drawing.extend);
+  return extensions[currentIndex >= 0 ? (currentIndex + 1) % extensions.length : 0]!;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -866,6 +877,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const narrowerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, -1) : null;
   const widerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, 1) : null;
   const nextTextAlign = supportsUserDrawingTextAlignControls(selectedDrawing) ? getNextUserDrawingTextAlign(selectedDrawing) : null;
+  const nextTrendLineExtend = supportsUserDrawingTrendLineExtendControls(selectedDrawing)
+    ? getNextUserDrawingTrendLineExtend(selectedDrawing)
+    : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -1004,6 +1018,15 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'setTextAlign', textAlign: nextTextAlign },
       }
     : null;
+  const trendLineExtendItem: UserDrawingSelectedActionSurfaceItem | null = nextTrendLineExtend
+    ? {
+        id: `extend:${nextTrendLineExtend}`,
+        icon: USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.find((descriptor) => descriptor.extend === nextTrendLineExtend)!.icon,
+        label: `Cycle selected trend line extension to ${nextTrendLineExtend}`,
+        enabled: styleEnabled,
+        command: { type: 'setTrendLineExtend', extend: nextTrendLineExtend },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -1052,6 +1075,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(narrowerTextMaxWidthItem ? [narrowerTextMaxWidthItem] : []),
       ...(widerTextMaxWidthItem ? [widerTextMaxWidthItem] : []),
       ...(textAlignItem ? [textAlignItem] : []),
+      ...(trendLineExtendItem ? [trendLineExtendItem] : []),
     ],
   };
 }
@@ -1119,7 +1143,11 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
             command: { type: 'editText', drawingId: selectedDrawing?.id ?? '' },
           };
         }
-        if (item.command.type === 'updateStyle' || item.command.type === 'setTextAlign') {
+        if (
+          item.command.type === 'updateStyle' ||
+          item.command.type === 'setTextAlign' ||
+          item.command.type === 'setTrendLineExtend'
+        ) {
           return item;
         }
         if (item.command.type === 'styleAction') {

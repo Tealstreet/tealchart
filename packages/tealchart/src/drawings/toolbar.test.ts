@@ -1607,6 +1607,63 @@ describe('user drawing toolbar descriptors', () => {
     });
   });
 
+  it('resolves selected trend-line extension actions for trend lines', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'trend' },
+      drawings: [
+        {
+          id: 'trend',
+          kind: 'trendLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+          extend: 'none' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(styleItems.find((item) => item.id === 'extend:left')).toMatchObject({
+      enabled: true,
+      command: { type: 'setTrendLineExtend', extend: 'left' },
+    });
+
+    const nonTrend = {
+      ...selected,
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    expect(
+      resolveUserDrawingSelectedActionSurface(nonTrend)
+        .groups.find((group) => group.id === 'style')!
+        .items.some((item) => item.id.startsWith('extend:')),
+    ).toBe(false);
+  });
+
   it('resolves selected text appearance actions for text-capable drawings', () => {
     const selected = {
       ...state,
