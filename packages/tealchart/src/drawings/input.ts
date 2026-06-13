@@ -56,6 +56,10 @@ export interface UserDrawingSelectionAtPointResult {
   changed: boolean;
 }
 
+export interface AddUserDrawingOptions {
+  select?: boolean;
+}
+
 export interface DeleteUserDrawingOptions {
   drawingId?: string;
   drawingIds?: readonly string[];
@@ -199,6 +203,24 @@ export function selectUserDrawingsById(state: UserDrawingState, drawingIds: read
   const existingIds = new Set(state.drawings.map((drawing) => drawing.id));
   const selectedIds = [...new Set(drawingIds)].filter((drawingId) => existingIds.has(drawingId));
   return selectUserDrawing(state, createUserDrawingSelection(selectedIds));
+}
+
+export function addUserDrawing(
+  state: UserDrawingState,
+  drawing: UserDrawing,
+  options: AddUserDrawingOptions = {},
+): UserDrawingState {
+  if (state.drawings.some((existingDrawing) => existingDrawing.id === drawing.id)) return state;
+  const drawingSnapshot = cloneUserDrawingSnapshot(drawing);
+
+  return {
+    ...state,
+    activeTool: 'select',
+    drawings: [...state.drawings, drawingSnapshot],
+    selection: options.select === false ? state.selection : { drawingId: drawing.id },
+    draft: null,
+    textEdit: null,
+  };
 }
 
 export function deleteUserDrawing(
@@ -435,7 +457,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
   }
 }
 
-function cloneDrawingForClipboard(drawing: UserDrawing): UserDrawing {
+export function cloneUserDrawingSnapshot(drawing: UserDrawing): UserDrawing {
   return {
     ...cloneDrawingForDuplicate(drawing, drawing.id, drawing.createdAt),
     updatedAt: drawing.updatedAt,
@@ -457,7 +479,7 @@ export function createUserDrawingClipboard(
 
   const drawings = state.drawings
     .filter((drawing) => selectedIds.has(drawing.id) && (!drawing.locked || options.includeLocked))
-    .map(cloneDrawingForClipboard);
+    .map(cloneUserDrawingSnapshot);
 
   return drawings.length === 0 ? null : { drawings };
 }

@@ -19,7 +19,7 @@ import {
   redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
-import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingTool } from '../../drawings';
+import type { DrawingCoordinateSpace, UserDrawing, UserDrawingState, UserDrawingTool } from '../../drawings';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
@@ -88,6 +88,71 @@ function createMobileStateWithTable(): UserDrawingState {
 }
 
 describe('mobile drawing handle command dispatch', () => {
+  it('records complete drawing additions through the mobile command adapter', () => {
+    const drawing: UserDrawing = {
+      id: 'api-line',
+      kind: 'trendLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { ...style },
+      points: [anchorA, anchorB],
+      extend: 'none',
+    };
+    const state = createUserDrawingState();
+    const history = createUserDrawingCommandHistory();
+
+    const onEvent = vi.fn();
+    const added = dispatchMobileUserDrawingHistoryCommandWithEvent(state, history, {
+      type: 'add',
+      drawing,
+      meta: { source: 'api' },
+    }, onEvent);
+
+    expect(added.changed).toBe(true);
+    expect(added.state.drawings).toEqual([drawing]);
+    expect(added.state.selection).toEqual({ drawingId: 'api-line' });
+    expect(added.history.undoStack).toHaveLength(1);
+    expect(added.command.drawing).not.toBe(drawing);
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ affectedIds: ['api-line'] }));
+
+    drawing.points[0] = { time: 1_000, price: 999 };
+    drawing.style.lineColor = '#f00';
+    expect(added.state.drawings[0]).toMatchObject({
+      id: 'api-line',
+      style: { lineColor: '#fff' },
+      points: [anchorA, anchorB],
+    });
+
+    const duplicate = dispatchMobileUserDrawingHistoryCommand(added.state, added.history, {
+      type: 'add',
+      drawing,
+      meta: { source: 'api' },
+    });
+    expect(duplicate.changed).toBe(false);
+    expect(duplicate.history.undoStack).toHaveLength(1);
+
+    const undo = undoUserDrawingCommand(added.state, added.history);
+    expect(undo.state.drawings).toEqual([]);
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]).toMatchObject({
+      id: 'api-line',
+      style: { lineColor: '#fff' },
+      points: [anchorA, anchorB],
+    });
+
+    const secondDrawing: UserDrawing = { ...drawing, id: 'api-line-2', style: { ...drawing.style } };
+    dispatchMobileUserDrawingHistoryCommandWithEvent(redo.state, redo.history, {
+      type: 'add',
+      drawing: secondDrawing,
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(onEvent.mock.calls.at(-1)?.[0].affectedIds).toEqual(expect.arrayContaining(['api-line', 'api-line-2']));
+    expect(onEvent.mock.calls.at(-1)?.[0].affectedIds).toHaveLength(2);
+  });
+
   it('commits changed handle commands and preserves boolean results', () => {
     const commit = vi.fn<(state: UserDrawingState) => void>();
     const state = createMobileStateWithTrendLine();

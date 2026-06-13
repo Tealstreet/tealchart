@@ -49,6 +49,7 @@ export { TealchartRenderer } from './TealchartRenderer';
 // User drawing model (platform-neutral)
 export {
   anchorToScreenPoint,
+  addUserDrawing,
   beginUserDrawingTextEdit,
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STATE,
@@ -458,6 +459,7 @@ export type {
   UserDrawingHitTestOptions,
   UserDrawingHitTestTextMeasure,
   UserDrawingClipboard,
+  AddUserDrawingOptions,
   UserDrawingCommand,
   UserDrawingCommandDispatchResult,
   UserDrawingCommandEvent,
