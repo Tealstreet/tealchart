@@ -37,6 +37,7 @@ import type {
   UserDrawingIconName,
   UserDrawingImageSourceInput,
   UserDrawingInputPoint,
+  UserDrawingKeyboardInput,
   UserDrawingLineStyle,
   UserDrawingState,
   UserDrawingStyle,
@@ -168,7 +169,10 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import { dispatchMobileUserDrawingHistoryCommand } from './mobile/utils/drawingCommands';
+import {
+  dispatchMobileUserDrawingHistoryCommand,
+  dispatchMobileUserDrawingKeyboardAction as dispatchMobileUserDrawingKeyboardActionToState,
+} from './mobile/utils/drawingCommands';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -285,6 +289,7 @@ export interface SkiaTealchartHandle {
   canRedoUserDrawingCommand(): boolean;
   undoUserDrawingCommand(): boolean;
   redoUserDrawingCommand(): boolean;
+  dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean;
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
   selectUserDrawings(drawingIds: readonly string[]): void;
   deleteUserDrawing(drawingId?: string): boolean;
@@ -596,6 +601,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       redoUserDrawingCommand(): boolean {
         const result = redoUserDrawingCommandHistory(userDrawingStateRef.current, userDrawingHistoryRef.current);
+        userDrawingHistoryRef.current = result.history;
+        if (result.changed) {
+          commitUserDrawingState(result.state);
+        }
+        return result.changed;
+      },
+      dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean {
+        const result = dispatchMobileUserDrawingKeyboardActionToState(
+          userDrawingStateRef.current,
+          userDrawingHistoryRef.current,
+          input,
+        );
         userDrawingHistoryRef.current = result.history;
         if (result.changed) {
           commitUserDrawingState(result.state);

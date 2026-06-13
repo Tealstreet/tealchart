@@ -28,6 +28,7 @@ import type {
   UserDrawingIconName,
   UserDrawingImageSourceInput,
   UserDrawingInputPoint,
+  UserDrawingKeyboardInput,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
   UserDrawingState,
@@ -63,6 +64,7 @@ import {
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
   resolveUserDrawingEditIntentAtPoint,
+  resolveUserDrawingKeyboardAction,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
@@ -2265,6 +2267,16 @@ export class TealchartWidget {
     return result.changed;
   }
 
+  dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean {
+    const action = resolveUserDrawingKeyboardAction(this._userDrawingState, input);
+    if (!action) return false;
+
+    if (action.type === 'undo') return this.undoUserDrawingCommand();
+    if (action.type === 'redo') return this.redoUserDrawingCommand();
+    if (action.type === 'deleteSelected') return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
+    return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
+  }
+
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
     this.dispatchUserDrawingCommand({ type: 'select', drawingId, handle, meta: { source: 'api' } });
   }
@@ -2911,25 +2923,7 @@ export class TealchartWidget {
       return;
     }
 
-    const key = e.key.toLowerCase();
-    const isDrawingUndoKey = (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && key === 'z';
-    if (isDrawingUndoKey && this.undoUserDrawingCommand()) {
-      e.stopPropagation();
-      e.preventDefault();
-      return;
-    }
-
-    const isDrawingRedoKey =
-      (e.metaKey || e.ctrlKey) && !e.altKey && ((e.shiftKey && key === 'z') || (!e.shiftKey && key === 'y'));
-    if (isDrawingRedoKey && this.redoUserDrawingCommand()) {
-      e.stopPropagation();
-      e.preventDefault();
-      return;
-    }
-
-    const isBareDeleteKey =
-      (e.key === 'Delete' || e.key === 'Backspace') && !e.metaKey && !e.ctrlKey && !e.altKey;
-    if (isBareDeleteKey && this.deleteSelectedUserDrawing()) {
+    if (this.dispatchUserDrawingKeyboardAction(e)) {
       e.stopPropagation();
       e.preventDefault();
       return;
