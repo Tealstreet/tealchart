@@ -358,6 +358,25 @@ describe('user drawing command dispatch', () => {
     expect(movedDrawing.points[0]?.price).toBeGreaterThan(anchorA.price);
   });
 
+  it('wraps selected drawing nudges through edit-drag geometry', () => {
+    const state = createStateWithTrendLine();
+    const nudged = dispatchUserDrawingCommand(state, {
+      type: 'nudge',
+      spacesByPaneId,
+      options: { delta: { x: 10, y: 10 }, now: () => 91 },
+      meta: { source: 'keyboard' },
+    });
+
+    expect(nudged.changed).toBe(true);
+    expect(nudged.state.selection).toEqual(state.selection);
+    const movedDrawing = nudged.state.drawings[0];
+    expect(movedDrawing?.kind).toBe('trendLine');
+    if (movedDrawing?.kind !== 'trendLine') throw new Error('expected trend line drawing');
+    expect(movedDrawing.updatedAt).toBe(91);
+    expect(movedDrawing.points[0]).toEqual({ time: 1100, price: 99 });
+    expect(movedDrawing.points[1]).toEqual({ time: 2100, price: 109 });
+  });
+
   it('wraps image, table, text alignment, icon, and visibility reducers', () => {
     const imageState: UserDrawingState = {
       ...createUserDrawingState(),

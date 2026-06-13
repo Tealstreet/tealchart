@@ -4,6 +4,7 @@ import type {
   UserDrawingCommandHistory,
   UserDrawingHistoryDispatchResult,
   UserDrawingClipboard,
+  DrawingCoordinateSpace,
   UserDrawingKeyboardAction,
   UserDrawingKeyboardInput,
   UserDrawingState,
@@ -58,6 +59,7 @@ export interface MobileUserDrawingKeyboardDispatchOptions {
   clipboard?: UserDrawingClipboard | null;
   createId: () => string;
   setClipboard?: (clipboard: UserDrawingClipboard | null) => void;
+  spacesByPaneId?: ReadonlyMap<string, DrawingCoordinateSpace>;
 }
 
 export function dispatchMobileUserDrawingKeyboardAction(
@@ -90,6 +92,19 @@ export function dispatchMobileUserDrawingKeyboardAction(
         type: 'paste',
         clipboard: options.clipboard,
         options: { createId: options.createId },
+        meta: { source: 'keyboard' },
+      }),
+      action,
+    };
+  }
+
+  if (action.type === 'nudge') {
+    if (!action.delta || !options.spacesByPaneId) return { state, history, changed: false, action };
+    return {
+      ...dispatchUserDrawingCommandWithHistory(state, history, {
+        type: 'nudge',
+        spacesByPaneId: options.spacesByPaneId,
+        options: { delta: action.delta },
         meta: { source: 'keyboard' },
       }),
       action,

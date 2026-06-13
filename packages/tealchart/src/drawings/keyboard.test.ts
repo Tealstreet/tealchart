@@ -78,6 +78,21 @@ describe('user drawing keyboard actions', () => {
     expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'Delete' })).toBeNull();
   });
 
+  it('maps arrow-key nudge only when a drawing is selected', () => {
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'ArrowLeft' })).toEqual({
+      type: 'nudge',
+      delta: { x: -1, y: 0 },
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'ArrowDown', shiftKey: true })).toEqual({
+      type: 'nudge',
+      delta: { x: 0, y: 10 },
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'ArrowRight', metaKey: true })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'ArrowRight' })).toBeNull();
+  });
+
   it('maps bare escape only while a draft is active', () => {
     expect(resolveUserDrawingKeyboardAction(withDraft(), { key: 'Escape' })).toEqual({
       type: 'cancelDraft',

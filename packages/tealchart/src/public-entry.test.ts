@@ -211,6 +211,7 @@ import {
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
   resolveUserDrawingKeyboardAction,
+  nudgeUserDrawingSelection,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
   resolveAnchoredVolumeProfileFromAnchor,
@@ -319,6 +320,7 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingPropertiesSurface).toBeTypeOf('function');
     expect(resolveUserDrawingPropertiesSurfaceCommand).toBeTypeOf('function');
     expect(resolveUserDrawingKeyboardAction).toBeTypeOf('function');
+    expect(nudgeUserDrawingSelection).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');

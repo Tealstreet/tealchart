@@ -2278,6 +2278,16 @@ export class TealchartWidget {
     if (action.type === 'redo') return this.redoUserDrawingCommand();
     if (action.type === 'copySelected') return this.copySelectedUserDrawing();
     if (action.type === 'paste') return this.pasteUserDrawingClipboard();
+    if (action.type === 'nudge') {
+      const spacesByPaneId = this._ui?.getChartCore()?.getUserDrawingSpacesForCurrentViewport();
+      if (!action.delta || !spacesByPaneId) return false;
+      return this.dispatchUserDrawingCommand({
+        type: 'nudge',
+        spacesByPaneId,
+        options: { delta: action.delta },
+        meta: { source: 'keyboard' },
+      });
+    }
     if (action.type === 'deleteSelected') return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
     return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
   }

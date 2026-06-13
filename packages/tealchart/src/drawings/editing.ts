@@ -26,6 +26,10 @@ export interface ApplyUserDrawingEditDragOptions {
   now?: () => number;
 }
 
+export interface NudgeUserDrawingSelectionOptions extends ApplyUserDrawingEditDragOptions {
+  delta: DrawingScreenPoint;
+}
+
 export interface BeginUserDrawingEditDragOptions {
   hitTest?: UserDrawingHitTestOptions;
 }
@@ -671,6 +675,38 @@ export function applyUserDrawingEditDrag(
     draft: null,
     textEdit: null,
   };
+}
+
+export function nudgeUserDrawingSelection(
+  state: UserDrawingState,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: NudgeUserDrawingSelectionOptions,
+): UserDrawingState {
+  if (!state.selection) return state;
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  if (selectedIds.size === 0) return state;
+
+  const startDrawing = state.drawings.find((drawing) => selectedIds.has(drawing.id) && !drawing.locked);
+  if (!startDrawing) return state;
+  const space = spacesByPaneId.get(startDrawing.paneId);
+  if (!space) return state;
+
+  const startDrawings =
+    selectedIds.size > 1 ? state.drawings.filter((drawing) => selectedIds.has(drawing.id) && !drawing.locked) : [startDrawing];
+  if (startDrawings.length === 0) return state;
+
+  return applyUserDrawingEditDrag(
+    state,
+    {
+      selection: state.selection,
+      startPoint: { x: 0, y: 0 },
+      startDrawing,
+      startDrawings,
+      space,
+    },
+    options.delta,
+    options,
+  );
 }
 
 export function beginUserDrawingEditDragAtPoint(
