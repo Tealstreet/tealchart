@@ -259,11 +259,18 @@ long-press.
 
 ### Epic 4.1: Shared Selected-Action Model
 
+Status: initial selected-action surface descriptors shipped for duplicate,
+delete, z-order, visibility, and lock/unlock. The web top bar now consumes this
+shared model for selected actions while mobile Skia can consume the same
+exported descriptors when the native action surface lands. Geometry anchoring,
+text/tool-specific actions, context actions, and mobile UI chrome remain open.
+
 Phase 1: Action availability model
 
-- Produce selected drawing action descriptors from shared state.
-- Include duplicate, delete, lock, hide, z-order, style groups, text edit, and
-  tool-specific actions.
+- Status: duplicate, delete, lock, hide/show, unlock, and z-order action
+  descriptors resolve from shared drawing state.
+- Future work: add text edit, rich style groups, and tool-specific actions to
+  the same model as those surfaces move out of the top bar.
 
 Phase 2: Anchor geometry model
 

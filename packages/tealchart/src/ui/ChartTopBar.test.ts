@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import type { UserDrawingState } from '../drawings';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
