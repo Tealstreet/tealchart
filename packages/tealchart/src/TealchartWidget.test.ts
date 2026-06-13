@@ -1045,6 +1045,71 @@ describe('TealchartWidget', () => {
       });
     });
 
+    it('exposes selected drawing properties intent and open callback', () => {
+      const datafeed = createMockDatafeed();
+      const onOpenProperties = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingPropertiesOpen: onOpenProperties });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'line' },
+        drawings: [
+          {
+            id: 'line',
+            name: 'Breakout',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'locked',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: true,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 1, price: 45 },
+              { time: 2, price: 55 },
+            ],
+          },
+        ],
+      });
+
+      expect(widget.getUserDrawingPropertiesIntent()).toMatchObject({
+        type: 'properties',
+        drawingId: 'line',
+        selected: true,
+        editable: true,
+        drawing: expect.objectContaining({ id: 'line', kind: 'horizontalLine' }),
+      });
+      expect(widget.getUserDrawingPropertiesIntent('locked')).toMatchObject({
+        drawingId: 'locked',
+        selected: false,
+        editable: false,
+        drawing: expect.objectContaining({ id: 'locked', kind: 'rectangle' }),
+      });
+      expect(widget.getUserDrawingPropertiesIntent('missing')).toBeNull();
+
+      const opened = widget.openUserDrawingProperties('locked');
+      expect(onOpenProperties).toHaveBeenCalledWith(opened);
+      expect(opened).toMatchObject({ drawingId: 'locked', editable: false });
+    });
+
     it('applies public image source commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

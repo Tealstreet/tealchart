@@ -197,8 +197,14 @@ export type {
   BeginUserDrawingEditDragResult,
   UserDrawingEditDrag,
 } from './editing';
-export { resolveUserDrawingEditIntentAtPoint } from './editIntent';
-export type { ResolveUserDrawingEditIntentOptions, UserDrawingEditIntent, UserDrawingEditIntentKind } from './editIntent';
+export { resolveUserDrawingEditIntentAtPoint, resolveUserDrawingPropertiesIntent } from './editIntent';
+export type {
+  ResolveUserDrawingEditIntentOptions,
+  ResolveUserDrawingPropertiesIntentOptions,
+  UserDrawingEditIntent,
+  UserDrawingEditIntentKind,
+  UserDrawingPropertiesIntent,
+} from './editIntent';
 export {
   distanceBetweenPoints,
   distanceToRectEdge,

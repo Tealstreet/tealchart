@@ -4,7 +4,7 @@
  */
 
 import type { WorkerError } from '@tealstreet/tealscript';
-import type { UserDrawingObjectTreeModel, UserDrawingState } from './drawings';
+import type { UserDrawingObjectTreeModel, UserDrawingPropertiesIntent, UserDrawingState } from './drawings';
 import type { ChartThemeInput } from './theme';
 
 // Reuse Bar type from existing codebase
@@ -725,6 +725,8 @@ export interface TealchartWidgetOptions {
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   /** Called when app or widget code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
+  /** Called when app or widget code asks to open selected drawing properties. */
+  onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   locale?: string;
   autosize?: boolean;
   fullscreen?: boolean;
