@@ -189,6 +189,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
     const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
     expect(selectedActionSurface).not.toBeNull();
+    expect(selectedActionSurface?.style.pointerEvents).toBe('auto');
 
     const onSurfaceMouseDownFallthrough = vi.fn();
     const onSurfaceMouseUpFallthrough = vi.fn();
