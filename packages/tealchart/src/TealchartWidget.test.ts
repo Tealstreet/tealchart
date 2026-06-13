@@ -7,7 +7,7 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
-import type { DrawingCoordinateSpace, UserDrawingCommandEvent, UserDrawingState } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
@@ -652,6 +652,78 @@ describe('TealchartWidget', () => {
         kind: 'trendLine',
       });
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it('creates web path-family drawings from drag samples through the widget state owner', () => {
+      const pathFamilyTools: UserDrawingTool[] = ['brush', 'highlighter'];
+
+      for (const tool of pathFamilyTools) {
+        const datafeed = createMockDatafeed();
+        const widget = createWidget(datafeed);
+        widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
+
+        const testWidget = widget as unknown as {
+          _handleUserDrawingPathDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+          _handleUserDrawingPathDragMove(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+          _handleUserDrawingPathDragEnd(): void;
+        };
+
+        const drag = (offset: number) => {
+          expect(
+            testWidget._handleUserDrawingPathDragStart({
+              paneId: 'main',
+              anchor: { time: offset + 1, price: offset + 10 },
+            }),
+          ).toBe(true);
+          expect(
+            testWidget._handleUserDrawingPathDragMove({
+              paneId: 'main',
+              anchor: { time: offset + 2, price: offset + 20 },
+            }),
+          ).toBe(true);
+          expect(
+            testWidget._handleUserDrawingPathDragMove({
+              paneId: 'main',
+              anchor: { time: offset + 3, price: offset + 30 },
+            }),
+          ).toBe(true);
+          testWidget._handleUserDrawingPathDragEnd();
+        };
+
+        drag(0);
+
+        expect(widget.getUserDrawingState().draft).toBeNull();
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+        expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+          id: 'drawing_1',
+          kind: tool,
+          paneId: 'main',
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 20 },
+            { time: 3, price: 30 },
+          ],
+        });
+        expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+        drag(10);
+
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_2' });
+        expect(widget.getUserDrawingState().drawings).toHaveLength(2);
+        expect(widget.getUserDrawingState().drawings[1]).toMatchObject({
+          id: 'drawing_2',
+          kind: tool,
+          points: [
+            { time: 11, price: 20 },
+            { time: 12, price: 30 },
+            { time: 13, price: 40 },
+          ],
+        });
+        expect(widget.undoUserDrawingCommand()).toBe(true);
+        expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'drawing_1' })]);
+
+        widget.remove();
+      }
     });
 
     it('generates drawing IDs without colliding with restored drawing state', () => {

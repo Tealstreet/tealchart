@@ -617,6 +617,61 @@ describe('mobile drawing handle command dispatch', () => {
     }
   });
 
+  it('records mobile path-family drags as one undoable drawing creation', () => {
+    const pathFamilyTools: UserDrawingTool[] = ['brush', 'highlighter'];
+
+    for (const tool of pathFamilyTools) {
+      let state = setUserDrawingTool(createUserDrawingState(), tool);
+      let history = createUserDrawingCommandHistory();
+      const drag = (id: string, firstAnchor = anchorA, secondAnchor = anchorB) => {
+        const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+          type: 'beginPathDrag',
+          point: { paneId: 'main', anchor: firstAnchor },
+          meta: { source: 'touch', transactionKey: `${tool}-path-drag` },
+        });
+        const moved = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+          type: 'appendPathDragPoint',
+          point: { paneId: 'main', anchor: secondAnchor },
+          meta: { source: 'touch', transactionKey: `${tool}-path-drag` },
+        });
+        const committed = dispatchMobileUserDrawingHistoryCommand(moved.state, moved.history, {
+          type: 'commitPathDrag',
+          options: { createId: () => id, now: () => 44, style },
+          meta: { source: 'touch' },
+        });
+
+        expect(started.changed, tool).toBe(true);
+        expect(started.history.undoStack, tool).toHaveLength(history.undoStack.length);
+        expect(moved.changed, tool).toBe(true);
+        expect(moved.history.undoStack, tool).toHaveLength(history.undoStack.length);
+        expect(committed.changed, tool).toBe(true);
+
+        state = committed.state;
+        history = committed.history;
+      };
+
+      drag(`${tool}-drawing-1`);
+      drag(`${tool}-drawing-2`, { time: 3_000, price: 120 }, { time: 4_000, price: 130 });
+
+      expect(history.undoStack, tool).toHaveLength(2);
+      expect(state.drawings, tool).toEqual([
+        expect.objectContaining({ id: `${tool}-drawing-1`, kind: tool, points: [anchorA, anchorB] }),
+        expect.objectContaining({
+          id: `${tool}-drawing-2`,
+          kind: tool,
+          points: [
+            { time: 3_000, price: 120 },
+            { time: 4_000, price: 130 },
+          ],
+        }),
+      ]);
+
+      const undo = undoUserDrawingCommand(state, history);
+      expect(undo.changed, tool).toBe(true);
+      expect(undo.state.drawings, tool).toEqual([expect.objectContaining({ id: `${tool}-drawing-1` })]);
+    }
+  });
+
   it('does not record a mobile placement drag that ends at the start anchor', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const history = createUserDrawingCommandHistory();
