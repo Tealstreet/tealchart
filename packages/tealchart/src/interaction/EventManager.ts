@@ -85,6 +85,8 @@ export interface EventManagerCallbacks {
   onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called when an active drawing edit drag ends */
   onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
+  /** Called when an active drawing drag is cancelled before normal completion */
+  onDrawingDragCancel?: (source: 'mouse' | 'touch') => void;
   /** Crosshair-only render (skips main canvas repaint) */
   onCrosshairRender?: () => void;
 }
@@ -1017,7 +1019,11 @@ export class EventManager {
         this.handleTap(this.touchStart.x, this.touchStart.y);
       } else if (this.state.isDragging) {
         if (this.state.dragMode === 'drawing') {
-          this.callbacks.onDrawingDragEnd?.('touch');
+          if (e.type === 'touchcancel') {
+            this.callbacks.onDrawingDragCancel?.('touch');
+          } else {
+            this.callbacks.onDrawingDragEnd?.('touch');
+          }
         } else {
           // Drag ended - sync viewport
           this.callbacks.onViewportChange?.(this.callbacks.getViewport());
@@ -1025,6 +1031,7 @@ export class EventManager {
       }
 
       this.touchStart = null;
+
       this.state.isDragging = false;
       this.state.dragMode = 'none';
       this.state.dragStartViewport = null;
@@ -1131,6 +1138,10 @@ export class EventManager {
   private handleKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Escape' && this.state.isDragging) {
       // Cancel drag and revert viewport
+      if (this.state.dragMode === 'drawing') {
+        this.callbacks.onDrawingDragCancel?.('mouse');
+      }
+
       if (this.state.dragStartViewport) {
         this.callbacks.onViewportChange?.(this.state.dragStartViewport);
       }
