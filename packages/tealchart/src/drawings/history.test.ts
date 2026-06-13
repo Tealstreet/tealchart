@@ -28,6 +28,39 @@ afterEach(() => {
 });
 
 describe('user drawing command history', () => {
+  it('records public add drawing commands as undoable creations', () => {
+    const state = createUserDrawingState();
+    const history = createUserDrawingCommandHistory();
+
+    const result = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'add',
+      drawing: {
+        id: 'line',
+        kind: 'trendLine',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style,
+        points: [anchorA, anchorB],
+        extend: 'none',
+      },
+      meta: { source: 'api', affectedIds: ['line'] },
+    });
+
+    expect(result.changed).toBe(true);
+    expect(result.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+    expect(result.state.selection).toEqual({ drawingId: 'line' });
+    expect(result.history.undoStack).toHaveLength(1);
+
+    const undo = undoUserDrawingCommand(result.state, result.history);
+    expect(undo.state.drawings).toEqual([]);
+
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
   it('records committed drawing creation while excluding tool and draft state', () => {
     let state = createUserDrawingState();
     let history = createUserDrawingCommandHistory();
