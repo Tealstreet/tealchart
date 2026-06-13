@@ -38,6 +38,7 @@ export interface ChartLegendOptions extends ComponentOptions {
   symbol: string;
   interval: ResolutionString;
   exchangeName?: string;
+  avoidLeftTools?: boolean;
   onToggleIndicator?: (indicatorId: string) => void;
   onSettingsIndicator?: (indicatorId: string) => void;
   onRemoveIndicator?: (indicatorId: string) => void;
@@ -78,13 +79,26 @@ interface IndicatorListElements {
 // Styles
 // ============================================================================
 
-const legendOrigin = computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, rect(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER));
+function resolveLegendOrigin(avoidLeftTools: boolean): { left: string; top: string } {
+  const origin = computeTopLeftLegendRect(
+    WEB_CHART_CHROME_METRICS,
+    rect(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER),
+    0,
+    { avoidLeftTools },
+  );
+  return {
+    top: `${origin?.y ?? 40}px`,
+    left: `${origin?.x ?? 12}px`,
+  };
+}
+
+const defaultLegendOrigin = resolveLegendOrigin(false);
 
 const styles = {
   container: {
     position: 'absolute',
-    top: `${legendOrigin?.y ?? 40}px`,
-    left: `${legendOrigin?.x ?? 12}px`,
+    top: defaultLegendOrigin.top,
+    left: defaultLegendOrigin.left,
     zIndex: '4',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '12px',
@@ -236,6 +250,7 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     this.options = options;
     Object.assign(this.el.style, styles.container);
+    this.applyPosition();
   }
 
   // ============================================================================
@@ -257,6 +272,12 @@ export class ChartLegend extends Component<ChartLegendState> {
     if (interval === this.options.interval) return;
     this.options.interval = interval;
     this.render();
+  }
+
+  setAvoidLeftTools(avoidLeftTools: boolean): void {
+    if (avoidLeftTools === Boolean(this.options.avoidLeftTools)) return;
+    this.options.avoidLeftTools = avoidLeftTools;
+    this.applyPosition();
   }
 
   setBars(latestBar: Bar | null, previousBar: Bar | null): void {
@@ -323,6 +344,12 @@ export class ChartLegend extends Component<ChartLegendState> {
       this.state.indicatorPaneInfo = paneInfo;
       this.updateIndicatorList(overlayIndicators);
     }
+  }
+
+  private applyPosition(): void {
+    const origin = resolveLegendOrigin(Boolean(this.options.avoidLeftTools));
+    this.el.style.top = origin.top;
+    this.el.style.left = origin.left;
   }
 
   /**
