@@ -365,6 +365,34 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings[0]).toEqual(editStart.state.drawings[0]);
   });
 
+  it('records mobile duplicate-drag start and moves as one coalesced undo entry', () => {
+    const state = createMobileStateWithTrendLine();
+    const history = createUserDrawingCommandHistory();
+    const duplicateStart = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginDuplicateEditDragAtPoint',
+      point: { x: 150, y: 150 },
+      spacesByPaneId,
+      options: { createId: () => 'copy', now: () => 45 },
+      meta: { source: 'api', transactionKey: 'duplicate-drag' },
+    });
+
+    expect(duplicateStart.changed).toBe(true);
+    expect(duplicateStart.history.undoStack).toHaveLength(1);
+    expect(duplicateStart.editDrag?.startDrawing.id).toBe('copy');
+    if (!duplicateStart.editDrag) throw new Error('expected duplicate edit drag');
+
+    const moved = dispatchMobileUserDrawingHistoryCommand(duplicateStart.state, duplicateStart.history, {
+      type: 'applyEditDrag',
+      drag: duplicateStart.editDrag,
+      point: { x: 170, y: 130 },
+      meta: { source: 'touch', transactionKey: 'duplicate-drag' },
+    });
+
+    expect(moved.history.undoStack).toHaveLength(1);
+    const undo = undoUserDrawingCommand(moved.state, moved.history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
   it('records mobile text edit commit as one undoable transaction', () => {
     let state = handleUserDrawingInput(
       setUserDrawingTool(createUserDrawingState(), 'textLabel'),

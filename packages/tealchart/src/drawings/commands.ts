@@ -19,7 +19,12 @@ import type {
   UserDrawingZOrderAction,
 } from './input';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
-import type { BeginUserDrawingEditDragOptions, NudgeUserDrawingSelectionOptions, UserDrawingEditDrag } from './editing';
+import type {
+  BeginUserDrawingDuplicateEditDragOptions,
+  BeginUserDrawingEditDragOptions,
+  NudgeUserDrawingSelectionOptions,
+  UserDrawingEditDrag,
+} from './editing';
 import type {
   UserDrawingHandleRole,
   UserDrawingIconName,
@@ -69,7 +74,12 @@ import {
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
-import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint, nudgeUserDrawingSelection } from './editing';
+import {
+  applyUserDrawingEditDrag,
+  beginUserDrawingDuplicateEditDragAtPoint,
+  beginUserDrawingEditDragAtPoint,
+  nudgeUserDrawingSelection,
+} from './editing';
 
 export type UserDrawingCommandSource =
   | 'pointer'
@@ -107,6 +117,12 @@ export type UserDrawingCommand =
       point: DrawingScreenPoint;
       spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>;
       options?: BeginUserDrawingEditDragOptions;
+    })
+  | (UserDrawingCommandBase & {
+      type: 'beginDuplicateEditDragAtPoint';
+      point: DrawingScreenPoint;
+      spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>;
+      options: BeginUserDrawingDuplicateEditDragOptions;
     })
   | (UserDrawingCommandBase & {
       type: 'applyEditDrag';
@@ -233,6 +249,18 @@ export function dispatchUserDrawingCommand(
     };
   }
 
+  if (command.type === 'beginDuplicateEditDragAtPoint') {
+    const result = beginUserDrawingDuplicateEditDragAtPoint(state, command.point, command.spacesByPaneId, command.options);
+    return {
+      state: result.state,
+      changed: result.changed,
+      command,
+      meta: command.meta,
+      hit: result.hit,
+      editDrag: result.drag,
+    };
+  }
+
   const nextState = reduceUserDrawingCommand(state, command);
   return {
     state: nextState,
@@ -254,6 +282,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return resolveUserDrawingSelectionAtPoint(state, command.point, command.spacesByPaneId, command.options).state;
     case 'beginEditDragAtPoint':
       return beginUserDrawingEditDragAtPoint(state, command.point, command.spacesByPaneId, command.options).state;
+    case 'beginDuplicateEditDragAtPoint':
+      return beginUserDrawingDuplicateEditDragAtPoint(state, command.point, command.spacesByPaneId, command.options).state;
     case 'applyEditDrag':
       return applyUserDrawingEditDrag(state, command.drag, command.point);
     case 'nudge':
