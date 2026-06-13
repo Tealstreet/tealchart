@@ -123,6 +123,11 @@ export interface ChartCoreOptions {
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ) => boolean;
+  /** Called when select-mode context menu input may target a user drawing */
+  onUserDrawingContextMenu?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => ContextMenuItem[];
   /** Called while an active user drawing edit drag moves */
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
@@ -1403,9 +1408,11 @@ export class ChartCore {
   }
 
   private handleContextMenu(screenX: number, screenY: number, price: number, time: number): void {
-    if (!this.options.onContextMenu) return;
-
-    const items = this.options.onContextMenu(time, price);
+    const drawingItems =
+      this.viewport && this.userDrawingState?.activeTool === 'select'
+        ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
+        : undefined;
+    const items = (drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? [];
     if (items.length === 0) return;
 
     // Remove existing menu
@@ -1433,15 +1440,18 @@ export class ChartCore {
           padding: '8px 12px',
           fontSize: '12px',
           color: '#d1d4dc',
-          cursor: 'pointer',
+          cursor: item.enabled === false ? 'default' : 'pointer',
+          opacity: item.enabled === false ? '0.5' : '1',
         },
         text: item.text,
         onClick: () => {
+          if (item.enabled === false) return;
           item.click();
           this.contextMenu?.remove();
           this.contextMenu = null;
         },
         onMouseEnter: (e) => {
+          if (item.enabled === false) return;
           (e.target as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
         },
         onMouseLeave: (e) => {
