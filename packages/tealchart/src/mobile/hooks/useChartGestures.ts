@@ -17,6 +17,7 @@ import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 
 import { getGestureZone } from '../utils/coordinates';
+import { getDrawingPanFinalizeAction } from '../utils/drawingGestureFinalize';
 
 export interface UseChartGesturesOptions {
   dimensions: ChartDimensions;
@@ -37,6 +38,8 @@ export interface UseChartGesturesOptions {
   onDrawingEditMove?: (x: number, y: number) => void;
   /** Called when a claimed drawing edit gesture ends */
   onDrawingEditEnd?: () => void;
+  /** Called when a claimed drawing edit gesture is cancelled before normal completion */
+  onDrawingEditCancel?: () => void;
 }
 
 export interface UseChartGesturesResult {
@@ -56,6 +59,7 @@ export function useChartGestures({
   onDrawingEditStart,
   onDrawingEditMove,
   onDrawingEditEnd,
+  onDrawingEditCancel,
 }: UseChartGesturesOptions): UseChartGesturesResult {
   // Shared values for gesture state (UI thread)
   const gestureZoneValue = useSharedValue<GestureZone>('chart');
@@ -291,13 +295,17 @@ export function useChartGestures({
           updateViewportFromPan(deltaX, deltaY);
         }
       })
-      .onFinalize(() => {
+      .onFinalize((_event, success) => {
         if (gestureCleanedUp.value) return;
         gestureCleanedUp.value = true;
 
         const zone = gestureZoneValue.value;
         if (drawingEditClaimed.value) {
-          onDrawingEditEnd?.();
+          if (getDrawingPanFinalizeAction(success) === 'cancel') {
+            onDrawingEditCancel?.();
+          } else {
+            onDrawingEditEnd?.();
+          }
           onSwipeBlockChange?.(false);
           drawingEditClaimed.value = false;
         } else if (zone === 'chart' && onSwipeBlockChange) {
@@ -314,6 +322,7 @@ export function useChartGestures({
     onInteraction,
     onDrawingEditMove,
     onDrawingEditEnd,
+    onDrawingEditCancel,
     gestureZoneValue,
     priceAxisStartRange,
     timeAxisStartRange,
