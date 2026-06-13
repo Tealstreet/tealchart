@@ -18,7 +18,7 @@ import {
   redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
-import type { DrawingCoordinateSpace, UserDrawingState } from '../../drawings';
+import type { DrawingCoordinateSpace, UserDrawingCommand, UserDrawingState } from '../../drawings';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
@@ -30,6 +30,54 @@ const coordinateSpace: DrawingCoordinateSpace = {
   chartRight: 300,
 };
 const spacesByPaneId = new Map([['main', coordinateSpace]]);
+const coveredMobileUserDrawingCommandTypes = [
+  'setActiveTool',
+  'select',
+  'selectMany',
+  'selectAtPoint',
+  'beginEditDragAtPoint',
+  'beginDuplicateEditDragAtPoint',
+  'applyEditDrag',
+  'nudge',
+  'delete',
+  'duplicate',
+  'paste',
+  'clear',
+  'cancelDraft',
+  'handleInput',
+  'beginPlacementDrag',
+  'commitPlacementDrag',
+  'beginPathDrag',
+  'appendPathDragPoint',
+  'commitPathDrag',
+  'beginTextEdit',
+  'updateTextEdit',
+  'commitTextEdit',
+  'cancelTextEdit',
+  'setText',
+  'setTextContent',
+  'updateStyle',
+  'setTextAlign',
+  'setTrendLineExtend',
+  'setIconName',
+  'setImageSource',
+  'setName',
+  'setTableCells',
+  'setTableCell',
+  'setTableDimensions',
+  'insertTableRow',
+  'deleteTableRow',
+  'insertTableColumn',
+  'deleteTableColumn',
+  'setVisibility',
+  'setLocked',
+  'reorder',
+] as const satisfies readonly UserDrawingCommand['type'][];
+type MissingCoveredMobileUserDrawingCommandType = Exclude<
+  UserDrawingCommand['type'],
+  (typeof coveredMobileUserDrawingCommandTypes)[number]
+>;
+const allMobileUserDrawingCommandTypesCovered: Record<MissingCoveredMobileUserDrawingCommandType, never> = {};
 
 afterEach(() => {
   clearChartStoreCache();
@@ -57,6 +105,11 @@ function createMobileStateWithTable(): UserDrawingState {
 }
 
 describe('mobile drawing handle command dispatch', () => {
+  it('keeps mobile command coverage aligned with the shared command union', () => {
+    expect(allMobileUserDrawingCommandTypesCovered).toEqual({});
+    expect(new Set(coveredMobileUserDrawingCommandTypes).size).toBe(coveredMobileUserDrawingCommandTypes.length);
+  });
+
   it('commits changed handle commands and preserves boolean results', () => {
     const commit = vi.fn<(state: UserDrawingState) => void>();
     const state = createMobileStateWithTrendLine();
@@ -83,7 +136,14 @@ describe('mobile drawing handle command dispatch', () => {
 
   it('routes representative mobile style, visibility, and table commands through shared dispatch', () => {
     const state = createMobileStateWithTable();
-    const styleResult = dispatchMobileUserDrawingHandleCommand(state, {
+    const namedResult = dispatchMobileUserDrawingHandleCommand(state, {
+      type: 'setName',
+      drawingId: 'table',
+      name: 'Mobile metrics',
+      options: { now: () => 30 },
+      meta: { source: 'api' },
+    });
+    const styleResult = dispatchMobileUserDrawingHandleCommand(namedResult.state, {
       type: 'updateStyle',
       style: { lineColor: '#00ff88' },
       options: { now: () => 31 },
@@ -104,11 +164,14 @@ describe('mobile drawing handle command dispatch', () => {
       meta: { source: 'api' },
     });
 
+    expect(namedResult.changed).toBe(true);
+    expect(namedResult.state.drawings[0]).toMatchObject({ name: 'Mobile metrics' });
     expect(styleResult.changed).toBe(true);
     expect(tableResult.changed).toBe(true);
     expect(hiddenResult.changed).toBe(true);
     expect(hiddenResult.state.selection).toBeNull();
     expect(hiddenResult.state.drawings[0]).toMatchObject({
+      name: 'Mobile metrics',
       visible: false,
       style: expect.objectContaining({ lineColor: '#00ff88' }),
     });

@@ -31,6 +31,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingName,
   setUserDrawingTableCells,
   setUserDrawingTableCell,
   setUserDrawingTableDimensions,
@@ -66,6 +67,51 @@ const multiPaneSpacesByPaneId = new Map([
   ['main', coordinateSpace],
   ['indicator', indicatorCoordinateSpace],
 ]);
+const coveredUserDrawingCommandTypes = [
+  'setActiveTool',
+  'select',
+  'selectMany',
+  'selectAtPoint',
+  'beginEditDragAtPoint',
+  'beginDuplicateEditDragAtPoint',
+  'applyEditDrag',
+  'nudge',
+  'delete',
+  'duplicate',
+  'paste',
+  'clear',
+  'cancelDraft',
+  'handleInput',
+  'beginPlacementDrag',
+  'commitPlacementDrag',
+  'beginPathDrag',
+  'appendPathDragPoint',
+  'commitPathDrag',
+  'beginTextEdit',
+  'updateTextEdit',
+  'commitTextEdit',
+  'cancelTextEdit',
+  'setText',
+  'setTextContent',
+  'updateStyle',
+  'setTextAlign',
+  'setTrendLineExtend',
+  'setIconName',
+  'setImageSource',
+  'setName',
+  'setTableCells',
+  'setTableCell',
+  'setTableDimensions',
+  'insertTableRow',
+  'deleteTableRow',
+  'insertTableColumn',
+  'deleteTableColumn',
+  'setVisibility',
+  'setLocked',
+  'reorder',
+] as const satisfies readonly UserDrawingCommand['type'][];
+type MissingCoveredUserDrawingCommandType = Exclude<UserDrawingCommand['type'], (typeof coveredUserDrawingCommandTypes)[number]>;
+const allUserDrawingCommandTypesCovered: Record<MissingCoveredUserDrawingCommandType, never> = {};
 
 afterEach(() => {
   clearChartStoreCache();
@@ -108,6 +154,11 @@ function expectCommandState(state: UserDrawingState, command: UserDrawingCommand
 }
 
 describe('user drawing command dispatch', () => {
+  it('keeps the shared command coverage harness exhaustive', () => {
+    expect(allUserDrawingCommandTypesCovered).toEqual({});
+    expect(new Set(coveredUserDrawingCommandTypes).size).toBe(coveredUserDrawingCommandTypes.length);
+  });
+
   it('wraps active tool and drawing input reducers without changing behavior', () => {
     const initial = createUserDrawingState();
     const toolDirect = setUserDrawingTool(initial, 'rectangle');
@@ -217,6 +268,15 @@ describe('user drawing command dispatch', () => {
     expect(dispatchUserDrawingCommand(duplicated, { type: 'reorder', action: 'sendToBack' }).state).toEqual(
       reorderUserDrawings(duplicated, 'sendToBack'),
     );
+
+    expect(
+      dispatchUserDrawingCommand(duplicated, {
+        type: 'setName',
+        drawingId: 'trend-line-copy',
+        name: 'Copied trend',
+        options: { now: () => 43 },
+      }).state,
+    ).toEqual(setUserDrawingName(duplicated, 'trend-line-copy', 'Copied trend', { now: () => 43 }));
 
     expect(dispatchUserDrawingCommand(duplicated, { type: 'delete' }).state).toEqual(deleteUserDrawing(duplicated));
   });
