@@ -146,6 +146,11 @@ export interface TealchartWidgetUIOptions {
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ) => boolean;
+  /** Called when select-mode context menu input may target a user drawing */
+  onUserDrawingContextMenu?: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => ContextMenuItem[];
   /** Called while an active user drawing edit drag moves */
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
@@ -419,6 +424,7 @@ export class TealchartWidgetUI {
       onUserDrawingInput: this.options.onUserDrawingInput,
       onUserDrawingSelection: this.options.onUserDrawingSelection,
       onUserDrawingEditStart: this.options.onUserDrawingEditStart,
+      onUserDrawingContextMenu: this.options.onUserDrawingContextMenu,
       onUserDrawingEditMove: this.options.onUserDrawingEditMove,
       onUserDrawingEditEnd: this.options.onUserDrawingEditEnd,
       onUserDrawingPlacementDragStart: this.options.onUserDrawingPlacementDragStart,
