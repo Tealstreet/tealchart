@@ -172,8 +172,11 @@ Canvas and mobile Skia route those tools through matching drag preview/commit
 flows. Event-level web regression coverage now guards click preservation,
 mousemove promotion, and mouseup promotion through the pending-drawing path;
 mobile command/gesture/render-model regression gates cover the sibling behavior.
-Remaining Gap 3 work should expand tool coverage, constraints, and deeper
-cancel/pointer-exit harness coverage.
+Placement constraints are wired through shared screen-space geometry: web uses
+Shift during drag, while mobile Skia exposes `constrainUserDrawingPlacement` for
+touch toolbars to request matching square and 45-degree snapping. Remaining Gap
+3 work should expand tool coverage and deeper cancel/pointer-exit harness
+coverage.
 
 ### Epic 3.1: Shared Placement State Machine
 
@@ -192,8 +195,11 @@ Phase 2: Draft lifecycle
 Phase 3: Gesture thresholds and constraints
 
 - Define pointer/touch drag thresholds.
-- Define Shift constraint hooks for square rectangles, angle snapping, and
-  future constrained lines.
+- Status: initial constraints shipped for drag two-anchor rectangle, circle,
+  ellipse, and line-family tools through a shared helper, with web Shift and a
+  mobile Skia prop for toolbar-controlled constrained placement.
+- Future work: broaden constrained placement semantics as multi-anchor tools
+  move from click placement to dedicated gestures.
 
 ### Epic 3.2: Web Drag-to-Draw Adapter
 

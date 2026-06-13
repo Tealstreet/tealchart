@@ -294,8 +294,9 @@ export type {
 export {
   getUserDrawingPlacementMode,
   isUserDrawingDragPlacementTool,
+  resolveUserDrawingPlacementConstraint,
 } from './placement';
-export type { UserDrawingPlacementMode } from './placement';
+export type { UserDrawingPlacementConstraintOptions, UserDrawingPlacementMode } from './placement';
 export {
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,

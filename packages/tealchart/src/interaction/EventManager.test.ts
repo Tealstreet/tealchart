@@ -149,6 +149,34 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('passes Shift placement constraints through pending mouse drags', () => {
+    const container = createContainer();
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd: vi.fn(),
+      }),
+    );
+
+    container.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100, shiftKey: true }),
+    );
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 130, clientY: 110, shiftKey: true }));
+
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', { constrainedPlacement: true });
+
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
+    manager.dispose();
+  });
+
   it('promotes pending drawing drags on mouseup when no move frame was processed', () => {
     const container = createContainer();
     const onDrawingInput = vi.fn(() => true);

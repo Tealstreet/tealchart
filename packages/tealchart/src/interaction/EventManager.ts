@@ -78,11 +78,11 @@ export interface EventManagerCallbacks {
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
   onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingInputEventOptions) => DrawingInputResult;
   /** Called before drag starts when drawing mode may need to preserve click input */
-  onDrawingDragPending?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  onDrawingDragPending?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called before pan starts so selected drawing edits can claim the drag */
-  onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called while an active drawing edit drag moves */
-  onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called when an active drawing edit drag ends */
   onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
   /** Crosshair-only render (skips main canvas repaint) */
@@ -98,6 +98,10 @@ export interface DrawingInputEventOptions {
   additiveSelection?: boolean;
 }
 
+export interface DrawingDragEventOptions {
+  constrainedPlacement?: boolean;
+}
+
 export type DrawingInputResult = boolean | DrawingInputHandledResult;
 
 function isDrawingInputHandled(result: DrawingInputResult | undefined): boolean {
@@ -106,6 +110,20 @@ function isDrawingInputHandled(result: DrawingInputResult | undefined): boolean 
 
 function allowsPaneDoubleClick(result: DrawingInputResult | undefined): boolean {
   return typeof result === 'boolean' ? false : result?.allowPaneDoubleClick === true;
+}
+
+function getMouseDrawingDragOptions(e: MouseEvent): DrawingDragEventOptions | undefined {
+  return e.shiftKey ? { constrainedPlacement: true } : undefined;
+}
+
+function invokeDrawingDragCallback(
+  callback: ((x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean) | undefined,
+  x: number,
+  y: number,
+  source: 'mouse' | 'touch',
+  options?: DrawingDragEventOptions,
+): boolean {
+  return options ? callback?.(x, y, source, options) === true : callback?.(x, y, source) === true;
 }
 
 export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider' | 'drawing' | 'pendingDrawing';
@@ -375,7 +393,7 @@ export class EventManager {
       return;
     }
 
-    if (e.button === 0 && this.callbacks.onDrawingDragPending?.(x, y, 'mouse')) {
+    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', getMouseDrawingDragOptions(e))) {
       this.state.isDragging = true;
       this.state.dragMode = 'pendingDrawing';
       this.state.dragStartX = x;
@@ -385,7 +403,7 @@ export class EventManager {
       return;
     }
 
-    if (e.button === 0 && this.callbacks.onDrawingDragStart?.(x, y, 'mouse')) {
+    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', getMouseDrawingDragOptions(e))) {
       this.state.isDragging = true;
       this.state.dragMode = 'drawing';
       this.state.dragStartX = x;
@@ -442,6 +460,7 @@ export class EventManager {
   private _pendingEventType: 'none' | 'move' | 'drag' | 'touchmove' | 'leave' | 'docmove' = 'none';
   private _pendingMouseClientX = 0;
   private _pendingMouseClientY = 0;
+  private _pendingMouseConstrainedPlacement = false;
   private _pendingTouchEvent: TouchEvent | null = null;
   private _inputRafId: number | null = null;
 
@@ -554,6 +573,7 @@ export class EventManager {
     // Store coordinates and defer to RAF
     this._pendingMouseClientX = e.clientX;
     this._pendingMouseClientY = e.clientY;
+    this._pendingMouseConstrainedPlacement = e.shiftKey;
     this._pendingEventType = 'drag';
     this.scheduleInputProcessing();
   }
@@ -575,17 +595,24 @@ export class EventManager {
       const distance = Math.hypot(x - this.state.dragStartX, y - this.state.dragStartY);
       if (distance < 5) return;
 
-      if (this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'mouse')) {
+      const options = this._pendingMouseConstrainedPlacement ? { constrainedPlacement: true } : undefined;
+      if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', options)) {
         this.state.dragMode = 'drawing';
         this.callbacks.onCursorChange?.('move');
-        this.callbacks.onDrawingDragMove?.(x, y, 'mouse');
+        invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', options);
         this.scheduleRender();
       }
       return;
     }
 
     if (this.state.dragMode === 'drawing') {
-      this.callbacks.onDrawingDragMove?.(x, y, 'mouse');
+      invokeDrawingDragCallback(
+        this.callbacks.onDrawingDragMove,
+        x,
+        y,
+        'mouse',
+        this._pendingMouseConstrainedPlacement ? { constrainedPlacement: true } : undefined,
+      );
       this.scheduleRender();
       return;
     }
@@ -624,9 +651,16 @@ export class EventManager {
 
     let wasDrawingDrag = this.state.dragMode === 'drawing';
     if (!wasClick && this.state.dragMode === 'pendingDrawing') {
-      wasDrawingDrag = this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'mouse') === true;
+      const drawingDragOptions = getMouseDrawingDragOptions(e);
+      wasDrawingDrag = invokeDrawingDragCallback(
+        this.callbacks.onDrawingDragStart,
+        this.state.dragStartX,
+        this.state.dragStartY,
+        'mouse',
+        drawingDragOptions,
+      );
       if (wasDrawingDrag) {
-        this.callbacks.onDrawingDragMove?.(mouseX, mouseY, 'mouse');
+        invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, mouseX, mouseY, 'mouse', drawingDragOptions);
       }
     }
     const drawingInputResult =
@@ -683,6 +717,7 @@ export class EventManager {
     this.state.dragStartPaneYRange = null;
     this.state.dragStartPaneHeight = 0;
     this.state.draggedDivider = null;
+    this._pendingMouseConstrainedPlacement = false;
 
     // Remove window listeners
     window.removeEventListener('mousemove', this.boundWindowMouseMove);
