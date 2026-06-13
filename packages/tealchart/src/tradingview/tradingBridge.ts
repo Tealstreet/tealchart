@@ -49,10 +49,22 @@ interface HitTarget {
     | { type: 'bracket'; ownerType: TradingViewTradingOwnerType; ownerId: string; lineId: string; side: 'tp' | 'sl' };
 }
 
-interface ActiveDrag {
+interface ActiveOrderDrag {
+  type: 'order';
   line: ChartTradingOrderLine;
   start: Point;
 }
+
+interface ActiveBracketDrag {
+  type: 'bracket';
+  ownerType: TradingViewTradingOwnerType;
+  ownerId: string;
+  lineId: string;
+  side: 'tp' | 'sl';
+  start: Point;
+}
+
+type ActiveDrag = ActiveOrderDrag | ActiveBracketDrag;
 
 export interface TradingViewTradingBridgeOptions {
   state?: ChartTradingState;
@@ -114,12 +126,16 @@ export class TradingViewTradingBridge {
       this.handleHitStart(hit, point);
     };
     const onPointerMove = (event: PointerEvent) => {
-      const point = this.eventPoint(event);
       if (this.activeDrag) {
+        const point = this.eventPoint(event, { allowOutside: true });
         element.style.cursor = 'ns-resize';
         claimPointerEvent(event);
+        if (point) {
+          this.handlePointerMove(point);
+        }
         return;
       }
+      const point = this.eventPoint(event);
       if (!point) return;
       const hit = this.findHit(point);
       if (hit) {
@@ -143,6 +159,13 @@ export class TradingViewTradingBridge {
       releasePointer(element, event);
       element.style.cursor = point ? this.findHit(point)?.cursor ?? '' : '';
     };
+    const onPointerCancel = (event: PointerEvent) => {
+      if (!this.activeDrag) return;
+      claimPointerEvent(event);
+      this.activeDrag = null;
+      releasePointer(element, event);
+      element.style.cursor = '';
+    };
     const onPointerLeave = () => {
       if (!this.activeDrag) {
         element.style.cursor = '';
@@ -151,12 +174,16 @@ export class TradingViewTradingBridge {
 
     element.addEventListener('pointerdown', onPointerDown, { capture: true });
     element.addEventListener('pointermove', onPointerMove, { capture: true });
+    element.addEventListener('pointercancel', onPointerCancel, { capture: true });
+    element.addEventListener('lostpointercapture', onPointerCancel, { capture: true });
     element.addEventListener('pointerleave', onPointerLeave, { capture: true });
     window.addEventListener('pointerup', onPointerUp, { capture: true });
 
     this.detachListeners = () => {
       element.removeEventListener('pointerdown', onPointerDown, { capture: true });
       element.removeEventListener('pointermove', onPointerMove, { capture: true });
+      element.removeEventListener('pointercancel', onPointerCancel, { capture: true });
+      element.removeEventListener('lostpointercapture', onPointerCancel, { capture: true });
       element.removeEventListener('pointerleave', onPointerLeave, { capture: true });
       window.removeEventListener('pointerup', onPointerUp, { capture: true });
       if (this.attachedElement === element) {
@@ -188,19 +215,49 @@ export class TradingViewTradingBridge {
     }
   }
 
+  handlePointerMove(point: Point): void {
+    if (!this.activeDrag || !this.lastFrame) return;
+    if (this.activeDrag.type !== 'bracket') return;
+    if (distance(this.activeDrag.start, point) < DRAG_THRESHOLD_PX) return;
+    this.emit({
+      type: `bracket.${this.activeDrag.side}.preview`,
+      source: 'tradingview-bridge',
+      ownerType: this.activeDrag.ownerType,
+      ownerId: this.activeDrag.ownerId,
+      lineId: this.activeDrag.lineId,
+      price: this.lastFrame.coordToPrice(point.y),
+      partialPercent: 100,
+    });
+  }
+
   handlePointerUp(point: Point): void {
     if (!this.activeDrag || !this.lastFrame) return;
-    const line = this.activeDrag.line;
     if (distance(this.activeDrag.start, point) < DRAG_THRESHOLD_PX) {
+      if (this.activeDrag.type === 'bracket') {
+        this.emitBracketClick(this.activeDrag);
+      }
+      return;
+    }
+    if (this.activeDrag.type === 'order') {
+      const line = this.activeDrag.line;
+      this.emit({
+        type: 'order.move.commit',
+        source: 'tradingview-bridge',
+        orderId: line.orderId ?? line.id,
+        lineId: ownedTradingLineId('order', line.id),
+        price: this.lastFrame.coordToPrice(point.y),
+        ...meta(line.meta),
+      });
       return;
     }
     this.emit({
-      type: 'order.move.commit',
+      type: `bracket.${this.activeDrag.side}.commit`,
       source: 'tradingview-bridge',
-      orderId: line.orderId ?? line.id,
-      lineId: ownedTradingLineId('order', line.id),
+      ownerType: this.activeDrag.ownerType,
+      ownerId: this.activeDrag.ownerId,
+      lineId: this.activeDrag.lineId,
       price: this.lastFrame.coordToPrice(point.y),
-      ...meta(line.meta),
+      partialPercent: 100,
     });
   }
 
@@ -422,7 +479,7 @@ export class TradingViewTradingBridge {
   private handleHitStart(hit: HitTarget, point: Point): void {
     switch (hit.action.type) {
       case 'order-line':
-        this.activeDrag = { line: hit.action.line, start: point };
+        this.activeDrag = { type: 'order', line: hit.action.line, start: point };
         break;
       case 'order-cancel':
         this.emit({
@@ -460,19 +517,23 @@ export class TradingViewTradingBridge {
         });
         break;
       case 'bracket':
-        this.emit({
-          type: `bracket.${hit.action.side}.click`,
-          source: 'tradingview-bridge',
-          ownerType: hit.action.ownerType,
-          ownerId: hit.action.ownerId,
-          lineId: hit.action.lineId,
-        });
+        this.activeDrag = { ...hit.action, start: point };
         break;
     }
 
-    if (hit.action.type !== 'order-line') {
+    if (hit.action.type !== 'order-line' && hit.action.type !== 'bracket') {
       this.handlePointerUp(point);
     }
+  }
+
+  private emitBracketClick(drag: ActiveBracketDrag): void {
+    this.emit({
+      type: `bracket.${drag.side}.click`,
+      source: 'tradingview-bridge',
+      ownerType: drag.ownerType,
+      ownerId: drag.ownerId,
+      lineId: drag.lineId,
+    });
   }
   private emit(intent: ChartTradingIntent): void {
     for (const listener of this.listeners) {
@@ -500,8 +561,16 @@ function cloneTradingState(state: ChartTradingState): ChartTradingState {
 
 function rebindActiveDrag(activeDrag: ActiveDrag | null, state: ChartTradingState): ActiveDrag | null {
   if (!activeDrag) return null;
-  const line = state.orders?.find((order) => order.id === activeDrag.line.id);
-  return line?.editable === true ? { ...activeDrag, line } : null;
+  if (activeDrag.type === 'order') {
+    const line = state.orders?.find((order) => order.id === activeDrag.line.id);
+    return line?.editable === true ? { ...activeDrag, line } : null;
+  }
+
+  const owners = activeDrag.ownerType === 'order' ? state.orders : state.positions;
+  const owner = owners?.find((line) => ownedTradingLineId(activeDrag.ownerType, line.id) === activeDrag.lineId);
+  if (!owner?.brackets) return null;
+  const bracketPrice = activeDrag.side === 'tp' ? owner.brackets.takeProfit : owner.brackets.stopLoss;
+  return bracketPrice == null ? null : activeDrag;
 }
 
 function ownedTradingLineId(kind: TradingViewTradingOwnerType | 'execution', id: string): string {
@@ -521,7 +590,12 @@ function capturePointer(element: HTMLElement, event: PointerEvent): void {
 
 function releasePointer(element: HTMLElement, event: PointerEvent): void {
   if (typeof event.pointerId !== 'number' || typeof element.releasePointerCapture !== 'function') return;
-  element.releasePointerCapture(event.pointerId);
+  if (typeof element.hasPointerCapture === 'function' && !element.hasPointerCapture(event.pointerId)) return;
+  try {
+    element.releasePointerCapture(event.pointerId);
+  } catch {
+    // Browsers can report lost capture before pointerup; cleanup should still proceed.
+  }
 }
 
 function actionButtons(
