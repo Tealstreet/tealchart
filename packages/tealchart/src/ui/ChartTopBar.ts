@@ -128,7 +128,7 @@ interface ChartTopBarState {
 // ============================================================================
 
 const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
-const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 40;
+const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 
 const styles = {
   container: {
@@ -318,6 +318,8 @@ const styles = {
     position: 'absolute',
     display: 'flex',
     alignItems: 'center',
+    alignContent: 'center',
+    flexWrap: 'wrap',
     gap: '3px',
     width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
     boxSizing: 'border-box',
@@ -616,6 +618,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
+    if (item.command.type === 'updateStyle') {
+      this.options.onUserDrawingStyleChange?.(item.command.style);
+      return;
+    }
+
     if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
     if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
     if (
@@ -676,6 +683,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         const btn = this.createElement('button', {
           style: {
             ...styles.drawingButton,
+            ...(item.swatchColor ? styles.drawingSwatch : {}),
+            ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
             opacity: item.enabled ? '1' : '0.35',
             cursor: item.enabled ? 'pointer' : 'default',
           },
@@ -691,7 +700,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
           btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
           btn.addEventListener('mouseleave', () => {
-            btn.style.backgroundColor = 'transparent';
+            btn.style.backgroundColor = item.swatchColor ?? 'transparent';
             btn.style.color = 'var(--text2, #787b86)';
           });
         }

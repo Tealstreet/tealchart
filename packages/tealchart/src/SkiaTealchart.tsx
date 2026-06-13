@@ -196,7 +196,7 @@ const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
 const USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
-const USER_DRAWING_ACTION_SURFACE_HEIGHT = 40;
+const USER_DRAWING_ACTION_SURFACE_HEIGHT = 70;
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
 
@@ -2073,6 +2073,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               if (intent) {
                 onUserDrawingPropertiesOpen?.(intent);
               }
+              return;
+            }
+            if (item.command.type === 'updateStyle') {
+              dispatchUserDrawingCommandToState({
+                type: 'updateStyle',
+                style: item.command.style,
+                meta: { source: 'contextMenu' },
+              });
               return;
             }
             if (item.command.action === 'duplicateSelected') {
@@ -4625,7 +4633,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     accessibilityLabel={item.label}
                     disabled={!item.enabled}
                     activeOpacity={0.72}
-                    style={[styles.userDrawingActionButton, !item.enabled && styles.userDrawingActionButtonDisabled]}
+                    style={[
+                      styles.userDrawingActionButton,
+                      item.swatchColor && { backgroundColor: item.swatchColor },
+                      !item.enabled && styles.userDrawingActionButtonDisabled,
+                    ]}
                     onPress={() => {
                       if (item.command.type === 'openProperties') {
                         const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current);
@@ -4650,6 +4662,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                             meta: { source: 'toolbar' },
                           });
                         }
+                        return;
+                      }
+                      if (item.command.type === 'updateStyle') {
+                        dispatchUserDrawingCommandToState({
+                          type: 'updateStyle',
+                          style: item.command.style,
+                          meta: { source: 'toolbar' },
+                        });
                         return;
                       }
                       if (item.command.action === 'duplicateSelected') {
@@ -4811,7 +4831,9 @@ const styles = StyleSheet.create({
     zIndex: 9,
     width: USER_DRAWING_ACTION_SURFACE_WIDTH,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    alignContent: 'center',
     gap: 3,
     padding: 4,
     borderWidth: 1,
