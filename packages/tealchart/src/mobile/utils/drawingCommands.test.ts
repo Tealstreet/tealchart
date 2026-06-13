@@ -557,38 +557,56 @@ describe('mobile drawing handle command dispatch', () => {
     expect(movedDrawing.points[1]?.time).toBe(2010);
   });
 
-  it('records mobile two-anchor placement drag as one undoable drawing creation', () => {
-    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+  it('records consecutive mobile two-anchor placement drags as independent undo entries', () => {
+    let state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     let history = createUserDrawingCommandHistory();
-    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'beginPlacementDrag',
-      point: { paneId: 'main', anchor: anchorA },
-      meta: { source: 'touch', transactionKey: 'placement-drag' },
-    });
+    const drag = (id: string, firstAnchor = anchorA, secondAnchor = anchorB) => {
+      const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'beginPlacementDrag',
+        point: { paneId: 'main', anchor: firstAnchor },
+        meta: { source: 'touch' },
+      });
 
-    expect(started.changed).toBe(true);
-    expect(started.history.undoStack).toHaveLength(0);
-    expect(started.state.draft?.anchors).toEqual([anchorA]);
+      expect(started.changed).toBe(true);
+      expect(started.history.undoStack).toHaveLength(history.undoStack.length);
+      expect(started.state.draft?.anchors).toEqual([firstAnchor]);
 
-    history = started.history;
-    const committed = dispatchMobileUserDrawingHistoryCommand(started.state, history, {
-      type: 'commitPlacementDrag',
-      point: { paneId: 'main', anchor: anchorB },
-      options: { createId: () => 'rect', now: () => 42, style },
-      meta: { source: 'touch', transactionKey: 'placement-drag' },
-    });
+      const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+        type: 'commitPlacementDrag',
+        point: { paneId: 'main', anchor: secondAnchor },
+        options: { createId: () => id, now: () => 42, style },
+        meta: { source: 'touch' },
+      });
 
-    expect(committed.changed).toBe(true);
-    expect(committed.history.undoStack).toHaveLength(1);
-    expect(committed.state.drawings[0]).toMatchObject({
-      id: 'rect',
-      kind: 'rectangle',
-      points: [anchorA, anchorB],
-    });
+      expect(committed.changed).toBe(true);
 
-    const undo = undoUserDrawingCommand(committed.state, committed.history);
+      state = committed.state;
+      history = committed.history;
+    };
+
+    drag('rect-1');
+    drag('rect-2', { time: 3_000, price: 120 }, { time: 4_000, price: 130 });
+
+    expect(history.undoStack).toHaveLength(2);
+    expect(state.drawings).toEqual([
+      expect.objectContaining({
+        id: 'rect-1',
+        kind: 'rectangle',
+        points: [anchorA, anchorB],
+      }),
+      expect.objectContaining({
+        id: 'rect-2',
+        kind: 'rectangle',
+        points: [
+          { time: 3_000, price: 120 },
+          { time: 4_000, price: 130 },
+        ],
+      }),
+    ]);
+
+    const undo = undoUserDrawingCommand(state, history);
     expect(undo.changed).toBe(true);
-    expect(undo.state.drawings).toEqual([]);
+    expect(undo.state.drawings).toEqual([expect.objectContaining({ id: 'rect-1' })]);
   });
 
   it('records expanded mobile two-anchor placement tools through the same drag lifecycle', () => {
@@ -603,7 +621,7 @@ describe('mobile drawing handle command dispatch', () => {
         type: 'commitPlacementDrag',
         point: { paneId: 'main', anchor: anchorB },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
-        meta: { source: 'touch', transactionKey: `${tool}-placement` },
+        meta: { source: 'touch' },
       });
 
       expect(started.changed, tool).toBe(true);
@@ -678,13 +696,13 @@ describe('mobile drawing handle command dispatch', () => {
     const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
       type: 'beginPlacementDrag',
       point: { paneId: 'main', anchor: anchorA },
-      meta: { source: 'touch', transactionKey: 'placement-drag' },
+      meta: { source: 'touch' },
     });
     const cancelled = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
       type: 'commitPlacementDrag',
       point: { paneId: 'main', anchor: anchorA },
       options: { createId: () => 'rect', now: () => 42, style },
-      meta: { source: 'touch', transactionKey: 'placement-drag' },
+      meta: { source: 'touch' },
     });
 
     expect(cancelled.changed).toBe(true);

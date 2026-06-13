@@ -654,6 +654,61 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('creates web placement-drag drawings as independent undo entries', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: 'rectangle' });
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingPlacementDragStart(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
+        _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      const drag = (offset: number) => {
+        expect(
+          testWidget._handleUserDrawingPlacementDragStart({
+            paneId: 'main',
+            anchor: { time: offset + 1, price: offset + 10 },
+          }),
+        ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingPlacementDragEnd({
+            paneId: 'main',
+            anchor: { time: offset + 2, price: offset + 20 },
+          }),
+        ).toBe(true);
+      };
+
+      drag(0);
+      drag(10);
+
+      expect(widget.getUserDrawingState().drawings).toHaveLength(2);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'drawing_1',
+        kind: 'rectangle',
+        points: [
+          { time: 1, price: 10 },
+          { time: 2, price: 20 },
+        ],
+      });
+      expect(widget.getUserDrawingState().drawings[1]).toMatchObject({
+        id: 'drawing_2',
+        kind: 'rectangle',
+        points: [
+          { time: 11, price: 20 },
+          { time: 12, price: 30 },
+        ],
+      });
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'drawing_1' })]);
+
+      widget.remove();
+    });
+
     it('creates web path-family drawings from drag samples through the widget state owner', () => {
       const pathFamilyTools: UserDrawingTool[] = ['brush', 'highlighter'];
 
