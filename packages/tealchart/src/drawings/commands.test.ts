@@ -5,6 +5,7 @@ import type { UserDrawingCommand } from './commands';
 import { beginUserDrawingDuplicateEditDragAtPoint, beginUserDrawingEditDragAtPoint } from './editing';
 import { clearChartStoreCache } from '../state/chartState';
 import {
+  addUserDrawing,
   appendUserDrawingPathDragPoint,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
@@ -69,6 +70,7 @@ const multiPaneSpacesByPaneId = new Map([
 ]);
 const coveredUserDrawingCommandTypes = [
   'setActiveTool',
+  'add',
   'select',
   'selectMany',
   'selectAtPoint',
@@ -239,6 +241,16 @@ describe('user drawing command dispatch', () => {
 
   it('wraps selection, duplicate, delete, style, lock, and z-order reducers', () => {
     const state = createStateWithTrendLine();
+    const addedDrawing = { ...state.drawings[0]!, id: 'added-line' };
+
+    expect(
+      dispatchUserDrawingCommand(createUserDrawingState(), {
+        type: 'add',
+        drawing: addedDrawing,
+        options: { select: false },
+        meta: { source: 'api', affectedIds: ['added-line'] },
+      }).state,
+    ).toEqual(addUserDrawing(createUserDrawingState(), addedDrawing, { select: false }));
 
     expect(dispatchUserDrawingCommand(state, { type: 'select', drawingId: 'trend-line' }).state).toEqual(
       selectUserDrawingById(state, 'trend-line'),

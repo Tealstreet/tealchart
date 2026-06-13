@@ -56,6 +56,10 @@ export interface UserDrawingSelectionAtPointResult {
   changed: boolean;
 }
 
+export interface AddUserDrawingOptions {
+  select?: boolean;
+}
+
 export interface DeleteUserDrawingOptions {
   drawingId?: string;
   drawingIds?: readonly string[];
@@ -199,6 +203,23 @@ export function selectUserDrawingsById(state: UserDrawingState, drawingIds: read
   const existingIds = new Set(state.drawings.map((drawing) => drawing.id));
   const selectedIds = [...new Set(drawingIds)].filter((drawingId) => existingIds.has(drawingId));
   return selectUserDrawing(state, createUserDrawingSelection(selectedIds));
+}
+
+export function addUserDrawing(
+  state: UserDrawingState,
+  drawing: UserDrawing,
+  options: AddUserDrawingOptions = {},
+): UserDrawingState {
+  if (state.drawings.some((existingDrawing) => existingDrawing.id === drawing.id)) return state;
+
+  return {
+    ...state,
+    activeTool: 'select',
+    drawings: [...state.drawings, drawing],
+    selection: options.select === false ? state.selection : { drawingId: drawing.id },
+    draft: null,
+    textEdit: null,
+  };
 }
 
 export function deleteUserDrawing(

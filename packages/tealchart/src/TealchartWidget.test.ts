@@ -7,7 +7,7 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
-import type { DrawingCoordinateSpace, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawing, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
@@ -369,6 +369,46 @@ describe('TealchartWidget', () => {
 
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'b', drawingIds: ['b', 'a'] });
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it('adds complete user drawings through an undoable command-backed API', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      const drawing: UserDrawing = {
+        id: 'api-line',
+        kind: 'trendLine',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+        points: [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 110 },
+        ],
+        extend: 'none',
+      };
+
+      expect(widget.addUserDrawing(drawing)).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([drawing]);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'api-line' });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'add', drawing }),
+          source: 'api',
+          affectedIds: ['api-line'],
+        }),
+      );
+
+      expect(widget.addUserDrawing(drawing)).toBe(false);
+      expect(widget.getUserDrawingState().drawings).toEqual([drawing]);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(widget.redoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([drawing]);
     });
 
     it('notifies option and subscription listeners after drawing commands change state', () => {

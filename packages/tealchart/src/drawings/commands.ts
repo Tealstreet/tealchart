@@ -1,4 +1,5 @@
 import type {
+  AddUserDrawingOptions,
   UserDrawingSelectionInputOptions,
   DeleteUserDrawingOptions,
   DuplicateUserDrawingOptions,
@@ -28,6 +29,7 @@ import type {
 import type {
   UserDrawingHandleRole,
   UserDrawingIconName,
+  UserDrawing,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -36,6 +38,7 @@ import type {
 } from './types';
 
 import {
+  addUserDrawing,
   appendUserDrawingPathDragPoint,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
@@ -104,6 +107,7 @@ interface UserDrawingCommandBase {
 
 export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setActiveTool'; tool: UserDrawingTool })
+  | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
   | (UserDrawingCommandBase & { type: 'selectMany'; drawingIds: readonly string[] })
   | (UserDrawingCommandBase & {
@@ -369,6 +373,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
   switch (command.type) {
     case 'setActiveTool':
       return setUserDrawingTool(state, command.tool);
+    case 'add':
+      return addUserDrawing(state, command.drawing, command.options);
     case 'select':
       return selectUserDrawingById(state, command.drawingId, command.handle);
     case 'selectMany':
