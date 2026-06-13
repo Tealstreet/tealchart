@@ -6,6 +6,7 @@ import type {
   UserDrawingIconName,
   UserDrawingLineStyle,
   UserDrawingState,
+  UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTextMaxWidth,
   UserDrawingTrendLineExtend,
@@ -40,10 +41,14 @@ export type UserDrawingSelectedActionSurfaceAction =
   | Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>
   | UserDrawingStyleToolbarAction
   | 'openProperties';
-export type UserDrawingSelectedActionSurfaceGroupId = 'primary' | 'arrange' | 'visibility';
+export type UserDrawingSelectedActionSurfaceGroupId = 'primary' | 'style' | 'arrange' | 'visibility';
 export type UserDrawingSelectedActionSurfaceCommand =
   | {
       type: 'openProperties';
+    }
+  | {
+      type: 'updateStyle';
+      style: Partial<UserDrawingStyle>;
     }
   | {
       type: 'toolbarAction';
@@ -178,12 +183,13 @@ export interface UserDrawingStyleToolbarActionDescriptor {
 }
 
 export interface UserDrawingSelectedActionSurfaceItem {
-  id: UserDrawingSelectedActionSurfaceAction;
+  id: UserDrawingSelectedActionSurfaceAction | string;
   icon: string;
   label: string;
   enabled: boolean;
   command: UserDrawingSelectedActionSurfaceCommand;
   destructive?: boolean;
+  swatchColor?: string;
 }
 
 export interface UserDrawingSelectedActionSurfaceGroup {
@@ -718,6 +724,76 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
   },
 ] as const;
 
+function getNextUserDrawingLineColor(drawing: UserDrawing): string {
+  const currentIndex = USER_DRAWING_LINE_COLOR_DESCRIPTORS.findIndex(
+    (descriptor) => descriptor.color.toLowerCase() === drawing.style.lineColor.toLowerCase(),
+  );
+  const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % USER_DRAWING_LINE_COLOR_DESCRIPTORS.length : 0;
+  return USER_DRAWING_LINE_COLOR_DESCRIPTORS[nextIndex]!.color;
+}
+
+function getAdjacentUserDrawingLineWidth(drawing: UserDrawing, direction: -1 | 1): number | null {
+  const widths = USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width);
+  const currentIndex = widths.indexOf(drawing.style.lineWidth);
+  if (currentIndex === -1) return widths[direction > 0 ? 0 : widths.length - 1] ?? null;
+  return widths[currentIndex + direction] ?? null;
+}
+
+function getNextUserDrawingLineStyle(drawing: UserDrawing): UserDrawingLineStyle {
+  const styles = USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => descriptor.lineStyle);
+  const currentIndex = styles.indexOf(drawing.style.lineStyle);
+  return styles[currentIndex >= 0 ? (currentIndex + 1) % styles.length : 0]!;
+}
+
+function resolveUserDrawingSelectedStyleActionSurfaceGroup(
+  state: UserDrawingState,
+  selectedDrawing: UserDrawing | null,
+): UserDrawingSelectedActionSurfaceGroup | null {
+  if (!selectedDrawing) return null;
+
+  const styleEnabled = isUserDrawingStyleToolbarEnabled(state);
+  const nextLineColor = getNextUserDrawingLineColor(selectedDrawing);
+  const thinnerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, -1);
+  const thickerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, 1);
+  const nextLineStyle = getNextUserDrawingLineStyle(selectedDrawing);
+
+  return {
+    id: 'style',
+    label: 'Style',
+    items: [
+      {
+        id: `lineColor:${nextLineColor}`,
+        icon: '',
+        label: `Cycle selected drawing line color to ${nextLineColor}`,
+        enabled: styleEnabled,
+        command: { type: 'updateStyle', style: { lineColor: nextLineColor } },
+        swatchColor: nextLineColor,
+      },
+      {
+        id: 'lineWidth:decrease',
+        icon: '−',
+        label: thinnerLineWidth === null ? 'Decrease selected drawing line width' : `${thinnerLineWidth} pixel line width`,
+        enabled: styleEnabled && thinnerLineWidth !== null,
+        command: { type: 'updateStyle', style: thinnerLineWidth === null ? {} : { lineWidth: thinnerLineWidth } },
+      },
+      {
+        id: 'lineWidth:increase',
+        icon: '+',
+        label: thickerLineWidth === null ? 'Increase selected drawing line width' : `${thickerLineWidth} pixel line width`,
+        enabled: styleEnabled && thickerLineWidth !== null,
+        command: { type: 'updateStyle', style: thickerLineWidth === null ? {} : { lineWidth: thickerLineWidth } },
+      },
+      {
+        id: `lineStyle:${nextLineStyle}`,
+        icon: USER_DRAWING_LINE_STYLE_DESCRIPTORS.find((descriptor) => descriptor.lineStyle === nextLineStyle)!.icon,
+        label: `Cycle selected drawing line style to ${nextLineStyle}`,
+        enabled: styleEnabled,
+        command: { type: 'updateStyle', style: { lineStyle: nextLineStyle } },
+      },
+    ],
+  };
+}
+
 function resolveUserDrawingSelectedActionSurfaceStyleCommand(
   state: UserDrawingState,
   action: UserDrawingStyleToolbarAction,
@@ -747,9 +823,18 @@ export function isUserDrawingToolbarActionEnabled(
 
 export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState): UserDrawingSelectedActionSurface {
   const selectedDrawing = getSelectedUserDrawing(state);
+  const styleGroup = resolveUserDrawingSelectedStyleActionSurfaceGroup(state, selectedDrawing);
+  const groups = styleGroup
+    ? [
+        USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS[0]!,
+        styleGroup,
+        ...USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS.slice(1),
+      ]
+    : USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS;
+
   return {
     selectedDrawing,
-    groups: USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS.map((group) => ({
+    groups: groups.map((group) => ({
       ...group,
       items: group.items.map((item) => {
         if (item.command.type === 'openProperties') {
@@ -757,6 +842,9 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
             ...item,
             enabled: selectedDrawing !== null,
           };
+        }
+        if (item.command.type === 'updateStyle') {
+          return item;
         }
         if (item.command.type === 'styleAction') {
           return {

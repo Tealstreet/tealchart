@@ -1493,15 +1493,22 @@ describe('user drawing toolbar descriptors', () => {
     } satisfies UserDrawingState;
     const surface = resolveUserDrawingSelectedActionSurface(selected);
     const primary = surface.groups.find((group) => group.id === 'primary')!;
+    const style = surface.groups.find((group) => group.id === 'style')!;
     const arrange = surface.groups.find((group) => group.id === 'arrange')!;
     const visibility = surface.groups.find((group) => group.id === 'visibility')!;
 
     expect(surface.selectedDrawing?.id).toBe('front');
-    expect(surface.groups.map((group) => group.id)).toEqual(['primary', 'arrange', 'visibility']);
+    expect(surface.groups.map((group) => group.id)).toEqual(['primary', 'style', 'arrange', 'visibility']);
     expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
       ['openProperties', true, false],
       ['duplicateSelected', true, false],
       ['deleteSelected', true, true],
+    ]);
+    expect(style.items.map((item) => [item.id, item.enabled, item.command, item.swatchColor])).toEqual([
+      ['lineColor:#f5c542', true, { type: 'updateStyle', style: { lineColor: '#f5c542' } }, '#f5c542'],
+      ['lineWidth:decrease', false, { type: 'updateStyle', style: {} }, undefined],
+      ['lineWidth:increase', true, { type: 'updateStyle', style: { lineWidth: 2 } }, undefined],
+      ['lineStyle:dashed', true, { type: 'updateStyle', style: { lineStyle: 'dashed' } }, undefined],
     ]);
     expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
       ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
@@ -1577,6 +1584,9 @@ describe('user drawing toolbar descriptors', () => {
 
     expect(items.find((item) => item.id === 'duplicateSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'deleteSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'lineColor:#f5c542')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'lineWidth:increase')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'lineStyle:dashed')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'hideSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lockSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'unlockSelected')).toMatchObject({
