@@ -19,11 +19,19 @@ import {
   redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
-import type { DrawingCoordinateSpace, UserDrawingState } from '../../drawings';
+import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingTool } from '../../drawings';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+const expandedDragPlacementTools: UserDrawingTool[] = [
+  'priceRange',
+  'dateRange',
+  'datePriceRange',
+  'forecast',
+  'callout',
+  'priceNote',
+];
 const coordinateSpace: DrawingCoordinateSpace = {
   viewport: { startTime: 0, endTime: 3_000, priceMin: 90, priceMax: 120 },
   pane: { id: 'main', top: 0, height: 300, bottom: 300, yMin: 90, yMax: 120 },
@@ -454,6 +462,32 @@ describe('mobile drawing handle command dispatch', () => {
     const undo = undoUserDrawingCommand(committed.state, committed.history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings).toEqual([]);
+  });
+
+  it('records expanded mobile two-anchor placement tools through the same drag lifecycle', () => {
+    for (const tool of expandedDragPlacementTools) {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const started = dispatchMobileUserDrawingHistoryCommand(state, createUserDrawingCommandHistory(), {
+        type: 'beginPlacementDrag',
+        point: { paneId: 'main', anchor: anchorA },
+        meta: { source: 'touch', transactionKey: `${tool}-placement` },
+      });
+      const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+        type: 'commitPlacementDrag',
+        point: { paneId: 'main', anchor: anchorB },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
+        meta: { source: 'touch', transactionKey: `${tool}-placement` },
+      });
+
+      expect(started.changed, tool).toBe(true);
+      expect(committed.changed, tool).toBe(true);
+      expect(committed.history.undoStack, tool).toHaveLength(1);
+      expect(committed.state.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB],
+      });
+    }
   });
 
   it('does not record a mobile placement drag that ends at the start anchor', () => {
