@@ -602,14 +602,23 @@ export function resolveUserDrawingSelectionActionAnchor(
   const drawingsById = new Map(state.drawings.map((drawing) => [drawing.id, drawing]));
   const drawingIds: string[] = [];
   const paneIds: string[] = [];
+  const fallbackDrawingIds: string[] = [];
+  const fallbackPaneIds: string[] = [];
+  let fallbackSpace: DrawingCoordinateSpace | null = null;
   let bounds: DrawingScreenRect | null = null;
 
   for (const drawingId of selectedIds) {
     const drawing = drawingsById.get(drawingId);
-    if (!drawing?.visible) continue;
+    if (!drawing) continue;
 
     const space = getSpaceForDrawing(spacesByPaneId, drawing);
     if (!space) continue;
+
+    fallbackDrawingIds.push(drawing.id);
+    if (!fallbackPaneIds.includes(drawing.paneId)) fallbackPaneIds.push(drawing.paneId);
+    fallbackSpace ??= space;
+
+    if (!drawing.visible) continue;
 
     const drawingBounds = resolveUserDrawingScreenBounds(drawing, space, normalizedOptions);
     if (!drawingBounds) continue;
@@ -617,6 +626,17 @@ export function resolveUserDrawingSelectionActionAnchor(
     drawingIds.push(drawing.id);
     if (!paneIds.includes(drawing.paneId)) paneIds.push(drawing.paneId);
     bounds = bounds ? mergeBounds(bounds, drawingBounds) : drawingBounds;
+  }
+
+  if (!bounds && fallbackSpace) {
+    bounds = {
+      x: fallbackSpace.chartLeft + normalizedOptions.padding,
+      y: fallbackSpace.pane.top + normalizedOptions.padding,
+      width: normalizedOptions.minTargetSize,
+      height: normalizedOptions.minTargetSize,
+    };
+    drawingIds.push(...fallbackDrawingIds);
+    paneIds.push(...fallbackPaneIds);
   }
 
   if (!bounds || drawingIds.length === 0 || paneIds.length === 0) return null;

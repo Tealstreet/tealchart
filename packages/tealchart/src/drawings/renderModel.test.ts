@@ -632,7 +632,7 @@ describe('user drawing render model', () => {
     });
   });
 
-  it('does not resolve selection action anchors for hidden selected drawings', () => {
+  it('resolves a fallback selection action anchor for hidden selected drawings', () => {
     const state: UserDrawingState = {
       version: 1,
       activeTool: 'select',
@@ -654,6 +654,12 @@ describe('user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveUserDrawingSelectionActionAnchor(state, { main: space })).toBeNull();
+    expect(resolveUserDrawingSelectionActionAnchor(state, { main: space }, { padding: 4, minTargetSize: 16 })).toEqual({
+      anchor: { x: 12, y: 4 },
+      bounds: { x: 4, y: 4, width: 16, height: 16 },
+      drawingIds: ['hidden'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    });
   });
 });
