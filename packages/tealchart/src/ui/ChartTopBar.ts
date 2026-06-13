@@ -14,8 +14,6 @@ import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
-  isUserDrawingToolbarActionEnabled,
-  getUserDrawingZOrderAction,
   getSelectedUserDrawing,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -23,7 +21,7 @@ import {
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
-  resolveUserDrawingStyleToolbarAction,
+  resolveUserDrawingSelectedActionSurface,
   getUserDrawingToolDescriptor,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -44,7 +42,6 @@ import {
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
-  USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
@@ -704,6 +701,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     group.appendChild(this.createElement('div', { style: styles.divider }));
 
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
+    const selectedActionSurface = state ? resolveUserDrawingSelectedActionSurface(state) : null;
     const styleEnabled = state ? isUserDrawingStyleToolbarEnabled(state) : false;
     const fillColorEnabled = state ? isUserDrawingFillToolbarEnabled(state) : false;
     const fillVisibilityEnabled = state ? isUserDrawingFillVisibilityToolbarEnabled(state) : false;
@@ -1365,30 +1363,31 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         group.appendChild(this.createElement('div', { style: styles.divider }));
       }
 
-      for (const descriptor of USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS) {
-        const actionState = resolveUserDrawingStyleToolbarAction(state!, descriptor.action);
-        const enabled = actionState.enabled;
+      const visibilityActions = selectedActionSurface?.groups.find((actionGroup) => actionGroup.id === 'visibility');
+      for (const item of visibilityActions?.items ?? []) {
+        const enabled = item.enabled;
         const btn = this.createElement('button', {
           style: {
             ...styles.drawingButton,
             opacity: enabled ? '1' : '0.35',
             cursor: enabled ? 'pointer' : 'default',
           },
-          textContent: descriptor.icon,
+          textContent: item.icon,
           attributes: {
             type: 'button',
-            title: descriptor.label,
-            'aria-label': descriptor.label,
+            title: item.label,
+            'aria-label': item.label,
           },
         });
         btn.disabled = !enabled;
         if (enabled) {
           btn.addEventListener('click', () => {
-            if (actionState.visible !== undefined) {
-              this.options.onUserDrawingVisibilityChange?.(actionState.visible);
+            if (item.command.type !== 'styleAction') return;
+            if (item.command.visible !== undefined) {
+              this.options.onUserDrawingVisibilityChange?.(item.command.visible);
             }
-            if (actionState.locked !== undefined) {
-              this.options.onUserDrawingLockedChange?.(actionState.locked, actionState.includeLocked);
+            if (item.command.locked !== undefined) {
+              this.options.onUserDrawingLockedChange?.(item.command.locked, item.command.includeLocked);
             }
           });
           btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
@@ -1403,30 +1402,46 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       group.appendChild(this.createElement('div', { style: styles.divider }));
     }
 
-    for (const descriptor of USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS) {
-      const enabled = state ? isUserDrawingToolbarActionEnabled(state, descriptor.action) : false;
+    const selectedActionItems = (selectedActionSurface?.groups ?? [])
+      .filter((actionGroup) => actionGroup.id !== 'visibility')
+      .flatMap((actionGroup) => actionGroup.items);
+    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.slice(6);
+    for (const item of [...selectedActionItems, ...globalActionDescriptors.map((descriptor) => ({
+      ...descriptor,
+      id: descriptor.action,
+      enabled: state ? descriptor.action === 'cancelDraft' ? state.draft !== null : state.drawings.length > 0 : false,
+      command: { type: 'toolbarAction' as const, action: descriptor.action },
+    }))]) {
+      const enabled = item.enabled;
       const btn = this.createElement('button', {
         style: {
           ...styles.drawingButton,
           opacity: enabled ? '1' : '0.35',
           cursor: enabled ? 'pointer' : 'default',
         },
-        textContent: descriptor.icon,
+        textContent: item.icon,
         attributes: {
           type: 'button',
-          title: descriptor.label,
-          'aria-label': descriptor.label,
+          title: item.label,
+          'aria-label': item.label,
         },
       });
       btn.disabled = !enabled;
       if (enabled) {
         btn.addEventListener('click', () => {
-          if (descriptor.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
-          if (descriptor.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
-          const zOrderAction = getUserDrawingZOrderAction(descriptor.action);
-          if (zOrderAction) this.options.onUserDrawingZOrderChange?.(zOrderAction);
-          if (descriptor.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
-          if (descriptor.action === 'clearAll') this.options.onUserDrawingClearAll?.();
+          if (item.command.type !== 'toolbarAction') return;
+          if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
+          if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
+          if (
+            item.command.action === 'bringForward' ||
+            item.command.action === 'sendBackward' ||
+            item.command.action === 'bringToFront' ||
+            item.command.action === 'sendToBack'
+          ) {
+            this.options.onUserDrawingZOrderChange?.(item.command.action);
+          }
+          if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
+          if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
         });
         btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
         btn.addEventListener('mouseleave', () => {
