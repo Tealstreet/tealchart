@@ -1,10 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { resolveUserDrawingKeyboardAction } from './keyboard';
 import { createUserDrawingState, setUserDrawingTool, handleUserDrawingInput } from './input';
+import { clearChartStoreCache } from '../state/chartState';
 import type { UserDrawingState } from './types';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 function withSelection(): UserDrawingState {
   return {
