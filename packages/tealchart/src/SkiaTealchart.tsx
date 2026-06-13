@@ -22,6 +22,7 @@ import type {
   DrawingCoordinateSpace,
   UpdateUserDrawingOptions,
   UserDrawingClipboard,
+  UserDrawingCommandEvent,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
@@ -115,6 +116,7 @@ import {
   clearUserDrawingCommandHistory,
   createUserDrawingClipboard,
   createUserDrawingCommandHistory,
+  createUserDrawingCommandEvent,
   createUserDrawingState,
   dispatchUserDrawingCommand,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
@@ -392,6 +394,8 @@ export interface SkiaTealchartProps {
   userDrawingState?: UserDrawingState;
   /** Called when the chart updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
+  /** Called after a user drawing command changes state. Direct state replacement does not emit this. */
+  onUserDrawingCommand?: (event: UserDrawingCommandEvent) => void;
   /** Called when app or handle code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   /** Called when app or handle code asks to open selected drawing properties. */
@@ -453,6 +457,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onCrossHairMoved,
     userDrawingState: propUserDrawingState,
     onUserDrawingStateChange,
+    onUserDrawingCommand,
     onUserDrawingObjectTreeOpen,
     onUserDrawingPropertiesOpen,
     constrainUserDrawingPlacement = false,
@@ -536,18 +541,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const dispatchUserDrawingCommandToStateWithResult = useCallback(
     (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => {
-      const result = dispatchMobileUserDrawingHistoryCommand(
-        userDrawingStateRef.current,
-        userDrawingHistoryRef.current,
-        command,
-      );
+      const previousState = userDrawingStateRef.current;
+      const result = dispatchMobileUserDrawingHistoryCommand(previousState, userDrawingHistoryRef.current, command);
       userDrawingHistoryRef.current = result.history;
       if (result.changed) {
         commitUserDrawingState(result.state);
+        const event = createUserDrawingCommandEvent(previousState, result);
+        if (event) {
+          onUserDrawingCommand?.(event);
+        }
       }
       return result;
     },
-    [commitUserDrawingState],
+    [commitUserDrawingState, onUserDrawingCommand],
   );
 
   const dispatchUserDrawingCommandToState = useCallback(
@@ -675,8 +681,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean {
         const transactionKey = `duplicate-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
+        const previousState = userDrawingStateRef.current;
         const result = dispatchMobileUserDrawingHistoryCommand(
-          userDrawingStateRef.current,
+          previousState,
           userDrawingHistoryRef.current,
           {
             type: 'beginDuplicateEditDragAtPoint',
@@ -694,6 +701,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         userDrawingHistoryRef.current = result.history;
         if (result.changed) {
           commitUserDrawingState(result.state);
+          const event = createUserDrawingCommandEvent(previousState, result);
+          if (event) {
+            onUserDrawingCommand?.(event);
+          }
         }
         userDrawingEditDragRef.current = result.editDrag;
         userDrawingEditDragTransactionKeyRef.current = transactionKey;
@@ -900,6 +911,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       createUserDrawingId,
       dispatchUserDrawingCommandToState,
       dispatchUserDrawingCommandToStateWithResult,
+      onUserDrawingCommand,
       onUserDrawingObjectTreeOpen,
       onUserDrawingPropertiesOpen,
     ],
@@ -1498,6 +1510,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
         if (selection.changed) {
           commitUserDrawingState(selection.state);
+          const event = createUserDrawingCommandEvent(effectiveUserDrawingState, selection);
+          if (event) {
+            onUserDrawingCommand?.(event);
+          }
         }
         return (selection.hit ?? false) || selection.changed;
       }
@@ -1528,6 +1544,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
+      onUserDrawingCommand,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
       bars,
@@ -1598,6 +1615,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       userDrawingEditDragTransactionKeyRef.current = transactionKey;
       if (result.changed) {
         commitUserDrawingState(result.state);
+        const event = createUserDrawingCommandEvent(effectiveUserDrawingState, result);
+        if (event) {
+          onUserDrawingCommand?.(event);
+        }
       }
       return true;
     },
@@ -1608,6 +1629,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
+      onUserDrawingCommand,
       resolveConstrainedUserDrawingPlacementPoint,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,

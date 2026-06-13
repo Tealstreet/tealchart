@@ -13,6 +13,7 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UserDrawingClipboard,
+  UserDrawingCommandDispatchResult,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
@@ -43,6 +44,7 @@ import type {
   UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
+  UserDrawingCommandEvent,
   UpdateUserDrawingOptions,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
@@ -57,6 +59,7 @@ import {
   clearUserDrawingCommandHistory,
   createUserDrawingClipboard,
   createUserDrawingCommandHistory,
+  createUserDrawingCommandEvent,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
@@ -2553,10 +2556,23 @@ export class TealchartWidget {
   private dispatchUserDrawingCommandWithResult(
     command: Parameters<typeof dispatchUserDrawingCommand>[1],
   ): ReturnType<typeof dispatchUserDrawingCommandWithHistory> {
-    const result = dispatchUserDrawingCommandWithHistory(this._userDrawingState, this._userDrawingHistory, command);
+    const previousState = this._userDrawingState;
+    const result = dispatchUserDrawingCommandWithHistory(previousState, this._userDrawingHistory, command);
     this._userDrawingHistory = result.history;
     this.setUserDrawingState(result.state, { preserveHistory: true });
+    this._emitUserDrawingCommandEvent(previousState, result);
     return result;
+  }
+
+  private _emitUserDrawingCommandEvent(
+    previousState: UserDrawingState,
+    result: UserDrawingCommandDispatchResult,
+  ): UserDrawingCommandEvent | null {
+    const event = createUserDrawingCommandEvent(previousState, result);
+    if (!event) return null;
+    this._options.onUserDrawingCommand?.(event);
+    this._eventEmitter.emit('user_drawing_command', event);
+    return event;
   }
 
   private _measureUserDrawingTextLabelLine = (drawing: UserDrawingTextAnnotation, line: string): number => {
@@ -2650,7 +2666,8 @@ export class TealchartWidget {
       return { state: this._userDrawingState, hit: false, changed: false };
     }
 
-    const result = dispatchUserDrawingCommand(this._userDrawingState, {
+    const previousState = this._userDrawingState;
+    const result = dispatchUserDrawingCommand(previousState, {
       type: 'selectAtPoint',
       point,
       spacesByPaneId,
@@ -2661,6 +2678,7 @@ export class TealchartWidget {
       meta: { source: 'pointer' },
     });
     this.setUserDrawingState(result.state, { preserveHistory: true });
+    this._emitUserDrawingCommandEvent(previousState, result);
     return {
       state: result.state,
       hit: result.hit ?? false,
@@ -2676,6 +2694,7 @@ export class TealchartWidget {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
     const transactionKey = `${options?.duplicateOnDrag ? 'duplicate-drag' : 'edit-drag'}-${++this._userDrawingEditDragTransactionCounter}`;
+    const previousState = this._userDrawingState;
     const result = options?.duplicateOnDrag
       ? this.dispatchUserDrawingCommandWithResult({
           type: 'beginDuplicateEditDragAtPoint',
@@ -2687,7 +2706,7 @@ export class TealchartWidget {
           },
           meta: { source: 'pointer', transactionKey },
         })
-      : dispatchUserDrawingCommand(this._userDrawingState, {
+      : dispatchUserDrawingCommand(previousState, {
           type: 'beginEditDragAtPoint',
           point,
           spacesByPaneId,
@@ -2701,6 +2720,9 @@ export class TealchartWidget {
     this._userDrawingEditDrag = result.editDrag;
     this._userDrawingEditDragTransactionKey = transactionKey;
     this.setUserDrawingState(result.state, { preserveHistory: true });
+    if (!options?.duplicateOnDrag) {
+      this._emitUserDrawingCommandEvent(previousState, result);
+    }
     return true;
   }
 
