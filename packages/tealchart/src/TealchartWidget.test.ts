@@ -1104,6 +1104,12 @@ describe('TealchartWidget', () => {
         drawing: expect.objectContaining({ id: 'locked', kind: 'rectangle' }),
       });
       expect(widget.getUserDrawingPropertiesIntent('missing')).toBeNull();
+      expect(widget.getUserDrawingPropertiesSurface().drawing).toMatchObject({ id: 'line', kind: 'horizontalLine' });
+      expect(widget.getUserDrawingPropertiesSurface().groups.map((group) => group.id)).toEqual(['line']);
+      expect(widget.getUserDrawingPropertiesSurface('locked')).toMatchObject({
+        drawing: { id: 'locked', kind: 'rectangle' },
+        editable: false,
+      });
 
       const opened = widget.openUserDrawingProperties('locked');
       expect(onOpenProperties).toHaveBeenCalledWith(opened);

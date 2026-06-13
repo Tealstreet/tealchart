@@ -495,6 +495,8 @@ Phase 2: Properties popover
 
 - Open a selected drawing properties popover for non-text drawings when
   appropriate.
+- Status: initial shared properties surface descriptors now resolve line,
+  fill, text, geometry, and icon control groups for web popover consumers.
 
 Phase 3: History and focus
 
@@ -512,6 +514,8 @@ Phase 1: Text edit parity
 Phase 2: Properties sheet
 
 - Open a mobile properties sheet for non-text drawings when appropriate.
+- Status: mobile Skia handle parity now exposes the same shared properties
+  surface model for native sheet consumers.
 
 Phase 3: History and focus
 

@@ -26,6 +26,7 @@ import type {
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
   UserDrawingPropertiesIntent,
+  UserDrawingPropertiesSurface,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
   UserDrawingAnchor,
@@ -122,6 +123,7 @@ import {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
+  resolveUserDrawingPropertiesSurface,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -331,6 +333,7 @@ export interface SkiaTealchartHandle {
   openUserDrawingObjectTree(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
   dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean;
   getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null;
+  getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface;
   openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null;
 }
 
@@ -782,6 +785,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null {
         return resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
+      },
+      getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface {
+        return resolveUserDrawingPropertiesSurface(userDrawingStateRef.current, drawingId);
       },
       openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
         const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });

@@ -46,6 +46,7 @@ import {
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
+import { resolveUserDrawingPropertiesSurface } from './propertiesSurface';
 import type { UserDrawing, UserDrawingState } from './types';
 
 const state: UserDrawingState = {
@@ -1672,5 +1673,216 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolbarStateKey({ ...iconState, drawings: [{ ...iconDrawing, iconName: 'flag' }] })).not.toBe(
       getUserDrawingToolbarStateKey(iconState),
     );
+  });
+
+  it('resolves shared properties surface controls for line drawings', () => {
+    const lineState = {
+      ...state,
+      selection: { drawingId: 'line' },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'trendLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#38bdf8', lineWidth: 2, lineStyle: 'dashed' as const, opacity: 0.5 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+          extend: 'right' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const surface = resolveUserDrawingPropertiesSurface(lineState);
+
+    expect(surface.drawing?.id).toBe('line');
+    expect(surface.editable).toBe(true);
+    expect(surface.groups.map((group) => group.id)).toEqual(['line', 'geometry']);
+    expect(surface.groups[0]!.controls.find((control) => control.id === 'lineColor:#38bdf8')).toMatchObject({
+      selected: true,
+      command: { type: 'updateStyle', style: { lineColor: '#38bdf8' } },
+    });
+    expect(surface.groups[0]!.controls.find((control) => control.id === 'lineWidth:2')).toMatchObject({
+      selected: true,
+      command: { type: 'updateStyle', style: { lineWidth: 2 } },
+    });
+    expect(surface.groups[1]!.controls.find((control) => control.id === 'extend:right')).toMatchObject({
+      selected: true,
+      command: { type: 'setTrendLineExtend', extend: 'right' },
+    });
+  });
+
+  it('resolves shared properties surface controls for text and fill drawings', () => {
+    const textState = {
+      ...state,
+      selection: { drawingId: 'text' },
+      drawings: [
+        {
+          id: 'text',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#38bdf8',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            fillColor: 'rgba(245, 197, 66, 0.12)',
+            textColor: '#d1d4dc',
+            fontSize: 14,
+            textWrap: true,
+            textMaxWidth: 160 as const,
+          },
+          point: { time: 1, price: 10 },
+          text: 'note',
+          textAlign: 'center' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const surface = resolveUserDrawingPropertiesSurface(textState);
+
+    expect(surface.groups.map((group) => group.id)).toEqual(['line', 'fill', 'text']);
+    expect(surface.groups.find((group) => group.id === 'fill')?.controls.find((control) => control.id === 'fillColor:rgba(245, 197, 66, 0.12)')).toMatchObject({
+      selected: true,
+      command: { type: 'updateStyle', style: { fillColor: 'rgba(245, 197, 66, 0.12)' } },
+    });
+    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textColor:#d1d4dc')).toMatchObject({
+      selected: true,
+      command: { type: 'updateStyle', style: { textColor: '#d1d4dc' } },
+    });
+    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textAlign:center')).toMatchObject({
+      selected: true,
+      command: { type: 'setTextAlign', textAlign: 'center' },
+    });
+    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textWrap:true')).toMatchObject({
+      selected: true,
+      command: { type: 'updateStyle', style: { textWrap: true } },
+    });
+  });
+
+  it('resolves locked and targeted properties surfaces', () => {
+    const lockedState = {
+      ...state,
+      selection: { drawingId: 'selected' },
+      drawings: [
+        {
+          id: 'selected',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+        {
+          id: 'locked',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f23645', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 11,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    expect(resolveUserDrawingPropertiesSurface(lockedState, 'locked')).toMatchObject({
+      drawing: { id: 'locked' },
+      editable: false,
+    });
+    expect(resolveUserDrawingPropertiesSurface(lockedState, 'missing')).toEqual({
+      drawing: null,
+      editable: false,
+      groups: [],
+    });
+  });
+
+  it('keeps properties surface fill color and fill visibility support separate', () => {
+    const riskRewardState = {
+      ...state,
+      selection: { drawingId: 'long' },
+      drawings: [
+        {
+          id: 'long',
+          kind: 'longPosition' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#38bdf8',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            fillVisible: true,
+          },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+            { time: 2, price: 95 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const fillControls = resolveUserDrawingPropertiesSurface(riskRewardState)
+      .groups.find((group) => group.id === 'fill')
+      ?.controls.map((control) => control.id);
+
+    expect(fillControls).toEqual(['lineVisible:true', 'fillVisible:true']);
+  });
+
+  it('matches properties surface colors case-insensitively', () => {
+    const colorState = {
+      ...state,
+      selection: { drawingId: 'text' },
+      drawings: [
+        {
+          id: 'text',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#38BDF8',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            fillColor: 'RGBA(245, 197, 66, 0.12)',
+            textColor: '#D1D4DC',
+          },
+          point: { time: 1, price: 10 },
+          text: 'note',
+          textAlign: 'center' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const surface = resolveUserDrawingPropertiesSurface(colorState);
+
+    expect(surface.groups[0]!.controls.find((control) => control.id === 'lineColor:#38bdf8')).toMatchObject({
+      selected: true,
+    });
+    expect(
+      surface.groups.find((group) => group.id === 'fill')?.controls.find((control) => control.id === 'fillColor:rgba(245, 197, 66, 0.12)'),
+    ).toMatchObject({
+      selected: true,
+    });
+    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textColor:#d1d4dc')).toMatchObject({
+      selected: true,
+    });
   });
 });

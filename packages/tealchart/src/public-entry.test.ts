@@ -206,6 +206,7 @@ import {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
+  resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
   resolveAnchoredVolumeProfileFromAnchor,
@@ -309,6 +310,7 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingObjectTreeModel).toBeTypeOf('function');
     expect(resolveUserDrawingObjectTreeActionCommands).toBeTypeOf('function');
     expect(resolveUserDrawingPropertiesIntent).toBeTypeOf('function');
+    expect(resolveUserDrawingPropertiesSurface).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
