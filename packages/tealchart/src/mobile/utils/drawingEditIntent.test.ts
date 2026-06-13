@@ -1,4 +1,10 @@
-import type { DrawingCoordinateSpace, UserDrawing, UserDrawingState, UserDrawingStyle } from '../../drawings';
+import type {
+  DrawingCoordinateSpace,
+  UserDrawing,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingTextAnnotationKind,
+} from '../../drawings';
 
 import { describe, expect, it } from 'vitest';
 
@@ -47,6 +53,47 @@ function createHorizontalLine(overrides: Partial<Extract<UserDrawing, { kind: 'h
   };
 }
 
+function createTextAnnotation(kind: UserDrawingTextAnnotationKind): UserDrawing {
+  const base = {
+    id: kind,
+    kind,
+    paneId: 'main',
+    visible: true,
+    locked: false,
+    createdAt: 1,
+    updatedAt: 1,
+    style,
+    text: 'Note',
+    textAlign: 'center' as const,
+  };
+
+  if (kind === 'anchoredText' || kind === 'anchoredNote') {
+    return {
+      ...base,
+      position: { x: 0.5, y: 0.5 },
+    } as UserDrawing;
+  }
+
+  if (kind === 'callout' || kind === 'priceNote') {
+    return {
+      ...base,
+      points: [
+        { time: 35, price: 65 },
+        { time: 50, price: 50 },
+      ],
+    } as UserDrawing;
+  }
+
+  return {
+    ...base,
+    point: { time: 50, price: 50 },
+  } as UserDrawing;
+}
+
+function textHitPoint(kind: UserDrawingTextAnnotationKind): { x: number; y: number } {
+  return kind === 'balloon' ? { x: 50, y: 25 } : { x: 50, y: 50 };
+}
+
 function stateWith(drawings: readonly UserDrawing[], overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return createUserDrawingState({
     drawings,
@@ -73,6 +120,44 @@ describe('mobile user drawing edit intent', () => {
       editable: true,
       drawing: expect.objectContaining({ id: 'line', kind: 'horizontalLine' }),
     });
+  });
+
+  it('applies double-tap text edit intent for every text annotation kind', () => {
+    const kinds: UserDrawingTextAnnotationKind[] = [
+      'textLabel',
+      'note',
+      'callout',
+      'comment',
+      'anchoredText',
+      'anchoredNote',
+      'priceLabel',
+      'priceNote',
+      'emoji',
+      'sticker',
+      'balloon',
+      'signpost',
+    ];
+
+    for (const kind of kinds) {
+      const result = resolveMobileUserDrawingDoubleTapEditIntent(
+        stateWith([createTextAnnotation(kind)]),
+        textHitPoint(kind),
+        spacesByPaneId,
+        {
+          hitTest: {
+            labelWidth: 64,
+            labelHeight: 24,
+            measureTextLabelLine: (_drawing, line) => line.length * 7,
+          },
+        },
+      );
+
+      expect(result.intent.type, kind).toBe('text');
+      expect(result.changed, kind).toBe(true);
+      expect(result.propertiesIntent, kind).toBeNull();
+      expect(result.state.selection, kind).toEqual({ drawingId: kind });
+      expect(result.state.textEdit, kind).toMatchObject({ drawingId: kind, value: 'Note' });
+    }
   });
 
   it('returns pane fallback without mutating state when double-tap misses drawings', () => {

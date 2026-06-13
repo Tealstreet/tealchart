@@ -137,4 +137,62 @@ describe('TealchartWidgetUI user drawing text editor', () => {
     expect(document.querySelector('textarea[data-tealchart-user-drawing-text-editor="true"]')).toBeNull();
     ui.dispose();
   });
+
+  it('renders an editor for callout text edits at the text anchor', () => {
+    stubCanvasContext();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const calloutState: UserDrawingState = {
+      ...drawingState,
+      selection: { drawingId: 'callout' },
+      textEdit: {
+        drawingId: 'callout',
+        value: 'Draft callout',
+        originalValue: 'Callout',
+        startedAt: 1,
+      },
+      drawings: [
+        {
+          id: 'callout',
+          kind: 'callout',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            textColor: '#ffffff',
+            fontSize: 14,
+          },
+          points: [
+            { time: 35, price: 65 },
+            { time: 50, price: 50 },
+          ],
+          text: 'Callout',
+          textAlign: 'center',
+        },
+      ],
+    };
+    const ui = new TealchartWidgetUI({
+      container,
+      chartKey: 'callout-text-edit-ui',
+      symbol: 'BTCUSDT',
+      interval: '60',
+      showTopBar: false,
+      userDrawingState: calloutState,
+    });
+
+    ui.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    ui.setUserDrawingState(calloutState);
+
+    const editor = document.querySelector<HTMLTextAreaElement>('textarea[data-tealchart-user-drawing-text-editor="true"]');
+    expect(editor).not.toBeNull();
+    expect(editor?.value).toBe('Draft callout');
+    expect(editor?.style.left).not.toBe('');
+    expect(editor?.style.top).not.toBe('');
+    ui.dispose();
+  });
 });

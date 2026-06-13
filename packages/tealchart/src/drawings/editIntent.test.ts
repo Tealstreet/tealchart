@@ -1,5 +1,5 @@
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { UserDrawing, UserDrawingState, UserDrawingStyle } from './types';
+import type { UserDrawing, UserDrawingState, UserDrawingStyle, UserDrawingTextAnnotationKind } from './types';
 
 import { describe, expect, it } from 'vitest';
 
@@ -49,6 +49,47 @@ function createText(overrides: Partial<Extract<UserDrawing, { kind: 'textLabel' 
     textAlign: 'center',
     ...overrides,
   };
+}
+
+function createTextAnnotation(kind: UserDrawingTextAnnotationKind): UserDrawing {
+  const base = {
+    id: kind,
+    kind,
+    paneId: 'main',
+    visible: true,
+    locked: false,
+    createdAt: 1,
+    updatedAt: 1,
+    style,
+    text: 'Note',
+    textAlign: 'center' as const,
+  };
+
+  if (kind === 'anchoredText' || kind === 'anchoredNote') {
+    return {
+      ...base,
+      position: { x: 0.5, y: 0.5 },
+    } as UserDrawing;
+  }
+
+  if (kind === 'callout' || kind === 'priceNote') {
+    return {
+      ...base,
+      points: [
+        { time: 35, price: 65 },
+        { time: 50, price: 50 },
+      ],
+    } as UserDrawing;
+  }
+
+  return {
+    ...base,
+    point: { time: 50, price: 50 },
+  } as UserDrawing;
+}
+
+function textHitPoint(kind: UserDrawingTextAnnotationKind): { x: number; y: number } {
+  return kind === 'balloon' ? { x: 50, y: 25 } : { x: 50, y: 50 };
 }
 
 function createRectangle(overrides: Partial<Extract<UserDrawing, { kind: 'rectangle' }>> = {}): UserDrawing {
@@ -103,6 +144,46 @@ describe('user drawing edit intent', () => {
     expect(intent.commands.map((command) => command.type)).toEqual(['selectAtPoint', 'beginTextEdit']);
     expect(intent.commands[0]).toMatchObject({ meta: { source: 'pointer' } });
     expect(intent.commands[1]).toMatchObject({ drawingId: 'label', meta: { source: 'pointer' } });
+  });
+
+  it('resolves every text annotation kind to text edit intent', () => {
+    const kinds: UserDrawingTextAnnotationKind[] = [
+      'textLabel',
+      'note',
+      'callout',
+      'comment',
+      'anchoredText',
+      'anchoredNote',
+      'priceLabel',
+      'priceNote',
+      'emoji',
+      'sticker',
+      'balloon',
+      'signpost',
+    ];
+
+    for (const kind of kinds) {
+      const intent = resolveUserDrawingEditIntentAtPoint(
+        stateWith([createTextAnnotation(kind)]),
+        textHitPoint(kind),
+        spacesByPaneId,
+        {
+          source: 'pointer',
+          hitTest: {
+            labelWidth: 64,
+            labelHeight: 24,
+            measureTextLabelLine: (_drawing, line) => line.length * 7,
+          },
+        },
+      );
+
+      expect(intent.type, kind).toBe('text');
+      if (intent.type === 'text') {
+        expect(intent.drawing.kind).toBe(kind);
+        expect(intent.commands.map((command) => command.type)).toEqual(['selectAtPoint', 'beginTextEdit']);
+        expect(intent.commands[1]).toMatchObject({ drawingId: kind, meta: { source: 'pointer' } });
+      }
+    }
   });
 
   it('resolves non-text drawing body hits to properties intent', () => {
