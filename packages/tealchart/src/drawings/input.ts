@@ -987,6 +987,7 @@ export function beginUserDrawingPlacementDrag(
       positions: point.position ? [normalizeUserDrawingPanePosition(point.position)] : undefined,
       style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
       text: options.text,
+      barsPatternBars: state.activeTool === 'barsPattern' ? point.bars : undefined,
       startedAt: options.now?.() ?? Date.now(),
     },
     textEdit: null,
