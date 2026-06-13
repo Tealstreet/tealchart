@@ -57,6 +57,22 @@ const expandedDragPlacementTools: UserDrawingTool[] = [
   'forecast',
   'callout',
   'priceNote',
+  'fibRetracement',
+  'fibExtension',
+  'fibFan',
+  'fibSpeedResistanceFan',
+  'fibArcs',
+  'fibSpeedResistanceArcs',
+  'fibCircles',
+  'fibSpiral',
+  'gannFan',
+  'gannBox',
+  'gannSquare',
+  'gannSquareFixed',
+  'fibTimeZone',
+  'cyclicLines',
+  'timeCycles',
+  'sineLine',
 ];
 const space: DrawingCoordinateSpace = {
   viewport: {
