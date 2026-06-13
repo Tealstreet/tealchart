@@ -193,6 +193,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
   /** Called when the selected drawing properties should open */
   onUserDrawingPropertiesOpen?: () => void;
+  /** Called when the drawing object tree should open */
+  onUserDrawingObjectTreeOpen?: () => void;
   /** Called when the active user drawing text editor changes */
   onUserDrawingTextEditChange?: (value: string) => void;
   /** Called when the active user drawing text editor should commit */
@@ -328,6 +330,7 @@ export class TealchartWidgetUI {
         onUserDrawingVisibilityChange: options.onUserDrawingVisibilityChange,
         onUserDrawingLockedChange: options.onUserDrawingLockedChange,
         onUserDrawingPropertiesOpen: options.onUserDrawingPropertiesOpen,
+        onUserDrawingObjectTreeOpen: options.onUserDrawingObjectTreeOpen,
         drawingOverlayParent: this.overlayRoot,
         layoutCallbacks: options.layoutCallbacks,
       });

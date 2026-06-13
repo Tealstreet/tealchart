@@ -111,6 +111,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
   /** Callback when selected drawing properties should open */
   onUserDrawingPropertiesOpen?: () => void;
+  /** Callback when the drawing object tree should open */
+  onUserDrawingObjectTreeOpen?: () => void;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
   /** Optional overlay root for drawing rail/flyout DOM. Falls back to the top bar parent. */
@@ -610,6 +612,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private handleSelectedActionSurfaceItemClick(item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number]): void {
     if (item.command.type === 'openProperties') {
       this.options.onUserDrawingPropertiesOpen?.();
+      return;
+    }
+
+    if (item.command.type === 'openObjectTree') {
+      this.options.onUserDrawingObjectTreeOpen?.();
       return;
     }
 

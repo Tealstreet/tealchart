@@ -1501,6 +1501,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(surface.groups.map((group) => group.id)).toEqual(['primary', 'style', 'arrange', 'visibility']);
     expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
       ['openProperties', true, false],
+      ['openObjectTree', true, false],
       ['duplicateSelected', true, false],
       ['deleteSelected', true, true],
     ]);
