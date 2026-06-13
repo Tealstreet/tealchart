@@ -1830,7 +1830,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         options: {
           createId: createUserDrawingId,
         },
-        meta: { source: 'touch', transactionKey: 'path-drag' },
+        meta: { source: 'touch' },
       });
       return;
     }

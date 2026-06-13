@@ -88,7 +88,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Shift constraints for cycle/wave tools |
 | Geometric shapes | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
 | Geometric shapes | `doubleCurve` | 4 | `multi-point-click` | `partial` | Placement previews, properties |
-| Brushes | `path`, `brush`, `highlighter` | 3 currently | `freehand-drag` | `partial` | Real sampled path model, history grouping |
+| Brushes | `path`, `brush`, `highlighter` | sampled path | `freehand-drag` | `partial` | Smoothing, pressure/stroke properties, object tree polish |
 | Annotation | `textLabel`, `note`, `comment`, `anchoredText`, `anchoredNote`, `priceLabel`, `pin`, `emoji`, `sticker`, `balloon`, `signpost`, `table` | 1 | `one-point` or `anchored-pane` | `partial` | Floating toolbar, properties, object tree |
 | Annotation | `callout`, `priceNote`, `image` | 2 | `two-point-drag-click` | `partial` | Properties |
 | Forecasting/measurement | `priceRange`, `dateRange`, `datePriceRange`, `forecast`, `fixedRangeVolumeProfile` | 2 | `two-point-drag-click` or `computed-special` | `partial` | Computed settings/properties |
@@ -136,9 +136,10 @@ summary:
 
 ## Open Classification Questions
 
-- `path`, `brush`, and `highlighter` currently use a fixed anchor count in the
-  type contract. TradingView-grade behavior should probably move these to a
-  sampled freehand path model with undo transaction grouping.
+- `path`, `brush`, and `highlighter` use sampled freehand drag input with undo
+  transaction grouping on both web Canvas and mobile Skia. TradingView-grade
+  behavior still needs smoothing, pressure/stroke properties, and richer style
+  presets.
 - `anchoredText` and `anchoredNote` currently share one-anchor input semantics,
   but their long-term behavior should be treated as `anchored-pane` placement.
 - `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars
