@@ -83,7 +83,14 @@ describe('mobile drawing handle command dispatch', () => {
 
   it('routes representative mobile style, visibility, and table commands through shared dispatch', () => {
     const state = createMobileStateWithTable();
-    const styleResult = dispatchMobileUserDrawingHandleCommand(state, {
+    const namedResult = dispatchMobileUserDrawingHandleCommand(state, {
+      type: 'setName',
+      drawingId: 'table',
+      name: 'Mobile metrics',
+      options: { now: () => 30 },
+      meta: { source: 'api' },
+    });
+    const styleResult = dispatchMobileUserDrawingHandleCommand(namedResult.state, {
       type: 'updateStyle',
       style: { lineColor: '#00ff88' },
       options: { now: () => 31 },
@@ -104,11 +111,14 @@ describe('mobile drawing handle command dispatch', () => {
       meta: { source: 'api' },
     });
 
+    expect(namedResult.changed).toBe(true);
+    expect(namedResult.state.drawings[0]).toMatchObject({ name: 'Mobile metrics' });
     expect(styleResult.changed).toBe(true);
     expect(tableResult.changed).toBe(true);
     expect(hiddenResult.changed).toBe(true);
     expect(hiddenResult.state.selection).toBeNull();
     expect(hiddenResult.state.drawings[0]).toMatchObject({
+      name: 'Mobile metrics',
       visible: false,
       style: expect.objectContaining({ lineColor: '#00ff88' }),
     });
