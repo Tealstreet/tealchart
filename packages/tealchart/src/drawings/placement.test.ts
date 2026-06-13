@@ -19,6 +19,7 @@ const space: DrawingCoordinateSpace = {
 
 const dragTwoAnchorTools: UserDrawingTool[] = [
   'trendLine',
+  'trendAngle',
   'extendedLine',
   'infoLine',
   'arrowLine',
@@ -92,18 +93,21 @@ describe('user drawing placement modes', () => {
     expect(constrained.anchor).toEqual({ time: 30, price: 70 });
   });
 
-  it('snaps line placement drags to 45-degree visual increments', () => {
-    const constrained = resolveUserDrawingPlacementConstraint({
-      tool: 'trendLine',
-      startPoint: point(10, 90),
-      currentPoint: point(40, 80),
-      spacesByPaneId: new Map([['main', space]]),
-      options: { constrainedPlacement: true },
-    });
+  it.each(['trendLine', 'trendAngle'] satisfies UserDrawingTool[])(
+    'snaps %s placement drags to 45-degree visual increments',
+    (tool) => {
+      const constrained = resolveUserDrawingPlacementConstraint({
+        tool,
+        startPoint: point(10, 90),
+        currentPoint: point(40, 80),
+        spacesByPaneId: new Map([['main', space]]),
+        options: { constrainedPlacement: true },
+      });
 
-    expect(constrained.anchor.time).toBeCloseTo(41.6227766);
-    expect(constrained.anchor.price).toBeCloseTo(90);
-  });
+      expect(constrained.anchor.time).toBeCloseTo(41.6227766);
+      expect(constrained.anchor.price).toBeCloseTo(90);
+    },
+  );
 
   it('leaves placement unchanged when constraints are disabled or unsupported', () => {
     const current = point(30, 80);
