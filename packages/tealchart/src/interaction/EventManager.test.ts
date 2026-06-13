@@ -119,6 +119,36 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('keeps handled mouse drawing input from triggering pane double-click routing', () => {
+    const container = createContainer();
+    const getPaneAtY = vi.fn(() => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 600 }));
+    const onPaneDoubleClick = vi.fn();
+    const onDrawingInput = vi
+      .fn()
+      .mockReturnValueOnce({ handled: true })
+      .mockReturnValueOnce({ handled: true });
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getPaneAtY,
+        onDrawingInput,
+        onPaneDoubleClick,
+      }),
+    );
+
+    vi.setSystemTime(1_000);
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    vi.setSystemTime(1_100);
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+
+    expect(onDrawingInput).toHaveBeenCalledTimes(2);
+    expect(onPaneDoubleClick).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
   it('starts pending drawing drags after pointer movement', () => {
     const container = createContainer();
     const onDrawingInput = vi.fn(() => true);
@@ -296,6 +326,51 @@ describe('EventManager drawing drag routing', () => {
     }
     expect(onDrawingDragStart).toHaveBeenCalledOnce();
     expect(onDrawingDragMove).toHaveBeenCalledOnce();
+
+    manager.dispose();
+  });
+
+  it('lets drawing input preserve or release touch double-tap edit routing', () => {
+    const container = createContainer();
+    const getPaneAtY = vi.fn(() => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 600 }));
+    const onPaneDoubleClick = vi.fn();
+    const onDrawingInput = vi
+      .fn()
+      .mockReturnValueOnce({ handled: true })
+      .mockReturnValueOnce({ handled: true })
+      .mockReturnValueOnce({ handled: true, allowPaneDoubleClick: true })
+      .mockReturnValueOnce({ handled: true, allowPaneDoubleClick: true });
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getPaneAtY,
+        onDrawingInput,
+        onPaneDoubleClick,
+      }),
+    );
+
+    const firstTouch = createTouch(container, { clientX: 100, clientY: 100 });
+    vi.setSystemTime(1_000);
+    dispatchTouchEvent(container, 'touchstart', [firstTouch], [firstTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [firstTouch]);
+    vi.setSystemTime(1_100);
+    dispatchTouchEvent(container, 'touchstart', [firstTouch], [firstTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [firstTouch]);
+
+    expect(onDrawingInput).toHaveBeenCalledTimes(2);
+    expect(onPaneDoubleClick).not.toHaveBeenCalled();
+
+    const secondTouch = createTouch(container, { clientX: 120, clientY: 120 });
+    vi.setSystemTime(2_000);
+    dispatchTouchEvent(container, 'touchstart', [secondTouch], [secondTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [secondTouch]);
+    vi.setSystemTime(2_100);
+    dispatchTouchEvent(container, 'touchstart', [secondTouch], [secondTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [secondTouch]);
+
+    expect(onDrawingInput).toHaveBeenCalledTimes(4);
+    expect(onPaneDoubleClick).toHaveBeenCalledOnce();
+    expect(onPaneDoubleClick).toHaveBeenCalledWith('main', { x: 120, y: 120 });
 
     manager.dispose();
   });

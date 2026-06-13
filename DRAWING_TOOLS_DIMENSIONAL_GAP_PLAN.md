@@ -684,6 +684,11 @@ Phase 2: Web interaction tests
 
 - Cover mouse placement, selection toolbar, context menu, object tree actions,
   keyboard shortcuts, and double-click edit.
+- Status: web EventManager tests now cover drawing-input first refusal for
+  mouse double-click and touch double-tap edit routing, including the touch
+  `allowPaneDoubleClick` release path. This pairs with the mobile double-tap
+  edit-intent tests that resolve selection, properties, text edit, and pane
+  fallback behavior through the same shared intent commands.
 
 Phase 3: Mobile interaction/model tests
 
