@@ -83,9 +83,9 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Channels | `parallelChannel`, `regressionTrend`, `flatTopBottom` | 3 | `multi-point-click` | `partial` | Placement previews, command history |
 | Channels | `disjointChannel` | 4 | `multi-point-click` | `partial` | Placement previews, object tree |
 | Pitchforks | `pitchfork`, `schiffPitchfork`, `modifiedSchiffPitchfork`, `insidePitchfork`, `pitchfan` | 3 | `multi-point-click` | `partial` | Placement previews, style/property surface |
-| Gann/Fibonacci | `fibRetracement`, `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`, `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`, `gannSquare`, `gannSquareFixed`, `fibTimeZone` | 2 | `two-point-drag-click` | `partial` | Drag-to-draw, properties |
+| Gann/Fibonacci | `fibRetracement`, `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`, `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`, `gannSquare`, `gannSquareFixed`, `fibTimeZone` | 2 | `two-point-drag-click` | `partial` | Properties |
 | Gann/Fibonacci | `trendBasedFibExtension`, `fibWedge`, `fibChannel`, `trendBasedFibTime` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
-| Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Drag-to-draw, Shift constraints |
+| Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Shift constraints for cycle/wave tools |
 | Geometric shapes | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
 | Geometric shapes | `doubleCurve` | 4 | `multi-point-click` | `partial` | Placement previews, properties |
 | Brushes | `path`, `brush`, `highlighter` | 3 currently | `freehand-drag` | `partial` | Real sampled path model, history grouping |

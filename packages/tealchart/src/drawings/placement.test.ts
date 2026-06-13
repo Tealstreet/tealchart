@@ -33,6 +33,22 @@ const dragTwoAnchorTools: UserDrawingTool[] = [
   'forecast',
   'callout',
   'priceNote',
+  'fibRetracement',
+  'fibExtension',
+  'fibFan',
+  'fibSpeedResistanceFan',
+  'fibArcs',
+  'fibSpeedResistanceArcs',
+  'fibCircles',
+  'fibSpiral',
+  'gannFan',
+  'gannBox',
+  'gannSquare',
+  'gannSquareFixed',
+  'fibTimeZone',
+  'cyclicLines',
+  'timeCycles',
+  'sineLine',
 ];
 
 function point(time: number, price: number): UserDrawingInputPoint {
