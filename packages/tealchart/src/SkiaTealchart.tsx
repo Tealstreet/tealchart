@@ -2075,6 +2075,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               }
               return;
             }
+            if (item.command.type === 'openObjectTree') {
+              onUserDrawingObjectTreeOpen?.(resolveUserDrawingObjectTreeModel(userDrawingStateRef.current));
+              return;
+            }
             if (item.command.type === 'updateStyle') {
               dispatchUserDrawingCommandToState({
                 type: 'updateStyle',
@@ -2119,6 +2123,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
       notifyUserDrawingCommand,
+      onUserDrawingObjectTreeOpen,
       onUserDrawingPropertiesOpen,
       userDrawingSpacesByPaneId,
       viewport,
@@ -4649,6 +4654,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                         if (intent) {
                           onUserDrawingPropertiesOpen?.(intent);
                         }
+                        return;
+                      }
+                      if (item.command.type === 'openObjectTree') {
+                        onUserDrawingObjectTreeOpen?.(resolveUserDrawingObjectTreeModel(userDrawingStateRef.current));
                         return;
                       }
                       if (item.command.type === 'styleAction') {

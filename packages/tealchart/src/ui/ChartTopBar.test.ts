@@ -130,6 +130,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onClear = vi.fn();
     const onZOrder = vi.fn();
     const onProperties = vi.fn();
+    const onObjectTree = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-actions',
       symbol: 'BTCUSDT',
@@ -187,10 +188,12 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingClearAll: onClear,
       onUserDrawingZOrderChange: onZOrder,
       onUserDrawingPropertiesOpen: onProperties,
+      onUserDrawingObjectTreeOpen: onObjectTree,
     });
     topBar.mount(document.body);
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing forward"]')?.click();
@@ -201,6 +204,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
 
     expect(onProperties).toHaveBeenCalledTimes(1);
+    expect(onObjectTree).toHaveBeenCalledTimes(1);
     expect(onDuplicate).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
