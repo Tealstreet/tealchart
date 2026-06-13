@@ -233,11 +233,13 @@ export type {
 } from './history';
 export {
   beginUserDrawingTextEdit,
+  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   appendUserDrawingPathDragPoint,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
@@ -276,6 +278,8 @@ export type {
   UserDrawingInputOptions,
   UserDrawingImageSourceInput,
   UserDrawingInputPoint,
+  UserDrawingPlacementDragCommitOptions,
+  UserDrawingPlacementDragStartOptions,
   UserDrawingPathDragOptions,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
@@ -287,6 +291,11 @@ export type {
   UpdateUserDrawingOptions,
   UserDrawingZOrderAction,
 } from './input';
+export {
+  getUserDrawingPlacementMode,
+  isUserDrawingDragPlacementTool,
+} from './placement';
+export type { UserDrawingPlacementMode } from './placement';
 export {
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingVisualPriceRangeMetrics,

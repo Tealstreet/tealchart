@@ -131,6 +131,40 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
   });
 
+  it('records mobile two-anchor placement drag as one undoable drawing creation', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    let history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch', transactionKey: 'placement-drag' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(started.history.undoStack).toHaveLength(0);
+    expect(started.state.draft?.anchors).toEqual([anchorA]);
+
+    history = started.history;
+    const committed = dispatchMobileUserDrawingHistoryCommand(started.state, history, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'rect', now: () => 42, style },
+      meta: { source: 'touch', transactionKey: 'placement-drag' },
+    });
+
+    expect(committed.changed).toBe(true);
+    expect(committed.history.undoStack).toHaveLength(1);
+    expect(committed.state.drawings[0]).toMatchObject({
+      id: 'rect',
+      kind: 'rectangle',
+      points: [anchorA, anchorB],
+    });
+
+    const undo = undoUserDrawingCommand(committed.state, committed.history);
+    expect(undo.changed).toBe(true);
+    expect(undo.state.drawings).toEqual([]);
+  });
+
   it('records mobile edit-drag moves as one coalesced undo entry', () => {
     const state = createMobileStateWithTrendLine();
     let history = createUserDrawingCommandHistory();

@@ -165,6 +165,13 @@ Phase 3: Mobile adapter tests
 Goal: replace click-only placement for shape tools with real drawing gestures
 while preserving click-to-place workflows where appropriate.
 
+Status: initial slice in progress. Shared placement modes and two-anchor drag
+placement commands exist for `trendLine`, `extendedLine`, `infoLine`,
+`arrowLine`, `arrowMarker`, `ray`, `rectangle`, `circle`, and `ellipse`; web
+Canvas and mobile Skia route those tools through matching drag preview/commit
+flows. Remaining Gap 3 work should expand tool coverage, constraints, cancel
+behavior, and event-level regression coverage.
+
 ### Epic 3.1: Shared Placement State Machine
 
 Phase 1: Placement mode registry

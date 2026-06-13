@@ -29,6 +29,7 @@ import {
 import { hitTestUserDrawings } from './hitTesting';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
 import type { UserDrawingHitTestOptions } from './hitTesting';
+import { isUserDrawingDragPlacementTool } from './placement';
 
 export interface UserDrawingInputPoint {
   paneId: string;
@@ -92,6 +93,14 @@ export interface UserDrawingPathDragOptions {
   now?: () => number;
   style?: UserDrawingStyle;
 }
+
+export interface UserDrawingPlacementDragStartOptions {
+  now?: () => number;
+  style?: UserDrawingStyle;
+  text?: string;
+}
+
+export type UserDrawingPlacementDragCommitOptions = UserDrawingInputOptions;
 
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
@@ -857,6 +866,47 @@ export function beginUserDrawingPathDrag(
     },
     textEdit: null,
   };
+}
+
+export function beginUserDrawingPlacementDrag(
+  state: UserDrawingState,
+  point: UserDrawingInputPoint,
+  options: UserDrawingPlacementDragStartOptions = {},
+): UserDrawingState {
+  if (!isUserDrawingDragPlacementTool(state.activeTool)) return state;
+
+  return {
+    ...state,
+    selection: null,
+    draft: {
+      tool: state.activeTool,
+      paneId: point.paneId,
+      anchors: [point.anchor],
+      positions: point.position ? [normalizeUserDrawingPanePosition(point.position)] : undefined,
+      style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
+      text: options.text,
+      startedAt: options.now?.() ?? Date.now(),
+    },
+    textEdit: null,
+  };
+}
+
+export function commitUserDrawingPlacementDrag(
+  state: UserDrawingState,
+  point: UserDrawingInputPoint,
+  options: UserDrawingPlacementDragCommitOptions,
+): UserDrawingState {
+  const draft = state.draft;
+  if (
+    !isUserDrawingDragPlacementTool(state.activeTool) ||
+    !draft ||
+    draft.tool !== state.activeTool ||
+    draft.paneId !== point.paneId
+  ) {
+    return state;
+  }
+
+  return handleUserDrawingInput(state, point, options);
 }
 
 export function appendUserDrawingPathDragPoint(

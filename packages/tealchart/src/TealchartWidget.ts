@@ -1026,6 +1026,8 @@ export class TealchartWidget {
       onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
       onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
+      onUserDrawingPlacementDragStart: (point) => this._handleUserDrawingPlacementDragStart(point),
+      onUserDrawingPlacementDragEnd: (point) => this._handleUserDrawingPlacementDragEnd(point),
       onUserDrawingPathDragStart: (point) => this._handleUserDrawingPathDragStart(point),
       onUserDrawingPathDragMove: (point) => this._handleUserDrawingPathDragMove(point),
       onUserDrawingPathDragEnd: () => this._handleUserDrawingPathDragEnd(),
@@ -2452,6 +2454,25 @@ export class TealchartWidget {
         createId: () => this._createUserDrawingId(),
       },
       meta: { source: 'pointer' },
+    });
+  }
+
+  private _handleUserDrawingPlacementDragStart(point: UserDrawingInputPoint): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'beginPlacementDrag',
+      point,
+      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+    });
+  }
+
+  private _handleUserDrawingPlacementDragEnd(point: UserDrawingInputPoint): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'commitPlacementDrag',
+      point,
+      options: {
+        createId: () => this._createUserDrawingId(),
+      },
+      meta: { source: 'pointer', transactionKey: 'placement-drag' },
     });
   }
 
