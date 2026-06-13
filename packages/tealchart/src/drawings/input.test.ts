@@ -189,6 +189,23 @@ describe('user drawing input controller', () => {
     ).toBe(horizontalLineState);
   });
 
+  it('cancels two-anchor drag placement when the drag never reaches a distinct endpoint', () => {
+    const started = beginUserDrawingPlacementDrag(
+      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { now: () => 10, style },
+    );
+    const cancelled = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorA }, {
+      createId: () => 'drag-rect',
+      now: () => 11,
+      style,
+    });
+
+    expect(cancelled.drawings).toEqual([]);
+    expect(cancelled.draft).toBeNull();
+    expect(cancelled.selection).toBeNull();
+  });
+
   it('commits fixed range volume profiles from two anchors', () => {
     const options = { createId: () => 'volume-profile', now: () => 21 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'fixedRangeVolumeProfile'), {

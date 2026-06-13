@@ -165,6 +165,27 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings).toEqual([]);
   });
 
+  it('does not record a mobile placement drag that ends at the start anchor', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch', transactionKey: 'placement-drag' },
+    });
+    const cancelled = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'rect', now: () => 42, style },
+      meta: { source: 'touch', transactionKey: 'placement-drag' },
+    });
+
+    expect(cancelled.changed).toBe(true);
+    expect(cancelled.history.undoStack).toHaveLength(0);
+    expect(cancelled.state.drawings).toEqual([]);
+    expect(cancelled.state.draft).toBeNull();
+  });
+
   it('records mobile edit-drag moves as one coalesced undo entry', () => {
     const state = createMobileStateWithTrendLine();
     let history = createUserDrawingCommandHistory();

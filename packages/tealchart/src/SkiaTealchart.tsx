@@ -130,6 +130,10 @@ import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { resolveMobileUserDrawingFontFamily } from './mobile/utils/drawingFonts';
+import {
+  isMobileChartGestureLayerEnabled,
+  isMobileCrosshairPanGestureEnabled,
+} from './mobile/utils/drawingGestureMode';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
 import {
   exportMobileUserDrawingStateForLayout,
@@ -1504,7 +1508,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     bars,
     viewport,
     onViewportChange: handleViewportChange,
-    enabled: !crosshairVisible,
+    enabled: isMobileChartGestureLayerEnabled(effectiveUserDrawingState.activeTool, crosshairVisible),
     onSwipeBlockChange,
     onAutoScaleDisabled: handleAutoScaleDisabled,
     isAutoScale: getIsAutoScale,
@@ -1543,7 +1547,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const crosshairPanGesture = useMemo(
     () =>
       Gesture.Pan()
-        .enabled(crosshairVisible)
+        .enabled(isMobileCrosshairPanGestureEnabled(effectiveUserDrawingState.activeTool, crosshairVisible))
         .onStart((event) => {
           runOnJS(revealResetButtonIfInBottomRegion)(event.x, event.y);
           crosshairDragStartX.value = lastCrosshairPosition.x;
@@ -1561,6 +1565,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         }),
     [
       crosshairVisible,
+      effectiveUserDrawingState.activeTool,
       crosshairDragStartX,
       crosshairDragStartY,
       handleCrosshairMove,
