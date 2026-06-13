@@ -164,6 +164,9 @@ describe('user drawing context actions', () => {
               ...style,
               textColor: '#f5c542',
               fontSize: 14,
+              fontFamily: 'sans-serif',
+              fontWeight: 'normal',
+              fontStyle: 'normal',
             },
             point: { time: 50, price: 50 },
             text: 'Note',
@@ -190,6 +193,21 @@ describe('user drawing context actions', () => {
       groupId: 'style',
       enabled: true,
       command: { type: 'updateStyle', style: { fontSize: 16 } },
+    });
+    expect(result.items.find((item) => item.id === 'fontFamily:serif')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
+    });
+    expect(result.items.find((item) => item.id === 'fontWeight:bold')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontWeight: 'bold' } },
+    });
+    expect(result.items.find((item) => item.id === 'fontStyle:italic')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontStyle: 'italic' } },
     });
   });
 
