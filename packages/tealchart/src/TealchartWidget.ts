@@ -1099,6 +1099,9 @@ export class TealchartWidget {
       onUserDrawingObjectTreeOpen: () => {
         this.openUserDrawingObjectTree();
       },
+      onUserDrawingTextEditOpen: (drawingId) => {
+        this.beginUserDrawingTextEdit(drawingId);
+      },
       onUserDrawingTextEditChange: (value) => this.updateUserDrawingTextEdit(value),
       onUserDrawingTextEditCommit: () => this.commitUserDrawingTextEdit(),
       onUserDrawingTextEditCancel: () => this.cancelUserDrawingTextEdit(),
@@ -2836,6 +2839,11 @@ export class TealchartWidget {
 
     if (command.type === 'openObjectTree') {
       this.openUserDrawingObjectTree();
+      return;
+    }
+
+    if (command.type === 'editText') {
+      this.beginUserDrawingTextEdit(command.drawingId);
       return;
     }
 
