@@ -147,6 +147,52 @@ describe('user drawing context actions', () => {
     });
   });
 
+  it('includes selected text appearance actions for text-capable context targets', () => {
+    const result = resolveUserDrawingContextActionsAtPoint(
+      {
+        ...state,
+        drawings: [
+          {
+            id: 'label',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              ...style,
+              textColor: '#f5c542',
+              fontSize: 14,
+            },
+            point: { time: 50, price: 50 },
+            text: 'Note',
+            textAlign: 'center',
+          },
+        ],
+      },
+      { x: 50, y: 50 },
+      new Map([['main', space]]),
+      { hitTest: { labelWidth: 80, labelHeight: 24 } },
+    );
+
+    expect(result.items.find((item) => item.id === 'textColor:#22c55e')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { textColor: '#22c55e' } },
+    });
+    expect(result.items.find((item) => item.id === 'fontSize:decrease')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 12 } },
+    });
+    expect(result.items.find((item) => item.id === 'fontSize:increase')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 16 } },
+    });
+  });
+
   it('keeps state unchanged when no drawing is hit', () => {
     const result = resolveUserDrawingContextActionsAtPoint(state, { x: 50, y: 5 }, new Map([['main', space]]));
 

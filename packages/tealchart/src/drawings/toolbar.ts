@@ -15,6 +15,7 @@ import type {
 import type { UserDrawingZOrderAction } from './input';
 
 import {
+  DEFAULT_USER_DRAWING_STYLE,
   USER_DRAWING_ICON_NAMES,
   isUserDrawingTextAnnotation,
   USER_DRAWING_FONT_FAMILIES,
@@ -24,6 +25,7 @@ import {
   USER_DRAWING_OPACITIES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
+  normalizeUserDrawingFontSize,
 } from './types';
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
@@ -777,6 +779,23 @@ function getNextUserDrawingFillColor(drawing: UserDrawing): string {
   return USER_DRAWING_FILL_COLOR_DESCRIPTORS[nextIndex]!.fillColor;
 }
 
+function getNextUserDrawingTextColor(drawing: UserDrawing): string {
+  const currentTextColor = drawing.style.textColor?.toLowerCase();
+  const currentIndex = USER_DRAWING_TEXT_COLOR_DESCRIPTORS.findIndex(
+    (descriptor) => descriptor.textColor.toLowerCase() === currentTextColor,
+  );
+  const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % USER_DRAWING_TEXT_COLOR_DESCRIPTORS.length : 0;
+  return USER_DRAWING_TEXT_COLOR_DESCRIPTORS[nextIndex]!.textColor;
+}
+
+function getAdjacentUserDrawingFontSize(drawing: UserDrawing, direction: -1 | 1): number | null {
+  const sizes = USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize);
+  const currentFontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? DEFAULT_USER_DRAWING_STYLE.fontSize!);
+  const currentIndex = sizes.indexOf(currentFontSize);
+  if (currentIndex === -1) return sizes[direction > 0 ? 0 : sizes.length - 1] ?? null;
+  return sizes[currentIndex + direction] ?? null;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -792,6 +811,10 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const nextLineStyle = getNextUserDrawingLineStyle(selectedDrawing);
   const nextFillColor = fillColorEnabled ? getNextUserDrawingFillColor(selectedDrawing) : null;
   const nextFillVisible = selectedDrawing.style.fillVisible === false;
+  const textEnabled = isUserDrawingTextToolbarEnabled(state);
+  const nextTextColor = textEnabled ? getNextUserDrawingTextColor(selectedDrawing) : null;
+  const smallerFontSize = textEnabled ? getAdjacentUserDrawingFontSize(selectedDrawing, -1) : null;
+  const largerFontSize = textEnabled ? getAdjacentUserDrawingFontSize(selectedDrawing, 1) : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -809,6 +832,34 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         label: nextFillVisible ? 'Show selected drawing fill' : 'Hide selected drawing fill',
         enabled: fillVisibilityEnabled,
         command: { type: 'updateStyle', style: { fillVisible: nextFillVisible } },
+      }
+    : null;
+  const textColorItem: UserDrawingSelectedActionSurfaceItem | null = nextTextColor
+    ? {
+        id: `textColor:${nextTextColor}`,
+        icon: '',
+        label: `Cycle selected drawing text color to ${nextTextColor}`,
+        enabled: textEnabled,
+        command: { type: 'updateStyle', style: { textColor: nextTextColor } },
+        swatchColor: nextTextColor,
+      }
+    : null;
+  const smallerFontSizeItem: UserDrawingSelectedActionSurfaceItem | null = textEnabled
+    ? {
+        id: 'fontSize:decrease',
+        icon: '−',
+        label: smallerFontSize === null ? 'Decrease selected drawing font size' : `${smallerFontSize} pixel font size`,
+        enabled: smallerFontSize !== null,
+        command: { type: 'updateStyle', style: smallerFontSize === null ? {} : { fontSize: smallerFontSize } },
+      }
+    : null;
+  const largerFontSizeItem: UserDrawingSelectedActionSurfaceItem | null = textEnabled
+    ? {
+        id: 'fontSize:increase',
+        icon: '+',
+        label: largerFontSize === null ? 'Increase selected drawing font size' : `${largerFontSize} pixel font size`,
+        enabled: largerFontSize !== null,
+        command: { type: 'updateStyle', style: largerFontSize === null ? {} : { fontSize: largerFontSize } },
       }
     : null;
 
@@ -847,6 +898,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       },
       ...(fillColorItem ? [fillColorItem] : []),
       ...(fillVisibilityItem ? [fillVisibilityItem] : []),
+      ...(textColorItem ? [textColorItem] : []),
+      ...(smallerFontSizeItem ? [smallerFontSizeItem] : []),
+      ...(largerFontSizeItem ? [largerFontSizeItem] : []),
     ],
   };
 }

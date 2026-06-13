@@ -1607,6 +1607,69 @@ describe('user drawing toolbar descriptors', () => {
     });
   });
 
+  it('resolves selected text appearance actions for text-capable drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            textColor: '#f5c542',
+            fontSize: 14,
+          },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(styleItems.find((item) => item.id === 'textColor:#22c55e')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textColor: '#22c55e' } },
+      swatchColor: '#22c55e',
+    });
+    expect(styleItems.find((item) => item.id === 'fontSize:decrease')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 12 } },
+    });
+    expect(styleItems.find((item) => item.id === 'fontSize:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 16 } },
+    });
+
+    const defaultSized = {
+      ...selected,
+      drawings: [{ ...selected.drawings[0]!, style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const } }],
+    } satisfies UserDrawingState;
+    const defaultSizeItems = resolveUserDrawingSelectedActionSurface(defaultSized)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(defaultSizeItems.find((item) => item.id === 'fontSize:decrease')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 10 } },
+    });
+    expect(defaultSizeItems.find((item) => item.id === 'fontSize:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 14 } },
+    });
+  });
+
   it('clamps selected action surfaces inside shared safe viewport insets', () => {
     expect(
       resolveUserDrawingActionSurfacePosition({
