@@ -15,6 +15,7 @@ import type { LayoutSelectorCallbacks } from './LayoutSelector';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
   getSelectedUserDrawing,
+  isUserDrawingToolbarActionEnabled,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
   isUserDrawingIconToolbarEnabled,
@@ -1405,11 +1406,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const selectedActionItems = (selectedActionSurface?.groups ?? [])
       .filter((actionGroup) => actionGroup.id !== 'visibility')
       .flatMap((actionGroup) => actionGroup.items);
-    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.slice(6);
+    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
+      (descriptor) => descriptor.action === 'cancelDraft' || descriptor.action === 'clearAll',
+    );
     for (const item of [...selectedActionItems, ...globalActionDescriptors.map((descriptor) => ({
       ...descriptor,
       id: descriptor.action,
-      enabled: state ? descriptor.action === 'cancelDraft' ? state.draft !== null : state.drawings.length > 0 : false,
+      enabled: state ? isUserDrawingToolbarActionEnabled(state, descriptor.action) : false,
       command: { type: 'toolbarAction' as const, action: descriptor.action },
     }))]) {
       const enabled = item.enabled;
