@@ -25,6 +25,7 @@ import {
   isUserDrawingTextAnnotation,
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
+  shouldRenderUserDrawingSelectedActionSurface,
   getUserDrawingToolDescriptor,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -673,10 +674,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeSelectedActionSurface();
     const state = this.options.userDrawingState;
     const anchor = this.options.userDrawingSelectionActionAnchor;
-    if (!state || !anchor) return;
+    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor)) return;
 
     const surface = resolveUserDrawingSelectedActionSurface(state);
-    if (!surface.selectedDrawing) return;
     const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
     const parentRect = parent.getBoundingClientRect();
     const position = resolveUserDrawingActionSurfacePosition({

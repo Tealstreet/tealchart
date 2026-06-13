@@ -399,6 +399,9 @@ Phase 3: Dismissal and focus
 
 - Dismiss on selection clear, Escape, draft start, or outside click.
 - Keep toolbar interactions from causing chart selection misses.
+- Status: selected-action surfaces now use a shared visibility guard so web
+  floating toolbar actions dismiss during transient draft/text-edit states while
+  retaining pointer-event isolation for toolbar clicks.
 
 ### Epic 4.3: Mobile Selection Action Sheet
 
@@ -429,6 +432,9 @@ Phase 3: Dismissal and focus
 
 - Dismiss on selection clear, gesture start, or app-level dismissal.
 - Preserve mobile chart pan/zoom outside the action surface.
+- Status: mobile Skia action strip consumes the same shared visibility guard as
+  web, so transient draft/text-edit states hide selected actions without
+  diverging from Canvas behavior.
 
 ### Epic 4.4: Drawing Context Menu
 

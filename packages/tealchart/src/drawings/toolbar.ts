@@ -13,6 +13,7 @@ import type {
   UserDrawingTool,
 } from './types';
 import type { UserDrawingZOrderAction } from './input';
+import type { UserDrawingSelectionActionAnchor } from './renderModel';
 
 import {
   DEFAULT_USER_DRAWING_STYLE,
@@ -1214,6 +1215,14 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
       }),
     })),
   };
+}
+
+export function shouldRenderUserDrawingSelectedActionSurface(
+  state: UserDrawingState | null | undefined,
+  anchor: UserDrawingSelectionActionAnchor | null | undefined,
+): boolean {
+  if (!state || !anchor || state.draft || state.textEdit) return false;
+  return getSelectedUserDrawing(state) !== null;
 }
 
 function clampNumber(value: number, min: number, max: number): number {
