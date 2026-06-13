@@ -36,6 +36,22 @@ export type UserDrawingToolbarAction =
   | 'cancelDraft'
   | 'clearAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'showSelected' | 'lockSelected' | 'unlockSelected';
+export type UserDrawingSelectedActionSurfaceAction =
+  | Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>
+  | UserDrawingStyleToolbarAction;
+export type UserDrawingSelectedActionSurfaceGroupId = 'primary' | 'arrange' | 'visibility';
+export type UserDrawingSelectedActionSurfaceCommand =
+  | {
+      type: 'toolbarAction';
+      action: Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>;
+    }
+  | {
+      type: 'styleAction';
+      action: UserDrawingStyleToolbarAction;
+      visible?: boolean;
+      locked?: boolean;
+      includeLocked?: boolean;
+    };
 
 export interface UserDrawingToolDescriptor {
   tool: UserDrawingTool;
@@ -155,6 +171,26 @@ export interface UserDrawingStyleToolbarActionDescriptor {
   action: UserDrawingStyleToolbarAction;
   icon: string;
   label: string;
+}
+
+export interface UserDrawingSelectedActionSurfaceItem {
+  id: UserDrawingSelectedActionSurfaceAction;
+  icon: string;
+  label: string;
+  enabled: boolean;
+  command: UserDrawingSelectedActionSurfaceCommand;
+  destructive?: boolean;
+}
+
+export interface UserDrawingSelectedActionSurfaceGroup {
+  id: UserDrawingSelectedActionSurfaceGroupId;
+  label: string;
+  items: readonly UserDrawingSelectedActionSurfaceItem[];
+}
+
+export interface UserDrawingSelectedActionSurface {
+  selectedDrawing: UserDrawing | null;
+  groups: readonly UserDrawingSelectedActionSurfaceGroup[];
 }
 
 export type UserDrawingStyleToolbarActionState =
@@ -596,6 +632,80 @@ export const USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawing
   { action: 'unlockSelected', icon: '🔓', label: 'Unlock selected drawing' },
 ] as const;
 
+const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelectedActionSurfaceGroup[] = [
+  {
+    id: 'primary',
+    label: 'Primary',
+    items: [
+      {
+        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[0]!,
+        id: 'duplicateSelected',
+        enabled: false,
+        command: { type: 'toolbarAction', action: 'duplicateSelected' },
+      },
+      {
+        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[1]!,
+        id: 'deleteSelected',
+        enabled: false,
+        command: { type: 'toolbarAction', action: 'deleteSelected' },
+        destructive: true,
+      },
+    ],
+  },
+  {
+    id: 'arrange',
+    label: 'Arrange',
+    items: [
+      {
+        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[2]!,
+        id: 'bringForward',
+        enabled: false,
+        command: { type: 'toolbarAction', action: 'bringForward' },
+      },
+      {
+        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[3]!,
+        id: 'sendBackward',
+        enabled: false,
+        command: { type: 'toolbarAction', action: 'sendBackward' },
+      },
+      {
+        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[4]!,
+        id: 'bringToFront',
+        enabled: false,
+        command: { type: 'toolbarAction', action: 'bringToFront' },
+      },
+      {
+        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[5]!,
+        id: 'sendToBack',
+        enabled: false,
+        command: { type: 'toolbarAction', action: 'sendToBack' },
+      },
+    ],
+  },
+  {
+    id: 'visibility',
+    label: 'Visibility',
+    items: USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => ({
+      ...descriptor,
+      id: descriptor.action,
+      enabled: false,
+      command: { type: 'styleAction', action: descriptor.action },
+    })),
+  },
+] as const;
+
+function resolveUserDrawingSelectedActionSurfaceStyleCommand(
+  state: UserDrawingState,
+  action: UserDrawingStyleToolbarAction,
+): Extract<UserDrawingSelectedActionSurfaceCommand, { type: 'styleAction' }> {
+  const { enabled: _enabled, ...payload } = resolveUserDrawingStyleToolbarAction(state, action);
+  return {
+    type: 'styleAction',
+    action,
+    ...payload,
+  };
+}
+
 export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawingToolDescriptor {
   return USER_DRAWING_TOOL_DESCRIPTORS.find((descriptor) => descriptor.tool === tool) ?? USER_DRAWING_TOOL_DESCRIPTORS[0]!;
 }
@@ -609,6 +719,29 @@ export function isUserDrawingToolbarActionEnabled(
   if (zOrderAction) return reorderUserDrawings(state, zOrderAction) !== state;
   if (action === 'cancelDraft') return state.draft !== null;
   return state.drawings.length > 0;
+}
+
+export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState): UserDrawingSelectedActionSurface {
+  const selectedDrawing = getSelectedUserDrawing(state);
+  return {
+    selectedDrawing,
+    groups: USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS.map((group) => ({
+      ...group,
+      items: group.items.map((item) => {
+        if (item.command.type === 'styleAction') {
+          return {
+            ...item,
+            enabled: isUserDrawingStyleToolbarActionEnabled(state, item.command.action),
+            command: resolveUserDrawingSelectedActionSurfaceStyleCommand(state, item.command.action),
+          };
+        }
+        return {
+          ...item,
+          enabled: isUserDrawingToolbarActionEnabled(state, item.command.action),
+        };
+      }),
+    })),
+  };
 }
 
 function hasUnlockedSelectedDrawing(state: UserDrawingState): boolean {
