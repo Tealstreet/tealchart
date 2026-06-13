@@ -4624,8 +4624,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           pointerEvents="box-none"
         >
           {userDrawingSelectedActionSurface.groups.map((group, groupIndex) => (
-            <React.Fragment key={group.id}>
-              <View style={styles.userDrawingActionSurfaceGroup}>
+            <View
+              key={group.id}
+              style={[
+                styles.userDrawingActionSurfaceGroup,
+                groupIndex > 0 && styles.userDrawingActionSurfaceGroupSeparated,
+              ]}
+            >
                 {group.items.map((item) => (
                   <TouchableOpacity
                     key={item.id}
@@ -4694,9 +4699,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </View>
-              {groupIndex < userDrawingSelectedActionSurface.groups.length - 1 && <View style={styles.userDrawingActionDivider} />}
-            </React.Fragment>
+            </View>
           ))}
         </View>
       )}
@@ -4845,6 +4848,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+  },
+  userDrawingActionSurfaceGroupSeparated: {
+    borderLeftWidth: 1,
+    borderLeftColor: '#363a45',
+    paddingLeft: 3,
   },
   userDrawingActionButton: {
     width: 24,
