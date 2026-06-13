@@ -652,6 +652,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
+    if (item.command.type === 'setIconName') {
+      this.options.onUserDrawingIconNameChange?.(item.command.iconName);
+      return;
+    }
+
     if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
     if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
     if (
