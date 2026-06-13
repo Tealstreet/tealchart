@@ -213,7 +213,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
           <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
             {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
               const activeCategory = category.tools.includes(userDrawingState.activeTool);
-              const firstTool = getUserDrawingToolDescriptor(category.tools[0]!);
+              const categoryTool = activeCategory ? userDrawingState.activeTool : category.tools[0]!;
+              const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
               const expanded = expandedDrawingCategoryId === category.id;
               return (
                 <Pressable
@@ -229,7 +230,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   ]}
                 >
                   <Text style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}>
-                    {firstTool.icon}
+                    {categoryToolDescriptor.icon}
                   </Text>
                 </Pressable>
               );

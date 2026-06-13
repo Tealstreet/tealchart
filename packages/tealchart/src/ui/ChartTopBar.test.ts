@@ -2,6 +2,7 @@ import type { UserDrawingState } from '../drawings';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { getUserDrawingToolDescriptor } from '../drawings';
 import { clearChartStoreCache } from '../state/chartState';
 import { ChartTopBar } from './ChartTopBar';
 
@@ -94,6 +95,20 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(categoryRail).not.toBeNull();
     expect(overlayParent.contains(categoryRail)).toBe(true);
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
+
+    topBar.unmount();
+  });
+
+  it('shows the active tool icon on its category button', () => {
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-active-category-icon',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, activeTool: 'horizontalLine' },
+    });
+    topBar.mount(document.body);
+
+    const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    expect(linesCategory?.textContent).toBe(getUserDrawingToolDescriptor('horizontalLine').icon);
 
     topBar.unmount();
   });
