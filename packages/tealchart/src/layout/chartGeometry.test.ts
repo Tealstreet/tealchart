@@ -113,4 +113,22 @@ describe('chart geometry', () => {
     expect(snapshot.canvas).toEqual({ x: 0, y: 0, width: 400, height: 300 });
     expect(snapshot.drawable).toEqual({ x: 44, y: 32, width: 306, height: 242 });
   });
+
+  it('positions panes within safe-area-adjusted vertical bounds', () => {
+    const snapshot = computeChartGeometry({
+      width: 400,
+      height: 300,
+      margins: { top: 10, right: 50, bottom: 26, left: 0 },
+      paneLayout,
+      safeAreaInsets: { top: 20, bottom: 8 },
+    });
+
+    expect(snapshot.panes[0].top).toBe(30);
+    expect(snapshot.panes[0].height).toBeCloseTo(165.2);
+    expect(snapshot.panes[0].bottom).toBeCloseTo(195.2);
+    expect(snapshot.panes[1].top).toBeCloseTo(195.2);
+    expect(snapshot.panes[1].height).toBeCloseTo(70.8);
+    expect(snapshot.panes[1].bottom).toBe(266);
+    expect(snapshot.chrome.bottomTimeAxis).toEqual({ x: 0, y: 266, width: 400, height: 26 });
+  });
 });

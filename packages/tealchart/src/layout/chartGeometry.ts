@@ -164,7 +164,7 @@ export function computeChartGeometry(input: ChartGeometryInput): ChartGeometrySn
   const drawable = insetRect(safeRoot, reservedInsets);
   const panes = computePaneGeometry({
     paneLayout: input.paneLayout,
-    height: safeRoot.height,
+    height: input.height - safeAreaInsets.bottom,
     topOffset: input.margins.top + safeAreaInsets.top,
   });
 
