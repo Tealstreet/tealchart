@@ -9,9 +9,21 @@ import { TealchartRenderer } from '../TealchartRenderer';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
 
+interface EventManagerCallbackProbe {
+  onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
+  onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
+  onDrawingDragCancel?: (source: 'mouse' | 'touch') => void;
+}
+
+const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe }>);
+
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
+    constructor(_container: HTMLElement, callbacks: EventManagerCallbackProbe) {
+      eventManagerInstances.push({ callbacks });
+    }
     getIsDragging() {
       return false;
     }
@@ -107,6 +119,7 @@ describe('ChartCore viewport management', () => {
   let container: HTMLDivElement;
 
   beforeEach(() => {
+    eventManagerInstances.length = 0;
     stubCanvasContext();
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
       cb(0);
@@ -498,6 +511,43 @@ describe('ChartCore viewport management', () => {
         anchor: testCore.resolveUserDrawingInputPoint(160, 120)?.anchor,
       }),
     );
+
+    core.dispose();
+  });
+
+  it('routes EventManager placement drag cancellation to draft cancellation', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingPlacementDragStart = vi.fn(() => true);
+    const onUserDrawingPlacementDragEnd = vi.fn();
+    const onUserDrawingCancelDraft = vi.fn();
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onUserDrawingPlacementDragStart,
+      onUserDrawingPlacementDragEnd,
+      onUserDrawingCancelDraft,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'rectangle',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const eventCallbacks = eventManagerInstances.at(-1)?.callbacks;
+    expect(eventCallbacks).toBeDefined();
+    expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'mouse')).toBe(true);
+    expect(eventCallbacks?.onDrawingDragMove?.(140, 120, 'mouse')).toBe(true);
+
+    eventCallbacks?.onDrawingDragCancel?.('mouse');
+
+    expect(onUserDrawingPlacementDragStart).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingCancelDraft).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalled();
 
     core.dispose();
   });
