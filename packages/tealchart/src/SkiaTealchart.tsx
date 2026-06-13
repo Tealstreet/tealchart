@@ -127,6 +127,7 @@ import {
   updateUserDrawingTextEdit,
   USER_DRAWING_FONT_FAMILIES,
 } from './drawings';
+import { computePaneGeometry } from './layout/chartGeometry';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
@@ -825,24 +826,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingInputPanes = useMemo(() => {
     if (!viewport || !unifiedPaneLayout) return [];
 
-    const availableHeight = dimensions.height - unifiedPaneLayout.timeAxisHeight - margins.top;
-    let currentTop = margins.top;
-
-    return unifiedPaneLayout.panes.map((pane) => {
-      const height = availableHeight * pane.heightRatio;
+    return computePaneGeometry({
+      paneLayout: unifiedPaneLayout,
+      height: dimensions.height,
+      topOffset: margins.top,
+    }).map((pane) => {
       const yRange =
         pane.type === 'main' && !pane.fixedRange
           ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
           : { yMin: pane.yMin, yMax: pane.yMax };
-      const resolvedPane = {
+      return {
         id: pane.id,
-        top: currentTop,
-        height,
-        bottom: currentTop + height,
+        top: pane.top,
+        height: pane.height,
+        bottom: pane.bottom,
         ...yRange,
       };
-      currentTop += height;
-      return resolvedPane;
     });
   }, [dimensions.height, margins.top, unifiedPaneLayout, viewport]);
 
