@@ -728,11 +728,17 @@ describe('TealchartWidget', () => {
         'sector',
         'longPosition',
         'shortPosition',
+        'barsPattern',
         'elliottCorrectiveWave',
         'elliottDoubleComboWave',
       ];
 
       for (const tool of dragSeedTools) {
+        const bars = [
+          { time: 1, open: 10, high: 14, low: 9, close: 12 },
+          { time: 2, open: 12, high: 15, low: 11, close: 11 },
+        ];
+        const pointOptions = tool === 'barsPattern' ? { bars } : {};
         const datafeed = createMockDatafeed();
         const widget = createWidget(datafeed);
         widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
@@ -746,12 +752,20 @@ describe('TealchartWidget', () => {
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
-        expect(testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(
-          true,
-        );
-        expect(testWidget._handleUserDrawingPlacementDragEnd({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
-          true,
-        );
+        expect(
+          testWidget._handleUserDrawingPlacementDragStart({
+            paneId: 'main',
+            anchor: { time: 1, price: 10 },
+            ...pointOptions,
+          }),
+        ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingPlacementDragEnd({
+            paneId: 'main',
+            anchor: { time: 2, price: 20 },
+            ...pointOptions,
+          }),
+        ).toBe(true);
         expect(widget.getUserDrawingState().drawings).toEqual([]);
         expect(widget.getUserDrawingState().draft).toMatchObject({
           tool,
@@ -762,7 +776,13 @@ describe('TealchartWidget', () => {
           ],
         });
 
-        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(true);
+        expect(
+          testWidget._handleUserDrawingInput({
+            paneId: 'main',
+            anchor: { time: 3, price: 30 },
+            ...pointOptions,
+          }),
+        ).toBe(true);
         expect(widget.getUserDrawingState().draft).toBeNull();
         expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
         expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
@@ -773,6 +793,7 @@ describe('TealchartWidget', () => {
             { time: 2, price: 20 },
             { time: 3, price: 30 },
           ],
+          ...(tool === 'barsPattern' ? { bars } : {}),
         });
 
         widget.remove();

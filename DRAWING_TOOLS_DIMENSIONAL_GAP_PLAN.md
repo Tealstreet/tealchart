@@ -223,8 +223,10 @@ Phase 1: Placement mode registry
   supported three-anchor forecasting, measurement, and pattern tools, with web
   Canvas and mobile Skia continuing through the normal final click/tap commit
   path: `projection`, `sector`, `longPosition`, `shortPosition`,
-  `elliottCorrectiveWave`, and `elliottDoubleComboWave`. `barsPattern` remains
-  special because it requires source-bar payloads.
+  `barsPattern`, `elliottCorrectiveWave`, and `elliottDoubleComboWave`.
+  `barsPattern` remains a computed-special tool, but its drag-start draft now
+  preserves source bars so web Canvas and mobile Skia can render active previews
+  and commit the final source-bar payload.
 - Status: shared placement drag now also seeds the first two anchors for
   supported four- and five-anchor pattern tools, with web Canvas and mobile
   Skia continuing through the normal remaining click/tap commit path:

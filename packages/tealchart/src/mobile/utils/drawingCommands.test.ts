@@ -657,27 +657,33 @@ describe('mobile drawing handle command dispatch', () => {
       'sector',
       'longPosition',
       'shortPosition',
+      'barsPattern',
       'elliottCorrectiveWave',
       'elliottDoubleComboWave',
     ];
 
     for (const tool of dragSeedTools) {
+      const bars = [
+        { time: 1_000, open: 100, high: 104, low: 99, close: 102 },
+        { time: 2_000, open: 102, high: 105, low: 101, close: 101 },
+      ];
+      const pointOptions = tool === 'barsPattern' ? { bars } : {};
       const state = setUserDrawingTool(createUserDrawingState(), tool);
       const history = createUserDrawingCommandHistory();
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
         type: 'beginPlacementDrag',
-        point: { paneId: 'main', anchor: anchorA },
+        point: { paneId: 'main', anchor: anchorA, ...pointOptions },
         meta: { source: 'touch' },
       });
       const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
         type: 'commitPlacementDrag',
-        point: { paneId: 'main', anchor: anchorB },
+        point: { paneId: 'main', anchor: anchorB, ...pointOptions },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
       });
       const committed = dispatchMobileUserDrawingHistoryCommand(seeded.state, seeded.history, {
         type: 'handleInput',
-        point: { paneId: 'main', anchor: anchorC },
+        point: { paneId: 'main', anchor: anchorC, ...pointOptions },
         options: { createId: () => `${tool}-drawing`, now: () => 44, style },
         meta: { source: 'touch' },
       });
@@ -697,6 +703,7 @@ describe('mobile drawing handle command dispatch', () => {
         id: `${tool}-drawing`,
         kind: tool,
         points: [anchorA, anchorB, anchorC],
+        ...(tool === 'barsPattern' ? { bars } : {}),
       });
     }
   });

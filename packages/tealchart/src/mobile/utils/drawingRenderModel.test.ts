@@ -266,12 +266,17 @@ describe('mobile user drawing render model', () => {
       'sector',
       'longPosition',
       'shortPosition',
+      'barsPattern',
       'elliottCorrectiveWave',
       'elliottDoubleComboWave',
     ] as const;
 
     for (const tool of draftTools) {
       const expectedKind = tool === 'longPosition' || tool === 'shortPosition' ? 'riskRewardPosition' : tool;
+      const bars = [
+        { time: 10, open: 100, high: 104, low: 99, close: 102 },
+        { time: 40, open: 102, high: 105, low: 101, close: 101 },
+      ];
       const state: UserDrawingState = {
         version: 1,
         activeTool: tool,
@@ -281,6 +286,7 @@ describe('mobile user drawing render model', () => {
           tool,
           paneId: 'main',
           anchors: [{ time: 10, price: 90 }],
+          barsPatternBars: tool === 'barsPattern' ? bars : undefined,
           style,
           startedAt: 2,
         },
