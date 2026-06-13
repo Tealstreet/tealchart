@@ -42,17 +42,51 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
     linesCategory?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+    linesCategory?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     expect(document.body.textContent).toContain('Lines');
     expect(document.body.textContent).toContain('Channels');
     expect(document.body.textContent).toContain('Gann and Fibonacci');
     expect(rectangle?.getAttribute('aria-pressed')).toBe('true');
     trendLine?.click();
     expect(onTool).toHaveBeenCalledWith('trendLine');
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
+
+    linesCategory?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+    document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
+
+    linesCategory?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
 
     topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'trendLine' });
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.getAttribute('aria-pressed')).toBe(
       'true',
     );
+
+    topBar.unmount();
+  });
+
+  it('mounts drawing tools in a dedicated overlay parent when provided', () => {
+    const overlayParent = document.createElement('div');
+    const chromeParent = document.createElement('div');
+    document.body.append(chromeParent, overlayParent);
+
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-overlay-parent',
+      symbol: 'BTCUSDT',
+      userDrawingState: baseDrawingState,
+      drawingOverlayParent: overlayParent,
+    });
+    topBar.mount(chromeParent);
+
+    const categoryRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
+    expect(categoryRail).not.toBeNull();
+    expect(overlayParent.contains(categoryRail)).toBe(true);
+    expect(topBar.getElement().contains(categoryRail)).toBe(false);
 
     topBar.unmount();
   });

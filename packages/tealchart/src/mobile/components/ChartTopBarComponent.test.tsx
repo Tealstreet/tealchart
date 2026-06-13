@@ -38,6 +38,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
     fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
     expect(screen.getByLabelText('Rectangle')).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('Close drawing tools'));
+    expect(screen.queryByLabelText('Rectangle')).toBeNull();
     fireEvent.click(screen.getByLabelText('Lines drawing tools'));
     fireEvent.click(screen.getByLabelText('Trend line'));
 
