@@ -185,6 +185,40 @@ describe('user drawing context actions', () => {
     });
   });
 
+  it('includes selected icon library actions for icon context targets', () => {
+    const result = resolveUserDrawingContextActionsAtPoint(
+      {
+        ...state,
+        drawings: [
+          {
+            id: 'icon',
+            kind: 'icon',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              ...style,
+              fillColor: 'rgba(245, 197, 66, 0.12)',
+            },
+            point: { time: 50, price: 50 },
+            iconName: 'star',
+          },
+        ],
+      },
+      { x: 50, y: 50 },
+      new Map([['main', space]]),
+      { hitTest: { labelWidth: 24, labelHeight: 24 } },
+    );
+
+    expect(result.items.find((item) => item.id === 'iconName:circle')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'setIconName', iconName: 'circle' },
+    });
+  });
+
   it('includes selected text appearance actions for text-capable context targets', () => {
     const result = resolveUserDrawingContextActionsAtPoint(
       {
