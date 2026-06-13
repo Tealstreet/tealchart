@@ -334,6 +334,7 @@ export class TealchartWidgetUI {
     this.legend = new ChartLegend({
       symbol: options.symbol,
       interval: options.interval,
+      avoidLeftTools: this.shouldAvoidLegendLeftTools(),
       onToggleIndicator: options.onToggleIndicator,
       onSettingsIndicator: (indicatorId) => this.openIndicatorSettings(indicatorId),
       onRemoveIndicator: options.onRemoveIndicator,
@@ -512,6 +513,7 @@ export class TealchartWidgetUI {
    */
   setUserDrawingState(state: UserDrawingState): void {
     this.options.userDrawingState = state;
+    this.legend?.setAvoidLeftTools(this.shouldAvoidLegendLeftTools());
     const toolbarStateKey = getUserDrawingToolbarStateKey(state);
     if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
       this.currentUserDrawingToolbarStateKey = toolbarStateKey;
@@ -519,6 +521,10 @@ export class TealchartWidgetUI {
     }
     this.chartCore?.setUserDrawingState(state);
     this.renderUserDrawingTextEditor(state);
+  }
+
+  private shouldAvoidLegendLeftTools(): boolean {
+    return this.options.showTopBar !== false && Boolean(this.options.userDrawingState);
   }
 
   private removeUserDrawingTextEditor(): void {
