@@ -38,9 +38,13 @@ export type UserDrawingToolbarAction =
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'showSelected' | 'lockSelected' | 'unlockSelected';
 export type UserDrawingSelectedActionSurfaceAction =
   | Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>
-  | UserDrawingStyleToolbarAction;
+  | UserDrawingStyleToolbarAction
+  | 'openProperties';
 export type UserDrawingSelectedActionSurfaceGroupId = 'primary' | 'arrange' | 'visibility';
 export type UserDrawingSelectedActionSurfaceCommand =
+  | {
+      type: 'openProperties';
+    }
   | {
       type: 'toolbarAction';
       action: Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>;
@@ -651,6 +655,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
     label: 'Primary',
     items: [
       {
+        id: 'openProperties',
+        icon: '⚙',
+        label: 'Open selected drawing properties',
+        enabled: false,
+        command: { type: 'openProperties' },
+      },
+      {
         ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[0]!,
         id: 'duplicateSelected',
         enabled: false,
@@ -741,6 +752,12 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
     groups: USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS.map((group) => ({
       ...group,
       items: group.items.map((item) => {
+        if (item.command.type === 'openProperties') {
+          return {
+            ...item,
+            enabled: selectedDrawing !== null,
+          };
+        }
         if (item.command.type === 'styleAction') {
           return {
             ...item,

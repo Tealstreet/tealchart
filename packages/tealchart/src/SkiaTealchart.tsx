@@ -195,7 +195,7 @@ import { intervalToMs } from './viewport/viewScale';
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
-const USER_DRAWING_ACTION_SURFACE_WIDTH = 280;
+const USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
 const USER_DRAWING_ACTION_SURFACE_HEIGHT = 40;
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
@@ -2065,6 +2065,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   options: { includeLocked: item.command.includeLocked },
                   meta: { source: 'contextMenu' },
                 });
+              }
+              return;
+            }
+            if (item.command.type === 'openProperties') {
+              const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current);
+              if (intent) {
+                onUserDrawingPropertiesOpen?.(intent);
               }
               return;
             }
@@ -4619,6 +4626,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     activeOpacity={0.72}
                     style={[styles.userDrawingActionButton, !item.enabled && styles.userDrawingActionButtonDisabled]}
                     onPress={() => {
+                      if (item.command.type === 'openProperties') {
+                        const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current);
+                        if (intent) {
+                          onUserDrawingPropertiesOpen?.(intent);
+                        }
+                        return;
+                      }
                       if (item.command.type === 'styleAction') {
                         if (item.command.visible !== undefined) {
                           dispatchUserDrawingCommandToState({
