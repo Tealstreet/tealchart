@@ -34,6 +34,7 @@ const dragTwoAnchorTools: UserDrawingTool[] = [
   'forecast',
   'callout',
   'priceNote',
+  'image',
   'fibRetracement',
   'fibExtension',
   'fibFan',
