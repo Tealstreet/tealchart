@@ -1666,6 +1666,18 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { fontStyle: 'italic' } },
     });
+    expect(styleItems.find((item) => item.id === 'textUnderline:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textUnderline: true } },
+    });
+    expect(styleItems.find((item) => item.id === 'textLineThrough:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textLineThrough: true } },
+    });
+    expect(styleItems.find((item) => item.id === 'textWrap:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
+    });
 
     const defaultSized = {
       ...selected,
@@ -1735,6 +1747,9 @@ describe('user drawing toolbar descriptors', () => {
     });
     expect(styleItems.some((item) => item.id.startsWith('fontWeight:'))).toBe(false);
     expect(styleItems.some((item) => item.id.startsWith('fontStyle:'))).toBe(false);
+    expect(styleItems.some((item) => item.id.startsWith('textUnderline:'))).toBe(false);
+    expect(styleItems.some((item) => item.id.startsWith('textLineThrough:'))).toBe(false);
+    expect(styleItems.some((item) => item.id.startsWith('textWrap:'))).toBe(false);
   });
 
   it('clamps selected action surfaces inside shared safe viewport insets', () => {

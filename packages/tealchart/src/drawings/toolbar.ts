@@ -27,6 +27,7 @@ import {
   USER_DRAWING_TREND_LINE_EXTENDS,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingFontFamily,
+  normalizeUserDrawingTextMaxWidth,
 } from './types';
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
@@ -839,6 +840,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const nextFontFamily = textEnabled ? getNextUserDrawingFontFamily(selectedDrawing) : null;
   const nextFontWeight = richTextEnabled ? getNextUserDrawingFontWeight(selectedDrawing) : null;
   const nextFontStyle = richTextEnabled ? getNextUserDrawingFontStyle(selectedDrawing) : null;
+  const textWrapEnabled = richTextEnabled && supportsUserDrawingTextWrapControls(selectedDrawing);
+  const nextTextWrap = selectedDrawing.style.textWrap !== true;
+  const nextTextMaxWidth = normalizeUserDrawingTextMaxWidth(selectedDrawing.style.textMaxWidth ?? 180);
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -913,6 +917,36 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'updateStyle', style: { fontStyle: nextFontStyle } },
       }
     : null;
+  const textUnderlineItem: UserDrawingSelectedActionSurfaceItem | null = richTextEnabled
+    ? {
+        id: 'textUnderline:toggle',
+        icon: 'U',
+        label: selectedDrawing.style.textUnderline === true ? 'Remove selected drawing underline' : 'Underline selected drawing text',
+        enabled: richTextEnabled,
+        command: { type: 'updateStyle', style: { textUnderline: selectedDrawing.style.textUnderline !== true } },
+      }
+    : null;
+  const textLineThroughItem: UserDrawingSelectedActionSurfaceItem | null = richTextEnabled
+    ? {
+        id: 'textLineThrough:toggle',
+        icon: 'S',
+        label: selectedDrawing.style.textLineThrough === true ? 'Remove selected drawing strike-through' : 'Strike selected drawing text',
+        enabled: richTextEnabled,
+        command: { type: 'updateStyle', style: { textLineThrough: selectedDrawing.style.textLineThrough !== true } },
+      }
+    : null;
+  const textWrapItem: UserDrawingSelectedActionSurfaceItem | null = textWrapEnabled
+    ? {
+        id: 'textWrap:toggle',
+        icon: nextTextWrap ? '↵' : '↔',
+        label: nextTextWrap ? 'Wrap selected drawing text' : 'Do not wrap selected drawing text',
+        enabled: textWrapEnabled,
+        command: {
+          type: 'updateStyle',
+          style: nextTextWrap ? { textWrap: true, textMaxWidth: nextTextMaxWidth } : { textWrap: false },
+        },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -955,6 +989,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(fontFamilyItem ? [fontFamilyItem] : []),
       ...(fontWeightItem ? [fontWeightItem] : []),
       ...(fontStyleItem ? [fontStyleItem] : []),
+      ...(textUnderlineItem ? [textUnderlineItem] : []),
+      ...(textLineThroughItem ? [textLineThroughItem] : []),
+      ...(textWrapItem ? [textWrapItem] : []),
     ],
   };
 }
