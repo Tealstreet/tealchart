@@ -22,6 +22,8 @@ const DRAG_THRESHOLD_PX = 3;
 const DEFAULT_ORDER_COLOR = '#3b82f6';
 const DEFAULT_POSITION_COLOR = '#22c55e';
 const DEFAULT_SELL_COLOR = '#ef4444';
+const TAKE_PROFIT_COLOR = '#22c55e';
+const STOP_LOSS_COLOR = '#f97316';
 
 type TradingViewTradingOwnerType = 'order' | 'position';
 
@@ -324,8 +326,8 @@ export class TradingViewTradingBridge {
       ...(cancellable
         ? [{ id: 'cancel', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]
         : []),
-      ...(line.brackets?.takeProfit == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: '#22c55e', border: '#22c55e' }]),
-      ...(line.brackets?.stopLoss == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: '#f97316', border: '#f97316' }]),
+      ...(line.brackets == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: TAKE_PROFIT_COLOR, border: TAKE_PROFIT_COLOR }]),
+      ...(line.brackets == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: STOP_LOSS_COLOR, border: STOP_LOSS_COLOR }]),
       ...actions,
     ];
     const labelWidth = BASE_LABEL_WIDTH + buttons.reduce((sum, button) => sum + button.width, 0) + (buttons.length > 0 ? BRACKET_GAP : 0);
@@ -388,14 +390,15 @@ export class TradingViewTradingBridge {
       ...(reversible
         ? [{ id: 'reverse', width: BUILT_IN_ACTION_WIDTH, text: '↩', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]
         : []),
-      ...(line.brackets?.takeProfit == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: '#22c55e', border: '#22c55e' }]),
-      ...(line.brackets?.stopLoss == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: '#f97316', border: '#f97316' }]),
+      ...(line.brackets == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: TAKE_PROFIT_COLOR, border: TAKE_PROFIT_COLOR }]),
+      ...(line.brackets == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: STOP_LOSS_COLOR, border: STOP_LOSS_COLOR }]),
       ...actions,
     ];
     const labelWidth = BASE_LABEL_WIDTH + buttons.reduce((sum, button) => sum + button.width, 0) + (buttons.length > 0 ? BRACKET_GAP : 0);
     const labelX = labelLeft(frame.chartWidth, labelWidth, line.style?.lineLength);
 
     drawTradingLine(ctx, frame, y, labelX, labelWidth, color, line.style);
+    this.drawPositionBracketLines(ctx, frame, line, labelX, labelWidth);
     const secondary = line.label?.pnl ?? quantity;
     const buttonRects = this.drawLabel(ctx, labelX, y, label, secondary, color, line.style, buttons);
 
@@ -424,6 +427,30 @@ export class TradingViewTradingBridge {
           action: { type: 'line-action', lineId: ownedTradingLineId('position', line.id), actionId: target.id },
         });
       }
+    }
+  }
+
+  private drawPositionBracketLines(
+    ctx: CanvasRenderingContext2D,
+    frame: TradingViewRenderFrame,
+    line: ChartTradingPositionLine,
+    labelX: number,
+    labelWidth: number,
+  ): void {
+    if (!line.brackets) return;
+    if (isPositiveFinite(line.brackets.takeProfit)) {
+      drawTradingLine(ctx, frame, frame.priceToCoord(line.brackets.takeProfit), labelX, labelWidth, TAKE_PROFIT_COLOR, {
+        lineStyle: 'dashed',
+        lineWidth: 1,
+        extendLeft: true,
+      });
+    }
+    if (isPositiveFinite(line.brackets.stopLoss)) {
+      drawTradingLine(ctx, frame, frame.priceToCoord(line.brackets.stopLoss), labelX, labelWidth, STOP_LOSS_COLOR, {
+        lineStyle: 'dashed',
+        lineWidth: 1,
+        extendLeft: true,
+      });
     }
   }
 
@@ -579,26 +606,20 @@ function rebindActiveDrag(activeDrag: ActiveDrag | null, state: ChartTradingStat
   if (activeDrag.ownerType === 'order') {
     const owner = state.orders?.find((order) => ownedTradingLineId('order', order.id) === activeDrag.lineId);
     if (!owner?.brackets) return null;
-    const bracketPrice = activeDrag.side === 'tp' ? owner.brackets.takeProfit : owner.brackets.stopLoss;
-    return bracketPrice == null
-      ? null
-      : {
-          ...activeDrag,
-          ownerId: owner.orderId ?? owner.id,
-          partialEnabled: owner.partialEnabled === true,
-        };
+    return {
+      ...activeDrag,
+      ownerId: owner.orderId ?? owner.id,
+      partialEnabled: owner.partialEnabled === true,
+    };
   }
 
   const owner = state.positions?.find((position) => ownedTradingLineId('position', position.id) === activeDrag.lineId);
   if (!owner?.brackets) return null;
-  const bracketPrice = activeDrag.side === 'tp' ? owner.brackets.takeProfit : owner.brackets.stopLoss;
-  return bracketPrice == null
-    ? null
-    : {
-        ...activeDrag,
-        ownerId: owner.positionId ?? owner.id,
-        partialEnabled: owner.partialEnabled === true,
-      };
+  return {
+    ...activeDrag,
+    ownerId: owner.positionId ?? owner.id,
+    partialEnabled: owner.partialEnabled === true,
+  };
 }
 
 function ownedTradingLineId(kind: TradingViewTradingOwnerType | 'execution', id: string): string {
@@ -613,6 +634,10 @@ function bracketPartialPercent(drag: ActiveBracketDrag, point: Point): number {
   if (deltaX <= 137) return 50;
   if (deltaX <= 192) return 25;
   return 10;
+}
+
+function isPositiveFinite(value: number | undefined): value is number {
+  return value !== undefined && Number.isFinite(value) && value > 0;
 }
 
 function claimPointerEvent(event: PointerEvent): void {

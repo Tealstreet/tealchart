@@ -444,8 +444,8 @@ describe('TradingViewTradingBridge', () => {
     });
 
     bridge.draw(frame(createRecordingContext()));
-    bridge.handlePointerDown({ x: 320, y: 100 });
-    bridge.handlePointerUp({ x: 320, y: 101 });
+    bridge.handlePointerDown({ x: 306, y: 100 });
+    bridge.handlePointerUp({ x: 306, y: 101 });
 
     expect(onIntent).toHaveBeenCalledWith({
       type: 'bracket.tp.click',
@@ -454,6 +454,58 @@ describe('TradingViewTradingBridge', () => {
       ownerId: 'external-order-1',
       lineId: 'chart_trading_order_order-1',
     });
+  });
+
+  it('emits missing-side bracket intents when bracket config is one-sided', () => {
+    const intents: unknown[] = [];
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            brackets: { takeProfit: 110 },
+          },
+        ],
+        positions: [
+          {
+            kind: 'position',
+            id: 'position-1',
+            positionId: 'external-position-1',
+            price: 120,
+            brackets: { takeProfit: 130 },
+          },
+        ],
+      },
+      onIntent: (intent) => intents.push(intent),
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 330, y: 100 });
+    bridge.handlePointerUp({ x: 330, y: 101 });
+    bridge.handlePointerDown({ x: 330, y: 80 });
+    bridge.handlePointerUp({ x: 330, y: 70 });
+
+    expect(intents).toEqual([
+      {
+        type: 'bracket.sl.click',
+        source: 'tradingview-bridge',
+        ownerType: 'order',
+        ownerId: 'external-order-1',
+        lineId: 'chart_trading_order_order-1',
+      },
+      {
+        type: 'bracket.sl.commit',
+        source: 'tradingview-bridge',
+        ownerType: 'position',
+        ownerId: 'external-position-1',
+        lineId: 'chart_trading_position_position-1',
+        price: 130,
+        partialPercent: 100,
+      },
+    ]);
   });
 
   it('emits bracket preview and commit intents from bracket drags', () => {
@@ -474,7 +526,7 @@ describe('TradingViewTradingBridge', () => {
     });
 
     bridge.draw(frame(createRecordingContext()));
-    bridge.handlePointerDown({ x: 320, y: 100 });
+    bridge.handlePointerDown({ x: 330, y: 100 });
     bridge.handlePointerMove({ x: 320, y: 80 });
     bridge.handlePointerUp({ x: 320, y: 70 });
 
@@ -500,6 +552,28 @@ describe('TradingViewTradingBridge', () => {
     ]);
   });
 
+  it('draws existing position bracket price lines', () => {
+    const ctx = createRecordingContext();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        positions: [
+          {
+            kind: 'position',
+            id: 'position-1',
+            price: 100,
+            brackets: { takeProfit: 120, stopLoss: 80 },
+          },
+        ],
+      },
+    });
+
+    bridge.draw(frame(ctx));
+
+    expect(ctx.setLineDash).toHaveBeenCalledWith([6, 4]);
+    expect(ctx.moveTo).toHaveBeenCalledWith(0, 80);
+    expect(ctx.moveTo).toHaveBeenCalledWith(0, 120);
+  });
+
   it('emits partial bracket percentages from horizontal bracket drags', () => {
     const intents: unknown[] = [];
     const bridge = new TradingViewTradingBridge({
@@ -519,7 +593,7 @@ describe('TradingViewTradingBridge', () => {
     });
 
     bridge.draw(frame(createRecordingContext()));
-    bridge.handlePointerDown({ x: 320, y: 100 });
+    bridge.handlePointerDown({ x: 330, y: 100 });
     bridge.handlePointerMove({ x: 420, y: 80 });
     bridge.handlePointerUp({ x: 500, y: 70 });
 
@@ -563,7 +637,7 @@ describe('TradingViewTradingBridge', () => {
     });
 
     bridge.draw(frame(createRecordingContext()));
-    bridge.handlePointerDown({ x: 320, y: 100 });
+    bridge.handlePointerDown({ x: 306, y: 100 });
     bridge.setState({
       orders: [
         {
