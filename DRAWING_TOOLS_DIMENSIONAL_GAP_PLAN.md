@@ -570,6 +570,8 @@ Phase 3: Nudge
 
 - Add arrow-key nudge for selected drawings if it can be implemented as an
   undoable command without conflicting with chart navigation.
+- Shipped shared selected-drawing nudge command and web Arrow-key dispatch
+  through the drawing command history.
 
 ### Epic 7.3: Mobile Modifier Equivalents
 
@@ -580,6 +582,8 @@ Phase 1: Hardware keyboard support
   adapters to dispatch the shared drawing keyboard actions.
 - Shipped mobile command utility and Skia handle support for hardware-keyboard
   copy/paste using the same shared clipboard payload and paste command.
+- Shipped mobile command utility and Skia handle support for selected-drawing
+  Arrow-key nudge using the same shared coordinate-space command.
 
 Phase 2: Touch-native duplicate workflow
 

@@ -19,7 +19,7 @@ import type {
   UserDrawingZOrderAction,
 } from './input';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
-import type { BeginUserDrawingEditDragOptions, UserDrawingEditDrag } from './editing';
+import type { BeginUserDrawingEditDragOptions, NudgeUserDrawingSelectionOptions, UserDrawingEditDrag } from './editing';
 import type {
   UserDrawingHandleRole,
   UserDrawingIconName,
@@ -69,7 +69,7 @@ import {
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
-import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
+import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint, nudgeUserDrawingSelection } from './editing';
 
 export type UserDrawingCommandSource =
   | 'pointer'
@@ -112,6 +112,11 @@ export type UserDrawingCommand =
       type: 'applyEditDrag';
       drag: UserDrawingEditDrag;
       point: DrawingScreenPoint;
+    })
+  | (UserDrawingCommandBase & {
+      type: 'nudge';
+      spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>;
+      options: NudgeUserDrawingSelectionOptions;
     })
   | (UserDrawingCommandBase & { type: 'delete'; options?: DeleteUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'duplicate'; options: DuplicateUserDrawingOptions })
@@ -251,6 +256,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return beginUserDrawingEditDragAtPoint(state, command.point, command.spacesByPaneId, command.options).state;
     case 'applyEditDrag':
       return applyUserDrawingEditDrag(state, command.drag, command.point);
+    case 'nudge':
+      return nudgeUserDrawingSelection(state, command.spacesByPaneId, command.options);
     case 'delete':
       return deleteUserDrawing(state, command.options);
     case 'duplicate':
