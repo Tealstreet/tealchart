@@ -14,6 +14,7 @@ import {
   createUserDrawingState,
   duplicateUserDrawing,
   handleUserDrawingInput,
+  resolveUserDrawingObjectTreeDispatchActionCommands,
   setUserDrawingTool,
   redoUserDrawingCommand,
   undoUserDrawingCommand,
@@ -328,6 +329,57 @@ describe('mobile drawing handle command dispatch', () => {
     expect(result.command ? createUserDrawingCommandEvent(state, { ...result, command: result.command })?.source : null).toBe(
       'keyboard',
     );
+  });
+
+  it('routes mobile object-tree actions through shared history dispatch', () => {
+    let state = duplicateUserDrawing(createMobileStateWithTrendLine(), {
+      createId: () => 'copy',
+      now: () => 43,
+    });
+    state = { ...state, selection: { drawingId: 'line', drawingIds: ['line', 'copy'] } };
+    let history = createUserDrawingCommandHistory();
+
+    for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(
+      state,
+      { type: 'hide', drawingIds: ['copy'] },
+      { createId: () => 'unused', now: () => 44 },
+    )) {
+      ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
+    }
+
+    expect(state.selection).toEqual({ drawingId: 'line' });
+    expect(state.drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
+      ['line', true],
+      ['copy', false],
+    ]);
+    expect(history.undoStack).toHaveLength(1);
+
+    for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(
+      state,
+      { type: 'duplicate', drawingIds: ['line'] },
+      { createId: () => 'object-tree-copy', now: () => 45 },
+    )) {
+      ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
+    }
+
+    expect(state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'object-tree-copy', 'copy']);
+    expect(state.selection).toEqual({ drawingId: 'object-tree-copy' });
+    expect(history.undoStack).toHaveLength(2);
+
+    for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(
+      state,
+      { type: 'sendToBack', drawingIds: ['object-tree-copy'] },
+      { createId: () => 'unused', now: () => 46 },
+    )) {
+      ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
+    }
+
+    expect(state.drawings.map((drawing) => drawing.id)).toEqual(['object-tree-copy', 'line', 'copy']);
+    expect(state.selection).toEqual({ drawingId: 'object-tree-copy' });
+    expect(history.undoStack).toHaveLength(3);
+
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'object-tree-copy', 'copy']);
   });
 
   it('routes mobile select-all keyboard action without recording undo history', () => {
