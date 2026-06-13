@@ -168,6 +168,42 @@ describe('TradingViewTradingBridge', () => {
     });
   });
 
+  it('maps attached pointer events through the rendered canvas bounds', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+    const container = document.createElement('div');
+    container.getBoundingClientRect = vi.fn(() => domRect({ left: 0, top: 0, width: 500, height: 300 }));
+    const ctx = createRecordingContext(domRect({ left: 50, top: 30, width: 400, height: 200 }));
+
+    bridge.draw(frame(ctx));
+    const detach = bridge.attach(container);
+
+    container.dispatchEvent(new MouseEvent('pointerdown', { clientX: 80, clientY: 130, bubbles: true, cancelable: true }));
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 80, clientY: 110, bubbles: true, cancelable: true }));
+    detach();
+
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'order.move.commit',
+      source: 'tradingview-bridge',
+      orderId: 'external-order-1',
+      lineId: 'order-1',
+      price: 120,
+    });
+  });
+
   it('emits position action intents from label hits', () => {
     const intents: unknown[] = [];
     const bridge = new TradingViewTradingBridge({
@@ -262,9 +298,13 @@ function executionFrame(ctx: CanvasRenderingContext2D): TradingViewRawRenderFram
   };
 }
 
-function createRecordingContext(): CanvasRenderingContext2D {
+function createRecordingContext(canvasBounds?: DOMRect): CanvasRenderingContext2D {
   const ctx = {
-    canvas: { width: 400, height: 200 },
+    canvas: {
+      width: 400,
+      height: 200,
+      getBoundingClientRect: vi.fn(() => canvasBounds ?? domRect({ left: 0, top: 0, width: 400, height: 200 })),
+    },
     save: vi.fn(),
     restore: vi.fn(),
     beginPath: vi.fn(),
@@ -287,4 +327,15 @@ function createRecordingContext(): CanvasRenderingContext2D {
     textBaseline: 'middle',
   };
   return ctx as unknown as CanvasRenderingContext2D;
+}
+
+function domRect(rect: { left: number; top: number; width: number; height: number }): DOMRect {
+  return {
+    ...rect,
+    right: rect.left + rect.width,
+    bottom: rect.top + rect.height,
+    x: rect.left,
+    y: rect.top,
+    toJSON: () => rect,
+  } as DOMRect;
 }

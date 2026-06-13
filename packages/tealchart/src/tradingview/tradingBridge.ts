@@ -374,8 +374,11 @@ export class TradingViewTradingBridge {
 
   private eventPoint(event: PointerEvent): Point | null {
     if (!this.attachedElement || !this.lastFrame) return null;
-    const rect = this.attachedElement.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return null;
+    const rect = elementBounds(this.lastFrame.ctx.canvas) ?? elementBounds(this.attachedElement);
+    if (!rect) return null;
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+      return null;
+    }
     return {
       x: ((event.clientX - rect.left) * this.lastFrame.chartWidth) / rect.width,
       y: ((event.clientY - rect.top) * this.lastFrame.chartHeight) / rect.height,
@@ -564,6 +567,12 @@ function fontSize(ctx: CanvasRenderingContext2D, size: number): number {
 
 function contains(rect: Rect, point: Point): boolean {
   return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+}
+
+function elementBounds(element: Element | null | undefined): DOMRect | null {
+  const rect = element?.getBoundingClientRect();
+  if (!rect || rect.width <= 0 || rect.height <= 0) return null;
+  return rect;
 }
 
 function tradingColor(side: ChartTradingOrderLine['side'], kind: 'order' | 'position'): string {
