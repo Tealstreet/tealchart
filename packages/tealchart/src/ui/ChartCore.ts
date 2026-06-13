@@ -144,6 +144,8 @@ export interface ChartCoreOptions {
   onUserDrawingPathDragMove?: (point: UserDrawingInputPoint) => boolean;
   /** Called when an active path-tool drag ends */
   onUserDrawingPathDragEnd?: () => void;
+  /** Called when an active drawing draft is cancelled before normal completion */
+  onUserDrawingCancelDraft?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
@@ -751,6 +753,7 @@ export class ChartCore {
       onDrawingDragStart: (x, y, _source, options) => this.handleUserDrawingDragStart(x, y, options),
       onDrawingDragMove: (x, y, _source, options) => this.handleUserDrawingDragMove(x, y, options),
       onDrawingDragEnd: () => this.handleUserDrawingDragEnd(),
+      onDrawingDragCancel: () => this.handleUserDrawingDragCancel(),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
@@ -1714,6 +1717,22 @@ export class ChartCore {
     }
 
     this.options.onUserDrawingEditEnd?.();
+  }
+
+  private handleUserDrawingDragCancel(): void {
+    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
+      this.userDrawingDraftPreviewAnchor = null;
+      this.userDrawingPlacementDragStartPoint = null;
+      this.userDrawingPlacementDragLastPoint = null;
+      this.options.onUserDrawingCancelDraft?.();
+      this.scheduleRender();
+      return;
+    }
+
+    if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
+      this.options.onUserDrawingCancelDraft?.();
+      this.scheduleRender();
+    }
   }
 
   private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {

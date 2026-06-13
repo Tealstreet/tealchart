@@ -181,6 +181,41 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('cancels active mouse drawing drags on Escape without ending them', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const onDrawingDragCancel = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+        onDrawingDragCancel,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 112, clientY: 104 }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 112, clientY: 104 }));
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingDragMove).toHaveBeenCalledWith(112, 104, 'mouse');
+    expect(onDrawingDragCancel).toHaveBeenCalledOnce();
+    expect(onDrawingDragCancel).toHaveBeenCalledWith('mouse');
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
   it('passes Shift placement constraints through pending mouse drags', () => {
     const container = createContainer();
     const onDrawingDragPending = vi.fn(() => true);
@@ -418,6 +453,42 @@ describe('EventManager drawing drag routing', () => {
     }
     expect(onDrawingDragStart).not.toHaveBeenCalled();
     expect(onDrawingDragMove).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
+  it('cancels active touch drawing drags on touchcancel without ending them', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const onDrawingDragCancel = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+        onDrawingDragCancel,
+      }),
+    );
+
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100 });
+    const moveTouch = createTouch(container, { clientX: 130, clientY: 110 });
+    dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
+    dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
+    dispatchTouchEvent(container, 'touchcancel', [], [moveTouch]);
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch');
+    expect(onDrawingDragCancel).toHaveBeenCalledOnce();
+    expect(onDrawingDragCancel).toHaveBeenCalledWith('touch');
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
 
     manager.dispose();
   });
