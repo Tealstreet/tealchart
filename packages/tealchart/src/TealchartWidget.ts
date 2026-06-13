@@ -66,6 +66,7 @@ import {
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
   isUserDrawingLayoutStateEqual,
+  isUserDrawingPathFamilyTool,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
@@ -2664,7 +2665,7 @@ export class TealchartWidget {
   }
 
   private _handleUserDrawingPathDragStart(point: UserDrawingInputPoint): boolean {
-    if (this._userDrawingState.activeTool !== 'path') return false;
+    if (!isUserDrawingPathFamilyTool(this._userDrawingState.activeTool)) return false;
 
     return this.dispatchUserDrawingCommand({
       type: 'beginPathDrag',
@@ -2674,7 +2675,7 @@ export class TealchartWidget {
   }
 
   private _handleUserDrawingPathDragMove(point: UserDrawingInputPoint): boolean {
-    if (this._userDrawingState.activeTool !== 'path') return false;
+    if (!isUserDrawingPathFamilyTool(this._userDrawingState.activeTool)) return false;
 
     return this.dispatchUserDrawingCommand({
       type: 'appendPathDragPoint',
@@ -2684,14 +2685,14 @@ export class TealchartWidget {
   }
 
   private _handleUserDrawingPathDragEnd(): void {
-    if (this._userDrawingState.activeTool !== 'path') return;
+    if (!isUserDrawingPathFamilyTool(this._userDrawingState.activeTool)) return;
 
     this.dispatchUserDrawingCommand({
       type: 'commitPathDrag',
       options: {
         createId: () => this._createUserDrawingId(),
       },
-      meta: { source: 'pointer', transactionKey: 'path-drag' },
+      meta: { source: 'pointer' },
     });
   }
 
