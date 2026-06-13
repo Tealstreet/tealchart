@@ -2447,6 +2447,42 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toEqual([]);
   });
 
+  it('renders committed state drawings in z-order before selection handles', () => {
+    const ctx = new RecordingCanvasContext();
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'front' },
+      drawings: [
+        {
+          ...base,
+          id: 'back',
+          kind: 'horizontalLine',
+          style: { ...style, lineColor: '#111111', lineStyle: 'solid' },
+          price: 25,
+        },
+        {
+          ...base,
+          id: 'front',
+          kind: 'horizontalLine',
+          style: { ...style, lineColor: '#eeeeee', lineStyle: 'solid' },
+          price: 75,
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    renderUserDrawingLayer(ctx, state, new Map([[space.pane.id, space]]));
+
+    expect(ctx.calls.filter((call) => call.startsWith('stroke:'))).toEqual([
+      'stroke:#111111:2::1',
+      'stroke:#eeeeee:2::1',
+      'stroke:#eeeeee:1::1',
+      'stroke:#eeeeee:1::1',
+    ]);
+  });
+
   it('renders state layers with draft opacity and selection handles', () => {
     const ctx = new RecordingCanvasContext();
     const state: UserDrawingState = {

@@ -131,6 +131,47 @@ describe('mobile user drawing render model', () => {
     ]);
   });
 
+  it('preserves committed drawing z-order before selected handles', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'front' },
+      drawings: [
+        {
+          id: 'back',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, lineColor: '#111111' },
+          price: 25,
+        },
+        {
+          id: 'front',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { ...style, lineColor: '#eeeeee' },
+          price: 75,
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]])).map((primitive) => primitive.id)).toEqual([
+      'back',
+      'front',
+      'front:handle:0',
+      'front:handle:1',
+    ]);
+  });
+
   it('shares selected action anchor geometry with Skia render spaces', () => {
     const state: UserDrawingState = {
       version: 1,
