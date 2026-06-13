@@ -32,6 +32,7 @@ import type {
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
+  UserDrawing,
   UserDrawingAnchor,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
@@ -300,6 +301,7 @@ export interface SkiaTealchartHandle {
   dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean;
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
   selectUserDrawings(drawingIds: readonly string[]): void;
+  addUserDrawing(drawing: UserDrawing, options?: { select?: boolean }): boolean;
   deleteUserDrawing(drawingId?: string): boolean;
   deleteSelectedUserDrawing(): boolean;
   duplicateUserDrawing(drawingId?: string): boolean;
@@ -715,6 +717,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       selectUserDrawings(drawingIds: readonly string[]): void {
         dispatchUserDrawingCommandToState({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
+      },
+      addUserDrawing(drawing: UserDrawing, options: { select?: boolean } = {}): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'add',
+          drawing,
+          options,
+          meta: { source: 'api' },
+        });
       },
       deleteUserDrawing(drawingId?: string): boolean {
         return dispatchUserDrawingCommandToState({ type: 'delete', options: { drawingId }, meta: { source: 'api' } });

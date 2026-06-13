@@ -24,6 +24,7 @@ import type {
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingContextActionItem,
   UserDrawingEditDrag,
+  UserDrawing,
   UserDrawingCommandHistory,
   UserDrawingHandleRole,
   UserDrawingHitTestOptions,
@@ -2332,6 +2333,15 @@ export class TealchartWidget {
 
   selectUserDrawings(drawingIds: readonly string[]): void {
     this.dispatchUserDrawingCommand({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
+  }
+
+  addUserDrawing(drawing: UserDrawing, options: { select?: boolean } = {}): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'add',
+      drawing,
+      options,
+      meta: { source: 'api' },
+    });
   }
 
   deleteUserDrawing(drawingId?: string): boolean {

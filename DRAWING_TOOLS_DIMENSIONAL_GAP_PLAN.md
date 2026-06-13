@@ -686,6 +686,11 @@ Phase 1: Command-backed APIs
 - Ensure create, update, select, delete, duplicate, reorder, lock, hide,
   style update, undo, redo, open object tree, and open properties APIs exist
   for web and mobile.
+- Status: direct complete-drawing create now goes through the shared undoable
+  `add` command. Web exposes `TealchartWidget.addUserDrawing`; mobile exposes
+  the sibling `SkiaTealchartHandle.addUserDrawing`. Duplicate IDs are a no-op,
+  added drawings select by default, and both platforms share the same
+  command/history behavior.
 
 Phase 2: Event subscriptions
 

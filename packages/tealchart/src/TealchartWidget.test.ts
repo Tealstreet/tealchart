@@ -7,7 +7,7 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
-import type { DrawingCoordinateSpace, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawing, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
@@ -369,6 +369,74 @@ describe('TealchartWidget', () => {
 
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'b', drawingIds: ['b', 'a'] });
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it('adds complete user drawings through an undoable command-backed API', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      const drawing: UserDrawing = {
+        id: 'api-line',
+        kind: 'trendLine',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+        points: [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 110 },
+        ],
+        extend: 'none',
+      };
+
+      expect(widget.addUserDrawing(drawing)).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([drawing]);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'api-line' });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'add', drawing }),
+          source: 'api',
+          affectedIds: ['api-line'],
+        }),
+      );
+      const addEvent = onCommand.mock.calls.at(-1)?.[0];
+      expect(addEvent?.command).toMatchObject({ type: 'add' });
+      if (addEvent?.command.type === 'add') {
+        expect(addEvent.command.drawing).not.toBe(drawing);
+      }
+
+      (drawing as unknown as { points: { time: number; price: number }[] }).points[0] = { time: 1_000, price: 999 };
+      drawing.style.lineColor = '#f00';
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'api-line',
+        style: { lineColor: '#f5c542' },
+        points: [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 110 },
+        ],
+      });
+
+      expect(widget.addUserDrawing(drawing)).toBe(false);
+      expect(widget.getUserDrawingState().drawings).toHaveLength(1);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(widget.redoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'api-line',
+        style: { lineColor: '#f5c542' },
+        points: [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 110 },
+        ],
+      });
+
+      const secondDrawing: UserDrawing = { ...drawing, id: 'api-line-2', style: { ...drawing.style } };
+      expect(widget.addUserDrawing(secondDrawing)).toBe(true);
+      expect(onCommand.mock.calls.at(-1)?.[0].affectedIds).toEqual(expect.arrayContaining(['api-line', 'api-line-2']));
+      expect(onCommand.mock.calls.at(-1)?.[0].affectedIds).toHaveLength(2);
     });
 
     it('notifies option and subscription listeners after drawing commands change state', () => {

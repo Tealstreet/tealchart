@@ -261,6 +261,7 @@ export type {
   UserDrawingHistoryStepResult,
 } from './history';
 export {
+  addUserDrawing,
   beginUserDrawingTextEdit,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
@@ -268,6 +269,7 @@ export {
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  cloneUserDrawingSnapshot,
   commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
@@ -305,6 +307,7 @@ export {
   updateUserDrawingTextEdit,
 } from './input';
 export type {
+  AddUserDrawingOptions,
   CopyUserDrawingOptions,
   DeleteUserDrawingOptions,
   DuplicateUserDrawingOptions,

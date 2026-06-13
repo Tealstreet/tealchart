@@ -1,6 +1,7 @@
 import type {
   AnchoredVolumeProfileDrawing,
   AnchoredVwapDrawing,
+  AddUserDrawingOptions,
   ArcDrawing,
   ArrowLineDrawing,
   ArrowMarkDownDrawing,
@@ -158,6 +159,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   WEB_CHART_CHROME_METRICS,
+  addUserDrawing,
   computeChartGeometry,
   computeTopLeftLegendRect,
   createUserDrawingClipboard,
@@ -310,6 +312,9 @@ describe('tealchart public entries', () => {
       'right',
       'both',
     ]);
+    const addOptions: NonNever<AddUserDrawingOptions> = { select: false };
+    expect(addUserDrawing).toBeTypeOf('function');
+    expect(addOptions.select).toBe(false);
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(createUserDrawingClipboard).toBeTypeOf('function');
     expect(pasteUserDrawingClipboard).toBeTypeOf('function');

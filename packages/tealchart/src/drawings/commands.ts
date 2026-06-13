@@ -1,4 +1,5 @@
 import type {
+  AddUserDrawingOptions,
   UserDrawingSelectionInputOptions,
   DeleteUserDrawingOptions,
   DuplicateUserDrawingOptions,
@@ -28,6 +29,7 @@ import type {
 import type {
   UserDrawingHandleRole,
   UserDrawingIconName,
+  UserDrawing,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -36,6 +38,7 @@ import type {
 } from './types';
 
 import {
+  addUserDrawing,
   appendUserDrawingPathDragPoint,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
@@ -43,6 +46,7 @@ import {
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  cloneUserDrawingSnapshot,
   commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
@@ -104,6 +108,7 @@ interface UserDrawingCommandBase {
 
 export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setActiveTool'; tool: UserDrawingTool })
+  | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
   | (UserDrawingCommandBase & { type: 'selectMany'; drawingIds: readonly string[] })
   | (UserDrawingCommandBase & {
@@ -321,6 +326,17 @@ export function dispatchUserDrawingCommand(
   state: UserDrawingState,
   command: UserDrawingCommand,
 ): UserDrawingCommandDispatchResult {
+  if (command.type === 'add') {
+    const snapshotCommand = { ...command, drawing: cloneUserDrawingSnapshot(command.drawing) };
+    const nextState = reduceUserDrawingCommand(state, snapshotCommand);
+    return {
+      state: nextState,
+      changed: nextState !== state,
+      command: snapshotCommand,
+      meta: snapshotCommand.meta,
+    };
+  }
+
   if (command.type === 'selectAtPoint') {
     const result = resolveUserDrawingSelectionAtPoint(state, command.point, command.spacesByPaneId, command.options);
     return {
@@ -369,6 +385,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
   switch (command.type) {
     case 'setActiveTool':
       return setUserDrawingTool(state, command.tool);
+    case 'add':
+      return addUserDrawing(state, command.drawing, command.options);
     case 'select':
       return selectUserDrawingById(state, command.drawingId, command.handle);
     case 'selectMany':
