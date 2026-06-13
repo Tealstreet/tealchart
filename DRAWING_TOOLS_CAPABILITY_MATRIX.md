@@ -91,7 +91,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Brushes | `path`, `brush`, `highlighter` | 3 currently | `freehand-drag` | `partial` | Real sampled path model, history grouping |
 | Annotation | `textLabel`, `note`, `comment`, `anchoredText`, `anchoredNote`, `priceLabel`, `pin`, `emoji`, `sticker`, `balloon`, `signpost`, `table` | 1 | `one-point` or `anchored-pane` | `partial` | Floating toolbar, properties, object tree |
 | Annotation | `callout`, `priceNote`, `image` | 2 | `two-point-drag-click` | `partial` | Properties |
-| Forecasting/measurement | `priceRange`, `dateRange`, `datePriceRange`, `forecast`, `fixedRangeVolumeProfile` | 2 | `two-point-drag-click` or `computed-special` | `partial` | Drag-to-draw for fixed range volume profile, computed settings |
+| Forecasting/measurement | `priceRange`, `dateRange`, `datePriceRange`, `forecast`, `fixedRangeVolumeProfile` | 2 | `two-point-drag-click` or `computed-special` | `partial` | Computed settings/properties |
 | Forecasting/measurement | `longPosition`, `shortPosition`, `projection`, `sector`, `barsPattern` | 3 | `multi-point-click` or `computed-special` | `partial` | Properties, placement previews |
 | Volume/profile | `anchoredVwap`, `anchoredVolumeProfile` | 1 | `one-point` / `computed-special` | `partial` | Properties, computed settings |
 | Patterns | `trianglePattern`, `abcdPattern` | 4 | `multi-point-click` | `partial` | Placement previews, labels/properties |
