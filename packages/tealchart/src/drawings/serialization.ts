@@ -13,11 +13,14 @@ import type {
 
 import { createUserDrawingState } from './input';
 import {
+  USER_DRAWING_SCHEMA_VERSION,
   normalizeUserDrawingIconName,
   normalizeUserDrawingPanePosition,
   normalizeUserDrawingStyle,
   normalizeUserDrawingTableCells,
 } from './types';
+
+export const USER_DRAWING_LAYOUT_SCHEMA_VERSION = USER_DRAWING_SCHEMA_VERSION;
 
 function cloneUserDrawing(drawing: UserDrawing): UserDrawing {
   switch (drawing.kind) {
@@ -358,10 +361,6 @@ function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'
   if (
     typeof value.id !== 'string' ||
     typeof value.paneId !== 'string' ||
-    typeof value.visible !== 'boolean' ||
-    typeof value.locked !== 'boolean' ||
-    !isFiniteNumber(value.createdAt) ||
-    !isFiniteNumber(value.updatedAt) ||
     !style
   ) {
     return null;
@@ -371,10 +370,10 @@ function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'
     id: value.id,
     name: typeof value.name === 'string' && value.name.trim() ? value.name.trim() : undefined,
     paneId: value.paneId,
-    visible: value.visible,
-    locked: value.locked,
-    createdAt: value.createdAt,
-    updatedAt: value.updatedAt,
+    visible: typeof value.visible === 'boolean' ? value.visible : true,
+    locked: typeof value.locked === 'boolean' ? value.locked : false,
+    createdAt: isFiniteNumber(value.createdAt) ? value.createdAt : 0,
+    updatedAt: isFiniteNumber(value.updatedAt) ? value.updatedAt : isFiniteNumber(value.createdAt) ? value.createdAt : 0,
     style,
   };
 }
@@ -1251,18 +1250,21 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
   if (!state || state.drawings.length === 0) return undefined;
 
   return createUserDrawingState({
-    version: state.version,
+    version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings: state.drawings.map(cloneUserDrawing),
   });
 }
 
 export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDrawingState | undefined {
   if (!isRecord(state) || !Array.isArray(state.drawings)) return undefined;
+  const layoutVersion = isFiniteNumber(state.version) ? state.version : USER_DRAWING_LAYOUT_SCHEMA_VERSION;
+  if (layoutVersion > USER_DRAWING_LAYOUT_SCHEMA_VERSION) return undefined;
+
   const drawings = state.drawings.map(parseUserDrawing).filter((drawing): drawing is UserDrawing => drawing !== null);
   if (drawings.length === 0) return undefined;
 
   return createUserDrawingState({
-    version: isFiniteNumber(state.version) ? state.version : undefined,
+    version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings,
   });
 }
