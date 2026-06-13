@@ -239,14 +239,16 @@ function resolveUserDrawingCommandAffectedIds(
   const changedIds = new Set<string>();
   const previousById = new Map(previousState.drawings.map((drawing) => [drawing.id, drawing]));
   const nextById = new Map(nextState.drawings.map((drawing) => [drawing.id, drawing]));
+  const previousIndexById = new Map(previousState.drawings.map((drawing, index) => [drawing.id, index]));
 
   for (const previousDrawing of previousState.drawings) {
     if (nextById.get(previousDrawing.id) !== previousDrawing) {
       changedIds.add(previousDrawing.id);
     }
   }
-  for (const nextDrawing of nextState.drawings) {
-    if (previousById.get(nextDrawing.id) !== nextDrawing) {
+  for (let index = 0; index < nextState.drawings.length; index++) {
+    const nextDrawing = nextState.drawings[index]!;
+    if (previousById.get(nextDrawing.id) !== nextDrawing || previousIndexById.get(nextDrawing.id) !== index) {
       changedIds.add(nextDrawing.id);
     }
   }

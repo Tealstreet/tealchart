@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { dispatchUserDrawingCommand } from './commands';
+import { createUserDrawingCommandEvent, dispatchUserDrawingCommand } from './commands';
 import type { UserDrawingCommand } from './commands';
 import { beginUserDrawingDuplicateEditDragAtPoint, beginUserDrawingEditDragAtPoint } from './editing';
 import { clearChartStoreCache } from '../state/chartState';
@@ -150,6 +150,23 @@ describe('user drawing command dispatch', () => {
 
     expect(secondCommand.state).toEqual(secondDirect);
     expect(secondCommand.state.selection).toEqual({ drawingId: 'rect' });
+  });
+
+  it('derives affected drawing ids for reorder command events', () => {
+    const state = duplicateUserDrawing(createStateWithTrendLine(), {
+      createId: () => 'copy',
+      now: () => 30,
+    });
+    const result = dispatchUserDrawingCommand(state, {
+      type: 'reorder',
+      action: 'sendToBack',
+      meta: { source: 'api' },
+    });
+    const event = createUserDrawingCommandEvent(state, result);
+
+    expect(result.changed).toBe(true);
+    expect(event?.affectedIds).toEqual(expect.arrayContaining(['trend-line', 'copy']));
+    expect(event?.affectedIds).toHaveLength(2);
   });
 
   it('wraps selection, duplicate, delete, style, lock, and z-order reducers', () => {

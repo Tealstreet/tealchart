@@ -10,6 +10,7 @@ import {
 import { clearChartStoreCache } from '../../state/chartState';
 import {
   createUserDrawingCommandHistory,
+  createUserDrawingCommandEvent,
   createUserDrawingState,
   duplicateUserDrawing,
   handleUserDrawingInput,
@@ -268,10 +269,14 @@ describe('mobile drawing handle command dispatch', () => {
     );
 
     expect(result.action?.type).toBe('duplicateSelected');
+    expect(result.command).toMatchObject({ type: 'duplicate', meta: { source: 'keyboard' } });
     expect(result.changed).toBe(true);
     expect(result.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
     expect(result.state.selection).toEqual({ drawingId: 'copy' });
     expect(result.history.undoStack).toHaveLength(1);
+    expect(result.command ? createUserDrawingCommandEvent(state, { ...result, command: result.command })?.source : null).toBe(
+      'keyboard',
+    );
   });
 
   it('routes mobile select-all keyboard action without recording undo history', () => {
