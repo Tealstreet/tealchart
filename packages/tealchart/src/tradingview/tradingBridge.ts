@@ -76,9 +76,10 @@ export class TradingViewTradingBridge {
   }
 
   setState(state: ChartTradingState): void {
-    this.state = cloneTradingState(state);
+    const nextState = cloneTradingState(state);
+    this.activeDrag = rebindActiveDrag(this.activeDrag, nextState);
+    this.state = nextState;
     this.hitTargets = [];
-    this.activeDrag = null;
   }
 
   getState(): ChartTradingState {
@@ -108,25 +109,38 @@ export class TradingViewTradingBridge {
       const hit = this.findHit(point);
       if (!hit) return;
       element.style.cursor = hit.cursor;
-      event.preventDefault();
+      claimPointerEvent(event);
+      capturePointer(element, event);
       this.handleHitStart(hit, point);
     };
     const onPointerMove = (event: PointerEvent) => {
       const point = this.eventPoint(event);
-      if (!point) return;
       if (this.activeDrag) {
         element.style.cursor = 'ns-resize';
-        event.preventDefault();
+        claimPointerEvent(event);
         return;
       }
-      element.style.cursor = this.findHit(point)?.cursor ?? '';
+      if (!point) return;
+      const hit = this.findHit(point);
+      if (hit) {
+        element.style.cursor = hit.cursor;
+        claimPointerEvent(event);
+        return;
+      }
+      element.style.cursor = '';
     };
     const onPointerUp = (event: PointerEvent) => {
       const point = this.eventPoint(event);
+      const activeDrag = this.activeDrag;
+      const hit = point ? this.findHit(point) : null;
+      if (activeDrag || hit) {
+        claimPointerEvent(event);
+      }
       if (point) {
         this.handlePointerUp(point);
       }
       this.activeDrag = null;
+      releasePointer(element, event);
       element.style.cursor = point ? this.findHit(point)?.cursor ?? '' : '';
     };
     const onPointerLeave = () => {
@@ -135,16 +149,16 @@ export class TradingViewTradingBridge {
       }
     };
 
-    element.addEventListener('pointerdown', onPointerDown);
-    element.addEventListener('pointermove', onPointerMove);
-    element.addEventListener('pointerleave', onPointerLeave);
-    window.addEventListener('pointerup', onPointerUp);
+    element.addEventListener('pointerdown', onPointerDown, { capture: true });
+    element.addEventListener('pointermove', onPointerMove, { capture: true });
+    element.addEventListener('pointerleave', onPointerLeave, { capture: true });
+    window.addEventListener('pointerup', onPointerUp, { capture: true });
 
     this.detachListeners = () => {
-      element.removeEventListener('pointerdown', onPointerDown);
-      element.removeEventListener('pointermove', onPointerMove);
-      element.removeEventListener('pointerleave', onPointerLeave);
-      window.removeEventListener('pointerup', onPointerUp);
+      element.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      element.removeEventListener('pointermove', onPointerMove, { capture: true });
+      element.removeEventListener('pointerleave', onPointerLeave, { capture: true });
+      window.removeEventListener('pointerup', onPointerUp, { capture: true });
       if (this.attachedElement === element) {
         element.style.cursor = '';
       }
@@ -482,6 +496,28 @@ function cloneTradingState(state: ChartTradingState): ChartTradingState {
     positions: state.positions?.map((position) => ({ ...position, label: position.label ? { ...position.label } : undefined, style: position.style ? { ...position.style } : undefined, actions: position.actions?.map((action) => ({ ...action })), brackets: position.brackets ? { ...position.brackets } : position.brackets })),
     executions: state.executions?.map((execution) => ({ ...execution, label: execution.label ? { ...execution.label } : undefined, style: execution.style ? { ...execution.style } : undefined, actions: execution.actions?.map((action) => ({ ...action })) })),
   };
+}
+
+function rebindActiveDrag(activeDrag: ActiveDrag | null, state: ChartTradingState): ActiveDrag | null {
+  if (!activeDrag) return null;
+  const line = state.orders?.find((order) => order.id === activeDrag.line.id);
+  return line?.editable === true ? { ...activeDrag, line } : null;
+}
+
+function claimPointerEvent(event: PointerEvent): void {
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+}
+
+function capturePointer(element: HTMLElement, event: PointerEvent): void {
+  if (typeof event.pointerId !== 'number' || typeof element.setPointerCapture !== 'function') return;
+  element.setPointerCapture(event.pointerId);
+}
+
+function releasePointer(element: HTMLElement, event: PointerEvent): void {
+  if (typeof event.pointerId !== 'number' || typeof element.releasePointerCapture !== 'function') return;
+  element.releasePointerCapture(event.pointerId);
 }
 
 function actionButtons(

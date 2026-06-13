@@ -271,6 +271,94 @@ describe('TradingViewTradingBridge', () => {
     });
   });
 
+  it('claims attached trading pointer gestures before child handlers receive them', () => {
+    const onIntent = vi.fn();
+    const childPointerDown = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+    const container = document.createElement('div');
+    const child = document.createElement('div');
+    const setPointerCapture = vi.fn();
+    const releasePointerCapture = vi.fn();
+    container.appendChild(child);
+    container.getBoundingClientRect = vi.fn(() => domRect({ left: 0, top: 0, width: 500, height: 300 }));
+    container.setPointerCapture = setPointerCapture;
+    container.releasePointerCapture = releasePointerCapture;
+    child.addEventListener('pointerdown', childPointerDown);
+    const ctx = createRecordingContext(domRect({ left: 50, top: 30, width: 400, height: 200 }));
+
+    bridge.draw(frame(ctx));
+    const detach = bridge.attach(container);
+
+    child.dispatchEvent(pointerMouseEvent('pointerdown', { clientX: 80, clientY: 130, pointerId: 7 }));
+    window.dispatchEvent(pointerMouseEvent('pointerup', { clientX: 80, clientY: 110, pointerId: 7 }));
+    detach();
+
+    expect(childPointerDown).not.toHaveBeenCalled();
+    expect(setPointerCapture).toHaveBeenCalledWith(7);
+    expect(releasePointerCapture).toHaveBeenCalledWith(7);
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'order.move.commit',
+      source: 'tradingview-bridge',
+      orderId: 'external-order-1',
+      lineId: 'order-1',
+      price: 120,
+    });
+  });
+
+  it('preserves active drags through editable order state refreshes', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 30, y: 100 });
+    bridge.setState({
+      orders: [
+        {
+          kind: 'order',
+          id: 'order-1',
+          orderId: 'updated-order-1',
+          price: 100,
+          editable: true,
+        },
+      ],
+    });
+    bridge.handlePointerUp({ x: 30, y: 80 });
+
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'order.move.commit',
+      source: 'tradingview-bridge',
+      orderId: 'updated-order-1',
+      lineId: 'order-1',
+      price: 120,
+    });
+  });
+
   it('emits position action intents from label hits', () => {
     const intents: unknown[] = [];
     const bridge = new TradingViewTradingBridge({
@@ -405,4 +493,13 @@ function domRect(rect: { left: number; top: number; width: number; height: numbe
     y: rect.top,
     toJSON: () => rect,
   } as DOMRect;
+}
+
+function pointerMouseEvent(
+  type: string,
+  options: MouseEventInit & { pointerId: number },
+): MouseEvent {
+  const event = new MouseEvent(type, { bubbles: true, cancelable: true, ...options });
+  Object.defineProperty(event, 'pointerId', { value: options.pointerId });
+  return event;
 }
