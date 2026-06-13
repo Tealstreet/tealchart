@@ -23,6 +23,7 @@ import {
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
+  resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   getUserDrawingToolDescriptor,
   supportsUserDrawingFillColorControls,
@@ -124,7 +125,8 @@ interface ChartTopBarState {
 // Styles
 // ============================================================================
 
-const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 268;
+const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 280;
+const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 40;
 
 const styles = {
   container: {
@@ -315,6 +317,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
+    width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
+    boxSizing: 'border-box',
     padding: '4px',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '6px',
@@ -626,18 +630,30 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const surface = resolveUserDrawingSelectedActionSurface(state);
     if (!surface.selectedDrawing) return;
     const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
-    const parentWidth = parent.getBoundingClientRect().width || window.innerWidth;
-    const halfWidth = SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH / 2;
-    const minCenterX = 8 + halfWidth;
-    const maxCenterX = Math.max(minCenterX, parentWidth - 8 - halfWidth);
-    const centerX = Math.max(minCenterX, Math.min(maxCenterX, anchor.anchor.x));
+    const parentRect = parent.getBoundingClientRect();
+    const position = resolveUserDrawingActionSurfacePosition({
+      anchor: anchor.anchor,
+      viewport: {
+        width: parentRect.width || window.innerWidth,
+        height: parentRect.height || window.innerHeight,
+      },
+      surface: {
+        width: SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
+        height: SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT,
+      },
+      inset: {
+        left: 8,
+        right: 8,
+        top: WEB_CHART_CHROME_METRICS.topBarHeight + 6,
+        bottom: 8,
+      },
+    });
 
     const el = this.createElement('div', {
       style: {
         ...styles.selectedActionSurface,
-        left: `${centerX}px`,
-        top: `${Math.max(WEB_CHART_CHROME_METRICS.topBarHeight + 6, anchor.anchor.y - 42)}px`,
-        transform: 'translateX(-50%)',
+        left: `${position.left}px`,
+        top: `${position.top}px`,
       },
       attributes: {
         'aria-label': 'Selected drawing actions',
