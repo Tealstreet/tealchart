@@ -491,6 +491,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
   const userDrawingEditDragTransactionKeyRef = useRef('edit-drag');
+  const userDrawingEditDragTransactionCounterRef = useRef(0);
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
   const userDrawingPlacementDragStartPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
@@ -673,6 +674,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       },
       beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean {
+        const transactionKey = `duplicate-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
         const result = dispatchUserDrawingCommandToStateWithResult({
           type: 'beginDuplicateEditDragAtPoint',
           point,
@@ -681,12 +683,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             createId: createUserDrawingId,
             hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
           },
-          meta: { source: 'api', transactionKey: 'duplicate-drag' },
+          meta: { source: 'api', transactionKey },
         });
         if (!result.hit || !result.editDrag) return false;
 
         userDrawingEditDragRef.current = result.editDrag;
-        userDrawingEditDragTransactionKeyRef.current = 'duplicate-drag';
+        userDrawingEditDragTransactionKeyRef.current = transactionKey;
         return true;
       },
       copySelectedUserDrawing(): boolean {
@@ -1572,6 +1574,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
       if (effectiveUserDrawingState.activeTool !== 'select') return false;
 
+      const transactionKey = `edit-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
       const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
         type: 'beginEditDragAtPoint',
         point: { x, y },
@@ -1579,12 +1582,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         options: {
           hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
         },
-        meta: { source: 'touch', transactionKey: 'edit-drag' },
+        meta: { source: 'touch', transactionKey },
       });
       if (!result.hit || !result.editDrag) return false;
 
       userDrawingEditDragRef.current = result.editDrag;
-      userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
+      userDrawingEditDragTransactionKeyRef.current = transactionKey;
       if (result.changed) {
         commitUserDrawingState(result.state);
       }
