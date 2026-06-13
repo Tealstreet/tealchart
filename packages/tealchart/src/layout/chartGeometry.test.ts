@@ -4,11 +4,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   clampRectToBounds,
+  computeLeftToolRailTop,
   computeChartGeometry,
   computePaneGeometry,
   insetRect,
   intersectsRect,
+  MOBILE_CHART_CHROME_METRICS,
   rect,
+  WEB_CHART_CHROME_METRICS,
 } from './chartGeometry';
 
 const paneLayout: UnifiedPaneLayout = {
@@ -112,6 +115,32 @@ describe('chart geometry', () => {
 
     expect(snapshot.canvas).toEqual({ x: 0, y: 0, width: 400, height: 300 });
     expect(snapshot.drawable).toEqual({ x: 44, y: 32, width: 306, height: 242 });
+  });
+
+  it('describes platform chrome metrics for overlay layout consumers', () => {
+    const webSnapshot = computeChartGeometry({
+      width: 500,
+      height: 320,
+      margins: { top: WEB_CHART_CHROME_METRICS.topBarHeight, right: 60, bottom: 26, left: 0 },
+      paneLayout,
+      topBarHeight: WEB_CHART_CHROME_METRICS.topBarHeight,
+      leftToolRailWidth: WEB_CHART_CHROME_METRICS.leftToolRailWidth,
+    });
+    const mobileSnapshot = computeChartGeometry({
+      width: 500,
+      height: 320,
+      margins: { top: MOBILE_CHART_CHROME_METRICS.topBarHeight, right: 60, bottom: 26, left: 0 },
+      paneLayout,
+      topBarHeight: MOBILE_CHART_CHROME_METRICS.topBarHeight,
+      leftToolRailWidth: MOBILE_CHART_CHROME_METRICS.leftToolRailWidth,
+    });
+
+    expect(computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)).toBe(40);
+    expect(computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS)).toBe(44);
+    expect(webSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 32 });
+    expect(webSnapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
+    expect(mobileSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 36 });
+    expect(mobileSnapshot.chrome.leftTools).toEqual({ x: 0, y: 36, width: 52, height: 284 });
   });
 
   it('positions panes within safe-area-adjusted vertical bounds', () => {

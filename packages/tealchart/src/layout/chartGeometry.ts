@@ -25,6 +25,13 @@ export interface ChartChromeLayoutModes {
   bottomTimeAxis: ChartLayoutMode;
 }
 
+export interface ChartChromeMetrics {
+  topBarHeight: number;
+  leftToolRailWidth: number;
+  leftToolRailInset: number;
+  leftToolRailTopGap: number;
+}
+
 export interface ChartGeometryInput {
   width: number;
   height: number;
@@ -50,6 +57,20 @@ export const DEFAULT_CHART_CHROME_LAYOUT: ChartChromeLayoutModes = {
   leftTools: 'overlay',
   rightPriceAxis: 'hybrid',
   bottomTimeAxis: 'hybrid',
+};
+
+export const WEB_CHART_CHROME_METRICS: ChartChromeMetrics = {
+  topBarHeight: 32,
+  leftToolRailWidth: 50,
+  leftToolRailInset: 8,
+  leftToolRailTopGap: 8,
+};
+
+export const MOBILE_CHART_CHROME_METRICS: ChartChromeMetrics = {
+  topBarHeight: 36,
+  leftToolRailWidth: 52,
+  leftToolRailInset: 8,
+  leftToolRailTopGap: 8,
 };
 
 export const EMPTY_INSETS: Insets = {
@@ -103,6 +124,10 @@ export function clampRectToBounds(input: Rect, bounds: Rect): Rect {
     width,
     height,
   );
+}
+
+export function computeLeftToolRailTop(metrics: Pick<ChartChromeMetrics, 'topBarHeight' | 'leftToolRailTopGap'>): number {
+  return metrics.topBarHeight + metrics.leftToolRailTopGap;
 }
 
 export function computePaneGeometry(options: {
