@@ -7,7 +7,8 @@ import type {
   UserDrawingSelectedActionSurfaceItem,
 } from './toolbar';
 
-import { resolveUserDrawingSelectionAtPoint } from './input';
+import { hitTestUserDrawings } from './hitTesting';
+import { getUserDrawingSelectionIds, resolveUserDrawingSelectionAtPoint } from './input';
 import { resolveUserDrawingSelectedActionSurface } from './toolbar';
 
 export interface UserDrawingContextActionItem {
@@ -37,10 +38,8 @@ export function resolveUserDrawingContextActionsAtPoint(
   spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   options: ResolveUserDrawingContextActionsAtPointOptions = {},
 ): UserDrawingContextActionsAtPointResult {
-  const selection = resolveUserDrawingSelectionAtPoint(state, point, spacesByPaneId, {
-    hitTest: options.hitTest,
-  });
-  if (!selection.hit) {
+  const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, options.hitTest);
+  if (!hit) {
     return {
       state,
       hit: false,
@@ -49,6 +48,17 @@ export function resolveUserDrawingContextActionsAtPoint(
       items: [],
     };
   }
+
+  const selectedIds = getUserDrawingSelectionIds(state.selection);
+  const selection = selectedIds.includes(hit.drawing.id)
+    ? {
+        state,
+        hit: true,
+        changed: false,
+      }
+    : resolveUserDrawingSelectionAtPoint(state, point, spacesByPaneId, {
+        hitTest: options.hitTest,
+      });
 
   const surface = resolveUserDrawingSelectedActionSurface(selection.state);
   return {

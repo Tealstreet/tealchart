@@ -84,6 +84,22 @@ describe('user drawing context actions', () => {
     ]);
   });
 
+  it('preserves multi-selection when the hit drawing is already selected', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'back', drawingIds: ['back', 'front'] },
+    } satisfies UserDrawingState;
+
+    const result = resolveUserDrawingContextActionsAtPoint(selected, { x: 50, y: 40 }, new Map([['main', space]]));
+
+    expect(result.hit).toBe(true);
+    expect(result.changed).toBe(false);
+    expect(result.drawingId).toBe('back');
+    expect(result.state.selection).toEqual({ drawingId: 'back', drawingIds: ['back', 'front'] });
+    expect(result.items.find((item) => item.id === 'deleteSelected')?.enabled).toBe(true);
+    expect(result.items.find((item) => item.id === 'sendToBack')?.enabled).toBe(false);
+  });
+
   it('keeps state unchanged when no drawing is hit', () => {
     const result = resolveUserDrawingContextActionsAtPoint(state, { x: 50, y: 5 }, new Map([['main', space]]));
 

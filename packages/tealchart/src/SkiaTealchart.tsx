@@ -1811,7 +1811,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Combine all gestures
   const allGestures = useMemo(
-    () => Gesture.Race(drawingContextMenuGesture, crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
+    () =>
+      Gesture.Simultaneous(
+        drawingContextMenuGesture,
+        Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
+      ),
     [composedGesture, crosshairPanGesture, drawingContextMenuGesture, tapOrDoubleTapGesture],
   );
 
