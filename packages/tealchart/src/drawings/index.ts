@@ -207,6 +207,13 @@ export {
 export type { UserDrawingHitResult, UserDrawingHitTestOptions, UserDrawingHitTestTextMeasure } from './hitTesting';
 export { resolveUserDrawingInfoLineMetrics } from './infoLine';
 export type { UserDrawingInfoLineMetrics } from './infoLine';
+export { dispatchUserDrawingCommand, reduceUserDrawingCommand } from './commands';
+export type {
+  UserDrawingCommand,
+  UserDrawingCommandDispatchResult,
+  UserDrawingCommandMetadata,
+  UserDrawingCommandSource,
+} from './commands';
 export {
   beginUserDrawingTextEdit,
   beginUserDrawingPathDrag,
