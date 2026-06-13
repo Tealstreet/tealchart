@@ -405,6 +405,8 @@ Phase 3: Dismissal and focus
 - Status: web widget coverage now pins the chart-surface selection-miss route
   that clears selection without recording undo history, dismissing selected
   action surfaces through the shared selection/anchor state.
+- Status: bare Escape now clears selected drawings when no draft is active,
+  dismissing web selected-action surfaces without recording undo history.
 
 ### Epic 4.3: Mobile Selection Action Sheet
 
@@ -440,6 +442,9 @@ Phase 3: Dismissal and focus
   diverging from Canvas behavior.
 - Status: mobile command-adapter coverage now pins touch selection misses
   clearing selection and hiding the shared selected action surface model.
+- Status: mobile hardware-keyboard Escape uses the same shared clear-selection
+  action as web, hiding the Skia selected action strip without recording undo
+  history.
 
 ### Epic 4.4: Drawing Context Menu
 

@@ -478,6 +478,30 @@ describe('mobile drawing handle command dispatch', () => {
     expect(result.history.undoStack).toHaveLength(0);
   });
 
+  it('routes mobile escape keyboard action to selected action dismissal without recording undo history', () => {
+    const state = createMobileStateWithTrendLine();
+    const anchor = {
+      anchor: { x: 100, y: 200 },
+      bounds: { x: 80, y: 180, width: 40, height: 40 },
+      drawingIds: ['line'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    };
+    const result = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      createUserDrawingCommandHistory(),
+      { key: 'Escape' },
+      { createId: () => 'copy' },
+    );
+
+    expect(result.action?.type).toBe('clearSelection');
+    expect(result.changed).toBe(true);
+    expect(result.state.selection).toBeNull();
+    expect(result.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+    expect(result.history.undoStack).toHaveLength(0);
+    expect(shouldRenderUserDrawingSelectedActionSurface(result.state, anchor)).toBe(false);
+  });
+
   it('routes mobile selection misses through shared selected action dismissal state', () => {
     const state = createMobileStateWithTrendLine();
     const selected = dispatchMobileUserDrawingHandleCommand(state, {
