@@ -93,7 +93,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Annotation | `callout`, `priceNote`, `image` | 2 | `two-point-drag-click` | `partial` | Properties |
 | Forecasting/measurement | `priceRange`, `dateRange`, `datePriceRange`, `forecast`, `fixedRangeVolumeProfile` | 2 | `two-point-drag-click` or `computed-special` | `partial` | Computed settings/properties |
 | Forecasting/measurement | `longPosition`, `shortPosition`, `projection`, `sector` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
-| Forecasting/measurement | `barsPattern` | 3 | `computed-special` | `partial` | Source-bar payload, properties, placement previews |
+| Forecasting/measurement | `barsPattern` | 3 | `computed-special` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Volume/profile | `anchoredVwap`, `anchoredVolumeProfile` | 1 | `one-point` / `computed-special` | `partial` | Properties, computed settings |
 | Patterns | `trianglePattern`, `abcdPattern` | 4 | `multi-point-click` with first-segment drag seed | `partial` | Richer multi-point previews, labels/properties |
 | Patterns | `xabcdPattern`, `cypherPattern`, `threeDrivesPattern`, `headShouldersPattern`, `elliottImpulseWave`, `elliottTripleComboWave`, `elliottTriangleWave` | 5 | `multi-point-click` with first-segment drag seed | `partial` | Richer multi-point previews, labels/properties |

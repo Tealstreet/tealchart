@@ -126,8 +126,6 @@ describe('user drawing render model', () => {
       'sector',
       'longPosition',
       'shortPosition',
-      'elliottCorrectiveWave',
-      'elliottDoubleComboWave',
     ] as const;
 
     for (const tool of dragSeedTools) {
@@ -160,6 +158,43 @@ describe('user drawing render model', () => {
         ],
       });
     }
+  });
+
+  it('keeps drag-seeded bars pattern drafts renderable after drag release', () => {
+    const bars = [
+      { time: 10, open: 100, high: 104, low: 99, close: 102 },
+      { time: 40, open: 102, high: 105, low: 101, close: 101 },
+    ];
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'barsPattern',
+      selection: null,
+      drawings: [],
+      draft: {
+        tool: 'barsPattern',
+        paneId: 'main',
+        anchors: [
+          { time: 10, price: 90 },
+          { time: 40, price: 60 },
+        ],
+        barsPatternBars: bars,
+        style,
+        startedAt: 2,
+      },
+      textEdit: null,
+    };
+
+    expect(resolveUserDrawingRenderEntries(state)).toHaveLength(1);
+    expect(resolveUserDrawingRenderEntries(state)[0]?.drawing).toMatchObject({
+      id: '__draft__',
+      kind: 'barsPattern',
+      points: [
+        { time: 10, price: 90 },
+        { time: 40, price: 60 },
+        { time: 40, price: 60 },
+      ],
+      bars,
+    });
   });
 
   it('keeps drag-seeded four-anchor drafts renderable after drag release', () => {
