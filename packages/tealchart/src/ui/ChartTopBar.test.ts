@@ -139,13 +139,6 @@ describe('ChartTopBar drawing toolbar', () => {
         ...baseDrawingState,
         activeTool: 'trendLine',
         selection: { drawingId: 'h' },
-        draft: {
-          tool: 'trendLine',
-          paneId: 'main',
-          anchors: [{ time: 1, price: 10 }],
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
-          startedAt: 1,
-        },
         drawings: [
           {
             id: 'back',
@@ -202,19 +195,46 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Send selected drawing backward"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing to front"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Send selected drawing to back"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
 
     expect(onProperties).toHaveBeenCalledTimes(1);
     expect(onObjectTree).toHaveBeenCalledTimes(1);
     expect(onDuplicate).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledTimes(1);
-    expect(onCancel).toHaveBeenCalledTimes(1);
-    expect(onClear).toHaveBeenCalledTimes(1);
     expect(onZOrder).toHaveBeenCalledWith('bringForward');
     expect(onZOrder).toHaveBeenCalledWith('sendBackward');
     expect(onZOrder).toHaveBeenCalledWith('bringToFront');
     expect(onZOrder).toHaveBeenCalledWith('sendToBack');
+
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      activeTool: 'trendLine',
+      selection: { drawingId: 'h' },
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [{ time: 1, price: 10 }],
+        style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+        startedAt: 1,
+      },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 10,
+        },
+      ],
+    });
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onClear).toHaveBeenCalledTimes(1);
 
     topBar.setUserDrawingState({
       ...baseDrawingState,

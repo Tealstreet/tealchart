@@ -437,6 +437,7 @@ export {
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingStyleToolbarAction,
+  shouldRenderUserDrawingSelectedActionSurface,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
   supportsUserDrawingFillVisibilityControls,
