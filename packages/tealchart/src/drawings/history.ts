@@ -98,6 +98,7 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'setTrendLineExtend':
     case 'setIconName':
     case 'setImageSource':
+    case 'setName':
     case 'setTableCells':
     case 'setTableCell':
     case 'setTableDimensions':

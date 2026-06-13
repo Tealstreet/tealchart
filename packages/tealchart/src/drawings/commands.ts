@@ -53,6 +53,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingName,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingTableDimensions,
@@ -150,6 +151,7 @@ export type UserDrawingCommand =
       source: UserDrawingImageSourceInput;
       options?: UpdateUserDrawingOptions;
     })
+  | (UserDrawingCommandBase & { type: 'setName'; drawingId: string; name: string | null; options?: UpdateUserDrawingOptions })
   | (UserDrawingCommandBase & {
       type: 'setTableCells';
       cells: UserDrawingTableCellsInput;
@@ -287,6 +289,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return setUserDrawingIconName(state, command.iconName, command.options);
     case 'setImageSource':
       return setUserDrawingImageSource(state, command.source, command.options);
+    case 'setName':
+      return setUserDrawingName(state, command.drawingId, command.name, command.options);
     case 'setTableCells':
       return setUserDrawingTableCells(state, command.cells, command.options);
     case 'setTableCell':
