@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
@@ -34,6 +36,41 @@ function createCallbacks(overrides: Partial<EventManagerCallbacks> = {}): EventM
     onCursorChange: vi.fn(),
     ...overrides,
   };
+}
+
+function createTouch(
+  target: EventTarget,
+  init: { identifier?: number; clientX: number; clientY: number },
+): Touch {
+  return {
+    identifier: init.identifier ?? 1,
+    target,
+    clientX: init.clientX,
+    clientY: init.clientY,
+    screenX: init.clientX,
+    screenY: init.clientY,
+    pageX: init.clientX,
+    pageY: init.clientY,
+    radiusX: 1,
+    radiusY: 1,
+    rotationAngle: 0,
+    force: 1,
+  } as Touch;
+}
+
+function dispatchTouchEvent(
+  target: EventTarget,
+  type: string,
+  touches: Touch[],
+  changedTouches: Touch[] = touches,
+): void {
+  const event = new Event(type, { bubbles: true, cancelable: true }) as TouchEvent;
+  Object.defineProperties(event, {
+    touches: { value: touches },
+    targetTouches: { value: touches },
+    changedTouches: { value: changedTouches },
+  });
+  target.dispatchEvent(event);
 }
 
 describe('EventManager drawing drag routing', () => {
@@ -108,6 +145,164 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse');
     expect(onDrawingDragMove).toHaveBeenCalledWith(112, 104, 'mouse');
     expect(onDrawingDragEnd).toHaveBeenCalledWith('mouse');
+
+    manager.dispose();
+  });
+
+  it('promotes pending drawing drags on mouseup when no move frame was processed', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).toHaveBeenCalledOnce();
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingDragMove).toHaveBeenCalledOnce();
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse');
+    expect(onDrawingDragEnd).toHaveBeenCalledOnce();
+    expect(onDrawingDragEnd).toHaveBeenCalledWith('mouse');
+
+    manager.dispose();
+  });
+
+  it('promotes pending touch drawing drags after movement without firing tap input', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100 });
+    const moveTouch = createTouch(container, { clientX: 130, clientY: 110 });
+    dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
+    dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [moveTouch]);
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).toHaveBeenCalledOnce();
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragMove).toHaveBeenCalledOnce();
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch');
+    expect(onDrawingDragEnd).toHaveBeenCalledOnce();
+    expect(onDrawingDragEnd).toHaveBeenCalledWith('touch');
+
+    manager.dispose();
+  });
+
+  it('promotes pending touch drawing drags on touchend when the move frame has not run', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100 });
+    const moveTouch = createTouch(container, { clientX: 130, clientY: 110 });
+    dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
+    dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [moveTouch]);
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).toHaveBeenCalledOnce();
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragMove).toHaveBeenCalledOnce();
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch');
+    expect(onDrawingDragEnd).toHaveBeenCalledOnce();
+    expect(onDrawingDragEnd).toHaveBeenCalledWith('touch');
+
+    for (const callback of rafCallbacks) {
+      callback(0);
+    }
+    expect(onDrawingDragStart).toHaveBeenCalledOnce();
+    expect(onDrawingDragMove).toHaveBeenCalledOnce();
+
+    manager.dispose();
+  });
+
+  it('does not promote pending touch drawing drags on touchcancel', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100 });
+    const moveTouch = createTouch(container, { clientX: 130, clientY: 110 });
+    dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
+    dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
+    dispatchTouchEvent(container, 'touchcancel', [], [moveTouch]);
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).not.toHaveBeenCalled();
+    expect(onDrawingDragMove).not.toHaveBeenCalled();
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+
+    for (const callback of rafCallbacks) {
+      callback(0);
+    }
+    expect(onDrawingDragStart).not.toHaveBeenCalled();
+    expect(onDrawingDragMove).not.toHaveBeenCalled();
 
     manager.dispose();
   });
