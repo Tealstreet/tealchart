@@ -333,8 +333,9 @@ Phase 2: Anchor geometry model
 - Status: selected drawing bounds, preferred toolbar anchor point, single-anchor
   minimum target sizing, multi-select bounds, and pane split metadata resolve
   from shared render geometry.
-- Future work: clamp the visual toolbar/sheet to safe viewport insets when the
-  web floating toolbar and mobile action surface consume this model.
+- Status: web floating toolbar and mobile Skia action strip now use the same
+  safe viewport clamp helper so action surfaces stay inside left/right,
+  top-bar, and bottom insets near chart edges.
 
 Phase 3: Command dispatch
 

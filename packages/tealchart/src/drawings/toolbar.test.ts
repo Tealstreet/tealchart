@@ -12,6 +12,7 @@ import {
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillColorControls,
@@ -1513,6 +1514,44 @@ describe('user drawing toolbar descriptors', () => {
       ['lockSelected', true, { type: 'styleAction', action: 'lockSelected', locked: true }],
       ['unlockSelected', false, { type: 'styleAction', action: 'unlockSelected' }],
     ]);
+  });
+
+  it('clamps selected action surfaces inside shared safe viewport insets', () => {
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 10, y: 20 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      }),
+    ).toEqual({ left: 8, top: 38 });
+
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 310, y: 218 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      }),
+    ).toEqual({ left: 192, top: 172 });
+
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 160, y: 120 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      }),
+    ).toEqual({ left: 100, top: 78 });
+
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 318, y: 120 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 280, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      }),
+    ).toEqual({ left: 32, top: 78 });
   });
 
   it('keeps locked selected action surface mutations disabled except unlock', () => {
