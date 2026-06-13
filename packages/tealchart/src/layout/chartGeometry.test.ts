@@ -162,10 +162,16 @@ describe('chart geometry', () => {
       width: 480,
       height: 44,
     });
+    expect(computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, rect(0, 0, 500, 320), 0, { avoidLeftTools: true })).toEqual({
+      x: 70,
+      y: 40,
+      width: 430,
+      height: 44,
+    });
     expect(computeTopLeftLegendRect(MOBILE_CHART_CHROME_METRICS, rect(0, 0, 500, 320))).toBeNull();
-    expect(snapshot.chrome.topLeftLegend).toEqual({ x: 12, y: 40, width: 480, height: 44 });
+    expect(snapshot.chrome.topLeftLegend).toEqual({ x: 70, y: 40, width: 430, height: 44 });
     expect(snapshot.drawable).toEqual({ x: 0, y: 0, width: 440, height: 294 });
-    expect(snapshot.avoidRects).toContainEqual({ x: 12, y: 40, width: 480, height: 44 });
+    expect(snapshot.avoidRects).toContainEqual({ x: 70, y: 40, width: 430, height: 44 });
   });
 
   it('positions panes within safe-area-adjusted vertical bounds', () => {

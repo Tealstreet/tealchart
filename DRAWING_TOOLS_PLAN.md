@@ -6,6 +6,7 @@
 - Shared chart geometry now computes pane positions and first-party chrome regions for top bar, left drawing tools, right price axis, and bottom time axis.
 - Top-left legend overlay metadata is represented in shared geometry; mobile currently reports no separate legend region.
 - Chart chrome geometry helpers and metrics are exported for app-level toolbar and overlay integration.
+- Web top-left legend shifts right of the drawing rail when left drawing tools are visible.
 - The web drawing rail mounts into a transparent chart overlay root; mobile uses the sibling full-chart overlay region for tap-away dismissal.
 
 ## Current Direction

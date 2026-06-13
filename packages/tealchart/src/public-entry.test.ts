@@ -259,11 +259,13 @@ describe('tealchart public entries', () => {
       topLeftLegend: true,
       chromeMetrics: WEB_CHART_CHROME_METRICS,
     });
-    const legendRect: Rect | null = computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, snapshot.root);
+    const legendRect: Rect | null = computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, snapshot.root, 0, {
+      avoidLeftTools: true,
+    });
 
     expect(snapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 32 });
     expect(snapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
-    expect(snapshot.chrome.topLeftLegend).toEqual({ x: 12, y: 40, width: 480, height: 44 });
+    expect(snapshot.chrome.topLeftLegend).toEqual({ x: 70, y: 40, width: 430, height: 44 });
     expect(legendRect).toEqual(snapshot.chrome.topLeftLegend);
   });
 
