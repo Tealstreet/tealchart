@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { reduceUserDrawingCommand } from './commands';
 import { createUserDrawingState } from './input';
-import { resolveUserDrawingObjectTreeModel } from './objectTree';
+import { resolveUserDrawingObjectTreeActionCommands, resolveUserDrawingObjectTreeModel } from './objectTree';
+import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
 const style: UserDrawingStyle = {
@@ -116,6 +118,97 @@ describe('user drawing object tree model', () => {
       ['rect', true, true, true, false],
       ['trend', true, false, false, true],
     ]);
+  });
+
+  it('uses optional drawing names as row labels', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine({ id: 'trend', name: 'Support break' })],
+    });
+
+    expect(resolveUserDrawingObjectTreeModel(state).rows[0]).toMatchObject({
+      drawingId: 'trend',
+      label: 'Support break',
+      defaultLabel: 'Trend line',
+      customName: 'Support break',
+    });
+  });
+
+  it('resolves row selection and range selection commands', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine(), createRectangle(), createHorizontalLine()],
+      selection: { drawingId: 'trend' },
+    });
+
+    expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'select', drawingId: 'rect', additive: true })).toEqual([
+      { type: 'selectMany', drawingIds: ['trend', 'rect'], meta: { source: 'objectTree' } },
+    ]);
+    expect(
+      resolveUserDrawingObjectTreeActionCommands(state, {
+        type: 'selectRange',
+        anchorDrawingId: 'hline',
+        targetDrawingId: 'rect',
+      }),
+    ).toEqual([{ type: 'selectMany', drawingIds: ['hline', 'rect'], meta: { source: 'objectTree' } }]);
+  });
+
+  it('resolves row mutation actions to shared drawing commands', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine(), createRectangle(), createHorizontalLine()],
+      selection: { drawingId: 'trend' },
+    });
+
+    expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'hide', drawingIds: ['rect'] })).toEqual([
+      { type: 'select', drawingId: 'rect', meta: { source: 'objectTree' } },
+      {
+        type: 'setVisibility',
+        visible: false,
+        options: { drawingId: 'rect' },
+        meta: { source: 'objectTree', affectedIds: ['rect'] },
+      },
+    ]);
+    expect(
+      resolveUserDrawingObjectTreeActionCommands(
+        state,
+        { type: 'duplicate', drawingIds: ['trend', 'rect'], includeLocked: true },
+        { createId: () => 'copy', now: () => 10 },
+      ),
+    ).toEqual([
+      { type: 'selectMany', drawingIds: ['trend', 'rect'], meta: { source: 'objectTree' } },
+      {
+        type: 'duplicate',
+        options: { includeLocked: true, now: expect.any(Function), createId: expect.any(Function) },
+        meta: { source: 'objectTree', affectedIds: ['trend', 'rect'] },
+      },
+    ]);
+    expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'sendToBack', drawingIds: ['rect'] })).toEqual([
+      { type: 'select', drawingId: 'rect', meta: { source: 'objectTree' } },
+      {
+        type: 'reorder',
+        action: 'sendToBack',
+        options: { drawingId: 'rect' },
+        meta: { source: 'objectTree', affectedIds: ['rect'] },
+      },
+    ]);
+  });
+
+  it('renames drawings through shared commands and layout serialization', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine({ id: 'trend' })],
+    });
+    const command = resolveUserDrawingObjectTreeActionCommands(
+      state,
+      { type: 'rename', drawingId: 'trend', name: 'Breakout line' },
+      { now: () => 20 },
+    )[0]!;
+
+    const renamed = reduceUserDrawingCommand(state, command);
+    expect(renamed.drawings[0]).toMatchObject({ id: 'trend', name: 'Breakout line', updatedAt: 20 });
+
+    const restored = deserializeUserDrawingStateFromLayout(serializeUserDrawingStateForLayout(renamed));
+    expect(restored?.drawings[0]).toMatchObject({ id: 'trend', name: 'Breakout line' });
+
+    const cleared = reduceUserDrawingCommand(renamed, { type: 'setName', drawingId: 'trend', name: '   ' });
+    expect(cleared.drawings[0]?.name).toBeUndefined();
   });
 
   it('returns stable empty metadata for an empty drawing state', () => {

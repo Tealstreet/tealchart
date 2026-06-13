@@ -378,11 +378,17 @@ Phase 2: Shared actions
 
 - Select single row, additive row select, range select if supported, delete,
   duplicate, hide/show, lock/unlock, bring forward/back/front/back.
+- Status: shared object-tree actions now resolve to drawing command sequences
+  with `objectTree` metadata, including multi-row selection setup before
+  mutating selection-scoped commands.
 
 Phase 3: Naming model
 
 - Add optional user-facing names without breaking persistence.
 - Fall back to localized drawing kind labels.
+- Status: committed drawings support optional names; object-tree rows prefer
+  names as labels and layout serialization/deserialization preserves them while
+  unnamed drawings continue to use shared drawing-kind labels.
 
 ### Epic 5.2: Web Object Tree Panel
 
