@@ -27,6 +27,7 @@ import {
   USER_DRAWING_TREND_LINE_EXTENDS,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingFontFamily,
+  normalizeUserDrawingOpacity,
   normalizeUserDrawingTextMaxWidth,
 } from './types';
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
@@ -784,6 +785,13 @@ function getNextUserDrawingLineStyle(drawing: UserDrawing): UserDrawingLineStyle
   return styles[currentIndex >= 0 ? (currentIndex + 1) % styles.length : 0]!;
 }
 
+function getNextUserDrawingOpacity(drawing: UserDrawing): number {
+  const opacities = USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity);
+  const currentOpacity = normalizeUserDrawingOpacity(drawing.style.opacity ?? DEFAULT_USER_DRAWING_STYLE.opacity ?? 1);
+  const currentIndex = opacities.indexOf(currentOpacity);
+  return opacities[currentIndex >= 0 ? (currentIndex + 1) % opacities.length : 0]!;
+}
+
 function getNextUserDrawingFillColor(drawing: UserDrawing): string {
   const currentFillColor = drawing.style.fillColor?.toLowerCase();
   const currentIndex = USER_DRAWING_FILL_COLOR_DESCRIPTORS.findIndex(
@@ -871,6 +879,8 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const thinnerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, -1);
   const thickerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, 1);
   const nextLineStyle = getNextUserDrawingLineStyle(selectedDrawing);
+  const nextOpacity = getNextUserDrawingOpacity(selectedDrawing);
+  const nextLineVisible = selectedDrawing.style.lineVisible === false;
   const nextFillColor = fillColorEnabled ? getNextUserDrawingFillColor(selectedDrawing) : null;
   const nextFillVisible = selectedDrawing.style.fillVisible === false;
   const textEnabled = isUserDrawingTextToolbarEnabled(state);
@@ -1081,6 +1091,20 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         label: `Cycle selected drawing line style to ${nextLineStyle}`,
         enabled: styleEnabled,
         command: { type: 'updateStyle', style: { lineStyle: nextLineStyle } },
+      },
+      {
+        id: `opacity:${nextOpacity}`,
+        icon: '◐',
+        label: `Cycle selected drawing opacity to ${Math.round(nextOpacity * 100)} percent`,
+        enabled: styleEnabled,
+        command: { type: 'updateStyle', style: { opacity: nextOpacity } },
+      },
+      {
+        id: 'lineVisible:toggle',
+        icon: '▣',
+        label: nextLineVisible ? 'Show selected drawing border' : 'Hide selected drawing border',
+        enabled: styleEnabled,
+        command: { type: 'updateStyle', style: { lineVisible: nextLineVisible } },
       },
       ...(fillColorItem ? [fillColorItem] : []),
       ...(fillVisibilityItem ? [fillVisibilityItem] : []),

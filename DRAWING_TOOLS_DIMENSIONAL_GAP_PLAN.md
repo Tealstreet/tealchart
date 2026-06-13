@@ -324,10 +324,11 @@ open.
 
 Phase 1: Action availability model
 
-- Status: properties, quick line color/width/style changes, quick fill color
-  and fill visibility changes, quick text color/font-size/family/weight/style
-  changes plus rich-text underline/strike-through/wrap, wrapped text-width, and
-  text-alignment controls, quick trend-line extension and icon library controls,
+- Status: properties, quick line color/width/style/visibility/opacity changes,
+  quick fill color and fill visibility changes, quick text
+  color/font-size/family/weight/style changes plus rich-text
+  underline/strike-through/wrap, wrapped text-width, and text-alignment
+  controls, quick trend-line extension and icon library controls,
   duplicate, delete, lock, hide/show, unlock, and z-order action descriptors
   resolve from shared drawing state.
 - Status: text-capable drawings now expose a shared selected/context action for
@@ -367,7 +368,7 @@ Phase 1: DOM surface primitive
 Phase 2: Initial actions
 
 - Status: properties, text edit for text-capable drawings, quick line
-  color/width/style changes, quick fill color and fill visibility changes,
+  color/width/style/visibility/opacity changes, quick fill color and fill visibility changes,
   quick text color/font-size/family/weight/style changes plus rich-text
   underline/strike-through/wrap, wrapped text-width, and text-alignment
   controls, quick trend-line extension and icon library controls, duplicate,
@@ -398,7 +399,7 @@ Phase 1: Native surface primitive
 Phase 2: Initial actions
 
 - Status: properties, text edit for text-capable drawings, quick line
-  color/width/style changes, quick fill color and fill visibility changes,
+  color/width/style/visibility/opacity changes, quick fill color and fill visibility changes,
   quick text color/font-size/family/weight/style changes plus rich-text
   underline/strike-through/wrap, wrapped text-width, and text-alignment
   controls plus quick trend-line extension and icon library controls, duplicate,
