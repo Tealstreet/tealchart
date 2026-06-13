@@ -187,6 +187,26 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
+    const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
+    expect(selectedActionSurface).not.toBeNull();
+    expect(selectedActionSurface?.style.pointerEvents).toBe('auto');
+
+    const onSurfaceMouseDownFallthrough = vi.fn();
+    const onSurfaceMouseUpFallthrough = vi.fn();
+    const onSurfaceClickFallthrough = vi.fn();
+    document.body.addEventListener('mousedown', onSurfaceMouseDownFallthrough);
+    document.body.addEventListener('mouseup', onSurfaceMouseUpFallthrough);
+    document.body.addEventListener('click', onSurfaceClickFallthrough);
+    selectedActionSurface?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    selectedActionSurface?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+    selectedActionSurface?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(onSurfaceMouseDownFallthrough).not.toHaveBeenCalled();
+    expect(onSurfaceMouseUpFallthrough).not.toHaveBeenCalled();
+    expect(onSurfaceClickFallthrough).not.toHaveBeenCalled();
+    document.body.removeEventListener('mousedown', onSurfaceMouseDownFallthrough);
+    document.body.removeEventListener('mouseup', onSurfaceMouseUpFallthrough);
+    document.body.removeEventListener('click', onSurfaceClickFallthrough);
+
     document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
