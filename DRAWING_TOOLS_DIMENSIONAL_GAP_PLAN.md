@@ -169,8 +169,11 @@ Status: initial slice in progress. Shared placement modes and two-anchor drag
 placement commands exist for `trendLine`, `extendedLine`, `infoLine`,
 `arrowLine`, `arrowMarker`, `ray`, `rectangle`, `circle`, and `ellipse`; web
 Canvas and mobile Skia route those tools through matching drag preview/commit
-flows. Remaining Gap 3 work should expand tool coverage, constraints, cancel
-behavior, and event-level regression coverage.
+flows. Event-level web regression coverage now guards click preservation,
+mousemove promotion, and mouseup promotion through the pending-drawing path;
+mobile command/gesture/render-model regression gates cover the sibling behavior.
+Remaining Gap 3 work should expand tool coverage, constraints, and deeper
+cancel/pointer-exit harness coverage.
 
 ### Epic 3.1: Shared Placement State Machine
 

@@ -946,8 +946,9 @@ export class EventManager {
   }
 
   private handleTouchEnd(e: TouchEvent): void {
+    const endedTouches = Array.from(e.changedTouches);
     // Remove ended touches
-    for (const touch of Array.from(e.changedTouches)) {
+    for (const touch of endedTouches) {
       this.activeTouches.delete(touch.identifier);
     }
 
@@ -956,8 +957,26 @@ export class EventManager {
     if (e.touches.length === 0 && this.touchStart) {
       const endTime = Date.now();
       const duration = endTime - this.touchStart.time;
+      const changedTouch = endedTouches[0];
+      const rect = this.container.getBoundingClientRect();
+      const endX = changedTouch ? changedTouch.clientX - rect.left : this.touchStart.x;
+      const endY = changedTouch ? changedTouch.clientY - rect.top : this.touchStart.y;
+      const endDistance = Math.hypot(endX - this.touchStart.x, endY - this.touchStart.y);
 
-      if (!this.isTouchDragging && duration < TOUCH_TAP_TIMEOUT) {
+      if (
+        !this.isTouchDragging &&
+        e.type === 'touchend' &&
+        endDistance > TOUCH_TAP_THRESHOLD &&
+        this.state.dragMode === 'pendingDrawing' &&
+        this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'touch')
+      ) {
+        this.isTouchDragging = true;
+        this.state.isDragging = true;
+        this.state.dragMode = 'drawing';
+        this.callbacks.onDrawingDragMove?.(endX, endY, 'touch');
+      }
+
+      if (!this.isTouchDragging && e.type === 'touchend' && duration < TOUCH_TAP_TIMEOUT) {
         // This was a tap, not a drag
         this.handleTap(this.touchStart.x, this.touchStart.y);
       } else if (this.state.isDragging) {
