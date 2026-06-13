@@ -3,11 +3,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   commitMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHandleCommand,
+  dispatchMobileUserDrawingHistoryCommand,
 } from './drawingCommands';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
+  createUserDrawingCommandHistory,
   createUserDrawingState,
   handleUserDrawingInput,
+  undoUserDrawingCommand,
   setUserDrawingTool,
 } from '../../drawings';
 import type { UserDrawingState } from '../../drawings';
@@ -101,5 +104,23 @@ describe('mobile drawing handle command dispatch', () => {
       ['Metric', 'Value'],
       ['Price', ''],
     ]);
+  });
+
+  it('routes mobile commands through shared undo history', () => {
+    const state = createMobileStateWithTrendLine();
+    const history = createUserDrawingCommandHistory();
+    const result = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'duplicate',
+      options: { createId: () => 'copy', now: () => 40 },
+      meta: { source: 'api' },
+    });
+
+    expect(result.changed).toBe(true);
+    expect(result.history.undoStack).toHaveLength(1);
+    expect(result.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
+
+    const undo = undoUserDrawingCommand(result.state, result.history);
+    expect(undo.changed).toBe(true);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
   });
 });
