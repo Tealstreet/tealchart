@@ -1543,6 +1543,15 @@ describe('user drawing toolbar descriptors', () => {
         inset: { left: 8, right: 8, top: 38, bottom: 8 },
       }),
     ).toEqual({ left: 100, top: 78 });
+
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 318, y: 120 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 280, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      }),
+    ).toEqual({ left: 32, top: 78 });
   });
 
   it('keeps locked selected action surface mutations disabled except unlock', () => {
