@@ -133,10 +133,8 @@ import {
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
-  resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
-  shouldRenderUserDrawingSelectedActionSurface,
   resolveUserDrawingPlacementConstraint,
   resolveUserDrawingTextEditMetrics,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
@@ -150,6 +148,7 @@ import { IndicatorSettingsModalMobile } from './mobile/components/IndicatorSetti
 import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
 import { OrderLineComponent } from './mobile/components/OrderLineComponent';
 import { PositionLineComponent } from './mobile/components/PositionLineComponent';
+import { UserDrawingSelectedActionSurfaceComponent } from './mobile/components/UserDrawingSelectedActionSurface';
 import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
@@ -197,8 +196,6 @@ import { intervalToMs } from './viewport/viewScale';
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
-const USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
-const USER_DRAWING_ACTION_SURFACE_HEIGHT = 70;
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
 
@@ -4573,59 +4570,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         />
       )}
 
-      {shouldRenderUserDrawingSelectedActionSurface(effectiveUserDrawingState, userDrawingSelectionActionAnchor) && (
-        <View
-          style={[
-            styles.userDrawingActionSurface,
-            resolveUserDrawingActionSurfacePosition({
-              anchor: userDrawingSelectionActionAnchor.anchor,
-              viewport: { width: dimensions.width, height: dimensions.height },
-              surface: { width: USER_DRAWING_ACTION_SURFACE_WIDTH, height: USER_DRAWING_ACTION_SURFACE_HEIGHT },
-              inset: { left: 8, right: 8, top: (showTopBar ? TOP_BAR_SAFE_ZONE : 0) + 6, bottom: 8 },
-            }),
-          ]}
-          pointerEvents="box-none"
-        >
-          {userDrawingSelectedActionSurface.groups.map((group, groupIndex) => (
-            <View
-              key={group.id}
-              style={[
-                styles.userDrawingActionSurfaceGroup,
-                groupIndex > 0 && styles.userDrawingActionSurfaceGroupSeparated,
-              ]}
-            >
-                {group.items.map((item) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={item.label}
-                    disabled={!item.enabled}
-                    activeOpacity={0.72}
-                    style={[
-                      styles.userDrawingActionButton,
-                      item.swatchColor && { backgroundColor: item.swatchColor },
-                      !item.enabled && styles.userDrawingActionButtonDisabled,
-                    ]}
-                    onPress={() => {
-                      dispatchMobileUserDrawingActionCommand(item.command, {
-                        state: userDrawingStateRef.current,
-                        source: 'toolbar',
-                        createId: createUserDrawingId,
-                        dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
-                        onUserDrawingPropertiesOpen,
-                        onUserDrawingObjectTreeOpen,
-                      });
-                    }}
-                  >
-                    <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
-                      {item.icon}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-            </View>
-          ))}
-        </View>
-      )}
+      <UserDrawingSelectedActionSurfaceComponent
+        state={effectiveUserDrawingState}
+        surface={userDrawingSelectedActionSurface}
+        anchor={userDrawingSelectionActionAnchor}
+        dimensions={dimensions}
+        topInset={showTopBar ? TOP_BAR_SAFE_ZONE : 0}
+        createId={createUserDrawingId}
+        dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
+        onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+        onUserDrawingObjectTreeOpen={onUserDrawingObjectTreeOpen}
+      />
 
       {/* Top Bar (overlay on top of chart) */}
       {showTopBar && (
@@ -4751,49 +4706,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: 'rgba(9, 12, 18, 0.92)',
     lineHeight: 18,
-  },
-  userDrawingActionSurface: {
-    position: 'absolute',
-    zIndex: 9,
-    width: USER_DRAWING_ACTION_SURFACE_WIDTH,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    alignContent: 'center',
-    gap: 3,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: '#363a45',
-    borderRadius: 6,
-    backgroundColor: 'rgba(19, 23, 34, 0.98)',
-  },
-  userDrawingActionSurfaceGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  userDrawingActionSurfaceGroupSeparated: {
-    borderLeftWidth: 1,
-    borderLeftColor: '#363a45',
-    paddingLeft: 3,
-  },
-  userDrawingActionButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userDrawingActionButtonDisabled: {
-    opacity: 0.35,
-  },
-  userDrawingActionButtonText: {
-    color: '#d1d4dc',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  userDrawingActionButtonTextDisabled: {
-    color: '#787b86',
   },
   userDrawingActionDivider: {
     width: 1,
