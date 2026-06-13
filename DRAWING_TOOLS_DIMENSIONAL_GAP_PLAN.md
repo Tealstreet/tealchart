@@ -539,6 +539,8 @@ Phase 1: Action registry
   copy/paste if supported later, nudge, and select all.
 - Shipped initial shared resolver for undo, redo, selected delete, and draft
   cancel so web and mobile adapters consume the same action map.
+- Shipped shared copy/paste keyboard actions backed by transient adapter
+  clipboards and undoable paste commands.
 
 Phase 2: Focus rules
 
@@ -556,6 +558,8 @@ Phase 3: Command dispatch
 Phase 1: Core shortcuts
 
 - Implement Delete/Backspace, Escape, Ctrl/Cmd+Z, redo, and duplicate.
+- Shipped Ctrl/Cmd+C copy selected drawing and Ctrl/Cmd+V paste object on web
+  while chart keyboard ownership is active.
 
 Phase 2: Modifier drag
 
@@ -574,6 +578,8 @@ Phase 1: Hardware keyboard support
 - Support undo/redo/delete where React Native keyboard events are available.
 - Shipped Skia imperative handle support for host-level hardware-keyboard
   adapters to dispatch the shared drawing keyboard actions.
+- Shipped mobile command utility and Skia handle support for hardware-keyboard
+  copy/paste using the same shared clipboard payload and paste command.
 
 Phase 2: Touch-native duplicate workflow
 

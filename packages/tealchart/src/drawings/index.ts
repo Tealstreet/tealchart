@@ -256,6 +256,7 @@ export {
   commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
+  createUserDrawingClipboard,
   createUserDrawingState,
   deleteUserDrawingTableColumn,
   deleteUserDrawingTableRow,
@@ -265,6 +266,7 @@ export {
   handleUserDrawingInput,
   insertUserDrawingTableColumn,
   insertUserDrawingTableRow,
+  pasteUserDrawingClipboard,
   reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingAtPoint,
@@ -288,8 +290,11 @@ export {
   updateUserDrawingTextEdit,
 } from './input';
 export type {
+  CopyUserDrawingOptions,
   DeleteUserDrawingOptions,
   DuplicateUserDrawingOptions,
+  PasteUserDrawingOptions,
+  UserDrawingClipboard,
   UserDrawingInputOptions,
   UserDrawingImageSourceInput,
   UserDrawingInputPoint,

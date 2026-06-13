@@ -3,12 +3,14 @@ import type {
   UserDrawingCommandDispatchResult,
   UserDrawingCommandHistory,
   UserDrawingHistoryDispatchResult,
+  UserDrawingClipboard,
   UserDrawingKeyboardAction,
   UserDrawingKeyboardInput,
   UserDrawingState,
 } from '../../drawings';
 
 import {
+  createUserDrawingClipboard,
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
   redoUserDrawingCommand,
@@ -52,10 +54,17 @@ export interface MobileUserDrawingKeyboardDispatchResult {
   action: UserDrawingKeyboardAction | null;
 }
 
+export interface MobileUserDrawingKeyboardDispatchOptions {
+  clipboard?: UserDrawingClipboard | null;
+  createId: () => string;
+  setClipboard?: (clipboard: UserDrawingClipboard | null) => void;
+}
+
 export function dispatchMobileUserDrawingKeyboardAction(
   state: UserDrawingState,
   history: UserDrawingCommandHistory,
   input: UserDrawingKeyboardInput,
+  options: MobileUserDrawingKeyboardDispatchOptions,
 ): MobileUserDrawingKeyboardDispatchResult {
   const action = resolveUserDrawingKeyboardAction(state, input);
   if (!action) return { state, history, changed: false, action: null };
@@ -66,6 +75,25 @@ export function dispatchMobileUserDrawingKeyboardAction(
 
   if (action.type === 'redo') {
     return { ...redoUserDrawingCommand(state, history), action };
+  }
+
+  if (action.type === 'copySelected') {
+    const clipboard = createUserDrawingClipboard(state);
+    if (!clipboard) return { state, history, changed: false, action };
+    options.setClipboard?.(clipboard);
+    return { state, history, changed: true, action };
+  }
+
+  if (action.type === 'paste') {
+    return {
+      ...dispatchUserDrawingCommandWithHistory(state, history, {
+        type: 'paste',
+        clipboard: options.clipboard,
+        options: { createId: options.createId },
+        meta: { source: 'keyboard' },
+      }),
+      action,
+    };
   }
 
   const command: UserDrawingCommand =

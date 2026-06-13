@@ -159,6 +159,7 @@ import {
   WEB_CHART_CHROME_METRICS,
   computeChartGeometry,
   computeTopLeftLegendRect,
+  createUserDrawingClipboard,
   duplicateUserDrawing,
   formatTrendAngleDegrees,
   formatUserDrawingDateRangeBars,
@@ -169,6 +170,7 @@ import {
   normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingTextMaxWidth,
+  pasteUserDrawingClipboard,
   resolveAnchoredVwapFromAnchor,
   resolveArcFromAnchors,
   resolveBarsPatternFromAnchors,
@@ -307,6 +309,8 @@ describe('tealchart public entries', () => {
       'both',
     ]);
     expect(duplicateUserDrawing).toBeTypeOf('function');
+    expect(createUserDrawingClipboard).toBeTypeOf('function');
+    expect(pasteUserDrawingClipboard).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
     expect(resolveUserDrawingEditIntentAtPoint).toBeTypeOf('function');
     expect(resolveUserDrawingObjectTreeModel).toBeTypeOf('function');

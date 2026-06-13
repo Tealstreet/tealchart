@@ -6,6 +6,8 @@ import type {
   UserDrawingImageSourceInput,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
+  UserDrawingClipboard,
+  PasteUserDrawingOptions,
   UserDrawingPlacementDragCommitOptions,
   UserDrawingPlacementDragStartOptions,
   UserDrawingPathDragOptions,
@@ -47,6 +49,7 @@ import {
   insertUserDrawingTableColumn,
   insertUserDrawingTableRow,
   reorderUserDrawings,
+  pasteUserDrawingClipboard,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   selectUserDrawingsById,
@@ -112,6 +115,7 @@ export type UserDrawingCommand =
     })
   | (UserDrawingCommandBase & { type: 'delete'; options?: DeleteUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'duplicate'; options: DuplicateUserDrawingOptions })
+  | (UserDrawingCommandBase & { type: 'paste'; clipboard: UserDrawingClipboard | null | undefined; options: PasteUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'clear' })
   | (UserDrawingCommandBase & { type: 'cancelDraft' })
   | (UserDrawingCommandBase & { type: 'handleInput'; point: UserDrawingInputPoint; options: UserDrawingInputOptions })
@@ -251,6 +255,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return deleteUserDrawing(state, command.options);
     case 'duplicate':
       return duplicateUserDrawing(state, command.options);
+    case 'paste':
+      return pasteUserDrawingClipboard(state, command.clipboard, command.options);
     case 'clear':
       return clearUserDrawings(state);
     case 'cancelDraft':
