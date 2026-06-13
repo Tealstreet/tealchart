@@ -10,9 +10,7 @@ import type {
 
 type IndicatorDrawArgsWithoutSettings = Omit<IndicatorDrawArgs, 'settings'>;
 
-export function normalizeTradingViewRenderFrame(
-  frame: TradingViewRenderFrameInput
-): TradingViewRenderFrame | null {
+export function normalizeTradingViewRenderFrame(frame: TradingViewRenderFrameInput): TradingViewRenderFrame | null {
   const rawFrame = frame as TradingViewRawRenderFrame;
   if (!rawFrame.ctx || !rawFrame.priceToCoord || !rawFrame.coordToPrice) {
     return null;
@@ -27,6 +25,7 @@ export function normalizeTradingViewRenderFrame(
 
   return {
     ctx: rawFrame.ctx,
+    sourceId: rawFrame.sourceId,
     bars,
     candleCoords,
     exchange: rawFrame.exchange ?? '',
@@ -42,9 +41,7 @@ export function normalizeTradingViewRenderFrame(
   };
 }
 
-export function toIndicatorDrawArgs(
-  frame: TradingViewRenderFrameInput
-): IndicatorDrawArgsWithoutSettings | null {
+export function toIndicatorDrawArgs(frame: TradingViewRenderFrameInput): IndicatorDrawArgsWithoutSettings | null {
   const normalized = normalizeTradingViewRenderFrame(frame);
   if (!normalized) return null;
 
@@ -93,7 +90,7 @@ function isBarObject(bar: TradingViewRealBar): bar is Bar {
 }
 
 function normalizeCandleCoords(
-  candleCoords: readonly TradingViewCoordinateBar[] | undefined
+  candleCoords: readonly TradingViewCoordinateBar[] | undefined,
 ): TradingViewRenderFrame['candleCoords'] {
   if (!candleCoords) return [];
 
@@ -129,7 +126,7 @@ interface PriceScaleModel {
 
 function deriveFramePriceScale(
   bars: readonly Bar[],
-  candleCoords: readonly TradingViewRenderFrame['candleCoords'][number][]
+  candleCoords: readonly TradingViewRenderFrame['candleCoords'][number][],
 ): Pick<PriceScaleModel, 'priceToCoord' | 'coordToPrice'> | null {
   const samples: Array<{ price: number; coord: number }> = [];
   const count = Math.min(bars.length, candleCoords.length);
@@ -142,10 +139,12 @@ function deriveFramePriceScale(
     addPriceCoordSample(samples, bar.low, coord.low);
   }
 
-  const linear = fitPriceScaleModel(samples, (price) => price, (value) => value);
-  const log = samples.every((sample) => sample.price > 0)
-    ? fitPriceScaleModel(samples, Math.log, Math.exp)
-    : null;
+  const linear = fitPriceScaleModel(
+    samples,
+    (price) => price,
+    (value) => value,
+  );
+  const log = samples.every((sample) => sample.price > 0) ? fitPriceScaleModel(samples, Math.log, Math.exp) : null;
   const model = log && (!linear || log.error < linear.error) ? log : linear;
 
   return model
@@ -156,11 +155,7 @@ function deriveFramePriceScale(
     : null;
 }
 
-function addPriceCoordSample(
-  samples: Array<{ price: number; coord: number }>,
-  price: number,
-  coord: number
-): void {
+function addPriceCoordSample(samples: Array<{ price: number; coord: number }>, price: number, coord: number): void {
   if (!Number.isFinite(price) || !Number.isFinite(coord)) return;
   samples.push({ price, coord });
 }
@@ -168,7 +163,7 @@ function addPriceCoordSample(
 function fitPriceScaleModel(
   samples: readonly { price: number; coord: number }[],
   toDomain: (price: number) => number,
-  fromDomain: (value: number) => number
+  fromDomain: (value: number) => number,
 ): PriceScaleModel | null {
   const points = samples
     .map((sample) => ({ x: toDomain(sample.price), y: sample.coord }))
@@ -194,8 +189,7 @@ function fitPriceScaleModel(
 
   const intercept = (sumY - slope * sumX) / points.length;
   const error =
-    points.reduce((total, point) => total + Math.abs(slope * point.x + intercept - point.y), 0) /
-    points.length;
+    points.reduce((total, point) => total + Math.abs(slope * point.x + intercept - point.y), 0) / points.length;
 
   return {
     error,
@@ -204,9 +198,7 @@ function fitPriceScaleModel(
   };
 }
 
-function toDimensions(
-  coordinates: TradingViewRawRenderFrame['coordinates']
-): TradingViewRenderFrame['coordinates'] {
+function toDimensions(coordinates: TradingViewRawRenderFrame['coordinates']): TradingViewRenderFrame['coordinates'] {
   if (!coordinates?.width || !coordinates.height) return undefined;
   return {
     width: coordinates.width,

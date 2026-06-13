@@ -1,5 +1,5 @@
-import type { Bar } from '../types';
 import type { CandleCoordinates } from '../jailbreak/types';
+import type { Bar } from '../types';
 
 export const TRADINGVIEW_ADAPTER_HOOK_KEY = '__tealchartTradingViewHooks__';
 
@@ -20,6 +20,7 @@ export interface TradingViewSymbolInfo {
 
 export interface TradingViewRenderFrame extends TradingViewSymbolInfo {
   ctx: CanvasRenderingContext2D;
+  sourceId?: string;
   bars: Bar[];
   candleCoords: CandleCoordinates[];
   chartWidth: number;
@@ -39,7 +40,14 @@ export interface TradingViewCoordinatesPayload {
 
 export type TradingViewRealBar =
   | Bar
-  | readonly [time: number | string, open: number | string, high: number | string, low: number | string, close: number | string, volume?: number | string];
+  | readonly [
+      time: number | string,
+      open: number | string,
+      high: number | string,
+      low: number | string,
+      close: number | string,
+      volume?: number | string,
+    ];
 
 export type TradingViewCoordinateBar = Partial<CandleCoordinates> & {
   center: number;
@@ -47,6 +55,7 @@ export type TradingViewCoordinateBar = Partial<CandleCoordinates> & {
 
 export interface TradingViewRawRenderFrame extends Partial<TradingViewSymbolInfo> {
   ctx?: CanvasRenderingContext2D;
+  sourceId?: string;
   bars?: readonly Bar[];
   realBars?: readonly TradingViewRealBar[];
   candleCoords?: readonly CandleCoordinates[];
@@ -65,6 +74,8 @@ export type TradingViewRenderFrameInput = TradingViewRenderFrame | TradingViewRa
 export interface TradingViewPatchCallbacks {
   beforeBars?: (frame: TradingViewRenderFrameInput) => void;
   afterBars?: (frame: TradingViewRenderFrameInput) => void;
+  afterPane?: (frame: TradingViewRenderFrameInput) => void;
+  hasPaneSource?: (sourceId: string) => boolean;
   shouldSkipNativeBars?: (frame: TradingViewRenderFrameInput) => boolean;
 }
 
@@ -102,11 +113,7 @@ export interface TradingViewPatchResult {
   warnings: string[];
 }
 
-export type TradingViewPatchErrorCode =
-  | 'hash-mismatch'
-  | 'missing-anchor'
-  | 'ambiguous-anchor'
-  | 'invalid-occurrence';
+export type TradingViewPatchErrorCode = 'hash-mismatch' | 'missing-anchor' | 'ambiguous-anchor' | 'invalid-occurrence';
 
 export interface TradingViewHookHost {
   [TRADINGVIEW_ADAPTER_HOOK_KEY]?: TradingViewPatchCallbacks;
