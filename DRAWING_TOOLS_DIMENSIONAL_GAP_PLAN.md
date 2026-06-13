@@ -675,9 +675,10 @@ Phase 3: Cross-platform import/export
 Phase 1: Shared command tests
 
 - Cover every command and command history boundary.
-- Status: shared command tests and mobile command adapter tests now include
-  compile-checked command-union coverage guards, duplicate checks for command
-  type lists, and the previously missing user-facing name command route.
+- Status: shared command tests now include a compile-checked command-union
+  coverage guard and duplicate checks for the command type list. Shared reducer
+  tests and mobile command adapter tests both cover the previously missing
+  user-facing name command route.
 
 Phase 2: Web interaction tests
 
