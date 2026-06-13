@@ -18,6 +18,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { safeToFixed } from '../../utils/safeNumber';
+import { bracketPartialPercent } from '../utils/bracketPartial';
 import { priceToY, yToPrice } from '../utils/coordinates';
 
 export interface PositionLineComponentProps {
@@ -120,24 +121,24 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
 
   // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
-    (newPrice: number) => {
-      position.callbacks?.onTPMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      position.callbacks?.onTPMoveEnd?.(newPrice, partialPercent);
     },
     [position.callbacks],
   );
 
   // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
-    (newPrice: number) => {
-      position.callbacks?.onSLMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      position.callbacks?.onSLMoveEnd?.(newPrice, partialPercent);
     },
     [position.callbacks],
   );
 
   // Handle continuous TP move (for adapter callback + Skia drag preview)
   const handleTPMove = useCallback(
-    (price: number) => {
-      position.callbacks?.onTPMove?.(price);
+    (price: number, partialPercent: number) => {
+      position.callbacks?.onTPMove?.(price, partialPercent);
       onTPMovePreview?.(position.id, price);
     },
     [position.callbacks, onTPMovePreview, position.id],
@@ -145,8 +146,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
 
   // Handle continuous SL move (for adapter callback + Skia drag preview)
   const handleSLMove = useCallback(
-    (price: number) => {
-      position.callbacks?.onSLMove?.(price);
+    (price: number, partialPercent: number) => {
+      position.callbacks?.onSLMove?.(price, partialPercent);
       onSLMovePreview?.(position.id, price);
     },
     [position.callbacks, onSLMovePreview, position.id],
@@ -172,7 +173,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         // Emit continuous move for Skia drag preview (only after drag threshold)
         if (Math.abs(event.translationY) >= 5) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleTPMove)(dragPrice);
+          const partialPercent = bracketPartialPercent(position.partialEnabled === true, event.translationX);
+          runOnJS(handleTPMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
@@ -187,7 +189,9 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         if (Math.abs(event.translationY) < 5) {
           runOnJS(handleTPClick)();
         } else {
-          runOnJS(handleTPDragEnd)(newPrice);
+          const partialPercent =
+            position.partialEnabled === true ? bracketPartialPercent(true, event.translationX) : undefined;
+          runOnJS(handleTPDragEnd)(newPrice, partialPercent);
         }
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -207,6 +211,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     handleTPSLDragEnd,
     tpDragging,
     tpTranslateY,
+    position.partialEnabled,
   ]);
 
   // SL button drag gesture
@@ -222,7 +227,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         // Emit continuous move for Skia drag preview (only after drag threshold)
         if (Math.abs(event.translationY) >= 5) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleSLMove)(dragPrice);
+          const partialPercent = bracketPartialPercent(position.partialEnabled === true, event.translationX);
+          runOnJS(handleSLMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
@@ -237,7 +243,9 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         if (Math.abs(event.translationY) < 5) {
           runOnJS(handleSLClick)();
         } else {
-          runOnJS(handleSLDragEnd)(newPrice);
+          const partialPercent =
+            position.partialEnabled === true ? bracketPartialPercent(true, event.translationX) : undefined;
+          runOnJS(handleSLDragEnd)(newPrice, partialPercent);
         }
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -257,6 +265,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     handleTPSLDragEnd,
     slDragging,
     slTranslateY,
+    position.partialEnabled,
   ]);
 
   // Animated styles for TP button

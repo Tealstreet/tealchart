@@ -19,6 +19,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { safeToFixed } from '../../utils/safeNumber';
+import { bracketPartialPercent } from '../utils/bracketPartial';
 import { priceToY, yToPrice } from '../utils/coordinates';
 
 export interface OrderLineComponentProps {
@@ -128,24 +129,24 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
   // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
-    (newPrice: number) => {
-      order.callbacks?.onTPMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      order.callbacks?.onTPMoveEnd?.(newPrice, partialPercent);
     },
     [order.callbacks],
   );
 
   // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
-    (newPrice: number) => {
-      order.callbacks?.onSLMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      order.callbacks?.onSLMoveEnd?.(newPrice, partialPercent);
     },
     [order.callbacks],
   );
 
   // Handle continuous TP move (for adapter callback + Skia drag preview)
   const handleTPMove = useCallback(
-    (price: number) => {
-      order.callbacks?.onTPMove?.(price);
+    (price: number, partialPercent: number) => {
+      order.callbacks?.onTPMove?.(price, partialPercent);
       onTPMovePreview?.(order.id, price);
     },
     [order.callbacks, onTPMovePreview, order.id],
@@ -153,8 +154,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
   // Handle continuous SL move (for adapter callback + Skia drag preview)
   const handleSLMove = useCallback(
-    (price: number) => {
-      order.callbacks?.onSLMove?.(price);
+    (price: number, partialPercent: number) => {
+      order.callbacks?.onSLMove?.(price, partialPercent);
       onSLMovePreview?.(order.id, price);
     },
     [order.callbacks, onSLMovePreview, order.id],
@@ -179,7 +180,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
         tpTranslateY.value = event.translationY;
         if (Math.abs(event.translationY) >= 5) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleTPMove)(dragPrice);
+          const partialPercent = bracketPartialPercent(order.partialEnabled === true, event.translationX);
+          runOnJS(handleTPMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
@@ -192,7 +194,9 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
         if (Math.abs(event.translationY) < 5) {
           runOnJS(handleTPClick)();
         } else {
-          runOnJS(handleTPDragEnd)(newPrice);
+          const partialPercent =
+            order.partialEnabled === true ? bracketPartialPercent(true, event.translationX) : undefined;
+          runOnJS(handleTPDragEnd)(newPrice, partialPercent);
         }
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -211,6 +215,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     handleTPSLDragEnd,
     tpDragging,
     tpTranslateY,
+    order.partialEnabled,
   ]);
 
   // SL button drag gesture
@@ -225,7 +230,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
         slTranslateY.value = event.translationY;
         if (Math.abs(event.translationY) >= 5) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleSLMove)(dragPrice);
+          const partialPercent = bracketPartialPercent(order.partialEnabled === true, event.translationX);
+          runOnJS(handleSLMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
@@ -238,7 +244,9 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
         if (Math.abs(event.translationY) < 5) {
           runOnJS(handleSLClick)();
         } else {
-          runOnJS(handleSLDragEnd)(newPrice);
+          const partialPercent =
+            order.partialEnabled === true ? bracketPartialPercent(true, event.translationX) : undefined;
+          runOnJS(handleSLDragEnd)(newPrice, partialPercent);
         }
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -257,6 +265,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     handleTPSLDragEnd,
     slDragging,
     slTranslateY,
+    order.partialEnabled,
   ]);
 
   // Animated styles for TP button
