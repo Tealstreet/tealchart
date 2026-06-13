@@ -29,6 +29,9 @@ for built-in and user-authored indicators.
   Bollinger Bands, etc.) defined via `@tealstreet/tealscript`. User
   indicators authored in the same DSL run in a Web Worker so the UI
   thread stays free.
+- **Chart trading contract.** State-driven order, position, bracket,
+  execution, and custom action overlays emit typed intents for the
+  consuming OMS. See [`docs/chart-trading.md`](./docs/chart-trading.md).
 - **Per-chart persistence.** Jotai `atomWithStorage` with schema
   versioning and a `safeDeepMerge` recovery path for corrupted
   localStorage.
