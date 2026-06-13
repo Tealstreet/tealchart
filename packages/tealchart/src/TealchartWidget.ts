@@ -15,7 +15,6 @@ import type {
   UserDrawingClipboard,
   UserDrawingCommandDispatchResult,
   UserDrawingCommandSource,
-  UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -73,7 +72,7 @@ import {
   resolveUserDrawingContextActionsAtPoint,
   resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingKeyboardAction,
-  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
@@ -2525,9 +2524,8 @@ export class TealchartWidget {
   }
 
   dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean {
-    const resolvedAction: UserDrawingObjectTreeAction =
-      action.type === 'duplicate' ? { ...action, createId: action.createId ?? (() => this._createUserDrawingId()) } : action;
-    const commands = resolveUserDrawingObjectTreeActionCommands(this._userDrawingState, resolvedAction, {
+    const commands = resolveUserDrawingObjectTreeDispatchActionCommands(this._userDrawingState, action, {
+      createId: () => this._createUserDrawingId(),
       now: () => Date.now(),
     });
     let changed = false;

@@ -467,7 +467,11 @@ export {
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
 export { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
-export { resolveUserDrawingObjectTreeActionCommands, resolveUserDrawingObjectTreeModel } from './objectTree';
+export {
+  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeDispatchActionCommands,
+  resolveUserDrawingObjectTreeModel,
+} from './objectTree';
 export type {
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingPropertiesSurface,
@@ -511,6 +515,7 @@ export type {
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeCommandOptions,
+  UserDrawingObjectTreeDispatchCommandOptions,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeMutationAction,
   UserDrawingObjectTreeOptions,

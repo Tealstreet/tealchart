@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { reduceUserDrawingCommand } from './commands';
 import { createUserDrawingCommandHistory, dispatchUserDrawingCommandWithHistory, undoUserDrawingCommand } from './history';
 import { createUserDrawingState } from './input';
-import { resolveUserDrawingObjectTreeActionCommands, resolveUserDrawingObjectTreeModel } from './objectTree';
+import {
+  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeDispatchActionCommands,
+  resolveUserDrawingObjectTreeModel,
+} from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
@@ -188,6 +192,31 @@ describe('user drawing object tree model', () => {
       },
     ]);
     expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'delete', drawingIds: [] })).toEqual([]);
+  });
+
+  it('resolves app-dispatchable duplicate actions with a default id factory', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine(), createRectangle()],
+      selection: { drawingId: 'trend' },
+    });
+
+    const commands = resolveUserDrawingObjectTreeDispatchActionCommands(
+      state,
+      { type: 'duplicate', drawingIds: ['trend'] },
+      { createId: () => 'copy', now: () => 30 },
+    );
+
+    expect(commands).toEqual([
+      {
+        type: 'duplicate',
+        options: { drawingId: 'trend', now: expect.any(Function), createId: expect.any(Function) },
+        meta: { source: 'objectTree', affectedIds: ['trend'] },
+      },
+    ]);
+
+    const next = reduceUserDrawingCommand(state, commands[0]!);
+    expect(next.drawings.map((drawing) => drawing.id)).toEqual(['trend', 'copy', 'rect']);
+    expect(next.selection).toEqual({ drawingId: 'copy' });
   });
 
   it('preserves selection snapshots when object-tree mutations target multiple ids', () => {
