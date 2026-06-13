@@ -537,6 +537,8 @@ Phase 1: Action registry
 
 - Define drawing keyboard actions for delete, cancel, undo, redo, duplicate,
   copy/paste if supported later, nudge, and select all.
+- Shipped initial shared resolver for undo, redo, selected delete, and draft
+  cancel so web and mobile adapters consume the same action map.
 
 Phase 2: Focus rules
 
@@ -546,6 +548,8 @@ Phase 2: Focus rules
 Phase 3: Command dispatch
 
 - Route keyboard actions through shared commands and history.
+- Shipped web widget and mobile command utility dispatch paths that preserve
+  existing drawing command history semantics.
 
 ### Epic 7.2: Web Keyboard Integration
 
@@ -568,6 +572,8 @@ Phase 3: Nudge
 Phase 1: Hardware keyboard support
 
 - Support undo/redo/delete where React Native keyboard events are available.
+- Shipped Skia imperative handle support for host-level hardware-keyboard
+  adapters to dispatch the shared drawing keyboard actions.
 
 Phase 2: Touch-native duplicate workflow
 
