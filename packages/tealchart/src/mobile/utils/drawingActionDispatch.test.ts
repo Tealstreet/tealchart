@@ -131,6 +131,15 @@ describe('mobile drawing action dispatch', () => {
       },
     );
     dispatchMobileUserDrawingActionCommand(
+      { type: 'updateStyle', style: { fillColor: 'rgba(34, 197, 94, 0.12)', fillVisible: false } },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
       { type: 'toolbarAction', action: 'duplicateSelected' },
       {
         state: createSelectedState(),
@@ -144,6 +153,11 @@ describe('mobile drawing action dispatch', () => {
       type: 'updateStyle',
       style: { lineWidth: 3 },
       meta: { source: 'contextMenu' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { fillColor: 'rgba(34, 197, 94, 0.12)', fillVisible: false },
+      meta: { source: 'toolbar' },
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',
