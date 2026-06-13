@@ -25,6 +25,7 @@ import type {
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
+  UserDrawingPropertiesIntent,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
   UserDrawingAnchor,
@@ -121,6 +122,7 @@ import {
   resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingPropertiesIntent,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -328,6 +330,8 @@ export interface SkiaTealchartHandle {
   getUserDrawingObjectTreeModel(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
   openUserDrawingObjectTree(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
   dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean;
+  getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null;
+  openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null;
 }
 
 export interface SkiaTealchartProps {
@@ -369,6 +373,8 @@ export interface SkiaTealchartProps {
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   /** Called when app or handle code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
+  /** Called when app or handle code asks to open selected drawing properties. */
+  onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   /** Constrain two-anchor drawing placement drags to square or 45-degree geometry for touch toolbars. */
   constrainUserDrawingPlacement?: boolean;
   /** Called when gesture blocks/unblocks parent scroll */
@@ -427,6 +433,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingState: propUserDrawingState,
     onUserDrawingStateChange,
     onUserDrawingObjectTreeOpen,
+    onUserDrawingPropertiesOpen,
     constrainUserDrawingPlacement = false,
     onSwipeBlockChange,
     onOrderMove,
@@ -773,8 +780,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         }
         return changed;
       },
+      getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null {
+        return resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
+      },
+      openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
+        const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
+        if (intent) {
+          onUserDrawingPropertiesOpen?.(intent);
+        }
+        return intent;
+      },
     }),
-    [commitUserDrawingState, createUserDrawingId, dispatchUserDrawingCommandToState, onUserDrawingObjectTreeOpen],
+    [
+      commitUserDrawingState,
+      createUserDrawingId,
+      dispatchUserDrawingCommandToState,
+      onUserDrawingObjectTreeOpen,
+      onUserDrawingPropertiesOpen,
+    ],
   );
 
   // Use core hook for bar fetching and state management
@@ -1690,6 +1713,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (changed) {
             commitUserDrawingState(nextState);
           }
+          if (intent.type === 'properties') {
+            const propertiesIntent = resolveUserDrawingPropertiesIntent(nextState, { drawingId: intent.drawingId });
+            if (propertiesIntent) {
+              onUserDrawingPropertiesOpen?.(propertiesIntent);
+            }
+          }
           return;
         }
       }
@@ -1716,6 +1745,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       isPointInChartArea,
       margins,
       measureUserDrawingTextLabelLine,
+      onUserDrawingPropertiesOpen,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
     ],

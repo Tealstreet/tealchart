@@ -80,11 +80,13 @@ import type {
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
   ResolveUserDrawingEditIntentOptions,
+  ResolveUserDrawingPropertiesIntentOptions,
   UserDrawingEditIntent,
   UserDrawingEditIntentKind,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
+  UserDrawingPropertiesIntent,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
   UserDrawingStyleToggleDescriptor,
@@ -203,6 +205,7 @@ import {
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
   resolveAnchoredVolumeProfileFromAnchor,
@@ -305,6 +308,7 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingEditIntentAtPoint).toBeTypeOf('function');
     expect(resolveUserDrawingObjectTreeModel).toBeTypeOf('function');
     expect(resolveUserDrawingObjectTreeActionCommands).toBeTypeOf('function');
+    expect(resolveUserDrawingPropertiesIntent).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
@@ -455,6 +459,36 @@ describe('tealchart public entries', () => {
     expect(kind).toBe('properties');
     expect(options.source).toBe('pointer');
     expect(intent.type).toBe('pane');
+  });
+
+  it('exports drawing properties intent public types', () => {
+    const options: NonNever<ResolveUserDrawingPropertiesIntentOptions> = {
+      drawingId: 'line',
+    };
+    const intent: NonNever<UserDrawingPropertiesIntent> = {
+      type: 'properties',
+      drawingId: 'line',
+      drawing: {
+        id: 'line',
+        kind: 'horizontalLine',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: {
+          lineColor: '#f5c542',
+          lineWidth: 1,
+          lineStyle: 'solid',
+        },
+        price: 50,
+      },
+      selected: true,
+      editable: true,
+    };
+
+    expect(options.drawingId).toBe('line');
+    expect(intent.editable).toBe(true);
   });
 
   it('exports usable native channel primitive aliases', () => {
