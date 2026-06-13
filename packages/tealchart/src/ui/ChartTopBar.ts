@@ -585,7 +585,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
       const activeCategory = category.tools.includes(activeTool);
-      const firstTool = getUserDrawingToolDescriptor(category.tools[0]!);
+      const categoryTool = activeCategory ? activeTool : category.tools[0]!;
+      const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
       const flyoutId = `tealchart-drawing-tools-${category.id}`;
       const railItem = this.createElement('div', {
         style: styles.drawingToolRailItem,
@@ -595,7 +596,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           ...styles.drawingToolCategoryButton,
           ...(activeCategory ? styles.drawingButtonActive : {}),
         },
-        textContent: firstTool.icon,
+        textContent: categoryToolDescriptor.icon,
         attributes: {
           type: 'button',
           title: category.label,
