@@ -66,6 +66,7 @@ const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'sector',
   'longPosition',
   'shortPosition',
+  'barsPattern',
   'elliottCorrectiveWave',
   'elliottDoubleComboWave',
   'doubleCurve',

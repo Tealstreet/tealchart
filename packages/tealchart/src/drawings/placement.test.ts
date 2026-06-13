@@ -75,6 +75,7 @@ const dragSeedTools: UserDrawingTool[] = [
   'sector',
   'longPosition',
   'shortPosition',
+  'barsPattern',
   'elliottCorrectiveWave',
   'elliottDoubleComboWave',
   'doubleCurve',
@@ -111,6 +112,7 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('fibChannel')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('projection')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('longPosition')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('barsPattern')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('elliottCorrectiveWave')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('doubleCurve')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('trianglePattern')).toBe('dragSeed');
@@ -132,8 +134,8 @@ describe('user drawing placement modes', () => {
   });
 
   it('keeps unsupported multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
-    expect(isUserDrawingDragPlacementTool('barsPattern')).toBe(false);
-    expect(getUserDrawingPlacementMode('barsPattern')).toBe('click');
+    expect(isUserDrawingDragPlacementTool('select')).toBe(false);
+    expect(getUserDrawingPlacementMode('select')).toBe('select');
   });
 
   it('constrains shape placement drags to a visual square', () => {

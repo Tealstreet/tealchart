@@ -640,9 +640,8 @@ describe('user drawing input controller', () => {
       'sector',
       'longPosition',
       'shortPosition',
-      'elliottCorrectiveWave',
-      'elliottDoubleComboWave',
     ] as const;
+    const specialThreeAnchorDragSeedTools = ['barsPattern', 'elliottCorrectiveWave', 'elliottDoubleComboWave'] as const;
     const fourAnchorDragSeedTools = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'] as const;
     const fiveAnchorDragSeedTools = [
       'xabcdPattern',
@@ -693,6 +692,54 @@ describe('user drawing input controller', () => {
         id: `${tool}-drawing`,
         kind: tool,
         points: [anchorA, anchorB, anchorC],
+      });
+    }
+
+    for (const tool of specialThreeAnchorDragSeedTools) {
+      const bars = [
+        { time: 1_000, open: 100, high: 104, low: 99, close: 102 },
+        { time: 2_000, open: 102, high: 105, low: 101, close: 101 },
+      ];
+      const pointOptions = tool === 'barsPattern' ? { bars } : {};
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const started = beginUserDrawingPlacementDrag(
+        state,
+        { paneId: 'main', anchor: anchorA, ...pointOptions },
+        { now: () => 10, style },
+      );
+      const seeded = commitUserDrawingPlacementDrag(
+        started,
+        { paneId: 'main', anchor: anchorB, ...pointOptions },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 11,
+          style,
+        },
+      );
+      const committed = handleUserDrawingInput(
+        seeded,
+        { paneId: 'main', anchor: anchorC, ...pointOptions },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 12,
+          style,
+        },
+      );
+
+      expect(started.draft?.anchors, tool).toEqual([anchorA]);
+      expect(seeded.drawings, tool).toEqual([]);
+      expect(seeded.draft, tool).toMatchObject({
+        tool,
+        paneId: 'main',
+        anchors: [anchorA, anchorB],
+      });
+      expect(committed.draft, tool).toBeNull();
+      expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
+      expect(committed.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB, anchorC],
+        ...(tool === 'barsPattern' ? { bars } : {}),
       });
     }
 
