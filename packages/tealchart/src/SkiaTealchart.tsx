@@ -103,12 +103,12 @@ import {
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft as cancelUserDrawingDraftState,
-  cancelUserDrawingTextEdit,
   clearUserDrawings as clearUserDrawingsState,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
   deleteUserDrawing as deleteUserDrawingState,
+  dispatchUserDrawingCommand,
   duplicateUserDrawing as duplicateUserDrawingState,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   handleUserDrawingInput,
@@ -119,10 +119,6 @@ import {
   reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   resolveUserDrawingTextEditMetrics,
-  selectUserDrawingById,
-  selectUserDrawingsById,
-  setUserDrawingImageSource,
-  setUserDrawingText,
   setUserDrawingTool,
   updateUserDrawingTextEdit,
   USER_DRAWING_FONT_FAMILIES,
@@ -157,16 +153,8 @@ import {
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import {
-  deleteMobileUserDrawingTableColumn,
-  deleteMobileUserDrawingTableRow,
-  insertMobileUserDrawingTableColumn,
-  insertMobileUserDrawingTableRow,
   setMobileUserDrawingIconName,
   setMobileUserDrawingLocked,
-  setMobileUserDrawingTableCell,
-  setMobileUserDrawingTableCells,
-  setMobileUserDrawingTableDimensions,
-  setMobileUserDrawingTextContent,
   setMobileUserDrawingTextAlign,
   setMobileUserDrawingTrendLineExtend,
   setMobileUserDrawingVisibility,
@@ -493,6 +481,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     return id;
   }, []);
 
+  const dispatchUserDrawingCommandToState = useCallback(
+    (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => {
+      const result = dispatchUserDrawingCommand(userDrawingStateRef.current, command);
+      commitUserDrawingStateIfChanged(result.state);
+      return result.changed;
+    },
+    [commitUserDrawingStateIfChanged],
+  );
+
   // Create indicator manager (stable ref)
   const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
   if (!indicatorManagerRef.current) {
@@ -534,68 +531,68 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         commitUserDrawingState(nextState);
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): void {
-        commitUserDrawingStateIfChanged(setUserDrawingTool(userDrawingStateRef.current, tool));
+        dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
       },
       selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
-        commitUserDrawingStateIfChanged(selectUserDrawingById(userDrawingStateRef.current, drawingId, handle));
+        dispatchUserDrawingCommandToState({ type: 'select', drawingId, handle, meta: { source: 'api' } });
       },
       selectUserDrawings(drawingIds: readonly string[]): void {
-        commitUserDrawingStateIfChanged(selectUserDrawingsById(userDrawingStateRef.current, drawingIds));
+        dispatchUserDrawingCommandToState({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
       },
       deleteUserDrawing(drawingId?: string): boolean {
-        const nextState = deleteUserDrawingState(userDrawingStateRef.current, { drawingId });
-        return commitUserDrawingStateIfChanged(nextState);
+        return dispatchUserDrawingCommandToState({ type: 'delete', options: { drawingId }, meta: { source: 'api' } });
       },
       deleteSelectedUserDrawing(): boolean {
-        const nextState = deleteUserDrawingState(userDrawingStateRef.current);
-        return commitUserDrawingStateIfChanged(nextState);
+        return dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'api' } });
       },
       duplicateUserDrawing(drawingId?: string): boolean {
-        const nextState = duplicateUserDrawingState(userDrawingStateRef.current, {
-          drawingId,
-          createId: createUserDrawingId,
+        return dispatchUserDrawingCommandToState({
+          type: 'duplicate',
+          options: {
+            drawingId,
+            createId: createUserDrawingId,
+          },
+          meta: { source: 'api' },
         });
-        return commitUserDrawingStateIfChanged(nextState);
       },
       duplicateSelectedUserDrawing(): boolean {
-        const nextState = duplicateUserDrawingState(userDrawingStateRef.current, {
-          createId: createUserDrawingId,
+        return dispatchUserDrawingCommandToState({
+          type: 'duplicate',
+          options: {
+            createId: createUserDrawingId,
+          },
+          meta: { source: 'api' },
         });
-        return commitUserDrawingStateIfChanged(nextState);
       },
       clearUserDrawings(): void {
-        commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
+        dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
       },
       cancelUserDrawingDraft(): void {
-        commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(userDrawingStateRef.current));
+        dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'api' } });
       },
       beginUserDrawingTextEdit(drawingId?: string): boolean {
-        return commitUserDrawingStateIfChanged(beginUserDrawingTextEdit(userDrawingStateRef.current, drawingId));
+        return dispatchUserDrawingCommandToState({ type: 'beginTextEdit', drawingId, meta: { source: 'api' } });
       },
       updateUserDrawingTextEdit(value: string): boolean {
-        return commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
+        return dispatchUserDrawingCommandToState({ type: 'updateTextEdit', value, meta: { source: 'textEditor' } });
       },
       commitUserDrawingTextEdit(): boolean {
-        return commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
+        return dispatchUserDrawingCommandToState({ type: 'commitTextEdit', meta: { source: 'textEditor' } });
       },
       cancelUserDrawingTextEdit(): boolean {
-        return commitUserDrawingStateIfChanged(cancelUserDrawingTextEdit(userDrawingStateRef.current));
+        return dispatchUserDrawingCommandToState({ type: 'cancelTextEdit', meta: { source: 'textEditor' } });
       },
       setUserDrawingText(drawingId: string, text: string): boolean {
-        return commitUserDrawingStateIfChanged(setUserDrawingText(userDrawingStateRef.current, drawingId, text));
+        return dispatchUserDrawingCommandToState({ type: 'setText', drawingId, text, meta: { source: 'api' } });
       },
       setUserDrawingTextContent(text: string, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingTextContent(userDrawingStateRef.current, text, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setTextContent', text, options, meta: { source: 'api' } });
       },
       setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(setUserDrawingImageSource(userDrawingStateRef.current, source, options));
+        return dispatchUserDrawingCommandToState({ type: 'setImageSource', source, options, meta: { source: 'api' } });
       },
       setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingTableCells(userDrawingStateRef.current, cells, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setTableCells', cells, options, meta: { source: 'api' } });
       },
       setUserDrawingTableCell(
         row: number,
@@ -603,103 +600,106 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         value: UserDrawingTableCellInput,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingTableCell(userDrawingStateRef.current, row, column, value, options),
-        );
+        return dispatchUserDrawingCommandToState({
+          type: 'setTableCell',
+          row,
+          column,
+          value,
+          options,
+          meta: { source: 'api' },
+        });
       },
       setUserDrawingTableDimensions(
         rows: number,
         columns: number,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingTableDimensions(userDrawingStateRef.current, rows, columns, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setTableDimensions', rows, columns, options, meta: { source: 'api' } });
       },
       insertUserDrawingTableRow(
         row: number,
         values?: UserDrawingTableRowInput,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return commitUserDrawingStateIfChanged(
-          insertMobileUserDrawingTableRow(userDrawingStateRef.current, row, values, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'insertTableRow', row, values, options, meta: { source: 'api' } });
       },
       deleteUserDrawingTableRow(row: number, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          deleteMobileUserDrawingTableRow(userDrawingStateRef.current, row, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'deleteTableRow', row, options, meta: { source: 'api' } });
       },
       insertUserDrawingTableColumn(
         column: number,
         values?: UserDrawingTableColumnInput,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return commitUserDrawingStateIfChanged(
-          insertMobileUserDrawingTableColumn(userDrawingStateRef.current, column, values, options),
-        );
+        return dispatchUserDrawingCommandToState({
+          type: 'insertTableColumn',
+          column,
+          values,
+          options,
+          meta: { source: 'api' },
+        });
       },
       deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          deleteMobileUserDrawingTableColumn(userDrawingStateRef.current, column, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'deleteTableColumn', column, options, meta: { source: 'api' } });
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          updateMobileUserDrawingStyle(userDrawingStateRef.current, style, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'updateStyle', style, options, meta: { source: 'api' } });
       },
       setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setTextAlign', textAlign, options, meta: { source: 'api' } });
       },
       setUserDrawingTrendLineExtend(
         extend: UserDrawingTrendLineExtend,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingTrendLineExtend(userDrawingStateRef.current, extend, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setTrendLineExtend', extend, options, meta: { source: 'api' } });
       },
       setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingIconName(userDrawingStateRef.current, iconName, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setIconName', iconName, options, meta: { source: 'api' } });
       },
       setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingVisibility(userDrawingStateRef.current, visible, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setVisibility', visible, options, meta: { source: 'api' } });
       },
       setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          setMobileUserDrawingLocked(userDrawingStateRef.current, locked, options),
-        );
+        return dispatchUserDrawingCommandToState({ type: 'setLocked', locked, options, meta: { source: 'api' } });
       },
       reorderUserDrawings(action: UserDrawingZOrderAction, options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, action, options));
+        return dispatchUserDrawingCommandToState({ type: 'reorder', action, options, meta: { source: 'api' } });
       },
       bringUserDrawingForward(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          reorderUserDrawings(userDrawingStateRef.current, 'bringForward', options),
-        );
+        return dispatchUserDrawingCommandToState({
+          type: 'reorder',
+          action: 'bringForward',
+          options,
+          meta: { source: 'api' },
+        });
       },
       sendUserDrawingBackward(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          reorderUserDrawings(userDrawingStateRef.current, 'sendBackward', options),
-        );
+        return dispatchUserDrawingCommandToState({
+          type: 'reorder',
+          action: 'sendBackward',
+          options,
+          meta: { source: 'api' },
+        });
       },
       bringUserDrawingToFront(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(
-          reorderUserDrawings(userDrawingStateRef.current, 'bringToFront', options),
-        );
+        return dispatchUserDrawingCommandToState({
+          type: 'reorder',
+          action: 'bringToFront',
+          options,
+          meta: { source: 'api' },
+        });
       },
       sendUserDrawingToBack(options: UpdateUserDrawingOptions = {}): boolean {
-        return commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, 'sendToBack', options));
+        return dispatchUserDrawingCommandToState({
+          type: 'reorder',
+          action: 'sendToBack',
+          options,
+          meta: { source: 'api' },
+        });
       },
     }),
-    [commitUserDrawingState, commitUserDrawingStateIfChanged, createUserDrawingId],
+    [commitUserDrawingState, createUserDrawingId, dispatchUserDrawingCommandToState],
   );
 
   // Use core hook for bar fetching and state management
