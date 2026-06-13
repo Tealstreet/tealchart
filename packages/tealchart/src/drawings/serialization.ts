@@ -369,6 +369,7 @@ function parseBase(value: Record<string, unknown>): Omit<UserDrawingBase, 'kind'
 
   return {
     id: value.id,
+    name: typeof value.name === 'string' && value.name.trim() ? value.name.trim() : undefined,
     paneId: value.paneId,
     visible: value.visible,
     locked: value.locked,

@@ -163,6 +163,7 @@ export interface UserDrawingStyle {
 export interface UserDrawingBase {
   id: string;
   kind: UserDrawingKind;
+  name?: string;
   paneId: string;
   visible: boolean;
   locked: boolean;
