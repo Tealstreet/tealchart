@@ -1612,6 +1612,18 @@ describe('TealchartWidget', () => {
       expect(onOpenObjectTree).toHaveBeenCalledWith(opened);
       expect(opened.rows).toHaveLength(2);
 
+      onOpenObjectTree.mockClear();
+      const contextItems = (
+        widget as unknown as {
+          _handleUserDrawingContextMenu(
+            point: { x: number; y: number },
+            spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          ): Array<{ text: string; click: () => void }>;
+        }
+      )._handleUserDrawingContextMenu({ x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+      contextItems.find((item) => item.text === 'Open drawing object tree')?.click();
+      expect(onOpenObjectTree).toHaveBeenCalledWith(expect.objectContaining({ rows: expect.any(Array) }));
+
       expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'hide', drawingIds: ['target'] })).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([
         expect.objectContaining({ id: 'line', visible: true }),

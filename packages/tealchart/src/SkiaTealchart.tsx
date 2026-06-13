@@ -183,6 +183,7 @@ import {
   dispatchMobileUserDrawingHistoryCommand,
   dispatchMobileUserDrawingKeyboardAction as dispatchMobileUserDrawingKeyboardActionToState,
 } from './mobile/utils/drawingCommands';
+import { dispatchMobileUserDrawingActionCommand } from './mobile/utils/drawingActionDispatch';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -2050,58 +2051,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           enabled: item.enabled,
           click: () => {
             if (!item.enabled) return;
-            if (item.command.type === 'styleAction') {
-              if (item.command.visible !== undefined) {
-                dispatchUserDrawingCommandToState({
-                  type: 'setVisibility',
-                  visible: item.command.visible,
-                  meta: { source: 'contextMenu' },
-                });
-              }
-              if (item.command.locked !== undefined) {
-                dispatchUserDrawingCommandToState({
-                  type: 'setLocked',
-                  locked: item.command.locked,
-                  options: { includeLocked: item.command.includeLocked },
-                  meta: { source: 'contextMenu' },
-                });
-              }
-              return;
-            }
-            if (item.command.type === 'openProperties') {
-              const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current);
-              if (intent) {
-                onUserDrawingPropertiesOpen?.(intent);
-              }
-              return;
-            }
-            if (item.command.type === 'openObjectTree') {
-              onUserDrawingObjectTreeOpen?.(resolveUserDrawingObjectTreeModel(userDrawingStateRef.current));
-              return;
-            }
-            if (item.command.type === 'updateStyle') {
-              dispatchUserDrawingCommandToState({
-                type: 'updateStyle',
-                style: item.command.style,
-                meta: { source: 'contextMenu' },
-              });
-              return;
-            }
-            if (item.command.action === 'duplicateSelected') {
-              dispatchUserDrawingCommandToState({
-                type: 'duplicate',
-                options: { createId: createUserDrawingId },
-                meta: { source: 'contextMenu' },
-              });
-            } else if (item.command.action === 'deleteSelected') {
-              dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'contextMenu' } });
-            } else {
-              dispatchUserDrawingCommandToState({
-                type: 'reorder',
-                action: item.command.action,
-                meta: { source: 'contextMenu' },
-              });
-            }
+            dispatchMobileUserDrawingActionCommand(item.command, {
+              state: userDrawingStateRef.current,
+              source: 'contextMenu',
+              createId: createUserDrawingId,
+              dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
+              onUserDrawingPropertiesOpen,
+              onUserDrawingObjectTreeOpen,
+            });
           },
         })),
       );
@@ -4649,58 +4606,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       !item.enabled && styles.userDrawingActionButtonDisabled,
                     ]}
                     onPress={() => {
-                      if (item.command.type === 'openProperties') {
-                        const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current);
-                        if (intent) {
-                          onUserDrawingPropertiesOpen?.(intent);
-                        }
-                        return;
-                      }
-                      if (item.command.type === 'openObjectTree') {
-                        onUserDrawingObjectTreeOpen?.(resolveUserDrawingObjectTreeModel(userDrawingStateRef.current));
-                        return;
-                      }
-                      if (item.command.type === 'styleAction') {
-                        if (item.command.visible !== undefined) {
-                          dispatchUserDrawingCommandToState({
-                            type: 'setVisibility',
-                            visible: item.command.visible,
-                            meta: { source: 'toolbar' },
-                          });
-                        }
-                        if (item.command.locked !== undefined) {
-                          dispatchUserDrawingCommandToState({
-                            type: 'setLocked',
-                            locked: item.command.locked,
-                            options: { includeLocked: item.command.includeLocked },
-                            meta: { source: 'toolbar' },
-                          });
-                        }
-                        return;
-                      }
-                      if (item.command.type === 'updateStyle') {
-                        dispatchUserDrawingCommandToState({
-                          type: 'updateStyle',
-                          style: item.command.style,
-                          meta: { source: 'toolbar' },
-                        });
-                        return;
-                      }
-                      if (item.command.action === 'duplicateSelected') {
-                        dispatchUserDrawingCommandToState({
-                          type: 'duplicate',
-                          options: { createId: createUserDrawingId },
-                          meta: { source: 'toolbar' },
-                        });
-                      } else if (item.command.action === 'deleteSelected') {
-                        dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'toolbar' } });
-                      } else {
-                        dispatchUserDrawingCommandToState({
-                          type: 'reorder',
-                          action: item.command.action,
-                          meta: { source: 'toolbar' },
-                        });
-                      }
+                      dispatchMobileUserDrawingActionCommand(item.command, {
+                        state: userDrawingStateRef.current,
+                        source: 'toolbar',
+                        createId: createUserDrawingId,
+                        dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
+                        onUserDrawingPropertiesOpen,
+                        onUserDrawingObjectTreeOpen,
+                      });
                     }}
                   >
                     <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
