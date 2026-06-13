@@ -5,6 +5,7 @@
 - Selection, editing primitives, and drawing style controls exist for both web Canvas and mobile Skia paths.
 - Shared chart geometry now computes pane positions and first-party chrome regions for top bar, left drawing tools, right price axis, and bottom time axis.
 - Top-left legend overlay metadata is represented in shared geometry; mobile currently reports no separate legend region.
+- Chart chrome geometry helpers and metrics are exported for app-level toolbar and overlay integration.
 - The web drawing rail mounts into a transparent chart overlay root; mobile uses the sibling full-chart overlay region for tap-away dismissal.
 
 ## Current Direction
@@ -21,6 +22,6 @@
 
 ## Known Gaps
 
-- Layout reservations are computed but not yet exposed as a public API.
+- Public layout helpers expose metadata only; they do not yet drive every internal overlay placement.
 - Indicator legend collision avoidance still needs to consume the shared top-left legend metadata end to end.
 - TradingView-grade grouped toolbar affordances need continued parity work across web and mobile.
