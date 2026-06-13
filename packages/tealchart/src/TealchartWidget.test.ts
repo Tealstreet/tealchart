@@ -1505,6 +1505,56 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('duplicates selected drawings from keyboard shortcuts while chart owns input', () => {
+      const datafeed = createMockDatafeed();
+      const container = document.createElement('div');
+      const input = document.createElement('input');
+      container.appendChild(input);
+      const widget = createWidget(datafeed, { container });
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      const inputDuplicate = new KeyboardEvent('keydown', { key: 'd', metaKey: true, bubbles: true, cancelable: true });
+      input.dispatchEvent(inputDuplicate);
+
+      expect(inputDuplicate.defaultPrevented).toBe(false);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+
+      const chartDuplicate = new KeyboardEvent('keydown', { key: 'd', metaKey: true, cancelable: true });
+      document.dispatchEvent(chartDuplicate);
+
+      expect(chartDuplicate.defaultPrevented).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_1']);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+
+      widget.remove();
+    });
+
     it('selects all drawings from keyboard shortcuts while chart owns input', () => {
       const datafeed = createMockDatafeed();
       const container = document.createElement('div');

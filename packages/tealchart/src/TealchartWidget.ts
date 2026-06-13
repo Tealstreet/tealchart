@@ -2277,6 +2277,7 @@ export class TealchartWidget {
     if (action.type === 'undo') return this.undoUserDrawingCommand();
     if (action.type === 'redo') return this.redoUserDrawingCommand();
     if (action.type === 'copySelected') return this.copySelectedUserDrawing();
+    if (action.type === 'duplicateSelected') return this.duplicateSelectedUserDrawing();
     if (action.type === 'paste') return this.pasteUserDrawingClipboard();
     if (action.type === 'selectAll') {
       return this.dispatchUserDrawingCommand({

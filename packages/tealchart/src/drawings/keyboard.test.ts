@@ -70,6 +70,15 @@ describe('user drawing keyboard actions', () => {
     expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'c', metaKey: true, shiftKey: true })).toBeNull();
   });
 
+  it('maps primary-modifier duplicate only when a drawing is selected', () => {
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'd', metaKey: true })).toEqual({
+      type: 'duplicateSelected',
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'd', metaKey: true })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'd', metaKey: true, shiftKey: true })).toBeNull();
+  });
+
   it('maps primary-modifier select all only when drawings exist', () => {
     expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'a', metaKey: true })).toEqual({
       type: 'selectAll',
