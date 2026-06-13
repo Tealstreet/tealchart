@@ -574,6 +574,35 @@ export type { PaneOffset, AddIndicatorOptions } from './rendering/PaneManager';
 export type { IndicatorPane, PaneLayout } from './types';
 export { DEFAULT_PANE_LAYOUT, DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT } from './types';
 
+// Shared chart layout geometry
+export {
+  DEFAULT_CHART_CHROME_LAYOUT,
+  EMPTY_INSETS,
+  MOBILE_CHART_CHROME_METRICS,
+  WEB_CHART_CHROME_METRICS,
+  clampRectToBounds,
+  computeChartGeometry,
+  computeLeftToolRailTop,
+  computePaneGeometry,
+  computeTopLeftLegendRect,
+  insetRect,
+  intersectsRect,
+  normalizeInsets,
+  rect,
+  rectBottom,
+  rectRight,
+} from './layout/chartGeometry';
+export type {
+  ChartChromeLayoutModes,
+  ChartChromeMetrics,
+  ChartChromeRegion,
+  ChartGeometryInput,
+  ChartGeometrySnapshot,
+  ChartLayoutMode,
+  Insets,
+  Rect,
+} from './layout/chartGeometry';
+
 // TradingView Layout Transformer
 // For saving/loading Custom Chart layouts in TradingView format
 export {
