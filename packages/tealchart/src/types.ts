@@ -978,8 +978,8 @@ export interface TealstreetOrderLineExtensions {
   // Bracket callbacks
   onTPClick(callback: () => void): IOrderLineAdapter;
   onSLClick(callback: () => void): IOrderLineAdapter;
-  onTPMove(callback: (price: number) => void): IOrderLineAdapter;
-  onSLMove(callback: (price: number) => void): IOrderLineAdapter;
+  onTPMove(callback: (price: number, partialPercent?: number) => void): IOrderLineAdapter;
+  onSLMove(callback: (price: number, partialPercent?: number) => void): IOrderLineAdapter;
   onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): IOrderLineAdapter;
   onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): IOrderLineAdapter;
 }
@@ -1005,8 +1005,8 @@ export interface TealstreetPositionLineExtensions {
   // Bracket callbacks
   onTPClick(callback: () => void): IPositionLineAdapter;
   onSLClick(callback: () => void): IPositionLineAdapter;
-  onTPMove(callback: (price: number) => void): IPositionLineAdapter;
-  onSLMove(callback: (price: number) => void): IPositionLineAdapter;
+  onTPMove(callback: (price: number, partialPercent?: number) => void): IPositionLineAdapter;
+  onSLMove(callback: (price: number, partialPercent?: number) => void): IPositionLineAdapter;
   onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): IPositionLineAdapter;
   onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): IPositionLineAdapter;
 }
@@ -1032,8 +1032,8 @@ export interface OrderLineCallbacks {
   pnlCalculator: ((price: number, percent: number) => string) | null;
   onTPClick: (() => void) | null;
   onSLClick: (() => void) | null;
-  onTPMove: ((price: number) => void) | null;
-  onSLMove: ((price: number) => void) | null;
+  onTPMove: ((price: number, partialPercent?: number) => void) | null;
+  onSLMove: ((price: number, partialPercent?: number) => void) | null;
   onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null;
   onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null;
 }
@@ -1049,8 +1049,8 @@ export interface PositionLineCallbacks {
   pnlCalculator: ((price: number, percent: number) => string) | null;
   onTPClick: (() => void) | null;
   onSLClick: (() => void) | null;
-  onTPMove: ((price: number) => void) | null;
-  onSLMove: ((price: number) => void) | null;
+  onTPMove: ((price: number, partialPercent?: number) => void) | null;
+  onSLMove: ((price: number, partialPercent?: number) => void) | null;
   onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null;
   onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null;
 }

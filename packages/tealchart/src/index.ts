@@ -9,6 +9,37 @@ export { TealchartWidget, createTealchartWidget } from './TealchartWidget';
 // Per-chart API
 export { TealchartApi, type StudyCreateCallback } from './TealchartApi';
 
+// Chart trading domain types
+export type {
+  ChartTradingAction,
+  ChartTradingApi,
+  ChartTradingBracketClickIntent,
+  ChartTradingBracketCommitIntent,
+  ChartTradingBracketConfig,
+  ChartTradingBracketIntentBase,
+  ChartTradingBracketOwnerType,
+  ChartTradingBracketPreviewIntent,
+  ChartTradingCustomLine,
+  ChartTradingExecutionLine,
+  ChartTradingIntent,
+  ChartTradingIntentBase,
+  ChartTradingIntentHandler,
+  ChartTradingIntentSource,
+  ChartTradingLabel,
+  ChartTradingLineActionIntent,
+  ChartTradingLineBase,
+  ChartTradingLineSide,
+  ChartTradingLineStatus,
+  ChartTradingOrderCancelIntent,
+  ChartTradingOrderLine,
+  ChartTradingOrderMoveCommitIntent,
+  ChartTradingOrderMovePreviewIntent,
+  ChartTradingPositionCloseIntent,
+  ChartTradingPositionLine,
+  ChartTradingPositionReverseIntent,
+  ChartTradingState,
+} from './trading';
+
 // React Native Skia component - import from '@tealstreet/tealchart/native' for React Native
 // NOT exported here to avoid breaking web builds with RN dependencies
 

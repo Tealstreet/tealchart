@@ -4,6 +4,7 @@
  */
 
 import { Subscription } from './events/EventEmitter';
+import type { ChartTradingIntent, ChartTradingIntentHandler } from './trading';
 import {
   BracketConfig,
   CrossHairMovedEventParams,
@@ -60,6 +61,7 @@ export class TealchartApi {
   private _crossHairMovedSubscription: Subscription<(params: CrossHairMovedEventParams) => void>;
   private _symbolChangedSubscription: Subscription<() => void>;
   private _intervalChangedSubscription: Subscription<(interval: ResolutionString) => void>;
+  private _tradingIntentSubscription: Subscription<ChartTradingIntentHandler>;
 
   // Trading lines
   private _orderLines: Map<string, InternalOrderLineAdapter> = new Map();
@@ -88,6 +90,7 @@ export class TealchartApi {
     this._crossHairMovedSubscription = new Subscription();
     this._symbolChangedSubscription = new Subscription();
     this._intervalChangedSubscription = new Subscription();
+    this._tradingIntentSubscription = new Subscription();
   }
 
   // ============================================================================
@@ -155,6 +158,13 @@ export class TealchartApi {
     return this._intervalChangedSubscription;
   }
 
+  /**
+   * Subscribe to chart trading intents emitted by order and position interactions.
+   */
+  onTradingIntent(): ISubscription<ChartTradingIntentHandler> {
+    return this._tradingIntentSubscription;
+  }
+
   // ============================================================================
   // Internal methods for emitting events (called by widget/renderer)
   // ============================================================================
@@ -164,6 +174,13 @@ export class TealchartApi {
    */
   emitCrossHairMoved(params: CrossHairMovedEventParams): void {
     this._crossHairMovedSubscription.emit(params);
+  }
+
+  /**
+   * @internal Emit a chart trading intent for adapter-compatible interactions.
+   */
+  emitTradingIntent(intent: ChartTradingIntent): void {
+    this._tradingIntentSubscription.emit(intent);
   }
 
   /**
@@ -325,14 +342,38 @@ export class TealchartApi {
     // TEALSTREET bracket callbacks
     let _onTPClick: (() => void) | null = null;
     let _onSLClick: (() => void) | null = null;
-    let _onTPMove: ((price: number) => void) | null = null;
-    let _onSLMove: ((price: number) => void) | null = null;
+    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
     let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
     let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
 
     // Capture references for closure
     const orderLines = this._orderLines;
     const onOrderPriceChanged = () => this._onOrderPriceChanged;
+    const emitOrderBracketIntent = (
+      type: 'bracket.tp.preview' | 'bracket.sl.preview' | 'bracket.tp.commit' | 'bracket.sl.commit',
+      price: number,
+      partialPercent?: number,
+    ) => {
+      this.emitTradingIntent({
+        type,
+        ownerType: 'order',
+        ownerId: data.orderId ?? id,
+        lineId: id,
+        price,
+        partialPercent: partialPercent ?? 100,
+        source: 'native-line',
+      });
+    };
+    const emitOrderBracketClickIntent = (type: 'bracket.tp.click' | 'bracket.sl.click') => {
+      this.emitTradingIntent({
+        type,
+        ownerType: 'order',
+        ownerId: data.orderId ?? id,
+        lineId: id,
+        source: 'native-line',
+      });
+    };
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
     let notifyPending = false;
     const notifyChange = () => {
@@ -543,11 +584,11 @@ export class TealchartApi {
         _onSLClick = callback;
         return this;
       },
-      onTPMove(callback: (price: number) => void) {
+      onTPMove(callback: (price: number, partialPercent?: number) => void) {
         _onTPMove = callback;
         return this;
       },
-      onSLMove(callback: (price: number) => void) {
+      onSLMove(callback: (price: number, partialPercent?: number) => void) {
         _onSLMove = callback;
         return this;
       },
@@ -567,12 +608,30 @@ export class TealchartApi {
           ...data,
           editable: data.editable && !!_onMoveCallback,
           callbacks: {
-            onTPClick: _onTPClick ?? undefined,
-            onSLClick: _onSLClick ?? undefined,
-            onTPMove: _onTPMove ?? undefined,
-            onSLMove: _onSLMove ?? undefined,
-            onTPMoveEnd: _onTPMoveEnd ?? undefined,
-            onSLMoveEnd: _onSLMoveEnd ?? undefined,
+            onTPClick: () => {
+              emitOrderBracketClickIntent('bracket.tp.click');
+              _onTPClick?.();
+            },
+            onSLClick: () => {
+              emitOrderBracketClickIntent('bracket.sl.click');
+              _onSLClick?.();
+            },
+            onTPMove: (price, partialPercent) => {
+              emitOrderBracketIntent('bracket.tp.preview', price, partialPercent);
+              _onTPMove?.(price, partialPercent);
+            },
+            onSLMove: (price, partialPercent) => {
+              emitOrderBracketIntent('bracket.sl.preview', price, partialPercent);
+              _onSLMove?.(price, partialPercent);
+            },
+            onTPMoveEnd: (price, partialPercent) => {
+              emitOrderBracketIntent('bracket.tp.commit', price, partialPercent);
+              _onTPMoveEnd?.(price, partialPercent);
+            },
+            onSLMoveEnd: (price, partialPercent) => {
+              emitOrderBracketIntent('bracket.sl.commit', price, partialPercent);
+              _onSLMoveEnd?.(price, partialPercent);
+            },
             onCancel: _onCancelCallback ?? undefined,
           },
         };
@@ -649,13 +708,37 @@ export class TealchartApi {
     // TEALSTREET bracket callbacks
     let _onTPClick: (() => void) | null = null;
     let _onSLClick: (() => void) | null = null;
-    let _onTPMove: ((price: number) => void) | null = null;
-    let _onSLMove: ((price: number) => void) | null = null;
+    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
     let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
     let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
 
     // Capture references for closure
     const positionLines = this._positionLines;
+    const emitPositionBracketIntent = (
+      type: 'bracket.tp.preview' | 'bracket.sl.preview' | 'bracket.tp.commit' | 'bracket.sl.commit',
+      price: number,
+      partialPercent?: number,
+    ) => {
+      this.emitTradingIntent({
+        type,
+        ownerType: 'position',
+        ownerId: data.positionId ?? id,
+        lineId: id,
+        price,
+        partialPercent: partialPercent ?? 100,
+        source: 'native-line',
+      });
+    };
+    const emitPositionBracketClickIntent = (type: 'bracket.tp.click' | 'bracket.sl.click') => {
+      this.emitTradingIntent({
+        type,
+        ownerType: 'position',
+        ownerId: data.positionId ?? id,
+        lineId: id,
+        source: 'native-line',
+      });
+    };
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
     let notifyPending = false;
     const notifyChange = () => {
@@ -894,11 +977,11 @@ export class TealchartApi {
         _onSLClick = callback;
         return this;
       },
-      onTPMove(callback: (price: number) => void) {
+      onTPMove(callback: (price: number, partialPercent?: number) => void) {
         _onTPMove = callback;
         return this;
       },
-      onSLMove(callback: (price: number) => void) {
+      onSLMove(callback: (price: number, partialPercent?: number) => void) {
         _onSLMove = callback;
         return this;
       },
@@ -916,12 +999,30 @@ export class TealchartApi {
         return {
           ...data,
           callbacks: {
-            onTPClick: _onTPClick ?? undefined,
-            onSLClick: _onSLClick ?? undefined,
-            onTPMove: _onTPMove ?? undefined,
-            onSLMove: _onSLMove ?? undefined,
-            onTPMoveEnd: _onTPMoveEnd ?? undefined,
-            onSLMoveEnd: _onSLMoveEnd ?? undefined,
+            onTPClick: () => {
+              emitPositionBracketClickIntent('bracket.tp.click');
+              _onTPClick?.();
+            },
+            onSLClick: () => {
+              emitPositionBracketClickIntent('bracket.sl.click');
+              _onSLClick?.();
+            },
+            onTPMove: (price, partialPercent) => {
+              emitPositionBracketIntent('bracket.tp.preview', price, partialPercent);
+              _onTPMove?.(price, partialPercent);
+            },
+            onSLMove: (price, partialPercent) => {
+              emitPositionBracketIntent('bracket.sl.preview', price, partialPercent);
+              _onSLMove?.(price, partialPercent);
+            },
+            onTPMoveEnd: (price, partialPercent) => {
+              emitPositionBracketIntent('bracket.tp.commit', price, partialPercent);
+              _onTPMoveEnd?.(price, partialPercent);
+            },
+            onSLMoveEnd: (price, partialPercent) => {
+              emitPositionBracketIntent('bracket.sl.commit', price, partialPercent);
+              _onSLMoveEnd?.(price, partialPercent);
+            },
             onClose: _onCloseCallback ?? undefined,
             onReverse: _onReverseCallback ?? undefined,
           },
@@ -1398,6 +1499,13 @@ export class TealchartApi {
   triggerOrderCancel(orderId: string): void {
     const adapter = this._orderLines.get(orderId);
     if (adapter) {
+      const renderData = adapter._getRenderData();
+      this.emitTradingIntent({
+        type: 'order.cancel',
+        orderId: renderData.orderId ?? orderId,
+        lineId: orderId,
+        source: 'native-line',
+      });
       const callbacks = adapter._getCallbacks();
       if (callbacks.onCancel) {
         callbacks.onCancel();
@@ -1412,6 +1520,14 @@ export class TealchartApi {
   triggerOrderMove(orderId: string, newPrice: number): void {
     const adapter = this._orderLines.get(orderId);
     if (adapter) {
+      const renderData = adapter._getRenderData();
+      this.emitTradingIntent({
+        type: 'order.move.commit',
+        orderId: renderData.orderId ?? orderId,
+        lineId: orderId,
+        price: newPrice,
+        source: 'native-line',
+      });
       const callbacks = adapter._getCallbacks();
       if (callbacks.onMove) {
         callbacks.onMove(newPrice);
@@ -1426,6 +1542,13 @@ export class TealchartApi {
   triggerPositionClose(positionId: string): void {
     const adapter = this._positionLines.get(positionId);
     if (adapter) {
+      const renderData = adapter._getRenderData();
+      this.emitTradingIntent({
+        type: 'position.close',
+        positionId: renderData.positionId ?? positionId,
+        lineId: positionId,
+        source: 'native-line',
+      });
       const callbacks = adapter._getCallbacks();
       if (callbacks.onClose) {
         callbacks.onClose();
@@ -1440,6 +1563,13 @@ export class TealchartApi {
   triggerPositionReverse(positionId: string): void {
     const adapter = this._positionLines.get(positionId);
     if (adapter) {
+      const renderData = adapter._getRenderData();
+      this.emitTradingIntent({
+        type: 'position.reverse',
+        positionId: renderData.positionId ?? positionId,
+        lineId: positionId,
+        source: 'native-line',
+      });
       const callbacks = adapter._getCallbacks();
       if (callbacks.onReverse) {
         callbacks.onReverse();
