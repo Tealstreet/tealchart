@@ -152,6 +152,39 @@ describe('user drawing context actions', () => {
     });
   });
 
+  it('includes selected trend-line extension actions for trend-line context targets', () => {
+    const result = resolveUserDrawingContextActionsAtPoint(
+      {
+        ...state,
+        drawings: [
+          {
+            id: 'trend',
+            kind: 'trendLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style,
+            points: [
+              { time: 25, price: 75 },
+              { time: 75, price: 25 },
+            ],
+            extend: 'none',
+          },
+        ],
+      },
+      { x: 50, y: 50 },
+      new Map([['main', space]]),
+    );
+
+    expect(result.items.find((item) => item.id === 'extend:left')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'setTrendLineExtend', extend: 'left' },
+    });
+  });
+
   it('includes selected text appearance actions for text-capable context targets', () => {
     const result = resolveUserDrawingContextActionsAtPoint(
       {

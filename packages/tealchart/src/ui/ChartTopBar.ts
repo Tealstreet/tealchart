@@ -647,6 +647,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
+    if (item.command.type === 'setTrendLineExtend') {
+      this.options.onUserDrawingTrendLineExtendChange?.(item.command.extend);
+      return;
+    }
+
     if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
     if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
     if (
