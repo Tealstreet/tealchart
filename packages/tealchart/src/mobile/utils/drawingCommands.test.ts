@@ -11,6 +11,7 @@ import {
   createUserDrawingState,
   handleUserDrawingInput,
   setUserDrawingTool,
+  redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
 import type { DrawingCoordinateSpace, UserDrawingState } from '../../drawings';
@@ -217,5 +218,87 @@ describe('mobile drawing handle command dispatch', () => {
     expect(moved.history.undoStack).toHaveLength(1);
     const undo = undoUserDrawingCommand(moved.state, moved.history);
     expect(undo.state.drawings[0]).toEqual(editStart.state.drawings[0]);
+  });
+
+  it('records mobile text edit commit as one undoable transaction', () => {
+    let state = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'textLabel'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'label', now: () => 50, style, text: 'Initial' },
+    );
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      options: { now: () => 51 },
+      meta: { source: 'api', transactionKey: 'label-edit' },
+    }));
+    expect(state.textEdit).toMatchObject({ drawingId: 'label', value: 'Initial' });
+    expect(history.undoStack).toHaveLength(0);
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'updateTextEdit',
+      value: 'Changed',
+      meta: { source: 'textEditor', transactionKey: 'label-edit' },
+    }));
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'updateTextEdit',
+      value: 'Changed again',
+      meta: { source: 'textEditor', transactionKey: 'label-edit' },
+    }));
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'commitTextEdit',
+      options: { now: () => 52 },
+      meta: { source: 'textEditor', transactionKey: 'label-edit' },
+    }));
+
+    expect(state.drawings[0]).toMatchObject({ id: 'label', text: 'Changed again' });
+    expect(state.textEdit).toBeNull();
+    expect(history.undoStack).toHaveLength(1);
+
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]).toMatchObject({ id: 'label', text: 'Initial' });
+    expect(undo.state.textEdit).toBeNull();
+
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]).toMatchObject({ id: 'label', text: 'Changed again' });
+    expect(redo.state.textEdit).toBeNull();
+  });
+
+  it('does not record mobile canceled or unchanged text edits', () => {
+    let state = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'textLabel'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'label', now: () => 60, style, text: 'Initial' },
+    );
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      meta: { source: 'api' },
+    }));
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'cancelTextEdit',
+      meta: { source: 'textEditor' },
+    }));
+    expect(state.textEdit).toBeNull();
+    expect(history.undoStack).toHaveLength(0);
+    expect(history.redoStack).toHaveLength(0);
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      meta: { source: 'api' },
+    }));
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'commitTextEdit',
+      meta: { source: 'textEditor' },
+    }));
+    expect(state.drawings[0]).toMatchObject({ id: 'label', text: 'Initial' });
+    expect(state.textEdit).toBeNull();
+    expect(history.undoStack).toHaveLength(0);
+    expect(history.redoStack).toHaveLength(0);
   });
 });

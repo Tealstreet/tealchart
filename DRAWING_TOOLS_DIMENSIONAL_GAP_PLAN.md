@@ -471,6 +471,8 @@ Phase 2: Text edit state contract
 
 - Preserve existing text edit reducers but route begin/update/commit/cancel
   through commands and history.
+- Status: shared and mobile command-history tests pin begin/update/cancel as
+  transient state and committed text edits as one undoable transaction.
 
 Phase 3: Properties intent
 
