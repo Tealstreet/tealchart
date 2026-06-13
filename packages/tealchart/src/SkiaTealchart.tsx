@@ -629,8 +629,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return result.changed;
       },
       dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean {
+        const previousState = userDrawingStateRef.current;
         const result = dispatchMobileUserDrawingKeyboardActionToState(
-          userDrawingStateRef.current,
+          previousState,
           userDrawingHistoryRef.current,
           input,
           {
@@ -645,6 +646,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         userDrawingHistoryRef.current = result.history;
         if (result.changed && result.state !== userDrawingStateRef.current) {
           commitUserDrawingState(result.state);
+          if (result.command) {
+            const event = createUserDrawingCommandEvent(previousState, { ...result, command: result.command });
+            if (event) {
+              onUserDrawingCommand?.(event);
+            }
+          }
         }
         return result.changed;
       },
@@ -1836,6 +1843,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         if (result.intent.type !== 'pane') {
           if (result.changed) {
             commitUserDrawingState(result.state);
+            for (const event of result.events) {
+              onUserDrawingCommand?.(event);
+            }
           }
           if (result.propertiesIntent) {
             onUserDrawingPropertiesOpen?.(result.propertiesIntent);
@@ -1866,6 +1876,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       isPointInChartArea,
       margins,
       measureUserDrawingTextLabelLine,
+      onUserDrawingCommand,
       onUserDrawingPropertiesOpen,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
@@ -1882,6 +1893,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!result.hit) return false;
       if (result.changed) {
         commitUserDrawingState(result.state);
+        const event = createUserDrawingCommandEvent(effectiveUserDrawingState, {
+          state: result.state,
+          changed: true,
+          command: {
+            type: 'selectAtPoint',
+            point: { x, y },
+            spacesByPaneId: userDrawingSpacesByPaneId,
+            options: { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
+            meta: { source: 'contextMenu' },
+          },
+          meta: { source: 'contextMenu' },
+          hit: true,
+        });
+        if (event) {
+          onUserDrawingCommand?.(event);
+        }
       }
 
       setContextMenuItems(
@@ -1944,6 +1971,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
+      onUserDrawingCommand,
       userDrawingSpacesByPaneId,
       viewport,
     ],

@@ -2732,12 +2732,25 @@ export class TealchartWidget {
   ): ContextMenuItem[] {
     if (this._userDrawingState.activeTool !== 'select') return [];
 
-    const result = resolveUserDrawingContextActionsAtPoint(this._userDrawingState, point, spacesByPaneId, {
-      hitTest: this._getUserDrawingHitTestOptions(),
-    });
+    const hitTest = this._getUserDrawingHitTestOptions();
+    const previousState = this._userDrawingState;
+    const result = resolveUserDrawingContextActionsAtPoint(previousState, point, spacesByPaneId, { hitTest });
     if (!result.hit) return [];
     if (result.changed) {
       this.setUserDrawingState(result.state, { preserveHistory: true });
+      this._emitUserDrawingCommandEvent(previousState, {
+        state: result.state,
+        changed: true,
+        command: {
+          type: 'selectAtPoint',
+          point,
+          spacesByPaneId,
+          options: { hitTest },
+          meta: { source: 'contextMenu' },
+        },
+        meta: { source: 'contextMenu' },
+        hit: true,
+      });
     }
 
     return result.items.map((item) => ({
@@ -2799,13 +2812,19 @@ export class TealchartWidget {
     if (intent.type !== 'pane') {
       let nextState = this._userDrawingState;
       let changed = false;
+      const commandResults: Array<{ previousState: UserDrawingState; result: UserDrawingCommandDispatchResult }> = [];
       for (const command of intent.commands) {
+        const previousState = nextState;
         const result = dispatchUserDrawingCommand(nextState, command);
         nextState = result.state;
         changed = result.changed || changed;
+        commandResults.push({ previousState, result });
       }
       if (changed) {
         this.setUserDrawingState(nextState, { preserveHistory: true });
+        for (const { previousState, result } of commandResults) {
+          this._emitUserDrawingCommandEvent(previousState, result);
+        }
       }
       if (intent.type === 'properties') {
         const propertiesIntent = resolveUserDrawingPropertiesIntent(nextState, { drawingId: intent.drawingId });
