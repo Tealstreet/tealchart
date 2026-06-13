@@ -8,7 +8,13 @@ export interface UserDrawingKeyboardInput {
   shiftKey?: boolean;
 }
 
-export type UserDrawingKeyboardActionType = 'undo' | 'redo' | 'deleteSelected' | 'cancelDraft';
+export type UserDrawingKeyboardActionType =
+  | 'undo'
+  | 'redo'
+  | 'copySelected'
+  | 'paste'
+  | 'deleteSelected'
+  | 'cancelDraft';
 
 export interface UserDrawingKeyboardAction {
   type: UserDrawingKeyboardActionType;
@@ -39,6 +45,14 @@ export function resolveUserDrawingKeyboardAction(
     ((input.shiftKey === true && key === 'z') || (input.shiftKey !== true && key === 'y'))
   ) {
     return { type: 'redo', preventDefault: true };
+  }
+
+  if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'c' && state.selection) {
+    return { type: 'copySelected', preventDefault: true };
+  }
+
+  if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'v') {
+    return { type: 'paste', preventDefault: true };
   }
 
   if ((input.key === 'Delete' || input.key === 'Backspace') && !hasAnyModifier(input) && state.selection) {
