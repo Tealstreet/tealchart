@@ -217,6 +217,27 @@ describe('user drawing object tree model', () => {
     ]);
   });
 
+  it('updates object-tree z-order without rewriting drawing IDs or selection', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine(), createRectangle(), createHorizontalLine()],
+      selection: { drawingId: 'rect' },
+    });
+    const command = resolveUserDrawingObjectTreeActionCommands(state, {
+      type: 'bringToFront',
+      drawingIds: ['trend'],
+    })[0]!;
+
+    const next = reduceUserDrawingCommand(state, command);
+
+    expect(next.selection).toEqual({ drawingId: 'rect' });
+    expect(next.drawings.map((drawing) => drawing.id)).toEqual(['rect', 'hline', 'trend']);
+    expect(resolveUserDrawingObjectTreeModel(next).rows.map((row) => [row.drawingId, row.zIndex])).toEqual([
+      ['trend', 2],
+      ['hline', 1],
+      ['rect', 0],
+    ]);
+  });
+
   it('renames drawings through shared commands and layout serialization', () => {
     const state = createUserDrawingState({
       drawings: [createTrendLine({ id: 'trend' })],
