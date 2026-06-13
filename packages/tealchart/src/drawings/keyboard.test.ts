@@ -116,9 +116,13 @@ describe('user drawing keyboard actions', () => {
     expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'ArrowRight' })).toBeNull();
   });
 
-  it('maps bare escape only while a draft is active', () => {
+  it('maps bare escape to cancel drafts before clearing selection', () => {
     expect(resolveUserDrawingKeyboardAction(withDraft(), { key: 'Escape' })).toEqual({
       type: 'cancelDraft',
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'Escape' })).toEqual({
+      type: 'clearSelection',
       preventDefault: true,
     });
     expect(resolveUserDrawingKeyboardAction(withDraft(), { key: 'Escape', shiftKey: true })).toBeNull();

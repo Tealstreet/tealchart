@@ -2099,6 +2099,45 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('clears selected drawing actions with Escape while chart owns keyboard input', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'select',
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+      testWidget._isHovered = true;
+
+      const escape = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+      document.dispatchEvent(escape);
+
+      expect(widget.getUserDrawingState().selection).toBeNull();
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+      expect(escape.defaultPrevented).toBe(true);
+
+      widget.remove();
+    });
+
     it('undoes and redoes drawing commands from keyboard shortcuts while chart owns input', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
