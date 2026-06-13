@@ -195,7 +195,7 @@ import { intervalToMs } from './viewport/viewScale';
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
-const USER_DRAWING_ACTION_SURFACE_WIDTH = 268;
+const USER_DRAWING_ACTION_SURFACE_WIDTH = 280;
 const USER_DRAWING_ACTION_SURFACE_HEIGHT = 40;
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
@@ -4810,8 +4810,8 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   userDrawingActionButton: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',

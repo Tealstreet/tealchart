@@ -125,7 +125,7 @@ interface ChartTopBarState {
 // Styles
 // ============================================================================
 
-const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 268;
+const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 280;
 const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 40;
 
 const styles = {
@@ -317,6 +317,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
+    width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
+    boxSizing: 'border-box',
     padding: '4px',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '6px',
