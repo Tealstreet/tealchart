@@ -316,7 +316,7 @@ export class TradingViewTradingBridge {
     }
     for (const execution of this.state.executions ?? []) {
       const y = normalized.priceToCoord(execution.price);
-      const x = xForTime(normalized, execution.time);
+      const x = xForTime(normalized, normalizedExecutionTime(execution.time));
       if (x === null || !Number.isFinite(y)) continue;
       const color = execution.direction === 'sell' ? DEFAULT_SELL_COLOR : DEFAULT_POSITION_COLOR;
       ctx.fillStyle = execution.style?.lineColor ?? color;
@@ -854,4 +854,8 @@ function xForTime(frame: TradingViewRenderFrame, time: number): number | null {
   }
 
   return null;
+}
+
+function normalizedExecutionTime(time: number): number {
+  return time < 1_000_000_000_000 ? time * 1000 : time;
 }

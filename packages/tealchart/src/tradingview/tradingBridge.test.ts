@@ -841,7 +841,7 @@ describe('TradingViewTradingBridge', () => {
     ]);
   });
 
-  it('interpolates execution markers only inside the visible bar range', () => {
+  it('interpolates second-based execution markers only inside the visible millisecond bar range', () => {
     const insideCtx = createRecordingContext();
     const insideBridge = new TradingViewTradingBridge({
       state: {
@@ -865,6 +865,7 @@ describe('TradingViewTradingBridge', () => {
 
     expect(outsideCtx.fill).not.toHaveBeenCalled();
   });
+
 });
 
 function frame(ctx: CanvasRenderingContext2D): TradingViewRawRenderFrame {
@@ -883,8 +884,8 @@ function executionFrame(ctx: CanvasRenderingContext2D): TradingViewRawRenderFram
   return {
     ctx,
     bars: [
-      { time: 1, open: 99, high: 110, low: 90, close: 100, volume: 10 },
-      { time: 3, open: 99, high: 110, low: 90, close: 100, volume: 10 },
+      { time: 1000, open: 99, high: 110, low: 90, close: 100, volume: 10 },
+      { time: 3000, open: 99, high: 110, low: 90, close: 100, volume: 10 },
     ],
     candleCoords: [
       { top: 90, bottom: 100, center: 20, left: 16, right: 24, candleWidth: 8, high: 90, low: 110, wickWidth: 1 },
