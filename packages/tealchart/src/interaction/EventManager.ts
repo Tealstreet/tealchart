@@ -965,6 +965,7 @@ export class EventManager {
 
       if (
         !this.isTouchDragging &&
+        e.type === 'touchend' &&
         endDistance > TOUCH_TAP_THRESHOLD &&
         this.state.dragMode === 'pendingDrawing' &&
         this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'touch')
@@ -975,7 +976,7 @@ export class EventManager {
         this.callbacks.onDrawingDragMove?.(endX, endY, 'touch');
       }
 
-      if (!this.isTouchDragging && duration < TOUCH_TAP_TIMEOUT) {
+      if (!this.isTouchDragging && e.type === 'touchend' && duration < TOUCH_TAP_TIMEOUT) {
         // This was a tap, not a drag
         this.handleTap(this.touchStart.x, this.touchStart.y);
       } else if (this.state.isDragging) {
