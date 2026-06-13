@@ -371,8 +371,8 @@ Phase 1: Tree row model
   pane ID, and group membership.
 - Status: shared row resolver added in `drawings/objectTree.ts`; rows are
   surface-neutral for web Canvas and mobile Skia consumers, default to
-  front-to-back order, and include placeholder custom-name/group fields until
-  persistence-backed naming/grouping lands.
+  front-to-back order, persist custom-name labels, and include provisional
+  group fields until persistence-backed grouping lands.
 
 Phase 2: Shared actions
 
