@@ -213,6 +213,7 @@ export class TealchartWidgetUI {
   // DOM elements
   private rootEl: HTMLDivElement;
   private chartArea: HTMLDivElement;
+  private overlayRoot: HTMLDivElement;
   private loadingDots: HTMLDivElement | null = null;
   private userDrawingTextEditor: HTMLTextAreaElement | null = null;
 
@@ -262,6 +263,20 @@ export class TealchartWidgetUI {
     });
     this.rootEl.appendChild(this.chartArea);
 
+    this.overlayRoot = div({
+      style: {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        right: '0',
+        bottom: '0',
+        zIndex: '6',
+        pointerEvents: 'none',
+      },
+    });
+    this.overlayRoot.setAttribute('data-tealchart-overlay-root', 'true');
+    this.rootEl.appendChild(this.overlayRoot);
+
     // Create top bar - positioned absolutely over the chart
     if (options.showTopBar !== false) {
       this.currentUserDrawingToolbarStateKey = options.userDrawingState
@@ -299,6 +314,7 @@ export class TealchartWidgetUI {
         onUserDrawingIconNameChange: options.onUserDrawingIconNameChange,
         onUserDrawingVisibilityChange: options.onUserDrawingVisibilityChange,
         onUserDrawingLockedChange: options.onUserDrawingLockedChange,
+        drawingOverlayParent: this.overlayRoot,
         layoutCallbacks: options.layoutCallbacks,
       });
       this.topBar.mount(topBarWrapper);
