@@ -65,7 +65,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     );
   });
 
-  it('dispatches selected drawing actions from shared toolbar descriptors', () => {
+  it('dispatches global drawing actions from shared toolbar descriptors', () => {
     const onDuplicate = vi.fn();
     const onDelete = vi.fn();
     const onCancel = vi.fn();
@@ -130,23 +130,20 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
-    fireEvent.click(screen.getByLabelText('Delete selected drawing'));
-    fireEvent.click(screen.getByLabelText('Bring selected drawing forward'));
-    fireEvent.click(screen.getByLabelText('Send selected drawing backward'));
-    fireEvent.click(screen.getByLabelText('Bring selected drawing to front'));
-    fireEvent.click(screen.getByLabelText('Send selected drawing to back'));
+    expect(screen.queryByLabelText('Duplicate selected drawing')).toBeNull();
+    expect(screen.queryByLabelText('Delete selected drawing')).toBeNull();
+    expect(screen.queryByLabelText('Bring selected drawing forward')).toBeNull();
+    expect(screen.queryByLabelText('Send selected drawing backward')).toBeNull();
+    expect(screen.queryByLabelText('Bring selected drawing to front')).toBeNull();
+    expect(screen.queryByLabelText('Send selected drawing to back')).toBeNull();
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
     fireEvent.click(screen.getByLabelText('Clear all drawings'));
 
-    expect(onDuplicate).toHaveBeenCalledTimes(1);
-    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onDuplicate).not.toHaveBeenCalled();
+    expect(onDelete).not.toHaveBeenCalled();
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
-    expect(onZOrder).toHaveBeenCalledWith('bringForward');
-    expect(onZOrder).toHaveBeenCalledWith('sendBackward');
-    expect(onZOrder).toHaveBeenCalledWith('bringToFront');
-    expect(onZOrder).toHaveBeenCalledWith('sendToBack');
+    expect(onZOrder).not.toHaveBeenCalled();
   });
 
   it('dispatches selected rectangle fill style controls without text controls', () => {
@@ -298,7 +295,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Bold text')).toBeNull();
   });
 
-  it('dispatches hidden selected drawing show control', () => {
+  it('does not render selected visibility actions in the top bar', () => {
     const onVisibility = vi.fn();
     render(
       <ChartTopBarComponent
@@ -325,13 +322,9 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText('Hide selected drawing'));
-    fireEvent.click(screen.getByLabelText('Show selected drawing'));
-
-    expect((screen.getByLabelText('Hide selected drawing') as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByLabelText('Show selected drawing') as HTMLButtonElement).disabled).toBe(false);
-    expect(onVisibility).toHaveBeenCalledTimes(1);
-    expect(onVisibility).toHaveBeenCalledWith(true);
+    expect(screen.queryByLabelText('Hide selected drawing')).toBeNull();
+    expect(screen.queryByLabelText('Show selected drawing')).toBeNull();
+    expect(onVisibility).not.toHaveBeenCalled();
   });
 
   it('dispatches selected trend-line extension controls only for trend lines', () => {
@@ -638,7 +631,6 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText('Delete selected drawing'));
     fireEvent.click(screen.getByLabelText('Green fill color'));
     fireEvent.click(screen.getByLabelText('75 percent opacity'));
     fireEvent.click(screen.getByLabelText('Toggle drawing border'));
@@ -647,7 +639,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('16 pixel font size'));
     fireEvent.click(screen.getByLabelText('monospace font family'));
     fireEvent.click(screen.getByLabelText('Right text alignment'));
-    fireEvent.click(screen.getByLabelText('Unlock selected drawing'));
+    expect(screen.queryByLabelText('Delete selected drawing')).toBeNull();
+    expect(screen.queryByLabelText('Unlock selected drawing')).toBeNull();
 
     expect((screen.getByLabelText('Green fill color') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('75 percent opacity') as HTMLButtonElement).disabled).toBe(true);
@@ -657,11 +650,9 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect((screen.getByLabelText('16 pixel font size') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('monospace font family') as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByLabelText('Right text alignment') as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByLabelText('Delete selected drawing') as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByLabelText('Unlock selected drawing') as HTMLButtonElement).disabled).toBe(false);
     expect(onStyle).not.toHaveBeenCalled();
     expect(onTextAlign).not.toHaveBeenCalled();
     expect(onDeleteSelected).not.toHaveBeenCalled();
-    expect(onLocked).toHaveBeenCalledWith(false, true);
+    expect(onLocked).not.toHaveBeenCalled();
   });
 });
