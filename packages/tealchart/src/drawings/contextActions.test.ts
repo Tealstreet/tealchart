@@ -1,9 +1,14 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingState, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { clearChartStoreCache } from '../state/chartState';
 
 import { resolveUserDrawingContextActionsAtPoint } from './contextActions';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -223,6 +228,11 @@ describe('user drawing context actions', () => {
       groupId: 'style',
       enabled: true,
       command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
+    });
+    expect(result.items.find((item) => item.id === 'textAlign:right')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'setTextAlign', textAlign: 'right' },
     });
     expect(result.items.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
   });

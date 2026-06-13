@@ -2852,12 +2852,19 @@ export class TealchartWidget {
       return;
     }
 
-    if (command.action === 'duplicateSelected') {
-      this.duplicateSelectedUserDrawing();
-    } else if (command.action === 'deleteSelected') {
-      this.deleteSelectedUserDrawing();
-    } else {
-      this.reorderUserDrawings(command.action);
+    if (command.type === 'setTextAlign') {
+      this.setUserDrawingTextAlign(command.textAlign);
+      return;
+    }
+
+    if (command.type === 'toolbarAction') {
+      if (command.action === 'duplicateSelected') {
+        this.duplicateSelectedUserDrawing();
+      } else if (command.action === 'deleteSelected') {
+        this.deleteSelectedUserDrawing();
+      } else {
+        this.reorderUserDrawings(command.action);
+      }
     }
   }
 

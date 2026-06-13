@@ -71,6 +71,15 @@ export function dispatchMobileUserDrawingActionCommand(
     return true;
   }
 
+  if (command.type === 'setTextAlign') {
+    options.dispatchUserDrawingCommand({
+      type: 'setTextAlign',
+      textAlign: command.textAlign,
+      meta: { source: options.source },
+    });
+    return true;
+  }
+
   if (command.type === 'toolbarAction') {
     if (command.action === 'duplicateSelected') {
       options.dispatchUserDrawingCommand({

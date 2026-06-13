@@ -64,6 +64,10 @@ export type UserDrawingSelectedActionSurfaceCommand =
       style: Partial<UserDrawingStyle>;
     }
   | {
+      type: 'setTextAlign';
+      textAlign: UserDrawingTextAlign;
+    }
+  | {
       type: 'toolbarAction';
       action: Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>;
     }
@@ -825,6 +829,13 @@ function getAdjacentUserDrawingTextMaxWidth(drawing: UserDrawing, direction: -1 
   return widths[currentIndex + direction] ?? null;
 }
 
+function getNextUserDrawingTextAlign(drawing: UserDrawing): UserDrawingTextAlign | null {
+  if (drawing.kind !== 'table' && !isUserDrawingTextAnnotation(drawing)) return null;
+  const aligns = USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => descriptor.textAlign);
+  const currentIndex = aligns.indexOf(drawing.textAlign);
+  return aligns[currentIndex >= 0 ? (currentIndex + 1) % aligns.length : 0]!;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -854,6 +865,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const textMaxWidthEnabled = textWrapEnabled && selectedDrawing.style.textWrap === true;
   const narrowerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, -1) : null;
   const widerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, 1) : null;
+  const nextTextAlign = supportsUserDrawingTextAlignControls(selectedDrawing) ? getNextUserDrawingTextAlign(selectedDrawing) : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -983,6 +995,15 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         },
       }
     : null;
+  const textAlignItem: UserDrawingSelectedActionSurfaceItem | null = nextTextAlign
+    ? {
+        id: `textAlign:${nextTextAlign}`,
+        icon: USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.find((descriptor) => descriptor.textAlign === nextTextAlign)!.icon,
+        label: `Cycle selected drawing text alignment to ${nextTextAlign}`,
+        enabled: textEnabled,
+        command: { type: 'setTextAlign', textAlign: nextTextAlign },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -1030,6 +1051,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(textWrapItem ? [textWrapItem] : []),
       ...(narrowerTextMaxWidthItem ? [narrowerTextMaxWidthItem] : []),
       ...(widerTextMaxWidthItem ? [widerTextMaxWidthItem] : []),
+      ...(textAlignItem ? [textAlignItem] : []),
     ],
   };
 }
@@ -1097,7 +1119,7 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
             command: { type: 'editText', drawingId: selectedDrawing?.id ?? '' },
           };
         }
-        if (item.command.type === 'updateStyle') {
+        if (item.command.type === 'updateStyle' || item.command.type === 'setTextAlign') {
           return item;
         }
         if (item.command.type === 'styleAction') {
@@ -1107,10 +1129,13 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
             command: resolveUserDrawingSelectedActionSurfaceStyleCommand(state, item.command.action),
           };
         }
-        return {
-          ...item,
-          enabled: isUserDrawingToolbarActionEnabled(state, item.command.action),
-        };
+        if (item.command.type === 'toolbarAction') {
+          return {
+            ...item,
+            enabled: isUserDrawingToolbarActionEnabled(state, item.command.action),
+          };
+        }
+        return item;
       }),
     })),
   };

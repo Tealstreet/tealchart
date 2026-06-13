@@ -642,6 +642,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
+    if (item.command.type === 'setTextAlign') {
+      this.options.onUserDrawingTextAlignChange?.(item.command.textAlign);
+      return;
+    }
+
     if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
     if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
     if (

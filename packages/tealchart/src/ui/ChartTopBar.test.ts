@@ -252,6 +252,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onStyle = vi.fn();
     const onVisibility = vi.fn();
     const onLocked = vi.fn();
+    const onTextAlign = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-style',
       symbol: 'BTCUSDT',
@@ -274,6 +275,7 @@ describe('ChartTopBar drawing toolbar', () => {
       },
       userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
+      onUserDrawingTextAlignChange: onTextAlign,
       onUserDrawingVisibilityChange: onVisibility,
       onUserDrawingLockedChange: onLocked,
     });
@@ -367,6 +369,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Underline selected drawing text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Strike selected drawing text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Wrap selected drawing text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text alignment to right"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 12 });
@@ -377,6 +380,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
     expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
     expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
+    expect(onTextAlign).toHaveBeenCalledWith('right');
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
