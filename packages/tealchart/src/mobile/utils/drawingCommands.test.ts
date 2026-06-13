@@ -136,7 +136,8 @@ describe('mobile drawing handle command dispatch', () => {
   it('routes mobile keyboard actions through shared history state', () => {
     const state = createMobileStateWithTrendLine();
     let history = createUserDrawingCommandHistory();
-    const deleted = dispatchMobileUserDrawingKeyboardAction(state, history, { key: 'Delete' });
+    const keyboardOptions = { createId: () => 'copy' };
+    const deleted = dispatchMobileUserDrawingKeyboardAction(state, history, { key: 'Delete' }, keyboardOptions);
 
     expect(deleted.action?.type).toBe('deleteSelected');
     expect(deleted.changed).toBe(true);
@@ -144,14 +145,19 @@ describe('mobile drawing handle command dispatch', () => {
     expect(deleted.history.undoStack).toHaveLength(1);
 
     history = deleted.history;
-    const undo = dispatchMobileUserDrawingKeyboardAction(deleted.state, history, { key: 'z', metaKey: true });
+    const undo = dispatchMobileUserDrawingKeyboardAction(deleted.state, history, { key: 'z', metaKey: true }, keyboardOptions);
 
     expect(undo.action?.type).toBe('undo');
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
     expect(undo.history.redoStack).toHaveLength(1);
 
-    const redo = dispatchMobileUserDrawingKeyboardAction(undo.state, undo.history, { key: 'Z', metaKey: true, shiftKey: true });
+    const redo = dispatchMobileUserDrawingKeyboardAction(
+      undo.state,
+      undo.history,
+      { key: 'Z', metaKey: true, shiftKey: true },
+      keyboardOptions,
+    );
 
     expect(redo.action?.type).toBe('redo');
     expect(redo.changed).toBe(true);
@@ -164,12 +170,54 @@ describe('mobile drawing handle command dispatch', () => {
       { paneId: 'main', anchor: anchorA },
       { createId: () => 'rect', now: () => 41, style },
     );
-    const result = dispatchMobileUserDrawingKeyboardAction(state, createUserDrawingCommandHistory(), { key: 'Escape' });
+    const result = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      createUserDrawingCommandHistory(),
+      { key: 'Escape' },
+      { createId: () => 'copy' },
+    );
 
     expect(result.action?.type).toBe('cancelDraft');
     expect(result.changed).toBe(true);
     expect(result.state.draft).toBeNull();
     expect(result.history.undoStack).toHaveLength(0);
+  });
+
+  it('routes mobile copy and paste keyboard actions through adapter clipboard state', () => {
+    const state = createMobileStateWithTrendLine();
+    let clipboard = null;
+    const copied = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      createUserDrawingCommandHistory(),
+      { key: 'c', metaKey: true },
+      {
+        createId: () => 'copy',
+        setClipboard: (nextClipboard) => {
+          clipboard = nextClipboard;
+        },
+      },
+    );
+
+    expect(copied.action?.type).toBe('copySelected');
+    expect(copied.changed).toBe(true);
+    expect(copied.state).toBe(state);
+    expect(clipboard).toMatchObject({ drawings: [{ id: 'line' }] });
+
+    const pasted = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      copied.history,
+      { key: 'v', metaKey: true },
+      {
+        clipboard,
+        createId: () => 'copy',
+      },
+    );
+
+    expect(pasted.action?.type).toBe('paste');
+    expect(pasted.changed).toBe(true);
+    expect(pasted.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
+    expect(pasted.state.selection).toEqual({ drawingId: 'copy' });
+    expect(pasted.history.undoStack).toHaveLength(1);
   });
 
   it('records mobile two-anchor placement drag as one undoable drawing creation', () => {

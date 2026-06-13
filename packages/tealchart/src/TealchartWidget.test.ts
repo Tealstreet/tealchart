@@ -1452,6 +1452,59 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('copies and pastes selected drawings from keyboard shortcuts while chart owns input', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      const pasteWithoutClipboard = new KeyboardEvent('keydown', { key: 'v', metaKey: true, cancelable: true });
+      document.dispatchEvent(pasteWithoutClipboard);
+
+      expect(pasteWithoutClipboard.defaultPrevented).toBe(false);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+
+      const copy = new KeyboardEvent('keydown', { key: 'c', metaKey: true, cancelable: true });
+      document.dispatchEvent(copy);
+
+      expect(copy.defaultPrevented).toBe(true);
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+
+      const paste = new KeyboardEvent('keydown', { key: 'v', metaKey: true, cancelable: true });
+      document.dispatchEvent(paste);
+
+      expect(paste.defaultPrevented).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_1']);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+
+      widget.remove();
+    });
+
     it('clears drawing command history when user drawing state is externally replaced', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);

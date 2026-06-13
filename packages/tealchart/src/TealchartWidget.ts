@@ -12,6 +12,7 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingClipboard,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
@@ -53,6 +54,7 @@ import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
   canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
   clearUserDrawingCommandHistory,
+  createUserDrawingClipboard,
   createUserDrawingCommandHistory,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
@@ -165,6 +167,7 @@ export class TealchartWidget {
   private _drawings: DrawingOutput[] = [];
   private _userDrawingState: UserDrawingState;
   private _userDrawingHistory: UserDrawingCommandHistory = createUserDrawingCommandHistory();
+  private _userDrawingClipboard: UserDrawingClipboard | null = null;
   private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
   private _userDrawingIdCounter = 0;
   private _userDrawingTextMeasureCtx: CanvasRenderingContext2D | null = null;
@@ -2273,6 +2276,8 @@ export class TealchartWidget {
 
     if (action.type === 'undo') return this.undoUserDrawingCommand();
     if (action.type === 'redo') return this.redoUserDrawingCommand();
+    if (action.type === 'copySelected') return this.copySelectedUserDrawing();
+    if (action.type === 'paste') return this.pasteUserDrawingClipboard();
     if (action.type === 'deleteSelected') return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
     return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
   }
@@ -2306,6 +2311,28 @@ export class TealchartWidget {
 
   duplicateSelectedUserDrawing(): boolean {
     return this.duplicateUserDrawing();
+  }
+
+  copySelectedUserDrawing(): boolean {
+    const clipboard = createUserDrawingClipboard(this._userDrawingState);
+    if (!clipboard) return false;
+    this._userDrawingClipboard = clipboard;
+    return true;
+  }
+
+  pasteUserDrawingClipboard(): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'paste',
+      clipboard: this._userDrawingClipboard,
+      options: {
+        createId: () => this._createUserDrawingId(),
+      },
+      meta: { source: 'keyboard' },
+    });
+  }
+
+  clearUserDrawingClipboard(): void {
+    this._userDrawingClipboard = null;
   }
 
   clearUserDrawings(): void {
