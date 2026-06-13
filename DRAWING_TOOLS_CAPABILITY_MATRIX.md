@@ -54,7 +54,7 @@ Sources:
 | Public APIs | Many widget APIs exist | Web API coverage broad | Mobile handle coverage broad | `partial` | Gap 8 |
 | Event subscriptions | General widget/event infrastructure exists | Drawing command events incomplete | Drawing command events incomplete | `missing` | Gap 8 |
 | Persistence | Committed drawing state persists; transient state cleared | Layout save/load includes drawings | Mobile import/export exists | `partial` | Gap 8 |
-| Visual parity evidence | Tests exist across render/input pieces | Canvas tests exist | Skia render-model tests exist | `partial` | Gap 8 |
+| Visual parity evidence | Tests exist across render/input pieces; manual visual evidence checklist exists | Canvas tests exist plus desktop/narrow-desktop checklist | Skia render-model tests exist plus portrait/landscape checklist | `partial` | Gap 8 |
 
 ## Placement Mode Legend
 
@@ -129,6 +129,8 @@ summary:
 - [ ] Focused mobile tests were added or updated, or a test-gap note explains
       why the behavior cannot be covered yet.
 - [ ] `just check` passes before requesting review.
+- [ ] Manual visual evidence checklist was completed for rendering or interaction
+      surface changes, or the PR states why it is not applicable.
 - [ ] Tracking docs were updated when capability status changed.
 - [ ] PR description lists web coverage and mobile Skia coverage explicitly.
 
