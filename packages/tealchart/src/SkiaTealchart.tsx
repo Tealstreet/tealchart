@@ -102,25 +102,17 @@ import {
   beginUserDrawingEditDragAtPoint,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
-  cancelUserDrawingDraft as cancelUserDrawingDraftState,
-  clearUserDrawings as clearUserDrawingsState,
   commitUserDrawingPathDrag,
-  commitUserDrawingTextEdit,
   createUserDrawingState,
-  deleteUserDrawing as deleteUserDrawingState,
   dispatchUserDrawingCommand,
-  duplicateUserDrawing as duplicateUserDrawingState,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   handleUserDrawingInput,
   isUserDrawingPathFamilyTool,
   measureUserDrawingTextLines,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
-  reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   resolveUserDrawingTextEditMetrics,
-  setUserDrawingTool,
-  updateUserDrawingTextEdit,
   USER_DRAWING_FONT_FAMILIES,
 } from './drawings';
 import { computePaneGeometry } from './layout/chartGeometry';
@@ -152,14 +144,6 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import {
-  setMobileUserDrawingIconName,
-  setMobileUserDrawingLocked,
-  setMobileUserDrawingTextAlign,
-  setMobileUserDrawingTrendLineExtend,
-  setMobileUserDrawingVisibility,
-  updateMobileUserDrawingStyle,
-} from './mobile/utils/drawingStyle';
 import { commitMobileUserDrawingHandleCommand } from './mobile/utils/drawingCommands';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
@@ -4025,10 +4009,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           selectTextOnFocus
           value={activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text}
           onChangeText={(value: string) => {
-            commitUserDrawingStateIfChanged(updateUserDrawingTextEdit(userDrawingStateRef.current, value));
+            dispatchUserDrawingCommandToState({ type: 'updateTextEdit', value, meta: { source: 'textEditor' } });
           }}
           onBlur={() => {
-            commitUserDrawingStateIfChanged(commitUserDrawingTextEdit(userDrawingStateRef.current));
+            dispatchUserDrawingCommandToState({ type: 'commitTextEdit', meta: { source: 'textEditor' } });
           }}
           style={[styles.userDrawingTextEditor, activeUserDrawingTextEditorStyle]}
         />
@@ -4046,46 +4030,49 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             supportedResolutions={supportedResolutions}
             userDrawingState={effectiveUserDrawingState}
             onUserDrawingToolSelect={(tool) =>
-              commitUserDrawingStateIfChanged(setUserDrawingTool(userDrawingStateRef.current, tool))
+              dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'toolbar' } })
             }
             onUserDrawingDuplicateSelected={() => {
-              commitUserDrawingStateIfChanged(
-                duplicateUserDrawingState(userDrawingStateRef.current, { createId: createUserDrawingId }),
-              );
+              dispatchUserDrawingCommandToState({
+                type: 'duplicate',
+                options: { createId: createUserDrawingId },
+                meta: { source: 'toolbar' },
+              });
             }}
             onUserDrawingDeleteSelected={() => {
-              commitUserDrawingStateIfChanged(deleteUserDrawingState(userDrawingStateRef.current));
+              dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'toolbar' } });
             }}
             onUserDrawingCancelDraft={() => {
-              commitUserDrawingStateIfChanged(cancelUserDrawingDraftState(userDrawingStateRef.current));
+              dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'toolbar' } });
             }}
             onUserDrawingClearAll={() => {
-              commitUserDrawingStateIfChanged(clearUserDrawingsState(userDrawingStateRef.current));
+              dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'toolbar' } });
             }}
             onUserDrawingZOrderChange={(action) => {
-              commitUserDrawingStateIfChanged(reorderUserDrawings(userDrawingStateRef.current, action));
+              dispatchUserDrawingCommandToState({ type: 'reorder', action, meta: { source: 'toolbar' } });
             }}
             onUserDrawingStyleChange={(style) => {
-              commitUserDrawingStateIfChanged(updateMobileUserDrawingStyle(userDrawingStateRef.current, style));
+              dispatchUserDrawingCommandToState({ type: 'updateStyle', style, meta: { source: 'toolbar' } });
             }}
             onUserDrawingTextAlignChange={(textAlign) => {
-              commitUserDrawingStateIfChanged(setMobileUserDrawingTextAlign(userDrawingStateRef.current, textAlign));
+              dispatchUserDrawingCommandToState({ type: 'setTextAlign', textAlign, meta: { source: 'toolbar' } });
             }}
             onUserDrawingTrendLineExtendChange={(extend) => {
-              commitUserDrawingStateIfChanged(
-                setMobileUserDrawingTrendLineExtend(userDrawingStateRef.current, extend),
-              );
+              dispatchUserDrawingCommandToState({ type: 'setTrendLineExtend', extend, meta: { source: 'toolbar' } });
             }}
             onUserDrawingIconNameChange={(iconName) => {
-              commitUserDrawingStateIfChanged(setMobileUserDrawingIconName(userDrawingStateRef.current, iconName));
+              dispatchUserDrawingCommandToState({ type: 'setIconName', iconName, meta: { source: 'toolbar' } });
             }}
             onUserDrawingVisibilityChange={(visible) => {
-              commitUserDrawingStateIfChanged(setMobileUserDrawingVisibility(userDrawingStateRef.current, visible));
+              dispatchUserDrawingCommandToState({ type: 'setVisibility', visible, meta: { source: 'toolbar' } });
             }}
             onUserDrawingLockedChange={(locked, includeLocked) => {
-              commitUserDrawingStateIfChanged(
-                setMobileUserDrawingLocked(userDrawingStateRef.current, locked, { includeLocked }),
-              );
+              dispatchUserDrawingCommandToState({
+                type: 'setLocked',
+                locked,
+                options: { includeLocked },
+                meta: { source: 'toolbar' },
+              });
             }}
           />
         </View>
