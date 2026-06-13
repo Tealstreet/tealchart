@@ -171,6 +171,7 @@ export class TealchartWidget {
   private _userDrawingClipboard: UserDrawingClipboard | null = null;
   private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
   private _userDrawingEditDragTransactionKey = 'edit-drag';
+  private _userDrawingEditDragTransactionCounter = 0;
   private _userDrawingIdCounter = 0;
   private _userDrawingTextMeasureCtx: CanvasRenderingContext2D | null = null;
 
@@ -2674,7 +2675,7 @@ export class TealchartWidget {
   ): boolean {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
-    const transactionKey = options?.duplicateOnDrag ? 'duplicate-drag' : 'edit-drag';
+    const transactionKey = `${options?.duplicateOnDrag ? 'duplicate-drag' : 'edit-drag'}-${++this._userDrawingEditDragTransactionCounter}`;
     const result = options?.duplicateOnDrag
       ? this.dispatchUserDrawingCommandWithResult({
           type: 'beginDuplicateEditDragAtPoint',
