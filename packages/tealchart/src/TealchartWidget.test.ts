@@ -724,6 +724,12 @@ describe('TealchartWidget', () => {
         'fibWedge',
         'fibChannel',
         'trendBasedFibTime',
+        'projection',
+        'sector',
+        'longPosition',
+        'shortPosition',
+        'elliottCorrectiveWave',
+        'elliottDoubleComboWave',
       ];
 
       for (const tool of dragSeedTools) {

@@ -636,6 +636,12 @@ describe('user drawing input controller', () => {
       'fibWedge',
       'fibChannel',
       'trendBasedFibTime',
+      'projection',
+      'sector',
+      'longPosition',
+      'shortPosition',
+      'elliottCorrectiveWave',
+      'elliottDoubleComboWave',
     ] as const;
     const fourAnchorDragSeedTools = ['doubleCurve', 'disjointChannel'] as const;
 
