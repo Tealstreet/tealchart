@@ -91,6 +91,9 @@ adding richer gestures and surfaces.
 
 ### Epic 2.1: Shared Drawing Command Layer
 
+Status: shipped for app-facing web widget APIs and mobile Skia imperative
+handle APIs. Low-level gesture transaction grouping continues in Epic 2.2.
+
 Phase 1: Command envelope
 
 - Introduce shared command names for create, delete, duplicate, select,

@@ -94,6 +94,16 @@ object-tree gaps stay visible.
 - Web widget APIs and mobile Skia handles expose matching z-order methods for
   app toolbar integration.
 
+## Shipped: Command Dispatch Foundation
+
+- Shared drawing command descriptors and dispatch results cover the current
+  drawing mutation, input, text-edit, table, style, visibility, lock, and
+  z-order reducer surface.
+- Web widget drawing APIs and mobile Skia imperative handle APIs route
+  app-facing drawing mutations through the same command dispatcher.
+- Existing low-level drawing gesture reducers remain behavior-preserving and are
+  ready to be wrapped into history transactions in the next phase.
+
 ## Shipped: Z-Order Toolbar Controls
 
 - Shared toolbar action descriptors include bring-forward, send-backward,
