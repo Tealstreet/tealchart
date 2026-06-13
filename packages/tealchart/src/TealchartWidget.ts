@@ -1093,6 +1093,9 @@ export class TealchartWidget {
       onUserDrawingLockedChange: (locked, includeLocked) => {
         this.setUserDrawingLocked(locked, { includeLocked });
       },
+      onUserDrawingPropertiesOpen: () => {
+        this.openUserDrawingProperties();
+      },
       onUserDrawingTextEditChange: (value) => this.updateUserDrawingTextEdit(value),
       onUserDrawingTextEditCommit: () => this.commitUserDrawingTextEdit(),
       onUserDrawingTextEditCancel: () => this.cancelUserDrawingTextEdit(),
@@ -2820,6 +2823,11 @@ export class TealchartWidget {
       if (command.locked !== undefined) {
         this.setUserDrawingLocked(command.locked, { includeLocked: command.includeLocked });
       }
+      return;
+    }
+
+    if (command.type === 'openProperties') {
+      this.openUserDrawingProperties();
       return;
     }
 
