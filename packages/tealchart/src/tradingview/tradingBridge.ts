@@ -46,7 +46,14 @@ interface HitTarget {
     | { type: 'position-close'; line: ChartTradingPositionLine }
     | { type: 'position-reverse'; line: ChartTradingPositionLine }
     | { type: 'line-action'; lineId: string; actionId: string }
-    | { type: 'bracket'; ownerType: TradingViewTradingOwnerType; ownerId: string; lineId: string; side: 'tp' | 'sl' };
+    | {
+        type: 'bracket';
+        ownerType: TradingViewTradingOwnerType;
+        ownerId: string;
+        lineId: string;
+        side: 'tp' | 'sl';
+        partialEnabled: boolean;
+      };
 }
 
 interface ActiveOrderDrag {
@@ -62,6 +69,7 @@ interface ActiveBracketDrag {
   lineId: string;
   side: 'tp' | 'sl';
   start: Point;
+  partialEnabled: boolean;
 }
 
 type ActiveDrag = ActiveOrderDrag | ActiveBracketDrag;
@@ -226,7 +234,7 @@ export class TradingViewTradingBridge {
       ownerId: this.activeDrag.ownerId,
       lineId: this.activeDrag.lineId,
       price: this.lastFrame.coordToPrice(point.y),
-      partialPercent: 100,
+      partialPercent: bracketPartialPercent(this.activeDrag, point),
     });
   }
 
@@ -257,7 +265,7 @@ export class TradingViewTradingBridge {
       ownerId: this.activeDrag.ownerId,
       lineId: this.activeDrag.lineId,
       price: this.lastFrame.coordToPrice(point.y),
-      partialPercent: 100,
+      partialPercent: bracketPartialPercent(this.activeDrag, point),
     });
   }
 
@@ -346,6 +354,7 @@ export class TradingViewTradingBridge {
             ownerId: line.orderId ?? line.id,
             lineId: ownedTradingLineId('order', line.id),
             side: target.id,
+            partialEnabled: line.partialEnabled === true,
           },
         });
       } else {
@@ -405,6 +414,7 @@ export class TradingViewTradingBridge {
             ownerId: line.positionId ?? line.id,
             lineId: ownedTradingLineId('position', line.id),
             side: target.id,
+            partialEnabled: line.partialEnabled === true,
           },
         });
       } else {
@@ -566,15 +576,43 @@ function rebindActiveDrag(activeDrag: ActiveDrag | null, state: ChartTradingStat
     return line?.editable === true ? { ...activeDrag, line } : null;
   }
 
-  const owners = activeDrag.ownerType === 'order' ? state.orders : state.positions;
-  const owner = owners?.find((line) => ownedTradingLineId(activeDrag.ownerType, line.id) === activeDrag.lineId);
+  if (activeDrag.ownerType === 'order') {
+    const owner = state.orders?.find((order) => ownedTradingLineId('order', order.id) === activeDrag.lineId);
+    if (!owner?.brackets) return null;
+    const bracketPrice = activeDrag.side === 'tp' ? owner.brackets.takeProfit : owner.brackets.stopLoss;
+    return bracketPrice == null
+      ? null
+      : {
+          ...activeDrag,
+          ownerId: owner.orderId ?? owner.id,
+          partialEnabled: owner.partialEnabled === true,
+        };
+  }
+
+  const owner = state.positions?.find((position) => ownedTradingLineId('position', position.id) === activeDrag.lineId);
   if (!owner?.brackets) return null;
   const bracketPrice = activeDrag.side === 'tp' ? owner.brackets.takeProfit : owner.brackets.stopLoss;
-  return bracketPrice == null ? null : activeDrag;
+  return bracketPrice == null
+    ? null
+    : {
+        ...activeDrag,
+        ownerId: owner.positionId ?? owner.id,
+        partialEnabled: owner.partialEnabled === true,
+      };
 }
 
 function ownedTradingLineId(kind: TradingViewTradingOwnerType | 'execution', id: string): string {
   return `chart_trading_${kind}_${id}`;
+}
+
+function bracketPartialPercent(drag: ActiveBracketDrag, point: Point): number {
+  if (!drag.partialEnabled) return 100;
+  const deltaX = Math.abs(point.x - drag.start.x);
+  if (deltaX <= 27) return 100;
+  if (deltaX <= 82) return 75;
+  if (deltaX <= 137) return 50;
+  if (deltaX <= 192) return 25;
+  return 10;
 }
 
 function claimPointerEvent(event: PointerEvent): void {

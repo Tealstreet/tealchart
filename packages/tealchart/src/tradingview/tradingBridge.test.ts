@@ -500,6 +500,107 @@ describe('TradingViewTradingBridge', () => {
     ]);
   });
 
+  it('emits partial bracket percentages from horizontal bracket drags', () => {
+    const intents: unknown[] = [];
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        positions: [
+          {
+            kind: 'position',
+            id: 'position-1',
+            positionId: 'external-position-1',
+            price: 100,
+            brackets: { stopLoss: 90 },
+            partialEnabled: true,
+          },
+        ],
+      },
+      onIntent: (intent) => intents.push(intent),
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 320, y: 100 });
+    bridge.handlePointerMove({ x: 420, y: 80 });
+    bridge.handlePointerUp({ x: 500, y: 70 });
+
+    expect(intents).toEqual([
+      {
+        type: 'bracket.sl.preview',
+        source: 'tradingview-bridge',
+        ownerType: 'position',
+        ownerId: 'external-position-1',
+        lineId: 'chart_trading_position_position-1',
+        price: 120,
+        partialPercent: 50,
+      },
+      {
+        type: 'bracket.sl.commit',
+        source: 'tradingview-bridge',
+        ownerType: 'position',
+        ownerId: 'external-position-1',
+        lineId: 'chart_trading_position_position-1',
+        price: 130,
+        partialPercent: 25,
+      },
+    ]);
+  });
+
+  it('rebinds active bracket drags to refreshed owner metadata', () => {
+    const intents: unknown[] = [];
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            brackets: { takeProfit: 110 },
+          },
+        ],
+      },
+      onIntent: (intent) => intents.push(intent),
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 320, y: 100 });
+    bridge.setState({
+      orders: [
+        {
+          kind: 'order',
+          id: 'order-1',
+          orderId: 'updated-order-1',
+          price: 100,
+          brackets: { takeProfit: 110 },
+          partialEnabled: true,
+        },
+      ],
+    });
+    bridge.handlePointerMove({ x: 420, y: 80 });
+    bridge.handlePointerUp({ x: 420, y: 70 });
+
+    expect(intents).toEqual([
+      {
+        type: 'bracket.tp.preview',
+        source: 'tradingview-bridge',
+        ownerType: 'order',
+        ownerId: 'updated-order-1',
+        lineId: 'chart_trading_order_order-1',
+        price: 120,
+        partialPercent: 50,
+      },
+      {
+        type: 'bracket.tp.commit',
+        source: 'tradingview-bridge',
+        ownerType: 'order',
+        ownerId: 'updated-order-1',
+        lineId: 'chart_trading_order_order-1',
+        price: 130,
+        partialPercent: 50,
+      },
+    ]);
+  });
+
   it('emits position action intents from label hits', () => {
     const intents: unknown[] = [];
     const bridge = new TradingViewTradingBridge({
