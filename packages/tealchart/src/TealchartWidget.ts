@@ -44,43 +44,17 @@ import {
   beginUserDrawingEditDragAtPoint,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
-  cancelUserDrawingDraft as cancelUserDrawingDraftState,
-  cancelUserDrawingTextEdit,
-  clearUserDrawings as clearUserDrawingsState,
   commitUserDrawingPathDrag,
-  commitUserDrawingTextEdit,
   createUserDrawingState,
-  deleteUserDrawing as deleteUserDrawingState,
-  duplicateUserDrawing as duplicateUserDrawingState,
   deserializeUserDrawingStateFromLayout,
-  deleteUserDrawingTableColumn as deleteUserDrawingTableColumnState,
-  deleteUserDrawingTableRow as deleteUserDrawingTableRowState,
+  dispatchUserDrawingCommand,
   handleUserDrawingInput,
-  insertUserDrawingTableColumn as insertUserDrawingTableColumnState,
-  insertUserDrawingTableRow as insertUserDrawingTableRowState,
   isUserDrawingLayoutStateEqual,
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
-  reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
-  selectUserDrawingById,
-  selectUserDrawingsById,
   serializeUserDrawingStateForLayout,
-  setUserDrawingIconName as setUserDrawingIconNameState,
-  setUserDrawingImageSource as setUserDrawingImageSourceState,
-  setUserDrawingLocked as setUserDrawingLockedState,
-  setUserDrawingTableCell as setUserDrawingTableCellState,
-  setUserDrawingTableCells as setUserDrawingTableCellsState,
-  setUserDrawingTableDimensions as setUserDrawingTableDimensionsState,
-  setUserDrawingText,
-  setUserDrawingTextContent as setUserDrawingTextContentState,
-  setUserDrawingTextAlign as setUserDrawingTextAlignState,
-  setUserDrawingTrendLineExtend as setUserDrawingTrendLineExtendState,
-  setUserDrawingTool,
-  setUserDrawingVisibility as setUserDrawingVisibilityState,
-  updateUserDrawingStyle as updateUserDrawingStyleState,
-  updateUserDrawingTextEdit,
 } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
@@ -2235,21 +2209,19 @@ export class TealchartWidget {
   }
 
   setActiveUserDrawingTool(tool: UserDrawingTool): void {
-    this.setUserDrawingState(setUserDrawingTool(this._userDrawingState, tool));
+    this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'api' } });
   }
 
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
-    this.setUserDrawingState(selectUserDrawingById(this._userDrawingState, drawingId, handle));
+    this.dispatchUserDrawingCommand({ type: 'select', drawingId, handle, meta: { source: 'api' } });
   }
 
   selectUserDrawings(drawingIds: readonly string[]): void {
-    this.setUserDrawingState(selectUserDrawingsById(this._userDrawingState, drawingIds));
+    this.dispatchUserDrawingCommand({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
   }
 
   deleteUserDrawing(drawingId?: string): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(deleteUserDrawingState(this._userDrawingState, { drawingId }));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'delete', options: { drawingId }, meta: { source: 'api' } });
   }
 
   deleteSelectedUserDrawing(): boolean {
@@ -2257,14 +2229,14 @@ export class TealchartWidget {
   }
 
   duplicateUserDrawing(drawingId?: string): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(
-      duplicateUserDrawingState(this._userDrawingState, {
+    return this.dispatchUserDrawingCommand({
+      type: 'duplicate',
+      options: {
         drawingId,
         createId: () => this._createUserDrawingId(),
-      }),
-    );
-    return this._userDrawingState !== previousState;
+      },
+      meta: { source: 'api' },
+    });
   }
 
   duplicateSelectedUserDrawing(): boolean {
@@ -2272,86 +2244,62 @@ export class TealchartWidget {
   }
 
   clearUserDrawings(): void {
-    this.setUserDrawingState(clearUserDrawingsState(this._userDrawingState));
+    this.dispatchUserDrawingCommand({ type: 'clear', meta: { source: 'api' } });
   }
 
   cancelUserDrawingDraft(): void {
-    this.setUserDrawingState(cancelUserDrawingDraftState(this._userDrawingState));
+    this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'api' } });
   }
 
   beginUserDrawingTextEdit(drawingId = this._userDrawingState.selection?.drawingId): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(beginUserDrawingTextEdit(this._userDrawingState, drawingId));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'beginTextEdit', drawingId, meta: { source: 'api' } });
   }
 
   updateUserDrawingTextEdit(value: string): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(updateUserDrawingTextEdit(this._userDrawingState, value));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'updateTextEdit', value, meta: { source: 'textEditor' } });
   }
 
   commitUserDrawingTextEdit(): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(commitUserDrawingTextEdit(this._userDrawingState));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'commitTextEdit', meta: { source: 'textEditor' } });
   }
 
   cancelUserDrawingTextEdit(): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(cancelUserDrawingTextEdit(this._userDrawingState));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'cancelTextEdit', meta: { source: 'textEditor' } });
   }
 
   setUserDrawingText(drawingId: string, text: string): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingText(this._userDrawingState, drawingId, text));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setText', drawingId, text, meta: { source: 'api' } });
   }
 
   setUserDrawingTextContent(text: string, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingTextContentState(this._userDrawingState, text, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setTextContent', text, options, meta: { source: 'api' } });
   }
 
   updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(updateUserDrawingStyleState(this._userDrawingState, style, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'updateStyle', style, options, meta: { source: 'api' } });
   }
 
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingTextAlignState(this._userDrawingState, textAlign, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setTextAlign', textAlign, options, meta: { source: 'api' } });
   }
 
   setUserDrawingTrendLineExtend(
     extend: UserDrawingTrendLineExtend,
     options: UpdateUserDrawingOptions = {},
   ): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingTrendLineExtendState(this._userDrawingState, extend, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setTrendLineExtend', extend, options, meta: { source: 'api' } });
   }
 
   setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingIconNameState(this._userDrawingState, iconName, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setIconName', iconName, options, meta: { source: 'api' } });
   }
 
   setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingImageSourceState(this._userDrawingState, source, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setImageSource', source, options, meta: { source: 'api' } });
   }
 
   setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingTableCellsState(this._userDrawingState, cells, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setTableCells', cells, options, meta: { source: 'api' } });
   }
 
   setUserDrawingTableCell(
@@ -2360,15 +2308,18 @@ export class TealchartWidget {
     value: UserDrawingTableCellInput,
     options: UpdateUserDrawingOptions = {},
   ): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingTableCellState(this._userDrawingState, row, column, value, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({
+      type: 'setTableCell',
+      row,
+      column,
+      value,
+      options,
+      meta: { source: 'api' },
+    });
   }
 
   setUserDrawingTableDimensions(rows: number, columns: number, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingTableDimensionsState(this._userDrawingState, rows, columns, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setTableDimensions', rows, columns, options, meta: { source: 'api' } });
   }
 
   insertUserDrawingTableRow(
@@ -2376,15 +2327,11 @@ export class TealchartWidget {
     values?: UserDrawingTableRowInput,
     options: UpdateUserDrawingOptions = {},
   ): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(insertUserDrawingTableRowState(this._userDrawingState, row, values, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'insertTableRow', row, values, options, meta: { source: 'api' } });
   }
 
   deleteUserDrawingTableRow(row: number, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(deleteUserDrawingTableRowState(this._userDrawingState, row, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'deleteTableRow', row, options, meta: { source: 'api' } });
   }
 
   insertUserDrawingTableColumn(
@@ -2392,33 +2339,23 @@ export class TealchartWidget {
     values?: UserDrawingTableColumnInput,
     options: UpdateUserDrawingOptions = {},
   ): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(insertUserDrawingTableColumnState(this._userDrawingState, column, values, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'insertTableColumn', column, values, options, meta: { source: 'api' } });
   }
 
   deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(deleteUserDrawingTableColumnState(this._userDrawingState, column, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'deleteTableColumn', column, options, meta: { source: 'api' } });
   }
 
   setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingVisibilityState(this._userDrawingState, visible, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setVisibility', visible, options, meta: { source: 'api' } });
   }
 
   setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(setUserDrawingLockedState(this._userDrawingState, locked, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'setLocked', locked, options, meta: { source: 'api' } });
   }
 
   reorderUserDrawings(action: UserDrawingZOrderAction, options: UpdateUserDrawingOptions = {}): boolean {
-    const previousState = this._userDrawingState;
-    this.setUserDrawingState(reorderUserDrawings(this._userDrawingState, action, options));
-    return this._userDrawingState !== previousState;
+    return this.dispatchUserDrawingCommand({ type: 'reorder', action, options, meta: { source: 'api' } });
   }
 
   bringUserDrawingForward(options: UpdateUserDrawingOptions = {}): boolean {
@@ -2444,6 +2381,12 @@ export class TealchartWidget {
       id = `drawing_${++this._userDrawingIdCounter}`;
     } while (existingIds.has(id));
     return id;
+  }
+
+  private dispatchUserDrawingCommand(command: Parameters<typeof dispatchUserDrawingCommand>[1]): boolean {
+    const result = dispatchUserDrawingCommand(this._userDrawingState, command);
+    this.setUserDrawingState(result.state);
+    return result.changed;
   }
 
   private _measureUserDrawingTextLabelLine = (drawing: UserDrawingTextAnnotation, line: string): number => {
