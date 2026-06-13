@@ -113,6 +113,8 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
+  resolveUserDrawingSelectedActionSurface,
+  resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
   resolveUserDrawingTextEditMetrics,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
@@ -902,6 +904,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         draftPreviewAnchor: userDrawingDraftPreviewAnchor ?? undefined,
       }),
     [effectiveUserDrawingState, userDrawingDraftPreviewAnchor, userDrawingSpacesByPaneId],
+  );
+  const userDrawingSelectionActionAnchor = useMemo(
+    () => resolveUserDrawingSelectionActionAnchor(effectiveUserDrawingState, userDrawingSpacesByPaneId),
+    [effectiveUserDrawingState, userDrawingSpacesByPaneId],
+  );
+  const userDrawingSelectedActionSurface = useMemo(
+    () => resolveUserDrawingSelectedActionSurface(effectiveUserDrawingState),
+    [effectiveUserDrawingState],
   );
   const resolveConstrainedUserDrawingPlacementPoint = useCallback(
     (point: UserDrawingInputPoint): UserDrawingInputPoint =>
@@ -4158,6 +4168,76 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         />
       )}
 
+      {userDrawingSelectionActionAnchor && userDrawingSelectedActionSurface.selectedDrawing && (
+        <View
+          style={[
+            styles.userDrawingActionSurface,
+            {
+              left: Math.max(8, Math.min(dimensions.width - 232, userDrawingSelectionActionAnchor.anchor.x - 112)),
+              top: Math.max(TOP_BAR_HEIGHT + 6, userDrawingSelectionActionAnchor.anchor.y - 42),
+            },
+          ]}
+          pointerEvents="box-none"
+        >
+          {userDrawingSelectedActionSurface.groups.map((group, groupIndex) => (
+            <React.Fragment key={group.id}>
+              <View style={styles.userDrawingActionSurfaceGroup}>
+                {group.items.map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={item.label}
+                    disabled={!item.enabled}
+                    activeOpacity={0.72}
+                    style={[styles.userDrawingActionButton, !item.enabled && styles.userDrawingActionButtonDisabled]}
+                    onPress={() => {
+                      if (item.command.type === 'styleAction') {
+                        if (item.command.visible !== undefined) {
+                          dispatchUserDrawingCommandToState({
+                            type: 'setVisibility',
+                            visible: item.command.visible,
+                            meta: { source: 'toolbar' },
+                          });
+                        }
+                        if (item.command.locked !== undefined) {
+                          dispatchUserDrawingCommandToState({
+                            type: 'setLocked',
+                            locked: item.command.locked,
+                            options: { includeLocked: item.command.includeLocked },
+                            meta: { source: 'toolbar' },
+                          });
+                        }
+                        return;
+                      }
+                      if (item.command.action === 'duplicateSelected') {
+                        dispatchUserDrawingCommandToState({
+                          type: 'duplicate',
+                          options: { createId: createUserDrawingId },
+                          meta: { source: 'toolbar' },
+                        });
+                      } else if (item.command.action === 'deleteSelected') {
+                        dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'toolbar' } });
+                      } else {
+                        dispatchUserDrawingCommandToState({
+                          type: 'reorder',
+                          action: item.command.action,
+                          meta: { source: 'toolbar' },
+                        });
+                      }
+                    }}
+                  >
+                    <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
+                      {item.icon}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {groupIndex < userDrawingSelectedActionSurface.groups.length - 1 && <View style={styles.userDrawingActionDivider} />}
+            </React.Fragment>
+          ))}
+        </View>
+      )}
+
       {/* Top Bar (overlay on top of chart) */}
       {showTopBar && (
         <View style={styles.topBarOverlay} pointerEvents="box-none">
@@ -4282,6 +4362,47 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: 'rgba(9, 12, 18, 0.92)',
     lineHeight: 18,
+  },
+  userDrawingActionSurface: {
+    position: 'absolute',
+    zIndex: 9,
+    minWidth: 224,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: '#363a45',
+    borderRadius: 6,
+    backgroundColor: 'rgba(19, 23, 34, 0.98)',
+  },
+  userDrawingActionSurfaceGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  userDrawingActionButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userDrawingActionButtonDisabled: {
+    opacity: 0.35,
+  },
+  userDrawingActionButtonText: {
+    color: '#d1d4dc',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  userDrawingActionButtonTextDisabled: {
+    color: '#787b86',
+  },
+  userDrawingActionDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: '#363a45',
   },
   interactiveLayer: {
     // Interactive elements go here

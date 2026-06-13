@@ -22,7 +22,6 @@ import type {
 import {
   getSelectedUserDrawing,
   getUserDrawingToolDescriptor,
-  getUserDrawingZOrderAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -30,7 +29,6 @@ import {
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
-  resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
@@ -50,7 +48,6 @@ import {
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
-  USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
@@ -129,17 +126,12 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     supportedResolutions,
     userDrawingState,
     onUserDrawingToolSelect,
-    onUserDrawingDuplicateSelected,
-    onUserDrawingDeleteSelected,
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
-    onUserDrawingZOrderChange,
     onUserDrawingStyleChange,
     onUserDrawingTextAlignChange,
     onUserDrawingTrendLineExtendChange,
     onUserDrawingIconNameChange,
-    onUserDrawingVisibilityChange,
-    onUserDrawingLockedChange,
   }) => {
     // Filter timeframes by supported resolutions (if set by datafeed)
     const timeframes = useMemo(() => {
@@ -868,40 +860,12 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     </>
                   )}
 
-                  {USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
-                    const actionState = resolveUserDrawingStyleToolbarAction(userDrawingState, descriptor.action);
-                    const enabled = actionState.enabled;
-                    return (
-                      <Pressable
-                        key={descriptor.action}
-                        accessibilityRole="button"
-                        accessibilityLabel={descriptor.label}
-                        accessibilityState={{ disabled: !enabled }}
-                        disabled={!enabled}
-                        onPress={() => {
-                          if (actionState.visible !== undefined) {
-                            onUserDrawingVisibilityChange?.(actionState.visible);
-                          }
-                          if (actionState.locked !== undefined) {
-                            onUserDrawingLockedChange?.(actionState.locked, actionState.includeLocked);
-                          }
-                        }}
-                        style={({ pressed }: PressableStyleState) => [
-                          styles.drawingButton,
-                          enabled && pressed && styles.drawingButtonPressed,
-                          !enabled && styles.drawingButtonDisabled,
-                        ]}
-                      >
-                        <Text style={[styles.drawingButtonText, { color: textSecondaryColor }]}>{descriptor.icon}</Text>
-                      </Pressable>
-                    );
-                  })}
-
-                  <View style={styles.innerDivider} />
                 </>
               )}
 
-              {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => {
+              {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
+                (descriptor) => descriptor.action === 'cancelDraft' || descriptor.action === 'clearAll',
+              ).map((descriptor) => {
                 const enabled = isUserDrawingToolbarActionEnabled(userDrawingState, descriptor.action);
                 return (
                   <Pressable
@@ -911,10 +875,6 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     accessibilityState={{ disabled: !enabled }}
                     disabled={!enabled}
                     onPress={() => {
-                      if (descriptor.action === 'duplicateSelected') onUserDrawingDuplicateSelected?.();
-                      if (descriptor.action === 'deleteSelected') onUserDrawingDeleteSelected?.();
-                      const zOrderAction = getUserDrawingZOrderAction(descriptor.action);
-                      if (zOrderAction) onUserDrawingZOrderChange?.(zOrderAction);
                       if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                       if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
                     }}

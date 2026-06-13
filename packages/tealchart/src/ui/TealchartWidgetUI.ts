@@ -40,6 +40,7 @@ import {
   getUserDrawingToolbarStateKey,
   isUserDrawingTextAnnotation,
   panePositionToScreenPoint,
+  resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingTextEditMetrics,
 } from '../drawings';
 import { ChartCore } from './ChartCore';
@@ -456,6 +457,7 @@ export class TealchartWidgetUI {
    */
   setViewport(viewport: Viewport): void {
     this.chartCore?.setViewport(viewport);
+    this.updateUserDrawingSelectionActionAnchor();
     this.renderUserDrawingTextEditor(this.options.userDrawingState);
   }
 
@@ -524,9 +526,19 @@ export class TealchartWidgetUI {
     if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
       this.currentUserDrawingToolbarStateKey = toolbarStateKey;
       this.topBar?.setUserDrawingState(state);
+    } else {
+      this.topBar?.setUserDrawingState(state, { render: false });
     }
     this.chartCore?.setUserDrawingState(state);
+    this.updateUserDrawingSelectionActionAnchor();
     this.renderUserDrawingTextEditor(state);
+  }
+
+  private updateUserDrawingSelectionActionAnchor(): void {
+    const state = this.options.userDrawingState;
+    const spacesByPaneId = this.chartCore?.getUserDrawingSpacesForCurrentViewport();
+    const anchor = state && spacesByPaneId ? resolveUserDrawingSelectionActionAnchor(state, spacesByPaneId) : null;
+    this.topBar?.setUserDrawingSelectionActionAnchor(anchor);
   }
 
   private shouldAvoidLegendLeftTools(): boolean {
@@ -661,6 +673,7 @@ export class TealchartWidgetUI {
     this.chartCore?.setPaneLayout(layout);
     // Update indicator pane legend positions
     this.updateIndicatorPaneLegends();
+    this.updateUserDrawingSelectionActionAnchor();
     this.renderUserDrawingTextEditor(this.options.userDrawingState);
   }
 
@@ -773,6 +786,7 @@ export class TealchartWidgetUI {
     const w = width ?? rect.width;
     const h = height ?? rect.height;
     this.chartCore?.resize(w, h);
+    this.updateUserDrawingSelectionActionAnchor();
   }
 
   /**
