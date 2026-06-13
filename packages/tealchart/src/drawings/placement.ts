@@ -62,6 +62,8 @@ const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'fibWedge',
   'fibChannel',
   'trendBasedFibTime',
+  'doubleCurve',
+  'disjointChannel',
 ]);
 
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {
