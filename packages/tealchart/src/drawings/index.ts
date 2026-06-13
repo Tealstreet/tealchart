@@ -388,6 +388,7 @@ export {
   deserializeUserDrawingStateFromLayout,
   isUserDrawingLayoutStateEqual,
   serializeUserDrawingStateForLayout,
+  USER_DRAWING_LAYOUT_SCHEMA_VERSION,
 } from './serialization';
 export {
   createUserDrawingFromDraft,

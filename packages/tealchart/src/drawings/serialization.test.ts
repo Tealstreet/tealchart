@@ -6,6 +6,7 @@ import {
   deserializeUserDrawingStateFromLayout,
   isUserDrawingLayoutStateEqual,
   serializeUserDrawingStateForLayout,
+  USER_DRAWING_LAYOUT_SCHEMA_VERSION,
 } from './serialization';
 import type { UserDrawingState } from './types';
 
@@ -61,12 +62,74 @@ describe('drawing layout serialization', () => {
   it('persists committed drawings and clears transient editing state', () => {
     const persisted = serializeUserDrawingStateForLayout(createStateWithTransientFields());
 
+    expect(persisted?.version).toBe(USER_DRAWING_LAYOUT_SCHEMA_VERSION);
     expect(persisted?.drawings).toHaveLength(1);
     expect(persisted?.drawings[0]?.id).toBe('trend_1');
     expect(persisted?.activeTool).toBe('select');
     expect(persisted?.selection).toBeNull();
     expect(persisted?.draft).toBeNull();
     expect(persisted?.textEdit).toBeNull();
+  });
+
+  it('persists user-facing drawing names and trims restored legacy names', () => {
+    const legacyPayload = {
+      drawings: [
+        {
+          id: 'legacy_line',
+          name: '  Legacy support  ',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 10,
+        },
+      ],
+    };
+    expect('version' in legacyPayload).toBe(false);
+
+    const restored = deserializeUserDrawingStateFromLayout(legacyPayload);
+
+    expect(restored).toMatchObject({
+      version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'legacy_line',
+          name: 'Legacy support',
+          visible: true,
+          locked: false,
+          createdAt: 0,
+          updatedAt: 0,
+        },
+      ],
+    });
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings[0]).toMatchObject({
+      id: 'legacy_line',
+      name: 'Legacy support',
+    });
+  });
+
+  it('ignores layout payloads from newer drawing schema versions', () => {
+    expect(
+      deserializeUserDrawingStateFromLayout({
+        version: USER_DRAWING_LAYOUT_SCHEMA_VERSION + 1,
+        drawings: [
+          {
+            id: 'future',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      }),
+    ).toBeUndefined();
   });
 
   it('returns undefined when there are no committed drawings', () => {

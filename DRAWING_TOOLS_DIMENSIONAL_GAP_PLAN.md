@@ -651,15 +651,24 @@ Phase 1: New state fields
 - Persist committed drawing data and user-facing names.
 - Do not persist transient draft, toolbar, context menu, object tree open state,
   text edit draft, or undo/redo stacks unless explicitly decided later.
+- Status: shared layout export now stamps the explicit drawing layout schema
+  version, preserves committed user-facing names, and continues to omit
+  transient selection/draft/text-edit state.
 
 Phase 2: Restore validation
 
 - Clear invalid selection/edit state on restore.
 - Normalize old drawings without new fields.
+- Status: restore now treats versionless payloads as legacy v1, defaults missing
+  legacy `visible`/`locked`/timestamp fields, trims restored names, and ignores
+  payloads from newer unsupported schema versions.
 
 Phase 3: Cross-platform import/export
 
 - Ensure web layouts and mobile drawing import/export use the same schema.
+- Status: web layout serialization and mobile Skia import/export wrappers share
+  the same schema version and migration tests; mobile import accepts raw
+  persisted layout payloads through the same unknown-safe deserializer.
 
 ### Epic 8.3: Test Harness and Manual Evidence
 
