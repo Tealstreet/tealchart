@@ -128,7 +128,7 @@ interface ChartTopBarState {
 // ============================================================================
 
 const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
-const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 40;
+const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 
 const styles = {
   container: {
@@ -318,6 +318,8 @@ const styles = {
     position: 'absolute',
     display: 'flex',
     alignItems: 'center',
+    alignContent: 'center',
+    flexWrap: 'wrap',
     gap: '3px',
     width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
     boxSizing: 'border-box',
@@ -334,6 +336,11 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '2px',
+  } as Partial<CSSStyleDeclaration>,
+
+  selectedActionSurfaceGroupSeparated: {
+    borderLeft: '1px solid var(--border, #363a45)',
+    paddingLeft: '3px',
   } as Partial<CSSStyleDeclaration>,
 
   drawingGroup: {
@@ -616,6 +623,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
+    if (item.command.type === 'updateStyle') {
+      this.options.onUserDrawingStyleChange?.(item.command.style);
+      return;
+    }
+
     if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
     if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
     if (
@@ -670,12 +682,20 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     el.addEventListener('mouseup', (event) => event.stopPropagation());
     el.addEventListener('click', (event) => event.stopPropagation());
 
-    for (const group of surface.groups) {
-      const groupEl = this.createElement('div', { style: styles.selectedActionSurfaceGroup });
+    for (let groupIndex = 0; groupIndex < surface.groups.length; groupIndex += 1) {
+      const group = surface.groups[groupIndex]!;
+      const groupEl = this.createElement('div', {
+        style: {
+          ...styles.selectedActionSurfaceGroup,
+          ...(groupIndex > 0 ? styles.selectedActionSurfaceGroupSeparated : {}),
+        },
+      });
       for (const item of group.items) {
         const btn = this.createElement('button', {
           style: {
             ...styles.drawingButton,
+            ...(item.swatchColor ? styles.drawingSwatch : {}),
+            ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
             opacity: item.enabled ? '1' : '0.35',
             cursor: item.enabled ? 'pointer' : 'default',
           },
@@ -691,16 +711,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
           btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
           btn.addEventListener('mouseleave', () => {
-            btn.style.backgroundColor = 'transparent';
+            btn.style.backgroundColor = item.swatchColor ?? 'transparent';
             btn.style.color = 'var(--text2, #787b86)';
           });
         }
         groupEl.appendChild(btn);
       }
       el.appendChild(groupEl);
-      if (group !== surface.groups[surface.groups.length - 1]) {
-        el.appendChild(this.createElement('div', { style: styles.divider }));
-      }
     }
 
     this.selectedActionSurfaceEl = el;

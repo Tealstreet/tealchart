@@ -2831,6 +2831,11 @@ export class TealchartWidget {
       return;
     }
 
+    if (command.type === 'updateStyle') {
+      this.updateUserDrawingStyle(command.style);
+      return;
+    }
+
     if (command.action === 'duplicateSelected') {
       this.duplicateSelectedUserDrawing();
     } else if (command.action === 'deleteSelected') {
