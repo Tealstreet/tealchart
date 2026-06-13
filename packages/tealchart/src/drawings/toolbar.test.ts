@@ -1499,6 +1499,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(surface.selectedDrawing?.id).toBe('front');
     expect(surface.groups.map((group) => group.id)).toEqual(['primary', 'arrange', 'visibility']);
     expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
+      ['openProperties', true, false],
       ['duplicateSelected', true, false],
       ['deleteSelected', true, true],
     ]);
@@ -1548,10 +1549,10 @@ describe('user drawing toolbar descriptors', () => {
       resolveUserDrawingActionSurfacePosition({
         anchor: { x: 318, y: 120 },
         viewport: { width: 320, height: 220 },
-        surface: { width: 280, height: 40 },
+        surface: { width: 304, height: 40 },
         inset: { left: 8, right: 8, top: 38, bottom: 8 },
       }),
-    ).toEqual({ left: 32, top: 78 });
+    ).toEqual({ left: 8, top: 78 });
   });
 
   it('keeps locked selected action surface mutations disabled except unlock', () => {

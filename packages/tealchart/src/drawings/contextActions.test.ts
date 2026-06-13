@@ -71,6 +71,7 @@ describe('user drawing context actions', () => {
     expect(result.drawingId).toBe('front');
     expect(result.state.selection).toEqual({ drawingId: 'front' });
     expect(result.items.map((item) => [item.id, item.groupId, item.enabled, item.command])).toEqual([
+      ['openProperties', 'primary', true, { type: 'openProperties' }],
       ['duplicateSelected', 'primary', true, { type: 'toolbarAction', action: 'duplicateSelected' }],
       ['deleteSelected', 'primary', true, { type: 'toolbarAction', action: 'deleteSelected' }],
       ['bringForward', 'arrange', false, { type: 'toolbarAction', action: 'bringForward' }],
