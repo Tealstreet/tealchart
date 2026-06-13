@@ -23,6 +23,22 @@ const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'forecast',
   'callout',
   'priceNote',
+  'fibRetracement',
+  'fibExtension',
+  'fibFan',
+  'fibSpeedResistanceFan',
+  'fibArcs',
+  'fibSpeedResistanceArcs',
+  'fibCircles',
+  'fibSpiral',
+  'gannFan',
+  'gannBox',
+  'gannSquare',
+  'gannSquareFixed',
+  'fibTimeZone',
+  'cyclicLines',
+  'timeCycles',
+  'sineLine',
 ]);
 
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {

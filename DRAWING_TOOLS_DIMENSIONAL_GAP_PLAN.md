@@ -189,6 +189,12 @@ Phase 1: Placement mode registry
   proof tools plus `priceRange`, `dateRange`, `datePriceRange`, `forecast`,
   `callout`, and `priceNote`, with the same registry consumed by web Canvas
   and mobile Skia adapters.
+- Status: shared two-anchor drag placement now also covers mature Fib/Gann and
+  cycle tools with existing web/mobile render coverage: `fibRetracement`,
+  `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`,
+  `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`,
+  `gannSquare`, `gannSquareFixed`, `fibTimeZone`, `cyclicLines`,
+  `timeCycles`, and `sineLine`.
 
 Phase 2: Draft lifecycle
 
