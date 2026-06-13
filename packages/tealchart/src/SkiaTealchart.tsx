@@ -1839,6 +1839,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
   }, [createUserDrawingId, dispatchUserDrawingCommandToState]);
 
+  const handleUserDrawingEditCancel = useCallback(() => {
+    if (
+      isUserDrawingDragPlacementTool(userDrawingStateRef.current.activeTool) ||
+      isUserDrawingPathFamilyTool(userDrawingStateRef.current.activeTool)
+    ) {
+      userDrawingPlacementDragStartPointRef.current = null;
+      userDrawingPlacementDragLastPointRef.current = null;
+      setUserDrawingDraftPreviewAnchor(null);
+      dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'touch' } });
+      return;
+    }
+
+    userDrawingEditDragRef.current = null;
+    userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
+  }, [dispatchUserDrawingCommandToState]);
+
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
     bars,
@@ -1852,6 +1868,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onDrawingEditStart: handleUserDrawingEditStart,
     onDrawingEditMove: handleUserDrawingEditMove,
     onDrawingEditEnd: handleUserDrawingEditEnd,
+    onDrawingEditCancel: handleUserDrawingEditCancel,
   });
 
   const handleCrosshairTap = useCallback(
