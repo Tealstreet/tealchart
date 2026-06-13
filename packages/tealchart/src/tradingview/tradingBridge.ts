@@ -198,7 +198,7 @@ export class TradingViewTradingBridge {
       type: 'order.move.commit',
       source: 'tradingview-bridge',
       orderId: line.orderId ?? line.id,
-      lineId: line.id,
+      lineId: ownedTradingLineId('order', line.id),
       price: this.lastFrame.coordToPrice(point.y),
       ...meta(line.meta),
     });
@@ -287,7 +287,7 @@ export class TradingViewTradingBridge {
             type: 'bracket',
             ownerType: 'order',
             ownerId: line.orderId ?? line.id,
-            lineId: line.id,
+            lineId: ownedTradingLineId('order', line.id),
             side: target.id,
           },
         });
@@ -295,7 +295,7 @@ export class TradingViewTradingBridge {
         this.hitTargets.push({
           rect: target.rect,
           cursor: 'pointer',
-          action: { type: 'line-action', lineId: line.id, actionId: target.id },
+          action: { type: 'line-action', lineId: ownedTradingLineId('order', line.id), actionId: target.id },
         });
       }
     }
@@ -346,7 +346,7 @@ export class TradingViewTradingBridge {
             type: 'bracket',
             ownerType: 'position',
             ownerId: line.positionId ?? line.id,
-            lineId: line.id,
+            lineId: ownedTradingLineId('position', line.id),
             side: target.id,
           },
         });
@@ -354,7 +354,7 @@ export class TradingViewTradingBridge {
         this.hitTargets.push({
           rect: target.rect,
           cursor: 'pointer',
-          action: { type: 'line-action', lineId: line.id, actionId: target.id },
+          action: { type: 'line-action', lineId: ownedTradingLineId('position', line.id), actionId: target.id },
         });
       }
     }
@@ -429,7 +429,7 @@ export class TradingViewTradingBridge {
           type: 'order.cancel',
           source: 'tradingview-bridge',
           orderId: hit.action.line.orderId ?? hit.action.line.id,
-          lineId: hit.action.line.id,
+          lineId: ownedTradingLineId('order', hit.action.line.id),
           ...meta(hit.action.line.meta),
         });
         break;
@@ -438,7 +438,7 @@ export class TradingViewTradingBridge {
           type: 'position.close',
           source: 'tradingview-bridge',
           positionId: hit.action.line.positionId ?? hit.action.line.id,
-          lineId: hit.action.line.id,
+          lineId: ownedTradingLineId('position', hit.action.line.id),
           ...meta(hit.action.line.meta),
         });
         break;
@@ -447,7 +447,7 @@ export class TradingViewTradingBridge {
           type: 'position.reverse',
           source: 'tradingview-bridge',
           positionId: hit.action.line.positionId ?? hit.action.line.id,
-          lineId: hit.action.line.id,
+          lineId: ownedTradingLineId('position', hit.action.line.id),
           ...meta(hit.action.line.meta),
         });
         break;
@@ -502,6 +502,10 @@ function rebindActiveDrag(activeDrag: ActiveDrag | null, state: ChartTradingStat
   if (!activeDrag) return null;
   const line = state.orders?.find((order) => order.id === activeDrag.line.id);
   return line?.editable === true ? { ...activeDrag, line } : null;
+}
+
+function ownedTradingLineId(kind: TradingViewTradingOwnerType | 'execution', id: string): string {
+  return `chart_trading_${kind}_${id}`;
 }
 
 function claimPointerEvent(event: PointerEvent): void {

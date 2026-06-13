@@ -55,12 +55,12 @@ describe('TradingViewTradingBridge', () => {
         type: 'order.cancel',
         source: 'tradingview-bridge',
         orderId: 'external-order-1',
-        lineId: 'order-1',
+        lineId: 'chart_trading_order_order-1',
       },
       {
         type: 'line.action',
         source: 'tradingview-bridge',
-        lineId: 'order-1',
+        lineId: 'chart_trading_order_order-1',
         actionId: 'amend',
       },
     ]);
@@ -121,19 +121,19 @@ describe('TradingViewTradingBridge', () => {
         type: 'order.cancel',
         source: 'tradingview-bridge',
         orderId: 'order-1',
-        lineId: 'order-1',
+        lineId: 'chart_trading_order_order-1',
       },
       {
         type: 'position.close',
         source: 'tradingview-bridge',
         positionId: 'position-1',
-        lineId: 'position-1',
+        lineId: 'chart_trading_position_position-1',
       },
       {
         type: 'position.reverse',
         source: 'tradingview-bridge',
         positionId: 'position-1',
-        lineId: 'position-1',
+        lineId: 'chart_trading_position_position-1',
       },
     ]);
   });
@@ -163,7 +163,7 @@ describe('TradingViewTradingBridge', () => {
       type: 'order.move.commit',
       source: 'tradingview-bridge',
       orderId: 'external-order-1',
-      lineId: 'order-1',
+      lineId: 'chart_trading_order_order-1',
       price: 120,
     });
   });
@@ -266,7 +266,7 @@ describe('TradingViewTradingBridge', () => {
       type: 'order.move.commit',
       source: 'tradingview-bridge',
       orderId: 'external-order-1',
-      lineId: 'order-1',
+      lineId: 'chart_trading_order_order-1',
       price: 120,
     });
   });
@@ -313,7 +313,7 @@ describe('TradingViewTradingBridge', () => {
       type: 'order.move.commit',
       source: 'tradingview-bridge',
       orderId: 'external-order-1',
-      lineId: 'order-1',
+      lineId: 'chart_trading_order_order-1',
       price: 120,
     });
   });
@@ -354,7 +354,7 @@ describe('TradingViewTradingBridge', () => {
       type: 'order.move.commit',
       source: 'tradingview-bridge',
       orderId: 'updated-order-1',
-      lineId: 'order-1',
+      lineId: 'chart_trading_order_order-1',
       price: 120,
     });
   });
@@ -386,13 +386,13 @@ describe('TradingViewTradingBridge', () => {
         type: 'position.close',
         source: 'tradingview-bridge',
         positionId: 'external-position-1',
-        lineId: 'position-1',
+        lineId: 'chart_trading_position_position-1',
       },
       {
         type: 'position.reverse',
         source: 'tradingview-bridge',
         positionId: 'external-position-1',
-        lineId: 'position-1',
+        lineId: 'chart_trading_position_position-1',
       },
     ]);
   });
