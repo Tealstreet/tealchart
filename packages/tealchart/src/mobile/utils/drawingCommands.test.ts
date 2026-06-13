@@ -16,6 +16,7 @@ import {
   handleUserDrawingInput,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   setUserDrawingTool,
+  shouldRenderUserDrawingSelectedActionSurface,
   redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
@@ -475,6 +476,39 @@ describe('mobile drawing handle command dispatch', () => {
     expect(result.changed).toBe(true);
     expect(result.state.draft).toBeNull();
     expect(result.history.undoStack).toHaveLength(0);
+  });
+
+  it('routes mobile selection misses through shared selected action dismissal state', () => {
+    const state = createMobileStateWithTrendLine();
+    const selected = dispatchMobileUserDrawingHandleCommand(state, {
+      type: 'selectAtPoint',
+      point: { x: 100, y: 200 },
+      spacesByPaneId,
+      meta: { source: 'pointer' },
+    });
+    const anchor = {
+      anchor: { x: 100, y: 200 },
+      bounds: { x: 80, y: 180, width: 40, height: 40 },
+      drawingIds: ['line'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    };
+
+    expect(selected.hit).toBe(true);
+    expect(selected.state.selection).toMatchObject({ drawingId: 'line' });
+    expect(shouldRenderUserDrawingSelectedActionSurface(selected.state, anchor)).toBe(true);
+
+    const missed = dispatchMobileUserDrawingHandleCommand(selected.state, {
+      type: 'selectAtPoint',
+      point: { x: 20, y: 20 },
+      spacesByPaneId,
+      meta: { source: 'pointer' },
+    });
+
+    expect(missed.hit).toBe(false);
+    expect(missed.changed).toBe(true);
+    expect(missed.state.selection).toBeNull();
+    expect(shouldRenderUserDrawingSelectedActionSurface(missed.state, anchor)).toBe(false);
   });
 
   it('routes mobile copy and paste keyboard actions through adapter clipboard state', () => {
