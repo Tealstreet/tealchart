@@ -14,6 +14,7 @@ import {
   timeToDrawingX,
 } from './coordinates';
 import { getUserDrawingSelectionIds } from './input';
+import { getUserDrawingPlacementMode } from './placement';
 import { createUserDrawingFromDraft, getRequiredAnchorCount } from './types';
 
 export type UserDrawingRenderPhase = 'committed' | 'draft';
@@ -60,10 +61,20 @@ export function resolveUserDrawingRenderEntries(
   if (!state.draft) return entries;
 
   const requiredAnchorCount = getRequiredAnchorCount(state.draft.tool);
-  const draftAnchors =
-    state.draft.anchors.length < requiredAnchorCount && options.draftPreviewAnchor
-      ? [...state.draft.anchors, options.draftPreviewAnchor]
-      : state.draft.anchors;
+  let draftAnchors = state.draft.anchors;
+  if (state.draft.anchors.length < requiredAnchorCount && options.draftPreviewAnchor) {
+    draftAnchors = [...state.draft.anchors, options.draftPreviewAnchor];
+  } else if (
+    state.draft.anchors.length >= 2 &&
+    state.draft.anchors.length < requiredAnchorCount &&
+    getUserDrawingPlacementMode(state.draft.tool) === 'dragSeed'
+  ) {
+    const terminalAnchor = state.draft.anchors[state.draft.anchors.length - 1]!;
+    draftAnchors = [
+      ...state.draft.anchors,
+      ...Array.from({ length: requiredAnchorCount - state.draft.anchors.length }, () => terminalAnchor),
+    ];
+  }
 
   const draftDrawing = createUserDrawingFromDraft(
     {

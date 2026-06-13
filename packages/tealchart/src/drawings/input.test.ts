@@ -617,6 +617,52 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('seeds geometric multi-anchor drawings from placement drag before final click', () => {
+    const dragSeedTools = ['triangle', 'curve', 'arc', 'polyline', 'rotatedRectangle'] as const;
+
+    for (const tool of dragSeedTools) {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const started = beginUserDrawingPlacementDrag(
+        state,
+        { paneId: 'main', anchor: anchorA },
+        { now: () => 10, style },
+      );
+      const seeded = commitUserDrawingPlacementDrag(
+        started,
+        { paneId: 'main', anchor: anchorB },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 11,
+          style,
+        },
+      );
+      const committed = handleUserDrawingInput(
+        seeded,
+        { paneId: 'main', anchor: anchorC },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 12,
+          style,
+        },
+      );
+
+      expect(started.draft?.anchors, tool).toEqual([anchorA]);
+      expect(seeded.drawings, tool).toEqual([]);
+      expect(seeded.draft, tool).toMatchObject({
+        tool,
+        paneId: 'main',
+        anchors: [anchorA, anchorB],
+      });
+      expect(committed.draft, tool).toBeNull();
+      expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
+      expect(committed.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB, anchorC],
+      });
+    }
+  });
+
   it('commits long position drawings from three anchors', () => {
     const options = { createId: () => 'long-position', now: () => 30 };
     const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'longPosition'), {
