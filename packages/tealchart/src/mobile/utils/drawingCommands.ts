@@ -86,6 +86,17 @@ export function dispatchMobileUserDrawingKeyboardAction(
     return { state, history, changed: true, action };
   }
 
+  if (action.type === 'duplicateSelected') {
+    return {
+      ...dispatchUserDrawingCommandWithHistory(state, history, {
+        type: 'duplicate',
+        options: { createId: options.createId },
+        meta: { source: 'keyboard' },
+      }),
+      action,
+    };
+  }
+
   if (action.type === 'paste') {
     return {
       ...dispatchUserDrawingCommandWithHistory(state, history, {
