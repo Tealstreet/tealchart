@@ -288,15 +288,23 @@ Phase 3: Command dispatch
 
 ### Epic 4.2: Web Floating Toolbar
 
+Status: initial selected-object floating toolbar shipped for duplicate, delete,
+z-order, visibility, and lock/unlock actions. The surface is positioned from
+the shared selection action anchor model and dispatches existing drawing
+commands. Rich style controls still live in the top bar and should migrate in
+later slices.
+
 Phase 1: DOM surface primitive
 
-- Add a chart-overlay floating toolbar positioned near selected drawing bounds.
-- Keep it transparent to chart layout except for its own hit region.
+- Status: chart-overlay floating toolbar positions near selected drawing bounds
+  without claiming chart layout space.
 
 Phase 2: Initial actions
 
-- Move duplicate/delete/z-order/lock/hide/basic style actions out of the top bar
-  into the floating toolbar for selected drawings.
+- Status: duplicate, delete, z-order, hide/show, and lock/unlock actions moved
+  out of the top bar into the floating toolbar for selected drawings.
+- Future work: migrate basic style actions after the style-control grouping is
+  ready for both web and mobile.
 
 Phase 3: Dismissal and focus
 
@@ -305,15 +313,20 @@ Phase 3: Dismissal and focus
 
 ### Epic 4.3: Mobile Selection Action Sheet
 
+Status: initial anchored mobile action strip shipped for the same selected
+object actions as web. It consumes the shared selected-action descriptors and
+selection action anchor model in the Skia chart component.
+
 Phase 1: Native surface primitive
 
-- Add a mobile drawing action surface, likely a bottom sheet or anchored action
-  popover depending on current mobile UI conventions.
+- Status: anchored React Native action strip added above the selected drawing
+  bounds using the same shared anchor model as web.
 
 Phase 2: Initial actions
 
-- Expose the same selected-action descriptors as web.
-- Use mobile-native controls while preserving command semantics.
+- Status: duplicate, delete, z-order, hide/show, and lock/unlock actions expose
+  the same selected-action descriptors as web and dispatch existing mobile
+  drawing commands.
 
 Phase 3: Dismissal and focus
 

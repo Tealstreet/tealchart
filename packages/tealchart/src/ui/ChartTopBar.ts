@@ -2,6 +2,7 @@ import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type {
   UserDrawingIconName,
+  UserDrawingSelectionActionAnchor,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -81,6 +82,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   layoutCallbacks?: LayoutSelectorCallbacks;
   /** Current user drawing state for toolbar highlighting and action availability */
   userDrawingState?: UserDrawingState;
+  /** Resolved selected drawing action surface anchor in chart screen coordinates */
+  userDrawingSelectionActionAnchor?: UserDrawingSelectionActionAnchor | null;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   /** Callback when the selected drawing should be duplicated */
@@ -305,6 +308,26 @@ const styles = {
     whiteSpace: 'nowrap',
   } as Partial<CSSStyleDeclaration>,
 
+  selectedActionSurface: {
+    position: 'absolute',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: '6px',
+    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    boxShadow: '0 10px 28px rgba(0, 0, 0, 0.32)',
+    zIndex: '8',
+    pointerEvents: 'auto',
+  } as Partial<CSSStyleDeclaration>,
+
+  selectedActionSurfaceGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '2px',
+  } as Partial<CSSStyleDeclaration>,
+
   drawingGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -383,6 +406,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
+  private selectedActionSurfaceEl: HTMLElement | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -420,6 +444,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   protected onUnmount(): void {
     this.removeDrawingToolRail();
+    this.removeSelectedActionSurface();
     this.layoutSelector?.dispose();
     this.layoutSelector = null;
   }
@@ -431,6 +456,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   protected render(): void {
     this.el.innerHTML = '';
     this.removeDrawingToolRail();
+    this.removeSelectedActionSurface();
     this.timeframeButtons.clear();
 
     // Symbol section
@@ -534,6 +560,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     if (this.options.userDrawingState) {
       this.el.appendChild(this.createElement('div', { style: styles.divider }));
       this.el.appendChild(this.renderDrawingToolbar());
+      this.renderSelectedActionSurface();
     }
 
     // Spacer
@@ -558,6 +585,101 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.drawingToolRailCleanup = [];
     this.drawingToolRailEl?.remove();
     this.drawingToolRailEl = null;
+  }
+
+  private removeSelectedActionSurface(): void {
+    this.selectedActionSurfaceEl?.remove();
+    this.selectedActionSurfaceEl = null;
+  }
+
+  private handleSelectedActionSurfaceItemClick(item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number]): void {
+    if (item.command.type === 'styleAction') {
+      if (item.command.visible !== undefined) {
+        this.options.onUserDrawingVisibilityChange?.(item.command.visible);
+      }
+      if (item.command.locked !== undefined) {
+        this.options.onUserDrawingLockedChange?.(item.command.locked, item.command.includeLocked);
+      }
+      return;
+    }
+
+    if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
+    if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
+    if (
+      item.command.action === 'bringForward' ||
+      item.command.action === 'sendBackward' ||
+      item.command.action === 'bringToFront' ||
+      item.command.action === 'sendToBack'
+    ) {
+      this.options.onUserDrawingZOrderChange?.(item.command.action);
+    }
+  }
+
+  private renderSelectedActionSurface(): void {
+    this.removeSelectedActionSurface();
+    const state = this.options.userDrawingState;
+    const anchor = this.options.userDrawingSelectionActionAnchor;
+    if (!state || !anchor) return;
+
+    const surface = resolveUserDrawingSelectedActionSurface(state);
+    if (!surface.selectedDrawing) return;
+    const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
+    const parentWidth = parent.getBoundingClientRect().width || window.innerWidth;
+    const halfWidth = 116;
+    const minCenterX = 8 + halfWidth;
+    const maxCenterX = Math.max(minCenterX, parentWidth - 8 - halfWidth);
+    const centerX = Math.max(minCenterX, Math.min(maxCenterX, anchor.anchor.x));
+
+    const el = this.createElement('div', {
+      style: {
+        ...styles.selectedActionSurface,
+        left: `${centerX}px`,
+        top: `${Math.max(WEB_CHART_CHROME_METRICS.topBarHeight + 6, anchor.anchor.y - 42)}px`,
+        transform: 'translateX(-50%)',
+      },
+      attributes: {
+        'aria-label': 'Selected drawing actions',
+      },
+    });
+    el.addEventListener('mousedown', (event) => event.stopPropagation());
+    el.addEventListener('mouseup', (event) => event.stopPropagation());
+    el.addEventListener('click', (event) => event.stopPropagation());
+
+    for (const group of surface.groups) {
+      const groupEl = this.createElement('div', { style: styles.selectedActionSurfaceGroup });
+      for (const item of group.items) {
+        const btn = this.createElement('button', {
+          style: {
+            ...styles.drawingButton,
+            opacity: item.enabled ? '1' : '0.35',
+            cursor: item.enabled ? 'pointer' : 'default',
+          },
+          textContent: item.icon,
+          attributes: {
+            type: 'button',
+            title: item.label,
+            'aria-label': item.label,
+          },
+        });
+        btn.disabled = !item.enabled;
+        if (item.enabled) {
+          btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
+          btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
+          btn.addEventListener('mouseleave', () => {
+            btn.style.backgroundColor = 'transparent';
+            btn.style.color = 'var(--text2, #787b86)';
+          });
+        }
+        groupEl.appendChild(btn);
+      }
+      el.appendChild(groupEl);
+      if (group !== surface.groups[surface.groups.length - 1]) {
+        el.appendChild(this.createElement('div', { style: styles.divider }));
+      }
+    }
+
+    this.selectedActionSurfaceEl = el;
+    parent.appendChild(el);
   }
 
   private renderDrawingToolRail(activeTool: UserDrawingTool): void {
@@ -702,7 +824,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     group.appendChild(this.createElement('div', { style: styles.divider }));
 
     const selectedDrawing = state ? getSelectedUserDrawing(state) : null;
-    const selectedActionSurface = state ? resolveUserDrawingSelectedActionSurface(state) : null;
     const styleEnabled = state ? isUserDrawingStyleToolbarEnabled(state) : false;
     const fillColorEnabled = state ? isUserDrawingFillToolbarEnabled(state) : false;
     const fillVisibilityEnabled = state ? isUserDrawingFillVisibilityToolbarEnabled(state) : false;
@@ -1364,57 +1485,17 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         group.appendChild(this.createElement('div', { style: styles.divider }));
       }
 
-      const visibilityActions = selectedActionSurface?.groups.find((actionGroup) => actionGroup.id === 'visibility');
-      for (const item of visibilityActions?.items ?? []) {
-        const enabled = item.enabled;
-        const btn = this.createElement('button', {
-          style: {
-            ...styles.drawingButton,
-            opacity: enabled ? '1' : '0.35',
-            cursor: enabled ? 'pointer' : 'default',
-          },
-          textContent: item.icon,
-          attributes: {
-            type: 'button',
-            title: item.label,
-            'aria-label': item.label,
-          },
-        });
-        btn.disabled = !enabled;
-        if (enabled) {
-          btn.addEventListener('click', () => {
-            if (item.command.type !== 'styleAction') return;
-            if (item.command.visible !== undefined) {
-              this.options.onUserDrawingVisibilityChange?.(item.command.visible);
-            }
-            if (item.command.locked !== undefined) {
-              this.options.onUserDrawingLockedChange?.(item.command.locked, item.command.includeLocked);
-            }
-          });
-          btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
-          btn.addEventListener('mouseleave', () => {
-            btn.style.backgroundColor = 'transparent';
-            btn.style.color = 'var(--text2, #787b86)';
-          });
-        }
-        group.appendChild(btn);
-      }
-
-      group.appendChild(this.createElement('div', { style: styles.divider }));
     }
 
-    const selectedActionItems = (selectedActionSurface?.groups ?? [])
-      .filter((actionGroup) => actionGroup.id !== 'visibility')
-      .flatMap((actionGroup) => actionGroup.items);
     const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
       (descriptor) => descriptor.action === 'cancelDraft' || descriptor.action === 'clearAll',
     );
-    for (const item of [...selectedActionItems, ...globalActionDescriptors.map((descriptor) => ({
+    for (const item of globalActionDescriptors.map((descriptor) => ({
       ...descriptor,
       id: descriptor.action,
       enabled: state ? isUserDrawingToolbarActionEnabled(state, descriptor.action) : false,
       command: { type: 'toolbarAction' as const, action: descriptor.action },
-    }))]) {
+    }))) {
       const enabled = item.enabled;
       const btn = this.createElement('button', {
         style: {
@@ -1433,16 +1514,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       if (enabled) {
         btn.addEventListener('click', () => {
           if (item.command.type !== 'toolbarAction') return;
-          if (item.command.action === 'duplicateSelected') this.options.onUserDrawingDuplicateSelected?.();
-          if (item.command.action === 'deleteSelected') this.options.onUserDrawingDeleteSelected?.();
-          if (
-            item.command.action === 'bringForward' ||
-            item.command.action === 'sendBackward' ||
-            item.command.action === 'bringToFront' ||
-            item.command.action === 'sendToBack'
-          ) {
-            this.options.onUserDrawingZOrderChange?.(item.command.action);
-          }
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
         });
@@ -1537,9 +1608,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.render();
   }
 
-  setUserDrawingState(state: UserDrawingState): void {
+  setUserDrawingState(state: UserDrawingState, options: { render?: boolean } = {}): void {
     this.options.userDrawingState = state;
-    this.render();
+    if (options.render !== false) this.render();
+  }
+
+  setUserDrawingSelectionActionAnchor(anchor: UserDrawingSelectionActionAnchor | null): void {
+    this.options.userDrawingSelectionActionAnchor = anchor;
+    this.renderSelectedActionSurface();
   }
 
   /**
