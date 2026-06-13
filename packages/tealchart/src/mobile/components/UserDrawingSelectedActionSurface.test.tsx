@@ -70,7 +70,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
       </div>,
     );
 
-    expect(screen.getByLabelText('Selected drawing actions').getAttribute('data-pointer-events')).toBe('box-none');
+    expect(screen.getByLabelText('Selected drawing actions').getAttribute('data-pointer-events')).toBe('auto');
 
     fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
     fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
