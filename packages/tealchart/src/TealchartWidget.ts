@@ -13,6 +13,7 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UserDrawingEditDrag,
+  UserDrawingCommandHistory,
   UserDrawingHandleRole,
   UserDrawingHitTestOptions,
   UserDrawingIconName,
@@ -39,14 +40,21 @@ import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } 
 
 import { LOADING_OPACITY } from './constants';
 import {
+  canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
+  canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
+  clearUserDrawingCommandHistory,
+  createUserDrawingCommandHistory,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
+  dispatchUserDrawingCommandWithHistory,
   isUserDrawingLayoutStateEqual,
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  redoUserDrawingCommand as redoUserDrawingCommandHistory,
   serializeUserDrawingStateForLayout,
+  undoUserDrawingCommand as undoUserDrawingCommandHistory,
 } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
@@ -138,6 +146,7 @@ export class TealchartWidget {
   private _plots: PlotOutput[] = [];
   private _drawings: DrawingOutput[] = [];
   private _userDrawingState: UserDrawingState;
+  private _userDrawingHistory: UserDrawingCommandHistory = createUserDrawingCommandHistory();
   private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
   private _userDrawingIdCounter = 0;
   private _userDrawingTextMeasureCtx: CanvasRenderingContext2D | null = null;
@@ -2184,6 +2193,7 @@ export class TealchartWidget {
   }
 
   importUserDrawingStateFromLayout(state?: UserDrawingState | null): void {
+    this._userDrawingHistory = clearUserDrawingCommandHistory(this._userDrawingHistory);
     this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState(), {
       markLayoutDirty: false,
     });
@@ -2202,6 +2212,32 @@ export class TealchartWidget {
 
   setActiveUserDrawingTool(tool: UserDrawingTool): void {
     this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+  }
+
+  canUndoUserDrawingCommand(): boolean {
+    return canUndoUserDrawingCommandHistory(this._userDrawingHistory);
+  }
+
+  canRedoUserDrawingCommand(): boolean {
+    return canRedoUserDrawingCommandHistory(this._userDrawingHistory);
+  }
+
+  undoUserDrawingCommand(): boolean {
+    const result = undoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
+    this._userDrawingHistory = result.history;
+    if (result.changed) {
+      this.setUserDrawingState(result.state);
+    }
+    return result.changed;
+  }
+
+  redoUserDrawingCommand(): boolean {
+    const result = redoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
+    this._userDrawingHistory = result.history;
+    if (result.changed) {
+      this.setUserDrawingState(result.state);
+    }
+    return result.changed;
   }
 
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
@@ -2376,7 +2412,8 @@ export class TealchartWidget {
   }
 
   private dispatchUserDrawingCommand(command: Parameters<typeof dispatchUserDrawingCommand>[1]): boolean {
-    const result = dispatchUserDrawingCommand(this._userDrawingState, command);
+    const result = dispatchUserDrawingCommandWithHistory(this._userDrawingState, this._userDrawingHistory, command);
+    this._userDrawingHistory = result.history;
     this.setUserDrawingState(result.state);
     return result.changed;
   }
@@ -2738,6 +2775,22 @@ export class TealchartWidget {
 
     // Don't capture events when user is typing in an input (e.g., modal search)
     if (this._isInputElement(e)) {
+      return;
+    }
+
+    const key = e.key.toLowerCase();
+    const isDrawingUndoKey = (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && key === 'z';
+    if (isDrawingUndoKey && this.undoUserDrawingCommand()) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+
+    const isDrawingRedoKey =
+      (e.metaKey || e.ctrlKey) && !e.altKey && ((e.shiftKey && key === 'z') || (!e.shiftKey && key === 'y'));
+    if (isDrawingRedoKey && this.redoUserDrawingCommand()) {
+      e.stopPropagation();
+      e.preventDefault();
       return;
     }
 

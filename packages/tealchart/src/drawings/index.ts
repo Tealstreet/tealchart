@@ -215,6 +215,23 @@ export type {
   UserDrawingCommandSource,
 } from './commands';
 export {
+  canRedoUserDrawingCommand,
+  canUndoUserDrawingCommand,
+  clearUserDrawingCommandHistory,
+  createUserDrawingCommandHistory,
+  DEFAULT_USER_DRAWING_HISTORY_CAPACITY,
+  dispatchUserDrawingCommandWithHistory,
+  redoUserDrawingCommand,
+  undoUserDrawingCommand,
+} from './history';
+export type {
+  UserDrawingCommandHistory,
+  UserDrawingCommandHistoryOptions,
+  UserDrawingHistoryDispatchResult,
+  UserDrawingHistoryEntry,
+  UserDrawingHistoryStepResult,
+} from './history';
+export {
   beginUserDrawingTextEdit,
   beginUserDrawingPathDrag,
   appendUserDrawingPathDragPoint,

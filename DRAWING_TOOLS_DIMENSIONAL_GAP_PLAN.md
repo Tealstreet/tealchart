@@ -116,6 +116,10 @@ Phase 3: Platform owners
 
 ### Epic 2.2: Drawing Undo/Redo History
 
+Status: shipped for existing committed drawing mutations with web keyboard/API
+controls and mobile Skia imperative handle controls. Further validation and
+future gesture-specific transaction hardening continues in Epic 2.3 and Gap 3.
+
 Phase 1: Shared history model
 
 - Add drawing-only undo and redo stacks with bounded capacity.
