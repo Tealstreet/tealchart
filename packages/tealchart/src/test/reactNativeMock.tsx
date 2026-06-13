@@ -4,7 +4,7 @@ import React from 'react';
 
 interface PressableProps {
   accessibilityLabel?: string;
-  accessibilityState?: { disabled?: boolean; selected?: boolean };
+  accessibilityState?: { disabled?: boolean; expanded?: boolean; selected?: boolean };
   children?: ReactNode | ((state: { pressed: boolean }) => ReactNode);
   disabled?: boolean;
   onPress?: () => void;
@@ -27,6 +27,7 @@ export function Pressable({ accessibilityLabel, accessibilityState, children, di
   return (
     <button
       aria-disabled={isDisabled ? 'true' : undefined}
+      aria-expanded={accessibilityState?.expanded === undefined ? undefined : accessibilityState.expanded ? 'true' : 'false'}
       aria-label={accessibilityLabel}
       aria-pressed={accessibilityState?.selected ? 'true' : 'false'}
       disabled={isDisabled}
