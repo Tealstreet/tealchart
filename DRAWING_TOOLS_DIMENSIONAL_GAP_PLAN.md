@@ -125,23 +125,33 @@ Phase 1: Shared history model
 - Add drawing-only undo and redo stacks with bounded capacity.
 - Store before/after committed drawing state for transaction-level undo.
 - Exclude transient hover and preview state from history.
+- Status: shared drawing command history ships with bounded undo/redo stacks,
+  before/after snapshots, transient-state exclusion, and command-event
+  metadata for web Canvas and mobile Skia callers.
 
 Phase 2: Transaction boundaries
 
 - Group drag gestures into one history entry.
 - Group text edit commit into one entry.
 - Group multi-select actions like delete/duplicate/z-order into one entry.
+- Status: placement, duplicate/edit drag, text edit commit, style,
+  lock/visibility, delete/duplicate, and z-order commands record coherent
+  transaction entries with redo clearing.
 
 Phase 3: Web keyboard/API integration
 
 - Add `Ctrl/Cmd+Z` undo and redo shortcuts on web when chart focus owns drawing
   keyboard input.
 - Expose widget APIs for undo/redo drawing commands.
+- Status: web widget APIs and keyboard shortcuts route undo/redo through the
+  shared drawing history while preserving chart focus/input ownership rules.
 
 Phase 4: Mobile handle/API integration
 
 - Add matching imperative handle methods for mobile Skia.
 - Add mobile-safe command dispatch so app toolbars can trigger undo/redo.
+- Status: mobile Skia handle and keyboard adapters route undo/redo through the
+  same shared drawing history and expose matching app-toolbar dispatch paths.
 
 ### Epic 2.3: History Validation
 
@@ -161,11 +171,16 @@ Phase 2: Web adapter tests
 
 - Test keyboard dispatch and focus rules.
 - Confirm existing chart shortcuts and pane interactions are not hijacked.
+- Status: web widget tests cover keyboard delete, undo/redo, copy/paste,
+  duplicate, and select-all ownership.
 
 Phase 3: Mobile adapter tests
 
 - Test imperative handle undo/redo.
 - Confirm Skia render model reflects restored drawing state.
+- Status: mobile command adapter tests cover undo/redo, copy/paste,
+  duplicate, select-all, nudge, and draft cancellation through the shared
+  keyboard/history path.
 
 ## Gap 3: Real Drawing Gesture Placement
 
@@ -173,11 +188,14 @@ Goal: replace click-only placement for shape tools with real drawing gestures
 while preserving click-to-place workflows where appropriate.
 
 Status: initial slice in progress. Shared placement modes and two-anchor drag
-placement commands exist for `trendLine`, `extendedLine`, `infoLine`,
-`arrowLine`, `arrowMarker`, `ray`, `rectangle`, `circle`, and `ellipse`; web
-Canvas and mobile Skia route those tools through matching drag preview/commit
-flows. Event-level web regression coverage now guards click preservation,
-mousemove promotion, and mouseup promotion through the pending-drawing path;
+placement commands exist for line, shape, measurement, forecasting, Fibonacci,
+Gann, cyclic, callout/price-note, image, and fixed-range volume profile tools;
+drag-seeded placement exists for multi-anchor geometric, channel, pitchfork,
+Fibonacci, forecasting, position, bars-pattern, Elliott, and harmonic-pattern
+tools. Web Canvas and mobile Skia route those tools through matching drag
+preview/commit flows. Event-level web regression coverage now guards click
+preservation, mousemove promotion, and mouseup promotion through the
+pending-drawing path;
 mobile command/gesture/render-model regression gates cover the sibling behavior.
 Placement constraints are wired through shared screen-space geometry: web uses
 Shift during drag, while mobile Skia exposes `constrainUserDrawingPlacement` for
@@ -415,9 +433,10 @@ Phase 3: Dismissal and focus
 ### Epic 4.4: Drawing Context Menu
 
 Status: initial drawing context menu shipped for properties, text edit, quick
-stroke/fill/text appearance style, duplicate, delete, z-order, visibility, and
-lock/unlock actions. Web right-click and mobile Skia long-press consume the same
-shared context-action resolver and preserve existing chart context menu
+stroke/fill/text appearance style, line visibility/opacity, text alignment,
+trend-line extension, icon library, duplicate, delete, z-order, visibility, and
+lock/unlock actions. Web right-click and mobile Skia long-press consume the
+same shared context-action resolver and preserve existing chart context menu
 behavior when no drawing is hit.
 
 Phase 1: Shared context action resolution
@@ -497,6 +516,9 @@ Phase 3: Multi-select
 
 - Support additive selection and bulk actions through existing grouped
   selection state.
+- Status: shared range/additive selection commands and multi-row mutation
+  actions resolve through existing grouped selection state for web object-tree
+  hosts.
 
 ### Epic 5.3: Mobile Object Tree Surface
 
@@ -517,6 +539,10 @@ Phase 2: Row actions
   command resolver with mobile-owned duplicate ID generation.
 
 Phase 3: Multi-select
+
+- Status: mobile object-tree dispatch consumes the same shared additive/range
+  selection and multi-row mutation commands as web, with mobile-owned duplicate
+  ID generation.
 
 - Support mobile-friendly multi-select and bulk actions.
 
