@@ -156,7 +156,10 @@ import {
   isMobileChartGestureLayerEnabled,
   isMobileCrosshairPanGestureEnabled,
 } from './mobile/utils/drawingGestureMode';
-import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+import {
+  resolveMobileUserDrawingInputPoint,
+  resolveMobileUserDrawingPlacementConstraintEnabled,
+} from './mobile/utils/drawingInput';
 import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/drawingEditIntent';
 import {
   exportMobileUserDrawingStateForLayout,
@@ -301,6 +304,9 @@ export interface SkiaTealchartHandle {
   duplicateUserDrawing(drawingId?: string): boolean;
   duplicateSelectedUserDrawing(): boolean;
   beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean;
+  setUserDrawingPlacementConstraint(constrained: boolean): void;
+  clearUserDrawingPlacementConstraint(): void;
+  isUserDrawingPlacementConstrained(): boolean;
   copySelectedUserDrawing(): boolean;
   pasteUserDrawingClipboard(): boolean;
   clearUserDrawingClipboard(): void;
@@ -500,6 +506,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
   const userDrawingPlacementDragStartPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
+  const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
@@ -757,6 +764,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         userDrawingEditDragTransactionKeyRef.current = transactionKey;
         return true;
       },
+      setUserDrawingPlacementConstraint(constrained: boolean): void {
+        userDrawingPlacementConstraintOverrideRef.current = constrained;
+      },
+      clearUserDrawingPlacementConstraint(): void {
+        userDrawingPlacementConstraintOverrideRef.current = null;
+      },
+      isUserDrawingPlacementConstrained(): boolean {
+        return resolveMobileUserDrawingPlacementConstraintEnabled({
+          propConstrained: constrainUserDrawingPlacement,
+          overrideConstrained: userDrawingPlacementConstraintOverrideRef.current,
+        });
+      },
       copySelectedUserDrawing(): boolean {
         const clipboard = createUserDrawingClipboard(userDrawingStateRef.current);
         if (!clipboard) return false;
@@ -954,6 +973,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }),
     [
       commitUserDrawingState,
+      constrainUserDrawingPlacement,
       createUserDrawingId,
       dispatchUserDrawingCommandToState,
       dispatchUserDrawingCommandToStateWithResult,
@@ -1146,7 +1166,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         startPoint: userDrawingPlacementDragStartPointRef.current,
         currentPoint: point,
         spacesByPaneId: userDrawingSpacesByPaneId,
-        options: { constrainedPlacement: constrainUserDrawingPlacement },
+        options: {
+          constrainedPlacement: resolveMobileUserDrawingPlacementConstraintEnabled({
+            propConstrained: constrainUserDrawingPlacement,
+            overrideConstrained: userDrawingPlacementConstraintOverrideRef.current,
+          }),
+        },
       }),
     [constrainUserDrawingPlacement, userDrawingSpacesByPaneId],
   );
