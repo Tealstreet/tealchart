@@ -15,6 +15,7 @@ import {
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingStyleToolbarAction,
+  shouldRenderUserDrawingSelectedActionSurface,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
   supportsUserDrawingFillVisibilityControls,
@@ -1526,6 +1527,61 @@ describe('user drawing toolbar descriptors', () => {
       ['lockSelected', true, { type: 'styleAction', action: 'lockSelected', locked: true }],
       ['unlockSelected', false, { type: 'styleAction', action: 'unlockSelected' }],
     ]);
+  });
+
+  it('hides selected action surfaces during transient editing states', () => {
+    const anchor = {
+      anchor: { x: 100, y: 80 },
+      bounds: { x: 80, y: 70, width: 40, height: 20 },
+      drawingIds: ['front'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    };
+    const selected = {
+      ...state,
+      selection: { drawingId: 'front' },
+      drawings: [
+        {
+          id: 'front',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    expect(shouldRenderUserDrawingSelectedActionSurface(selected, anchor)).toBe(true);
+    expect(shouldRenderUserDrawingSelectedActionSurface(selected, null)).toBe(false);
+    expect(shouldRenderUserDrawingSelectedActionSurface({ ...selected, selection: null }, anchor)).toBe(false);
+    expect(
+      shouldRenderUserDrawingSelectedActionSurface(
+        {
+          ...selected,
+          draft: {
+            tool: 'rectangle',
+            paneId: 'main',
+            anchors: [{ time: 1, price: 10 }],
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            startedAt: 1,
+          },
+        },
+        anchor,
+      ),
+    ).toBe(false);
+    expect(
+      shouldRenderUserDrawingSelectedActionSurface(
+        {
+          ...selected,
+          textEdit: { drawingId: 'front', value: 'note', originalValue: 'note', startedAt: 1 },
+        },
+        anchor,
+      ),
+    ).toBe(false);
   });
 
   it('enables selected text edit actions only for unlocked text drawings', () => {
