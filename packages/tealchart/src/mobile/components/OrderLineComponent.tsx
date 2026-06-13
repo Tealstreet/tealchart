@@ -48,7 +48,10 @@ export interface OrderLineComponentProps {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum touch target per accessibility guidelines
 const LABEL_HEIGHT = 18;
+const BASE_LABEL_WIDTH = 100;
+const BUILT_IN_ACTION_WIDTH = 18;
 const TP_SL_BUTTON_WIDTH = 24;
+const BRACKET_BUTTON_GAP = 6;
 const TP_COLOR = '#22c55e'; // Green for take profit
 const SL_COLOR = '#f97316'; // Orange for stop loss
 export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
@@ -328,6 +331,14 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     () => (order.actions ?? []).filter((action) => action.type === 'action' && action.actionId),
     [order.actions],
   );
+  const labelGroupWidth = useMemo(
+    () =>
+      BASE_LABEL_WIDTH +
+      (order.cancellable ? BUILT_IN_ACTION_WIDTH : 0) +
+      (showBrackets ? BRACKET_BUTTON_GAP + TP_SL_BUTTON_WIDTH * 2 : 0) +
+      customActions.length * TP_SL_BUTTON_WIDTH,
+    [customActions.length, order.cancellable, showBrackets],
+  );
 
   return (
     <Animated.View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }, animatedContainerStyle]}>
@@ -355,7 +366,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             styles.dragHandle,
             {
               left: labelX,
-              width: 100, // Approximate label width - drag handle over label area
+              width: BASE_LABEL_WIDTH, // Approximate text segment width - drag handle over label area
               height: TOUCH_TARGET_HEIGHT,
             },
           ]}
@@ -486,7 +497,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
         style={[
           styles.lineSegment,
           {
-            left: labelX + 100 + 2, // After label
+            left: labelX + labelGroupWidth + 2, // After label/actions
             right: dimensions.margins.right + 60, // Before price axis label
             top: TOUCH_TARGET_HEIGHT / 2,
             borderBottomColor: order.lineColor,

@@ -47,7 +47,10 @@ export interface PositionLineComponentProps {
 
 const TOUCH_TARGET_HEIGHT = 44;
 const LABEL_HEIGHT = 18;
+const BASE_LABEL_WIDTH = 180;
+const BUILT_IN_ACTION_WIDTH = 18;
 const TP_SL_BUTTON_WIDTH = 24;
+const BRACKET_BUTTON_GAP = 4;
 const TP_COLOR = '#22c55e'; // Green for take profit
 const SL_COLOR = '#f97316'; // Orange for stop loss
 
@@ -310,6 +313,15 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     () => (position.actions ?? []).filter((action) => action.type === 'action' && action.actionId),
     [position.actions],
   );
+  const labelGroupWidth = useMemo(
+    () =>
+      BASE_LABEL_WIDTH +
+      (showBrackets ? BRACKET_BUTTON_GAP + TP_SL_BUTTON_WIDTH * 2 : 0) +
+      (position.closeable ? BUILT_IN_ACTION_WIDTH : 0) +
+      (position.reversible ? BUILT_IN_ACTION_WIDTH : 0) +
+      customActions.length * TP_SL_BUTTON_WIDTH,
+    [customActions.length, position.closeable, position.reversible, showBrackets],
+  );
 
   return (
     <View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }]}>
@@ -494,7 +506,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         style={[
           styles.lineSegment,
           {
-            left: labelX + 180, // After label
+            left: labelX + labelGroupWidth, // After label/actions
             right: dimensions.margins.right + 60,
             top: TOUCH_TARGET_HEIGHT / 2,
             borderBottomColor: position.lineColor,

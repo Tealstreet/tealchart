@@ -59,7 +59,7 @@ export {
   AVAILABLE_TIMEFRAMES,
   DEFAULT_CHART_SETTINGS,
 } from './state/chartState';
-export type { ChartSettings, TimeframeOption, IndicatorInstance } from './state/chartState';
+export type { ChartSettings, IndicatorInstance, PlotStyleOverride, TimeframeOption } from './state/chartState';
 
 // Indicator CRUD actions
 export {
@@ -522,6 +522,8 @@ export type {
   PriceLineLabel,
   PriceLineLabelBounds,
   ExecutionLineRenderData,
+  OrderLineRenderData,
+  PositionLineRenderData,
   // TradingView-compatible types
   WidgetEvent,
   ResolutionString,
