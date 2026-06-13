@@ -1138,6 +1138,14 @@ describe('TealchartWidget', () => {
       });
       expect(additive).toEqual(expect.objectContaining({ hit: true, changed: true }));
       expect(widget.getUserDrawingState().selection).toBeNull();
+
+      testWidget._handleUserDrawingSelection({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]));
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
+
+      const miss = testWidget._handleUserDrawingSelection({ x: 40, y: 20 }, new Map([['main', userDrawingSpace]]));
+      expect(miss).toEqual(expect.objectContaining({ hit: false, changed: true }));
+      expect(widget.getUserDrawingState().selection).toBeNull();
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
     });
 
     it('edits selected drawings from chart-surface drag input in select mode', () => {

@@ -402,6 +402,9 @@ Phase 3: Dismissal and focus
 - Status: selected-action surfaces now use a shared visibility guard so web
   floating toolbar actions dismiss during transient draft/text-edit states while
   retaining pointer-event isolation for toolbar clicks.
+- Status: web widget coverage now pins the chart-surface selection-miss route
+  that clears selection without recording undo history, dismissing selected
+  action surfaces through the shared selection/anchor state.
 
 ### Epic 4.3: Mobile Selection Action Sheet
 
@@ -435,6 +438,8 @@ Phase 3: Dismissal and focus
 - Status: mobile Skia action strip consumes the same shared visibility guard as
   web, so transient draft/text-edit states hide selected actions without
   diverging from Canvas behavior.
+- Status: mobile command-adapter coverage now pins touch selection misses
+  clearing selection and hiding the shared selected action surface model.
 
 ### Epic 4.4: Drawing Context Menu
 
