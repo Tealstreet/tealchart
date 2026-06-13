@@ -501,6 +501,9 @@ Phase 2: Properties popover
 Phase 3: History and focus
 
 - Commit text/property changes as one undoable transaction.
+- Status: properties surface controls now convert through shared drawing
+  commands and web widget dispatch so property changes use the command/history
+  owner path.
 
 ### Epic 6.3: Mobile Double-Tap Editing
 
@@ -520,6 +523,8 @@ Phase 2: Properties sheet
 Phase 3: History and focus
 
 - Commit mobile text/property changes as one undoable transaction.
+- Status: mobile Skia handle parity now dispatches properties surface controls
+  through the same shared drawing command conversion path.
 
 ## Gap 7: Keyboard and Modifier Behavior
 

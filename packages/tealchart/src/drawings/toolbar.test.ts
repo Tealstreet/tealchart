@@ -46,7 +46,7 @@ import {
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
-import { resolveUserDrawingPropertiesSurface } from './propertiesSurface';
+import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 import type { UserDrawing, UserDrawingState } from './types';
 
 const state: UserDrawingState = {
@@ -1883,6 +1883,38 @@ describe('user drawing toolbar descriptors', () => {
     });
     expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textColor:#d1d4dc')).toMatchObject({
       selected: true,
+    });
+  });
+
+  it('converts properties surface controls to drawing commands', () => {
+    expect(
+      resolveUserDrawingPropertiesSurfaceCommand(
+        { type: 'updateStyle', style: { lineColor: '#38bdf8' } },
+        { drawingId: 'line', source: 'api' },
+      ),
+    ).toEqual({
+      type: 'updateStyle',
+      style: { lineColor: '#38bdf8' },
+      options: { drawingId: 'line' },
+      meta: { source: 'api' },
+    });
+    expect(
+      resolveUserDrawingPropertiesSurfaceCommand({ type: 'setTextAlign', textAlign: 'right' }, { drawingId: 'text' }),
+    ).toEqual({
+      type: 'setTextAlign',
+      textAlign: 'right',
+      options: { drawingId: 'text' },
+      meta: { source: 'toolbar' },
+    });
+    expect(resolveUserDrawingPropertiesSurfaceCommand({ type: 'setTrendLineExtend', extend: 'both' })).toMatchObject({
+      type: 'setTrendLineExtend',
+      extend: 'both',
+      meta: { source: 'toolbar' },
+    });
+    expect(resolveUserDrawingPropertiesSurfaceCommand({ type: 'setIconName', iconName: 'flag' })).toMatchObject({
+      type: 'setIconName',
+      iconName: 'flag',
+      meta: { source: 'toolbar' },
     });
   });
 });

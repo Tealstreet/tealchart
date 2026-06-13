@@ -1,4 +1,11 @@
 import type {
+  UserDrawingCommand,
+  UserDrawingCommandSource,
+} from './commands';
+import type {
+  UpdateUserDrawingOptions,
+} from './input';
+import type {
   UserDrawing,
   UserDrawingFontFamily,
   UserDrawingFontStyle,
@@ -88,12 +95,35 @@ export interface UserDrawingPropertiesSurface {
   groups: readonly UserDrawingPropertiesSurfaceGroup[];
 }
 
+export interface ResolveUserDrawingPropertiesSurfaceCommandOptions extends UpdateUserDrawingOptions {
+  source?: Extract<UserDrawingCommandSource, 'api' | 'toolbar'>;
+}
+
 function normalizeSurfaceColor(value: string | undefined): string {
   return (value ?? '').toLowerCase().replace(/\s+/g, '');
 }
 
 function colorsMatch(a: string | undefined, b: string): boolean {
   return normalizeSurfaceColor(a) === normalizeSurfaceColor(b);
+}
+
+export function resolveUserDrawingPropertiesSurfaceCommand(
+  command: UserDrawingPropertiesSurfaceCommand,
+  options: ResolveUserDrawingPropertiesSurfaceCommandOptions = {},
+): UserDrawingCommand {
+  const { source = 'toolbar', ...updateOptions } = options;
+  const meta = { source };
+
+  if (command.type === 'updateStyle') {
+    return { type: 'updateStyle', style: command.style, options: updateOptions, meta };
+  }
+  if (command.type === 'setTextAlign') {
+    return { type: 'setTextAlign', textAlign: command.textAlign, options: updateOptions, meta };
+  }
+  if (command.type === 'setTrendLineExtend') {
+    return { type: 'setTrendLineExtend', extend: command.extend, options: updateOptions, meta };
+  }
+  return { type: 'setIconName', iconName: command.iconName, options: updateOptions, meta };
 }
 
 export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, drawingId?: string): UserDrawingPropertiesSurface {

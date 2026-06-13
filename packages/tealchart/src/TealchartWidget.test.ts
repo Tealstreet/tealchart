@@ -1110,6 +1110,15 @@ describe('TealchartWidget', () => {
         drawing: { id: 'locked', kind: 'rectangle' },
         editable: false,
       });
+      expect(
+        widget.dispatchUserDrawingPropertiesSurfaceCommand(
+          { type: 'updateStyle', style: { lineColor: '#38bdf8' } },
+          { drawingId: 'line' },
+        ),
+      ).toBe(true);
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'line')?.style.lineColor).toBe(
+        '#38bdf8',
+      );
 
       const opened = widget.openUserDrawingProperties('locked');
       expect(onOpenProperties).toHaveBeenCalledWith(opened);
