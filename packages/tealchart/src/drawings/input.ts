@@ -219,6 +219,7 @@ function cloneAnchor(anchor: UserDrawingAnchor): UserDrawingAnchor {
 function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number): UserDrawing {
   const base = {
     id,
+    name: drawing.name,
     paneId: drawing.paneId,
     visible: drawing.visible,
     locked: drawing.locked,
@@ -464,6 +465,25 @@ export function duplicateUserDrawing(
     draft: null,
     textEdit: null,
   };
+}
+
+export function setUserDrawingName(
+  state: UserDrawingState,
+  drawingId: string,
+  name: string | null,
+  options: Pick<UpdateUserDrawingOptions, 'includeLocked' | 'now'> = {},
+): UserDrawingState {
+  const target = findUserDrawingForUpdate(state, { drawingId, includeLocked: options.includeLocked });
+  if (!target) return state;
+
+  const normalizedName = name?.trim() || undefined;
+  if (target.drawing.name === normalizedName) return state;
+
+  return replaceUserDrawing(state, target.index, {
+    ...target.drawing,
+    name: normalizedName,
+    updatedAt: options.now?.() ?? Date.now(),
+  });
 }
 
 export function clearUserDrawings(state: UserDrawingState): UserDrawingState {

@@ -1,3 +1,5 @@
+import type { UserDrawingCommand } from './commands';
+import type { DuplicateUserDrawingOptions, UpdateUserDrawingOptions, UserDrawingZOrderAction } from './input';
 import type { UserDrawing, UserDrawingKind, UserDrawingState, UserDrawingTool } from './types';
 
 import { getUserDrawingSelectionIds } from './input';
@@ -34,6 +36,30 @@ export interface UserDrawingObjectTreeModel {
   drawingCount: number;
 }
 
+export type UserDrawingObjectTreeSelectionAction =
+  | { type: 'select'; drawingId: string; additive?: boolean }
+  | { type: 'selectRange'; anchorDrawingId: string; targetDrawingId: string; order?: UserDrawingObjectTreeOrder };
+
+export type UserDrawingObjectTreeMutationAction =
+  | { type: 'delete'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'duplicate'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'hide'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'show'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'lock'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'unlock'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'bringForward'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'sendBackward'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'bringToFront'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'sendToBack'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | { type: 'rename'; drawingId: string; name: string | null; includeLocked?: boolean };
+
+export type UserDrawingObjectTreeAction = UserDrawingObjectTreeSelectionAction | UserDrawingObjectTreeMutationAction;
+
+export interface UserDrawingObjectTreeCommandOptions {
+  createId?: DuplicateUserDrawingOptions['createId'];
+  now?: UpdateUserDrawingOptions['now'];
+}
+
 function resolveUserDrawingObjectTreeRow(
   drawing: UserDrawing,
   drawingIndex: number,
@@ -41,15 +67,16 @@ function resolveUserDrawingObjectTreeRow(
   selectedIds: ReadonlySet<string>,
 ): UserDrawingObjectTreeRow {
   const descriptor = getUserDrawingToolDescriptor(drawing.kind);
+  const customName = drawing.name?.trim() || null;
 
   return {
     id: drawing.id,
     drawingId: drawing.id,
     kind: drawing.kind,
     tool: drawing.kind,
-    label: descriptor.label,
+    label: customName ?? descriptor.label,
     defaultLabel: descriptor.label,
-    customName: null,
+    customName,
     icon: descriptor.icon,
     paneId: drawing.paneId,
     visible: drawing.visible,
@@ -78,4 +105,122 @@ export function resolveUserDrawingObjectTreeModel(
     selectedIds,
     drawingCount: state.drawings.length,
   };
+}
+
+function getObjectTreeActionDrawingIds(state: UserDrawingState, drawingIds?: readonly string[]): readonly string[] {
+  return drawingIds && drawingIds.length > 0 ? [...new Set(drawingIds)] : getUserDrawingSelectionIds(state.selection);
+}
+
+function getObjectTreeSelectionCommands(
+  state: UserDrawingState,
+  drawingIds: readonly string[],
+): readonly UserDrawingCommand[] {
+  if (drawingIds.length === 0) return [];
+  const selectedIds = getUserDrawingSelectionIds(state.selection);
+  if (selectedIds.length === drawingIds.length && selectedIds.every((drawingId, index) => drawingId === drawingIds[index])) return [];
+  return drawingIds.length === 1
+    ? [{ type: 'select', drawingId: drawingIds[0]!, meta: { source: 'objectTree' } }]
+    : [{ type: 'selectMany', drawingIds, meta: { source: 'objectTree' } }];
+}
+
+function getObjectTreeUpdateOptions(
+  action: Extract<UserDrawingObjectTreeMutationAction, { drawingIds?: readonly string[]; includeLocked?: boolean }>,
+  drawingIds: readonly string[],
+  now?: UpdateUserDrawingOptions['now'],
+): UpdateUserDrawingOptions {
+  const options: UpdateUserDrawingOptions = {};
+  if (drawingIds.length === 1) options.drawingId = drawingIds[0];
+  if (action.includeLocked !== undefined) options.includeLocked = action.includeLocked;
+  if (now) options.now = now;
+  return options;
+}
+
+function getObjectTreeZOrderAction(action: UserDrawingObjectTreeMutationAction['type']): UserDrawingZOrderAction | null {
+  switch (action) {
+    case 'bringForward':
+    case 'sendBackward':
+    case 'bringToFront':
+    case 'sendToBack':
+      return action;
+    default:
+      return null;
+  }
+}
+
+function resolveUserDrawingObjectTreeRangeSelection(
+  state: UserDrawingState,
+  action: Extract<UserDrawingObjectTreeSelectionAction, { type: 'selectRange' }>,
+): readonly string[] {
+  const rows = resolveUserDrawingObjectTreeModel(state, { order: action.order }).rows;
+  const anchorIndex = rows.findIndex((row) => row.drawingId === action.anchorDrawingId);
+  const targetIndex = rows.findIndex((row) => row.drawingId === action.targetDrawingId);
+  if (anchorIndex < 0 || targetIndex < 0) return [];
+
+  const start = Math.min(anchorIndex, targetIndex);
+  const end = Math.max(anchorIndex, targetIndex);
+  return rows.slice(start, end + 1).map((row) => row.drawingId);
+}
+
+export function resolveUserDrawingObjectTreeActionCommands(
+  state: UserDrawingState,
+  action: UserDrawingObjectTreeAction,
+  options: UserDrawingObjectTreeCommandOptions = {},
+): readonly UserDrawingCommand[] {
+  if (action.type === 'select') {
+    const selectedIds = action.additive
+      ? [...new Set([...getUserDrawingSelectionIds(state.selection), action.drawingId])]
+      : [action.drawingId];
+    return getObjectTreeSelectionCommands(state, selectedIds);
+  }
+
+  if (action.type === 'selectRange') {
+    return getObjectTreeSelectionCommands(state, resolveUserDrawingObjectTreeRangeSelection(state, action));
+  }
+
+  if (action.type === 'rename') {
+    const commandOptions: UpdateUserDrawingOptions = {};
+    if (action.includeLocked !== undefined) commandOptions.includeLocked = action.includeLocked;
+    if (options.now) commandOptions.now = options.now;
+    return [
+      {
+        type: 'setName',
+        drawingId: action.drawingId,
+        name: action.name,
+        options: commandOptions,
+        meta: { source: 'objectTree', affectedIds: [action.drawingId] },
+      },
+    ];
+  }
+
+  const drawingIds = getObjectTreeActionDrawingIds(state, action.drawingIds);
+  if (drawingIds.length === 0) return [];
+
+  const selectionCommands = action.drawingIds ? getObjectTreeSelectionCommands(state, drawingIds) : [];
+  const updateOptions = getObjectTreeUpdateOptions(action, drawingIds, options.now);
+  const meta = { source: 'objectTree' as const, affectedIds: drawingIds };
+  const zOrderAction = getObjectTreeZOrderAction(action.type);
+
+  if (zOrderAction) {
+    return [...selectionCommands, { type: 'reorder', action: zOrderAction, options: updateOptions, meta }];
+  }
+
+  switch (action.type) {
+    case 'delete':
+      return [...selectionCommands, { type: 'delete', options: updateOptions, meta }];
+    case 'duplicate':
+      return options.createId
+        ? [
+            ...selectionCommands,
+            { type: 'duplicate', options: { ...updateOptions, createId: options.createId }, meta },
+          ]
+        : [];
+    case 'hide':
+    case 'show':
+      return [...selectionCommands, { type: 'setVisibility', visible: action.type === 'show', options: updateOptions, meta }];
+    case 'lock':
+    case 'unlock':
+      return [...selectionCommands, { type: 'setLocked', locked: action.type === 'lock', options: updateOptions, meta }];
+    default:
+      return [];
+  }
 }
