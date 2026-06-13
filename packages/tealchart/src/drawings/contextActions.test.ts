@@ -72,6 +72,7 @@ describe('user drawing context actions', () => {
     expect(result.state.selection).toEqual({ drawingId: 'front' });
     expect(result.items.map((item) => [item.id, item.groupId, item.enabled, item.command])).toEqual([
       ['openProperties', 'primary', true, { type: 'openProperties' }],
+      ['openObjectTree', 'primary', true, { type: 'openObjectTree' }],
       ['duplicateSelected', 'primary', true, { type: 'toolbarAction', action: 'duplicateSelected' }],
       ['deleteSelected', 'primary', true, { type: 'toolbarAction', action: 'deleteSelected' }],
       ['lineColor:#22c55e', 'style', true, { type: 'updateStyle', style: { lineColor: '#22c55e' } }],

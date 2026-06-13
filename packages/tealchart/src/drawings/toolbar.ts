@@ -40,11 +40,15 @@ export type UserDrawingStyleToolbarAction = 'hideSelected' | 'showSelected' | 'l
 export type UserDrawingSelectedActionSurfaceAction =
   | Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>
   | UserDrawingStyleToolbarAction
-  | 'openProperties';
+  | 'openProperties'
+  | 'openObjectTree';
 export type UserDrawingSelectedActionSurfaceGroupId = 'primary' | 'style' | 'arrange' | 'visibility';
 export type UserDrawingSelectedActionSurfaceCommand =
   | {
       type: 'openProperties';
+    }
+  | {
+      type: 'openObjectTree';
     }
   | {
       type: 'updateStyle';
@@ -668,6 +672,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
         command: { type: 'openProperties' },
       },
       {
+        id: 'openObjectTree',
+        icon: '☰',
+        label: 'Open drawing object tree',
+        enabled: false,
+        command: { type: 'openObjectTree' },
+      },
+      {
         ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[0]!,
         id: 'duplicateSelected',
         enabled: false,
@@ -841,6 +852,12 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
           return {
             ...item,
             enabled: selectedDrawing !== null,
+          };
+        }
+        if (item.command.type === 'openObjectTree') {
+          return {
+            ...item,
+            enabled: state.drawings.length > 0,
           };
         }
         if (item.command.type === 'updateStyle') {
