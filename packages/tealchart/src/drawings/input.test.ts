@@ -58,6 +58,7 @@ const expandedDragPlacementTools: UserDrawingTool[] = [
   'forecast',
   'callout',
   'priceNote',
+  'image',
   'fibRetracement',
   'fibExtension',
   'fibFan',
