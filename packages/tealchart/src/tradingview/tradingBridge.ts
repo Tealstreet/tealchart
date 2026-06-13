@@ -18,6 +18,7 @@ const PRICE_AXIS_GAP = 64;
 const ACTION_WIDTH = 24;
 const BUILT_IN_ACTION_WIDTH = 18;
 const BRACKET_GAP = 6;
+const DRAG_THRESHOLD_PX = 3;
 const DEFAULT_ORDER_COLOR = '#3b82f6';
 const DEFAULT_POSITION_COLOR = '#22c55e';
 const DEFAULT_SELL_COLOR = '#ef4444';
@@ -50,6 +51,7 @@ interface HitTarget {
 
 interface ActiveDrag {
   line: ChartTradingOrderLine;
+  start: Point;
 }
 
 export interface TradingViewTradingBridgeOptions {
@@ -75,6 +77,8 @@ export class TradingViewTradingBridge {
 
   setState(state: ChartTradingState): void {
     this.state = cloneTradingState(state);
+    this.hitTargets = [];
+    this.activeDrag = null;
   }
 
   getState(): ChartTradingState {
@@ -173,6 +177,9 @@ export class TradingViewTradingBridge {
   handlePointerUp(point: Point): void {
     if (!this.activeDrag || !this.lastFrame) return;
     const line = this.activeDrag.line;
+    if (distance(this.activeDrag.start, point) < DRAG_THRESHOLD_PX) {
+      return;
+    }
     this.emit({
       type: 'order.move.commit',
       source: 'tradingview-bridge',
@@ -185,7 +192,12 @@ export class TradingViewTradingBridge {
 
   draw(frame: TradingViewRenderFrameInput): void {
     const normalized = normalizeTradingViewRenderFrame(frame);
-    if (!normalized) return;
+    if (!normalized) {
+      this.lastFrame = null;
+      this.hitTargets = [];
+      this.activeDrag = null;
+      return;
+    }
 
     this.lastFrame = normalized;
     this.hitTargets = [];
@@ -396,7 +408,7 @@ export class TradingViewTradingBridge {
   private handleHitStart(hit: HitTarget, point: Point): void {
     switch (hit.action.type) {
       case 'order-line':
-        this.activeDrag = { line: hit.action.line };
+        this.activeDrag = { line: hit.action.line, start: point };
         break;
       case 'order-cancel':
         this.emit({
@@ -567,6 +579,10 @@ function fontSize(ctx: CanvasRenderingContext2D, size: number): number {
 
 function contains(rect: Rect, point: Point): boolean {
   return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+}
+
+function distance(a: Point, b: Point): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
 function elementBounds(element: Element | null | undefined): DOMRect | null {

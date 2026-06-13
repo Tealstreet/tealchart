@@ -168,6 +168,73 @@ describe('TradingViewTradingBridge', () => {
     });
   });
 
+  it('does not emit order move commits for line clicks without a drag', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 30, y: 100 });
+    bridge.handlePointerUp({ x: 31, y: 101 });
+
+    expect(onIntent).not.toHaveBeenCalled();
+  });
+
+  it('invalidates hit targets when state changes or frames cannot normalize', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+            cancellable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.setState({});
+    bridge.handlePointerDown({ x: 326, y: 100 });
+    bridge.handlePointerDown({ x: 30, y: 100 });
+    bridge.handlePointerUp({ x: 30, y: 80 });
+
+    bridge.setState({
+      orders: [
+        {
+          kind: 'order',
+          id: 'order-1',
+          orderId: 'external-order-1',
+          price: 100,
+          editable: true,
+          cancellable: true,
+        },
+      ],
+    });
+    bridge.draw(frame(createRecordingContext()));
+    bridge.draw({ ctx: createRecordingContext(), bars: [], candleCoords: [], priceToCoord: (price) => price, coordToPrice: (coord) => coord });
+    bridge.handlePointerDown({ x: 326, y: 100 });
+
+    expect(onIntent).not.toHaveBeenCalled();
+  });
+
   it('maps attached pointer events through the rendered canvas bounds', () => {
     const onIntent = vi.fn();
     const bridge = new TradingViewTradingBridge({
