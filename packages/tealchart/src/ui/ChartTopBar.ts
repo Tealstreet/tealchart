@@ -54,6 +54,7 @@ import {
   USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
+import { computeLeftToolRailTop, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { Component } from './Component';
 import { LayoutSelector } from './LayoutSelector';
 
@@ -217,8 +218,8 @@ const styles = {
 
   drawingToolRail: {
     position: 'absolute',
-    top: '40px',
-    left: '8px',
+    top: `${computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)}px`,
+    left: `${WEB_CHART_CHROME_METRICS.leftToolRailInset}px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

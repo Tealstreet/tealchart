@@ -60,6 +60,7 @@ import {
   USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../../drawings';
+import { computeLeftToolRailTop, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 
 export interface ChartTopBarComponentProps {
@@ -111,7 +112,7 @@ export interface ChartTopBarComponentProps {
   onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
 }
 
-const TOP_BAR_HEIGHT = 36;
+const TOP_BAR_HEIGHT = MOBILE_CHART_CHROME_METRICS.topBarHeight;
 type PressableStyleState = { pressed: boolean };
 
 export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
@@ -1070,8 +1071,8 @@ const styles = StyleSheet.create({
   },
   drawingToolRail: {
     position: 'absolute',
-    top: TOP_BAR_HEIGHT + 8,
-    left: 8,
+    top: computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS),
+    left: MOBILE_CHART_CHROME_METRICS.leftToolRailInset,
     zIndex: 8,
     paddingVertical: 6,
     paddingHorizontal: 4,
