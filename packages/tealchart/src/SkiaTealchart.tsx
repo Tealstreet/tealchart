@@ -166,6 +166,7 @@ import { intervalToMs } from './viewport/viewScale';
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
+const USER_DRAWING_ACTION_SURFACE_WIDTH = 268;
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
 
@@ -4173,7 +4174,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           style={[
             styles.userDrawingActionSurface,
             {
-              left: Math.max(8, Math.min(dimensions.width - 232, userDrawingSelectionActionAnchor.anchor.x - 112)),
+              left: Math.max(
+                8,
+                Math.min(
+                  Math.max(8, dimensions.width - USER_DRAWING_ACTION_SURFACE_WIDTH - 8),
+                  userDrawingSelectionActionAnchor.anchor.x - USER_DRAWING_ACTION_SURFACE_WIDTH / 2,
+                ),
+              ),
               top: Math.max(TOP_BAR_HEIGHT + 6, userDrawingSelectionActionAnchor.anchor.y - 42),
             },
           ]}
@@ -4366,7 +4373,7 @@ const styles = StyleSheet.create({
   userDrawingActionSurface: {
     position: 'absolute',
     zIndex: 9,
-    minWidth: 224,
+    width: USER_DRAWING_ACTION_SURFACE_WIDTH,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,

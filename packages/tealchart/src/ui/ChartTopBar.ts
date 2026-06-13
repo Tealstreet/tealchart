@@ -124,6 +124,8 @@ interface ChartTopBarState {
 // Styles
 // ============================================================================
 
+const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 268;
+
 const styles = {
   container: {
     display: 'flex',
@@ -625,7 +627,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     if (!surface.selectedDrawing) return;
     const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
     const parentWidth = parent.getBoundingClientRect().width || window.innerWidth;
-    const halfWidth = 116;
+    const halfWidth = SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH / 2;
     const minCenterX = 8 + halfWidth;
     const maxCenterX = Math.max(minCenterX, parentWidth - 8 - halfWidth);
     const centerX = Math.max(minCenterX, Math.min(maxCenterX, anchor.anchor.x));
