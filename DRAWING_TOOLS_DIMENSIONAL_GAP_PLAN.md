@@ -369,6 +369,10 @@ Phase 1: Tree row model
 - Generate rows from committed drawing state.
 - Include ID, kind, label/name, visible, locked, selected, editable, z-order,
   pane ID, and group membership.
+- Status: shared row resolver added in `drawings/objectTree.ts`; rows are
+  surface-neutral for web Canvas and mobile Skia consumers, default to
+  front-to-back order, and include placeholder custom-name/group fields until
+  persistence-backed naming/grouping lands.
 
 Phase 2: Shared actions
 
