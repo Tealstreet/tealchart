@@ -224,6 +224,48 @@ describe('user drawing context actions', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
     });
+    expect(result.items.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
+  });
+
+  it('includes selected wrapped text width actions for text-capable context targets', () => {
+    const result = resolveUserDrawingContextActionsAtPoint(
+      {
+        ...state,
+        drawings: [
+          {
+            id: 'label',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              ...style,
+              textWrap: true,
+              textMaxWidth: 180,
+            },
+            point: { time: 50, price: 50 },
+            text: 'Note',
+            textAlign: 'center',
+          },
+        ],
+      },
+      { x: 50, y: 50 },
+      new Map([['main', space]]),
+      { hitTest: { labelWidth: 80, labelHeight: 24 } },
+    );
+
+    expect(result.items.find((item) => item.id === 'textMaxWidth:decrease')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { textMaxWidth: 120 } },
+    });
+    expect(result.items.find((item) => item.id === 'textMaxWidth:increase')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { textMaxWidth: 240 } },
+    });
   });
 
   it('keeps state unchanged when no drawing is hit', () => {
