@@ -104,6 +104,17 @@ object-tree gaps stay visible.
 - Existing low-level drawing gesture reducers remain behavior-preserving and are
   ready to be wrapped into history transactions in the next phase.
 
+## Shipped: Drawing Command History
+
+- Shared drawing history records committed command mutations with bounded
+  undo/redo stacks while excluding selection-only, draft, and text-edit preview
+  state.
+- Repeated commands with the same transaction key coalesce into one undo entry
+  so edit drags can be restored as a single action.
+- Web exposes undo/redo APIs plus Ctrl/Cmd+Z and redo shortcuts while the chart
+  owns keyboard input.
+- Mobile Skia exposes matching imperative handle methods for app toolbars.
+
 ## Shipped: Z-Order Toolbar Controls
 
 - Shared toolbar action descriptors include bring-forward, send-backward,

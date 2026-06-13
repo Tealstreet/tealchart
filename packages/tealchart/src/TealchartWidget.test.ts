@@ -13,6 +13,7 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DIRTY } from './rendering/RenderScheduler';
+import { createUserDrawingState } from './drawings';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
@@ -1241,6 +1242,90 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings).toEqual([]);
       expect(widget.getUserDrawingState().selection).toBeNull();
       expect(chartDelete.defaultPrevented).toBe(true);
+
+      widget.remove();
+    });
+
+    it('undoes and redoes drawing commands from keyboard shortcuts while chart owns input', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      expect(widget.deleteSelectedUserDrawing()).toBe(true);
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+
+      const undo = new KeyboardEvent('keydown', { key: 'z', metaKey: true, cancelable: true });
+      document.dispatchEvent(undo);
+
+      expect(undo.defaultPrevented).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(widget.canRedoUserDrawingCommand()).toBe(true);
+
+      const redo = new KeyboardEvent('keydown', { key: 'Z', metaKey: true, shiftKey: true, cancelable: true });
+      document.dispatchEvent(redo);
+
+      expect(redo.defaultPrevented).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+
+      widget.remove();
+    });
+
+    it('clears drawing command history when user drawing state is externally replaced', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      expect(widget.deleteSelectedUserDrawing()).toBe(true);
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+      widget.setUserDrawingState(createUserDrawingState());
+
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+      expect(widget.undoUserDrawingCommand()).toBe(false);
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
 
       widget.remove();
     });
