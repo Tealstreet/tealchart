@@ -38,8 +38,8 @@ Sources:
 | Multi-select | Group selection state exists | Modifier selection exists | Two-finger additive selection exists | `shipped` | Gap 5 |
 | Handle editing | Shared edit helpers exist | Select-mode handle drag exists | Select-mode handle drag exists | `shipped` | Gap 6 polish |
 | Whole-object move | Shared edit helpers exist | Select-mode whole drag exists | Select-mode whole drag exists | `shipped` | Gap 7 duplicate-drag |
-| Duplicate action | Shared command and reducer exist | API, toolbar/context, keyboard, and Shift-drag paths exist | Handle, action/context, keyboard, and duplicate-drag handle paths exist | `shipped` | Gap 4/7 polish |
-| Shift+drag duplicate | Shared duplicate edit-drag transaction exists | Shift+drag duplicate-and-move exists in select mode | Mobile duplicate-drag handle equivalent exists | `shipped` | Gap 7 polish |
+| Duplicate action | Shared command and reducer exist | API, toolbar/context, keyboard, and Shift-drag paths exist | Handle, action/context, keyboard, duplicate-drag handle, and duplicate edit-drag mode paths exist | `shipped` | Gap 4/7 polish |
+| Shift+drag duplicate | Shared duplicate edit-drag transaction exists | Shift+drag duplicate-and-move exists in select mode | Mobile duplicate edit-drag mode equivalent exists for host toolbars | `shipped` | Gap 7 polish |
 | Delete selected | Shared command and reducer exist | API, toolbar/context, and keyboard Delete exist | Handle, toolbar/context, and keyboard adapter paths exist | `shipped` | Gap 4 polish |
 | Z-order actions | Shared command and object-tree action models exist | API, toolbar/context, and object-tree dispatch exist | Handle, toolbar/context, and object-tree dispatch exist | `shipped` | Gap 5 polish |
 | Lock/hide | Shared reducers and selected-action descriptors exist | API, floating toolbar/context, and object-tree dispatch exist | Handle, action strip/context, and object-tree dispatch exist | `shipped` | Gap 4/5 polish |
