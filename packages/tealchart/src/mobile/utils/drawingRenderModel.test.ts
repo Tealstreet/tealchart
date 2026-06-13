@@ -227,6 +227,39 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('keeps drag-seeded Fib/Gann drafts visible for Skia during active drag preview', () => {
+    const draftTools = ['trendBasedFibExtension', 'fibWedge', 'fibChannel', 'trendBasedFibTime'] as const;
+
+    for (const tool of draftTools) {
+      const state: UserDrawingState = {
+        version: 1,
+        activeTool: tool,
+        selection: null,
+        drawings: [],
+        draft: {
+          tool,
+          paneId: 'main',
+          anchors: [{ time: 10, price: 90 }],
+          style,
+          startedAt: 2,
+        },
+        textEdit: null,
+      };
+
+      expect(
+        resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), {
+          draftPreviewAnchor: { time: 40, price: 60 },
+        }).at(0),
+        tool,
+      ).toMatchObject({
+        kind: tool,
+        id: '__draft__',
+        phase: 'draft',
+        selected: false,
+      });
+    }
+  });
+
   it('preserves committed drawing z-order before selected handles', () => {
     const state: UserDrawingState = {
       version: 1,

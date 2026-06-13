@@ -632,6 +632,10 @@ describe('user drawing input controller', () => {
       'modifiedSchiffPitchfork',
       'insidePitchfork',
       'pitchfan',
+      'trendBasedFibExtension',
+      'fibWedge',
+      'fibChannel',
+      'trendBasedFibTime',
     ] as const;
 
     for (const tool of dragSeedTools) {
