@@ -1,26 +1,38 @@
 import { describe, expect, it } from 'vitest';
 
 import { dispatchUserDrawingCommand } from './commands';
+import type { UserDrawingCommand } from './commands';
 import { beginUserDrawingEditDragAtPoint } from './editing';
 import {
   appendUserDrawingPathDragPoint,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
+  cancelUserDrawingDraft,
+  cancelUserDrawingTextEdit,
+  clearUserDrawings,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
+  deleteUserDrawingTableColumn,
+  deleteUserDrawingTableRow,
   deleteUserDrawing,
   duplicateUserDrawing,
   handleUserDrawingInput,
+  insertUserDrawingTableColumn,
+  insertUserDrawingTableRow,
   reorderUserDrawings,
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
+  selectUserDrawingsById,
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingTableCells,
   setUserDrawingTableCell,
   setUserDrawingTableDimensions,
+  setUserDrawingText,
   setUserDrawingTextAlign,
+  setUserDrawingTextContent,
   setUserDrawingTool,
   setUserDrawingTrendLineExtend,
   setUserDrawingVisibility,
@@ -68,6 +80,13 @@ function createStateWithTable(): UserDrawingState {
     { paneId: 'main', anchor: anchorA },
     { createId: () => 'table', now: () => 25, style },
   );
+}
+
+function expectCommandState(state: UserDrawingState, command: UserDrawingCommand, directState: UserDrawingState): UserDrawingState {
+  const result = dispatchUserDrawingCommand(state, command);
+  expect(result.state).toEqual(directState);
+  expect(result.changed).toBe(result.state !== state);
+  return result.state;
 }
 
 describe('user drawing command dispatch', () => {
@@ -166,6 +185,74 @@ describe('user drawing command dispatch', () => {
     expect(dispatchUserDrawingCommand(editing, { type: 'updateTextEdit', value: 'Changed' }).state).toEqual(updated);
     expect(dispatchUserDrawingCommand(updated, { type: 'commitTextEdit', options: { now: () => 51 } }).state).toEqual(
       commitUserDrawingTextEdit(updated, { now: () => 51 }),
+    );
+  });
+
+  it('wraps remaining selection, draft, text, table, and clear reducers', () => {
+    const selectedState = createStateWithTrendLine();
+    const duplicatedState = duplicateUserDrawing(selectedState, {
+      createId: () => 'trend-line-copy',
+      now: () => 80,
+    });
+    expectCommandState(
+      duplicatedState,
+      { type: 'selectMany', drawingIds: ['trend-line', 'trend-line-copy'], meta: { source: 'api' } },
+      selectUserDrawingsById(duplicatedState, ['trend-line', 'trend-line-copy']),
+    );
+    expectCommandState(duplicatedState, { type: 'clear', meta: { source: 'api' } }, clearUserDrawings(duplicatedState));
+
+    const draftState = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'rect', now: () => 81, style },
+    );
+    expectCommandState(draftState, { type: 'cancelDraft', meta: { source: 'api' } }, cancelUserDrawingDraft(draftState));
+
+    const textState = createStateWithTextLabel();
+    const editing = beginUserDrawingTextEdit(textState, 'label', { now: () => 82 });
+    expectCommandState(editing, { type: 'cancelTextEdit', meta: { source: 'textEditor' } }, cancelUserDrawingTextEdit(editing));
+    expectCommandState(
+      textState,
+      { type: 'setText', drawingId: 'label', text: 'Direct text', options: { now: () => 83 } },
+      setUserDrawingText(textState, 'label', 'Direct text', { now: () => 83 }),
+    );
+    expectCommandState(
+      textState,
+      { type: 'setTextContent', text: 'Selected text', options: { now: () => 84 } },
+      setUserDrawingTextContent(textState, 'Selected text', { now: () => 84 }),
+    );
+
+    const tableState = createStateWithTable();
+    const tableCells = [
+      ['A', 'B'],
+      ['C', 'D'],
+    ];
+    expectCommandState(
+      tableState,
+      { type: 'setTableCells', cells: tableCells, options: { now: () => 85 } },
+      setUserDrawingTableCells(tableState, tableCells, { now: () => 85 }),
+    );
+
+    const expandedTable = setUserDrawingTableCells(tableState, tableCells, { now: () => 86 });
+    expectCommandState(
+      expandedTable,
+      { type: 'insertTableRow', row: 1, values: ['E', 'F'], options: { now: () => 87 } },
+      insertUserDrawingTableRow(expandedTable, 1, ['E', 'F'], { now: () => 87 }),
+    );
+    expectCommandState(
+      expandedTable,
+      { type: 'deleteTableRow', row: 1, options: { now: () => 88 } },
+      deleteUserDrawingTableRow(expandedTable, 1, { now: () => 88 }),
+    );
+    expectCommandState(
+      expandedTable,
+      { type: 'insertTableColumn', column: 1, values: ['X', 'Y'], options: { now: () => 89 } },
+      insertUserDrawingTableColumn(expandedTable, 1, ['X', 'Y'], { now: () => 89 }),
+    );
+    expectCommandState(
+      expandedTable,
+      { type: 'deleteTableColumn', column: 1, options: { now: () => 90 } },
+      deleteUserDrawingTableColumn(expandedTable, 1, { now: () => 90 }),
     );
   });
 
