@@ -113,6 +113,7 @@ import {
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
+  resolveUserDrawingPlacementConstraint,
   resolveUserDrawingTextEditMetrics,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
   USER_DRAWING_FONT_FAMILIES,
@@ -351,6 +352,8 @@ export interface SkiaTealchartProps {
   userDrawingState?: UserDrawingState;
   /** Called when the chart updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
+  /** Constrain two-anchor drawing placement drags to square or 45-degree geometry for touch toolbars. */
+  constrainUserDrawingPlacement?: boolean;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when order price is changed via drag */
@@ -406,6 +409,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onCrossHairMoved,
     userDrawingState: propUserDrawingState,
     onUserDrawingStateChange,
+    constrainUserDrawingPlacement = false,
     onSwipeBlockChange,
     onOrderMove,
     onOrderCancel,
@@ -439,12 +443,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
+  const userDrawingPlacementDragStartPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
       userDrawingStateRef.current = nextState;
       if (!nextState.draft) {
+        userDrawingPlacementDragStartPointRef.current = null;
         userDrawingPlacementDragLastPointRef.current = null;
         setUserDrawingDraftPreviewAnchor(null);
       }
@@ -457,6 +463,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   useEffect(() => {
     if (propUserDrawingState) {
       userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
+      userDrawingPlacementDragStartPointRef.current = null;
       userDrawingPlacementDragLastPointRef.current = null;
       setUserDrawingDraftPreviewAnchor(null);
       userDrawingStateRef.current = propUserDrawingState;
@@ -895,6 +902,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         draftPreviewAnchor: userDrawingDraftPreviewAnchor ?? undefined,
       }),
     [effectiveUserDrawingState, userDrawingDraftPreviewAnchor, userDrawingSpacesByPaneId],
+  );
+  const resolveConstrainedUserDrawingPlacementPoint = useCallback(
+    (point: UserDrawingInputPoint): UserDrawingInputPoint =>
+      resolveUserDrawingPlacementConstraint({
+        tool: userDrawingStateRef.current.activeTool,
+        startPoint: userDrawingPlacementDragStartPointRef.current,
+        currentPoint: point,
+        spacesByPaneId: userDrawingSpacesByPaneId,
+        options: { constrainedPlacement: constrainUserDrawingPlacement },
+      }),
+    [constrainUserDrawingPlacement, userDrawingSpacesByPaneId],
   );
   const activeUserDrawingTextEditPrimitive = useMemo(
     () =>
@@ -1361,8 +1379,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
         if (!changed) return false;
 
+        userDrawingPlacementDragStartPointRef.current = point;
         userDrawingPlacementDragLastPointRef.current = point;
-        setUserDrawingDraftPreviewAnchor(point.anchor);
+        setUserDrawingDraftPreviewAnchor(resolveConstrainedUserDrawingPlacementPoint(point).anchor);
         return true;
       }
 
@@ -1409,6 +1428,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
+      resolveConstrainedUserDrawingPlacementPoint,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
       bars,
@@ -1446,8 +1466,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
         if (!point || !userDrawingPlacementDragLastPointRef.current) return;
 
-        userDrawingPlacementDragLastPointRef.current = point;
-        setUserDrawingDraftPreviewAnchor(point.anchor);
+        const previewPoint = resolveConstrainedUserDrawingPlacementPoint(point);
+        userDrawingPlacementDragLastPointRef.current = previewPoint;
+        setUserDrawingDraftPreviewAnchor(previewPoint.anchor);
         return;
       }
 
@@ -1465,6 +1486,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       chartDimensions,
       dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
+      resolveConstrainedUserDrawingPlacementPoint,
       userDrawingInputPanes,
       bars,
       viewport,
@@ -1474,6 +1496,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleUserDrawingEditEnd = useCallback(() => {
     if (isUserDrawingDragPlacementTool(userDrawingStateRef.current.activeTool)) {
       const point = userDrawingPlacementDragLastPointRef.current;
+      userDrawingPlacementDragStartPointRef.current = null;
       userDrawingPlacementDragLastPointRef.current = null;
       setUserDrawingDraftPreviewAnchor(null);
       if (point) {
