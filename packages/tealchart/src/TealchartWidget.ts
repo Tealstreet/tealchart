@@ -14,6 +14,7 @@ import type {
   DrawingScreenPoint,
   UserDrawingClipboard,
   UserDrawingCommandDispatchResult,
+  UserDrawingCommandSource,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
@@ -60,6 +61,7 @@ import {
   createUserDrawingClipboard,
   createUserDrawingCommandHistory,
   createUserDrawingCommandEvent,
+  createUserDrawingHistoryCommandEvent,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
@@ -2259,19 +2261,37 @@ export class TealchartWidget {
   }
 
   undoUserDrawingCommand(): boolean {
-    const result = undoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
+    return this._undoUserDrawingCommand('api');
+  }
+
+  private _undoUserDrawingCommand(source: UserDrawingCommandSource): boolean {
+    const previousState = this._userDrawingState;
+    const result = undoUserDrawingCommandHistory(previousState, this._userDrawingHistory);
     this._userDrawingHistory = result.history;
     if (result.changed) {
       this.setUserDrawingState(result.state, { preserveHistory: true });
+      this._emitUserDrawingHistoryCommandEvent(previousState, result.state, {
+        type: 'undo',
+        meta: { source },
+      });
     }
     return result.changed;
   }
 
   redoUserDrawingCommand(): boolean {
-    const result = redoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
+    return this._redoUserDrawingCommand('api');
+  }
+
+  private _redoUserDrawingCommand(source: UserDrawingCommandSource): boolean {
+    const previousState = this._userDrawingState;
+    const result = redoUserDrawingCommandHistory(previousState, this._userDrawingHistory);
     this._userDrawingHistory = result.history;
     if (result.changed) {
       this.setUserDrawingState(result.state, { preserveHistory: true });
+      this._emitUserDrawingHistoryCommandEvent(previousState, result.state, {
+        type: 'redo',
+        meta: { source },
+      });
     }
     return result.changed;
   }
@@ -2280,8 +2300,8 @@ export class TealchartWidget {
     const action = resolveUserDrawingKeyboardAction(this._userDrawingState, input);
     if (!action) return false;
 
-    if (action.type === 'undo') return this.undoUserDrawingCommand();
-    if (action.type === 'redo') return this.redoUserDrawingCommand();
+    if (action.type === 'undo') return this._undoUserDrawingCommand('keyboard');
+    if (action.type === 'redo') return this._redoUserDrawingCommand('keyboard');
     if (action.type === 'copySelected') return this.copySelectedUserDrawing();
     if (action.type === 'duplicateSelected') return this.duplicateSelectedUserDrawing();
     if (action.type === 'paste') return this.pasteUserDrawingClipboard();
@@ -2570,7 +2590,27 @@ export class TealchartWidget {
   ): UserDrawingCommandEvent | null {
     const event = createUserDrawingCommandEvent(previousState, result);
     if (!event) return null;
-    this._options.onUserDrawingCommand?.(event);
+    try {
+      this._options.onUserDrawingCommand?.(event);
+    } catch (error) {
+      this._logger?.error(LogCategory.Widget, 'onUserDrawingCommand callback threw', error);
+    }
+    this._eventEmitter.emit('user_drawing_command', event);
+    return event;
+  }
+
+  private _emitUserDrawingHistoryCommandEvent(
+    previousState: UserDrawingState,
+    state: UserDrawingState,
+    command: Parameters<typeof createUserDrawingHistoryCommandEvent>[2],
+  ): UserDrawingCommandEvent | null {
+    const event = createUserDrawingHistoryCommandEvent(previousState, state, command, previousState !== state);
+    if (!event) return null;
+    try {
+      this._options.onUserDrawingCommand?.(event);
+    } catch (error) {
+      this._logger?.error(LogCategory.Widget, 'onUserDrawingCommand callback threw', error);
+    }
     this._eventEmitter.emit('user_drawing_command', event);
     return event;
   }

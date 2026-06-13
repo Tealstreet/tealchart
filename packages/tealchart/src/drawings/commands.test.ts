@@ -169,6 +169,23 @@ describe('user drawing command dispatch', () => {
     expect(event?.affectedIds).toHaveLength(2);
   });
 
+  it('derives affected drawing ids when select-many changes the secondary selection set', () => {
+    const state = duplicateUserDrawing(createStateWithTrendLine(), {
+      createId: () => 'copy',
+      now: () => 31,
+    });
+    const selectedPrimaryOnly = { ...state, selection: { drawingId: 'trend-line' } };
+    const result = dispatchUserDrawingCommand(selectedPrimaryOnly, {
+      type: 'selectMany',
+      drawingIds: ['trend-line', 'copy'],
+      meta: { source: 'api' },
+    });
+    const event = createUserDrawingCommandEvent(selectedPrimaryOnly, result);
+
+    expect(result.changed).toBe(true);
+    expect(event?.affectedIds).toEqual(['copy']);
+  });
+
   it('wraps selection, duplicate, delete, style, lock, and z-order reducers', () => {
     const state = createStateWithTrendLine();
 
