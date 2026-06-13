@@ -21,6 +21,7 @@ import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
   UpdateUserDrawingOptions,
+  UserDrawingCommandHistory,
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
@@ -97,6 +98,10 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
+  canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
+  canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
+  clearUserDrawingCommandHistory,
+  createUserDrawingCommandHistory,
   createUserDrawingState,
   dispatchUserDrawingCommand,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
@@ -104,7 +109,9 @@ import {
   measureUserDrawingTextLines,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingTextEditMetrics,
+  undoUserDrawingCommand as undoUserDrawingCommandHistory,
   USER_DRAWING_FONT_FAMILIES,
 } from './drawings';
 import { computePaneGeometry } from './layout/chartGeometry';
@@ -136,7 +143,7 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import { commitMobileUserDrawingHandleCommand } from './mobile/utils/drawingCommands';
+import { dispatchMobileUserDrawingHistoryCommand } from './mobile/utils/drawingCommands';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -248,6 +255,10 @@ export interface SkiaTealchartHandle {
   importUserDrawingStateFromLayout(state?: UserDrawingState | null): void;
   setUserDrawingState(state: UserDrawingState): void;
   setActiveUserDrawingTool(tool: UserDrawingTool): void;
+  canUndoUserDrawingCommand(): boolean;
+  canRedoUserDrawingCommand(): boolean;
+  undoUserDrawingCommand(): boolean;
+  redoUserDrawingCommand(): boolean;
   selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
   selectUserDrawings(drawingIds: readonly string[]): void;
   deleteUserDrawing(drawingId?: string): boolean;
@@ -417,6 +428,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingStateRef = useRef(effectiveUserDrawingState);
+  const userDrawingHistoryRef = useRef<UserDrawingCommandHistory>(createUserDrawingCommandHistory());
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
 
@@ -431,6 +443,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   useEffect(() => {
     if (propUserDrawingState) {
+      userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
       userDrawingStateRef.current = propUserDrawingState;
       setUncontrolledUserDrawingState(propUserDrawingState);
     }
@@ -451,7 +464,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const dispatchUserDrawingCommandToState = useCallback(
     (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => {
-      return commitMobileUserDrawingHandleCommand(userDrawingStateRef.current, command, commitUserDrawingState);
+      const result = dispatchMobileUserDrawingHistoryCommand(
+        userDrawingStateRef.current,
+        userDrawingHistoryRef.current,
+        command,
+      );
+      userDrawingHistoryRef.current = result.history;
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+      }
+      return result.changed;
     },
     [commitUserDrawingState],
   );
@@ -491,13 +513,37 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return exportMobileUserDrawingStateForLayout(userDrawingStateRef.current);
       },
       importUserDrawingStateFromLayout(nextState?: UserDrawingState | null): void {
+        userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
         commitUserDrawingState(importMobileUserDrawingStateFromLayout(nextState));
       },
       setUserDrawingState(nextState: UserDrawingState): void {
+        userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
         commitUserDrawingState(nextState);
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): void {
         dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+      },
+      canUndoUserDrawingCommand(): boolean {
+        return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);
+      },
+      canRedoUserDrawingCommand(): boolean {
+        return canRedoUserDrawingCommandHistory(userDrawingHistoryRef.current);
+      },
+      undoUserDrawingCommand(): boolean {
+        const result = undoUserDrawingCommandHistory(userDrawingStateRef.current, userDrawingHistoryRef.current);
+        userDrawingHistoryRef.current = result.history;
+        if (result.changed) {
+          commitUserDrawingState(result.state);
+        }
+        return result.changed;
+      },
+      redoUserDrawingCommand(): boolean {
+        const result = redoUserDrawingCommandHistory(userDrawingStateRef.current, userDrawingHistoryRef.current);
+        userDrawingHistoryRef.current = result.history;
+        if (result.changed) {
+          commitUserDrawingState(result.state);
+        }
+        return result.changed;
       },
       selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
         dispatchUserDrawingCommandToState({ type: 'select', drawingId, handle, meta: { source: 'api' } });
@@ -1353,19 +1399,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const drag = userDrawingEditDragRef.current;
       if (!drag) return;
 
-      const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
+      dispatchUserDrawingCommandToState({
         type: 'applyEditDrag',
         drag,
         point: { x, y },
         meta: { source: 'touch', transactionKey: 'edit-drag' },
       });
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-      }
     },
     [
       chartDimensions,
-      commitUserDrawingState,
       dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
       userDrawingInputPanes,

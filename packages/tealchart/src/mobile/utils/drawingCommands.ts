@@ -1,10 +1,15 @@
 import type {
   UserDrawingCommand,
   UserDrawingCommandDispatchResult,
+  UserDrawingCommandHistory,
+  UserDrawingHistoryDispatchResult,
   UserDrawingState,
 } from '../../drawings';
 
-import { dispatchUserDrawingCommand } from '../../drawings';
+import {
+  dispatchUserDrawingCommand,
+  dispatchUserDrawingCommandWithHistory,
+} from '../../drawings';
 
 export type MobileUserDrawingCommit = (state: UserDrawingState) => void;
 
@@ -25,4 +30,12 @@ export function commitMobileUserDrawingHandleCommand(
     commit(result.state);
   }
   return result.changed;
+}
+
+export function dispatchMobileUserDrawingHistoryCommand(
+  state: UserDrawingState,
+  history: UserDrawingCommandHistory,
+  command: UserDrawingCommand,
+): UserDrawingHistoryDispatchResult {
+  return dispatchUserDrawingCommandWithHistory(state, history, command);
 }
