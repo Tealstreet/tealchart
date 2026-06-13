@@ -209,6 +209,21 @@ describe('user drawing context actions', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { fontStyle: 'italic' } },
     });
+    expect(result.items.find((item) => item.id === 'textUnderline:toggle')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { textUnderline: true } },
+    });
+    expect(result.items.find((item) => item.id === 'textLineThrough:toggle')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { textLineThrough: true } },
+    });
+    expect(result.items.find((item) => item.id === 'textWrap:toggle')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
+    });
   });
 
   it('keeps state unchanged when no drawing is hit', () => {
