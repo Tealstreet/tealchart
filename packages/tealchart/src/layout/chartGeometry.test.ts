@@ -7,6 +7,7 @@ import {
   computeLeftToolRailTop,
   computeChartGeometry,
   computePaneGeometry,
+  computeTopLeftLegendRect,
   insetRect,
   intersectsRect,
   MOBILE_CHART_CHROME_METRICS,
@@ -141,6 +142,30 @@ describe('chart geometry', () => {
     expect(webSnapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
     expect(mobileSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 36 });
     expect(mobileSnapshot.chrome.leftTools).toEqual({ x: 0, y: 36, width: 52, height: 284 });
+  });
+
+  it('tracks optional top-left legend overlay metadata without reserving canvas space', () => {
+    const snapshot = computeChartGeometry({
+      width: 500,
+      height: 320,
+      margins: { top: WEB_CHART_CHROME_METRICS.topBarHeight, right: 60, bottom: 26, left: 0 },
+      paneLayout,
+      topBarHeight: WEB_CHART_CHROME_METRICS.topBarHeight,
+      leftToolRailWidth: WEB_CHART_CHROME_METRICS.leftToolRailWidth,
+      topLeftLegend: true,
+      chromeMetrics: WEB_CHART_CHROME_METRICS,
+    });
+
+    expect(computeTopLeftLegendRect(WEB_CHART_CHROME_METRICS, rect(0, 0, 500, 320))).toEqual({
+      x: 12,
+      y: 40,
+      width: 480,
+      height: 44,
+    });
+    expect(computeTopLeftLegendRect(MOBILE_CHART_CHROME_METRICS, rect(0, 0, 500, 320))).toBeNull();
+    expect(snapshot.chrome.topLeftLegend).toEqual({ x: 12, y: 40, width: 480, height: 44 });
+    expect(snapshot.drawable).toEqual({ x: 0, y: 0, width: 440, height: 294 });
+    expect(snapshot.avoidRects).toContainEqual({ x: 12, y: 40, width: 480, height: 44 });
   });
 
   it('positions panes within safe-area-adjusted vertical bounds', () => {
