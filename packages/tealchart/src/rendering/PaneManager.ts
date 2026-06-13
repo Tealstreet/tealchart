@@ -12,6 +12,7 @@ import type {
   UnifiedPaneLayout,
 } from '../types';
 
+import { computePaneGeometry } from '../layout/chartGeometry';
 import { DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT, TIME_AXIS_HEIGHT } from '../types';
 
 /**
@@ -206,20 +207,9 @@ export class PaneManager {
    * @returns Array of ComputedPane with pixel positions
    */
   computeLayout(totalHeight: number): ComputedPane[] {
-    // Available height for panes (excluding time axis)
-    const availableHeight = totalHeight - this.timeAxisHeight;
-    let currentTop = 0;
-
-    return this.panes.map((pane) => {
-      const height = availableHeight * pane.heightRatio;
-      const computed: ComputedPane = {
-        ...pane,
-        top: currentTop,
-        height,
-        bottom: currentTop + height,
-      };
-      currentTop += height;
-      return computed;
+    return computePaneGeometry({
+      paneLayout: this.getUnifiedLayout(),
+      height: totalHeight,
     });
   }
 
