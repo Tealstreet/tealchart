@@ -1662,7 +1662,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         const changed = dispatchUserDrawingCommandToState({
           type: 'beginPlacementDrag',
           point,
-          meta: { source: 'touch', transactionKey: 'placement-drag' },
+          meta: { source: 'touch' },
         });
         if (!changed) return false;
 
@@ -1818,7 +1818,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           options: {
             createId: createUserDrawingId,
           },
-          meta: { source: 'touch', transactionKey: 'placement-drag' },
+          meta: { source: 'touch' },
         });
       }
       return;

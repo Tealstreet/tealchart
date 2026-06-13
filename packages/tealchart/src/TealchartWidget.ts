@@ -2649,7 +2649,7 @@ export class TealchartWidget {
     return this.dispatchUserDrawingCommand({
       type: 'beginPlacementDrag',
       point,
-      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+      meta: { source: 'pointer' },
     });
   }
 
@@ -2660,7 +2660,7 @@ export class TealchartWidget {
       options: {
         createId: () => this._createUserDrawingId(),
       },
-      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+      meta: { source: 'pointer' },
     });
   }
 
