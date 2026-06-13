@@ -10,8 +10,19 @@ interface PressableProps {
   onPress?: () => void;
 }
 
-export function View({ children }: { children?: ReactNode }) {
-  return <div>{children}</div>;
+interface ViewProps {
+  accessibilityLabel?: string;
+  children?: ReactNode;
+  pointerEvents?: string;
+  style?: unknown;
+}
+
+export function View({ accessibilityLabel, children, pointerEvents }: ViewProps) {
+  return (
+    <div aria-label={accessibilityLabel} data-pointer-events={pointerEvents}>
+      {children}
+    </div>
+  );
 }
 
 export function Text({ children }: { children?: ReactNode }) {
@@ -32,6 +43,27 @@ export function Pressable({ accessibilityLabel, accessibilityState, children, di
       aria-pressed={accessibilityState?.selected ? 'true' : 'false'}
       disabled={isDisabled}
       onClick={isDisabled ? undefined : onPress}
+      type="button"
+    >
+      {typeof children === 'function' ? children({ pressed: false }) : children}
+    </button>
+  );
+}
+
+export function TouchableOpacity({ accessibilityLabel, children, disabled, onPress }: PressableProps) {
+  return (
+    <button
+      aria-disabled={disabled ? 'true' : undefined}
+      aria-label={accessibilityLabel}
+      disabled={disabled}
+      onClick={
+        disabled
+          ? undefined
+          : (event) => {
+              event.stopPropagation();
+              onPress?.();
+            }
+      }
       type="button"
     >
       {typeof children === 'function' ? children({ pressed: false }) : children}

@@ -118,6 +118,74 @@ describe('mobile drawing action dispatch', () => {
     );
   });
 
+  it('does not leak selected action taps into direct selection commands', () => {
+    const dispatchUserDrawingCommand = vi.fn();
+    const onOpenProperties = vi.fn();
+    const onOpenObjectTree = vi.fn();
+
+    dispatchMobileUserDrawingActionCommand(
+      { type: 'openProperties' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+        onUserDrawingPropertiesOpen: onOpenProperties,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
+      { type: 'openObjectTree' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+        onUserDrawingObjectTreeOpen: onOpenObjectTree,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
+      { type: 'updateStyle', style: { lineWidth: 3 } },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
+      { type: 'toolbarAction', action: 'duplicateSelected' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+
+    expect(onOpenProperties).toHaveBeenCalledWith(
+      expect.objectContaining({
+        drawingId: 'line',
+        editable: true,
+        selected: true,
+        type: 'properties',
+      }),
+    );
+    expect(onOpenObjectTree).toHaveBeenCalledTimes(1);
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledTimes(2);
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { lineWidth: 3 },
+      meta: { source: 'toolbar' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'duplicate',
+      options: { createId: expect.any(Function) },
+      meta: { source: 'toolbar' },
+    });
+    expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'select' }));
+    expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'selectMany' }));
+  });
+
   it('preserves source metadata when dispatching mobile mutation actions', () => {
     const dispatchUserDrawingCommand = vi.fn();
 
