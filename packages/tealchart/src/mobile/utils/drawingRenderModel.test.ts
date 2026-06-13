@@ -260,6 +260,47 @@ describe('mobile user drawing render model', () => {
     }
   });
 
+  it('keeps drag-seeded measurement and pattern drafts visible for Skia during active drag preview', () => {
+    const draftTools = [
+      'projection',
+      'sector',
+      'longPosition',
+      'shortPosition',
+      'elliottCorrectiveWave',
+      'elliottDoubleComboWave',
+    ] as const;
+
+    for (const tool of draftTools) {
+      const expectedKind = tool === 'longPosition' || tool === 'shortPosition' ? 'riskRewardPosition' : tool;
+      const state: UserDrawingState = {
+        version: 1,
+        activeTool: tool,
+        selection: null,
+        drawings: [],
+        draft: {
+          tool,
+          paneId: 'main',
+          anchors: [{ time: 10, price: 90 }],
+          style,
+          startedAt: 2,
+        },
+        textEdit: null,
+      };
+
+      expect(
+        resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), {
+          draftPreviewAnchor: { time: 40, price: 60 },
+        }).at(0),
+        tool,
+      ).toMatchObject({
+        kind: expectedKind,
+        id: '__draft__',
+        phase: 'draft',
+        selected: false,
+      });
+    }
+  });
+
   it('keeps drag-seeded four-anchor drafts visible for Skia during active drag preview', () => {
     const draftTools = ['doubleCurve', 'disjointChannel'] as const;
 

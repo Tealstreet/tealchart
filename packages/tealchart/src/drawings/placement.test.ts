@@ -71,6 +71,12 @@ const dragSeedTools: UserDrawingTool[] = [
   'fibWedge',
   'fibChannel',
   'trendBasedFibTime',
+  'projection',
+  'sector',
+  'longPosition',
+  'shortPosition',
+  'elliottCorrectiveWave',
+  'elliottDoubleComboWave',
   'doubleCurve',
   'disjointChannel',
 ];
@@ -94,6 +100,9 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('parallelChannel')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('pitchfork')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('fibChannel')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('projection')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('longPosition')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('elliottCorrectiveWave')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('doubleCurve')).toBe('dragSeed');
   });
 

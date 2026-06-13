@@ -122,6 +122,12 @@ describe('user drawing render model', () => {
       'fibWedge',
       'fibChannel',
       'trendBasedFibTime',
+      'projection',
+      'sector',
+      'longPosition',
+      'shortPosition',
+      'elliottCorrectiveWave',
+      'elliottDoubleComboWave',
     ] as const;
 
     for (const tool of dragSeedTools) {
