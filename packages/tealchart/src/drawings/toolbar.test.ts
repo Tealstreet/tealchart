@@ -1678,6 +1678,7 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
     });
+    expect(styleItems.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
 
     const defaultSized = {
       ...selected,
@@ -1698,6 +1699,51 @@ describe('user drawing toolbar descriptors', () => {
     expect(defaultSizeItems.find((item) => item.id === 'fontFamily:serif')).toMatchObject({
       enabled: true,
       command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
+    });
+  });
+
+  it('resolves selected wrapped text width actions for text-capable drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            textWrap: true,
+            textMaxWidth: 180 as const,
+          },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(styleItems.find((item) => item.id === 'textWrap:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textWrap: false } },
+    });
+    expect(styleItems.find((item) => item.id === 'textMaxWidth:decrease')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textMaxWidth: 120 } },
+    });
+    expect(styleItems.find((item) => item.id === 'textMaxWidth:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textMaxWidth: 240 } },
     });
   });
 
@@ -1750,6 +1796,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(styleItems.some((item) => item.id.startsWith('textUnderline:'))).toBe(false);
     expect(styleItems.some((item) => item.id.startsWith('textLineThrough:'))).toBe(false);
     expect(styleItems.some((item) => item.id.startsWith('textWrap:'))).toBe(false);
+    expect(styleItems.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
   });
 
   it('clamps selected action surfaces inside shared safe viewport insets', () => {

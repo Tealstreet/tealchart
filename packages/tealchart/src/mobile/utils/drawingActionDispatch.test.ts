@@ -162,6 +162,15 @@ describe('mobile drawing action dispatch', () => {
       },
     );
     dispatchMobileUserDrawingActionCommand(
+      { type: 'updateStyle', style: { textMaxWidth: 240 } },
+      {
+        state: createSelectedState(),
+        source: 'contextMenu',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
       { type: 'toolbarAction', action: 'duplicateSelected' },
       {
         state: createSelectedState(),
@@ -195,6 +204,11 @@ describe('mobile drawing action dispatch', () => {
         textMaxWidth: 180,
       },
       meta: { source: 'toolbar' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { textMaxWidth: 240 },
+      meta: { source: 'contextMenu' },
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',
