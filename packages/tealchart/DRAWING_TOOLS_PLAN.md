@@ -5,7 +5,9 @@ matching behavior in the same PR for every user-facing drawing feature.
 
 Detailed capability status and the ordered foundational roadmap now live in the
 repo-root `DRAWING_TOOLS_CAPABILITY_MATRIX.md` and
-`DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`. Use those docs before adding more
+`DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`. Shared interaction terms, state
+ownership, cancellation rules, command sources, and parity gates live in
+`DRAWING_TOOLS_INTERACTION_INVARIANTS.md`. Use those docs before adding more
 drawing shapes so interaction, command, history, toolbar, context-menu, and
 object-tree gaps stay visible.
 
