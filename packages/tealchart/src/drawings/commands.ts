@@ -6,6 +6,8 @@ import type {
   UserDrawingImageSourceInput,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
+  UserDrawingPlacementDragCommitOptions,
+  UserDrawingPlacementDragStartOptions,
   UserDrawingPathDragOptions,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
@@ -28,11 +30,13 @@ import type {
 
 import {
   appendUserDrawingPathDragPoint,
+  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   deleteUserDrawing,
@@ -110,6 +114,16 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'clear' })
   | (UserDrawingCommandBase & { type: 'cancelDraft' })
   | (UserDrawingCommandBase & { type: 'handleInput'; point: UserDrawingInputPoint; options: UserDrawingInputOptions })
+  | (UserDrawingCommandBase & {
+      type: 'beginPlacementDrag';
+      point: UserDrawingInputPoint;
+      options?: UserDrawingPlacementDragStartOptions;
+    })
+  | (UserDrawingCommandBase & {
+      type: 'commitPlacementDrag';
+      point: UserDrawingInputPoint;
+      options: UserDrawingPlacementDragCommitOptions;
+    })
   | (UserDrawingCommandBase & {
       type: 'beginPathDrag';
       point: UserDrawingInputPoint;
@@ -241,6 +255,10 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return cancelUserDrawingDraft(state);
     case 'handleInput':
       return handleUserDrawingInput(state, command.point, command.options);
+    case 'beginPlacementDrag':
+      return beginUserDrawingPlacementDrag(state, command.point, command.options);
+    case 'commitPlacementDrag':
+      return commitUserDrawingPlacementDrag(state, command.point, command.options);
     case 'beginPathDrag':
       return beginUserDrawingPathDrag(state, command.point, command.options);
     case 'appendPathDragPoint':

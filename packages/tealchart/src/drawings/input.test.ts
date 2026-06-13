@@ -3,11 +3,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { clearChartStoreCache } from '../state/chartState';
 import {
   appendUserDrawingPathDragPoint,
+  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
@@ -143,6 +145,65 @@ describe('user drawing input controller', () => {
       createdAt: 20,
       updatedAt: 20,
     });
+  });
+
+  it('commits two-anchor drag placement from the drag start and end anchors', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const started = beginUserDrawingPlacementDrag(
+      state,
+      { paneId: 'main', anchor: anchorA, position: { x: 10, y: 20 } },
+      { now: () => 10, style },
+    );
+
+    expect(started.draft).toMatchObject({
+      tool: 'rectangle',
+      paneId: 'main',
+      anchors: [anchorA],
+      positions: [{ x: 1, y: 1 }],
+    });
+
+    const committed = commitUserDrawingPlacementDrag(
+      started,
+      { paneId: 'main', anchor: anchorB, position: { x: 80, y: 60 } },
+      { createId: () => 'drag-rect', now: () => 11, style },
+    );
+
+    expect(committed.draft).toBeNull();
+    expect(committed.selection).toEqual({ drawingId: 'drag-rect' });
+    expect(committed.drawings).toHaveLength(1);
+    expect(committed.drawings[0]).toMatchObject({
+      id: 'drag-rect',
+      kind: 'rectangle',
+      points: [anchorA, anchorB],
+    });
+  });
+
+  it('ignores drag placement commands for tools without drag placement semantics', () => {
+    const horizontalLineState = setUserDrawingTool(createUserDrawingState(), 'horizontalLine');
+
+    expect(beginUserDrawingPlacementDrag(horizontalLineState, { paneId: 'main', anchor: anchorA })).toBe(
+      horizontalLineState,
+    );
+    expect(
+      commitUserDrawingPlacementDrag(horizontalLineState, { paneId: 'main', anchor: anchorB }, { createId: () => 'line' }),
+    ).toBe(horizontalLineState);
+  });
+
+  it('cancels two-anchor drag placement when the drag never reaches a distinct endpoint', () => {
+    const started = beginUserDrawingPlacementDrag(
+      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { now: () => 10, style },
+    );
+    const cancelled = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorA }, {
+      createId: () => 'drag-rect',
+      now: () => 11,
+      style,
+    });
+
+    expect(cancelled.drawings).toEqual([]);
+    expect(cancelled.draft).toBeNull();
+    expect(cancelled.selection).toBeNull();
   });
 
   it('commits fixed range volume profiles from two anchors', () => {
