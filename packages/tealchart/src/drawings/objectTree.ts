@@ -70,6 +70,10 @@ export interface UserDrawingObjectTreeCommandOptions {
   now?: UpdateUserDrawingOptions['now'];
 }
 
+export interface UserDrawingObjectTreeDispatchCommandOptions extends UserDrawingObjectTreeCommandOptions {
+  createId: DuplicateUserDrawingOptions['createId'];
+}
+
 function resolveUserDrawingObjectTreeRow(
   drawing: UserDrawing,
   drawingIndex: number,
@@ -228,4 +232,14 @@ export function resolveUserDrawingObjectTreeActionCommands(
     default:
       return [];
   }
+}
+
+export function resolveUserDrawingObjectTreeDispatchActionCommands(
+  state: UserDrawingState,
+  action: UserDrawingObjectTreeDispatchAction,
+  options: UserDrawingObjectTreeDispatchCommandOptions,
+): readonly UserDrawingCommand[] {
+  const resolvedAction: UserDrawingObjectTreeAction =
+    action.type === 'duplicate' ? { ...action, createId: action.createId ?? options.createId } : action;
+  return resolveUserDrawingObjectTreeActionCommands(state, resolvedAction, options);
 }

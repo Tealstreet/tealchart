@@ -23,7 +23,6 @@ import type {
   UpdateUserDrawingOptions,
   UserDrawingClipboard,
   UserDrawingCommandEvent,
-  UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -128,7 +127,7 @@ import {
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
-  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
@@ -923,9 +922,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return model;
       },
       dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean {
-        const resolvedAction: UserDrawingObjectTreeAction =
-          action.type === 'duplicate' ? { ...action, createId: action.createId ?? createUserDrawingId } : action;
-        const commands = resolveUserDrawingObjectTreeActionCommands(userDrawingStateRef.current, resolvedAction, {
+        const commands = resolveUserDrawingObjectTreeDispatchActionCommands(userDrawingStateRef.current, action, {
+          createId: createUserDrawingId,
           now: () => Date.now(),
         });
         let changed = false;
