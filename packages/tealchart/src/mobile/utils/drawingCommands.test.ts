@@ -10,14 +10,21 @@ import {
   createUserDrawingCommandHistory,
   createUserDrawingState,
   handleUserDrawingInput,
-  undoUserDrawingCommand,
   setUserDrawingTool,
+  undoUserDrawingCommand,
 } from '../../drawings';
-import type { UserDrawingState } from '../../drawings';
+import type { DrawingCoordinateSpace, UserDrawingState } from '../../drawings';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+const coordinateSpace: DrawingCoordinateSpace = {
+  viewport: { startTime: 0, endTime: 3_000, priceMin: 90, priceMax: 120 },
+  pane: { id: 'main', top: 0, height: 300, bottom: 300, yMin: 90, yMax: 120 },
+  chartLeft: 0,
+  chartRight: 300,
+};
+const spacesByPaneId = new Map([['main', coordinateSpace]]);
 
 afterEach(() => {
   clearChartStoreCache();
@@ -122,5 +129,38 @@ describe('mobile drawing handle command dispatch', () => {
     const undo = undoUserDrawingCommand(result.state, result.history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
+  it('records mobile edit-drag moves as one coalesced undo entry', () => {
+    const state = createMobileStateWithTrendLine();
+    let history = createUserDrawingCommandHistory();
+    const editStart = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginEditDragAtPoint',
+      point: { x: 100, y: 200 },
+      spacesByPaneId,
+      meta: { source: 'touch', transactionKey: 'edit-drag' },
+    });
+
+    expect(editStart.history.undoStack).toHaveLength(0);
+    expect(editStart.editDrag).not.toBeNull();
+    if (!editStart.editDrag) throw new Error('expected edit drag');
+
+    let moved = dispatchMobileUserDrawingHistoryCommand(editStart.state, editStart.history, {
+      type: 'applyEditDrag',
+      drag: editStart.editDrag,
+      point: { x: 110, y: 190 },
+      meta: { source: 'touch', transactionKey: 'edit-drag' },
+    });
+    history = moved.history;
+    moved = dispatchMobileUserDrawingHistoryCommand(moved.state, history, {
+      type: 'applyEditDrag',
+      drag: editStart.editDrag,
+      point: { x: 120, y: 180 },
+      meta: { source: 'touch', transactionKey: 'edit-drag' },
+    });
+
+    expect(moved.history.undoStack).toHaveLength(1);
+    const undo = undoUserDrawingCommand(moved.state, moved.history);
+    expect(undo.state.drawings[0]).toEqual(editStart.state.drawings[0]);
   });
 });

@@ -2199,9 +2199,15 @@ export class TealchartWidget {
     });
   }
 
-  setUserDrawingState(state: UserDrawingState, options: { markLayoutDirty?: boolean } = {}): void {
+  setUserDrawingState(
+    state: UserDrawingState,
+    options: { markLayoutDirty?: boolean; preserveHistory?: boolean } = {},
+  ): void {
     if (state === this._userDrawingState) return;
     const previousState = this._userDrawingState;
+    if (!options.preserveHistory) {
+      this._userDrawingHistory = clearUserDrawingCommandHistory(this._userDrawingHistory);
+    }
     this._userDrawingState = state;
     this._options.onUserDrawingStateChange?.(state);
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
@@ -2226,7 +2232,7 @@ export class TealchartWidget {
     const result = undoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
     this._userDrawingHistory = result.history;
     if (result.changed) {
-      this.setUserDrawingState(result.state);
+      this.setUserDrawingState(result.state, { preserveHistory: true });
     }
     return result.changed;
   }
@@ -2235,7 +2241,7 @@ export class TealchartWidget {
     const result = redoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
     this._userDrawingHistory = result.history;
     if (result.changed) {
-      this.setUserDrawingState(result.state);
+      this.setUserDrawingState(result.state, { preserveHistory: true });
     }
     return result.changed;
   }
@@ -2414,7 +2420,7 @@ export class TealchartWidget {
   private dispatchUserDrawingCommand(command: Parameters<typeof dispatchUserDrawingCommand>[1]): boolean {
     const result = dispatchUserDrawingCommandWithHistory(this._userDrawingState, this._userDrawingHistory, command);
     this._userDrawingHistory = result.history;
-    this.setUserDrawingState(result.state);
+    this.setUserDrawingState(result.state, { preserveHistory: true });
     return result.changed;
   }
 
@@ -2500,7 +2506,7 @@ export class TealchartWidget {
       },
       meta: { source: 'pointer' },
     });
-    this.setUserDrawingState(result.state);
+    this.setUserDrawingState(result.state, { preserveHistory: true });
     return {
       state: result.state,
       hit: result.hit ?? false,
@@ -2526,7 +2532,7 @@ export class TealchartWidget {
     if (!result.hit || !result.editDrag) return false;
 
     this._userDrawingEditDrag = result.editDrag;
-    this.setUserDrawingState(result.state);
+    this.setUserDrawingState(result.state, { preserveHistory: true });
     return true;
   }
 
@@ -2571,12 +2577,12 @@ export class TealchartWidget {
           meta: { source: 'pointer' },
         });
         if (commandResult.changed) {
-          this.setUserDrawingState(commandResult.state);
+          this.setUserDrawingState(commandResult.state, { preserveHistory: true });
           return;
         }
       }
       if (result.changed) {
-        this.setUserDrawingState(result.state);
+        this.setUserDrawingState(result.state, { preserveHistory: true });
       }
     }
 
