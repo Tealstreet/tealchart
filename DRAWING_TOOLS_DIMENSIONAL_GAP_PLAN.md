@@ -463,6 +463,9 @@ Phase 1: Edit target resolution
 
 - Resolve whether double interaction edits text, opens properties, edits a
   point, or falls back to chart pane behavior.
+- Status: shared edit-intent resolver classifies double interaction targets
+  as text, properties, point, or pane fallback and is consumed by both web
+  widget double-click and mobile Skia double-tap handlers.
 
 Phase 2: Text edit state contract
 
