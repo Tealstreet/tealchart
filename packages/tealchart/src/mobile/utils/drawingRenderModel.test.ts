@@ -302,7 +302,48 @@ describe('mobile user drawing render model', () => {
   });
 
   it('keeps drag-seeded four-anchor drafts visible for Skia during active drag preview', () => {
-    const draftTools = ['doubleCurve', 'disjointChannel'] as const;
+    const draftTools = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'] as const;
+
+    for (const tool of draftTools) {
+      const state: UserDrawingState = {
+        version: 1,
+        activeTool: tool,
+        selection: null,
+        drawings: [],
+        draft: {
+          tool,
+          paneId: 'main',
+          anchors: [{ time: 10, price: 90 }],
+          style,
+          startedAt: 2,
+        },
+        textEdit: null,
+      };
+
+      expect(
+        resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), {
+          draftPreviewAnchor: { time: 40, price: 60 },
+        }).at(0),
+        tool,
+      ).toMatchObject({
+        kind: tool,
+        id: '__draft__',
+        phase: 'draft',
+        selected: false,
+      });
+    }
+  });
+
+  it('keeps drag-seeded five-anchor pattern drafts visible for Skia during active drag preview', () => {
+    const draftTools = [
+      'xabcdPattern',
+      'cypherPattern',
+      'threeDrivesPattern',
+      'headShouldersPattern',
+      'elliottImpulseWave',
+      'elliottTripleComboWave',
+      'elliottTriangleWave',
+    ] as const;
 
     for (const tool of draftTools) {
       const state: UserDrawingState = {

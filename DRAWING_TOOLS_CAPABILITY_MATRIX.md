@@ -95,8 +95,8 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Forecasting/measurement | `longPosition`, `shortPosition`, `projection`, `sector` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Forecasting/measurement | `barsPattern` | 3 | `computed-special` | `partial` | Source-bar payload, properties, placement previews |
 | Volume/profile | `anchoredVwap`, `anchoredVolumeProfile` | 1 | `one-point` / `computed-special` | `partial` | Properties, computed settings |
-| Patterns | `trianglePattern`, `abcdPattern` | 4 | `multi-point-click` | `partial` | Placement previews, labels/properties |
-| Patterns | `xabcdPattern`, `cypherPattern`, `threeDrivesPattern`, `headShouldersPattern`, `elliottImpulseWave`, `elliottTripleComboWave`, `elliottTriangleWave` | 5 | `multi-point-click` | `partial` | Placement previews, labels/properties |
+| Patterns | `trianglePattern`, `abcdPattern` | 4 | `multi-point-click` with first-segment drag seed | `partial` | Richer multi-point previews, labels/properties |
+| Patterns | `xabcdPattern`, `cypherPattern`, `threeDrivesPattern`, `headShouldersPattern`, `elliottImpulseWave`, `elliottTripleComboWave`, `elliottTriangleWave` | 5 | `multi-point-click` with first-segment drag seed | `partial` | Richer multi-point previews, labels/properties |
 | Patterns | `elliottCorrectiveWave`, `elliottDoubleComboWave` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Richer multi-point previews, labels/properties |
 | Icons | `icon`, `flagMark` | 1 | `one-point` | `partial` | Icon picker/properties, object tree |
 
