@@ -33,6 +33,7 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { TIME_AXIS_HEIGHT } from '../types';
+import { WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import {
   anchorToScreenPoint,
   getUserDrawingTextAnnotationPoint,
@@ -74,7 +75,7 @@ function resolveUserDrawingTextDecorationLine(style: {
  */
 
 // Top bar height - used to offset chart rendering so labels don't appear under the top bar
-const TOP_BAR_HEIGHT = 32;
+const TOP_BAR_HEIGHT = WEB_CHART_CHROME_METRICS.topBarHeight;
 
 // ============================================================================
 // Types
