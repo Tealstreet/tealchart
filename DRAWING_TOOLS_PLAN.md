@@ -14,6 +14,7 @@
 - Keep the chart canvas full size by default.
 - Treat chart chrome as first-party layout metadata with overlay, reserve, or hybrid behavior per region.
 - Land web drawing UI changes only with mobile Skia sibling behavior in the same PR.
+- Use `DRAWING_TOOLS_CAPABILITY_MATRIX.md` and `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md` as the source of truth before adding more drawing shape coverage.
 
 ## Supported User Drawing Surface
 
@@ -26,3 +27,4 @@
 - Public layout helpers expose metadata only; they do not yet drive every internal overlay placement.
 - Indicator legend collision avoidance still needs to consume the shared top-left legend metadata end to end.
 - TradingView-grade grouped toolbar affordances need continued parity work across web and mobile.
+- Drawing commands, undo/redo, drag-to-draw, floating selected-object actions, context menu, object tree, and modifier behavior are tracked in `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`.
