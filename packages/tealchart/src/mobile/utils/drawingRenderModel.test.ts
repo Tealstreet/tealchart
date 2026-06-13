@@ -4481,6 +4481,22 @@ describe('mobile user drawing render model', () => {
           textAlign: 'center',
         },
         {
+          id: 'callout',
+          kind: 'callout',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 30, price: 70 },
+            { time: 60, price: 40 },
+          ],
+          text: 'Callout',
+          textAlign: 'center',
+        },
+        {
           id: 'table',
           kind: 'table',
           paneId: 'main',
@@ -4495,19 +4511,20 @@ describe('mobile user drawing render model', () => {
         },
       ],
       draft: null,
-      textEdit: { drawingId: 'balloon', value: 'Draft', originalValue: 'Balloon', startedAt: 2 },
+      textEdit: { drawingId: 'callout', value: 'Draft callout', originalValue: 'Callout', startedAt: 2 },
     };
     const primitives = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
 
     expect(primitives.map((primitive) => [primitive.kind, isMobileUserDrawingTextBoxPrimitive(primitive)])).toEqual([
       ['balloon', true],
       ['signpost', true],
+      ['callout', true],
       ['table', false],
     ]);
-    expect(primitives[0]).toMatchObject({
-      kind: 'balloon',
+    expect(primitives[2]).toMatchObject({
+      kind: 'callout',
       editing: true,
-      editValue: 'Draft',
+      editValue: 'Draft callout',
     });
   });
 

@@ -488,6 +488,8 @@ Phase 1: Text edit parity
 
 - Ensure double-click on all text-capable drawings opens the text editor at the
   correct screen bounds.
+- Status: shared edit-intent coverage now pins every text annotation kind as
+  text-edit eligible, with web editor placement coverage for callouts.
 
 Phase 2: Properties popover
 
@@ -504,6 +506,8 @@ Phase 1: Text edit parity
 
 - Ensure double-tap on all text-capable Skia drawings opens the native editor at
   the correct position.
+- Status: mobile double-tap coverage now pins every text annotation kind as
+  text-edit eligible, with Skia render-model coverage for active callout edits.
 
 Phase 2: Properties sheet
 
