@@ -647,6 +647,10 @@ describe('mobile drawing handle command dispatch', () => {
       'modifiedSchiffPitchfork',
       'insidePitchfork',
       'pitchfan',
+      'trendBasedFibExtension',
+      'fibWedge',
+      'fibChannel',
+      'trendBasedFibTime',
     ];
 
     for (const tool of dragSeedTools) {

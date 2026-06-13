@@ -84,7 +84,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Channels | `disjointChannel` | 4 | `multi-point-click` | `partial` | Placement previews, object tree |
 | Pitchforks | `pitchfork`, `schiffPitchfork`, `modifiedSchiffPitchfork`, `insidePitchfork`, `pitchfan` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Style/property surface, richer multi-point previews |
 | Gann/Fibonacci | `fibRetracement`, `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`, `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`, `gannSquare`, `gannSquareFixed`, `fibTimeZone` | 2 | `two-point-drag-click` | `partial` | Properties |
-| Gann/Fibonacci | `trendBasedFibExtension`, `fibWedge`, `fibChannel`, `trendBasedFibTime` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
+| Gann/Fibonacci | `trendBasedFibExtension`, `fibWedge`, `fibChannel`, `trendBasedFibTime` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Shift constraints for cycle/wave tools |
 | Geometric shapes | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Geometric shapes | `doubleCurve` | 4 | `multi-point-click` | `partial` | Placement previews, properties |
