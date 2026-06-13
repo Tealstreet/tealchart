@@ -62,6 +62,12 @@ const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'fibWedge',
   'fibChannel',
   'trendBasedFibTime',
+  'projection',
+  'sector',
+  'longPosition',
+  'shortPosition',
+  'elliottCorrectiveWave',
+  'elliottDoubleComboWave',
   'doubleCurve',
   'disjointChannel',
 ]);

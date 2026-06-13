@@ -219,6 +219,12 @@ Phase 1: Placement mode registry
   supported four-anchor tools, with web Canvas and mobile Skia continuing
   through the normal remaining click/tap commit path: `doubleCurve` and
   `disjointChannel`.
+- Status: shared placement drag now also seeds the first two anchors for
+  supported three-anchor forecasting, measurement, and pattern tools, with web
+  Canvas and mobile Skia continuing through the normal final click/tap commit
+  path: `projection`, `sector`, `longPosition`, `shortPosition`,
+  `elliottCorrectiveWave`, and `elliottDoubleComboWave`. `barsPattern` remains
+  special because it requires source-bar payloads.
 
 Phase 2: Draft lifecycle
 
