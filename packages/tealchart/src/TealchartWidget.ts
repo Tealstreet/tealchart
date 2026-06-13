@@ -2862,6 +2862,11 @@ export class TealchartWidget {
       return;
     }
 
+    if (command.type === 'setIconName') {
+      this.setUserDrawingIconName(command.iconName);
+      return;
+    }
+
     if (command.type === 'toolbarAction') {
       if (command.action === 'duplicateSelected') {
         this.duplicateSelectedUserDrawing();

@@ -189,6 +189,15 @@ describe('mobile drawing action dispatch', () => {
       },
     );
     dispatchMobileUserDrawingActionCommand(
+      { type: 'setIconName', iconName: 'circle' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
       { type: 'toolbarAction', action: 'duplicateSelected' },
       {
         state: createSelectedState(),
@@ -237,6 +246,11 @@ describe('mobile drawing action dispatch', () => {
       type: 'setTrendLineExtend',
       extend: 'left',
       meta: { source: 'contextMenu' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'setIconName',
+      iconName: 'circle',
+      meta: { source: 'toolbar' },
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',

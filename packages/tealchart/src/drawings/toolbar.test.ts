@@ -1664,6 +1664,65 @@ describe('user drawing toolbar descriptors', () => {
     ).toBe(false);
   });
 
+  it('resolves selected icon library actions for icon drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'icon' },
+      drawings: [
+        {
+          id: 'icon',
+          kind: 'icon' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            fillColor: 'rgba(245, 197, 66, 0.12)',
+          },
+          point: { time: 1, price: 10 },
+          iconName: 'star' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
+      .groups.find((group) => group.id === 'style')!
+      .items;
+
+    expect(styleItems.find((item) => item.id === 'iconName:circle')).toMatchObject({
+      enabled: true,
+      command: { type: 'setIconName', iconName: 'circle' },
+    });
+
+    const nonIcon = {
+      ...selected,
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    expect(
+      resolveUserDrawingSelectedActionSurface(nonIcon)
+        .groups.find((group) => group.id === 'style')!
+        .items.some((item) => item.id.startsWith('iconName:')),
+    ).toBe(false);
+  });
+
   it('resolves selected text appearance actions for text-capable drawings', () => {
     const selected = {
       ...state,
