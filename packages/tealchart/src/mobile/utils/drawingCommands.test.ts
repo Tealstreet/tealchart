@@ -456,6 +456,30 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings).toEqual([]);
   });
 
+  it('records expanded mobile two-anchor placement tools through the same drag lifecycle', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'priceRange');
+    const started = dispatchMobileUserDrawingHistoryCommand(state, createUserDrawingCommandHistory(), {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch', transactionKey: 'price-range-placement' },
+    });
+    const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'price-range', now: () => 43, style },
+      meta: { source: 'touch', transactionKey: 'price-range-placement' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(committed.changed).toBe(true);
+    expect(committed.history.undoStack).toHaveLength(1);
+    expect(committed.state.drawings[0]).toMatchObject({
+      id: 'price-range',
+      kind: 'priceRange',
+      points: [anchorA, anchorB],
+    });
+  });
+
   it('does not record a mobile placement drag that ends at the start anchor', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const history = createUserDrawingCommandHistory();
