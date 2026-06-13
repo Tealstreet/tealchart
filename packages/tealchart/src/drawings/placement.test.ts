@@ -53,6 +53,7 @@ const dragTwoAnchorTools: UserDrawingTool[] = [
   'timeCycles',
   'sineLine',
 ];
+const dragSeedTools: UserDrawingTool[] = ['triangle', 'curve', 'arc', 'polyline', 'rotatedRectangle'];
 
 function point(time: number, price: number): UserDrawingInputPoint {
   return {
@@ -62,19 +63,27 @@ function point(time: number, price: number): UserDrawingInputPoint {
 }
 
 describe('user drawing placement modes', () => {
-  it('classifies select, click, path drag, and two-anchor drag tools', () => {
+  it('classifies select, click, path drag, two-anchor drag, and drag-seeded tools', () => {
     expect(getUserDrawingPlacementMode('select')).toBe('select');
     expect(getUserDrawingPlacementMode('horizontalLine')).toBe('click');
     expect(getUserDrawingPlacementMode('path')).toBe('pathDrag');
     expect(getUserDrawingPlacementMode('rectangle')).toBe('dragTwoAnchor');
     expect(getUserDrawingPlacementMode('trendLine')).toBe('dragTwoAnchor');
     expect(getUserDrawingPlacementMode('ellipse')).toBe('dragTwoAnchor');
+    expect(getUserDrawingPlacementMode('triangle')).toBe('dragSeed');
   });
 
   it('classifies supported two-anchor tools as drag placement tools', () => {
     for (const tool of dragTwoAnchorTools) {
       expect(isUserDrawingDragPlacementTool(tool), tool).toBe(true);
       expect(getUserDrawingPlacementMode(tool), tool).toBe('dragTwoAnchor');
+    }
+  });
+
+  it('classifies supported multi-anchor tools as drag-seeded placement tools', () => {
+    for (const tool of dragSeedTools) {
+      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(true);
+      expect(getUserDrawingPlacementMode(tool), tool).toBe('dragSeed');
     }
   });
 

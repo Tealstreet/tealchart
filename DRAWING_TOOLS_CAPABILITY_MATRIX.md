@@ -86,7 +86,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Gann/Fibonacci | `fibRetracement`, `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`, `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`, `gannSquare`, `gannSquareFixed`, `fibTimeZone` | 2 | `two-point-drag-click` | `partial` | Properties |
 | Gann/Fibonacci | `trendBasedFibExtension`, `fibWedge`, `fibChannel`, `trendBasedFibTime` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
 | Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Shift constraints for cycle/wave tools |
-| Geometric shapes | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline` | 3 | `multi-point-click` | `partial` | Placement previews, properties |
+| Geometric shapes | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Geometric shapes | `doubleCurve` | 4 | `multi-point-click` | `partial` | Placement previews, properties |
 | Brushes | `path`, `brush`, `highlighter` | sampled path | `freehand-drag` | `partial` | Smoothing, pressure/stroke properties, object tree polish |
 | Annotation | `textLabel`, `note`, `comment`, `anchoredText`, `anchoredNote`, `priceLabel`, `pin`, `emoji`, `sticker`, `balloon`, `signpost`, `table` | 1 | `one-point` or `anchored-pane` | `partial` | Floating toolbar, properties, object tree |

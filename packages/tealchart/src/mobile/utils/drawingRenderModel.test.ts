@@ -131,6 +131,43 @@ describe('mobile user drawing render model', () => {
     ]);
   });
 
+  it('keeps drag-seeded multi-anchor drafts visible for Skia after drag release', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'triangle',
+      selection: null,
+      drawings: [],
+      draft: {
+        tool: 'triangle',
+        paneId: 'main',
+        anchors: [
+          { time: 10, price: 90 },
+          { time: 40, price: 60 },
+        ],
+        style,
+        startedAt: 2,
+      },
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))).toEqual([
+      {
+        kind: 'triangle',
+        id: '__draft__',
+        phase: 'draft',
+        selected: false,
+        opacity: 0.65,
+        clip,
+        points: [
+          { x: 10, y: 10 },
+          { x: 40, y: 40 },
+          { x: 40, y: 40 },
+        ],
+        style,
+      },
+    ]);
+  });
+
   it('preserves committed drawing z-order before selected handles', () => {
     const state: UserDrawingState = {
       version: 1,

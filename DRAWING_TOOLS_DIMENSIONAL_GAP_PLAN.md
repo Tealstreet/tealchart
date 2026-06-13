@@ -202,6 +202,10 @@ Phase 1: Placement mode registry
   `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`,
   `gannSquare`, `gannSquareFixed`, `fibTimeZone`, `cyclicLines`,
   `timeCycles`, and `sineLine`.
+- Status: shared placement drag now seeds the first two anchors for geometric
+  three-anchor tools, with web Canvas and mobile Skia continuing through the
+  normal final click/tap commit path: `triangle`, `curve`, `arc`, `polyline`,
+  and `rotatedRectangle`.
 
 Phase 2: Draft lifecycle
 

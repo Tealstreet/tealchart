@@ -5,7 +5,7 @@ import type { UserDrawingAnchor, UserDrawingTool } from './types';
 import { anchorToScreenPoint, screenPointToAnchor } from './coordinates';
 import { getRequiredAnchorCount, isUserDrawingPathFamilyTool } from './types';
 
-export type UserDrawingPlacementMode = 'select' | 'click' | 'dragTwoAnchor' | 'pathDrag';
+export type UserDrawingPlacementMode = 'select' | 'click' | 'dragTwoAnchor' | 'dragSeed' | 'pathDrag';
 
 const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'trendLine',
@@ -44,15 +44,25 @@ const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'sineLine',
 ]);
 
+const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
+  'triangle',
+  'curve',
+  'arc',
+  'polyline',
+  'rotatedRectangle',
+]);
+
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {
   if (tool === 'select') return 'select';
   if (isUserDrawingPathFamilyTool(tool)) return 'pathDrag';
   if (DRAG_TWO_ANCHOR_TOOLS.has(tool) && getRequiredAnchorCount(tool) === 2) return 'dragTwoAnchor';
+  if (DRAG_SEED_MULTI_ANCHOR_TOOLS.has(tool) && getRequiredAnchorCount(tool) > 2) return 'dragSeed';
   return 'click';
 }
 
 export function isUserDrawingDragPlacementTool(tool: UserDrawingTool): boolean {
-  return getUserDrawingPlacementMode(tool) === 'dragTwoAnchor';
+  const mode = getUserDrawingPlacementMode(tool);
+  return mode === 'dragTwoAnchor' || mode === 'dragSeed';
 }
 
 export interface UserDrawingPlacementConstraintOptions {

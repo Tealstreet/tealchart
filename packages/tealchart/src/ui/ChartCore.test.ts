@@ -364,6 +364,31 @@ describe('ChartCore viewport management', () => {
     testCore.handleUserDrawingDragEnd();
     expect(onUserDrawingPathDragEnd).toHaveBeenCalledTimes(1);
 
+    onUserDrawingPathDragStart.mockClear();
+    onUserDrawingPathDragMove.mockClear();
+    onUserDrawingPathDragEnd.mockClear();
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'brush',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+    expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
+    expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
+    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(expect.objectContaining({
+      paneId: 'main',
+      anchor: { time: expect.any(Number), price: expect.any(Number) },
+    }));
+    expect(testCore.handleUserDrawingDragMove(120, 110)).toBe(true);
+    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(expect.objectContaining({
+      paneId: 'main',
+      anchor: { time: expect.any(Number), price: expect.any(Number) },
+    }));
+    testCore.handleUserDrawingDragEnd();
+    expect(onUserDrawingPathDragEnd).toHaveBeenCalledTimes(1);
+
     core.dispose();
   });
 
