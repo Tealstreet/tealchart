@@ -675,18 +675,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean {
         const transactionKey = `duplicate-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
-        const result = dispatchUserDrawingCommandToStateWithResult({
-          type: 'beginDuplicateEditDragAtPoint',
-          point,
-          spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
-          options: {
-            createId: createUserDrawingId,
-            hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+        const result = dispatchMobileUserDrawingHistoryCommand(
+          userDrawingStateRef.current,
+          userDrawingHistoryRef.current,
+          {
+            type: 'beginDuplicateEditDragAtPoint',
+            point,
+            spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
+            options: {
+              createId: createUserDrawingId,
+              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+            },
+            meta: { source: 'api', transactionKey },
           },
-          meta: { source: 'api', transactionKey },
-        });
+        );
         if (!result.hit || !result.editDrag) return false;
 
+        userDrawingHistoryRef.current = result.history;
+        if (result.changed) {
+          commitUserDrawingState(result.state);
+        }
         userDrawingEditDragRef.current = result.editDrag;
         userDrawingEditDragTransactionKeyRef.current = transactionKey;
         return true;
