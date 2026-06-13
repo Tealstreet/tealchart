@@ -697,13 +697,16 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingIconNameChange: onIconName,
     });
     topBar.mount(document.body);
 
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing icon to circle"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Flag icon"]')?.click();
 
-    expect(onIconName).toHaveBeenCalledWith('flag');
+    expect(onIconName).toHaveBeenNthCalledWith(1, 'circle');
+    expect(onIconName).toHaveBeenNthCalledWith(2, 'flag');
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')).toBeNull();
 
     topBar.unmount();

@@ -89,6 +89,15 @@ export function dispatchMobileUserDrawingActionCommand(
     return true;
   }
 
+  if (command.type === 'setIconName') {
+    options.dispatchUserDrawingCommand({
+      type: 'setIconName',
+      iconName: command.iconName,
+      meta: { source: options.source },
+    });
+    return true;
+  }
+
   if (command.type === 'toolbarAction') {
     if (command.action === 'duplicateSelected') {
       options.dispatchUserDrawingCommand({

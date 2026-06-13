@@ -72,6 +72,10 @@ export type UserDrawingSelectedActionSurfaceCommand =
       extend: UserDrawingTrendLineExtend;
     }
   | {
+      type: 'setIconName';
+      iconName: UserDrawingIconName;
+    }
+  | {
       type: 'toolbarAction';
       action: Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>;
     }
@@ -847,6 +851,13 @@ function getNextUserDrawingTrendLineExtend(drawing: UserDrawing): UserDrawingTre
   return extensions[currentIndex >= 0 ? (currentIndex + 1) % extensions.length : 0]!;
 }
 
+function getNextUserDrawingIconName(drawing: UserDrawing): UserDrawingIconName | null {
+  if (drawing.kind !== 'icon') return null;
+  const iconNames = USER_DRAWING_ICON_NAME_DESCRIPTORS.map((descriptor) => descriptor.iconName);
+  const currentIndex = iconNames.indexOf(drawing.iconName);
+  return iconNames[currentIndex >= 0 ? (currentIndex + 1) % iconNames.length : 0]!;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -880,6 +891,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const nextTrendLineExtend = supportsUserDrawingTrendLineExtendControls(selectedDrawing)
     ? getNextUserDrawingTrendLineExtend(selectedDrawing)
     : null;
+  const nextIconName = supportsUserDrawingIconControls(selectedDrawing) ? getNextUserDrawingIconName(selectedDrawing) : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -1027,6 +1039,15 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'setTrendLineExtend', extend: nextTrendLineExtend },
       }
     : null;
+  const iconNameItem: UserDrawingSelectedActionSurfaceItem | null = nextIconName
+    ? {
+        id: `iconName:${nextIconName}`,
+        icon: USER_DRAWING_ICON_NAME_DESCRIPTORS.find((descriptor) => descriptor.iconName === nextIconName)!.icon,
+        label: `Cycle selected drawing icon to ${nextIconName}`,
+        enabled: styleEnabled,
+        command: { type: 'setIconName', iconName: nextIconName },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -1076,6 +1097,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(widerTextMaxWidthItem ? [widerTextMaxWidthItem] : []),
       ...(textAlignItem ? [textAlignItem] : []),
       ...(trendLineExtendItem ? [trendLineExtendItem] : []),
+      ...(iconNameItem ? [iconNameItem] : []),
     ],
   };
 }
@@ -1146,7 +1168,8 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
         if (
           item.command.type === 'updateStyle' ||
           item.command.type === 'setTextAlign' ||
-          item.command.type === 'setTrendLineExtend'
+          item.command.type === 'setTrendLineExtend' ||
+          item.command.type === 'setIconName'
         ) {
           return item;
         }
