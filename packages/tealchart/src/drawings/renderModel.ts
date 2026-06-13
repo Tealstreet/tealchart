@@ -1,4 +1,4 @@
-import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
+import type { DrawingCoordinateSpace, DrawingScreenPoint, DrawingScreenRect } from './coordinates';
 import type { UserDrawing, UserDrawingAnchor, UserDrawingState } from './types';
 
 import {
@@ -29,6 +29,22 @@ export interface ResolveUserDrawingRenderEntriesOptions {
   draftId?: string;
   now?: number;
 }
+
+export interface ResolveUserDrawingSelectionActionAnchorOptions {
+  padding?: number;
+  minTargetSize?: number;
+}
+
+export interface UserDrawingSelectionActionAnchor {
+  anchor: DrawingScreenPoint;
+  bounds: DrawingScreenRect;
+  drawingIds: readonly string[];
+  paneIds: readonly string[];
+  primaryPaneId: string;
+}
+
+const DEFAULT_SELECTION_ACTION_PADDING = 8;
+const DEFAULT_SELECTION_ACTION_MIN_TARGET_SIZE = 24;
 
 export function resolveUserDrawingRenderEntries(
   state: UserDrawingState,
@@ -286,4 +302,333 @@ export function resolveUserDrawingHandlePoints(
     case 'anchoredNote':
       return [panePositionToScreenPoint(drawing.position, space)];
   }
+}
+
+function pointsToBounds(points: readonly DrawingScreenPoint[]): DrawingScreenRect | null {
+  if (points.length === 0) return null;
+
+  let minX = points[0]?.x ?? 0;
+  let maxX = minX;
+  let minY = points[0]?.y ?? 0;
+  let maxY = minY;
+
+  for (const point of points.slice(1)) {
+    minX = Math.min(minX, point.x);
+    maxX = Math.max(maxX, point.x);
+    minY = Math.min(minY, point.y);
+    maxY = Math.max(maxY, point.y);
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
+function segmentToBounds({ start, end }: { start: DrawingScreenPoint; end: DrawingScreenPoint }): DrawingScreenRect {
+  const minX = Math.min(start.x, end.x);
+  const minY = Math.min(start.y, end.y);
+
+  return {
+    x: minX,
+    y: minY,
+    width: Math.max(start.x, end.x) - minX,
+    height: Math.max(start.y, end.y) - minY,
+  };
+}
+
+function normalizeSelectionActionBounds(
+  bounds: DrawingScreenRect,
+  options: Required<ResolveUserDrawingSelectionActionAnchorOptions>,
+): DrawingScreenRect {
+  const padded = {
+    x: bounds.x - options.padding,
+    y: bounds.y - options.padding,
+    width: bounds.width + options.padding * 2,
+    height: bounds.height + options.padding * 2,
+  };
+  const widthDelta = Math.max(0, options.minTargetSize - padded.width);
+  const heightDelta = Math.max(0, options.minTargetSize - padded.height);
+
+  return {
+    x: padded.x - widthDelta / 2,
+    y: padded.y - heightDelta / 2,
+    width: padded.width + widthDelta,
+    height: padded.height + heightDelta,
+  };
+}
+
+function mergeBounds(a: DrawingScreenRect, b: DrawingScreenRect): DrawingScreenRect {
+  const minX = Math.min(a.x, b.x);
+  const minY = Math.min(a.y, b.y);
+  const maxX = Math.max(a.x + a.width, b.x + b.width);
+  const maxY = Math.max(a.y + a.height, b.y + b.height);
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
+function getSpaceForDrawing(
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace> | Readonly<Record<string, DrawingCoordinateSpace>>,
+  drawing: UserDrawing,
+): DrawingCoordinateSpace | undefined {
+  if (typeof (spacesByPaneId as ReadonlyMap<string, DrawingCoordinateSpace>).get === 'function') {
+    return (spacesByPaneId as ReadonlyMap<string, DrawingCoordinateSpace>).get(drawing.paneId);
+  }
+
+  return (spacesByPaneId as Readonly<Record<string, DrawingCoordinateSpace>>)[drawing.paneId];
+}
+
+function boundsFromUserDrawingGeometry(drawing: UserDrawing, space: DrawingCoordinateSpace): DrawingScreenRect | null {
+  const geometry = resolveUserDrawingGeometry(drawing, space);
+
+  switch (geometry.kind) {
+    case 'line':
+    case 'arrowLine':
+    case 'ray':
+    case 'horizontalRay':
+    case 'horizontalLine':
+    case 'verticalLine':
+      return segmentToBounds(geometry.segment);
+    case 'trendAngle':
+      return segmentToBounds(geometry.angle.segment);
+    case 'infoLine':
+      return segmentToBounds(geometry.segment);
+    case 'crossLine':
+      return mergeBounds(segmentToBounds(geometry.crossLine.horizontal), segmentToBounds(geometry.crossLine.vertical));
+    case 'arrowMarker':
+      return pointsToBounds(geometry.marker.points);
+    case 'arrowMark':
+      return pointsToBounds(geometry.mark.points);
+    case 'rectangle':
+    case 'image':
+    case 'priceRange':
+    case 'datePriceRange':
+    case 'dateRange':
+      return geometry.rect;
+    case 'circle':
+      return geometry.circle.rect;
+    case 'ellipse':
+      return geometry.ellipse.rect;
+    case 'longPosition':
+    case 'shortPosition':
+      return mergeBounds(geometry.position.profitRect, geometry.position.riskRect);
+    case 'forecast':
+      return segmentToBounds(geometry.forecast.segment);
+    case 'projection':
+      return mergeBounds(segmentToBounds(geometry.projection.baseSegment), segmentToBounds(geometry.projection.projectionSegment));
+    case 'sector':
+      return pointsToBounds(geometry.sector.polygon.points);
+    case 'barsPattern':
+      return geometry.pattern.bounds;
+    case 'trianglePattern':
+      return pointsToBounds(geometry.pattern.polygon.points);
+    case 'xabcdPattern':
+    case 'cypherPattern':
+    case 'threeDrivesPattern':
+    case 'abcdPattern':
+    case 'elliottImpulseWave':
+    case 'elliottCorrectiveWave':
+    case 'elliottDoubleComboWave':
+    case 'elliottTripleComboWave':
+    case 'elliottTriangleWave':
+      return pointsToBounds(geometry.pattern.polyline.points);
+    case 'headShouldersPattern':
+      return mergeBounds(pointsToBounds(geometry.pattern.polyline.points) ?? segmentToBounds(geometry.pattern.neckline), segmentToBounds(geometry.pattern.neckline));
+    case 'fibRetracement':
+    case 'fibExtension':
+    case 'trendBasedFibExtension':
+      return geometry.fib.rect;
+    case 'path':
+    case 'brush':
+    case 'highlighter':
+      return pointsToBounds(geometry.polyline.points);
+    case 'curve':
+      return pointsToBounds(geometry.curve.points);
+    case 'doubleCurve':
+      return pointsToBounds(geometry.doubleCurve.points);
+    case 'arc':
+      return pointsToBounds(geometry.arc.points);
+    case 'anchoredVwap':
+      return pointsToBounds([geometry.vwap.anchor, ...geometry.vwap.points]);
+    case 'anchoredVolumeProfile':
+    case 'fixedRangeVolumeProfile':
+      return geometry.volumeProfile.bounds;
+    case 'triangle':
+      return pointsToBounds(geometry.polygon.points);
+    case 'pitchfork': {
+      let bounds = mergeBounds(segmentToBounds(geometry.pitchfork.median), segmentToBounds(geometry.pitchfork.upper));
+      bounds = mergeBounds(bounds, segmentToBounds(geometry.pitchfork.lower));
+      for (const parallel of geometry.pitchfork.parallels) {
+        bounds = mergeBounds(bounds, segmentToBounds(parallel.segment));
+      }
+      return bounds;
+    }
+    case 'pitchfan':
+      return pointsToBounds([
+        geometry.pitchfan.origin,
+        geometry.pitchfan.targetStart,
+        geometry.pitchfan.targetEnd,
+        ...geometry.pitchfan.rays.flatMap((ray) => [ray.segment.start, ray.segment.end]),
+      ]);
+    case 'fibFan':
+      return pointsToBounds([
+        geometry.fibFan.origin,
+        geometry.fibFan.targetStart,
+        geometry.fibFan.targetEnd,
+        ...geometry.fibFan.rays.flatMap((ray) => [ray.segment.start, ray.segment.end]),
+      ]);
+    case 'fibSpeedResistanceFan':
+      return pointsToBounds([
+        geometry.fibSpeedResistanceFan.origin,
+        geometry.fibSpeedResistanceFan.targetStart,
+        geometry.fibSpeedResistanceFan.targetEnd,
+        ...geometry.fibSpeedResistanceFan.rays.flatMap((ray) => [ray.segment.start, ray.segment.end]),
+      ]);
+    case 'fibArcs':
+      return pointsToBounds(geometry.fibArcs.arcs.flatMap((arc) => [arc.labelPoint, { x: arc.rect.x, y: arc.rect.y }, { x: arc.rect.x + arc.rect.width, y: arc.rect.y + arc.rect.height }]));
+    case 'fibSpeedResistanceArcs':
+      return pointsToBounds(
+        geometry.fibSpeedResistanceArcs.arcs.flatMap((arc) => [
+          arc.labelPoint,
+          { x: arc.rect.x, y: arc.rect.y },
+          { x: arc.rect.x + arc.rect.width, y: arc.rect.y + arc.rect.height },
+        ]),
+      );
+    case 'fibCircles':
+      return pointsToBounds(
+        geometry.fibCircles.circles.flatMap((circle) => [
+          circle.labelPoint,
+          { x: circle.rect.x, y: circle.rect.y },
+          { x: circle.rect.x + circle.rect.width, y: circle.rect.y + circle.rect.height },
+        ]),
+      );
+    case 'fibWedge':
+      return pointsToBounds([
+        geometry.fibWedge.center,
+        geometry.fibWedge.lower,
+        geometry.fibWedge.upper,
+        ...geometry.fibWedge.boundaries.flatMap((boundary) => [boundary.start, boundary.end]),
+        ...geometry.fibWedge.arcs.flatMap((arc) => [
+          arc.labelPoint,
+          { x: arc.rect.x, y: arc.rect.y },
+          { x: arc.rect.x + arc.rect.width, y: arc.rect.y + arc.rect.height },
+        ]),
+      ]);
+    case 'fibSpiral':
+      return pointsToBounds(geometry.fibSpiral.points);
+    case 'fibChannel':
+      return pointsToBounds(geometry.fibChannel.polygon.points);
+    case 'fibTimeZone':
+      return pointsToBounds(geometry.fibTimeZone.levels.flatMap((level) => [level.segment.start, level.segment.end]));
+    case 'trendBasedFibTime':
+      return pointsToBounds(geometry.trendBasedFibTime.levels.flatMap((level) => [level.segment.start, level.segment.end]));
+    case 'cyclicLines':
+      return pointsToBounds(geometry.cyclicLines.levels.flatMap((level) => [level.segment.start, level.segment.end]));
+    case 'timeCycles':
+      return pointsToBounds([
+        geometry.timeCycles.baseline,
+        geometry.timeCycles.peak,
+        ...geometry.timeCycles.cycles.flatMap((cycle) => cycle.points),
+      ]);
+    case 'sineLine':
+      return pointsToBounds(geometry.sineLine.points);
+    case 'gannFan':
+      return pointsToBounds([geometry.gannFan.origin, geometry.gannFan.reference, ...geometry.gannFan.rays.flatMap((ray) => [ray.segment.start, ray.segment.end])]);
+    case 'gannBox':
+    case 'gannSquare':
+    case 'gannSquareFixed':
+      return geometry.gannBox.rect;
+    case 'parallelChannel':
+    case 'regressionTrend':
+    case 'flatTopBottom':
+    case 'disjointChannel':
+    case 'rotatedRectangle':
+      return pointsToBounds(geometry.channel.polygon.points);
+    case 'textLabel':
+    case 'note':
+    case 'comment':
+    case 'anchoredText':
+    case 'anchoredNote':
+    case 'priceLabel':
+    case 'emoji':
+    case 'sticker':
+    case 'balloon':
+    case 'signpost':
+    case 'pin':
+      return pointsToBounds([geometry.point]);
+    case 'table':
+      return geometry.table.bounds;
+    case 'icon':
+      return geometry.icon.bounds;
+    case 'callout':
+    case 'priceNote':
+      return pointsToBounds([geometry.tip, geometry.point]);
+  }
+}
+
+export function resolveUserDrawingScreenBounds(
+  drawing: UserDrawing,
+  space: DrawingCoordinateSpace,
+  options: ResolveUserDrawingSelectionActionAnchorOptions = {},
+): DrawingScreenRect | null {
+  const bounds = boundsFromUserDrawingGeometry(drawing, space) ?? pointsToBounds(resolveUserDrawingHandlePoints(drawing, space));
+  if (!bounds) return null;
+
+  return normalizeSelectionActionBounds(bounds, {
+    padding: options.padding ?? DEFAULT_SELECTION_ACTION_PADDING,
+    minTargetSize: options.minTargetSize ?? DEFAULT_SELECTION_ACTION_MIN_TARGET_SIZE,
+  });
+}
+
+export function resolveUserDrawingSelectionActionAnchor(
+  state: UserDrawingState,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace> | Readonly<Record<string, DrawingCoordinateSpace>>,
+  options: ResolveUserDrawingSelectionActionAnchorOptions = {},
+): UserDrawingSelectionActionAnchor | null {
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  if (selectedIds.size === 0) return null;
+
+  const normalizedOptions = {
+    padding: options.padding ?? DEFAULT_SELECTION_ACTION_PADDING,
+    minTargetSize: options.minTargetSize ?? DEFAULT_SELECTION_ACTION_MIN_TARGET_SIZE,
+  };
+  const drawingsById = new Map(state.drawings.map((drawing) => [drawing.id, drawing]));
+  const drawingIds: string[] = [];
+  const paneIds: string[] = [];
+  let bounds: DrawingScreenRect | null = null;
+
+  for (const drawingId of selectedIds) {
+    const drawing = drawingsById.get(drawingId);
+    if (!drawing?.visible) continue;
+
+    const space = getSpaceForDrawing(spacesByPaneId, drawing);
+    if (!space) continue;
+
+    const drawingBounds = resolveUserDrawingScreenBounds(drawing, space, normalizedOptions);
+    if (!drawingBounds) continue;
+
+    drawingIds.push(drawing.id);
+    if (!paneIds.includes(drawing.paneId)) paneIds.push(drawing.paneId);
+    bounds = bounds ? mergeBounds(bounds, drawingBounds) : drawingBounds;
+  }
+
+  if (!bounds || drawingIds.length === 0 || paneIds.length === 0) return null;
+
+  return {
+    anchor: {
+      x: bounds.x + bounds.width / 2,
+      y: bounds.y,
+    },
+    bounds,
+    drawingIds,
+    paneIds,
+    primaryPaneId: paneIds[0] ?? '',
+  };
 }

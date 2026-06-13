@@ -262,8 +262,10 @@ long-press.
 Status: initial selected-action surface descriptors shipped for duplicate,
 delete, z-order, visibility, and lock/unlock. The web top bar now consumes this
 shared model for selected actions while mobile Skia can consume the same
-exported descriptors when the native action surface lands. Geometry anchoring,
-text/tool-specific actions, context actions, and mobile UI chrome remain open.
+exported descriptors when the native action surface lands. Shared selection
+bounds and preferred action anchor geometry now resolve from the drawing render
+model for both Canvas and Skia callers. Text/tool-specific actions, context
+actions, offscreen UI placement, and mobile UI chrome remain open.
 
 Phase 1: Action availability model
 
@@ -274,9 +276,11 @@ Phase 1: Action availability model
 
 Phase 2: Anchor geometry model
 
-- Resolve selected drawing bounds and preferred toolbar anchor point from shared
-  render geometry.
-- Handle offscreen, multi-select, pane split, and price/time axis clipping.
+- Status: selected drawing bounds, preferred toolbar anchor point, single-anchor
+  minimum target sizing, multi-select bounds, and pane split metadata resolve
+  from shared render geometry.
+- Future work: clamp the visual toolbar/sheet to safe viewport insets when the
+  web floating toolbar and mobile action surface consume this model.
 
 Phase 3: Command dispatch
 
