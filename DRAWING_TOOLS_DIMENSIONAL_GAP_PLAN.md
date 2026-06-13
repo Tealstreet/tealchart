@@ -215,6 +215,10 @@ Phase 1: Placement mode registry
   Gann/Fibonacci three-anchor tools, with web Canvas and mobile Skia continuing
   through the normal final click/tap commit path: `trendBasedFibExtension`,
   `fibWedge`, `fibChannel`, and `trendBasedFibTime`.
+- Status: shared placement drag now also seeds the first two anchors for
+  supported four-anchor tools, with web Canvas and mobile Skia continuing
+  through the normal remaining click/tap commit path: `doubleCurve` and
+  `disjointChannel`.
 
 Phase 2: Draft lifecycle
 
