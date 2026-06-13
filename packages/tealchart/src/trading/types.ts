@@ -8,7 +8,7 @@ export type ChartTradingBracketOwnerType = 'order' | 'position';
 
 export type ChartTradingProfitState = 'positive' | 'negative' | 'neutral';
 
-export type ChartTradingLineDash = 'solid' | 'dotted' | 'dashed' | 'long-dashed' | 0 | 1 | 2 | 4;
+export type ChartTradingLineDash = 'solid' | 'dotted' | 'dashed' | 0 | 1 | 2;
 
 export interface ChartTradingLineStyle {
   lineColor?: string;
@@ -87,16 +87,10 @@ export interface ChartTradingExecutionLine extends ChartTradingLineBase {
   direction: 'buy' | 'sell';
 }
 
-export interface ChartTradingCustomLine extends ChartTradingLineBase {
-  kind: 'custom';
-  type?: string;
-}
-
 export interface ChartTradingState {
   orders?: readonly ChartTradingOrderLine[];
   positions?: readonly ChartTradingPositionLine[];
   executions?: readonly ChartTradingExecutionLine[];
-  custom?: readonly ChartTradingCustomLine[];
 }
 
 export interface ChartTradingIntentBase {

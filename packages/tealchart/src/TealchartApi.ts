@@ -260,10 +260,38 @@ export class TealchartApi {
 
   private _cloneTradingState(state: ChartTradingState): ChartTradingState {
     return {
-      orders: state.orders ? [...state.orders] : undefined,
-      positions: state.positions ? [...state.positions] : undefined,
-      executions: state.executions ? [...state.executions] : undefined,
-      custom: state.custom ? [...state.custom] : undefined,
+      orders: state.orders?.map((order) => this._cloneTradingOrder(order)),
+      positions: state.positions?.map((position) => this._cloneTradingPosition(position)),
+      executions: state.executions?.map((execution) => this._cloneTradingExecution(execution)),
+    };
+  }
+
+  private _cloneTradingOrder(order: ChartTradingOrderLine): ChartTradingOrderLine {
+    return {
+      ...order,
+      label: order.label ? { ...order.label } : undefined,
+      style: order.style ? { ...order.style } : undefined,
+      actions: order.actions?.map((action) => ({ ...action })),
+      brackets: order.brackets ? { ...order.brackets } : order.brackets,
+    };
+  }
+
+  private _cloneTradingPosition(position: ChartTradingPositionLine): ChartTradingPositionLine {
+    return {
+      ...position,
+      label: position.label ? { ...position.label } : undefined,
+      style: position.style ? { ...position.style } : undefined,
+      actions: position.actions?.map((action) => ({ ...action })),
+      brackets: position.brackets ? { ...position.brackets } : position.brackets,
+    };
+  }
+
+  private _cloneTradingExecution(execution: ChartTradingExecutionLine): ChartTradingExecutionLine {
+    return {
+      ...execution,
+      label: execution.label ? { ...execution.label } : undefined,
+      style: execution.style ? { ...execution.style } : undefined,
+      actions: execution.actions?.map((action) => ({ ...action })),
     };
   }
 
@@ -455,7 +483,6 @@ export class TealchartApi {
     if (style === 'solid') return 0;
     if (style === 'dotted') return 1;
     if (style === 'dashed') return 2;
-    if (style === 'long-dashed') return 4;
     return style;
   }
 
@@ -465,19 +492,19 @@ export class TealchartApi {
     defaultLineColor: string,
   ): void {
     adapter.setLineColor(style?.lineColor ?? defaultLineColor);
-    if (style?.lineStyle !== undefined) adapter.setLineStyle(this._lineStyleValue(style.lineStyle)!);
-    if (style?.lineWidth !== undefined) adapter.setLineWidth(style.lineWidth);
-    if (style?.lineLength !== undefined) adapter.setLineLength(style.lineLength);
-    if (style?.extendLeft !== undefined) adapter.setExtendLeft(style.extendLeft);
-    if (style?.bodyBackgroundColor) adapter.setBodyBackgroundColor(style.bodyBackgroundColor);
-    if (style?.bodyTextColor) adapter.setBodyTextColor(style.bodyTextColor);
-    if (style?.bodyBorderColor) adapter.setBodyBorderColor(style.bodyBorderColor);
-    if (style?.quantityBackgroundColor) adapter.setQuantityBackgroundColor(style.quantityBackgroundColor);
-    if (style?.quantityTextColor) adapter.setQuantityTextColor(style.quantityTextColor);
-    if (style?.quantityBorderColor) adapter.setQuantityBorderColor(style.quantityBorderColor);
-    if (style?.actionBackgroundColor) adapter.setCancelButtonBackgroundColor(style.actionBackgroundColor);
-    if (style?.actionIconColor) adapter.setCancelButtonIconColor(style.actionIconColor);
-    if (style?.actionBorderColor) adapter.setCancelButtonBorderColor(style.actionBorderColor);
+    adapter.setLineStyle(this._lineStyleValue(style?.lineStyle) ?? 0);
+    adapter.setLineWidth(style?.lineWidth ?? 1);
+    adapter.setLineLength(style?.lineLength ?? 50);
+    adapter.setExtendLeft(style?.extendLeft ?? false);
+    adapter.setBodyBackgroundColor(style?.bodyBackgroundColor ?? 'rgba(33, 150, 243, 0.75)');
+    adapter.setBodyTextColor(style?.bodyTextColor ?? '#FFFFFF');
+    adapter.setBodyBorderColor(style?.bodyBorderColor ?? defaultLineColor);
+    adapter.setQuantityBackgroundColor(style?.quantityBackgroundColor ?? 'rgba(33, 150, 243, 0.75)');
+    adapter.setQuantityTextColor(style?.quantityTextColor ?? '#FFFFFF');
+    adapter.setQuantityBorderColor(style?.quantityBorderColor ?? defaultLineColor);
+    adapter.setCancelButtonBackgroundColor(style?.actionBackgroundColor ?? 'rgba(33, 150, 243, 0.75)');
+    adapter.setCancelButtonIconColor(style?.actionIconColor ?? '#FFFFFF');
+    adapter.setCancelButtonBorderColor(style?.actionBorderColor ?? defaultLineColor);
   }
 
   private _applyPositionTradingStyle(
@@ -486,28 +513,22 @@ export class TealchartApi {
     defaultLineColor: string,
   ): void {
     adapter.setLineColor(style?.lineColor ?? defaultLineColor);
-    if (style?.lineStyle !== undefined) adapter.setLineStyle(this._lineStyleValue(style.lineStyle)!);
-    if (style?.lineWidth !== undefined) adapter.setLineWidth(style.lineWidth);
-    if (style?.lineLength !== undefined) adapter.setLineLength(style.lineLength);
-    if (style?.extendLeft !== undefined) adapter.setExtendLeft(style.extendLeft);
-    if (style?.bodyBackgroundColor) adapter.setBodyBackgroundColor(style.bodyBackgroundColor);
-    if (style?.bodyTextColor) adapter.setBodyTextColor(style.bodyTextColor);
-    if (style?.bodyBorderColor) adapter.setBodyBorderColor(style.bodyBorderColor);
-    if (style?.quantityBackgroundColor) adapter.setQuantityBackgroundColor(style.quantityBackgroundColor);
-    if (style?.quantityTextColor) adapter.setQuantityTextColor(style.quantityTextColor);
-    if (style?.quantityBorderColor) adapter.setQuantityBorderColor(style.quantityBorderColor);
-    if (style?.actionBackgroundColor) {
-      adapter.setCloseButtonBackgroundColor(style.actionBackgroundColor);
-      adapter.setReverseButtonBackgroundColor(style.actionBackgroundColor);
-    }
-    if (style?.actionIconColor) {
-      adapter.setCloseButtonIconColor(style.actionIconColor);
-      adapter.setReverseButtonIconColor(style.actionIconColor);
-    }
-    if (style?.actionBorderColor) {
-      adapter.setCloseButtonBorderColor(style.actionBorderColor);
-      adapter.setReverseButtonBorderColor(style.actionBorderColor);
-    }
+    adapter.setLineStyle(this._lineStyleValue(style?.lineStyle) ?? 0);
+    adapter.setLineWidth(style?.lineWidth ?? 2);
+    adapter.setLineLength(style?.lineLength ?? 100);
+    adapter.setExtendLeft(style?.extendLeft ?? false);
+    adapter.setBodyBackgroundColor(style?.bodyBackgroundColor ?? 'rgba(76, 175, 80, 0.75)');
+    adapter.setBodyTextColor(style?.bodyTextColor ?? '#FFFFFF');
+    adapter.setBodyBorderColor(style?.bodyBorderColor ?? defaultLineColor);
+    adapter.setQuantityBackgroundColor(style?.quantityBackgroundColor ?? 'rgba(76, 175, 80, 0.75)');
+    adapter.setQuantityTextColor(style?.quantityTextColor ?? '#FFFFFF');
+    adapter.setQuantityBorderColor(style?.quantityBorderColor ?? defaultLineColor);
+    adapter.setCloseButtonBackgroundColor(style?.actionBackgroundColor ?? 'rgba(244, 67, 54, 0.75)');
+    adapter.setCloseButtonIconColor(style?.actionIconColor ?? '#FFFFFF');
+    adapter.setCloseButtonBorderColor(style?.actionBorderColor ?? '#F44336');
+    adapter.setReverseButtonBackgroundColor(style?.actionBackgroundColor ?? 'rgba(76, 175, 80, 0.75)');
+    adapter.setReverseButtonIconColor(style?.actionIconColor ?? '#FFFFFF');
+    adapter.setReverseButtonBorderColor(style?.actionBorderColor ?? defaultLineColor);
   }
 
   // ============================================================================

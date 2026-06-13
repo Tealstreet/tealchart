@@ -7,7 +7,6 @@ export type {
   ChartTradingBracketIntentBase,
   ChartTradingBracketOwnerType,
   ChartTradingBracketPreviewIntent,
-  ChartTradingCustomLine,
   ChartTradingExecutionLine,
   ChartTradingIntent,
   ChartTradingIntentBase,

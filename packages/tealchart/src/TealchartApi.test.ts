@@ -281,7 +281,6 @@ describe('TealchartApi trading intents', () => {
           style: { lineColor: '#00ff00' },
         },
       ],
-      custom: [{ kind: 'custom', id: 'custom-1', price: 51_000, type: 'alert', meta: { source: 'test' } }],
     });
 
     const order = api.getOrderLinesRenderData()[0];
@@ -340,7 +339,6 @@ describe('TealchartApi trading intents', () => {
       { type: 'position.close', positionId: 'BTCUSDT:long', lineId: position.id, source: 'native-line' },
       { type: 'position.reverse', positionId: 'BTCUSDT:long', lineId: position.id, source: 'native-line' },
     ]);
-    expect(api.trading().getState().custom?.[0]?.meta).toEqual({ source: 'test' });
   });
 
   it('reconciles facade-owned trading lines without removing legacy lines', async () => {
@@ -387,5 +385,116 @@ describe('TealchartApi trading intents', () => {
     expect(renderData).toMatchObject({ closeable: false, reversible: false });
     expect(renderData.callbacks?.onClose).toBeUndefined();
     expect(renderData.callbacks?.onReverse).toBeUndefined();
+  });
+
+  it('treats trading state as authoritative when style fields are removed', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+
+    api.setTradingState({
+      orders: [
+        {
+          kind: 'order',
+          id: 'order',
+          price: 10,
+          side: 'buy',
+          style: {
+            lineColor: '#111111',
+            lineStyle: 'dashed',
+            lineWidth: 4,
+            lineLength: 70,
+            extendLeft: true,
+            bodyBackgroundColor: '#222222',
+            actionBackgroundColor: '#333333',
+          },
+        },
+      ],
+      positions: [
+        {
+          kind: 'position',
+          id: 'position',
+          price: 20,
+          side: 'short',
+          style: {
+            lineColor: '#444444',
+            lineStyle: 'dotted',
+            lineWidth: 5,
+            lineLength: 40,
+            extendLeft: true,
+            bodyBackgroundColor: '#555555',
+            actionBackgroundColor: '#666666',
+          },
+        },
+      ],
+    });
+
+    api.setTradingState({
+      orders: [{ kind: 'order', id: 'order', price: 10, side: 'buy' }],
+      positions: [{ kind: 'position', id: 'position', price: 20, side: 'short' }],
+    });
+
+    expect(api.getOrderLinesRenderData()[0]).toMatchObject({
+      lineColor: '#22c55e',
+      lineStyle: 0,
+      lineWidth: 1,
+      lineLength: 50,
+      extendLeft: false,
+      bodyBackgroundColor: 'rgba(33, 150, 243, 0.75)',
+      cancelButtonBackgroundColor: 'rgba(33, 150, 243, 0.75)',
+    });
+    expect(api.getPositionLinesRenderData()[0]).toMatchObject({
+      lineColor: '#ef4444',
+      lineStyle: 0,
+      lineWidth: 2,
+      lineLength: 100,
+      extendLeft: false,
+      bodyBackgroundColor: 'rgba(76, 175, 80, 0.75)',
+      closeButtonBackgroundColor: 'rgba(244, 67, 54, 0.75)',
+      reverseButtonBackgroundColor: 'rgba(76, 175, 80, 0.75)',
+    });
+  });
+
+  it('clones trading state structural fields on set and get', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const state: ChartTradingState = {
+      orders: [
+        {
+          kind: 'order',
+          id: 'order',
+          price: 10,
+          label: { primary: 'Original' },
+          style: { lineWidth: 3 },
+          actions: [{ id: 'cancel', label: 'Cancel' }],
+          brackets: { takeProfit: 12 },
+          meta: { owner: 'consumer' },
+        },
+      ],
+    };
+
+    api.setTradingState(state);
+    state.orders![0].label!.primary = 'Mutated input';
+    state.orders![0].style!.lineWidth = 9;
+    state.orders![0].actions![0].label = 'Mutated action';
+    state.orders![0].brackets!.takeProfit = 99;
+
+    expect(api.getTradingState().orders?.[0]).toMatchObject({
+      label: { primary: 'Original' },
+      style: { lineWidth: 3 },
+      actions: [{ id: 'cancel', label: 'Cancel' }],
+      brackets: { takeProfit: 12 },
+    });
+    expect(api.getTradingState().orders?.[0].meta).toBe(state.orders![0].meta);
+
+    const returned = api.getTradingState();
+    returned.orders![0].label!.primary = 'Mutated output';
+    returned.orders![0].style!.lineWidth = 10;
+    returned.orders![0].actions![0].label = 'Mutated returned action';
+    returned.orders![0].brackets!.takeProfit = 100;
+
+    expect(api.getTradingState().orders?.[0]).toMatchObject({
+      label: { primary: 'Original' },
+      style: { lineWidth: 3 },
+      actions: [{ id: 'cancel', label: 'Cancel' }],
+      brackets: { takeProfit: 12 },
+    });
   });
 });
