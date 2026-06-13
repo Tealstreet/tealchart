@@ -38,6 +38,7 @@ describe('TradingViewTradingBridge', () => {
             orderId: 'external-order-1',
             price: 100,
             side: 'buy',
+            cancellable: true,
             actions: [{ id: 'amend', label: 'Amend' }],
           },
         ],
@@ -61,6 +62,78 @@ describe('TradingViewTradingBridge', () => {
         source: 'tradingview-bridge',
         lineId: 'order-1',
         actionId: 'amend',
+      },
+    ]);
+  });
+
+  it('does not emit built-in intents unless lines opt in', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [{ kind: 'order', id: 'order-1', price: 100 }],
+        positions: [{ kind: 'position', id: 'position-1', price: 120 }],
+      },
+      onIntent,
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 30, y: 100 });
+    bridge.handlePointerUp({ x: 30, y: 80 });
+    bridge.handlePointerDown({ x: 306, y: 80 });
+
+    expect(onIntent).not.toHaveBeenCalled();
+  });
+
+  it('enables built-in actions from action metadata', () => {
+    const intents: unknown[] = [];
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            price: 100,
+            actions: [{ id: 'cancel', label: 'Cancel' }],
+          },
+        ],
+        positions: [
+          {
+            kind: 'position',
+            id: 'position-1',
+            price: 120,
+            actions: [
+              { id: 'close', label: 'Close' },
+              { id: 'reverse', label: 'Reverse' },
+            ],
+          },
+        ],
+      },
+      onIntent: (intent) => intents.push(intent),
+    });
+
+    bridge.draw(frame(createRecordingContext()));
+    bridge.handlePointerDown({ x: 326, y: 100 });
+    bridge.handlePointerDown({ x: 306, y: 80 });
+    bridge.handlePointerDown({ x: 324, y: 80 });
+
+    expect(intents).toEqual([
+      {
+        type: 'order.cancel',
+        source: 'tradingview-bridge',
+        orderId: 'order-1',
+        lineId: 'order-1',
+      },
+      {
+        type: 'position.close',
+        source: 'tradingview-bridge',
+        positionId: 'position-1',
+        lineId: 'position-1',
+      },
+      {
+        type: 'position.reverse',
+        source: 'tradingview-bridge',
+        positionId: 'position-1',
+        lineId: 'position-1',
       },
     ]);
   });
@@ -132,6 +205,31 @@ describe('TradingViewTradingBridge', () => {
       },
     ]);
   });
+
+  it('interpolates execution markers only inside the visible bar range', () => {
+    const insideCtx = createRecordingContext();
+    const insideBridge = new TradingViewTradingBridge({
+      state: {
+        executions: [{ kind: 'execution', id: 'execution-1', price: 100, time: 2, direction: 'buy' }],
+      },
+    });
+
+    insideBridge.draw(executionFrame(insideCtx));
+
+    expect(insideCtx.moveTo).toHaveBeenCalledWith(30, 95);
+    expect(insideCtx.fill).toHaveBeenCalledTimes(1);
+
+    const outsideCtx = createRecordingContext();
+    const outsideBridge = new TradingViewTradingBridge({
+      state: {
+        executions: [{ kind: 'execution', id: 'execution-1', price: 100, time: 4, direction: 'buy' }],
+      },
+    });
+
+    outsideBridge.draw(executionFrame(outsideCtx));
+
+    expect(outsideCtx.fill).not.toHaveBeenCalled();
+  });
 });
 
 function frame(ctx: CanvasRenderingContext2D): TradingViewRawRenderFrame {
@@ -139,6 +237,24 @@ function frame(ctx: CanvasRenderingContext2D): TradingViewRawRenderFrame {
     ctx,
     bars: [{ time: 1, open: 99, high: 110, low: 90, close: 100, volume: 10 }],
     candleCoords: [{ top: 90, bottom: 100, center: 20, left: 16, right: 24, candleWidth: 8, high: 90, low: 110, wickWidth: 1 }],
+    chartWidth: 400,
+    chartHeight: 200,
+    priceToCoord: (price) => 200 - price,
+    coordToPrice: (coord) => 200 - coord,
+  };
+}
+
+function executionFrame(ctx: CanvasRenderingContext2D): TradingViewRawRenderFrame {
+  return {
+    ctx,
+    bars: [
+      { time: 1, open: 99, high: 110, low: 90, close: 100, volume: 10 },
+      { time: 3, open: 99, high: 110, low: 90, close: 100, volume: 10 },
+    ],
+    candleCoords: [
+      { top: 90, bottom: 100, center: 20, left: 16, right: 24, candleWidth: 8, high: 90, low: 110, wickWidth: 1 },
+      { top: 90, bottom: 100, center: 40, left: 36, right: 44, candleWidth: 8, high: 90, low: 110, wickWidth: 1 },
+    ],
     chartWidth: 400,
     chartHeight: 200,
     priceToCoord: (price) => 200 - price,

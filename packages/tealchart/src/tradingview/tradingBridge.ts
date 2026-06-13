@@ -227,10 +227,12 @@ export class TradingViewTradingBridge {
     const label = line.label?.primary ?? defaultLabel(line.side, 'Order');
     const quantity = line.label?.quantity ?? (line.quantity == null ? '' : String(line.quantity));
     const actions = actionButtons(line.actions, line.style, color);
+    const cancellable = line.cancellable === true || hasEnabledTradingAction(line.actions, 'cancel');
+    const editable = line.editable === true;
     const buttons = [
-      ...(line.cancellable === false
-        ? []
-        : [{ id: 'cancel', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]),
+      ...(cancellable
+        ? [{ id: 'cancel', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]
+        : []),
       ...(line.brackets?.takeProfit == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: '#22c55e', border: '#22c55e' }]),
       ...(line.brackets?.stopLoss == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: '#f97316', border: '#f97316' }]),
       ...actions,
@@ -241,11 +243,13 @@ export class TradingViewTradingBridge {
     drawTradingLine(ctx, frame, y, labelX, labelWidth, color, line.style);
     const buttonRects = this.drawLabel(ctx, labelX, y, label, quantity, color, line.style, buttons);
 
-    this.hitTargets.push({
-      rect: { x: 0, y: y - LINE_HIT_HEIGHT / 2, width: frame.chartWidth - PRICE_AXIS_GAP, height: LINE_HIT_HEIGHT },
-      cursor: line.editable === false ? 'default' : 'ns-resize',
-      action: { type: 'order-line', line },
-    });
+    if (editable) {
+      this.hitTargets.push({
+        rect: { x: 0, y: y - LINE_HIT_HEIGHT / 2, width: frame.chartWidth - PRICE_AXIS_GAP, height: LINE_HIT_HEIGHT },
+        cursor: 'ns-resize',
+        action: { type: 'order-line', line },
+      });
+    }
     for (const target of buttonRects) {
       if (target.id === 'cancel') {
         this.hitTargets.push({ rect: target.rect, cursor: 'pointer', action: { type: 'order-cancel', line } });
@@ -283,11 +287,13 @@ export class TradingViewTradingBridge {
     const label = line.label?.primary ?? defaultLabel(line.side, 'Position');
     const quantity = line.label?.quantity ?? (line.quantity == null ? '' : String(line.quantity));
     const actions = actionButtons(line.actions, line.style, color);
+    const closeable = line.closeable === true || hasEnabledTradingAction(line.actions, 'close');
+    const reversible = line.reversible === true || hasEnabledTradingAction(line.actions, 'reverse');
     const buttons = [
-      ...(line.closeable === false
-        ? []
-        : [{ id: 'close', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]),
-      ...(line.reversible
+      ...(closeable
+        ? [{ id: 'close', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]
+        : []),
+      ...(reversible
         ? [{ id: 'reverse', width: BUILT_IN_ACTION_WIDTH, text: '↩', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]
         : []),
       ...(line.brackets?.takeProfit == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: '#22c55e', border: '#22c55e' }]),
@@ -387,9 +393,7 @@ export class TradingViewTradingBridge {
   private handleHitStart(hit: HitTarget, point: Point): void {
     switch (hit.action.type) {
       case 'order-line':
-        if (hit.action.line.editable !== false) {
-          this.activeDrag = { line: hit.action.line };
-        }
+        this.activeDrag = { line: hit.action.line };
         break;
       case 'order-cancel':
         this.emit({
@@ -441,7 +445,6 @@ export class TradingViewTradingBridge {
       this.handlePointerUp(point);
     }
   }
-
   private emit(intent: ChartTradingIntent): void {
     for (const listener of this.listeners) {
       listener(intent);
@@ -485,6 +488,10 @@ function actionButtons(
 
 function isBuiltInAction(id: string): boolean {
   return id === 'cancel' || id === 'close' || id === 'reverse';
+}
+
+function hasEnabledTradingAction(actions: readonly ChartTradingAction[] | undefined, id: string): boolean {
+  return (actions ?? []).some((action) => action.id === id && !action.disabled);
 }
 
 function drawTradingLine(
@@ -575,16 +582,38 @@ function meta(value: unknown): { meta?: unknown } {
 
 function xForTime(frame: TradingViewRenderFrame, time: number): number | null {
   if (!frame.bars.length || !frame.candleCoords.length) return null;
-  let closestIndex = -1;
-  let closestDistance = Number.POSITIVE_INFINITY;
-  for (let index = 0; index < frame.bars.length; index += 1) {
+  const pointCount = Math.min(frame.bars.length, frame.candleCoords.length);
+  if (pointCount === 0) return null;
+
+  const firstTime = frame.bars[0]?.time;
+  const lastTime = frame.bars[pointCount - 1]?.time;
+  if (firstTime == null || lastTime == null) return null;
+
+  const minTime = Math.min(firstTime, lastTime);
+  const maxTime = Math.max(firstTime, lastTime);
+  if (time < minTime || time > maxTime) return null;
+
+  for (let index = 0; index < pointCount; index += 1) {
     const bar = frame.bars[index];
-    if (!bar) continue;
-    const distance = Math.abs(bar.time - time);
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closestIndex = index;
-    }
+    const coord = frame.candleCoords[index];
+    if (!bar || !coord) continue;
+    if (bar.time === time) return coord.center;
   }
-  return closestIndex >= 0 ? frame.candleCoords[closestIndex]?.center ?? null : null;
+
+  for (let index = 1; index < pointCount; index += 1) {
+    const previousBar = frame.bars[index - 1];
+    const previousCoord = frame.candleCoords[index - 1];
+    const bar = frame.bars[index];
+    const coord = frame.candleCoords[index];
+    if (!previousBar || !previousCoord || !bar || !coord || previousBar.time === bar.time) continue;
+
+    const lower = Math.min(previousBar.time, bar.time);
+    const upper = Math.max(previousBar.time, bar.time);
+    if (time < lower || time > upper) continue;
+
+    const ratio = (time - previousBar.time) / (bar.time - previousBar.time);
+    return previousCoord.center + (coord.center - previousCoord.center) * ratio;
+  }
+
+  return null;
 }
