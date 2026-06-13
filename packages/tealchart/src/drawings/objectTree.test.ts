@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { reduceUserDrawingCommand } from './commands';
+import { createUserDrawingCommandHistory, dispatchUserDrawingCommandWithHistory, undoUserDrawingCommand } from './history';
 import { createUserDrawingState } from './input';
 import { resolveUserDrawingObjectTreeActionCommands, resolveUserDrawingObjectTreeModel } from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
@@ -158,7 +159,6 @@ describe('user drawing object tree model', () => {
     });
 
     expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'hide', drawingIds: ['rect'] })).toEqual([
-      { type: 'select', drawingId: 'rect', meta: { source: 'objectTree' } },
       {
         type: 'setVisibility',
         visible: false,
@@ -169,25 +169,51 @@ describe('user drawing object tree model', () => {
     expect(
       resolveUserDrawingObjectTreeActionCommands(
         state,
-        { type: 'duplicate', drawingIds: ['trend', 'rect'], includeLocked: true },
-        { createId: () => 'copy', now: () => 10 },
+        { type: 'duplicate', drawingIds: ['trend', 'rect'], includeLocked: true, createId: () => 'copy' },
+        { now: () => 10 },
       ),
     ).toEqual([
-      { type: 'selectMany', drawingIds: ['trend', 'rect'], meta: { source: 'objectTree' } },
       {
         type: 'duplicate',
-        options: { includeLocked: true, now: expect.any(Function), createId: expect.any(Function) },
+        options: { drawingIds: ['trend', 'rect'], includeLocked: true, now: expect.any(Function), createId: expect.any(Function) },
         meta: { source: 'objectTree', affectedIds: ['trend', 'rect'] },
       },
     ]);
     expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'sendToBack', drawingIds: ['rect'] })).toEqual([
-      { type: 'select', drawingId: 'rect', meta: { source: 'objectTree' } },
       {
         type: 'reorder',
         action: 'sendToBack',
         options: { drawingId: 'rect' },
         meta: { source: 'objectTree', affectedIds: ['rect'] },
       },
+    ]);
+    expect(resolveUserDrawingObjectTreeActionCommands(state, { type: 'delete', drawingIds: [] })).toEqual([]);
+  });
+
+  it('preserves selection snapshots when object-tree mutations target multiple ids', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine(), createRectangle(), createHorizontalLine()],
+      selection: { drawingId: 'hline' },
+    });
+    const [command] = resolveUserDrawingObjectTreeActionCommands(state, {
+      type: 'hide',
+      drawingIds: ['trend', 'rect'],
+    });
+
+    const dispatched = dispatchUserDrawingCommandWithHistory(state, createUserDrawingCommandHistory(), command!);
+    expect(dispatched.state.selection).toEqual({ drawingId: 'hline' });
+    expect(dispatched.state.drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
+      ['trend', false],
+      ['rect', false],
+      ['hline', true],
+    ]);
+
+    const undone = undoUserDrawingCommand(dispatched.state, dispatched.history);
+    expect(undone.state.selection).toEqual({ drawingId: 'hline' });
+    expect(undone.state.drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
+      ['trend', true],
+      ['rect', true],
+      ['hline', true],
     ]);
   });
 
