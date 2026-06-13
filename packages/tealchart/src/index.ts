@@ -601,6 +601,7 @@ export type {
   ChartLayoutMode,
   Insets,
   Rect,
+  TopLeftLegendRectOptions,
 } from './layout/chartGeometry';
 
 // TradingView Layout Transformer

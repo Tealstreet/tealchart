@@ -49,6 +49,10 @@ export interface ChartGeometryInput {
   chrome?: Partial<ChartChromeLayoutModes>;
 }
 
+export interface TopLeftLegendRectOptions {
+  avoidLeftTools?: boolean;
+}
+
 export interface ChartGeometrySnapshot {
   root: Rect;
   canvas: Rect;
@@ -144,9 +148,15 @@ export function computeLeftToolRailTop(metrics: Pick<ChartChromeMetrics, 'topBar
   return metrics.topBarHeight + metrics.leftToolRailTopGap;
 }
 
-export function computeTopLeftLegendRect(metrics: ChartChromeMetrics, bounds: Rect, safeTop = 0): Rect | null {
+export function computeTopLeftLegendRect(
+  metrics: ChartChromeMetrics,
+  bounds: Rect,
+  safeTop = 0,
+  options: TopLeftLegendRectOptions = {},
+): Rect | null {
   if (metrics.topLeftLegendWidth <= 0 || metrics.topLeftLegendMinHeight <= 0) return null;
-  const x = bounds.x + metrics.topLeftLegendLeft;
+  const leftToolsOffset = options.avoidLeftTools ? metrics.leftToolRailInset + metrics.leftToolRailWidth : 0;
+  const x = bounds.x + metrics.topLeftLegendLeft + leftToolsOffset;
   const y = bounds.y + safeTop + metrics.topBarHeight + metrics.topLeftLegendTopGap;
   return rect(x, y, Math.min(metrics.topLeftLegendWidth, Math.max(0, rectRight(bounds) - x)), metrics.topLeftLegendMinHeight);
 }
@@ -202,7 +212,9 @@ export function computeChartGeometry(input: ChartGeometryInput): ChartGeometrySn
     );
   }
   if (input.topLeftLegend && chromeMetrics) {
-    const legendRect = computeTopLeftLegendRect(chromeMetrics, safeRoot);
+    const legendRect = computeTopLeftLegendRect(chromeMetrics, safeRoot, 0, {
+      avoidLeftTools: leftToolRailWidth > 0,
+    });
     if (legendRect) {
       chrome.topLeftLegend = legendRect;
     }
