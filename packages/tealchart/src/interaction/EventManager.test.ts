@@ -83,6 +83,7 @@ describe('EventManager drawing drag routing', () => {
 
   afterEach(() => {
     clearChartStoreCache();
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     document.body.innerHTML = '';
   });
@@ -120,6 +121,7 @@ describe('EventManager drawing drag routing', () => {
   });
 
   it('keeps handled mouse drawing input from triggering pane double-click routing', () => {
+    vi.useFakeTimers();
     const container = createContainer();
     const getPaneAtY = vi.fn(() => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 600 }));
     const onPaneDoubleClick = vi.fn();
@@ -331,6 +333,7 @@ describe('EventManager drawing drag routing', () => {
   });
 
   it('lets drawing input preserve or release touch double-tap edit routing', () => {
+    vi.useFakeTimers();
     const container = createContainer();
     const getPaneAtY = vi.fn(() => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 600 }));
     const onPaneDoubleClick = vi.fn();
