@@ -348,6 +348,9 @@ describe('ChartTopBar drawing toolbar', () => {
             lineStyle: 'solid',
             textColor: '#f5c542',
             fontSize: 14,
+            fontFamily: 'sans-serif',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
           },
           point: { time: 1, price: 10 },
           text: 'Note',
@@ -358,10 +361,16 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text color to #22c55e"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="12 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font family to serif"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font weight to bold"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font style to italic"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 12 });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
+    expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
+    expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
 
     topBar.unmount();
   });
