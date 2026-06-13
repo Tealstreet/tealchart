@@ -305,6 +305,96 @@ describe('user drawing command history', () => {
     expect(history.undoStack[0]?.after.drawings.map((drawing) => drawing.id)).toEqual(['line-1', 'line-2']);
   });
 
+  it('records style, visibility, lock, and z-order commands as undoable transactions', () => {
+    let state = createUserDrawingState();
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setActiveTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'line-1', now: () => 40, style },
+      meta: { source: 'pointer' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'line-1', now: () => 41, style },
+      meta: { source: 'pointer' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'line-2', now: () => 42, style },
+      meta: { source: 'pointer' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorC },
+      options: { createId: () => 'line-2', now: () => 43, style },
+      meta: { source: 'pointer' },
+    }));
+    state = { ...state, selection: { drawingId: 'line-1' } };
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'updateStyle',
+      style: { lineColor: '#00ff88' },
+      options: { drawingId: 'line-1', now: () => 44 },
+      meta: { source: 'toolbar' },
+    }));
+    expect(state.drawings[0]?.style.lineColor).toBe('#00ff88');
+    let undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]?.style.lineColor).toBe('#fff');
+    let redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]?.style.lineColor).toBe('#00ff88');
+    state = redo.state;
+    history = redo.history;
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setVisibility',
+      visible: false,
+      options: { drawingId: 'line-1', now: () => 45 },
+      meta: { source: 'objectTree' },
+    }));
+    expect(state.drawings[0]?.visible).toBe(false);
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]?.visible).toBe(true);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]?.visible).toBe(false);
+    state = undo.state;
+    history = undo.history;
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setLocked',
+      locked: true,
+      options: { drawingId: 'line-1', now: () => 46 },
+      meta: { source: 'toolbar' },
+    }));
+    expect(state.drawings[0]?.locked).toBe(true);
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]?.locked).toBe(false);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]?.locked).toBe(true);
+    state = redo.state;
+    history = redo.history;
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'reorder',
+      action: 'sendToBack',
+      options: { drawingId: 'line-2' },
+      meta: { source: 'contextMenu' },
+    }));
+    expect(state.drawings.map((drawing) => drawing.id)).toEqual(['line-2', 'line-1']);
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line-1', 'line-2']);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings.map((drawing) => drawing.id)).toEqual(['line-2', 'line-1']);
+  });
+
   it('records committed text edits as one undoable transaction', () => {
     let state = handleUserDrawingInput(
       setUserDrawingTool(createUserDrawingState(), 'textLabel'),
