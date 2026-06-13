@@ -1,0 +1,307 @@
+import type {
+  UserDrawing,
+  UserDrawingFontFamily,
+  UserDrawingFontStyle,
+  UserDrawingFontWeight,
+  UserDrawingIconName,
+  UserDrawingLineStyle,
+  UserDrawingState,
+  UserDrawingStyle,
+  UserDrawingTextAlign,
+  UserDrawingTextMaxWidth,
+  UserDrawingTrendLineExtend,
+} from './types';
+
+import {
+  getSelectedUserDrawing,
+  supportsUserDrawingFillColorControls,
+  supportsUserDrawingFillVisibilityControls,
+  supportsUserDrawingIconControls,
+  supportsUserDrawingRichTextControls,
+  supportsUserDrawingTextAlignControls,
+  supportsUserDrawingTextAppearanceControls,
+  supportsUserDrawingTextWrapControls,
+  supportsUserDrawingTrendLineExtendControls,
+  USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
+  USER_DRAWING_FONT_SIZE_DESCRIPTORS,
+  USER_DRAWING_FONT_STYLE_DESCRIPTORS,
+  USER_DRAWING_FONT_WEIGHT_DESCRIPTORS,
+  USER_DRAWING_ICON_NAME_DESCRIPTORS,
+  USER_DRAWING_LINE_COLOR_DESCRIPTORS,
+  USER_DRAWING_LINE_STYLE_DESCRIPTORS,
+  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_OPACITY_DESCRIPTORS,
+  USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
+  USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
+  USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
+  USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
+  USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
+  USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
+} from './toolbar';
+
+export type UserDrawingPropertiesSurfaceCommand =
+  | { type: 'updateStyle'; style: Partial<UserDrawingStyle> }
+  | { type: 'setTextAlign'; textAlign: UserDrawingTextAlign }
+  | { type: 'setTrendLineExtend'; extend: UserDrawingTrendLineExtend }
+  | { type: 'setIconName'; iconName: UserDrawingIconName };
+
+export type UserDrawingPropertiesSurfaceControl =
+  | {
+      id: string;
+      type: 'swatch';
+      label: string;
+      value: string;
+      selected: boolean;
+      command: UserDrawingPropertiesSurfaceCommand;
+    }
+  | {
+      id: string;
+      type: 'option';
+      label: string;
+      icon?: string;
+      value:
+        | number
+        | boolean
+        | UserDrawingFontFamily
+        | UserDrawingFontStyle
+        | UserDrawingFontWeight
+        | UserDrawingIconName
+        | UserDrawingLineStyle
+        | UserDrawingTextAlign
+        | UserDrawingTextMaxWidth
+        | UserDrawingTrendLineExtend;
+      selected: boolean;
+      command: UserDrawingPropertiesSurfaceCommand;
+    };
+
+export interface UserDrawingPropertiesSurfaceGroup {
+  id: 'line' | 'fill' | 'text' | 'geometry' | 'icon';
+  label: string;
+  controls: readonly UserDrawingPropertiesSurfaceControl[];
+}
+
+export interface UserDrawingPropertiesSurface {
+  drawing: UserDrawing | null;
+  editable: boolean;
+  groups: readonly UserDrawingPropertiesSurfaceGroup[];
+}
+
+function normalizeSurfaceColor(value: string | undefined): string {
+  return (value ?? '').toLowerCase().replace(/\s+/g, '');
+}
+
+function colorsMatch(a: string | undefined, b: string): boolean {
+  return normalizeSurfaceColor(a) === normalizeSurfaceColor(b);
+}
+
+export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, drawingId?: string): UserDrawingPropertiesSurface {
+  const drawing = drawingId
+    ? state.drawings.find((candidate) => candidate.id === drawingId) ?? null
+    : getSelectedUserDrawing(state);
+  if (!drawing) return { drawing: null, editable: false, groups: [] };
+
+  const editable = !drawing.locked;
+  const groups: UserDrawingPropertiesSurfaceGroup[] = [
+    {
+      id: 'line',
+      label: 'Line',
+      controls: [
+        ...USER_DRAWING_LINE_COLOR_DESCRIPTORS.map((descriptor) => ({
+          id: `lineColor:${descriptor.color}`,
+          type: 'swatch' as const,
+          label: descriptor.label,
+          value: descriptor.color,
+          selected: colorsMatch(drawing.style.lineColor, descriptor.color),
+          command: { type: 'updateStyle' as const, style: { lineColor: descriptor.color } },
+        })),
+        ...USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => ({
+          id: `lineWidth:${descriptor.width}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.width,
+          selected: drawing.style.lineWidth === descriptor.width,
+          command: { type: 'updateStyle' as const, style: { lineWidth: descriptor.width } },
+        })),
+        ...USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => ({
+          id: `lineStyle:${descriptor.lineStyle}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          icon: descriptor.icon,
+          value: descriptor.lineStyle,
+          selected: drawing.style.lineStyle === descriptor.lineStyle,
+          command: { type: 'updateStyle' as const, style: { lineStyle: descriptor.lineStyle } },
+        })),
+        ...USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => ({
+          id: `opacity:${descriptor.opacity}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.opacity,
+          selected: drawing.style.opacity === descriptor.opacity,
+          command: { type: 'updateStyle' as const, style: { opacity: descriptor.opacity } },
+        })),
+      ],
+    },
+  ];
+
+  if (supportsUserDrawingFillColorControls(drawing) || supportsUserDrawingFillVisibilityControls(drawing)) {
+    groups.push({
+      id: 'fill',
+      label: 'Fill',
+      controls: [
+        ...(supportsUserDrawingFillColorControls(drawing)
+          ? USER_DRAWING_FILL_COLOR_DESCRIPTORS.map((descriptor) => ({
+              id: `fillColor:${descriptor.fillColor}`,
+              type: 'swatch' as const,
+              label: descriptor.label,
+              value: descriptor.fillColor,
+              selected: colorsMatch(drawing.style.fillColor, descriptor.fillColor),
+              command: { type: 'updateStyle' as const, style: { fillColor: descriptor.fillColor } },
+            }))
+          : []),
+        ...USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.map((descriptor) => ({
+          id: `${descriptor.style}:${drawing.style[descriptor.style] !== false}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          icon: descriptor.icon,
+          value: drawing.style[descriptor.style] !== false,
+          selected: drawing.style[descriptor.style] !== false,
+          command: { type: 'updateStyle' as const, style: { [descriptor.style]: drawing.style[descriptor.style] === false } },
+        })),
+      ],
+    });
+  }
+
+  if (supportsUserDrawingTextAppearanceControls(drawing)) {
+    groups.push({
+      id: 'text',
+      label: 'Text',
+      controls: [
+        ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS.map((descriptor) => ({
+          id: `textColor:${descriptor.textColor}`,
+          type: 'swatch' as const,
+          label: descriptor.label,
+          value: descriptor.textColor,
+          selected: colorsMatch(drawing.style.textColor, descriptor.textColor),
+          command: { type: 'updateStyle' as const, style: { textColor: descriptor.textColor } },
+        })),
+        ...USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => ({
+          id: `fontSize:${descriptor.fontSize}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.fontSize,
+          selected: drawing.style.fontSize === descriptor.fontSize,
+          command: { type: 'updateStyle' as const, style: { fontSize: descriptor.fontSize } },
+        })),
+        ...USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => ({
+          id: `fontFamily:${descriptor.fontFamily}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          icon: descriptor.icon,
+          value: descriptor.fontFamily,
+          selected: drawing.style.fontFamily === descriptor.fontFamily,
+          command: { type: 'updateStyle' as const, style: { fontFamily: descriptor.fontFamily } },
+        })),
+        ...USER_DRAWING_FONT_WEIGHT_DESCRIPTORS.map((descriptor) => ({
+          id: `fontWeight:${descriptor.fontWeight}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          icon: descriptor.icon,
+          value: descriptor.fontWeight,
+          selected: drawing.style.fontWeight === descriptor.fontWeight,
+          command: { type: 'updateStyle' as const, style: { fontWeight: descriptor.fontWeight } },
+        })),
+        ...USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => ({
+          id: `fontStyle:${descriptor.fontStyle}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          icon: descriptor.icon,
+          value: descriptor.fontStyle,
+          selected: drawing.style.fontStyle === descriptor.fontStyle,
+          command: { type: 'updateStyle' as const, style: { fontStyle: descriptor.fontStyle } },
+        })),
+        ...USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => ({
+          id: descriptor.textUnderline ? 'textUnderline' : 'textLineThrough',
+          type: 'option' as const,
+          label: descriptor.label,
+          icon: descriptor.icon,
+          value: descriptor.textUnderline ? drawing.style.textUnderline === true : drawing.style.textLineThrough === true,
+          selected: descriptor.textUnderline ? drawing.style.textUnderline === true : drawing.style.textLineThrough === true,
+          command: {
+            type: 'updateStyle' as const,
+            style: descriptor.textUnderline
+              ? { textUnderline: drawing.style.textUnderline !== true }
+              : { textLineThrough: drawing.style.textLineThrough !== true },
+          },
+        })),
+        ...(supportsUserDrawingTextAlignControls(drawing)
+          ? USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => ({
+              id: `textAlign:${descriptor.textAlign}`,
+              type: 'option' as const,
+              label: descriptor.label,
+              icon: descriptor.icon,
+              value: descriptor.textAlign,
+              selected: 'textAlign' in drawing && drawing.textAlign === descriptor.textAlign,
+              command: { type: 'setTextAlign' as const, textAlign: descriptor.textAlign },
+            }))
+          : []),
+        ...(supportsUserDrawingRichTextControls(drawing) && supportsUserDrawingTextWrapControls(drawing)
+          ? [
+              ...USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => ({
+                id: `textWrap:${descriptor.textWrap}`,
+                type: 'option' as const,
+                label: descriptor.label,
+                icon: descriptor.icon,
+                value: descriptor.textWrap,
+                selected: drawing.style.textWrap === descriptor.textWrap,
+                command: { type: 'updateStyle' as const, style: { textWrap: descriptor.textWrap } },
+              })),
+              ...USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => ({
+                id: `textMaxWidth:${descriptor.textMaxWidth}`,
+                type: 'option' as const,
+                label: descriptor.label,
+                value: descriptor.textMaxWidth,
+                selected: drawing.style.textMaxWidth === descriptor.textMaxWidth,
+                command: { type: 'updateStyle' as const, style: { textMaxWidth: descriptor.textMaxWidth } },
+              })),
+            ]
+          : []),
+      ],
+    });
+  }
+
+  if (supportsUserDrawingTrendLineExtendControls(drawing) && drawing.kind === 'trendLine') {
+    groups.push({
+      id: 'geometry',
+      label: 'Geometry',
+      controls: USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.map((descriptor) => ({
+        id: `extend:${descriptor.extend}`,
+        type: 'option' as const,
+        label: descriptor.label,
+        icon: descriptor.icon,
+        value: descriptor.extend,
+        selected: drawing.extend === descriptor.extend,
+        command: { type: 'setTrendLineExtend' as const, extend: descriptor.extend },
+      })),
+    });
+  }
+
+  if (supportsUserDrawingIconControls(drawing) && drawing.kind === 'icon') {
+    groups.push({
+      id: 'icon',
+      label: 'Icon',
+      controls: USER_DRAWING_ICON_NAME_DESCRIPTORS.map((descriptor) => ({
+        id: `iconName:${descriptor.iconName}`,
+        type: 'option' as const,
+        label: descriptor.label,
+        icon: descriptor.icon,
+        value: descriptor.iconName,
+        selected: drawing.iconName === descriptor.iconName,
+        command: { type: 'setIconName' as const, iconName: descriptor.iconName },
+      })),
+    });
+  }
+
+  return { drawing, editable, groups };
+}
