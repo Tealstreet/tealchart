@@ -2538,6 +2538,9 @@ export class TealchartWidget {
           return;
         }
       }
+      if (result.changed) {
+        this.setUserDrawingState(result.state);
+      }
     }
 
     this._paneManager.toggleMaximizePane(paneId);

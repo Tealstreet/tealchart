@@ -1519,6 +1519,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return;
           }
         }
+        if (selection.changed) {
+          commitUserDrawingState(selection.state);
+        }
       }
 
       if (!unifiedPaneLayout || !coreResult.core) return;
