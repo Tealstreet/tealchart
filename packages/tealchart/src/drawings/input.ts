@@ -906,6 +906,15 @@ export function commitUserDrawingPlacementDrag(
     return state;
   }
 
+  const startAnchor = draft.anchors[0];
+  if (!startAnchor || isSameDrawingAnchor(startAnchor, point.anchor)) {
+    return {
+      ...state,
+      draft: null,
+      textEdit: null,
+    };
+  }
+
   return handleUserDrawingInput(state, point, options);
 }
 
