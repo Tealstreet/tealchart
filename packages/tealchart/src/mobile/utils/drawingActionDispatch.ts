@@ -62,24 +62,28 @@ export function dispatchMobileUserDrawingActionCommand(
     return true;
   }
 
-  if (command.action === 'duplicateSelected') {
+  if (command.type === 'toolbarAction') {
+    if (command.action === 'duplicateSelected') {
+      options.dispatchUserDrawingCommand({
+        type: 'duplicate',
+        options: { createId: options.createId },
+        meta: { source: options.source },
+      });
+      return true;
+    }
+
+    if (command.action === 'deleteSelected') {
+      options.dispatchUserDrawingCommand({ type: 'delete', meta: { source: options.source } });
+      return true;
+    }
+
     options.dispatchUserDrawingCommand({
-      type: 'duplicate',
-      options: { createId: options.createId },
+      type: 'reorder',
+      action: command.action,
       meta: { source: options.source },
     });
     return true;
   }
 
-  if (command.action === 'deleteSelected') {
-    options.dispatchUserDrawingCommand({ type: 'delete', meta: { source: options.source } });
-    return true;
-  }
-
-  options.dispatchUserDrawingCommand({
-    type: 'reorder',
-    action: command.action,
-    meta: { source: options.source },
-  });
-  return true;
+  return false;
 }
