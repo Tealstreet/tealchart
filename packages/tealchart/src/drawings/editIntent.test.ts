@@ -4,7 +4,7 @@ import type { UserDrawing, UserDrawingState, UserDrawingStyle } from './types';
 import { describe, expect, it } from 'vitest';
 
 import { createUserDrawingState } from './input';
-import { resolveUserDrawingEditIntentAtPoint } from './editIntent';
+import { resolveUserDrawingEditIntentAtPoint, resolveUserDrawingPropertiesIntent } from './editIntent';
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -109,6 +109,9 @@ describe('user drawing edit intent', () => {
     const intent = resolveUserDrawingEditIntentAtPoint(stateWith([createHorizontalLine()]), { x: 50, y: 50 }, spacesByPaneId);
 
     expect(intent.type).toBe('properties');
+    if (intent.type === 'properties') {
+      expect(intent.drawing).toMatchObject({ id: 'line', kind: 'horizontalLine' });
+    }
     expect(intent.commands.map((command) => command.type)).toEqual(['selectAtPoint']);
     expect(intent.commands[0]).toMatchObject({ meta: { source: 'api' } });
   });
@@ -141,5 +144,50 @@ describe('user drawing edit intent', () => {
 
     expect(intent.type).toBe('pane');
     expect(intent.commands).toEqual([]);
+  });
+
+  it('resolves selected drawing properties intent', () => {
+    const intent = resolveUserDrawingPropertiesIntent(
+      stateWith([createHorizontalLine(), createRectangle()], { selection: { drawingId: 'line' } }),
+    );
+
+    expect(intent).toMatchObject({
+      type: 'properties',
+      drawingId: 'line',
+      selected: true,
+      editable: true,
+      drawing: expect.objectContaining({ id: 'line', kind: 'horizontalLine' }),
+    });
+  });
+
+  it('resolves explicit drawing properties intent independently from selection', () => {
+    const intent = resolveUserDrawingPropertiesIntent(
+      stateWith([createHorizontalLine(), createRectangle()], { selection: { drawingId: 'line' } }),
+      { drawingId: 'rect' },
+    );
+
+    expect(intent).toMatchObject({
+      drawingId: 'rect',
+      selected: false,
+      editable: true,
+      drawing: expect.objectContaining({ id: 'rect', kind: 'rectangle' }),
+    });
+  });
+
+  it('marks locked drawing properties intent as read-only', () => {
+    const intent = resolveUserDrawingPropertiesIntent(
+      stateWith([createRectangle({ locked: true })], { selection: { drawingId: 'rect' } }),
+    );
+
+    expect(intent).toMatchObject({
+      drawingId: 'rect',
+      selected: true,
+      editable: false,
+    });
+  });
+
+  it('returns null for missing properties targets', () => {
+    expect(resolveUserDrawingPropertiesIntent(stateWith([createRectangle()]))).toBeNull();
+    expect(resolveUserDrawingPropertiesIntent(stateWith([createRectangle()]), { drawingId: 'missing' })).toBeNull();
   });
 });

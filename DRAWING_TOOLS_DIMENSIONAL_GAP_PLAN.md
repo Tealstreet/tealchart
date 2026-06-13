@@ -476,6 +476,9 @@ Phase 3: Properties intent
 
 - Add a generic selected-drawing properties intent, even if the first UI only
   exposes existing style controls.
+- Status: shared selected-drawing properties intent is exported and exposed by
+  web widget and mobile Skia callback/handle APIs; visual popover/sheet remains
+  in Epics 6.2 and 6.3.
 
 ### Epic 6.2: Web Double-Click Editing
 

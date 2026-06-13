@@ -25,6 +25,7 @@ import type {
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
+  UserDrawingPropertiesIntent,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
   UserDrawingAnchor,
@@ -118,9 +119,9 @@ import {
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
-  resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingPropertiesIntent,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -146,6 +147,7 @@ import {
   isMobileCrosshairPanGestureEnabled,
 } from './mobile/utils/drawingGestureMode';
 import { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
+import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/drawingEditIntent';
 import {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
@@ -328,6 +330,8 @@ export interface SkiaTealchartHandle {
   getUserDrawingObjectTreeModel(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
   openUserDrawingObjectTree(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
   dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean;
+  getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null;
+  openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null;
 }
 
 export interface SkiaTealchartProps {
@@ -369,6 +373,8 @@ export interface SkiaTealchartProps {
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   /** Called when app or handle code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
+  /** Called when app or handle code asks to open selected drawing properties. */
+  onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   /** Constrain two-anchor drawing placement drags to square or 45-degree geometry for touch toolbars. */
   constrainUserDrawingPlacement?: boolean;
   /** Called when gesture blocks/unblocks parent scroll */
@@ -427,6 +433,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingState: propUserDrawingState,
     onUserDrawingStateChange,
     onUserDrawingObjectTreeOpen,
+    onUserDrawingPropertiesOpen,
     constrainUserDrawingPlacement = false,
     onSwipeBlockChange,
     onOrderMove,
@@ -773,8 +780,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         }
         return changed;
       },
+      getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null {
+        return resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
+      },
+      openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
+        const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
+        if (intent) {
+          onUserDrawingPropertiesOpen?.(intent);
+        }
+        return intent;
+      },
     }),
-    [commitUserDrawingState, createUserDrawingId, dispatchUserDrawingCommandToState, onUserDrawingObjectTreeOpen],
+    [
+      commitUserDrawingState,
+      createUserDrawingId,
+      dispatchUserDrawingCommandToState,
+      onUserDrawingObjectTreeOpen,
+      onUserDrawingPropertiesOpen,
+    ],
   );
 
   // Use core hook for bar fetching and state management
@@ -1674,21 +1697,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
       if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
-        const intent = resolveUserDrawingEditIntentAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
+        const result = resolveMobileUserDrawingDoubleTapEditIntent(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
           source: 'touch',
           hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
         });
 
-        if (intent.type !== 'pane') {
-          let nextState = effectiveUserDrawingState;
-          let changed = false;
-          for (const command of intent.commands) {
-            const result = dispatchUserDrawingCommand(nextState, command);
-            nextState = result.state;
-            changed = result.changed || changed;
+        if (result.intent.type !== 'pane') {
+          if (result.changed) {
+            commitUserDrawingState(result.state);
           }
-          if (changed) {
-            commitUserDrawingState(nextState);
+          if (result.propertiesIntent) {
+            onUserDrawingPropertiesOpen?.(result.propertiesIntent);
           }
           return;
         }
@@ -1716,6 +1735,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       isPointInChartArea,
       margins,
       measureUserDrawingTextLabelLine,
+      onUserDrawingPropertiesOpen,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
     ],

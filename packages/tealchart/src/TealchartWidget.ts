@@ -16,6 +16,7 @@ import type {
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
+  UserDrawingPropertiesIntent,
   UserDrawingContextActionItem,
   UserDrawingEditDrag,
   UserDrawingCommandHistory,
@@ -61,6 +62,7 @@ import {
   resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingPropertiesIntent,
   serializeUserDrawingStateForLayout,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
 } from './drawings';
@@ -2447,6 +2449,18 @@ export class TealchartWidget {
     return changed;
   }
 
+  getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null {
+    return resolveUserDrawingPropertiesIntent(this._userDrawingState, { drawingId });
+  }
+
+  openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
+    const intent = this.getUserDrawingPropertiesIntent(drawingId);
+    if (intent) {
+      this._options.onUserDrawingPropertiesOpen?.(intent);
+    }
+    return intent;
+  }
+
   private _createUserDrawingId(): string {
     const existingIds = new Set(this._userDrawingState.drawings.map((drawing) => drawing.id));
     let id = '';
@@ -2673,6 +2687,12 @@ export class TealchartWidget {
       }
       if (changed) {
         this.setUserDrawingState(nextState, { preserveHistory: true });
+      }
+      if (intent.type === 'properties') {
+        const propertiesIntent = resolveUserDrawingPropertiesIntent(nextState, { drawingId: intent.drawingId });
+        if (propertiesIntent) {
+          this._options.onUserDrawingPropertiesOpen?.(propertiesIntent);
+        }
       }
       return;
     }
