@@ -2322,6 +2322,9 @@ export class TealchartWidget {
         meta: { source: 'keyboard' },
       });
     }
+    if (action.type === 'clearSelection') {
+      return this.dispatchUserDrawingCommand({ type: 'selectMany', drawingIds: [], meta: { source: 'keyboard' } });
+    }
     if (action.type === 'nudge') {
       const spacesByPaneId = this._ui?.getChartCore()?.getUserDrawingSpacesForCurrentViewport();
       if (!action.delta || !spacesByPaneId) return false;
