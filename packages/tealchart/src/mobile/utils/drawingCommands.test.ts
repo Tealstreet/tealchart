@@ -25,6 +25,7 @@ const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
 const expandedDragPlacementTools: UserDrawingTool[] = [
+  'trendAngle',
   'priceRange',
   'dateRange',
   'datePriceRange',

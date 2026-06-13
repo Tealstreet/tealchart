@@ -76,9 +76,9 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Category | Tools | Anchor count | Intended placement | Current status | Primary gaps |
 | --- | --- | --- | --- | --- | --- |
 | Cursor | `select` | 0 | `none` | `partial` | Floating toolbar, context menu, object tree |
-| Lines | `trendLine`, `trendAngle`, `extendedLine`, `infoLine`, `arrowLine`, `ray` | 2 | `two-point-drag-click` | `partial` | Drag-to-draw, command history |
+| Lines | `trendLine`, `trendAngle`, `extendedLine`, `infoLine`, `arrowLine`, `ray` | 2 | `two-point-drag-click` | `partial` | Properties, selected toolbar |
 | Lines | `horizontalLine`, `verticalLine`, `horizontalRay`, `crossLine` | 1 | `one-point` | `partial` | Command history, selected toolbar |
-| Lines | `arrowMarker` | 2 | `two-point-drag-click` | `partial` | Drag-to-draw, selected toolbar |
+| Lines | `arrowMarker` | 2 | `two-point-drag-click` | `partial` | Selected toolbar |
 | Lines | `arrowMarkLeft`, `arrowMarkRight`, `arrowMarkUp`, `arrowMarkDown` | 1 | `one-point` | `partial` | Selected toolbar, object tree |
 | Channels | `parallelChannel`, `regressionTrend`, `flatTopBottom` | 3 | `multi-point-click` | `partial` | Placement previews, command history |
 | Channels | `disjointChannel` | 4 | `multi-point-click` | `partial` | Placement previews, object tree |
