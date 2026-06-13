@@ -10,6 +10,7 @@ import { clearChartStoreCache } from '../../state/chartState';
 import {
   createUserDrawingCommandHistory,
   createUserDrawingState,
+  duplicateUserDrawing,
   handleUserDrawingInput,
   setUserDrawingTool,
   redoUserDrawingCommand,
@@ -218,6 +219,24 @@ describe('mobile drawing handle command dispatch', () => {
     expect(pasted.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
     expect(pasted.state.selection).toEqual({ drawingId: 'copy' });
     expect(pasted.history.undoStack).toHaveLength(1);
+  });
+
+  it('routes mobile select-all keyboard action without recording undo history', () => {
+    const state = duplicateUserDrawing(createMobileStateWithTrendLine(), {
+      createId: () => 'copy',
+      now: () => 43,
+    });
+    const result = dispatchMobileUserDrawingKeyboardAction(
+      { ...state, selection: null },
+      createUserDrawingCommandHistory(),
+      { key: 'a', metaKey: true },
+      { createId: () => 'unused' },
+    );
+
+    expect(result.action?.type).toBe('selectAll');
+    expect(result.changed).toBe(true);
+    expect(result.state.selection).toEqual({ drawingId: 'line', drawingIds: ['line', 'copy'] });
+    expect(result.history.undoStack).toHaveLength(0);
   });
 
   it('routes mobile keyboard nudge through shared drawing history', () => {
