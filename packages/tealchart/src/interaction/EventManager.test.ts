@@ -169,9 +169,18 @@ describe('EventManager drawing drag routing', () => {
     );
     window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 130, clientY: 110, shiftKey: true }));
 
-    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
-    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
-    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', {
+      constrainedPlacement: true,
+      duplicateOnDrag: true,
+    });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', {
+      constrainedPlacement: true,
+      duplicateOnDrag: true,
+    });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', {
+      constrainedPlacement: true,
+      duplicateOnDrag: true,
+    });
 
     window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
     manager.dispose();

@@ -298,6 +298,7 @@ export interface SkiaTealchartHandle {
   deleteSelectedUserDrawing(): boolean;
   duplicateUserDrawing(drawingId?: string): boolean;
   duplicateSelectedUserDrawing(): boolean;
+  beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean;
   copySelectedUserDrawing(): boolean;
   pasteUserDrawingClipboard(): boolean;
   clearUserDrawingClipboard(): void;
@@ -489,6 +490,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingSpacesByPaneIdRef = useRef<ReadonlyMap<string, DrawingCoordinateSpace>>(new Map());
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
+  const userDrawingEditDragTransactionKeyRef = useRef('edit-drag');
+  const userDrawingEditDragTransactionCounterRef = useRef(0);
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
   const userDrawingPlacementDragStartPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
@@ -531,7 +534,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     return id;
   }, []);
 
-  const dispatchUserDrawingCommandToState = useCallback(
+  const dispatchUserDrawingCommandToStateWithResult = useCallback(
     (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => {
       const result = dispatchMobileUserDrawingHistoryCommand(
         userDrawingStateRef.current,
@@ -542,9 +545,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (result.changed) {
         commitUserDrawingState(result.state);
       }
-      return result.changed;
+      return result;
     },
     [commitUserDrawingState],
+  );
+
+  const dispatchUserDrawingCommandToState = useCallback(
+    (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => dispatchUserDrawingCommandToStateWithResult(command).changed,
+    [dispatchUserDrawingCommandToStateWithResult],
   );
 
   // Create indicator manager (stable ref)
@@ -664,6 +672,32 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           },
           meta: { source: 'api' },
         });
+      },
+      beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean {
+        const transactionKey = `duplicate-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
+        const result = dispatchMobileUserDrawingHistoryCommand(
+          userDrawingStateRef.current,
+          userDrawingHistoryRef.current,
+          {
+            type: 'beginDuplicateEditDragAtPoint',
+            point,
+            spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
+            options: {
+              createId: createUserDrawingId,
+              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+            },
+            meta: { source: 'api', transactionKey },
+          },
+        );
+        if (!result.hit || !result.editDrag) return false;
+
+        userDrawingHistoryRef.current = result.history;
+        if (result.changed) {
+          commitUserDrawingState(result.state);
+        }
+        userDrawingEditDragRef.current = result.editDrag;
+        userDrawingEditDragTransactionKeyRef.current = transactionKey;
+        return true;
       },
       copySelectedUserDrawing(): boolean {
         const clipboard = createUserDrawingClipboard(userDrawingStateRef.current);
@@ -865,6 +899,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       commitUserDrawingState,
       createUserDrawingId,
       dispatchUserDrawingCommandToState,
+      dispatchUserDrawingCommandToStateWithResult,
       onUserDrawingObjectTreeOpen,
       onUserDrawingPropertiesOpen,
     ],
@@ -1547,6 +1582,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
       if (effectiveUserDrawingState.activeTool !== 'select') return false;
 
+      const transactionKey = `edit-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
       const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
         type: 'beginEditDragAtPoint',
         point: { x, y },
@@ -1554,11 +1590,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         options: {
           hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
         },
-        meta: { source: 'touch', transactionKey: 'edit-drag' },
+        meta: { source: 'touch', transactionKey },
       });
       if (!result.hit || !result.editDrag) return false;
 
       userDrawingEditDragRef.current = result.editDrag;
+      userDrawingEditDragTransactionKeyRef.current = transactionKey;
       if (result.changed) {
         commitUserDrawingState(result.state);
       }
@@ -1622,7 +1659,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         type: 'applyEditDrag',
         drag,
         point: { x, y },
-        meta: { source: 'touch', transactionKey: 'edit-drag' },
+        meta: { source: 'touch', transactionKey: userDrawingEditDragTransactionKeyRef.current },
       });
     },
     [
@@ -1667,6 +1704,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     userDrawingEditDragRef.current = null;
+    userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
   }, [createUserDrawingId, dispatchUserDrawingCommandToState]);
 
   const { composedGesture } = useChartGestures({
