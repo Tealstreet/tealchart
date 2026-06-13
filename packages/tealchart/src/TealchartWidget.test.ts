@@ -1505,6 +1505,67 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('selects all drawings from keyboard shortcuts while chart owns input', () => {
+      const datafeed = createMockDatafeed();
+      const container = document.createElement('div');
+      const input = document.createElement('input');
+      container.appendChild(input);
+      const widget = createWidget(datafeed, { container });
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: null,
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'v',
+            kind: 'verticalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            time: 20,
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      const inputSelectAll = new KeyboardEvent('keydown', { key: 'a', metaKey: true, bubbles: true, cancelable: true });
+      input.dispatchEvent(inputSelectAll);
+
+      expect(inputSelectAll.defaultPrevented).toBe(false);
+      expect(widget.getUserDrawingState().selection).toBeNull();
+
+      const chartSelectAll = new KeyboardEvent('keydown', { key: 'a', metaKey: true, cancelable: true });
+      document.dispatchEvent(chartSelectAll);
+
+      expect(chartSelectAll.defaultPrevented).toBe(true);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h', drawingIds: ['h', 'v'] });
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+
+      widget.remove();
+    });
+
     it('clears drawing command history when user drawing state is externally replaced', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
