@@ -42,7 +42,12 @@ export type UserDrawingObjectTreeSelectionAction =
 
 export type UserDrawingObjectTreeMutationAction =
   | { type: 'delete'; drawingIds?: readonly string[]; includeLocked?: boolean }
-  | { type: 'duplicate'; drawingIds?: readonly string[]; includeLocked?: boolean }
+  | {
+      type: 'duplicate';
+      createId: DuplicateUserDrawingOptions['createId'];
+      drawingIds?: readonly string[];
+      includeLocked?: boolean;
+    }
   | { type: 'hide'; drawingIds?: readonly string[]; includeLocked?: boolean }
   | { type: 'show'; drawingIds?: readonly string[]; includeLocked?: boolean }
   | { type: 'lock'; drawingIds?: readonly string[]; includeLocked?: boolean }
@@ -56,7 +61,6 @@ export type UserDrawingObjectTreeMutationAction =
 export type UserDrawingObjectTreeAction = UserDrawingObjectTreeSelectionAction | UserDrawingObjectTreeMutationAction;
 
 export interface UserDrawingObjectTreeCommandOptions {
-  createId?: DuplicateUserDrawingOptions['createId'];
   now?: UpdateUserDrawingOptions['now'];
 }
 
@@ -108,7 +112,7 @@ export function resolveUserDrawingObjectTreeModel(
 }
 
 function getObjectTreeActionDrawingIds(state: UserDrawingState, drawingIds?: readonly string[]): readonly string[] {
-  return drawingIds && drawingIds.length > 0 ? [...new Set(drawingIds)] : getUserDrawingSelectionIds(state.selection);
+  return drawingIds !== undefined ? [...new Set(drawingIds)] : getUserDrawingSelectionIds(state.selection);
 }
 
 function getObjectTreeSelectionCommands(
@@ -130,6 +134,7 @@ function getObjectTreeUpdateOptions(
 ): UpdateUserDrawingOptions {
   const options: UpdateUserDrawingOptions = {};
   if (drawingIds.length === 1) options.drawingId = drawingIds[0];
+  else options.drawingIds = drawingIds;
   if (action.includeLocked !== undefined) options.includeLocked = action.includeLocked;
   if (now) options.now = now;
   return options;
@@ -195,31 +200,25 @@ export function resolveUserDrawingObjectTreeActionCommands(
   const drawingIds = getObjectTreeActionDrawingIds(state, action.drawingIds);
   if (drawingIds.length === 0) return [];
 
-  const selectionCommands = action.drawingIds ? getObjectTreeSelectionCommands(state, drawingIds) : [];
   const updateOptions = getObjectTreeUpdateOptions(action, drawingIds, options.now);
   const meta = { source: 'objectTree' as const, affectedIds: drawingIds };
   const zOrderAction = getObjectTreeZOrderAction(action.type);
 
   if (zOrderAction) {
-    return [...selectionCommands, { type: 'reorder', action: zOrderAction, options: updateOptions, meta }];
+    return [{ type: 'reorder', action: zOrderAction, options: updateOptions, meta }];
   }
 
   switch (action.type) {
     case 'delete':
-      return [...selectionCommands, { type: 'delete', options: updateOptions, meta }];
+      return [{ type: 'delete', options: updateOptions, meta }];
     case 'duplicate':
-      return options.createId
-        ? [
-            ...selectionCommands,
-            { type: 'duplicate', options: { ...updateOptions, createId: options.createId }, meta },
-          ]
-        : [];
+      return [{ type: 'duplicate', options: { ...updateOptions, createId: action.createId }, meta }];
     case 'hide':
     case 'show':
-      return [...selectionCommands, { type: 'setVisibility', visible: action.type === 'show', options: updateOptions, meta }];
+      return [{ type: 'setVisibility', visible: action.type === 'show', options: updateOptions, meta }];
     case 'lock':
     case 'unlock':
-      return [...selectionCommands, { type: 'setLocked', locked: action.type === 'lock', options: updateOptions, meta }];
+      return [{ type: 'setLocked', locked: action.type === 'lock', options: updateOptions, meta }];
     default:
       return [];
   }

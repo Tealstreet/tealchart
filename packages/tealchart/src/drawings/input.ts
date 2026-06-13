@@ -58,6 +58,7 @@ export interface UserDrawingSelectionAtPointResult {
 
 export interface DeleteUserDrawingOptions {
   drawingId?: string;
+  drawingIds?: readonly string[];
   includeLocked?: boolean;
 }
 
@@ -82,6 +83,7 @@ type UserDrawingTableTarget = { index: number; drawing: Extract<UserDrawing, { k
 
 export interface UpdateUserDrawingOptions {
   drawingId?: string;
+  drawingIds?: readonly string[];
   includeLocked?: boolean;
   now?: () => number;
 }
@@ -188,7 +190,8 @@ export function deleteUserDrawing(
   state: UserDrawingState,
   options: DeleteUserDrawingOptions = {},
 ): UserDrawingState {
-  const selectedIds = options.drawingId ? [options.drawingId] : getUserDrawingSelectionIds(state.selection);
+  const selectedIds =
+    options.drawingIds !== undefined ? [...new Set(options.drawingIds)] : options.drawingId ? [options.drawingId] : getUserDrawingSelectionIds(state.selection);
   if (selectedIds.length === 0) return state;
 
   const selectedIdSet = new Set(selectedIds);
@@ -441,7 +444,9 @@ export function duplicateUserDrawing(
     };
   }
 
-  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  const selectedIds = new Set(
+    options.drawingIds !== undefined ? [...new Set(options.drawingIds)] : getUserDrawingSelectionIds(state.selection),
+  );
   if (selectedIds.size === 0) return state;
 
   const now = options.now?.() ?? Date.now();
@@ -515,6 +520,14 @@ function findUserDrawingsForUpdate(
   state: UserDrawingState,
   options: UpdateUserDrawingOptions = {},
 ): Array<{ drawing: UserDrawingState['drawings'][number]; index: number }> {
+  if (options.drawingIds !== undefined) {
+    const targetIds = new Set(options.drawingIds);
+    if (targetIds.size === 0) return [];
+    return state.drawings.flatMap((drawing, index) =>
+      targetIds.has(drawing.id) && (!drawing.locked || options.includeLocked) ? [{ drawing, index }] : [],
+    );
+  }
+
   if (options.drawingId) {
     const target = findUserDrawingForUpdate(state, options);
     return target ? [target] : [];
@@ -661,7 +674,8 @@ export function setUserDrawingLocked(
 }
 
 function getUserDrawingReorderTargetIds(state: UserDrawingState, options: UpdateUserDrawingOptions = {}): Set<string> {
-  const selectedIds = options.drawingId ? [options.drawingId] : getUserDrawingSelectionIds(state.selection);
+  const selectedIds =
+    options.drawingIds !== undefined ? [...new Set(options.drawingIds)] : options.drawingId ? [options.drawingId] : getUserDrawingSelectionIds(state.selection);
   if (selectedIds.length === 0) return new Set();
 
   const candidateIds = new Set(selectedIds);
