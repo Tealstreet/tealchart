@@ -1411,6 +1411,7 @@ export class TealchartApi {
     this._crossHairMovedSubscription.clear();
     this._symbolChangedSubscription.clear();
     this._intervalChangedSubscription.clear();
+    this._tradingIntentSubscription.clear();
     this._orderLines.clear();
     this._positionLines.clear();
     this._executionLines.clear();

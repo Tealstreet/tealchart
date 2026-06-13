@@ -21,7 +21,6 @@ export type {
   ChartTradingOrderCancelIntent,
   ChartTradingOrderLine,
   ChartTradingOrderMoveCommitIntent,
-  ChartTradingOrderMovePreviewIntent,
   ChartTradingPositionCloseIntent,
   ChartTradingPositionLine,
   ChartTradingPositionReverseIntent,

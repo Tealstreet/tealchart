@@ -203,4 +203,19 @@ describe('TealchartApi trading intents', () => {
     expect(onTPClick).toHaveBeenCalledOnce();
     expect(onSLMoveEnd).toHaveBeenCalledWith(48_000, 25);
   });
+
+  it('clears trading intent listeners on dispose', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const onIntent = vi.fn();
+
+    api.onTradingIntent().subscribe(null, onIntent);
+    api.dispose();
+    api.emitTradingIntent({
+      type: 'order.cancel',
+      orderId: 'order-1',
+      source: 'programmatic',
+    });
+
+    expect(onIntent).not.toHaveBeenCalled();
+  });
 });

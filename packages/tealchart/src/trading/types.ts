@@ -80,13 +80,6 @@ export interface ChartTradingIntentBase {
   meta?: unknown;
 }
 
-export interface ChartTradingOrderMovePreviewIntent extends ChartTradingIntentBase {
-  type: 'order.move.preview';
-  orderId: string;
-  lineId?: string;
-  price: number;
-}
-
 export interface ChartTradingOrderMoveCommitIntent extends ChartTradingIntentBase {
   type: 'order.move.commit';
   orderId: string;
@@ -141,7 +134,6 @@ export interface ChartTradingLineActionIntent extends ChartTradingIntentBase {
 }
 
 export type ChartTradingIntent =
-  | ChartTradingOrderMovePreviewIntent
   | ChartTradingOrderMoveCommitIntent
   | ChartTradingOrderCancelIntent
   | ChartTradingPositionCloseIntent
