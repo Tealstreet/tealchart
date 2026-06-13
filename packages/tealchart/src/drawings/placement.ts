@@ -58,6 +58,10 @@ const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'modifiedSchiffPitchfork',
   'insidePitchfork',
   'pitchfan',
+  'trendBasedFibExtension',
+  'fibWedge',
+  'fibChannel',
+  'trendBasedFibTime',
 ]);
 
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {

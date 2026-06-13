@@ -211,6 +211,10 @@ Phase 1: Placement mode registry
   continuing through the normal final click/tap commit path: `parallelChannel`,
   `regressionTrend`, `flatTopBottom`, `pitchfork`, `schiffPitchfork`,
   `modifiedSchiffPitchfork`, `insidePitchfork`, and `pitchfan`.
+- Status: shared placement drag now also seeds the first two anchors for
+  Gann/Fibonacci three-anchor tools, with web Canvas and mobile Skia continuing
+  through the normal final click/tap commit path: `trendBasedFibExtension`,
+  `fibWedge`, `fibChannel`, and `trendBasedFibTime`.
 
 Phase 2: Draft lifecycle
 

@@ -720,6 +720,10 @@ describe('TealchartWidget', () => {
         'modifiedSchiffPitchfork',
         'insidePitchfork',
         'pitchfan',
+        'trendBasedFibExtension',
+        'fibWedge',
+        'fibChannel',
+        'trendBasedFibTime',
       ];
 
       for (const tool of dragSeedTools) {
