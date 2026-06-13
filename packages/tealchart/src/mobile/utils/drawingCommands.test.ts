@@ -221,6 +221,22 @@ describe('mobile drawing handle command dispatch', () => {
     expect(pasted.history.undoStack).toHaveLength(1);
   });
 
+  it('routes mobile duplicate keyboard action through shared drawing history', () => {
+    const state = createMobileStateWithTrendLine();
+    const result = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      createUserDrawingCommandHistory(),
+      { key: 'd', metaKey: true },
+      { createId: () => 'copy' },
+    );
+
+    expect(result.action?.type).toBe('duplicateSelected');
+    expect(result.changed).toBe(true);
+    expect(result.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
+    expect(result.state.selection).toEqual({ drawingId: 'copy' });
+    expect(result.history.undoStack).toHaveLength(1);
+  });
+
   it('routes mobile select-all keyboard action without recording undo history', () => {
     const state = duplicateUserDrawing(createMobileStateWithTrendLine(), {
       createId: () => 'copy',
