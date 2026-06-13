@@ -72,7 +72,7 @@ describe('drawing layout serialization', () => {
   });
 
   it('persists user-facing drawing names and trims restored legacy names', () => {
-    const restored = deserializeUserDrawingStateFromLayout({
+    const legacyPayload = {
       drawings: [
         {
           id: 'legacy_line',
@@ -83,7 +83,10 @@ describe('drawing layout serialization', () => {
           price: 10,
         },
       ],
-    });
+    };
+    expect('version' in legacyPayload).toBe(false);
+
+    const restored = deserializeUserDrawingStateFromLayout(legacyPayload);
 
     expect(restored).toMatchObject({
       version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
