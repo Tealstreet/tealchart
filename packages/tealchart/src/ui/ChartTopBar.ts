@@ -338,6 +338,11 @@ const styles = {
     gap: '2px',
   } as Partial<CSSStyleDeclaration>,
 
+  selectedActionSurfaceGroupSeparated: {
+    borderLeft: '1px solid var(--border, #363a45)',
+    paddingLeft: '3px',
+  } as Partial<CSSStyleDeclaration>,
+
   drawingGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -677,8 +682,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     el.addEventListener('mouseup', (event) => event.stopPropagation());
     el.addEventListener('click', (event) => event.stopPropagation());
 
-    for (const group of surface.groups) {
-      const groupEl = this.createElement('div', { style: styles.selectedActionSurfaceGroup });
+    for (let groupIndex = 0; groupIndex < surface.groups.length; groupIndex += 1) {
+      const group = surface.groups[groupIndex]!;
+      const groupEl = this.createElement('div', {
+        style: {
+          ...styles.selectedActionSurfaceGroup,
+          ...(groupIndex > 0 ? styles.selectedActionSurfaceGroupSeparated : {}),
+        },
+      });
       for (const item of group.items) {
         const btn = this.createElement('button', {
           style: {
@@ -707,9 +718,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         groupEl.appendChild(btn);
       }
       el.appendChild(groupEl);
-      if (group !== surface.groups[surface.groups.length - 1]) {
-        el.appendChild(this.createElement('div', { style: styles.divider }));
-      }
     }
 
     this.selectedActionSurfaceEl = el;
