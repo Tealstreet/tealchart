@@ -4,7 +4,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { resolveUserDrawingPlacementConstraint, type DrawingCoordinateSpace } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
-import { resolveMobileUserDrawingInputPoint } from './drawingInput';
+import {
+  resolveMobileUserDrawingInputPoint,
+  resolveMobileUserDrawingPlacementConstraintEnabled,
+} from './drawingInput';
 
 const dimensions: ChartDimensions = {
   width: 320,
@@ -76,6 +79,29 @@ describe('mobile user drawing input resolver', () => {
         panes,
       }),
     ).toBeNull();
+  });
+
+  it('resolves mobile placement constraint override state for host toolbars', () => {
+    expect(resolveMobileUserDrawingPlacementConstraintEnabled({})).toBe(false);
+    expect(resolveMobileUserDrawingPlacementConstraintEnabled({ propConstrained: true })).toBe(true);
+    expect(
+      resolveMobileUserDrawingPlacementConstraintEnabled({
+        propConstrained: true,
+        overrideConstrained: false,
+      }),
+    ).toBe(false);
+    expect(
+      resolveMobileUserDrawingPlacementConstraintEnabled({
+        propConstrained: false,
+        overrideConstrained: true,
+      }),
+    ).toBe(true);
+    expect(
+      resolveMobileUserDrawingPlacementConstraintEnabled({
+        propConstrained: true,
+        overrideConstrained: null,
+      }),
+    ).toBe(true);
   });
 
   it('feeds constrained placement geometry from resolved mobile touch anchors', () => {

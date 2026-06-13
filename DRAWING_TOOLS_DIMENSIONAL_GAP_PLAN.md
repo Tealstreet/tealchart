@@ -611,6 +611,9 @@ Phase 3: Constraint affordance
 
 - Provide mobile constraint toggles for square/angle-constrained drawing where
   web uses Shift.
+- Shipped mobile Skia prop and imperative handle override support for
+  host-controlled constrained placement, feeding the same shared square and
+  45-degree placement geometry as web Shift drag.
 
 ## Gap 8: Public API, Events, Persistence, and Testing
 
