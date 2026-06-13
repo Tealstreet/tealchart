@@ -21,6 +21,10 @@ import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
   UpdateUserDrawingOptions,
+  UserDrawingObjectTreeAction,
+  UserDrawingObjectTreeDispatchAction,
+  UserDrawingObjectTreeModel,
+  UserDrawingObjectTreeOptions,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
   UserDrawingAnchor,
@@ -114,6 +118,8 @@ import {
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
+  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeModel,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -285,6 +291,7 @@ export interface SkiaTealchartHandle {
   cancelUserDrawingTextEdit(): boolean;
   setUserDrawingText(drawingId: string, text: string): boolean;
   setUserDrawingTextContent(text: string, options?: UpdateUserDrawingOptions): boolean;
+  setUserDrawingName(drawingId: string, name: string | null, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingImageSource(source: UserDrawingImageSourceInput, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options?: UpdateUserDrawingOptions): boolean;
   setUserDrawingTableCell(
@@ -317,6 +324,9 @@ export interface SkiaTealchartHandle {
   sendUserDrawingBackward(options?: UpdateUserDrawingOptions): boolean;
   bringUserDrawingToFront(options?: UpdateUserDrawingOptions): boolean;
   sendUserDrawingToBack(options?: UpdateUserDrawingOptions): boolean;
+  getUserDrawingObjectTreeModel(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
+  openUserDrawingObjectTree(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
+  dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean;
 }
 
 export interface SkiaTealchartProps {
@@ -356,6 +366,8 @@ export interface SkiaTealchartProps {
   userDrawingState?: UserDrawingState;
   /** Called when the chart updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
+  /** Called when app or handle code asks to open the user drawing object tree. */
+  onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   /** Constrain two-anchor drawing placement drags to square or 45-degree geometry for touch toolbars. */
   constrainUserDrawingPlacement?: boolean;
   /** Called when gesture blocks/unblocks parent scroll */
@@ -413,6 +425,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onCrossHairMoved,
     userDrawingState: propUserDrawingState,
     onUserDrawingStateChange,
+    onUserDrawingObjectTreeOpen,
     constrainUserDrawingPlacement = false,
     onSwipeBlockChange,
     onOrderMove,
@@ -626,6 +639,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setUserDrawingTextContent(text: string, options: UpdateUserDrawingOptions = {}): boolean {
         return dispatchUserDrawingCommandToState({ type: 'setTextContent', text, options, meta: { source: 'api' } });
       },
+      setUserDrawingName(drawingId: string, name: string | null, options: UpdateUserDrawingOptions = {}): boolean {
+        return dispatchUserDrawingCommandToState({ type: 'setName', drawingId, name, options, meta: { source: 'api' } });
+      },
       setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
         return dispatchUserDrawingCommandToState({ type: 'setImageSource', source, options, meta: { source: 'api' } });
       },
@@ -736,8 +752,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           meta: { source: 'api' },
         });
       },
+      getUserDrawingObjectTreeModel(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
+        return resolveUserDrawingObjectTreeModel(userDrawingStateRef.current, options);
+      },
+      openUserDrawingObjectTree(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
+        const model = resolveUserDrawingObjectTreeModel(userDrawingStateRef.current, options);
+        onUserDrawingObjectTreeOpen?.(model);
+        return model;
+      },
+      dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean {
+        const resolvedAction: UserDrawingObjectTreeAction =
+          action.type === 'duplicate' ? { ...action, createId: action.createId ?? createUserDrawingId } : action;
+        const commands = resolveUserDrawingObjectTreeActionCommands(userDrawingStateRef.current, resolvedAction, {
+          now: () => Date.now(),
+        });
+        let changed = false;
+        for (const command of commands) {
+          changed = dispatchUserDrawingCommandToState(command) || changed;
+        }
+        return changed;
+      },
     }),
-    [commitUserDrawingState, createUserDrawingId, dispatchUserDrawingCommandToState],
+    [commitUserDrawingState, createUserDrawingId, dispatchUserDrawingCommandToState, onUserDrawingObjectTreeOpen],
   );
 
   // Use core hook for bar fetching and state management

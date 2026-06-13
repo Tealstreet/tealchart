@@ -966,6 +966,85 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('exposes object tree model, open callback, and shared action dispatch', () => {
+      const datafeed = createMockDatafeed();
+      const onOpenObjectTree = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingObjectTreeOpen: onOpenObjectTree });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'line' },
+        drawings: [
+          {
+            id: 'line',
+            name: 'Breakout',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'target',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 1, price: 45 },
+              { time: 2, price: 55 },
+            ],
+          },
+        ],
+      });
+
+      expect(widget.getUserDrawingObjectTreeModel().rows.map((row) => [row.drawingId, row.label, row.selected])).toEqual([
+        ['target', 'Rectangle', false],
+        ['line', 'Breakout', true],
+      ]);
+
+      const opened = widget.openUserDrawingObjectTree();
+      expect(onOpenObjectTree).toHaveBeenCalledWith(opened);
+      expect(opened.rows).toHaveLength(2);
+
+      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'hide', drawingIds: ['target'] })).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toEqual([
+        expect.objectContaining({ id: 'line', visible: true }),
+        expect.objectContaining({ id: 'target', visible: false }),
+      ]);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'line' });
+
+      expect(widget.setUserDrawingName('target', 'Range box')).toBe(true);
+      expect(widget.getUserDrawingObjectTreeModel().rows[0]).toMatchObject({
+        drawingId: 'target',
+        label: 'Range box',
+        customName: 'Range box',
+      });
+
+      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'duplicate', drawingIds: ['line'] })).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        selection: { drawingId: 'drawing_1' },
+        drawings: [
+          expect.objectContaining({ id: 'line', name: 'Breakout' }),
+          expect.objectContaining({ id: 'drawing_1', name: 'Breakout' }),
+          expect.objectContaining({ id: 'target', name: 'Range box' }),
+        ],
+      });
+    });
+
     it('applies public image source commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();
