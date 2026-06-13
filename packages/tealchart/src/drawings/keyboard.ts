@@ -14,6 +14,7 @@ export type UserDrawingKeyboardActionType =
   | 'copySelected'
   | 'paste'
   | 'nudge'
+  | 'selectAll'
   | 'deleteSelected'
   | 'cancelDraft';
 
@@ -55,6 +56,10 @@ export function resolveUserDrawingKeyboardAction(
 
   if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'v') {
     return { type: 'paste', preventDefault: true };
+  }
+
+  if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'a' && state.drawings.length > 0) {
+    return { type: 'selectAll', preventDefault: true };
   }
 
   const nudgeStep = input.shiftKey === true ? 10 : 1;

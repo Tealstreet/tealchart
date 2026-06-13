@@ -114,6 +114,8 @@ export function dispatchMobileUserDrawingKeyboardAction(
   const command: UserDrawingCommand =
     action.type === 'deleteSelected'
       ? { type: 'delete', meta: { source: 'keyboard' } }
-      : { type: 'cancelDraft', meta: { source: 'keyboard' } };
+      : action.type === 'selectAll'
+        ? { type: 'selectMany', drawingIds: state.drawings.map((drawing) => drawing.id), meta: { source: 'keyboard' } }
+        : { type: 'cancelDraft', meta: { source: 'keyboard' } };
   return { ...dispatchUserDrawingCommandWithHistory(state, history, command), action };
 }
