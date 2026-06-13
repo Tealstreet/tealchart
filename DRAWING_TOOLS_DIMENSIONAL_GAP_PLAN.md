@@ -185,6 +185,10 @@ Phase 1: Placement mode registry
 - Add a shared mapping from tool to placement mode and required anchors.
 - Keep this separate from render geometry so behavior can evolve without adding
   shape-specific input branches everywhere.
+- Status: shared two-anchor drag placement now covers the initial line/shape
+  proof tools plus `priceRange`, `dateRange`, `datePriceRange`, `forecast`,
+  `callout`, and `priceNote`, with the same registry consumed by web Canvas
+  and mobile Skia adapters.
 
 Phase 2: Draft lifecycle
 
