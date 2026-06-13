@@ -198,7 +198,16 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         : null;
 
     return (
-      <View style={[styles.container, { backgroundColor }]}>
+      <View style={styles.container} pointerEvents="box-none">
+        {expandedDrawingCategory && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Close drawing tools"
+            onPress={() => setExpandedDrawingCategoryId(null)}
+            style={styles.drawingToolDismissLayer}
+          />
+        )}
+
         {userDrawingState && (
           <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
             {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
@@ -263,59 +272,60 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
           </View>
         )}
 
-        {/* Symbol display (only shown if symbol is provided) */}
-        {symbol ? (
-          <>
-            <View style={styles.symbolContainer}>
-              <Text style={[styles.symbolText, { color: textColor }]}>{symbol}</Text>
-              {exchangeName && <Text style={[styles.exchangeText, { color: textSecondaryColor }]}>{exchangeName}</Text>}
-            </View>
-            {/* Divider after symbol */}
+        <View style={[styles.topBarRow, { backgroundColor }]}>
+          {/* Symbol display (only shown if symbol is provided) */}
+          {symbol ? (
+            <>
+              <View style={styles.symbolContainer}>
+                <Text style={[styles.symbolText, { color: textColor }]}>{symbol}</Text>
+                {exchangeName && <Text style={[styles.exchangeText, { color: textSecondaryColor }]}>{exchangeName}</Text>}
+              </View>
+              {/* Divider after symbol */}
+              <View style={styles.divider} />
+            </>
+          ) : (
+            /* Leading divider when no symbol */
             <View style={styles.divider} />
-          </>
-        ) : (
-          /* Leading divider when no symbol */
+          )}
+
+          {/* Timeframe selector - horizontal scroll */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timeframeContainer}>
+            {timeframes.map((tf) => (
+              <TimeframeButton
+                key={tf.value}
+                value={tf.value}
+                label={tf.shortLabel}
+                isActive={internalInterval === tf.value}
+                onPress={handleTimeframePress}
+                textColor={textSecondaryColor}
+                accentColor={accentColor}
+              />
+            ))}
+          </ScrollView>
+
+          {/* Divider */}
           <View style={styles.divider} />
-        )}
 
-        {/* Timeframe selector - horizontal scroll */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timeframeContainer}>
-          {timeframes.map((tf) => (
-            <TimeframeButton
-              key={tf.value}
-              value={tf.value}
-              label={tf.shortLabel}
-              isActive={internalInterval === tf.value}
-              onPress={handleTimeframePress}
-              textColor={textSecondaryColor}
-              accentColor={accentColor}
-            />
-          ))}
-        </ScrollView>
+          {/* Indicators button */}
+          <Pressable
+            style={({ pressed }: PressableStyleState) => [
+              styles.indicatorsButton,
+              pressed && styles.indicatorsButtonPressed,
+            ]}
+            onPress={onIndicatorsPress}
+          >
+            <Text style={[styles.indicatorsIcon, { color: textSecondaryColor }]}>ƒ</Text>
+            <Text style={[styles.indicatorsText, { color: textSecondaryColor }]}>Indicators</Text>
+          </Pressable>
 
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Indicators button */}
-        <Pressable
-          style={({ pressed }: PressableStyleState) => [
-            styles.indicatorsButton,
-            pressed && styles.indicatorsButtonPressed,
-          ]}
-          onPress={onIndicatorsPress}
-        >
-          <Text style={[styles.indicatorsIcon, { color: textSecondaryColor }]}>ƒ</Text>
-          <Text style={[styles.indicatorsText, { color: textSecondaryColor }]}>Indicators</Text>
-        </Pressable>
-
-        {userDrawingState && (
-          <>
-            <View style={styles.divider} />
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.drawingContainer}
-            >
+          {userDrawingState && (
+            <>
+              <View style={styles.divider} />
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.drawingContainer}
+              >
               {selectedDrawing && (
                 <>
                   {USER_DRAWING_LINE_COLOR_DESCRIPTORS.map((descriptor) => {
@@ -924,9 +934,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   </Pressable>
                 );
               })}
-            </ScrollView>
-          </>
-        )}
+              </ScrollView>
+            </>
+          )}
+        </View>
       </View>
     );
   },
@@ -980,6 +991,13 @@ TimeframeButton.displayName = 'TimeframeButton';
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  topBarRow: {
     height: TOP_BAR_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1062,6 +1080,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.96)',
     gap: 4,
+  },
+  drawingToolDismissLayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 7,
   },
   drawingToolCategoryButton: {
     width: 34,

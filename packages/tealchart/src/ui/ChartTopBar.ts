@@ -108,6 +108,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
+  /** Optional overlay root for drawing rail/flyout DOM. Falls back to the top bar parent. */
+  drawingOverlayParent?: HTMLElement;
 }
 
 interface ChartTopBarState {
@@ -227,6 +229,7 @@ const styles = {
     backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.96))',
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
     zIndex: '7',
+    pointerEvents: 'auto',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolRailItem: {
@@ -380,6 +383,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private indicatorsBtn: HTMLButtonElement | null = null;
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
+  private drawingToolRailCleanup: Array<() => void> = [];
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -549,6 +553,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private removeDrawingToolRail(): void {
+    for (const cleanup of this.drawingToolRailCleanup) {
+      cleanup();
+    }
+    this.drawingToolRailCleanup = [];
     this.drawingToolRailEl?.remove();
     this.drawingToolRailEl = null;
   }
@@ -560,6 +568,19 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         'aria-label': 'Drawing tool categories',
       },
     });
+    let activeFlyout:
+      | {
+          id: string;
+          button: HTMLButtonElement;
+          flyout: HTMLElement;
+        }
+      | null = null;
+    const closeActiveFlyout = () => {
+      if (!activeFlyout) return;
+      activeFlyout.flyout.style.display = 'none';
+      activeFlyout.button.setAttribute('aria-expanded', 'false');
+      activeFlyout = null;
+    };
 
     for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
       const activeCategory = category.tools.includes(activeTool);
@@ -583,19 +604,24 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       const flyout = this.createElement('div', { style: styles.drawingToolFlyout });
       flyout.appendChild(this.createElement('div', { style: styles.drawingToolFlyoutTitle, textContent: category.label }));
       const showFlyout = () => {
+        if (activeFlyout?.id === category.id) return;
+        closeActiveFlyout();
         flyout.style.display = 'block';
         categoryButton.setAttribute('aria-expanded', 'true');
+        activeFlyout = { id: category.id, button: categoryButton, flyout };
       };
       const hideFlyout = () => {
+        if (activeFlyout?.id !== category.id) return;
         flyout.style.display = 'none';
         categoryButton.setAttribute('aria-expanded', 'false');
+        activeFlyout = null;
       };
-      categoryButton.addEventListener('click', () => {
+      categoryButton.addEventListener('click', (event) => {
+        event.stopPropagation();
         if (flyout.style.display === 'block') hideFlyout();
         else showFlyout();
       });
       railItem.addEventListener('mouseenter', showFlyout);
-      railItem.addEventListener('mouseleave', hideFlyout);
 
       for (const tool of category.tools) {
         const descriptor = getUserDrawingToolDescriptor(tool);
@@ -616,7 +642,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         btn.appendChild(this.createElement('span', { style: styles.drawingToolFlyoutLabel, textContent: descriptor.label }));
         btn.addEventListener('click', () => {
           this.options.onUserDrawingToolSelect?.(descriptor.tool);
-          hideFlyout();
+          closeActiveFlyout();
         });
         btn.addEventListener('mouseenter', () => {
           if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
@@ -636,7 +662,24 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
 
     this.drawingToolRailEl = rail;
-    (this.el.parentElement ?? this.el).appendChild(rail);
+    (this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el).appendChild(rail);
+
+    const closeOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
+      const target = event.target;
+      if (target instanceof Node && rail.contains(target)) return;
+      closeActiveFlyout();
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeActiveFlyout();
+    };
+    document.addEventListener('mousedown', closeOnOutsidePointer);
+    document.addEventListener('touchstart', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    this.drawingToolRailCleanup.push(
+      () => document.removeEventListener('mousedown', closeOnOutsidePointer),
+      () => document.removeEventListener('touchstart', closeOnOutsidePointer),
+      () => document.removeEventListener('keydown', closeOnEscape),
+    );
   }
 
   private renderDrawingToolbar(): HTMLElement {
