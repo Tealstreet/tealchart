@@ -24,6 +24,7 @@ const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'forecast',
   'callout',
   'priceNote',
+  'image',
   'fibRetracement',
   'fibExtension',
   'fibFan',
