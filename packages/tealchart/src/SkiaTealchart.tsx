@@ -97,16 +97,11 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
-  appendUserDrawingPathDragPoint,
   applyUserDrawingEditDrag,
   beginUserDrawingEditDragAtPoint,
-  beginUserDrawingPathDrag,
-  beginUserDrawingTextEdit,
-  commitUserDrawingPathDrag,
   createUserDrawingState,
   dispatchUserDrawingCommand,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
-  handleUserDrawingInput,
   isUserDrawingPathFamilyTool,
   measureUserDrawingTextLines,
   normalizeUserDrawingFontFamily,
@@ -435,15 +430,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       onUserDrawingStateChange?.(nextState);
     },
     [onUserDrawingStateChange],
-  );
-
-  const commitUserDrawingStateIfChanged = useCallback(
-    (nextState: UserDrawingState) => {
-      if (nextState === userDrawingStateRef.current) return false;
-      commitUserDrawingState(nextState);
-      return true;
-    },
-    [commitUserDrawingState],
   );
 
   useEffect(() => {
@@ -1267,24 +1253,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       });
       if (!point) return false;
 
-      const nextState = handleUserDrawingInput(effectiveUserDrawingState, point, {
-        createId: () => {
-          const existingIds = new Set(effectiveUserDrawingState.drawings.map((drawing) => drawing.id));
-          let id = '';
-          do {
-            id = `drawing_${++userDrawingIdCounterRef.current}`;
-          } while (existingIds.has(id));
-          return id;
+      return dispatchUserDrawingCommandToState({
+        type: 'handleInput',
+        point,
+        options: {
+          createId: createUserDrawingId,
         },
+        meta: { source: 'touch' },
       });
-      if (nextState === effectiveUserDrawingState) return false;
-
-      commitUserDrawingState(nextState);
-      return true;
     },
     [
       chartDimensions,
+      createUserDrawingId,
       commitUserDrawingState,
+      dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
@@ -1310,7 +1292,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
         if (!point) return false;
 
-        return commitUserDrawingStateIfChanged(beginUserDrawingPathDrag(userDrawingStateRef.current, point));
+        return dispatchUserDrawingCommandToState({
+          type: 'beginPathDrag',
+          point,
+          meta: { source: 'touch', transactionKey: 'path-drag' },
+        });
       }
 
       if (effectiveUserDrawingState.activeTool !== 'select') return false;
@@ -1329,7 +1315,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [
       chartDimensions,
       commitUserDrawingState,
-      commitUserDrawingStateIfChanged,
+      dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
@@ -1352,7 +1338,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
         if (!point) return;
 
-        commitUserDrawingStateIfChanged(appendUserDrawingPathDragPoint(userDrawingStateRef.current, point));
+        dispatchUserDrawingCommandToState({
+          type: 'appendPathDragPoint',
+          point,
+          meta: { source: 'touch', transactionKey: 'path-drag' },
+        });
         return;
       }
 
@@ -1367,7 +1357,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [
       chartDimensions,
       commitUserDrawingState,
-      commitUserDrawingStateIfChanged,
+      dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
       userDrawingInputPanes,
       bars,
@@ -1377,23 +1367,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleUserDrawingEditEnd = useCallback(() => {
     if (isUserDrawingPathFamilyTool(userDrawingStateRef.current.activeTool)) {
-      commitUserDrawingStateIfChanged(
-        commitUserDrawingPathDrag(userDrawingStateRef.current, {
-          createId: () => {
-            const existingIds = new Set(userDrawingStateRef.current.drawings.map((drawing) => drawing.id));
-            let id = '';
-            do {
-              id = `drawing_${++userDrawingIdCounterRef.current}`;
-            } while (existingIds.has(id));
-            return id;
-          },
-        }),
-      );
+      dispatchUserDrawingCommandToState({
+        type: 'commitPathDrag',
+        options: {
+          createId: createUserDrawingId,
+        },
+        meta: { source: 'touch', transactionKey: 'path-drag' },
+      });
       return;
     }
 
     userDrawingEditDragRef.current = null;
-  }, [commitUserDrawingStateIfChanged]);
+  }, [createUserDrawingId, dispatchUserDrawingCommandToState]);
 
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
@@ -1514,9 +1499,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             selectedDrawing?.kind === 'priceNote' ||
             selectedDrawing?.kind === 'comment')
         ) {
-          const nextState = beginUserDrawingTextEdit(selection.state, selectedDrawing.id);
-          if (nextState !== selection.state) {
-            commitUserDrawingState(nextState);
+          const result = dispatchUserDrawingCommand(selection.state, {
+            type: 'beginTextEdit',
+            drawingId: selectedDrawing.id,
+            meta: { source: 'touch' },
+          });
+          if (result.changed) {
+            commitUserDrawingState(result.state);
             return;
           }
         }
