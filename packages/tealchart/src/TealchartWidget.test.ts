@@ -2011,6 +2011,33 @@ describe('TealchartWidget', () => {
       expect(testWidget._paneManager.toggleMaximizePane).toHaveBeenCalledWith('main');
     });
 
+    it('does not record cancelled web placement drags in drawing undo history', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as {
+        _handleUserDrawingPlacementDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+      widget.setActiveUserDrawingTool('rectangle');
+
+      expect(
+        testWidget._handleUserDrawingPlacementDragStart({
+          paneId: 'main',
+          anchor: { time: 1_000, price: 100 },
+        }),
+      ).toBe(true);
+      expect(widget.getUserDrawingState().draft).toMatchObject({
+        tool: 'rectangle',
+        anchors: [{ time: 1_000, price: 100 }],
+      });
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+
+      widget.cancelUserDrawingDraft();
+
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(widget.getUserDrawingState().draft).toBeNull();
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+    });
+
     it('deletes the selected drawing from keyboard delete shortcuts only while chart owns input', () => {
       const datafeed = createMockDatafeed();
       const container = document.createElement('div');
