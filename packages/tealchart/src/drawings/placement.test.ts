@@ -67,6 +67,10 @@ const dragSeedTools: UserDrawingTool[] = [
   'modifiedSchiffPitchfork',
   'insidePitchfork',
   'pitchfan',
+  'trendBasedFibExtension',
+  'fibWedge',
+  'fibChannel',
+  'trendBasedFibTime',
 ];
 
 function point(time: number, price: number): UserDrawingInputPoint {
@@ -87,6 +91,7 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('triangle')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('parallelChannel')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('pitchfork')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('fibChannel')).toBe('dragSeed');
   });
 
   it('classifies supported two-anchor tools as drag placement tools', () => {
