@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { resolveUserDrawingPlacementConstraint, type DrawingCoordinateSpace } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
+  resolveMobileUserDrawingDuplicateEditDragEnabled,
   resolveMobileUserDrawingInputPoint,
   resolveMobileUserDrawingPlacementConstraintEnabled,
 } from './drawingInput';
@@ -100,6 +101,29 @@ describe('mobile user drawing input resolver', () => {
       resolveMobileUserDrawingPlacementConstraintEnabled({
         propConstrained: true,
         overrideConstrained: null,
+      }),
+    ).toBe(true);
+  });
+
+  it('resolves mobile duplicate edit-drag override state for host toolbars', () => {
+    expect(resolveMobileUserDrawingDuplicateEditDragEnabled({})).toBe(false);
+    expect(resolveMobileUserDrawingDuplicateEditDragEnabled({ propDuplicate: true })).toBe(true);
+    expect(
+      resolveMobileUserDrawingDuplicateEditDragEnabled({
+        propDuplicate: true,
+        overrideDuplicate: false,
+      }),
+    ).toBe(false);
+    expect(
+      resolveMobileUserDrawingDuplicateEditDragEnabled({
+        propDuplicate: false,
+        overrideDuplicate: true,
+      }),
+    ).toBe(true);
+    expect(
+      resolveMobileUserDrawingDuplicateEditDragEnabled({
+        propDuplicate: true,
+        overrideDuplicate: null,
       }),
     ).toBe(true);
   });

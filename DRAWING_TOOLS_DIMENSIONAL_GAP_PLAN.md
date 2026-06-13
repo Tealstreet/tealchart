@@ -591,7 +591,8 @@ Phase 2: Modifier drag
 - Preserve Shift constraints for active drawing placement.
 - Shipped shared duplicate-edit-drag begin command. Web select mode uses
   Shift+drag to duplicate the hit/selected drawing set and immediately move the
-  copy, while active drawing placement still uses Shift for constraints.
+  copy, with widget-level undo coverage, while active drawing placement still
+  uses Shift for constraints.
 
 Phase 3: Nudge
 
@@ -623,6 +624,11 @@ Phase 2: Touch-native duplicate workflow
 - Shipped Skia imperative `beginDuplicateUserDrawingDragAtPoint` support backed
   by the same shared duplicate-edit-drag command, so mobile action surfaces can
   duplicate at a press point and continue through the existing touch drag path.
+- Shipped Skia `duplicateUserDrawingOnEditDrag` prop and imperative override
+  mode so host toolbars can make normal touch edit drags duplicate and move the
+  copy without needing to compute a drag start point themselves; the imperative
+  override is persistent until cleared, matching the placement constraint
+  override contract.
 
 Phase 3: Constraint affordance
 
