@@ -8,7 +8,7 @@ import {
   redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from './history';
-import { createUserDrawingState } from './input';
+import { createUserDrawingState, handleUserDrawingInput, setUserDrawingTool } from './input';
 import { clearChartStoreCache } from '../state/chartState';
 
 const anchorA = { time: 1_000, price: 100 };
@@ -204,5 +204,88 @@ describe('user drawing command history', () => {
 
     expect(history.undoStack).toHaveLength(1);
     expect(history.undoStack[0]?.after.drawings.map((drawing) => drawing.id)).toEqual(['line-1', 'line-2']);
+  });
+
+  it('records committed text edits as one undoable transaction', () => {
+    let state = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'textLabel'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'label', now: () => 50, style, text: 'Initial' },
+    );
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      options: { now: () => 51 },
+      meta: { source: 'api', transactionKey: 'label-edit' },
+    }));
+    expect(state.textEdit).toMatchObject({ drawingId: 'label', value: 'Initial' });
+    expect(history.undoStack).toHaveLength(0);
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'updateTextEdit',
+      value: 'Changed',
+      meta: { source: 'textEditor', transactionKey: 'label-edit' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'updateTextEdit',
+      value: 'Changed again',
+      meta: { source: 'textEditor', transactionKey: 'label-edit' },
+    }));
+    expect(state.textEdit).toMatchObject({ drawingId: 'label', value: 'Changed again' });
+    expect(history.undoStack).toHaveLength(0);
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'commitTextEdit',
+      options: { now: () => 52 },
+      meta: { source: 'textEditor', transactionKey: 'label-edit' },
+    }));
+
+    expect(history.undoStack).toHaveLength(1);
+    expect(state.textEdit).toBeNull();
+    expect(state.drawings[0]).toMatchObject({ id: 'label', text: 'Changed again' });
+
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]).toMatchObject({ id: 'label', text: 'Initial' });
+    expect(undo.state.textEdit).toBeNull();
+
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]).toMatchObject({ id: 'label', text: 'Changed again' });
+    expect(redo.state.textEdit).toBeNull();
+  });
+
+  it('does not record canceled or unchanged text edits', () => {
+    let state = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'textLabel'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'label', now: () => 60, style, text: 'Initial' },
+    );
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      meta: { source: 'api' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'cancelTextEdit',
+      meta: { source: 'textEditor' },
+    }));
+    expect(state.textEdit).toBeNull();
+    expect(history.undoStack).toHaveLength(0);
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      meta: { source: 'api' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'commitTextEdit',
+      meta: { source: 'textEditor' },
+    }));
+    expect(state.drawings[0]).toMatchObject({ id: 'label', text: 'Initial' });
+    expect(state.textEdit).toBeNull();
+    expect(history.undoStack).toHaveLength(0);
   });
 });
