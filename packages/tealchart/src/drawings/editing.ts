@@ -26,6 +26,10 @@ export interface ApplyUserDrawingEditDragOptions {
   now?: () => number;
 }
 
+export interface NudgeUserDrawingSelectionOptions extends ApplyUserDrawingEditDragOptions {
+  delta: DrawingScreenPoint;
+}
+
 export interface BeginUserDrawingEditDragOptions {
   hitTest?: UserDrawingHitTestOptions;
 }
@@ -668,6 +672,53 @@ export function applyUserDrawingEditDrag(
     ...state,
     drawings,
     selection: drag.selection,
+    draft: null,
+    textEdit: null,
+  };
+}
+
+export function nudgeUserDrawingSelection(
+  state: UserDrawingState,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: NudgeUserDrawingSelectionOptions,
+): UserDrawingState {
+  if (!state.selection) return state;
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  if (selectedIds.size === 0) return state;
+
+  const updatedAt = options.now?.() ?? Date.now();
+  let changed = false;
+  const startPoint = { x: 0, y: 0 };
+
+  const drawings = state.drawings.map((drawing) => {
+    if (!selectedIds.has(drawing.id) || drawing.locked) return drawing;
+    const space = spacesByPaneId.get(drawing.paneId);
+    if (!space) return drawing;
+
+    const startAnchor = screenPointToAnchor(startPoint, space);
+    const currentAnchor = screenPointToAnchor(options.delta, space);
+    const delta = {
+      time: currentAnchor.time - startAnchor.time,
+      price: currentAnchor.price - startAnchor.price,
+    };
+    const startPosition = screenPointToPanePosition(startPoint, space);
+    const currentPosition = screenPointToPanePosition(options.delta, space);
+    const positionDelta = {
+      x: currentPosition.x - startPosition.x,
+      y: currentPosition.y - startPosition.y,
+    };
+    const nextDrawing = moveDrawingByScreenDelta(drawing, delta, positionDelta, space, updatedAt);
+    if (nextDrawing === drawing) return drawing;
+    changed = true;
+    return nextDrawing;
+  });
+
+  if (!changed) return state;
+
+  return {
+    ...state,
+    drawings,
+    selection: state.selection,
     draft: null,
     textEdit: null,
   };

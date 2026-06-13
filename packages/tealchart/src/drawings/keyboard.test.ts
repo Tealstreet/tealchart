@@ -1,10 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { resolveUserDrawingKeyboardAction } from './keyboard';
 import { createUserDrawingState, setUserDrawingTool, handleUserDrawingInput } from './input';
+import { clearChartStoreCache } from '../state/chartState';
 import type { UserDrawingState } from './types';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 function withSelection(): UserDrawingState {
   return {
@@ -76,6 +81,21 @@ describe('user drawing keyboard actions', () => {
     });
     expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'Delete', metaKey: true })).toBeNull();
     expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'Delete' })).toBeNull();
+  });
+
+  it('maps arrow-key nudge only when a drawing is selected', () => {
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'ArrowLeft' })).toEqual({
+      type: 'nudge',
+      delta: { x: -1, y: 0 },
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'ArrowDown', shiftKey: true })).toEqual({
+      type: 'nudge',
+      delta: { x: 0, y: 10 },
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'ArrowRight', metaKey: true })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'ArrowRight' })).toBeNull();
   });
 
   it('maps bare escape only while a draft is active', () => {

@@ -220,6 +220,28 @@ describe('mobile drawing handle command dispatch', () => {
     expect(pasted.history.undoStack).toHaveLength(1);
   });
 
+  it('routes mobile keyboard nudge through shared drawing history', () => {
+    const state = createMobileStateWithTrendLine();
+    const result = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      createUserDrawingCommandHistory(),
+      { key: 'ArrowRight' },
+      {
+        createId: () => 'copy',
+        spacesByPaneId,
+      },
+    );
+
+    expect(result.action?.type).toBe('nudge');
+    expect(result.changed).toBe(true);
+    expect(result.history.undoStack).toHaveLength(1);
+    const movedDrawing = result.state.drawings[0];
+    expect(movedDrawing?.kind).toBe('trendLine');
+    if (movedDrawing?.kind !== 'trendLine') throw new Error('expected trend line drawing');
+    expect(movedDrawing.points[0]?.time).toBe(1010);
+    expect(movedDrawing.points[1]?.time).toBe(2010);
+  });
+
   it('records mobile two-anchor placement drag as one undoable drawing creation', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     let history = createUserDrawingCommandHistory();

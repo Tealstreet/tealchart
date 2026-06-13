@@ -79,6 +79,7 @@ import type {
   UserDrawingInfoLineMetrics,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
+  NudgeUserDrawingSelectionOptions,
   ResolveUserDrawingEditIntentOptions,
   ResolveUserDrawingPropertiesIntentOptions,
   UserDrawingEditIntent,
@@ -211,6 +212,7 @@ import {
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
   resolveUserDrawingKeyboardAction,
+  nudgeUserDrawingSelection,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
   resolveAnchoredVolumeProfileFromAnchor,
@@ -319,6 +321,7 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingPropertiesSurface).toBeTypeOf('function');
     expect(resolveUserDrawingPropertiesSurfaceCommand).toBeTypeOf('function');
     expect(resolveUserDrawingKeyboardAction).toBeTypeOf('function');
+    expect(nudgeUserDrawingSelection).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
@@ -461,6 +464,9 @@ describe('tealchart public entries', () => {
     const options: NonNever<ResolveUserDrawingEditIntentOptions> = {
       source: 'pointer',
     };
+    const nudgeOptions: NonNever<NudgeUserDrawingSelectionOptions> = {
+      delta: { x: 1, y: 0 },
+    };
     const intent: NonNever<UserDrawingEditIntent> = {
       type: 'pane',
       commands: [],
@@ -468,6 +474,7 @@ describe('tealchart public entries', () => {
 
     expect(kind).toBe('properties');
     expect(options.source).toBe('pointer');
+    expect(nudgeOptions.delta.x).toBe(1);
     expect(intent.type).toBe('pane');
   });
 
