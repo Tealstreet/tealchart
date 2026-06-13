@@ -38,7 +38,8 @@ object tree and advanced property panels build on them.
 Goal: create the source of truth for supported drawing behaviors, tool placement
 modes, action availability, and platform parity.
 
-Tracking artifact: `DRAWING_TOOLS_CAPABILITY_MATRIX.md`.
+Tracking artifacts: `DRAWING_TOOLS_CAPABILITY_MATRIX.md` and
+`DRAWING_TOOLS_INTERACTION_INVARIANTS.md`.
 
 ### Epic 1.1: Drawing Capability Inventory
 
@@ -65,6 +66,8 @@ Phase 3: PR/epic acceptance checklist
 - Require focused tests or an explicit test-gap note for every touched platform.
 
 ### Epic 1.2: Drawing Interaction Invariants
+
+Status: documented in `DRAWING_TOOLS_INTERACTION_INVARIANTS.md`.
 
 Phase 1: Shared terminology
 
