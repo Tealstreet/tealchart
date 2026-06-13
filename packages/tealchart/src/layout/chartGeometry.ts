@@ -14,7 +14,7 @@ export interface Insets {
   left: number;
 }
 
-export type ChartChromeRegion = 'topBar' | 'leftTools' | 'rightPriceAxis' | 'bottomTimeAxis';
+export type ChartChromeRegion = 'topBar' | 'leftTools' | 'rightPriceAxis' | 'bottomTimeAxis' | 'topLeftLegend';
 
 export type ChartLayoutMode = 'overlay' | 'reserve' | 'hybrid';
 
@@ -30,6 +30,10 @@ export interface ChartChromeMetrics {
   leftToolRailWidth: number;
   leftToolRailInset: number;
   leftToolRailTopGap: number;
+  topLeftLegendLeft: number;
+  topLeftLegendTopGap: number;
+  topLeftLegendWidth: number;
+  topLeftLegendMinHeight: number;
 }
 
 export interface ChartGeometryInput {
@@ -39,6 +43,8 @@ export interface ChartGeometryInput {
   paneLayout: UnifiedPaneLayout;
   topBarHeight?: number;
   leftToolRailWidth?: number;
+  topLeftLegend?: boolean;
+  chromeMetrics?: ChartChromeMetrics;
   safeAreaInsets?: Partial<Insets>;
   chrome?: Partial<ChartChromeLayoutModes>;
 }
@@ -64,6 +70,10 @@ export const WEB_CHART_CHROME_METRICS: ChartChromeMetrics = {
   leftToolRailWidth: 50,
   leftToolRailInset: 8,
   leftToolRailTopGap: 8,
+  topLeftLegendLeft: 12,
+  topLeftLegendTopGap: 8,
+  topLeftLegendWidth: 480,
+  topLeftLegendMinHeight: 44,
 };
 
 export const MOBILE_CHART_CHROME_METRICS: ChartChromeMetrics = {
@@ -71,6 +81,10 @@ export const MOBILE_CHART_CHROME_METRICS: ChartChromeMetrics = {
   leftToolRailWidth: 52,
   leftToolRailInset: 8,
   leftToolRailTopGap: 8,
+  topLeftLegendLeft: 0,
+  topLeftLegendTopGap: 0,
+  topLeftLegendWidth: 0,
+  topLeftLegendMinHeight: 0,
 };
 
 export const EMPTY_INSETS: Insets = {
@@ -130,6 +144,13 @@ export function computeLeftToolRailTop(metrics: Pick<ChartChromeMetrics, 'topBar
   return metrics.topBarHeight + metrics.leftToolRailTopGap;
 }
 
+export function computeTopLeftLegendRect(metrics: ChartChromeMetrics, bounds: Rect, safeTop = 0): Rect | null {
+  if (metrics.topLeftLegendWidth <= 0 || metrics.topLeftLegendMinHeight <= 0) return null;
+  const x = bounds.x + metrics.topLeftLegendLeft;
+  const y = bounds.y + safeTop + metrics.topBarHeight + metrics.topLeftLegendTopGap;
+  return rect(x, y, Math.min(metrics.topLeftLegendWidth, Math.max(0, rectRight(bounds) - x)), metrics.topLeftLegendMinHeight);
+}
+
 export function computePaneGeometry(options: {
   paneLayout: UnifiedPaneLayout;
   height: number;
@@ -159,6 +180,7 @@ export function computeChartGeometry(input: ChartGeometryInput): ChartGeometrySn
   const chromeModes = { ...DEFAULT_CHART_CHROME_LAYOUT, ...input.chrome };
   const topBarHeight = input.topBarHeight ?? 0;
   const leftToolRailWidth = input.leftToolRailWidth ?? 0;
+  const chromeMetrics = input.chromeMetrics;
 
   const chrome: ChartGeometrySnapshot['chrome'] = {};
   if (topBarHeight > 0) {
@@ -178,6 +200,12 @@ export function computeChartGeometry(input: ChartGeometryInput): ChartGeometrySn
       safeRoot.width,
       input.paneLayout.timeAxisHeight,
     );
+  }
+  if (input.topLeftLegend && chromeMetrics) {
+    const legendRect = computeTopLeftLegendRect(chromeMetrics, safeRoot);
+    if (legendRect) {
+      chrome.topLeftLegend = legendRect;
+    }
   }
 
   const reservedInsets: Insets = {
