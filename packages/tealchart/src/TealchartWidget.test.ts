@@ -418,6 +418,51 @@ describe('TealchartWidget', () => {
       expect(widget.deleteUserDrawing('missing')).toBe(false);
       expect(onCommand).toHaveBeenCalledTimes(1);
       expect(subscribed).toHaveBeenCalledTimes(1);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(onCommand).toHaveBeenCalledTimes(2);
+      expect(subscribed).toHaveBeenCalledTimes(2);
+      expect(onCommand.mock.calls[1]![0]).toMatchObject({
+        command: { type: 'undo' },
+        source: 'api',
+      });
+      expect(onCommand.mock.calls[1]![0].state.drawings.map((drawing) => drawing.id)).toEqual(['a']);
+    });
+
+    it('continues subscription emission when the option command listener throws', () => {
+      const datafeed = createMockDatafeed();
+      const subscribed = vi.fn();
+      const widget = createWidget(datafeed, {
+        onUserDrawingCommand: () => {
+          throw new Error('listener failed');
+        },
+      });
+      widget.subscribe('user_drawing_command', subscribed);
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        drawings: [
+          {
+            id: 'a',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 100,
+          },
+        ],
+        selection: { drawingId: 'a' },
+      });
+
+      expect(() => widget.deleteSelectedUserDrawing()).not.toThrow();
+      expect(subscribed).toHaveBeenCalledTimes(1);
+      expect(subscribed.mock.calls[0]?.[0]).toMatchObject({ command: { type: 'delete' } });
     });
 
     it('marks layouts dirty only when committed user drawings change', () => {

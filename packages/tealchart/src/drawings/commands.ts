@@ -213,6 +213,9 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setLocked'; locked: boolean; options?: UpdateUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'reorder'; action: UserDrawingZOrderAction; options?: UpdateUserDrawingOptions });
 
+export type UserDrawingHistoryCommand = UserDrawingCommandBase & { type: 'undo' | 'redo' };
+export type UserDrawingCommandEventCommand = UserDrawingCommand | UserDrawingHistoryCommand;
+
 export interface UserDrawingCommandDispatchResult {
   state: UserDrawingState;
   changed: boolean;
@@ -223,7 +226,7 @@ export interface UserDrawingCommandDispatchResult {
 }
 
 export interface UserDrawingCommandEvent {
-  command: UserDrawingCommand;
+  command: UserDrawingCommandEventCommand;
   previousState: UserDrawingState;
   state: UserDrawingState;
   meta?: UserDrawingCommandMetadata;
@@ -253,16 +256,32 @@ function resolveUserDrawingCommandAffectedIds(
     }
   }
 
-  if (previousState.selection?.drawingId !== nextState.selection?.drawingId) {
-    if (previousState.selection?.drawingId) changedIds.add(previousState.selection.drawingId);
-    if (nextState.selection?.drawingId) changedIds.add(nextState.selection.drawingId);
-  }
+  addUserDrawingSelectionAffectedIds(previousState, nextState, changedIds);
   if (previousState.textEdit?.drawingId !== nextState.textEdit?.drawingId) {
     if (previousState.textEdit?.drawingId) changedIds.add(previousState.textEdit.drawingId);
     if (nextState.textEdit?.drawingId) changedIds.add(nextState.textEdit.drawingId);
   }
 
   return changedIds.size > 0 ? [...changedIds] : undefined;
+}
+
+function getUserDrawingSelectionIdSet(state: UserDrawingState): Set<string> {
+  return new Set(state.selection?.drawingIds ?? (state.selection?.drawingId ? [state.selection.drawingId] : []));
+}
+
+function addUserDrawingSelectionAffectedIds(
+  previousState: UserDrawingState,
+  nextState: UserDrawingState,
+  affectedIds: Set<string>,
+): void {
+  const previousSelectionIds = getUserDrawingSelectionIdSet(previousState);
+  const nextSelectionIds = getUserDrawingSelectionIdSet(nextState);
+  for (const id of previousSelectionIds) {
+    if (!nextSelectionIds.has(id)) affectedIds.add(id);
+  }
+  for (const id of nextSelectionIds) {
+    if (!previousSelectionIds.has(id)) affectedIds.add(id);
+  }
 }
 
 export function createUserDrawingCommandEvent(
@@ -278,6 +297,23 @@ export function createUserDrawingCommandEvent(
     source: result.meta?.source,
     affectedIds: result.meta?.affectedIds ?? resolveUserDrawingCommandAffectedIds(previousState, result.state),
     hit: result.hit,
+  };
+}
+
+export function createUserDrawingHistoryCommandEvent(
+  previousState: UserDrawingState,
+  state: UserDrawingState,
+  command: UserDrawingHistoryCommand,
+  changed: boolean,
+): UserDrawingCommandEvent | null {
+  if (!changed) return null;
+  return {
+    command,
+    previousState,
+    state,
+    meta: command.meta,
+    source: command.meta?.source,
+    affectedIds: command.meta?.affectedIds ?? resolveUserDrawingCommandAffectedIds(previousState, state),
   };
 }
 

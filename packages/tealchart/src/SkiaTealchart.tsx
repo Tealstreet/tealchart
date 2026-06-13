@@ -117,6 +117,7 @@ import {
   createUserDrawingClipboard,
   createUserDrawingCommandHistory,
   createUserDrawingCommandEvent,
+  createUserDrawingHistoryCommandEvent,
   createUserDrawingState,
   dispatchUserDrawingCommand,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
@@ -515,6 +516,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [onUserDrawingStateChange],
   );
 
+  const notifyUserDrawingCommand = useCallback(
+    (event: UserDrawingCommandEvent) => {
+      try {
+        onUserDrawingCommand?.(event);
+      } catch {
+        // Keep chart input/state flow isolated from app callback failures.
+      }
+    },
+    [onUserDrawingCommand],
+  );
+
   useEffect(() => {
     if (propUserDrawingState) {
       userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
@@ -548,12 +560,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         commitUserDrawingState(result.state);
         const event = createUserDrawingCommandEvent(previousState, result);
         if (event) {
-          onUserDrawingCommand?.(event);
+          notifyUserDrawingCommand(event);
         }
       }
       return result;
     },
-    [commitUserDrawingState, onUserDrawingCommand],
+    [commitUserDrawingState, notifyUserDrawingCommand],
   );
 
   const dispatchUserDrawingCommandToState = useCallback(
@@ -613,18 +625,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return canRedoUserDrawingCommandHistory(userDrawingHistoryRef.current);
       },
       undoUserDrawingCommand(): boolean {
-        const result = undoUserDrawingCommandHistory(userDrawingStateRef.current, userDrawingHistoryRef.current);
+        const previousState = userDrawingStateRef.current;
+        const result = undoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
         userDrawingHistoryRef.current = result.history;
         if (result.changed) {
           commitUserDrawingState(result.state);
+          const event = createUserDrawingHistoryCommandEvent(
+            previousState,
+            result.state,
+            { type: 'undo', meta: { source: 'api' } },
+            true,
+          );
+          if (event) notifyUserDrawingCommand(event);
         }
         return result.changed;
       },
       redoUserDrawingCommand(): boolean {
-        const result = redoUserDrawingCommandHistory(userDrawingStateRef.current, userDrawingHistoryRef.current);
+        const previousState = userDrawingStateRef.current;
+        const result = redoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
         userDrawingHistoryRef.current = result.history;
         if (result.changed) {
           commitUserDrawingState(result.state);
+          const event = createUserDrawingHistoryCommandEvent(
+            previousState,
+            result.state,
+            { type: 'redo', meta: { source: 'api' } },
+            true,
+          );
+          if (event) notifyUserDrawingCommand(event);
         }
         return result.changed;
       },
@@ -649,7 +677,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (result.command) {
             const event = createUserDrawingCommandEvent(previousState, { ...result, command: result.command });
             if (event) {
-              onUserDrawingCommand?.(event);
+              notifyUserDrawingCommand(event);
+            }
+          } else if (result.action?.type === 'undo' || result.action?.type === 'redo') {
+            const event = createUserDrawingHistoryCommandEvent(
+              previousState,
+              result.state,
+              {
+                type: result.action.type === 'undo' ? 'undo' : 'redo',
+                meta: { source: 'keyboard' },
+              },
+              true,
+            );
+            if (event) {
+              notifyUserDrawingCommand(event);
             }
           }
         }
@@ -710,7 +751,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           commitUserDrawingState(result.state);
           const event = createUserDrawingCommandEvent(previousState, result);
           if (event) {
-            onUserDrawingCommand?.(event);
+            notifyUserDrawingCommand(event);
           }
         }
         userDrawingEditDragRef.current = result.editDrag;
@@ -918,7 +959,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       createUserDrawingId,
       dispatchUserDrawingCommandToState,
       dispatchUserDrawingCommandToStateWithResult,
-      onUserDrawingCommand,
+      notifyUserDrawingCommand,
       onUserDrawingObjectTreeOpen,
       onUserDrawingPropertiesOpen,
     ],
@@ -1519,7 +1560,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           commitUserDrawingState(selection.state);
           const event = createUserDrawingCommandEvent(effectiveUserDrawingState, selection);
           if (event) {
-            onUserDrawingCommand?.(event);
+            notifyUserDrawingCommand(event);
           }
         }
         return (selection.hit ?? false) || selection.changed;
@@ -1551,7 +1592,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
-      onUserDrawingCommand,
+      notifyUserDrawingCommand,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
       bars,
@@ -1624,7 +1665,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         commitUserDrawingState(result.state);
         const event = createUserDrawingCommandEvent(effectiveUserDrawingState, result);
         if (event) {
-          onUserDrawingCommand?.(event);
+          notifyUserDrawingCommand(event);
         }
       }
       return true;
@@ -1636,7 +1677,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
-      onUserDrawingCommand,
+      notifyUserDrawingCommand,
       resolveConstrainedUserDrawingPlacementPoint,
       userDrawingInputPanes,
       userDrawingSpacesByPaneId,
@@ -1844,7 +1885,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           if (result.changed) {
             commitUserDrawingState(result.state);
             for (const event of result.events) {
-              onUserDrawingCommand?.(event);
+              notifyUserDrawingCommand(event);
             }
           }
           if (result.propertiesIntent) {
@@ -1876,7 +1917,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       isPointInChartArea,
       margins,
       measureUserDrawingTextLabelLine,
-      onUserDrawingCommand,
+      notifyUserDrawingCommand,
       onUserDrawingPropertiesOpen,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
@@ -1907,7 +1948,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           hit: true,
         });
         if (event) {
-          onUserDrawingCommand?.(event);
+          notifyUserDrawingCommand(event);
         }
       }
 
@@ -1971,7 +2012,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState,
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
-      onUserDrawingCommand,
+      notifyUserDrawingCommand,
       userDrawingSpacesByPaneId,
       viewport,
     ],

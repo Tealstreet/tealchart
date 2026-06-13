@@ -222,11 +222,18 @@ export {
 export type { UserDrawingHitResult, UserDrawingHitTestOptions, UserDrawingHitTestTextMeasure } from './hitTesting';
 export { resolveUserDrawingInfoLineMetrics } from './infoLine';
 export type { UserDrawingInfoLineMetrics } from './infoLine';
-export { createUserDrawingCommandEvent, dispatchUserDrawingCommand, reduceUserDrawingCommand } from './commands';
+export {
+  createUserDrawingCommandEvent,
+  createUserDrawingHistoryCommandEvent,
+  dispatchUserDrawingCommand,
+  reduceUserDrawingCommand,
+} from './commands';
 export type {
   UserDrawingCommand,
   UserDrawingCommandDispatchResult,
   UserDrawingCommandEvent,
+  UserDrawingCommandEventCommand,
+  UserDrawingHistoryCommand,
   UserDrawingCommandMetadata,
   UserDrawingCommandSource,
 } from './commands';
