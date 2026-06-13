@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { dispatchUserDrawingCommand } from './commands';
 import type { UserDrawingCommand } from './commands';
 import { beginUserDrawingEditDragAtPoint } from './editing';
+import { clearChartStoreCache } from '../state/chartState';
 import {
   appendUserDrawingPathDragPoint,
   beginUserDrawingPathDrag,
@@ -52,6 +53,10 @@ const coordinateSpace: DrawingCoordinateSpace = {
   chartRight: 300,
 };
 const spacesByPaneId = new Map([['main', coordinateSpace]]);
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 function createStateWithTrendLine(): UserDrawingState {
   const first = handleUserDrawingInput(

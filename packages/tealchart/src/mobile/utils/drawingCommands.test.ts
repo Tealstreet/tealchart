@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   commitMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHandleCommand,
 } from './drawingCommands';
+import { clearChartStoreCache } from '../../state/chartState';
 import {
   createUserDrawingState,
   handleUserDrawingInput,
@@ -14,6 +15,10 @@ import type { UserDrawingState } from '../../drawings';
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 function createMobileStateWithTrendLine(): UserDrawingState {
   const first = handleUserDrawingInput(
