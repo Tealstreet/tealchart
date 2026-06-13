@@ -1229,7 +1229,7 @@ describe('TealchartWidget', () => {
         drawings: [
           {
             id: 'locked',
-            kind: 'horizontalLine',
+            kind: 'textLabel',
             paneId: 'main',
             visible: true,
             locked: true,
@@ -1240,7 +1240,9 @@ describe('TealchartWidget', () => {
               lineWidth: 1,
               lineStyle: 'solid',
             },
-            price: 50,
+            point: { time: 1, price: 50 },
+            text: 'Locked label',
+            textAlign: 'center',
           },
         ],
       });
@@ -1250,6 +1252,7 @@ describe('TealchartWidget', () => {
       expect(widget.reorderUserDrawings('bringToFront', { drawingId: 'missing' })).toBe(false);
       expect(widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'locked' })).toBe(false);
       expect(widget.beginUserDrawingTextEdit('locked')).toBe(false);
+      expect(widget.beginUserDrawingTextEdit()).toBe(false);
 
       expect(() => widget.openUserDrawingObjectTree()).not.toThrow();
       expect(widget.openUserDrawingObjectTree().rows).toHaveLength(1);
