@@ -40,15 +40,10 @@ import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } 
 import { LOADING_OPACITY } from './constants';
 import {
   applyUserDrawingEditDrag,
-  appendUserDrawingPathDragPoint,
   beginUserDrawingEditDragAtPoint,
-  beginUserDrawingPathDrag,
-  beginUserDrawingTextEdit,
-  commitUserDrawingPathDrag,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
-  handleUserDrawingInput,
   isUserDrawingLayoutStateEqual,
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
@@ -2410,40 +2405,46 @@ export class TealchartWidget {
   private _handleUserDrawingInput(point: UserDrawingInputPoint): boolean {
     if (this._userDrawingState.activeTool === 'select') return false;
 
-    const previousState = this._userDrawingState;
-    const nextState = handleUserDrawingInput(this._userDrawingState, point, {
-      createId: () => this._createUserDrawingId(),
+    return this.dispatchUserDrawingCommand({
+      type: 'handleInput',
+      point,
+      options: {
+        createId: () => this._createUserDrawingId(),
+      },
+      meta: { source: 'pointer' },
     });
-    this.setUserDrawingState(nextState);
-    return nextState !== previousState;
   }
 
   private _handleUserDrawingPathDragStart(point: UserDrawingInputPoint): boolean {
     if (this._userDrawingState.activeTool !== 'path') return false;
 
-    const previousState = this._userDrawingState;
-    const nextState = beginUserDrawingPathDrag(this._userDrawingState, point);
-    this.setUserDrawingState(nextState);
-    return nextState !== previousState;
+    return this.dispatchUserDrawingCommand({
+      type: 'beginPathDrag',
+      point,
+      meta: { source: 'pointer', transactionKey: 'path-drag' },
+    });
   }
 
   private _handleUserDrawingPathDragMove(point: UserDrawingInputPoint): boolean {
     if (this._userDrawingState.activeTool !== 'path') return false;
 
-    const previousState = this._userDrawingState;
-    const nextState = appendUserDrawingPathDragPoint(this._userDrawingState, point);
-    this.setUserDrawingState(nextState);
-    return nextState !== previousState;
+    return this.dispatchUserDrawingCommand({
+      type: 'appendPathDragPoint',
+      point,
+      meta: { source: 'pointer', transactionKey: 'path-drag' },
+    });
   }
 
   private _handleUserDrawingPathDragEnd(): void {
     if (this._userDrawingState.activeTool !== 'path') return;
 
-    this.setUserDrawingState(
-      commitUserDrawingPathDrag(this._userDrawingState, {
+    this.dispatchUserDrawingCommand({
+      type: 'commitPathDrag',
+      options: {
         createId: () => this._createUserDrawingId(),
-      }),
-    );
+      },
+      meta: { source: 'pointer', transactionKey: 'path-drag' },
+    });
   }
 
   private _handleUserDrawingSelection(
@@ -2506,9 +2507,13 @@ export class TealchartWidget {
         ? result.state.drawings.find((drawing) => drawing.id === selectedId)
         : null;
       if (result.hit && selectedDrawing && isUserDrawingTextAnnotation(selectedDrawing)) {
-        const nextState = beginUserDrawingTextEdit(result.state, selectedDrawing.id);
-        if (nextState !== result.state) {
-          this.setUserDrawingState(nextState);
+        const commandResult = dispatchUserDrawingCommand(result.state, {
+          type: 'beginTextEdit',
+          drawingId: selectedDrawing.id,
+          meta: { source: 'pointer' },
+        });
+        if (commandResult.changed) {
+          this.setUserDrawingState(commandResult.state);
           return;
         }
       }
