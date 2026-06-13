@@ -10,6 +10,6 @@ export function exportMobileUserDrawingStateForLayout(state: UserDrawingState): 
   return serializeUserDrawingStateForLayout(state);
 }
 
-export function importMobileUserDrawingStateFromLayout(state?: UserDrawingState | null): UserDrawingState {
+export function importMobileUserDrawingStateFromLayout(state?: unknown): UserDrawingState {
   return deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState();
 }
