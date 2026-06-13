@@ -48,6 +48,28 @@ function createSelectedState(): UserDrawingState {
   };
 }
 
+function createSelectedTextState(): UserDrawingState {
+  return {
+    ...createSelectedState(),
+    selection: { drawingId: 'label' },
+    drawings: [
+      {
+        id: 'label',
+        kind: 'textLabel',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style,
+        point: { time: 1, price: 50 },
+        text: 'Note',
+        textAlign: 'center',
+      },
+    ],
+  };
+}
+
 describe('mobile drawing action dispatch', () => {
   it('opens the shared object tree model from selected toolbar actions', () => {
     const onOpenObjectTree = vi.fn();
@@ -127,6 +149,26 @@ describe('mobile drawing action dispatch', () => {
       type: 'duplicate',
       options: { createId: expect.any(Function) },
       meta: { source: 'toolbar' },
+    });
+  });
+
+  it('dispatches mobile text edit actions with platform source metadata', () => {
+    const dispatchUserDrawingCommand = vi.fn();
+
+    dispatchMobileUserDrawingActionCommand(
+      { type: 'editText', drawingId: 'label' },
+      {
+        state: createSelectedTextState(),
+        source: 'contextMenu',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'beginTextEdit',
+      drawingId: 'label',
+      meta: { source: 'contextMenu' },
     });
   });
 });

@@ -314,7 +314,7 @@ long-press.
 ### Epic 4.1: Shared Selected-Action Model
 
 Status: initial selected-action surface descriptors shipped for properties,
-quick stroke style, duplicate, delete, z-order, visibility, and lock/unlock.
+text edit, quick stroke style, duplicate, delete, z-order, visibility, and lock/unlock.
 The web floating toolbar, web context menu, mobile Skia action strip, and
 mobile long-press menu consume this shared model. Shared selection bounds and
 preferred action anchor geometry now resolve from the drawing render model for
@@ -326,9 +326,10 @@ Phase 1: Action availability model
 - Status: properties, quick line color/width/style changes, duplicate, delete,
   lock, hide/show, unlock, and z-order action descriptors resolve from shared
   drawing state.
-- Future work: add text edit, richer style groups, fill/text controls, and
-  tool-specific actions to the same model as those surfaces move out of the top
-  bar.
+- Status: text-capable drawings now expose a shared selected/context action for
+  starting text edit on both web Canvas and mobile Skia.
+- Future work: add richer style groups, fill/text controls, and tool-specific
+  actions to the same model as those surfaces move out of the top bar.
 
 Phase 2: Anchor geometry model
 
@@ -345,8 +346,8 @@ Phase 3: Command dispatch
 
 ### Epic 4.2: Web Floating Toolbar
 
-Status: initial selected-object floating toolbar shipped for properties, quick
-stroke style, duplicate, delete, z-order, visibility, and lock/unlock actions.
+Status: initial selected-object floating toolbar shipped for properties, text
+edit, quick stroke style, duplicate, delete, z-order, visibility, and lock/unlock actions.
 The surface is positioned from the shared selection action anchor model and
 dispatches existing drawing commands or app-owned properties UI. Rich
 fill/text/tool-specific style controls still live in the top bar/properties
@@ -359,9 +360,10 @@ Phase 1: DOM surface primitive
 
 Phase 2: Initial actions
 
-- Status: properties, quick line color/width/style changes, duplicate, delete,
-  z-order, hide/show, and lock/unlock actions moved out of the top bar into the
-  floating toolbar for selected drawings.
+- Status: properties, text edit for text-capable drawings, quick line
+  color/width/style changes, duplicate, delete, z-order, hide/show, and
+  lock/unlock actions moved out of the top bar into the floating toolbar for
+  selected drawings.
 - Future work: migrate richer fill/text/tool-specific style actions after the
   style-control grouping is ready for both web and mobile.
 
@@ -373,9 +375,9 @@ Phase 3: Dismissal and focus
 ### Epic 4.3: Mobile Selection Action Sheet
 
 Status: initial anchored mobile action strip shipped for the same selected
-object actions as web, including the shared properties-open entry point and
-quick stroke style controls. It consumes the shared selected-action descriptors
-and selection action anchor model in the Skia chart component.
+object actions as web, including the shared properties-open and text-edit entry
+points plus quick stroke style controls. It consumes the shared selected-action
+descriptors and selection action anchor model in the Skia chart component.
 
 Phase 1: Native surface primitive
 
@@ -384,10 +386,10 @@ Phase 1: Native surface primitive
 
 Phase 2: Initial actions
 
-- Status: properties, quick line color/width/style changes, duplicate, delete,
-  z-order, hide/show, and lock/unlock actions expose the same selected-action
-  descriptors as web and dispatch existing mobile drawing commands or app-owned
-  properties UI.
+- Status: properties, text edit for text-capable drawings, quick line
+  color/width/style changes, duplicate, delete, z-order, hide/show, and
+  lock/unlock actions expose the same selected-action descriptors as web and
+  dispatch existing mobile drawing commands or app-owned properties UI.
 
 Phase 3: Dismissal and focus
 
@@ -396,7 +398,7 @@ Phase 3: Dismissal and focus
 
 ### Epic 4.4: Drawing Context Menu
 
-Status: initial drawing context menu shipped for properties, quick stroke style,
+Status: initial drawing context menu shipped for properties, text edit, quick stroke style,
 duplicate, delete, z-order, visibility, and lock/unlock actions. Web right-click
 and mobile Skia long-press consume the same shared context-action resolver and
 preserve existing chart context menu behavior when no drawing is hit.
@@ -415,6 +417,8 @@ Phase 3: Mobile long-press menu
 
 - Status: long-press over a drawing in Skia select mode opens the native mobile
   context menu with matching drawing actions and command semantics.
+- Status: text-capable drawing context actions now begin text editing through
+  the same command owner path on both web Canvas and mobile Skia.
 - Future work: add richer text/fill/tool-specific context actions after the
   style popover model moves out of the top bar on both platforms.
 
