@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
 import {
+  addUserDrawing,
   appendUserDrawingPathDragPoint,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
@@ -43,7 +44,7 @@ import {
   updateUserDrawingTextEdit,
 } from './input';
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { UserDrawingTool } from './types';
+import type { UserDrawing, UserDrawingTool } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
@@ -110,6 +111,31 @@ describe('user drawing input controller', () => {
       selection: null,
       draft: null,
       textEdit: null,
+    });
+  });
+
+  it('snapshots added drawings so caller mutations cannot change state', () => {
+    const drawing: UserDrawing = {
+      id: 'api-line',
+      kind: 'trendLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 2,
+      style: { ...style },
+      points: [anchorA, anchorB],
+      extend: 'none',
+    };
+    const state = addUserDrawing(createUserDrawingState(), drawing);
+
+    (drawing as unknown as { points: { time: number; price: number }[] }).points[0] = { time: 1_000, price: 999 };
+    drawing.style.lineColor = '#f00';
+
+    expect(state.drawings[0]).toMatchObject({
+      id: 'api-line',
+      style: { lineColor: '#fff' },
+      points: [anchorA, anchorB],
     });
   });
 

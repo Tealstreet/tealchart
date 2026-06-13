@@ -211,11 +211,12 @@ export function addUserDrawing(
   options: AddUserDrawingOptions = {},
 ): UserDrawingState {
   if (state.drawings.some((existingDrawing) => existingDrawing.id === drawing.id)) return state;
+  const drawingSnapshot = cloneUserDrawingSnapshot(drawing);
 
   return {
     ...state,
     activeTool: 'select',
-    drawings: [...state.drawings, drawing],
+    drawings: [...state.drawings, drawingSnapshot],
     selection: options.select === false ? state.selection : { drawingId: drawing.id },
     draft: null,
     textEdit: null,
@@ -456,7 +457,7 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
   }
 }
 
-function cloneDrawingForClipboard(drawing: UserDrawing): UserDrawing {
+export function cloneUserDrawingSnapshot(drawing: UserDrawing): UserDrawing {
   return {
     ...cloneDrawingForDuplicate(drawing, drawing.id, drawing.createdAt),
     updatedAt: drawing.updatedAt,
@@ -478,7 +479,7 @@ export function createUserDrawingClipboard(
 
   const drawings = state.drawings
     .filter((drawing) => selectedIds.has(drawing.id) && (!drawing.locked || options.includeLocked))
-    .map(cloneDrawingForClipboard);
+    .map(cloneUserDrawingSnapshot);
 
   return drawings.length === 0 ? null : { drawings };
 }
