@@ -66,6 +66,21 @@ export interface DuplicateUserDrawingOptions extends UpdateUserDrawingOptions {
   createId: () => string;
 }
 
+export interface UserDrawingClipboard {
+  drawings: readonly UserDrawing[];
+}
+
+export interface CopyUserDrawingOptions {
+  drawingId?: string;
+  drawingIds?: readonly string[];
+  includeLocked?: boolean;
+}
+
+export interface PasteUserDrawingOptions {
+  createId: () => string;
+  now?: () => number;
+}
+
 export interface UserDrawingTextEditOptions {
   now?: () => number;
 }
@@ -418,6 +433,59 @@ function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number)
         textAlign: drawing.textAlign,
       } as UserDrawing;
   }
+}
+
+function cloneDrawingForClipboard(drawing: UserDrawing): UserDrawing {
+  return {
+    ...cloneDrawingForDuplicate(drawing, drawing.id, drawing.createdAt),
+    updatedAt: drawing.updatedAt,
+  };
+}
+
+export function createUserDrawingClipboard(
+  state: UserDrawingState,
+  options: CopyUserDrawingOptions = {},
+): UserDrawingClipboard | null {
+  const selectedIds = new Set(
+    options.drawingId !== undefined
+      ? [options.drawingId]
+      : options.drawingIds !== undefined
+        ? [...new Set(options.drawingIds)]
+        : getUserDrawingSelectionIds(state.selection),
+  );
+  if (selectedIds.size === 0) return null;
+
+  const drawings = state.drawings
+    .filter((drawing) => selectedIds.has(drawing.id) && (!drawing.locked || options.includeLocked))
+    .map(cloneDrawingForClipboard);
+
+  return drawings.length === 0 ? null : { drawings };
+}
+
+export function pasteUserDrawingClipboard(
+  state: UserDrawingState,
+  clipboard: UserDrawingClipboard | null | undefined,
+  options: PasteUserDrawingOptions,
+): UserDrawingState {
+  if (!clipboard || clipboard.drawings.length === 0) return state;
+
+  const now = options.now?.() ?? Date.now();
+  const pastedIds: string[] = [];
+  const drawings = state.drawings.slice();
+  for (const drawing of clipboard.drawings) {
+    const id = options.createId();
+    pastedIds.push(id);
+    drawings.push(cloneDrawingForDuplicate(drawing, id, now));
+  }
+
+  return {
+    ...state,
+    activeTool: 'select',
+    drawings,
+    selection: createUserDrawingSelection(pastedIds),
+    draft: null,
+    textEdit: null,
+  };
 }
 
 export function duplicateUserDrawing(

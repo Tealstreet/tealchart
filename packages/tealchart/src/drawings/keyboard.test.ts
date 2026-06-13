@@ -52,6 +52,19 @@ describe('user drawing keyboard actions', () => {
     });
   });
 
+  it('maps primary-modifier copy and paste shortcuts', () => {
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'c', metaKey: true })).toEqual({
+      type: 'copySelected',
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'c', metaKey: true })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(createUserDrawingState(), { key: 'V', ctrlKey: true })).toEqual({
+      type: 'paste',
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'c', metaKey: true, shiftKey: true })).toBeNull();
+  });
+
   it('maps bare delete/backspace only when a drawing is selected', () => {
     expect(resolveUserDrawingKeyboardAction(withSelection(), { key: 'Delete' })).toEqual({
       type: 'deleteSelected',

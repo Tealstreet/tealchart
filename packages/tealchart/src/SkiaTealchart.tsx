@@ -21,6 +21,7 @@ import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
   UpdateUserDrawingOptions,
+  UserDrawingClipboard,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
@@ -112,6 +113,7 @@ import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
   canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
   clearUserDrawingCommandHistory,
+  createUserDrawingClipboard,
   createUserDrawingCommandHistory,
   createUserDrawingState,
   dispatchUserDrawingCommand,
@@ -296,6 +298,9 @@ export interface SkiaTealchartHandle {
   deleteSelectedUserDrawing(): boolean;
   duplicateUserDrawing(drawingId?: string): boolean;
   duplicateSelectedUserDrawing(): boolean;
+  copySelectedUserDrawing(): boolean;
+  pasteUserDrawingClipboard(): boolean;
+  clearUserDrawingClipboard(): void;
   clearUserDrawings(): void;
   cancelUserDrawingDraft(): void;
   beginUserDrawingTextEdit(drawingId?: string): boolean;
@@ -480,6 +485,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingStateRef = useRef(effectiveUserDrawingState);
   const userDrawingHistoryRef = useRef<UserDrawingCommandHistory>(createUserDrawingCommandHistory());
+  const userDrawingClipboardRef = useRef<UserDrawingClipboard | null>(null);
   const userDrawingIdCounterRef = useRef(0);
   const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
@@ -612,9 +618,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           userDrawingStateRef.current,
           userDrawingHistoryRef.current,
           input,
+          {
+            clipboard: userDrawingClipboardRef.current,
+            createId: createUserDrawingId,
+            setClipboard: (clipboard) => {
+              userDrawingClipboardRef.current = clipboard;
+            },
+          },
         );
         userDrawingHistoryRef.current = result.history;
-        if (result.changed) {
+        if (result.changed && result.state !== userDrawingStateRef.current) {
           commitUserDrawingState(result.state);
         }
         return result.changed;
@@ -649,6 +662,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           },
           meta: { source: 'api' },
         });
+      },
+      copySelectedUserDrawing(): boolean {
+        const clipboard = createUserDrawingClipboard(userDrawingStateRef.current);
+        if (!clipboard) return false;
+        userDrawingClipboardRef.current = clipboard;
+        return true;
+      },
+      pasteUserDrawingClipboard(): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'paste',
+          clipboard: userDrawingClipboardRef.current,
+          options: {
+            createId: createUserDrawingId,
+          },
+          meta: { source: 'keyboard' },
+        });
+      },
+      clearUserDrawingClipboard(): void {
+        userDrawingClipboardRef.current = null;
       },
       clearUserDrawings(): void {
         dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });

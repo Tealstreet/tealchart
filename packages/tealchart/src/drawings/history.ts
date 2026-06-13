@@ -87,6 +87,7 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'applyEditDrag':
     case 'delete':
     case 'duplicate':
+    case 'paste':
     case 'clear':
     case 'commitPlacementDrag':
     case 'commitPathDrag':

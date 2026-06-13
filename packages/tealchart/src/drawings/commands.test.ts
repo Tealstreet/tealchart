@@ -15,6 +15,7 @@ import {
   commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
+  createUserDrawingClipboard,
   createUserDrawingState,
   deleteUserDrawingTableColumn,
   deleteUserDrawingTableRow,
@@ -439,5 +440,41 @@ describe('user drawing command dispatch', () => {
     expect(result.state).toBe(state);
     expect(result.changed).toBe(false);
     expect(result.meta).toEqual({ source: 'keyboard' });
+  });
+
+  it('copies selected drawings into a transient clipboard and pastes fresh drawings through commands', () => {
+    const state = createStateWithTrendLine();
+    const clipboard = createUserDrawingClipboard(state);
+
+    expect(clipboard?.drawings.map((drawing) => drawing.id)).toEqual(['trend-line']);
+
+    const pasted = dispatchUserDrawingCommand(state, {
+      type: 'paste',
+      clipboard,
+      options: { createId: () => 'trend-line-copy', now: () => 90 },
+      meta: { source: 'keyboard' },
+    });
+
+    expect(pasted.changed).toBe(true);
+    expect(pasted.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line', 'trend-line-copy']);
+    expect(pasted.state.selection).toEqual({ drawingId: 'trend-line-copy' });
+    expect(pasted.state.drawings[1]).toMatchObject({
+      id: 'trend-line-copy',
+      createdAt: 90,
+      updatedAt: 90,
+    });
+  });
+
+  it('does not copy locked selected drawings unless requested', () => {
+    const state = {
+      ...createStateWithTrendLine(),
+      drawings: [{ ...createStateWithTrendLine().drawings[0]!, locked: true }],
+    };
+
+    expect(createUserDrawingClipboard(state)).toBeNull();
+    expect(createUserDrawingClipboard(state, { includeLocked: true })?.drawings[0]).toMatchObject({
+      id: 'trend-line',
+      locked: true,
+    });
   });
 });
