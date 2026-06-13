@@ -46,6 +46,7 @@ import {
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
+  cloneUserDrawingSnapshot,
   commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
@@ -325,6 +326,17 @@ export function dispatchUserDrawingCommand(
   state: UserDrawingState,
   command: UserDrawingCommand,
 ): UserDrawingCommandDispatchResult {
+  if (command.type === 'add') {
+    const snapshotCommand = { ...command, drawing: cloneUserDrawingSnapshot(command.drawing) };
+    const nextState = reduceUserDrawingCommand(state, snapshotCommand);
+    return {
+      state: nextState,
+      changed: nextState !== state,
+      command: snapshotCommand,
+      meta: snapshotCommand.meta,
+    };
+  }
+
   if (command.type === 'selectAtPoint') {
     const result = resolveUserDrawingSelectionAtPoint(state, command.point, command.spacesByPaneId, command.options);
     return {

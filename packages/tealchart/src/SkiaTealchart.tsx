@@ -723,7 +723,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           type: 'add',
           drawing,
           options,
-          meta: { source: 'api', affectedIds: [drawing.id] },
+          meta: { source: 'api' },
         });
       },
       deleteUserDrawing(drawingId?: string): boolean {

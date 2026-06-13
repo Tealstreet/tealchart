@@ -2340,7 +2340,7 @@ export class TealchartWidget {
       type: 'add',
       drawing,
       options,
-      meta: { source: 'api', affectedIds: [drawing.id] },
+      meta: { source: 'api' },
     });
   }
 
