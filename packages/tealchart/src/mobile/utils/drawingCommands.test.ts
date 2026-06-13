@@ -4,6 +4,7 @@ import {
   commitMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHistoryCommand,
+  dispatchMobileUserDrawingHistoryCommandWithEvent,
   dispatchMobileUserDrawingKeyboardAction,
 } from './drawingCommands';
 import { clearChartStoreCache } from '../../state/chartState';
@@ -132,6 +133,42 @@ describe('mobile drawing handle command dispatch', () => {
     const undo = undoUserDrawingCommand(result.state, result.history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
+  it('emits mobile drawing command events for changed history commands', () => {
+    const state = createMobileStateWithTrendLine();
+    const onEvent = vi.fn();
+    const result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      state,
+      createUserDrawingCommandHistory(),
+      {
+        type: 'duplicate',
+        options: { createId: () => 'copy', now: () => 44 },
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
+
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+    const event = onEvent.mock.calls[0]?.[0];
+    expect(event).toMatchObject({
+      command: { type: 'duplicate' },
+      previousState: state,
+      state: result.state,
+      source: 'api',
+    });
+    expect(event?.affectedIds).toContain('copy');
+
+    const unchanged = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'delete', options: { drawingId: 'missing' }, meta: { source: 'api' } },
+      onEvent,
+    );
+
+    expect(unchanged.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
   });
 
   it('routes mobile keyboard actions through shared history state', () => {

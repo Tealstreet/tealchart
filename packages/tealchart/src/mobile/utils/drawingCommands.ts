@@ -1,6 +1,7 @@
 import type {
   UserDrawingCommand,
   UserDrawingCommandDispatchResult,
+  UserDrawingCommandEvent,
   UserDrawingCommandHistory,
   UserDrawingHistoryDispatchResult,
   UserDrawingClipboard,
@@ -12,6 +13,7 @@ import type {
 
 import {
   createUserDrawingClipboard,
+  createUserDrawingCommandEvent,
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
   redoUserDrawingCommand,
@@ -20,6 +22,7 @@ import {
 } from '../../drawings';
 
 export type MobileUserDrawingCommit = (state: UserDrawingState) => void;
+export type MobileUserDrawingCommandEventListener = (event: UserDrawingCommandEvent) => void;
 
 export function dispatchMobileUserDrawingHandleCommand(
   state: UserDrawingState,
@@ -46,6 +49,20 @@ export function dispatchMobileUserDrawingHistoryCommand(
   command: UserDrawingCommand,
 ): UserDrawingHistoryDispatchResult {
   return dispatchUserDrawingCommandWithHistory(state, history, command);
+}
+
+export function dispatchMobileUserDrawingHistoryCommandWithEvent(
+  state: UserDrawingState,
+  history: UserDrawingCommandHistory,
+  command: UserDrawingCommand,
+  onEvent?: MobileUserDrawingCommandEventListener,
+): UserDrawingHistoryDispatchResult {
+  const result = dispatchMobileUserDrawingHistoryCommand(state, history, command);
+  const event = createUserDrawingCommandEvent(state, result);
+  if (event) {
+    onEvent?.(event);
+  }
+  return result;
 }
 
 export interface MobileUserDrawingKeyboardDispatchResult {

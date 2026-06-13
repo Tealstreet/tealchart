@@ -7,7 +7,7 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
-import type { DrawingCoordinateSpace, UserDrawingState } from './drawings';
+import type { DrawingCoordinateSpace, UserDrawingCommandEvent, UserDrawingState } from './drawings';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -368,6 +368,56 @@ describe('TealchartWidget', () => {
 
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'b', drawingIds: ['b', 'a'] });
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it('notifies option and subscription listeners after drawing commands change state', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const subscribed = vi.fn();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      widget.subscribe('user_drawing_command', subscribed);
+
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({
+        ...initial,
+        drawings: [
+          {
+            id: 'a',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 100,
+          },
+        ],
+        selection: { drawingId: 'a' },
+      });
+
+      expect(onCommand).not.toHaveBeenCalled();
+      expect(subscribed).not.toHaveBeenCalled();
+
+      expect(widget.deleteSelectedUserDrawing()).toBe(true);
+
+      expect(onCommand).toHaveBeenCalledTimes(1);
+      expect(subscribed).toHaveBeenCalledTimes(1);
+      const event = onCommand.mock.calls[0]![0];
+      expect(subscribed.mock.calls[0]![0]).toBe(event);
+      expect(event.command.type).toBe('delete');
+      expect(event.source).toBe('api');
+      expect(event.previousState.drawings.map((drawing) => drawing.id)).toEqual(['a']);
+      expect(event.state.drawings).toEqual([]);
+      expect(event.affectedIds).toEqual(['a']);
+
+      expect(widget.deleteUserDrawing('missing')).toBe(false);
+      expect(onCommand).toHaveBeenCalledTimes(1);
+      expect(subscribed).toHaveBeenCalledTimes(1);
     });
 
     it('marks layouts dirty only when committed user drawings change', () => {

@@ -222,6 +222,63 @@ export interface UserDrawingCommandDispatchResult {
   editDrag?: UserDrawingEditDrag | null;
 }
 
+export interface UserDrawingCommandEvent {
+  command: UserDrawingCommand;
+  previousState: UserDrawingState;
+  state: UserDrawingState;
+  meta?: UserDrawingCommandMetadata;
+  source?: UserDrawingCommandSource;
+  affectedIds?: readonly string[];
+  hit?: boolean;
+}
+
+function resolveUserDrawingCommandAffectedIds(
+  previousState: UserDrawingState,
+  nextState: UserDrawingState,
+): readonly string[] | undefined {
+  const changedIds = new Set<string>();
+  const previousById = new Map(previousState.drawings.map((drawing) => [drawing.id, drawing]));
+  const nextById = new Map(nextState.drawings.map((drawing) => [drawing.id, drawing]));
+
+  for (const previousDrawing of previousState.drawings) {
+    if (nextById.get(previousDrawing.id) !== previousDrawing) {
+      changedIds.add(previousDrawing.id);
+    }
+  }
+  for (const nextDrawing of nextState.drawings) {
+    if (previousById.get(nextDrawing.id) !== nextDrawing) {
+      changedIds.add(nextDrawing.id);
+    }
+  }
+
+  if (previousState.selection?.drawingId !== nextState.selection?.drawingId) {
+    if (previousState.selection?.drawingId) changedIds.add(previousState.selection.drawingId);
+    if (nextState.selection?.drawingId) changedIds.add(nextState.selection.drawingId);
+  }
+  if (previousState.textEdit?.drawingId !== nextState.textEdit?.drawingId) {
+    if (previousState.textEdit?.drawingId) changedIds.add(previousState.textEdit.drawingId);
+    if (nextState.textEdit?.drawingId) changedIds.add(nextState.textEdit.drawingId);
+  }
+
+  return changedIds.size > 0 ? [...changedIds] : undefined;
+}
+
+export function createUserDrawingCommandEvent(
+  previousState: UserDrawingState,
+  result: UserDrawingCommandDispatchResult,
+): UserDrawingCommandEvent | null {
+  if (!result.changed) return null;
+  return {
+    command: result.command,
+    previousState,
+    state: result.state,
+    meta: result.meta,
+    source: result.meta?.source,
+    affectedIds: result.meta?.affectedIds ?? resolveUserDrawingCommandAffectedIds(previousState, result.state),
+    hit: result.hit,
+  };
+}
+
 export function dispatchUserDrawingCommand(
   state: UserDrawingState,
   command: UserDrawingCommand,
