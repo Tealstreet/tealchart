@@ -25,6 +25,7 @@ const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
 const anchorC = { time: 3_000, price: 120 };
+const anchorD = { time: 4_000, price: 130 };
 const expandedDragPlacementTools: UserDrawingTool[] = [
   'trendAngle',
   'priceRange',
@@ -689,6 +690,57 @@ describe('mobile drawing handle command dispatch', () => {
         id: `${tool}-drawing`,
         kind: tool,
         points: [anchorA, anchorB, anchorC],
+      });
+    }
+  });
+
+  it('records mobile drag-seeded four-anchor placement after the final tap', () => {
+    const dragSeedTools: UserDrawingTool[] = ['doubleCurve', 'disjointChannel'];
+
+    for (const tool of dragSeedTools) {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const history = createUserDrawingCommandHistory();
+      const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'beginPlacementDrag',
+        point: { paneId: 'main', anchor: anchorA },
+        meta: { source: 'touch' },
+      });
+      const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+        type: 'commitPlacementDrag',
+        point: { paneId: 'main', anchor: anchorB },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
+        meta: { source: 'touch' },
+      });
+      const waitingForFourth = dispatchMobileUserDrawingHistoryCommand(seeded.state, seeded.history, {
+        type: 'handleInput',
+        point: { paneId: 'main', anchor: anchorC },
+        options: { createId: () => `${tool}-drawing`, now: () => 44, style },
+        meta: { source: 'touch' },
+      });
+      const committed = dispatchMobileUserDrawingHistoryCommand(waitingForFourth.state, waitingForFourth.history, {
+        type: 'handleInput',
+        point: { paneId: 'main', anchor: anchorD },
+        options: { createId: () => `${tool}-drawing`, now: () => 45, style },
+        meta: { source: 'touch' },
+      });
+
+      expect(started.changed, tool).toBe(true);
+      expect(seeded.changed, tool).toBe(true);
+      expect(seeded.history.undoStack, tool).toHaveLength(0);
+      expect(waitingForFourth.changed, tool).toBe(true);
+      expect(waitingForFourth.history.undoStack, tool).toHaveLength(0);
+      expect(waitingForFourth.state.drawings, tool).toEqual([]);
+      expect(waitingForFourth.state.draft, tool).toMatchObject({
+        tool,
+        anchors: [anchorA, anchorB, anchorC],
+      });
+      expect(committed.changed, tool).toBe(true);
+      expect(committed.history.undoStack, tool).toHaveLength(1);
+      expect(committed.state.draft, tool).toBeNull();
+      expect(committed.state.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB, anchorC, anchorD],
       });
     }
   });

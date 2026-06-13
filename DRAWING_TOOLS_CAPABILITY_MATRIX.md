@@ -81,13 +81,13 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Lines | `arrowMarker` | 2 | `two-point-drag-click` | `partial` | Selected toolbar |
 | Lines | `arrowMarkLeft`, `arrowMarkRight`, `arrowMarkUp`, `arrowMarkDown` | 1 | `one-point` | `partial` | Selected toolbar, object tree |
 | Channels | `parallelChannel`, `regressionTrend`, `flatTopBottom` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
-| Channels | `disjointChannel` | 4 | `multi-point-click` | `partial` | Placement previews, object tree |
+| Channels | `disjointChannel` | 4 | `multi-point-click` with first-segment drag seed | `partial` | Object tree, richer multi-point previews |
 | Pitchforks | `pitchfork`, `schiffPitchfork`, `modifiedSchiffPitchfork`, `insidePitchfork`, `pitchfan` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Style/property surface, richer multi-point previews |
 | Gann/Fibonacci | `fibRetracement`, `fibExtension`, `fibFan`, `fibSpeedResistanceFan`, `fibArcs`, `fibSpeedResistanceArcs`, `fibCircles`, `fibSpiral`, `gannFan`, `gannBox`, `gannSquare`, `gannSquareFixed`, `fibTimeZone` | 2 | `two-point-drag-click` | `partial` | Properties |
 | Gann/Fibonacci | `trendBasedFibExtension`, `fibWedge`, `fibChannel`, `trendBasedFibTime` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Geometric shapes | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles` | 2 | `two-point-drag-click` | `partial` | Shift constraints for cycle/wave tools |
 | Geometric shapes | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline` | 3 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
-| Geometric shapes | `doubleCurve` | 4 | `multi-point-click` | `partial` | Placement previews, properties |
+| Geometric shapes | `doubleCurve` | 4 | `multi-point-click` with first-segment drag seed | `partial` | Properties, richer multi-point previews |
 | Brushes | `path`, `brush`, `highlighter` | sampled path | `freehand-drag` | `partial` | Smoothing, pressure/stroke properties, object tree polish |
 | Annotation | `textLabel`, `note`, `comment`, `anchoredText`, `anchoredNote`, `priceLabel`, `pin`, `emoji`, `sticker`, `balloon`, `signpost`, `table` | 1 | `one-point` or `anchored-pane` | `partial` | Floating toolbar, properties, object tree |
 | Annotation | `callout`, `priceNote`, `image` | 2 | `two-point-drag-click` | `partial` | Properties |
