@@ -378,6 +378,37 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
     expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
 
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'wrapped-label' },
+      drawings: [
+        {
+          id: 'wrapped-label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            textWrap: true,
+            textMaxWidth: 180,
+          },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+    document.querySelector<HTMLButtonElement>('button[aria-label="120 pixel text box width"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="240 pixel text box width"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 120 });
+    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 240 });
+
     topBar.unmount();
   });
 

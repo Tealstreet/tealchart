@@ -817,6 +817,14 @@ function getNextUserDrawingFontStyle(drawing: UserDrawing): UserDrawingFontStyle
   return styles[currentIndex >= 0 ? (currentIndex + 1) % styles.length : 0]!;
 }
 
+function getAdjacentUserDrawingTextMaxWidth(drawing: UserDrawing, direction: -1 | 1): UserDrawingTextMaxWidth | null {
+  const widths = USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.textMaxWidth);
+  const currentWidth = normalizeUserDrawingTextMaxWidth(drawing.style.textMaxWidth ?? 180);
+  const currentIndex = widths.indexOf(currentWidth);
+  if (currentIndex === -1) return widths[direction > 0 ? 0 : widths.length - 1] ?? null;
+  return widths[currentIndex + direction] ?? null;
+}
+
 function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   state: UserDrawingState,
   selectedDrawing: UserDrawing | null,
@@ -843,6 +851,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const textWrapEnabled = richTextEnabled && supportsUserDrawingTextWrapControls(selectedDrawing);
   const nextTextWrap = selectedDrawing.style.textWrap !== true;
   const nextTextMaxWidth = normalizeUserDrawingTextMaxWidth(selectedDrawing.style.textMaxWidth ?? 180);
+  const textMaxWidthEnabled = textWrapEnabled && selectedDrawing.style.textWrap === true;
+  const narrowerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, -1) : null;
+  const widerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, 1) : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -947,6 +958,31 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         },
       }
     : null;
+  const narrowerTextMaxWidthItem: UserDrawingSelectedActionSurfaceItem | null = textMaxWidthEnabled
+    ? {
+        id: 'textMaxWidth:decrease',
+        icon: '↤',
+        label:
+          narrowerTextMaxWidth === null ? 'Decrease selected drawing text box width' : `${narrowerTextMaxWidth} pixel text box width`,
+        enabled: narrowerTextMaxWidth !== null,
+        command: {
+          type: 'updateStyle',
+          style: narrowerTextMaxWidth === null ? {} : { textMaxWidth: narrowerTextMaxWidth },
+        },
+      }
+    : null;
+  const widerTextMaxWidthItem: UserDrawingSelectedActionSurfaceItem | null = textMaxWidthEnabled
+    ? {
+        id: 'textMaxWidth:increase',
+        icon: '↦',
+        label: widerTextMaxWidth === null ? 'Increase selected drawing text box width' : `${widerTextMaxWidth} pixel text box width`,
+        enabled: widerTextMaxWidth !== null,
+        command: {
+          type: 'updateStyle',
+          style: widerTextMaxWidth === null ? {} : { textMaxWidth: widerTextMaxWidth },
+        },
+      }
+    : null;
 
   return {
     id: 'style',
@@ -992,6 +1028,8 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(textUnderlineItem ? [textUnderlineItem] : []),
       ...(textLineThroughItem ? [textLineThroughItem] : []),
       ...(textWrapItem ? [textWrapItem] : []),
+      ...(narrowerTextMaxWidthItem ? [narrowerTextMaxWidthItem] : []),
+      ...(widerTextMaxWidthItem ? [widerTextMaxWidthItem] : []),
     ],
   };
 }
