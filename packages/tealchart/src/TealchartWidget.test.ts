@@ -773,6 +773,59 @@ describe('TealchartWidget', () => {
       }
     });
 
+    it('seeds web four-anchor placement from drag before final inputs', () => {
+      const dragSeedTools: UserDrawingTool[] = ['doubleCurve', 'disjointChannel'];
+
+      for (const tool of dragSeedTools) {
+        const datafeed = createMockDatafeed();
+        const widget = createWidget(datafeed);
+        widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
+
+        const testWidget = widget as unknown as {
+          _handleUserDrawingPlacementDragStart(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+          _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+          _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        };
+
+        expect(testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(
+          true,
+        );
+        expect(testWidget._handleUserDrawingPlacementDragEnd({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
+          true,
+        );
+        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(true);
+        expect(widget.getUserDrawingState().drawings).toEqual([]);
+        expect(widget.getUserDrawingState().draft).toMatchObject({
+          tool,
+          paneId: 'main',
+          anchors: [
+            { time: 1, price: 10 },
+            { time: 2, price: 20 },
+            { time: 3, price: 30 },
+          ],
+        });
+
+        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 4, price: 40 } })).toBe(true);
+        expect(widget.getUserDrawingState().draft).toBeNull();
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+        expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+          id: 'drawing_1',
+          kind: tool,
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 20 },
+            { time: 3, price: 30 },
+            { time: 4, price: 40 },
+          ],
+        });
+
+        widget.remove();
+      }
+    });
+
     it('creates web path-family drawings from drag samples through the widget state owner', () => {
       const pathFamilyTools: UserDrawingTool[] = ['brush', 'highlighter'];
 

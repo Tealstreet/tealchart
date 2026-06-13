@@ -71,6 +71,8 @@ const dragSeedTools: UserDrawingTool[] = [
   'fibWedge',
   'fibChannel',
   'trendBasedFibTime',
+  'doubleCurve',
+  'disjointChannel',
 ];
 
 function point(time: number, price: number): UserDrawingInputPoint {
@@ -92,6 +94,7 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('parallelChannel')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('pitchfork')).toBe('dragSeed');
     expect(getUserDrawingPlacementMode('fibChannel')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('doubleCurve')).toBe('dragSeed');
   });
 
   it('classifies supported two-anchor tools as drag placement tools', () => {
@@ -109,8 +112,8 @@ describe('user drawing placement modes', () => {
   });
 
   it('keeps unsupported multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
-    expect(isUserDrawingDragPlacementTool('disjointChannel')).toBe(false);
-    expect(getUserDrawingPlacementMode('disjointChannel')).toBe('click');
+    expect(isUserDrawingDragPlacementTool('trianglePattern')).toBe(false);
+    expect(getUserDrawingPlacementMode('trianglePattern')).toBe('click');
   });
 
   it('constrains shape placement drags to a visual square', () => {
