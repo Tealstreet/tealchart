@@ -1,9 +1,14 @@
 import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingState, UserDrawingStyle } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { clearChartStoreCache } from '../state/chartState';
 
 import { resolveUserDrawingContextActionsAtPoint } from './contextActions';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
