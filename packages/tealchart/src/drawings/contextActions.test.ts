@@ -224,6 +224,11 @@ describe('user drawing context actions', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
     });
+    expect(result.items.find((item) => item.id === 'textAlign:right')).toMatchObject({
+      groupId: 'style',
+      enabled: true,
+      command: { type: 'setTextAlign', textAlign: 'right' },
+    });
     expect(result.items.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
   });
 

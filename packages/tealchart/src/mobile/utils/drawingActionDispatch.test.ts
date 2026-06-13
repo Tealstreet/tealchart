@@ -171,6 +171,15 @@ describe('mobile drawing action dispatch', () => {
       },
     );
     dispatchMobileUserDrawingActionCommand(
+      { type: 'setTextAlign', textAlign: 'right' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
       { type: 'toolbarAction', action: 'duplicateSelected' },
       {
         state: createSelectedState(),
@@ -209,6 +218,11 @@ describe('mobile drawing action dispatch', () => {
       type: 'updateStyle',
       style: { textMaxWidth: 240 },
       meta: { source: 'contextMenu' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'setTextAlign',
+      textAlign: 'right',
+      meta: { source: 'toolbar' },
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',

@@ -1678,6 +1678,10 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { textWrap: true, textMaxWidth: 180 } },
     });
+    expect(styleItems.find((item) => item.id === 'textAlign:right')).toMatchObject({
+      enabled: true,
+      command: { type: 'setTextAlign', textAlign: 'right' },
+    });
     expect(styleItems.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
 
     const defaultSized = {
@@ -1797,6 +1801,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(styleItems.some((item) => item.id.startsWith('textLineThrough:'))).toBe(false);
     expect(styleItems.some((item) => item.id.startsWith('textWrap:'))).toBe(false);
     expect(styleItems.some((item) => item.id.startsWith('textMaxWidth:'))).toBe(false);
+    expect(styleItems.some((item) => item.id.startsWith('textAlign:'))).toBe(false);
   });
 
   it('clamps selected action surfaces inside shared safe viewport insets', () => {
