@@ -4602,7 +4602,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               anchor: userDrawingSelectionActionAnchor.anchor,
               viewport: { width: dimensions.width, height: dimensions.height },
               surface: { width: USER_DRAWING_ACTION_SURFACE_WIDTH, height: USER_DRAWING_ACTION_SURFACE_HEIGHT },
-              inset: { left: 8, right: 8, top: TOP_BAR_HEIGHT + 6, bottom: 8 },
+              inset: { left: 8, right: 8, top: (showTopBar ? TOP_BAR_SAFE_ZONE : 0) + 6, bottom: 8 },
             }),
           ]}
           pointerEvents="box-none"
