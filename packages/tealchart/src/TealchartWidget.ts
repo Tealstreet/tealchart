@@ -54,11 +54,11 @@ import {
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
   isUserDrawingLayoutStateEqual,
-  isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
+  resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   serializeUserDrawingStateForLayout,
@@ -2658,34 +2658,23 @@ export class TealchartWidget {
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ): void {
-    if (this._userDrawingState.activeTool === 'select') {
-      const result = dispatchUserDrawingCommand(this._userDrawingState, {
-        type: 'selectAtPoint',
-        point,
-        spacesByPaneId,
-        options: {
-          hitTest: this._getUserDrawingHitTestOptions(),
-        },
-        meta: { source: 'pointer' },
-      });
-      const selectedId = result.state.selection?.drawingId;
-      const selectedDrawing = selectedId
-        ? result.state.drawings.find((drawing) => drawing.id === selectedId)
-        : null;
-      if (result.hit && selectedDrawing && isUserDrawingTextAnnotation(selectedDrawing)) {
-        const commandResult = dispatchUserDrawingCommand(result.state, {
-          type: 'beginTextEdit',
-          drawingId: selectedDrawing.id,
-          meta: { source: 'pointer' },
-        });
-        if (commandResult.changed) {
-          this.setUserDrawingState(commandResult.state, { preserveHistory: true });
-          return;
-        }
+    const intent = resolveUserDrawingEditIntentAtPoint(this._userDrawingState, point, spacesByPaneId, {
+      source: 'pointer',
+      hitTest: this._getUserDrawingHitTestOptions(),
+    });
+
+    if (intent.type !== 'pane') {
+      let nextState = this._userDrawingState;
+      let changed = false;
+      for (const command of intent.commands) {
+        const result = dispatchUserDrawingCommand(nextState, command);
+        nextState = result.state;
+        changed = result.changed || changed;
       }
-      if (result.changed) {
-        this.setUserDrawingState(result.state, { preserveHistory: true });
+      if (changed) {
+        this.setUserDrawingState(nextState, { preserveHistory: true });
       }
+      return;
     }
 
     this._paneManager.toggleMaximizePane(paneId);

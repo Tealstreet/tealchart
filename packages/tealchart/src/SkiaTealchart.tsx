@@ -118,6 +118,7 @@ import {
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
+  resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingSelectedActionSurface,
@@ -1673,40 +1674,23 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
       if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
-        const selection = dispatchUserDrawingCommand(effectiveUserDrawingState, {
-          type: 'selectAtPoint',
-          point: { x, y },
-          spacesByPaneId: userDrawingSpacesByPaneId,
-          options: { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
-          meta: { source: 'touch' },
+        const intent = resolveUserDrawingEditIntentAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
+          source: 'touch',
+          hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
         });
-        const selectedId = selection.state.selection?.drawingId;
-        const selectedDrawing = selectedId
-          ? selection.state.drawings.find((drawing) => drawing.id === selectedId)
-          : null;
-        if (
-          selection.hit &&
-          (selectedDrawing?.kind === 'textLabel' ||
-            selectedDrawing?.kind === 'note' ||
-            selectedDrawing?.kind === 'anchoredText' ||
-            selectedDrawing?.kind === 'anchoredNote' ||
-            selectedDrawing?.kind === 'callout' ||
-            selectedDrawing?.kind === 'priceLabel' ||
-            selectedDrawing?.kind === 'priceNote' ||
-            selectedDrawing?.kind === 'comment')
-        ) {
-          const result = dispatchUserDrawingCommand(selection.state, {
-            type: 'beginTextEdit',
-            drawingId: selectedDrawing.id,
-            meta: { source: 'touch' },
-          });
-          if (result.changed) {
-            commitUserDrawingState(result.state);
-            return;
+
+        if (intent.type !== 'pane') {
+          let nextState = effectiveUserDrawingState;
+          let changed = false;
+          for (const command of intent.commands) {
+            const result = dispatchUserDrawingCommand(nextState, command);
+            nextState = result.state;
+            changed = result.changed || changed;
           }
-        }
-        if (selection.changed) {
-          commitUserDrawingState(selection.state);
+          if (changed) {
+            commitUserDrawingState(nextState);
+          }
+          return;
         }
       }
 

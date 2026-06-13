@@ -197,6 +197,8 @@ export type {
   BeginUserDrawingEditDragResult,
   UserDrawingEditDrag,
 } from './editing';
+export { resolveUserDrawingEditIntentAtPoint } from './editIntent';
+export type { ResolveUserDrawingEditIntentOptions, UserDrawingEditIntent, UserDrawingEditIntentKind } from './editIntent';
 export {
   distanceBetweenPoints,
   distanceToRectEdge,
