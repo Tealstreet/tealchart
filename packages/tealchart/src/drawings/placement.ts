@@ -70,6 +70,15 @@ const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
   'elliottDoubleComboWave',
   'doubleCurve',
   'disjointChannel',
+  'trianglePattern',
+  'abcdPattern',
+  'xabcdPattern',
+  'cypherPattern',
+  'threeDrivesPattern',
+  'headShouldersPattern',
+  'elliottImpulseWave',
+  'elliottTripleComboWave',
+  'elliottTriangleWave',
 ]);
 
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {

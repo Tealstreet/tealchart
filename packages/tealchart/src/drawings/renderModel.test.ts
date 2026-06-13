@@ -163,7 +163,7 @@ describe('user drawing render model', () => {
   });
 
   it('keeps drag-seeded four-anchor drafts renderable after drag release', () => {
-    const dragSeedTools = ['doubleCurve', 'disjointChannel'] as const;
+    const dragSeedTools = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'] as const;
 
     for (const tool of dragSeedTools) {
       const state: UserDrawingState = {
@@ -190,6 +190,51 @@ describe('user drawing render model', () => {
         kind: tool,
         points: [
           { time: 10, price: 90 },
+          { time: 40, price: 60 },
+          { time: 40, price: 60 },
+          { time: 40, price: 60 },
+        ],
+      });
+    }
+  });
+
+  it('keeps drag-seeded five-anchor pattern drafts renderable after drag release', () => {
+    const dragSeedTools = [
+      'xabcdPattern',
+      'cypherPattern',
+      'threeDrivesPattern',
+      'headShouldersPattern',
+      'elliottImpulseWave',
+      'elliottTripleComboWave',
+      'elliottTriangleWave',
+    ] as const;
+
+    for (const tool of dragSeedTools) {
+      const state: UserDrawingState = {
+        version: 1,
+        activeTool: tool,
+        selection: null,
+        drawings: [],
+        draft: {
+          tool,
+          paneId: 'main',
+          anchors: [
+            { time: 10, price: 90 },
+            { time: 40, price: 60 },
+          ],
+          style,
+          startedAt: 2,
+        },
+        textEdit: null,
+      };
+
+      expect(resolveUserDrawingRenderEntries(state), tool).toHaveLength(1);
+      expect(resolveUserDrawingRenderEntries(state)[0]?.drawing, tool).toMatchObject({
+        id: '__draft__',
+        kind: tool,
+        points: [
+          { time: 10, price: 90 },
+          { time: 40, price: 60 },
           { time: 40, price: 60 },
           { time: 40, price: 60 },
           { time: 40, price: 60 },

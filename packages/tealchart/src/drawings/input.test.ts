@@ -643,7 +643,16 @@ describe('user drawing input controller', () => {
       'elliottCorrectiveWave',
       'elliottDoubleComboWave',
     ] as const;
-    const fourAnchorDragSeedTools = ['doubleCurve', 'disjointChannel'] as const;
+    const fourAnchorDragSeedTools = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'] as const;
+    const fiveAnchorDragSeedTools = [
+      'xabcdPattern',
+      'cypherPattern',
+      'threeDrivesPattern',
+      'headShouldersPattern',
+      'elliottImpulseWave',
+      'elliottTripleComboWave',
+      'elliottTriangleWave',
+    ] as const;
 
     for (const tool of dragSeedTools) {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
@@ -741,6 +750,78 @@ describe('user drawing input controller', () => {
         id: `${tool}-drawing`,
         kind: tool,
         points: [anchorA, anchorB, anchorC, anchorD],
+      });
+    }
+
+    for (const tool of fiveAnchorDragSeedTools) {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const started = beginUserDrawingPlacementDrag(
+        state,
+        { paneId: 'main', anchor: anchorA },
+        { now: () => 10, style },
+      );
+      const seeded = commitUserDrawingPlacementDrag(
+        started,
+        { paneId: 'main', anchor: anchorB },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 11,
+          style,
+        },
+      );
+      const waitingForFourth = handleUserDrawingInput(
+        seeded,
+        { paneId: 'main', anchor: anchorC },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 12,
+          style,
+        },
+      );
+      const waitingForFifth = handleUserDrawingInput(
+        waitingForFourth,
+        { paneId: 'main', anchor: anchorD },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 13,
+          style,
+        },
+      );
+      const committed = handleUserDrawingInput(
+        waitingForFifth,
+        { paneId: 'main', anchor: anchorE },
+        {
+          createId: () => `${tool}-drawing`,
+          now: () => 14,
+          style,
+        },
+      );
+
+      expect(started.draft?.anchors, tool).toEqual([anchorA]);
+      expect(seeded.drawings, tool).toEqual([]);
+      expect(seeded.draft, tool).toMatchObject({
+        tool,
+        paneId: 'main',
+        anchors: [anchorA, anchorB],
+      });
+      expect(waitingForFourth.drawings, tool).toEqual([]);
+      expect(waitingForFourth.draft, tool).toMatchObject({
+        tool,
+        paneId: 'main',
+        anchors: [anchorA, anchorB, anchorC],
+      });
+      expect(waitingForFifth.drawings, tool).toEqual([]);
+      expect(waitingForFifth.draft, tool).toMatchObject({
+        tool,
+        paneId: 'main',
+        anchors: [anchorA, anchorB, anchorC, anchorD],
+      });
+      expect(committed.draft, tool).toBeNull();
+      expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
+      expect(committed.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB, anchorC, anchorD, anchorE],
       });
     }
   });
