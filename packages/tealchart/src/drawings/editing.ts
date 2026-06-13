@@ -686,27 +686,42 @@ export function nudgeUserDrawingSelection(
   const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
   if (selectedIds.size === 0) return state;
 
-  const startDrawing = state.drawings.find((drawing) => selectedIds.has(drawing.id) && !drawing.locked);
-  if (!startDrawing) return state;
-  const space = spacesByPaneId.get(startDrawing.paneId);
-  if (!space) return state;
+  const updatedAt = options.now?.() ?? Date.now();
+  let changed = false;
+  const startPoint = { x: 0, y: 0 };
 
-  const startDrawings =
-    selectedIds.size > 1 ? state.drawings.filter((drawing) => selectedIds.has(drawing.id) && !drawing.locked) : [startDrawing];
-  if (startDrawings.length === 0) return state;
+  const drawings = state.drawings.map((drawing) => {
+    if (!selectedIds.has(drawing.id) || drawing.locked) return drawing;
+    const space = spacesByPaneId.get(drawing.paneId);
+    if (!space) return drawing;
 
-  return applyUserDrawingEditDrag(
-    state,
-    {
-      selection: state.selection,
-      startPoint: { x: 0, y: 0 },
-      startDrawing,
-      startDrawings,
-      space,
-    },
-    options.delta,
-    options,
-  );
+    const startAnchor = screenPointToAnchor(startPoint, space);
+    const currentAnchor = screenPointToAnchor(options.delta, space);
+    const delta = {
+      time: currentAnchor.time - startAnchor.time,
+      price: currentAnchor.price - startAnchor.price,
+    };
+    const startPosition = screenPointToPanePosition(startPoint, space);
+    const currentPosition = screenPointToPanePosition(options.delta, space);
+    const positionDelta = {
+      x: currentPosition.x - startPosition.x,
+      y: currentPosition.y - startPosition.y,
+    };
+    const nextDrawing = moveDrawingByScreenDelta(drawing, delta, positionDelta, space, updatedAt);
+    if (nextDrawing === drawing) return drawing;
+    changed = true;
+    return nextDrawing;
+  });
+
+  if (!changed) return state;
+
+  return {
+    ...state,
+    drawings,
+    selection: state.selection,
+    draft: null,
+    textEdit: null,
+  };
 }
 
 export function beginUserDrawingEditDragAtPoint(

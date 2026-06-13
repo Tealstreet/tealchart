@@ -55,7 +55,17 @@ const coordinateSpace: DrawingCoordinateSpace = {
   chartLeft: 0,
   chartRight: 300,
 };
+const indicatorCoordinateSpace: DrawingCoordinateSpace = {
+  viewport: { startTime: 0, endTime: 3_000, priceMin: 0, priceMax: 100 },
+  pane: { id: 'indicator', top: 300, height: 100, bottom: 400, yMin: 0, yMax: 100 },
+  chartLeft: 0,
+  chartRight: 300,
+};
 const spacesByPaneId = new Map([['main', coordinateSpace]]);
+const multiPaneSpacesByPaneId = new Map([
+  ['main', coordinateSpace],
+  ['indicator', indicatorCoordinateSpace],
+]);
 
 afterEach(() => {
   clearChartStoreCache();
@@ -375,6 +385,48 @@ describe('user drawing command dispatch', () => {
     expect(movedDrawing.updatedAt).toBe(91);
     expect(movedDrawing.points[0]).toEqual({ time: 1100, price: 99 });
     expect(movedDrawing.points[1]).toEqual({ time: 2100, price: 109 });
+  });
+
+  it('nudges multi-pane selections using each drawing pane coordinate space', () => {
+    const state: UserDrawingState = {
+      ...createUserDrawingState(),
+      selection: { drawingId: 'main-line', drawingIds: ['main-line', 'indicator-line'] },
+      drawings: [
+        {
+          id: 'main-line',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 100,
+        },
+        {
+          id: 'indicator-line',
+          kind: 'horizontalLine',
+          paneId: 'indicator',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+    };
+
+    const nudged = dispatchUserDrawingCommand(state, {
+      type: 'nudge',
+      spacesByPaneId: multiPaneSpacesByPaneId,
+      options: { delta: { x: 0, y: 10 }, now: () => 92 },
+      meta: { source: 'keyboard' },
+    });
+
+    expect(nudged.changed).toBe(true);
+    expect(nudged.state.drawings[0]).toMatchObject({ id: 'main-line', price: 99, updatedAt: 92 });
+    expect(nudged.state.drawings[1]).toMatchObject({ id: 'indicator-line', price: 40, updatedAt: 92 });
   });
 
   it('wraps image, table, text alignment, icon, and visibility reducers', () => {
