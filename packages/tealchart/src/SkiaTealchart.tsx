@@ -1399,19 +1399,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const drag = userDrawingEditDragRef.current;
       if (!drag) return;
 
-      const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
+      dispatchUserDrawingCommandToState({
         type: 'applyEditDrag',
         drag,
         point: { x, y },
         meta: { source: 'touch', transactionKey: 'edit-drag' },
       });
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-      }
     },
     [
       chartDimensions,
-      commitUserDrawingState,
       dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
       userDrawingInputPanes,
