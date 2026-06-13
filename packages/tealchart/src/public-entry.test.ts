@@ -79,6 +79,9 @@ import type {
   UserDrawingInfoLineMetrics,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
+  UserDrawingObjectTreeAction,
+  UserDrawingObjectTreeModel,
+  UserDrawingObjectTreeRow,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
   UserDrawingStyleToggleDescriptor,
@@ -194,6 +197,8 @@ import {
   resolveTrendBasedFibTimeFromAnchors,
   resolveUserDrawingDateRangeMetrics,
   resolveUserDrawingInfoLineMetrics,
+  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPriceRangeMetrics,
   resolveUserDrawingRiskRewardMetrics,
   resolveAnchoredVolumeProfileFromAnchor,
@@ -208,6 +213,7 @@ import {
   insertUserDrawingTableRow,
   setUserDrawingIconName,
   setUserDrawingImageSource,
+  setUserDrawingName,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingTableDimensions,
@@ -273,6 +279,7 @@ describe('tealchart public entries', () => {
     expect(setUserDrawingTextAlign).toBeTypeOf('function');
     expect(setUserDrawingIconName).toBeTypeOf('function');
     expect(setUserDrawingImageSource).toBeTypeOf('function');
+    expect(setUserDrawingName).toBeTypeOf('function');
     expect(setUserDrawingTableCell).toBeTypeOf('function');
     expect(setUserDrawingTableCells).toBeTypeOf('function');
     expect(setUserDrawingTableDimensions).toBeTypeOf('function');
@@ -291,6 +298,8 @@ describe('tealchart public entries', () => {
     ]);
     expect(duplicateUserDrawing).toBeTypeOf('function');
     expect(getUserDrawingSelectionIds).toBeTypeOf('function');
+    expect(resolveUserDrawingObjectTreeModel).toBeTypeOf('function');
+    expect(resolveUserDrawingObjectTreeActionCommands).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
     expect(resolveRegressionTrendFromAnchors).toBeTypeOf('function');
     expect(resolveFlatTopBottomFromAnchors).toBeTypeOf('function');
@@ -392,6 +401,40 @@ describe('tealchart public entries', () => {
     expect(nativeEntry).toContain('MobileUserDrawingTrendBasedFibTimePrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingTrianglePatternPrimitive');
     expect(nativeEntry).toContain('MobileUserDrawingXabcdPatternPrimitive');
+  });
+
+  it('exports drawing object tree public types', () => {
+    const row: NonNever<UserDrawingObjectTreeRow> = {
+      id: 'trend',
+      drawingId: 'trend',
+      kind: 'trendLine',
+      tool: 'trendLine',
+      label: 'Trend line',
+      defaultLabel: 'Trend line',
+      customName: null,
+      icon: '╱',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      selected: false,
+      editable: true,
+      zIndex: 0,
+      orderIndex: 0,
+      groupIds: [],
+    };
+    const model: NonNever<UserDrawingObjectTreeModel> = {
+      rows: [row],
+      selectedIds: [],
+      drawingCount: 1,
+    };
+    const action: NonNever<UserDrawingObjectTreeAction> = {
+      type: 'duplicate',
+      drawingIds: ['trend'],
+      createId: () => 'copy',
+    };
+
+    expect(model.rows[0]).toBe(row);
+    expect(action.type).toBe('duplicate');
   });
 
   it('exports usable native channel primitive aliases', () => {
