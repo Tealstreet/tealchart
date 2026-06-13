@@ -165,6 +165,37 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('shares fallback selected action anchor geometry for hidden Skia selections', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'hidden' },
+      drawings: [
+        {
+          id: 'hidden',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: false,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveUserDrawingSelectionActionAnchor(state, new Map([[space.pane.id, space]]), { padding: 4, minTargetSize: 16 })).toEqual({
+      anchor: { x: 12, y: 4 },
+      bounds: { x: 4, y: 4, width: 16, height: 16 },
+      drawingIds: ['hidden'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    });
+  });
+
   it('returns table primitives for Skia rendering', () => {
     const state: UserDrawingState = {
       version: 1,

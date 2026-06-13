@@ -17,6 +17,14 @@ const baseDrawingState: UserDrawingState = {
   drawings: [],
 };
 
+const selectionActionAnchor = {
+  anchor: { x: 160, y: 80 },
+  bounds: { x: 120, y: 80, width: 80, height: 40 },
+  drawingIds: ['h'],
+  paneIds: ['main'],
+  primaryPaneId: 'main',
+};
+
 describe('ChartTopBar drawing toolbar', () => {
   afterEach(() => {
     document.body.innerHTML = '';
@@ -171,6 +179,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingDuplicateSelected: onDuplicate,
       onUserDrawingDeleteSelected: onDelete,
       onUserDrawingCancelDraft: onCancel,
@@ -199,10 +208,8 @@ describe('ChartTopBar drawing toolbar', () => {
 
     topBar.setUserDrawingState(baseDrawingState);
 
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.disabled).toBe(
-      true,
-    );
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.disabled).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.disabled).toBe(true);
 
@@ -233,6 +240,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
       onUserDrawingVisibilityChange: onVisibility,
       onUserDrawingLockedChange: onLocked,
@@ -280,6 +288,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingVisibilityChange: onVisibility,
     });
     topBar.mount(document.body);
@@ -327,6 +336,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
     });
     topBar.mount(document.body);
@@ -372,6 +382,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
     });
     topBar.mount(document.body);
@@ -424,6 +435,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
     });
     topBar.mount(document.body);
@@ -576,6 +588,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
       onUserDrawingTextAlignChange: onTextAlign,
     });
@@ -731,6 +744,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingStyleChange: onStyle,
       onUserDrawingLockedChange: onLocked,
       onUserDrawingDeleteSelected: onDeleteSelected,
