@@ -330,6 +330,39 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
     expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
 
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#f5c542',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            textColor: '#f5c542',
+            fontSize: 14,
+          },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text color to #22c55e"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="12 pixel font size"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
+
+    expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 12 });
+    expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
+
     topBar.unmount();
   });
 
