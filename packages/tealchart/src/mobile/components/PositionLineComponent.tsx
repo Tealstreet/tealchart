@@ -51,6 +51,7 @@ const BASE_LABEL_WIDTH = 180;
 const BUILT_IN_ACTION_WIDTH = 18;
 const TP_SL_BUTTON_WIDTH = 24;
 const BRACKET_BUTTON_GAP = 4;
+const PRICE_AXIS_GAP = 60;
 const TP_COLOR = '#22c55e'; // Green for take profit
 const SL_COLOR = '#f97316'; // Orange for stop loss
 
@@ -280,12 +281,31 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     }
   }, [position.lineStyle]);
 
+  // Whether to show TP/SL buttons
+  const showBrackets = position.brackets !== null;
+  const customActions = useMemo(
+    () => (position.actions ?? []).filter((action) => action.type === 'action' && action.actionId),
+    [position.actions],
+  );
+  const labelGroupWidth = useMemo(
+    () =>
+      BASE_LABEL_WIDTH +
+      (showBrackets ? BRACKET_BUTTON_GAP + TP_SL_BUTTON_WIDTH * 2 : 0) +
+      (position.closeable ? BUILT_IN_ACTION_WIDTH : 0) +
+      (position.reversible ? BUILT_IN_ACTION_WIDTH : 0) +
+      customActions.length * TP_SL_BUTTON_WIDTH,
+    [customActions.length, position.closeable, position.reversible, showBrackets],
+  );
+
   // Calculate label positioning based on lineLength
   const labelX = useMemo(() => {
-    const maxLabelX = dimensions.width - dimensions.margins.right - 150;
     const minLabelX = dimensions.margins.left;
+    const maxLabelX = Math.max(
+      minLabelX,
+      dimensions.width - dimensions.margins.right - PRICE_AXIS_GAP - labelGroupWidth,
+    );
     return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength)) / 100;
-  }, [position.lineLength, dimensions]);
+  }, [position.lineLength, dimensions, labelGroupWidth]);
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? position.textShort : position.text;
@@ -306,22 +326,6 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
 
   // Format price for display
   const formattedPrice = safeToFixed(position.price, pricePrecision);
-
-  // Whether to show TP/SL buttons
-  const showBrackets = position.brackets !== null;
-  const customActions = useMemo(
-    () => (position.actions ?? []).filter((action) => action.type === 'action' && action.actionId),
-    [position.actions],
-  );
-  const labelGroupWidth = useMemo(
-    () =>
-      BASE_LABEL_WIDTH +
-      (showBrackets ? BRACKET_BUTTON_GAP + TP_SL_BUTTON_WIDTH * 2 : 0) +
-      (position.closeable ? BUILT_IN_ACTION_WIDTH : 0) +
-      (position.reversible ? BUILT_IN_ACTION_WIDTH : 0) +
-      customActions.length * TP_SL_BUTTON_WIDTH,
-    [customActions.length, position.closeable, position.reversible, showBrackets],
-  );
 
   return (
     <View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }]}>
@@ -507,7 +511,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           styles.lineSegment,
           {
             left: labelX + labelGroupWidth, // After label/actions
-            right: dimensions.margins.right + 60,
+            right: dimensions.margins.right + PRICE_AXIS_GAP,
             top: TOUCH_TARGET_HEIGHT / 2,
             borderBottomColor: position.lineColor,
             borderBottomWidth: position.lineWidth,

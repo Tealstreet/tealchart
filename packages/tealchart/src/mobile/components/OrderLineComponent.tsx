@@ -52,6 +52,7 @@ const BASE_LABEL_WIDTH = 100;
 const BUILT_IN_ACTION_WIDTH = 18;
 const TP_SL_BUTTON_WIDTH = 24;
 const BRACKET_BUTTON_GAP = 6;
+const PRICE_AXIS_GAP = 60;
 const TP_COLOR = '#22c55e'; // Green for take profit
 const SL_COLOR = '#f97316'; // Orange for stop loss
 export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
@@ -309,22 +310,6 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     }
   }, [order.lineStyle]);
 
-  // Calculate label positioning based on lineLength
-  const labelX = useMemo(() => {
-    // lineLength=100 means line extends full width, label at LEFT edge
-    // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
-    const maxLabelX = dimensions.width - dimensions.margins.right - 120; // Approximate label width
-    const minLabelX = dimensions.margins.left;
-    return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
-  }, [order.lineLength, dimensions]);
-
-  // Display text (use narrow if appropriate)
-  const displayText = useNarrowText ? order.textShort : order.text;
-  const displayQuantity = useNarrowText ? order.quantityShort : order.quantity;
-
-  // Format price for display
-  const formattedPrice = safeToFixed(order.price, pricePrecision);
-
   // Whether to show TP/SL buttons
   const showBrackets = order.brackets !== null;
   const customActions = useMemo(
@@ -339,6 +324,25 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       customActions.length * TP_SL_BUTTON_WIDTH,
     [customActions.length, order.cancellable, showBrackets],
   );
+
+  // Calculate label positioning based on lineLength
+  const labelX = useMemo(() => {
+    // lineLength=100 means line extends full width, label at LEFT edge
+    // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
+    const minLabelX = dimensions.margins.left;
+    const maxLabelX = Math.max(
+      minLabelX,
+      dimensions.width - dimensions.margins.right - PRICE_AXIS_GAP - labelGroupWidth,
+    );
+    return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
+  }, [order.lineLength, dimensions, labelGroupWidth]);
+
+  // Display text (use narrow if appropriate)
+  const displayText = useNarrowText ? order.textShort : order.text;
+  const displayQuantity = useNarrowText ? order.quantityShort : order.quantity;
+
+  // Format price for display
+  const formattedPrice = safeToFixed(order.price, pricePrecision);
 
   return (
     <Animated.View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }, animatedContainerStyle]}>
@@ -498,7 +502,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           styles.lineSegment,
           {
             left: labelX + labelGroupWidth + 2, // After label/actions
-            right: dimensions.margins.right + 60, // Before price axis label
+            right: dimensions.margins.right + PRICE_AXIS_GAP, // Before price axis label
             top: TOUCH_TARGET_HEIGHT / 2,
             borderBottomColor: order.lineColor,
             borderBottomWidth: order.lineWidth,
