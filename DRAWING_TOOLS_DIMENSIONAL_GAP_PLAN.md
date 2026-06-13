@@ -638,6 +638,11 @@ Phase 3: Error behavior
 
 - Define return values for stale IDs, locked drawings, hidden drawings, invalid
   point counts, and unavailable platform UI surfaces.
+- Status: web widget APIs and mobile command utilities now have focused contract
+  coverage for stale IDs, locked drawing opt-in, hidden-selection cleanup,
+  invalid placement drags, and optional UI callbacks. Mutating commands return
+  `false`/unchanged state on unavailable targets; query/open APIs return
+  `null` or the computed model without requiring app callbacks.
 
 ### Epic 8.2: Persistence and Migration Hardening
 
