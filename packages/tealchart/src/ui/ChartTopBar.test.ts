@@ -34,11 +34,18 @@ describe('ChartTopBar drawing toolbar', () => {
     const trendLine = document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]');
 
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    const shapesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]');
     const categoryRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
 
     expect(linesCategory).not.toBeNull();
+    expect(shapesCategory).not.toBeNull();
     expect(categoryRail).not.toBeNull();
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
+    expect(shapesCategory?.getAttribute('aria-pressed')).toBe('true');
+    expect(linesCategory?.getAttribute('aria-pressed')).toBe('false');
+    expect(linesCategory?.getAttribute('aria-haspopup')).toBe('menu');
+    expect(linesCategory?.getAttribute('aria-controls')).toBe('tealchart-drawing-tools-lines');
+    expect(document.getElementById('tealchart-drawing-tools-lines')?.getAttribute('role')).toBe('menu');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
     linesCategory?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
