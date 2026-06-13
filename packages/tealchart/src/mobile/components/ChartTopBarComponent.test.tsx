@@ -3,6 +3,7 @@ import type { UserDrawingState } from '../../drawings';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { getUserDrawingToolDescriptor } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import { ChartTopBarComponent } from './ChartTopBarComponent';
 
@@ -48,6 +49,20 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Trend line'));
 
     expect(onTool).toHaveBeenCalledWith('trendLine');
+  });
+
+  it('shows the active tool icon on its category button', () => {
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'horizontalLine' }}
+      />,
+    );
+
+    expect(screen.getByLabelText('Lines drawing tools').textContent).toBe(
+      getUserDrawingToolDescriptor('horizontalLine').icon,
+    );
   });
 
   it('dispatches selected drawing actions from shared toolbar descriptors', () => {
