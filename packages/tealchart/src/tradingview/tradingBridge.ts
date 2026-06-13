@@ -1,0 +1,590 @@
+import type {
+  ChartTradingAction,
+  ChartTradingIntent,
+  ChartTradingIntentHandler,
+  ChartTradingLineDash,
+  ChartTradingOrderLine,
+  ChartTradingPositionLine,
+  ChartTradingState,
+} from '../trading';
+import type { TradingViewPatchCallbacks, TradingViewRenderFrame, TradingViewRenderFrameInput } from './types';
+
+import { normalizeTradingViewRenderFrame } from './frameBridge';
+
+const LABEL_HEIGHT = 18;
+const LINE_HIT_HEIGHT = 10;
+const BASE_LABEL_WIDTH = 112;
+const PRICE_AXIS_GAP = 64;
+const ACTION_WIDTH = 24;
+const BUILT_IN_ACTION_WIDTH = 18;
+const BRACKET_GAP = 6;
+const DEFAULT_ORDER_COLOR = '#3b82f6';
+const DEFAULT_POSITION_COLOR = '#22c55e';
+const DEFAULT_SELL_COLOR = '#ef4444';
+
+type TradingViewTradingOwnerType = 'order' | 'position';
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface HitTarget {
+  rect: Rect;
+  cursor: string;
+  action:
+    | { type: 'order-line'; line: ChartTradingOrderLine }
+    | { type: 'order-cancel'; line: ChartTradingOrderLine }
+    | { type: 'position-close'; line: ChartTradingPositionLine }
+    | { type: 'position-reverse'; line: ChartTradingPositionLine }
+    | { type: 'line-action'; lineId: string; actionId: string }
+    | { type: 'bracket'; ownerType: TradingViewTradingOwnerType; ownerId: string; lineId: string; side: 'tp' | 'sl' };
+}
+
+interface ActiveDrag {
+  line: ChartTradingOrderLine;
+}
+
+export interface TradingViewTradingBridgeOptions {
+  state?: ChartTradingState;
+  onIntent?: ChartTradingIntentHandler;
+}
+
+export class TradingViewTradingBridge {
+  private state: ChartTradingState = {};
+  private lastFrame: TradingViewRenderFrame | null = null;
+  private hitTargets: HitTarget[] = [];
+  private activeDrag: ActiveDrag | null = null;
+  private readonly listeners = new Set<ChartTradingIntentHandler>();
+  private attachedElement: HTMLElement | null = null;
+  private detachListeners: (() => void) | null = null;
+
+  constructor(options: TradingViewTradingBridgeOptions = {}) {
+    this.state = cloneTradingState(options.state ?? {});
+    if (options.onIntent) {
+      this.listeners.add(options.onIntent);
+    }
+  }
+
+  setState(state: ChartTradingState): void {
+    this.state = cloneTradingState(state);
+  }
+
+  getState(): ChartTradingState {
+    return cloneTradingState(this.state);
+  }
+
+  onIntent(handler: ChartTradingIntentHandler): () => void {
+    this.listeners.add(handler);
+    return () => {
+      this.listeners.delete(handler);
+    };
+  }
+
+  callbacks(): TradingViewPatchCallbacks {
+    return {
+      afterBars: (frame) => this.draw(frame),
+    };
+  }
+
+  attach(element: HTMLElement): () => void {
+    this.detach();
+    this.attachedElement = element;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const point = this.eventPoint(event);
+      if (!point) return;
+      const hit = this.findHit(point);
+      if (!hit) return;
+      element.style.cursor = hit.cursor;
+      event.preventDefault();
+      this.handleHitStart(hit, point);
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      const point = this.eventPoint(event);
+      if (!point) return;
+      if (this.activeDrag) {
+        element.style.cursor = 'ns-resize';
+        event.preventDefault();
+        return;
+      }
+      element.style.cursor = this.findHit(point)?.cursor ?? '';
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      const point = this.eventPoint(event);
+      if (point) {
+        this.handlePointerUp(point);
+      }
+      this.activeDrag = null;
+      element.style.cursor = point ? this.findHit(point)?.cursor ?? '' : '';
+    };
+    const onPointerLeave = () => {
+      if (!this.activeDrag) {
+        element.style.cursor = '';
+      }
+    };
+
+    element.addEventListener('pointerdown', onPointerDown);
+    element.addEventListener('pointermove', onPointerMove);
+    element.addEventListener('pointerleave', onPointerLeave);
+    window.addEventListener('pointerup', onPointerUp);
+
+    this.detachListeners = () => {
+      element.removeEventListener('pointerdown', onPointerDown);
+      element.removeEventListener('pointermove', onPointerMove);
+      element.removeEventListener('pointerleave', onPointerLeave);
+      window.removeEventListener('pointerup', onPointerUp);
+      if (this.attachedElement === element) {
+        element.style.cursor = '';
+      }
+    };
+
+    return () => this.detach();
+  }
+
+  detach(): void {
+    this.detachListeners?.();
+    this.detachListeners = null;
+    this.attachedElement = null;
+    this.activeDrag = null;
+  }
+
+  destroy(): void {
+    this.detach();
+    this.listeners.clear();
+    this.hitTargets = [];
+    this.lastFrame = null;
+  }
+
+  handlePointerDown(point: Point): void {
+    const hit = this.findHit(point);
+    if (hit) {
+      this.handleHitStart(hit, point);
+    }
+  }
+
+  handlePointerUp(point: Point): void {
+    if (!this.activeDrag || !this.lastFrame) return;
+    const line = this.activeDrag.line;
+    this.emit({
+      type: 'order.move.commit',
+      source: 'tradingview-bridge',
+      orderId: line.orderId ?? line.id,
+      lineId: line.id,
+      price: this.lastFrame.coordToPrice(point.y),
+      ...meta(line.meta),
+    });
+  }
+
+  draw(frame: TradingViewRenderFrameInput): void {
+    const normalized = normalizeTradingViewRenderFrame(frame);
+    if (!normalized) return;
+
+    this.lastFrame = normalized;
+    this.hitTargets = [];
+
+    const ctx = normalized.ctx;
+    ctx.save();
+    ctx.font = `${fontSize(ctx, 11)}px sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.lineCap = 'butt';
+
+    for (const position of this.state.positions ?? []) {
+      this.drawPosition(ctx, normalized, position);
+    }
+    for (const order of this.state.orders ?? []) {
+      this.drawOrder(ctx, normalized, order);
+    }
+    for (const execution of this.state.executions ?? []) {
+      const y = normalized.priceToCoord(execution.price);
+      const x = xForTime(normalized, execution.time);
+      if (x === null || !Number.isFinite(y)) continue;
+      const color = execution.direction === 'sell' ? DEFAULT_SELL_COLOR : DEFAULT_POSITION_COLOR;
+      ctx.fillStyle = execution.style?.lineColor ?? color;
+      ctx.beginPath();
+      ctx.moveTo(x, y - 5);
+      ctx.lineTo(x + (execution.direction === 'sell' ? -8 : 8), y);
+      ctx.lineTo(x, y + 5);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  private drawOrder(ctx: CanvasRenderingContext2D, frame: TradingViewRenderFrame, line: ChartTradingOrderLine): void {
+    const y = frame.priceToCoord(line.price);
+    if (!Number.isFinite(y)) return;
+
+    const color = line.style?.lineColor ?? tradingColor(line.side, 'order');
+    const label = line.label?.primary ?? defaultLabel(line.side, 'Order');
+    const quantity = line.label?.quantity ?? (line.quantity == null ? '' : String(line.quantity));
+    const actions = actionButtons(line.actions, line.style, color);
+    const buttons = [
+      ...(line.cancellable === false
+        ? []
+        : [{ id: 'cancel', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]),
+      ...(line.brackets?.takeProfit == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: '#22c55e', border: '#22c55e' }]),
+      ...(line.brackets?.stopLoss == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: '#f97316', border: '#f97316' }]),
+      ...actions,
+    ];
+    const labelWidth = BASE_LABEL_WIDTH + buttons.reduce((sum, button) => sum + button.width, 0) + (buttons.length > 0 ? BRACKET_GAP : 0);
+    const labelX = labelLeft(frame.chartWidth, labelWidth, line.style?.lineLength);
+
+    drawTradingLine(ctx, frame, y, labelX, labelWidth, color, line.style);
+    const buttonRects = this.drawLabel(ctx, labelX, y, label, quantity, color, line.style, buttons);
+
+    this.hitTargets.push({
+      rect: { x: 0, y: y - LINE_HIT_HEIGHT / 2, width: frame.chartWidth - PRICE_AXIS_GAP, height: LINE_HIT_HEIGHT },
+      cursor: line.editable === false ? 'default' : 'ns-resize',
+      action: { type: 'order-line', line },
+    });
+    for (const target of buttonRects) {
+      if (target.id === 'cancel') {
+        this.hitTargets.push({ rect: target.rect, cursor: 'pointer', action: { type: 'order-cancel', line } });
+      } else if (target.id === 'tp' || target.id === 'sl') {
+        this.hitTargets.push({
+          rect: target.rect,
+          cursor: 'pointer',
+          action: {
+            type: 'bracket',
+            ownerType: 'order',
+            ownerId: line.orderId ?? line.id,
+            lineId: line.id,
+            side: target.id,
+          },
+        });
+      } else {
+        this.hitTargets.push({
+          rect: target.rect,
+          cursor: 'pointer',
+          action: { type: 'line-action', lineId: line.id, actionId: target.id },
+        });
+      }
+    }
+  }
+
+  private drawPosition(
+    ctx: CanvasRenderingContext2D,
+    frame: TradingViewRenderFrame,
+    line: ChartTradingPositionLine,
+  ): void {
+    const y = frame.priceToCoord(line.price);
+    if (!Number.isFinite(y)) return;
+
+    const color = line.style?.lineColor ?? tradingColor(line.side, 'position');
+    const label = line.label?.primary ?? defaultLabel(line.side, 'Position');
+    const quantity = line.label?.quantity ?? (line.quantity == null ? '' : String(line.quantity));
+    const actions = actionButtons(line.actions, line.style, color);
+    const buttons = [
+      ...(line.closeable === false
+        ? []
+        : [{ id: 'close', width: BUILT_IN_ACTION_WIDTH, text: '×', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]),
+      ...(line.reversible
+        ? [{ id: 'reverse', width: BUILT_IN_ACTION_WIDTH, text: '↩', background: line.style?.actionBackgroundColor ?? color, color: line.style?.actionIconColor ?? '#ffffff', border: line.style?.actionBorderColor ?? color }]
+        : []),
+      ...(line.brackets?.takeProfit == null ? [] : [{ id: 'tp', width: ACTION_WIDTH, text: 'TP', background: '#101827', color: '#22c55e', border: '#22c55e' }]),
+      ...(line.brackets?.stopLoss == null ? [] : [{ id: 'sl', width: ACTION_WIDTH, text: 'SL', background: '#101827', color: '#f97316', border: '#f97316' }]),
+      ...actions,
+    ];
+    const labelWidth = BASE_LABEL_WIDTH + buttons.reduce((sum, button) => sum + button.width, 0) + (buttons.length > 0 ? BRACKET_GAP : 0);
+    const labelX = labelLeft(frame.chartWidth, labelWidth, line.style?.lineLength);
+
+    drawTradingLine(ctx, frame, y, labelX, labelWidth, color, line.style);
+    const secondary = line.label?.pnl ?? quantity;
+    const buttonRects = this.drawLabel(ctx, labelX, y, label, secondary, color, line.style, buttons);
+
+    for (const target of buttonRects) {
+      if (target.id === 'close') {
+        this.hitTargets.push({ rect: target.rect, cursor: 'pointer', action: { type: 'position-close', line } });
+      } else if (target.id === 'reverse') {
+        this.hitTargets.push({ rect: target.rect, cursor: 'pointer', action: { type: 'position-reverse', line } });
+      } else if (target.id === 'tp' || target.id === 'sl') {
+        this.hitTargets.push({
+          rect: target.rect,
+          cursor: 'pointer',
+          action: {
+            type: 'bracket',
+            ownerType: 'position',
+            ownerId: line.positionId ?? line.id,
+            lineId: line.id,
+            side: target.id,
+          },
+        });
+      } else {
+        this.hitTargets.push({
+          rect: target.rect,
+          cursor: 'pointer',
+          action: { type: 'line-action', lineId: line.id, actionId: target.id },
+        });
+      }
+    }
+  }
+
+  private drawLabel(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    lineY: number,
+    primary: string,
+    secondary: string,
+    fallbackColor: string,
+    style: ChartTradingOrderLine['style'],
+    buttons: readonly ButtonSpec[],
+  ): Array<{ id: string; rect: Rect }> {
+    const y = lineY - LABEL_HEIGHT / 2;
+    const bodyColor = style?.bodyBackgroundColor ?? '#111827';
+    const bodyTextColor = style?.bodyTextColor ?? '#ffffff';
+    const bodyBorderColor = style?.bodyBorderColor ?? fallbackColor;
+    const secondaryColor = style?.quantityBackgroundColor ?? '#1f2937';
+    const secondaryTextColor = style?.quantityTextColor ?? bodyTextColor;
+    const secondaryBorderColor = style?.quantityBorderColor ?? bodyBorderColor;
+    const primaryWidth = Math.round(BASE_LABEL_WIDTH * 0.58);
+    const secondaryWidth = BASE_LABEL_WIDTH - primaryWidth;
+    const buttonRects: Array<{ id: string; rect: Rect }> = [];
+
+    drawSegment(ctx, { x, y, width: primaryWidth, height: LABEL_HEIGHT }, bodyColor, bodyBorderColor);
+    drawText(ctx, primary, x + 6, lineY, bodyTextColor, 'left');
+    drawSegment(ctx, { x: x + primaryWidth, y, width: secondaryWidth, height: LABEL_HEIGHT }, secondaryColor, secondaryBorderColor);
+    drawText(ctx, secondary, x + primaryWidth + 6, lineY, secondaryTextColor, 'left');
+
+    let buttonX = x + BASE_LABEL_WIDTH + (buttons.length > 0 ? BRACKET_GAP : 0);
+    for (const button of buttons) {
+      const rect = { x: buttonX, y, width: button.width, height: LABEL_HEIGHT };
+      drawSegment(ctx, rect, button.background, button.border);
+      drawText(ctx, button.text, buttonX + button.width / 2, lineY, button.color, 'center');
+      buttonRects.push({ id: button.id, rect });
+      buttonX += button.width;
+    }
+
+    return buttonRects;
+  }
+
+  private eventPoint(event: PointerEvent): Point | null {
+    if (!this.attachedElement || !this.lastFrame) return null;
+    const rect = this.attachedElement.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    return {
+      x: ((event.clientX - rect.left) * this.lastFrame.chartWidth) / rect.width,
+      y: ((event.clientY - rect.top) * this.lastFrame.chartHeight) / rect.height,
+    };
+  }
+
+  private findHit(point: Point): HitTarget | null {
+    for (let index = this.hitTargets.length - 1; index >= 0; index -= 1) {
+      const target = this.hitTargets[index];
+      if (target && contains(target.rect, point)) return target;
+    }
+    return null;
+  }
+
+  private handleHitStart(hit: HitTarget, point: Point): void {
+    switch (hit.action.type) {
+      case 'order-line':
+        if (hit.action.line.editable !== false) {
+          this.activeDrag = { line: hit.action.line };
+        }
+        break;
+      case 'order-cancel':
+        this.emit({
+          type: 'order.cancel',
+          source: 'tradingview-bridge',
+          orderId: hit.action.line.orderId ?? hit.action.line.id,
+          lineId: hit.action.line.id,
+          ...meta(hit.action.line.meta),
+        });
+        break;
+      case 'position-close':
+        this.emit({
+          type: 'position.close',
+          source: 'tradingview-bridge',
+          positionId: hit.action.line.positionId ?? hit.action.line.id,
+          lineId: hit.action.line.id,
+          ...meta(hit.action.line.meta),
+        });
+        break;
+      case 'position-reverse':
+        this.emit({
+          type: 'position.reverse',
+          source: 'tradingview-bridge',
+          positionId: hit.action.line.positionId ?? hit.action.line.id,
+          lineId: hit.action.line.id,
+          ...meta(hit.action.line.meta),
+        });
+        break;
+      case 'line-action':
+        this.emit({
+          type: 'line.action',
+          source: 'tradingview-bridge',
+          lineId: hit.action.lineId,
+          actionId: hit.action.actionId,
+        });
+        break;
+      case 'bracket':
+        this.emit({
+          type: `bracket.${hit.action.side}.click`,
+          source: 'tradingview-bridge',
+          ownerType: hit.action.ownerType,
+          ownerId: hit.action.ownerId,
+          lineId: hit.action.lineId,
+        });
+        break;
+    }
+
+    if (hit.action.type !== 'order-line') {
+      this.handlePointerUp(point);
+    }
+  }
+
+  private emit(intent: ChartTradingIntent): void {
+    for (const listener of this.listeners) {
+      listener(intent);
+    }
+  }
+}
+
+interface ButtonSpec {
+  id: string;
+  width: number;
+  text: string;
+  background: string;
+  color: string;
+  border: string;
+}
+
+function cloneTradingState(state: ChartTradingState): ChartTradingState {
+  return {
+    orders: state.orders?.map((order) => ({ ...order, label: order.label ? { ...order.label } : undefined, style: order.style ? { ...order.style } : undefined, actions: order.actions?.map((action) => ({ ...action })), brackets: order.brackets ? { ...order.brackets } : order.brackets })),
+    positions: state.positions?.map((position) => ({ ...position, label: position.label ? { ...position.label } : undefined, style: position.style ? { ...position.style } : undefined, actions: position.actions?.map((action) => ({ ...action })), brackets: position.brackets ? { ...position.brackets } : position.brackets })),
+    executions: state.executions?.map((execution) => ({ ...execution, label: execution.label ? { ...execution.label } : undefined, style: execution.style ? { ...execution.style } : undefined, actions: execution.actions?.map((action) => ({ ...action })) })),
+  };
+}
+
+function actionButtons(
+  actions: readonly ChartTradingAction[] | undefined,
+  style: ChartTradingOrderLine['style'],
+  fallbackColor: string,
+): ButtonSpec[] {
+  return (actions ?? [])
+    .filter((action) => !action.disabled && !isBuiltInAction(action.id))
+    .map((action) => ({
+      id: action.id,
+      width: ACTION_WIDTH,
+      text: action.icon ?? action.label.slice(0, 2).toUpperCase(),
+      background: style?.actionBackgroundColor ?? fallbackColor,
+      color: style?.actionIconColor ?? '#ffffff',
+      border: style?.actionBorderColor ?? fallbackColor,
+    }));
+}
+
+function isBuiltInAction(id: string): boolean {
+  return id === 'cancel' || id === 'close' || id === 'reverse';
+}
+
+function drawTradingLine(
+  ctx: CanvasRenderingContext2D,
+  frame: TradingViewRenderFrame,
+  y: number,
+  labelX: number,
+  labelWidth: number,
+  color: string,
+  style: ChartTradingOrderLine['style'],
+): void {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = style?.lineWidth ?? 1;
+  ctx.setLineDash(lineDash(style?.lineStyle));
+  ctx.beginPath();
+  if (style?.extendLeft !== false) {
+    ctx.moveTo(0, y);
+    ctx.lineTo(Math.max(0, labelX - 2), y);
+  }
+  ctx.moveTo(labelX + labelWidth + 2, y);
+  ctx.lineTo(Math.max(labelX + labelWidth + 2, frame.chartWidth - PRICE_AXIS_GAP), y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawSegment(ctx: CanvasRenderingContext2D, rect: Rect, fill: string, stroke: string): void {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1;
+  ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+}
+
+function drawText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  color: string,
+  align: CanvasTextAlign,
+): void {
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+}
+
+function labelLeft(chartWidth: number, labelWidth: number, lineLength = 0): number {
+  const min = 0;
+  const max = Math.max(min, chartWidth - PRICE_AXIS_GAP - labelWidth);
+  return min + ((max - min) * (100 - lineLength)) / 100;
+}
+
+function lineDash(style: ChartTradingLineDash | undefined): number[] {
+  switch (style) {
+    case 1:
+    case 'dotted':
+      return [2, 4];
+    case 2:
+    case 'dashed':
+      return [6, 4];
+    default:
+      return [];
+  }
+}
+
+function fontSize(ctx: CanvasRenderingContext2D, size: number): number {
+  const maybeScaled = ctx as CanvasRenderingContext2D & { fontSize?: (value: number) => number };
+  return typeof maybeScaled.fontSize === 'function' ? maybeScaled.fontSize(size) : size;
+}
+
+function contains(rect: Rect, point: Point): boolean {
+  return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+}
+
+function tradingColor(side: ChartTradingOrderLine['side'], kind: 'order' | 'position'): string {
+  if (side === 'sell' || side === 'short') return DEFAULT_SELL_COLOR;
+  return kind === 'position' ? DEFAULT_POSITION_COLOR : DEFAULT_ORDER_COLOR;
+}
+
+function defaultLabel(side: ChartTradingOrderLine['side'], fallback: string): string {
+  if (!side) return fallback;
+  return side.toUpperCase();
+}
+
+function meta(value: unknown): { meta?: unknown } {
+  return value === undefined ? {} : { meta: value };
+}
+
+function xForTime(frame: TradingViewRenderFrame, time: number): number | null {
+  if (!frame.bars.length || !frame.candleCoords.length) return null;
+  let closestIndex = -1;
+  let closestDistance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < frame.bars.length; index += 1) {
+    const bar = frame.bars[index];
+    if (!bar) continue;
+    const distance = Math.abs(bar.time - time);
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  }
+  return closestIndex >= 0 ? frame.candleCoords[closestIndex]?.center ?? null : null;
+}

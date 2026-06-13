@@ -4,5 +4,6 @@ export * from './overlayBridge';
 export * from './runtimePatcher';
 export * from './scriptInterceptor';
 export * from './scriptLoader';
+export * from './tradingBridge';
 export * from './types';
 export * from './widgetAdapter';
