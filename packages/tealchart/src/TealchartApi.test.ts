@@ -44,6 +44,28 @@ describe('TealchartApi trading intents', () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 
+  it('emits order cancel intents from render data callbacks', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const intents = collectTradingIntents(api);
+    const onCancel = vi.fn();
+
+    const line = (await api.createOrderLine({ price: 50_000 })) as FullOrderLineAdapter;
+    line.setOrderId('order-1').onCancel(onCancel);
+    const renderData = api.getOrderLinesRenderData()[0];
+
+    renderData.callbacks?.onCancel?.();
+
+    expect(intents).toEqual([
+      {
+        type: 'order.cancel',
+        orderId: 'order-1',
+        lineId: renderData.id,
+        source: 'native-line',
+      },
+    ]);
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
   it('emits position close and reverse intents while preserving adapter callbacks', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     const intents = collectTradingIntents(api);
@@ -68,6 +90,37 @@ describe('TealchartApi trading intents', () => {
         type: 'position.reverse',
         positionId: 'BTCUSDT:long',
         lineId,
+        source: 'native-line',
+      },
+    ]);
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(onReverse).toHaveBeenCalledOnce();
+  });
+
+  it('emits position close and reverse intents from render data callbacks', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const intents = collectTradingIntents(api);
+    const onClose = vi.fn();
+    const onReverse = vi.fn();
+
+    const line = (await api.createPositionLine({ price: 50_000 })) as FullPositionLineAdapter;
+    line.setPositionId('BTCUSDT:long').onClose(onClose).onReverse(onReverse);
+    const renderData = api.getPositionLinesRenderData()[0];
+
+    renderData.callbacks?.onClose?.();
+    renderData.callbacks?.onReverse?.();
+
+    expect(intents).toEqual([
+      {
+        type: 'position.close',
+        positionId: 'BTCUSDT:long',
+        lineId: renderData.id,
+        source: 'native-line',
+      },
+      {
+        type: 'position.reverse',
+        positionId: 'BTCUSDT:long',
+        lineId: renderData.id,
         source: 'native-line',
       },
     ]);

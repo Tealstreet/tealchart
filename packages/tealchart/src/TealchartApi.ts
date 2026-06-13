@@ -374,6 +374,14 @@ export class TealchartApi {
         source: 'native-line',
       });
     };
+    const emitOrderCancelIntent = () => {
+      this.emitTradingIntent({
+        type: 'order.cancel',
+        orderId: data.orderId ?? id,
+        lineId: id,
+        source: 'native-line',
+      });
+    };
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
     let notifyPending = false;
     const notifyChange = () => {
@@ -632,7 +640,12 @@ export class TealchartApi {
               emitOrderBracketIntent('bracket.sl.commit', price, partialPercent);
               _onSLMoveEnd?.(price, partialPercent);
             },
-            onCancel: _onCancelCallback ?? undefined,
+            onCancel: _onCancelCallback
+              ? () => {
+                  emitOrderCancelIntent();
+                  _onCancelCallback?.();
+                }
+              : undefined,
           },
         };
       },
@@ -735,6 +748,22 @@ export class TealchartApi {
         type,
         ownerType: 'position',
         ownerId: data.positionId ?? id,
+        lineId: id,
+        source: 'native-line',
+      });
+    };
+    const emitPositionCloseIntent = () => {
+      this.emitTradingIntent({
+        type: 'position.close',
+        positionId: data.positionId ?? id,
+        lineId: id,
+        source: 'native-line',
+      });
+    };
+    const emitPositionReverseIntent = () => {
+      this.emitTradingIntent({
+        type: 'position.reverse',
+        positionId: data.positionId ?? id,
         lineId: id,
         source: 'native-line',
       });
@@ -1023,8 +1052,18 @@ export class TealchartApi {
               emitPositionBracketIntent('bracket.sl.commit', price, partialPercent);
               _onSLMoveEnd?.(price, partialPercent);
             },
-            onClose: _onCloseCallback ?? undefined,
-            onReverse: _onReverseCallback ?? undefined,
+            onClose: _onCloseCallback
+              ? () => {
+                  emitPositionCloseIntent();
+                  _onCloseCallback?.();
+                }
+              : undefined,
+            onReverse: _onReverseCallback
+              ? () => {
+                  emitPositionReverseIntent();
+                  _onReverseCallback?.();
+                }
+              : undefined,
           },
         };
       },
