@@ -18,6 +18,8 @@ import type {
   UserDrawingObjectTreeOptions,
   UserDrawingPropertiesIntent,
   UserDrawingPropertiesSurface,
+  UserDrawingPropertiesSurfaceCommand,
+  ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingContextActionItem,
   UserDrawingEditDrag,
   UserDrawingCommandHistory,
@@ -65,6 +67,7 @@ import {
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
+  resolveUserDrawingPropertiesSurfaceCommand,
   serializeUserDrawingStateForLayout,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
 } from './drawings';
@@ -2457,6 +2460,13 @@ export class TealchartWidget {
 
   getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface {
     return resolveUserDrawingPropertiesSurface(this._userDrawingState, drawingId);
+  }
+
+  dispatchUserDrawingPropertiesSurfaceCommand(
+    command: UserDrawingPropertiesSurfaceCommand,
+    options: ResolveUserDrawingPropertiesSurfaceCommandOptions = {},
+  ): boolean {
+    return this.dispatchUserDrawingCommand(resolveUserDrawingPropertiesSurfaceCommand(command, options));
   }
 
   openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {

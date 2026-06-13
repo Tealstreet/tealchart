@@ -27,6 +27,8 @@ import type {
   UserDrawingObjectTreeOptions,
   UserDrawingPropertiesIntent,
   UserDrawingPropertiesSurface,
+  UserDrawingPropertiesSurfaceCommand,
+  ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
   UserDrawingAnchor,
@@ -124,6 +126,7 @@ import {
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
+  resolveUserDrawingPropertiesSurfaceCommand,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -334,6 +337,10 @@ export interface SkiaTealchartHandle {
   dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean;
   getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null;
   getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface;
+  dispatchUserDrawingPropertiesSurfaceCommand(
+    command: UserDrawingPropertiesSurfaceCommand,
+    options?: ResolveUserDrawingPropertiesSurfaceCommandOptions,
+  ): boolean;
   openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null;
 }
 
@@ -788,6 +795,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface {
         return resolveUserDrawingPropertiesSurface(userDrawingStateRef.current, drawingId);
+      },
+      dispatchUserDrawingPropertiesSurfaceCommand(
+        command: UserDrawingPropertiesSurfaceCommand,
+        options: ResolveUserDrawingPropertiesSurfaceCommandOptions = {},
+      ): boolean {
+        return dispatchUserDrawingCommandToState(resolveUserDrawingPropertiesSurfaceCommand(command, options));
       },
       openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
         const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
