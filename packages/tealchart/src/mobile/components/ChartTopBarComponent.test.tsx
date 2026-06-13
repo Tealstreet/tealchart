@@ -35,8 +35,12 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.getByLabelText('Lines drawing tools')).toBeTruthy();
     expect(screen.getByLabelText('Channels drawing tools')).toBeTruthy();
     expect(screen.getByLabelText('Gann and Fibonacci drawing tools')).toBeTruthy();
+    expect(screen.getByLabelText('Geometric Shapes drawing tools').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('Geometric Shapes drawing tools').getAttribute('aria-expanded')).toBe('false');
 
     fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    expect(screen.getByLabelText('Geometric Shapes drawing tools').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('Geometric Shapes drawing tools').getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByLabelText('Rectangle')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Close drawing tools'));
     expect(screen.queryByLabelText('Rectangle')).toBeNull();

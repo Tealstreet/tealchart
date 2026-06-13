@@ -586,6 +586,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
       const activeCategory = category.tools.includes(activeTool);
       const firstTool = getUserDrawingToolDescriptor(category.tools[0]!);
+      const flyoutId = `tealchart-drawing-tools-${category.id}`;
       const railItem = this.createElement('div', {
         style: styles.drawingToolRailItem,
       });
@@ -600,9 +601,19 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           title: category.label,
           'aria-label': `${category.label} drawing tools`,
           'aria-expanded': 'false',
+          'aria-haspopup': 'menu',
+          'aria-controls': flyoutId,
+          'aria-pressed': activeCategory ? 'true' : 'false',
         },
       });
-      const flyout = this.createElement('div', { style: styles.drawingToolFlyout });
+      const flyout = this.createElement('div', {
+        style: styles.drawingToolFlyout,
+        attributes: {
+          id: flyoutId,
+          role: 'menu',
+          'aria-label': `${category.label} tools`,
+        },
+      });
       flyout.appendChild(this.createElement('div', { style: styles.drawingToolFlyoutTitle, textContent: category.label }));
       const showFlyout = () => {
         if (activeFlyout?.id === category.id) return;
