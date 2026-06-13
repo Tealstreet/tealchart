@@ -34,6 +34,15 @@ export function dispatchMobileUserDrawingActionCommand(
     return true;
   }
 
+  if (command.type === 'editText') {
+    options.dispatchUserDrawingCommand({
+      type: 'beginTextEdit',
+      drawingId: command.drawingId,
+      meta: { source: options.source },
+    });
+    return true;
+  }
+
   if (command.type === 'styleAction') {
     if (command.visible !== undefined) {
       options.dispatchUserDrawingCommand({

@@ -1502,6 +1502,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
       ['openProperties', true, false],
       ['openObjectTree', true, false],
+      ['editText', false, false],
       ['duplicateSelected', true, false],
       ['deleteSelected', true, true],
     ]);
@@ -1523,6 +1524,45 @@ describe('user drawing toolbar descriptors', () => {
       ['lockSelected', true, { type: 'styleAction', action: 'lockSelected', locked: true }],
       ['unlockSelected', false, { type: 'styleAction', action: 'unlockSelected' }],
     ]);
+  });
+
+  it('enables selected text edit actions only for unlocked text drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center' as const,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    expect(
+      resolveUserDrawingSelectedActionSurface(selected)
+        .groups.find((group) => group.id === 'primary')!
+        .items.find((item) => item.id === 'editText'),
+    ).toMatchObject({
+      enabled: true,
+      command: { type: 'editText', drawingId: 'label' },
+    });
+    expect(
+      resolveUserDrawingSelectedActionSurface({
+        ...selected,
+        drawings: [{ ...selected.drawings[0]!, locked: true }],
+      })
+        .groups.find((group) => group.id === 'primary')!
+        .items.find((item) => item.id === 'editText'),
+    ).toMatchObject({ enabled: false });
   });
 
   it('clamps selected action surfaces inside shared safe viewport insets', () => {

@@ -195,6 +195,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingPropertiesOpen?: () => void;
   /** Called when the drawing object tree should open */
   onUserDrawingObjectTreeOpen?: () => void;
+  /** Called when the selected drawing text editor should open */
+  onUserDrawingTextEditOpen?: (drawingId: string) => void;
   /** Called when the active user drawing text editor changes */
   onUserDrawingTextEditChange?: (value: string) => void;
   /** Called when the active user drawing text editor should commit */
@@ -331,6 +333,7 @@ export class TealchartWidgetUI {
         onUserDrawingLockedChange: options.onUserDrawingLockedChange,
         onUserDrawingPropertiesOpen: options.onUserDrawingPropertiesOpen,
         onUserDrawingObjectTreeOpen: options.onUserDrawingObjectTreeOpen,
+        onUserDrawingTextEditOpen: options.onUserDrawingTextEditOpen,
         drawingOverlayParent: this.overlayRoot,
         layoutCallbacks: options.layoutCallbacks,
       });
