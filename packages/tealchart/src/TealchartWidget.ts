@@ -13,6 +13,8 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UserDrawingClipboard,
+  UserDrawingCommandDispatchResult,
+  UserDrawingCommandSource,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
@@ -43,6 +45,7 @@ import type {
   UserDrawingTrendLineExtend,
   UserDrawingTool,
   UserDrawingZOrderAction,
+  UserDrawingCommandEvent,
   UpdateUserDrawingOptions,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
@@ -57,6 +60,8 @@ import {
   clearUserDrawingCommandHistory,
   createUserDrawingClipboard,
   createUserDrawingCommandHistory,
+  createUserDrawingCommandEvent,
+  createUserDrawingHistoryCommandEvent,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
@@ -2256,19 +2261,37 @@ export class TealchartWidget {
   }
 
   undoUserDrawingCommand(): boolean {
-    const result = undoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
+    return this._undoUserDrawingCommand('api');
+  }
+
+  private _undoUserDrawingCommand(source: UserDrawingCommandSource): boolean {
+    const previousState = this._userDrawingState;
+    const result = undoUserDrawingCommandHistory(previousState, this._userDrawingHistory);
     this._userDrawingHistory = result.history;
     if (result.changed) {
       this.setUserDrawingState(result.state, { preserveHistory: true });
+      this._emitUserDrawingHistoryCommandEvent(previousState, result.state, {
+        type: 'undo',
+        meta: { source },
+      });
     }
     return result.changed;
   }
 
   redoUserDrawingCommand(): boolean {
-    const result = redoUserDrawingCommandHistory(this._userDrawingState, this._userDrawingHistory);
+    return this._redoUserDrawingCommand('api');
+  }
+
+  private _redoUserDrawingCommand(source: UserDrawingCommandSource): boolean {
+    const previousState = this._userDrawingState;
+    const result = redoUserDrawingCommandHistory(previousState, this._userDrawingHistory);
     this._userDrawingHistory = result.history;
     if (result.changed) {
       this.setUserDrawingState(result.state, { preserveHistory: true });
+      this._emitUserDrawingHistoryCommandEvent(previousState, result.state, {
+        type: 'redo',
+        meta: { source },
+      });
     }
     return result.changed;
   }
@@ -2277,8 +2300,8 @@ export class TealchartWidget {
     const action = resolveUserDrawingKeyboardAction(this._userDrawingState, input);
     if (!action) return false;
 
-    if (action.type === 'undo') return this.undoUserDrawingCommand();
-    if (action.type === 'redo') return this.redoUserDrawingCommand();
+    if (action.type === 'undo') return this._undoUserDrawingCommand('keyboard');
+    if (action.type === 'redo') return this._redoUserDrawingCommand('keyboard');
     if (action.type === 'copySelected') return this.copySelectedUserDrawing();
     if (action.type === 'duplicateSelected') return this.duplicateSelectedUserDrawing();
     if (action.type === 'paste') return this.pasteUserDrawingClipboard();
@@ -2553,10 +2576,43 @@ export class TealchartWidget {
   private dispatchUserDrawingCommandWithResult(
     command: Parameters<typeof dispatchUserDrawingCommand>[1],
   ): ReturnType<typeof dispatchUserDrawingCommandWithHistory> {
-    const result = dispatchUserDrawingCommandWithHistory(this._userDrawingState, this._userDrawingHistory, command);
+    const previousState = this._userDrawingState;
+    const result = dispatchUserDrawingCommandWithHistory(previousState, this._userDrawingHistory, command);
     this._userDrawingHistory = result.history;
     this.setUserDrawingState(result.state, { preserveHistory: true });
+    this._emitUserDrawingCommandEvent(previousState, result);
     return result;
+  }
+
+  private _emitUserDrawingCommandEvent(
+    previousState: UserDrawingState,
+    result: UserDrawingCommandDispatchResult,
+  ): UserDrawingCommandEvent | null {
+    const event = createUserDrawingCommandEvent(previousState, result);
+    if (!event) return null;
+    try {
+      this._options.onUserDrawingCommand?.(event);
+    } catch (error) {
+      this._logger?.error(LogCategory.Widget, 'onUserDrawingCommand callback threw', error);
+    }
+    this._eventEmitter.emit('user_drawing_command', event);
+    return event;
+  }
+
+  private _emitUserDrawingHistoryCommandEvent(
+    previousState: UserDrawingState,
+    state: UserDrawingState,
+    command: Parameters<typeof createUserDrawingHistoryCommandEvent>[2],
+  ): UserDrawingCommandEvent | null {
+    const event = createUserDrawingHistoryCommandEvent(previousState, state, command, previousState !== state);
+    if (!event) return null;
+    try {
+      this._options.onUserDrawingCommand?.(event);
+    } catch (error) {
+      this._logger?.error(LogCategory.Widget, 'onUserDrawingCommand callback threw', error);
+    }
+    this._eventEmitter.emit('user_drawing_command', event);
+    return event;
   }
 
   private _measureUserDrawingTextLabelLine = (drawing: UserDrawingTextAnnotation, line: string): number => {
@@ -2650,7 +2706,8 @@ export class TealchartWidget {
       return { state: this._userDrawingState, hit: false, changed: false };
     }
 
-    const result = dispatchUserDrawingCommand(this._userDrawingState, {
+    const previousState = this._userDrawingState;
+    const result = dispatchUserDrawingCommand(previousState, {
       type: 'selectAtPoint',
       point,
       spacesByPaneId,
@@ -2661,6 +2718,7 @@ export class TealchartWidget {
       meta: { source: 'pointer' },
     });
     this.setUserDrawingState(result.state, { preserveHistory: true });
+    this._emitUserDrawingCommandEvent(previousState, result);
     return {
       state: result.state,
       hit: result.hit ?? false,
@@ -2676,6 +2734,7 @@ export class TealchartWidget {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
     const transactionKey = `${options?.duplicateOnDrag ? 'duplicate-drag' : 'edit-drag'}-${++this._userDrawingEditDragTransactionCounter}`;
+    const previousState = this._userDrawingState;
     const result = options?.duplicateOnDrag
       ? this.dispatchUserDrawingCommandWithResult({
           type: 'beginDuplicateEditDragAtPoint',
@@ -2687,7 +2746,7 @@ export class TealchartWidget {
           },
           meta: { source: 'pointer', transactionKey },
         })
-      : dispatchUserDrawingCommand(this._userDrawingState, {
+      : dispatchUserDrawingCommand(previousState, {
           type: 'beginEditDragAtPoint',
           point,
           spacesByPaneId,
@@ -2701,6 +2760,9 @@ export class TealchartWidget {
     this._userDrawingEditDrag = result.editDrag;
     this._userDrawingEditDragTransactionKey = transactionKey;
     this.setUserDrawingState(result.state, { preserveHistory: true });
+    if (!options?.duplicateOnDrag) {
+      this._emitUserDrawingCommandEvent(previousState, result);
+    }
     return true;
   }
 
@@ -2710,12 +2772,25 @@ export class TealchartWidget {
   ): ContextMenuItem[] {
     if (this._userDrawingState.activeTool !== 'select') return [];
 
-    const result = resolveUserDrawingContextActionsAtPoint(this._userDrawingState, point, spacesByPaneId, {
-      hitTest: this._getUserDrawingHitTestOptions(),
-    });
+    const hitTest = this._getUserDrawingHitTestOptions();
+    const previousState = this._userDrawingState;
+    const result = resolveUserDrawingContextActionsAtPoint(previousState, point, spacesByPaneId, { hitTest });
     if (!result.hit) return [];
     if (result.changed) {
       this.setUserDrawingState(result.state, { preserveHistory: true });
+      this._emitUserDrawingCommandEvent(previousState, {
+        state: result.state,
+        changed: true,
+        command: {
+          type: 'selectAtPoint',
+          point,
+          spacesByPaneId,
+          options: { hitTest },
+          meta: { source: 'contextMenu' },
+        },
+        meta: { source: 'contextMenu' },
+        hit: true,
+      });
     }
 
     return result.items.map((item) => ({
@@ -2777,13 +2852,19 @@ export class TealchartWidget {
     if (intent.type !== 'pane') {
       let nextState = this._userDrawingState;
       let changed = false;
+      const commandResults: Array<{ previousState: UserDrawingState; result: UserDrawingCommandDispatchResult }> = [];
       for (const command of intent.commands) {
+        const previousState = nextState;
         const result = dispatchUserDrawingCommand(nextState, command);
         nextState = result.state;
         changed = result.changed || changed;
+        commandResults.push({ previousState, result });
       }
       if (changed) {
         this.setUserDrawingState(nextState, { preserveHistory: true });
+        for (const { previousState, result } of commandResults) {
+          this._emitUserDrawingCommandEvent(previousState, result);
+        }
       }
       if (intent.type === 'properties') {
         const propertiesIntent = resolveUserDrawingPropertiesIntent(nextState, { drawingId: intent.drawingId });

@@ -628,6 +628,11 @@ Phase 2: Event subscriptions
 
 - Add drawing command/drawing event notifications for create, update, delete,
   select, reorder, and edit commit.
+- Status: web exposes changed drawing commands through
+  `onUserDrawingCommand` and `widget.subscribe('user_drawing_command', ...)`;
+  mobile Skia exposes the same event shape through `onUserDrawingCommand` and
+  the mobile command utility covers the sibling command-event behavior. Direct
+  state replacement/import remains silent.
 
 Phase 3: Error behavior
 

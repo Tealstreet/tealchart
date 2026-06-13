@@ -4,7 +4,12 @@
  */
 
 import type { WorkerError } from '@tealstreet/tealscript';
-import type { UserDrawingObjectTreeModel, UserDrawingPropertiesIntent, UserDrawingState } from './drawings';
+import type {
+  UserDrawingCommandEvent,
+  UserDrawingObjectTreeModel,
+  UserDrawingPropertiesIntent,
+  UserDrawingState,
+} from './drawings';
 import type { ChartThemeInput } from './theme';
 
 // Reuse Bar type from existing codebase
@@ -406,7 +411,8 @@ export type WidgetEvent =
   | 'chart_loaded'
   | 'layout_changed'
   | 'mouse_down'
-  | 'mouse_up';
+  | 'mouse_up'
+  | 'user_drawing_command';
 
 /**
  * Resolution string type (matches TradingView's nominal type)
@@ -723,6 +729,8 @@ export interface TealchartWidgetOptions {
   userDrawingState?: UserDrawingState;
   /** Called when the widget updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
+  /** Called after a user drawing command changes state. Direct state replacement does not emit this. */
+  onUserDrawingCommand?: (event: UserDrawingCommandEvent) => void;
   /** Called when app or widget code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   /** Called when app or widget code asks to open selected drawing properties. */

@@ -1,6 +1,7 @@
 import type {
   UserDrawingCommand,
   UserDrawingCommandDispatchResult,
+  UserDrawingCommandEvent,
   UserDrawingCommandHistory,
   UserDrawingHistoryDispatchResult,
   UserDrawingClipboard,
@@ -12,6 +13,7 @@ import type {
 
 import {
   createUserDrawingClipboard,
+  createUserDrawingCommandEvent,
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
   redoUserDrawingCommand,
@@ -20,6 +22,7 @@ import {
 } from '../../drawings';
 
 export type MobileUserDrawingCommit = (state: UserDrawingState) => void;
+export type MobileUserDrawingCommandEventListener = (event: UserDrawingCommandEvent) => void;
 
 export function dispatchMobileUserDrawingHandleCommand(
   state: UserDrawingState,
@@ -48,11 +51,26 @@ export function dispatchMobileUserDrawingHistoryCommand(
   return dispatchUserDrawingCommandWithHistory(state, history, command);
 }
 
+export function dispatchMobileUserDrawingHistoryCommandWithEvent(
+  state: UserDrawingState,
+  history: UserDrawingCommandHistory,
+  command: UserDrawingCommand,
+  onEvent?: MobileUserDrawingCommandEventListener,
+): UserDrawingHistoryDispatchResult {
+  const result = dispatchMobileUserDrawingHistoryCommand(state, history, command);
+  const event = createUserDrawingCommandEvent(state, result);
+  if (event) {
+    onEvent?.(event);
+  }
+  return result;
+}
+
 export interface MobileUserDrawingKeyboardDispatchResult {
   state: UserDrawingState;
   history: UserDrawingCommandHistory;
   changed: boolean;
   action: UserDrawingKeyboardAction | null;
+  command?: UserDrawingCommand;
 }
 
 export interface MobileUserDrawingKeyboardDispatchOptions {
@@ -87,38 +105,44 @@ export function dispatchMobileUserDrawingKeyboardAction(
   }
 
   if (action.type === 'duplicateSelected') {
+    const command: UserDrawingCommand = {
+      type: 'duplicate',
+      options: { createId: options.createId },
+      meta: { source: 'keyboard' },
+    };
     return {
-      ...dispatchUserDrawingCommandWithHistory(state, history, {
-        type: 'duplicate',
-        options: { createId: options.createId },
-        meta: { source: 'keyboard' },
-      }),
+      ...dispatchUserDrawingCommandWithHistory(state, history, command),
       action,
+      command,
     };
   }
 
   if (action.type === 'paste') {
+    const command: UserDrawingCommand = {
+      type: 'paste',
+      clipboard: options.clipboard,
+      options: { createId: options.createId },
+      meta: { source: 'keyboard' },
+    };
     return {
-      ...dispatchUserDrawingCommandWithHistory(state, history, {
-        type: 'paste',
-        clipboard: options.clipboard,
-        options: { createId: options.createId },
-        meta: { source: 'keyboard' },
-      }),
+      ...dispatchUserDrawingCommandWithHistory(state, history, command),
       action,
+      command,
     };
   }
 
   if (action.type === 'nudge') {
     if (!action.delta || !options.spacesByPaneId) return { state, history, changed: false, action };
+    const command: UserDrawingCommand = {
+      type: 'nudge',
+      spacesByPaneId: options.spacesByPaneId,
+      options: { delta: action.delta },
+      meta: { source: 'keyboard' },
+    };
     return {
-      ...dispatchUserDrawingCommandWithHistory(state, history, {
-        type: 'nudge',
-        spacesByPaneId: options.spacesByPaneId,
-        options: { delta: action.delta },
-        meta: { source: 'keyboard' },
-      }),
+      ...dispatchUserDrawingCommandWithHistory(state, history, command),
       action,
+      command,
     };
   }
 
@@ -128,5 +152,5 @@ export function dispatchMobileUserDrawingKeyboardAction(
       : action.type === 'selectAll'
         ? { type: 'selectMany', drawingIds: state.drawings.map((drawing) => drawing.id), meta: { source: 'keyboard' } }
         : { type: 'cancelDraft', meta: { source: 'keyboard' } };
-  return { ...dispatchUserDrawingCommandWithHistory(state, history, command), action };
+  return { ...dispatchUserDrawingCommandWithHistory(state, history, command), action, command };
 }
