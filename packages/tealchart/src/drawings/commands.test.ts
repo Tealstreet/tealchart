@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { dispatchUserDrawingCommand } from './commands';
 import type { UserDrawingCommand } from './commands';
-import { beginUserDrawingEditDragAtPoint } from './editing';
+import { beginUserDrawingDuplicateEditDragAtPoint, beginUserDrawingEditDragAtPoint } from './editing';
 import { clearChartStoreCache } from '../state/chartState';
 import {
   appendUserDrawingPathDragPoint,
@@ -366,6 +366,33 @@ describe('user drawing command dispatch', () => {
     expect(movedDrawing.points[0]).not.toEqual(anchorA);
     expect(movedDrawing.points[0]?.time).toBeGreaterThan(anchorA.time);
     expect(movedDrawing.points[0]?.price).toBeGreaterThan(anchorA.price);
+  });
+
+  it('wraps duplicate edit-drag start with hit metadata for the copied drawing', () => {
+    const state = createStateWithTrendLine();
+    const hitPoint = { x: 150, y: 150 };
+    const direct = beginUserDrawingDuplicateEditDragAtPoint(state, hitPoint, spacesByPaneId, {
+      createId: () => 'trend-line-copy',
+      now: () => 50,
+    });
+    const command = dispatchUserDrawingCommand(state, {
+      type: 'beginDuplicateEditDragAtPoint',
+      point: hitPoint,
+      spacesByPaneId,
+      options: {
+        createId: () => 'trend-line-copy',
+        now: () => 50,
+      },
+      meta: { source: 'pointer', transactionKey: 'duplicate-drag' },
+    });
+
+    expect(command.state).toEqual(direct.state);
+    expect(command.changed).toBe(true);
+    expect(command.hit).toBe(true);
+    expect(command.editDrag).toEqual(direct.drag);
+    expect(command.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line', 'trend-line-copy']);
+    expect(command.state.selection).toEqual({ drawingId: 'trend-line-copy' });
+    expect(command.editDrag?.startDrawing.id).toBe('trend-line-copy');
   });
 
   it('wraps selected drawing nudges through edit-drag geometry', () => {

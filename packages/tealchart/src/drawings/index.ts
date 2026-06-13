@@ -190,9 +190,15 @@ export {
   resolveUserDrawingDateRangeMetrics,
 } from './dateRange';
 export type { UserDrawingDateRangeMetrics } from './dateRange';
-export { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint, nudgeUserDrawingSelection } from './editing';
+export {
+  applyUserDrawingEditDrag,
+  beginUserDrawingDuplicateEditDragAtPoint,
+  beginUserDrawingEditDragAtPoint,
+  nudgeUserDrawingSelection,
+} from './editing';
 export type {
   ApplyUserDrawingEditDragOptions,
+  BeginUserDrawingDuplicateEditDragOptions,
   BeginUserDrawingEditDragOptions,
   BeginUserDrawingEditDragResult,
   NudgeUserDrawingSelectionOptions,

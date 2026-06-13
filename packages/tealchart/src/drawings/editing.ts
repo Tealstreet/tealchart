@@ -10,7 +10,7 @@ import type {
 
 import { resolveUserDrawingGeometry, screenPointToAnchor, screenPointToPanePosition } from './coordinates';
 import { hitTestUserDrawings } from './hitTesting';
-import { getUserDrawingSelectionIds, selectUserDrawing } from './input';
+import { duplicateUserDrawing, getUserDrawingSelectionIds, selectUserDrawing } from './input';
 import { normalizeUserDrawingPanePosition } from './types';
 import type { UserDrawingHitTestOptions } from './hitTesting';
 
@@ -32,6 +32,11 @@ export interface NudgeUserDrawingSelectionOptions extends ApplyUserDrawingEditDr
 
 export interface BeginUserDrawingEditDragOptions {
   hitTest?: UserDrawingHitTestOptions;
+}
+
+export interface BeginUserDrawingDuplicateEditDragOptions extends BeginUserDrawingEditDragOptions {
+  createId: () => string;
+  now?: () => number;
 }
 
 export interface BeginUserDrawingEditDragResult {
@@ -768,5 +773,34 @@ export function beginUserDrawingEditDragAtPoint(
       : null,
     hit: true,
     changed: nextState !== state,
+  };
+}
+
+export function beginUserDrawingDuplicateEditDragAtPoint(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  options: BeginUserDrawingDuplicateEditDragOptions,
+): BeginUserDrawingEditDragResult {
+  const initial = beginUserDrawingEditDragAtPoint(state, point, spacesByPaneId, options);
+  if (!initial.hit || !initial.drag) return initial;
+
+  const duplicatedState = duplicateUserDrawing(initial.state, {
+    createId: options.createId,
+    now: options.now,
+  });
+  if (duplicatedState === initial.state) {
+    return {
+      ...initial,
+      changed: initial.changed,
+    };
+  }
+
+  const duplicateDrag = beginUserDrawingEditDragAtPoint(duplicatedState, point, spacesByPaneId, options);
+  return {
+    state: duplicateDrag.state,
+    drag: duplicateDrag.drag,
+    hit: duplicateDrag.hit,
+    changed: duplicateDrag.changed || duplicatedState !== state,
   };
 }

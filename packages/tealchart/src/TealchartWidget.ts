@@ -46,6 +46,7 @@ import type {
   UpdateUserDrawingOptions,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
@@ -169,6 +170,8 @@ export class TealchartWidget {
   private _userDrawingHistory: UserDrawingCommandHistory = createUserDrawingCommandHistory();
   private _userDrawingClipboard: UserDrawingClipboard | null = null;
   private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
+  private _userDrawingEditDragTransactionKey = 'edit-drag';
+  private _userDrawingEditDragTransactionCounter = 0;
   private _userDrawingIdCounter = 0;
   private _userDrawingTextMeasureCtx: CanvasRenderingContext2D | null = null;
 
@@ -2544,10 +2547,16 @@ export class TealchartWidget {
   }
 
   private dispatchUserDrawingCommand(command: Parameters<typeof dispatchUserDrawingCommand>[1]): boolean {
+    return this.dispatchUserDrawingCommandWithResult(command).changed;
+  }
+
+  private dispatchUserDrawingCommandWithResult(
+    command: Parameters<typeof dispatchUserDrawingCommand>[1],
+  ): ReturnType<typeof dispatchUserDrawingCommandWithHistory> {
     const result = dispatchUserDrawingCommandWithHistory(this._userDrawingState, this._userDrawingHistory, command);
     this._userDrawingHistory = result.history;
     this.setUserDrawingState(result.state, { preserveHistory: true });
-    return result.changed;
+    return result;
   }
 
   private _measureUserDrawingTextLabelLine = (drawing: UserDrawingTextAnnotation, line: string): number => {
@@ -2662,21 +2671,35 @@ export class TealchartWidget {
   private _handleUserDrawingEditStart(
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+    options?: DrawingDragEventOptions,
   ): boolean {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
-    const result = dispatchUserDrawingCommand(this._userDrawingState, {
-      type: 'beginEditDragAtPoint',
-      point,
-      spacesByPaneId,
-      options: {
-        hitTest: this._getUserDrawingHitTestOptions(),
-      },
-      meta: { source: 'pointer', transactionKey: 'edit-drag' },
-    });
+    const transactionKey = `${options?.duplicateOnDrag ? 'duplicate-drag' : 'edit-drag'}-${++this._userDrawingEditDragTransactionCounter}`;
+    const result = options?.duplicateOnDrag
+      ? this.dispatchUserDrawingCommandWithResult({
+          type: 'beginDuplicateEditDragAtPoint',
+          point,
+          spacesByPaneId,
+          options: {
+            createId: () => this._createUserDrawingId(),
+            hitTest: this._getUserDrawingHitTestOptions(),
+          },
+          meta: { source: 'pointer', transactionKey },
+        })
+      : dispatchUserDrawingCommand(this._userDrawingState, {
+          type: 'beginEditDragAtPoint',
+          point,
+          spacesByPaneId,
+          options: {
+            hitTest: this._getUserDrawingHitTestOptions(),
+          },
+          meta: { source: 'pointer', transactionKey },
+        });
     if (!result.hit || !result.editDrag) return false;
 
     this._userDrawingEditDrag = result.editDrag;
+    this._userDrawingEditDragTransactionKey = transactionKey;
     this.setUserDrawingState(result.state, { preserveHistory: true });
     return true;
   }
@@ -2732,12 +2755,13 @@ export class TealchartWidget {
       type: 'applyEditDrag',
       drag: this._userDrawingEditDrag,
       point,
-      meta: { source: 'pointer', transactionKey: 'edit-drag' },
+      meta: { source: 'pointer', transactionKey: this._userDrawingEditDragTransactionKey },
     });
   }
 
   private _handleUserDrawingEditEnd(): void {
     this._userDrawingEditDrag = null;
+    this._userDrawingEditDragTransactionKey = 'edit-drag';
   }
 
   private _handlePaneDoubleClick(
