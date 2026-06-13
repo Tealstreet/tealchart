@@ -16,6 +16,7 @@ import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 import type {
+  UserDrawingAnchor,
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UserDrawingInputPoint,
@@ -28,7 +29,7 @@ import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
-import { renderUserDrawingLayer, resolveUserDrawingInputPointFromChart } from '../drawings';
+import { isUserDrawingDragPlacementTool, renderUserDrawingLayer, resolveUserDrawingInputPointFromChart } from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -116,6 +117,10 @@ export interface ChartCoreOptions {
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
   onUserDrawingEditEnd?: () => void;
+  /** Called when a two-anchor drawing tool drag starts placement */
+  onUserDrawingPlacementDragStart?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when a two-anchor drawing tool drag commits placement */
+  onUserDrawingPlacementDragEnd?: (point: UserDrawingInputPoint) => boolean;
   /** Called when path-tool pointer down starts collecting freehand samples */
   onUserDrawingPathDragStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called while an active path-tool drag collects freehand samples */
@@ -529,6 +534,8 @@ export class ChartCore {
   private plots: PlotOutput[] = [];
   private drawings: DrawingOutput[] = [];
   private userDrawingState: UserDrawingState | null = null;
+  private userDrawingDraftPreviewAnchor: UserDrawingAnchor | null = null;
+  private userDrawingPlacementDragLastPoint: UserDrawingInputPoint | null = null;
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
   private indicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
@@ -995,6 +1002,10 @@ export class ChartCore {
   setUserDrawingState(state: UserDrawingState): void {
     if (state === this.userDrawingState) return;
     this.userDrawingState = state;
+    if (!state.draft) {
+      this.userDrawingDraftPreviewAnchor = null;
+      this.userDrawingPlacementDragLastPoint = null;
+    }
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1571,6 +1582,15 @@ export class ChartCore {
   private handleUserDrawingDragStart(x: number, y: number): boolean {
     if (!this.viewport) return false;
 
+    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
+      const point = this.resolveUserDrawingInputPoint(x, y);
+      if (!point || this.options.onUserDrawingPlacementDragStart?.(point) !== true) return false;
+      this.userDrawingDraftPreviewAnchor = point.anchor;
+      this.userDrawingPlacementDragLastPoint = point;
+      this.scheduleRender();
+      return true;
+    }
+
     if (this.userDrawingState?.activeTool === 'path') {
       const point = this.resolveUserDrawingInputPoint(x, y);
       return point ? this.options.onUserDrawingPathDragStart?.(point) === true : false;
@@ -1588,7 +1608,21 @@ export class ChartCore {
   private handleUserDrawingDragPending(x: number, y: number): boolean {
     if (
       !this.viewport ||
-      this.userDrawingState?.activeTool !== 'path' ||
+      !this.userDrawingState
+    ) {
+      return false;
+    }
+
+    if (isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
+      return (
+        !!this.options.onUserDrawingPlacementDragStart &&
+        !!this.options.onUserDrawingPlacementDragEnd &&
+        this.resolveUserDrawingInputPoint(x, y) !== null
+      );
+    }
+
+    if (
+      this.userDrawingState.activeTool !== 'path' ||
       !this.options.onUserDrawingPathDragStart ||
       !this.options.onUserDrawingPathDragMove ||
       !this.options.onUserDrawingPathDragEnd
@@ -1601,6 +1635,15 @@ export class ChartCore {
   private handleUserDrawingDragMove(x: number, y: number): boolean {
     if (!this.viewport) return false;
 
+    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
+      const point = this.resolveUserDrawingInputPoint(x, y);
+      if (!point || !this.userDrawingPlacementDragLastPoint) return false;
+      this.userDrawingDraftPreviewAnchor = point.anchor;
+      this.userDrawingPlacementDragLastPoint = point;
+      this.scheduleRender();
+      return true;
+    }
+
     if (this.userDrawingState?.activeTool === 'path') {
       const point = this.resolveUserDrawingInputPoint(x, y);
       return point ? this.options.onUserDrawingPathDragMove?.(point) === true : false;
@@ -1611,6 +1654,18 @@ export class ChartCore {
   }
 
   private handleUserDrawingDragEnd(): void {
+    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
+      const point = this.userDrawingPlacementDragLastPoint;
+      this.userDrawingDraftPreviewAnchor = null;
+      this.userDrawingPlacementDragLastPoint = null;
+      if (point) {
+        this.options.onUserDrawingPlacementDragEnd?.(point);
+      } else {
+        this.scheduleRender();
+      }
+      return;
+    }
+
     if (this.userDrawingState?.activeTool === 'path') {
       this.options.onUserDrawingPathDragEnd?.();
       return;
@@ -1943,6 +1998,7 @@ export class ChartCore {
 
     if (this.userDrawingState) {
       renderUserDrawingLayer(this.canvasContext, this.userDrawingState, this.getUserDrawingSpaces(vp), {
+        draftPreviewAnchor: this.userDrawingDraftPreviewAnchor ?? undefined,
         onImageLoad: () => this.scheduleRender(),
       });
     }
