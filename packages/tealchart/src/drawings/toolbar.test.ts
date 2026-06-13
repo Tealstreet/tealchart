@@ -12,6 +12,7 @@ import {
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingStyleToolbarAction,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
@@ -1456,6 +1457,95 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       locked: false,
       includeLocked: true,
+    });
+  });
+
+  it('resolves shared selected drawing action surface groups', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'front' },
+      drawings: [
+        {
+          id: 'back',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 9,
+        },
+        {
+          id: 'front',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    } satisfies UserDrawingState;
+    const surface = resolveUserDrawingSelectedActionSurface(selected);
+    const primary = surface.groups.find((group) => group.id === 'primary')!;
+    const arrange = surface.groups.find((group) => group.id === 'arrange')!;
+    const visibility = surface.groups.find((group) => group.id === 'visibility')!;
+
+    expect(surface.selectedDrawing?.id).toBe('front');
+    expect(surface.groups.map((group) => group.id)).toEqual(['primary', 'arrange', 'visibility']);
+    expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
+      ['duplicateSelected', true, false],
+      ['deleteSelected', true, true],
+    ]);
+    expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
+      ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
+      ['sendBackward', true, { type: 'toolbarAction', action: 'sendBackward' }],
+      ['bringToFront', false, { type: 'toolbarAction', action: 'bringToFront' }],
+      ['sendToBack', true, { type: 'toolbarAction', action: 'sendToBack' }],
+    ]);
+    expect(visibility.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
+      ['hideSelected', true, { type: 'styleAction', action: 'hideSelected', visible: false }],
+      ['showSelected', false, { type: 'styleAction', action: 'showSelected' }],
+      ['lockSelected', true, { type: 'styleAction', action: 'lockSelected', locked: true }],
+      ['unlockSelected', false, { type: 'styleAction', action: 'unlockSelected' }],
+    ]);
+  });
+
+  it('keeps locked selected action surface mutations disabled except unlock', () => {
+    const locked = {
+      ...state,
+      selection: { drawingId: 'locked' },
+      drawings: [
+        {
+          id: 'locked',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    } satisfies UserDrawingState;
+    const items = resolveUserDrawingSelectedActionSurface(locked).groups.flatMap((group) => group.items);
+
+    expect(items.find((item) => item.id === 'duplicateSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'deleteSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'hideSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'lockSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'unlockSelected')).toMatchObject({
+      enabled: true,
+      command: {
+        type: 'styleAction',
+        action: 'unlockSelected',
+        locked: false,
+        includeLocked: true,
+      },
     });
   });
 
