@@ -698,6 +698,8 @@ describe('TradingViewTradingBridge', () => {
     expect(ctx.setLineDash).toHaveBeenCalledWith([6, 4]);
     expect(ctx.moveTo).toHaveBeenCalledWith(0, 80);
     expect(ctx.moveTo).toHaveBeenCalledWith(0, 120);
+    expect(ctx.lineTo).toHaveBeenCalledWith(336, 80);
+    expect(ctx.lineTo).toHaveBeenCalledWith(336, 120);
   });
 
   it('emits partial bracket percentages from horizontal bracket drags', () => {

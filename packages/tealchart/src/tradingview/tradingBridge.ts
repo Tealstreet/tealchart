@@ -417,7 +417,7 @@ export class TradingViewTradingBridge {
     const labelX = labelLeft(frame.chartWidth, labelWidth, line.style?.lineLength);
 
     drawTradingLine(ctx, frame, y, labelX, labelWidth, color, line.style);
-    this.drawPositionBracketLines(ctx, frame, line, labelX, labelWidth);
+    this.drawPositionBracketLines(ctx, frame, line);
     const secondary = line.label?.pnl ?? quantity;
     const buttonRects = this.drawLabel(ctx, labelX, y, label, secondary, color, line.style, buttons);
 
@@ -453,23 +453,13 @@ export class TradingViewTradingBridge {
     ctx: CanvasRenderingContext2D,
     frame: TradingViewRenderFrame,
     line: ChartTradingPositionLine,
-    labelX: number,
-    labelWidth: number,
   ): void {
     if (!line.brackets) return;
     if (isPositiveFinite(line.brackets.takeProfit)) {
-      drawTradingLine(ctx, frame, frame.priceToCoord(line.brackets.takeProfit), labelX, labelWidth, TAKE_PROFIT_COLOR, {
-        lineStyle: 'dashed',
-        lineWidth: 1,
-        extendLeft: true,
-      });
+      drawBracketGuideLine(ctx, frame, frame.priceToCoord(line.brackets.takeProfit), TAKE_PROFIT_COLOR);
     }
     if (isPositiveFinite(line.brackets.stopLoss)) {
-      drawTradingLine(ctx, frame, frame.priceToCoord(line.brackets.stopLoss), labelX, labelWidth, STOP_LOSS_COLOR, {
-        lineStyle: 'dashed',
-        lineWidth: 1,
-        extendLeft: true,
-      });
+      drawBracketGuideLine(ctx, frame, frame.priceToCoord(line.brackets.stopLoss), STOP_LOSS_COLOR);
     }
   }
 
@@ -739,6 +729,18 @@ function drawTradingLine(
   }
   ctx.moveTo(labelX + labelWidth + 2, y);
   ctx.lineTo(Math.max(labelX + labelWidth + 2, frame.chartWidth - PRICE_AXIS_GAP), y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawBracketGuideLine(ctx: CanvasRenderingContext2D, frame: TradingViewRenderFrame, y: number, color: string): void {
+  if (!Number.isFinite(y)) return;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.setLineDash(lineDash('dashed'));
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(Math.max(0, frame.chartWidth - PRICE_AXIS_GAP), y);
   ctx.stroke();
   ctx.setLineDash([]);
 }
