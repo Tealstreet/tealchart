@@ -36,6 +36,7 @@ import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
 import {
   isUserDrawingDragPlacementTool,
+  isUserDrawingPathFamilyTool,
   renderUserDrawingLayer,
   resolveUserDrawingInputPointFromChart,
   resolveUserDrawingPlacementConstraint,
@@ -1630,7 +1631,7 @@ export class ChartCore {
       return true;
     }
 
-    if (this.userDrawingState?.activeTool === 'path') {
+    if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y);
       return point ? this.options.onUserDrawingPathDragStart?.(point) === true : false;
     }
@@ -1661,7 +1662,7 @@ export class ChartCore {
     }
 
     if (
-      this.userDrawingState.activeTool !== 'path' ||
+      !isUserDrawingPathFamilyTool(this.userDrawingState.activeTool) ||
       !this.options.onUserDrawingPathDragStart ||
       !this.options.onUserDrawingPathDragMove ||
       !this.options.onUserDrawingPathDragEnd
@@ -1684,7 +1685,7 @@ export class ChartCore {
       return true;
     }
 
-    if (this.userDrawingState?.activeTool === 'path') {
+    if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y);
       return point ? this.options.onUserDrawingPathDragMove?.(point) === true : false;
     }
@@ -1707,7 +1708,7 @@ export class ChartCore {
       return;
     }
 
-    if (this.userDrawingState?.activeTool === 'path') {
+    if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
       this.options.onUserDrawingPathDragEnd?.();
       return;
     }

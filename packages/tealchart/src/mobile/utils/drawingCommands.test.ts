@@ -24,6 +24,7 @@ import type { DrawingCoordinateSpace, UserDrawingState, UserDrawingTool } from '
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
+const anchorC = { time: 3_000, price: 120 };
 const expandedDragPlacementTools: UserDrawingTool[] = [
   'trendAngle',
   'priceRange',
@@ -633,6 +634,45 @@ describe('mobile drawing handle command dispatch', () => {
         points: [anchorA, anchorB],
       });
     }
+  });
+
+  it('records mobile geometric drag-seeded placement after the final tap', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'triangle');
+    const history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch' },
+    });
+    const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'triangle', now: () => 43, style },
+      meta: { source: 'touch' },
+    });
+    const committed = dispatchMobileUserDrawingHistoryCommand(seeded.state, seeded.history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorC },
+      options: { createId: () => 'triangle', now: () => 44, style },
+      meta: { source: 'touch' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(seeded.changed).toBe(true);
+    expect(seeded.history.undoStack).toHaveLength(0);
+    expect(seeded.state.drawings).toEqual([]);
+    expect(seeded.state.draft).toMatchObject({
+      tool: 'triangle',
+      anchors: [anchorA, anchorB],
+    });
+    expect(committed.changed).toBe(true);
+    expect(committed.history.undoStack).toHaveLength(1);
+    expect(committed.state.draft).toBeNull();
+    expect(committed.state.drawings[0]).toMatchObject({
+      id: 'triangle',
+      kind: 'triangle',
+      points: [anchorA, anchorB, anchorC],
+    });
   });
 
   it('records mobile path-family drags as one undoable drawing creation', () => {
