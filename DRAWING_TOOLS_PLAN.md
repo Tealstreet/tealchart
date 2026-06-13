@@ -23,6 +23,8 @@
 - Active tool selection and draft creation.
 - Drawing selection, deletion, duplication, z-order changes, locking, visibility, and style edits.
 - Shared render/input model coverage for web and mobile drawing paths.
+- Shared command dispatch envelope for app-facing drawing mutations on web and
+  mobile.
 
 ## Known Gaps
 
