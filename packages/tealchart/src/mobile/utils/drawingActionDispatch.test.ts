@@ -142,7 +142,17 @@ describe('mobile drawing action dispatch', () => {
     dispatchMobileUserDrawingActionCommand(
       {
         type: 'updateStyle',
-        style: { textColor: '#22c55e', fontSize: 16, fontFamily: 'serif', fontWeight: 'bold', fontStyle: 'italic' },
+        style: {
+          textColor: '#22c55e',
+          fontSize: 16,
+          fontFamily: 'serif',
+          fontWeight: 'bold',
+          fontStyle: 'italic',
+          textUnderline: true,
+          textLineThrough: true,
+          textWrap: true,
+          textMaxWidth: 180,
+        },
       },
       {
         state: createSelectedState(),
@@ -173,7 +183,17 @@ describe('mobile drawing action dispatch', () => {
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'updateStyle',
-      style: { textColor: '#22c55e', fontSize: 16, fontFamily: 'serif', fontWeight: 'bold', fontStyle: 'italic' },
+      style: {
+        textColor: '#22c55e',
+        fontSize: 16,
+        fontFamily: 'serif',
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        textUnderline: true,
+        textLineThrough: true,
+        textWrap: true,
+        textMaxWidth: 180,
+      },
       meta: { source: 'toolbar' },
     });
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({

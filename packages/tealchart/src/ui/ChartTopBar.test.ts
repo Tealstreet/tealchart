@@ -364,6 +364,9 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font family to serif"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font weight to bold"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font style to italic"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Underline selected drawing text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Strike selected drawing text"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Wrap selected drawing text"]')?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 12 });
@@ -371,6 +374,9 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
     expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
     expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
+    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
+    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
+    expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
 
     topBar.unmount();
   });

@@ -326,8 +326,9 @@ Phase 1: Action availability model
 
 - Status: properties, quick line color/width/style changes, quick fill color
   and fill visibility changes, quick text color/font-size/family/weight/style
-  changes, duplicate, delete, lock, hide/show, unlock, and z-order action
-  descriptors resolve from shared drawing state.
+  changes plus rich-text underline/strike-through/wrap toggles, duplicate,
+  delete, lock, hide/show, unlock, and z-order action descriptors resolve from
+  shared drawing state.
 - Status: text-capable drawings now expose a shared selected/context action for
   starting text edit on both web Canvas and mobile Skia.
 - Future work: add richer typography, geometry, and tool-specific actions to
@@ -365,9 +366,10 @@ Phase 2: Initial actions
 
 - Status: properties, text edit for text-capable drawings, quick line
   color/width/style changes, quick fill color and fill visibility changes,
-  quick text color/font-size/family/weight/style changes, duplicate, delete,
-  z-order, hide/show, and lock/unlock actions moved out of the top bar into
-  the floating toolbar for selected drawings.
+  quick text color/font-size/family/weight/style changes plus rich-text
+  underline/strike-through/wrap toggles, duplicate, delete, z-order, hide/show,
+  and lock/unlock actions moved out of the top bar into the floating toolbar
+  for selected drawings.
 - Future work: migrate richer typography/tool-specific style actions after the
   style-control grouping is ready for both web and mobile.
 
@@ -393,10 +395,10 @@ Phase 2: Initial actions
 
 - Status: properties, text edit for text-capable drawings, quick line
   color/width/style changes, quick fill color and fill visibility changes,
-  quick text color/font-size/family/weight/style changes, duplicate, delete,
-  z-order, hide/show, and lock/unlock actions expose the same selected-action
-  descriptors as web and dispatch existing mobile drawing commands or
-  app-owned properties UI.
+  quick text color/font-size/family/weight/style changes plus rich-text
+  underline/strike-through/wrap toggles, duplicate, delete, z-order, hide/show,
+  and lock/unlock actions expose the same selected-action descriptors as web
+  and dispatch existing mobile drawing commands or app-owned properties UI.
 
 Phase 3: Dismissal and focus
 
