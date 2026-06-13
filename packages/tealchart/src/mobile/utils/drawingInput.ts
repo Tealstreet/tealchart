@@ -16,6 +16,18 @@ export interface ResolveMobileUserDrawingInputPointOptions {
   bars?: readonly Bar[];
 }
 
+export interface ResolveMobileUserDrawingPlacementConstraintOptions {
+  propConstrained?: boolean;
+  overrideConstrained?: boolean | null;
+}
+
+export function resolveMobileUserDrawingPlacementConstraintEnabled({
+  propConstrained = false,
+  overrideConstrained = null,
+}: ResolveMobileUserDrawingPlacementConstraintOptions): boolean {
+  return overrideConstrained ?? propConstrained;
+}
+
 export function resolveMobileUserDrawingInputPoint({
   point,
   viewport,
