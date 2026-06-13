@@ -4,6 +4,7 @@ import {
   commitMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHistoryCommand,
+  dispatchMobileUserDrawingKeyboardAction,
 } from './drawingCommands';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
@@ -54,7 +55,7 @@ function createMobileStateWithTable(): UserDrawingState {
 
 describe('mobile drawing handle command dispatch', () => {
   it('commits changed handle commands and preserves boolean results', () => {
-    const commit = vi.fn();
+    const commit = vi.fn<(state: UserDrawingState) => void>();
     const state = createMobileStateWithTrendLine();
 
     const changed = commitMobileUserDrawingHandleCommand(
@@ -130,6 +131,45 @@ describe('mobile drawing handle command dispatch', () => {
     const undo = undoUserDrawingCommand(result.state, result.history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
+  it('routes mobile keyboard actions through shared history state', () => {
+    const state = createMobileStateWithTrendLine();
+    let history = createUserDrawingCommandHistory();
+    const deleted = dispatchMobileUserDrawingKeyboardAction(state, history, { key: 'Delete' });
+
+    expect(deleted.action?.type).toBe('deleteSelected');
+    expect(deleted.changed).toBe(true);
+    expect(deleted.state.drawings).toEqual([]);
+    expect(deleted.history.undoStack).toHaveLength(1);
+
+    history = deleted.history;
+    const undo = dispatchMobileUserDrawingKeyboardAction(deleted.state, history, { key: 'z', metaKey: true });
+
+    expect(undo.action?.type).toBe('undo');
+    expect(undo.changed).toBe(true);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+    expect(undo.history.redoStack).toHaveLength(1);
+
+    const redo = dispatchMobileUserDrawingKeyboardAction(undo.state, undo.history, { key: 'Z', metaKey: true, shiftKey: true });
+
+    expect(redo.action?.type).toBe('redo');
+    expect(redo.changed).toBe(true);
+    expect(redo.state.drawings).toEqual([]);
+  });
+
+  it('routes mobile escape keyboard action to draft cancellation without recording undo history', () => {
+    const state = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'rect', now: () => 41, style },
+    );
+    const result = dispatchMobileUserDrawingKeyboardAction(state, createUserDrawingCommandHistory(), { key: 'Escape' });
+
+    expect(result.action?.type).toBe('cancelDraft');
+    expect(result.changed).toBe(true);
+    expect(result.state.draft).toBeNull();
+    expect(result.history.undoStack).toHaveLength(0);
   });
 
   it('records mobile two-anchor placement drag as one undoable drawing creation', () => {
