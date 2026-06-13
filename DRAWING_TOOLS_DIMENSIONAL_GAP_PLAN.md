@@ -396,11 +396,17 @@ Phase 1: Minimal panel surface
 
 - Add a web object tree panel/surface that can be opened by app UI or widget API.
 - Keep the initial UI compact and utilitarian.
+- Status: app-owned web panel integration is exposed through widget APIs for
+  resolving and opening the shared object-tree model, with an
+  `onUserDrawingObjectTreeOpen` callback for toolbar/sidebar hosts.
 
 Phase 2: Row actions
 
 - Wire selection, visibility, lock, delete, duplicate, and z-order through
   shared commands.
+- Status: web widget object-tree dispatch routes row actions through the
+  shared command resolver and injects chart-owned duplicate IDs so callers do
+  not need internal ID factories.
 
 Phase 3: Multi-select
 
@@ -412,10 +418,15 @@ Phase 3: Multi-select
 Phase 1: Mobile panel/sheet
 
 - Add a mobile object tree sheet using the same shared row model.
+- Status: mobile Skia exposes matching handle methods and an
+  `onUserDrawingObjectTreeOpen` prop so app-owned sheets can use the same row
+  model as web.
 
 Phase 2: Row actions
 
 - Wire mobile row actions to the same shared commands.
+- Status: mobile Skia dispatches object-tree actions through the same shared
+  command resolver with mobile-owned duplicate ID generation.
 
 Phase 3: Multi-select
 

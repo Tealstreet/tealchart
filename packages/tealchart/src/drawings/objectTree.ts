@@ -59,6 +59,12 @@ export type UserDrawingObjectTreeMutationAction =
   | { type: 'rename'; drawingId: string; name: string | null; includeLocked?: boolean };
 
 export type UserDrawingObjectTreeAction = UserDrawingObjectTreeSelectionAction | UserDrawingObjectTreeMutationAction;
+export type UserDrawingObjectTreeDispatchAction =
+  | UserDrawingObjectTreeSelectionAction
+  | Exclude<UserDrawingObjectTreeMutationAction, { type: 'duplicate' }>
+  | (Omit<Extract<UserDrawingObjectTreeMutationAction, { type: 'duplicate' }>, 'createId'> & {
+      createId?: DuplicateUserDrawingOptions['createId'];
+    });
 
 export interface UserDrawingObjectTreeCommandOptions {
   now?: UpdateUserDrawingOptions['now'];

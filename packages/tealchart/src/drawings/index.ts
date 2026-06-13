@@ -468,6 +468,7 @@ export type {
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeCommandOptions,
+  UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeMutationAction,
   UserDrawingObjectTreeOptions,
   UserDrawingObjectTreeOrder,

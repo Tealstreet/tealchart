@@ -12,6 +12,10 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingObjectTreeAction,
+  UserDrawingObjectTreeDispatchAction,
+  UserDrawingObjectTreeModel,
+  UserDrawingObjectTreeOptions,
   UserDrawingContextActionItem,
   UserDrawingEditDrag,
   UserDrawingCommandHistory,
@@ -55,6 +59,8 @@ import {
   normalizeUserDrawingFontSize,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
+  resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeModel,
   serializeUserDrawingStateForLayout,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
 } from './drawings';
@@ -2319,6 +2325,10 @@ export class TealchartWidget {
     return this.dispatchUserDrawingCommand({ type: 'updateStyle', style, options, meta: { source: 'api' } });
   }
 
+  setUserDrawingName(drawingId: string, name: string | null, options: UpdateUserDrawingOptions = {}): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'setName', drawingId, name, options, meta: { source: 'api' } });
+  }
+
   setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
     return this.dispatchUserDrawingCommand({ type: 'setTextAlign', textAlign, options, meta: { source: 'api' } });
   }
@@ -2412,6 +2422,29 @@ export class TealchartWidget {
 
   sendUserDrawingToBack(options: UpdateUserDrawingOptions = {}): boolean {
     return this.reorderUserDrawings('sendToBack', options);
+  }
+
+  getUserDrawingObjectTreeModel(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
+    return resolveUserDrawingObjectTreeModel(this._userDrawingState, options);
+  }
+
+  openUserDrawingObjectTree(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
+    const model = this.getUserDrawingObjectTreeModel(options);
+    this._options.onUserDrawingObjectTreeOpen?.(model);
+    return model;
+  }
+
+  dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean {
+    const resolvedAction: UserDrawingObjectTreeAction =
+      action.type === 'duplicate' ? { ...action, createId: action.createId ?? (() => this._createUserDrawingId()) } : action;
+    const commands = resolveUserDrawingObjectTreeActionCommands(this._userDrawingState, resolvedAction, {
+      now: () => Date.now(),
+    });
+    let changed = false;
+    for (const command of commands) {
+      changed = this.dispatchUserDrawingCommand(command) || changed;
+    }
+    return changed;
   }
 
   private _createUserDrawingId(): string {
