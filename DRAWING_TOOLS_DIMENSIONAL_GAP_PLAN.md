@@ -694,12 +694,18 @@ Phase 3: Mobile interaction/model tests
 
 - Cover touch placement, Skia render output, mobile action surfaces, object tree
   actions, and mobile handle APIs.
+- Status: mobile command-history tests cover object-tree hide, duplicate, and
+  z-order actions through the shared dispatch resolver. Existing mobile render
+  model tests cover selected/draft Skia primitives and action-surface geometry.
 
 Phase 4: Visual parity checklist
 
 - Maintain a manual screenshot checklist for selected state, draft state,
   toolbar/context surfaces, object tree, and text/property editing on desktop
   and mobile viewport sizes.
+- Status: `DRAWING_TOOLS_VISUAL_EVIDENCE.md` defines required desktop/mobile
+  viewport families, drawing states, regression checks, and a PR evidence
+  template for manual visual parity capture.
 
 ## First Implementation Recommendation
 
