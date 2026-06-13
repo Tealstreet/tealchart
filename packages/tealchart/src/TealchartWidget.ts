@@ -39,8 +39,6 @@ import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } 
 
 import { LOADING_OPACITY } from './constants';
 import {
-  applyUserDrawingEditDrag,
-  beginUserDrawingEditDragAtPoint,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
@@ -48,7 +46,6 @@ import {
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
-  resolveUserDrawingSelectionAtPoint,
   serializeUserDrawingStateForLayout,
 } from './drawings';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
@@ -2456,12 +2453,22 @@ export class TealchartWidget {
       return { state: this._userDrawingState, hit: false, changed: false };
     }
 
-    const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId, {
-      additive: options.additive,
-      hitTest: this._getUserDrawingHitTestOptions(),
+    const result = dispatchUserDrawingCommand(this._userDrawingState, {
+      type: 'selectAtPoint',
+      point,
+      spacesByPaneId,
+      options: {
+        additive: options.additive,
+        hitTest: this._getUserDrawingHitTestOptions(),
+      },
+      meta: { source: 'pointer' },
     });
     this.setUserDrawingState(result.state);
-    return result;
+    return {
+      state: result.state,
+      hit: result.hit ?? false,
+      changed: result.changed,
+    };
   }
 
   private _handleUserDrawingEditStart(
@@ -2470,12 +2477,18 @@ export class TealchartWidget {
   ): boolean {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
-    const result = beginUserDrawingEditDragAtPoint(this._userDrawingState, point, spacesByPaneId, {
-      hitTest: this._getUserDrawingHitTestOptions(),
+    const result = dispatchUserDrawingCommand(this._userDrawingState, {
+      type: 'beginEditDragAtPoint',
+      point,
+      spacesByPaneId,
+      options: {
+        hitTest: this._getUserDrawingHitTestOptions(),
+      },
+      meta: { source: 'pointer', transactionKey: 'edit-drag' },
     });
-    if (!result.hit || !result.drag) return false;
+    if (!result.hit || !result.editDrag) return false;
 
-    this._userDrawingEditDrag = result.drag;
+    this._userDrawingEditDrag = result.editDrag;
     this.setUserDrawingState(result.state);
     return true;
   }
@@ -2483,10 +2496,12 @@ export class TealchartWidget {
   private _handleUserDrawingEditMove(point: DrawingScreenPoint): boolean {
     if (!this._userDrawingEditDrag) return false;
 
-    const previousState = this._userDrawingState;
-    const nextState = applyUserDrawingEditDrag(this._userDrawingState, this._userDrawingEditDrag, point);
-    this.setUserDrawingState(nextState);
-    return nextState !== previousState;
+    return this.dispatchUserDrawingCommand({
+      type: 'applyEditDrag',
+      drag: this._userDrawingEditDrag,
+      point,
+      meta: { source: 'pointer', transactionKey: 'edit-drag' },
+    });
   }
 
   private _handleUserDrawingEditEnd(): void {
@@ -2499,8 +2514,14 @@ export class TealchartWidget {
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ): void {
     if (this._userDrawingState.activeTool === 'select') {
-      const result = resolveUserDrawingSelectionAtPoint(this._userDrawingState, point, spacesByPaneId, {
-        hitTest: this._getUserDrawingHitTestOptions(),
+      const result = dispatchUserDrawingCommand(this._userDrawingState, {
+        type: 'selectAtPoint',
+        point,
+        spacesByPaneId,
+        options: {
+          hitTest: this._getUserDrawingHitTestOptions(),
+        },
+        meta: { source: 'pointer' },
       });
       const selectedId = result.state.selection?.drawingId;
       const selectedDrawing = selectedId

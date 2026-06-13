@@ -97,8 +97,6 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
-  applyUserDrawingEditDrag,
-  beginUserDrawingEditDragAtPoint,
   createUserDrawingState,
   dispatchUserDrawingCommand,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
@@ -106,7 +104,6 @@ import {
   measureUserDrawingTextLines,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
-  resolveUserDrawingSelectionAtPoint,
   resolveUserDrawingTextEditMetrics,
   USER_DRAWING_FONT_FAMILIES,
 } from './drawings';
@@ -1232,16 +1229,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (effectiveUserDrawingState.activeTool === 'select') {
         if (!isPointInChartArea(x, y)) return false;
 
-        const selection = resolveUserDrawingSelectionAtPoint(
-          effectiveUserDrawingState,
-          { x, y },
-          userDrawingSpacesByPaneId,
-          { additive, hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
-        );
+        const selection = dispatchUserDrawingCommand(effectiveUserDrawingState, {
+          type: 'selectAtPoint',
+          point: { x, y },
+          spacesByPaneId: userDrawingSpacesByPaneId,
+          options: { additive, hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
+          meta: { source: 'touch' },
+        });
         if (selection.changed) {
           commitUserDrawingState(selection.state);
         }
-        return selection.hit || selection.changed;
+        return (selection.hit ?? false) || selection.changed;
       }
 
       const point = resolveMobileUserDrawingInputPoint({
@@ -1301,12 +1299,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
       if (effectiveUserDrawingState.activeTool !== 'select') return false;
 
-      const result = beginUserDrawingEditDragAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
-        hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+      const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
+        type: 'beginEditDragAtPoint',
+        point: { x, y },
+        spacesByPaneId: userDrawingSpacesByPaneId,
+        options: {
+          hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+        },
+        meta: { source: 'touch', transactionKey: 'edit-drag' },
       });
-      if (!result.hit || !result.drag) return false;
+      if (!result.hit || !result.editDrag) return false;
 
-      userDrawingEditDragRef.current = result.drag;
+      userDrawingEditDragRef.current = result.editDrag;
       if (result.changed) {
         commitUserDrawingState(result.state);
       }
@@ -1349,9 +1353,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const drag = userDrawingEditDragRef.current;
       if (!drag) return;
 
-      const nextState = applyUserDrawingEditDrag(effectiveUserDrawingState, drag, { x, y });
-      if (nextState !== effectiveUserDrawingState) {
-        commitUserDrawingState(nextState);
+      const result = dispatchUserDrawingCommand(effectiveUserDrawingState, {
+        type: 'applyEditDrag',
+        drag,
+        point: { x, y },
+        meta: { source: 'touch', transactionKey: 'edit-drag' },
+      });
+      if (result.changed) {
+        commitUserDrawingState(result.state);
       }
     },
     [
@@ -1478,12 +1487,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
       if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
-        const selection = resolveUserDrawingSelectionAtPoint(
-          effectiveUserDrawingState,
-          { x, y },
-          userDrawingSpacesByPaneId,
-          { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
-        );
+        const selection = dispatchUserDrawingCommand(effectiveUserDrawingState, {
+          type: 'selectAtPoint',
+          point: { x, y },
+          spacesByPaneId: userDrawingSpacesByPaneId,
+          options: { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
+          meta: { source: 'touch' },
+        });
         const selectedId = selection.state.selection?.drawingId;
         const selectedDrawing = selectedId
           ? selection.state.drawings.find((drawing) => drawing.id === selectedId)
