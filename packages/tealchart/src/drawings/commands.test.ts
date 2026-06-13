@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { dispatchUserDrawingCommand } from './commands';
+import { beginUserDrawingEditDragAtPoint } from './editing';
 import {
   appendUserDrawingPathDragPoint,
   beginUserDrawingPathDrag,
@@ -12,6 +13,7 @@ import {
   duplicateUserDrawing,
   handleUserDrawingInput,
   reorderUserDrawings,
+  resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   setUserDrawingIconName,
   setUserDrawingImageSource,
@@ -25,11 +27,19 @@ import {
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
+import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingState } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
+const coordinateSpace: DrawingCoordinateSpace = {
+  viewport: { startTime: 0, endTime: 3_000, priceMin: 90, priceMax: 120 },
+  pane: { id: 'main', top: 0, height: 300, bottom: 300, yMin: 90, yMax: 120 },
+  chartLeft: 0,
+  chartRight: 300,
+};
+const spacesByPaneId = new Map([['main', coordinateSpace]]);
 
 function createStateWithTrendLine(): UserDrawingState {
   const first = handleUserDrawingInput(
@@ -180,6 +190,55 @@ describe('user drawing command dispatch', () => {
         options: { createId: () => 'path-1', now: () => 61, style },
       }).state,
     ).toEqual(commitUserDrawingPathDrag(appended, { createId: () => 'path-1', now: () => 61, style }));
+  });
+
+  it('wraps point selection and edit drag reducers with hit metadata', () => {
+    const state = createStateWithTrendLine();
+    const hitPoint = { x: 100, y: 200 };
+    const selectedDirect = resolveUserDrawingSelectionAtPoint(state, hitPoint, spacesByPaneId);
+    const selectedCommand = dispatchUserDrawingCommand(state, {
+      type: 'selectAtPoint',
+      point: hitPoint,
+      spacesByPaneId,
+      meta: { source: 'pointer' },
+    });
+
+    expect(selectedCommand.state).toEqual(selectedDirect.state);
+    expect(selectedCommand.changed).toBe(true);
+    expect(selectedCommand.hit).toBe(true);
+    expect(selectedCommand.state.selection).toEqual({ drawingId: 'trend-line', handle: 'start' });
+
+    const dragDirect = beginUserDrawingEditDragAtPoint(selectedCommand.state, hitPoint, spacesByPaneId);
+    const dragCommand = dispatchUserDrawingCommand(selectedCommand.state, {
+      type: 'beginEditDragAtPoint',
+      point: hitPoint,
+      spacesByPaneId,
+      meta: { source: 'pointer', transactionKey: 'edit-drag' },
+    });
+
+    expect(dragCommand.state).toEqual(dragDirect.state);
+    expect(dragCommand.hit).toBe(true);
+    expect(dragCommand.editDrag).toEqual(dragDirect.drag);
+    expect(dragCommand.editDrag).not.toBeNull();
+
+    const drag = dragCommand.editDrag;
+    if (!drag) throw new Error('expected edit drag metadata');
+
+    const movePoint = { x: 110, y: 190 };
+    const movedCommand = dispatchUserDrawingCommand(dragCommand.state, {
+      type: 'applyEditDrag',
+      drag,
+      point: movePoint,
+      meta: { source: 'pointer', transactionKey: 'edit-drag' },
+    });
+
+    expect(movedCommand.changed).toBe(true);
+    const movedDrawing = movedCommand.state.drawings[0];
+    expect(movedDrawing?.kind).toBe('trendLine');
+    if (movedDrawing?.kind !== 'trendLine') throw new Error('expected trend line drawing');
+    expect(movedDrawing.points[0]).not.toEqual(anchorA);
+    expect(movedDrawing.points[0]?.time).toBeGreaterThan(anchorA.time);
+    expect(movedDrawing.points[0]?.price).toBeGreaterThan(anchorA.price);
   });
 
   it('wraps image, table, text alignment, icon, and visibility reducers', () => {

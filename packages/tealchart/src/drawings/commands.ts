@@ -1,4 +1,5 @@
 import type {
+  UserDrawingSelectionInputOptions,
   DeleteUserDrawingOptions,
   DuplicateUserDrawingOptions,
   UpdateUserDrawingOptions,
@@ -13,6 +14,8 @@ import type {
   UserDrawingTextEditOptions,
   UserDrawingZOrderAction,
 } from './input';
+import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
+import type { BeginUserDrawingEditDragOptions, UserDrawingEditDrag } from './editing';
 import type {
   UserDrawingHandleRole,
   UserDrawingIconName,
@@ -40,6 +43,7 @@ import {
   insertUserDrawingTableColumn,
   insertUserDrawingTableRow,
   reorderUserDrawings,
+  resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   selectUserDrawingsById,
   setUserDrawingIconName,
@@ -57,6 +61,7 @@ import {
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
+import { applyUserDrawingEditDrag, beginUserDrawingEditDragAtPoint } from './editing';
 
 export type UserDrawingCommandSource =
   | 'pointer'
@@ -83,6 +88,23 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setActiveTool'; tool: UserDrawingTool })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
   | (UserDrawingCommandBase & { type: 'selectMany'; drawingIds: readonly string[] })
+  | (UserDrawingCommandBase & {
+      type: 'selectAtPoint';
+      point: DrawingScreenPoint;
+      spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>;
+      options?: UserDrawingSelectionInputOptions;
+    })
+  | (UserDrawingCommandBase & {
+      type: 'beginEditDragAtPoint';
+      point: DrawingScreenPoint;
+      spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>;
+      options?: BeginUserDrawingEditDragOptions;
+    })
+  | (UserDrawingCommandBase & {
+      type: 'applyEditDrag';
+      drag: UserDrawingEditDrag;
+      point: DrawingScreenPoint;
+    })
   | (UserDrawingCommandBase & { type: 'delete'; options?: DeleteUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'duplicate'; options: DuplicateUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'clear' })
@@ -155,12 +177,37 @@ export interface UserDrawingCommandDispatchResult {
   changed: boolean;
   command: UserDrawingCommand;
   meta?: UserDrawingCommandMetadata;
+  hit?: boolean;
+  editDrag?: UserDrawingEditDrag | null;
 }
 
 export function dispatchUserDrawingCommand(
   state: UserDrawingState,
   command: UserDrawingCommand,
 ): UserDrawingCommandDispatchResult {
+  if (command.type === 'selectAtPoint') {
+    const result = resolveUserDrawingSelectionAtPoint(state, command.point, command.spacesByPaneId, command.options);
+    return {
+      state: result.state,
+      changed: result.changed,
+      command,
+      meta: command.meta,
+      hit: result.hit,
+    };
+  }
+
+  if (command.type === 'beginEditDragAtPoint') {
+    const result = beginUserDrawingEditDragAtPoint(state, command.point, command.spacesByPaneId, command.options);
+    return {
+      state: result.state,
+      changed: result.changed,
+      command,
+      meta: command.meta,
+      hit: result.hit,
+      editDrag: result.drag,
+    };
+  }
+
   const nextState = reduceUserDrawingCommand(state, command);
   return {
     state: nextState,
@@ -178,6 +225,12 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return selectUserDrawingById(state, command.drawingId, command.handle);
     case 'selectMany':
       return selectUserDrawingsById(state, command.drawingIds);
+    case 'selectAtPoint':
+      return resolveUserDrawingSelectionAtPoint(state, command.point, command.spacesByPaneId, command.options).state;
+    case 'beginEditDragAtPoint':
+      return beginUserDrawingEditDragAtPoint(state, command.point, command.spacesByPaneId, command.options).state;
+    case 'applyEditDrag':
+      return applyUserDrawingEditDrag(state, command.drag, command.point);
     case 'delete':
       return deleteUserDrawing(state, command.options);
     case 'duplicate':
