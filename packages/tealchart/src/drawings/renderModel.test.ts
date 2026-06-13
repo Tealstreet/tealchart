@@ -104,7 +104,21 @@ describe('user drawing render model', () => {
   });
 
   it('keeps drag-seeded multi-anchor drafts renderable after drag release', () => {
-    const dragSeedTools = ['triangle', 'curve', 'arc', 'polyline', 'rotatedRectangle'] as const;
+    const dragSeedTools = [
+      'triangle',
+      'curve',
+      'arc',
+      'polyline',
+      'rotatedRectangle',
+      'parallelChannel',
+      'regressionTrend',
+      'flatTopBottom',
+      'pitchfork',
+      'schiffPitchfork',
+      'modifiedSchiffPitchfork',
+      'insidePitchfork',
+      'pitchfan',
+    ] as const;
 
     for (const tool of dragSeedTools) {
       const state: UserDrawingState = {
@@ -136,6 +150,37 @@ describe('user drawing render model', () => {
         ],
       });
     }
+  });
+
+  it('keeps drag-seeded multi-anchor drafts renderable during active drag preview', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'parallelChannel',
+      selection: null,
+      drawings: [],
+      draft: {
+        tool: 'parallelChannel',
+        paneId: 'main',
+        anchors: [{ time: 10, price: 90 }],
+        style,
+        startedAt: 2,
+      },
+      textEdit: null,
+    };
+
+    expect(
+      resolveUserDrawingRenderEntries(state, {
+        draftPreviewAnchor: { time: 40, price: 60 },
+      })[0]?.drawing,
+    ).toMatchObject({
+      id: '__draft__',
+      kind: 'parallelChannel',
+      points: [
+        { time: 10, price: 90 },
+        { time: 40, price: 60 },
+        { time: 40, price: 60 },
+      ],
+    });
   });
 
   it('marks every drawing in a grouped selection as selected', () => {
