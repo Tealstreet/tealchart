@@ -136,6 +136,7 @@ import {
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
+  shouldRenderUserDrawingSelectedActionSurface,
   resolveUserDrawingPlacementConstraint,
   resolveUserDrawingTextEditMetrics,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
@@ -4572,7 +4573,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         />
       )}
 
-      {userDrawingSelectionActionAnchor && userDrawingSelectedActionSurface.selectedDrawing && (
+      {shouldRenderUserDrawingSelectedActionSurface(effectiveUserDrawingState, userDrawingSelectionActionAnchor) && (
         <View
           style={[
             styles.userDrawingActionSurface,
