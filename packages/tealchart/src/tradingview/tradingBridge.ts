@@ -130,7 +130,7 @@ export class TradingViewTradingBridge {
       element.style.cursor = '';
     };
     const onPointerUp = (event: PointerEvent) => {
-      const point = this.eventPoint(event);
+      const point = this.activeDrag ? this.eventPoint(event, { allowOutside: true }) : this.eventPoint(event);
       const activeDrag = this.activeDrag;
       const hit = point ? this.findHit(point) : null;
       if (activeDrag || hit) {
@@ -398,11 +398,11 @@ export class TradingViewTradingBridge {
     return buttonRects;
   }
 
-  private eventPoint(event: PointerEvent): Point | null {
+  private eventPoint(event: PointerEvent, options: { allowOutside?: boolean } = {}): Point | null {
     if (!this.attachedElement || !this.lastFrame) return null;
     const rect = elementBounds(this.lastFrame.ctx.canvas) ?? elementBounds(this.attachedElement);
     if (!rect) return null;
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+    if (!options.allowOutside && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) {
       return null;
     }
     return {

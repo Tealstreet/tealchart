@@ -318,6 +318,42 @@ describe('TradingViewTradingBridge', () => {
     });
   });
 
+  it('commits active order drags released outside the rendered canvas bounds', () => {
+    const onIntent = vi.fn();
+    const bridge = new TradingViewTradingBridge({
+      state: {
+        orders: [
+          {
+            kind: 'order',
+            id: 'order-1',
+            orderId: 'external-order-1',
+            price: 100,
+            editable: true,
+          },
+        ],
+      },
+      onIntent,
+    });
+    const container = document.createElement('div');
+    container.getBoundingClientRect = vi.fn(() => domRect({ left: 0, top: 0, width: 500, height: 300 }));
+    const ctx = createRecordingContext(domRect({ left: 50, top: 30, width: 400, height: 200 }));
+
+    bridge.draw(frame(ctx));
+    const detach = bridge.attach(container);
+
+    container.dispatchEvent(pointerMouseEvent('pointerdown', { clientX: 80, clientY: 130, pointerId: 7 }));
+    window.dispatchEvent(pointerMouseEvent('pointerup', { clientX: 80, clientY: 10, pointerId: 7 }));
+    detach();
+
+    expect(onIntent).toHaveBeenCalledWith({
+      type: 'order.move.commit',
+      source: 'tradingview-bridge',
+      orderId: 'external-order-1',
+      lineId: 'chart_trading_order_order-1',
+      price: 220,
+    });
+  });
+
   it('preserves active drags through editable order state refreshes', () => {
     const onIntent = vi.fn();
     const bridge = new TradingViewTradingBridge({
