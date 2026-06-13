@@ -458,6 +458,7 @@ export type {
   UserDrawingClipboard,
   UserDrawingInputOptions,
   UserDrawingInputPoint,
+  NudgeUserDrawingSelectionOptions,
   PasteUserDrawingOptions,
   UserDrawingRenderOptions,
   UserDrawingRenderEntry,
