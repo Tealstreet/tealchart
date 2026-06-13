@@ -617,8 +617,22 @@ describe('user drawing input controller', () => {
     });
   });
 
-  it('seeds geometric multi-anchor drawings from placement drag before final click', () => {
-    const dragSeedTools = ['triangle', 'curve', 'arc', 'polyline', 'rotatedRectangle'] as const;
+  it('seeds supported multi-anchor drawings from placement drag before final click', () => {
+    const dragSeedTools = [
+      'triangle',
+      'curve',
+      'arc',
+      'polyline',
+      'rotatedRectangle',
+      'parallelChannel',
+      'regressionTrend',
+      'flatTopBottom',
+      'pitchfork',
+      'schiffPitchfork',
+      'modifiedSchiffPitchfork',
+      'insidePitchfork',
+      'pitchfan',
+    ] as const;
 
     for (const tool of dragSeedTools) {
       const state = setUserDrawingTool(createUserDrawingState(), tool);

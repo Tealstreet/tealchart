@@ -53,7 +53,21 @@ const dragTwoAnchorTools: UserDrawingTool[] = [
   'timeCycles',
   'sineLine',
 ];
-const dragSeedTools: UserDrawingTool[] = ['triangle', 'curve', 'arc', 'polyline', 'rotatedRectangle'];
+const dragSeedTools: UserDrawingTool[] = [
+  'triangle',
+  'curve',
+  'arc',
+  'polyline',
+  'rotatedRectangle',
+  'parallelChannel',
+  'regressionTrend',
+  'flatTopBottom',
+  'pitchfork',
+  'schiffPitchfork',
+  'modifiedSchiffPitchfork',
+  'insidePitchfork',
+  'pitchfan',
+];
 
 function point(time: number, price: number): UserDrawingInputPoint {
   return {
@@ -71,6 +85,8 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('trendLine')).toBe('dragTwoAnchor');
     expect(getUserDrawingPlacementMode('ellipse')).toBe('dragTwoAnchor');
     expect(getUserDrawingPlacementMode('triangle')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('parallelChannel')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('pitchfork')).toBe('dragSeed');
   });
 
   it('classifies supported two-anchor tools as drag placement tools', () => {
@@ -87,9 +103,9 @@ describe('user drawing placement modes', () => {
     }
   });
 
-  it('keeps multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
-    expect(isUserDrawingDragPlacementTool('parallelChannel')).toBe(false);
-    expect(getUserDrawingPlacementMode('parallelChannel')).toBe('click');
+  it('keeps unsupported multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
+    expect(isUserDrawingDragPlacementTool('disjointChannel')).toBe(false);
+    expect(getUserDrawingPlacementMode('disjointChannel')).toBe('click');
   });
 
   it('constrains shape placement drags to a visual square', () => {

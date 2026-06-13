@@ -636,43 +636,57 @@ describe('mobile drawing handle command dispatch', () => {
     }
   });
 
-  it('records mobile geometric drag-seeded placement after the final tap', () => {
-    const state = setUserDrawingTool(createUserDrawingState(), 'triangle');
-    const history = createUserDrawingCommandHistory();
-    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'beginPlacementDrag',
-      point: { paneId: 'main', anchor: anchorA },
-      meta: { source: 'touch' },
-    });
-    const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-      type: 'commitPlacementDrag',
-      point: { paneId: 'main', anchor: anchorB },
-      options: { createId: () => 'triangle', now: () => 43, style },
-      meta: { source: 'touch' },
-    });
-    const committed = dispatchMobileUserDrawingHistoryCommand(seeded.state, seeded.history, {
-      type: 'handleInput',
-      point: { paneId: 'main', anchor: anchorC },
-      options: { createId: () => 'triangle', now: () => 44, style },
-      meta: { source: 'touch' },
-    });
+  it('records mobile drag-seeded multi-anchor placement after the final tap', () => {
+    const dragSeedTools: UserDrawingTool[] = [
+      'triangle',
+      'parallelChannel',
+      'regressionTrend',
+      'flatTopBottom',
+      'pitchfork',
+      'schiffPitchfork',
+      'modifiedSchiffPitchfork',
+      'insidePitchfork',
+      'pitchfan',
+    ];
 
-    expect(started.changed).toBe(true);
-    expect(seeded.changed).toBe(true);
-    expect(seeded.history.undoStack).toHaveLength(0);
-    expect(seeded.state.drawings).toEqual([]);
-    expect(seeded.state.draft).toMatchObject({
-      tool: 'triangle',
-      anchors: [anchorA, anchorB],
-    });
-    expect(committed.changed).toBe(true);
-    expect(committed.history.undoStack).toHaveLength(1);
-    expect(committed.state.draft).toBeNull();
-    expect(committed.state.drawings[0]).toMatchObject({
-      id: 'triangle',
-      kind: 'triangle',
-      points: [anchorA, anchorB, anchorC],
-    });
+    for (const tool of dragSeedTools) {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const history = createUserDrawingCommandHistory();
+      const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'beginPlacementDrag',
+        point: { paneId: 'main', anchor: anchorA },
+        meta: { source: 'touch' },
+      });
+      const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+        type: 'commitPlacementDrag',
+        point: { paneId: 'main', anchor: anchorB },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
+        meta: { source: 'touch' },
+      });
+      const committed = dispatchMobileUserDrawingHistoryCommand(seeded.state, seeded.history, {
+        type: 'handleInput',
+        point: { paneId: 'main', anchor: anchorC },
+        options: { createId: () => `${tool}-drawing`, now: () => 44, style },
+        meta: { source: 'touch' },
+      });
+
+      expect(started.changed, tool).toBe(true);
+      expect(seeded.changed, tool).toBe(true);
+      expect(seeded.history.undoStack, tool).toHaveLength(0);
+      expect(seeded.state.drawings, tool).toEqual([]);
+      expect(seeded.state.draft, tool).toMatchObject({
+        tool,
+        anchors: [anchorA, anchorB],
+      });
+      expect(committed.changed, tool).toBe(true);
+      expect(committed.history.undoStack, tool).toHaveLength(1);
+      expect(committed.state.draft, tool).toBeNull();
+      expect(committed.state.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB, anchorC],
+      });
+    }
   });
 
   it('records mobile path-family drags as one undoable drawing creation', () => {
