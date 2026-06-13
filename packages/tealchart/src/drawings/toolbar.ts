@@ -193,6 +193,19 @@ export interface UserDrawingSelectedActionSurface {
   groups: readonly UserDrawingSelectedActionSurfaceGroup[];
 }
 
+export interface UserDrawingActionSurfacePositionOptions {
+  anchor: { x: number; y: number };
+  viewport: { width: number; height: number };
+  surface: { width: number; height: number };
+  inset?: Partial<{ left: number; right: number; top: number; bottom: number }>;
+  offsetY?: number;
+}
+
+export interface UserDrawingActionSurfacePosition {
+  left: number;
+  top: number;
+}
+
 export type UserDrawingStyleToolbarActionState =
   | {
       enabled: true;
@@ -741,6 +754,31 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
         };
       }),
     })),
+  };
+}
+
+function clampNumber(value: number, min: number, max: number): number {
+  if (max < min) return min;
+  return Math.max(min, Math.min(max, value));
+}
+
+export function resolveUserDrawingActionSurfacePosition({
+  anchor,
+  viewport,
+  surface,
+  inset = {},
+  offsetY = -42,
+}: UserDrawingActionSurfacePositionOptions): UserDrawingActionSurfacePosition {
+  const leftInset = inset.left ?? 8;
+  const rightInset = inset.right ?? 8;
+  const topInset = inset.top ?? 8;
+  const bottomInset = inset.bottom ?? 8;
+  const preferredLeft = anchor.x - surface.width / 2;
+  const preferredTop = anchor.y + offsetY;
+
+  return {
+    left: clampNumber(preferredLeft, leftInset, viewport.width - rightInset - surface.width),
+    top: clampNumber(preferredTop, topInset, viewport.height - bottomInset - surface.height),
   };
 }
 

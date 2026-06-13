@@ -133,6 +133,7 @@ import {
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
+  resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingPlacementConstraint,
@@ -195,6 +196,7 @@ const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
 const USER_DRAWING_ACTION_SURFACE_WIDTH = 268;
+const USER_DRAWING_ACTION_SURFACE_HEIGHT = 40;
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
 
@@ -4596,16 +4598,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <View
           style={[
             styles.userDrawingActionSurface,
-            {
-              left: Math.max(
-                8,
-                Math.min(
-                  Math.max(8, dimensions.width - USER_DRAWING_ACTION_SURFACE_WIDTH - 8),
-                  userDrawingSelectionActionAnchor.anchor.x - USER_DRAWING_ACTION_SURFACE_WIDTH / 2,
-                ),
-              ),
-              top: Math.max(TOP_BAR_HEIGHT + 6, userDrawingSelectionActionAnchor.anchor.y - 42),
-            },
+            resolveUserDrawingActionSurfacePosition({
+              anchor: userDrawingSelectionActionAnchor.anchor,
+              viewport: { width: dimensions.width, height: dimensions.height },
+              surface: { width: USER_DRAWING_ACTION_SURFACE_WIDTH, height: USER_DRAWING_ACTION_SURFACE_HEIGHT },
+              inset: { left: 8, right: 8, top: TOP_BAR_HEIGHT + 6, bottom: 8 },
+            }),
           ]}
           pointerEvents="box-none"
         >
