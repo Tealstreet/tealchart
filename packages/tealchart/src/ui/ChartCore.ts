@@ -27,6 +27,7 @@ import type {
 import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
+import { computePaneGeometry } from '../layout/chartGeometry';
 import { renderUserDrawingLayer, resolveUserDrawingInputPointFromChart } from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
@@ -1478,16 +1479,14 @@ export class ChartCore {
 
   private getPaneAtY(y: number): { paneId: string; yMin: number; yMax: number; paneHeight: number } | null {
     const layout = this.getUnifiedLayout();
-    const timeAxisHeight = layout.timeAxisHeight;
-    const topMargin = this.margins.top;
-    const availableHeight = this.options.height - timeAxisHeight - topMargin;
+    const panes = computePaneGeometry({
+      paneLayout: layout,
+      height: this.options.height,
+      topOffset: this.margins.top,
+    });
 
-    let currentTop = topMargin;
-    for (const pane of layout.panes) {
-      const paneHeight = availableHeight * pane.heightRatio;
-      const paneBottom = currentTop + paneHeight;
-
-      if (y >= currentTop && y < paneBottom) {
+    for (const pane of panes) {
+      if (y >= pane.top && y < pane.bottom) {
         let yMin = pane.yMin;
         let yMax = pane.yMax;
 
@@ -1497,10 +1496,8 @@ export class ChartCore {
           yMax = this.viewport.priceMax;
         }
 
-        return { paneId: pane.id, yMin, yMax, paneHeight };
+        return { paneId: pane.id, yMin, yMax, paneHeight: pane.height };
       }
-
-      currentTop = paneBottom;
     }
 
     return null;
@@ -1537,26 +1534,22 @@ export class ChartCore {
     if (!this.viewport) return null;
 
     const layout = this.getUnifiedLayout();
-    const timeAxisHeight = layout.timeAxisHeight;
-    const topMargin = this.margins.top;
-    const availableHeight = this.options.height - timeAxisHeight - topMargin;
-    let currentTop = topMargin;
-
-    const panes = layout.panes.map((pane) => {
-      const height = availableHeight * pane.heightRatio;
+    const panes = computePaneGeometry({
+      paneLayout: layout,
+      height: this.options.height,
+      topOffset: this.margins.top,
+    }).map((pane) => {
       const yRange =
         pane.type === 'main' && !pane.fixedRange
           ? { yMin: this.viewport!.priceMin, yMax: this.viewport!.priceMax }
           : { yMin: pane.yMin, yMax: pane.yMax };
-      const resolvedPane = {
+      return {
         id: pane.id,
-        top: currentTop,
-        height,
-        bottom: currentTop + height,
+        top: pane.top,
+        height: pane.height,
+        bottom: pane.bottom,
         ...yRange,
       };
-      currentTop += height;
-      return resolvedPane;
     });
 
     const point = resolveUserDrawingInputPointFromChart({
@@ -1628,12 +1621,14 @@ export class ChartCore {
 
   private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {
     const layout = this.getUnifiedLayout();
-    const availableHeight = this.options.height - layout.timeAxisHeight - this.margins.top;
-    let currentTop = this.margins.top;
+    const computedPanes = computePaneGeometry({
+      paneLayout: layout,
+      height: this.options.height,
+      topOffset: this.margins.top,
+    });
     const spaces = new Map<string, DrawingCoordinateSpace>();
 
-    for (const pane of layout.panes) {
-      const height = availableHeight * pane.heightRatio;
+    for (const pane of computedPanes) {
       const yRange =
         pane.type === 'main' && !pane.fixedRange
           ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
@@ -1642,16 +1637,15 @@ export class ChartCore {
         viewport,
         pane: {
           id: pane.id,
-          top: currentTop,
-          height,
-          bottom: currentTop + height,
+          top: pane.top,
+          height: pane.height,
+          bottom: pane.bottom,
           ...yRange,
         },
         chartLeft: this.margins.left,
         chartRight: this.options.width - this.margins.right,
         bars: pane.type === 'main' ? this.bars : undefined,
       });
-      currentTop += height;
     }
 
     return spaces;
@@ -1664,18 +1658,18 @@ export class ChartCore {
     // Need at least 2 panes for a divider
     if (panes.length < 2) return null;
 
-    const timeAxisHeight = layout.timeAxisHeight;
-    const topMargin = this.margins.top;
-    const availableHeight = this.options.height - timeAxisHeight - topMargin;
+    const computedPanes = computePaneGeometry({
+      paneLayout: layout,
+      height: this.options.height,
+      topOffset: this.margins.top,
+    });
 
     const DIVIDER_HIT_ZONE = 6; // Pixels around divider that count as "over divider"
 
-    let currentTop = topMargin;
-    for (let i = 0; i < panes.length - 1; i++) {
+    for (let i = 0; i < computedPanes.length - 1; i++) {
       const pane = panes[i];
       const nextPane = panes[i + 1];
-      const paneHeight = availableHeight * pane.heightRatio;
-      const dividerY = currentTop + paneHeight;
+      const dividerY = computedPanes[i]!.bottom;
 
       // Check if y is within hit zone of this divider
       if (Math.abs(y - dividerY) <= DIVIDER_HIT_ZONE) {
@@ -1688,8 +1682,6 @@ export class ChartCore {
           paneBelowRatio: nextPane.heightRatio,
         };
       }
-
-      currentTop += paneHeight;
     }
 
     return null;
