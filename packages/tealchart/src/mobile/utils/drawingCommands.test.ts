@@ -217,6 +217,69 @@ describe('mobile drawing handle command dispatch', () => {
     });
   });
 
+  it('records mobile style, visibility, lock, and z-order commands through shared history', () => {
+    let state = duplicateUserDrawing(createMobileStateWithTrendLine(), {
+      createId: () => 'copy',
+      now: () => 30,
+    });
+    state = { ...state, selection: { drawingId: 'line' } };
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'updateStyle',
+      style: { lineColor: '#00ff88' },
+      options: { drawingId: 'line', now: () => 31 },
+      meta: { source: 'toolbar' },
+    }));
+    expect(state.drawings[0]?.style.lineColor).toBe('#00ff88');
+    let undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]?.style.lineColor).toBe('#fff');
+    let redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]?.style.lineColor).toBe('#00ff88');
+    state = redo.state;
+    history = redo.history;
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'setVisibility',
+      visible: false,
+      options: { drawingId: 'line', now: () => 32 },
+      meta: { source: 'objectTree' },
+    }));
+    expect(state.drawings[0]?.visible).toBe(false);
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]?.visible).toBe(true);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]?.visible).toBe(false);
+    state = undo.state;
+    history = undo.history;
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'setLocked',
+      locked: true,
+      options: { drawingId: 'line', now: () => 33 },
+      meta: { source: 'toolbar' },
+    }));
+    expect(state.drawings[0]?.locked).toBe(true);
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]?.locked).toBe(false);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]?.locked).toBe(true);
+    state = redo.state;
+    history = redo.history;
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'reorder',
+      action: 'sendToBack',
+      options: { drawingId: 'copy' },
+      meta: { source: 'contextMenu' },
+    }));
+    expect(state.drawings.map((drawing) => drawing.id)).toEqual(['copy', 'line']);
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings.map((drawing) => drawing.id)).toEqual(['copy', 'line']);
+  });
+
   it('defines mobile command failure returns for stale IDs and locked drawings', () => {
     const state = {
       ...createMobileStateWithTrendLine(),

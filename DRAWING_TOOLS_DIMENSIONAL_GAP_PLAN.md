@@ -146,10 +146,11 @@ Phase 4: Mobile handle/API integration
 ### Epic 2.3: History Validation
 
 Status: in progress. Shared history tests cover creation, duplicate/edit drag,
-text edits, redo clearing, and coalescing. Web widget and mobile Skia command
-adapter tests now also validate tap/click-created drawings: draft inputs stay
-out of history, final placement records one undoable transaction, and redo
-restores the committed drawing.
+text edits, style changes, lock/visibility, z-order, redo clearing, and
+coalescing. Web widget and mobile Skia command adapter tests now also validate
+tap/click-created drawings and selected action mutations: draft inputs stay out
+of history, final placement records one undoable transaction, action commands
+record undoable transactions, and redo restores the committed state.
 
 Phase 1: Shared tests
 

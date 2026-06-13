@@ -1019,6 +1019,10 @@ describe('TealchartWidget', () => {
 
       expect(widget.sendUserDrawingToBack({ drawingId: 'c' })).toBe(true);
       expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['c', 'b', 'a']);
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['b', 'a', 'c']);
+      expect(widget.redoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['c', 'b', 'a']);
 
       expect(widget.reorderUserDrawings('bringToFront', { drawingId: 'missing' })).toBe(false);
       expect(onChange).toHaveBeenCalled();
@@ -1054,8 +1058,26 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
         style: expect.objectContaining({ lineColor: '#00ffcc', lineWidth: 3 }),
       });
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        style: expect.objectContaining({ lineColor: '#f5c542', lineWidth: 1 }),
+      });
+      expect(widget.redoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        style: expect.objectContaining({ lineColor: '#00ffcc', lineWidth: 3 }),
+      });
 
       expect(widget.setUserDrawingLocked(true)).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        selection: null,
+        drawings: [expect.objectContaining({ id: 'line', locked: true })],
+      });
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        selection: { drawingId: 'line' },
+        drawings: [expect.objectContaining({ id: 'line', locked: false })],
+      });
+      expect(widget.redoUserDrawingCommand()).toBe(true);
       expect(widget.getUserDrawingState()).toMatchObject({
         selection: null,
         drawings: [expect.objectContaining({ id: 'line', locked: true })],
