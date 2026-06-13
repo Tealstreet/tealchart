@@ -16,6 +16,7 @@ export type UserDrawingKeyboardActionType =
   | 'duplicateSelected'
   | 'nudge'
   | 'selectAll'
+  | 'clearSelection'
   | 'deleteSelected'
   | 'cancelDraft';
 
@@ -81,6 +82,10 @@ export function resolveUserDrawingKeyboardAction(
 
   if (input.key === 'Escape' && !hasAnyModifier(input) && state.draft) {
     return { type: 'cancelDraft', preventDefault: true };
+  }
+
+  if (input.key === 'Escape' && !hasAnyModifier(input) && state.selection) {
+    return { type: 'clearSelection', preventDefault: true };
   }
 
   return null;
