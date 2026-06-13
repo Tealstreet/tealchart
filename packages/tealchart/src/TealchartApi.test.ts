@@ -1,4 +1,4 @@
-import type { ChartTradingIntent } from './trading';
+import type { ChartTradingIntent, ChartTradingState } from './trading';
 import type { FullOrderLineAdapter, FullPositionLineAdapter } from './types';
 
 import { describe, expect, it, vi } from 'vitest';
@@ -217,5 +217,175 @@ describe('TealchartApi trading intents', () => {
     });
 
     expect(onIntent).not.toHaveBeenCalled();
+  });
+
+  it('subscribes to intents through the trading facade', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const onIntent = vi.fn();
+    const unsubscribe = api.trading().onIntent(onIntent);
+
+    api.emitTradingIntent({ type: 'order.cancel', orderId: 'order-1', source: 'programmatic' });
+    unsubscribe();
+    api.emitTradingIntent({ type: 'order.cancel', orderId: 'order-2', source: 'programmatic' });
+
+    expect(onIntent).toHaveBeenCalledOnce();
+    expect(onIntent).toHaveBeenCalledWith({ type: 'order.cancel', orderId: 'order-1', source: 'programmatic' });
+  });
+
+  it('renders typed trading state through native line adapters', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const intents = collectTradingIntents(api);
+
+    api.trading().setState({
+      orders: [
+        {
+          kind: 'order',
+          id: 'order-line-1',
+          orderId: 'order-1',
+          price: 50_000,
+          side: 'buy',
+          quantity: '0.5 BTC',
+          editable: true,
+          actions: [{ id: 'cancel', label: 'Cancel' }],
+          brackets: { takeProfit: 52_000, stopLoss: 49_000 },
+          partialEnabled: true,
+          label: { primary: 'Limit', secondary: 'LMT', quantity: '0.5' },
+          style: { lineColor: '#123456', lineStyle: 'dashed', lineWidth: 2, lineLength: 60, extendLeft: true },
+        },
+      ],
+      positions: [
+        {
+          kind: 'position',
+          id: 'position-line-1',
+          positionId: 'BTCUSDT:long',
+          price: 49_500,
+          side: 'long',
+          quantity: '1 BTC',
+          notional: 49_500,
+          closeable: true,
+          reversible: true,
+          brackets: { takeProfit: 53_000 },
+          partialEnabled: true,
+          profitState: 'positive',
+          label: { primary: 'Long', secondary: '+120.00', quantity: '1', pnl: '+120.00' },
+        },
+      ],
+      executions: [
+        {
+          kind: 'execution',
+          id: 'fill-1',
+          price: 49_750,
+          time: 1_700_000_000,
+          direction: 'buy',
+          label: { primary: 'Fill', secondary: 'Filled 1 BTC' },
+          style: { lineColor: '#00ff00' },
+        },
+      ],
+      custom: [{ kind: 'custom', id: 'custom-1', price: 51_000, type: 'alert', meta: { source: 'test' } }],
+    });
+
+    const order = api.getOrderLinesRenderData()[0];
+    expect(order).toMatchObject({
+      id: 'chart_trading_order_order-line-1',
+      orderId: 'order-1',
+      price: 50_000,
+      text: 'Limit',
+      textShort: 'LMT',
+      quantity: '0.5',
+      lineColor: '#123456',
+      lineStyle: 2,
+      lineWidth: 2,
+      lineLength: 60,
+      extendLeft: true,
+      editable: true,
+      cancellable: true,
+      brackets: { takeProfit: 52_000, stopLoss: 49_000 },
+      partialEnabled: true,
+    });
+
+    const position = api.getPositionLinesRenderData()[0];
+    expect(position).toMatchObject({
+      id: 'chart_trading_position_position-line-1',
+      positionId: 'BTCUSDT:long',
+      price: 49_500,
+      text: 'Long',
+      textShort: '+120.00',
+      quantity: '1',
+      pnl: '+120.00',
+      profitState: 'positive',
+      closeable: true,
+      reversible: true,
+      brackets: { takeProfit: 53_000, stopLoss: undefined },
+      partialEnabled: true,
+      positionData: { entryPrice: 49_500, notional: 49_500, isLong: true },
+    });
+
+    const execution = api.getExecutionLinesRenderData()[0];
+    expect(execution).toMatchObject({
+      id: 'chart_trading_execution_fill-1',
+      price: 49_750,
+      time: 1_700_000_000,
+      direction: 'buy',
+      text: 'Fill',
+      tooltip: 'Filled 1 BTC',
+      arrowColor: '#00ff00',
+    });
+
+    order.callbacks?.onCancel?.();
+    position.callbacks?.onClose?.();
+    position.callbacks?.onReverse?.();
+
+    expect(intents).toEqual([
+      { type: 'order.cancel', orderId: 'order-1', lineId: order.id, source: 'native-line' },
+      { type: 'position.close', positionId: 'BTCUSDT:long', lineId: position.id, source: 'native-line' },
+      { type: 'position.reverse', positionId: 'BTCUSDT:long', lineId: position.id, source: 'native-line' },
+    ]);
+    expect(api.trading().getState().custom?.[0]?.meta).toEqual({ source: 'test' });
+  });
+
+  it('reconciles facade-owned trading lines without removing legacy lines', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const legacyLine = (await api.createOrderLine({ price: 1 })) as FullOrderLineAdapter;
+    legacyLine.setOrderId('legacy-order').setText('Legacy');
+
+    const firstState: ChartTradingState = {
+      orders: [
+        { kind: 'order', id: 'a', price: 10, label: { primary: 'A' } },
+        { kind: 'order', id: 'b', price: 20, label: { primary: 'B' }, actions: [{ id: 'cancel', label: 'Cancel' }] },
+      ],
+    };
+    api.setTradingState(firstState);
+
+    expect(api.getOrderLinesRenderData().map((line) => line.id)).toEqual(['order_1', 'chart_trading_order_a', 'chart_trading_order_b']);
+
+    api.setTradingState({
+      orders: [{ kind: 'order', id: 'b', price: 25, label: { primary: 'B2' }, actions: [] }],
+    });
+
+    const orders = api.getOrderLinesRenderData();
+    expect(orders.map((line) => line.id)).toEqual(['order_1', 'chart_trading_order_b']);
+    expect(orders.find((line) => line.id === 'order_1')).toMatchObject({ orderId: 'legacy-order', text: 'Legacy' });
+    expect(orders.find((line) => line.id === 'chart_trading_order_b')).toMatchObject({
+      price: 25,
+      text: 'B2',
+      cancellable: false,
+    });
+  });
+
+  it('toggles facade-owned position controls from state', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+
+    api.setTradingState({
+      positions: [{ kind: 'position', id: 'pos', price: 10, closeable: true, reversible: true }],
+    });
+    expect(api.getPositionLinesRenderData()[0]).toMatchObject({ closeable: true, reversible: true });
+
+    api.setTradingState({
+      positions: [{ kind: 'position', id: 'pos', price: 10, closeable: false, reversible: false }],
+    });
+    const renderData = api.getPositionLinesRenderData()[0];
+    expect(renderData).toMatchObject({ closeable: false, reversible: false });
+    expect(renderData.callbacks?.onClose).toBeUndefined();
+    expect(renderData.callbacks?.onReverse).toBeUndefined();
   });
 });

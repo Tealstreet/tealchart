@@ -28,14 +28,17 @@ export type {
   ChartTradingLabel,
   ChartTradingLineActionIntent,
   ChartTradingLineBase,
+  ChartTradingLineDash,
   ChartTradingLineSide,
   ChartTradingLineStatus,
+  ChartTradingLineStyle,
   ChartTradingOrderCancelIntent,
   ChartTradingOrderLine,
   ChartTradingOrderMoveCommitIntent,
   ChartTradingPositionCloseIntent,
   ChartTradingPositionLine,
   ChartTradingPositionReverseIntent,
+  ChartTradingProfitState,
   ChartTradingState,
 } from './trading';
 

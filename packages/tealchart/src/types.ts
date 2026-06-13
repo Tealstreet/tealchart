@@ -573,6 +573,8 @@ export interface IPositionLineAdapter {
   setProtectTooltipText(text: string): this;
   onClose(callback: () => void): this;
   onReverse(callback: () => void): this;
+  setCloseable(closeable: boolean): this;
+  setReversible(reversible: boolean): this;
   onModify(callback: (text: string, price: number) => void): this;
   getPrice(): number;
 }

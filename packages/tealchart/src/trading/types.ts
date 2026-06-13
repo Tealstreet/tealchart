@@ -6,6 +6,27 @@ export type ChartTradingIntentSource = 'native-line' | 'tradingview-bridge' | 'p
 
 export type ChartTradingBracketOwnerType = 'order' | 'position';
 
+export type ChartTradingProfitState = 'positive' | 'negative' | 'neutral';
+
+export type ChartTradingLineDash = 'solid' | 'dotted' | 'dashed' | 'long-dashed' | 0 | 1 | 2 | 4;
+
+export interface ChartTradingLineStyle {
+  lineColor?: string;
+  lineStyle?: ChartTradingLineDash;
+  lineWidth?: number;
+  lineLength?: number;
+  extendLeft?: boolean;
+  bodyBackgroundColor?: string;
+  bodyTextColor?: string;
+  bodyBorderColor?: string;
+  quantityBackgroundColor?: string;
+  quantityTextColor?: string;
+  quantityBorderColor?: string;
+  actionBackgroundColor?: string;
+  actionIconColor?: string;
+  actionBorderColor?: string;
+}
+
 export interface ChartTradingBracketConfig {
   takeProfit?: number;
   stopLoss?: number;
@@ -33,6 +54,7 @@ export interface ChartTradingLineBase {
   side?: ChartTradingLineSide;
   status?: ChartTradingLineStatus;
   label?: ChartTradingLabel;
+  style?: ChartTradingLineStyle;
   actions?: readonly ChartTradingAction[];
   meta?: unknown;
 }
@@ -51,8 +73,10 @@ export interface ChartTradingPositionLine extends ChartTradingLineBase {
   kind: 'position';
   positionId?: string;
   quantity?: string | number;
+  notional?: number;
   closeable?: boolean;
   reversible?: boolean;
+  profitState?: ChartTradingProfitState;
   brackets?: ChartTradingBracketConfig | null;
   partialEnabled?: boolean;
 }
@@ -148,5 +172,5 @@ export type ChartTradingIntentHandler = (intent: ChartTradingIntent) => void;
 export interface ChartTradingApi {
   setState(state: ChartTradingState): void;
   getState(): ChartTradingState;
-  onIntent(handler: ChartTradingIntentHandler): void;
+  onIntent(handler: ChartTradingIntentHandler): () => void;
 }

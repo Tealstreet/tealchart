@@ -4,7 +4,16 @@
  */
 
 import { Subscription } from './events/EventEmitter';
-import type { ChartTradingIntent, ChartTradingIntentHandler } from './trading';
+import type {
+  ChartTradingApi,
+  ChartTradingExecutionLine,
+  ChartTradingIntent,
+  ChartTradingIntentHandler,
+  ChartTradingLineStyle,
+  ChartTradingOrderLine,
+  ChartTradingPositionLine,
+  ChartTradingState,
+} from './trading';
 import {
   BracketConfig,
   CrossHairMovedEventParams,
@@ -62,6 +71,11 @@ export class TealchartApi {
   private _symbolChangedSubscription: Subscription<() => void>;
   private _intervalChangedSubscription: Subscription<(interval: ResolutionString) => void>;
   private _tradingIntentSubscription: Subscription<ChartTradingIntentHandler>;
+  private _chartTradingApi: ChartTradingApi | null = null;
+  private _chartTradingState: ChartTradingState = {};
+  private _chartTradingOrderLineIds: Map<string, string> = new Map();
+  private _chartTradingPositionLineIds: Map<string, string> = new Map();
+  private _chartTradingExecutionLineIds: Map<string, string> = new Map();
 
   // Trading lines
   private _orderLines: Map<string, InternalOrderLineAdapter> = new Map();
@@ -165,6 +179,38 @@ export class TealchartApi {
     return this._tradingIntentSubscription;
   }
 
+  /**
+   * High-level chart trading facade for state-driven order, position, and execution rendering.
+   */
+  trading(): ChartTradingApi {
+    if (!this._chartTradingApi) {
+      this._chartTradingApi = {
+        setState: (state) => this.setTradingState(state),
+        getState: () => this.getTradingState(),
+        onIntent: (handler) => {
+          this._tradingIntentSubscription.subscribe(null, handler);
+          return () => this._tradingIntentSubscription.unsubscribe(null, handler);
+        },
+      };
+    }
+
+    return this._chartTradingApi;
+  }
+
+  /**
+   * Set the state rendered by the high-level chart trading facade.
+   */
+  setTradingState(state: ChartTradingState): void {
+    this._setTradingState(state);
+  }
+
+  /**
+   * Get the last state passed to the high-level chart trading facade.
+   */
+  getTradingState(): ChartTradingState {
+    return this._cloneTradingState(this._chartTradingState);
+  }
+
   // ============================================================================
   // Internal methods for emitting events (called by widget/renderer)
   // ============================================================================
@@ -200,6 +246,268 @@ export class TealchartApi {
    */
   emitCurrentInterval(): void {
     this._intervalChangedSubscription.emit(this._interval);
+  }
+
+  private _setTradingState(state: ChartTradingState): void {
+    const nextState = this._cloneTradingState(state);
+
+    this._syncChartTradingOrders(nextState.orders ?? []);
+    this._syncChartTradingPositions(nextState.positions ?? []);
+    this._syncChartTradingExecutions(nextState.executions ?? []);
+    this._chartTradingState = nextState;
+    this._onLinesChanged?.();
+  }
+
+  private _cloneTradingState(state: ChartTradingState): ChartTradingState {
+    return {
+      orders: state.orders ? [...state.orders] : undefined,
+      positions: state.positions ? [...state.positions] : undefined,
+      executions: state.executions ? [...state.executions] : undefined,
+      custom: state.custom ? [...state.custom] : undefined,
+    };
+  }
+
+  private _syncChartTradingOrders(orders: readonly ChartTradingOrderLine[]): void {
+    const nextIds = new Set(orders.map((order) => order.id));
+
+    for (const [id, lineId] of this._chartTradingOrderLineIds) {
+      if (!nextIds.has(id)) {
+        this._orderLines.delete(lineId);
+        this._chartTradingOrderLineIds.delete(id);
+      }
+    }
+
+    for (const order of orders) {
+      const lineId = this._ownedTradingLineId('order', order.id);
+      let adapter = this._orderLines.get(lineId);
+      if (!adapter) {
+        adapter = this._createOrderLineAdapter(lineId, { price: order.price });
+        this._orderLines.set(lineId, adapter);
+      }
+
+      this._chartTradingOrderLineIds.set(order.id, lineId);
+      this._applyChartTradingOrder(adapter, order);
+    }
+  }
+
+  private _syncChartTradingPositions(positions: readonly ChartTradingPositionLine[]): void {
+    const nextIds = new Set(positions.map((position) => position.id));
+
+    for (const [id, lineId] of this._chartTradingPositionLineIds) {
+      if (!nextIds.has(id)) {
+        this._positionLines.delete(lineId);
+        this._chartTradingPositionLineIds.delete(id);
+      }
+    }
+
+    for (const position of positions) {
+      const lineId = this._ownedTradingLineId('position', position.id);
+      let adapter = this._positionLines.get(lineId);
+      if (!adapter) {
+        adapter = this._createPositionLineAdapter(lineId, { price: position.price });
+        this._positionLines.set(lineId, adapter);
+      }
+
+      this._chartTradingPositionLineIds.set(position.id, lineId);
+      this._applyChartTradingPosition(adapter, position);
+    }
+  }
+
+  private _syncChartTradingExecutions(executions: readonly ChartTradingExecutionLine[]): void {
+    const nextIds = new Set(executions.map((execution) => execution.id));
+
+    for (const [id, lineId] of this._chartTradingExecutionLineIds) {
+      if (!nextIds.has(id)) {
+        this._executionLines.delete(lineId);
+        this._chartTradingExecutionLineIds.delete(id);
+      }
+    }
+
+    for (const execution of executions) {
+      const lineId = this._ownedTradingLineId('execution', execution.id);
+      let adapter = this._executionLines.get(lineId);
+      if (!adapter) {
+        adapter = this._createExecutionLineAdapter(lineId);
+        this._executionLines.set(lineId, adapter);
+      }
+
+      this._chartTradingExecutionLineIds.set(execution.id, lineId);
+      this._applyChartTradingExecution(adapter, execution);
+    }
+  }
+
+  private _ownedTradingLineId(kind: 'order' | 'position' | 'execution', id: string): string {
+    return `chart_trading_${kind}_${id}`;
+  }
+
+  private _applyChartTradingOrder(adapter: InternalOrderLineAdapter, order: ChartTradingOrderLine): void {
+    const style = order.style;
+    const text = order.label?.primary ?? this._defaultTradingLabel(order.side, 'Order');
+    const textShort = order.label?.secondary ?? text;
+    const quantity = this._formatTradingQuantity(order.label?.quantity ?? order.quantity);
+    const cancellable = order.cancellable === true || this._hasEnabledTradingAction(order.actions, 'cancel');
+    const editable = order.editable === true;
+
+    adapter
+      .setOrderId(order.orderId ?? order.id)
+      .setPrice(order.price)
+      .setText(text)
+      .setQuantity(quantity)
+      .setEditable(editable)
+      .setCancellable(cancellable);
+
+    adapter.setTextShort?.(textShort);
+    adapter.setQuantityShort?.(quantity);
+    adapter.setBrackets?.(this._toBracketConfig(order.brackets));
+    adapter.setPartialEnabled?.(order.partialEnabled === true);
+
+    if (editable) {
+      adapter.onMove(() => {});
+    }
+    if (cancellable) {
+      adapter.onCancel(() => {});
+    }
+
+    this._applyOrderTradingStyle(adapter, style, this._tradingLineColor(order.side, 'order'));
+  }
+
+  private _applyChartTradingPosition(adapter: InternalPositionLineAdapter, position: ChartTradingPositionLine): void {
+    const style = position.style;
+    const text = position.label?.primary ?? this._defaultTradingLabel(position.side, 'Position');
+    const textShort = position.label?.secondary ?? text;
+    const quantity = this._formatTradingQuantity(position.label?.quantity ?? position.quantity);
+    const closeable = position.closeable === true || this._hasEnabledTradingAction(position.actions, 'close');
+    const reversible = position.reversible === true || this._hasEnabledTradingAction(position.actions, 'reverse');
+    const isLong = position.side !== 'short' && position.side !== 'sell';
+
+    adapter
+      .setPositionId(position.positionId ?? position.id)
+      .setPrice(position.price)
+      .setText(text)
+      .setQuantity(quantity)
+      .setCloseable(closeable)
+      .setReversible(reversible);
+
+    adapter.setTextShort?.(textShort);
+    adapter.setQuantityShort?.(quantity);
+    adapter.setPnl?.(position.label?.pnl ?? position.label?.secondary ?? '');
+    adapter.setPnlShort?.(position.label?.pnl ?? position.label?.secondary ?? '');
+    adapter.setProfitState?.(position.profitState ?? 'neutral');
+    adapter.setPositionData?.({
+      entryPrice: position.price,
+      notional: position.notional ?? 0,
+      isLong,
+    });
+    adapter.setBrackets?.(this._toBracketConfig(position.brackets));
+    adapter.setPartialEnabled?.(position.partialEnabled === true);
+
+    if (closeable) {
+      adapter.onClose(() => {});
+    }
+    if (reversible) {
+      adapter.onReverse(() => {});
+    }
+
+    this._applyPositionTradingStyle(adapter, style, this._tradingLineColor(position.side, 'position'));
+  }
+
+  private _applyChartTradingExecution(adapter: InternalExecutionLineAdapter, execution: ChartTradingExecutionLine): void {
+    const color = execution.style?.lineColor ?? this._tradingLineColor(execution.direction, 'order');
+
+    adapter
+      .setPrice(execution.price)
+      .setTime(execution.time)
+      .setDirection(execution.direction)
+      .setText(execution.label?.primary ?? execution.direction.toUpperCase())
+      .setTooltip(execution.label?.secondary ?? '')
+      .setArrowColor(color);
+  }
+
+  private _toBracketConfig(brackets: ChartTradingOrderLine['brackets']): BracketConfig | null {
+    if (!brackets) return null;
+    return {
+      takeProfit: brackets.takeProfit,
+      stopLoss: brackets.stopLoss,
+    };
+  }
+
+  private _formatTradingQuantity(quantity: string | number | undefined): string {
+    return quantity === undefined ? '' : String(quantity);
+  }
+
+  private _hasEnabledTradingAction(actions: readonly { id: string; disabled?: boolean }[] | undefined, id: string): boolean {
+    return actions?.some((action) => action.id === id && !action.disabled) ?? false;
+  }
+
+  private _defaultTradingLabel(side: ChartTradingOrderLine['side'], fallback: string): string {
+    if (!side) return fallback;
+    return side.toUpperCase();
+  }
+
+  private _tradingLineColor(side: ChartTradingOrderLine['side'], kind: 'order' | 'position'): string {
+    if (side === 'buy' || side === 'long') return '#22c55e';
+    if (side === 'sell' || side === 'short') return '#ef4444';
+    return kind === 'position' ? '#4CAF50' : '#2196F3';
+  }
+
+  private _lineStyleValue(style: ChartTradingLineStyle['lineStyle'] | undefined): number | undefined {
+    if (style === undefined) return undefined;
+    if (style === 'solid') return 0;
+    if (style === 'dotted') return 1;
+    if (style === 'dashed') return 2;
+    if (style === 'long-dashed') return 4;
+    return style;
+  }
+
+  private _applyOrderTradingStyle(
+    adapter: InternalOrderLineAdapter,
+    style: ChartTradingLineStyle | undefined,
+    defaultLineColor: string,
+  ): void {
+    adapter.setLineColor(style?.lineColor ?? defaultLineColor);
+    if (style?.lineStyle !== undefined) adapter.setLineStyle(this._lineStyleValue(style.lineStyle)!);
+    if (style?.lineWidth !== undefined) adapter.setLineWidth(style.lineWidth);
+    if (style?.lineLength !== undefined) adapter.setLineLength(style.lineLength);
+    if (style?.extendLeft !== undefined) adapter.setExtendLeft(style.extendLeft);
+    if (style?.bodyBackgroundColor) adapter.setBodyBackgroundColor(style.bodyBackgroundColor);
+    if (style?.bodyTextColor) adapter.setBodyTextColor(style.bodyTextColor);
+    if (style?.bodyBorderColor) adapter.setBodyBorderColor(style.bodyBorderColor);
+    if (style?.quantityBackgroundColor) adapter.setQuantityBackgroundColor(style.quantityBackgroundColor);
+    if (style?.quantityTextColor) adapter.setQuantityTextColor(style.quantityTextColor);
+    if (style?.quantityBorderColor) adapter.setQuantityBorderColor(style.quantityBorderColor);
+    if (style?.actionBackgroundColor) adapter.setCancelButtonBackgroundColor(style.actionBackgroundColor);
+    if (style?.actionIconColor) adapter.setCancelButtonIconColor(style.actionIconColor);
+    if (style?.actionBorderColor) adapter.setCancelButtonBorderColor(style.actionBorderColor);
+  }
+
+  private _applyPositionTradingStyle(
+    adapter: InternalPositionLineAdapter,
+    style: ChartTradingLineStyle | undefined,
+    defaultLineColor: string,
+  ): void {
+    adapter.setLineColor(style?.lineColor ?? defaultLineColor);
+    if (style?.lineStyle !== undefined) adapter.setLineStyle(this._lineStyleValue(style.lineStyle)!);
+    if (style?.lineWidth !== undefined) adapter.setLineWidth(style.lineWidth);
+    if (style?.lineLength !== undefined) adapter.setLineLength(style.lineLength);
+    if (style?.extendLeft !== undefined) adapter.setExtendLeft(style.extendLeft);
+    if (style?.bodyBackgroundColor) adapter.setBodyBackgroundColor(style.bodyBackgroundColor);
+    if (style?.bodyTextColor) adapter.setBodyTextColor(style.bodyTextColor);
+    if (style?.bodyBorderColor) adapter.setBodyBorderColor(style.bodyBorderColor);
+    if (style?.quantityBackgroundColor) adapter.setQuantityBackgroundColor(style.quantityBackgroundColor);
+    if (style?.quantityTextColor) adapter.setQuantityTextColor(style.quantityTextColor);
+    if (style?.quantityBorderColor) adapter.setQuantityBorderColor(style.quantityBorderColor);
+    if (style?.actionBackgroundColor) {
+      adapter.setCloseButtonBackgroundColor(style.actionBackgroundColor);
+      adapter.setReverseButtonBackgroundColor(style.actionBackgroundColor);
+    }
+    if (style?.actionIconColor) {
+      adapter.setCloseButtonIconColor(style.actionIconColor);
+      adapter.setReverseButtonIconColor(style.actionIconColor);
+    }
+    if (style?.actionBorderColor) {
+      adapter.setCloseButtonBorderColor(style.actionBorderColor);
+      adapter.setReverseButtonBorderColor(style.actionBorderColor);
+    }
   }
 
   // ============================================================================
@@ -640,7 +948,7 @@ export class TealchartApi {
               emitOrderBracketIntent('bracket.sl.commit', price, partialPercent);
               _onSLMoveEnd?.(price, partialPercent);
             },
-            onCancel: _onCancelCallback
+            onCancel: data.cancellable && _onCancelCallback
               ? () => {
                   emitOrderCancelIntent();
                   _onCancelCallback?.();
@@ -945,6 +1253,16 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      setCloseable(closeable: boolean) {
+        data.closeable = closeable;
+        notifyChange();
+        return this;
+      },
+      setReversible(reversible: boolean) {
+        data.reversible = reversible;
+        notifyChange();
+        return this;
+      },
       onModify(callback: (text: string, price: number) => void) {
         _onModifyCallback = callback;
         return this;
@@ -1052,13 +1370,13 @@ export class TealchartApi {
               emitPositionBracketIntent('bracket.sl.commit', price, partialPercent);
               _onSLMoveEnd?.(price, partialPercent);
             },
-            onClose: _onCloseCallback
+            onClose: data.closeable && _onCloseCallback
               ? () => {
                   emitPositionCloseIntent();
                   _onCloseCallback?.();
                 }
               : undefined,
-            onReverse: _onReverseCallback
+            onReverse: data.reversible && _onReverseCallback
               ? () => {
                   emitPositionReverseIntent();
                   _onReverseCallback?.();
@@ -1415,6 +1733,10 @@ export class TealchartApi {
     this._orderLines.clear();
     this._positionLines.clear();
     this._executionLines.clear();
+    this._chartTradingOrderLineIds.clear();
+    this._chartTradingPositionLineIds.clear();
+    this._chartTradingExecutionLineIds.clear();
+    this._chartTradingState = {};
     this._studies.clear();
   }
 
