@@ -11,7 +11,12 @@
  */
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { CrosshairState as EventCrosshairState, DrawingInputResult, PaneDividerInfo } from '../interaction/EventManager';
+import type {
+  CrosshairState as EventCrosshairState,
+  DrawingDragEventOptions,
+  DrawingInputResult,
+  PaneDividerInfo,
+} from '../interaction/EventManager';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -29,7 +34,12 @@ import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
-import { isUserDrawingDragPlacementTool, renderUserDrawingLayer, resolveUserDrawingInputPointFromChart } from '../drawings';
+import {
+  isUserDrawingDragPlacementTool,
+  renderUserDrawingLayer,
+  resolveUserDrawingInputPointFromChart,
+  resolveUserDrawingPlacementConstraint,
+} from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -535,6 +545,7 @@ export class ChartCore {
   private drawings: DrawingOutput[] = [];
   private userDrawingState: UserDrawingState | null = null;
   private userDrawingDraftPreviewAnchor: UserDrawingAnchor | null = null;
+  private userDrawingPlacementDragStartPoint: UserDrawingInputPoint | null = null;
   private userDrawingPlacementDragLastPoint: UserDrawingInputPoint | null = null;
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
@@ -730,8 +741,8 @@ export class ChartCore {
       getPaneAtY: (y) => this.getPaneAtY(y),
       onDrawingInput: (x, y, source, options) => this.handleUserDrawingInput(x, y, source, options),
       onDrawingDragPending: (x, y) => this.handleUserDrawingDragPending(x, y),
-      onDrawingDragStart: (x, y) => this.handleUserDrawingDragStart(x, y),
-      onDrawingDragMove: (x, y) => this.handleUserDrawingDragMove(x, y),
+      onDrawingDragStart: (x, y, _source, options) => this.handleUserDrawingDragStart(x, y, options),
+      onDrawingDragMove: (x, y, _source, options) => this.handleUserDrawingDragMove(x, y, options),
       onDrawingDragEnd: () => this.handleUserDrawingDragEnd(),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
@@ -1004,6 +1015,7 @@ export class ChartCore {
     this.userDrawingState = state;
     if (!state.draft) {
       this.userDrawingDraftPreviewAnchor = null;
+      this.userDrawingPlacementDragStartPoint = null;
       this.userDrawingPlacementDragLastPoint = null;
     }
     // No scheduleRender — paint() is called by the widget after pushing state
@@ -1579,14 +1591,30 @@ export class ChartCore {
     };
   }
 
-  private handleUserDrawingDragStart(x: number, y: number): boolean {
+  private resolveConstrainedUserDrawingPlacementPoint(
+    point: UserDrawingInputPoint,
+    options?: DrawingDragEventOptions,
+  ): UserDrawingInputPoint {
+    if (!this.viewport || !this.userDrawingState) return point;
+    return resolveUserDrawingPlacementConstraint({
+      tool: this.userDrawingState.activeTool,
+      startPoint: this.userDrawingPlacementDragStartPoint,
+      currentPoint: point,
+      spacesByPaneId: this.getUserDrawingSpaces(this.viewport),
+      options,
+    });
+  }
+
+  private handleUserDrawingDragStart(x: number, y: number, options?: DrawingDragEventOptions): boolean {
     if (!this.viewport) return false;
 
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y);
       if (!point || this.options.onUserDrawingPlacementDragStart?.(point) !== true) return false;
-      this.userDrawingDraftPreviewAnchor = point.anchor;
-      this.userDrawingPlacementDragLastPoint = point;
+      this.userDrawingPlacementDragStartPoint = point;
+      const previewPoint = this.resolveConstrainedUserDrawingPlacementPoint(point, options);
+      this.userDrawingDraftPreviewAnchor = previewPoint.anchor;
+      this.userDrawingPlacementDragLastPoint = previewPoint;
       this.scheduleRender();
       return true;
     }
@@ -1632,14 +1660,15 @@ export class ChartCore {
     return this.resolveUserDrawingInputPoint(x, y) !== null;
   }
 
-  private handleUserDrawingDragMove(x: number, y: number): boolean {
+  private handleUserDrawingDragMove(x: number, y: number, options?: DrawingDragEventOptions): boolean {
     if (!this.viewport) return false;
 
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y);
       if (!point || !this.userDrawingPlacementDragLastPoint) return false;
-      this.userDrawingDraftPreviewAnchor = point.anchor;
-      this.userDrawingPlacementDragLastPoint = point;
+      const previewPoint = this.resolveConstrainedUserDrawingPlacementPoint(point, options);
+      this.userDrawingDraftPreviewAnchor = previewPoint.anchor;
+      this.userDrawingPlacementDragLastPoint = previewPoint;
       this.scheduleRender();
       return true;
     }
@@ -1657,6 +1686,7 @@ export class ChartCore {
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       const point = this.userDrawingPlacementDragLastPoint;
       this.userDrawingDraftPreviewAnchor = null;
+      this.userDrawingPlacementDragStartPoint = null;
       this.userDrawingPlacementDragLastPoint = null;
       if (point) {
         this.options.onUserDrawingPlacementDragEnd?.(point);
