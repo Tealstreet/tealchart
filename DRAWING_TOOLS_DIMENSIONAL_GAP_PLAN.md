@@ -437,14 +437,20 @@ Phase 3: Multi-select
 Phase 1: Shared z-order tests
 
 - Verify object tree actions preserve drawing IDs and selection.
+- Status: shared object-tree z-order tests cover command dispatch preserving
+  drawing IDs, selection, and front-to-back model order.
 
 Phase 2: Web render-order tests
 
 - Verify canvas drawing order follows object tree z-order.
+- Status: web renderer tests assert committed drawing paint order follows
+  drawing z-order before selected handles.
 
 Phase 3: Mobile render-order tests
 
 - Verify Skia primitive order follows object tree z-order.
+- Status: mobile render-model tests assert committed drawing primitive order
+  follows drawing z-order before selected handles.
 
 ## Gap 6: Text and Property Edit Lifecycle
 
