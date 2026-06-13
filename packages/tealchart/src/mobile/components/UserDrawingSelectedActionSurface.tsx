@@ -59,7 +59,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
           inset: { left: 8, right: 8, top: topInset + 6, bottom: 8 },
         }),
       ]}
-      pointerEvents="box-none"
+      pointerEvents="auto"
     >
       {surface.groups.map((group, groupIndex) => (
         <View
