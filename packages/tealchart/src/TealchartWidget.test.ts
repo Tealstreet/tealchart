@@ -620,6 +620,7 @@ describe('TealchartWidget', () => {
       };
 
       expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
       expect(widget.getUserDrawingState().draft).toMatchObject({
         tool: 'trendLine',
         paneId: 'main',
@@ -635,6 +636,19 @@ describe('TealchartWidget', () => {
           { time: 1, price: 10 },
           { time: 2, price: 20 },
         ],
+      });
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        drawings: [],
+        draft: null,
+        selection: null,
+      });
+      expect(widget.canRedoUserDrawingCommand()).toBe(true);
+      expect(widget.redoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'drawing_1',
+        kind: 'trendLine',
       });
       expect(onChange).toHaveBeenCalled();
     });

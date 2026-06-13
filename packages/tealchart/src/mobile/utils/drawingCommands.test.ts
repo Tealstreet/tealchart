@@ -172,6 +172,51 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
   });
 
+  it('records mobile tap-created drawings only after final placement input', () => {
+    let state = setUserDrawingTool(createUserDrawingState(), 'trendLine');
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'line', now: () => 20, style },
+      meta: { source: 'touch', transactionKey: 'tap-placement' },
+    }));
+
+    expect(state.draft).toMatchObject({ tool: 'trendLine', anchors: [anchorA] });
+    expect(history.undoStack).toHaveLength(0);
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'line', now: () => 21, style },
+      meta: { source: 'touch', transactionKey: 'tap-placement' },
+    }));
+
+    expect(state.draft).toBeNull();
+    expect(state.selection).toEqual({ drawingId: 'line' });
+    expect(state.drawings[0]).toMatchObject({
+      id: 'line',
+      kind: 'trendLine',
+      points: [anchorA, anchorB],
+    });
+    expect(history.undoStack).toHaveLength(1);
+
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state).toMatchObject({
+      drawings: [],
+      draft: null,
+      selection: null,
+    });
+
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]).toMatchObject({
+      id: 'line',
+      kind: 'trendLine',
+      points: [anchorA, anchorB],
+    });
+  });
+
   it('defines mobile command failure returns for stale IDs and locked drawings', () => {
     const state = {
       ...createMobileStateWithTrendLine(),
