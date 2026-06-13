@@ -1220,6 +1220,49 @@ describe('TealchartWidget', () => {
       expect(opened).toMatchObject({ drawingId: 'locked', editable: false });
     });
 
+    it('defines public drawing API failure returns for unavailable targets and callbacks', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'locked' },
+        drawings: [
+          {
+            id: 'locked',
+            kind: 'textLabel',
+            paneId: 'main',
+            visible: true,
+            locked: true,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            point: { time: 1, price: 50 },
+            text: 'Locked label',
+            textAlign: 'center',
+          },
+        ],
+      });
+
+      expect(widget.deleteUserDrawing('missing')).toBe(false);
+      expect(widget.duplicateUserDrawing('missing')).toBe(false);
+      expect(widget.reorderUserDrawings('bringToFront', { drawingId: 'missing' })).toBe(false);
+      expect(widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'locked' })).toBe(false);
+      expect(widget.beginUserDrawingTextEdit('locked')).toBe(false);
+      expect(widget.beginUserDrawingTextEdit()).toBe(false);
+
+      expect(() => widget.openUserDrawingObjectTree()).not.toThrow();
+      expect(widget.openUserDrawingObjectTree().rows).toHaveLength(1);
+      expect(widget.openUserDrawingProperties('missing')).toBeNull();
+      expect(widget.getUserDrawingPropertiesIntent('missing')).toBeNull();
+      expect(widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'locked', includeLocked: true })).toBe(
+        true,
+      );
+    });
+
     it('applies public image source commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

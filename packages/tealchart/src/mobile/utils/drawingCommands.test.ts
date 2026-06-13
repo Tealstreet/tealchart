@@ -136,6 +136,47 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
   });
 
+  it('defines mobile command failure returns for stale IDs and locked drawings', () => {
+    const state = {
+      ...createMobileStateWithTrendLine(),
+      selection: { drawingId: 'line' },
+      drawings: createMobileStateWithTrendLine().drawings.map((drawing) => ({ ...drawing, locked: true })),
+    };
+    const history = createUserDrawingCommandHistory();
+
+    expect(
+      dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'delete',
+        options: { drawingId: 'missing' },
+        meta: { source: 'api' },
+      }).changed,
+    ).toBe(false);
+    expect(
+      dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'duplicate',
+        options: { drawingId: 'missing', createId: () => 'copy' },
+        meta: { source: 'api' },
+      }).changed,
+    ).toBe(false);
+    expect(
+      dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'updateStyle',
+        style: { lineColor: '#ffffff' },
+        options: { drawingId: 'line' },
+        meta: { source: 'api' },
+      }).changed,
+    ).toBe(false);
+
+    const forced = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'updateStyle',
+      style: { lineColor: '#ffffff' },
+      options: { drawingId: 'line', includeLocked: true },
+      meta: { source: 'api' },
+    });
+    expect(forced.changed).toBe(true);
+    expect(forced.state.drawings[0]?.style.lineColor).toBe('#ffffff');
+  });
+
   it('emits mobile drawing command events for changed history commands', () => {
     const state = createMobileStateWithTrendLine();
     const onEvent = vi.fn();
