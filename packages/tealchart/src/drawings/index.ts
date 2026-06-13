@@ -439,9 +439,10 @@ export {
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
-export { resolveUserDrawingPropertiesSurface } from './propertiesSurface';
+export { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 export { resolveUserDrawingObjectTreeActionCommands, resolveUserDrawingObjectTreeModel } from './objectTree';
 export type {
+  ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingPropertiesSurface,
   UserDrawingPropertiesSurfaceCommand,
   UserDrawingPropertiesSurfaceControl,
