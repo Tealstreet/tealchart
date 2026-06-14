@@ -48,6 +48,10 @@ describe('drawing visual evidence matrix', () => {
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
       expect(template).toContain(`- [ ] ${state.label}, if affected`);
     }
+    expect(template).toContain('Regression checks:');
+    for (const check of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.regressionChecks) {
+      expect(template).toContain(`- [ ] ${check}`);
+    }
     expect(template).toContain('Known visual gaps:');
   });
 });
