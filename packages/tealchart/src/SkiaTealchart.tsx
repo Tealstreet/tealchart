@@ -1432,6 +1432,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0, price: 0, time: 0 });
+  const closeContextMenu = useCallback(() => {
+    setContextMenuVisible(false);
+    setContextMenuItems([]);
+  }, []);
 
   // ==========================================================================
   // Bracket Drag Preview State (TP/SL drag on Skia canvas)
@@ -2016,12 +2020,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleUserDrawingContextMenu = useCallback(
     (x: number, y: number) => {
-      if (!viewport || effectiveUserDrawingState.activeTool !== 'select' || !isPointInChartArea(x, y)) return false;
+      if (!viewport || effectiveUserDrawingState.activeTool !== 'select' || !isPointInChartArea(x, y)) {
+        closeContextMenu();
+        return false;
+      }
 
       const result = resolveUserDrawingContextActionsAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
         hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
       });
-      if (!result.hit) return false;
+      if (!result.hit) {
+        closeContextMenu();
+        return false;
+      }
       if (result.changed) {
         commitUserDrawingState(result.state);
         const event = createUserDrawingCommandEvent(effectiveUserDrawingState, {
@@ -2040,6 +2050,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         if (event) {
           notifyUserDrawingCommand(event);
         }
+      }
+
+      if (result.items.length === 0) {
+        closeContextMenu();
+        return true;
       }
 
       setContextMenuItems(
@@ -2071,6 +2086,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [
       chartDimensions,
+      closeContextMenu,
       commitUserDrawingState,
       createUserDrawingId,
       dispatchUserDrawingCommandToState,
@@ -2171,27 +2187,30 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleContextMenuPress = useCallback(
     (price: number, time: number) => {
-      if (onContextMenu) {
-        const items = onContextMenu(time, price);
-        if (items && items.length > 0) {
-          setContextMenuItems(items);
-          setContextMenuPosition({
-            x: lastCrosshairPosition.x,
-            y: lastCrosshairPosition.y,
-            price,
-            time,
-          });
-          setContextMenuVisible(true);
-        }
+      if (!onContextMenu) {
+        closeContextMenu();
+        return;
       }
+
+      const items = onContextMenu(time, price);
+      if (!items || items.length === 0) {
+        closeContextMenu();
+        return;
+      }
+
+      setContextMenuItems(items);
+      setContextMenuPosition({
+        x: lastCrosshairPosition.x,
+        y: lastCrosshairPosition.y,
+        price,
+        time,
+      });
+      setContextMenuVisible(true);
     },
-    [onContextMenu, lastCrosshairPosition],
+    [closeContextMenu, onContextMenu, lastCrosshairPosition],
   );
 
-  const handleContextMenuClose = useCallback(() => {
-    setContextMenuVisible(false);
-    setContextMenuItems([]);
-  }, []);
+  const handleContextMenuClose = closeContextMenu;
 
   // ==========================================================================
   // Skia Picture Rendering (Layer 1: Static)

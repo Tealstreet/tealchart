@@ -531,6 +531,8 @@ export class ChartCore {
   private resetButton: HTMLButtonElement | null = null;
   private resetButtonHoverZone: HTMLDivElement | null = null;
   private contextMenu: HTMLDivElement | null = null;
+  private contextMenuCloseHandler: ((e: MouseEvent) => void) | null = null;
+  private contextMenuCloseTimer: ReturnType<typeof setTimeout> | null = null;
   // + button drawn on crosshair canvas — hit-test bounds for click detection
   private _plusButtonBounds: { x: number; y: number; r: number } | null = null;
   // Bound handler for + button click — stored so it can be removed on dispose
@@ -1307,6 +1309,7 @@ export class ChartCore {
       clearTimeout(this.resetButtonTimer);
     }
     this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
+    this.closeContextMenu();
     this.eventManager.dispose();
     this.priceLineManager?.dispose();
     this.stage?.destroy();
@@ -1418,10 +1421,8 @@ export class ChartCore {
         ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
         : undefined;
     const items = (drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? [];
+    this.closeContextMenu();
     if (items.length === 0) return;
-
-    // Remove existing menu
-    this.contextMenu?.remove();
 
     // Create menu
     this.contextMenu = div({
@@ -1438,6 +1439,10 @@ export class ChartCore {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
       },
     });
+    this.contextMenu.addEventListener('mousedown', (event) => event.stopPropagation());
+    this.contextMenu.addEventListener('mouseup', (event) => event.stopPropagation());
+    this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
+    this.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
 
     for (const item of items) {
       const menuItem = div({
@@ -1449,11 +1454,11 @@ export class ChartCore {
           opacity: item.enabled === false ? '0.5' : '1',
         },
         text: item.text,
-        onClick: () => {
+        onClick: (event) => {
+          event.stopPropagation();
           if (item.enabled === false) return;
           item.click();
-          this.contextMenu?.remove();
-          this.contextMenu = null;
+          this.closeContextMenu();
         },
         onMouseEnter: (e) => {
           if (item.enabled === false) return;
@@ -1469,14 +1474,29 @@ export class ChartCore {
     document.body.appendChild(this.contextMenu);
 
     // Close on click outside
-    const closeMenu = (e: MouseEvent) => {
+    this.contextMenuCloseHandler = (e: MouseEvent) => {
       if (this.contextMenu && !this.contextMenu.contains(e.target as Node)) {
-        this.contextMenu.remove();
-        this.contextMenu = null;
-        document.removeEventListener('click', closeMenu);
+        this.closeContextMenu();
       }
     };
-    setTimeout(() => document.addEventListener('click', closeMenu), 0);
+    this.contextMenuCloseTimer = setTimeout(() => {
+      this.contextMenuCloseTimer = null;
+      if (!this.contextMenu || !this.contextMenuCloseHandler) return;
+      document.addEventListener('click', this.contextMenuCloseHandler);
+    }, 0);
+  }
+
+  private closeContextMenu(): void {
+    if (this.contextMenuCloseTimer) {
+      clearTimeout(this.contextMenuCloseTimer);
+      this.contextMenuCloseTimer = null;
+    }
+    if (this.contextMenuCloseHandler) {
+      document.removeEventListener('click', this.contextMenuCloseHandler);
+      this.contextMenuCloseHandler = null;
+    }
+    this.contextMenu?.remove();
+    this.contextMenu = null;
   }
 
   // ============================================================================
