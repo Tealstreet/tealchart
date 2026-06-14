@@ -324,9 +324,10 @@ describe('TealchartWidget', () => {
         ...initial,
         activeTool: 'trendLine',
       };
-      widget.setUserDrawingState(nextState);
+      expect(widget.setUserDrawingState(nextState)).toBe(true);
       expect(widget.getUserDrawingState()).toBe(nextState);
       expect(onChange).toHaveBeenCalledWith(nextState);
+      expect(widget.setUserDrawingState(nextState)).toBe(false);
 
       const testWidget = widget as unknown as { _render(dirty: number): void };
       testWidget._render(DIRTY.USER_DRAWINGS);
@@ -726,7 +727,7 @@ describe('TealchartWidget', () => {
 
       widget.clearUserDrawings();
       onCommand.mockClear();
-      widget.importUserDrawingStateFromLayout(exported);
+      expect(widget.importUserDrawingStateFromLayout(exported)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
       expect(widget.getUserDrawingState().activeTool).toBe('select');
       expect(onCommand).toHaveBeenCalledTimes(1);
@@ -741,12 +742,12 @@ describe('TealchartWidget', () => {
       };
       testWidget._chartStore.isDirty.set(false);
       onCommand.mockClear();
-      widget.importUserDrawingStateFromLayout(exported);
+      expect(widget.importUserDrawingStateFromLayout(exported)).toBe(false);
       expect(testWidget._chartStore.isDirty.get()).toBe(false);
       expect(onCommand).not.toHaveBeenCalled();
 
       onCommand.mockClear();
-      widget.importUserDrawingStateFromLayout(undefined);
+      expect(widget.importUserDrawingStateFromLayout(undefined)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([]);
       expect(onCommand).toHaveBeenCalledWith(
         expect.objectContaining({

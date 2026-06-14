@@ -836,7 +836,8 @@ Phase 3: Error behavior
   computed-model returns without requiring app callbacks. Mutating commands
   return `false`/unchanged state on unavailable targets. Web widget APIs and
   mobile Skia handle APIs now also expose explicit boolean changed/no-op returns
-  for active-tool, selection, clear, and cancel-draft command paths.
+  for active-tool, selection, clear, cancel-draft, direct state replacement, and
+  layout import paths.
 
 ### Epic 8.2: Persistence and Migration Hardening
 
