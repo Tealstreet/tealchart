@@ -423,6 +423,39 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('keeps below-threshold pending touch movement as tap input', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100 });
+    const moveTouch = createTouch(container, { clientX: 104, clientY: 105 });
+    dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
+    dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
+    dispatchTouchEvent(container, 'touchend', [], [moveTouch]);
+
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragStart).not.toHaveBeenCalled();
+    expect(onDrawingDragMove).not.toHaveBeenCalled();
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+    expect(onDrawingInput).toHaveBeenCalledWith(100, 100, 'touch');
+
+    manager.dispose();
+  });
+
   it('promotes pending touch drawing drags on touchend when the move frame has not run', () => {
     const rafCallbacks: FrameRequestCallback[] = [];
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
