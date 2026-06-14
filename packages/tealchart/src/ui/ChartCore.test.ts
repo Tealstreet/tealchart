@@ -506,6 +506,11 @@ describe('ChartCore viewport management', () => {
     expect(removeDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
     await new Promise((resolve) => setTimeout(resolve, 0));
 
+    onContextMenu.mockReturnValueOnce([]);
+    testCore.handleContextMenu(140, 140, 12, 22);
+    expect(document.body.textContent).not.toContain('Fallback action');
+    expect(removeDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
+
     core.dispose();
     expect(removeDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
 
