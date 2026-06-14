@@ -27,6 +27,8 @@ const RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
   'delete',
   'bringForward',
   'sendBackward',
+  'bringToFront',
+  'sendToBack',
 ];
 
 const ACTION_LABELS: Partial<Record<UserDrawingObjectTreeRowActionType, string>> = {
@@ -38,6 +40,8 @@ const ACTION_LABELS: Partial<Record<UserDrawingObjectTreeRowActionType, string>>
   delete: 'Del',
   bringForward: 'Up',
   sendBackward: 'Down',
+  bringToFront: 'Top',
+  sendToBack: 'Back',
 };
 
 export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProps> = memo(
@@ -257,11 +261,13 @@ const styles = StyleSheet.create({
   },
   rowActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: 4,
   },
   actionButton: {
-    minWidth: 30,
+    minWidth: 28,
     height: 28,
     paddingHorizontal: 6,
     borderRadius: 5,
