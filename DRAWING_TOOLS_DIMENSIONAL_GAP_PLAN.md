@@ -851,7 +851,9 @@ Phase 1: Command-backed APIs
   `add` command. Web exposes `TealchartWidget.addUserDrawing`; mobile exposes
   the sibling `SkiaTealchartHandle.addUserDrawing`. Duplicate IDs are a no-op,
   added drawings select by default, and both platforms share the same
-  command/history behavior.
+  command/history behavior. Global clear, hide/show all, and lock/unlock all
+  actions now route through the shared toolbar descriptors and explicit
+  all-drawing command options on both web Canvas and mobile Skia topbars.
 
 Phase 2: Event subscriptions
 
