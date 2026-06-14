@@ -52,7 +52,6 @@ export interface UserDrawingObjectTreeRowAction {
 }
 
 export const USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
-  'rename',
   'hide',
   'show',
   'lock',
@@ -63,6 +62,11 @@ export const USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS: readonly UserDrawing
   'sendBackward',
   'bringToFront',
   'sendToBack',
+] as const;
+
+export const USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
+  'rename',
+  ...USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 ] as const;
 
 export const USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS: Readonly<

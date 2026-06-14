@@ -80,6 +80,15 @@ describe('UserDrawingObjectTreeSheet', () => {
       name: 'Range box',
       includeLocked: undefined,
     });
+    fireEvent.click(screen.getAllByLabelText('Rename drawing')[0]!);
+    fireEvent.change(screen.getByLabelText('Rename Rectangle'), { target: { value: 'Keyboard range' } });
+    fireEvent.keyDown(screen.getByLabelText('Rename Rectangle'), { key: 'Enter' });
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'rename',
+      drawingId: 'target',
+      name: 'Keyboard range',
+      includeLocked: undefined,
+    });
 
     fireEvent.click(screen.getAllByLabelText('Hide drawing')[0]!);
     expect(onDispatch).toHaveBeenCalledWith({
