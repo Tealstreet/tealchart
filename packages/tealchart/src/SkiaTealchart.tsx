@@ -3803,10 +3803,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             for (const point of remainingPoints) {
               path.lineTo(point.x, point.y);
             }
+            const pressureSegments =
+              primitive.kind === 'path' || primitive.kind === 'brush' || primitive.kind === 'highlighter'
+                ? primitive.pressureSegments
+                : [];
 
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false && (
+                {primitive.style.lineVisible !== false && pressureSegments.length > 0
+                  ? pressureSegments.map((segment, index) => {
+                      const segmentPath = Skia.Path.Make();
+                      segmentPath.moveTo(segment.start.x, segment.start.y);
+                      segmentPath.lineTo(segment.end.x, segment.end.y);
+                      return (
+                        <SkiaPath
+                          key={`${primitive.id}:pressure:${index}`}
+                          path={segmentPath}
+                          color={primitive.style.lineColor}
+                          style="stroke"
+                          strokeWidth={segment.lineWidth}
+                          strokeCap="round"
+                          strokeJoin="round"
+                        >
+                          {dash && <DashPathEffect intervals={dash} />}
+                        </SkiaPath>
+                      );
+                    })
+                  : primitive.style.lineVisible !== false && (
                   <SkiaPath
                     path={path}
                     color={primitive.style.lineColor}
@@ -3817,7 +3840,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   >
                     {dash && <DashPathEffect intervals={dash} />}
                   </SkiaPath>
-                )}
+                    )}
                 {(primitive.kind === 'xabcdPattern' ||
                   primitive.kind === 'cypherPattern' ||
                   primitive.kind === 'abcdPattern' ||

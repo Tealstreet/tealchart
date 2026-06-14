@@ -3,6 +3,9 @@ import type { DrawingCoordinateSpace, ResolvedUserDrawingGeometry } from './coor
 import type { ResolveUserDrawingRenderEntriesOptions } from './renderModel';
 import type {
   UserDrawing,
+  BrushDrawing,
+  HighlighterDrawing,
+  PathDrawing,
   UserDrawingLineStyle,
   UserDrawingPathFamilyKind,
   UserDrawingState,
@@ -14,7 +17,11 @@ import type {
 import { resolveDrawingArrowHead } from './arrowGeometry';
 import { resolveUserDrawingGeometry } from './coordinates';
 import { resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
-import { resolveUserDrawingHandlePoints, resolveUserDrawingRenderEntries } from './renderModel';
+import {
+  resolveUserDrawingHandlePoints,
+  resolveUserDrawingPressureStrokeSegments,
+  resolveUserDrawingRenderEntries,
+} from './renderModel';
 import {
   measureUserDrawingTextLines,
   resolveUserDrawingBalloonLayout,
@@ -148,6 +155,23 @@ function renderPathGeometry(
   if (!firstPoint) return;
 
   applyStrokeStyle(ctx, geometry.drawing);
+  const pathDrawing = geometry.drawing as PathDrawing | BrushDrawing | HighlighterDrawing;
+  const pressureSegments = resolveUserDrawingPressureStrokeSegments(
+    pathDrawing.points,
+    geometry.polyline.points,
+    geometry.drawing.style.lineWidth,
+  );
+  if (pressureSegments.length > 0) {
+    for (const segment of pressureSegments) {
+      ctx.lineWidth = segment.lineWidth;
+      ctx.beginPath();
+      ctx.moveTo(segment.start.x, segment.start.y);
+      ctx.lineTo(segment.end.x, segment.end.y);
+      ctx.stroke();
+    }
+    return;
+  }
+
   ctx.beginPath();
   ctx.moveTo(firstPoint.x, firstPoint.y);
   for (const point of remainingPoints) {
