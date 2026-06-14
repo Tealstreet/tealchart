@@ -717,6 +717,9 @@ Phase 2: Focus rules
 
 - Document and implement when drawing shortcuts are active versus when text
   inputs, chart panes, or app controls own keyboard input.
+- Shipped shared keyboard focus ownership for chart, text input, and app
+  control owners so web widget and mobile Skia host adapters can suppress
+  drawing shortcuts outside chart-owned keyboard focus.
 
 Phase 3: Command dispatch
 

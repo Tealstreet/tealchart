@@ -459,6 +459,26 @@ describe('mobile drawing handle command dispatch', () => {
     expect(redo.state.drawings).toEqual([]);
   });
 
+  it('ignores mobile keyboard actions when chart does not own keyboard focus', () => {
+    const state = createMobileStateWithTrendLine();
+    const history = createUserDrawingCommandHistory();
+
+    for (const focusOwner of ['textInput', 'appControl'] as const) {
+      const result = dispatchMobileUserDrawingKeyboardAction(
+        state,
+        history,
+        { key: 'Delete', focusOwner },
+        { createId: () => 'copy' },
+      );
+
+      expect(result.action).toBeNull();
+      expect(result.changed).toBe(false);
+      expect(result.state).toBe(state);
+      expect(result.history).toBe(history);
+      expect(result.command).toBeUndefined();
+    }
+  });
+
   it('routes mobile escape keyboard action to draft cancellation without recording undo history', () => {
     const state = handleUserDrawingInput(
       setUserDrawingTool(createUserDrawingState(), 'rectangle'),
