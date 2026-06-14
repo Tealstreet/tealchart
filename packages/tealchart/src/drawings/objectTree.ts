@@ -28,6 +28,27 @@ export interface UserDrawingObjectTreeRow {
   zIndex: number;
   orderIndex: number;
   groupIds: readonly string[];
+  actions?: readonly UserDrawingObjectTreeRowAction[];
+}
+
+export type UserDrawingObjectTreeRowActionType =
+  | 'rename'
+  | 'duplicate'
+  | 'delete'
+  | 'hide'
+  | 'show'
+  | 'lock'
+  | 'unlock'
+  | 'bringForward'
+  | 'sendBackward'
+  | 'bringToFront'
+  | 'sendToBack';
+
+export interface UserDrawingObjectTreeRowAction {
+  type: UserDrawingObjectTreeRowActionType;
+  label: string;
+  enabled: boolean;
+  destructive?: boolean;
 }
 
 export interface UserDrawingObjectTreeGroup {
@@ -90,6 +111,7 @@ function resolveUserDrawingObjectTreeRow(
   drawingIndex: number,
   orderIndex: number,
   selectedIds: ReadonlySet<string>,
+  drawingCount: number,
 ): UserDrawingObjectTreeRow {
   const descriptor = getUserDrawingToolDescriptor(drawing.kind);
   const customName = drawing.name?.trim() || null;
@@ -111,7 +133,27 @@ function resolveUserDrawingObjectTreeRow(
     zIndex: drawingIndex,
     orderIndex,
     groupIds: [getUserDrawingObjectTreePaneGroupId(drawing.paneId)],
+    actions: resolveUserDrawingObjectTreeRowActions(drawing, drawingIndex, drawingCount),
   };
+}
+
+function resolveUserDrawingObjectTreeRowActions(
+  drawing: UserDrawing,
+  drawingIndex: number,
+  drawingCount: number,
+): readonly UserDrawingObjectTreeRowAction[] {
+  const editable = !drawing.locked;
+  return [
+    { type: 'rename', label: 'Rename drawing', enabled: editable },
+    { type: 'duplicate', label: 'Duplicate drawing', enabled: editable },
+    { type: 'delete', label: 'Delete drawing', enabled: editable, destructive: true },
+    { type: drawing.visible ? 'hide' : 'show', label: drawing.visible ? 'Hide drawing' : 'Show drawing', enabled: editable },
+    { type: drawing.locked ? 'unlock' : 'lock', label: drawing.locked ? 'Unlock drawing' : 'Lock drawing', enabled: true },
+    { type: 'bringForward', label: 'Bring drawing forward', enabled: editable && drawingIndex < drawingCount - 1 },
+    { type: 'sendBackward', label: 'Send drawing backward', enabled: editable && drawingIndex > 0 },
+    { type: 'bringToFront', label: 'Bring drawing to front', enabled: editable && drawingIndex < drawingCount - 1 },
+    { type: 'sendToBack', label: 'Send drawing to back', enabled: editable && drawingIndex > 0 },
+  ];
 }
 
 function getUserDrawingObjectTreePaneGroupId(paneId: string): string {
@@ -163,7 +205,7 @@ export function resolveUserDrawingObjectTreeModel(
   const indexedDrawings = state.drawings.map((drawing, drawingIndex) => ({ drawing, drawingIndex }));
   const orderedDrawings = options.order === 'backToFront' ? indexedDrawings : [...indexedDrawings].reverse();
   const rows = orderedDrawings.map(({ drawing, drawingIndex }, orderIndex) =>
-    resolveUserDrawingObjectTreeRow(drawing, drawingIndex, orderIndex, selectedIdSet),
+    resolveUserDrawingObjectTreeRow(drawing, drawingIndex, orderIndex, selectedIdSet, state.drawings.length),
   );
 
   return {

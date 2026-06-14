@@ -89,6 +89,8 @@ import type {
   UserDrawingObjectTreeGroup,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
+  UserDrawingObjectTreeRowAction,
+  UserDrawingObjectTreeRowActionType,
   UserDrawingCommandEvent,
   UserDrawingPropertiesIntent,
   UserDrawingVisualEvidenceMatrix,
@@ -486,7 +488,10 @@ describe('tealchart public entries', () => {
       zIndex: 0,
       orderIndex: 0,
       groupIds: ['pane:main'],
+      actions: [{ type: 'rename', label: 'Rename drawing', enabled: true }],
     };
+    const rowAction: NonNever<UserDrawingObjectTreeRowAction> = row.actions![0]!;
+    const rowActionType: NonNever<UserDrawingObjectTreeRowActionType> = 'rename';
     const group: NonNever<UserDrawingObjectTreeGroup> = {
       id: 'pane:main',
       label: 'Main chart',
@@ -510,6 +515,7 @@ describe('tealchart public entries', () => {
 
     expect(model.rows[0]).toBe(row);
     expect(model.groups?.[0]).toBe(group);
+    expect(rowAction.type).toBe(rowActionType);
     expect(action.type).toBe('duplicate');
   });
 
