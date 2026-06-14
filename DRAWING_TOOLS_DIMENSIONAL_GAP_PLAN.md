@@ -585,7 +585,8 @@ Phase 1: Minimal panel surface
 - Status: web now includes a built-in object-tree panel fallback when no
   app-owned callback is supplied. The panel renders the shared row/group model,
   blocks chart event fallthrough, and dispatches row select, visibility, lock,
-  duplicate, delete, and z-order actions through the widget command owner.
+  duplicate, delete, one-step z-order, and direct front/back z-order actions
+  through the widget command owner.
 
 Phase 2: Row actions
 
@@ -594,6 +595,8 @@ Phase 2: Row actions
 - Status: web widget object-tree dispatch routes row actions through the
   shared command resolver and injects chart-owned duplicate IDs so callers do
   not need internal ID factories.
+- Status: built-in web object-tree rows expose direct bring-to-front and
+  send-to-back controls in addition to one-step forward/back controls.
 
 Phase 3: Multi-select
 
@@ -616,14 +619,17 @@ Phase 1: Mobile panel/sheet
   row model for app-owned sheets.
 - Status: mobile Skia now includes a built-in object-tree sheet fallback when no
   app-owned callback is supplied. The sheet renders the same shared row/group
-  model and dispatches row select, visibility, lock, duplicate, delete, and
-  z-order actions through the Skia command owner.
+  model and dispatches row select, visibility, lock, duplicate, delete,
+  one-step z-order, and direct front/back z-order actions through the Skia
+  command owner.
 
 Phase 2: Row actions
 
 - Wire mobile row actions to the same shared commands.
 - Status: mobile Skia dispatches object-tree actions through the same shared
   command resolver with mobile-owned duplicate ID generation.
+- Status: built-in mobile object-tree rows expose direct bring-to-front and
+  send-to-back controls in addition to one-step forward/back controls.
 
 Phase 3: Multi-select
 

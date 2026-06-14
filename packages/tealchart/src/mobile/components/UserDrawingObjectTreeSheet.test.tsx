@@ -75,6 +75,14 @@ describe('UserDrawingObjectTreeSheet', () => {
       drawingIds: ['target'],
       includeLocked: undefined,
     });
+    fireEvent.click(screen.getAllByLabelText('Send drawing to back')[0]!);
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'sendToBack',
+      drawingIds: ['target'],
+      includeLocked: undefined,
+    });
+    expect(screen.getAllByText('Top').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Back').length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByLabelText('Close drawing object tree'));
     expect(onClose).toHaveBeenCalledTimes(1);

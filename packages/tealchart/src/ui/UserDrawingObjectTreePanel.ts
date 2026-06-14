@@ -115,10 +115,12 @@ const styles = {
   rowActions: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
     gap: '4px',
   } as Partial<CSSStyleDeclaration>,
   actionButton: {
-    minWidth: '28px',
+    minWidth: '26px',
     height: '26px',
     padding: '0 7px',
     border: '0',
@@ -143,6 +145,8 @@ const ACTION_LABELS: Partial<Record<UserDrawingObjectTreeRowActionType, string>>
   delete: 'Del',
   bringForward: 'Up',
   sendBackward: 'Down',
+  bringToFront: 'Top',
+  sendToBack: 'Back',
 };
 
 const RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
@@ -154,6 +158,8 @@ const RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
   'delete',
   'bringForward',
   'sendBackward',
+  'bringToFront',
+  'sendToBack',
 ];
 
 export class UserDrawingObjectTreePanel {

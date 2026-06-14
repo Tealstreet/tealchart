@@ -1991,6 +1991,9 @@ describe('TealchartWidget', () => {
         visible: false,
       });
       expect(panel?.textContent).toContain('hidden');
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Send drawing to back"]')?.click();
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['target', 'line']);
+      expect(panel?.textContent).toContain('Back');
 
       panel?.querySelector<HTMLButtonElement>('[aria-label="Close drawing object tree"]')?.click();
       expect(document.querySelector('[aria-label="Drawing object tree"]')).toBeNull();
