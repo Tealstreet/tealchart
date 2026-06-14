@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 
 import type { Bar, Viewport } from '../types';
-import type { UserDrawingInputPoint, UserDrawingSelectionAtPointResult, UserDrawingState } from '../drawings';
+import type {
+  UserDrawingInputPoint,
+  UserDrawingSelectionAtPointResult,
+  UserDrawingState,
+  UserDrawingTool,
+} from '../drawings';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -518,53 +523,56 @@ describe('ChartCore viewport management', () => {
     removeDocumentListener.mockRestore();
   });
 
-  it('applies constrained placement options through ChartCore preview and commit', async () => {
-    const { ChartCore } = await import('./ChartCore');
-    const onUserDrawingPlacementDragStart = vi.fn(() => true);
-    const onUserDrawingPlacementDragEnd = vi.fn(() => true);
-    const core = new ChartCore({
-      container,
-      width: 800,
-      height: 600,
-      onUserDrawingPlacementDragStart,
-      onUserDrawingPlacementDragEnd,
-    });
-    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
-    core.setUserDrawingState({
-      version: 1,
-      activeTool: 'rectangle',
-      selection: null,
-      draft: null,
-      textEdit: null,
-      drawings: [],
-    } satisfies UserDrawingState);
+  it.each(['rectangle', 'gannSquare', 'fibCircles'] satisfies UserDrawingTool[])(
+    'applies constrained %s placement options through ChartCore preview and commit',
+    async (tool) => {
+      const { ChartCore } = await import('./ChartCore');
+      const onUserDrawingPlacementDragStart = vi.fn(() => true);
+      const onUserDrawingPlacementDragEnd = vi.fn(() => true);
+      const core = new ChartCore({
+        container,
+        width: 800,
+        height: 600,
+        onUserDrawingPlacementDragStart,
+        onUserDrawingPlacementDragEnd,
+      });
+      core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+      core.setUserDrawingState({
+        version: 1,
+        activeTool: tool,
+        selection: null,
+        draft: null,
+        textEdit: null,
+        drawings: [],
+      } satisfies UserDrawingState);
 
-    const testCore = core as unknown as {
-      handleUserDrawingDragStart(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
-      handleUserDrawingDragMove(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
-      handleUserDrawingDragEnd(): void;
-      resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
-    };
+      const testCore = core as unknown as {
+        handleUserDrawingDragStart(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
+        handleUserDrawingDragMove(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
+        handleUserDrawingDragEnd(): void;
+        resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
+      };
 
-    expect(testCore.handleUserDrawingDragStart(100, 100, { constrainedPlacement: true })).toBe(true);
-    expect(testCore.handleUserDrawingDragMove(160, 120, { constrainedPlacement: true })).toBe(true);
-    testCore.handleUserDrawingDragEnd();
+      expect(testCore.handleUserDrawingDragStart(100, 100, { constrainedPlacement: true })).toBe(true);
+      expect(testCore.handleUserDrawingDragMove(160, 120, { constrainedPlacement: true })).toBe(true);
+      testCore.handleUserDrawingDragEnd();
 
-    const expectedConstrainedEnd = testCore.resolveUserDrawingInputPoint(160, 160);
-    expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledWith(
-      expect.objectContaining({
-        paneId: 'main',
-        anchor: expectedConstrainedEnd?.anchor,
-      }),
-    );
-    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        anchor: testCore.resolveUserDrawingInputPoint(160, 120)?.anchor,
-      }),
-    );
+      const expectedConstrainedEnd = testCore.resolveUserDrawingInputPoint(160, 160);
+      expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledWith(
+        expect.objectContaining({
+          paneId: 'main',
+          anchor: expectedConstrainedEnd?.anchor,
+        }),
+      );
+      expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          anchor: testCore.resolveUserDrawingInputPoint(160, 120)?.anchor,
+        }),
+      );
 
-    core.dispose();
-  });
+      core.dispose();
+    },
+  );
 
   it('routes EventManager placement drag cancellation to draft cancellation', async () => {
     const { ChartCore } = await import('./ChartCore');

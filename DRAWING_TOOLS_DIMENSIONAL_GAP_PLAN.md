@@ -268,10 +268,11 @@ Phase 3: Gesture thresholds and constraints
 
 - Define pointer/touch drag thresholds.
 - Status: initial constraints shipped for drag two-anchor rectangle, circle,
-  ellipse, and line-family tools through a shared helper, with web Shift and a
-  mobile Skia prop for toolbar-controlled constrained placement.
-- Future work: broaden constrained placement semantics as multi-anchor tools
-  move from click placement to dedicated gestures.
+  ellipse, Fib circle/spiral, Gann square/fixed, and line-family tools through
+  a shared helper, with web Shift and a mobile Skia prop for toolbar-controlled
+  constrained placement.
+- Future work: broaden constrained placement semantics for multi-anchor tools
+  as their dedicated gestures mature.
 
 ### Epic 3.2: Web Drag-to-Draw Adapter
 
