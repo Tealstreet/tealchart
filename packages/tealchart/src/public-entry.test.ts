@@ -88,6 +88,7 @@ import type {
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
+  UserDrawingCommandEvent,
   UserDrawingPropertiesIntent,
   UserDrawingVisualEvidenceMatrix,
   UserDrawingVisualEvidenceState,
@@ -104,7 +105,11 @@ import type {
   UserDrawingTextMaxWidth,
   UserDrawingTextMaxWidthDescriptor,
   UserDrawingTextWrapDescriptor,
+  TealchartWidgetOptions,
+  WidgetEventCallback,
+  WidgetEventMap,
 } from './index';
+import type { SkiaTealchartProps } from './SkiaTealchart';
 import type {
   MobileUserDrawingAnchoredVolumeProfilePrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
@@ -294,6 +299,24 @@ describe('tealchart public entries', () => {
     expect(snapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
     expect(snapshot.chrome.topLeftLegend).toEqual({ x: 70, y: 40, width: 430, height: 44 });
     expect(legendRect).toEqual(snapshot.chrome.topLeftLegend);
+  });
+
+  it('exports typed drawing command event callbacks for web and mobile surfaces', () => {
+    const webSubscriptionCallback = ((event) => event.source) satisfies WidgetEventCallback<'user_drawing_command'>;
+    const webOptionCallback = ((event) => event.state.drawings.length) satisfies NonNullable<
+      TealchartWidgetOptions['onUserDrawingCommand']
+    >;
+    const mobileOptionCallback = ((event) => event.command.type) satisfies NonNullable<
+      SkiaTealchartProps['onUserDrawingCommand']
+    >;
+    const acceptsCommandTuple = (_tuple: WidgetEventMap['user_drawing_command']) => true;
+    const commandEvent: UserDrawingCommandEvent | null = null;
+
+    expect(webSubscriptionCallback).toBeTypeOf('function');
+    expect(webOptionCallback).toBeTypeOf('function');
+    expect(mobileOptionCallback).toBeTypeOf('function');
+    expect(acceptsCommandTuple).toBeTypeOf('function');
+    expect(commandEvent).toBeNull();
   });
 
   it('exports shared and native drawing text alignment helpers', () => {
