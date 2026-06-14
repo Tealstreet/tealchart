@@ -27,6 +27,19 @@ afterEach(() => {
   clearChartStoreCache();
 });
 
+function createStateWithTrendLine() {
+  const first = handleUserDrawingInput(
+    setUserDrawingTool(createUserDrawingState(), 'trendLine'),
+    { paneId: 'main', anchor: anchorA },
+    { createId: () => 'trend-line', now: () => 10, style },
+  );
+  return handleUserDrawingInput(
+    first,
+    { paneId: 'main', anchor: anchorB },
+    { createId: () => 'trend-line', now: () => 11, style },
+  );
+}
+
 describe('user drawing command history', () => {
   it('records public add drawing commands as undoable creations', () => {
     const state = createUserDrawingState();
@@ -245,6 +258,66 @@ describe('user drawing command history', () => {
     expect(history.undoStack).toHaveLength(2);
     const undo = undoUserDrawingCommand(state, history);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+  });
+
+  it('records duplicate, delete, and nudge commands as independent undoable transactions', () => {
+    let state = createStateWithTrendLine();
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'duplicate',
+      options: { createId: () => 'copy', now: () => 50 },
+      meta: { source: 'toolbar' },
+    }));
+
+    expect(state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line', 'copy']);
+    expect(state.selection).toEqual({ drawingId: 'copy' });
+    expect(history.undoStack).toHaveLength(1);
+
+    let undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line']);
+    let redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line', 'copy']);
+    state = redo.state;
+    history = redo.history;
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'delete',
+      options: { drawingId: 'copy' },
+      meta: { source: 'toolbar' },
+    }));
+
+    expect(state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line']);
+    expect(history.undoStack).toHaveLength(2);
+
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line', 'copy']);
+    redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line']);
+    state = { ...redo.state, selection: { drawingId: 'trend-line' } };
+    history = redo.history;
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'nudge',
+      spacesByPaneId,
+      options: { delta: { x: 10, y: 10 }, now: () => 51 },
+      meta: { source: 'keyboard' },
+    }));
+
+    const movedDrawing = state.drawings[0];
+    expect(movedDrawing?.kind).toBe('trendLine');
+    if (movedDrawing?.kind !== 'trendLine') throw new Error('expected trend line drawing');
+    expect(movedDrawing.points).toEqual([
+      { time: 1100, price: 99 },
+      { time: 2100, price: 109 },
+    ]);
+    expect(history.undoStack).toHaveLength(3);
+
+    undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]).toMatchObject({
+      id: 'trend-line',
+      points: [anchorA, anchorB],
+    });
   });
 
   it('keeps separate duplicate edit-drag transactions independently undoable', () => {

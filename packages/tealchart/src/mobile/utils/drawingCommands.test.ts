@@ -241,6 +241,19 @@ describe('mobile drawing handle command dispatch', () => {
     const undo = undoUserDrawingCommand(result.state, result.history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+
+    const deleted = dispatchMobileUserDrawingHistoryCommand(result.state, result.history, {
+      type: 'delete',
+      options: { drawingId: 'copy' },
+      meta: { source: 'api' },
+    });
+
+    expect(deleted.changed).toBe(true);
+    expect(deleted.history.undoStack).toHaveLength(2);
+    expect(deleted.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+
+    const restored = undoUserDrawingCommand(deleted.state, deleted.history);
+    expect(restored.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
   });
 
   it('records mobile tap-created drawings only after final placement input', () => {
