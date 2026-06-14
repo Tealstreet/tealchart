@@ -484,6 +484,7 @@ export {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingObjectTreeRowDispatchAction,
 } from './objectTree';
 export type {
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
@@ -536,6 +537,7 @@ export type {
   UserDrawingToolDescriptor,
 } from './toolbar';
 export type {
+  ResolveUserDrawingObjectTreeRowDispatchActionOptions,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeCommandOptions,
