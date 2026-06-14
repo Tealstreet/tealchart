@@ -718,6 +718,7 @@ describe('TealchartWidget', () => {
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
         activeTool: 'rectangle',
+        stayInDrawingMode: false,
         selection: { drawingId: 'h' },
         drawings: [
           {
@@ -742,6 +743,7 @@ describe('TealchartWidget', () => {
       const exported = widget.exportUserDrawingStateForLayout();
       expect(exported?.drawings).toHaveLength(1);
       expect(exported?.activeTool).toBe('select');
+      expect(exported?.stayInDrawingMode).toBe(false);
       expect(exported?.selection).toBeNull();
 
       widget.clearUserDrawings();
@@ -749,6 +751,7 @@ describe('TealchartWidget', () => {
       expect(widget.importUserDrawingStateFromLayout(exported)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
       expect(widget.getUserDrawingState().activeTool).toBe('select');
+      expect(widget.isUserDrawingStayInDrawingMode()).toBe(false);
       expect(onCommand).toHaveBeenCalledTimes(1);
       expect(onCommand.mock.calls[0]![0]).toMatchObject({
         command: { type: 'replaceState' },
@@ -768,6 +771,7 @@ describe('TealchartWidget', () => {
       onCommand.mockClear();
       expect(widget.importUserDrawingStateFromLayout(undefined)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(widget.isUserDrawingStayInDrawingMode()).toBe(true);
       expect(onCommand).toHaveBeenCalledWith(
         expect.objectContaining({
           command: { type: 'replaceState', meta: { source: 'layout' } },

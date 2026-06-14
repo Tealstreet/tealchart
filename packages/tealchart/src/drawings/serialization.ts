@@ -1260,6 +1260,7 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
   return createUserDrawingState({
     version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings: state.drawings.map(cloneUserDrawing),
+    stayInDrawingMode: state.stayInDrawingMode !== false,
   });
 }
 
@@ -1274,6 +1275,7 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
   return createUserDrawingState({
     version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings,
+    stayInDrawingMode: state.stayInDrawingMode !== false,
   });
 }
 
