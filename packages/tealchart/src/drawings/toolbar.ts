@@ -864,7 +864,10 @@ function getNextUserDrawingLineColor(drawing: UserDrawing): string {
 function getAdjacentUserDrawingLineWidth(drawing: UserDrawing, direction: -1 | 1): number | null {
   const widths = getUserDrawingLineWidthDescriptors(drawing).map((descriptor) => descriptor.width);
   const currentIndex = widths.indexOf(drawing.style.lineWidth);
-  if (currentIndex === -1) return widths[direction > 0 ? 0 : widths.length - 1] ?? null;
+  if (currentIndex === -1) {
+    if (direction > 0) return widths.find((width) => width > drawing.style.lineWidth) ?? null;
+    return widths.findLast((width) => width < drawing.style.lineWidth) ?? null;
+  }
   return widths[currentIndex + direction] ?? null;
 }
 
