@@ -92,6 +92,8 @@ import type {
   UserDrawingObjectTreeRow,
   UserDrawingObjectTreeRowAction,
   UserDrawingObjectTreeRowActionType,
+  UserDrawingObjectTreeSelectionActionDescriptor,
+  UserDrawingObjectTreeSelectionActionType,
   UserDrawingCommandEvent,
   UserDrawingPropertiesIntent,
   UserDrawingVisualEvidenceMatrix,
@@ -226,6 +228,7 @@ import {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
+  resolveUserDrawingObjectTreeSelectionDispatchAction,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
@@ -494,6 +497,13 @@ describe('tealchart public entries', () => {
     };
     const rowAction: NonNever<UserDrawingObjectTreeRowAction> = row.actions![0]!;
     const rowActionType: NonNever<UserDrawingObjectTreeRowActionType> = 'rename';
+    const selectionAction: NonNever<UserDrawingObjectTreeSelectionActionDescriptor> = {
+      type: 'hide',
+      label: 'Hide selected drawings',
+      enabled: true,
+      selectedCount: 1,
+    };
+    const selectionActionType: NonNever<UserDrawingObjectTreeSelectionActionType> = 'hide';
     const rowDispatchOptions: NonNever<ResolveUserDrawingObjectTreeRowDispatchActionOptions> = { name: 'Breakout' };
     const group: NonNever<UserDrawingObjectTreeGroup> = {
       id: 'pane:main',
@@ -507,7 +517,8 @@ describe('tealchart public entries', () => {
     const model: NonNever<UserDrawingObjectTreeModel> = {
       rows: [row],
       groups: [group],
-      selectedIds: [],
+      selectionActions: [selectionAction],
+      selectedIds: ['trend'],
       drawingCount: 1,
     };
     const action: NonNever<UserDrawingObjectTreeAction> = {
@@ -519,10 +530,17 @@ describe('tealchart public entries', () => {
     expect(model.rows[0]).toBe(row);
     expect(model.groups?.[0]).toBe(group);
     expect(rowAction.type).toBe(rowActionType);
+    expect(model.selectionActions?.[0]).toBe(selectionAction);
+    expect(selectionAction.type).toBe(selectionActionType);
     expect(resolveUserDrawingObjectTreeRowDispatchAction(row, rowActionType, rowDispatchOptions)).toEqual({
       type: 'rename',
       drawingId: 'trend',
       name: 'Breakout',
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, selectionActionType)).toEqual({
+      type: 'hide',
+      drawingIds: ['trend'],
       includeLocked: undefined,
     });
     expect(action.type).toBe('duplicate');

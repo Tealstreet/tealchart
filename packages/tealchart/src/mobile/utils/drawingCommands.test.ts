@@ -17,6 +17,7 @@ import {
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
+  resolveUserDrawingObjectTreeSelectionDispatchAction,
   setUserDrawingTool,
   shouldRenderUserDrawingSelectedActionSurface,
   redoUserDrawingCommand,
@@ -750,12 +751,36 @@ describe('mobile drawing handle command dispatch', () => {
     state = { ...state, selection: { drawingId: 'line', drawingIds: ['line', 'copy'] } };
     let history = createUserDrawingCommandHistory();
 
+    const lockSelectedAction = resolveUserDrawingObjectTreeSelectionDispatchAction(resolveUserDrawingObjectTreeModel(state), 'lock')!;
+    expect(lockSelectedAction).toEqual({ type: 'lock', drawingIds: ['line', 'copy'], includeLocked: undefined });
+    for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, lockSelectedAction, {
+      createId: () => 'unused',
+      now: () => 44,
+    })) {
+      ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
+    }
+    state = { ...state, selection: { drawingId: 'line', drawingIds: ['line', 'copy'] } };
+    const unlockSelectedAction = resolveUserDrawingObjectTreeSelectionDispatchAction(resolveUserDrawingObjectTreeModel(state), 'unlock')!;
+    expect(unlockSelectedAction).toEqual({ type: 'unlock', drawingIds: ['line', 'copy'], includeLocked: true });
+    for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, unlockSelectedAction, {
+      createId: () => 'unused',
+      now: () => 45,
+    })) {
+      ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
+    }
+
+    expect(state.drawings.map((drawing) => [drawing.id, drawing.locked])).toEqual([
+      ['line', false],
+      ['copy', false],
+    ]);
+    expect(history.undoStack).toHaveLength(2);
+
     const copyRow = resolveUserDrawingObjectTreeModel(state).rows.find((row) => row.drawingId === 'copy')!;
     const hideCopyAction = resolveUserDrawingObjectTreeRowDispatchAction(copyRow, 'hide')!;
     expect(hideCopyAction).toEqual({ type: 'hide', drawingIds: ['copy'], includeLocked: undefined });
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, hideCopyAction, {
       createId: () => 'unused',
-      now: () => 44,
+      now: () => 46,
     })) {
       ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
     }
@@ -765,12 +790,12 @@ describe('mobile drawing handle command dispatch', () => {
       ['line', true],
       ['copy', false],
     ]);
-    expect(history.undoStack).toHaveLength(1);
+    expect(history.undoStack).toHaveLength(3);
 
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(
       state,
       { type: 'lock', drawingIds: ['copy'] },
-      { createId: () => 'unused', now: () => 45 },
+      { createId: () => 'unused', now: () => 47 },
     )) {
       ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
     }
@@ -779,37 +804,37 @@ describe('mobile drawing handle command dispatch', () => {
     expect(unlockCopyAction).toEqual({ type: 'unlock', drawingIds: ['copy'], includeLocked: true });
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, unlockCopyAction, {
       createId: () => 'unused',
-      now: () => 46,
+      now: () => 48,
     })) {
       ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
     }
 
     expect(state.drawings.find((drawing) => drawing.id === 'copy')).toMatchObject({ locked: false });
-    expect(history.undoStack).toHaveLength(3);
+    expect(history.undoStack).toHaveLength(5);
 
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(
       state,
       { type: 'duplicate', drawingIds: ['line'] },
-      { createId: () => 'object-tree-copy', now: () => 47 },
+      { createId: () => 'object-tree-copy', now: () => 49 },
     )) {
       ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
     }
 
     expect(state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'object-tree-copy', 'copy']);
     expect(state.selection).toEqual({ drawingId: 'object-tree-copy' });
-    expect(history.undoStack).toHaveLength(4);
+    expect(history.undoStack).toHaveLength(6);
 
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(
       state,
       { type: 'sendToBack', drawingIds: ['object-tree-copy'] },
-      { createId: () => 'unused', now: () => 48 },
+      { createId: () => 'unused', now: () => 50 },
     )) {
       ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
     }
 
     expect(state.drawings.map((drawing) => drawing.id)).toEqual(['object-tree-copy', 'line', 'copy']);
     expect(state.selection).toEqual({ drawingId: 'object-tree-copy' });
-    expect(history.undoStack).toHaveLength(5);
+    expect(history.undoStack).toHaveLength(7);
 
     const undo = undoUserDrawingCommand(state, history);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'object-tree-copy', 'copy']);

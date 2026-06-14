@@ -543,6 +543,10 @@ Phase 2: Shared actions
 - Status: shared object-tree actions now resolve to drawing command sequences
   with `objectTree` metadata, including multi-row selection setup before
   mutating selection-scoped commands.
+- Status: the object-tree model now includes shared selected-drawing action
+  descriptors and a dispatch resolver, so web and mobile app-owned bulk action
+  toolbars can execute the same selected-row commands without duplicating state
+  checks.
 
 Phase 3: Naming model
 
