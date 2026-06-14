@@ -52,6 +52,7 @@ export interface UserDrawingObjectTreeRowAction {
 }
 
 export const USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
+  'rename',
   'hide',
   'show',
   'lock',
@@ -67,6 +68,7 @@ export const USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS: readonly UserDrawing
 export const USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS: Readonly<
   Partial<Record<UserDrawingObjectTreeRowActionType, string>>
 > = {
+  rename: 'Name',
   hide: 'Hide',
   show: 'Show',
   lock: 'Lock',

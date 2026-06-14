@@ -71,6 +71,16 @@ describe('UserDrawingObjectTreeSheet', () => {
     fireEvent.click(screen.getByLabelText('Select Rectangle'));
     expect(onDispatch).toHaveBeenCalledWith({ type: 'select', drawingId: 'target' });
 
+    fireEvent.click(screen.getAllByLabelText('Rename drawing')[0]!);
+    fireEvent.change(screen.getByLabelText('Rename Rectangle'), { target: { value: 'Range box' } });
+    fireEvent.click(screen.getByLabelText('Save drawing name'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'rename',
+      drawingId: 'target',
+      name: 'Range box',
+      includeLocked: undefined,
+    });
+
     fireEvent.click(screen.getAllByLabelText('Hide drawing')[0]!);
     expect(onDispatch).toHaveBeenCalledWith({
       type: 'hide',
