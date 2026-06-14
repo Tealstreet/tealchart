@@ -243,6 +243,8 @@ export interface UserDrawingCommandEvent {
   hit?: boolean;
 }
 
+export type UserDrawingCommandEventListener = (event: UserDrawingCommandEvent) => void;
+
 function resolveUserDrawingCommandAffectedIds(
   previousState: UserDrawingState,
   nextState: UserDrawingState,
