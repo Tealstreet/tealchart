@@ -834,7 +834,9 @@ Phase 3: Error behavior
   coverage for stale IDs, locked drawing opt-in, hidden-selection cleanup,
   and invalid placement drags. Web query/open APIs additionally cover `null` or
   computed-model returns without requiring app callbacks. Mutating commands
-  return `false`/unchanged state on unavailable targets.
+  return `false`/unchanged state on unavailable targets. Web widget APIs and
+  mobile Skia handle APIs now also expose explicit boolean changed/no-op returns
+  for active-tool, selection, clear, and cancel-draft command paths.
 
 ### Epic 8.2: Persistence and Migration Hardening
 

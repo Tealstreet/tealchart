@@ -89,6 +89,121 @@ function createMobileStateWithTable(): UserDrawingState {
 }
 
 describe('mobile drawing handle command dispatch', () => {
+  it('exposes boolean results for no-op-capable Skia drawing command APIs', () => {
+    let history = createUserDrawingCommandHistory();
+    const onEvent = vi.fn();
+    let result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      createUserDrawingState(),
+      history,
+      { type: 'setActiveTool', tool: 'select', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).not.toHaveBeenCalled();
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setActiveTool', tool: 'rectangle', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setActiveTool', tool: 'rectangle', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'select', drawingId: 'missing', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    const lineState = createMobileStateWithTrendLine();
+    history = createUserDrawingCommandHistory();
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      lineState,
+      history,
+      { type: 'select', drawingId: 'line', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'select', drawingId: null, meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(2);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(3);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(3);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
+      type: 'clear',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(true);
+    expect(result.state.drawings).toEqual([]);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+    const undoClear = undoUserDrawingCommand(result.state, result.history);
+    expect(undoClear.changed).toBe(true);
+    expect(undoClear.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
+      type: 'clear',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
+      type: 'cancelDraft',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+
+    const draftState = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'rect', now: () => 30, style },
+    );
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(draftState, createUserDrawingCommandHistory(), {
+      type: 'cancelDraft',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(5);
+  });
+
   it('records complete drawing additions through the mobile command adapter', () => {
     const drawing: UserDrawing = {
       id: 'api-line',
