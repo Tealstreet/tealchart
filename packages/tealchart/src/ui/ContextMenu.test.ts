@@ -24,6 +24,7 @@ describe('ContextMenu', () => {
 
     menu.getElement().dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     menu.getElement().dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+    menu.getElement().dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
     item?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(onItemClick).toHaveBeenCalledTimes(1);
