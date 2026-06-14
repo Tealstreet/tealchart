@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -5,7 +7,28 @@ import {
   USER_DRAWING_VISUAL_EVIDENCE_MATRIX,
 } from './visualEvidence';
 
+const readVisualEvidenceMarkdown = () => {
+  const candidates = ['DRAWING_TOOLS_VISUAL_EVIDENCE.md', '../../DRAWING_TOOLS_VISUAL_EVIDENCE.md'];
+  const path = candidates.find((candidate) => existsSync(candidate));
+  if (!path) {
+    throw new Error('Unable to locate DRAWING_TOOLS_VISUAL_EVIDENCE.md');
+  }
+  return readFileSync(path, 'utf8');
+};
+
 describe('drawing visual evidence matrix', () => {
+  it('keeps the markdown PR checklist aligned with the shared evidence matrix', () => {
+    const markdown = readVisualEvidenceMarkdown();
+
+    for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
+      const status = state.status!;
+      expect(markdown).toContain(
+        `- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`,
+      );
+      expect(markdown).toContain(`| ${state.label} | \`${status.web}\` | \`${status.mobile}\` |`);
+    }
+  });
+
   it('defines required web and mobile viewport families', () => {
     expect(USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.map((viewport) => viewport.id)).toEqual([
       'desktop',
