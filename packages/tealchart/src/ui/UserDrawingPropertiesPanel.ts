@@ -4,12 +4,17 @@ import type {
   UserDrawingPropertiesSurfaceControl,
 } from '../drawings';
 
+import { Component } from './Component';
 import { button, div, span } from './dom';
 
 export interface UserDrawingPropertiesPanelOptions {
   surface: UserDrawingPropertiesSurface;
   onDispatch: (command: UserDrawingPropertiesSurfaceCommand) => boolean;
   onClose?: () => void;
+}
+
+interface UserDrawingPropertiesPanelState {
+  surface: UserDrawingPropertiesSurface;
 }
 
 const styles = {
@@ -115,47 +120,39 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 };
 
-export class UserDrawingPropertiesPanel {
-  private surface: UserDrawingPropertiesSurface;
+export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesPanelState> {
   private readonly options: UserDrawingPropertiesPanelOptions;
-  private readonly el: HTMLDivElement;
 
   constructor(options: UserDrawingPropertiesPanelOptions) {
+    super('div', { surface: options.surface }, { style: styles.panel });
     this.options = options;
-    this.surface = options.surface;
-    this.el = div({
-      style: styles.panel,
-      attrs: {
-        role: 'dialog',
-        'aria-label': 'Drawing properties',
-      },
-    });
+    this.el.setAttribute('role', 'dialog');
+    this.el.setAttribute('aria-label', 'Drawing properties');
     this.el.addEventListener('mousedown', (event) => event.stopPropagation());
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());
     this.el.addEventListener('contextmenu', (event) => event.stopPropagation());
-    document.body.appendChild(this.el);
-    this.render();
+    this.mount(document.body);
   }
 
   updateSurface(surface: UserDrawingPropertiesSurface): void {
-    this.surface = surface;
-    this.render();
+    this.setState({ surface });
   }
 
   close(): void {
-    this.el.remove();
+    this.unmount();
     this.options.onClose?.();
   }
 
-  private render(): void {
+  protected render(): void {
+    const { surface } = this.state;
     this.el.replaceChildren();
     this.el.appendChild(this.createHeader());
     const body = div({ style: styles.body });
-    if (!this.surface.drawing || this.surface.groups.length === 0) {
+    if (!surface.drawing || surface.groups.length === 0) {
       body.appendChild(div({ style: styles.empty, text: 'No editable drawing' }));
     } else {
-      for (const group of this.surface.groups) {
+      for (const group of surface.groups) {
         const controls = div({ style: styles.controls });
         for (const control of group.controls) {
           controls.appendChild(this.createControl(control));
@@ -172,7 +169,8 @@ export class UserDrawingPropertiesPanel {
   }
 
   private createHeader(): HTMLDivElement {
-    const title = this.surface.drawing ? `${this.surface.drawing.kind} properties` : 'Drawing properties';
+    const { surface } = this.state;
+    const title = surface.drawing ? `${surface.drawing.kind} properties` : 'Drawing properties';
     const closeButton = button({
       style: styles.closeButton,
       text: 'x',

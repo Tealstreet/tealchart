@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createPicture } from '@shopify/react-native-skia';
 import { SkiaTealchart } from './SkiaTealchart';
+import { clearChartStoreCache } from './state/chartState';
 
 function createBars(): Bar[] {
   return Array.from({ length: 5 }, (_, index) => ({
@@ -87,6 +88,7 @@ const initialDrawingState: UserDrawingState = {
 describe('SkiaTealchart drawing properties', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('opens the built-in properties sheet through the handle and dispatches controls to the pinned drawing', async () => {
