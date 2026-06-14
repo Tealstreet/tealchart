@@ -523,7 +523,7 @@ describe('ChartCore viewport management', () => {
     removeDocumentListener.mockRestore();
   });
 
-  it.each(['rectangle', 'gannSquare', 'fibCircles'] satisfies UserDrawingTool[])(
+  it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(
     'applies constrained %s placement options through ChartCore preview and commit',
     async (tool) => {
       const { ChartCore } = await import('./ChartCore');
