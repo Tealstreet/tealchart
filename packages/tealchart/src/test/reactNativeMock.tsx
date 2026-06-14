@@ -31,12 +31,18 @@ interface ViewProps {
   style?: unknown;
 }
 
-export function View({ accessibilityLabel, children, onStartShouldSetResponder, pointerEvents }: ViewProps) {
+function serializeStyle(style: unknown): string | undefined {
+  if (style === undefined) return undefined;
+  return JSON.stringify(style);
+}
+
+export function View({ accessibilityLabel, children, onStartShouldSetResponder, pointerEvents, style }: ViewProps) {
   return (
     <div
       aria-label={accessibilityLabel}
       data-pointer-events={pointerEvents}
       data-start-should-set-responder={onStartShouldSetResponder?.() ? 'true' : undefined}
+      data-style={serializeStyle(style)}
     >
       {children}
     </div>
@@ -75,10 +81,11 @@ export function Pressable({ accessibilityLabel, accessibilityState, children, di
   );
 }
 
-export function TouchableOpacity({ accessibilityLabel, children, disabled, onPress }: PressableProps) {
+export function TouchableOpacity({ accessibilityLabel, accessibilityState, children, disabled, onPress }: PressableProps) {
   return (
     <button
       aria-disabled={disabled ? 'true' : undefined}
+      aria-expanded={accessibilityState?.expanded === undefined ? undefined : accessibilityState.expanded ? 'true' : 'false'}
       aria-label={accessibilityLabel}
       disabled={disabled}
       onClick={
