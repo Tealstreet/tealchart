@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { reduceUserDrawingCommand } from './commands';
 import { createUserDrawingCommandHistory, dispatchUserDrawingCommandWithHistory, undoUserDrawingCommand } from './history';
@@ -9,6 +9,7 @@ import {
   resolveUserDrawingObjectTreeModel,
 } from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
+import { clearChartStoreCache } from '../state/chartState';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
 const style: UserDrawingStyle = {
@@ -67,6 +68,10 @@ function createHorizontalLine(overrides: Partial<Extract<UserDrawing, { kind: 'h
 }
 
 describe('user drawing object tree model', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('resolves committed drawings in front-to-back order by default', () => {
     const state = createUserDrawingState({
       drawings: [createTrendLine(), createRectangle(), createHorizontalLine()],
