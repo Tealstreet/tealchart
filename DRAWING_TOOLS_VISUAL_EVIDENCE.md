@@ -9,6 +9,12 @@ states that are not built yet or not touched as not applicable with a short note
 Every user-facing drawing behavior must cover both web Canvas/DOM and mobile
 Skia/RN unless the PR is documentation-only.
 
+The checklist below is mirrored in
+`packages/tealchart/src/drawings/visualEvidence.ts`. Use
+`USER_DRAWING_VISUAL_EVIDENCE_MATRIX` when tooling needs the canonical viewport
+and state list, and `createUserDrawingVisualEvidencePrNoteTemplate()` when a PR
+needs a fresh evidence block.
+
 ## Viewports
 
 Capture the affected surface in these viewport families:
