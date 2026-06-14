@@ -134,6 +134,8 @@ interface ChartTopBarState {
 
 const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
 const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
+const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
+const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
 
 const styles = {
   container: {
@@ -445,6 +447,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private drawingToolRailCleanup: Array<() => void> = [];
   private selectedActionSurfaceEl: HTMLElement | null = null;
   private selectedActionPopoverGroupId: string | null = null;
+  private selectedActionPopoverDrawingId: string | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -692,9 +695,24 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeSelectedActionSurface();
     const state = this.options.userDrawingState;
     const anchor = this.options.userDrawingSelectionActionAnchor;
-    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor)) return;
+    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor)) {
+      this.selectedActionPopoverGroupId = null;
+      this.selectedActionPopoverDrawingId = null;
+      return;
+    }
 
     const surface = resolveUserDrawingSelectedActionSurface(state);
+    const selectedDrawingId = surface.selectedDrawing?.id ?? null;
+    if (this.selectedActionPopoverDrawingId !== selectedDrawingId) {
+      this.selectedActionPopoverGroupId = null;
+      this.selectedActionPopoverDrawingId = selectedDrawingId;
+    }
+    const activePopoverGroup = surface.groups.find((group) => group.id === this.selectedActionPopoverGroupId);
+    const activePopoverHeight =
+      activePopoverGroup?.presentation?.type === 'popover'
+        ? SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y +
+          Math.max(SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT, SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT)
+        : SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT;
     const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
     const parentRect = parent.getBoundingClientRect();
     const position = resolveUserDrawingActionSurfacePosition({
@@ -705,7 +723,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       },
       surface: {
         width: SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
-        height: SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT,
+        height: activePopoverHeight,
       },
       inset: {
         left: 8,
@@ -771,6 +789,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           const popover = this.createElement('div', {
             style: {
               ...styles.selectedActionSurfacePopover,
+              top: `${SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y}px`,
               width: `${group.presentation.popoverWidth ?? 272}px`,
             },
             attributes: {

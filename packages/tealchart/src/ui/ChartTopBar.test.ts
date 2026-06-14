@@ -342,6 +342,29 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing line color to #22c55e"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing opacity to 75 percent"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing border"]')?.click();
+    expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).not.toBeNull();
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'h2' },
+      drawings: [
+        {
+          id: 'h2',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          price: 11,
+        },
+      ],
+    });
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).toBeNull();
+    openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]')?.click();
 
@@ -472,6 +495,57 @@ describe('ChartTopBar drawing toolbar', () => {
 
     expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 120 });
     expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 240 });
+
+    topBar.unmount();
+  });
+
+  it('clamps selected style popovers inside the overlay height', () => {
+    const overlay = document.createElement('div');
+    overlay.getBoundingClientRect = () =>
+      ({
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        right: 360,
+        bottom: 240,
+        width: 360,
+        height: 240,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    document.body.appendChild(overlay);
+    const bottomAnchor = {
+      ...selectionActionAnchor,
+      anchor: { x: 160, y: 230 },
+    };
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-style-bottom-clamp',
+      symbol: 'BTCUSDT',
+      drawingOverlayParent: overlay,
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      userDrawingSelectionActionAnchor: bottomAnchor,
+    });
+    topBar.mount(document.body);
+
+    openSelectedDrawingStylePopover();
+    const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
+    expect(Number.parseFloat(selectedActionSurface?.style.top ?? 'NaN')).toBeLessThanOrEqual(124);
 
     topBar.unmount();
   });

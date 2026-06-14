@@ -55,7 +55,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     const dispatchUserDrawingCommand = vi.fn();
     const onUserDrawingPropertiesOpen = vi.fn();
 
-    render(
+    const { rerender } = render(
       <div onClick={onChartTouch}>
         <UserDrawingSelectedActionSurfaceComponent
           state={state}
@@ -81,6 +81,36 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     fireEvent.click(screen.getByLabelText('Cycle selected drawing line color to #22c55e'));
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
     fireEvent.click(screen.getByLabelText('Cycle selected drawing opacity to 75 percent'));
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+
+    const nextState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'line-2' },
+      drawings: [
+        {
+          ...state.drawings[0]!,
+          id: 'line-2',
+          name: 'Range',
+          price: 60,
+        },
+      ],
+    };
+    rerender(
+      <div onClick={onChartTouch}>
+        <UserDrawingSelectedActionSurfaceComponent
+          state={nextState}
+          surface={resolveUserDrawingSelectedActionSurface(nextState)}
+          anchor={{ ...selectionActionAnchor, drawingIds: ['line-2'] }}
+          dimensions={{ width: 360, height: 240 }}
+          topInset={40}
+          createId={() => 'copy'}
+          dispatchUserDrawingCommand={dispatchUserDrawingCommand}
+          onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+        />
+      </div>,
+    );
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
 
     expect(onChartTouch).not.toHaveBeenCalled();
     expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
