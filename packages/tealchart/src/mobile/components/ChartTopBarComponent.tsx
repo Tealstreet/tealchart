@@ -23,6 +23,9 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingLineWidthDescriptors,
+  getUserDrawingLineWidthPreviewFontSize,
+  getUserDrawingOpacityDescriptors,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -48,8 +51,6 @@ import {
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
-  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
-  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -357,7 +358,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
                     <View style={styles.innerDivider} />
 
-                    {USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => {
+                    {getUserDrawingLineWidthDescriptors(selectedDrawing).map((descriptor) => {
                       const active = selectedDrawing.style.lineWidth === descriptor.width;
                       return (
                         <Pressable
@@ -377,7 +378,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                           <Text
                             style={[
                               styles.drawingButtonText,
-                              { color: active ? accentColor : textSecondaryColor, fontSize: 10 + descriptor.width },
+                              {
+                                color: active ? accentColor : textSecondaryColor,
+                                fontSize: getUserDrawingLineWidthPreviewFontSize(descriptor.width),
+                              },
                             ]}
                           >
                             ━
@@ -440,7 +444,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         );
                       })}
 
-                    {USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => {
+                    {getUserDrawingOpacityDescriptors(selectedDrawing).map((descriptor) => {
                       const active = (selectedDrawing.style.opacity ?? 1) === descriptor.opacity;
                       return (
                         <Pressable

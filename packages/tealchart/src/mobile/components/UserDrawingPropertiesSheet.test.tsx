@@ -94,6 +94,45 @@ describe('UserDrawingPropertiesSheet', () => {
     expect(onDispatch).not.toHaveBeenCalled();
   });
 
+  it('renders freehand stroke presets from the shared properties surface', () => {
+    const onDispatch = vi.fn(() => true);
+    const freehandState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'marker' },
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid', opacity: 0.35 },
+          points: [
+            { time: 1, price: 45 },
+            { time: 2, price: 55 },
+          ],
+        },
+      ],
+    };
+
+    render(
+      <UserDrawingPropertiesSheet
+        visible
+        surface={resolveUserDrawingPropertiesSurface(freehandState)}
+        onDispatch={onDispatch}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Stroke')).not.toBeNull();
+    expect(screen.getByLabelText('Medium highlighter stroke width').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(screen.getByLabelText('35 percent highlighter opacity'));
+    expect(onDispatch).toHaveBeenCalledWith({ type: 'updateStyle', style: { opacity: 0.35 } });
+  });
+
   it('renders an empty state', () => {
     render(
       <UserDrawingPropertiesSheet

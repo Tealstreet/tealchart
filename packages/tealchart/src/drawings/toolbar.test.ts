@@ -6,6 +6,7 @@ import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 import {
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
@@ -1020,6 +1021,7 @@ describe('user drawing toolbar descriptors', () => {
       '#d1d4dc',
     ]);
     expect(USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width)).toEqual([1, 2, 3, 4, 5]);
+    expect([1, 8, 28].map(getUserDrawingLineWidthPreviewFontSize)).toEqual([11, 18, 20]);
     expect(USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => descriptor.lineStyle)).toEqual([
       'solid',
       'dashed',
@@ -1624,6 +1626,65 @@ describe('user drawing toolbar descriptors', () => {
       ['opacity:0.75', true, { type: 'updateStyle', style: { opacity: 0.75 } }, undefined],
       ['lineVisible:toggle', true, { type: 'updateStyle', style: { lineVisible: false } }, undefined],
     ]);
+    const highlighterSurface = resolveUserDrawingSelectedActionSurface({
+      ...selected,
+      selection: { drawingId: 'marker' },
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid' as const, opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+    const highlighterStyle = highlighterSurface.groups.find((group) => group.id === 'style')!;
+    expect(highlighterStyle.items.find((item) => item.id === 'lineWidth:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { lineWidth: 12 } },
+    });
+    expect(highlighterStyle.items.find((item) => item.id === 'opacity:0.25')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { opacity: 0.25 } },
+    });
+    const legacyHighlighterSurface = resolveUserDrawingSelectedActionSurface({
+      ...selected,
+      selection: { drawingId: 'marker' },
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' as const, opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+    const legacyHighlighterStyle = legacyHighlighterSurface.groups.find((group) => group.id === 'style')!;
+    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:decrease')).toMatchObject({
+      enabled: false,
+      command: { type: 'updateStyle', style: {} },
+    });
+    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { lineWidth: 4 } },
+    });
     expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
       ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
       ['sendBackward', true, { type: 'toolbarAction', action: 'sendBackward' }],
@@ -2381,6 +2442,48 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       selected: true,
       command: { type: 'setTrendLineExtend', extend: 'right' },
+    });
+  });
+
+  it('resolves freehand stroke presets for shared properties surfaces', () => {
+    const highlighterState = {
+      ...state,
+      selection: { drawingId: 'highlighter' },
+      drawings: [
+        {
+          id: 'highlighter',
+          kind: 'highlighter' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid' as const, opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const surface = resolveUserDrawingPropertiesSurface(highlighterState);
+    const strokeGroup = surface.groups[0]!;
+
+    expect(strokeGroup).toMatchObject({ id: 'line', label: 'Stroke' });
+    expect(strokeGroup.controls.find((control) => control.id === 'lineWidth:8')).toMatchObject({
+      enabled: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { lineWidth: 8 } },
+    });
+    expect(strokeGroup.controls.find((control) => control.id === 'lineWidth:28')).toMatchObject({
+      label: 'Extra wide highlighter stroke width',
+      command: { type: 'updateStyle', style: { lineWidth: 28 } },
+    });
+    expect(strokeGroup.controls.find((control) => control.id === 'opacity:0.35')).toMatchObject({
+      enabled: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { opacity: 0.35 } },
     });
   });
 

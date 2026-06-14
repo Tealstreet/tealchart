@@ -19,7 +19,10 @@ import type {
   UserDrawingTrendLineExtend,
 } from './types';
 
+import { isUserDrawingPathFamilyTool } from './types';
 import {
+  getUserDrawingLineWidthDescriptors,
+  getUserDrawingOpacityDescriptors,
   getSelectedUserDrawing,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -37,8 +40,6 @@ import {
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
-  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
-  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -150,10 +151,12 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
   if (!drawing) return { drawing: null, editable: false, groups: [] };
 
   const editable = !drawing.locked;
+  const lineWidthDescriptors = getUserDrawingLineWidthDescriptors(drawing);
+  const opacityDescriptors = getUserDrawingOpacityDescriptors(drawing);
   const groups: UserDrawingPropertiesSurfaceGroupDraft[] = [
     {
       id: 'line',
-      label: 'Line',
+      label: isUserDrawingPathFamilyTool(drawing.kind) ? 'Stroke' : 'Line',
       controls: [
         ...USER_DRAWING_LINE_COLOR_DESCRIPTORS.map((descriptor) => ({
           id: `lineColor:${descriptor.color}`,
@@ -163,7 +166,7 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
           selected: colorsMatch(drawing.style.lineColor, descriptor.color),
           command: { type: 'updateStyle' as const, style: { lineColor: descriptor.color } },
         })),
-        ...USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => ({
+        ...lineWidthDescriptors.map((descriptor) => ({
           id: `lineWidth:${descriptor.width}`,
           type: 'option' as const,
           label: descriptor.label,
@@ -180,7 +183,7 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
           selected: drawing.style.lineStyle === descriptor.lineStyle,
           command: { type: 'updateStyle' as const, style: { lineStyle: descriptor.lineStyle } },
         })),
-        ...USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => ({
+        ...opacityDescriptors.map((descriptor) => ({
           id: `opacity:${descriptor.opacity}`,
           type: 'option' as const,
           label: descriptor.label,

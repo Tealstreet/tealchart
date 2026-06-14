@@ -209,6 +209,40 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Green text color')).toBeNull();
   });
 
+  it('renders highlighter stroke presets in selected drawing style controls', () => {
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          selection: { drawingId: 'marker' },
+          drawings: [
+            {
+              id: 'marker',
+              kind: 'highlighter',
+              paneId: 'main',
+              visible: true,
+              locked: false,
+              createdAt: 3,
+              updatedAt: 3,
+              style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid', opacity: 0.35 },
+              points: [
+                { time: 1, price: 10 },
+                { time: 2, price: 12 },
+                { time: 3, price: 11 },
+              ],
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByLabelText('Medium highlighter stroke width').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('35 percent highlighter opacity').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.queryByLabelText('5 pixel line width')).toBeNull();
+  });
+
   it('dispatches selected projection fill and generated-label text appearance controls', () => {
     const onStyle = vi.fn();
     render(

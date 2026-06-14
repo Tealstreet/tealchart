@@ -423,6 +423,43 @@ describe('ChartTopBar drawing toolbar', () => {
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
+      selection: { drawingId: 'marker' },
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid', opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+    openSelectedDrawingStylePopover();
+    expect(
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Medium highlighter stroke width"]')
+        ?.getAttribute('aria-pressed'),
+    ).toBe('true');
+    expect(
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="35 percent highlighter opacity"]')
+        ?.getAttribute('aria-pressed'),
+    ).toBe('true');
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Extra wide highlighter stroke width"]')?.style
+        .fontSize,
+    ).toBe('20px');
+
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
       selection: { drawingId: 'rect' },
       drawings: [
         {

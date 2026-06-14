@@ -17,6 +17,9 @@ import type { LayoutSelectorCallbacks } from './LayoutSelector';
 import {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingLineWidthDescriptors,
+  getUserDrawingLineWidthPreviewFontSize,
+  getUserDrawingOpacityDescriptors,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -45,8 +48,6 @@ import {
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
-  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
-  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -1055,7 +1056,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
       group.appendChild(this.createElement('div', { style: styles.divider }));
 
-      for (const descriptor of USER_DRAWING_LINE_WIDTH_DESCRIPTORS) {
+      for (const descriptor of getUserDrawingLineWidthDescriptors(selectedDrawing)) {
         const isActive = selectedDrawing.style.lineWidth === descriptor.width;
         const btn = this.createElement('button', {
           style: {
@@ -1063,7 +1064,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             ...(isActive ? styles.drawingButtonActive : {}),
             opacity: styleEnabled ? '1' : '0.35',
             cursor: styleEnabled ? 'pointer' : 'default',
-            fontSize: `${10 + descriptor.width}px`,
+            fontSize: `${getUserDrawingLineWidthPreviewFontSize(descriptor.width)}px`,
           },
           textContent: '━',
           attributes: {
@@ -1159,7 +1160,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         }
       }
 
-      for (const descriptor of USER_DRAWING_OPACITY_DESCRIPTORS) {
+      for (const descriptor of getUserDrawingOpacityDescriptors(selectedDrawing)) {
         const isActive = (selectedDrawing.style.opacity ?? 1) === descriptor.opacity;
         const btn = this.createElement('button', {
           style: {
