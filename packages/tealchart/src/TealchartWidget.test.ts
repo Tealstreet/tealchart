@@ -2113,6 +2113,10 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings).toEqual([]);
       expect(widget.getUserDrawingState().selection).toBeNull();
       expect(chartDelete.defaultPrevented).toBe(true);
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
 
       widget.remove();
     });
