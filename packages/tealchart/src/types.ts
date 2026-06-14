@@ -6,6 +6,7 @@
 import type { WorkerError } from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEvent,
+  UserDrawingCommandEventListener,
   UserDrawingObjectTreeModel,
   UserDrawingPropertiesIntent,
   UserDrawingState,
@@ -746,7 +747,7 @@ export interface TealchartWidgetOptions {
    * replacement and layout import emit a non-undoable `replaceState` command
    * event when the committed drawing layout changes.
    */
-  onUserDrawingCommand?: (event: UserDrawingCommandEvent) => void;
+  onUserDrawingCommand?: UserDrawingCommandEventListener;
   /** Called when app or widget code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   /** Called when app or widget code asks to open selected drawing properties. */

@@ -472,6 +472,7 @@ export type {
   UserDrawingCommandDispatchResult,
   UserDrawingCommandEvent,
   UserDrawingCommandEventCommand,
+  UserDrawingCommandEventListener,
   UserDrawingHistoryCommand,
   UserDrawingReplaceStateCommand,
   UserDrawingCommandMetadata,

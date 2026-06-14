@@ -106,10 +106,10 @@ import type {
   UserDrawingTextMaxWidthDescriptor,
   UserDrawingTextWrapDescriptor,
   TealchartWidgetOptions,
+  UserDrawingCommandEventListener,
   WidgetEventCallback,
   WidgetEventMap,
 } from './index';
-import type { SkiaTealchartProps } from './SkiaTealchart';
 import type {
   MobileUserDrawingAnchoredVolumeProfilePrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
@@ -306,15 +306,13 @@ describe('tealchart public entries', () => {
     const webOptionCallback = ((event) => event.state.drawings.length) satisfies NonNullable<
       TealchartWidgetOptions['onUserDrawingCommand']
     >;
-    const mobileOptionCallback = ((event) => event.command.type) satisfies NonNullable<
-      SkiaTealchartProps['onUserDrawingCommand']
-    >;
+    const crossPlatformCallback = ((event) => event.command.type) satisfies UserDrawingCommandEventListener;
     const acceptsCommandTuple = (_tuple: WidgetEventMap['user_drawing_command']) => true;
     const commandEvent: UserDrawingCommandEvent | null = null;
 
     expect(webSubscriptionCallback).toBeTypeOf('function');
     expect(webOptionCallback).toBeTypeOf('function');
-    expect(mobileOptionCallback).toBeTypeOf('function');
+    expect(crossPlatformCallback).toBeTypeOf('function');
     expect(acceptsCommandTuple).toBeTypeOf('function');
     expect(commandEvent).toBeNull();
   });
