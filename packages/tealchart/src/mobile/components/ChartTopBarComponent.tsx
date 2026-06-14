@@ -24,6 +24,7 @@ import {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingLineWidthDescriptors,
+  getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
@@ -377,7 +378,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                           <Text
                             style={[
                               styles.drawingButtonText,
-                              { color: active ? accentColor : textSecondaryColor, fontSize: 10 + descriptor.width },
+                              {
+                                color: active ? accentColor : textSecondaryColor,
+                                fontSize: getUserDrawingLineWidthPreviewFontSize(descriptor.width),
+                              },
                             ]}
                           >
                             ━

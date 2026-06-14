@@ -453,6 +453,10 @@ describe('ChartTopBar drawing toolbar', () => {
         .querySelector<HTMLButtonElement>('button[aria-label="35 percent highlighter opacity"]')
         ?.getAttribute('aria-pressed'),
     ).toBe('true');
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Extra wide highlighter stroke width"]')?.style
+        .fontSize,
+    ).toBe('20px');
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
