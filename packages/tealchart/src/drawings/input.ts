@@ -12,6 +12,7 @@ import type {
   UserDrawingTool,
   UserDrawingTextAnnotation,
   UserDrawingPanePosition,
+  UserDrawingMagnetMode,
 } from './types';
 
 import {
@@ -130,6 +131,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     drawings: [],
     activeTool: 'select',
     stayInDrawingMode: true,
+    magnetMode: 'off',
     selection: null,
     draft: null,
     textEdit: null,
@@ -169,6 +171,14 @@ export function setUserDrawingStayInDrawingMode(state: UserDrawingState, stayInD
   return {
     ...state,
     stayInDrawingMode,
+  };
+}
+
+export function setUserDrawingMagnetMode(state: UserDrawingState, magnetMode: UserDrawingMagnetMode): UserDrawingState {
+  if ((state.magnetMode ?? 'off') === magnetMode) return state;
+  return {
+    ...state,
+    magnetMode,
   };
 }
 

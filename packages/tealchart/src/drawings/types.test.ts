@@ -51,6 +51,7 @@ describe('user drawing types', () => {
       drawings: [],
       activeTool: 'select',
       stayInDrawingMode: true,
+      magnetMode: 'off',
       selection: null,
       draft: null,
       textEdit: null,

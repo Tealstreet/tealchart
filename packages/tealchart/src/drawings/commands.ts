@@ -35,6 +35,7 @@ import type {
   UserDrawingTextAlign,
   UserDrawingTool,
   UserDrawingTrendLineExtend,
+  UserDrawingMagnetMode,
 } from './types';
 import { isUserDrawingLayoutStateEqual } from './serialization';
 
@@ -66,6 +67,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingMagnetMode,
   setUserDrawingName,
   setUserDrawingStayInDrawingMode,
   setUserDrawingTableCell,
@@ -112,6 +114,7 @@ interface UserDrawingCommandBase {
 export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setActiveTool'; tool: UserDrawingTool })
   | (UserDrawingCommandBase & { type: 'setStayInDrawingMode'; stayInDrawingMode: boolean })
+  | (UserDrawingCommandBase & { type: 'setMagnetMode'; magnetMode: UserDrawingMagnetMode })
   | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
   | (UserDrawingCommandBase & { type: 'selectMany'; drawingIds: readonly string[] })
@@ -410,6 +413,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return setUserDrawingTool(state, command.tool);
     case 'setStayInDrawingMode':
       return setUserDrawingStayInDrawingMode(state, command.stayInDrawingMode);
+    case 'setMagnetMode':
+      return setUserDrawingMagnetMode(state, command.magnetMode);
     case 'add':
       return addUserDrawing(state, command.drawing, command.options);
     case 'select':

@@ -65,6 +65,7 @@ function createHistorySnapshot(state: UserDrawingState): UserDrawingState {
     drawings: state.drawings,
     activeTool: state.activeTool,
     stayInDrawingMode: state.stayInDrawingMode !== false,
+    magnetMode: state.magnetMode ?? 'off',
     selection: state.selection,
   });
 }
@@ -73,6 +74,7 @@ function applyHistorySnapshot(snapshot: UserDrawingState, currentState: UserDraw
   return createUserDrawingState({
     ...snapshot,
     stayInDrawingMode: currentState.stayInDrawingMode !== false,
+    magnetMode: currentState.magnetMode ?? 'off',
   });
 }
 
@@ -80,6 +82,7 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
   switch (command.type) {
     case 'setActiveTool':
     case 'setStayInDrawingMode':
+    case 'setMagnetMode':
     case 'select':
     case 'selectMany':
     case 'selectAtPoint':

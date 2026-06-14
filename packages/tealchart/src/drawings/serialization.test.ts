@@ -64,6 +64,7 @@ describe('drawing layout serialization', () => {
       createUserDrawingState({
         ...createStateWithTransientFields(),
         stayInDrawingMode: false,
+        magnetMode: 'weak',
       }),
     );
 
@@ -72,6 +73,7 @@ describe('drawing layout serialization', () => {
     expect(persisted?.drawings[0]?.id).toBe('trend_1');
     expect(persisted?.activeTool).toBe('select');
     expect(persisted?.stayInDrawingMode).toBe(false);
+    expect(persisted?.magnetMode).toBe('weak');
     expect(persisted?.selection).toBeNull();
     expect(persisted?.draft).toBeNull();
     expect(persisted?.textEdit).toBeNull();
@@ -82,14 +84,18 @@ describe('drawing layout serialization', () => {
       createUserDrawingState({
         ...createStateWithTransientFields(),
         stayInDrawingMode: false,
+        magnetMode: 'strong',
       }),
     );
     const restored = deserializeUserDrawingStateFromLayout(persisted);
 
     expect(restored?.stayInDrawingMode).toBe(false);
+    expect(restored?.magnetMode).toBe('strong');
     expect(serializeUserDrawingStateForLayout(restored)?.stayInDrawingMode).toBe(false);
+    expect(serializeUserDrawingStateForLayout(restored)?.magnetMode).toBe('strong');
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, stayInDrawingMode: undefined })?.stayInDrawingMode)
       .toBe(true);
+    expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: 'future' })?.magnetMode).toBe('off');
   });
 
   it('persists user-facing drawing names and trims restored legacy names', () => {
@@ -174,6 +180,31 @@ describe('drawing layout serialization', () => {
       drawings: [],
       activeTool: 'select',
       stayInDrawingMode: false,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+  });
+
+  it('persists magnet mode without committed drawings', () => {
+    const persisted = serializeUserDrawingStateForLayout(createUserDrawingState({ magnetMode: 'weak' }));
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+
+    expect(persisted).toMatchObject({
+      version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: true,
+      magnetMode: 'weak',
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+    expect(restored).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: true,
+      magnetMode: 'weak',
       selection: null,
       draft: null,
       textEdit: null,
