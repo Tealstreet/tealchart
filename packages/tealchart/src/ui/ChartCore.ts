@@ -39,6 +39,7 @@ import {
   isUserDrawingPathFamilyTool,
   renderUserDrawingLayer,
   resolveUserDrawingInputPointFromChart,
+  resolveUserDrawingMagnetInputPoint,
   resolveUserDrawingPlacementConstraint,
 } from '../drawings';
 import { PriceLineManager } from '../interaction/PriceLineManager';
@@ -1624,6 +1625,7 @@ export class ChartCore {
     if (!point) return null;
 
     const sourcePane = layout.panes.find((pane) => pane.id === point.paneId);
+    const inputPane = panes.find((pane) => pane.id === point.paneId);
     const anchor =
       options?.pressure === undefined
         ? point.anchor
@@ -1631,11 +1633,32 @@ export class ChartCore {
             ...point.anchor,
             pressure: options.pressure,
           };
-    return {
+    const inputPoint = {
       ...point,
       anchor,
       bars: sourcePane?.type === 'main' && this.bars.length > 0 ? this.bars : undefined,
     };
+    if (
+      !inputPane ||
+      (this.userDrawingState?.magnetMode ?? 'off') === 'off' ||
+      !this.userDrawingState ||
+      isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)
+    ) {
+      return inputPoint;
+    }
+
+    return resolveUserDrawingMagnetInputPoint({
+      mode: this.userDrawingState.magnetMode,
+      point: inputPoint,
+      screenPoint: { x, y },
+      space: {
+        viewport: this.viewport,
+        pane: inputPane,
+        chartLeft: this.margins.left,
+        chartRight: this.options.width - this.margins.right,
+        bars: inputPoint.bars,
+      },
+    });
   }
 
   private resolveConstrainedUserDrawingPlacementPoint(
