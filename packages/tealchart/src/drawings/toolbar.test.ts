@@ -1624,6 +1624,36 @@ describe('user drawing toolbar descriptors', () => {
       ['opacity:0.75', true, { type: 'updateStyle', style: { opacity: 0.75 } }, undefined],
       ['lineVisible:toggle', true, { type: 'updateStyle', style: { lineVisible: false } }, undefined],
     ]);
+    const highlighterSurface = resolveUserDrawingSelectedActionSurface({
+      ...selected,
+      selection: { drawingId: 'marker' },
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid' as const, opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+    const highlighterStyle = highlighterSurface.groups.find((group) => group.id === 'style')!;
+    expect(highlighterStyle.items.find((item) => item.id === 'lineWidth:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { lineWidth: 12 } },
+    });
+    expect(highlighterStyle.items.find((item) => item.id === 'opacity:0.25')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { opacity: 0.25 } },
+    });
     expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
       ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
       ['sendBackward', true, { type: 'toolbarAction', action: 'sendBackward' }],
