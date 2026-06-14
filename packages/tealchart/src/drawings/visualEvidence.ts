@@ -14,6 +14,8 @@ export type UserDrawingVisualEvidenceStateId =
   | 'textPropertyEditing'
   | 'paneSplitIndicators';
 
+export type UserDrawingVisualEvidenceStateStatus = 'ready' | 'app-owned' | 'known-gap';
+
 export interface UserDrawingVisualEvidenceViewport {
   id: UserDrawingVisualEvidenceViewportId;
   label: string;
@@ -28,6 +30,11 @@ export interface UserDrawingVisualEvidenceState {
   label: string;
   webEvidence: string;
   mobileEvidence: string;
+  status?: {
+    web: UserDrawingVisualEvidenceStateStatus;
+    mobile: UserDrawingVisualEvidenceStateStatus;
+    notes: string;
+  };
   expectedChecks: readonly string[];
 }
 
@@ -78,6 +85,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Empty chart with drawing rail',
       webEvidence: 'Canvas plus overlay chrome.',
       mobileEvidence: 'Skia chart plus mobile toolbar/action entry points.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes: 'Both platforms have first-party chart surfaces for manual layout evidence.',
+      },
       expectedChecks: [
         'Chart remains max-size.',
         'Overlays do not hide legend, axes, or candles unexpectedly.',
@@ -88,6 +100,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Active tool draft',
       webEvidence: 'Draft preview for a two-anchor and one-anchor tool.',
       mobileEvidence: 'Matching Skia draft primitive.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes: 'Both platforms render active draft primitives from the shared drawing state.',
+      },
       expectedChecks: [
         'Draft style, opacity, handles, and cancellation state match platform expectations.',
       ],
@@ -97,6 +114,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Selected drawing',
       webEvidence: 'Selected outline, handles, and action anchor.',
       mobileEvidence: 'Matching Skia selected primitives and touch target geometry.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes: 'Both platforms render selected primitives and action anchors.',
+      },
       expectedChecks: [
         'Handles are visible, stable, clipped to pane, and do not shift layout.',
       ],
@@ -106,6 +128,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Floating/action toolbar',
       webEvidence: 'Selected-object actions near selection.',
       mobileEvidence: 'Mobile selected action surface or sibling controls.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes: 'Web floating toolbar and mobile selected action surface share selected-action descriptors.',
+      },
       expectedChecks: [
         'Delete, duplicate, z-order, style, lock, and hide actions map to the same command semantics.',
       ],
@@ -115,6 +142,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Context menu/long press',
       webEvidence: 'Drawing-specific context actions.',
       mobileEvidence: 'Mobile context menu/long-press equivalent.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes: 'Web context menu and mobile long-press menu consume shared context actions.',
+      },
       expectedChecks: [
         'Ordering, visibility, lock, duplicate, delete, and properties actions remain reachable.',
       ],
@@ -124,6 +156,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Object tree',
       webEvidence: 'Row order, selected rows, lock/visibility/name state.',
       mobileEvidence: 'Mobile object tree/sheet or app-owned surface using the shared row model.',
+      status: {
+        web: 'app-owned',
+        mobile: 'app-owned',
+        notes: 'Both platforms expose app-owned object-tree open/dispatch APIs backed by the shared row model.',
+      },
       expectedChecks: [
         'Row order matches z-order.',
         'IDs remain stable.',
@@ -135,6 +172,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Text/property editing',
       webEvidence: 'Double-click edit and property surface.',
       mobileEvidence: 'Double-tap edit and property surface.',
+      status: {
+        web: 'app-owned',
+        mobile: 'app-owned',
+        notes: 'Both platforms expose text edit and properties intents; host apps own the final properties surface.',
+      },
       expectedChecks: [
         'Text edits commit or cancel as one transaction.',
         'Selection and history state are preserved.',
@@ -145,6 +187,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       label: 'Pane split indicators',
       webEvidence: 'Drawings over main pane plus non-overlay indicator panes.',
       mobileEvidence: 'Skia panes with drawing primitives routed to the correct pane.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes: 'Both platforms route drawing primitives through pane-aware render models.',
+      },
       expectedChecks: [
         'Drawings clip to their pane.',
         'Drawings do not overlap dedicated indicator canvases unexpectedly.',
@@ -165,8 +212,20 @@ export function createUserDrawingVisualEvidencePrNoteTemplate(
   matrix: UserDrawingVisualEvidenceMatrix = USER_DRAWING_VISUAL_EVIDENCE_MATRIX,
 ): string {
   const viewportLines = matrix.viewports.map((viewport) => `- ${viewport.label}:`).join('\n');
-  const stateLines = matrix.states.map((state) => `- [ ] ${state.label}, if affected`).join('\n');
+  const stateLines = matrix.states
+    .map((state) =>
+      state.status
+        ? `- [ ] ${state.label} (web: ${state.status.web}, mobile: ${state.status.mobile}), if affected`
+        : `- [ ] ${state.label}, if affected`,
+    )
+    .join('\n');
   const regressionCheckLines = matrix.regressionChecks.map((check) => `- [ ] ${check}`).join('\n');
+  const knownGapLines = matrix.states
+    .filter((state) => state.status && (state.status.web === 'known-gap' || state.status.mobile === 'known-gap'))
+    .map((state) => {
+      const status = state.status!;
+      return `- ${state.label}: web ${status.web}, mobile ${status.mobile} - ${status.notes}`;
+    });
 
   return [
     '## Drawing Visual Evidence',
@@ -180,5 +239,6 @@ export function createUserDrawingVisualEvidencePrNoteTemplate(
     regressionCheckLines,
     '',
     'Known visual gaps:',
+    knownGapLines.length > 0 ? knownGapLines.join('\n') : '- None recorded in the matrix for affected states.',
   ].join('\n');
 }

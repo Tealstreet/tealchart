@@ -92,6 +92,7 @@ import type {
   UserDrawingPropertiesIntent,
   UserDrawingVisualEvidenceMatrix,
   UserDrawingVisualEvidenceState,
+  UserDrawingVisualEvidenceStateStatus,
   UserDrawingVisualEvidenceViewport,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
@@ -558,11 +559,17 @@ describe('tealchart public entries', () => {
       target: 'web',
       notes: 'Include chart chrome',
     };
+    const status: NonNever<UserDrawingVisualEvidenceStateStatus> = 'ready';
     const visualState: NonNever<UserDrawingVisualEvidenceState> = {
       id: 'selectedDrawing',
       label: 'Selected drawing',
       webEvidence: 'Canvas handles',
       mobileEvidence: 'Skia handles',
+      status: {
+        web: status,
+        mobile: status,
+        notes: 'Both platforms expose selected handles',
+      },
       expectedChecks: ['Handles are stable'],
     };
     const matrix: NonNever<UserDrawingVisualEvidenceMatrix> = {
