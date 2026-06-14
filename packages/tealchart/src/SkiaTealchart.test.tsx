@@ -57,6 +57,7 @@ const initialDrawingState: UserDrawingState = {
   version: 1,
   activeTool: 'select',
   stayInDrawingMode: true,
+  magnetMode: 'off',
   selection: { drawingId: 'selected' },
   draft: null,
   textEdit: null,
@@ -144,29 +145,40 @@ describe('SkiaTealchart drawing properties', () => {
         interval="60"
         width={320}
         height={240}
-        userDrawingState={{ ...initialDrawingState, stayInDrawingMode: true }}
+        userDrawingState={{ ...initialDrawingState, stayInDrawingMode: true, magnetMode: 'off' }}
         onUserDrawingStateChange={onStateChange}
         onUserDrawingCommand={onCommand}
       />,
     );
 
     expect(ref.current?.isUserDrawingStayInDrawingMode()).toBe(true);
+    expect(ref.current?.getUserDrawingMagnetMode()).toBe('off');
 
     await act(async () => {
       expect(ref.current?.setUserDrawingStayInDrawingMode(false)).toBe(true);
+      expect(ref.current?.setUserDrawingMagnetMode('weak')).toBe(true);
     });
 
     expect(ref.current?.isUserDrawingStayInDrawingMode()).toBe(false);
+    expect(ref.current?.getUserDrawingMagnetMode()).toBe('weak');
     expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ stayInDrawingMode: false }));
+    expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ magnetMode: 'weak' }));
     expect(onCommand).toHaveBeenCalledWith(
       expect.objectContaining({
         command: expect.objectContaining({ type: 'setStayInDrawingMode', stayInDrawingMode: false }),
         source: 'api',
       }),
     );
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setMagnetMode', magnetMode: 'weak' }),
+        source: 'api',
+      }),
+    );
 
     await act(async () => {
       expect(ref.current?.setUserDrawingStayInDrawingMode(false)).toBe(false);
+      expect(ref.current?.setUserDrawingMagnetMode('weak')).toBe(false);
     });
   });
 
@@ -175,6 +187,7 @@ describe('SkiaTealchart drawing properties', () => {
       version: 1,
       activeTool: 'select',
       stayInDrawingMode: true,
+      magnetMode: 'off',
       selection: null,
       draft: null,
       textEdit: null,
