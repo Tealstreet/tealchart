@@ -64,7 +64,7 @@ function createHistorySnapshot(state: UserDrawingState): UserDrawingState {
     version: state.version,
     drawings: state.drawings,
     activeTool: state.activeTool,
-    stayInDrawingMode: state.stayInDrawingMode,
+    stayInDrawingMode: state.stayInDrawingMode !== false,
     selection: state.selection,
   });
 }

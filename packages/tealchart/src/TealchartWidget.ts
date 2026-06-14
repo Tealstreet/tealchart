@@ -2307,7 +2307,7 @@ export class TealchartWidget {
   }
 
   isUserDrawingStayInDrawingMode(): boolean {
-    return this._userDrawingState.stayInDrawingMode;
+    return this._userDrawingState.stayInDrawingMode !== false;
   }
 
   canUndoUserDrawingCommand(): boolean {

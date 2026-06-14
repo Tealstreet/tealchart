@@ -165,7 +165,7 @@ export function setUserDrawingTool(state: UserDrawingState, tool: UserDrawingToo
 }
 
 export function setUserDrawingStayInDrawingMode(state: UserDrawingState, stayInDrawingMode: boolean): UserDrawingState {
-  if (state.stayInDrawingMode === stayInDrawingMode) return state;
+  if ((state.stayInDrawingMode !== false) === stayInDrawingMode) return state;
   return {
     ...state,
     stayInDrawingMode,
@@ -173,7 +173,7 @@ export function setUserDrawingStayInDrawingMode(state: UserDrawingState, stayInD
 }
 
 function resolveUserDrawingActiveToolAfterPlacement(state: UserDrawingState): UserDrawingTool {
-  return state.stayInDrawingMode ? state.activeTool : 'select';
+  return state.stayInDrawingMode !== false ? state.activeTool : 'select';
 }
 
 export function selectUserDrawing(

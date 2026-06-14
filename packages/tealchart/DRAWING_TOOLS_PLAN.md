@@ -115,6 +115,16 @@ object-tree gaps stay visible.
   owns keyboard input.
 - Mobile Skia exposes matching imperative handle methods for app toolbars.
 
+## Shipped: Stay In Drawing Mode
+
+- Shared drawing state and command dispatch preserve whether placement should
+  remain in the active drawing tool or return to select mode after a completed
+  drawing.
+- Web widget APIs expose matching setter/getter methods with explicit no-op
+  returns and command events.
+- Mobile Skia exposes the same imperative handle methods and one-shot touch
+  placement behavior when stay mode is disabled.
+
 ## Shipped: Z-Order Toolbar Controls
 
 - Shared toolbar action descriptors include bring-forward, send-backward,

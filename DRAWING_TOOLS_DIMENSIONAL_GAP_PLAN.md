@@ -964,6 +964,9 @@ Phase 3: Mobile interaction/model tests
 - Status: mobile command-history tests cover object-tree hide, duplicate, and
   z-order actions through the shared dispatch resolver. Existing mobile render
   model tests cover selected/draft Skia primitives and action-surface geometry.
+- Status: mobile command tests and `SkiaTealchart` handle tests cover the
+  stay-in-drawing-mode command/API path, including no-op command events and
+  one-shot touch drag placement when stay mode is disabled.
 
 Phase 4: Visual parity checklist
 
