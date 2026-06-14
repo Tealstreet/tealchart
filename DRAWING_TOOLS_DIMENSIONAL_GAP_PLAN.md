@@ -330,6 +330,9 @@ Phase 3: Mobile input tests
   geometry.
 - Status: mobile command-history coverage mirrors the shared cross-pane
   placement regression, preserving the draft without adding undo history.
+- Status: shared/web render entries and mobile Skia render primitives now
+  assert drag placement draft preview geometry matches the eventual committed
+  rectangle geometry.
 
 ## Gap 4: Selection Action Surfaces
 
