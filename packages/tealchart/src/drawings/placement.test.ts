@@ -9,6 +9,8 @@ import {
   isUserDrawingDragPlacementTool,
   resolveUserDrawingPlacementConstraint,
 } from './placement';
+import { USER_DRAWING_TOOL_DESCRIPTORS } from './toolbar';
+import { getRequiredAnchorCount, isUserDrawingPathFamilyTool } from './types';
 
 const space: DrawingCoordinateSpace = {
   viewport: { startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 },
@@ -136,6 +138,18 @@ describe('user drawing placement modes', () => {
   it('keeps unsupported multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
     expect(isUserDrawingDragPlacementTool('select')).toBe(false);
     expect(getUserDrawingPlacementMode('select')).toBe('select');
+  });
+
+  it('keeps every registered multi-point tool on an explicit drag placement path', () => {
+    for (const { tool } of USER_DRAWING_TOOL_DESCRIPTORS) {
+      const anchorCount = getRequiredAnchorCount(tool);
+      if (tool === 'select' || anchorCount <= 1) {
+        continue;
+      }
+
+      const expectedMode = isUserDrawingPathFamilyTool(tool) ? 'pathDrag' : anchorCount === 2 ? 'dragTwoAnchor' : 'dragSeed';
+      expect(getUserDrawingPlacementMode(tool), tool).toBe(expectedMode);
+    }
   });
 
   it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(

@@ -192,21 +192,22 @@ Phase 3: Mobile adapter tests
 Goal: replace click-only placement for shape tools with real drawing gestures
 while preserving click-to-place workflows where appropriate.
 
-Status: initial slice in progress. Shared placement modes and two-anchor drag
-placement commands exist for line, shape, measurement, forecasting, Fibonacci,
-Gann, cyclic, callout/price-note, image, and fixed-range volume profile tools;
-drag-seeded placement exists for multi-anchor geometric, channel, pitchfork,
-Fibonacci, forecasting, position, bars-pattern, Elliott, and harmonic-pattern
-tools. Web Canvas and mobile Skia route those tools through matching drag
-preview/commit flows. Event-level web regression coverage now guards click
-preservation, mousemove promotion, and mouseup promotion through the
-pending-drawing path;
-mobile command/gesture/render-model regression gates cover the sibling behavior.
-Placement constraints are wired through shared screen-space geometry: web uses
-Shift during drag, while mobile Skia exposes `constrainUserDrawingPlacement` for
-touch toolbars to request matching square and 45-degree snapping. Remaining Gap
-3 work should expand tool coverage and deeper cancel/pointer-exit harness
-coverage.
+Status: shipped for the current registered drawing-tool surface. Shared
+placement modes and two-anchor drag placement commands exist for line, shape,
+measurement, forecasting, Fibonacci, Gann, cyclic, callout/price-note, image,
+and fixed-range volume profile tools; drag-seeded placement exists for
+multi-anchor geometric, channel, pitchfork, Fibonacci, forecasting, position,
+bars-pattern, Elliott, and harmonic-pattern tools. Web Canvas and mobile Skia
+route those tools through matching drag preview/commit flows. Event-level web
+regression coverage guards click preservation, mousemove promotion, mouseup
+promotion, Escape/window-blur/touchcancel cancellation, and Shift constraint
+metadata through the pending-drawing path; mobile command/gesture/render-model
+regression gates cover the sibling behavior. Placement constraints are wired
+through shared screen-space geometry: web uses Shift during drag, while mobile
+Skia exposes `constrainUserDrawingPlacement` for touch toolbars to request
+matching square and 45-degree snapping. The placement-mode tests now guard that
+every registered multi-point drawing tool resolves to an explicit drag
+placement path.
 
 ### Epic 3.1: Shared Placement State Machine
 
@@ -279,9 +280,10 @@ Phase 3: Gesture thresholds and constraints
 - Status: constrained placement now also keeps `cyclicLines` interval placement
   on a horizontal visual baseline through the same shared helper, with web
   ChartCore and mobile input-model coverage.
-- Future work: broaden constrained placement semantics for multi-anchor tools
-  as their dedicated gestures mature, and add amplitude-safe constrained
-  semantics for `timeCycles` and `sineLine`.
+- Follow-up risk: broaden constrained placement semantics for multi-anchor tools
+  as their dedicated gestures mature. `timeCycles` and `sineLine` remain
+  intentionally unconstrained for amplitude-safe semantics, with shared and
+  mobile tests pinning that behavior.
 
 ### Epic 3.2: Web Drag-to-Draw Adapter
 
@@ -325,6 +327,9 @@ Phase 1: Shared reducer tests
 - Verify click, drag, cancel, pane switch, stale draft, and threshold behavior.
 - Status: shared command coverage now guards cross-pane placement drag commits,
   keeping the active draft intact and avoiding fabricated drawings.
+- Status: placement-mode coverage now asserts every registered multi-point tool
+  resolves to `dragTwoAnchor`, `dragSeed`, or `pathDrag`, preventing new
+  multi-point tools from silently falling back to click-only placement.
 
 Phase 2: Web event tests
 
