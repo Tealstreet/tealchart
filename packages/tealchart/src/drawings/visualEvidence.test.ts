@@ -64,6 +64,22 @@ describe('drawing visual evidence matrix', () => {
     expect(template).toContain('None recorded in the matrix for affected states.');
   });
 
+  it('tracks object-tree shared action and layering evidence', () => {
+    const objectTree = USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.find((state) => state.id === 'objectTree');
+
+    expect(objectTree).toMatchObject({
+      status: {
+        web: 'app-owned',
+        mobile: 'app-owned',
+      },
+      expectedChecks: expect.arrayContaining([
+        'Row order matches z-order.',
+        'Row and bulk actions resolve through the same shared command pipeline.',
+      ]),
+    });
+    expect(objectTree?.status?.notes).toContain('shared row, selection, rename, and z-order action models');
+  });
+
   it('keeps PR note generation compatible with custom legacy matrices without status fields', () => {
     const template = createUserDrawingVisualEvidencePrNoteTemplate({
       viewports: [

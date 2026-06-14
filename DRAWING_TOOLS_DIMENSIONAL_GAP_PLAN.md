@@ -633,6 +633,9 @@ Phase 3: Mobile render-order tests
 - Verify Skia primitive order follows object tree z-order.
 - Status: mobile render-model tests assert committed drawing primitive order
   follows drawing z-order before selected handles.
+- Status: the shared visual-evidence matrix now records object-tree row, bulk,
+  rename, and z-order command parity as app-owned web/mobile evidence, closing
+  the object-tree/layering epic.
 
 ## Gap 6: Text and Property Edit Lifecycle
 
