@@ -23,5 +23,8 @@ export type { ChartTopBarComponentProps } from './ChartTopBarComponent';
 export { UserDrawingObjectTreeSheet } from './UserDrawingObjectTreeSheet';
 export type { UserDrawingObjectTreeSheetProps } from './UserDrawingObjectTreeSheet';
 
+export { UserDrawingPropertiesSheet } from './UserDrawingPropertiesSheet';
+export type { UserDrawingPropertiesSheetProps } from './UserDrawingPropertiesSheet';
+
 export { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 export type { TimeframeOption } from '../../state/chartState';

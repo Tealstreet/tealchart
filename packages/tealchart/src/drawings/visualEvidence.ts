@@ -162,10 +162,10 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       webEvidence: 'Double-click edit and property surface.',
       mobileEvidence: 'Double-tap edit and property surface.',
       status: {
-        web: 'app-owned',
-        mobile: 'app-owned',
+        web: 'ready',
+        mobile: 'ready',
         notes:
-          'Both platforms expose app-owned text edit and properties surfaces backed by shared edit-intent, command/history, and properties-surface control models.',
+          'Both platforms include built-in properties surfaces when no app-owned callback is supplied, while preserving app-owned text edit and properties APIs backed by shared edit-intent, command/history, and properties-surface control models.',
       },
       expectedChecks: [
         'Double-click and double-tap resolve through the same shared edit-intent model.',

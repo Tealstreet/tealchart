@@ -111,8 +111,8 @@ describe('drawing visual evidence matrix', () => {
 
     expect(textProperty).toMatchObject({
       status: {
-        web: 'app-owned',
-        mobile: 'app-owned',
+        web: 'ready',
+        mobile: 'ready',
       },
       expectedChecks: expect.arrayContaining([
         'Double-click and double-tap resolve through the same shared edit-intent model.',
@@ -121,6 +121,7 @@ describe('drawing visual evidence matrix', () => {
       ]),
     });
     expect(textProperty?.status?.notes).toContain('shared edit-intent');
+    expect(textProperty?.status?.notes).toContain('built-in properties surfaces');
     expect(textProperty?.status?.notes).toContain('properties-surface control models');
   });
 

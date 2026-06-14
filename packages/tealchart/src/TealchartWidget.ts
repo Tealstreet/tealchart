@@ -121,6 +121,7 @@ import {
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
+import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs } from './viewport/viewScale';
@@ -156,6 +157,8 @@ export class TealchartWidget {
   // Context menu
   private _contextMenuCallback: ContextMenuCallback | null = null;
   private _userDrawingObjectTreePanel: UserDrawingObjectTreePanel | null = null;
+  private _userDrawingPropertiesPanel: UserDrawingPropertiesPanel | null = null;
+  private _userDrawingPropertiesPanelDrawingId: string | undefined;
 
   // Keyboard shortcuts
   private _shortcuts: Map<string, (e: KeyboardEvent) => void> = new Map();
@@ -2201,6 +2204,11 @@ export class TealchartWidget {
       this._userDrawingObjectTreePanel.close();
       this._userDrawingObjectTreePanel = null;
     }
+    if (this._userDrawingPropertiesPanel) {
+      this._userDrawingPropertiesPanel.close();
+      this._userDrawingPropertiesPanel = null;
+      this._userDrawingPropertiesPanelDrawingId = undefined;
+    }
 
     // Dispose vanilla UI — preserve DOM so the new widget can show old
     // content until its first paint with bars (prevents blank flash).
@@ -2274,6 +2282,7 @@ export class TealchartWidget {
     this._userDrawingState = state;
     this._options.onUserDrawingStateChange?.(state);
     this._refreshUserDrawingObjectTreePanel();
+    this._refreshUserDrawingPropertiesPanel();
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
     if (options.markLayoutDirty !== false && !isUserDrawingLayoutStateEqual(previousState, state)) {
       this._markDirty();
@@ -2644,9 +2653,42 @@ export class TealchartWidget {
   openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
     const intent = this.getUserDrawingPropertiesIntent(drawingId);
     if (intent) {
-      this._options.onUserDrawingPropertiesOpen?.(intent);
+      if (this._options.onUserDrawingPropertiesOpen) {
+        this._options.onUserDrawingPropertiesOpen(intent);
+      } else {
+        this._openUserDrawingPropertiesPanel(this.getUserDrawingPropertiesSurface(intent.drawingId), intent.drawingId);
+      }
     }
     return intent;
+  }
+
+  private _openUserDrawingPropertiesPanel(
+    surface = this.getUserDrawingPropertiesSurface(),
+    drawingId = surface.drawing?.id,
+  ): void {
+    this._userDrawingPropertiesPanelDrawingId = drawingId;
+    if (this._userDrawingPropertiesPanel) {
+      this._userDrawingPropertiesPanel.updateSurface(surface);
+      return;
+    }
+
+    this._userDrawingPropertiesPanel = new UserDrawingPropertiesPanel({
+      surface,
+      onDispatch: (command) =>
+        this.dispatchUserDrawingPropertiesSurfaceCommand(command, {
+          drawingId: this._userDrawingPropertiesPanelDrawingId,
+        }),
+      onClose: () => {
+        this._userDrawingPropertiesPanel = null;
+        this._userDrawingPropertiesPanelDrawingId = undefined;
+      },
+    });
+  }
+
+  private _refreshUserDrawingPropertiesPanel(): void {
+    this._userDrawingPropertiesPanel?.updateSurface(
+      this.getUserDrawingPropertiesSurface(this._userDrawingPropertiesPanelDrawingId),
+    );
   }
 
   private _openUserDrawingObjectTreePanel(model = this.getUserDrawingObjectTreeModel()): void {
@@ -3031,10 +3073,7 @@ export class TealchartWidget {
         }
       }
       if (intent.type === 'properties') {
-        const propertiesIntent = resolveUserDrawingPropertiesIntent(nextState, { drawingId: intent.drawingId });
-        if (propertiesIntent) {
-          this._options.onUserDrawingPropertiesOpen?.(propertiesIntent);
-        }
+        this.openUserDrawingProperties(intent.drawingId);
       }
       return;
     }
@@ -3249,6 +3288,15 @@ export class TealchartWidget {
         e.preventDefault();
         e.stopPropagation();
         this._userDrawingObjectTreePanel.close();
+      }
+      return;
+    }
+
+    if (this._userDrawingPropertiesPanel) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        this._userDrawingPropertiesPanel.close();
       }
       return;
     }

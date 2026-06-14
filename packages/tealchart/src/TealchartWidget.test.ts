@@ -2016,13 +2016,31 @@ describe('TealchartWidget', () => {
             price: 50,
           },
           {
+            id: 'target',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 1, price: 45 },
+              { time: 2, price: 55 },
+            ],
+          },
+          {
             id: 'locked',
             kind: 'rectangle',
             paneId: 'main',
             visible: true,
             locked: true,
-            createdAt: 2,
-            updatedAt: 2,
+            createdAt: 3,
+            updatedAt: 3,
             style: {
               lineColor: '#f5c542',
               lineWidth: 1,
@@ -2075,6 +2093,113 @@ describe('TealchartWidget', () => {
       const opened = widget.openUserDrawingProperties('locked');
       expect(onOpenProperties).toHaveBeenCalledWith(opened);
       expect(opened).toMatchObject({ drawingId: 'locked', editable: false });
+      widget.remove();
+    });
+
+    it('opens the built-in web properties panel when no app-owned callback is provided', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'line' },
+        drawings: [
+          {
+            id: 'line',
+            name: 'Breakout',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'target',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 1, price: 45 },
+              { time: 2, price: 55 },
+            ],
+          },
+          {
+            id: 'locked',
+            kind: 'rectangle',
+            paneId: 'main',
+            visible: true,
+            locked: true,
+            createdAt: 3,
+            updatedAt: 3,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 1, price: 45 },
+              { time: 2, price: 55 },
+            ],
+          },
+        ],
+      });
+
+      widget.openUserDrawingProperties();
+
+      let panel = document.querySelector<HTMLElement>('[aria-label="Drawing properties"]');
+      expect(panel).not.toBeNull();
+      expect(panel?.textContent).toContain('horizontalLine properties');
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Blue line color"]')?.click();
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'line')?.style.lineColor).toBe(
+        '#38bdf8',
+      );
+
+      testWidget._isHovered = true;
+      const escape = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+      document.dispatchEvent(escape);
+
+      expect(escape.defaultPrevented).toBe(true);
+      expect(document.querySelector('[aria-label="Drawing properties"]')).toBeNull();
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'line' });
+      testWidget._isHovered = false;
+
+      widget.openUserDrawingProperties('target');
+      panel = document.querySelector<HTMLElement>('[aria-label="Drawing properties"]');
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Blue line color"]')?.click();
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')?.style.lineColor).toBe(
+        '#38bdf8',
+      );
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'line')?.style.lineColor).toBe(
+        '#38bdf8',
+      );
+
+      widget.openUserDrawingProperties('locked');
+      panel = document.querySelector<HTMLElement>('[aria-label="Drawing properties"]');
+      const lockedLineColor = panel?.querySelector<HTMLButtonElement>('[aria-label="Blue line color"]');
+      expect(lockedLineColor?.getAttribute('aria-disabled')).toBe('true');
+      lockedLineColor?.click();
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'locked')?.style.lineColor).toBe(
+        '#f5c542',
+      );
+
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Close drawing properties"]')?.click();
+      expect(document.querySelector('[aria-label="Drawing properties"]')).toBeNull();
+      widget.remove();
     });
 
     it('defines public drawing API failure returns for unavailable targets and callbacks', () => {
