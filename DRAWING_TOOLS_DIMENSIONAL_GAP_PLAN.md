@@ -271,8 +271,12 @@ Phase 3: Gesture thresholds and constraints
   ellipse, Fib circle/spiral, Gann square/fixed, and line-family tools through
   a shared helper, with web Shift and a mobile Skia prop for toolbar-controlled
   constrained placement.
+- Status: constrained placement now also keeps `cyclicLines` interval placement
+  on a horizontal visual baseline through the same shared helper, with web
+  ChartCore and mobile input-model coverage.
 - Future work: broaden constrained placement semantics for multi-anchor tools
-  as their dedicated gestures mature.
+  as their dedicated gestures mature, and add amplitude-safe constrained
+  semantics for `timeCycles` and `sineLine`.
 
 ### Epic 3.2: Web Drag-to-Draw Adapter
 
