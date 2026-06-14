@@ -447,6 +447,7 @@ export type {
   UserDrawingVisualEvidenceMatrix,
   UserDrawingVisualEvidenceState,
   UserDrawingVisualEvidenceStateId,
+  UserDrawingVisualEvidenceStateStatus,
   UserDrawingVisualEvidenceViewport,
   UserDrawingVisualEvidenceViewportId,
   UserDrawingObjectTreeSelectionAction,

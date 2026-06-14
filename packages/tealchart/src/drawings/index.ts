@@ -496,6 +496,7 @@ export type {
   UserDrawingVisualEvidenceMatrix,
   UserDrawingVisualEvidenceState,
   UserDrawingVisualEvidenceStateId,
+  UserDrawingVisualEvidenceStateStatus,
   UserDrawingVisualEvidenceViewport,
   UserDrawingVisualEvidenceViewportId,
 } from './visualEvidence';
