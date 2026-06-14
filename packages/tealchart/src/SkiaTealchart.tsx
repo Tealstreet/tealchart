@@ -37,6 +37,7 @@ import type {
   UserDrawingKeyboardInput,
   UserDrawingLineStyle,
   UserDrawingMagnetMode,
+  UserDrawingMeasureMode,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -306,6 +307,8 @@ export interface SkiaTealchartHandle {
   isUserDrawingStayInDrawingMode(): boolean;
   setUserDrawingMagnetMode(magnetMode: UserDrawingMagnetMode): boolean;
   getUserDrawingMagnetMode(): UserDrawingMagnetMode;
+  setUserDrawingMeasureMode(measureMode: UserDrawingMeasureMode): boolean;
+  getUserDrawingMeasureMode(): UserDrawingMeasureMode;
   canUndoUserDrawingCommand(): boolean;
   canRedoUserDrawingCommand(): boolean;
   undoUserDrawingCommand(): boolean;
@@ -536,6 +539,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
   const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
+  const userDrawingMeasureLastPointRef = useRef<UserDrawingInputPoint | null>(null);
 
   const commitUserDrawingState = useCallback(
     (nextState: UserDrawingState) => {
@@ -544,6 +548,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         userDrawingPlacementDragStartPointRef.current = null;
         userDrawingPlacementDragLastPointRef.current = null;
         setUserDrawingDraftPreviewAnchor(null);
+      }
+      if (!nextState.measure) {
+        userDrawingMeasureLastPointRef.current = null;
       }
       setUncontrolledUserDrawingState(nextState);
       onUserDrawingStateChange?.(nextState);
@@ -567,6 +574,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
       userDrawingPlacementDragStartPointRef.current = null;
       userDrawingPlacementDragLastPointRef.current = null;
+      userDrawingMeasureLastPointRef.current = null;
       setUserDrawingDraftPreviewAnchor(null);
       const nextState = createUserDrawingState(propUserDrawingState);
       userDrawingStateRef.current = nextState;
@@ -728,6 +736,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       getUserDrawingMagnetMode(): UserDrawingMagnetMode {
         return userDrawingStateRef.current.magnetMode ?? 'off';
+      },
+      setUserDrawingMeasureMode(measureMode: UserDrawingMeasureMode): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setMeasureMode',
+          measureMode,
+          meta: { source: 'api' },
+        });
+      },
+      getUserDrawingMeasureMode(): UserDrawingMeasureMode {
+        return userDrawingStateRef.current.measureMode ?? 'off';
       },
       canUndoUserDrawingCommand(): boolean {
         return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);
@@ -1809,6 +1827,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!viewport) return false;
       if (!isPointInChartArea(x, y)) return false;
 
+      if (effectiveUserDrawingState.measureMode === 'on') {
+        const point = resolveMobileUserDrawingInputPoint({
+          point: { x, y },
+          viewport,
+          dimensions: chartDimensions,
+          panes: userDrawingInputPanes,
+          bars,
+          magnetMode: effectiveUserDrawingState.magnetMode ?? 'off',
+        });
+        if (!point) return false;
+
+        const changed = dispatchUserDrawingCommandToState({
+          type: 'beginMeasure',
+          point,
+          meta: { source: 'touch' },
+        });
+        if (!changed) return false;
+
+        userDrawingMeasureLastPointRef.current = point;
+        return true;
+      }
+
       if (isUserDrawingDragPlacementTool(effectiveUserDrawingState.activeTool)) {
         const point = resolveMobileUserDrawingInputPoint({
           point: { x, y },
@@ -1912,6 +1952,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleUserDrawingEditMove = useCallback(
     (x: number, y: number, options?: ChartDrawingGestureOptions) => {
+      if (viewport && effectiveUserDrawingState.measureMode === 'on') {
+        const point = resolveMobileUserDrawingInputPoint({
+          point: { x, y },
+          viewport,
+          dimensions: chartDimensions,
+          panes: userDrawingInputPanes,
+          bars,
+          magnetMode: effectiveUserDrawingState.magnetMode ?? 'off',
+        });
+        if (!point || !userDrawingMeasureLastPointRef.current) return;
+
+        userDrawingMeasureLastPointRef.current = point;
+        dispatchUserDrawingCommandToState({
+          type: 'updateMeasure',
+          point,
+          meta: { source: 'touch' },
+        });
+        return;
+      }
+
       if (viewport && isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)) {
         const point = resolveMobileUserDrawingInputPoint({
           point: { x, y },
@@ -1970,6 +2030,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const handleUserDrawingEditEnd = useCallback(() => {
+    if (userDrawingStateRef.current.measureMode === 'on') {
+      userDrawingMeasureLastPointRef.current = null;
+      dispatchUserDrawingCommandToState({ type: 'endMeasure', meta: { source: 'touch' } });
+      return;
+    }
+
     if (isUserDrawingDragPlacementTool(userDrawingStateRef.current.activeTool)) {
       const point = userDrawingPlacementDragLastPointRef.current;
       userDrawingPlacementDragStartPointRef.current = null;
@@ -2004,6 +2070,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, [createUserDrawingId, dispatchUserDrawingCommandToState]);
 
   const handleUserDrawingEditCancel = useCallback(() => {
+    if (userDrawingStateRef.current.measureMode === 'on') {
+      userDrawingMeasureLastPointRef.current = null;
+      dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'touch' } });
+      return;
+    }
+
     if (
       isUserDrawingDragPlacementTool(userDrawingStateRef.current.activeTool) ||
       isUserDrawingPathFamilyTool(userDrawingStateRef.current.activeTool)
@@ -4814,6 +4886,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             }}
             onUserDrawingClearAll={() => {
               dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'toolbar' } });
+            }}
+            onUserDrawingMeasureModeChange={(enabled) => {
+              dispatchUserDrawingCommandToState({
+                type: 'setMeasureMode',
+                measureMode: enabled ? 'on' : 'off',
+                meta: { source: 'toolbar' },
+              });
             }}
             onUserDrawingZOrderChange={(action) => {
               dispatchUserDrawingCommandToState({ type: 'reorder', action, meta: { source: 'toolbar' } });

@@ -137,6 +137,16 @@ object-tree gaps stay visible.
   OHLC snap resolver. Freehand path-family tools remain unsnapped so sampled
   pressure strokes stay usable.
 
+## Shipped: Measure Action
+
+- Shared drawing state and command dispatch support a transient measure mode
+  that renders a draft date-price range overlay without persisting a drawing or
+  adding undo history entries.
+- Web top-bar actions, widget APIs, and Canvas drag input toggle and draw the
+  temporary measurement overlay.
+- Mobile Skia top-bar actions, imperative handle APIs, touch drag input, and
+  render-model conversion expose the same temporary measurement behavior.
+
 ## Shipped: Z-Order Toolbar Controls
 
 - Shared toolbar action descriptors include bring-forward, send-backward,

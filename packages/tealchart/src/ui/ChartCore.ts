@@ -139,6 +139,12 @@ export interface ChartCoreOptions {
   onUserDrawingPlacementDragStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called when a two-anchor drawing tool drag commits placement */
   onUserDrawingPlacementDragEnd?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when temporary measure drag starts */
+  onUserDrawingMeasureStart?: (point: UserDrawingInputPoint) => boolean;
+  /** Called while temporary measure drag moves */
+  onUserDrawingMeasureMove?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when temporary measure drag ends */
+  onUserDrawingMeasureEnd?: () => void;
   /** Called when path-tool pointer down starts collecting freehand samples */
   onUserDrawingPathDragStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called while an active path-tool drag collects freehand samples */
@@ -559,6 +565,7 @@ export class ChartCore {
   private userDrawingDraftPreviewAnchor: UserDrawingAnchor | null = null;
   private userDrawingPlacementDragStartPoint: UserDrawingInputPoint | null = null;
   private userDrawingPlacementDragLastPoint: UserDrawingInputPoint | null = null;
+  private userDrawingMeasureLastPoint: UserDrawingInputPoint | null = null;
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
   private indicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
@@ -1030,6 +1037,7 @@ export class ChartCore {
       this.userDrawingDraftPreviewAnchor = null;
       this.userDrawingPlacementDragStartPoint = null;
       this.userDrawingPlacementDragLastPoint = null;
+      this.userDrawingMeasureLastPoint = null;
     }
     // No scheduleRender — paint() is called by the widget after pushing state
   }
@@ -1678,6 +1686,14 @@ export class ChartCore {
   private handleUserDrawingDragStart(x: number, y: number, options?: DrawingDragEventOptions): boolean {
     if (!this.viewport) return false;
 
+    if (this.userDrawingState?.measureMode === 'on') {
+      const point = this.resolveUserDrawingInputPoint(x, y);
+      if (!point || this.options.onUserDrawingMeasureStart?.(point) !== true) return false;
+      this.userDrawingMeasureLastPoint = point;
+      this.scheduleRender();
+      return true;
+    }
+
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y);
       if (!point || this.options.onUserDrawingPlacementDragStart?.(point) !== true) return false;
@@ -1719,6 +1735,15 @@ export class ChartCore {
       );
     }
 
+    if (this.userDrawingState.measureMode === 'on') {
+      return (
+        !!this.options.onUserDrawingMeasureStart &&
+        !!this.options.onUserDrawingMeasureMove &&
+        !!this.options.onUserDrawingMeasureEnd &&
+        this.resolveUserDrawingInputPoint(x, y) !== null
+      );
+    }
+
     if (
       !isUserDrawingPathFamilyTool(this.userDrawingState.activeTool) ||
       !this.options.onUserDrawingPathDragStart ||
@@ -1732,6 +1757,15 @@ export class ChartCore {
 
   private handleUserDrawingDragMove(x: number, y: number, options?: DrawingDragEventOptions): boolean {
     if (!this.viewport) return false;
+
+    if (this.userDrawingState?.measureMode === 'on') {
+      const point = this.resolveUserDrawingInputPoint(x, y);
+      if (!point || !this.userDrawingMeasureLastPoint) return false;
+      this.userDrawingMeasureLastPoint = point;
+      const changed = this.options.onUserDrawingMeasureMove?.(point) === true;
+      if (changed) this.scheduleRender();
+      return changed;
+    }
 
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y);
@@ -1753,6 +1787,13 @@ export class ChartCore {
   }
 
   private handleUserDrawingDragEnd(): void {
+    if (this.userDrawingState?.measureMode === 'on') {
+      this.userDrawingMeasureLastPoint = null;
+      this.options.onUserDrawingMeasureEnd?.();
+      this.scheduleRender();
+      return;
+    }
+
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       const point = this.userDrawingPlacementDragLastPoint;
       this.userDrawingDraftPreviewAnchor = null;
@@ -1775,6 +1816,13 @@ export class ChartCore {
   }
 
   private handleUserDrawingDragCancel(): void {
+    if (this.userDrawingState?.measureMode === 'on') {
+      this.userDrawingMeasureLastPoint = null;
+      this.options.onUserDrawingCancelDraft?.();
+      this.scheduleRender();
+      return;
+    }
+
     if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
       this.userDrawingDraftPreviewAnchor = null;
       this.userDrawingPlacementDragStartPoint = null;

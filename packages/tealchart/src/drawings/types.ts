@@ -102,6 +102,7 @@ export type UserDrawingTool =
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
 export type UserDrawingMagnetMode = 'off' | 'weak' | 'strong';
+export type UserDrawingMeasureMode = 'off' | 'on';
 export type UserDrawingTextAnnotationKind =
   | 'textLabel'
   | 'note'
@@ -884,12 +885,21 @@ export interface UserDrawingTextEdit {
   startedAt: number;
 }
 
+export interface UserDrawingMeasure {
+  paneId: string;
+  anchors: readonly [UserDrawingAnchor, UserDrawingAnchor];
+  style: UserDrawingStyle;
+  startedAt: number;
+}
+
 export interface UserDrawingState {
   version: number;
   drawings: readonly UserDrawing[];
   activeTool: UserDrawingTool;
   stayInDrawingMode?: boolean;
   magnetMode?: UserDrawingMagnetMode;
+  measureMode?: UserDrawingMeasureMode;
+  measure?: UserDrawingMeasure | null;
   selection: UserDrawingSelection | null;
   draft: UserDrawingDraft | null;
   textEdit: UserDrawingTextEdit | null;
@@ -1039,6 +1049,8 @@ export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   activeTool: 'select',
   stayInDrawingMode: true,
   magnetMode: 'off',
+  measureMode: 'off',
+  measure: null,
   selection: null,
   draft: null,
   textEdit: null,

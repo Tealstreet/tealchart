@@ -36,12 +36,14 @@ import type {
   UserDrawingTool,
   UserDrawingTrendLineExtend,
   UserDrawingMagnetMode,
+  UserDrawingMeasureMode,
 } from './types';
 import { isUserDrawingLayoutStateEqual } from './serialization';
 
 import {
   addUserDrawing,
   appendUserDrawingPathDragPoint,
+  beginUserDrawingMeasure,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
@@ -56,6 +58,7 @@ import {
   deleteUserDrawingTableColumn,
   deleteUserDrawingTableRow,
   duplicateUserDrawing,
+  endUserDrawingMeasure,
   handleUserDrawingInput,
   insertUserDrawingTableColumn,
   insertUserDrawingTableRow,
@@ -68,6 +71,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingLocked,
   setUserDrawingMagnetMode,
+  setUserDrawingMeasureMode,
   setUserDrawingName,
   setUserDrawingStayInDrawingMode,
   setUserDrawingTableCell,
@@ -79,6 +83,7 @@ import {
   setUserDrawingTool,
   setUserDrawingTrendLineExtend,
   setUserDrawingVisibility,
+  updateUserDrawingMeasure,
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
@@ -115,6 +120,7 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setActiveTool'; tool: UserDrawingTool })
   | (UserDrawingCommandBase & { type: 'setStayInDrawingMode'; stayInDrawingMode: boolean })
   | (UserDrawingCommandBase & { type: 'setMagnetMode'; magnetMode: UserDrawingMagnetMode })
+  | (UserDrawingCommandBase & { type: 'setMeasureMode'; measureMode: UserDrawingMeasureMode })
   | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
   | (UserDrawingCommandBase & { type: 'selectMany'; drawingIds: readonly string[] })
@@ -162,6 +168,13 @@ export type UserDrawingCommand =
       point: UserDrawingInputPoint;
       options: UserDrawingPlacementDragCommitOptions;
     })
+  | (UserDrawingCommandBase & {
+      type: 'beginMeasure';
+      point: UserDrawingInputPoint;
+      options?: UserDrawingPlacementDragStartOptions;
+    })
+  | (UserDrawingCommandBase & { type: 'updateMeasure'; point: UserDrawingInputPoint })
+  | (UserDrawingCommandBase & { type: 'endMeasure' })
   | (UserDrawingCommandBase & {
       type: 'beginPathDrag';
       point: UserDrawingInputPoint;
@@ -415,6 +428,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return setUserDrawingStayInDrawingMode(state, command.stayInDrawingMode);
     case 'setMagnetMode':
       return setUserDrawingMagnetMode(state, command.magnetMode);
+    case 'setMeasureMode':
+      return setUserDrawingMeasureMode(state, command.measureMode);
     case 'add':
       return addUserDrawing(state, command.drawing, command.options);
     case 'select':
@@ -447,6 +462,12 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return beginUserDrawingPlacementDrag(state, command.point, command.options);
     case 'commitPlacementDrag':
       return commitUserDrawingPlacementDrag(state, command.point, command.options);
+    case 'beginMeasure':
+      return beginUserDrawingMeasure(state, command.point, command.options);
+    case 'updateMeasure':
+      return updateUserDrawingMeasure(state, command.point);
+    case 'endMeasure':
+      return endUserDrawingMeasure(state);
     case 'beginPathDrag':
       return beginUserDrawingPathDrag(state, command.point, command.options);
     case 'appendPathDragPoint':

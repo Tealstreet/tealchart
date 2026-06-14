@@ -142,6 +142,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onDelete = vi.fn();
     const onCancel = vi.fn();
     const onClear = vi.fn();
+    const onMeasureModeChange = vi.fn();
     const onZOrder = vi.fn();
     const onProperties = vi.fn();
     const onObjectTree = vi.fn();
@@ -196,6 +197,7 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingDeleteSelected: onDelete,
       onUserDrawingCancelDraft: onCancel,
       onUserDrawingClearAll: onClear,
+      onUserDrawingMeasureModeChange: onMeasureModeChange,
       onUserDrawingZOrderChange: onZOrder,
       onUserDrawingPropertiesOpen: onProperties,
       onUserDrawingObjectTreeOpen: onObjectTree,
@@ -281,12 +283,14 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.click();
     expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onMeasureModeChange).toHaveBeenCalledWith(true);
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
     expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
@@ -295,6 +299,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
+      measureMode: 'on',
       selection: { drawingId: 'label' },
       drawings: [
         {
@@ -312,6 +317,13 @@ describe('ChartTopBar drawing toolbar', () => {
         },
       ],
     });
+    document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.click();
+    expect(onMeasureModeChange).toHaveBeenCalledWith(false);
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.getAttribute(
+        'aria-pressed',
+      ),
+    ).toBe('true');
     document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.click();
     expect(onTextEdit).toHaveBeenCalledWith('label');
 
