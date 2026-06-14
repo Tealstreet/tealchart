@@ -437,7 +437,11 @@ describe('ChartCore viewport management', () => {
       handleContextMenu(screenX: number, screenY: number, price: number, time: number): void;
     };
 
+    const addDocumentListener = vi.spyOn(document, 'addEventListener');
+    const removeDocumentListener = vi.spyOn(document, 'removeEventListener');
+
     testCore.handleContextMenu(100, 100, 10, 20);
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(onUserDrawingContextMenu).toHaveBeenCalledWith({ x: 100, y: 100 }, expect.any(Map));
     expect(onContextMenu).not.toHaveBeenCalled();
@@ -453,7 +457,11 @@ describe('ChartCore viewport management', () => {
     duplicateItem?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(drawingClick).toHaveBeenCalledTimes(1);
     expect(onChartClickFallthrough).not.toHaveBeenCalled();
+    expect(addDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
+    expect(removeDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
     document.body.removeEventListener('click', onChartClickFallthrough);
+    addDocumentListener.mockRestore();
+    removeDocumentListener.mockRestore();
 
     core.setUserDrawingState({
       version: 1,

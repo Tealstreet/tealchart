@@ -86,7 +86,11 @@ export const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={[styles.menu, { left: menuX, top: menuY }]}>
+            <View
+              accessibilityLabel="Context menu"
+              style={[styles.menu, { left: menuX, top: menuY }]}
+              onStartShouldSetResponder={() => true}
+            >
               {/* Header with price/time */}
               <View style={styles.header}>
                 <Text style={styles.headerText}>
