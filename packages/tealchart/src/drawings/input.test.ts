@@ -627,6 +627,30 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('keeps repeated-coordinate path samples when pressure changes', () => {
+    const pressureAnchorA = { ...anchorA, pressure: 0.2 };
+    const pressureAnchorB = { ...anchorA, pressure: 0.8 };
+    const started = beginUserDrawingPathDrag(
+      setUserDrawingTool(createUserDrawingState(), 'brush'),
+      { paneId: 'main', anchor: pressureAnchorA },
+      { now: () => 10, style },
+    );
+    const moved = appendUserDrawingPathDragPoint(started, { paneId: 'main', anchor: pressureAnchorB });
+    const committed = commitUserDrawingPathDrag(moved, { createId: () => 'pressure-only-brush', now: () => 20 });
+
+    expect(moved.draft?.anchors).toEqual([pressureAnchorA, pressureAnchorB]);
+    expect(committed.drawings[0]).toMatchObject({
+      id: 'pressure-only-brush',
+      kind: 'brush',
+      points: [
+        pressureAnchorA,
+        { ...anchorA, pressure: 0.35000000000000003 },
+        { ...anchorA, pressure: 0.6500000000000001 },
+        pressureAnchorB,
+      ],
+    });
+  });
+
   it('builds variable-point brush drawings from drag samples', () => {
     const rawPoints = [anchorA, anchorB, { time: 3_000, price: 90 }];
     const smoothedPoints = smoothUserDrawingPathAnchors(rawPoints);

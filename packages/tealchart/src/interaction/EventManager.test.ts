@@ -73,6 +73,36 @@ function dispatchTouchEvent(
   target.dispatchEvent(event);
 }
 
+function dispatchPointerEvent(
+  target: EventTarget,
+  type: string,
+  init: {
+    pointerId?: number;
+    pointerType?: string;
+    button?: number;
+    clientX: number;
+    clientY: number;
+    pressure?: number;
+    shiftKey?: boolean;
+    metaKey?: boolean;
+    ctrlKey?: boolean;
+  },
+): void {
+  const event = new Event(type, { bubbles: true, cancelable: true }) as PointerEvent;
+  Object.defineProperties(event, {
+    pointerId: { value: init.pointerId ?? 1 },
+    pointerType: { value: init.pointerType ?? 'pen' },
+    button: { value: init.button ?? 0 },
+    clientX: { value: init.clientX },
+    clientY: { value: init.clientY },
+    pressure: { value: init.pressure ?? 0.5 },
+    shiftKey: { value: init.shiftKey ?? false },
+    metaKey: { value: init.metaKey ?? false },
+    ctrlKey: { value: init.ctrlKey ?? false },
+  });
+  target.dispatchEvent(event);
+}
+
 describe('EventManager drawing drag routing', () => {
   beforeEach(() => {
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
@@ -207,6 +237,37 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingInput).not.toHaveBeenCalled();
     expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse');
     expect(onDrawingDragMove).toHaveBeenCalledWith(112, 104, 'mouse');
+    expect(onDrawingDragEnd).toHaveBeenCalledWith('mouse');
+
+    manager.dispose();
+  });
+
+  it('passes pen pointer pressure through pending drawing drags', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    dispatchPointerEvent(container, 'pointerdown', { clientX: 100, clientY: 100, pressure: 0.2 });
+    dispatchPointerEvent(window, 'pointermove', { clientX: 112, clientY: 104, pressure: 0.7 });
+    dispatchPointerEvent(window, 'pointerup', { clientX: 112, clientY: 104, pressure: 0.9 });
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { pressure: 0.2 });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { pressure: 0.2 });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(112, 104, 'mouse', { pressure: 0.7 });
     expect(onDrawingDragEnd).toHaveBeenCalledWith('mouse');
 
     manager.dispose();
