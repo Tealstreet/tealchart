@@ -7,7 +7,7 @@ import type {
   UserDrawingState,
 } from '../../drawings';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import {
@@ -18,6 +18,8 @@ import { dispatchMobileUserDrawingActionCommand } from '../utils/drawingActionDi
 
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT = 70;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y = 30;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_HEIGHT = 74;
 
 export interface UserDrawingSelectedActionSurfaceProps {
   state: UserDrawingState;
@@ -43,7 +45,26 @@ export function UserDrawingSelectedActionSurfaceComponent({
   onUserDrawingObjectTreeOpen,
 }: UserDrawingSelectedActionSurfaceProps) {
   const [activePopoverGroupId, setActivePopoverGroupId] = useState<string | null>(null);
-  if (!shouldRenderUserDrawingSelectedActionSurface(state, anchor)) return null;
+  const [activePopoverDrawingId, setActivePopoverDrawingId] = useState<string | null>(null);
+  const shouldRender = shouldRenderUserDrawingSelectedActionSurface(state, anchor);
+  const selectedDrawingId = surface.selectedDrawing?.id ?? null;
+  const activePopoverGroupIdForSelection =
+    activePopoverDrawingId === selectedDrawingId ? activePopoverGroupId : null;
+  const activePopoverGroup = surface.groups.find((group) => group.id === activePopoverGroupIdForSelection);
+  const surfaceHeight =
+    activePopoverGroup?.presentation?.type === 'popover'
+      ? MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y +
+        Math.max(MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT, MOBILE_USER_DRAWING_ACTION_POPOVER_HEIGHT)
+      : MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT;
+
+  useEffect(() => {
+    if (!shouldRender) {
+      setActivePopoverGroupId(null);
+      setActivePopoverDrawingId(null);
+    }
+  }, [shouldRender]);
+
+  if (!shouldRender) return null;
 
   const dispatchItem = (
     item: UserDrawingSelectedActionSurface['groups'][number]['items'][number],
@@ -72,7 +93,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
           viewport: { width: dimensions.width, height: dimensions.height },
           surface: {
             width: MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH,
-            height: MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT,
+            height: surfaceHeight,
           },
           inset: { left: 8, right: 8, top: topInset + 6, bottom: 8 },
         }),
@@ -93,17 +114,20 @@ export function UserDrawingSelectedActionSurfaceComponent({
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel={group.presentation.triggerLabel ?? group.label}
-                accessibilityState={{ expanded: activePopoverGroupId === group.id }}
+                accessibilityState={{ expanded: activePopoverGroupIdForSelection === group.id }}
                 activeOpacity={0.72}
                 style={[
                   styles.userDrawingActionButton,
-                  activePopoverGroupId === group.id && styles.userDrawingActionButtonActive,
+                  activePopoverGroupIdForSelection === group.id && styles.userDrawingActionButtonActive,
                 ]}
-                onPress={() => setActivePopoverGroupId(activePopoverGroupId === group.id ? null : group.id)}
+                onPress={() => {
+                  setActivePopoverDrawingId(selectedDrawingId);
+                  setActivePopoverGroupId(activePopoverGroupIdForSelection === group.id ? null : group.id);
+                }}
               >
                 <Text style={styles.userDrawingActionButtonText}>{group.presentation.triggerIcon ?? '...'}</Text>
               </TouchableOpacity>
-              {activePopoverGroupId === group.id && (
+              {activePopoverGroupIdForSelection === group.id && (
                 <View
                   accessibilityLabel={group.presentation.popoverLabel ?? `${group.label} controls`}
                   style={[styles.userDrawingActionPopover, { width: group.presentation.popoverWidth ?? 272 }]}
@@ -211,7 +235,7 @@ const styles = StyleSheet.create({
   userDrawingActionPopover: {
     position: 'absolute',
     left: 0,
-    top: 30,
+    top: MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y,
     zIndex: 10,
     flexDirection: 'row',
     flexWrap: 'wrap',
