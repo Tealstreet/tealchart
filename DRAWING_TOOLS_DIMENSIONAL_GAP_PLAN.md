@@ -321,7 +321,8 @@ Phase 2: Web event tests
 
 - Verify mouse drag creates exact anchors and click does not fabricate size.
 - Status: web EventManager coverage now verifies sub-threshold pending drawing
-  movement still resolves as click input rather than drag placement.
+  movement still resolves as click/tap input rather than drag placement for
+  mouse and touch.
 
 Phase 3: Mobile input tests
 
