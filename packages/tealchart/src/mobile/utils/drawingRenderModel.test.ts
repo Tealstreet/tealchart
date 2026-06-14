@@ -3,9 +3,14 @@ import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, Use
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  appendUserDrawingPathDragPoint,
+  beginUserDrawingPathDrag,
+  commitUserDrawingPathDrag,
   createUserDrawingCommandHistory,
+  createUserDrawingState,
   dispatchUserDrawingCommandWithHistory,
   resolveUserDrawingSelectionActionAnchor,
+  setUserDrawingTool,
   undoUserDrawingCommand,
 } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
@@ -3370,6 +3375,32 @@ describe('mobile user drawing render model', () => {
         { x: 50, y: 50 },
         { x: 90, y: 10 },
         { x: 95, y: 20 },
+      ],
+      style,
+    });
+  });
+
+  it('returns Skia-ready path primitives from smoothed shared drag commits', () => {
+    const started = beginUserDrawingPathDrag(
+      setUserDrawingTool(createUserDrawingState(), 'path'),
+      { paneId: 'main', anchor: { time: 10, price: 90 } },
+      { style, now: () => 1 },
+    );
+    const second = appendUserDrawingPathDragPoint(started, { paneId: 'main', anchor: { time: 50, price: 50 } });
+    const third = appendUserDrawingPathDragPoint(second, { paneId: 'main', anchor: { time: 90, price: 90 } });
+    const committed = commitUserDrawingPathDrag(third, { createId: () => 'path', now: () => 2, style });
+
+    expect(resolveMobileUserDrawingRenderModel(committed, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'path',
+      id: 'path',
+      clip,
+      points: [
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+        { x: 40, y: 40 },
+        { x: 60, y: 40 },
+        { x: 80, y: 20 },
+        { x: 90, y: 10 },
       ],
       style,
     });
