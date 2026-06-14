@@ -40,6 +40,17 @@ function withDraft(): UserDrawingState {
 }
 
 describe('user drawing keyboard actions', () => {
+  it('ignores drawing shortcuts when chart does not own keyboard focus', () => {
+    const state = withSelection();
+
+    for (const focusOwner of ['textInput', 'appControl'] as const) {
+      expect(resolveUserDrawingKeyboardAction(state, { key: 'Delete', focusOwner })).toBeNull();
+      expect(resolveUserDrawingKeyboardAction(state, { key: 'z', metaKey: true, focusOwner })).toBeNull();
+      expect(resolveUserDrawingKeyboardAction(state, { key: 'ArrowDown', focusOwner })).toBeNull();
+      expect(resolveUserDrawingKeyboardAction(withDraft(), { key: 'Escape', focusOwner })).toBeNull();
+    }
+  });
+
   it('maps primary-modifier undo and redo shortcuts', () => {
     const state = createUserDrawingState();
 

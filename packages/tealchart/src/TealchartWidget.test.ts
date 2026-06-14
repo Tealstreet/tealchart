@@ -2056,8 +2056,10 @@ describe('TealchartWidget', () => {
       const datafeed = createMockDatafeed();
       const container = document.createElement('div');
       const input = document.createElement('input');
+      const button = document.createElement('button');
       const onChange = vi.fn();
       container.appendChild(input);
+      container.appendChild(button);
       const widget = createWidget(datafeed, { container, onUserDrawingStateChange: onChange });
       const testWidget = widget as unknown as { _isHovered: boolean };
       widget.setUserDrawingState({
@@ -2094,6 +2096,16 @@ describe('TealchartWidget', () => {
 
       expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
       expect(modifiedDelete.defaultPrevented).toBe(false);
+
+      const buttonDelete = new KeyboardEvent('keydown', { key: 'Delete', bubbles: true, cancelable: true });
+      button.dispatchEvent(buttonDelete);
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(buttonDelete.defaultPrevented).toBe(false);
+
+      expect(widget.dispatchUserDrawingKeyboardAction({ key: 'Delete', focusOwner: 'textInput' })).toBe(false);
+      expect(widget.dispatchUserDrawingKeyboardAction({ key: 'Delete', focusOwner: 'appControl' })).toBe(false);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
 
       const chartDelete = new KeyboardEvent('keydown', { key: 'Backspace', cancelable: true });
       document.dispatchEvent(chartDelete);

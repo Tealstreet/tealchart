@@ -489,6 +489,7 @@ export type {
   UserDrawingImageSourceInput,
   UserDrawingKeyboardAction,
   UserDrawingKeyboardActionType,
+  UserDrawingKeyboardFocusOwner,
   UserDrawingKeyboardInput,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
