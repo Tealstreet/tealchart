@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { resolveUserDrawingObjectTreeModel } from '../../drawings';
+import { clearChartStoreCache } from '../../state/chartState';
 import { UserDrawingObjectTreeSheet } from './UserDrawingObjectTreeSheet';
 
 const state: UserDrawingState = {
@@ -45,6 +46,7 @@ const state: UserDrawingState = {
 describe('UserDrawingObjectTreeSheet', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('renders the shared object tree model and dispatches row actions', () => {
