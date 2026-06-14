@@ -555,6 +555,9 @@ Phase 3: Naming model
 - Status: committed drawings support optional names; object-tree rows prefer
   names as labels and layout serialization/deserialization preserves them while
   unnamed drawings continue to use shared drawing-kind labels.
+- Status: object-tree rename dispatch can now resolve from the shared model by
+  drawing ID, and both web and mobile paths route rename through the same
+  object-tree command pipeline rather than direct naming APIs.
 
 ### Epic 5.2: Web Object Tree Panel
 

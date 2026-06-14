@@ -276,6 +276,16 @@ export function resolveUserDrawingObjectTreeSelectionDispatchAction(
   };
 }
 
+export function resolveUserDrawingObjectTreeDrawingDispatchAction(
+  model: UserDrawingObjectTreeModel,
+  drawingId: string,
+  actionType: UserDrawingObjectTreeRowActionType,
+  options: ResolveUserDrawingObjectTreeRowDispatchActionOptions = {},
+): UserDrawingObjectTreeDispatchAction | null {
+  const row = model.rows.find((candidate) => candidate.drawingId === drawingId);
+  return row ? resolveUserDrawingObjectTreeRowDispatchAction(row, actionType, options) : null;
+}
+
 export function resolveUserDrawingObjectTreeRowDispatchAction(
   row: UserDrawingObjectTreeRow,
   actionType: UserDrawingObjectTreeRowActionType,

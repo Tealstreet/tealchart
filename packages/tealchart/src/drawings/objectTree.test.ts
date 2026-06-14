@@ -6,6 +6,7 @@ import { createUserDrawingState } from './input';
 import {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeDispatchActionCommands,
+  resolveUserDrawingObjectTreeDrawingDispatchAction,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
@@ -455,6 +456,29 @@ describe('user drawing object tree model', () => {
 
     const cleared = reduceUserDrawingCommand(renamed, { type: 'setName', drawingId: 'trend', name: '   ' });
     expect(cleared.drawings[0]?.name).toBeUndefined();
+  });
+
+  it('resolves drawing-id rename actions from the object-tree model', () => {
+    const state = createUserDrawingState({
+      drawings: [createTrendLine({ id: 'trend', name: 'Breakout line' }), createRectangle({ id: 'locked', locked: true })],
+    });
+    const model = resolveUserDrawingObjectTreeModel(state);
+
+    expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'trend', 'rename', { name: ' Support ' })).toEqual({
+      type: 'rename',
+      drawingId: 'trend',
+      name: ' Support ',
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'trend', 'rename', { name: null })).toEqual({
+      type: 'rename',
+      drawingId: 'trend',
+      name: null,
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'trend', 'rename')).toBeNull();
+    expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'locked', 'rename', { name: 'Locked' })).toBeNull();
+    expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'missing', 'rename', { name: 'Missing' })).toBeNull();
   });
 
   it('returns stable empty metadata for an empty drawing state', () => {
