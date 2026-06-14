@@ -2,10 +2,12 @@ import type { UserDrawingState } from '../../drawings';
 
 import { describe, expect, it } from 'vitest';
 
-import { USER_DRAWING_LAYOUT_SCHEMA_VERSION } from '../../drawings';
+import { createUserDrawingCommandHistory, dispatchUserDrawingCommandWithHistory, USER_DRAWING_LAYOUT_SCHEMA_VERSION } from '../../drawings';
 import {
+  createMobileUserDrawingReplaceStateCommandEvent,
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
+  replaceMobileUserDrawingState,
 } from './drawingPersistence';
 
 const state: UserDrawingState = {
@@ -73,6 +75,42 @@ describe('mobile drawing persistence', () => {
       draft: null,
       textEdit: null,
     });
+  });
+
+  it('creates mobile replace-state command events for imperative import and set flows', () => {
+    const previousState = importMobileUserDrawingStateFromLayout(undefined);
+    const event = createMobileUserDrawingReplaceStateCommandEvent(previousState, state, 'layout');
+
+    expect(event).toMatchObject({
+      command: { type: 'replaceState' },
+      source: 'layout',
+      previousState,
+      state,
+      affectedIds: ['rect_1'],
+    });
+    expect(createMobileUserDrawingReplaceStateCommandEvent(state, state, 'api')).toBeNull();
+  });
+
+  it('clears mobile command history when replacing drawing state through imperative handle flows', () => {
+    const previousState = importMobileUserDrawingStateFromLayout(undefined);
+    const { history } = dispatchUserDrawingCommandWithHistory(previousState, createUserDrawingCommandHistory(), {
+      type: 'add',
+      drawing: state.drawings[0]!,
+      meta: { source: 'api' },
+    });
+
+    expect(history.undoStack).toHaveLength(1);
+
+    const result = replaceMobileUserDrawingState(previousState, history, state, 'api');
+
+    expect(result.state).toBe(state);
+    expect(result.event).toMatchObject({
+      command: { type: 'replaceState' },
+      source: 'api',
+      affectedIds: ['rect_1'],
+    });
+    expect(result.history.undoStack).toEqual([]);
+    expect(result.history.redoStack).toEqual([]);
   });
 
   it('imports versionless legacy drawing payloads through the shared schema', () => {
