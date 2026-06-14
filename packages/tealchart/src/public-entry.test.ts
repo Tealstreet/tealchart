@@ -226,6 +226,7 @@ import {
   resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeDrawingDispatchAction,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
@@ -541,6 +542,12 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, selectionActionType)).toEqual({
       type: 'hide',
       drawingIds: ['trend'],
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'trend', rowActionType, rowDispatchOptions)).toEqual({
+      type: 'rename',
+      drawingId: 'trend',
+      name: 'Breakout',
       includeLocked: undefined,
     });
     expect(action.type).toBe('duplicate');

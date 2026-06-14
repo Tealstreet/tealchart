@@ -17,6 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DIRTY } from './rendering/RenderScheduler';
 import {
   createUserDrawingState,
+  resolveUserDrawingObjectTreeDrawingDispatchAction,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
 } from './drawings';
@@ -1782,7 +1783,14 @@ describe('TealchartWidget', () => {
         ['target', false],
       ]);
 
-      expect(widget.setUserDrawingName('target', 'Range box')).toBe(true);
+      const renameTargetAction = resolveUserDrawingObjectTreeDrawingDispatchAction(
+        widget.getUserDrawingObjectTreeModel(),
+        'target',
+        'rename',
+        { name: 'Range box' },
+      );
+      expect(renameTargetAction).toEqual({ type: 'rename', drawingId: 'target', name: 'Range box', includeLocked: undefined });
+      expect(renameTargetAction && widget.dispatchUserDrawingObjectTreeAction(renameTargetAction)).toBe(true);
       expect(widget.getUserDrawingObjectTreeModel().rows[0]).toMatchObject({
         drawingId: 'target',
         label: 'Range box',

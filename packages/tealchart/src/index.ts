@@ -194,6 +194,7 @@ export {
   reorderUserDrawings,
   resolveUserDrawingEditIntentAtPoint,
   resolveUserDrawingObjectTreeActionCommands,
+  resolveUserDrawingObjectTreeDrawingDispatchAction,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
