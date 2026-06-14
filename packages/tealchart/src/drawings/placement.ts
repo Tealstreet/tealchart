@@ -107,7 +107,15 @@ export interface ResolveUserDrawingPlacementConstraintOptions {
   options?: UserDrawingPlacementConstraintOptions;
 }
 
-const SHAPE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>(['rectangle', 'circle', 'ellipse']);
+const SHAPE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>([
+  'rectangle',
+  'circle',
+  'ellipse',
+  'fibCircles',
+  'fibSpiral',
+  'gannSquare',
+  'gannSquareFixed',
+]);
 const LINE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>([
   'trendLine',
   'trendAngle',
