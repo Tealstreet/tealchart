@@ -126,11 +126,32 @@ describe('mobile drawing handle command dispatch', () => {
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(
       result.state,
       result.history,
+      { type: 'setStayInDrawingMode', stayInDrawingMode: false, meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(result.state.stayInDrawingMode).toBe(false);
+    expect(result.history.undoStack).toHaveLength(0);
+    expect(onEvent).toHaveBeenCalledTimes(2);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setStayInDrawingMode', stayInDrawingMode: false, meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(2);
+    onEvent.mockClear();
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
       { type: 'select', drawingId: 'missing', meta: { source: 'api' } },
       onEvent,
     );
     expect(result.changed).toBe(false);
-    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onEvent).not.toHaveBeenCalled();
 
     const lineState = createMobileStateWithTrendLine();
     history = createUserDrawingCommandHistory();
@@ -141,12 +162,21 @@ describe('mobile drawing handle command dispatch', () => {
       onEvent,
     );
     expect(result.changed).toBe(false);
-    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onEvent).not.toHaveBeenCalled();
 
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(
       result.state,
       result.history,
       { type: 'select', drawingId: null, meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
       onEvent,
     );
     expect(result.changed).toBe(true);
@@ -158,17 +188,8 @@ describe('mobile drawing handle command dispatch', () => {
       { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
       onEvent,
     );
-    expect(result.changed).toBe(true);
-    expect(onEvent).toHaveBeenCalledTimes(3);
-
-    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
-      result.state,
-      result.history,
-      { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
-      onEvent,
-    );
     expect(result.changed).toBe(false);
-    expect(onEvent).toHaveBeenCalledTimes(3);
+    expect(onEvent).toHaveBeenCalledTimes(2);
 
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
       type: 'clear',
@@ -176,7 +197,7 @@ describe('mobile drawing handle command dispatch', () => {
     }, onEvent);
     expect(result.changed).toBe(true);
     expect(result.state.drawings).toEqual([]);
-    expect(onEvent).toHaveBeenCalledTimes(4);
+    expect(onEvent).toHaveBeenCalledTimes(3);
     const undoClear = undoUserDrawingCommand(result.state, result.history);
     expect(undoClear.changed).toBe(true);
     expect(undoClear.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
@@ -186,14 +207,14 @@ describe('mobile drawing handle command dispatch', () => {
       meta: { source: 'api' },
     }, onEvent);
     expect(result.changed).toBe(false);
-    expect(onEvent).toHaveBeenCalledTimes(4);
+    expect(onEvent).toHaveBeenCalledTimes(3);
 
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
       type: 'cancelDraft',
       meta: { source: 'api' },
     }, onEvent);
     expect(result.changed).toBe(false);
-    expect(onEvent).toHaveBeenCalledTimes(4);
+    expect(onEvent).toHaveBeenCalledTimes(3);
 
     const draftState = handleUserDrawingInput(
       setUserDrawingTool(createUserDrawingState(), 'rectangle'),
@@ -205,7 +226,35 @@ describe('mobile drawing handle command dispatch', () => {
       meta: { source: 'api' },
     }, onEvent);
     expect(result.changed).toBe(true);
-    expect(onEvent).toHaveBeenCalledTimes(5);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+  });
+
+  it('switches to select after mobile placement when stay-in-drawing-mode is disabled', () => {
+    let history = createUserDrawingCommandHistory();
+    let state = createUserDrawingState({ stayInDrawingMode: false });
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'setActiveTool',
+      tool: 'rectangle',
+      meta: { source: 'api' },
+    }));
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch' },
+    }));
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'rect', now: () => 20, style },
+      meta: { source: 'touch' },
+    }));
+
+    expect(state.activeTool).toBe('select');
+    expect(state.stayInDrawingMode).toBe(false);
+    expect(state.selection).toEqual({ drawingId: 'rect' });
+    expect(state.drawings[0]).toMatchObject({ id: 'rect', kind: 'rectangle' });
+    expect(history.undoStack).toHaveLength(1);
   });
 
   it('records complete drawing additions through the mobile command adapter', () => {

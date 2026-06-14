@@ -296,7 +296,7 @@ export class TealchartWidget {
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
     this._renderOptions = mergeChartThemeRenderOptions(options.theme, options.renderOptions);
-    this._userDrawingState = options.userDrawingState ?? createUserDrawingState();
+    this._userDrawingState = createUserDrawingState(options.userDrawingState);
 
     // Apply initial overrides if provided
     if (options.overrides) {
@@ -2296,6 +2296,18 @@ export class TealchartWidget {
 
   setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
     return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+  }
+
+  setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'setStayInDrawingMode',
+      stayInDrawingMode,
+      meta: { source: 'api' },
+    });
+  }
+
+  isUserDrawingStayInDrawingMode(): boolean {
+    return this._userDrawingState.stayInDrawingMode !== false;
   }
 
   canUndoUserDrawingCommand(): boolean {

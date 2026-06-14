@@ -31,6 +31,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingStayInDrawingMode,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingTableDimensions,
@@ -109,6 +110,7 @@ describe('user drawing input controller', () => {
       version: 1,
       drawings: [],
       activeTool: 'select',
+      stayInDrawingMode: true,
       selection: null,
       draft: null,
       textEdit: null,
@@ -193,6 +195,7 @@ describe('user drawing input controller', () => {
 
     expect(second.draft).toBeNull();
     expect(second.selection).toEqual({ drawingId: 'drawing-1' });
+    expect(second.activeTool).toBe('trendLine');
     expect(second.drawings[0]).toMatchObject({
       id: 'drawing-1',
       kind: 'trendLine',
@@ -200,6 +203,21 @@ describe('user drawing input controller', () => {
       createdAt: 20,
       updatedAt: 20,
     });
+  });
+
+  it('switches to select after click placement when stay-in-drawing-mode is disabled', () => {
+    const options = { createId: () => 'drawing-1', now: () => 20 };
+    const drawingState = setUserDrawingTool(
+      setUserDrawingStayInDrawingMode(createUserDrawingState(), false),
+      'trendLine',
+    );
+    const first = handleUserDrawingInput(drawingState, { paneId: 'main', anchor: anchorA }, options);
+    const second = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorB }, options);
+
+    expect(second.draft).toBeNull();
+    expect(second.selection).toEqual({ drawingId: 'drawing-1' });
+    expect(second.activeTool).toBe('select');
+    expect(second.stayInDrawingMode).toBe(false);
   });
 
   it('commits two-anchor drag placement from the drag start and end anchors', () => {
@@ -225,12 +243,31 @@ describe('user drawing input controller', () => {
 
     expect(committed.draft).toBeNull();
     expect(committed.selection).toEqual({ drawingId: 'drag-rect' });
+    expect(committed.activeTool).toBe('rectangle');
     expect(committed.drawings).toHaveLength(1);
     expect(committed.drawings[0]).toMatchObject({
       id: 'drag-rect',
       kind: 'rectangle',
       points: [anchorA, anchorB],
     });
+  });
+
+  it('switches to select after drag placement when stay-in-drawing-mode is disabled', () => {
+    const state = setUserDrawingTool(
+      setUserDrawingStayInDrawingMode(createUserDrawingState(), false),
+      'rectangle',
+    );
+    const started = beginUserDrawingPlacementDrag(state, { paneId: 'main', anchor: anchorA }, { now: () => 10, style });
+    const committed = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorB }, {
+      createId: () => 'drag-rect',
+      now: () => 11,
+      style,
+    });
+
+    expect(committed.draft).toBeNull();
+    expect(committed.selection).toEqual({ drawingId: 'drag-rect' });
+    expect(committed.activeTool).toBe('select');
+    expect(committed.stayInDrawingMode).toBe(false);
   });
 
   it('commits expanded two-anchor tools through drag placement', () => {
@@ -588,6 +625,7 @@ describe('user drawing input controller', () => {
       { time: 3_000, price: 90 },
     ]);
     expect(committed).toMatchObject({
+      activeTool: 'path',
       selection: { drawingId: 'freehand' },
       draft: null,
       drawings: [
@@ -600,6 +638,21 @@ describe('user drawing input controller', () => {
         },
       ],
     });
+  });
+
+  it('switches to select after path placement when stay-in-drawing-mode is disabled', () => {
+    const started = beginUserDrawingPathDrag(
+      setUserDrawingTool(setUserDrawingStayInDrawingMode(createUserDrawingState(), false), 'path'),
+      { paneId: 'main', anchor: anchorA },
+      { now: () => 10, style },
+    );
+    const moved = appendUserDrawingPathDragPoint(started, { paneId: 'main', anchor: anchorB });
+    const committed = commitUserDrawingPathDrag(moved, { createId: () => 'freehand', now: () => 20 });
+
+    expect(committed.draft).toBeNull();
+    expect(committed.selection).toEqual({ drawingId: 'freehand' });
+    expect(committed.activeTool).toBe('select');
+    expect(committed.stayInDrawingMode).toBe(false);
   });
 
   it('preserves pressure samples through smoothed path drag anchors', () => {

@@ -60,15 +60,36 @@ describe('drawing layout serialization', () => {
   });
 
   it('persists committed drawings and clears transient editing state', () => {
-    const persisted = serializeUserDrawingStateForLayout(createStateWithTransientFields());
+    const persisted = serializeUserDrawingStateForLayout(
+      createUserDrawingState({
+        ...createStateWithTransientFields(),
+        stayInDrawingMode: false,
+      }),
+    );
 
     expect(persisted?.version).toBe(USER_DRAWING_LAYOUT_SCHEMA_VERSION);
     expect(persisted?.drawings).toHaveLength(1);
     expect(persisted?.drawings[0]?.id).toBe('trend_1');
     expect(persisted?.activeTool).toBe('select');
+    expect(persisted?.stayInDrawingMode).toBe(false);
     expect(persisted?.selection).toBeNull();
     expect(persisted?.draft).toBeNull();
     expect(persisted?.textEdit).toBeNull();
+  });
+
+  it('round-trips stay-in-drawing-mode through layout state', () => {
+    const persisted = serializeUserDrawingStateForLayout(
+      createUserDrawingState({
+        ...createStateWithTransientFields(),
+        stayInDrawingMode: false,
+      }),
+    );
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+
+    expect(restored?.stayInDrawingMode).toBe(false);
+    expect(serializeUserDrawingStateForLayout(restored)?.stayInDrawingMode).toBe(false);
+    expect(deserializeUserDrawingStateFromLayout({ ...persisted, stayInDrawingMode: undefined })?.stayInDrawingMode)
+      .toBe(true);
   });
 
   it('persists user-facing drawing names and trims restored legacy names', () => {
@@ -134,6 +155,29 @@ describe('drawing layout serialization', () => {
 
   it('returns undefined when there are no committed drawings', () => {
     expect(serializeUserDrawingStateForLayout(createUserDrawingState())).toBeUndefined();
+  });
+
+  it('persists disabled stay-in-drawing-mode without committed drawings', () => {
+    const persisted = serializeUserDrawingStateForLayout(createUserDrawingState({ stayInDrawingMode: false }));
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+
+    expect(persisted).toMatchObject({
+      version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+    expect(restored).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
   });
 
   it('deserializes through the same idle persisted state contract', () => {
