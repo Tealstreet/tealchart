@@ -6,10 +6,10 @@ import type {
 
 import {
   resolveUserDrawingObjectTreeRowDispatchAction,
+  USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
   USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
-  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from '../drawings';
-import { button, div, span } from './dom';
+import { button, div, input, span } from './dom';
 
 export interface UserDrawingObjectTreePanelOptions {
   model: UserDrawingObjectTreeModel;
@@ -108,6 +108,18 @@ const styles = {
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   } as Partial<CSSStyleDeclaration>,
+  renameInput: {
+    minWidth: '0',
+    flex: '1',
+    height: '26px',
+    padding: '0 8px',
+    border: '1px solid rgba(120, 123, 134, 0.42)',
+    borderRadius: '4px',
+    backgroundColor: 'rgba(7, 9, 14, 0.86)',
+    color: '#d1d4dc',
+    fontSize: '12px',
+    outline: 'none',
+  } as Partial<CSSStyleDeclaration>,
   rowMeta: {
     color: '#787b86',
     fontSize: '11px',
@@ -142,6 +154,8 @@ export class UserDrawingObjectTreePanel {
   private model: UserDrawingObjectTreeModel;
   private readonly options: UserDrawingObjectTreePanelOptions;
   private readonly el: HTMLDivElement;
+  private editingDrawingId: string | null = null;
+  private editingName = '';
 
   constructor(options: UserDrawingObjectTreePanelOptions) {
     this.options = options;
@@ -163,6 +177,10 @@ export class UserDrawingObjectTreePanel {
 
   updateModel(model: UserDrawingObjectTreeModel): void {
     this.model = model;
+    if (this.editingDrawingId && !this.model.rows.some((row) => row.drawingId === this.editingDrawingId)) {
+      this.cancelRename();
+      return;
+    }
     this.render();
   }
 
@@ -220,6 +238,7 @@ export class UserDrawingObjectTreePanel {
   }
 
   private createRow(row: UserDrawingObjectTreeRow): HTMLDivElement {
+    const isEditing = this.editingDrawingId === row.drawingId;
     const rowEl = div({
       style: {
         ...styles.row,
@@ -232,6 +251,7 @@ export class UserDrawingObjectTreePanel {
         'aria-pressed': row.selected ? 'true' : 'false',
       },
       onClick: (event) => {
+        if (isEditing) return;
         this.dispatchAndRefresh({ type: 'select', drawingId: row.drawingId, additive: event.ctrlKey || event.metaKey });
       },
       onKeyDown: (event) => {
@@ -246,7 +266,37 @@ export class UserDrawingObjectTreePanel {
         style: styles.rowText,
         children: [
           span({ style: styles.rowIcon, text: row.icon }),
-          span({ style: styles.rowLabel, text: row.label }),
+          isEditing
+            ? input({
+                style: styles.renameInput,
+                value: this.editingName,
+                attrs: {
+                  type: 'text',
+                  'aria-label': `Rename ${row.label}`,
+                },
+                onClick: (event) => event.stopPropagation(),
+                onMouseDown: (event) => event.stopPropagation(),
+                onInput: (event) => {
+                  this.editingName = (event.currentTarget as HTMLInputElement).value;
+                },
+                onKeyDown: (event) => {
+                  event.stopPropagation();
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.commitRename(row);
+                  } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    this.cancelRename();
+                  }
+                },
+                ref: (el) => {
+                  window.setTimeout(() => {
+                    el.focus();
+                    el.select();
+                  }, 0);
+                },
+              })
+            : span({ style: styles.rowLabel, text: row.label }),
           span({ style: styles.rowMeta, text: `${row.visible ? '' : 'hidden '}${row.locked ? 'locked' : ''}`.trim() }),
         ],
       }),
@@ -257,7 +307,32 @@ export class UserDrawingObjectTreePanel {
 
   private createRowActions(row: UserDrawingObjectTreeRow): HTMLDivElement {
     const actions = div({ style: styles.rowActions });
-    for (const actionType of USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS) {
+    if (this.editingDrawingId === row.drawingId) {
+      actions.appendChild(
+        button({
+          style: styles.actionButton,
+          text: 'Save',
+          attrs: { type: 'button', 'aria-label': 'Save drawing name' },
+          onClick: (event) => {
+            event.stopPropagation();
+            this.commitRename(row);
+          },
+        }),
+      );
+      actions.appendChild(
+        button({
+          style: styles.actionButton,
+          text: 'Cancel',
+          attrs: { type: 'button', 'aria-label': 'Cancel drawing rename' },
+          onClick: (event) => {
+            event.stopPropagation();
+            this.cancelRename();
+          },
+        }),
+      );
+      return actions;
+    }
+    for (const actionType of USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS) {
       const descriptor = row.actions?.find((action) => action.type === actionType);
       if (!descriptor) continue;
       const enabled = descriptor.enabled;
@@ -277,6 +352,10 @@ export class UserDrawingObjectTreePanel {
           onClick: enabled
             ? (event) => {
                 event.stopPropagation();
+                if (actionType === 'rename') {
+                  this.beginRename(row);
+                  return;
+                }
                 const action = resolveUserDrawingObjectTreeRowDispatchAction(row, actionType);
                 if (action) this.dispatchAndRefresh(action);
               }
@@ -289,5 +368,27 @@ export class UserDrawingObjectTreePanel {
 
   private dispatchAndRefresh(action: UserDrawingObjectTreeDispatchAction): void {
     this.options.onDispatch(action);
+  }
+
+  private beginRename(row: UserDrawingObjectTreeRow): void {
+    this.editingDrawingId = row.drawingId;
+    this.editingName = row.customName ?? row.label;
+    this.render();
+  }
+
+  private commitRename(row: UserDrawingObjectTreeRow): void {
+    const action = resolveUserDrawingObjectTreeRowDispatchAction(row, 'rename', { name: this.editingName });
+    if (!action) return;
+    if (this.options.onDispatch(action)) {
+      this.editingDrawingId = null;
+      this.editingName = '';
+      this.render();
+    }
+  }
+
+  private cancelRename(): void {
+    this.editingDrawingId = null;
+    this.editingName = '';
+    this.render();
   }
 }

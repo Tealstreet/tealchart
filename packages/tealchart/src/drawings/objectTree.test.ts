@@ -10,6 +10,8 @@ import {
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
+  USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
+  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
 import { clearChartStoreCache } from '../state/chartState';
@@ -479,6 +481,12 @@ describe('user drawing object tree model', () => {
     expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'trend', 'rename')).toBeNull();
     expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'locked', 'rename', { name: 'Locked' })).toBeNull();
     expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'missing', 'rename', { name: 'Missing' })).toBeNull();
+  });
+
+  it('keeps direct row actions separate from built-in rename workflow actions', () => {
+    expect(USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS).not.toContain('rename');
+    expect(USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS[0]).toBe('rename');
+    expect(USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS.slice(1)).toEqual(USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS);
   });
 
   it('returns stable empty metadata for an empty drawing state', () => {

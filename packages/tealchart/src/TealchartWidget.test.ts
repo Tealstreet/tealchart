@@ -1974,6 +1974,16 @@ describe('TealchartWidget', () => {
       expect(panel?.querySelector<HTMLElement>('[aria-label="Select Rectangle"]')?.getAttribute('aria-pressed')).toBe(
         'true',
       );
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Rename drawing"]')?.click();
+      const renameInput = panel?.querySelector<HTMLInputElement>('[aria-label="Rename Rectangle"]');
+      expect(renameInput).not.toBeNull();
+      renameInput!.value = 'Range box';
+      renameInput!.dispatchEvent(new Event('input', { bubbles: true }));
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Save drawing name"]')?.click();
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
+        name: 'Range box',
+      });
+      expect(panel?.textContent).toContain('Range box');
 
       testWidget._isHovered = true;
       const escape = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });

@@ -584,9 +584,9 @@ Phase 1: Minimal panel surface
   app-owned object-tree callback.
 - Status: web now includes a built-in object-tree panel fallback when no
   app-owned callback is supplied. The panel renders the shared row/group model,
-  blocks chart event fallthrough, and dispatches row select, visibility, lock,
-  duplicate, delete, one-step z-order, and direct front/back z-order actions
-  through the widget command owner.
+  blocks chart event fallthrough, and dispatches row select, inline rename,
+  visibility, lock, duplicate, delete, one-step z-order, and direct front/back
+  z-order actions through the widget command owner.
 
 Phase 2: Row actions
 
@@ -597,6 +597,8 @@ Phase 2: Row actions
   not need internal ID factories.
 - Status: built-in web object-tree rows expose direct bring-to-front and
   send-to-back controls in addition to one-step forward/back controls.
+- Status: built-in web object-tree rows expose inline rename controls that
+  commit through the shared object-tree command resolver.
 
 Phase 3: Multi-select
 
@@ -619,9 +621,9 @@ Phase 1: Mobile panel/sheet
   row model for app-owned sheets.
 - Status: mobile Skia now includes a built-in object-tree sheet fallback when no
   app-owned callback is supplied. The sheet renders the same shared row/group
-  model and dispatches row select, visibility, lock, duplicate, delete,
-  one-step z-order, and direct front/back z-order actions through the Skia
-  command owner.
+  model and dispatches row select, inline rename, visibility, lock, duplicate,
+  delete, one-step z-order, and direct front/back z-order actions through the
+  Skia command owner.
 
 Phase 2: Row actions
 
@@ -630,6 +632,8 @@ Phase 2: Row actions
   command resolver with mobile-owned duplicate ID generation.
 - Status: built-in mobile object-tree rows expose direct bring-to-front and
   send-to-back controls in addition to one-step forward/back controls.
+- Status: built-in mobile object-tree rows expose the same inline rename
+  workflow through the shared object-tree command resolver.
 
 Phase 3: Multi-select
 
