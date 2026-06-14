@@ -3377,11 +3377,13 @@ describe('user drawing input controller', () => {
       'on',
     );
 
-    expect(initial.activeTool).toBe('select');
+    expect(initial.activeTool).toBe('rectangle');
     expect(initial.measureMode).toBe('on');
-    expect(initial.selection).toBeNull();
+    expect(initial.selection).toEqual({ drawingId: 'old' });
 
     const started = beginUserDrawingMeasure(initial, { paneId: 'main', anchor: anchorA }, { now: () => 10, style });
+    expect(started.activeTool).toBe('rectangle');
+    expect(started.selection).toEqual({ drawingId: 'old' });
     expect(started.drawings).toEqual([]);
     expect(started.measure).toMatchObject({
       paneId: 'main',
@@ -3400,6 +3402,8 @@ describe('user drawing input controller', () => {
     const ended = endUserDrawingMeasure(moved);
     expect(ended.measure).toBeNull();
     expect(ended.measureMode).toBe('on');
+    expect(ended.activeTool).toBe('rectangle');
+    expect(ended.selection).toEqual({ drawingId: 'old' });
     expect(ended.drawings).toEqual([]);
   });
 
@@ -3415,5 +3419,21 @@ describe('user drawing input controller', () => {
     const off = setUserDrawingMeasureMode(moved, 'off');
     expect(off.measureMode).toBe('off');
     expect(off.measure).toBeNull();
+  });
+
+  it('clears temporary measure overlays with clear all drawings', () => {
+    const measured = updateUserDrawingMeasure(
+      beginUserDrawingMeasure(setUserDrawingMeasureMode(createUserDrawingState(), 'on'), {
+        paneId: 'main',
+        anchor: anchorA,
+      }),
+      { paneId: 'main', anchor: anchorB },
+    );
+
+    const cleared = clearUserDrawings(measured);
+
+    expect(cleared.measureMode).toBe('off');
+    expect(cleared.measure).toBeNull();
+    expect(cleared.drawings).toEqual([]);
   });
 });
