@@ -255,6 +255,12 @@ describe('user drawing command dispatch', () => {
       affectedIds: ['trend-line'],
     });
     expect(createUserDrawingReplaceStateCommandEvent(state, state, { type: 'replaceState', meta: { source: 'api' } })).toBeNull();
+    expect(
+      createUserDrawingReplaceStateCommandEvent(previousState, { ...previousState, activeTool: 'rectangle' }, {
+        type: 'replaceState',
+        meta: { source: 'api' },
+      }),
+    ).toBeNull();
   });
 
   it('wraps selection, duplicate, delete, style, lock, and z-order reducers', () => {

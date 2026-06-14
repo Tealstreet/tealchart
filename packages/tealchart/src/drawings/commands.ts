@@ -36,6 +36,7 @@ import type {
   UserDrawingTool,
   UserDrawingTrendLineExtend,
 } from './types';
+import { isUserDrawingLayoutStateEqual } from './serialization';
 
 import {
   addUserDrawing,
@@ -329,7 +330,7 @@ export function createUserDrawingReplaceStateCommandEvent(
   state: UserDrawingState,
   command: UserDrawingReplaceStateCommand,
 ): UserDrawingCommandEvent | null {
-  if (previousState === state) return null;
+  if (isUserDrawingLayoutStateEqual(previousState, state)) return null;
   return {
     command,
     previousState,
