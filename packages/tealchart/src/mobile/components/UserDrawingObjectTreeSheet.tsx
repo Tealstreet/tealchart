@@ -5,14 +5,14 @@ import type {
   UserDrawingObjectTreeRowActionType,
 } from '../../drawings';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 
 import {
   resolveUserDrawingObjectTreeRowDispatchAction,
+  USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
   USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
-  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from '../../drawings';
 
 export interface UserDrawingObjectTreeSheetProps {
@@ -24,6 +24,9 @@ export interface UserDrawingObjectTreeSheetProps {
 
 export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProps> = memo(
   ({ visible, model, onDispatch, onClose }) => {
+    const [editingDrawingId, setEditingDrawingId] = useState<string | null>(null);
+    const [editingName, setEditingName] = useState('');
+
     const dispatchRowAction = useCallback(
       (row: UserDrawingObjectTreeRow, actionType: UserDrawingObjectTreeRowActionType) => {
         const action = resolveUserDrawingObjectTreeRowDispatchAction(row, actionType);
@@ -31,8 +34,31 @@ export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProp
       },
       [onDispatch],
     );
+    const beginRename = useCallback((row: UserDrawingObjectTreeRow) => {
+      setEditingDrawingId(row.drawingId);
+      setEditingName(row.customName ?? row.label);
+    }, []);
+    const cancelRename = useCallback(() => {
+      setEditingDrawingId(null);
+      setEditingName('');
+    }, []);
+    const commitRename = useCallback(
+      (row: UserDrawingObjectTreeRow) => {
+        const action = resolveUserDrawingObjectTreeRowDispatchAction(row, 'rename', { name: editingName });
+        if (action && onDispatch(action)) {
+          cancelRename();
+        }
+      },
+      [cancelRename, editingName, onDispatch],
+    );
 
     const rowsById = new Map(model.rows.map((row) => [row.id, row]));
+
+    useEffect(() => {
+      if (editingDrawingId && !model.rows.some((row) => row.drawingId === editingDrawingId)) {
+        cancelRename();
+      }
+    }, [cancelRename, editingDrawingId, model.rows]);
 
     if (!visible) return null;
 
@@ -68,55 +94,97 @@ export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProp
                           {group.rowIds.map((rowId) => {
                             const row = rowsById.get(rowId);
                             if (!row) return null;
+                            const isEditing = editingDrawingId === row.drawingId;
                             return (
                               <View key={row.id} style={[styles.row, row.selected && styles.rowSelected]}>
                                 <Pressable
                                   accessibilityRole="button"
                                   accessibilityLabel={`Select ${row.label}`}
                                   accessibilityState={{ selected: row.selected }}
+                                  disabled={isEditing}
                                   onPress={() => onDispatch({ type: 'select', drawingId: row.drawingId })}
                                   style={({ pressed }) => [styles.rowSelect, pressed && styles.rowPressed]}
                                 >
                                   <View style={styles.rowText}>
                                     <Text style={styles.rowIcon}>{row.icon}</Text>
-                                    <Text style={styles.rowLabel} numberOfLines={1}>
-                                      {row.label}
-                                    </Text>
+                                    {isEditing ? (
+                                      <TextInput
+                                        accessibilityLabel={`Rename ${row.label}`}
+                                        value={editingName}
+                                        onChangeText={setEditingName}
+                                        onSubmitEditing={() => commitRename(row)}
+                                        autoFocus
+                                        selectTextOnFocus
+                                        style={styles.renameInput}
+                                      />
+                                    ) : (
+                                      <Text style={styles.rowLabel} numberOfLines={1}>
+                                        {row.label}
+                                      </Text>
+                                    )}
                                     <Text style={styles.rowMeta} numberOfLines={1}>
                                       {`${row.visible ? '' : 'hidden '}${row.locked ? 'locked' : ''}`.trim()}
                                     </Text>
                                   </View>
                                 </Pressable>
                                 <View style={styles.rowActions}>
-                                  {USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS.map((actionType) => {
-                                    const descriptor = row.actions?.find((action) => action.type === actionType);
-                                    if (!descriptor) return null;
-                                    return (
+                                  {isEditing ? (
+                                    <>
                                       <Pressable
-                                        key={actionType}
                                         accessibilityRole="button"
-                                        accessibilityLabel={descriptor.label}
-                                        accessibilityState={{ disabled: !descriptor.enabled }}
-                                        disabled={!descriptor.enabled}
-                                        onPress={() => dispatchRowAction(row, actionType)}
-                                        style={({ pressed }) => [
-                                          styles.actionButton,
-                                          !descriptor.enabled && styles.actionButtonDisabled,
-                                          descriptor.enabled && pressed && styles.actionButtonPressed,
-                                        ]}
+                                        accessibilityLabel="Save drawing name"
+                                        onPress={() => commitRename(row)}
+                                        style={({ pressed }) => [styles.actionButton, pressed && styles.actionButtonPressed]}
                                       >
-                                        <Text
-                                          style={[
-                                            styles.actionText,
-                                            descriptor.destructive && styles.destructiveText,
-                                            !descriptor.enabled && styles.actionTextDisabled,
+                                        <Text style={styles.actionText}>Save</Text>
+                                      </Pressable>
+                                      <Pressable
+                                        accessibilityRole="button"
+                                        accessibilityLabel="Cancel drawing rename"
+                                        onPress={cancelRename}
+                                        style={({ pressed }) => [styles.actionButton, pressed && styles.actionButtonPressed]}
+                                      >
+                                        <Text style={styles.actionText}>Cancel</Text>
+                                      </Pressable>
+                                    </>
+                                  ) : (
+                                    USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS.map((actionType) => {
+                                      const descriptor = row.actions?.find((action) => action.type === actionType);
+                                      if (!descriptor) return null;
+                                      return (
+                                        <Pressable
+                                          key={actionType}
+                                          accessibilityRole="button"
+                                          accessibilityLabel={descriptor.label}
+                                          accessibilityState={{ disabled: !descriptor.enabled }}
+                                          disabled={!descriptor.enabled}
+                                          onPress={() => {
+                                            if (actionType === 'rename') {
+                                              beginRename(row);
+                                            } else {
+                                              dispatchRowAction(row, actionType);
+                                            }
+                                          }}
+                                          style={({ pressed }) => [
+                                            styles.actionButton,
+                                            !descriptor.enabled && styles.actionButtonDisabled,
+                                            descriptor.enabled && pressed && styles.actionButtonPressed,
                                           ]}
                                         >
-                                          {USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS[actionType] ?? descriptor.label}
-                                        </Text>
-                                      </Pressable>
-                                    );
-                                  })}
+                                          <Text
+                                            style={[
+                                              styles.actionText,
+                                              descriptor.destructive && styles.destructiveText,
+                                              !descriptor.enabled && styles.actionTextDisabled,
+                                            ]}
+                                          >
+                                            {USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS[actionType] ??
+                                              descriptor.label}
+                                          </Text>
+                                        </Pressable>
+                                      );
+                                    })
+                                  )}
                                 </View>
                               </View>
                             );
@@ -229,6 +297,18 @@ const styles = StyleSheet.create({
   rowLabel: {
     minWidth: 0,
     flexShrink: 1,
+    color: '#d1d4dc',
+    fontSize: 13,
+  },
+  renameInput: {
+    minWidth: 0,
+    flex: 1,
+    height: 30,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(120, 123, 134, 0.42)',
+    borderRadius: 5,
+    backgroundColor: 'rgba(7, 9, 14, 0.86)',
     color: '#d1d4dc',
     fontSize: 13,
   },

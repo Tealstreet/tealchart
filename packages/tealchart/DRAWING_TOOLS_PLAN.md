@@ -1361,6 +1361,15 @@ object-tree gaps stay visible.
 - Built-in mobile Skia object-tree sheets render and dispatch the same
   front/back row actions through the shared object-tree command resolver.
 
+## Shipped: Object Tree Rename Controls
+
+- Built-in web object-tree rows expose inline rename controls that save through
+  the shared object-tree command resolver.
+- Built-in mobile Skia object-tree rows expose the same rename workflow with a
+  native text input and matching save/cancel actions.
+- App-owned object-tree hosts continue to use the same shared rename dispatch
+  action as the built-in fallbacks.
+
 ## Shipped: Expanded Text Wrap Width Presets
 
 - Shared text wrap width normalization now supports wider 320px and 480px text

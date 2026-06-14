@@ -64,9 +64,15 @@ export const USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS: readonly UserDrawing
   'sendToBack',
 ] as const;
 
+export const USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
+  'rename',
+  ...USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
+] as const;
+
 export const USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS: Readonly<
   Partial<Record<UserDrawingObjectTreeRowActionType, string>>
 > = {
+  rename: 'Name',
   hide: 'Hide',
   show: 'Show',
   lock: 'Lock',

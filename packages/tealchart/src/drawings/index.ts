@@ -489,6 +489,7 @@ export {
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
+  USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
   USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
   USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from './objectTree';
