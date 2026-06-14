@@ -1505,7 +1505,7 @@ describe('user drawing toolbar descriptors', () => {
       triggerIcon: '◐',
       triggerLabel: 'Style selected drawing',
       popoverLabel: 'Selected drawing style controls',
-      popoverWidth: 272,
+      popoverWidth: 296,
     });
     expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
       ['openProperties', true, false],

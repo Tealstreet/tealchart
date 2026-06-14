@@ -353,7 +353,7 @@ const styles = {
   selectedActionSurfacePopover: {
     position: 'absolute',
     top: '34px',
-    left: '0',
+    left: '4px',
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -790,7 +790,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             style: {
               ...styles.selectedActionSurfacePopover,
               top: `${SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y}px`,
-              width: `${group.presentation.popoverWidth ?? 272}px`,
+              width: `${Math.min(group.presentation.popoverWidth ?? 296, SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH - 8)}px`,
             },
             attributes: {
               'aria-label': group.presentation.popoverLabel ?? `${group.label} controls`,
@@ -799,7 +799,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           for (const item of group.items) {
             popover.appendChild(this.createSelectedActionSurfaceButton(item));
           }
-          groupEl.appendChild(popover);
+          el.appendChild(popover);
         }
 
         el.appendChild(groupEl);

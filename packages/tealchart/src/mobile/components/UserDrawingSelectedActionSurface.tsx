@@ -51,6 +51,8 @@ export function UserDrawingSelectedActionSurfaceComponent({
   const activePopoverGroupIdForSelection =
     activePopoverDrawingId === selectedDrawingId ? activePopoverGroupId : null;
   const activePopoverGroup = surface.groups.find((group) => group.id === activePopoverGroupIdForSelection);
+  const activePopoverPresentation =
+    activePopoverGroup?.presentation?.type === 'popover' ? activePopoverGroup.presentation : null;
   const surfaceHeight =
     activePopoverGroup?.presentation?.type === 'popover'
       ? MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y +
@@ -134,33 +136,6 @@ export function UserDrawingSelectedActionSurfaceComponent({
               >
                 <Text style={styles.userDrawingActionButtonText}>{group.presentation.triggerIcon ?? '...'}</Text>
               </TouchableOpacity>
-              {activePopoverGroupIdForSelection === group.id && (
-                <View
-                  accessibilityLabel={group.presentation.popoverLabel ?? `${group.label} controls`}
-                  style={[styles.userDrawingActionPopover, { width: group.presentation.popoverWidth ?? 272 }]}
-                  pointerEvents="auto"
-                >
-                  {group.items.map((item) => (
-                    <TouchableOpacity
-                      key={item.id}
-                      accessibilityRole="button"
-                      accessibilityLabel={item.label}
-                      disabled={!item.enabled}
-                      activeOpacity={0.72}
-                      style={[
-                        styles.userDrawingActionButton,
-                        item.swatchColor && { backgroundColor: item.swatchColor },
-                        !item.enabled && styles.userDrawingActionButtonDisabled,
-                      ]}
-                      onPress={() => dispatchItem(item, { keepPopoverOpen: true })}
-                    >
-                      <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
-                        {item.icon}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
             </>
           ) : (
             group.items.map((item) => (
@@ -185,6 +160,41 @@ export function UserDrawingSelectedActionSurfaceComponent({
           )}
         </View>
       ))}
+      {activePopoverGroup && activePopoverPresentation && (
+        <View
+          accessibilityLabel={activePopoverPresentation.popoverLabel ?? `${activePopoverGroup.label} controls`}
+          style={[
+            styles.userDrawingActionPopover,
+            {
+              width: Math.min(
+                activePopoverPresentation.popoverWidth ?? 296,
+                MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH - 8,
+              ),
+            },
+          ]}
+          pointerEvents="auto"
+        >
+          {activePopoverGroup.items.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              accessibilityRole="button"
+              accessibilityLabel={item.label}
+              disabled={!item.enabled}
+              activeOpacity={0.72}
+              style={[
+                styles.userDrawingActionButton,
+                item.swatchColor && { backgroundColor: item.swatchColor },
+                !item.enabled && styles.userDrawingActionButtonDisabled,
+              ]}
+              onPress={() => dispatchItem(item, { keepPopoverOpen: true })}
+            >
+              <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
+                {item.icon}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -241,7 +251,7 @@ const styles = StyleSheet.create({
   },
   userDrawingActionPopover: {
     position: 'absolute',
-    left: 0,
+    left: 4,
     top: MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y,
     zIndex: 10,
     flexDirection: 'row',
