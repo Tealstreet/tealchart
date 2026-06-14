@@ -191,10 +191,8 @@ export function setUserDrawingMeasureMode(state: UserDrawingState, measureMode: 
   if ((state.measureMode ?? 'off') === measureMode && !state.measure) return state;
   return {
     ...state,
-    activeTool: measureMode === 'on' ? 'select' : state.activeTool,
     measureMode,
     measure: null,
-    selection: measureMode === 'on' ? null : state.selection,
     draft: null,
     textEdit: null,
   };
@@ -627,7 +625,16 @@ export function setUserDrawingName(
 }
 
 export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
-  if (state.drawings.length === 0 && !state.selection && !state.draft) return state;
+  if (
+    state.drawings.length === 0 &&
+    !state.selection &&
+    !state.draft &&
+    !state.textEdit &&
+    !state.measure &&
+    (state.measureMode ?? 'off') === 'off'
+  ) {
+    return state;
+  }
 
   return {
     ...state,
@@ -635,6 +642,8 @@ export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
     selection: null,
     draft: null,
     textEdit: null,
+    measureMode: 'off',
+    measure: null,
   };
 }
 
@@ -958,8 +967,6 @@ export function beginUserDrawingMeasure(
   const anchor: readonly [UserDrawingAnchor, UserDrawingAnchor] = [point.anchor, point.anchor];
   return {
     ...state,
-    activeTool: 'select',
-    selection: null,
     draft: null,
     textEdit: null,
     measure: {
