@@ -662,6 +662,7 @@ export type {
   UserDrawingTrendLineExtend,
   UserDrawingPathFamilyKind,
   UserDrawingLineStyle,
+  UserDrawingMagnetMode,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,

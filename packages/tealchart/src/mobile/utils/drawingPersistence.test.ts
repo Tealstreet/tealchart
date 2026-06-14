@@ -14,6 +14,7 @@ const state: UserDrawingState = {
   version: 1,
   activeTool: 'rectangle',
   stayInDrawingMode: false,
+  magnetMode: 'weak',
   selection: { drawingId: 'rect_1' },
   draft: {
     tool: 'trendLine',
@@ -64,6 +65,7 @@ describe('mobile drawing persistence', () => {
     expect(exported?.drawings[0]?.name).toBe('Mobile rectangle');
     expect(exported?.activeTool).toBe('select');
     expect(exported?.stayInDrawingMode).toBe(false);
+    expect(exported?.magnetMode).toBe('weak');
     expect(exported?.selection).toBeNull();
     expect(exported?.draft).toBeNull();
     expect(exported?.textEdit).toBeNull();
@@ -73,6 +75,7 @@ describe('mobile drawing persistence', () => {
     expect(importMobileUserDrawingStateFromLayout(undefined)).toMatchObject({
       drawings: [],
       activeTool: 'select',
+      magnetMode: 'off',
       selection: null,
       draft: null,
       textEdit: null,
@@ -87,19 +90,49 @@ describe('mobile drawing persistence', () => {
       draft: null,
       textEdit: null,
       stayInDrawingMode: false,
+      magnetMode: 'strong',
     });
 
     expect(exported).toMatchObject({
       drawings: [],
       stayInDrawingMode: false,
+      magnetMode: 'strong',
     });
     expect(importMobileUserDrawingStateFromLayout(exported)).toMatchObject({
       drawings: [],
       activeTool: 'select',
       stayInDrawingMode: false,
+      magnetMode: 'strong',
       selection: null,
       draft: null,
       textEdit: null,
+    });
+  });
+
+  it('normalizes invalid imported magnet modes to off', () => {
+    expect(
+      importMobileUserDrawingStateFromLayout({
+        drawings: [],
+        stayInDrawingMode: false,
+        magnetMode: 'invalid',
+      }),
+    ).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      magnetMode: 'off',
+    });
+    expect(
+      importMobileUserDrawingStateFromLayout({
+        drawings: [],
+        stayInDrawingMode: false,
+        magnetMode: 123,
+      }),
+    ).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      magnetMode: 'off',
     });
   });
 
@@ -179,6 +212,7 @@ describe('mobile drawing persistence', () => {
       ],
       activeTool: 'select',
       stayInDrawingMode: true,
+      magnetMode: 'off',
       selection: null,
       draft: null,
       textEdit: null,

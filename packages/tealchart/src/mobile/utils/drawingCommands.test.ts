@@ -142,6 +142,26 @@ describe('mobile drawing handle command dispatch', () => {
     );
     expect(result.changed).toBe(false);
     expect(onEvent).toHaveBeenCalledTimes(2);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setMagnetMode', magnetMode: 'strong', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(result.state.magnetMode).toBe('strong');
+    expect(result.history.undoStack).toHaveLength(0);
+    expect(onEvent).toHaveBeenCalledTimes(3);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setMagnetMode', magnetMode: 'strong', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(3);
     onEvent.mockClear();
 
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(

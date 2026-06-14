@@ -967,6 +967,9 @@ Phase 3: Mobile interaction/model tests
 - Status: mobile command tests and `SkiaTealchart` handle tests cover the
   stay-in-drawing-mode command/API path, including no-op command events and
   one-shot touch drag placement when stay mode is disabled.
+- Status: mobile command tests, persistence tests, and `SkiaTealchart` handle
+  tests cover the magnet-mode command/API path and layout-safe import/export;
+  weak/strong OHLC snapping remains a follow-up input/render behavior gap.
 
 Phase 4: Visual parity checklist
 

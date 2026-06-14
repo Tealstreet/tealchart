@@ -101,6 +101,7 @@ export type UserDrawingTool =
 
 export type UserDrawingKind = Exclude<UserDrawingTool, 'select'>;
 export type UserDrawingPathFamilyKind = 'path' | 'brush' | 'highlighter';
+export type UserDrawingMagnetMode = 'off' | 'weak' | 'strong';
 export type UserDrawingTextAnnotationKind =
   | 'textLabel'
   | 'note'
@@ -888,6 +889,7 @@ export interface UserDrawingState {
   drawings: readonly UserDrawing[];
   activeTool: UserDrawingTool;
   stayInDrawingMode?: boolean;
+  magnetMode?: UserDrawingMagnetMode;
   selection: UserDrawingSelection | null;
   draft: UserDrawingDraft | null;
   textEdit: UserDrawingTextEdit | null;
@@ -1036,6 +1038,7 @@ export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   drawings: [],
   activeTool: 'select',
   stayInDrawingMode: true,
+  magnetMode: 'off',
   selection: null,
   draft: null,
   textEdit: null,

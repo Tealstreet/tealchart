@@ -78,6 +78,7 @@ import type {
   UserDrawingHitTestTextMeasure,
   UserDrawingIconNameDescriptor,
   UserDrawingInfoLineMetrics,
+  UserDrawingMagnetMode,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
   NudgeUserDrawingSelectionOptions,
@@ -319,6 +320,7 @@ describe('tealchart public entries', () => {
     >;
     const crossPlatformCallback = ((event) => event.command.type) satisfies UserDrawingCommandEventListener;
     const acceptsCommandTuple = (_tuple: WidgetEventMap['user_drawing_command']) => true;
+    const magnetMode: UserDrawingMagnetMode = 'strong';
     const commandEvent: UserDrawingCommandEvent = {
       command: { type: 'setActiveTool', tool: 'trendLine' },
       previousState: createUserDrawingState(),
@@ -330,6 +332,7 @@ describe('tealchart public entries', () => {
     expect(webOptionCallback).toBeTypeOf('function');
     expect(crossPlatformCallback).toBeTypeOf('function');
     expect(acceptsCommandTuple).toBeTypeOf('function');
+    expect(magnetMode).toBe('strong');
     expect(commandEvent.command.type).toBe('setActiveTool');
     expect(commandEvent.state.activeTool).toBe('trendLine');
     expect(commandEvent.source).toBe('api');

@@ -29,6 +29,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingKeyboardFocusOwner,
   UserDrawingKeyboardInput,
+  UserDrawingMagnetMode,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -2308,6 +2309,18 @@ export class TealchartWidget {
 
   isUserDrawingStayInDrawingMode(): boolean {
     return this._userDrawingState.stayInDrawingMode !== false;
+  }
+
+  setUserDrawingMagnetMode(magnetMode: UserDrawingMagnetMode): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'setMagnetMode',
+      magnetMode,
+      meta: { source: 'api' },
+    });
+  }
+
+  getUserDrawingMagnetMode(): UserDrawingMagnetMode {
+    return this._userDrawingState.magnetMode ?? 'off';
   }
 
   canUndoUserDrawingCommand(): boolean {

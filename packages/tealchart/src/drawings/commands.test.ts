@@ -32,6 +32,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingMagnetMode,
   setUserDrawingName,
   setUserDrawingStayInDrawingMode,
   setUserDrawingTableCells,
@@ -72,6 +73,7 @@ const multiPaneSpacesByPaneId = new Map([
 const coveredUserDrawingCommandTypes = [
   'setActiveTool',
   'setStayInDrawingMode',
+  'setMagnetMode',
   'add',
   'select',
   'selectMany',
@@ -223,6 +225,29 @@ describe('user drawing command dispatch', () => {
     const unchanged = dispatchUserDrawingCommand(command.state, {
       type: 'setStayInDrawingMode',
       stayInDrawingMode: false,
+      meta: { source: 'toolbar' },
+    });
+
+    expect(unchanged.state).toBe(command.state);
+    expect(unchanged.changed).toBe(false);
+  });
+
+  it('wraps magnet-mode reducer without changing behavior', () => {
+    const initial = createUserDrawingState();
+    const direct = setUserDrawingMagnetMode(initial, 'strong');
+    const command = dispatchUserDrawingCommand(initial, {
+      type: 'setMagnetMode',
+      magnetMode: 'strong',
+      meta: { source: 'toolbar', timestamp: 3 },
+    });
+
+    expect(command.state).toEqual(direct);
+    expect(command.changed).toBe(true);
+    expect(command.meta).toEqual({ source: 'toolbar', timestamp: 3 });
+
+    const unchanged = dispatchUserDrawingCommand(command.state, {
+      type: 'setMagnetMode',
+      magnetMode: 'strong',
       meta: { source: 'toolbar' },
     });
 
