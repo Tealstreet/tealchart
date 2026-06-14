@@ -64,6 +64,13 @@ export function UserDrawingSelectedActionSurfaceComponent({
     }
   }, [shouldRender]);
 
+  useEffect(() => {
+    if (activePopoverDrawingId !== null && activePopoverDrawingId !== selectedDrawingId) {
+      setActivePopoverGroupId(null);
+      setActivePopoverDrawingId(selectedDrawingId);
+    }
+  }, [activePopoverDrawingId, selectedDrawingId]);
+
   if (!shouldRender) return null;
 
   const dispatchItem = (
