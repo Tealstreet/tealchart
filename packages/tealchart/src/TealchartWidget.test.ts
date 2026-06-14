@@ -1723,6 +1723,12 @@ describe('TealchartWidget', () => {
         editable: false,
       });
       expect(
+        widget
+          .getUserDrawingPropertiesSurface('locked')
+          .groups.flatMap((group) => group.controls)
+          .every((control) => control.enabled === false),
+      ).toBe(true);
+      expect(
         widget.dispatchUserDrawingPropertiesSurfaceCommand(
           { type: 'updateStyle', style: { lineColor: '#38bdf8' } },
           { drawingId: 'line' },

@@ -651,6 +651,9 @@ Phase 3: History and focus
 - Status: properties surface controls now convert through shared drawing
   commands and web widget dispatch so property changes use the command/history
   owner path.
+- Status: shared properties surface controls now carry explicit enabled state
+  so app-owned web popovers can render locked-target controls disabled without
+  inferring editability from the drawing object.
 
 ### Epic 6.3: Mobile Double-Tap Editing
 
@@ -672,6 +675,9 @@ Phase 3: History and focus
 - Commit mobile text/property changes as one undoable transaction.
 - Status: mobile Skia handle parity now dispatches properties surface controls
   through the same shared drawing command conversion path.
+- Status: mobile Skia property sheet consumers receive the same explicit
+  properties-surface control enabled state as web, keeping locked-target
+  disabled rendering platform-neutral.
 
 ## Gap 7: Keyboard and Modifier Behavior
 
