@@ -729,7 +729,11 @@ export interface TealchartWidgetOptions {
   userDrawingState?: UserDrawingState;
   /** Called when the widget updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
-  /** Called after a user drawing command changes state. Direct state replacement does not emit this. */
+  /**
+   * Called after a user drawing command changes state. Direct API state
+   * replacement and layout import emit a non-undoable `replaceState` command
+   * event when the committed drawing layout changes.
+   */
   onUserDrawingCommand?: (event: UserDrawingCommandEvent) => void;
   /** Called when app or widget code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;

@@ -469,15 +469,23 @@ describe('TealchartWidget', () => {
         selection: { drawingId: 'a' },
       });
 
-      expect(onCommand).not.toHaveBeenCalled();
-      expect(subscribed).not.toHaveBeenCalled();
+      expect(onCommand).toHaveBeenCalledTimes(1);
+      expect(subscribed).toHaveBeenCalledTimes(1);
+      const replaceEvent = onCommand.mock.calls[0]![0];
+      expect(subscribed.mock.calls[0]![0]).toBe(replaceEvent);
+      expect(replaceEvent).toMatchObject({
+        command: { type: 'replaceState' },
+        source: 'api',
+        previousState: initial,
+        affectedIds: ['a'],
+      });
 
       expect(widget.deleteSelectedUserDrawing()).toBe(true);
 
-      expect(onCommand).toHaveBeenCalledTimes(1);
-      expect(subscribed).toHaveBeenCalledTimes(1);
-      const event = onCommand.mock.calls[0]![0];
-      expect(subscribed.mock.calls[0]![0]).toBe(event);
+      expect(onCommand).toHaveBeenCalledTimes(2);
+      expect(subscribed).toHaveBeenCalledTimes(2);
+      const event = onCommand.mock.calls[1]![0];
+      expect(subscribed.mock.calls[1]![0]).toBe(event);
       expect(event.command.type).toBe('delete');
       expect(event.source).toBe('api');
       expect(event.previousState.drawings.map((drawing) => drawing.id)).toEqual(['a']);
@@ -485,17 +493,17 @@ describe('TealchartWidget', () => {
       expect(event.affectedIds).toEqual(['a']);
 
       expect(widget.deleteUserDrawing('missing')).toBe(false);
-      expect(onCommand).toHaveBeenCalledTimes(1);
-      expect(subscribed).toHaveBeenCalledTimes(1);
-
-      expect(widget.undoUserDrawingCommand()).toBe(true);
       expect(onCommand).toHaveBeenCalledTimes(2);
       expect(subscribed).toHaveBeenCalledTimes(2);
-      expect(onCommand.mock.calls[1]![0]).toMatchObject({
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(onCommand).toHaveBeenCalledTimes(3);
+      expect(subscribed).toHaveBeenCalledTimes(3);
+      expect(onCommand.mock.calls[2]![0]).toMatchObject({
         command: { type: 'undo' },
         source: 'api',
       });
-      expect(onCommand.mock.calls[1]![0].state.drawings.map((drawing) => drawing.id)).toEqual(['a']);
+      expect(onCommand.mock.calls[2]![0].state.drawings.map((drawing) => drawing.id)).toEqual(['a']);
     });
 
     it('continues subscription emission when the option command listener throws', () => {
@@ -528,6 +536,10 @@ describe('TealchartWidget', () => {
         ],
         selection: { drawingId: 'a' },
       });
+
+      expect(subscribed).toHaveBeenCalledTimes(1);
+      expect(subscribed.mock.calls[0]?.[0]).toMatchObject({ command: { type: 'replaceState' } });
+      subscribed.mockClear();
 
       expect(() => widget.deleteSelectedUserDrawing()).not.toThrow();
       expect(subscribed).toHaveBeenCalledTimes(1);
@@ -631,7 +643,8 @@ describe('TealchartWidget', () => {
 
     it('exports and imports layout-safe user drawing state', () => {
       const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
 
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
@@ -655,6 +668,7 @@ describe('TealchartWidget', () => {
           },
         ],
       });
+      onCommand.mockClear();
 
       const exported = widget.exportUserDrawingStateForLayout();
       expect(exported?.drawings).toHaveLength(1);
@@ -662,19 +676,36 @@ describe('TealchartWidget', () => {
       expect(exported?.selection).toBeNull();
 
       widget.clearUserDrawings();
+      onCommand.mockClear();
       widget.importUserDrawingStateFromLayout(exported);
       expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
       expect(widget.getUserDrawingState().activeTool).toBe('select');
+      expect(onCommand).toHaveBeenCalledTimes(1);
+      expect(onCommand.mock.calls[0]![0]).toMatchObject({
+        command: { type: 'replaceState' },
+        source: 'layout',
+        affectedIds: ['h'],
+      });
 
       const testWidget = widget as unknown as {
         _chartStore: { isDirty: { get(): boolean; set(value: boolean): void } };
       };
       testWidget._chartStore.isDirty.set(false);
+      onCommand.mockClear();
       widget.importUserDrawingStateFromLayout(exported);
       expect(testWidget._chartStore.isDirty.get()).toBe(false);
+      expect(onCommand).not.toHaveBeenCalled();
 
+      onCommand.mockClear();
       widget.importUserDrawingStateFromLayout(undefined);
       expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: { type: 'replaceState', meta: { source: 'layout' } },
+          source: 'layout',
+          affectedIds: ['h'],
+        }),
+      );
     });
 
     it('applies active drawing tool input through the widget state owner', () => {

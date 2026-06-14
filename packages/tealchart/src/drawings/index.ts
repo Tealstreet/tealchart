@@ -225,6 +225,7 @@ export type { UserDrawingInfoLineMetrics } from './infoLine';
 export {
   createUserDrawingCommandEvent,
   createUserDrawingHistoryCommandEvent,
+  createUserDrawingReplaceStateCommandEvent,
   dispatchUserDrawingCommand,
   reduceUserDrawingCommand,
 } from './commands';
@@ -234,6 +235,7 @@ export type {
   UserDrawingCommandEvent,
   UserDrawingCommandEventCommand,
   UserDrawingHistoryCommand,
+  UserDrawingReplaceStateCommand,
   UserDrawingCommandMetadata,
   UserDrawingCommandSource,
 } from './commands';

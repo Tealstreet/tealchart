@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { createUserDrawingCommandEvent, dispatchUserDrawingCommand } from './commands';
+import { createUserDrawingCommandEvent, createUserDrawingReplaceStateCommandEvent, dispatchUserDrawingCommand } from './commands';
 import type { UserDrawingCommand } from './commands';
 import { beginUserDrawingDuplicateEditDragAtPoint, beginUserDrawingEditDragAtPoint } from './editing';
 import { clearChartStoreCache } from '../state/chartState';
@@ -237,6 +237,30 @@ describe('user drawing command dispatch', () => {
 
     expect(result.changed).toBe(true);
     expect(event?.affectedIds).toEqual(['copy']);
+  });
+
+  it('creates non-undoable replace-state events for direct state replacement', () => {
+    const previousState = createUserDrawingState();
+    const state = createStateWithTrendLine();
+    const event = createUserDrawingReplaceStateCommandEvent(previousState, state, {
+      type: 'replaceState',
+      meta: { source: 'layout' },
+    });
+
+    expect(event).toMatchObject({
+      command: { type: 'replaceState' },
+      source: 'layout',
+      previousState,
+      state,
+      affectedIds: ['trend-line'],
+    });
+    expect(createUserDrawingReplaceStateCommandEvent(state, state, { type: 'replaceState', meta: { source: 'api' } })).toBeNull();
+    expect(
+      createUserDrawingReplaceStateCommandEvent(previousState, { ...previousState, activeTool: 'rectangle' }, {
+        type: 'replaceState',
+        meta: { source: 'api' },
+      }),
+    ).toBeNull();
   });
 
   it('wraps selection, duplicate, delete, style, lock, and z-order reducers', () => {

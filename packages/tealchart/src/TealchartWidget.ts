@@ -63,6 +63,7 @@ import {
   createUserDrawingCommandHistory,
   createUserDrawingCommandEvent,
   createUserDrawingHistoryCommandEvent,
+  createUserDrawingReplaceStateCommandEvent,
   createUserDrawingState,
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
@@ -2239,12 +2240,14 @@ export class TealchartWidget {
     this._userDrawingHistory = clearUserDrawingCommandHistory(this._userDrawingHistory);
     this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState(), {
       markLayoutDirty: false,
+      notifyCommand: true,
+      source: 'layout',
     });
   }
 
   setUserDrawingState(
     state: UserDrawingState,
-    options: { markLayoutDirty?: boolean; preserveHistory?: boolean } = {},
+    options: { markLayoutDirty?: boolean; preserveHistory?: boolean; notifyCommand?: boolean; source?: UserDrawingCommandSource } = {},
   ): void {
     if (state === this._userDrawingState) return;
     const previousState = this._userDrawingState;
@@ -2256,6 +2259,10 @@ export class TealchartWidget {
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
     if (options.markLayoutDirty !== false && !isUserDrawingLayoutStateEqual(previousState, state)) {
       this._markDirty();
+    }
+    const shouldNotifyReplacement = options.notifyCommand ?? !options.preserveHistory;
+    if (shouldNotifyReplacement && !isUserDrawingLayoutStateEqual(previousState, state)) {
+      this._emitUserDrawingReplaceStateCommandEvent(previousState, state, options.source ?? 'api');
     }
   }
 
@@ -2627,6 +2634,25 @@ export class TealchartWidget {
     command: Parameters<typeof createUserDrawingHistoryCommandEvent>[2],
   ): UserDrawingCommandEvent | null {
     const event = createUserDrawingHistoryCommandEvent(previousState, state, command, previousState !== state);
+    if (!event) return null;
+    try {
+      this._options.onUserDrawingCommand?.(event);
+    } catch (error) {
+      this._logger?.error(LogCategory.Widget, 'onUserDrawingCommand callback threw', error);
+    }
+    this._eventEmitter.emit('user_drawing_command', event);
+    return event;
+  }
+
+  private _emitUserDrawingReplaceStateCommandEvent(
+    previousState: UserDrawingState,
+    state: UserDrawingState,
+    source: UserDrawingCommandSource,
+  ): UserDrawingCommandEvent | null {
+    const event = createUserDrawingReplaceStateCommandEvent(previousState, state, {
+      type: 'replaceState',
+      meta: { source },
+    });
     if (!event) return null;
     try {
       this._options.onUserDrawingCommand?.(event);
@@ -3367,7 +3393,10 @@ export class TealchartWidget {
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
 
-    this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), { markLayoutDirty: false });
+    this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), {
+      markLayoutDirty: false,
+      source: 'layout',
+    });
 
     if (!settings.autoScale) {
       this._viewportController.disableAutoScale('main');
