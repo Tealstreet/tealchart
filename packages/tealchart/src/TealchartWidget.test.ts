@@ -1507,6 +1507,39 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('reports clipboard clear no-ops through the widget API', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      expect(widget.clearUserDrawingClipboard()).toBe(false);
+      expect(widget.copySelectedUserDrawing()).toBe(true);
+      expect(widget.clearUserDrawingClipboard()).toBe(true);
+      expect(widget.clearUserDrawingClipboard()).toBe(false);
+      expect(widget.pasteUserDrawingClipboard()).toBe(false);
+    });
+
     it('reorders selected or targeted drawings through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

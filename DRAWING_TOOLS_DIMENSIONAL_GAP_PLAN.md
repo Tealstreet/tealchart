@@ -837,7 +837,8 @@ Phase 3: Error behavior
   return `false`/unchanged state on unavailable targets. Web widget APIs and
   mobile Skia handle APIs now also expose explicit boolean changed/no-op returns
   for active-tool, selection, clear, cancel-draft, direct state replacement, and
-  layout import paths.
+  layout import paths. Clipboard clearing also reports whether a transient
+  clipboard was actually cleared on both web and mobile handles.
 
 ### Epic 8.2: Persistence and Migration Hardening
 
