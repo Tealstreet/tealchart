@@ -267,6 +267,7 @@ export type {
 } from './history';
 export {
   addUserDrawing,
+  beginUserDrawingMeasure,
   beginUserDrawingTextEdit,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
@@ -284,6 +285,7 @@ export {
   deleteUserDrawingTableRow,
   deleteUserDrawing,
   duplicateUserDrawing,
+  endUserDrawingMeasure,
   getUserDrawingSelectionIds,
   handleUserDrawingInput,
   insertUserDrawingTableColumn,
@@ -298,6 +300,7 @@ export {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingMeasureMode,
   setUserDrawingName,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
@@ -308,6 +311,7 @@ export {
   setUserDrawingTrendLineExtend,
   setUserDrawingTool,
   setUserDrawingVisibility,
+  updateUserDrawingMeasure,
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
@@ -664,6 +668,8 @@ export type {
   UserDrawingPathFamilyKind,
   UserDrawingLineStyle,
   UserDrawingMagnetMode,
+  UserDrawingMeasure,
+  UserDrawingMeasureMode,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingStyle,

@@ -4,6 +4,7 @@ import { clearChartStoreCache } from '../state/chartState';
 import {
   addUserDrawing,
   appendUserDrawingPathDragPoint,
+  beginUserDrawingMeasure,
   beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
@@ -18,6 +19,7 @@ import {
   deleteUserDrawingTableRow,
   deleteUserDrawing,
   duplicateUserDrawing,
+  endUserDrawingMeasure,
   getUserDrawingSelectionIds,
   handleUserDrawingInput,
   insertUserDrawingTableColumn,
@@ -31,6 +33,7 @@ import {
   setUserDrawingIconName,
   setUserDrawingImageSource,
   setUserDrawingLocked,
+  setUserDrawingMeasureMode,
   setUserDrawingStayInDrawingMode,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
@@ -42,6 +45,7 @@ import {
   setUserDrawingTool,
   setUserDrawingVisibility,
   smoothUserDrawingPathAnchors,
+  updateUserDrawingMeasure,
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
@@ -3362,5 +3366,54 @@ describe('user drawing input controller', () => {
     expect(next.activeTool).toBe('select');
     expect(result.hit).toBe(false);
     expect(result.changed).toBe(true);
+  });
+
+  it('tracks temporary measure overlays without creating drawings', () => {
+    const initial = setUserDrawingMeasureMode(
+      createUserDrawingState({
+        activeTool: 'rectangle',
+        selection: { drawingId: 'old' },
+      }),
+      'on',
+    );
+
+    expect(initial.activeTool).toBe('select');
+    expect(initial.measureMode).toBe('on');
+    expect(initial.selection).toBeNull();
+
+    const started = beginUserDrawingMeasure(initial, { paneId: 'main', anchor: anchorA }, { now: () => 10, style });
+    expect(started.drawings).toEqual([]);
+    expect(started.measure).toMatchObject({
+      paneId: 'main',
+      anchors: [anchorA, anchorA],
+      style,
+      startedAt: 10,
+    });
+
+    const moved = updateUserDrawingMeasure(started, { paneId: 'main', anchor: anchorB });
+    expect(moved.drawings).toEqual([]);
+    expect(moved.measure?.anchors).toEqual([anchorA, anchorB]);
+
+    const ignoredDifferentPane = updateUserDrawingMeasure(moved, { paneId: 'macd', anchor: anchorC });
+    expect(ignoredDifferentPane).toBe(moved);
+
+    const ended = endUserDrawingMeasure(moved);
+    expect(ended.measure).toBeNull();
+    expect(ended.measureMode).toBe('on');
+    expect(ended.drawings).toEqual([]);
+  });
+
+  it('clears temporary measure overlays with draft cancellation and mode changes', () => {
+    const measured = beginUserDrawingMeasure(setUserDrawingMeasureMode(createUserDrawingState(), 'on'), {
+      paneId: 'main',
+      anchor: anchorA,
+    });
+    const moved = updateUserDrawingMeasure(measured, { paneId: 'main', anchor: anchorB });
+
+    expect(cancelUserDrawingDraft(moved).measure).toBeNull();
+
+    const off = setUserDrawingMeasureMode(moved, 'off');
+    expect(off.measureMode).toBe('off');
+    expect(off.measure).toBeNull();
   });
 });
