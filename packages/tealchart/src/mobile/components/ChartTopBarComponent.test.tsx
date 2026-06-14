@@ -70,10 +70,11 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     const onDelete = vi.fn();
     const onCancel = vi.fn();
     const onClear = vi.fn();
+    const onMeasureModeChange = vi.fn();
     const onZOrder = vi.fn();
     const onVisibility = vi.fn();
     const onLocked = vi.fn();
-    render(
+    const { rerender } = render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
         interval="1"
@@ -128,6 +129,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
         onUserDrawingDeleteSelected={onDelete}
         onUserDrawingCancelDraft={onCancel}
         onUserDrawingClearAll={onClear}
+        onUserDrawingMeasureModeChange={onMeasureModeChange}
         onUserDrawingZOrderChange={onZOrder}
         onUserDrawingVisibilityChange={onVisibility}
         onUserDrawingLockedChange={onLocked}
@@ -141,6 +143,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Bring selected drawing to front')).toBeNull();
     expect(screen.queryByLabelText('Send selected drawing to back')).toBeNull();
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
+    fireEvent.click(screen.getByLabelText('Measure date and price range'));
     fireEvent.click(screen.getByLabelText('Clear all drawings'));
     fireEvent.click(screen.getByLabelText('Hide all drawings'));
     fireEvent.click(screen.getByLabelText('Show all drawings'));
@@ -150,12 +153,26 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onDuplicate).not.toHaveBeenCalled();
     expect(onDelete).not.toHaveBeenCalled();
     expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onMeasureModeChange).toHaveBeenCalledWith(true);
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onLocked).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'] });
     expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onZOrder).not.toHaveBeenCalled();
+
+    rerender(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, measureMode: 'on' }}
+        onUserDrawingMeasureModeChange={onMeasureModeChange}
+      />,
+    );
+
+    expect(screen.getByLabelText('Measure date and price range').getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByLabelText('Measure date and price range'));
+    expect(onMeasureModeChange).toHaveBeenCalledWith(false);
   });
 
   it('dispatches selected rectangle fill style controls without text controls', () => {

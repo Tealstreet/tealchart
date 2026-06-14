@@ -97,6 +97,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingCancelDraft?: () => void;
   /** Callback when all user drawings should be cleared */
   onUserDrawingClearAll?: () => void;
+  /** Callback when temporary measure mode should toggle */
+  onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
   /** Callback when selected drawings should be reordered */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
@@ -132,6 +134,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingToolSelect,
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
+    onUserDrawingMeasureModeChange,
     onUserDrawingStyleChange,
     onUserDrawingTextAlignChange,
     onUserDrawingTrendLineExtendChange,
@@ -896,12 +899,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   isUserDrawingGlobalToolbarAction(descriptor.action),
                 ).map((descriptor) => {
                   const enabled = isUserDrawingToolbarActionEnabled(userDrawingState, descriptor.action);
+                  const active = descriptor.action === 'measure' && userDrawingState.measureMode === 'on';
                   return (
                     <Pressable
                       key={descriptor.action}
                       accessibilityRole="button"
                       accessibilityLabel={descriptor.label}
-                      accessibilityState={{ disabled: !enabled }}
+                      accessibilityState={{ disabled: !enabled, selected: active }}
                       disabled={!enabled}
                       onPress={() => {
                         const allDrawingOptions = getUserDrawingAllDrawingsUpdateOptions(userDrawingState);
@@ -911,6 +915,9 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                             includeLocked: true,
                           },
                         );
+                        if (descriptor.action === 'measure') {
+                          onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on');
+                        }
                         if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                         if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
                         if (descriptor.action === 'hideAll') {
@@ -928,14 +935,15 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingButton,
+                        active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
                         !enabled && styles.drawingButtonDisabled,
-                        enabled && pressed && styles.drawingButtonPressed,
+                        enabled && pressed && !active && styles.drawingButtonPressed,
                       ]}
                     >
                       <Text
                         style={[
                           styles.drawingButtonText,
-                          { color: textSecondaryColor },
+                          { color: active ? accentColor : textSecondaryColor },
                           !enabled && styles.drawingButtonTextDisabled,
                         ]}
                       >

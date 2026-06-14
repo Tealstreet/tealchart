@@ -3062,6 +3062,47 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns the temporary measure overlay as a draft date and price range primitive', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      measureMode: 'on',
+      selection: null,
+      drawings: [],
+      draft: null,
+      textEdit: null,
+      measure: {
+        paneId: 'main',
+        anchors: [
+          { time: 10_000, price: 90 },
+          { time: 70_000, price: 10 },
+        ],
+        style,
+        startedAt: 1,
+      },
+    };
+    const durationSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+      ],
+    };
+
+    expect(
+      resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0],
+    ).toMatchObject({
+      kind: 'datePriceRange',
+      id: '__measure__',
+      phase: 'draft',
+      selected: false,
+      rect: { x: 10, y: 10, width: 60, height: 80 },
+      style,
+    });
+  });
+
   it('returns Skia-ready risk reward position primitives', () => {
     const state: UserDrawingState = {
       version: 1,

@@ -153,16 +153,20 @@ describe('SkiaTealchart drawing properties', () => {
 
     expect(ref.current?.isUserDrawingStayInDrawingMode()).toBe(true);
     expect(ref.current?.getUserDrawingMagnetMode()).toBe('off');
+    expect(ref.current?.getUserDrawingMeasureMode()).toBe('off');
 
     await act(async () => {
       expect(ref.current?.setUserDrawingStayInDrawingMode(false)).toBe(true);
       expect(ref.current?.setUserDrawingMagnetMode('weak')).toBe(true);
+      expect(ref.current?.setUserDrawingMeasureMode('on')).toBe(true);
     });
 
     expect(ref.current?.isUserDrawingStayInDrawingMode()).toBe(false);
     expect(ref.current?.getUserDrawingMagnetMode()).toBe('weak');
+    expect(ref.current?.getUserDrawingMeasureMode()).toBe('on');
     expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ stayInDrawingMode: false }));
     expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ magnetMode: 'weak' }));
+    expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ measureMode: 'on' }));
     expect(onCommand).toHaveBeenCalledWith(
       expect.objectContaining({
         command: expect.objectContaining({ type: 'setStayInDrawingMode', stayInDrawingMode: false }),
@@ -175,10 +179,17 @@ describe('SkiaTealchart drawing properties', () => {
         source: 'api',
       }),
     );
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setMeasureMode', measureMode: 'on' }),
+        source: 'api',
+      }),
+    );
 
     await act(async () => {
       expect(ref.current?.setUserDrawingStayInDrawingMode(false)).toBe(false);
       expect(ref.current?.setUserDrawingMagnetMode('weak')).toBe(false);
+      expect(ref.current?.setUserDrawingMeasureMode('on')).toBe(false);
     });
   });
 
