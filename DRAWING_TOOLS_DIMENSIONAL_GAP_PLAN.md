@@ -937,6 +937,11 @@ Phase 4: Visual parity checklist
 - Status: each required state now carries explicit web/mobile evidence status
   (`ready`, `app-owned`, or `known-gap`) so PR notes and tooling can separate
   first-party surfaces from app-owned capture points and tracked visual gaps.
+- Status: the visual evidence matrix now records the Gap 8 app-integration
+  contract across web Canvas and mobile Skia: command-backed sibling APIs,
+  matching command-event shapes, explicit no-op returns for unavailable targets,
+  and shared versioned import/export persistence that excludes transient draft,
+  selection, text-edit, and history state.
 
 ## First Implementation Recommendation
 
