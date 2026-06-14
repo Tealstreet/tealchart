@@ -15,7 +15,7 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DIRTY } from './rendering/RenderScheduler';
-import { createUserDrawingState } from './drawings';
+import { createUserDrawingState, resolveUserDrawingObjectTreeRowDispatchAction } from './drawings';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
@@ -1746,12 +1746,24 @@ describe('TealchartWidget', () => {
       contextItems.find((item) => item.text === 'Open drawing object tree')?.click();
       expect(onOpenObjectTree).toHaveBeenCalledWith(expect.objectContaining({ rows: expect.any(Array) }));
 
-      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'hide', drawingIds: ['target'] })).toBe(true);
+      const targetRow = widget.getUserDrawingObjectTreeModel().rows.find((row) => row.drawingId === 'target')!;
+      const hideTargetAction = resolveUserDrawingObjectTreeRowDispatchAction(targetRow, 'hide');
+      expect(hideTargetAction).toEqual({ type: 'hide', drawingIds: ['target'], includeLocked: undefined });
+      expect(hideTargetAction && widget.dispatchUserDrawingObjectTreeAction(hideTargetAction)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([
         expect.objectContaining({ id: 'line', visible: true }),
         expect.objectContaining({ id: 'target', visible: false }),
       ]);
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'line' });
+
+      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'lock', drawingIds: ['target'] })).toBe(true);
+      const lockedTargetRow = widget.getUserDrawingObjectTreeModel().rows.find((row) => row.drawingId === 'target')!;
+      const unlockTargetAction = resolveUserDrawingObjectTreeRowDispatchAction(lockedTargetRow, 'unlock');
+      expect(unlockTargetAction).toEqual({ type: 'unlock', drawingIds: ['target'], includeLocked: true });
+      expect(unlockTargetAction && widget.dispatchUserDrawingObjectTreeAction(unlockTargetAction)).toBe(true);
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
+        locked: false,
+      });
 
       expect(widget.setUserDrawingName('target', 'Range box')).toBe(true);
       expect(widget.getUserDrawingObjectTreeModel().rows[0]).toMatchObject({
