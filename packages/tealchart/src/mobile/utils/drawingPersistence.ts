@@ -32,6 +32,8 @@ export interface MobileUserDrawingReplaceStateResult {
   state: UserDrawingState;
   history: UserDrawingCommandHistory;
   event: UserDrawingCommandEvent | null;
+  changed: boolean;
+  layoutChanged: boolean;
 }
 
 export function replaceMobileUserDrawingState(
@@ -40,11 +42,12 @@ export function replaceMobileUserDrawingState(
   state: UserDrawingState,
   source: 'api' | 'layout',
 ): MobileUserDrawingReplaceStateResult {
+  const layoutChanged = !isUserDrawingLayoutStateEqual(previousState, state);
   return {
     state,
     history: clearUserDrawingCommandHistory(history),
-    event: isUserDrawingLayoutStateEqual(previousState, state)
-      ? null
-      : createMobileUserDrawingReplaceStateCommandEvent(previousState, state, source),
+    event: layoutChanged ? createMobileUserDrawingReplaceStateCommandEvent(previousState, state, source) : null,
+    changed: state !== previousState,
+    layoutChanged,
   };
 }

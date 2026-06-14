@@ -294,8 +294,8 @@ export interface SkiaTealchartHandle {
   changeTheme(theme: ChartThemeInput): void;
   getUserDrawingState(): UserDrawingState;
   exportUserDrawingStateForLayout(): UserDrawingState | undefined;
-  importUserDrawingStateFromLayout(state?: UserDrawingState | null): void;
-  setUserDrawingState(state: UserDrawingState): void;
+  importUserDrawingStateFromLayout(state?: UserDrawingState | null): boolean;
+  setUserDrawingState(state: UserDrawingState): boolean;
   setActiveUserDrawingTool(tool: UserDrawingTool): boolean;
   canUndoUserDrawingCommand(): boolean;
   canRedoUserDrawingCommand(): boolean;
@@ -600,8 +600,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const previousState = userDrawingStateRef.current;
       const result = replaceMobileUserDrawingState(previousState, userDrawingHistoryRef.current, nextState, source);
       userDrawingHistoryRef.current = result.history;
-      commitUserDrawingState(result.state);
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+      }
       if (result.event) notifyUserDrawingCommand(result.event);
+      return result;
     },
     [commitUserDrawingState, notifyUserDrawingCommand],
   );
@@ -640,11 +643,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       exportUserDrawingStateForLayout(): UserDrawingState | undefined {
         return exportMobileUserDrawingStateForLayout(userDrawingStateRef.current);
       },
-      importUserDrawingStateFromLayout(nextState?: UserDrawingState | null): void {
-        replaceUserDrawingState(importMobileUserDrawingStateFromLayout(nextState), 'layout');
+      importUserDrawingStateFromLayout(nextState?: UserDrawingState | null): boolean {
+        return replaceUserDrawingState(importMobileUserDrawingStateFromLayout(nextState), 'layout').layoutChanged;
       },
-      setUserDrawingState(nextState: UserDrawingState): void {
-        replaceUserDrawingState(nextState, 'api');
+      setUserDrawingState(nextState: UserDrawingState): boolean {
+        return replaceUserDrawingState(nextState, 'api').changed;
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
         return dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
