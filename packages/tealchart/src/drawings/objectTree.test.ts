@@ -8,6 +8,7 @@ import {
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
+  resolveUserDrawingObjectTreeSelectionDispatchAction,
 } from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
 import { clearChartStoreCache } from '../state/chartState';
@@ -186,6 +187,29 @@ describe('user drawing object tree model', () => {
       ['bringToFront', false],
       ['sendToBack', false],
     ]);
+    expect(model.selectionActions?.map((action) => [action.type, action.enabled, action.selectedCount])).toEqual([
+      ['duplicate', true, 2],
+      ['delete', true, 2],
+      ['hide', false, 2],
+      ['show', true, 2],
+      ['lock', true, 2],
+      ['unlock', true, 2],
+      ['bringForward', true, 2],
+      ['sendBackward', false, 2],
+      ['bringToFront', true, 2],
+      ['sendToBack', false, 2],
+    ]);
+    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'show')).toEqual({
+      type: 'show',
+      drawingIds: ['trend', 'rect'],
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'unlock')).toEqual({
+      type: 'unlock',
+      drawingIds: ['trend', 'rect'],
+      includeLocked: true,
+    });
+    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'hide')).toBeNull();
   });
 
   it('resolves row action descriptors to app-dispatchable object-tree actions', () => {
@@ -247,6 +271,28 @@ describe('user drawing object tree model', () => {
     const next = reduceUserDrawingCommand(state, commands[0]!);
 
     expect(next.drawings[0]).toMatchObject({ id: 'rect', locked: false, updatedAt: 51 });
+  });
+
+  it('routes selected bulk actions through app-dispatchable object-tree commands', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        createTrendLine({ id: 'trend', visible: false }),
+        createRectangle({ id: 'rect', locked: true }),
+      ],
+      selection: { drawingId: 'trend', drawingIds: ['trend', 'rect'] },
+    });
+    const unlockAction = resolveUserDrawingObjectTreeSelectionDispatchAction(resolveUserDrawingObjectTreeModel(state), 'unlock');
+
+    const commands = resolveUserDrawingObjectTreeDispatchActionCommands(state, unlockAction!, {
+      createId: () => 'unused',
+      now: () => 52,
+    });
+    const next = reduceUserDrawingCommand(state, commands[0]!);
+
+    expect(next.drawings).toEqual([
+      expect.objectContaining({ id: 'trend', locked: false }),
+      expect.objectContaining({ id: 'rect', locked: false, updatedAt: 52 }),
+    ]);
   });
 
   it('uses optional drawing names as row labels', () => {
@@ -417,8 +463,14 @@ describe('user drawing object tree model', () => {
     expect(model).toEqual({
       rows: [],
       groups: [],
+      selectionActions: expect.arrayContaining([
+        expect.objectContaining({ type: 'duplicate', enabled: false, selectedCount: 0 }),
+        expect.objectContaining({ type: 'delete', enabled: false, selectedCount: 0 }),
+        expect.objectContaining({ type: 'unlock', enabled: false, selectedCount: 0 }),
+      ]),
       selectedIds: [],
       drawingCount: 0,
     });
+    expect(model.selectionActions).toHaveLength(10);
   });
 });

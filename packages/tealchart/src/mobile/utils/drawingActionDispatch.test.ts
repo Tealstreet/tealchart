@@ -90,7 +90,7 @@ describe('mobile drawing action dispatch', () => {
     );
 
     expect(handled).toBe(true);
-    expect(onOpenObjectTree).toHaveBeenCalledWith({
+    expect(onOpenObjectTree).toHaveBeenCalledWith(expect.objectContaining({
       drawingCount: 2,
       groups: [
         {
@@ -125,8 +125,12 @@ describe('mobile drawing action dispatch', () => {
           ]),
         }),
       ],
+      selectionActions: expect.arrayContaining([
+        expect.objectContaining({ type: 'hide', enabled: true, selectedCount: 1 }),
+        expect.objectContaining({ type: 'lock', enabled: true, selectedCount: 1 }),
+      ]),
       selectedIds: ['line'],
-    });
+    }));
   });
 
   it('opens the same shared object tree model from context menu actions', () => {
