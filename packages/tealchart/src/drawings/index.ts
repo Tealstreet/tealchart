@@ -339,10 +339,7 @@ export {
   resolveUserDrawingPlacementConstraint,
 } from './placement';
 export type { UserDrawingPlacementConstraintOptions, UserDrawingPlacementMode } from './placement';
-export {
-  resolveUserDrawingPriceRangeMetrics,
-  resolveUserDrawingVisualPriceRangeMetrics,
-} from './priceRange';
+export { resolveUserDrawingPriceRangeMetrics, resolveUserDrawingVisualPriceRangeMetrics } from './priceRange';
 export type { UserDrawingPriceRangeMetrics } from './priceRange';
 export { resolveUserDrawingRiskRewardMetrics } from './riskReward';
 export type { UserDrawingRiskRewardMetrics } from './riskReward';
@@ -433,6 +430,7 @@ export {
   getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
+  isUserDrawingGlobalToolbarAction,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
@@ -476,10 +474,7 @@ export {
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from './toolbar';
 export { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
-export {
-  createUserDrawingVisualEvidencePrNoteTemplate,
-  USER_DRAWING_VISUAL_EVIDENCE_MATRIX,
-} from './visualEvidence';
+export { createUserDrawingVisualEvidencePrNoteTemplate, USER_DRAWING_VISUAL_EVIDENCE_MATRIX } from './visualEvidence';
 export {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeDispatchActionCommands,
@@ -533,6 +528,7 @@ export type {
   UserDrawingTextMaxWidthDescriptor,
   UserDrawingTextWrapDescriptor,
   UserDrawingTrendLineExtendDescriptor,
+  UserDrawingGlobalToolbarAction,
   UserDrawingToolbarAction,
   UserDrawingToolbarActionDescriptor,
   UserDrawingToolCategoryDescriptor,

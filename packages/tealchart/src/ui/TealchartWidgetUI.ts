@@ -1,10 +1,8 @@
 import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tealscript';
-import type { BuiltinIndicator } from '../indicators/builtinIndicators';
-import type { DirtyFlags } from '../rendering/RenderScheduler';
-import type { PlotStyleOverride } from '../state/chartState';
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UpdateUserDrawingOptions,
   UserDrawingIconName,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
@@ -12,10 +10,13 @@ import type {
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
-  UserDrawingTrendLineExtend,
   UserDrawingTool,
+  UserDrawingTrendLineExtend,
   UserDrawingZOrderAction,
 } from '../drawings';
+import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { DirtyFlags } from '../rendering/RenderScheduler';
+import type { PlotStyleOverride } from '../state/chartState';
 import type {
   Bar,
   ContextMenuItem,
@@ -32,8 +33,6 @@ import type { IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
-import { TIME_AXIS_HEIGHT } from '../types';
-import { WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import {
   anchorToScreenPoint,
   getUserDrawingTextAnnotationPoint,
@@ -43,6 +42,8 @@ import {
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingTextEditMetrics,
 } from '../drawings';
+import { WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import { TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
@@ -51,10 +52,7 @@ import { IndicatorPaneLegend } from './IndicatorPaneLegend';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import { IndicatorsModal } from './IndicatorsModal';
 
-function resolveUserDrawingTextDecorationLine(style: {
-  textUnderline?: boolean;
-  textLineThrough?: boolean;
-}): string {
+function resolveUserDrawingTextDecorationLine(style: { textUnderline?: boolean; textLineThrough?: boolean }): string {
   if (style.textUnderline && style.textLineThrough) return 'underline line-through';
   if (style.textUnderline) return 'underline';
   if (style.textLineThrough) return 'line-through';
@@ -188,9 +186,9 @@ export interface TealchartWidgetUIOptions {
   /** Called when the top bar should update selected icon marker shape */
   onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Called when the top bar should update selected drawing visibility */
-  onUserDrawingVisibilityChange?: (visible: boolean) => void;
+  onUserDrawingVisibilityChange?: (visible: boolean, options?: UpdateUserDrawingOptions) => void;
   /** Called when the top bar should update selected drawing locked state */
-  onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
+  onUserDrawingLockedChange?: (locked: boolean, options?: UpdateUserDrawingOptions) => void;
   /** Called when the selected drawing properties should open */
   onUserDrawingPropertiesOpen?: () => void;
   /** Called when the drawing object tree should open */
@@ -597,11 +595,15 @@ export class TealchartWidgetUI {
       return;
     }
     const editMetrics = resolveUserDrawingTextEditMetrics(textEdit.value);
-    const configuredWidth = drawing.style.textWrap && drawing.style.textMaxWidth ? drawing.style.textMaxWidth : undefined;
+    const configuredWidth =
+      drawing.style.textWrap && drawing.style.textMaxWidth ? drawing.style.textMaxWidth : undefined;
     const width = configuredWidth ?? Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
     const height = Math.max(28, Math.min(160, editMetrics.lines.length * 18 + 10));
     const chartWidth = this.chartArea.clientWidth || this.rootEl.clientWidth || 0;
-    const left = Math.max(space.chartLeft, Math.min(point.x - width / 2, Math.max(space.chartLeft, chartWidth - width - 8)));
+    const left = Math.max(
+      space.chartLeft,
+      Math.min(point.x - width / 2, Math.max(space.chartLeft, chartWidth - width - 8)),
+    );
     const top = Math.max(space.pane.top, point.y - height / 2);
 
     if (!this.userDrawingTextEditor) {
