@@ -1135,7 +1135,10 @@ describe('TealchartWidget', () => {
           paneId: 'main',
           points: [
             { time: 1, price: 10 },
-            { time: 2, price: 20 },
+            { time: 1.25, price: 12.5 },
+            { time: 1.75, price: 17.5 },
+            { time: 2.25, price: 22.5 },
+            { time: 2.75, price: 27.5 },
             { time: 3, price: 30 },
           ],
         });
@@ -1150,7 +1153,10 @@ describe('TealchartWidget', () => {
           kind: tool,
           points: [
             { time: 11, price: 20 },
-            { time: 12, price: 30 },
+            { time: 11.25, price: 22.5 },
+            { time: 11.75, price: 27.5 },
+            { time: 12.25, price: 32.5 },
+            { time: 12.75, price: 37.5 },
             { time: 13, price: 40 },
           ],
         });

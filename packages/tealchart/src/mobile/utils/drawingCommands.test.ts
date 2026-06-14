@@ -1202,12 +1202,23 @@ describe('mobile drawing handle command dispatch', () => {
 
       expect(history.undoStack, tool).toHaveLength(2);
       expect(state.drawings, tool).toEqual([
-        expect.objectContaining({ id: `${tool}-drawing-1`, kind: tool, points: [anchorA, anchorB] }),
+        expect.objectContaining({
+          id: `${tool}-drawing-1`,
+          kind: tool,
+          points: [
+            anchorA,
+            { time: 1_250, price: 102.5 },
+            { time: 1_750, price: 107.5 },
+            anchorB,
+          ],
+        }),
         expect.objectContaining({
           id: `${tool}-drawing-2`,
           kind: tool,
           points: [
             { time: 3_000, price: 120 },
+            { time: 3_250, price: 122.5 },
+            { time: 3_750, price: 127.5 },
             { time: 4_000, price: 130 },
           ],
         }),
