@@ -426,6 +426,8 @@ export {
 export {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingLineWidthDescriptors,
+  getUserDrawingOpacityDescriptors,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,

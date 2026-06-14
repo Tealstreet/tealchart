@@ -19,10 +19,10 @@ import type {
   UserDrawingTrendLineExtend,
 } from './types';
 
+import { isUserDrawingPathFamilyTool } from './types';
 import {
-  isUserDrawingPathFamilyTool,
-} from './types';
-import {
+  getUserDrawingLineWidthDescriptors,
+  getUserDrawingOpacityDescriptors,
   getSelectedUserDrawing,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -40,8 +40,6 @@ import {
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
-  USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
-  USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -50,40 +48,6 @@ import {
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
 } from './toolbar';
-
-const USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS = [
-  { width: 2, label: 'Fine freehand stroke width' },
-  { width: 4, label: 'Medium freehand stroke width' },
-  { width: 8, label: 'Bold freehand stroke width' },
-  { width: 12, label: 'Wide freehand stroke width' },
-  { width: 16, label: 'Extra wide freehand stroke width' },
-] as const;
-
-const USER_DRAWING_HIGHLIGHTER_LINE_WIDTH_DESCRIPTORS = [
-  { width: 4, label: 'Fine highlighter stroke width' },
-  { width: 8, label: 'Medium highlighter stroke width' },
-  { width: 12, label: 'Bold highlighter stroke width' },
-  { width: 20, label: 'Wide highlighter stroke width' },
-  { width: 28, label: 'Extra wide highlighter stroke width' },
-] as const;
-
-const USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS = [
-  { opacity: 0.5, label: '50 percent highlighter opacity' },
-  { opacity: 0.35, label: '35 percent highlighter opacity' },
-  { opacity: 0.25, label: '25 percent highlighter opacity' },
-  { opacity: 0.1, label: '10 percent highlighter opacity' },
-] as const;
-
-function getLineWidthDescriptorsForDrawing(drawing: UserDrawing) {
-  if (drawing.kind === 'highlighter') return USER_DRAWING_HIGHLIGHTER_LINE_WIDTH_DESCRIPTORS;
-  if (isUserDrawingPathFamilyTool(drawing.kind)) return USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS;
-  return USER_DRAWING_LINE_WIDTH_DESCRIPTORS;
-}
-
-function getOpacityDescriptorsForDrawing(drawing: UserDrawing) {
-  if (drawing.kind === 'highlighter') return USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS;
-  return USER_DRAWING_OPACITY_DESCRIPTORS;
-}
 
 export type UserDrawingPropertiesSurfaceCommand =
   | { type: 'updateStyle'; style: Partial<UserDrawingStyle> }
@@ -187,8 +151,8 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
   if (!drawing) return { drawing: null, editable: false, groups: [] };
 
   const editable = !drawing.locked;
-  const lineWidthDescriptors = getLineWidthDescriptorsForDrawing(drawing);
-  const opacityDescriptors = getOpacityDescriptorsForDrawing(drawing);
+  const lineWidthDescriptors = getUserDrawingLineWidthDescriptors(drawing);
+  const opacityDescriptors = getUserDrawingOpacityDescriptors(drawing);
   const groups: UserDrawingPropertiesSurfaceGroupDraft[] = [
     {
       id: 'line',
