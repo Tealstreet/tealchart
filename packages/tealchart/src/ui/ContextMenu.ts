@@ -107,6 +107,7 @@ const styles = {
 export class ContextMenu {
   private el: HTMLDivElement;
   private options: ContextMenuOptions;
+  private closed = false;
   private closeHandler: ((e: MouseEvent) => void) | null = null;
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
   private scrollHandler: (() => void) | null = null;
@@ -127,6 +128,8 @@ export class ContextMenu {
    * Close and destroy the menu
    */
   close(): void {
+    if (this.closed) return;
+    this.closed = true;
     this.detachEventListeners();
     this.el.remove();
     this.options.onClose?.();
@@ -246,9 +249,11 @@ export class ContextMenu {
       }
     };
     // Delay to avoid immediate close from the triggering click
-    setTimeout(() => {
-      document.addEventListener('click', this.closeHandler!, { capture: true });
-      document.addEventListener('contextmenu', this.closeHandler!, { capture: true });
+    this.attachTimeoutId = setTimeout(() => {
+      this.attachTimeoutId = null;
+      if (!this.closeHandler || this.closed) return;
+      document.addEventListener('click', this.closeHandler, { capture: true });
+      document.addEventListener('contextmenu', this.closeHandler, { capture: true });
     }, 0);
 
     // Close on escape
@@ -260,16 +265,27 @@ export class ContextMenu {
     document.addEventListener('keydown', this.keyHandler);
 
     // Close on scroll
-    window.addEventListener('scroll', () => this.close(), { once: true, capture: true });
+    this.scrollHandler = () => this.close();
+    window.addEventListener('scroll', this.scrollHandler, { once: true, capture: true });
   }
 
   private detachEventListeners(): void {
+    if (this.attachTimeoutId !== null) {
+      clearTimeout(this.attachTimeoutId);
+      this.attachTimeoutId = null;
+    }
     if (this.closeHandler) {
       document.removeEventListener('click', this.closeHandler, { capture: true });
       document.removeEventListener('contextmenu', this.closeHandler, { capture: true });
+      this.closeHandler = null;
     }
     if (this.keyHandler) {
       document.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = null;
+    }
+    if (this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler, { capture: true });
+      this.scrollHandler = null;
     }
   }
 }
