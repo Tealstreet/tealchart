@@ -125,6 +125,16 @@ object-tree gaps stay visible.
 - Mobile Skia exposes the same imperative handle methods and one-shot touch
   placement behavior when stay mode is disabled.
 
+## Shipped: Magnet Mode State
+
+- Shared drawing state, command dispatch, history, and layout serialization
+  preserve `off`, `weak`, and `strong` magnet-mode settings.
+- Web widget APIs expose matching setter/getter methods with explicit no-op
+  returns and command events.
+- Mobile Skia exposes the same imperative handle methods and mobile layout
+  import/export parity.
+- Actual weak/strong OHLC snap behavior remains a follow-up drawing-input gap.
+
 ## Shipped: Z-Order Toolbar Controls
 
 - Shared toolbar action descriptors include bring-forward, send-backward,

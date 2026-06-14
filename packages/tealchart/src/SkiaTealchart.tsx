@@ -36,6 +36,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingKeyboardInput,
   UserDrawingLineStyle,
+  UserDrawingMagnetMode,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -303,6 +304,8 @@ export interface SkiaTealchartHandle {
   setActiveUserDrawingTool(tool: UserDrawingTool): boolean;
   setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean;
   isUserDrawingStayInDrawingMode(): boolean;
+  setUserDrawingMagnetMode(magnetMode: UserDrawingMagnetMode): boolean;
+  getUserDrawingMagnetMode(): UserDrawingMagnetMode;
   canUndoUserDrawingCommand(): boolean;
   canRedoUserDrawingCommand(): boolean;
   undoUserDrawingCommand(): boolean;
@@ -715,6 +718,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       isUserDrawingStayInDrawingMode(): boolean {
         return userDrawingStateRef.current.stayInDrawingMode !== false;
+      },
+      setUserDrawingMagnetMode(magnetMode: UserDrawingMagnetMode): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setMagnetMode',
+          magnetMode,
+          meta: { source: 'api' },
+        });
+      },
+      getUserDrawingMagnetMode(): UserDrawingMagnetMode {
+        return userDrawingStateRef.current.magnetMode ?? 'off';
       },
       canUndoUserDrawingCommand(): boolean {
         return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);
