@@ -3111,7 +3111,7 @@ export class TealchartWidget {
     }
 
     // Also check for contenteditable elements
-    if (target.isContentEditable || target.closest('[contenteditable="true"]')) {
+    if (target.isContentEditable) {
       return true;
     }
 
@@ -3123,7 +3123,9 @@ export class TealchartWidget {
     if (!(target instanceof HTMLElement)) return 'chart';
     if (this._isInputElement(e)) return 'textInput';
 
-    const appControl = target.closest('button,a,[role="button"],[role="menuitem"],[role="option"],[aria-haspopup]');
+    const appControl = target.closest(
+      'button,a,[role="button"],[role="checkbox"],[role="menuitem"],[role="option"],[role="radio"],[role="slider"],[role="switch"],[role="tab"],[aria-haspopup]',
+    );
     return appControl ? 'appControl' : 'chart';
   }
 
