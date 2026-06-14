@@ -29,6 +29,7 @@ describe('drawing visual evidence matrix', () => {
       'contextMenuLongPress',
       'objectTree',
       'textPropertyEditing',
+      'keyboardModifierActions',
       'paneSplitIndicators',
     ]);
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
@@ -98,6 +99,26 @@ describe('drawing visual evidence matrix', () => {
     });
     expect(textProperty?.status?.notes).toContain('shared edit-intent');
     expect(textProperty?.status?.notes).toContain('properties-surface control models');
+  });
+
+  it('tracks keyboard and modifier drawing parity evidence', () => {
+    const keyboardModifier = USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.find(
+      (state) => state.id === 'keyboardModifierActions',
+    );
+
+    expect(keyboardModifier).toMatchObject({
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+      },
+      expectedChecks: expect.arrayContaining([
+        'Drawing shortcuts only run while chart keyboard focus owns the event.',
+        'Undo, redo, delete, duplicate, copy, paste, select-all, and nudge route through shared commands.',
+        'Web Shift-drag duplicate has a mobile touch-native duplicate-drag equivalent.',
+        'Web Shift placement constraints have a mobile host-controlled constraint equivalent.',
+      ]),
+    });
+    expect(keyboardModifier?.status?.notes).toContain('shared action and command models');
   });
 
   it('keeps PR note generation compatible with custom legacy matrices without status fields', () => {

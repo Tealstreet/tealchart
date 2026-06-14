@@ -819,6 +819,12 @@ Phase 3: Constraint affordance
 - Shipped mobile Skia prop and imperative handle override support for
   host-controlled constrained placement, feeding the same shared square and
   45-degree placement geometry as web Shift drag.
+- Status: the visual evidence matrix now records the keyboard/modifier parity
+  contract across web Canvas and mobile Skia: chart-owned shortcut focus,
+  shared undo/redo/delete/duplicate/copy/paste/select-all/nudge commands,
+  web Shift-drag duplicate with a mobile duplicate-drag equivalent, and web
+  Shift placement constraints with a mobile host-controlled constraint
+  equivalent.
 
 ## Gap 8: Public API, Events, Persistence, and Testing
 
