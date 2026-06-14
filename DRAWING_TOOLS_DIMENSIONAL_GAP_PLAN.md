@@ -356,9 +356,9 @@ long-press.
 
 ### Epic 4.1: Shared Selected-Action Model
 
-Status: initial selected-action surface descriptors shipped for properties,
-text edit, quick stroke/fill/text appearance style, duplicate, delete,
-z-order, visibility, and lock/unlock.
+Status: selected-action surface descriptors shipped for properties, text edit,
+explicit stroke-width and opacity presets, quick stroke/fill/text appearance
+style, duplicate, delete, z-order, visibility, and lock/unlock.
 The web floating toolbar, web context menu, mobile Skia action strip, and
 mobile long-press menu consume this shared model. Shared selection bounds and
 preferred action anchor geometry now resolve from the drawing render model for
@@ -367,7 +367,8 @@ added through the shared selected-action model when needed.
 
 Phase 1: Action availability model
 
-- Status: properties, quick line color/width/style/visibility/opacity changes,
+- Status: properties, quick line color/style/visibility changes, explicit
+  line-width and opacity preset changes,
   quick fill color and fill visibility changes, quick text
   color/font-size/family/weight/style changes plus rich-text
   underline/strike-through/wrap, wrapped text-width, and text-alignment

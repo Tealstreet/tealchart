@@ -88,7 +88,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Geometric shapes        | `rectangle`, `circle`, `ellipse`, `sineLine`, `cyclicLines`, `timeCycles`                                                                                                                                 | 2            | `two-point-drag-click`                           | `partial`      | Amplitude-safe constraints for cycle/wave tools, richer properties and visual polish |
 | Geometric shapes        | `rotatedRectangle`, `triangle`, `curve`, `arc`, `polyline`                                                                                                                                                | 3            | `multi-point-click` with first-segment drag seed | `partial`      | Properties, richer multi-point previews                                              |
 | Geometric shapes        | `doubleCurve`                                                                                                                                                                                             | 4            | `multi-point-click` with first-segment drag seed | `partial`      | Properties, richer multi-point previews                                              |
-| Brushes                 | `path`, `brush`, `highlighter`                                                                                                                                                                            | sampled path | `freehand-drag`                                  | `partial`      | Pressure sensitivity and object tree polish                                          |
+| Brushes                 | `path`, `brush`, `highlighter`                                                                                                                                                                            | sampled path | `freehand-drag`                                  | `partial`      | Object tree polish and richer brush template libraries                              |
 | Annotation              | `textLabel`, `note`, `comment`, `anchoredText`, `anchoredNote`, `priceLabel`, `pin`, `emoji`, `sticker`, `balloon`, `signpost`, `table`                                                                   | 1            | `one-point` or `anchored-pane`                   | `partial`      | Floating toolbar, properties, object tree                                            |
 | Annotation              | `callout`, `priceNote`, `image`                                                                                                                                                                           | 2            | `two-point-drag-click`                           | `partial`      | Properties                                                                           |
 | Forecasting/measurement | `priceRange`, `dateRange`, `datePriceRange`, `forecast`, `fixedRangeVolumeProfile`                                                                                                                        | 2            | `two-point-drag-click` or `computed-special`     | `partial`      | Computed settings/properties                                                         |
@@ -144,7 +144,10 @@ summary:
   through web/mobile input, smoothing, command history, and layout restore.
   Canvas and Skia derive matching variable-width pressure stroke segments at
   render time, including dash-phase continuity for dashed and dotted strokes.
-  TradingView-grade behavior still needs richer brush preset libraries.
+  Web floating toolbars, web context menus, mobile action strips, and mobile
+  long-press menus now expose the same selected stroke-width and opacity preset
+  commands from the shared selected-action model. TradingView-grade behavior
+  still needs saved brush template libraries.
 - `anchoredText` and `anchoredNote` currently share one-anchor input semantics,
   but their long-term behavior should be treated as `anchored-pane` placement.
 - `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars
