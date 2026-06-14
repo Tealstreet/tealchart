@@ -18,6 +18,7 @@ import type {
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 import {
   DEFAULT_USER_DRAWING_STYLE,
+  isUserDrawingPathFamilyTool,
   isUserDrawingTextAnnotation,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -719,6 +720,44 @@ export const USER_DRAWING_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityDescri
   })),
 ];
 
+export const USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
+  { width: 2, label: 'Fine freehand stroke width' },
+  { width: 4, label: 'Medium freehand stroke width' },
+  { width: 8, label: 'Bold freehand stroke width' },
+  { width: 12, label: 'Wide freehand stroke width' },
+  { width: 16, label: 'Extra wide freehand stroke width' },
+] as const;
+
+export const USER_DRAWING_HIGHLIGHTER_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
+  { width: 4, label: 'Fine highlighter stroke width' },
+  { width: 8, label: 'Medium highlighter stroke width' },
+  { width: 12, label: 'Bold highlighter stroke width' },
+  { width: 20, label: 'Wide highlighter stroke width' },
+  { width: 28, label: 'Extra wide highlighter stroke width' },
+] as const;
+
+export const USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityDescriptor[] = [
+  { opacity: 0.5, label: '50 percent highlighter opacity' },
+  { opacity: 0.35, label: '35 percent highlighter opacity' },
+  { opacity: 0.25, label: '25 percent highlighter opacity' },
+  { opacity: 0.1, label: '10 percent highlighter opacity' },
+] as const;
+
+export function getUserDrawingLineWidthPreviewFontSize(width: number): number {
+  return Math.min(10 + width, 20);
+}
+
+export function getUserDrawingLineWidthDescriptors(drawing: UserDrawing): readonly UserDrawingLineWidthDescriptor[] {
+  if (drawing.kind === 'highlighter') return USER_DRAWING_HIGHLIGHTER_LINE_WIDTH_DESCRIPTORS;
+  if (isUserDrawingPathFamilyTool(drawing.kind)) return USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS;
+  return USER_DRAWING_LINE_WIDTH_DESCRIPTORS;
+}
+
+export function getUserDrawingOpacityDescriptors(drawing: UserDrawing): readonly UserDrawingOpacityDescriptor[] {
+  if (drawing.kind === 'highlighter') return USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS;
+  return USER_DRAWING_OPACITY_DESCRIPTORS;
+}
+
 export const USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS: readonly UserDrawingStyleToggleDescriptor[] = [
   { style: 'lineVisible', icon: '▣', label: 'Toggle drawing border' },
   { style: 'fillVisible', icon: '◩', label: 'Toggle drawing fill' },
@@ -823,9 +862,12 @@ function getNextUserDrawingLineColor(drawing: UserDrawing): string {
 }
 
 function getAdjacentUserDrawingLineWidth(drawing: UserDrawing, direction: -1 | 1): number | null {
-  const widths = USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width);
+  const widths = getUserDrawingLineWidthDescriptors(drawing).map((descriptor) => descriptor.width);
   const currentIndex = widths.indexOf(drawing.style.lineWidth);
-  if (currentIndex === -1) return widths[direction > 0 ? 0 : widths.length - 1] ?? null;
+  if (currentIndex === -1) {
+    if (direction > 0) return widths.find((width) => width > drawing.style.lineWidth) ?? null;
+    return widths.findLast((width) => width < drawing.style.lineWidth) ?? null;
+  }
   return widths[currentIndex + direction] ?? null;
 }
 
@@ -836,7 +878,7 @@ function getNextUserDrawingLineStyle(drawing: UserDrawing): UserDrawingLineStyle
 }
 
 function getNextUserDrawingOpacity(drawing: UserDrawing): number {
-  const opacities = USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity);
+  const opacities = getUserDrawingOpacityDescriptors(drawing).map((descriptor) => descriptor.opacity);
   const currentOpacity = normalizeUserDrawingOpacity(drawing.style.opacity ?? DEFAULT_USER_DRAWING_STYLE.opacity ?? 1);
   const currentIndex = opacities.indexOf(currentOpacity);
   return opacities[currentIndex >= 0 ? (currentIndex + 1) % opacities.length : 0]!;

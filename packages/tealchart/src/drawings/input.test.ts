@@ -658,6 +658,31 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('applies tool-specific freehand stroke defaults only when no explicit style is supplied', () => {
+    const defaultPath = beginUserDrawingPathDrag(setUserDrawingTool(createUserDrawingState(), 'path'), {
+      paneId: 'main',
+      anchor: anchorA,
+    });
+    const defaultBrush = beginUserDrawingPathDrag(setUserDrawingTool(createUserDrawingState(), 'brush'), {
+      paneId: 'main',
+      anchor: anchorA,
+    });
+    const defaultHighlighter = beginUserDrawingPathDrag(setUserDrawingTool(createUserDrawingState(), 'highlighter'), {
+      paneId: 'main',
+      anchor: anchorA,
+    });
+    const explicitHighlighter = beginUserDrawingPathDrag(
+      setUserDrawingTool(createUserDrawingState(), 'highlighter'),
+      { paneId: 'main', anchor: anchorA },
+      { style },
+    );
+
+    expect(defaultPath.draft?.style).toMatchObject({ lineWidth: 2, opacity: 1 });
+    expect(defaultBrush.draft?.style).toMatchObject({ lineWidth: 4, opacity: 1 });
+    expect(defaultHighlighter.draft?.style).toMatchObject({ lineWidth: 8, opacity: 0.35 });
+    expect(explicitHighlighter.draft?.style).toEqual(style);
+  });
+
   it('seeds supported multi-anchor drawings from placement drag before final click', () => {
     const dragSeedTools = [
       'triangle',

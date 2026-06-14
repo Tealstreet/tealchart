@@ -2162,6 +2162,26 @@ describe('TealchartWidget', () => {
               { time: 2, price: 55 },
             ],
           },
+          {
+            id: 'marker',
+            kind: 'highlighter',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 4,
+            updatedAt: 4,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 8,
+              lineStyle: 'solid',
+              opacity: 0.35,
+            },
+            points: [
+              { time: 1, price: 45 },
+              { time: 2, price: 55 },
+              { time: 3, price: 50 },
+            ],
+          },
         ],
       });
 
@@ -2192,6 +2212,19 @@ describe('TealchartWidget', () => {
       );
       expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'line')?.style.lineColor).toBe(
         '#38bdf8',
+      );
+
+      widget.openUserDrawingProperties('marker');
+      panel = document.querySelector<HTMLElement>('[aria-label="Drawing properties"]');
+      expect(panel?.textContent).toContain('Stroke');
+      expect(
+        panel
+          ?.querySelector<HTMLButtonElement>('[aria-label="Medium highlighter stroke width"]')
+          ?.getAttribute('aria-pressed'),
+      ).toBe('true');
+      panel?.querySelector<HTMLButtonElement>('[aria-label="Extra wide highlighter stroke width"]')?.click();
+      expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'marker')?.style.lineWidth).toBe(
+        28,
       );
 
       widget.openUserDrawingProperties('locked');
