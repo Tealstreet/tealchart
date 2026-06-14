@@ -489,6 +489,8 @@ export {
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
+  USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
+  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from './objectTree';
 export type {
   ResolveUserDrawingPropertiesSurfaceCommandOptions,

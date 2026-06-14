@@ -1354,6 +1354,13 @@ object-tree gaps stay visible.
   long-press menus consume the same selected-action descriptors, including
   active preset state.
 
+## Shipped: Object Tree Front/Back Controls
+
+- Built-in web object-tree rows now expose direct bring-to-front and
+  send-to-back controls alongside one-step layer controls.
+- Built-in mobile Skia object-tree sheets render and dispatch the same
+  front/back row actions through the shared object-tree command resolver.
+
 ## Shipped: Expanded Text Wrap Width Presets
 
 - Shared text wrap width normalization now supports wider 320px and 480px text

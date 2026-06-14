@@ -75,6 +75,21 @@ describe('UserDrawingObjectTreeSheet', () => {
       drawingIds: ['target'],
       includeLocked: undefined,
     });
+    fireEvent.click(screen.getAllByLabelText('Send drawing to back')[0]!);
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'sendToBack',
+      drawingIds: ['target'],
+      includeLocked: undefined,
+    });
+    const bringToFrontButtons = screen.getAllByLabelText('Bring drawing to front');
+    fireEvent.click(bringToFrontButtons[bringToFrontButtons.length - 1]!);
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'bringToFront',
+      drawingIds: ['line'],
+      includeLocked: undefined,
+    });
+    expect(screen.getAllByText('Top').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Back').length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByLabelText('Close drawing object tree'));
     expect(onClose).toHaveBeenCalledTimes(1);
