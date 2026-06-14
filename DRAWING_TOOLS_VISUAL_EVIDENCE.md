@@ -44,6 +44,8 @@ Capture the affected surface in these viewport families:
 | Context menu/long press | `ready` | `ready` | Drawing-specific context actions | Mobile context menu/long-press equivalent | Ordering, visibility, lock, duplicate, delete, and properties actions remain reachable. |
 | Object tree | `app-owned` | `app-owned` | Row order, selected rows, lock/visibility/name state | Mobile object tree/sheet or app-owned surface using the shared row model | Row order matches z-order, IDs remain stable, hidden/locked state is clear. |
 | Text/property editing | `app-owned` | `app-owned` | Double-click edit and property surface | Double-tap edit and property surface | Text edits commit/cancel as one transaction and preserve selection/history state. |
+| Keyboard/modifier actions | `ready` | `ready` | Chart-owned keyboard shortcuts, Shift placement constraints, and Shift-drag duplicate | Hardware-keyboard adapter actions plus touch-native duplicate and constraint override surfaces | Drawing shortcuts respect chart focus; undo, redo, delete, duplicate, copy, paste, select-all, nudge, duplicate-drag, and placement constraints use shared commands. |
+| API/events/persistence | `ready` | `ready` | Widget drawing APIs, command events, layout import/export, and persistence restore behavior | Skia handle APIs, command events, drawing import/export, and persistence restore behavior | Web and mobile expose sibling APIs, matching command-event shapes, explicit no-op results, and the same versioned drawing layout schema. |
 | Pane split indicators | `ready` | `ready` | Drawings over main pane plus non-overlay indicator panes | Skia panes with drawing primitives routed to the correct pane | Drawings clip to their pane and do not overlap dedicated indicator canvases unexpectedly. |
 
 ## Regression Checks
@@ -78,6 +80,8 @@ Checked states:
 - [ ] Context menu/long press (web: ready, mobile: ready), if affected
 - [ ] Object tree (web: app-owned, mobile: app-owned), if affected
 - [ ] Text/property editing (web: app-owned, mobile: app-owned), if affected
+- [ ] Keyboard/modifier actions (web: ready, mobile: ready), if affected
+- [ ] API/events/persistence (web: ready, mobile: ready), if affected
 - [ ] Pane split indicators (web: ready, mobile: ready), if affected
 
 Regression checks:
