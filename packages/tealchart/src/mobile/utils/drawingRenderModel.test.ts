@@ -2,7 +2,12 @@ import type { DrawingCoordinateSpace, ExtendedLineDrawing, UserDrawingState, Use
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { resolveUserDrawingSelectionActionAnchor } from '../../drawings';
+import {
+  createUserDrawingCommandHistory,
+  dispatchUserDrawingCommandWithHistory,
+  resolveUserDrawingSelectionActionAnchor,
+  undoUserDrawingCommand,
+} from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
   isMobileUserDrawingTextBoxPrimitive,
@@ -129,6 +134,53 @@ describe('mobile user drawing render model', () => {
         radius: 6,
       },
     ]);
+  });
+
+  it('reflects undo-restored drawing state in Skia-ready primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'line' },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 0, price: 50 },
+            { time: 100, price: 50 },
+          ],
+          extend: 'none',
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const deleted = dispatchUserDrawingCommandWithHistory(state, createUserDrawingCommandHistory(), {
+      type: 'delete',
+      options: { drawingId: 'line' },
+      meta: { source: 'api' },
+    });
+    const restored = undoUserDrawingCommand(deleted.state, deleted.history);
+    const renderModel = resolveMobileUserDrawingRenderModel(restored.state, new Map([[space.pane.id, space]]), {
+      handleRadius: 6,
+    });
+
+    expect(resolveMobileUserDrawingRenderModel(deleted.state, new Map([[space.pane.id, space]]))).toEqual([]);
+    expect(renderModel.map((primitive) => primitive.id)).toEqual(['line', 'line:handle:0', 'line:handle:1']);
+    expect(renderModel[0]).toMatchObject({
+      kind: 'line',
+      id: 'line',
+      phase: 'committed',
+      selected: true,
+      start: { x: 0, y: 50 },
+      end: { x: 100, y: 50 },
+    });
   });
 
   it.each([
