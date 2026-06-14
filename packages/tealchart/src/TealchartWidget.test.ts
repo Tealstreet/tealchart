@@ -1913,6 +1913,7 @@ describe('TealchartWidget', () => {
     it('opens the built-in web object tree panel when no app-owned callback is provided', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as { _isHovered: boolean };
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
         selection: { drawingId: 'line' },
@@ -1956,7 +1957,7 @@ describe('TealchartWidget', () => {
 
       widget.openUserDrawingObjectTree();
 
-      const panel = document.querySelector<HTMLElement>('[aria-label="Drawing object tree"]');
+      let panel = document.querySelector<HTMLElement>('[aria-label="Drawing object tree"]');
       expect(panel).not.toBeNull();
       expect(panel?.textContent).toContain('Drawings (2)');
       const rectangleRow = panel?.querySelector<HTMLElement>('[aria-label="Select Rectangle"]');
@@ -1968,6 +1969,17 @@ describe('TealchartWidget', () => {
         'true',
       );
 
+      testWidget._isHovered = true;
+      const escape = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+      document.dispatchEvent(escape);
+
+      expect(escape.defaultPrevented).toBe(true);
+      expect(document.querySelector('[aria-label="Drawing object tree"]')).toBeNull();
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'target' });
+      testWidget._isHovered = false;
+
+      widget.openUserDrawingObjectTree();
+      panel = document.querySelector<HTMLElement>('[aria-label="Drawing object tree"]');
       panel?.querySelector<HTMLButtonElement>('[aria-label="Hide drawing"]')?.click();
       expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
         visible: false,

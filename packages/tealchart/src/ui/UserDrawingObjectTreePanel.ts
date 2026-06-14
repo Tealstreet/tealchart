@@ -160,9 +160,6 @@ export class UserDrawingObjectTreePanel {
   private model: UserDrawingObjectTreeModel;
   private readonly options: UserDrawingObjectTreePanelOptions;
   private readonly el: HTMLDivElement;
-  private readonly keyHandler = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') this.close();
-  };
 
   constructor(options: UserDrawingObjectTreePanelOptions) {
     this.options = options;
@@ -179,7 +176,6 @@ export class UserDrawingObjectTreePanel {
     this.el.addEventListener('click', (event) => event.stopPropagation());
     this.el.addEventListener('contextmenu', (event) => event.stopPropagation());
     document.body.appendChild(this.el);
-    document.addEventListener('keydown', this.keyHandler);
     this.render();
   }
 
@@ -189,7 +185,6 @@ export class UserDrawingObjectTreePanel {
   }
 
   close(): void {
-    document.removeEventListener('keydown', this.keyHandler);
     this.el.remove();
     this.options.onClose?.();
   }

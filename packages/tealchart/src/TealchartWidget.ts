@@ -3240,6 +3240,19 @@ export class TealchartWidget {
    * Handle keyboard down event
    */
   private _handleKeyDown(e: KeyboardEvent): void {
+    if (this._disposed) {
+      return;
+    }
+
+    if (this._userDrawingObjectTreePanel) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        this._userDrawingObjectTreePanel.close();
+      }
+      return;
+    }
+
     // Only process keyboard events when mouse is over the chart
     if (!this._isHovered) {
       return;
