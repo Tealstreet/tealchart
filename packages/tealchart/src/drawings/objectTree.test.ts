@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { reduceUserDrawingCommand } from './commands';
 import { createUserDrawingCommandHistory, dispatchUserDrawingCommandWithHistory, undoUserDrawingCommand } from './history';
@@ -9,6 +9,7 @@ import {
   resolveUserDrawingObjectTreeModel,
 } from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
+import { clearChartStoreCache } from '../state/chartState';
 import type { UserDrawing, UserDrawingStyle } from './types';
 
 const style: UserDrawingStyle = {
@@ -67,6 +68,10 @@ function createHorizontalLine(overrides: Partial<Extract<UserDrawing, { kind: 'h
 }
 
 describe('user drawing object tree model', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('resolves committed drawings in front-to-back order by default', () => {
     const state = createUserDrawingState({
       drawings: [createTrendLine(), createRectangle(), createHorizontalLine()],
@@ -91,7 +96,27 @@ describe('user drawing object tree model', () => {
       selected: false,
       editable: true,
     });
-    expect(model.rows[0]?.groupIds).toEqual([]);
+    expect(model.rows.map((row) => row.groupIds)).toEqual([['pane:volume'], ['pane:main'], ['pane:main']]);
+    expect(model.groups).toEqual([
+      {
+        id: 'pane:main',
+        label: 'Main chart',
+        paneId: 'main',
+        rowIds: ['rect', 'trend'],
+        drawingIds: ['rect', 'trend'],
+        orderIndex: 0,
+        drawingCount: 2,
+      },
+      {
+        id: 'pane:volume',
+        label: 'Pane volume',
+        paneId: 'volume',
+        rowIds: ['hline'],
+        drawingIds: ['hline'],
+        orderIndex: 1,
+        drawingCount: 1,
+      },
+    ]);
   });
 
   it('can resolve drawings in back-to-front order', () => {
@@ -103,6 +128,10 @@ describe('user drawing object tree model', () => {
 
     expect(model.rows.map((row) => row.drawingId)).toEqual(['trend', 'rect', 'hline']);
     expect(model.rows.map((row) => row.zIndex)).toEqual([0, 1, 2]);
+    expect(model.groups?.map((group) => [group.id, group.rowIds])).toEqual([
+      ['pane:main', ['trend', 'rect']],
+      ['pane:volume', ['hline']],
+    ]);
   });
 
   it('includes selection, visibility, lock, and editability metadata', () => {
@@ -292,6 +321,7 @@ describe('user drawing object tree model', () => {
 
     expect(model).toEqual({
       rows: [],
+      groups: [],
       selectedIds: [],
       drawingCount: 0,
     });

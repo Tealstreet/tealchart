@@ -30,8 +30,19 @@ export interface UserDrawingObjectTreeRow {
   groupIds: readonly string[];
 }
 
+export interface UserDrawingObjectTreeGroup {
+  id: string;
+  label: string;
+  paneId: string;
+  rowIds: readonly string[];
+  drawingIds: readonly string[];
+  orderIndex: number;
+  drawingCount: number;
+}
+
 export interface UserDrawingObjectTreeModel {
   rows: readonly UserDrawingObjectTreeRow[];
+  groups?: readonly UserDrawingObjectTreeGroup[];
   selectedIds: readonly string[];
   drawingCount: number;
 }
@@ -99,8 +110,48 @@ function resolveUserDrawingObjectTreeRow(
     editable: !drawing.locked,
     zIndex: drawingIndex,
     orderIndex,
-    groupIds: [],
+    groupIds: [getUserDrawingObjectTreePaneGroupId(drawing.paneId)],
   };
+}
+
+function getUserDrawingObjectTreePaneGroupId(paneId: string): string {
+  return `pane:${paneId}`;
+}
+
+function getUserDrawingObjectTreePaneGroupLabel(paneId: string): string {
+  return paneId === 'main' ? 'Main chart' : `Pane ${paneId}`;
+}
+
+function compareUserDrawingObjectTreePaneIds(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a === 'main') return -1;
+  if (b === 'main') return 1;
+  return a.localeCompare(b);
+}
+
+function resolveUserDrawingObjectTreeGroups(rows: readonly UserDrawingObjectTreeRow[]): readonly UserDrawingObjectTreeGroup[] {
+  const groupRows = new Map<string, UserDrawingObjectTreeRow[]>();
+  for (const row of rows) {
+    const groupId = getUserDrawingObjectTreePaneGroupId(row.paneId);
+    const rowsForGroup = groupRows.get(groupId);
+    if (rowsForGroup) rowsForGroup.push(row);
+    else groupRows.set(groupId, [row]);
+  }
+
+  return [...groupRows.entries()].sort(([, aRows], [, bRows]) =>
+    compareUserDrawingObjectTreePaneIds(aRows[0]?.paneId ?? '', bRows[0]?.paneId ?? ''),
+  ).map(([id, rowsForGroup], orderIndex) => {
+    const paneId = rowsForGroup[0]?.paneId ?? '';
+    return {
+      id,
+      label: getUserDrawingObjectTreePaneGroupLabel(paneId),
+      paneId,
+      rowIds: rowsForGroup.map((row) => row.id),
+      drawingIds: rowsForGroup.map((row) => row.drawingId),
+      orderIndex,
+      drawingCount: rowsForGroup.length,
+    };
+  });
 }
 
 export function resolveUserDrawingObjectTreeModel(
@@ -111,11 +162,13 @@ export function resolveUserDrawingObjectTreeModel(
   const selectedIdSet = new Set(selectedIds);
   const indexedDrawings = state.drawings.map((drawing, drawingIndex) => ({ drawing, drawingIndex }));
   const orderedDrawings = options.order === 'backToFront' ? indexedDrawings : [...indexedDrawings].reverse();
+  const rows = orderedDrawings.map(({ drawing, drawingIndex }, orderIndex) =>
+    resolveUserDrawingObjectTreeRow(drawing, drawingIndex, orderIndex, selectedIdSet),
+  );
 
   return {
-    rows: orderedDrawings.map(({ drawing, drawingIndex }, orderIndex) =>
-      resolveUserDrawingObjectTreeRow(drawing, drawingIndex, orderIndex, selectedIdSet),
-    ),
+    rows,
+    groups: resolveUserDrawingObjectTreeGroups(rows),
     selectedIds,
     drawingCount: state.drawings.length,
   };

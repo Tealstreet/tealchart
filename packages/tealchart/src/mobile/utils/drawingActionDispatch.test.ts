@@ -1,7 +1,8 @@
 import type { UserDrawingState, UserDrawingStyle } from '../../drawings';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import { dispatchMobileUserDrawingActionCommand } from './drawingActionDispatch';
 
 const style: UserDrawingStyle = {
@@ -71,6 +72,10 @@ function createSelectedTextState(): UserDrawingState {
 }
 
 describe('mobile drawing action dispatch', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('opens the shared object tree model from selected toolbar actions', () => {
     const onOpenObjectTree = vi.fn();
     const handled = dispatchMobileUserDrawingActionCommand(
@@ -87,9 +92,20 @@ describe('mobile drawing action dispatch', () => {
     expect(handled).toBe(true);
     expect(onOpenObjectTree).toHaveBeenCalledWith({
       drawingCount: 2,
+      groups: [
+        {
+          id: 'pane:main',
+          label: 'Main chart',
+          paneId: 'main',
+          rowIds: ['range', 'line'],
+          drawingIds: ['range', 'line'],
+          orderIndex: 0,
+          drawingCount: 2,
+        },
+      ],
       rows: [
-        expect.objectContaining({ drawingId: 'range', label: 'Rectangle', selected: false }),
-        expect.objectContaining({ drawingId: 'line', label: 'Breakout', selected: true }),
+        expect.objectContaining({ drawingId: 'range', groupIds: ['pane:main'], label: 'Rectangle', selected: false }),
+        expect.objectContaining({ drawingId: 'line', groupIds: ['pane:main'], label: 'Breakout', selected: true }),
       ],
       selectedIds: ['line'],
     });
