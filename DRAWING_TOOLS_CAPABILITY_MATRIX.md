@@ -141,9 +141,10 @@ summary:
   transaction grouping and shared commit-time smoothing on both web Canvas and
   mobile Skia. They also use shared tool-specific stroke defaults and
   properties-surface stroke presets. Optional pressure metadata is preserved
-  through web/mobile input, smoothing, command history, and layout restore, but
-  TradingView-grade behavior still needs variable-width pressure rendering and
-  richer brush preset libraries.
+  through web/mobile input, smoothing, command history, and layout restore.
+  Canvas and Skia derive matching variable-width pressure stroke segments at
+  render time. TradingView-grade behavior still needs richer brush preset
+  libraries.
 - `anchoredText` and `anchoredNote` currently share one-anchor input semantics,
   but their long-term behavior should be treated as `anchored-pane` placement.
 - `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars

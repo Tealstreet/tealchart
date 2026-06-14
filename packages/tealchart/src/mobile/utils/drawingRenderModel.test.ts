@@ -3376,7 +3376,52 @@ describe('mobile user drawing render model', () => {
         { x: 90, y: 10 },
         { x: 95, y: 20 },
       ],
+      pressureSegments: [],
       style,
+    });
+  });
+
+  it('returns Skia-ready pressure segments for pressure-aware path primitives', () => {
+    const pressureStyle = { ...style, lineWidth: 8 };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'path',
+          kind: 'path',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: pressureStyle,
+          points: [
+            { time: 10, price: 90, pressure: 0 },
+            { time: 50, price: 50, pressure: 0 },
+            { time: 90, price: 90, pressure: 1 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'path',
+      id: 'path',
+      clip,
+      points: [
+        { x: 10, y: 10 },
+        { x: 50, y: 50 },
+        { x: 90, y: 10 },
+      ],
+      pressureSegments: [
+        { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2 },
+        { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5 },
+      ],
+      style: pressureStyle,
     });
   });
 

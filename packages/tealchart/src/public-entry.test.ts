@@ -1070,6 +1070,7 @@ describe('tealchart public entries', () => {
         { x: 0, y: 0 },
         { x: 5, y: 5 },
       ],
+      pressureSegments: [],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const highlighterPrimitive: NonNever<MobileUserDrawingHighlighterPrimitive> = {
@@ -1083,6 +1084,7 @@ describe('tealchart public entries', () => {
         { x: 0, y: 0 },
         { x: 5, y: 5 },
       ],
+      pressureSegments: [],
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const notePrimitive: NonNever<MobileUserDrawingNotePrimitive> = {

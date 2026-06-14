@@ -906,6 +906,31 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
   });
 
+  it('renders pressure-aware path drawings as variable-width stroke segments', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'path',
+      kind: 'path',
+      style: { ...base.style, lineWidth: 8 },
+      points: [
+        { time: 10, price: 90, pressure: 0 },
+        { time: 50, price: 50, pressure: 0 },
+        { time: 90, price: 90, pressure: 1 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:50,50');
+    expect(ctx.calls).toContain('moveTo:50,50');
+    expect(ctx.calls).toContain('lineTo:90,10');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('stroke:#f5c542:5:6,4:1');
+    expect(ctx.calls).not.toContain('stroke:#f5c542:8:6,4:1');
+  });
+
   it('renders highlighter drawings as stroked polylines', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

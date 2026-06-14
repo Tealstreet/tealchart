@@ -44,8 +44,42 @@ export interface UserDrawingSelectionActionAnchor {
   primaryPaneId: string;
 }
 
+export interface UserDrawingPressureStrokeSegment {
+  start: DrawingScreenPoint;
+  end: DrawingScreenPoint;
+  lineWidth: number;
+}
+
 const DEFAULT_SELECTION_ACTION_PADDING = 8;
 const DEFAULT_SELECTION_ACTION_MIN_TARGET_SIZE = 24;
+const PRESSURE_STROKE_MIN_FACTOR = 0.25;
+
+function resolvePressureStrokeWidth(lineWidth: number, pressure: number): number {
+  const baseWidth = Math.max(1, lineWidth);
+  return Math.max(1, baseWidth * (PRESSURE_STROKE_MIN_FACTOR + (1 - PRESSURE_STROKE_MIN_FACTOR) * pressure));
+}
+
+export function resolveUserDrawingPressureStrokeSegments(
+  anchors: readonly UserDrawingAnchor[],
+  points: readonly DrawingScreenPoint[],
+  lineWidth: number,
+): UserDrawingPressureStrokeSegment[] {
+  if (anchors.length < 2 || points.length < 2 || anchors.every((anchor) => anchor.pressure === undefined)) return [];
+
+  const count = Math.min(anchors.length, points.length);
+  const segments: UserDrawingPressureStrokeSegment[] = [];
+  for (let index = 0; index < count - 1; index += 1) {
+    const startAnchor = anchors[index]!;
+    const endAnchor = anchors[index + 1]!;
+    const pressure = ((startAnchor.pressure ?? 1) + (endAnchor.pressure ?? 1)) / 2;
+    segments.push({
+      start: points[index]!,
+      end: points[index + 1]!,
+      lineWidth: resolvePressureStrokeWidth(lineWidth, pressure),
+    });
+  }
+  return segments;
+}
 
 export function resolveUserDrawingRenderEntries(
   state: UserDrawingState,

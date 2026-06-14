@@ -17,10 +17,14 @@ import type {
   DrawingScreenXabcdPatternLabel,
   ResolvedUserDrawingGeometry,
   ResolveUserDrawingRenderEntriesOptions,
+  UserDrawingPressureStrokeSegment,
   UserDrawingIconName,
   UserDrawingRenderPhase,
   UserDrawingState,
   UserDrawingStyle,
+  BrushDrawing,
+  HighlighterDrawing,
+  PathDrawing,
   TableDrawing,
   UserDrawingTextAnnotation,
 } from '../../drawings';
@@ -32,6 +36,7 @@ import {
   resolveUserDrawingBalloonLayout,
   resolveUserDrawingGeometry,
   resolveUserDrawingHandlePoints,
+  resolveUserDrawingPressureStrokeSegments,
   resolveUserDrawingRenderEntries,
   resolveUserDrawingTextLabelLayout,
   resolveUserDrawingVisualPriceRangeMetrics,
@@ -225,6 +230,7 @@ export type MobileUserDrawingPrimitive =
       opacity: number;
       clip: MobileUserDrawingClipRect;
       points: readonly DrawingScreenPoint[];
+      pressureSegments: readonly UserDrawingPressureStrokeSegment[];
       style: UserDrawingStyle;
     }
   | {
@@ -235,6 +241,7 @@ export type MobileUserDrawingPrimitive =
       opacity: number;
       clip: MobileUserDrawingClipRect;
       points: readonly DrawingScreenPoint[];
+      pressureSegments: readonly UserDrawingPressureStrokeSegment[];
       style: UserDrawingStyle;
     }
   | {
@@ -245,6 +252,7 @@ export type MobileUserDrawingPrimitive =
       opacity: number;
       clip: MobileUserDrawingClipRect;
       points: readonly DrawingScreenPoint[];
+      pressureSegments: readonly UserDrawingPressureStrokeSegment[];
       style: UserDrawingStyle;
     }
   | {
@@ -1578,6 +1586,7 @@ function primitiveFromGeometry(
     case 'path':
     case 'brush':
     case 'highlighter':
+      const pathDrawing = geometry.drawing as PathDrawing | BrushDrawing | HighlighterDrawing;
       return {
         kind: geometry.kind,
         id: geometry.drawing.id,
@@ -1586,6 +1595,11 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.polyline.points,
+        pressureSegments: resolveUserDrawingPressureStrokeSegments(
+          pathDrawing.points,
+          geometry.polyline.points,
+          geometry.drawing.style.lineWidth,
+        ),
         style: geometry.drawing.style,
       };
     case 'curve':

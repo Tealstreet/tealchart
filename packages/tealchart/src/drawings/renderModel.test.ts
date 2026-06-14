@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { clearChartStoreCache } from '../state/chartState';
 import {
   resolveUserDrawingHandlePoints,
+  resolveUserDrawingPressureStrokeSegments,
   resolveUserDrawingRenderEntries,
   resolveUserDrawingScreenBounds,
   resolveUserDrawingSelectionActionAnchor,
@@ -51,6 +52,43 @@ const lowerPaneSpace: DrawingCoordinateSpace = {
 describe('user drawing render model', () => {
   afterEach(() => {
     clearChartStoreCache();
+  });
+
+  it('derives pressure-weighted stroke segments from matched anchors and screen points', () => {
+    expect(
+      resolveUserDrawingPressureStrokeSegments(
+        [
+          { time: 10, price: 90, pressure: 0 },
+          { time: 50, price: 50, pressure: 0 },
+          { time: 90, price: 90, pressure: 1 },
+        ],
+        [
+          { x: 10, y: 10 },
+          { x: 50, y: 50 },
+          { x: 90, y: 10 },
+        ],
+        8,
+      ),
+    ).toEqual([
+      { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2 },
+      { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5 },
+    ]);
+  });
+
+  it('keeps legacy freehand paths on the single-stroke render path when pressure is absent', () => {
+    expect(
+      resolveUserDrawingPressureStrokeSegments(
+        [
+          { time: 10, price: 90 },
+          { time: 50, price: 50 },
+        ],
+        [
+          { x: 10, y: 10 },
+          { x: 50, y: 50 },
+        ],
+        8,
+      ),
+    ).toEqual([]);
   });
 
   it('marks committed selection and appends draft previews', () => {
