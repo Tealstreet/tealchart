@@ -433,6 +433,7 @@ export type {
   UserDrawingEditIntentKind,
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeCommandOptions,
+  UserDrawingObjectTreeGroup,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeMutationAction,
   UserDrawingObjectTreeOptions,
