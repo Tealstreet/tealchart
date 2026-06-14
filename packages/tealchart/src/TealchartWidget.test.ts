@@ -15,7 +15,11 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DIRTY } from './rendering/RenderScheduler';
-import { createUserDrawingState, resolveUserDrawingObjectTreeRowDispatchAction } from './drawings';
+import {
+  createUserDrawingState,
+  resolveUserDrawingObjectTreeRowDispatchAction,
+  resolveUserDrawingObjectTreeSelectionDispatchAction,
+} from './drawings';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
@@ -1764,6 +1768,19 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
         locked: false,
       });
+
+      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'select', drawingId: 'target', additive: true })).toBe(true);
+      const selectedHideAction = resolveUserDrawingObjectTreeSelectionDispatchAction(widget.getUserDrawingObjectTreeModel(), 'hide');
+      expect(selectedHideAction).toEqual({
+        type: 'hide',
+        drawingIds: ['line', 'target'],
+        includeLocked: undefined,
+      });
+      expect(selectedHideAction && widget.dispatchUserDrawingObjectTreeAction(selectedHideAction)).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
+        ['line', false],
+        ['target', false],
+      ]);
 
       expect(widget.setUserDrawingName('target', 'Range box')).toBe(true);
       expect(widget.getUserDrawingObjectTreeModel().rows[0]).toMatchObject({

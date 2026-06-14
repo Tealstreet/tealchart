@@ -51,6 +51,16 @@ export interface UserDrawingObjectTreeRowAction {
   destructive?: boolean;
 }
 
+export type UserDrawingObjectTreeSelectionActionType = Exclude<UserDrawingObjectTreeRowActionType, 'rename'>;
+
+export interface UserDrawingObjectTreeSelectionActionDescriptor {
+  type: UserDrawingObjectTreeSelectionActionType;
+  label: string;
+  enabled: boolean;
+  selectedCount: number;
+  destructive?: boolean;
+}
+
 export interface ResolveUserDrawingObjectTreeRowDispatchActionOptions {
   name?: string | null;
   includeLocked?: boolean;
@@ -69,6 +79,7 @@ export interface UserDrawingObjectTreeGroup {
 export interface UserDrawingObjectTreeModel {
   rows: readonly UserDrawingObjectTreeRow[];
   groups?: readonly UserDrawingObjectTreeGroup[];
+  selectionActions?: readonly UserDrawingObjectTreeSelectionActionDescriptor[];
   selectedIds: readonly string[];
   drawingCount: number;
 }
@@ -161,6 +172,34 @@ function resolveUserDrawingObjectTreeRowActions(
   ];
 }
 
+function resolveUserDrawingObjectTreeSelectionActions(
+  rows: readonly UserDrawingObjectTreeRow[],
+  drawingCount: number,
+): readonly UserDrawingObjectTreeSelectionActionDescriptor[] {
+  const selectedRows = rows.filter((row) => row.selected);
+  const selectedCount = selectedRows.length;
+  const editableRows = selectedRows.filter((row) => row.editable);
+  const hasEditable = editableRows.length > 0;
+  const hasLocked = selectedRows.some((row) => row.locked);
+  const hasVisibleEditable = editableRows.some((row) => row.visible);
+  const hasHiddenEditable = editableRows.some((row) => !row.visible);
+  const canBringForward = editableRows.some((row) => row.zIndex < drawingCount - 1);
+  const canSendBackward = editableRows.some((row) => row.zIndex > 0);
+
+  return [
+    { type: 'duplicate', label: 'Duplicate selected drawings', enabled: hasEditable, selectedCount },
+    { type: 'delete', label: 'Delete selected drawings', enabled: hasEditable, selectedCount, destructive: true },
+    { type: 'hide', label: 'Hide selected drawings', enabled: hasVisibleEditable, selectedCount },
+    { type: 'show', label: 'Show selected drawings', enabled: hasHiddenEditable, selectedCount },
+    { type: 'lock', label: 'Lock selected drawings', enabled: hasEditable, selectedCount },
+    { type: 'unlock', label: 'Unlock selected drawings', enabled: hasLocked, selectedCount },
+    { type: 'bringForward', label: 'Bring selected drawings forward', enabled: canBringForward, selectedCount },
+    { type: 'sendBackward', label: 'Send selected drawings backward', enabled: canSendBackward, selectedCount },
+    { type: 'bringToFront', label: 'Bring selected drawings to front', enabled: canBringForward, selectedCount },
+    { type: 'sendToBack', label: 'Send selected drawings to back', enabled: canSendBackward, selectedCount },
+  ];
+}
+
 function getUserDrawingObjectTreePaneGroupId(paneId: string): string {
   return `pane:${paneId}`;
 }
@@ -216,8 +255,24 @@ export function resolveUserDrawingObjectTreeModel(
   return {
     rows,
     groups: resolveUserDrawingObjectTreeGroups(rows),
+    selectionActions: resolveUserDrawingObjectTreeSelectionActions(rows, state.drawings.length),
     selectedIds,
     drawingCount: state.drawings.length,
+  };
+}
+
+export function resolveUserDrawingObjectTreeSelectionDispatchAction(
+  model: UserDrawingObjectTreeModel,
+  actionType: UserDrawingObjectTreeSelectionActionType,
+  options: Pick<ResolveUserDrawingObjectTreeRowDispatchActionOptions, 'includeLocked'> = {},
+): UserDrawingObjectTreeDispatchAction | null {
+  const action = model.selectionActions?.find((candidate) => candidate.type === actionType);
+  if (!action?.enabled || model.selectedIds.length === 0) return null;
+
+  return {
+    type: actionType,
+    drawingIds: model.selectedIds,
+    includeLocked: actionType === 'unlock' ? true : options.includeLocked,
   };
 }
 

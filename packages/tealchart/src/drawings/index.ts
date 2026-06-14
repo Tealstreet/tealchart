@@ -485,6 +485,7 @@ export {
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
   resolveUserDrawingObjectTreeRowDispatchAction,
+  resolveUserDrawingObjectTreeSelectionDispatchAction,
 } from './objectTree';
 export type {
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
@@ -550,6 +551,8 @@ export type {
   UserDrawingObjectTreeRow,
   UserDrawingObjectTreeRowAction,
   UserDrawingObjectTreeRowActionType,
+  UserDrawingObjectTreeSelectionActionDescriptor,
+  UserDrawingObjectTreeSelectionActionType,
   UserDrawingObjectTreeSelectionAction,
 } from './objectTree';
 export type {
