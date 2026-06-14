@@ -224,6 +224,7 @@ describe('EventManager drawing drag routing', () => {
     const onDrawingDragMove = vi.fn(() => true);
     const onDrawingDragEnd = vi.fn();
     const onDrawingDragCancel = vi.fn();
+    const onMouseUp = vi.fn();
     const manager = new EventManager(
       container,
       createCallbacks({
@@ -233,6 +234,7 @@ describe('EventManager drawing drag routing', () => {
         onDrawingDragMove,
         onDrawingDragEnd,
         onDrawingDragCancel,
+        onMouseUp,
       }),
     );
 
@@ -247,6 +249,7 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingDragCancel).toHaveBeenCalledOnce();
     expect(onDrawingDragCancel).toHaveBeenCalledWith('mouse');
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
+    expect(onMouseUp).toHaveBeenCalledOnce();
 
     manager.dispose();
   });

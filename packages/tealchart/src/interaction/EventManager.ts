@@ -758,6 +758,8 @@ export class EventManager {
   private handleWindowBlur(): void {
     if (!this.state.isDragging) return;
 
+    this.callbacks.onMouseUp?.();
+
     if (this.state.dragMode === 'drawing') {
       this.callbacks.onDrawingDragCancel?.('mouse');
     } else if (this.state.dragMode === 'pan' || this.state.dragMode === 'priceAxisZoom') {
