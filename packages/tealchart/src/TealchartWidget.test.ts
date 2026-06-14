@@ -413,6 +413,12 @@ describe('TealchartWidget', () => {
       expect(widget.isUserDrawingStayInDrawingMode()).toBe(false);
       expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(false);
       expect(widget.setUserDrawingStayInDrawingMode(true)).toBe(true);
+      expect(widget.getUserDrawingMagnetMode()).toBe('off');
+      expect(widget.setUserDrawingMagnetMode('weak')).toBe(true);
+      expect(widget.getUserDrawingMagnetMode()).toBe('weak');
+      expect(widget.setUserDrawingMagnetMode('weak')).toBe(false);
+      expect(widget.setUserDrawingMagnetMode('strong')).toBe(true);
+      expect(widget.getUserDrawingMagnetMode()).toBe('strong');
 
       expect(widget.selectUserDrawing('missing')).toBe(false);
       expect(widget.addUserDrawing(drawing)).toBe(true);
@@ -716,16 +722,19 @@ describe('TealchartWidget', () => {
       const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
 
       expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
+      expect(widget.setUserDrawingMagnetMode('strong')).toBe(true);
       const settingsOnlyExport = widget.exportUserDrawingStateForLayout();
       expect(settingsOnlyExport).toMatchObject({
         drawings: [],
         stayInDrawingMode: false,
+        magnetMode: 'strong',
       });
 
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
         activeTool: 'rectangle',
         stayInDrawingMode: false,
+        magnetMode: 'weak',
         selection: { drawingId: 'h' },
         drawings: [
           {
@@ -751,6 +760,7 @@ describe('TealchartWidget', () => {
       expect(exported?.drawings).toHaveLength(1);
       expect(exported?.activeTool).toBe('select');
       expect(exported?.stayInDrawingMode).toBe(false);
+      expect(exported?.magnetMode).toBe('weak');
       expect(exported?.selection).toBeNull();
 
       widget.clearUserDrawings();
@@ -759,6 +769,7 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h' })]);
       expect(widget.getUserDrawingState().activeTool).toBe('select');
       expect(widget.isUserDrawingStayInDrawingMode()).toBe(false);
+      expect(widget.getUserDrawingMagnetMode()).toBe('weak');
       expect(onCommand).toHaveBeenCalledTimes(1);
       expect(onCommand.mock.calls[0]![0]).toMatchObject({
         command: { type: 'replaceState' },
@@ -779,6 +790,7 @@ describe('TealchartWidget', () => {
       expect(widget.importUserDrawingStateFromLayout(undefined)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([]);
       expect(widget.isUserDrawingStayInDrawingMode()).toBe(true);
+      expect(widget.getUserDrawingMagnetMode()).toBe('off');
       expect(onCommand).toHaveBeenCalledWith(
         expect.objectContaining({
           command: { type: 'replaceState', meta: { source: 'layout' } },
@@ -845,6 +857,14 @@ describe('TealchartWidget', () => {
       expect(onCommand).toHaveBeenCalledWith(
         expect.objectContaining({
           command: expect.objectContaining({ type: 'setStayInDrawingMode', stayInDrawingMode: false }),
+          source: 'api',
+        }),
+      );
+      expect(widget.setUserDrawingMagnetMode('weak')).toBe(true);
+      expect(widget.getUserDrawingMagnetMode()).toBe('weak');
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setMagnetMode', magnetMode: 'weak' }),
           source: 'api',
         }),
       );
