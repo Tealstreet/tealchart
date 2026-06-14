@@ -581,6 +581,10 @@ Phase 1: Minimal panel surface
 - Status: the selected drawing floating toolbar and drawing right-click context
   menu now include a shared object-tree open action that calls the same
   app-owned object-tree callback.
+- Status: web now includes a built-in object-tree panel fallback when no
+  app-owned callback is supplied. The panel renders the shared row/group model,
+  blocks chart event fallthrough, and dispatches row select, visibility, lock,
+  duplicate, delete, and z-order actions through the widget command owner.
 
 Phase 2: Row actions
 
@@ -609,6 +613,10 @@ Phase 1: Mobile panel/sheet
 - Status: the mobile selected action strip and drawing long-press context menu
   now include the same shared object-tree open action and resolve the current
   row model for app-owned sheets.
+- Status: mobile Skia now includes a built-in object-tree sheet fallback when no
+  app-owned callback is supplied. The sheet renders the same shared row/group
+  model and dispatches row select, visibility, lock, duplicate, delete, and
+  z-order actions through the Skia command owner.
 
 Phase 2: Row actions
 
