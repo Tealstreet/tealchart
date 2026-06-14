@@ -13,6 +13,7 @@ import {
 const state: UserDrawingState = {
   version: 1,
   activeTool: 'rectangle',
+  stayInDrawingMode: false,
   selection: { drawingId: 'rect_1' },
   draft: {
     tool: 'trendLine',
@@ -62,6 +63,7 @@ describe('mobile drawing persistence', () => {
     expect(exported?.drawings).toHaveLength(1);
     expect(exported?.drawings[0]?.name).toBe('Mobile rectangle');
     expect(exported?.activeTool).toBe('select');
+    expect(exported?.stayInDrawingMode).toBe(false);
     expect(exported?.selection).toBeNull();
     expect(exported?.draft).toBeNull();
     expect(exported?.textEdit).toBeNull();
@@ -71,6 +73,30 @@ describe('mobile drawing persistence', () => {
     expect(importMobileUserDrawingStateFromLayout(undefined)).toMatchObject({
       drawings: [],
       activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+  });
+
+  it('exports and imports disabled stay-in-drawing-mode without drawings', () => {
+    const exported = exportMobileUserDrawingStateForLayout({
+      ...state,
+      drawings: [],
+      selection: null,
+      draft: null,
+      textEdit: null,
+      stayInDrawingMode: false,
+    });
+
+    expect(exported).toMatchObject({
+      drawings: [],
+      stayInDrawingMode: false,
+    });
+    expect(importMobileUserDrawingStateFromLayout(exported)).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
       selection: null,
       draft: null,
       textEdit: null,
@@ -152,6 +178,7 @@ describe('mobile drawing persistence', () => {
         },
       ],
       activeTool: 'select',
+      stayInDrawingMode: true,
       selection: null,
       draft: null,
       textEdit: null,

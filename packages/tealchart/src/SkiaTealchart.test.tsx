@@ -56,6 +56,7 @@ function createDatafeed(): IBasicDataFeed {
 const initialDrawingState: UserDrawingState = {
   version: 1,
   activeTool: 'select',
+  stayInDrawingMode: true,
   selection: { drawingId: 'selected' },
   draft: null,
   textEdit: null,
@@ -130,10 +131,50 @@ describe('SkiaTealchart drawing properties', () => {
     expect(createPicture).toHaveBeenCalled();
   });
 
+  it('exposes stay-in-drawing-mode through the mobile imperative handle', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onStateChange = vi.fn();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={320}
+        height={240}
+        userDrawingState={{ ...initialDrawingState, stayInDrawingMode: true }}
+        onUserDrawingStateChange={onStateChange}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    expect(ref.current?.isUserDrawingStayInDrawingMode()).toBe(true);
+
+    await act(async () => {
+      expect(ref.current?.setUserDrawingStayInDrawingMode(false)).toBe(true);
+    });
+
+    expect(ref.current?.isUserDrawingStayInDrawingMode()).toBe(false);
+    expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ stayInDrawingMode: false }));
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setStayInDrawingMode', stayInDrawingMode: false }),
+        source: 'api',
+      }),
+    );
+
+    await act(async () => {
+      expect(ref.current?.setUserDrawingStayInDrawingMode(false)).toBe(false);
+    });
+  });
+
   it('passes pressure segment dash phases into Skia dash effects', () => {
     const pressureState: UserDrawingState = {
       version: 1,
       activeTool: 'select',
+      stayInDrawingMode: true,
       selection: null,
       draft: null,
       textEdit: null,

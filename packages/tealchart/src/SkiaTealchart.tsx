@@ -301,6 +301,8 @@ export interface SkiaTealchartHandle {
   importUserDrawingStateFromLayout(state?: UserDrawingState | null): boolean;
   setUserDrawingState(state: UserDrawingState): boolean;
   setActiveUserDrawingTool(tool: UserDrawingTool): boolean;
+  setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean;
+  isUserDrawingStayInDrawingMode(): boolean;
   canUndoUserDrawingCommand(): boolean;
   canRedoUserDrawingCommand(): boolean;
   undoUserDrawingCommand(): boolean;
@@ -515,7 +517,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
   const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(
-    () => propUserDrawingState ?? createUserDrawingState(),
+    () => createUserDrawingState(propUserDrawingState),
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingStateRef = useRef(effectiveUserDrawingState);
@@ -563,8 +565,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       userDrawingPlacementDragStartPointRef.current = null;
       userDrawingPlacementDragLastPointRef.current = null;
       setUserDrawingDraftPreviewAnchor(null);
-      userDrawingStateRef.current = propUserDrawingState;
-      setUncontrolledUserDrawingState(propUserDrawingState);
+      const nextState = createUserDrawingState(propUserDrawingState);
+      userDrawingStateRef.current = nextState;
+      setUncontrolledUserDrawingState(nextState);
     }
   }, [propUserDrawingState]);
 
@@ -702,6 +705,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
         return dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+      },
+      setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setStayInDrawingMode',
+          stayInDrawingMode,
+          meta: { source: 'api' },
+        });
+      },
+      isUserDrawingStayInDrawingMode(): boolean {
+        return userDrawingStateRef.current.stayInDrawingMode !== false;
       },
       canUndoUserDrawingCommand(): boolean {
         return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);

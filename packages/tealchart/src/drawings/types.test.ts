@@ -50,6 +50,7 @@ describe('user drawing types', () => {
       version: USER_DRAWING_SCHEMA_VERSION,
       drawings: [],
       activeTool: 'select',
+      stayInDrawingMode: true,
       selection: null,
       draft: null,
       textEdit: null,

@@ -64,13 +64,22 @@ function createHistorySnapshot(state: UserDrawingState): UserDrawingState {
     version: state.version,
     drawings: state.drawings,
     activeTool: state.activeTool,
+    stayInDrawingMode: state.stayInDrawingMode !== false,
     selection: state.selection,
+  });
+}
+
+function applyHistorySnapshot(snapshot: UserDrawingState, currentState: UserDrawingState): UserDrawingState {
+  return createUserDrawingState({
+    ...snapshot,
+    stayInDrawingMode: currentState.stayInDrawingMode !== false,
   });
 }
 
 function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
   switch (command.type) {
     case 'setActiveTool':
+    case 'setStayInDrawingMode':
     case 'select':
     case 'selectMany':
     case 'selectAtPoint':
@@ -170,7 +179,7 @@ export function undoUserDrawingCommand(
   if (!entry) return { state, history, changed: false };
 
   return {
-    state: entry.before,
+    state: applyHistorySnapshot(entry.before, state),
     history: {
       ...history,
       undoStack: history.undoStack.slice(0, -1),
@@ -188,7 +197,7 @@ export function redoUserDrawingCommand(
   if (!entry) return { state, history, changed: false };
 
   return {
-    state: entry.after,
+    state: applyHistorySnapshot(entry.after, state),
     history: {
       ...history,
       undoStack: [...history.undoStack, entry].slice(
