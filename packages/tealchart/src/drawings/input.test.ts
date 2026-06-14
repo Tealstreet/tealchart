@@ -40,6 +40,7 @@ import {
   setUserDrawingTrendLineExtend,
   setUserDrawingTool,
   setUserDrawingVisibility,
+  smoothUserDrawingPathAnchors,
   updateUserDrawingStyle,
   updateUserDrawingTextEdit,
 } from './input';
@@ -564,6 +565,8 @@ describe('user drawing input controller', () => {
   });
 
   it('builds variable-point path drawings from drag samples', () => {
+    const rawPoints = [anchorA, anchorB, { time: 3_000, price: 90 }];
+    const smoothedPoints = smoothUserDrawingPathAnchors(rawPoints);
     const started = beginUserDrawingPathDrag(
       setUserDrawingTool(createUserDrawingState(), 'path'),
       { paneId: 'main', anchor: anchorA },
@@ -575,7 +578,15 @@ describe('user drawing input controller', () => {
     const committed = commitUserDrawingPathDrag(third, { createId: () => 'freehand', now: () => 20 });
 
     expect(duplicate).toBe(started);
-    expect(third.draft?.anchors).toEqual([anchorA, anchorB, { time: 3_000, price: 90 }]);
+    expect(third.draft?.anchors).toEqual(rawPoints);
+    expect(smoothedPoints).toEqual([
+      anchorA,
+      { time: 1_250, price: 102.5 },
+      { time: 1_750, price: 107.5 },
+      { time: 2_250, price: 105 },
+      { time: 2_750, price: 95 },
+      { time: 3_000, price: 90 },
+    ]);
     expect(committed).toMatchObject({
       selection: { drawingId: 'freehand' },
       draft: null,
@@ -583,7 +594,7 @@ describe('user drawing input controller', () => {
         {
           id: 'freehand',
           kind: 'path',
-          points: [anchorA, anchorB, { time: 3_000, price: 90 }],
+          points: smoothedPoints,
           createdAt: 20,
           updatedAt: 20,
         },
@@ -592,6 +603,8 @@ describe('user drawing input controller', () => {
   });
 
   it('builds variable-point brush drawings from drag samples', () => {
+    const rawPoints = [anchorA, anchorB, { time: 3_000, price: 90 }];
+    const smoothedPoints = smoothUserDrawingPathAnchors(rawPoints);
     const started = beginUserDrawingPathDrag(
       setUserDrawingTool(createUserDrawingState(), 'brush'),
       { paneId: 'main', anchor: anchorA },
@@ -609,7 +622,7 @@ describe('user drawing input controller', () => {
         {
           id: 'brush',
           kind: 'brush',
-          points: [anchorA, anchorB, { time: 3_000, price: 90 }],
+          points: smoothedPoints,
           createdAt: 20,
           updatedAt: 20,
         },
@@ -618,6 +631,8 @@ describe('user drawing input controller', () => {
   });
 
   it('builds variable-point highlighter drawings from drag samples', () => {
+    const rawPoints = [anchorA, anchorB, { time: 3_000, price: 90 }];
+    const smoothedPoints = smoothUserDrawingPathAnchors(rawPoints);
     const started = beginUserDrawingPathDrag(
       setUserDrawingTool(createUserDrawingState(), 'highlighter'),
       { paneId: 'main', anchor: anchorA },
@@ -635,7 +650,7 @@ describe('user drawing input controller', () => {
         {
           id: 'highlighter',
           kind: 'highlighter',
-          points: [anchorA, anchorB, { time: 3_000, price: 90 }],
+          points: smoothedPoints,
           createdAt: 20,
           updatedAt: 20,
         },

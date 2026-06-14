@@ -971,6 +971,29 @@ function isSameDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor): boolea
   return a.time === b.time && a.price === b.price;
 }
 
+function interpolateUserDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor, t: number): UserDrawingAnchor {
+  return {
+    time: a.time + (b.time - a.time) * t,
+    price: a.price + (b.price - a.price) * t,
+  };
+}
+
+export function smoothUserDrawingPathAnchors(anchors: readonly UserDrawingAnchor[]): UserDrawingAnchor[] {
+  if (anchors.length < 2) return anchors.map(cloneAnchor);
+
+  const smoothed: UserDrawingAnchor[] = [cloneAnchor(anchors[0]!)];
+  for (let index = 0; index < anchors.length - 1; index += 1) {
+    const start = anchors[index]!;
+    const end = anchors[index + 1]!;
+    if (isSameDrawingAnchor(start, end)) continue;
+    smoothed.push(interpolateUserDrawingAnchor(start, end, 0.25));
+    smoothed.push(interpolateUserDrawingAnchor(start, end, 0.75));
+  }
+  smoothed.push(cloneAnchor(anchors[anchors.length - 1]!));
+
+  return smoothed.length >= 2 ? smoothed : anchors.map(cloneAnchor);
+}
+
 export function beginUserDrawingPathDrag(
   state: UserDrawingState,
   point: UserDrawingInputPoint,
@@ -1084,6 +1107,7 @@ export function commitUserDrawingPathDrag(
   }
 
   const now = options.now?.() ?? Date.now();
+  const points = smoothUserDrawingPathAnchors(draft.anchors);
   const drawing = {
     id: options.createId(),
     kind: draft.tool,
@@ -1093,7 +1117,7 @@ export function commitUserDrawingPathDrag(
     createdAt: now,
     updatedAt: now,
     style: normalizeUserDrawingStyle({ ...draft.style }),
-    points: draft.anchors.slice(),
+    points,
   };
 
   return {
