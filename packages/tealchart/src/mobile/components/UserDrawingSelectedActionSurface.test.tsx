@@ -87,7 +87,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
     fireEvent.click(screen.getByLabelText('Cycle selected drawing line color to #22c55e'));
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
-    fireEvent.click(screen.getByLabelText('Cycle selected drawing opacity to 75 percent'));
+    fireEvent.click(screen.getByLabelText('75 percent opacity'));
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
 
     const nextState: UserDrawingState = {

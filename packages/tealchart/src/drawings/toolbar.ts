@@ -228,6 +228,7 @@ export interface UserDrawingSelectedActionSurfaceItem {
   enabled: boolean;
   command: UserDrawingSelectedActionSurfaceCommand;
   destructive?: boolean;
+  selected?: boolean;
   swatchColor?: string;
 }
 
@@ -861,27 +862,10 @@ function getNextUserDrawingLineColor(drawing: UserDrawing): string {
   return USER_DRAWING_LINE_COLOR_DESCRIPTORS[nextIndex]!.color;
 }
 
-function getAdjacentUserDrawingLineWidth(drawing: UserDrawing, direction: -1 | 1): number | null {
-  const widths = getUserDrawingLineWidthDescriptors(drawing).map((descriptor) => descriptor.width);
-  const currentIndex = widths.indexOf(drawing.style.lineWidth);
-  if (currentIndex === -1) {
-    if (direction > 0) return widths.find((width) => width > drawing.style.lineWidth) ?? null;
-    return widths.findLast((width) => width < drawing.style.lineWidth) ?? null;
-  }
-  return widths[currentIndex + direction] ?? null;
-}
-
 function getNextUserDrawingLineStyle(drawing: UserDrawing): UserDrawingLineStyle {
   const styles = USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => descriptor.lineStyle);
   const currentIndex = styles.indexOf(drawing.style.lineStyle);
   return styles[currentIndex >= 0 ? (currentIndex + 1) % styles.length : 0]!;
-}
-
-function getNextUserDrawingOpacity(drawing: UserDrawing): number {
-  const opacities = getUserDrawingOpacityDescriptors(drawing).map((descriptor) => descriptor.opacity);
-  const currentOpacity = normalizeUserDrawingOpacity(drawing.style.opacity ?? DEFAULT_USER_DRAWING_STYLE.opacity ?? 1);
-  const currentIndex = opacities.indexOf(currentOpacity);
-  return opacities[currentIndex >= 0 ? (currentIndex + 1) % opacities.length : 0]!;
 }
 
 function getNextUserDrawingFillColor(drawing: UserDrawing): string {
@@ -968,11 +952,29 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const fillColorEnabled = isUserDrawingFillToolbarEnabled(state);
   const fillVisibilityEnabled = isUserDrawingFillVisibilityToolbarEnabled(state);
   const nextLineColor = getNextUserDrawingLineColor(selectedDrawing);
-  const thinnerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, -1);
-  const thickerLineWidth = getAdjacentUserDrawingLineWidth(selectedDrawing, 1);
   const nextLineStyle = getNextUserDrawingLineStyle(selectedDrawing);
-  const nextOpacity = getNextUserDrawingOpacity(selectedDrawing);
   const nextLineVisible = selectedDrawing.style.lineVisible === false;
+  const currentOpacity = normalizeUserDrawingOpacity(selectedDrawing.style.opacity ?? DEFAULT_USER_DRAWING_STYLE.opacity ?? 1);
+  const lineWidthItems: UserDrawingSelectedActionSurfaceItem[] = getUserDrawingLineWidthDescriptors(selectedDrawing).map(
+    (descriptor) => ({
+      id: `lineWidth:${descriptor.width}`,
+      icon: '━',
+      label: descriptor.label,
+      enabled: styleEnabled,
+      selected: selectedDrawing.style.lineWidth === descriptor.width,
+      command: { type: 'updateStyle', style: { lineWidth: descriptor.width } },
+    }),
+  );
+  const opacityItems: UserDrawingSelectedActionSurfaceItem[] = getUserDrawingOpacityDescriptors(selectedDrawing).map(
+    (descriptor) => ({
+      id: `opacity:${descriptor.opacity}`,
+      icon: String(Math.round(descriptor.opacity * 100)),
+      label: descriptor.label,
+      enabled: styleEnabled,
+      selected: currentOpacity === descriptor.opacity,
+      command: { type: 'updateStyle', style: { opacity: descriptor.opacity } },
+    }),
+  );
   const nextFillColor = fillColorEnabled ? getNextUserDrawingFillColor(selectedDrawing) : null;
   const nextFillVisible = selectedDrawing.style.fillVisible === false;
   const textEnabled = isUserDrawingTextToolbarEnabled(state);
@@ -1187,22 +1189,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'updateStyle', style: { lineColor: nextLineColor } },
         swatchColor: nextLineColor,
       },
-      {
-        id: 'lineWidth:decrease',
-        icon: '−',
-        label:
-          thinnerLineWidth === null ? 'Decrease selected drawing line width' : `${thinnerLineWidth} pixel line width`,
-        enabled: styleEnabled && thinnerLineWidth !== null,
-        command: { type: 'updateStyle', style: thinnerLineWidth === null ? {} : { lineWidth: thinnerLineWidth } },
-      },
-      {
-        id: 'lineWidth:increase',
-        icon: '+',
-        label:
-          thickerLineWidth === null ? 'Increase selected drawing line width' : `${thickerLineWidth} pixel line width`,
-        enabled: styleEnabled && thickerLineWidth !== null,
-        command: { type: 'updateStyle', style: thickerLineWidth === null ? {} : { lineWidth: thickerLineWidth } },
-      },
+      ...lineWidthItems,
       {
         id: `lineStyle:${nextLineStyle}`,
         icon: USER_DRAWING_LINE_STYLE_DESCRIPTORS.find((descriptor) => descriptor.lineStyle === nextLineStyle)!.icon,
@@ -1210,13 +1197,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         enabled: styleEnabled,
         command: { type: 'updateStyle', style: { lineStyle: nextLineStyle } },
       },
-      {
-        id: `opacity:${nextOpacity}`,
-        icon: '◐',
-        label: `Cycle selected drawing opacity to ${Math.round(nextOpacity * 100)} percent`,
-        enabled: styleEnabled,
-        command: { type: 'updateStyle', style: { opacity: nextOpacity } },
-      },
+      ...opacityItems,
       {
         id: 'lineVisible:toggle',
         icon: '▣',

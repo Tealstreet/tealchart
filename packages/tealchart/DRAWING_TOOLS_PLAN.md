@@ -1346,6 +1346,14 @@ object-tree gaps stay visible.
   Canvas and Skia renderers continue to consume the existing shared `lineWidth`
   style value.
 
+## Shipped: Selected Action Style Presets
+
+- Shared selected-action surfaces now expose explicit stroke-width and opacity
+  preset commands instead of only next/previous quick actions.
+- Web floating toolbars and context menus plus mobile Skia action strips and
+  long-press menus consume the same selected-action descriptors, including
+  active preset state.
+
 ## Shipped: Expanded Text Wrap Width Presets
 
 - Shared text wrap width normalization now supports wider 320px and 480px text

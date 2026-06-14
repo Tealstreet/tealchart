@@ -1620,12 +1620,21 @@ describe('user drawing toolbar descriptors', () => {
     ]);
     expect(style.items.map((item) => [item.id, item.enabled, item.command, item.swatchColor])).toEqual([
       ['lineColor:#f5c542', true, { type: 'updateStyle', style: { lineColor: '#f5c542' } }, '#f5c542'],
-      ['lineWidth:decrease', false, { type: 'updateStyle', style: {} }, undefined],
-      ['lineWidth:increase', true, { type: 'updateStyle', style: { lineWidth: 2 } }, undefined],
+      ['lineWidth:1', true, { type: 'updateStyle', style: { lineWidth: 1 } }, undefined],
+      ['lineWidth:2', true, { type: 'updateStyle', style: { lineWidth: 2 } }, undefined],
+      ['lineWidth:3', true, { type: 'updateStyle', style: { lineWidth: 3 } }, undefined],
+      ['lineWidth:4', true, { type: 'updateStyle', style: { lineWidth: 4 } }, undefined],
+      ['lineWidth:5', true, { type: 'updateStyle', style: { lineWidth: 5 } }, undefined],
       ['lineStyle:dashed', true, { type: 'updateStyle', style: { lineStyle: 'dashed' } }, undefined],
+      ['opacity:1', true, { type: 'updateStyle', style: { opacity: 1 } }, undefined],
       ['opacity:0.75', true, { type: 'updateStyle', style: { opacity: 0.75 } }, undefined],
+      ['opacity:0.5', true, { type: 'updateStyle', style: { opacity: 0.5 } }, undefined],
+      ['opacity:0.25', true, { type: 'updateStyle', style: { opacity: 0.25 } }, undefined],
+      ['opacity:0.1', true, { type: 'updateStyle', style: { opacity: 0.1 } }, undefined],
       ['lineVisible:toggle', true, { type: 'updateStyle', style: { lineVisible: false } }, undefined],
     ]);
+    expect(style.items.find((item) => item.id === 'lineWidth:1')).toMatchObject({ selected: true });
+    expect(style.items.find((item) => item.id === 'opacity:1')).toMatchObject({ selected: true });
     const highlighterSurface = resolveUserDrawingSelectedActionSurface({
       ...selected,
       selection: { drawingId: 'marker' },
@@ -1648,14 +1657,17 @@ describe('user drawing toolbar descriptors', () => {
       ],
     });
     const highlighterStyle = highlighterSurface.groups.find((group) => group.id === 'style')!;
-    expect(highlighterStyle.items.find((item) => item.id === 'lineWidth:increase')).toMatchObject({
+    expect(highlighterStyle.items.find((item) => item.id === 'lineWidth:12')).toMatchObject({
       enabled: true,
+      label: 'Bold highlighter stroke width',
       command: { type: 'updateStyle', style: { lineWidth: 12 } },
     });
     expect(highlighterStyle.items.find((item) => item.id === 'opacity:0.25')).toMatchObject({
       enabled: true,
       command: { type: 'updateStyle', style: { opacity: 0.25 } },
     });
+    expect(highlighterStyle.items.find((item) => item.id === 'lineWidth:8')).toMatchObject({ selected: true });
+    expect(highlighterStyle.items.find((item) => item.id === 'opacity:0.35')).toMatchObject({ selected: true });
     const legacyHighlighterSurface = resolveUserDrawingSelectedActionSurface({
       ...selected,
       selection: { drawingId: 'marker' },
@@ -1677,14 +1689,11 @@ describe('user drawing toolbar descriptors', () => {
       ],
     });
     const legacyHighlighterStyle = legacyHighlighterSurface.groups.find((group) => group.id === 'style')!;
-    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:decrease')).toMatchObject({
-      enabled: false,
-      command: { type: 'updateStyle', style: {} },
-    });
-    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:increase')).toMatchObject({
+    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:4')).toMatchObject({
       enabled: true,
       command: { type: 'updateStyle', style: { lineWidth: 4 } },
     });
+    expect(legacyHighlighterStyle.items.some((item) => item.id === 'lineWidth:1' && item.selected)).toBe(false);
     expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
       ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
       ['sendBackward', true, { type: 'toolbarAction', action: 'sendBackward' }],
@@ -2217,7 +2226,7 @@ describe('user drawing toolbar descriptors', () => {
     expect(items.find((item) => item.id === 'duplicateSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'deleteSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lineColor:#f5c542')?.enabled).toBe(false);
-    expect(items.find((item) => item.id === 'lineWidth:increase')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'lineWidth:2')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lineStyle:dashed')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'hideSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lockSelected')?.enabled).toBe(false);
