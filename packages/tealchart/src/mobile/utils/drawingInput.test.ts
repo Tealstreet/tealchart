@@ -113,6 +113,30 @@ describe('mobile user drawing input resolver', () => {
     });
   });
 
+  it('applies strong magnet mode to main-pane OHLC anchors', () => {
+    expect(
+      resolveMobileUserDrawingInputPoint({
+        point: { x: 143, y: 37 },
+        viewport: {
+          startTime: 1_000,
+          endTime: 3_000,
+          priceMin: 90,
+          priceMax: 110,
+        },
+        dimensions,
+        panes,
+        bars: [{ time: 2_000, open: 96, high: 105, low: 94, close: 102, volume: 1 }],
+        magnetMode: 'strong',
+        pressure: 0.4,
+      }),
+    ).toEqual({
+      paneId: 'main',
+      anchor: { time: 2_000, price: 105, pressure: 0.4 },
+      position: { x: 0.5, y: 0.25 },
+      bars: [{ time: 2_000, open: 96, high: 105, low: 94, close: 102, volume: 1 }],
+    });
+  });
+
   it('rejects points in mobile chart margins', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
