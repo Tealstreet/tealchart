@@ -1588,7 +1588,11 @@ export class ChartCore {
     return point ? this.options.onUserDrawingInput(point) : false;
   }
 
-  private resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null {
+  private resolveUserDrawingInputPoint(
+    x: number,
+    y: number,
+    options?: Pick<DrawingDragEventOptions, 'pressure'>,
+  ): UserDrawingInputPoint | null {
     if (!this.viewport) return null;
 
     const layout = this.getUnifiedLayout();
@@ -1620,8 +1624,16 @@ export class ChartCore {
     if (!point) return null;
 
     const sourcePane = layout.panes.find((pane) => pane.id === point.paneId);
+    const anchor =
+      options?.pressure === undefined
+        ? point.anchor
+        : {
+            ...point.anchor,
+            pressure: options.pressure,
+          };
     return {
       ...point,
+      anchor,
       bars: sourcePane?.type === 'main' && this.bars.length > 0 ? this.bars : undefined,
     };
   }
@@ -1655,7 +1667,7 @@ export class ChartCore {
     }
 
     if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
-      const point = this.resolveUserDrawingInputPoint(x, y);
+      const point = this.resolveUserDrawingInputPoint(x, y, options);
       return point ? this.options.onUserDrawingPathDragStart?.(point) === true : false;
     }
 
@@ -1709,7 +1721,7 @@ export class ChartCore {
     }
 
     if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
-      const point = this.resolveUserDrawingInputPoint(x, y);
+      const point = this.resolveUserDrawingInputPoint(x, y, options);
       return point ? this.options.onUserDrawingPathDragMove?.(point) === true : false;
     }
 

@@ -103,6 +103,7 @@ export interface DrawingInputEventOptions {
 export interface DrawingDragEventOptions {
   constrainedPlacement?: boolean;
   duplicateOnDrag?: boolean;
+  pressure?: number;
 }
 
 export type DrawingInputResult = boolean | DrawingInputHandledResult;
@@ -115,8 +116,35 @@ function allowsPaneDoubleClick(result: DrawingInputResult | undefined): boolean 
   return typeof result === 'boolean' ? false : result?.allowPaneDoubleClick === true;
 }
 
+function normalizeDrawingPressure(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  return Math.max(0, Math.min(1, value));
+}
+
+function createDrawingDragOptions({
+  constrainedPlacement,
+  duplicateOnDrag,
+  pressure,
+}: DrawingDragEventOptions): DrawingDragEventOptions | undefined {
+  const options: DrawingDragEventOptions = {};
+  if (constrainedPlacement) options.constrainedPlacement = true;
+  if (duplicateOnDrag) options.duplicateOnDrag = true;
+  if (pressure !== undefined) options.pressure = pressure;
+  return Object.keys(options).length > 0 ? options : undefined;
+}
+
 function getMouseDrawingDragOptions(e: MouseEvent): DrawingDragEventOptions | undefined {
-  return e.shiftKey ? { constrainedPlacement: true, duplicateOnDrag: true } : undefined;
+  return createDrawingDragOptions({
+    constrainedPlacement: e.shiftKey,
+    duplicateOnDrag: e.shiftKey,
+    pressure: normalizeDrawingPressure((e as PointerEvent).pressure),
+  });
+}
+
+function getTouchDrawingDragOptions(touch: Touch): DrawingDragEventOptions | undefined {
+  return createDrawingDragOptions({
+    pressure: normalizeDrawingPressure(touch.force),
+  });
 }
 
 function invokeDrawingDragCallback(
@@ -221,7 +249,7 @@ export class EventManager {
 
   // Touch tracking
   private activeTouches = new Map<number, { x: number; y: number }>();
-  private touchStart: { x: number; y: number; time: number } | null = null;
+  private touchStart: { x: number; y: number; time: number; drawingDragOptions?: DrawingDragEventOptions } | null = null;
   private isTouchDragging = false;
   private touchCrosshairLocked = false;
   private touchCrosshairPosition = { x: 0, y: 0 };
@@ -874,15 +902,17 @@ export class EventManager {
 
     if (e.touches.length === 1) {
       // Single touch - start potential drag or long-press
-      this.touchStart = { x, y, time: Date.now() };
+      const drawingDragOptions = getTouchDrawingDragOptions(firstTouch);
+      this.touchStart = { x, y, time: Date.now(), drawingDragOptions };
       this.isTouchDragging = false;
       this.touchYPanUnlocked = false;
 
       const dims = this.callbacks.getDimensions();
       const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
-      const drawingDragPending = this.callbacks.onDrawingDragPending?.(x, y, 'touch') === true;
-      const drawingDragStarted = !drawingDragPending && this.callbacks.onDrawingDragStart?.(x, y, 'touch') === true;
+      const drawingDragPending = invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'touch', drawingDragOptions);
+      const drawingDragStarted =
+        !drawingDragPending && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'touch', drawingDragOptions);
 
       const viewport = this.callbacks.getViewport();
       this.state.dragStartX = x;
@@ -961,6 +991,7 @@ export class EventManager {
       const touch = e.touches[0];
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
+      const drawingDragOptions = getTouchDrawingDragOptions(touch);
 
       const dx = x - this.state.dragStartX;
       const dy = y - this.state.dragStartY;
@@ -972,13 +1003,21 @@ export class EventManager {
         this.state.isDragging = true;
 
         if (this.state.dragMode === 'pendingDrawing') {
-          if (this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'touch')) {
+          if (
+            invokeDrawingDragCallback(
+              this.callbacks.onDrawingDragStart,
+              this.state.dragStartX,
+              this.state.dragStartY,
+              'touch',
+              this.touchStart.drawingDragOptions,
+            )
+          ) {
             this.state.dragMode = 'drawing';
-            this.callbacks.onDrawingDragMove?.(x, y, 'touch');
+            invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'touch', drawingDragOptions);
             this.scheduleRender();
           }
         } else if (this.state.dragMode === 'drawing') {
-          this.callbacks.onDrawingDragMove?.(x, y, 'touch');
+          invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'touch', drawingDragOptions);
           this.scheduleRender();
         } else if (this.touchCrosshairLocked) {
           // Move crosshair proportionally
@@ -1035,6 +1074,7 @@ export class EventManager {
       const rect = this.container.getBoundingClientRect();
       const endX = changedTouch ? changedTouch.clientX - rect.left : this.touchStart.x;
       const endY = changedTouch ? changedTouch.clientY - rect.top : this.touchStart.y;
+      const drawingDragOptions = changedTouch ? getTouchDrawingDragOptions(changedTouch) : undefined;
       const endDistance = Math.hypot(endX - this.touchStart.x, endY - this.touchStart.y);
 
       if (
@@ -1042,12 +1082,18 @@ export class EventManager {
         e.type === 'touchend' &&
         endDistance > TOUCH_TAP_THRESHOLD &&
         this.state.dragMode === 'pendingDrawing' &&
-        this.callbacks.onDrawingDragStart?.(this.state.dragStartX, this.state.dragStartY, 'touch')
+        invokeDrawingDragCallback(
+          this.callbacks.onDrawingDragStart,
+          this.state.dragStartX,
+          this.state.dragStartY,
+          'touch',
+          this.touchStart.drawingDragOptions,
+        )
       ) {
         this.isTouchDragging = true;
         this.state.isDragging = true;
         this.state.dragMode = 'drawing';
-        this.callbacks.onDrawingDragMove?.(endX, endY, 'touch');
+        invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, endX, endY, 'touch', drawingDragOptions);
       }
 
       if (!this.isTouchDragging && e.type === 'touchend' && duration < TOUCH_TAP_TIMEOUT) {

@@ -40,7 +40,7 @@ function createCallbacks(overrides: Partial<EventManagerCallbacks> = {}): EventM
 
 function createTouch(
   target: EventTarget,
-  init: { identifier?: number; clientX: number; clientY: number },
+  init: { identifier?: number; clientX: number; clientY: number; force?: number },
 ): Touch {
   return {
     identifier: init.identifier ?? 1,
@@ -54,7 +54,7 @@ function createTouch(
     radiusX: 1,
     radiusY: 1,
     rotationAngle: 0,
-    force: 1,
+    force: init.force ?? 1,
   } as Touch;
 }
 
@@ -406,17 +406,17 @@ describe('EventManager drawing drag routing', () => {
       }),
     );
 
-    const startTouch = createTouch(container, { clientX: 100, clientY: 100 });
-    const moveTouch = createTouch(container, { clientX: 130, clientY: 110 });
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100, force: 0.25 });
+    const moveTouch = createTouch(container, { clientX: 130, clientY: 110, force: 0.75 });
     dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
     dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
     dispatchTouchEvent(container, 'touchend', [], [moveTouch]);
 
     expect(onDrawingInput).not.toHaveBeenCalled();
     expect(onDrawingDragStart).toHaveBeenCalledOnce();
-    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 0.25 });
     expect(onDrawingDragMove).toHaveBeenCalledOnce();
-    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch');
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch', { pressure: 0.75 });
     expect(onDrawingDragEnd).toHaveBeenCalledOnce();
     expect(onDrawingDragEnd).toHaveBeenCalledWith('touch');
 
@@ -447,7 +447,7 @@ describe('EventManager drawing drag routing', () => {
     dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
     dispatchTouchEvent(container, 'touchend', [], [moveTouch]);
 
-    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 1 });
     expect(onDrawingDragStart).not.toHaveBeenCalled();
     expect(onDrawingDragMove).not.toHaveBeenCalled();
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
@@ -488,9 +488,9 @@ describe('EventManager drawing drag routing', () => {
 
     expect(onDrawingInput).not.toHaveBeenCalled();
     expect(onDrawingDragStart).toHaveBeenCalledOnce();
-    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch');
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 1 });
     expect(onDrawingDragMove).toHaveBeenCalledOnce();
-    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch');
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch', { pressure: 1 });
     expect(onDrawingDragEnd).toHaveBeenCalledOnce();
     expect(onDrawingDragEnd).toHaveBeenCalledWith('touch');
 
@@ -620,8 +620,8 @@ describe('EventManager drawing drag routing', () => {
     dispatchTouchEvent(container, 'touchcancel', [], [moveTouch]);
 
     expect(onDrawingInput).not.toHaveBeenCalled();
-    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch');
-    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch');
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 1 });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch', { pressure: 1 });
     expect(onDrawingDragCancel).toHaveBeenCalledOnce();
     expect(onDrawingDragCancel).toHaveBeenCalledWith('touch');
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
