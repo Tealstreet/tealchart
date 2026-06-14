@@ -171,6 +171,7 @@ import {
   computeChartGeometry,
   computeTopLeftLegendRect,
   createUserDrawingClipboard,
+  createUserDrawingState,
   createUserDrawingVisualEvidencePrNoteTemplate,
   duplicateUserDrawing,
   formatTrendAngleDegrees,
@@ -308,13 +309,20 @@ describe('tealchart public entries', () => {
     >;
     const crossPlatformCallback = ((event) => event.command.type) satisfies UserDrawingCommandEventListener;
     const acceptsCommandTuple = (_tuple: WidgetEventMap['user_drawing_command']) => true;
-    const commandEvent: UserDrawingCommandEvent | null = null;
+    const commandEvent: UserDrawingCommandEvent = {
+      command: { type: 'setActiveTool', tool: 'trendLine' },
+      previousState: createUserDrawingState(),
+      state: createUserDrawingState({ activeTool: 'trendLine' }),
+      source: 'api',
+    };
 
     expect(webSubscriptionCallback).toBeTypeOf('function');
     expect(webOptionCallback).toBeTypeOf('function');
     expect(crossPlatformCallback).toBeTypeOf('function');
     expect(acceptsCommandTuple).toBeTypeOf('function');
-    expect(commandEvent).toBeNull();
+    expect(commandEvent.command.type).toBe('setActiveTool');
+    expect(commandEvent.state.activeTool).toBe('trendLine');
+    expect(commandEvent.source).toBe('api');
   });
 
   it('exports shared and native drawing text alignment helpers', () => {
