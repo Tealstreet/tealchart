@@ -574,6 +574,54 @@ describe('ChartCore viewport management', () => {
     },
   );
 
+  it('applies constrained cyclic line horizontal placement through ChartCore preview and commit', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingPlacementDragStart = vi.fn(() => true);
+    const onUserDrawingPlacementDragEnd = vi.fn(() => true);
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onUserDrawingPlacementDragStart,
+      onUserDrawingPlacementDragEnd,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'cyclicLines',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const testCore = core as unknown as {
+      handleUserDrawingDragStart(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
+      handleUserDrawingDragMove(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
+      handleUserDrawingDragEnd(): void;
+      resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
+    };
+
+    expect(testCore.handleUserDrawingDragStart(100, 100, { constrainedPlacement: true })).toBe(true);
+    expect(testCore.handleUserDrawingDragMove(160, 120, { constrainedPlacement: true })).toBe(true);
+    testCore.handleUserDrawingDragEnd();
+
+    const expectedConstrainedEnd = testCore.resolveUserDrawingInputPoint(160, 100);
+    expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paneId: 'main',
+        anchor: expectedConstrainedEnd?.anchor,
+      }),
+    );
+    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        anchor: testCore.resolveUserDrawingInputPoint(160, 120)?.anchor,
+      }),
+    );
+
+    core.dispose();
+  });
+
   it('routes EventManager placement drag cancellation to draft cancellation', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingPlacementDragStart = vi.fn(() => true);

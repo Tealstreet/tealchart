@@ -44,6 +44,27 @@ const panes: PaneInfo[] = [
   },
 ];
 
+function createSpacesByPaneId(viewport: { startTime: number; endTime: number; priceMin: number; priceMax: number }): Map<string, DrawingCoordinateSpace> {
+  return new Map<string, DrawingCoordinateSpace>(
+    panes.map((pane) => [
+      pane.id,
+      {
+        viewport,
+        pane: {
+          id: pane.id,
+          top: pane.top,
+          height: pane.height,
+          bottom: pane.top + pane.height,
+          yMin: pane.yMin,
+          yMax: pane.yMax,
+        },
+        chartLeft: dimensions.margins.left,
+        chartRight: dimensions.width - dimensions.margins.right,
+      },
+    ]),
+  );
+}
+
 describe('mobile user drawing input resolver', () => {
   afterEach(() => {
     clearChartStoreCache();
@@ -153,24 +174,7 @@ describe('mobile user drawing input resolver', () => {
         dimensions,
         panes,
       });
-      const spacesByPaneId = new Map<string, DrawingCoordinateSpace>(
-        panes.map((pane) => [
-          pane.id,
-          {
-            viewport,
-            pane: {
-              id: pane.id,
-              top: pane.top,
-              height: pane.height,
-              bottom: pane.top + pane.height,
-              yMin: pane.yMin,
-              yMax: pane.yMax,
-            },
-            chartLeft: dimensions.margins.left,
-            chartRight: dimensions.width - dimensions.margins.right,
-          },
-        ]),
-      );
+      const spacesByPaneId = createSpacesByPaneId(viewport);
 
       expect(startPoint).not.toBeNull();
       expect(currentPoint).not.toBeNull();
@@ -185,6 +189,78 @@ describe('mobile user drawing input resolver', () => {
 
       expect(constrained.anchor.time).toBeCloseTo(1_588.235294);
       expect(constrained.anchor.price).toBeCloseTo(100);
+    },
+  );
+
+  it('feeds constrained cyclic line horizontal interval geometry from resolved mobile touch anchors', () => {
+    const viewport = {
+      startTime: 1_000,
+      endTime: 3_000,
+      priceMin: 90,
+      priceMax: 110,
+    };
+    const startPoint = resolveMobileUserDrawingInputPoint({
+      point: { x: 48, y: 32 },
+      viewport,
+      dimensions,
+      panes,
+    });
+    const currentPoint = resolveMobileUserDrawingInputPoint({
+      point: { x: 88, y: 52 },
+      viewport,
+      dimensions,
+      panes,
+    });
+    const spacesByPaneId = createSpacesByPaneId(viewport);
+
+    expect(startPoint).not.toBeNull();
+    expect(currentPoint).not.toBeNull();
+
+    const constrained = resolveUserDrawingPlacementConstraint({
+      tool: 'cyclicLines',
+      startPoint,
+      currentPoint: currentPoint!,
+      spacesByPaneId,
+      options: { constrainedPlacement: true },
+    });
+
+    expect(constrained.anchor.time).toBeCloseTo(1_588.235294);
+    expect(constrained.anchor.price).toBeCloseTo(105.555555);
+  });
+
+  it.each(['timeCycles', 'sineLine'] satisfies UserDrawingTool[])(
+    'keeps mobile %s placement unconstrained until amplitude-safe semantics exist',
+    (tool) => {
+      const viewport = {
+        startTime: 1_000,
+        endTime: 3_000,
+        priceMin: 90,
+        priceMax: 110,
+      };
+      const startPoint = resolveMobileUserDrawingInputPoint({
+        point: { x: 48, y: 32 },
+        viewport,
+        dimensions,
+        panes,
+      });
+      const currentPoint = resolveMobileUserDrawingInputPoint({
+        point: { x: 88, y: 52 },
+        viewport,
+        dimensions,
+        panes,
+      });
+
+      expect(startPoint).not.toBeNull();
+      expect(currentPoint).not.toBeNull();
+      expect(
+        resolveUserDrawingPlacementConstraint({
+          tool,
+          startPoint,
+          currentPoint: currentPoint!,
+          spacesByPaneId: createSpacesByPaneId(viewport),
+          options: { constrainedPlacement: true },
+        }),
+      ).toBe(currentPoint);
     },
   );
 });
