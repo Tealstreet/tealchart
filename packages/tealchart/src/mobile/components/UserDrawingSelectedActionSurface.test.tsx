@@ -111,6 +111,22 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     );
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
     expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
+    rerender(
+      <div onClick={onChartTouch}>
+        <UserDrawingSelectedActionSurfaceComponent
+          state={state}
+          surface={resolveUserDrawingSelectedActionSurface(state)}
+          anchor={selectionActionAnchor}
+          dimensions={{ width: 360, height: 240 }}
+          topInset={40}
+          createId={() => 'copy'}
+          dispatchUserDrawingCommand={dispatchUserDrawingCommand}
+          onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+        />
+      </div>,
+    );
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
 
     expect(onChartTouch).not.toHaveBeenCalled();
     expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
