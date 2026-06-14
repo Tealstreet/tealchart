@@ -19,6 +19,10 @@ import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getGestureZone } from '../utils/coordinates';
 import { getDrawingPanFinalizeAction } from '../utils/drawingGestureFinalize';
 
+export interface ChartDrawingGestureOptions {
+  pressure?: number;
+}
+
 export interface UseChartGesturesOptions {
   dimensions: ChartDimensions;
   bars: Bar[];
@@ -33,9 +37,9 @@ export interface UseChartGesturesOptions {
   /** Called for active chart-surface touches so overlays can react without owning gestures */
   onInteraction?: (x: number, y: number) => void;
   /** Called before chart pan starts so drawing edits can claim the gesture */
-  onDrawingEditStart?: (x: number, y: number) => boolean;
+  onDrawingEditStart?: (x: number, y: number, options?: ChartDrawingGestureOptions) => boolean;
   /** Called while a claimed drawing edit gesture moves */
-  onDrawingEditMove?: (x: number, y: number) => void;
+  onDrawingEditMove?: (x: number, y: number, options?: ChartDrawingGestureOptions) => void;
   /** Called when a claimed drawing edit gesture ends */
   onDrawingEditEnd?: () => void;
   /** Called when a claimed drawing edit gesture is cancelled before normal completion */
@@ -44,6 +48,16 @@ export interface UseChartGesturesOptions {
 
 export interface UseChartGesturesResult {
   composedGesture: ReturnType<typeof Gesture.Simultaneous>;
+}
+
+function normalizeGesturePressure(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  return Math.max(0, Math.min(1, value));
+}
+
+function getChartDrawingGestureOptions(event: unknown): ChartDrawingGestureOptions | undefined {
+  const pressure = normalizeGesturePressure((event as { force?: unknown }).force);
+  return pressure === undefined ? undefined : { pressure };
 }
 
 export function useChartGestures({
@@ -203,12 +217,12 @@ export function useChartGestures({
 
   // Handler for pan start - processes zone detection and sets up initial values
   const handlePanStartAndSetValues = useCallback(
-    (x: number, y: number): boolean => {
+    (x: number, y: number, options?: ChartDrawingGestureOptions): boolean => {
       onInteraction?.(x, y);
       savedTranslateX.value = 0;
       savedTranslateY.value = 0;
 
-      if (onDrawingEditStart?.(x, y)) {
+      if (onDrawingEditStart?.(x, y, options)) {
         gestureZoneValue.value = 'outside';
         onSwipeBlockChange?.(true);
         return true;
@@ -273,8 +287,12 @@ export function useChartGestures({
         panBeginY.value = event.y;
         gestureCleanedUp.value = false;
       })
-      .onStart(() => {
-        drawingEditClaimed.value = handlePanStartAndSetValues(panBeginX.value, panBeginY.value);
+      .onStart((event) => {
+        drawingEditClaimed.value = handlePanStartAndSetValues(
+          panBeginX.value,
+          panBeginY.value,
+          getChartDrawingGestureOptions(event),
+        );
       })
       .onUpdate((event) => {
         scheduleInteraction(event.x, event.y);
@@ -282,7 +300,7 @@ export function useChartGestures({
         const zone = gestureZoneValue.value;
 
         if (drawingEditClaimed.value) {
-          onDrawingEditMove?.(event.x, event.y);
+          onDrawingEditMove?.(event.x, event.y, getChartDrawingGestureOptions(event));
         } else if (zone === 'priceAxis') {
           updatePriceScale(event.translationY, priceAxisStartRange.value);
         } else if (zone === 'timeAxis') {

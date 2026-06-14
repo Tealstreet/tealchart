@@ -434,6 +434,10 @@ object-tree gaps stay visible.
   gestures and commit the same path drawing state shape.
 - Layout persistence, point editing, hit testing, and render models retain all
   sampled path anchors on both platforms.
+- Optional normalized pressure metadata is now preserved on freehand anchors
+  from web and mobile drag input through smoothing, command history, and layout
+  restore. Rendering still uses constant stroke widths until the variable-width
+  brush rendering phase lands.
 
 ## Shipped: Risk/Reward Position Tools
 
@@ -844,6 +848,8 @@ object-tree gaps stay visible.
   polyline geometry.
 - Drag input, sampled-path hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
+- Brush drag samples preserve optional pressure metadata on web and mobile, but
+  variable-width rendering remains an open follow-up.
 
 ## Shipped: Highlighter Tool
 
@@ -853,6 +859,8 @@ object-tree gaps stay visible.
   polyline geometry.
 - Drag input, sampled-path hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
+- Highlighter drag samples preserve optional pressure metadata on web and
+  mobile, but variable-width rendering remains an open follow-up.
 
 ## Shipped: Note Tool
 
