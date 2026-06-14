@@ -1656,6 +1656,35 @@ describe('user drawing toolbar descriptors', () => {
       enabled: true,
       command: { type: 'updateStyle', style: { opacity: 0.25 } },
     });
+    const legacyHighlighterSurface = resolveUserDrawingSelectedActionSurface({
+      ...selected,
+      selection: { drawingId: 'marker' },
+      drawings: [
+        {
+          id: 'marker',
+          kind: 'highlighter',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' as const, opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+    const legacyHighlighterStyle = legacyHighlighterSurface.groups.find((group) => group.id === 'style')!;
+    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:decrease')).toMatchObject({
+      enabled: false,
+      command: { type: 'updateStyle', style: {} },
+    });
+    expect(legacyHighlighterStyle.items.find((item) => item.id === 'lineWidth:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { lineWidth: 4 } },
+    });
     expect(arrange.items.map((item) => [item.id, item.enabled, item.command])).toEqual([
       ['bringForward', false, { type: 'toolbarAction', action: 'bringForward' }],
       ['sendBackward', true, { type: 'toolbarAction', action: 'sendBackward' }],
