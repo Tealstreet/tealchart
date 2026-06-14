@@ -51,6 +51,34 @@ export interface UserDrawingObjectTreeRowAction {
   destructive?: boolean;
 }
 
+export const USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
+  'hide',
+  'show',
+  'lock',
+  'unlock',
+  'duplicate',
+  'delete',
+  'bringForward',
+  'sendBackward',
+  'bringToFront',
+  'sendToBack',
+] as const;
+
+export const USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS: Readonly<
+  Partial<Record<UserDrawingObjectTreeRowActionType, string>>
+> = {
+  hide: 'Hide',
+  show: 'Show',
+  lock: 'Lock',
+  unlock: 'Unlock',
+  duplicate: 'Copy',
+  delete: 'Del',
+  bringForward: 'Up',
+  sendBackward: 'Down',
+  bringToFront: 'Top',
+  sendToBack: 'Back',
+} as const;
+
 export type UserDrawingObjectTreeSelectionActionType = Exclude<UserDrawingObjectTreeRowActionType, 'rename'>;
 
 export interface UserDrawingObjectTreeSelectionActionDescriptor {
