@@ -797,7 +797,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             },
           });
           for (const item of group.items) {
-            popover.appendChild(this.createSelectedActionSurfaceButton(item));
+            popover.appendChild(this.createSelectedActionSurfaceButton(item, { keepPopoverOpen: true }));
           }
           el.appendChild(popover);
         }
@@ -818,6 +818,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   private createSelectedActionSurfaceButton(
     item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number],
+    options: { keepPopoverOpen?: boolean } = {},
   ): HTMLButtonElement {
     const btn = this.createElement('button', {
       style: {
@@ -836,7 +837,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     });
     btn.disabled = !item.enabled;
     if (item.enabled) {
-      btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
+      btn.addEventListener('click', () => {
+        this.handleSelectedActionSurfaceItemClick(item);
+        if (!options.keepPopoverOpen) {
+          this.selectedActionPopoverGroupId = null;
+          this.renderSelectedActionSurface();
+        }
+      });
       btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
       btn.addEventListener('mouseleave', () => {
         btn.style.backgroundColor = item.swatchColor ?? 'transparent';

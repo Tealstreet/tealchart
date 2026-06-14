@@ -343,6 +343,11 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing opacity to 75 percent"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing border"]')?.click();
     expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).not.toBeNull();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).toBeNull();
     topBar.setUserDrawingState({
       ...baseDrawingState,
       selection: { drawingId: 'h2' },
