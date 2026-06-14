@@ -3,6 +3,7 @@ import type { UserDrawingState } from '../../drawings';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../../state/chartState';
+import { resolveUserDrawingPropertiesSurface } from '../../drawings';
 import {
   deleteMobileUserDrawingTableColumn,
   deleteMobileUserDrawingTableRow,
@@ -71,6 +72,9 @@ describe('mobile drawing style helpers', () => {
     const locked = setMobileUserDrawingLocked(state, true, { now: () => 30 });
     expect(locked.drawings[0]).toMatchObject({ locked: true, updatedAt: 30 });
     expect(locked.selection).toBeNull();
+    expect(resolveUserDrawingPropertiesSurface(locked, 'line').groups[0]?.controls.every((control) => !control.enabled)).toBe(
+      true,
+    );
   });
 
   it('updates selected text label alignment through the shared reducer contract', () => {
