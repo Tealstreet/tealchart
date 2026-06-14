@@ -125,6 +125,7 @@ const LINE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>([
   'arrowMarker',
   'ray',
 ]);
+const HORIZONTAL_CYCLE_CONSTRAINT_TOOLS = new Set<UserDrawingTool>(['cyclicLines']);
 
 function constrainShapeAnchor(start: { x: number; y: number }, current: { x: number; y: number }): { x: number; y: number } {
   const dx = current.x - start.x;
@@ -146,6 +147,13 @@ function constrainLineAnchor(start: { x: number; y: number }, current: { x: numb
   return {
     x: start.x + Math.cos(snappedAngle) * length,
     y: start.y + Math.sin(snappedAngle) * length,
+  };
+}
+
+function constrainHorizontalAnchor(start: { x: number; y: number }, current: { x: number; y: number }): { x: number; y: number } {
+  return {
+    x: current.x,
+    y: start.y,
   };
 }
 
@@ -171,6 +179,8 @@ export function resolveUserDrawingPlacementConstraint({
     constrainedScreen = constrainShapeAnchor(startScreen, currentScreen);
   } else if (LINE_CONSTRAINT_TOOLS.has(tool)) {
     constrainedScreen = constrainLineAnchor(startScreen, currentScreen);
+  } else if (HORIZONTAL_CYCLE_CONSTRAINT_TOOLS.has(tool)) {
+    constrainedScreen = constrainHorizontalAnchor(startScreen, currentScreen);
   }
 
   if (!constrainedScreen) return currentPoint;
