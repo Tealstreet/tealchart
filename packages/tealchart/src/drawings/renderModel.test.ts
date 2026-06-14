@@ -103,7 +103,16 @@ describe('user drawing render model', () => {
     });
   });
 
-  it('resolves drag placement draft geometry to the same anchors as committed geometry', () => {
+  it.each([
+    {
+      start: { time: 10, price: 90 },
+      end: { time: 90, price: 10 },
+    },
+    {
+      start: { time: 90, price: 10 },
+      end: { time: 10, price: 90 },
+    },
+  ])('resolves drag placement draft geometry to the same anchors as committed geometry', ({ start, end }) => {
     const draftState: UserDrawingState = {
       version: 1,
       activeTool: 'rectangle',
@@ -112,7 +121,7 @@ describe('user drawing render model', () => {
       draft: {
         tool: 'rectangle',
         paneId: 'main',
-        anchors: [{ time: 10, price: 90 }],
+        anchors: [start],
         style,
         startedAt: 2,
       },
@@ -133,36 +142,29 @@ describe('user drawing render model', () => {
           createdAt: 2,
           updatedAt: 2,
           style,
-          points: [
-            { time: 10, price: 90 },
-            { time: 90, price: 10 },
-          ],
+          points: [start, end],
         },
       ],
     };
 
     const draftEntry = resolveUserDrawingRenderEntries(draftState, {
-      draftPreviewAnchor: { time: 90, price: 10 },
+      draftPreviewAnchor: end,
       draftId: 'draft-rect',
       now: 2,
     })[0];
     const committedEntry = resolveUserDrawingRenderEntries(committedState)[0];
 
+    expect(draftEntry).toBeDefined();
+    expect(committedEntry).toBeDefined();
     expect(draftEntry).toMatchObject({
       phase: 'draft',
       drawing: {
         id: 'draft-rect',
         kind: 'rectangle',
-        points: [
-          { time: 10, price: 90 },
-          { time: 90, price: 10 },
-        ],
+        points: [start, end],
       },
     });
-    expect(draftEntry?.drawing).toMatchObject({
-      ...committedEntry?.drawing,
-      id: 'draft-rect',
-    });
+    expect({ ...draftEntry!.drawing, id: 'rect' }).toEqual(committedEntry!.drawing);
   });
 
   it('keeps drag-seeded multi-anchor drafts renderable after drag release', () => {
