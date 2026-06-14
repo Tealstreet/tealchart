@@ -10,6 +10,17 @@ interface PressableProps {
   onPress?: () => void;
 }
 
+interface TextInputProps {
+  accessibilityLabel?: string;
+  autoFocus?: boolean;
+  multiline?: boolean;
+  onBlur?: () => void;
+  onChangeText?: (value: string) => void;
+  onKeyPress?: (event: { nativeEvent: { key: string } }) => void;
+  style?: unknown;
+  value?: string;
+}
+
 interface ModalProps {
   animationType?: string;
   children?: ReactNode;
@@ -51,6 +62,19 @@ export function View({ accessibilityLabel, children, onStartShouldSetResponder, 
 
 export function Text({ children }: { children?: ReactNode }) {
   return <span>{children}</span>;
+}
+
+export function TextInput({ accessibilityLabel, onBlur, onChangeText, onKeyPress, style, value }: TextInputProps) {
+  return (
+    <textarea
+      aria-label={accessibilityLabel}
+      data-style={serializeStyle(style)}
+      onBlur={onBlur}
+      onChange={(event) => onChangeText?.(event.currentTarget.value)}
+      onKeyDown={(event) => onKeyPress?.({ nativeEvent: { key: event.key } })}
+      value={value}
+    />
+  );
 }
 
 export function ScrollView({ children }: { children?: ReactNode }) {
@@ -123,4 +147,8 @@ export function TouchableWithoutFeedback({ children, onPress }: TouchableWithout
 
 export const StyleSheet = {
   create: <T,>(styles: T): T => styles,
+};
+
+export const Platform = {
+  OS: 'ios',
 };
