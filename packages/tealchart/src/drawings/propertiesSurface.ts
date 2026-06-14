@@ -58,9 +58,11 @@ interface UserDrawingPropertiesSurfaceControlBase {
   id: string;
   label: string;
   selected: boolean;
-  enabled: boolean;
+  enabled?: boolean;
   command: UserDrawingPropertiesSurfaceCommand;
 }
+
+type ResolvedUserDrawingPropertiesSurfaceControl = UserDrawingPropertiesSurfaceControl & { enabled: boolean };
 
 export type UserDrawingPropertiesSurfaceControl =
   | (UserDrawingPropertiesSurfaceControlBase & {
@@ -119,7 +121,7 @@ function enablePropertiesSurfaceControl(
   control: UserDrawingPropertiesSurfaceControlDraft,
   enabled: boolean,
 ): UserDrawingPropertiesSurfaceControl {
-  return { ...control, enabled } as UserDrawingPropertiesSurfaceControl;
+  return { ...control, enabled } as ResolvedUserDrawingPropertiesSurfaceControl;
 }
 
 export function resolveUserDrawingPropertiesSurfaceCommand(
