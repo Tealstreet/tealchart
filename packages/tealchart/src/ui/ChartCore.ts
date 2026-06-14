@@ -1438,6 +1438,10 @@ export class ChartCore {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
       },
     });
+    this.contextMenu.addEventListener('mousedown', (event) => event.stopPropagation());
+    this.contextMenu.addEventListener('mouseup', (event) => event.stopPropagation());
+    this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
+    this.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
 
     for (const item of items) {
       const menuItem = div({
@@ -1449,7 +1453,8 @@ export class ChartCore {
           opacity: item.enabled === false ? '0.5' : '1',
         },
         text: item.text,
-        onClick: () => {
+        onClick: (event) => {
+          event.stopPropagation();
           if (item.enabled === false) return;
           item.click();
           this.contextMenu?.remove();
