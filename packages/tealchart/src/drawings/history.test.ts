@@ -98,6 +98,16 @@ describe('user drawing command history', () => {
     expect(history.undoStack).toHaveLength(0);
 
     result = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setMagnetMode',
+      magnetMode: 'weak',
+      meta: { source: 'toolbar' },
+    });
+    state = result.state;
+    history = result.history;
+    expect(state.magnetMode).toBe('weak');
+    expect(history.undoStack).toHaveLength(0);
+
+    result = dispatchUserDrawingCommandWithHistory(state, history, {
       type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
       options: { createId: () => 'rect', now: () => 10, style },
@@ -126,6 +136,7 @@ describe('user drawing command history', () => {
     expect(undo.state.drawings).toHaveLength(0);
     expect(undo.state.draft).toBeNull();
     expect(undo.state.stayInDrawingMode).toBe(false);
+    expect(undo.state.magnetMode).toBe('weak');
 
     const redo = redoUserDrawingCommand(undo.state, undo.history);
     expect(redo.changed).toBe(true);
@@ -133,9 +144,10 @@ describe('user drawing command history', () => {
     expect(redo.state.selection).toEqual({ drawingId: 'rect' });
     expect(redo.state.activeTool).toBe('select');
     expect(redo.state.stayInDrawingMode).toBe(false);
+    expect(redo.state.magnetMode).toBe('weak');
   });
 
-  it('preserves current stay-in-drawing-mode across undo and redo snapshots', () => {
+  it('preserves current non-undoable drawing mode settings across undo and redo snapshots', () => {
     let state = createStateWithTrendLine();
     let history = createUserDrawingCommandHistory();
 
@@ -152,18 +164,26 @@ describe('user drawing command history', () => {
       stayInDrawingMode: false,
       meta: { source: 'toolbar' },
     }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setMagnetMode',
+      magnetMode: 'strong',
+      meta: { source: 'toolbar' },
+    }));
     expect(state.stayInDrawingMode).toBe(false);
+    expect(state.magnetMode).toBe('strong');
     expect(history.undoStack).toHaveLength(1);
 
     const undo = undoUserDrawingCommand(state, history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line']);
     expect(undo.state.stayInDrawingMode).toBe(false);
+    expect(undo.state.magnetMode).toBe('strong');
 
     const redo = redoUserDrawingCommand(undo.state, undo.history);
     expect(redo.changed).toBe(true);
     expect(redo.state.drawings).toHaveLength(0);
     expect(redo.state.stayInDrawingMode).toBe(false);
+    expect(redo.state.magnetMode).toBe('strong');
   });
 
   it('clears redo when a new committed command is recorded', () => {
