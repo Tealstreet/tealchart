@@ -143,10 +143,12 @@ export function UserDrawingSelectedActionSurfaceComponent({
                 key={item.id}
                 accessibilityRole="button"
                 accessibilityLabel={item.label}
+                accessibilityState={{ disabled: !item.enabled, selected: item.selected }}
                 disabled={!item.enabled}
                 activeOpacity={0.72}
                 style={[
                   styles.userDrawingActionButton,
+                  item.selected && styles.userDrawingActionButtonActive,
                   item.swatchColor && { backgroundColor: item.swatchColor },
                   !item.enabled && styles.userDrawingActionButtonDisabled,
                 ]}
@@ -179,10 +181,12 @@ export function UserDrawingSelectedActionSurfaceComponent({
               key={item.id}
               accessibilityRole="button"
               accessibilityLabel={item.label}
+              accessibilityState={{ disabled: !item.enabled, selected: item.selected }}
               disabled={!item.enabled}
               activeOpacity={0.72}
               style={[
                 styles.userDrawingActionButton,
+                item.selected && styles.userDrawingActionButtonActive,
                 item.swatchColor && { backgroundColor: item.swatchColor },
                 !item.enabled && styles.userDrawingActionButtonDisabled,
               ]}

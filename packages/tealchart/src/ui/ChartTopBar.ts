@@ -832,6 +832,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const btn = this.createElement('button', {
       style: {
         ...styles.drawingButton,
+        ...(item.selected ? styles.drawingButtonActive : {}),
         ...(item.swatchColor ? styles.drawingSwatch : {}),
         ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
         opacity: item.enabled ? '1' : '0.35',
@@ -842,6 +843,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         type: 'button',
         title: item.label,
         'aria-label': item.label,
+        ...(item.selected !== undefined ? { 'aria-pressed': item.selected ? 'true' : 'false' } : {}),
       },
     });
     btn.disabled = !item.enabled;
@@ -855,8 +857,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       });
       btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
       btn.addEventListener('mouseleave', () => {
-        btn.style.backgroundColor = item.swatchColor ?? 'transparent';
-        btn.style.color = 'var(--text2, #787b86)';
+        btn.style.backgroundColor =
+          item.swatchColor ?? (item.selected ? 'var(--accent-bg, rgba(41, 98, 255, 0.2))' : 'transparent');
+        btn.style.color = item.selected ? 'var(--accent, #2962ff)' : 'var(--text2, #787b86)';
       });
     }
     return btn;
