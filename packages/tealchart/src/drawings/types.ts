@@ -887,7 +887,7 @@ export interface UserDrawingState {
   version: number;
   drawings: readonly UserDrawing[];
   activeTool: UserDrawingTool;
-  stayInDrawingMode: boolean;
+  stayInDrawingMode?: boolean;
   selection: UserDrawingSelection | null;
   draft: UserDrawingDraft | null;
   textEdit: UserDrawingTextEdit | null;
