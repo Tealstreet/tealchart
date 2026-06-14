@@ -700,6 +700,10 @@ Phase 2: Properties popover
   appropriate.
 - Status: initial shared properties surface descriptors now resolve line,
   fill, text, geometry, and icon control groups for web popover consumers.
+- Status: web now includes a built-in drawing properties panel fallback when
+  no app-owned callback is supplied. The panel renders the shared line, fill,
+  text, geometry, and icon control groups, blocks chart event fallthrough, and
+  dispatches controls through the widget command/history owner.
 
 Phase 3: History and focus
 
@@ -725,6 +729,10 @@ Phase 2: Properties sheet
 - Open a mobile properties sheet for non-text drawings when appropriate.
 - Status: mobile Skia handle parity now exposes the same shared properties
   surface model for native sheet consumers.
+- Status: mobile Skia now includes a built-in drawing properties sheet fallback
+  when no app-owned callback is supplied. The sheet renders the same shared
+  properties surface and dispatches controls through the Skia command/history
+  owner.
 
 Phase 3: History and focus
 
@@ -737,8 +745,8 @@ Phase 3: History and focus
 - Status: the visual evidence matrix now records the cross-platform
   text/property edit lifecycle contract: double-click and double-tap resolve
   through the shared edit-intent model, text commits remain one history
-  transaction, and app-owned properties surfaces dispatch through the shared
-  command/control model on web Canvas and mobile Skia.
+  transaction, and built-in/app-owned properties surfaces dispatch through the
+  shared command/control model on web Canvas and mobile Skia.
 
 ## Gap 7: Keyboard and Modifier Behavior
 
