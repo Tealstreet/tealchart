@@ -54,19 +54,23 @@ export type UserDrawingPropertiesSurfaceCommand =
   | { type: 'setTrendLineExtend'; extend: UserDrawingTrendLineExtend }
   | { type: 'setIconName'; iconName: UserDrawingIconName };
 
+interface UserDrawingPropertiesSurfaceControlBase {
+  id: string;
+  label: string;
+  selected: boolean;
+  enabled?: boolean;
+  command: UserDrawingPropertiesSurfaceCommand;
+}
+
+type ResolvedUserDrawingPropertiesSurfaceControl = UserDrawingPropertiesSurfaceControl & { enabled: boolean };
+
 export type UserDrawingPropertiesSurfaceControl =
-  | {
-      id: string;
+  | (UserDrawingPropertiesSurfaceControlBase & {
       type: 'swatch';
-      label: string;
       value: string;
-      selected: boolean;
-      command: UserDrawingPropertiesSurfaceCommand;
-    }
-  | {
-      id: string;
+    })
+  | (UserDrawingPropertiesSurfaceControlBase & {
       type: 'option';
-      label: string;
       icon?: string;
       value:
         | number
@@ -79,14 +83,20 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingTextAlign
         | UserDrawingTextMaxWidth
         | UserDrawingTrendLineExtend;
-      selected: boolean;
-      command: UserDrawingPropertiesSurfaceCommand;
-    };
+    });
+
+type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
 
 export interface UserDrawingPropertiesSurfaceGroup {
   id: 'line' | 'fill' | 'text' | 'geometry' | 'icon';
   label: string;
   controls: readonly UserDrawingPropertiesSurfaceControl[];
+}
+
+interface UserDrawingPropertiesSurfaceGroupDraft {
+  id: UserDrawingPropertiesSurfaceGroup['id'];
+  label: string;
+  controls: readonly UserDrawingPropertiesSurfaceControlDraft[];
 }
 
 export interface UserDrawingPropertiesSurface {
@@ -105,6 +115,13 @@ function normalizeSurfaceColor(value: string | undefined): string {
 
 function colorsMatch(a: string | undefined, b: string): boolean {
   return normalizeSurfaceColor(a) === normalizeSurfaceColor(b);
+}
+
+function enablePropertiesSurfaceControl(
+  control: UserDrawingPropertiesSurfaceControlDraft,
+  enabled: boolean,
+): UserDrawingPropertiesSurfaceControl {
+  return { ...control, enabled } as ResolvedUserDrawingPropertiesSurfaceControl;
 }
 
 export function resolveUserDrawingPropertiesSurfaceCommand(
@@ -133,7 +150,7 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
   if (!drawing) return { drawing: null, editable: false, groups: [] };
 
   const editable = !drawing.locked;
-  const groups: UserDrawingPropertiesSurfaceGroup[] = [
+  const groups: UserDrawingPropertiesSurfaceGroupDraft[] = [
     {
       id: 'line',
       label: 'Line',
@@ -333,5 +350,12 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  return { drawing, editable, groups };
+  return {
+    drawing,
+    editable,
+    groups: groups.map((group) => ({
+      ...group,
+      controls: group.controls.map((control) => enablePropertiesSurfaceControl(control, editable)),
+    })),
+  };
 }
