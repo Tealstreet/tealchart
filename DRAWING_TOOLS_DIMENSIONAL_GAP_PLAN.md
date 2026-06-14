@@ -884,6 +884,10 @@ Phase 1: Command-backed APIs
   and mobile handles also expose explicit `hideAllUserDrawings`,
   `showAllUserDrawings`, `lockAllUserDrawings`, and `unlockAllUserDrawings`
   convenience APIs over the same command options.
+- Status: transient measure mode now has matching command-backed web widget and
+  mobile Skia handle APIs. Web Canvas and mobile Skia topbars toggle the same
+  action descriptor, and matching drag input renders a non-persistent
+  date-price range overlay without adding drawing history entries.
 
 Phase 2: Event subscriptions
 

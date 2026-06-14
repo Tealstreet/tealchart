@@ -13,6 +13,7 @@ import type {
   UserDrawingTextAnnotation,
   UserDrawingPanePosition,
   UserDrawingMagnetMode,
+  UserDrawingMeasureMode,
 } from './types';
 
 import {
@@ -132,6 +133,8 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     activeTool: 'select',
     stayInDrawingMode: true,
     magnetMode: 'off',
+    measureMode: 'off',
+    measure: null,
     selection: null,
     draft: null,
     textEdit: null,
@@ -161,6 +164,8 @@ export function setUserDrawingTool(state: UserDrawingState, tool: UserDrawingToo
     ...state,
     activeTool: tool,
     selection: tool === 'select' ? state.selection : null,
+    measureMode: 'off',
+    measure: null,
     draft: null,
     textEdit: null,
   };
@@ -179,6 +184,17 @@ export function setUserDrawingMagnetMode(state: UserDrawingState, magnetMode: Us
   return {
     ...state,
     magnetMode,
+  };
+}
+
+export function setUserDrawingMeasureMode(state: UserDrawingState, measureMode: UserDrawingMeasureMode): UserDrawingState {
+  if ((state.measureMode ?? 'off') === measureMode && !state.measure) return state;
+  return {
+    ...state,
+    measureMode,
+    measure: null,
+    draft: null,
+    textEdit: null,
   };
 }
 
@@ -207,6 +223,7 @@ export function selectUserDrawing(
     ...state,
     activeTool: 'select',
     selection,
+    measure: null,
     draft: null,
     textEdit: null,
   };
@@ -608,7 +625,16 @@ export function setUserDrawingName(
 }
 
 export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
-  if (state.drawings.length === 0 && !state.selection && !state.draft) return state;
+  if (
+    state.drawings.length === 0 &&
+    !state.selection &&
+    !state.draft &&
+    !state.textEdit &&
+    !state.measure &&
+    (state.measureMode ?? 'off') === 'off'
+  ) {
+    return state;
+  }
 
   return {
     ...state,
@@ -616,6 +642,8 @@ export function clearUserDrawings(state: UserDrawingState): UserDrawingState {
     selection: null,
     draft: null,
     textEdit: null,
+    measureMode: 'off',
+    measure: null,
   };
 }
 
@@ -922,10 +950,52 @@ export function resolveUserDrawingSelectionAtPoint(
 }
 
 export function cancelUserDrawingDraft(state: UserDrawingState): UserDrawingState {
-  if (!state.draft) return state;
+  if (!state.draft && !state.measure) return state;
   return {
     ...state,
     draft: null,
+    measure: null,
+  };
+}
+
+export function beginUserDrawingMeasure(
+  state: UserDrawingState,
+  point: UserDrawingInputPoint,
+  options: UserDrawingPlacementDragStartOptions = {},
+): UserDrawingState {
+  if ((state.measureMode ?? 'off') !== 'on') return state;
+  const anchor: readonly [UserDrawingAnchor, UserDrawingAnchor] = [point.anchor, point.anchor];
+  return {
+    ...state,
+    draft: null,
+    textEdit: null,
+    measure: {
+      paneId: point.paneId,
+      anchors: anchor,
+      style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
+      startedAt: options.now?.() ?? Date.now(),
+    },
+  };
+}
+
+export function updateUserDrawingMeasure(state: UserDrawingState, point: UserDrawingInputPoint): UserDrawingState {
+  if ((state.measureMode ?? 'off') !== 'on' || !state.measure || state.measure.paneId !== point.paneId) return state;
+  const startAnchor = state.measure.anchors[0];
+  const nextAnchors: readonly [UserDrawingAnchor, UserDrawingAnchor] = [startAnchor, point.anchor];
+  return {
+    ...state,
+    measure: {
+      ...state.measure,
+      anchors: nextAnchors,
+    },
+  };
+}
+
+export function endUserDrawingMeasure(state: UserDrawingState): UserDrawingState {
+  if (!state.measure) return state;
+  return {
+    ...state,
+    measure: null,
   };
 }
 

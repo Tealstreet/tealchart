@@ -51,6 +51,16 @@ function createStateWithTransientFields(): UserDrawingState {
       originalValue: '',
       startedAt: 400,
     },
+    measureMode: 'on',
+    measure: {
+      paneId: 'main',
+      anchors: [
+        { time: 1000, price: 10 },
+        { time: 2000, price: 20 },
+      ],
+      style: drawing.style,
+      startedAt: 500,
+    },
   });
 }
 
@@ -77,6 +87,8 @@ describe('drawing layout serialization', () => {
     expect(persisted?.selection).toBeNull();
     expect(persisted?.draft).toBeNull();
     expect(persisted?.textEdit).toBeNull();
+    expect(persisted?.measure).toBeNull();
+    expect(persisted?.measureMode).toBe('off');
   });
 
   it('round-trips stay-in-drawing-mode through layout state', () => {
@@ -3498,6 +3510,8 @@ describe('drawing layout serialization', () => {
       selection: null,
       draft: null,
       textEdit: null,
+      measureMode: 'off' as const,
+      measure: null,
     };
 
     expect(isUserDrawingLayoutStateEqual(previous, next)).toBe(true);

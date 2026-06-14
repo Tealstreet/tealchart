@@ -99,11 +99,34 @@ export function resolveUserDrawingRenderEntries(
   options: ResolveUserDrawingRenderEntriesOptions = {},
 ): UserDrawingRenderEntry[] {
   const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
-  const entries = state.drawings.map((drawing) => ({
+  const entries: UserDrawingRenderEntry[] = state.drawings.map((drawing) => ({
     drawing,
     phase: 'committed' as const,
     selected: selectedIds.has(drawing.id),
   }));
+
+  if (state.measure) {
+    const measureDrawing = createUserDrawingFromDraft(
+      {
+        tool: 'datePriceRange',
+        paneId: state.measure.paneId,
+        anchors: state.measure.anchors,
+        style: state.measure.style,
+        startedAt: state.measure.startedAt,
+      },
+      {
+        id: '__measure__',
+        now: options.now ?? state.measure.startedAt,
+      },
+    );
+    if (measureDrawing) {
+      entries.push({
+        drawing: measureDrawing,
+        phase: 'draft',
+        selected: false,
+      });
+    }
+  }
 
   if (!state.draft) return entries;
 

@@ -100,6 +100,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Callback when all user drawings should be cleared */
   onUserDrawingClearAll?: () => void;
+  /** Callback when temporary measure mode should toggle */
+  onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
   /** Callback when selected drawings should be reordered */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
@@ -1689,9 +1691,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       command: { type: 'toolbarAction' as const, action: descriptor.action },
     }))) {
       const enabled = item.enabled;
+      const active = item.command.action === 'measure' && state?.measureMode === 'on';
       const btn = this.createElement('button', {
         style: {
           ...styles.drawingButton,
+          ...(active ? styles.drawingButtonActive : {}),
           opacity: enabled ? '1' : '0.35',
           cursor: enabled ? 'pointer' : 'default',
         },
@@ -1700,6 +1704,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           type: 'button',
           title: item.label,
           'aria-label': item.label,
+          'aria-pressed': active ? 'true' : 'false',
         },
       });
       btn.disabled = !enabled;
@@ -1710,6 +1715,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           const allDrawingOptionsIncludingLocked = state
             ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
             : { drawingIds: [], includeLocked: true };
+          if (item.command.action === 'measure') this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on');
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
           if (item.command.action === 'hideAll') {
@@ -1725,8 +1731,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             this.options.onUserDrawingLockedChange?.(false, allDrawingOptionsIncludingLocked);
           }
         });
-        btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
+        btn.addEventListener('mouseenter', () => {
+          if (!active) Object.assign(btn.style, styles.drawingButtonHover);
+        });
         btn.addEventListener('mouseleave', () => {
+          if (active) {
+            Object.assign(btn.style, styles.drawingButtonActive);
+            return;
+          }
           btn.style.backgroundColor = 'transparent';
           btn.style.color = 'var(--text2, #787b86)';
         });

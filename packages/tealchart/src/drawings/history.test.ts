@@ -648,4 +648,35 @@ describe('user drawing command history', () => {
     expect(state.textEdit).toBeNull();
     expect(history.undoStack).toHaveLength(0);
   });
+
+  it('does not record temporary measure commands', () => {
+    let state = createUserDrawingState();
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setMeasureMode',
+      measureMode: 'on',
+      meta: { source: 'toolbar' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'beginMeasure',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { now: () => 70, style },
+      meta: { source: 'pointer', transactionKey: 'measure' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'updateMeasure',
+      point: { paneId: 'main', anchor: anchorB },
+      meta: { source: 'pointer', transactionKey: 'measure' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'endMeasure',
+      meta: { source: 'pointer', transactionKey: 'measure' },
+    }));
+
+    expect(state.measureMode).toBe('on');
+    expect(state.measure).toBeNull();
+    expect(state.drawings).toEqual([]);
+    expect(history.undoStack).toHaveLength(0);
+  });
 });
