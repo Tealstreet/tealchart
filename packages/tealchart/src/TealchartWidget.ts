@@ -2267,8 +2267,8 @@ export class TealchartWidget {
     }
   }
 
-  setActiveUserDrawingTool(tool: UserDrawingTool): void {
-    this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+  setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'api' } });
   }
 
   canUndoUserDrawingCommand(): boolean {
@@ -2348,12 +2348,12 @@ export class TealchartWidget {
     return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
   }
 
-  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
-    this.dispatchUserDrawingCommand({ type: 'select', drawingId, handle, meta: { source: 'api' } });
+  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'select', drawingId, handle, meta: { source: 'api' } });
   }
 
-  selectUserDrawings(drawingIds: readonly string[]): void {
-    this.dispatchUserDrawingCommand({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
+  selectUserDrawings(drawingIds: readonly string[]): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
   }
 
   addUserDrawing(drawing: UserDrawing, options: { select?: boolean } = {}): boolean {
@@ -2410,12 +2410,12 @@ export class TealchartWidget {
     this._userDrawingClipboard = null;
   }
 
-  clearUserDrawings(): void {
-    this.dispatchUserDrawingCommand({ type: 'clear', meta: { source: 'api' } });
+  clearUserDrawings(): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'clear', meta: { source: 'api' } });
   }
 
-  cancelUserDrawingDraft(): void {
-    this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'api' } });
+  cancelUserDrawingDraft(): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'api' } });
   }
 
   beginUserDrawingTextEdit(drawingId = this._userDrawingState.selection?.drawingId): boolean {

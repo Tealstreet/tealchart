@@ -9,6 +9,8 @@ import type {
   UserDrawingKeyboardAction,
   UserDrawingKeyboardInput,
   UserDrawingState,
+  UserDrawingHandleRole,
+  UserDrawingTool,
 } from '../../drawings';
 
 import {
@@ -41,6 +43,43 @@ export function commitMobileUserDrawingHandleCommand(
     commit(result.state);
   }
   return result.changed;
+}
+
+export function setMobileActiveUserDrawingTool(
+  state: UserDrawingState,
+  tool: UserDrawingTool,
+  commit: MobileUserDrawingCommit,
+): boolean {
+  return commitMobileUserDrawingHandleCommand(state, { type: 'setActiveTool', tool, meta: { source: 'api' } }, commit);
+}
+
+export function selectMobileUserDrawing(
+  state: UserDrawingState,
+  drawingId: string | null,
+  handle: UserDrawingHandleRole | undefined,
+  commit: MobileUserDrawingCommit,
+): boolean {
+  return commitMobileUserDrawingHandleCommand(
+    state,
+    { type: 'select', drawingId, handle, meta: { source: 'api' } },
+    commit,
+  );
+}
+
+export function selectMobileUserDrawings(
+  state: UserDrawingState,
+  drawingIds: readonly string[],
+  commit: MobileUserDrawingCommit,
+): boolean {
+  return commitMobileUserDrawingHandleCommand(state, { type: 'selectMany', drawingIds, meta: { source: 'api' } }, commit);
+}
+
+export function clearMobileUserDrawings(state: UserDrawingState, commit: MobileUserDrawingCommit): boolean {
+  return commitMobileUserDrawingHandleCommand(state, { type: 'clear', meta: { source: 'api' } }, commit);
+}
+
+export function cancelMobileUserDrawingDraft(state: UserDrawingState, commit: MobileUserDrawingCommit): boolean {
+  return commitMobileUserDrawingHandleCommand(state, { type: 'cancelDraft', meta: { source: 'api' } }, commit);
 }
 
 export function dispatchMobileUserDrawingHistoryCommand(
