@@ -1,3 +1,12 @@
+import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type {
+  DrawingCoordinateSpace,
+  UserDrawing,
+  UserDrawingCommandEvent,
+  UserDrawingState,
+  UserDrawingTool,
+} from './drawings';
+import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type {
   Bar,
   DatafeedConfiguration,
@@ -8,19 +17,16 @@ import type {
   TealchartWidgetOptions,
   WidgetEventCallback,
 } from './types';
-import type { DrawingCoordinateSpace, UserDrawing, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
-import type { DrawingDragEventOptions } from './interaction/EventManager';
-import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DIRTY } from './rendering/RenderScheduler';
 import {
   createUserDrawingState,
   resolveUserDrawingObjectTreeDrawingDispatchAction,
   resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingObjectTreeSelectionDispatchAction,
 } from './drawings';
+import { DIRTY } from './rendering/RenderScheduler';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
@@ -393,7 +399,10 @@ describe('TealchartWidget', () => {
         price: 100,
       };
       const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingPlacementDragStart(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
       };
 
       expect(widget.setActiveUserDrawingTool('select')).toBe(false);
@@ -902,7 +911,10 @@ describe('TealchartWidget', () => {
             paneId: string;
             anchor: { time: number; price: number };
           }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+          _handleUserDrawingPlacementDragEnd(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
@@ -967,13 +979,16 @@ describe('TealchartWidget', () => {
             paneId: string;
             anchor: { time: number; price: number };
           }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+          _handleUserDrawingPlacementDragEnd(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
-        expect(testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(
-          true,
-        );
+        expect(
+          testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } }),
+        ).toBe(true);
         expect(testWidget._handleUserDrawingPlacementDragEnd({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
           true,
         );
@@ -1028,13 +1043,16 @@ describe('TealchartWidget', () => {
             paneId: string;
             anchor: { time: number; price: number };
           }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+          _handleUserDrawingPlacementDragEnd(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
-        expect(testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(
-          true,
-        );
+        expect(
+          testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } }),
+        ).toBe(true);
         expect(testWidget._handleUserDrawingPlacementDragEnd({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
           true,
         );
@@ -1333,9 +1351,7 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
 
       expect(widget.undoUserDrawingCommand()).toBe(true);
-      expect(widget.getUserDrawingState().drawings).toEqual([
-        expect.objectContaining({ id: 'h', price: 50 }),
-      ]);
+      expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h', price: 50 })]);
     });
 
     it('applies public drawing action commands through the widget state owner', () => {
@@ -1685,6 +1701,80 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('applies public global drawing visibility and lock actions through all drawing ids', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        drawings: [
+          {
+            id: 'line',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'locked-hidden',
+            kind: 'verticalLine',
+            paneId: 'main',
+            visible: false,
+            locked: true,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            time: 20,
+          },
+        ],
+      });
+
+      expect(widget.hideAllUserDrawings()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
+        ['line', false],
+        ['locked-hidden', false],
+      ]);
+      expect(widget.hideAllUserDrawings()).toBe(false);
+
+      expect(widget.showAllUserDrawings()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
+        ['line', true],
+        ['locked-hidden', true],
+      ]);
+      expect(widget.showAllUserDrawings()).toBe(false);
+
+      expect(widget.lockAllUserDrawings()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => [drawing.id, drawing.locked])).toEqual([
+        ['line', true],
+        ['locked-hidden', true],
+      ]);
+      expect(widget.lockAllUserDrawings()).toBe(false);
+
+      expect(widget.unlockAllUserDrawings()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => [drawing.id, drawing.locked])).toEqual([
+        ['line', false],
+        ['locked-hidden', false],
+      ]);
+      expect(widget.unlockAllUserDrawings()).toBe(false);
+
+      expect(widget.clearUserDrawings()).toBe(true);
+      expect(widget.hideAllUserDrawings()).toBe(false);
+      expect(widget.showAllUserDrawings()).toBe(false);
+      expect(widget.lockAllUserDrawings()).toBe(false);
+      expect(widget.unlockAllUserDrawings()).toBe(false);
+    });
+
     it('exposes object tree model, open callback, and shared action dispatch', () => {
       const datafeed = createMockDatafeed();
       const onOpenObjectTree = vi.fn();
@@ -1730,7 +1820,9 @@ describe('TealchartWidget', () => {
         ],
       });
 
-      expect(widget.getUserDrawingObjectTreeModel().rows.map((row) => [row.drawingId, row.label, row.selected])).toEqual([
+      expect(
+        widget.getUserDrawingObjectTreeModel().rows.map((row) => [row.drawingId, row.label, row.selected]),
+      ).toEqual([
         ['target', 'Rectangle', false],
         ['line', 'Breakout', true],
       ]);
@@ -1770,8 +1862,13 @@ describe('TealchartWidget', () => {
         locked: false,
       });
 
-      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'select', drawingId: 'target', additive: true })).toBe(true);
-      const selectedHideAction = resolveUserDrawingObjectTreeSelectionDispatchAction(widget.getUserDrawingObjectTreeModel(), 'hide');
+      expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'select', drawingId: 'target', additive: true })).toBe(
+        true,
+      );
+      const selectedHideAction = resolveUserDrawingObjectTreeSelectionDispatchAction(
+        widget.getUserDrawingObjectTreeModel(),
+        'hide',
+      );
       expect(selectedHideAction).toEqual({
         type: 'hide',
         drawingIds: ['line', 'target'],
@@ -1789,7 +1886,12 @@ describe('TealchartWidget', () => {
         'rename',
         { name: 'Range box' },
       );
-      expect(renameTargetAction).toEqual({ type: 'rename', drawingId: 'target', name: 'Range box', includeLocked: undefined });
+      expect(renameTargetAction).toEqual({
+        type: 'rename',
+        drawingId: 'target',
+        name: 'Range box',
+        includeLocked: undefined,
+      });
       expect(renameTargetAction && widget.dispatchUserDrawingObjectTreeAction(renameTargetAction)).toBe(true);
       expect(widget.getUserDrawingObjectTreeModel().rows[0]).toMatchObject({
         drawingId: 'target',
@@ -1932,9 +2034,9 @@ describe('TealchartWidget', () => {
       expect(widget.openUserDrawingObjectTree().rows).toHaveLength(1);
       expect(widget.openUserDrawingProperties('missing')).toBeNull();
       expect(widget.getUserDrawingPropertiesIntent('missing')).toBeNull();
-      expect(widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'locked', includeLocked: true })).toBe(
-        true,
-      );
+      expect(
+        widget.updateUserDrawingStyle({ lineColor: '#ffffff' }, { drawingId: 'locked', includeLocked: true }),
+      ).toBe(true);
     });
 
     it('applies public image source commands through the widget state owner', () => {
@@ -2007,14 +2109,24 @@ describe('TealchartWidget', () => {
         ],
       });
 
-      expect(widget.setUserDrawingTableCells([['Metric', 'Value'], ['Price', 101.25]])).toBe(true);
+      expect(
+        widget.setUserDrawingTableCells([
+          ['Metric', 'Value'],
+          ['Price', 101.25],
+        ]),
+      ).toBe(true);
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
         cells: [
           ['Metric', 'Value'],
           ['Price', '101.25'],
         ],
       });
-      expect(widget.setUserDrawingTableCells([['Metric', 'Value'], ['Price', '101.25']])).toBe(false);
+      expect(
+        widget.setUserDrawingTableCells([
+          ['Metric', 'Value'],
+          ['Price', '101.25'],
+        ]),
+      ).toBe(false);
       expect(widget.setUserDrawingTableCell(1, 1, 102.5)).toBe(true);
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
         cells: [
@@ -2180,7 +2292,10 @@ describe('TealchartWidget', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingPlacementDragStart(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
       };
       widget.setActiveUserDrawingTool('rectangle');
 

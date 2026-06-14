@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 import {
+  getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
@@ -967,6 +968,45 @@ describe('user drawing toolbar descriptors', () => {
         'unlockAll',
       ),
     ).toBe(false);
+  });
+
+  it('builds all-drawings update options for shared web and mobile actions', () => {
+    const globalActionState: UserDrawingState = {
+      ...state,
+      drawings: [
+        {
+          id: 'line',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 10,
+        },
+        {
+          id: 'locked-hidden',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: false,
+          locked: true,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 12,
+        },
+      ],
+    };
+
+    expect(getUserDrawingAllDrawingsUpdateOptions(globalActionState)).toEqual({
+      drawingIds: ['line', 'locked-hidden'],
+    });
+    expect(getUserDrawingAllDrawingsUpdateOptions(globalActionState, { includeLocked: true })).toEqual({
+      drawingIds: ['line', 'locked-hidden'],
+      includeLocked: true,
+    });
+    expect(getUserDrawingAllDrawingsUpdateOptions(state)).toEqual({ drawingIds: [] });
   });
 
   it('describes selected-drawing style controls in stable order', () => {

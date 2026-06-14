@@ -22,6 +22,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   getSelectedUserDrawing,
+  getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -899,20 +900,26 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       accessibilityState={{ disabled: !enabled }}
                       disabled={!enabled}
                       onPress={() => {
-                        const drawingIds = userDrawingState.drawings.map((drawing) => drawing.id);
+                        const allDrawingOptions = getUserDrawingAllDrawingsUpdateOptions(userDrawingState);
+                        const allDrawingOptionsIncludingLocked = getUserDrawingAllDrawingsUpdateOptions(
+                          userDrawingState,
+                          {
+                            includeLocked: true,
+                          },
+                        );
                         if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                         if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
                         if (descriptor.action === 'hideAll') {
-                          onUserDrawingVisibilityChange?.(false, { drawingIds, includeLocked: true });
+                          onUserDrawingVisibilityChange?.(false, allDrawingOptionsIncludingLocked);
                         }
                         if (descriptor.action === 'showAll') {
-                          onUserDrawingVisibilityChange?.(true, { drawingIds, includeLocked: true });
+                          onUserDrawingVisibilityChange?.(true, allDrawingOptionsIncludingLocked);
                         }
                         if (descriptor.action === 'lockAll') {
-                          onUserDrawingLockedChange?.(true, { drawingIds });
+                          onUserDrawingLockedChange?.(true, allDrawingOptions);
                         }
                         if (descriptor.action === 'unlockAll') {
-                          onUserDrawingLockedChange?.(false, { drawingIds, includeLocked: true });
+                          onUserDrawingLockedChange?.(false, allDrawingOptionsIncludingLocked);
                         }
                       }}
                       style={({ pressed }: PressableStyleState) => [
