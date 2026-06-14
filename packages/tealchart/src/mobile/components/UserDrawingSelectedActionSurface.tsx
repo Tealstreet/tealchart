@@ -45,7 +45,10 @@ export function UserDrawingSelectedActionSurfaceComponent({
   const [activePopoverGroupId, setActivePopoverGroupId] = useState<string | null>(null);
   if (!shouldRenderUserDrawingSelectedActionSurface(state, anchor)) return null;
 
-  const dispatchItem = (item: UserDrawingSelectedActionSurface['groups'][number]['items'][number]) => {
+  const dispatchItem = (
+    item: UserDrawingSelectedActionSurface['groups'][number]['items'][number],
+    options: { keepPopoverOpen?: boolean } = {},
+  ) => {
     dispatchMobileUserDrawingActionCommand(item.command, {
       state,
       source: 'toolbar',
@@ -54,7 +57,9 @@ export function UserDrawingSelectedActionSurfaceComponent({
       onUserDrawingPropertiesOpen,
       onUserDrawingObjectTreeOpen,
     });
-    setActivePopoverGroupId(null);
+    if (!options.keepPopoverOpen) {
+      setActivePopoverGroupId(null);
+    }
   };
 
   return (
@@ -116,7 +121,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
                         item.swatchColor && { backgroundColor: item.swatchColor },
                         !item.enabled && styles.userDrawingActionButtonDisabled,
                       ]}
-                      onPress={() => dispatchItem(item)}
+                      onPress={() => dispatchItem(item, { keepPopoverOpen: true })}
                     >
                       <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
                         {item.icon}
