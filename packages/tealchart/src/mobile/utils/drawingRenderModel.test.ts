@@ -131,6 +131,65 @@ describe('mobile user drawing render model', () => {
     ]);
   });
 
+  it('resolves drag placement draft previews to the same Skia geometry as committed drawings', () => {
+    const draftState: UserDrawingState = {
+      version: 1,
+      activeTool: 'rectangle',
+      selection: null,
+      drawings: [],
+      draft: {
+        tool: 'rectangle',
+        paneId: 'main',
+        anchors: [{ time: 10, price: 90 }],
+        style,
+        startedAt: 2,
+      },
+      textEdit: null,
+    };
+    const committedState: UserDrawingState = {
+      ...draftState,
+      activeTool: 'select',
+      draft: null,
+      selection: { drawingId: 'rect' },
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+      ],
+    };
+
+    const [draftPrimitive] = resolveMobileUserDrawingRenderModel(draftState, new Map([[space.pane.id, space]]), {
+      draftPreviewAnchor: { time: 90, price: 10 },
+      draftId: 'draft-rect',
+      draftOpacity: 1,
+    });
+    const [committedPrimitive] = resolveMobileUserDrawingRenderModel(committedState, new Map([[space.pane.id, space]]));
+
+    expect(draftPrimitive).toMatchObject({
+      id: 'draft-rect',
+      kind: 'rectangle',
+      phase: 'draft',
+      rect: { x: 10, y: 10, width: 80, height: 80 },
+    });
+    expect(draftPrimitive).toMatchObject({
+      ...committedPrimitive,
+      id: 'draft-rect',
+      phase: 'draft',
+      selected: false,
+    });
+  });
+
   it('keeps drag-seeded multi-anchor drafts visible for Skia after drag release', () => {
     const state: UserDrawingState = {
       version: 1,
