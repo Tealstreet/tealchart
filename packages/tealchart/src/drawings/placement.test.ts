@@ -169,6 +169,34 @@ describe('user drawing placement modes', () => {
     },
   );
 
+  it('constrains cyclic line placement drags to a horizontal interval baseline', () => {
+    const constrained = resolveUserDrawingPlacementConstraint({
+      tool: 'cyclicLines',
+      startPoint: point(10, 90),
+      currentPoint: point(30, 80),
+      spacesByPaneId: new Map([['main', space]]),
+      options: { constrainedPlacement: true },
+    });
+
+    expect(constrained.anchor).toEqual({ time: 30, price: 90 });
+  });
+
+  it.each(['timeCycles', 'sineLine'] satisfies UserDrawingTool[])(
+    'keeps %s placement unconstrained until amplitude-safe semantics exist',
+    (tool) => {
+      const current = point(30, 80);
+      expect(
+        resolveUserDrawingPlacementConstraint({
+          tool,
+          startPoint: point(10, 90),
+          currentPoint: current,
+          spacesByPaneId: new Map([['main', space]]),
+          options: { constrainedPlacement: true },
+        }),
+      ).toBe(current);
+    },
+  );
+
   it('leaves placement unchanged when constraints are disabled or unsupported', () => {
     const current = point(30, 80);
     expect(
