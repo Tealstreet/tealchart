@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { resolveUserDrawingObjectTreeModel } from '../../drawings';
+import { clearChartStoreCache } from '../../state/chartState';
 import { UserDrawingObjectTreeSheet } from './UserDrawingObjectTreeSheet';
 
 const state: UserDrawingState = {
@@ -45,6 +46,7 @@ const state: UserDrawingState = {
 describe('UserDrawingObjectTreeSheet', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('renders the shared object tree model and dispatches row actions', () => {
@@ -75,6 +77,21 @@ describe('UserDrawingObjectTreeSheet', () => {
       drawingIds: ['target'],
       includeLocked: undefined,
     });
+    fireEvent.click(screen.getAllByLabelText('Send drawing to back')[0]!);
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'sendToBack',
+      drawingIds: ['target'],
+      includeLocked: undefined,
+    });
+    const bringToFrontButtons = screen.getAllByLabelText('Bring drawing to front');
+    fireEvent.click(bringToFrontButtons[bringToFrontButtons.length - 1]!);
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'bringToFront',
+      drawingIds: ['line'],
+      includeLocked: undefined,
+    });
+    expect(screen.getAllByText('Top').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Back').length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByLabelText('Close drawing object tree'));
     expect(onClose).toHaveBeenCalledTimes(1);
