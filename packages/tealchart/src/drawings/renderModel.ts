@@ -48,6 +48,7 @@ export interface UserDrawingPressureStrokeSegment {
   start: DrawingScreenPoint;
   end: DrawingScreenPoint;
   lineWidth: number;
+  lineDashOffset: number;
 }
 
 const DEFAULT_SELECTION_ACTION_PADDING = 8;
@@ -59,32 +60,36 @@ function resolvePressureStrokeWidth(lineWidth: number, pressure: number): number
   return Math.max(1, baseWidth * (PRESSURE_STROKE_MIN_FACTOR + (1 - PRESSURE_STROKE_MIN_FACTOR) * pressure));
 }
 
+function distanceBetweenScreenPoints(a: DrawingScreenPoint, b: DrawingScreenPoint): number {
+  return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
 export function resolveUserDrawingPressureStrokeSegments(
   anchors: readonly UserDrawingAnchor[],
   points: readonly DrawingScreenPoint[],
   lineWidth: number,
-  lineStyle: UserDrawingLineStyle,
+  _lineStyle: UserDrawingLineStyle,
 ): UserDrawingPressureStrokeSegment[] {
-  if (
-    lineStyle !== 'solid' ||
-    anchors.length < 2 ||
-    points.length < 2 ||
-    anchors.every((anchor) => anchor.pressure === undefined)
-  ) {
+  if (anchors.length < 2 || points.length < 2 || anchors.every((anchor) => anchor.pressure === undefined)) {
     return [];
   }
 
   const count = Math.min(anchors.length, points.length);
   const segments: UserDrawingPressureStrokeSegment[] = [];
+  let lineDashOffset = 0;
   for (let index = 0; index < count - 1; index += 1) {
     const startAnchor = anchors[index]!;
     const endAnchor = anchors[index + 1]!;
+    const start = points[index]!;
+    const end = points[index + 1]!;
     const pressure = ((startAnchor.pressure ?? 1) + (endAnchor.pressure ?? 1)) / 2;
     segments.push({
-      start: points[index]!,
-      end: points[index + 1]!,
+      start,
+      end,
       lineWidth: resolvePressureStrokeWidth(lineWidth, pressure),
+      lineDashOffset,
     });
+    lineDashOffset += distanceBetweenScreenPoints(start, end);
   }
   return segments;
 }
