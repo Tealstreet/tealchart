@@ -427,6 +427,7 @@ export {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingLineWidthDescriptors,
+  getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,

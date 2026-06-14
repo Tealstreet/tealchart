@@ -743,6 +743,10 @@ export const USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS: readonly UserDrawingO
   { opacity: 0.1, label: '10 percent highlighter opacity' },
 ] as const;
 
+export function getUserDrawingLineWidthPreviewFontSize(width: number): number {
+  return Math.min(10 + width, 20);
+}
+
 export function getUserDrawingLineWidthDescriptors(drawing: UserDrawing): readonly UserDrawingLineWidthDescriptor[] {
   if (drawing.kind === 'highlighter') return USER_DRAWING_HIGHLIGHTER_LINE_WIDTH_DESCRIPTORS;
   if (isUserDrawingPathFamilyTool(drawing.kind)) return USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS;

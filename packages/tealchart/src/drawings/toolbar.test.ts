@@ -6,6 +6,7 @@ import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 import {
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
@@ -1020,6 +1021,7 @@ describe('user drawing toolbar descriptors', () => {
       '#d1d4dc',
     ]);
     expect(USER_DRAWING_LINE_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.width)).toEqual([1, 2, 3, 4, 5]);
+    expect([1, 8, 28].map(getUserDrawingLineWidthPreviewFontSize)).toEqual([11, 18, 20]);
     expect(USER_DRAWING_LINE_STYLE_DESCRIPTORS.map((descriptor) => descriptor.lineStyle)).toEqual([
       'solid',
       'dashed',

@@ -18,6 +18,7 @@ import {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingLineWidthDescriptors,
+  getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
@@ -1063,7 +1064,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             ...(isActive ? styles.drawingButtonActive : {}),
             opacity: styleEnabled ? '1' : '0.35',
             cursor: styleEnabled ? 'pointer' : 'default',
-            fontSize: `${10 + descriptor.width}px`,
+            fontSize: `${getUserDrawingLineWidthPreviewFontSize(descriptor.width)}px`,
           },
           textContent: '━',
           attributes: {
