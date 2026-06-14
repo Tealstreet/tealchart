@@ -428,6 +428,7 @@ export type {
   UserDrawingFontWeight,
   UserDrawingFontWeightDescriptor,
   UserDrawingLineStyle,
+  UserDrawingMagnetMode,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
   ResolveUserDrawingObjectTreeRowDispatchActionOptions,
