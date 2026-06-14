@@ -425,6 +425,29 @@ describe('user drawing command dispatch', () => {
     ).toEqual(commitUserDrawingPlacementDrag(started, secondPoint, { createId: () => 'rect-1', now: () => 63, style }));
   });
 
+  it('keeps active placement drafts unchanged when commit arrives from another pane', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const started = dispatchUserDrawingCommand(state, {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { now: () => 64, style },
+      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+    });
+    const committed = dispatchUserDrawingCommand(started.state, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'indicator', anchor: anchorB },
+      options: { createId: () => 'cross-pane-rect', now: () => 65, style },
+      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(started.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
+    expect(committed.changed).toBe(false);
+    expect(committed.state).toBe(started.state);
+    expect(committed.state.drawings).toEqual([]);
+    expect(committed.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
+  });
+
   it('wraps point selection and edit drag reducers with hit metadata', () => {
     const state = createStateWithTrendLine();
     const hitPoint = { x: 100, y: 200 };
