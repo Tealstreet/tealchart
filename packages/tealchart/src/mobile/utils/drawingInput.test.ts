@@ -132,7 +132,7 @@ describe('mobile user drawing input resolver', () => {
     ).toBe(true);
   });
 
-  it.each(['rectangle', 'gannSquare', 'fibCircles'] satisfies UserDrawingTool[])(
+  it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(
     'feeds constrained %s placement geometry from resolved mobile touch anchors',
     (tool) => {
       const viewport = {
