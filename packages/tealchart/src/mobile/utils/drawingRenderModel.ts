@@ -1599,6 +1599,7 @@ function primitiveFromGeometry(
           pathDrawing.points,
           geometry.polyline.points,
           geometry.drawing.style.lineWidth,
+          geometry.drawing.style.lineStyle,
         ),
         style: geometry.drawing.style,
       };

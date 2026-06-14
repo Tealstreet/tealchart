@@ -68,6 +68,7 @@ describe('user drawing render model', () => {
           { x: 90, y: 10 },
         ],
         8,
+        'solid',
       ),
     ).toEqual([
       { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2 },
@@ -87,8 +88,25 @@ describe('user drawing render model', () => {
           { x: 50, y: 50 },
         ],
         8,
+        'solid',
       ),
     ).toEqual([]);
+  });
+
+  it('preserves dashed and dotted freehand paths on the continuous single-stroke render path', () => {
+    const anchors = [
+      { time: 10, price: 90, pressure: 0 },
+      { time: 50, price: 50, pressure: 0 },
+      { time: 90, price: 90, pressure: 1 },
+    ];
+    const points = [
+      { x: 10, y: 10 },
+      { x: 50, y: 50 },
+      { x: 90, y: 10 },
+    ];
+
+    expect(resolveUserDrawingPressureStrokeSegments(anchors, points, 8, 'dashed')).toEqual([]);
+    expect(resolveUserDrawingPressureStrokeSegments(anchors, points, 8, 'dotted')).toEqual([]);
   });
 
   it('marks committed selection and appends draft previews', () => {

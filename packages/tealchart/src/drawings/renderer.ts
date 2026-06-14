@@ -160,6 +160,7 @@ function renderPathGeometry(
     pathDrawing.points,
     geometry.polyline.points,
     geometry.drawing.style.lineWidth,
+    geometry.drawing.style.lineStyle,
   );
   if (pressureSegments.length > 0) {
     for (const segment of pressureSegments) {

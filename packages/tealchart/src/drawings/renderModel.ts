@@ -1,5 +1,5 @@
 import type { DrawingCoordinateSpace, DrawingScreenPoint, DrawingScreenRect } from './coordinates';
-import type { UserDrawing, UserDrawingAnchor, UserDrawingState } from './types';
+import type { UserDrawing, UserDrawingAnchor, UserDrawingLineStyle, UserDrawingState } from './types';
 
 import {
   anchorToScreenPoint,
@@ -63,8 +63,16 @@ export function resolveUserDrawingPressureStrokeSegments(
   anchors: readonly UserDrawingAnchor[],
   points: readonly DrawingScreenPoint[],
   lineWidth: number,
+  lineStyle: UserDrawingLineStyle,
 ): UserDrawingPressureStrokeSegment[] {
-  if (anchors.length < 2 || points.length < 2 || anchors.every((anchor) => anchor.pressure === undefined)) return [];
+  if (
+    lineStyle !== 'solid' ||
+    anchors.length < 2 ||
+    points.length < 2 ||
+    anchors.every((anchor) => anchor.pressure === undefined)
+  ) {
+    return [];
+  }
 
   const count = Math.min(anchors.length, points.length);
   const segments: UserDrawingPressureStrokeSegment[] = [];
