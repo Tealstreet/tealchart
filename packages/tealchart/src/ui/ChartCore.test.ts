@@ -481,6 +481,38 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('cleans up ChartCore context menu listeners when menus are replaced or disposed', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onContextMenu = vi.fn(() => [
+      { position: 'top' as const, text: 'Fallback action', click: vi.fn() },
+    ]);
+    const addDocumentListener = vi.spyOn(document, 'addEventListener');
+    const removeDocumentListener = vi.spyOn(document, 'removeEventListener');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu,
+    });
+    const testCore = core as unknown as {
+      handleContextMenu(screenX: number, screenY: number, price: number, time: number): void;
+    };
+
+    testCore.handleContextMenu(100, 100, 10, 20);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(addDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
+
+    testCore.handleContextMenu(120, 120, 11, 21);
+    expect(removeDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    core.dispose();
+    expect(removeDocumentListener).toHaveBeenCalledWith('click', expect.any(Function));
+
+    addDocumentListener.mockRestore();
+    removeDocumentListener.mockRestore();
+  });
+
   it('applies constrained placement options through ChartCore preview and commit', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingPlacementDragStart = vi.fn(() => true);
