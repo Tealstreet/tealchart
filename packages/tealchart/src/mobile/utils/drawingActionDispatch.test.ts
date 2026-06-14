@@ -87,9 +87,20 @@ describe('mobile drawing action dispatch', () => {
     expect(handled).toBe(true);
     expect(onOpenObjectTree).toHaveBeenCalledWith({
       drawingCount: 2,
+      groups: [
+        {
+          id: 'pane:main',
+          label: 'Main chart',
+          paneId: 'main',
+          rowIds: ['range', 'line'],
+          drawingIds: ['range', 'line'],
+          orderIndex: 0,
+          drawingCount: 2,
+        },
+      ],
       rows: [
-        expect.objectContaining({ drawingId: 'range', label: 'Rectangle', selected: false }),
-        expect.objectContaining({ drawingId: 'line', label: 'Breakout', selected: true }),
+        expect.objectContaining({ drawingId: 'range', groupIds: ['pane:main'], label: 'Rectangle', selected: false }),
+        expect.objectContaining({ drawingId: 'line', groupIds: ['pane:main'], label: 'Breakout', selected: true }),
       ],
       selectedIds: ['line'],
     });
