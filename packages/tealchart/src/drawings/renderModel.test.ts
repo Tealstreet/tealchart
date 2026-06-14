@@ -11,6 +11,12 @@ import {
   resolveUserDrawingScreenBounds,
   resolveUserDrawingSelectionActionAnchor,
 } from './renderModel';
+import {
+  beginUserDrawingMeasure,
+  createUserDrawingState,
+  setUserDrawingMeasureMode,
+  updateUserDrawingMeasure,
+} from './input';
 
 const style: UserDrawingStyle = {
   lineColor: '#f5c542',
@@ -52,6 +58,32 @@ const lowerPaneSpace: DrawingCoordinateSpace = {
 describe('user drawing render model', () => {
   afterEach(() => {
     clearChartStoreCache();
+  });
+
+  it('renders temporary measure overlays as draft date-price ranges', () => {
+    const started = beginUserDrawingMeasure(
+      setUserDrawingMeasureMode(createUserDrawingState(), 'on'),
+      { paneId: 'main', anchor: { time: 10, price: 20 } },
+      { now: () => 5, style },
+    );
+    const measured = updateUserDrawingMeasure(started, { paneId: 'main', anchor: { time: 30, price: 50 } });
+
+    const entries = resolveUserDrawingRenderEntries(measured);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      phase: 'draft',
+      selected: false,
+      drawing: {
+        id: '__measure__',
+        kind: 'datePriceRange',
+        paneId: 'main',
+        points: [
+          { time: 10, price: 20 },
+          { time: 30, price: 50 },
+        ],
+      },
+    });
   });
 
   it('derives pressure-weighted stroke segments from matched anchors and screen points', () => {

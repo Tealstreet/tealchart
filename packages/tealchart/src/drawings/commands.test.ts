@@ -33,6 +33,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingLocked,
   setUserDrawingMagnetMode,
+  setUserDrawingMeasureMode,
   setUserDrawingName,
   setUserDrawingStayInDrawingMode,
   setUserDrawingTableCells,
@@ -74,6 +75,7 @@ const coveredUserDrawingCommandTypes = [
   'setActiveTool',
   'setStayInDrawingMode',
   'setMagnetMode',
+  'setMeasureMode',
   'add',
   'select',
   'selectMany',
@@ -90,6 +92,9 @@ const coveredUserDrawingCommandTypes = [
   'handleInput',
   'beginPlacementDrag',
   'commitPlacementDrag',
+  'beginMeasure',
+  'updateMeasure',
+  'endMeasure',
   'beginPathDrag',
   'appendPathDragPoint',
   'commitPathDrag',
@@ -253,6 +258,44 @@ describe('user drawing command dispatch', () => {
 
     expect(unchanged.state).toBe(command.state);
     expect(unchanged.changed).toBe(false);
+  });
+
+  it('wraps temporary measure commands without creating drawings', () => {
+    const initial = createUserDrawingState();
+    const direct = setUserDrawingMeasureMode(initial, 'on');
+    const command = dispatchUserDrawingCommand(initial, {
+      type: 'setMeasureMode',
+      measureMode: 'on',
+      meta: { source: 'toolbar', timestamp: 4 },
+    });
+
+    expect(command.state).toEqual(direct);
+    expect(command.changed).toBe(true);
+
+    const started = dispatchUserDrawingCommand(command.state, {
+      type: 'beginMeasure',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { now: () => 20, style },
+      meta: { source: 'pointer' },
+    });
+    expect(started.state.drawings).toEqual([]);
+    expect(started.state.measure?.anchors).toEqual([anchorA, anchorA]);
+
+    const moved = dispatchUserDrawingCommand(started.state, {
+      type: 'updateMeasure',
+      point: { paneId: 'main', anchor: anchorB },
+      meta: { source: 'pointer' },
+    });
+    expect(moved.state.drawings).toEqual([]);
+    expect(moved.state.measure?.anchors).toEqual([anchorA, anchorB]);
+
+    const ended = dispatchUserDrawingCommand(moved.state, {
+      type: 'endMeasure',
+      meta: { source: 'pointer' },
+    });
+    expect(ended.state.measure).toBeNull();
+    expect(ended.state.measureMode).toBe('on');
+    expect(ended.state.drawings).toEqual([]);
   });
 
   it('derives affected drawing ids for reorder command events', () => {

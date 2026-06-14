@@ -66,6 +66,7 @@ function createHistorySnapshot(state: UserDrawingState): UserDrawingState {
     activeTool: state.activeTool,
     stayInDrawingMode: state.stayInDrawingMode !== false,
     magnetMode: state.magnetMode ?? 'off',
+    measureMode: state.measureMode ?? 'off',
     selection: state.selection,
   });
 }
@@ -75,6 +76,7 @@ function applyHistorySnapshot(snapshot: UserDrawingState, currentState: UserDraw
     ...snapshot,
     stayInDrawingMode: currentState.stayInDrawingMode !== false,
     magnetMode: currentState.magnetMode ?? 'off',
+    measureMode: currentState.measureMode ?? 'off',
   });
 }
 
@@ -83,12 +85,16 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'setActiveTool':
     case 'setStayInDrawingMode':
     case 'setMagnetMode':
+    case 'setMeasureMode':
     case 'select':
     case 'selectMany':
     case 'selectAtPoint':
     case 'beginEditDragAtPoint':
     case 'cancelDraft':
     case 'beginPlacementDrag':
+    case 'beginMeasure':
+    case 'updateMeasure':
+    case 'endMeasure':
     case 'beginPathDrag':
     case 'appendPathDragPoint':
     case 'beginTextEdit':
