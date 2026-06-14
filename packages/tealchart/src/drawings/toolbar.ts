@@ -1,3 +1,5 @@
+import type { UserDrawingZOrderAction } from './input';
+import type { UserDrawingSelectionActionAnchor } from './renderModel';
 import type {
   UserDrawing,
   UserDrawingFontFamily,
@@ -9,29 +11,27 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTextMaxWidth,
-  UserDrawingTrendLineExtend,
   UserDrawingTool,
+  UserDrawingTrendLineExtend,
 } from './types';
-import type { UserDrawingZOrderAction } from './input';
-import type { UserDrawingSelectionActionAnchor } from './renderModel';
 
+import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 import {
   DEFAULT_USER_DRAWING_STYLE,
-  USER_DRAWING_ICON_NAMES,
   isUserDrawingTextAnnotation,
+  normalizeUserDrawingFontFamily,
+  normalizeUserDrawingFontSize,
+  normalizeUserDrawingOpacity,
+  normalizeUserDrawingTextMaxWidth,
   USER_DRAWING_FONT_FAMILIES,
+  USER_DRAWING_FONT_SIZES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_FONT_WEIGHTS,
-  USER_DRAWING_FONT_SIZES,
+  USER_DRAWING_ICON_NAMES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
-  normalizeUserDrawingFontSize,
-  normalizeUserDrawingFontFamily,
-  normalizeUserDrawingOpacity,
-  normalizeUserDrawingTextMaxWidth,
 } from './types';
-import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
 
 export type UserDrawingToolbarAction =
   | 'duplicateSelected'
@@ -41,10 +41,21 @@ export type UserDrawingToolbarAction =
   | 'bringToFront'
   | 'sendToBack'
   | 'cancelDraft'
-  | 'clearAll';
+  | 'clearAll'
+  | 'hideAll'
+  | 'showAll'
+  | 'lockAll'
+  | 'unlockAll';
+export type UserDrawingGlobalToolbarAction =
+  | 'cancelDraft'
+  | 'clearAll'
+  | 'hideAll'
+  | 'showAll'
+  | 'lockAll'
+  | 'unlockAll';
 export type UserDrawingStyleToolbarAction = 'hideSelected' | 'showSelected' | 'lockSelected' | 'unlockSelected';
 export type UserDrawingSelectedActionSurfaceAction =
-  | Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>
+  | Exclude<UserDrawingToolbarAction, UserDrawingGlobalToolbarAction>
   | UserDrawingStyleToolbarAction
   | 'openProperties'
   | 'openObjectTree'
@@ -79,7 +90,7 @@ export type UserDrawingSelectedActionSurfaceCommand =
     }
   | {
       type: 'toolbarAction';
-      action: Exclude<UserDrawingToolbarAction, 'cancelDraft' | 'clearAll'>;
+      action: Exclude<UserDrawingToolbarAction, UserDrawingGlobalToolbarAction>;
     }
   | {
       type: 'styleAction';
@@ -526,7 +537,26 @@ export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolba
   { action: 'sendToBack', icon: '⇩', label: 'Send selected drawing to back' },
   { action: 'cancelDraft', icon: '×', label: 'Cancel draft drawing' },
   { action: 'clearAll', icon: '⌧', label: 'Clear all drawings' },
+  { action: 'hideAll', icon: '◌', label: 'Hide all drawings' },
+  { action: 'showAll', icon: '●', label: 'Show all drawings' },
+  { action: 'lockAll', icon: '🔒', label: 'Lock all drawings' },
+  { action: 'unlockAll', icon: '🔓', label: 'Unlock all drawings' },
 ] as const;
+
+const USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS: ReadonlySet<UserDrawingToolbarAction> = new Set([
+  'cancelDraft',
+  'clearAll',
+  'hideAll',
+  'showAll',
+  'lockAll',
+  'unlockAll',
+]);
+
+export function isUserDrawingGlobalToolbarAction(
+  action: UserDrawingToolbarAction,
+): action is UserDrawingGlobalToolbarAction {
+  return USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS.has(action);
+}
 
 export function getUserDrawingZOrderAction(action: UserDrawingToolbarAction): UserDrawingZOrderAction | null {
   switch (action) {
@@ -907,11 +937,15 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const textMaxWidthEnabled = textWrapEnabled && selectedDrawing.style.textWrap === true;
   const narrowerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, -1) : null;
   const widerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, 1) : null;
-  const nextTextAlign = supportsUserDrawingTextAlignControls(selectedDrawing) ? getNextUserDrawingTextAlign(selectedDrawing) : null;
+  const nextTextAlign = supportsUserDrawingTextAlignControls(selectedDrawing)
+    ? getNextUserDrawingTextAlign(selectedDrawing)
+    : null;
   const nextTrendLineExtend = supportsUserDrawingTrendLineExtendControls(selectedDrawing)
     ? getNextUserDrawingTrendLineExtend(selectedDrawing)
     : null;
-  const nextIconName = supportsUserDrawingIconControls(selectedDrawing) ? getNextUserDrawingIconName(selectedDrawing) : null;
+  const nextIconName = supportsUserDrawingIconControls(selectedDrawing)
+    ? getNextUserDrawingIconName(selectedDrawing)
+    : null;
   const fillColorItem: UserDrawingSelectedActionSurfaceItem | null = nextFillColor
     ? {
         id: `fillColor:${nextFillColor}`,
@@ -990,7 +1024,10 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
     ? {
         id: 'textUnderline:toggle',
         icon: 'U',
-        label: selectedDrawing.style.textUnderline === true ? 'Remove selected drawing underline' : 'Underline selected drawing text',
+        label:
+          selectedDrawing.style.textUnderline === true
+            ? 'Remove selected drawing underline'
+            : 'Underline selected drawing text',
         enabled: richTextEnabled,
         command: { type: 'updateStyle', style: { textUnderline: selectedDrawing.style.textUnderline !== true } },
       }
@@ -999,7 +1036,10 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
     ? {
         id: 'textLineThrough:toggle',
         icon: 'S',
-        label: selectedDrawing.style.textLineThrough === true ? 'Remove selected drawing strike-through' : 'Strike selected drawing text',
+        label:
+          selectedDrawing.style.textLineThrough === true
+            ? 'Remove selected drawing strike-through'
+            : 'Strike selected drawing text',
         enabled: richTextEnabled,
         command: { type: 'updateStyle', style: { textLineThrough: selectedDrawing.style.textLineThrough !== true } },
       }
@@ -1021,7 +1061,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         id: 'textMaxWidth:decrease',
         icon: '↤',
         label:
-          narrowerTextMaxWidth === null ? 'Decrease selected drawing text box width' : `${narrowerTextMaxWidth} pixel text box width`,
+          narrowerTextMaxWidth === null
+            ? 'Decrease selected drawing text box width'
+            : `${narrowerTextMaxWidth} pixel text box width`,
         enabled: narrowerTextMaxWidth !== null,
         command: {
           type: 'updateStyle',
@@ -1033,7 +1075,10 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
     ? {
         id: 'textMaxWidth:increase',
         icon: '↦',
-        label: widerTextMaxWidth === null ? 'Increase selected drawing text box width' : `${widerTextMaxWidth} pixel text box width`,
+        label:
+          widerTextMaxWidth === null
+            ? 'Increase selected drawing text box width'
+            : `${widerTextMaxWidth} pixel text box width`,
         enabled: widerTextMaxWidth !== null,
         command: {
           type: 'updateStyle',
@@ -1053,7 +1098,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const trendLineExtendItem: UserDrawingSelectedActionSurfaceItem | null = nextTrendLineExtend
     ? {
         id: `extend:${nextTrendLineExtend}`,
-        icon: USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.find((descriptor) => descriptor.extend === nextTrendLineExtend)!.icon,
+        icon: USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS.find(
+          (descriptor) => descriptor.extend === nextTrendLineExtend,
+        )!.icon,
         label: `Cycle selected trend line extension to ${nextTrendLineExtend}`,
         enabled: styleEnabled,
         command: { type: 'setTrendLineExtend', extend: nextTrendLineExtend },
@@ -1091,14 +1138,16 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       {
         id: 'lineWidth:decrease',
         icon: '−',
-        label: thinnerLineWidth === null ? 'Decrease selected drawing line width' : `${thinnerLineWidth} pixel line width`,
+        label:
+          thinnerLineWidth === null ? 'Decrease selected drawing line width' : `${thinnerLineWidth} pixel line width`,
         enabled: styleEnabled && thinnerLineWidth !== null,
         command: { type: 'updateStyle', style: thinnerLineWidth === null ? {} : { lineWidth: thinnerLineWidth } },
       },
       {
         id: 'lineWidth:increase',
         icon: '+',
-        label: thickerLineWidth === null ? 'Increase selected drawing line width' : `${thickerLineWidth} pixel line width`,
+        label:
+          thickerLineWidth === null ? 'Increase selected drawing line width' : `${thickerLineWidth} pixel line width`,
         enabled: styleEnabled && thickerLineWidth !== null,
         command: { type: 'updateStyle', style: thickerLineWidth === null ? {} : { lineWidth: thickerLineWidth } },
       },
@@ -1156,18 +1205,22 @@ function resolveUserDrawingSelectedActionSurfaceStyleCommand(
 }
 
 export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawingToolDescriptor {
-  return USER_DRAWING_TOOL_DESCRIPTORS.find((descriptor) => descriptor.tool === tool) ?? USER_DRAWING_TOOL_DESCRIPTORS[0]!;
+  return (
+    USER_DRAWING_TOOL_DESCRIPTORS.find((descriptor) => descriptor.tool === tool) ?? USER_DRAWING_TOOL_DESCRIPTORS[0]!
+  );
 }
 
-export function isUserDrawingToolbarActionEnabled(
-  state: UserDrawingState,
-  action: UserDrawingToolbarAction,
-): boolean {
+export function isUserDrawingToolbarActionEnabled(state: UserDrawingState, action: UserDrawingToolbarAction): boolean {
   if (action === 'duplicateSelected' || action === 'deleteSelected') return hasUnlockedSelectedDrawing(state);
   const zOrderAction = getUserDrawingZOrderAction(action);
   if (zOrderAction) return reorderUserDrawings(state, zOrderAction) !== state;
   if (action === 'cancelDraft') return state.draft !== null;
-  return state.drawings.length > 0;
+  if (action === 'clearAll') return state.drawings.length > 0;
+  if (action === 'hideAll') return state.drawings.some((drawing) => drawing.visible !== false);
+  if (action === 'showAll') return state.drawings.some((drawing) => drawing.visible === false);
+  if (action === 'lockAll') return state.drawings.some((drawing) => !drawing.locked);
+  if (action === 'unlockAll') return state.drawings.some((drawing) => drawing.locked);
+  return false;
 }
 
 export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState): UserDrawingSelectedActionSurface {
@@ -1199,7 +1252,8 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
           };
         }
         if (item.command.type === 'editText') {
-          const enabled = selectedDrawing !== null && isUserDrawingTextAnnotation(selectedDrawing) && !selectedDrawing.locked;
+          const enabled =
+            selectedDrawing !== null && isUserDrawingTextAnnotation(selectedDrawing) && !selectedDrawing.locked;
           return {
             ...item,
             enabled,
@@ -1273,7 +1327,7 @@ function hasUnlockedSelectedDrawing(state: UserDrawingState): boolean {
 
 export function getSelectedUserDrawing(state: UserDrawingState) {
   const selectedId = state.selection?.drawingId;
-  return selectedId ? state.drawings.find((drawing) => drawing.id === selectedId) ?? null : null;
+  return selectedId ? (state.drawings.find((drawing) => drawing.id === selectedId) ?? null) : null;
 }
 
 export function isUserDrawingStyleToolbarEnabled(state: UserDrawingState): boolean {
@@ -1317,9 +1371,7 @@ export function supportsUserDrawingFillColorControls(drawing: UserDrawing): bool
 
 export function supportsUserDrawingFillVisibilityControls(drawing: UserDrawing): boolean {
   return (
-    supportsUserDrawingFillColorControls(drawing) ||
-    drawing.kind === 'longPosition' ||
-    drawing.kind === 'shortPosition'
+    supportsUserDrawingFillColorControls(drawing) || drawing.kind === 'longPosition' || drawing.kind === 'shortPosition'
   );
 }
 
@@ -1398,12 +1450,16 @@ export function isUserDrawingFillToolbarEnabled(state: UserDrawingState): boolea
 
 export function isUserDrawingFillVisibilityToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
-  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillVisibilityControls(selectedDrawing);
+  return (
+    selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingFillVisibilityControls(selectedDrawing)
+  );
 }
 
 export function isUserDrawingTextToolbarEnabled(state: UserDrawingState): boolean {
   const selectedDrawing = getSelectedUserDrawing(state);
-  return selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextAppearanceControls(selectedDrawing);
+  return (
+    selectedDrawing !== null && !selectedDrawing.locked && supportsUserDrawingTextAppearanceControls(selectedDrawing)
+  );
 }
 
 export function isUserDrawingIconToolbarEnabled(state: UserDrawingState): boolean {
@@ -1426,9 +1482,7 @@ export function resolveUserDrawingStyleToolbarAction(
   if (!selectedDrawing) return { enabled: false };
 
   if (selectedDrawing.locked) {
-    return action === 'unlockSelected'
-      ? { enabled: true, locked: false, includeLocked: true }
-      : { enabled: false };
+    return action === 'unlockSelected' ? { enabled: true, locked: false, includeLocked: true } : { enabled: false };
   }
 
   if (action === 'hideSelected') {
@@ -1451,6 +1505,10 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     state.draft ? 'draft' : '',
     state.drawings.length,
     state.drawings.map((drawing) => drawing.id).join(','),
+    state.drawings.some((drawing) => drawing.visible !== false) ? 'has-visible' : 'no-visible',
+    state.drawings.some((drawing) => drawing.visible === false) ? 'has-hidden' : 'no-hidden',
+    state.drawings.some((drawing) => !drawing.locked) ? 'has-unlocked' : 'no-unlocked',
+    state.drawings.some((drawing) => drawing.locked) ? 'has-locked' : 'no-locked',
     selectedDrawing?.visible === false ? 'hidden' : 'visible',
     selectedDrawing?.locked ? 'locked' : 'unlocked',
     selectedDrawing?.style.lineColor ?? '',

@@ -57,7 +57,9 @@ describe('ChartTopBar drawing toolbar', () => {
     const trendLine = document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]');
 
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
-    const shapesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]');
+    const shapesCategory = document.querySelector<HTMLButtonElement>(
+      'button[aria-label="Geometric Shapes drawing tools"]',
+    );
     const categoryRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
 
     expect(linesCategory).not.toBeNull();
@@ -93,9 +95,9 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
 
     topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'trendLine' });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.getAttribute('aria-pressed')).toBe(
-      'true',
-    );
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.getAttribute('aria-pressed'),
+    ).toBe('true');
 
     topBar.unmount();
   });
@@ -144,6 +146,8 @@ describe('ChartTopBar drawing toolbar', () => {
     const onProperties = vi.fn();
     const onObjectTree = vi.fn();
     const onTextEdit = vi.fn();
+    const onVisibility = vi.fn();
+    const onLocked = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-actions',
       symbol: 'BTCUSDT',
@@ -196,6 +200,8 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingPropertiesOpen: onProperties,
       onUserDrawingObjectTreeOpen: onObjectTree,
       onUserDrawingTextEditOpen: onTextEdit,
+      onUserDrawingVisibilityChange: onVisibility,
+      onUserDrawingLockedChange: onLocked,
     });
     topBar.mount(document.body);
 
@@ -260,13 +266,32 @@ describe('ChartTopBar drawing toolbar', () => {
           style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
           price: 10,
         },
+        {
+          id: 'hidden-locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: false,
+          locked: true,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 12,
+        },
       ],
     });
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.click();
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
+    expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
+    expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
+    expect(onLocked).toHaveBeenCalledWith(true, { drawingIds: ['h', 'hidden-locked'] });
+    expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
@@ -296,6 +321,10 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.disabled).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.disabled).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.disabled).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.disabled).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.disabled).toBe(true);
 
     topBar.unmount();
   });
@@ -339,14 +368,20 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="10 percent opacity"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing border"]')?.click();
     openSelectedDrawingStylePopover();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing line color to #22c55e"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing opacity to 75 percent"]')?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing line color to #22c55e"]')
+      ?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing opacity to 75 percent"]')
+      ?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing border"]')?.click();
     expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).not.toBeNull();
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')?.getAttribute('aria-expanded')).toBe(
-      'false',
-    );
+    expect(
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')
+        ?.getAttribute('aria-expanded'),
+    ).toBe('false');
     expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).toBeNull();
     topBar.setUserDrawingState({
       ...baseDrawingState,
@@ -365,9 +400,11 @@ describe('ChartTopBar drawing toolbar', () => {
         },
       ],
     });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')?.getAttribute('aria-expanded')).toBe(
-      'false',
-    );
+    expect(
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')
+        ?.getAttribute('aria-expanded'),
+    ).toBe('false');
     expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).toBeNull();
     openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
@@ -411,7 +448,9 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     openSelectedDrawingStylePopover();
     document
-      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing fill color to rgba(34, 197, 94, 0.12)"]')
+      .querySelector<HTMLButtonElement>(
+        'button[aria-label="Cycle selected drawing fill color to rgba(34, 197, 94, 0.12)"]',
+      )
       ?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing fill"]')?.click();
 
@@ -447,16 +486,26 @@ describe('ChartTopBar drawing toolbar', () => {
       ],
     });
     openSelectedDrawingStylePopover();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text color to #22c55e"]')?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text color to #22c55e"]')
+      ?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="12 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font family to serif"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font weight to bold"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font style to italic"]')?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font family to serif"]')
+      ?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font weight to bold"]')
+      ?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing font style to italic"]')
+      ?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Underline selected drawing text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Strike selected drawing text"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Wrap selected drawing text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text alignment to right"]')?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text alignment to right"]')
+      ?.click();
 
     expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
     expect(onStyle).toHaveBeenCalledWith({ fontSize: 12 });
@@ -780,7 +829,9 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     openSelectedDrawingStylePopover();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected trend line extension to left"]')?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected trend line extension to left"]')
+      ?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line both ways"]')?.click();
     expect(onExtend).toHaveBeenNthCalledWith(1, 'left');
@@ -1063,7 +1114,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
     expect(onStyle).not.toHaveBeenCalled();
     expect(onDeleteSelected).not.toHaveBeenCalled();
-    expect(onLocked).toHaveBeenCalledWith(false, true);
+    expect(onLocked).toHaveBeenCalledWith(false, { includeLocked: true });
 
     topBar.unmount();
   });

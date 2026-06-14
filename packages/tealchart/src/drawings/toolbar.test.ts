@@ -1,12 +1,16 @@
+import type { UserDrawing, UserDrawingState } from './types';
+
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
+import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 import {
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
+  isUserDrawingGlobalToolbarAction,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
@@ -43,13 +47,11 @@ import {
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
-  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOL_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
 } from './toolbar';
-import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
-import type { UserDrawing, UserDrawingState } from './types';
 
 const state: UserDrawingState = {
   version: 1,
@@ -174,7 +176,9 @@ describe('user drawing toolbar descriptors', () => {
     const categorizedTools = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.flatMap((category) => category.tools);
     expect(categorizedTools).toHaveLength(USER_DRAWING_TOOL_DESCRIPTORS.length);
     expect(new Set(categorizedTools).size).toBe(categorizedTools.length);
-    expect(new Set(categorizedTools)).toEqual(new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)));
+    expect(new Set(categorizedTools)).toEqual(
+      new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool)),
+    );
     expect(USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => category.label)).toEqual([
       'Cursor',
       'Lines',
@@ -272,7 +276,9 @@ describe('user drawing toolbar descriptors', () => {
     expect(getUserDrawingToolDescriptor('projection')).toEqual(
       expect.objectContaining({ tool: 'projection', label: 'Projection' }),
     );
-    expect(getUserDrawingToolDescriptor('sector')).toEqual(expect.objectContaining({ tool: 'sector', label: 'Sector' }));
+    expect(getUserDrawingToolDescriptor('sector')).toEqual(
+      expect.objectContaining({ tool: 'sector', label: 'Sector' }),
+    );
     expect(getUserDrawingToolDescriptor('signpost')).toEqual(
       expect.objectContaining({ tool: 'signpost', label: 'Signpost' }),
     );
@@ -657,9 +663,18 @@ describe('user drawing toolbar descriptors', () => {
       'sendToBack',
       'cancelDraft',
       'clearAll',
+      'hideAll',
+      'showAll',
+      'lockAll',
+      'unlockAll',
     ]);
     expect(getUserDrawingZOrderAction('bringForward')).toBe('bringForward');
     expect(getUserDrawingZOrderAction('deleteSelected')).toBeNull();
+    expect(
+      USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
+        isUserDrawingGlobalToolbarAction(descriptor.action),
+      ).map((descriptor) => descriptor.action),
+    ).toEqual(['cancelDraft', 'clearAll', 'hideAll', 'showAll', 'lockAll', 'unlockAll']);
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);
     expect(
       isUserDrawingToolbarActionEnabled(
@@ -837,9 +852,9 @@ describe('user drawing toolbar descriptors', () => {
     expect(
       isUserDrawingToolbarActionEnabled({ ...layeredState, selection: { drawingId: 'front' } }, 'bringForward'),
     ).toBe(false);
-    expect(isUserDrawingToolbarActionEnabled({ ...layeredState, selection: { drawingId: 'back' } }, 'sendBackward')).toBe(
-      false,
-    );
+    expect(
+      isUserDrawingToolbarActionEnabled({ ...layeredState, selection: { drawingId: 'back' } }, 'sendBackward'),
+    ).toBe(false);
     expect(
       isUserDrawingToolbarActionEnabled(
         {
@@ -888,6 +903,70 @@ describe('user drawing toolbar descriptors', () => {
         'clearAll',
       ),
     ).toBe(true);
+    const globalActionState: UserDrawingState = {
+      ...state,
+      drawings: [
+        {
+          id: 'visible',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 10,
+        },
+        {
+          id: 'hidden-locked',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: false,
+          locked: true,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 12,
+        },
+      ],
+    };
+    expect(isUserDrawingToolbarActionEnabled(globalActionState, 'hideAll')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(globalActionState, 'showAll')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(globalActionState, 'lockAll')).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(globalActionState, 'unlockAll')).toBe(true);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...globalActionState,
+          drawings: globalActionState.drawings.map((drawing) => ({ ...drawing, visible: false })),
+        },
+        'hideAll',
+      ),
+    ).toBe(false);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...globalActionState,
+          drawings: globalActionState.drawings.map((drawing) => ({ ...drawing, visible: true })),
+        },
+        'showAll',
+      ),
+    ).toBe(false);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        { ...globalActionState, drawings: globalActionState.drawings.map((drawing) => ({ ...drawing, locked: true })) },
+        'lockAll',
+      ),
+    ).toBe(false);
+    expect(
+      isUserDrawingToolbarActionEnabled(
+        {
+          ...globalActionState,
+          drawings: globalActionState.drawings.map((drawing) => ({ ...drawing, locked: false })),
+        },
+        'unlockAll',
+      ),
+    ).toBe(false);
   });
 
   it('describes selected-drawing style controls in stable order', () => {
@@ -906,13 +985,7 @@ describe('user drawing toolbar descriptors', () => {
       'dashed',
       'dotted',
     ]);
-    expect(USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity)).toEqual([
-      1,
-      0.75,
-      0.5,
-      0.25,
-      0.1,
-    ]);
+    expect(USER_DRAWING_OPACITY_DESCRIPTORS.map((descriptor) => descriptor.opacity)).toEqual([1, 0.75, 0.5, 0.25, 0.1]);
     expect(USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.map((descriptor) => descriptor.style)).toEqual([
       'lineVisible',
       'fillVisible',
@@ -941,16 +1014,7 @@ describe('user drawing toolbar descriptors', () => {
       'monospace',
     ]);
     expect(USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => descriptor.fontSize)).toEqual([
-      8,
-      10,
-      12,
-      14,
-      16,
-      20,
-      24,
-      28,
-      32,
-      40,
+      8, 10, 12, 14, 16, 20, 24, 28, 32, 40,
     ]);
     expect(USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => descriptor.fontStyle)).toEqual(['normal', 'italic']);
     expect(USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => descriptor.label)).toEqual([
@@ -967,11 +1031,7 @@ describe('user drawing toolbar descriptors', () => {
     ]);
     expect(USER_DRAWING_TEXT_WRAP_DESCRIPTORS.map((descriptor) => descriptor.textWrap)).toEqual([false, true]);
     expect(USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS.map((descriptor) => descriptor.textMaxWidth)).toEqual([
-      120,
-      180,
-      240,
-      320,
-      480,
+      120, 180, 240, 320, 480,
     ]);
     expect(USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => descriptor.textAlign)).toEqual([
       'left',
@@ -1148,7 +1208,9 @@ describe('user drawing toolbar descriptors', () => {
       }),
     ).toBe(true);
     expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-box', kind: 'gannBox' as const })).toBe(true);
-    expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square', kind: 'gannSquare' as const })).toBe(true);
+    expect(supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square', kind: 'gannSquare' as const })).toBe(
+      true,
+    );
     expect(
       supportsUserDrawingFillControls({ ...rectangle, id: 'gann-square-fixed', kind: 'gannSquareFixed' as const }),
     ).toBe(true);
@@ -1384,9 +1446,9 @@ describe('user drawing toolbar descriptors', () => {
       }),
     ).toBe(true);
 
-    expect(
-      isUserDrawingFillToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] }),
-    ).toBe(true);
+    expect(isUserDrawingFillToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] })).toBe(
+      true,
+    );
     expect(isUserDrawingTextToolbarEnabled({ ...state, selection: { drawingId: 'r' }, drawings: [rectangle] })).toBe(
       false,
     );
@@ -1657,9 +1719,9 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(styleItems.find((item) => item.id === 'fillColor:rgba(34, 197, 94, 0.12)')).toMatchObject({
       enabled: true,
@@ -1703,9 +1765,9 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(styleItems.find((item) => item.id === 'extend:left')).toMatchObject({
       enabled: true,
@@ -1762,9 +1824,9 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(styleItems.find((item) => item.id === 'iconName:circle')).toMatchObject({
       enabled: true,
@@ -1826,9 +1888,9 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(styleItems.find((item) => item.id === 'textColor:#22c55e')).toMatchObject({
       enabled: true,
@@ -1877,9 +1939,9 @@ describe('user drawing toolbar descriptors', () => {
       ...selected,
       drawings: [{ ...selected.drawings[0]!, style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const } }],
     } satisfies UserDrawingState;
-    const defaultSizeItems = resolveUserDrawingSelectedActionSurface(defaultSized)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const defaultSizeItems = resolveUserDrawingSelectedActionSurface(defaultSized).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(defaultSizeItems.find((item) => item.id === 'fontSize:decrease')).toMatchObject({
       enabled: true,
@@ -1922,9 +1984,9 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(styleItems.find((item) => item.id === 'textWrap:toggle')).toMatchObject({
       enabled: true,
@@ -1971,9 +2033,9 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    const styleItems = resolveUserDrawingSelectedActionSurface(selected)
-      .groups.find((group) => group.id === 'style')!
-      .items;
+    const styleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
 
     expect(styleItems.find((item) => item.id === 'textColor:#22c55e')).toMatchObject({
       command: { type: 'updateStyle', style: { textColor: '#22c55e' } },
@@ -2144,6 +2206,49 @@ describe('user drawing toolbar descriptors', () => {
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(first));
 
+    const noSelectionState: UserDrawingState = {
+      ...state,
+      selection: null,
+      drawings: [
+        first.drawings[0]!,
+        {
+          id: 'locked-hidden',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: false,
+          locked: true,
+          createdAt: 2,
+          updatedAt: 2,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 12,
+        },
+      ],
+    };
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...noSelectionState,
+        drawings: noSelectionState.drawings.map((drawing) => ({ ...drawing, visible: false })),
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(noSelectionState));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...noSelectionState,
+        drawings: noSelectionState.drawings.map((drawing) => ({ ...drawing, visible: true })),
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(noSelectionState));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...noSelectionState,
+        drawings: noSelectionState.drawings.map((drawing) => ({ ...drawing, locked: true })),
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(noSelectionState));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...noSelectionState,
+        drawings: noSelectionState.drawings.map((drawing) => ({ ...drawing, locked: false })),
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(noSelectionState));
+
     const textDrawing = {
       id: 'text',
       kind: 'textLabel' as const,
@@ -2162,9 +2267,9 @@ describe('user drawing toolbar descriptors', () => {
       selection: { drawingId: 'text' },
       drawings: [textDrawing],
     };
-    expect(getUserDrawingToolbarStateKey({ ...textState, drawings: [{ ...textDrawing, textAlign: 'right' }] })).not.toBe(
-      getUserDrawingToolbarStateKey(textState),
-    );
+    expect(
+      getUserDrawingToolbarStateKey({ ...textState, drawings: [{ ...textDrawing, textAlign: 'right' }] }),
+    ).not.toBe(getUserDrawingToolbarStateKey(textState));
     expect(
       getUserDrawingToolbarStateKey({
         ...textState,
@@ -2272,19 +2377,33 @@ describe('user drawing toolbar descriptors', () => {
     const surface = resolveUserDrawingPropertiesSurface(textState);
 
     expect(surface.groups.map((group) => group.id)).toEqual(['line', 'fill', 'text']);
-    expect(surface.groups.find((group) => group.id === 'fill')?.controls.find((control) => control.id === 'fillColor:rgba(245, 197, 66, 0.12)')).toMatchObject({
+    expect(
+      surface.groups
+        .find((group) => group.id === 'fill')
+        ?.controls.find((control) => control.id === 'fillColor:rgba(245, 197, 66, 0.12)'),
+    ).toMatchObject({
       selected: true,
       command: { type: 'updateStyle', style: { fillColor: 'rgba(245, 197, 66, 0.12)' } },
     });
-    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textColor:#d1d4dc')).toMatchObject({
+    expect(
+      surface.groups
+        .find((group) => group.id === 'text')
+        ?.controls.find((control) => control.id === 'textColor:#d1d4dc'),
+    ).toMatchObject({
       selected: true,
       command: { type: 'updateStyle', style: { textColor: '#d1d4dc' } },
     });
-    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textAlign:center')).toMatchObject({
+    expect(
+      surface.groups
+        .find((group) => group.id === 'text')
+        ?.controls.find((control) => control.id === 'textAlign:center'),
+    ).toMatchObject({
       selected: true,
       command: { type: 'setTextAlign', textAlign: 'center' },
     });
-    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textWrap:true')).toMatchObject({
+    expect(
+      surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textWrap:true'),
+    ).toMatchObject({
       selected: true,
       command: { type: 'updateStyle', style: { textWrap: true } },
     });
@@ -2325,7 +2444,9 @@ describe('user drawing toolbar descriptors', () => {
       drawing: { id: 'locked' },
       editable: false,
     });
-    expect(lockedSurface.groups.flatMap((group) => group.controls).every((control) => control.enabled === false)).toBe(true);
+    expect(lockedSurface.groups.flatMap((group) => group.controls).every((control) => control.enabled === false)).toBe(
+      true,
+    );
     expect(resolveUserDrawingPropertiesSurface(lockedState, 'missing')).toEqual({
       drawing: null,
       editable: false,
@@ -2401,11 +2522,17 @@ describe('user drawing toolbar descriptors', () => {
       selected: true,
     });
     expect(
-      surface.groups.find((group) => group.id === 'fill')?.controls.find((control) => control.id === 'fillColor:rgba(245, 197, 66, 0.12)'),
+      surface.groups
+        .find((group) => group.id === 'fill')
+        ?.controls.find((control) => control.id === 'fillColor:rgba(245, 197, 66, 0.12)'),
     ).toMatchObject({
       selected: true,
     });
-    expect(surface.groups.find((group) => group.id === 'text')?.controls.find((control) => control.id === 'textColor:#d1d4dc')).toMatchObject({
+    expect(
+      surface.groups
+        .find((group) => group.id === 'text')
+        ?.controls.find((control) => control.id === 'textColor:#d1d4dc'),
+    ).toMatchObject({
       selected: true,
     });
   });

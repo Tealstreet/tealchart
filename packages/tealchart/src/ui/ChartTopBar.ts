@@ -1,32 +1,33 @@
-import type { ChartStore } from '../state/chartState';
-import type { ResolutionString } from '../types';
 import type {
+  UpdateUserDrawingOptions,
   UserDrawingIconName,
   UserDrawingSelectionActionAnchor,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
-  UserDrawingTrendLineExtend,
   UserDrawingTool,
+  UserDrawingTrendLineExtend,
   UserDrawingZOrderAction,
 } from '../drawings';
+import type { ChartStore } from '../state/chartState';
+import type { ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
-import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import {
   getSelectedUserDrawing,
-  isUserDrawingToolbarActionEnabled,
+  getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
+  isUserDrawingGlobalToolbarAction,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarEnabled,
-  isUserDrawingTextToolbarEnabled,
   isUserDrawingTextAnnotation,
+  isUserDrawingTextToolbarEnabled,
+  isUserDrawingToolbarActionEnabled,
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   shouldRenderUserDrawingSelectedActionSurface,
-  getUserDrawingToolDescriptor,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
@@ -51,11 +52,12 @@ import {
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
-  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
+  USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
 } from '../drawings';
 import { computeLeftToolRailTop, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import { Component } from './Component';
 import { LayoutSelector } from './LayoutSelector';
 
@@ -107,9 +109,9 @@ export interface ChartTopBarOptions extends ComponentOptions {
   /** Callback when selected icon marker shape should change */
   onUserDrawingIconNameChange?: (iconName: UserDrawingIconName) => void;
   /** Callback when selected drawing visibility should change */
-  onUserDrawingVisibilityChange?: (visible: boolean) => void;
+  onUserDrawingVisibilityChange?: (visible: boolean, options?: UpdateUserDrawingOptions) => void;
   /** Callback when selected drawing locked state should change */
-  onUserDrawingLockedChange?: (locked: boolean, includeLocked?: boolean) => void;
+  onUserDrawingLockedChange?: (locked: boolean, options?: UpdateUserDrawingOptions) => void;
   /** Callback when selected drawing properties should open */
   onUserDrawingPropertiesOpen?: () => void;
   /** Callback when the drawing object tree should open */
@@ -633,7 +635,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.selectedActionSurfaceEl = null;
   }
 
-  private handleSelectedActionSurfaceItemClick(item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number]): void {
+  private handleSelectedActionSurfaceItemClick(
+    item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number],
+  ): void {
     if (item.command.type === 'openProperties') {
       this.options.onUserDrawingPropertiesOpen?.();
       return;
@@ -654,7 +658,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         this.options.onUserDrawingVisibilityChange?.(item.command.visible);
       }
       if (item.command.locked !== undefined) {
-        this.options.onUserDrawingLockedChange?.(item.command.locked, item.command.includeLocked);
+        this.options.onUserDrawingLockedChange?.(
+          item.command.locked,
+          item.command.includeLocked === undefined ? undefined : { includeLocked: item.command.includeLocked },
+        );
       }
       return;
     }
@@ -860,13 +867,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         'aria-label': 'Drawing tool categories',
       },
     });
-    let activeFlyout:
-      | {
-          id: string;
-          button: HTMLButtonElement;
-          flyout: HTMLElement;
-        }
-      | null = null;
+    let activeFlyout: {
+      id: string;
+      button: HTMLButtonElement;
+      flyout: HTMLElement;
+    } | null = null;
     const closeActiveFlyout = () => {
       if (!activeFlyout) return;
       activeFlyout.flyout.style.display = 'none';
@@ -906,7 +911,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           'aria-label': `${category.label} tools`,
         },
       });
-      flyout.appendChild(this.createElement('div', { style: styles.drawingToolFlyoutTitle, textContent: category.label }));
+      flyout.appendChild(
+        this.createElement('div', { style: styles.drawingToolFlyoutTitle, textContent: category.label }),
+      );
       const showFlyout = () => {
         if (activeFlyout?.id === category.id) return;
         closeActiveFlyout();
@@ -942,8 +949,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             'aria-pressed': isActive ? 'true' : 'false',
           },
         });
-        btn.appendChild(this.createElement('span', { style: styles.drawingToolFlyoutIcon, textContent: descriptor.icon }));
-        btn.appendChild(this.createElement('span', { style: styles.drawingToolFlyoutLabel, textContent: descriptor.label }));
+        btn.appendChild(
+          this.createElement('span', { style: styles.drawingToolFlyoutIcon, textContent: descriptor.icon }),
+        );
+        btn.appendChild(
+          this.createElement('span', { style: styles.drawingToolFlyoutLabel, textContent: descriptor.label }),
+        );
         btn.addEventListener('click', () => {
           this.options.onUserDrawingToolSelect?.(descriptor.tool);
           closeActiveFlyout();
@@ -1001,9 +1012,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const iconEnabled = state ? isUserDrawingIconToolbarEnabled(state) : false;
     const textEnabled = state ? isUserDrawingTextToolbarEnabled(state) : false;
     const fillColorSupported = selectedDrawing ? supportsUserDrawingFillColorControls(selectedDrawing) : false;
-    const fillVisibilitySupported = selectedDrawing ? supportsUserDrawingFillVisibilityControls(selectedDrawing) : false;
+    const fillVisibilitySupported = selectedDrawing
+      ? supportsUserDrawingFillVisibilityControls(selectedDrawing)
+      : false;
     const iconSupported = selectedDrawing ? supportsUserDrawingIconControls(selectedDrawing) : false;
-    const textAppearanceSupported = selectedDrawing ? supportsUserDrawingTextAppearanceControls(selectedDrawing) : false;
+    const textAppearanceSupported = selectedDrawing
+      ? supportsUserDrawingTextAppearanceControls(selectedDrawing)
+      : false;
     const richTextSupported = selectedDrawing ? supportsUserDrawingRichTextControls(selectedDrawing) : false;
     const textAlignSupported = selectedDrawing ? supportsUserDrawingTextAlignControls(selectedDrawing) : false;
     const textWrapSupported = selectedDrawing ? supportsUserDrawingTextWrapControls(selectedDrawing) : false;
@@ -1128,9 +1143,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           });
           btn.disabled = !styleEnabled;
           if (styleEnabled) {
-            btn.addEventListener('click', () =>
-              this.options.onUserDrawingTrendLineExtendChange?.(descriptor.extend),
-            );
+            btn.addEventListener('click', () => this.options.onUserDrawingTrendLineExtendChange?.(descriptor.extend));
             btn.addEventListener('mouseenter', () => {
               if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
             });
@@ -1179,7 +1192,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         group.appendChild(btn);
       }
 
-      const borderToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find((descriptor) => descriptor.style === 'lineVisible')!;
+      const borderToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find(
+        (descriptor) => descriptor.style === 'lineVisible',
+      )!;
       const borderVisible = selectedDrawing.style.lineVisible !== false;
       const borderBtn = this.createElement('button', {
         style: {
@@ -1245,7 +1260,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
 
       if (fillVisibilitySupported) {
-        const fillToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find((descriptor) => descriptor.style === 'fillVisible')!;
+        const fillToggle = USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.find(
+          (descriptor) => descriptor.style === 'fillVisible',
+        )!;
         const fillVisible = selectedDrawing.style.fillVisible !== false;
         const fillBtn = this.createElement('button', {
           style: {
@@ -1655,11 +1672,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
         group.appendChild(this.createElement('div', { style: styles.divider }));
       }
-
     }
 
-    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
-      (descriptor) => descriptor.action === 'cancelDraft' || descriptor.action === 'clearAll',
+    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
+      isUserDrawingGlobalToolbarAction(descriptor.action),
     );
     for (const item of globalActionDescriptors.map((descriptor) => ({
       ...descriptor,
@@ -1685,8 +1701,21 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       if (enabled) {
         btn.addEventListener('click', () => {
           if (item.command.type !== 'toolbarAction') return;
+          const drawingIds = state?.drawings.map((drawing) => drawing.id) ?? [];
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
+          if (item.command.action === 'hideAll') {
+            this.options.onUserDrawingVisibilityChange?.(false, { drawingIds, includeLocked: true });
+          }
+          if (item.command.action === 'showAll') {
+            this.options.onUserDrawingVisibilityChange?.(true, { drawingIds, includeLocked: true });
+          }
+          if (item.command.action === 'lockAll') {
+            this.options.onUserDrawingLockedChange?.(true, { drawingIds });
+          }
+          if (item.command.action === 'unlockAll') {
+            this.options.onUserDrawingLockedChange?.(false, { drawingIds, includeLocked: true });
+          }
         });
         btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
         btn.addEventListener('mouseleave', () => {

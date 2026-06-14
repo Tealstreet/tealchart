@@ -71,6 +71,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     const onCancel = vi.fn();
     const onClear = vi.fn();
     const onZOrder = vi.fn();
+    const onVisibility = vi.fn();
+    const onLocked = vi.fn();
     render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
@@ -113,8 +115,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
               id: 'front',
               kind: 'horizontalLine',
               paneId: 'main',
-              visible: true,
-              locked: false,
+              visible: false,
+              locked: true,
               createdAt: 1,
               updatedAt: 1,
               style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
@@ -127,6 +129,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
         onUserDrawingCancelDraft={onCancel}
         onUserDrawingClearAll={onClear}
         onUserDrawingZOrderChange={onZOrder}
+        onUserDrawingVisibilityChange={onVisibility}
+        onUserDrawingLockedChange={onLocked}
       />,
     );
 
@@ -138,11 +142,19 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Send selected drawing to back')).toBeNull();
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
     fireEvent.click(screen.getByLabelText('Clear all drawings'));
+    fireEvent.click(screen.getByLabelText('Hide all drawings'));
+    fireEvent.click(screen.getByLabelText('Show all drawings'));
+    fireEvent.click(screen.getByLabelText('Lock all drawings'));
+    fireEvent.click(screen.getByLabelText('Unlock all drawings'));
 
     expect(onDuplicate).not.toHaveBeenCalled();
     expect(onDelete).not.toHaveBeenCalled();
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
+    expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
+    expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
+    expect(onLocked).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'] });
+    expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onZOrder).not.toHaveBeenCalled();
   });
 
