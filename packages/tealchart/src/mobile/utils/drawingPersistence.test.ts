@@ -79,6 +79,30 @@ describe('mobile drawing persistence', () => {
     });
   });
 
+  it('exports and imports disabled stay-in-drawing-mode without drawings', () => {
+    const exported = exportMobileUserDrawingStateForLayout({
+      ...state,
+      drawings: [],
+      selection: null,
+      draft: null,
+      textEdit: null,
+      stayInDrawingMode: false,
+    });
+
+    expect(exported).toMatchObject({
+      drawings: [],
+      stayInDrawingMode: false,
+    });
+    expect(importMobileUserDrawingStateFromLayout(exported)).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+  });
+
   it('creates mobile replace-state command events for imperative import and set flows', () => {
     const previousState = importMobileUserDrawingStateFromLayout(undefined);
     const event = createMobileUserDrawingReplaceStateCommandEvent(previousState, state, 'layout');

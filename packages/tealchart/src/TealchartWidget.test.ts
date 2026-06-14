@@ -715,6 +715,13 @@ describe('TealchartWidget', () => {
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
       const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
 
+      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
+      const settingsOnlyExport = widget.exportUserDrawingStateForLayout();
+      expect(settingsOnlyExport).toMatchObject({
+        drawings: [],
+        stayInDrawingMode: false,
+      });
+
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
         activeTool: 'rectangle',

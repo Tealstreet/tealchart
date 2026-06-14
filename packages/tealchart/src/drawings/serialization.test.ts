@@ -157,6 +157,29 @@ describe('drawing layout serialization', () => {
     expect(serializeUserDrawingStateForLayout(createUserDrawingState())).toBeUndefined();
   });
 
+  it('persists disabled stay-in-drawing-mode without committed drawings', () => {
+    const persisted = serializeUserDrawingStateForLayout(createUserDrawingState({ stayInDrawingMode: false }));
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+
+    expect(persisted).toMatchObject({
+      version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+    expect(restored).toMatchObject({
+      drawings: [],
+      activeTool: 'select',
+      stayInDrawingMode: false,
+      selection: null,
+      draft: null,
+      textEdit: null,
+    });
+  });
+
   it('deserializes through the same idle persisted state contract', () => {
     const restored = deserializeUserDrawingStateFromLayout(createStateWithTransientFields());
 
