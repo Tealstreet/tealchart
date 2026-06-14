@@ -2223,14 +2223,17 @@ describe('user drawing toolbar descriptors', () => {
     expect(surface.editable).toBe(true);
     expect(surface.groups.map((group) => group.id)).toEqual(['line', 'geometry']);
     expect(surface.groups[0]!.controls.find((control) => control.id === 'lineColor:#38bdf8')).toMatchObject({
+      enabled: true,
       selected: true,
       command: { type: 'updateStyle', style: { lineColor: '#38bdf8' } },
     });
     expect(surface.groups[0]!.controls.find((control) => control.id === 'lineWidth:2')).toMatchObject({
+      enabled: true,
       selected: true,
       command: { type: 'updateStyle', style: { lineWidth: 2 } },
     });
     expect(surface.groups[1]!.controls.find((control) => control.id === 'extend:right')).toMatchObject({
+      enabled: true,
       selected: true,
       command: { type: 'setTrendLineExtend', extend: 'right' },
     });
@@ -2317,10 +2320,12 @@ describe('user drawing toolbar descriptors', () => {
       ],
     } satisfies UserDrawingState;
 
-    expect(resolveUserDrawingPropertiesSurface(lockedState, 'locked')).toMatchObject({
+    const lockedSurface = resolveUserDrawingPropertiesSurface(lockedState, 'locked');
+    expect(lockedSurface).toMatchObject({
       drawing: { id: 'locked' },
       editable: false,
     });
+    expect(lockedSurface.groups.flatMap((group) => group.controls).every((control) => control.enabled === false)).toBe(true);
     expect(resolveUserDrawingPropertiesSurface(lockedState, 'missing')).toEqual({
       drawing: null,
       editable: false,
