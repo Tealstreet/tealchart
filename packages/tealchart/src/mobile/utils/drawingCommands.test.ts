@@ -1004,6 +1004,35 @@ describe('mobile drawing handle command dispatch', () => {
     }
   });
 
+  it('does not record a mobile path drag that is explicitly cancelled after movement', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'brush');
+    const history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginPathDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch', transactionKey: 'path-drag' },
+    });
+    const moved = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'appendPathDragPoint',
+      point: { paneId: 'main', anchor: anchorB },
+      meta: { source: 'touch', transactionKey: 'path-drag' },
+    });
+    const cancelled = dispatchMobileUserDrawingHistoryCommand(moved.state, moved.history, {
+      type: 'cancelDraft',
+      meta: { source: 'touch', transactionKey: 'path-drag' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(started.history.undoStack).toHaveLength(0);
+    expect(moved.changed).toBe(true);
+    expect(moved.history.undoStack).toHaveLength(0);
+    expect(moved.state.draft).toMatchObject({ tool: 'brush', anchors: [anchorA, anchorB] });
+    expect(cancelled.changed).toBe(true);
+    expect(cancelled.history.undoStack).toHaveLength(0);
+    expect(cancelled.state.drawings).toEqual([]);
+    expect(cancelled.state.draft).toBeNull();
+  });
+
   it('does not record a mobile placement drag that ends at the start anchor', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const history = createUserDrawingCommandHistory();

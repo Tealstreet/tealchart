@@ -216,6 +216,75 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('cancels active mouse drawing drags on window blur without ending them', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const onDrawingDragCancel = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+        onDrawingDragCancel,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 124, clientY: 112 }));
+    window.dispatchEvent(new Event('blur'));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 124, clientY: 112 }));
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingDragMove).toHaveBeenCalledWith(124, 112, 'mouse');
+    expect(onDrawingDragCancel).toHaveBeenCalledOnce();
+    expect(onDrawingDragCancel).toHaveBeenCalledWith('mouse');
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
+  it('does not promote pending mouse drawing drags on window blur', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const onDrawingDragCancel = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+        onDrawingDragCancel,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new Event('blur'));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragStart).not.toHaveBeenCalled();
+    expect(onDrawingDragMove).not.toHaveBeenCalled();
+    expect(onDrawingDragCancel).not.toHaveBeenCalled();
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
   it('passes Shift placement constraints through pending mouse drags', () => {
     const container = createContainer();
     const onDrawingDragPending = vi.fn(() => true);
