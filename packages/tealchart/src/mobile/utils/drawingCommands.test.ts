@@ -1224,6 +1224,34 @@ describe('mobile drawing handle command dispatch', () => {
         }),
       ]);
 
+      const pressureState = setUserDrawingTool(createUserDrawingState(), tool);
+      const pressureHistory = createUserDrawingCommandHistory();
+      const pressureStarted = dispatchMobileUserDrawingHistoryCommand(pressureState, pressureHistory, {
+        type: 'beginPathDrag',
+        point: { paneId: 'main', anchor: { ...anchorA, pressure: 0.25 } },
+        meta: { source: 'touch', transactionKey: `${tool}-pressure-path-drag` },
+      });
+      const pressureMoved = dispatchMobileUserDrawingHistoryCommand(pressureStarted.state, pressureStarted.history, {
+        type: 'appendPathDragPoint',
+        point: { paneId: 'main', anchor: { ...anchorB, pressure: 0.75 } },
+        meta: { source: 'touch', transactionKey: `${tool}-pressure-path-drag` },
+      });
+      const pressureCommitted = dispatchMobileUserDrawingHistoryCommand(pressureMoved.state, pressureMoved.history, {
+        type: 'commitPathDrag',
+        options: { createId: () => `${tool}-pressure`, now: () => 45, style },
+        meta: { source: 'touch' },
+      });
+      expect(pressureCommitted.state.drawings[0]).toMatchObject({
+        id: `${tool}-pressure`,
+        kind: tool,
+        points: [
+          { ...anchorA, pressure: 0.25 },
+          { time: 1_250, price: 102.5, pressure: 0.375 },
+          { time: 1_750, price: 107.5, pressure: 0.625 },
+          { ...anchorB, pressure: 0.75 },
+        ],
+      });
+
       const undo = undoUserDrawingCommand(state, history);
       expect(undo.changed, tool).toBe(true);
       expect(undo.state.drawings, tool).toEqual([expect.objectContaining({ id: `${tool}-drawing-1` })]);

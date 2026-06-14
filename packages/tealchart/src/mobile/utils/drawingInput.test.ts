@@ -91,6 +91,28 @@ describe('mobile user drawing input resolver', () => {
     });
   });
 
+  it('attaches normalized pressure metadata to resolved mobile anchors', () => {
+    expect(
+      resolveMobileUserDrawingInputPoint({
+        point: { x: 144, y: 180 },
+        viewport: {
+          startTime: 1_000,
+          endTime: 3_000,
+          priceMin: 90,
+          priceMax: 110,
+        },
+        dimensions,
+        panes,
+        pressure: 1.4,
+      }),
+    ).toEqual({
+      paneId: 'macd',
+      anchor: { time: 2_000, price: 0, pressure: 1 },
+      position: { x: 0.5, y: 0.5 },
+      bars: undefined,
+    });
+  });
+
   it('rejects points in mobile chart margins', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
