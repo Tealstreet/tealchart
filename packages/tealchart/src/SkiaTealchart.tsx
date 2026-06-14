@@ -296,14 +296,14 @@ export interface SkiaTealchartHandle {
   exportUserDrawingStateForLayout(): UserDrawingState | undefined;
   importUserDrawingStateFromLayout(state?: UserDrawingState | null): void;
   setUserDrawingState(state: UserDrawingState): void;
-  setActiveUserDrawingTool(tool: UserDrawingTool): void;
+  setActiveUserDrawingTool(tool: UserDrawingTool): boolean;
   canUndoUserDrawingCommand(): boolean;
   canRedoUserDrawingCommand(): boolean;
   undoUserDrawingCommand(): boolean;
   redoUserDrawingCommand(): boolean;
   dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean;
-  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void;
-  selectUserDrawings(drawingIds: readonly string[]): void;
+  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): boolean;
+  selectUserDrawings(drawingIds: readonly string[]): boolean;
   addUserDrawing(drawing: UserDrawing, options?: { select?: boolean }): boolean;
   deleteUserDrawing(drawingId?: string): boolean;
   deleteSelectedUserDrawing(): boolean;
@@ -319,8 +319,8 @@ export interface SkiaTealchartHandle {
   copySelectedUserDrawing(): boolean;
   pasteUserDrawingClipboard(): boolean;
   clearUserDrawingClipboard(): void;
-  clearUserDrawings(): void;
-  cancelUserDrawingDraft(): void;
+  clearUserDrawings(): boolean;
+  cancelUserDrawingDraft(): boolean;
   beginUserDrawingTextEdit(drawingId?: string): boolean;
   updateUserDrawingTextEdit(value: string): boolean;
   commitUserDrawingTextEdit(): boolean;
@@ -646,8 +646,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setUserDrawingState(nextState: UserDrawingState): void {
         replaceUserDrawingState(nextState, 'api');
       },
-      setActiveUserDrawingTool(tool: UserDrawingTool): void {
-        dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+      setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
+        return dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
       },
       canUndoUserDrawingCommand(): boolean {
         return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);
@@ -727,11 +727,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         }
         return result.changed;
       },
-      selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): void {
-        dispatchUserDrawingCommandToState({ type: 'select', drawingId, handle, meta: { source: 'api' } });
+      selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): boolean {
+        return dispatchUserDrawingCommandToState({ type: 'select', drawingId, handle, meta: { source: 'api' } });
       },
-      selectUserDrawings(drawingIds: readonly string[]): void {
-        dispatchUserDrawingCommandToState({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
+      selectUserDrawings(drawingIds: readonly string[]): boolean {
+        return dispatchUserDrawingCommandToState({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
       },
       addUserDrawing(drawing: UserDrawing, options: { select?: boolean } = {}): boolean {
         return dispatchUserDrawingCommandToState({
@@ -840,11 +840,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       clearUserDrawingClipboard(): void {
         userDrawingClipboardRef.current = null;
       },
-      clearUserDrawings(): void {
-        dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
+      clearUserDrawings(): boolean {
+        return dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
       },
-      cancelUserDrawingDraft(): void {
-        dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'api' } });
+      cancelUserDrawingDraft(): boolean {
+        return dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'api' } });
       },
       beginUserDrawingTextEdit(drawingId?: string): boolean {
         return dispatchUserDrawingCommandToState({ type: 'beginTextEdit', drawingId, meta: { source: 'api' } });
