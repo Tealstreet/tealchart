@@ -138,17 +138,20 @@ describe('user drawing placement modes', () => {
     expect(getUserDrawingPlacementMode('select')).toBe('select');
   });
 
-  it('constrains shape placement drags to a visual square', () => {
-    const constrained = resolveUserDrawingPlacementConstraint({
-      tool: 'rectangle',
-      startPoint: point(10, 90),
-      currentPoint: point(30, 80),
-      spacesByPaneId: new Map([['main', space]]),
-      options: { constrainedPlacement: true },
-    });
+  it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(
+    'constrains %s placement drags to a visual square',
+    (tool) => {
+      const constrained = resolveUserDrawingPlacementConstraint({
+        tool,
+        startPoint: point(10, 90),
+        currentPoint: point(30, 80),
+        spacesByPaneId: new Map([['main', space]]),
+        options: { constrainedPlacement: true },
+      });
 
-    expect(constrained.anchor).toEqual({ time: 30, price: 70 });
-  });
+      expect(constrained.anchor).toEqual({ time: 30, price: 70 });
+    },
+  );
 
   it.each(['trendLine', 'trendAngle'] satisfies UserDrawingTool[])(
     'snaps %s placement drags to 45-degree visual increments',

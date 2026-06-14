@@ -2,7 +2,11 @@ import type { ChartDimensions, PaneInfo } from './coordinates';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { resolveUserDrawingPlacementConstraint, type DrawingCoordinateSpace } from '../../drawings';
+import {
+  resolveUserDrawingPlacementConstraint,
+  type DrawingCoordinateSpace,
+  type UserDrawingTool,
+} from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
   resolveMobileUserDrawingDuplicateEditDragEnabled,
@@ -128,56 +132,59 @@ describe('mobile user drawing input resolver', () => {
     ).toBe(true);
   });
 
-  it('feeds constrained placement geometry from resolved mobile touch anchors', () => {
-    const viewport = {
-      startTime: 1_000,
-      endTime: 3_000,
-      priceMin: 90,
-      priceMax: 110,
-    };
-    const startPoint = resolveMobileUserDrawingInputPoint({
-      point: { x: 48, y: 32 },
-      viewport,
-      dimensions,
-      panes,
-    });
-    const currentPoint = resolveMobileUserDrawingInputPoint({
-      point: { x: 88, y: 52 },
-      viewport,
-      dimensions,
-      panes,
-    });
-    const spacesByPaneId = new Map<string, DrawingCoordinateSpace>(
-      panes.map((pane) => [
-        pane.id,
-        {
-          viewport,
-          pane: {
-            id: pane.id,
-            top: pane.top,
-            height: pane.height,
-            bottom: pane.top + pane.height,
-            yMin: pane.yMin,
-            yMax: pane.yMax,
+  it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(
+    'feeds constrained %s placement geometry from resolved mobile touch anchors',
+    (tool) => {
+      const viewport = {
+        startTime: 1_000,
+        endTime: 3_000,
+        priceMin: 90,
+        priceMax: 110,
+      };
+      const startPoint = resolveMobileUserDrawingInputPoint({
+        point: { x: 48, y: 32 },
+        viewport,
+        dimensions,
+        panes,
+      });
+      const currentPoint = resolveMobileUserDrawingInputPoint({
+        point: { x: 88, y: 52 },
+        viewport,
+        dimensions,
+        panes,
+      });
+      const spacesByPaneId = new Map<string, DrawingCoordinateSpace>(
+        panes.map((pane) => [
+          pane.id,
+          {
+            viewport,
+            pane: {
+              id: pane.id,
+              top: pane.top,
+              height: pane.height,
+              bottom: pane.top + pane.height,
+              yMin: pane.yMin,
+              yMax: pane.yMax,
+            },
+            chartLeft: dimensions.margins.left,
+            chartRight: dimensions.width - dimensions.margins.right,
           },
-          chartLeft: dimensions.margins.left,
-          chartRight: dimensions.width - dimensions.margins.right,
-        },
-      ]),
-    );
+        ]),
+      );
 
-    expect(startPoint).not.toBeNull();
-    expect(currentPoint).not.toBeNull();
+      expect(startPoint).not.toBeNull();
+      expect(currentPoint).not.toBeNull();
 
-    const constrained = resolveUserDrawingPlacementConstraint({
-      tool: 'rectangle',
-      startPoint,
-      currentPoint: currentPoint!,
-      spacesByPaneId,
-      options: { constrainedPlacement: true },
-    });
+      const constrained = resolveUserDrawingPlacementConstraint({
+        tool,
+        startPoint,
+        currentPoint: currentPoint!,
+        spacesByPaneId,
+        options: { constrainedPlacement: true },
+      });
 
-    expect(constrained.anchor.time).toBeCloseTo(1_588.235294);
-    expect(constrained.anchor.price).toBeCloseTo(100);
-  });
+      expect(constrained.anchor.time).toBeCloseTo(1_588.235294);
+      expect(constrained.anchor.price).toBeCloseTo(100);
+    },
+  );
 });
