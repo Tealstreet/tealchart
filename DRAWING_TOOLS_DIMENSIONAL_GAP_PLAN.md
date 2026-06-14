@@ -258,11 +258,11 @@ Phase 2: Draft lifecycle
 - Support preview anchor updates without committing.
 - Prevent accidental zero-size or default-size drawings.
 - Status: active web drawing drags now cancel through an explicit drawing-drag
-  cancel callback on Escape and touchcancel, clearing draft previews and the
-  draft through the same owner command path. Mobile Skia command coverage
-  verifies host-triggered placement cancellation stays out of undo history, and
-  native failed/cancelled pan finalization now routes drawing drags to cancel
-  instead of commit.
+  cancel callback on Escape, browser window blur, and touchcancel, clearing
+  draft previews and the draft through the same owner command path. Mobile Skia
+  command coverage verifies host-triggered placement and progressed path-drag
+  cancellation stay out of undo history, and native failed/cancelled pan
+  finalization now routes drawing drags to cancel instead of commit.
 
 Phase 3: Gesture thresholds and constraints
 
