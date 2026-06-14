@@ -120,6 +120,7 @@ import {
   WidgetEventCallback,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
+import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs } from './viewport/viewScale';
@@ -154,6 +155,7 @@ export class TealchartWidget {
 
   // Context menu
   private _contextMenuCallback: ContextMenuCallback | null = null;
+  private _userDrawingObjectTreePanel: UserDrawingObjectTreePanel | null = null;
 
   // Keyboard shortcuts
   private _shortcuts: Map<string, (e: KeyboardEvent) => void> = new Map();
@@ -2195,6 +2197,11 @@ export class TealchartWidget {
     // Clean up event emitter
     this._eventEmitter.removeAllListeners();
 
+    if (this._userDrawingObjectTreePanel) {
+      this._userDrawingObjectTreePanel.close();
+      this._userDrawingObjectTreePanel = null;
+    }
+
     // Dispose vanilla UI — preserve DOM so the new widget can show old
     // content until its first paint with bars (prevents blank flash).
     // The new widget's cleanupStaleSiblings() handles removal.
@@ -2266,6 +2273,7 @@ export class TealchartWidget {
     }
     this._userDrawingState = state;
     this._options.onUserDrawingStateChange?.(state);
+    this._refreshUserDrawingObjectTreePanel();
     this._scheduler.markDirty(DIRTY.USER_DRAWINGS);
     if (options.markLayoutDirty !== false && !isUserDrawingLayoutStateEqual(previousState, state)) {
       this._markDirty();
@@ -2598,7 +2606,11 @@ export class TealchartWidget {
 
   openUserDrawingObjectTree(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
     const model = this.getUserDrawingObjectTreeModel(options);
-    this._options.onUserDrawingObjectTreeOpen?.(model);
+    if (this._options.onUserDrawingObjectTreeOpen) {
+      this._options.onUserDrawingObjectTreeOpen(model);
+    } else {
+      this._openUserDrawingObjectTreePanel(model);
+    }
     return model;
   }
 
@@ -2635,6 +2647,25 @@ export class TealchartWidget {
       this._options.onUserDrawingPropertiesOpen?.(intent);
     }
     return intent;
+  }
+
+  private _openUserDrawingObjectTreePanel(model = this.getUserDrawingObjectTreeModel()): void {
+    if (this._userDrawingObjectTreePanel) {
+      this._userDrawingObjectTreePanel.updateModel(model);
+      return;
+    }
+
+    this._userDrawingObjectTreePanel = new UserDrawingObjectTreePanel({
+      model,
+      onDispatch: (action) => this.dispatchUserDrawingObjectTreeAction(action),
+      onClose: () => {
+        this._userDrawingObjectTreePanel = null;
+      },
+    });
+  }
+
+  private _refreshUserDrawingObjectTreePanel(): void {
+    this._userDrawingObjectTreePanel?.updateModel(this.getUserDrawingObjectTreeModel());
   }
 
   private _createUserDrawingId(): string {

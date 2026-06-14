@@ -1,8 +1,4 @@
-export type UserDrawingVisualEvidenceViewportId =
-  | 'desktop'
-  | 'narrowDesktop'
-  | 'mobilePortrait'
-  | 'mobileLandscape';
+export type UserDrawingVisualEvidenceViewportId = 'desktop' | 'narrowDesktop' | 'mobilePortrait' | 'mobileLandscape';
 
 export type UserDrawingVisualEvidenceStateId =
   | 'emptyChartDrawingRail'
@@ -92,10 +88,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         mobile: 'ready',
         notes: 'Both platforms have first-party chart surfaces for manual layout evidence.',
       },
-      expectedChecks: [
-        'Chart remains max-size.',
-        'Overlays do not hide legend, axes, or candles unexpectedly.',
-      ],
+      expectedChecks: ['Chart remains max-size.', 'Overlays do not hide legend, axes, or candles unexpectedly.'],
     },
     {
       id: 'activeToolDraft',
@@ -107,9 +100,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         mobile: 'ready',
         notes: 'Both platforms render active draft primitives from the shared drawing state.',
       },
-      expectedChecks: [
-        'Draft style, opacity, handles, and cancellation state match platform expectations.',
-      ],
+      expectedChecks: ['Draft style, opacity, handles, and cancellation state match platform expectations.'],
     },
     {
       id: 'selectedDrawing',
@@ -121,9 +112,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         mobile: 'ready',
         notes: 'Both platforms render selected primitives and action anchors.',
       },
-      expectedChecks: [
-        'Handles are visible, stable, clipped to pane, and do not shift layout.',
-      ],
+      expectedChecks: ['Handles are visible, stable, clipped to pane, and do not shift layout.'],
     },
     {
       id: 'floatingActionToolbar',
@@ -135,9 +124,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         mobile: 'ready',
         notes: 'Web floating toolbar and mobile selected action surface share selected-action descriptors.',
       },
-      expectedChecks: [
-        'Delete, duplicate, z-order, style, lock, and hide actions map to the same command semantics.',
-      ],
+      expectedChecks: ['Delete, duplicate, z-order, style, lock, and hide actions map to the same command semantics.'],
     },
     {
       id: 'contextMenuLongPress',
@@ -149,9 +136,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         mobile: 'ready',
         notes: 'Web context menu and mobile long-press menu consume shared context actions.',
       },
-      expectedChecks: [
-        'Ordering, visibility, lock, duplicate, delete, and properties actions remain reachable.',
-      ],
+      expectedChecks: ['Ordering, visibility, lock, duplicate, delete, and properties actions remain reachable.'],
     },
     {
       id: 'objectTree',
@@ -159,9 +144,10 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       webEvidence: 'Row order, selected rows, lock/visibility/name state.',
       mobileEvidence: 'Mobile object tree/sheet or app-owned surface using the shared row model.',
       status: {
-        web: 'app-owned',
-        mobile: 'app-owned',
-        notes: 'Both platforms expose app-owned object-tree open/dispatch APIs backed by shared row, selection, rename, and z-order action models.',
+        web: 'ready',
+        mobile: 'ready',
+        notes:
+          'Both platforms include built-in object-tree surfaces when no app-owned callback is supplied, while preserving app-owned open/dispatch APIs backed by shared row, selection, rename, and z-order action models.',
       },
       expectedChecks: [
         'Row order matches z-order.',
