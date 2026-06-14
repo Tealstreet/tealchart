@@ -21,6 +21,7 @@
     "dist",
     "src/mobile/**",
     "src/SkiaTealchart.tsx",
+    "src/SkiaTealchart.test.tsx",
     "src/index.native.ts",
     "native.ts"
   ],
