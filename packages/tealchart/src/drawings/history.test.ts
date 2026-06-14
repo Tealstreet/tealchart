@@ -135,6 +135,37 @@ describe('user drawing command history', () => {
     expect(redo.state.stayInDrawingMode).toBe(false);
   });
 
+  it('preserves current stay-in-drawing-mode across undo and redo snapshots', () => {
+    let state = createStateWithTrendLine();
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'delete',
+      options: { drawingId: 'trend-line' },
+      meta: { source: 'api' },
+    }));
+    expect(state.drawings).toHaveLength(0);
+    expect(history.undoStack).toHaveLength(1);
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setStayInDrawingMode',
+      stayInDrawingMode: false,
+      meta: { source: 'toolbar' },
+    }));
+    expect(state.stayInDrawingMode).toBe(false);
+    expect(history.undoStack).toHaveLength(1);
+
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.changed).toBe(true);
+    expect(undo.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line']);
+    expect(undo.state.stayInDrawingMode).toBe(false);
+
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.changed).toBe(true);
+    expect(redo.state.drawings).toHaveLength(0);
+    expect(redo.state.stayInDrawingMode).toBe(false);
+  });
+
   it('clears redo when a new committed command is recorded', () => {
     let state = createUserDrawingState();
     let history = createUserDrawingCommandHistory();
