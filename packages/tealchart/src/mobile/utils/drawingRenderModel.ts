@@ -1585,7 +1585,7 @@ function primitiveFromGeometry(
       };
     case 'path':
     case 'brush':
-    case 'highlighter':
+    case 'highlighter': {
       const pathDrawing = geometry.drawing as PathDrawing | BrushDrawing | HighlighterDrawing;
       return {
         kind: geometry.kind,
@@ -1603,6 +1603,7 @@ function primitiveFromGeometry(
         ),
         style: geometry.drawing.style,
       };
+    }
     case 'curve':
       return {
         kind: 'curve',
