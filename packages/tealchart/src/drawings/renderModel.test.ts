@@ -71,8 +71,8 @@ describe('user drawing render model', () => {
         'solid',
       ),
     ).toEqual([
-      { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2 },
-      { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5 },
+      { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2, lineDashOffset: 0 },
+      { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5, lineDashOffset: Math.hypot(40, -40) },
     ]);
   });
 
@@ -93,7 +93,7 @@ describe('user drawing render model', () => {
     ).toEqual([]);
   });
 
-  it('preserves dashed and dotted freehand paths on the continuous single-stroke render path', () => {
+  it('derives dash offsets for dashed and dotted pressure segments', () => {
     const anchors = [
       { time: 10, price: 90, pressure: 0 },
       { time: 50, price: 50, pressure: 0 },
@@ -105,8 +105,14 @@ describe('user drawing render model', () => {
       { x: 90, y: 10 },
     ];
 
-    expect(resolveUserDrawingPressureStrokeSegments(anchors, points, 8, 'dashed')).toEqual([]);
-    expect(resolveUserDrawingPressureStrokeSegments(anchors, points, 8, 'dotted')).toEqual([]);
+    expect(resolveUserDrawingPressureStrokeSegments(anchors, points, 8, 'dashed')).toMatchObject([
+      { lineWidth: 2, lineDashOffset: 0 },
+      { lineWidth: 5, lineDashOffset: Math.hypot(40, 40) },
+    ]);
+    expect(resolveUserDrawingPressureStrokeSegments(anchors, points, 8, 'dotted')).toMatchObject([
+      { lineWidth: 2, lineDashOffset: 0 },
+      { lineWidth: 5, lineDashOffset: Math.hypot(40, 40) },
+    ]);
   });
 
   it('marks committed selection and appends draft previews', () => {

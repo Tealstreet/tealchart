@@ -3418,8 +3418,8 @@ describe('mobile user drawing render model', () => {
         { x: 90, y: 10 },
       ],
       pressureSegments: [
-        { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2 },
-        { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5 },
+        { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2, lineDashOffset: 0 },
+        { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5, lineDashOffset: Math.hypot(40, -40) },
       ],
       style: pressureStyle,
     });
@@ -3568,8 +3568,8 @@ describe('mobile user drawing render model', () => {
         { x: 90, y: 10 },
       ],
       pressureSegments: [
-        { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2 },
-        { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5 },
+        { start: { x: 10, y: 10 }, end: { x: 50, y: 50 }, lineWidth: 2, lineDashOffset: 0 },
+        { start: { x: 50, y: 50 }, end: { x: 90, y: 10 }, lineWidth: 5, lineDashOffset: Math.hypot(40, -40) },
       ],
       style: pressureStyle,
     });
