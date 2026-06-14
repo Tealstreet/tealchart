@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { resolveUserDrawingPropertiesSurface } from '../../drawings';
+import { clearChartStoreCache } from '../../state/chartState';
 import { UserDrawingPropertiesSheet } from './UserDrawingPropertiesSheet';
 
 const state: UserDrawingState = {
@@ -45,6 +46,7 @@ const state: UserDrawingState = {
 describe('UserDrawingPropertiesSheet', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('renders the shared properties surface and dispatches enabled controls', () => {
