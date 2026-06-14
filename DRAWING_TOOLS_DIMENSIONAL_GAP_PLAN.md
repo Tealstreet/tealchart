@@ -853,7 +853,10 @@ Phase 1: Command-backed APIs
   added drawings select by default, and both platforms share the same
   command/history behavior. Global clear, hide/show all, and lock/unlock all
   actions now route through the shared toolbar descriptors and explicit
-  all-drawing command options on both web Canvas and mobile Skia topbars.
+  all-drawing command options on both web Canvas and mobile Skia topbars. Web
+  and mobile handles also expose explicit `hideAllUserDrawings`,
+  `showAllUserDrawings`, `lockAllUserDrawings`, and `unlockAllUserDrawings`
+  convenience APIs over the same command options.
 
 Phase 2: Event subscriptions
 
