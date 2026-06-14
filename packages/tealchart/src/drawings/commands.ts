@@ -67,6 +67,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingLocked,
   setUserDrawingName,
+  setUserDrawingStayInDrawingMode,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
   setUserDrawingTableDimensions,
@@ -110,6 +111,7 @@ interface UserDrawingCommandBase {
 
 export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setActiveTool'; tool: UserDrawingTool })
+  | (UserDrawingCommandBase & { type: 'setStayInDrawingMode'; stayInDrawingMode: boolean })
   | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
   | (UserDrawingCommandBase & { type: 'selectMany'; drawingIds: readonly string[] })
@@ -406,6 +408,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
   switch (command.type) {
     case 'setActiveTool':
       return setUserDrawingTool(state, command.tool);
+    case 'setStayInDrawingMode':
+      return setUserDrawingStayInDrawingMode(state, command.stayInDrawingMode);
     case 'add':
       return addUserDrawing(state, command.drawing, command.options);
     case 'select':

@@ -887,6 +887,7 @@ export interface UserDrawingState {
   version: number;
   drawings: readonly UserDrawing[];
   activeTool: UserDrawingTool;
+  stayInDrawingMode: boolean;
   selection: UserDrawingSelection | null;
   draft: UserDrawingDraft | null;
   textEdit: UserDrawingTextEdit | null;
@@ -1034,6 +1035,7 @@ export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   version: USER_DRAWING_SCHEMA_VERSION,
   drawings: [],
   activeTool: 'select',
+  stayInDrawingMode: true,
   selection: null,
   draft: null,
   textEdit: null,

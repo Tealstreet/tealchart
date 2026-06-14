@@ -129,6 +129,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     version: USER_DRAWING_SCHEMA_VERSION,
     drawings: [],
     activeTool: 'select',
+    stayInDrawingMode: true,
     selection: null,
     draft: null,
     textEdit: null,
@@ -161,6 +162,18 @@ export function setUserDrawingTool(state: UserDrawingState, tool: UserDrawingToo
     draft: null,
     textEdit: null,
   };
+}
+
+export function setUserDrawingStayInDrawingMode(state: UserDrawingState, stayInDrawingMode: boolean): UserDrawingState {
+  if (state.stayInDrawingMode === stayInDrawingMode) return state;
+  return {
+    ...state,
+    stayInDrawingMode,
+  };
+}
+
+function resolveUserDrawingActiveToolAfterPlacement(state: UserDrawingState): UserDrawingTool {
+  return state.stayInDrawingMode ? state.activeTool : 'select';
 }
 
 export function selectUserDrawing(
@@ -963,6 +976,7 @@ export function handleUserDrawingInput(
 
   return {
     ...state,
+    activeTool: resolveUserDrawingActiveToolAfterPlacement(state),
     drawings: [...state.drawings, drawing],
     selection: { drawingId: drawing.id },
     draft: null,
@@ -1131,6 +1145,7 @@ export function commitUserDrawingPathDrag(
 
   return {
     ...state,
+    activeTool: resolveUserDrawingActiveToolAfterPlacement(state),
     drawings: [...state.drawings, drawing],
     selection: { drawingId: drawing.id },
     draft: null,

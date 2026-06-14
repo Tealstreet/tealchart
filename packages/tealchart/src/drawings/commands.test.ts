@@ -33,6 +33,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingLocked,
   setUserDrawingName,
+  setUserDrawingStayInDrawingMode,
   setUserDrawingTableCells,
   setUserDrawingTableCell,
   setUserDrawingTableDimensions,
@@ -70,6 +71,7 @@ const multiPaneSpacesByPaneId = new Map([
 ]);
 const coveredUserDrawingCommandTypes = [
   'setActiveTool',
+  'setStayInDrawingMode',
   'add',
   'select',
   'selectMany',
@@ -203,6 +205,29 @@ describe('user drawing command dispatch', () => {
 
     expect(secondCommand.state).toEqual(secondDirect);
     expect(secondCommand.state.selection).toEqual({ drawingId: 'rect' });
+  });
+
+  it('wraps stay-in-drawing-mode reducer without changing behavior', () => {
+    const initial = createUserDrawingState();
+    const direct = setUserDrawingStayInDrawingMode(initial, false);
+    const command = dispatchUserDrawingCommand(initial, {
+      type: 'setStayInDrawingMode',
+      stayInDrawingMode: false,
+      meta: { source: 'toolbar', timestamp: 2 },
+    });
+
+    expect(command.state).toEqual(direct);
+    expect(command.changed).toBe(true);
+    expect(command.meta).toEqual({ source: 'toolbar', timestamp: 2 });
+
+    const unchanged = dispatchUserDrawingCommand(command.state, {
+      type: 'setStayInDrawingMode',
+      stayInDrawingMode: false,
+      meta: { source: 'toolbar' },
+    });
+
+    expect(unchanged.state).toBe(command.state);
+    expect(unchanged.changed).toBe(false);
   });
 
   it('derives affected drawing ids for reorder command events', () => {
