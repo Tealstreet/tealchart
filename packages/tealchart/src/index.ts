@@ -472,6 +472,7 @@ export type {
   UserDrawingCommandDispatchResult,
   UserDrawingCommandEvent,
   UserDrawingCommandEventCommand,
+  UserDrawingCommandEventListener,
   UserDrawingHistoryCommand,
   UserDrawingReplaceStateCommand,
   UserDrawingCommandMetadata,
@@ -549,6 +550,8 @@ export type {
   ExecutionLineRenderData,
   // TradingView-compatible types
   WidgetEvent,
+  WidgetEventCallback,
+  WidgetEventMap,
   ResolutionString,
   CrossHairMovedEventParams,
   EnhancedCrossHairState,
