@@ -2,10 +2,13 @@ import type {
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
-  UserDrawingObjectTreeRowActionType,
 } from '../drawings';
 
-import { resolveUserDrawingObjectTreeRowDispatchAction } from '../drawings';
+import {
+  resolveUserDrawingObjectTreeRowDispatchAction,
+  USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
+  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
+} from '../drawings';
 import { button, div, span } from './dom';
 
 export interface UserDrawingObjectTreePanelOptions {
@@ -76,10 +79,9 @@ const styles = {
     textTransform: 'uppercase',
   } as Partial<CSSStyleDeclaration>,
   row: {
-    display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1fr) auto',
+    display: 'flex',
+    flexDirection: 'column',
     gap: '8px',
-    alignItems: 'center',
     minHeight: '38px',
     padding: '6px 6px 6px 8px',
     borderRadius: '4px',
@@ -115,10 +117,12 @@ const styles = {
   rowActions: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
     gap: '4px',
   } as Partial<CSSStyleDeclaration>,
   actionButton: {
-    minWidth: '28px',
+    minWidth: '26px',
     height: '26px',
     padding: '0 7px',
     border: '0',
@@ -133,28 +137,6 @@ const styles = {
     cursor: 'default',
   } as Partial<CSSStyleDeclaration>,
 };
-
-const ACTION_LABELS: Partial<Record<UserDrawingObjectTreeRowActionType, string>> = {
-  hide: 'Hide',
-  show: 'Show',
-  lock: 'Lock',
-  unlock: 'Unlock',
-  duplicate: 'Copy',
-  delete: 'Del',
-  bringForward: 'Up',
-  sendBackward: 'Down',
-};
-
-const RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
-  'hide',
-  'show',
-  'lock',
-  'unlock',
-  'duplicate',
-  'delete',
-  'bringForward',
-  'sendBackward',
-];
 
 export class UserDrawingObjectTreePanel {
   private model: UserDrawingObjectTreeModel;
@@ -275,7 +257,7 @@ export class UserDrawingObjectTreePanel {
 
   private createRowActions(row: UserDrawingObjectTreeRow): HTMLDivElement {
     const actions = div({ style: styles.rowActions });
-    for (const actionType of RENDERED_ROW_ACTIONS) {
+    for (const actionType of USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS) {
       const descriptor = row.actions?.find((action) => action.type === actionType);
       if (!descriptor) continue;
       const enabled = descriptor.enabled;
@@ -285,7 +267,7 @@ export class UserDrawingObjectTreePanel {
             ...styles.actionButton,
             ...(enabled ? {} : styles.actionButtonDisabled),
           },
-          text: ACTION_LABELS[actionType] ?? descriptor.label,
+          text: USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS[actionType] ?? descriptor.label,
           attrs: {
             type: 'button',
             title: descriptor.label,

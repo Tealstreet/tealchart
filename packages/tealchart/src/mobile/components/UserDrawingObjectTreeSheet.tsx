@@ -9,7 +9,11 @@ import React, { memo, useCallback } from 'react';
 
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 
-import { resolveUserDrawingObjectTreeRowDispatchAction } from '../../drawings';
+import {
+  resolveUserDrawingObjectTreeRowDispatchAction,
+  USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
+  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
+} from '../../drawings';
 
 export interface UserDrawingObjectTreeSheetProps {
   visible: boolean;
@@ -17,28 +21,6 @@ export interface UserDrawingObjectTreeSheetProps {
   onDispatch: (action: UserDrawingObjectTreeDispatchAction) => boolean;
   onClose: () => void;
 }
-
-const RENDERED_ROW_ACTIONS: readonly UserDrawingObjectTreeRowActionType[] = [
-  'hide',
-  'show',
-  'lock',
-  'unlock',
-  'duplicate',
-  'delete',
-  'bringForward',
-  'sendBackward',
-];
-
-const ACTION_LABELS: Partial<Record<UserDrawingObjectTreeRowActionType, string>> = {
-  hide: 'Hide',
-  show: 'Show',
-  lock: 'Lock',
-  unlock: 'Unlock',
-  duplicate: 'Copy',
-  delete: 'Del',
-  bringForward: 'Up',
-  sendBackward: 'Down',
-};
 
 export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProps> = memo(
   ({ visible, model, onDispatch, onClose }) => {
@@ -106,7 +88,7 @@ export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProp
                                   </View>
                                 </Pressable>
                                 <View style={styles.rowActions}>
-                                  {RENDERED_ROW_ACTIONS.map((actionType) => {
+                                  {USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS.map((actionType) => {
                                     const descriptor = row.actions?.find((action) => action.type === actionType);
                                     if (!descriptor) return null;
                                     return (
@@ -130,7 +112,7 @@ export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProp
                                             !descriptor.enabled && styles.actionTextDisabled,
                                           ]}
                                         >
-                                          {ACTION_LABELS[actionType] ?? descriptor.label}
+                                          {USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS[actionType] ?? descriptor.label}
                                         </Text>
                                       </Pressable>
                                     );
@@ -211,9 +193,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingVertical: 4,
     borderRadius: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     gap: 8,
   },
   rowSelected: {
@@ -257,11 +238,13 @@ const styles = StyleSheet.create({
   },
   rowActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: 4,
   },
   actionButton: {
-    minWidth: 30,
+    minWidth: 28,
     height: 28,
     paddingHorizontal: 6,
     borderRadius: 5,
