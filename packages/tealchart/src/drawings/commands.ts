@@ -90,6 +90,7 @@ export type UserDrawingCommandSource =
   | 'touch'
   | 'keyboard'
   | 'api'
+  | 'layout'
   | 'toolbar'
   | 'contextMenu'
   | 'objectTree'
@@ -219,7 +220,8 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'reorder'; action: UserDrawingZOrderAction; options?: UpdateUserDrawingOptions });
 
 export type UserDrawingHistoryCommand = UserDrawingCommandBase & { type: 'undo' | 'redo' };
-export type UserDrawingCommandEventCommand = UserDrawingCommand | UserDrawingHistoryCommand;
+export type UserDrawingReplaceStateCommand = UserDrawingCommandBase & { type: 'replaceState' };
+export type UserDrawingCommandEventCommand = UserDrawingCommand | UserDrawingHistoryCommand | UserDrawingReplaceStateCommand;
 
 export interface UserDrawingCommandDispatchResult {
   state: UserDrawingState;
@@ -312,6 +314,22 @@ export function createUserDrawingHistoryCommandEvent(
   changed: boolean,
 ): UserDrawingCommandEvent | null {
   if (!changed) return null;
+  return {
+    command,
+    previousState,
+    state,
+    meta: command.meta,
+    source: command.meta?.source,
+    affectedIds: command.meta?.affectedIds ?? resolveUserDrawingCommandAffectedIds(previousState, state),
+  };
+}
+
+export function createUserDrawingReplaceStateCommandEvent(
+  previousState: UserDrawingState,
+  state: UserDrawingState,
+  command: UserDrawingReplaceStateCommand,
+): UserDrawingCommandEvent | null {
+  if (previousState === state) return null;
   return {
     command,
     previousState,

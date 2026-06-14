@@ -167,6 +167,7 @@ import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/draw
 import {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
+  replaceMobileUserDrawingState,
 } from './mobile/utils/drawingPersistence';
 import {
   isMobileUserDrawingTextBoxPrimitive,
@@ -590,6 +591,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [dispatchUserDrawingCommandToStateWithResult],
   );
 
+  const replaceUserDrawingState = useCallback(
+    (nextState: UserDrawingState, source: 'api' | 'layout') => {
+      const previousState = userDrawingStateRef.current;
+      const result = replaceMobileUserDrawingState(previousState, userDrawingHistoryRef.current, nextState, source);
+      userDrawingHistoryRef.current = result.history;
+      commitUserDrawingState(result.state);
+      if (result.event) notifyUserDrawingCommand(result.event);
+    },
+    [commitUserDrawingState, notifyUserDrawingCommand],
+  );
+
   // Create indicator manager (stable ref)
   const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
   if (!indicatorManagerRef.current) {
@@ -625,12 +637,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return exportMobileUserDrawingStateForLayout(userDrawingStateRef.current);
       },
       importUserDrawingStateFromLayout(nextState?: UserDrawingState | null): void {
-        userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
-        commitUserDrawingState(importMobileUserDrawingStateFromLayout(nextState));
+        replaceUserDrawingState(importMobileUserDrawingStateFromLayout(nextState), 'layout');
       },
       setUserDrawingState(nextState: UserDrawingState): void {
-        userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
-        commitUserDrawingState(nextState);
+        replaceUserDrawingState(nextState, 'api');
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): void {
         dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
@@ -1012,6 +1022,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       notifyUserDrawingCommand,
       onUserDrawingObjectTreeOpen,
       onUserDrawingPropertiesOpen,
+      replaceUserDrawingState,
     ],
   );
 

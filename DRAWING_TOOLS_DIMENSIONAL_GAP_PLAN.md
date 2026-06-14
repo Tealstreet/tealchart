@@ -822,7 +822,9 @@ Phase 2: Event subscriptions
   `onUserDrawingCommand` and `widget.subscribe('user_drawing_command', ...)`;
   mobile Skia exposes the same event shape through `onUserDrawingCommand` and
   the mobile command utility covers the sibling command-event behavior. Direct
-  state replacement/import remains silent.
+  state replacement and layout import now emit non-undoable `replaceState`
+  command events on both web Canvas and mobile Skia imperative paths when the
+  committed drawing layout changes.
 
 Phase 3: Error behavior
 
