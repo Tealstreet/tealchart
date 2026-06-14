@@ -318,7 +318,7 @@ export interface SkiaTealchartHandle {
   isUserDrawingPlacementConstrained(): boolean;
   copySelectedUserDrawing(): boolean;
   pasteUserDrawingClipboard(): boolean;
-  clearUserDrawingClipboard(): void;
+  clearUserDrawingClipboard(): boolean;
   clearUserDrawings(): boolean;
   cancelUserDrawingDraft(): boolean;
   beginUserDrawingTextEdit(drawingId?: string): boolean;
@@ -840,8 +840,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           meta: { source: 'keyboard' },
         });
       },
-      clearUserDrawingClipboard(): void {
+      clearUserDrawingClipboard(): boolean {
+        if (!userDrawingClipboardRef.current) return false;
         userDrawingClipboardRef.current = null;
+        return true;
       },
       clearUserDrawings(): boolean {
         return dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
