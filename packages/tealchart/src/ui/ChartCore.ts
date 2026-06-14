@@ -1421,9 +1421,8 @@ export class ChartCore {
         ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
         : undefined;
     const items = (drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? [];
-    if (items.length === 0) return;
-
     this.closeContextMenu();
+    if (items.length === 0) return;
 
     // Create menu
     this.contextMenu = div({
