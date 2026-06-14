@@ -137,13 +137,21 @@ function getMouseDrawingDragOptions(e: MouseEvent): DrawingDragEventOptions | un
   return createDrawingDragOptions({
     constrainedPlacement: e.shiftKey,
     duplicateOnDrag: e.shiftKey,
-    pressure: normalizeDrawingPressure((e as PointerEvent).pressure),
+    pressure: normalizeDrawingPressure((e as MouseEvent & { pressure?: number }).pressure),
   });
 }
 
 function getTouchDrawingDragOptions(touch: Touch): DrawingDragEventOptions | undefined {
   return createDrawingDragOptions({
     pressure: normalizeDrawingPressure(touch.force),
+  });
+}
+
+function getPointerDrawingDragOptions(e: PointerEvent): DrawingDragEventOptions | undefined {
+  return createDrawingDragOptions({
+    constrainedPlacement: e.shiftKey,
+    duplicateOnDrag: e.shiftKey,
+    pressure: normalizeDrawingPressure(e.pressure),
   });
 }
 
@@ -270,6 +278,7 @@ export class EventManager {
   private boundMouseMove: (e: MouseEvent) => void;
   private boundMouseUp: (e: MouseEvent) => void;
   private boundMouseLeave: (e: MouseEvent) => void;
+  private boundPointerDown: (e: PointerEvent) => void;
   private boundWheel: (e: WheelEvent) => void;
   private boundContextMenu: (e: MouseEvent) => void;
   private boundTouchStart: (e: TouchEvent) => void;
@@ -278,8 +287,12 @@ export class EventManager {
   private boundKeyDown: (e: KeyboardEvent) => void;
   private boundWindowMouseMove: (e: MouseEvent) => void;
   private boundWindowMouseUp: (e: MouseEvent) => void;
+  private boundWindowPointerMove: (e: PointerEvent) => void;
+  private boundWindowPointerUp: (e: PointerEvent) => void;
+  private boundWindowPointerCancel: (e: PointerEvent) => void;
   private boundWindowBlur: () => void;
   private boundDocumentMouseMove: (e: MouseEvent) => void;
+  private activeDrawingPointerId: number | null = null;
 
   constructor(container: HTMLElement, callbacks: EventManagerCallbacks) {
     this.container = container;
@@ -290,6 +303,7 @@ export class EventManager {
     this.boundMouseMove = this.handleMouseMove.bind(this);
     this.boundMouseUp = this.handleMouseUp.bind(this);
     this.boundMouseLeave = this.handleMouseLeave.bind(this);
+    this.boundPointerDown = this.handlePointerDown.bind(this);
     this.boundWheel = this.handleWheel.bind(this);
     this.boundContextMenu = this.handleContextMenu.bind(this);
     this.boundTouchStart = this.handleTouchStart.bind(this);
@@ -298,6 +312,9 @@ export class EventManager {
     this.boundKeyDown = this.handleKeyDown.bind(this);
     this.boundWindowMouseMove = this.handleWindowMouseMove.bind(this);
     this.boundWindowMouseUp = this.handleWindowMouseUp.bind(this);
+    this.boundWindowPointerMove = this.handleWindowPointerMove.bind(this);
+    this.boundWindowPointerUp = this.handleWindowPointerUp.bind(this);
+    this.boundWindowPointerCancel = this.handleWindowPointerCancel.bind(this);
     this.boundWindowBlur = this.handleWindowBlur.bind(this);
     this.boundDocumentMouseMove = this.handleDocumentMouseMove.bind(this);
 
@@ -354,6 +371,7 @@ export class EventManager {
     this.container.addEventListener('mousedown', this.boundMouseDown, { capture: true });
     this.container.addEventListener('mousemove', this.boundMouseMove, { capture: true });
     this.container.addEventListener('mouseleave', this.boundMouseLeave);
+    this.container.addEventListener('pointerdown', this.boundPointerDown, { capture: true });
     this.container.addEventListener('contextmenu', this.boundContextMenu, { capture: true });
 
     // Wheel event (capture, passive: false for preventDefault)
@@ -377,6 +395,7 @@ export class EventManager {
     this.container.removeEventListener('mousedown', this.boundMouseDown, { capture: true });
     this.container.removeEventListener('mousemove', this.boundMouseMove, { capture: true });
     this.container.removeEventListener('mouseleave', this.boundMouseLeave);
+    this.container.removeEventListener('pointerdown', this.boundPointerDown, { capture: true });
     this.container.removeEventListener('contextmenu', this.boundContextMenu, { capture: true });
     this.container.removeEventListener('wheel', this.boundWheel, { capture: true });
     this.container.removeEventListener('touchstart', this.boundTouchStart, { capture: true });
@@ -386,6 +405,7 @@ export class EventManager {
 
     // Window events (only if dragging was active)
     this.detachWindowDragListeners();
+    this.detachPointerDragListeners();
 
     // Document events
     document.removeEventListener('keydown', this.boundKeyDown);
@@ -424,16 +444,18 @@ export class EventManager {
       return;
     }
 
-    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', getMouseDrawingDragOptions(e))) {
+    const drawingDragOptions = getMouseDrawingDragOptions(e);
+    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', drawingDragOptions)) {
       this.state.isDragging = true;
       this.state.dragMode = 'pendingDrawing';
       this.state.dragStartX = x;
       this.state.dragStartY = y;
+      this._pendingMouseDrawingDragStartOptions = drawingDragOptions;
       this.attachWindowDragListeners();
       return;
     }
 
-    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', getMouseDrawingDragOptions(e))) {
+    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', drawingDragOptions)) {
       this.state.isDragging = true;
       this.state.dragMode = 'drawing';
       this.state.dragStartX = x;
@@ -484,10 +506,52 @@ export class EventManager {
     this.scheduleRender();
   }
 
+  private handlePointerDown(e: PointerEvent): void {
+    if (e.pointerType === 'mouse' || e.button !== 0) return;
+
+    const rect = this.container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (this.callbacks.isOverInteractiveElement?.(x, y)) {
+      return;
+    }
+
+    const drawingDragOptions = getPointerDrawingDragOptions(e);
+    const drawingDragPending = invokeDrawingDragCallback(
+      this.callbacks.onDrawingDragPending,
+      x,
+      y,
+      'mouse',
+      drawingDragOptions,
+    );
+    const drawingDragStarted =
+      !drawingDragPending &&
+      invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', drawingDragOptions);
+
+    if (!drawingDragPending && !drawingDragStarted) return;
+
+    this.callbacks.onMouseDown?.();
+    this.activeDrawingPointerId = e.pointerId;
+    this.state.isDragging = true;
+    this.state.dragMode = drawingDragPending ? 'pendingDrawing' : 'drawing';
+    this.state.dragStartX = x;
+    this.state.dragStartY = y;
+    this._pendingMouseDrawingDragStartOptions = drawingDragOptions;
+    this._pendingMouseDrawingDragOptions = drawingDragOptions;
+    this.attachPointerDragListeners();
+    if (drawingDragStarted) {
+      this.callbacks.onCursorChange?.('move');
+      this.scheduleRender();
+    }
+    e.preventDefault();
+  }
+
   // Unified pending input state — all high-frequency handlers store data and defer to RAF
   private _pendingEventType: 'none' | 'move' | 'drag' | 'touchmove' | 'leave' | 'docmove' = 'none';
   private _pendingMouseClientX = 0;
   private _pendingMouseClientY = 0;
+  private _pendingMouseDrawingDragStartOptions: DrawingDragEventOptions | undefined;
   private _pendingMouseDrawingDragOptions: DrawingDragEventOptions | undefined;
   private _pendingTouchEvent: TouchEvent | null = null;
   private _inputRafId: number | null = null;
@@ -623,11 +687,12 @@ export class EventManager {
       const distance = Math.hypot(x - this.state.dragStartX, y - this.state.dragStartY);
       if (distance < 5) return;
 
-      const options = this._pendingMouseDrawingDragOptions;
-      if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', options)) {
+      const startOptions = this._pendingMouseDrawingDragStartOptions ?? this._pendingMouseDrawingDragOptions;
+      const moveOptions = this._pendingMouseDrawingDragOptions;
+      if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', startOptions)) {
         this.state.dragMode = 'drawing';
         this.callbacks.onCursorChange?.('move');
-        invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', options);
+        invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', moveOptions);
         this.scheduleRender();
       }
       return;
@@ -666,6 +731,82 @@ export class EventManager {
     this.handleWindowMouseUp(e);
   }
 
+  private handleWindowPointerMove(e: PointerEvent): void {
+    if (!this.state.isDragging || e.pointerId !== this.activeDrawingPointerId) return;
+    this._pendingMouseClientX = e.clientX;
+    this._pendingMouseClientY = e.clientY;
+    this._pendingMouseDrawingDragOptions = getPointerDrawingDragOptions(e);
+    this._pendingEventType = 'drag';
+    this.scheduleInputProcessing();
+  }
+
+  private handleWindowPointerUp(e: PointerEvent): void {
+    if (e.pointerId !== this.activeDrawingPointerId) return;
+    this.callbacks.onMouseUp?.();
+
+    const rect = this.container.getBoundingClientRect();
+    const pointerX = e.clientX - rect.left;
+    const pointerY = e.clientY - rect.top;
+    const dx = Math.abs(pointerX - this.state.dragStartX);
+    const dy = Math.abs(pointerY - this.state.dragStartY);
+    const wasClick = dx < 5 && dy < 5;
+    const drawingDragOptions = getPointerDrawingDragOptions(e);
+
+    let wasDrawingDrag = this.state.dragMode === 'drawing';
+    if (!wasClick && this.state.dragMode === 'pendingDrawing') {
+      wasDrawingDrag = invokeDrawingDragCallback(
+        this.callbacks.onDrawingDragStart,
+        this.state.dragStartX,
+        this.state.dragStartY,
+        'mouse',
+        this._pendingMouseDrawingDragStartOptions ?? this._pendingMouseDrawingDragOptions,
+      );
+      if (wasDrawingDrag) {
+        invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, pointerX, pointerY, 'mouse', drawingDragOptions);
+      }
+    }
+
+    if (wasClick && !wasDrawingDrag) {
+      this.callbacks.onDrawingInput?.(pointerX, pointerY, 'mouse', {
+        additiveSelection: e.shiftKey || e.metaKey || e.ctrlKey,
+      });
+    }
+
+    if (this.state.isDragging) {
+      if (wasDrawingDrag) {
+        this.callbacks.onDrawingDragEnd?.('mouse');
+      }
+      this.state.isDragging = false;
+      this.state.dragMode = 'none';
+      this.callbacks.onCursorChange?.('crosshair');
+    }
+
+    this.state.dragStartViewport = null;
+    this.state.draggedPaneId = null;
+    this.state.dragStartPaneYRange = null;
+    this.state.dragStartPaneHeight = 0;
+    this.state.draggedDivider = null;
+    this._pendingMouseDrawingDragOptions = undefined;
+    this._pendingMouseDrawingDragStartOptions = undefined;
+    this.activeDrawingPointerId = null;
+    this.detachPointerDragListeners();
+    this.scheduleRender();
+    e.preventDefault();
+  }
+
+  private handleWindowPointerCancel(e: PointerEvent): void {
+    if (e.pointerId !== this.activeDrawingPointerId) return;
+    this.callbacks.onMouseUp?.();
+    if (this.state.dragMode === 'drawing') {
+      this.callbacks.onDrawingDragCancel?.('mouse');
+    }
+    this.resetDragState();
+    this.detachPointerDragListeners();
+    this.callbacks.onCursorChange?.('crosshair');
+    this.scheduleRender();
+    e.preventDefault();
+  }
+
   private handleWindowMouseUp(e: MouseEvent): void {
     this.callbacks.onMouseUp?.();
 
@@ -685,7 +826,7 @@ export class EventManager {
         this.state.dragStartX,
         this.state.dragStartY,
         'mouse',
-        drawingDragOptions,
+        this._pendingMouseDrawingDragStartOptions ?? drawingDragOptions,
       );
       if (wasDrawingDrag) {
         invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, mouseX, mouseY, 'mouse', drawingDragOptions);
@@ -746,6 +887,7 @@ export class EventManager {
     this.state.dragStartPaneHeight = 0;
     this.state.draggedDivider = null;
     this._pendingMouseDrawingDragOptions = undefined;
+    this._pendingMouseDrawingDragStartOptions = undefined;
 
     // Remove window listeners
     this.detachWindowDragListeners();
@@ -772,6 +914,20 @@ export class EventManager {
     window.removeEventListener('blur', this.boundWindowBlur);
   }
 
+  private attachPointerDragListeners(): void {
+    window.addEventListener('pointermove', this.boundWindowPointerMove);
+    window.addEventListener('pointerup', this.boundWindowPointerUp);
+    window.addEventListener('pointercancel', this.boundWindowPointerCancel);
+    window.addEventListener('blur', this.boundWindowBlur);
+  }
+
+  private detachPointerDragListeners(): void {
+    window.removeEventListener('pointermove', this.boundWindowPointerMove);
+    window.removeEventListener('pointerup', this.boundWindowPointerUp);
+    window.removeEventListener('pointercancel', this.boundWindowPointerCancel);
+    window.removeEventListener('blur', this.boundWindowBlur);
+  }
+
   private resetDragState(): void {
     this.state.isDragging = false;
     this.state.dragMode = 'none';
@@ -781,6 +937,8 @@ export class EventManager {
     this.state.dragStartPaneHeight = 0;
     this.state.draggedDivider = null;
     this._pendingMouseDrawingDragOptions = undefined;
+    this._pendingMouseDrawingDragStartOptions = undefined;
+    this.activeDrawingPointerId = null;
   }
 
   private handleWindowBlur(): void {
@@ -796,6 +954,7 @@ export class EventManager {
 
     this.resetDragState();
     this.detachWindowDragListeners();
+    this.detachPointerDragListeners();
     this.callbacks.onCursorChange?.('crosshair');
     this.scheduleRender();
   }

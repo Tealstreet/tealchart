@@ -971,7 +971,7 @@ export function handleUserDrawingInput(
 }
 
 function isSameDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor): boolean {
-  return a.time === b.time && a.price === b.price;
+  return a.time === b.time && a.price === b.price && a.pressure === b.pressure;
 }
 
 function interpolateUserDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor, t: number): UserDrawingAnchor {
