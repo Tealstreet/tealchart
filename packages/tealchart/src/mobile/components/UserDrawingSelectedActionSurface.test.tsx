@@ -79,6 +79,8 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
     fireEvent.click(screen.getByLabelText('Cycle selected drawing line color to #22c55e'));
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(screen.getByLabelText('Cycle selected drawing opacity to 75 percent'));
 
     expect(onChartTouch).not.toHaveBeenCalled();
     expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
@@ -97,6 +99,11 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'updateStyle',
       style: { lineColor: '#22c55e' },
+      meta: { source: 'toolbar' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { opacity: 0.75 },
       meta: { source: 'toolbar' },
     });
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'select' }));
