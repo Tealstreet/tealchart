@@ -2410,8 +2410,10 @@ export class TealchartWidget {
     });
   }
 
-  clearUserDrawingClipboard(): void {
+  clearUserDrawingClipboard(): boolean {
+    if (!this._userDrawingClipboard) return false;
     this._userDrawingClipboard = null;
+    return true;
   }
 
   clearUserDrawings(): boolean {
