@@ -145,6 +145,10 @@ export class ContextMenu {
 
   private createMenu(): HTMLDivElement {
     const menu = div({ style: styles.menu });
+    menu.addEventListener('mousedown', (event) => event.stopPropagation());
+    menu.addEventListener('mouseup', (event) => event.stopPropagation());
+    menu.addEventListener('click', (event) => event.stopPropagation());
+    menu.addEventListener('contextmenu', (event) => event.stopPropagation());
 
     for (const item of this.options.items) {
       if (item.text === '-' || item.text === 'divider') {
@@ -170,7 +174,8 @@ export class ContextMenu {
       },
       onClick: isDisabled
         ? undefined
-        : () => {
+        : (event) => {
+            event.stopPropagation();
             item.click?.();
             this.close();
           },
