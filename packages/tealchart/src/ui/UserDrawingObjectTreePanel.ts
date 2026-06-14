@@ -6,8 +6,8 @@ import type {
 
 import {
   resolveUserDrawingObjectTreeRowDispatchAction,
+  USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
   USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
-  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from '../drawings';
 import { button, div, input, span } from './dom';
 
@@ -332,7 +332,7 @@ export class UserDrawingObjectTreePanel {
       );
       return actions;
     }
-    for (const actionType of USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS) {
+    for (const actionType of USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS) {
       const descriptor = row.actions?.find((action) => action.type === actionType);
       if (!descriptor) continue;
       const enabled = descriptor.enabled;

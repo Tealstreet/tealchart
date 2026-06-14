@@ -11,8 +11,8 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWit
 
 import {
   resolveUserDrawingObjectTreeRowDispatchAction,
+  USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
   USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
-  USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from '../../drawings';
 
 export interface UserDrawingObjectTreeSheetProps {
@@ -148,7 +148,7 @@ export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProp
                                       </Pressable>
                                     </>
                                   ) : (
-                                    USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS.map((actionType) => {
+                                    USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS.map((actionType) => {
                                       const descriptor = row.actions?.find((action) => action.type === actionType);
                                       if (!descriptor) return null;
                                       return (

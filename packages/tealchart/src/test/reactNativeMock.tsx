@@ -17,6 +17,7 @@ interface TextInputProps {
   onBlur?: () => void;
   onChangeText?: (value: string) => void;
   onKeyPress?: (event: { nativeEvent: { key: string } }) => void;
+  onSubmitEditing?: () => void;
   style?: unknown;
   value?: string;
 }
@@ -64,14 +65,25 @@ export function Text({ children }: { children?: ReactNode }) {
   return <span>{children}</span>;
 }
 
-export function TextInput({ accessibilityLabel, onBlur, onChangeText, onKeyPress, style, value }: TextInputProps) {
+export function TextInput({
+  accessibilityLabel,
+  onBlur,
+  onChangeText,
+  onKeyPress,
+  onSubmitEditing,
+  style,
+  value,
+}: TextInputProps) {
   return (
     <textarea
       aria-label={accessibilityLabel}
       data-style={serializeStyle(style)}
       onBlur={onBlur}
       onChange={(event) => onChangeText?.(event.currentTarget.value)}
-      onKeyDown={(event) => onKeyPress?.({ nativeEvent: { key: event.key } })}
+      onKeyDown={(event) => {
+        onKeyPress?.({ nativeEvent: { key: event.key } });
+        if (event.key === 'Enter') onSubmitEditing?.();
+      }}
       value={value}
     />
   );
