@@ -26,6 +26,18 @@ const selectionActionAnchor = {
 };
 
 describe('ChartTopBar drawing toolbar', () => {
+  function openSelectedDrawingStylePopover(): HTMLButtonElement {
+    const trigger = document.querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]');
+    expect(trigger).not.toBeNull();
+    if (trigger?.getAttribute('aria-expanded') !== 'true') {
+      trigger?.click();
+    }
+    const expandedTrigger = document.querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]');
+    expect(expandedTrigger?.getAttribute('aria-expanded')).toBe('true');
+    expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).not.toBeNull();
+    return expandedTrigger!;
+  }
+
   afterEach(() => {
     document.body.innerHTML = '';
     clearChartStoreCache();
@@ -326,6 +338,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Dashed line style"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="10 percent opacity"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing border"]')?.click();
+    openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing line color to #22c55e"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing opacity to 75 percent"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing border"]')?.click();
@@ -368,6 +381,7 @@ describe('ChartTopBar drawing toolbar', () => {
         },
       ],
     });
+    openSelectedDrawingStylePopover();
     document
       .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing fill color to rgba(34, 197, 94, 0.12)"]')
       ?.click();
@@ -404,6 +418,7 @@ describe('ChartTopBar drawing toolbar', () => {
         },
       ],
     });
+    openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing text color to #22c55e"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="12 pixel font size"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
@@ -451,6 +466,7 @@ describe('ChartTopBar drawing toolbar', () => {
         },
       ],
     });
+    openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="120 pixel text box width"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="240 pixel text box width"]')?.click();
 
@@ -684,6 +700,7 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
+    openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected trend line extension to left"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line both ways"]')?.click();
@@ -746,6 +763,7 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
+    openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing icon to circle"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Flag icon"]')?.click();
 

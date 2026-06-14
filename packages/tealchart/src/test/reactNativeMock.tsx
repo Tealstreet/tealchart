@@ -75,10 +75,11 @@ export function Pressable({ accessibilityLabel, accessibilityState, children, di
   );
 }
 
-export function TouchableOpacity({ accessibilityLabel, children, disabled, onPress }: PressableProps) {
+export function TouchableOpacity({ accessibilityLabel, accessibilityState, children, disabled, onPress }: PressableProps) {
   return (
     <button
       aria-disabled={disabled ? 'true' : undefined}
+      aria-expanded={accessibilityState?.expanded === undefined ? undefined : accessibilityState.expanded ? 'true' : 'false'}
       aria-label={accessibilityLabel}
       disabled={disabled}
       onClick={

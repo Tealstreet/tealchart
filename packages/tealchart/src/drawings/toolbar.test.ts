@@ -1500,6 +1500,13 @@ describe('user drawing toolbar descriptors', () => {
 
     expect(surface.selectedDrawing?.id).toBe('front');
     expect(surface.groups.map((group) => group.id)).toEqual(['primary', 'style', 'arrange', 'visibility']);
+    expect(style.presentation).toEqual({
+      type: 'popover',
+      triggerIcon: '◐',
+      triggerLabel: 'Style selected drawing',
+      popoverLabel: 'Selected drawing style controls',
+      popoverWidth: 272,
+    });
     expect(primary.items.map((item) => [item.id, item.enabled, item.destructive ?? false])).toEqual([
       ['openProperties', true, false],
       ['openObjectTree', true, false],

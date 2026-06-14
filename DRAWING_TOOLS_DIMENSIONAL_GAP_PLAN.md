@@ -410,6 +410,10 @@ Phase 3: Dismissal and focus
 - Status: web floating toolbar coverage now pins pointer-event isolation for
   selected-action surfaces, so toolbar clicks cannot fall through into chart
   selection misses.
+- Status: selected drawing style controls now use shared popover-group
+  metadata, and both the web floating toolbar and mobile Skia action strip
+  render the style actions behind the same anchored Style trigger instead of
+  exposing every quick style action as flat toolbar chrome.
 
 ### Epic 4.3: Mobile Selection Action Sheet
 
@@ -451,6 +455,9 @@ Phase 3: Dismissal and focus
 - Status: mobile selected-action dispatch coverage now pins toolbar taps to
   their intended callbacks or drawing commands without emitting direct
   selection commands.
+- Status: mobile Skia consumes the same shared popover-group metadata as web
+  for selected drawing style controls, with RN coverage for opening the Style
+  popover and dispatching a style command through the mobile adapter.
 
 ### Epic 4.4: Drawing Context Menu
 
