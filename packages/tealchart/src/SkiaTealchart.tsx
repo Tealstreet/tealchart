@@ -20,21 +20,15 @@ import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
+  ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UpdateUserDrawingOptions,
+  UserDrawing,
+  UserDrawingAnchor,
   UserDrawingClipboard,
   UserDrawingCommandEvent,
   UserDrawingCommandEventListener,
-  UserDrawingObjectTreeDispatchAction,
-  UserDrawingObjectTreeModel,
-  UserDrawingObjectTreeOptions,
-  UserDrawingPropertiesIntent,
-  UserDrawingPropertiesSurface,
-  UserDrawingPropertiesSurfaceCommand,
-  ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingCommandHistory,
   UserDrawingEditDrag,
-  UserDrawing,
-  UserDrawingAnchor,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
   UserDrawingIconName,
@@ -42,6 +36,12 @@ import type {
   UserDrawingInputPoint,
   UserDrawingKeyboardInput,
   UserDrawingLineStyle,
+  UserDrawingObjectTreeDispatchAction,
+  UserDrawingObjectTreeModel,
+  UserDrawingObjectTreeOptions,
+  UserDrawingPropertiesIntent,
+  UserDrawingPropertiesSurface,
+  UserDrawingPropertiesSurfaceCommand,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTableCellInput,
@@ -50,8 +50,8 @@ import type {
   UserDrawingTableRowInput,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
-  UserDrawingTrendLineExtend,
   UserDrawingTool,
+  UserDrawingTrendLineExtend,
   UserDrawingZOrderAction,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
@@ -116,12 +116,12 @@ import {
   canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
   clearUserDrawingCommandHistory,
   createUserDrawingClipboard,
-  createUserDrawingCommandHistory,
   createUserDrawingCommandEvent,
+  createUserDrawingCommandHistory,
   createUserDrawingHistoryCommandEvent,
   createUserDrawingState,
-  dispatchUserDrawingCommand,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
+  dispatchUserDrawingCommand,
   isUserDrawingDragPlacementTool,
   isUserDrawingPathFamilyTool,
   measureUserDrawingTextLines,
@@ -131,12 +131,12 @@ import {
   resolveUserDrawingContextActionsAtPoint,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingPlacementConstraint,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingSelectionActionAnchor,
-  resolveUserDrawingPlacementConstraint,
   resolveUserDrawingTextEditMetrics,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
   USER_DRAWING_FONT_FAMILIES,
@@ -154,6 +154,12 @@ import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
+import { dispatchMobileUserDrawingActionCommand } from './mobile/utils/drawingActionDispatch';
+import {
+  dispatchMobileUserDrawingHistoryCommand,
+  dispatchMobileUserDrawingKeyboardAction as dispatchMobileUserDrawingKeyboardActionToState,
+} from './mobile/utils/drawingCommands';
+import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/drawingEditIntent';
 import { resolveMobileUserDrawingFontFamily } from './mobile/utils/drawingFonts';
 import {
   isMobileChartGestureLayerEnabled,
@@ -164,7 +170,6 @@ import {
   resolveMobileUserDrawingInputPoint,
   resolveMobileUserDrawingPlacementConstraintEnabled,
 } from './mobile/utils/drawingInput';
-import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/drawingEditIntent';
 import {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
@@ -181,11 +186,6 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
-import {
-  dispatchMobileUserDrawingHistoryCommand,
-  dispatchMobileUserDrawingKeyboardAction as dispatchMobileUserDrawingKeyboardActionToState,
-} from './mobile/utils/drawingCommands';
-import { dispatchMobileUserDrawingActionCommand } from './mobile/utils/drawingActionDispatch';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
@@ -591,7 +591,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const dispatchUserDrawingCommandToState = useCallback(
-    (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => dispatchUserDrawingCommandToStateWithResult(command).changed,
+    (command: Parameters<typeof dispatchUserDrawingCommand>[1]) =>
+      dispatchUserDrawingCommandToStateWithResult(command).changed,
     [dispatchUserDrawingCommandToStateWithResult],
   );
 
@@ -772,20 +773,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean {
         const transactionKey = `duplicate-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
         const previousState = userDrawingStateRef.current;
-        const result = dispatchMobileUserDrawingHistoryCommand(
-          previousState,
-          userDrawingHistoryRef.current,
-          {
-            type: 'beginDuplicateEditDragAtPoint',
-            point,
-            spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
-            options: {
-              createId: createUserDrawingId,
-              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-            },
-            meta: { source: 'api', transactionKey },
+        const result = dispatchMobileUserDrawingHistoryCommand(previousState, userDrawingHistoryRef.current, {
+          type: 'beginDuplicateEditDragAtPoint',
+          point,
+          spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
+          options: {
+            createId: createUserDrawingId,
+            hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
           },
-        );
+          meta: { source: 'api', transactionKey },
+        });
         if (!result.hit || !result.editDrag) return false;
 
         userDrawingHistoryRef.current = result.history;
@@ -870,7 +867,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return dispatchUserDrawingCommandToState({ type: 'setTextContent', text, options, meta: { source: 'api' } });
       },
       setUserDrawingName(drawingId: string, name: string | null, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setName', drawingId, name, options, meta: { source: 'api' } });
+        return dispatchUserDrawingCommandToState({
+          type: 'setName',
+          drawingId,
+          name,
+          options,
+          meta: { source: 'api' },
+        });
       },
       setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
         return dispatchUserDrawingCommandToState({ type: 'setImageSource', source, options, meta: { source: 'api' } });
@@ -893,19 +896,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           meta: { source: 'api' },
         });
       },
-      setUserDrawingTableDimensions(
-        rows: number,
-        columns: number,
-        options: UpdateUserDrawingOptions = {},
-      ): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setTableDimensions', rows, columns, options, meta: { source: 'api' } });
+      setUserDrawingTableDimensions(rows: number, columns: number, options: UpdateUserDrawingOptions = {}): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setTableDimensions',
+          rows,
+          columns,
+          options,
+          meta: { source: 'api' },
+        });
       },
       insertUserDrawingTableRow(
         row: number,
         values?: UserDrawingTableRowInput,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'insertTableRow', row, values, options, meta: { source: 'api' } });
+        return dispatchUserDrawingCommandToState({
+          type: 'insertTableRow',
+          row,
+          values,
+          options,
+          meta: { source: 'api' },
+        });
       },
       deleteUserDrawingTableRow(row: number, options: UpdateUserDrawingOptions = {}): boolean {
         return dispatchUserDrawingCommandToState({ type: 'deleteTableRow', row, options, meta: { source: 'api' } });
@@ -924,7 +935,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       },
       deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'deleteTableColumn', column, options, meta: { source: 'api' } });
+        return dispatchUserDrawingCommandToState({
+          type: 'deleteTableColumn',
+          column,
+          options,
+          meta: { source: 'api' },
+        });
       },
       updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
         return dispatchUserDrawingCommandToState({ type: 'updateStyle', style, options, meta: { source: 'api' } });
@@ -936,7 +952,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         extend: UserDrawingTrendLineExtend,
         options: UpdateUserDrawingOptions = {},
       ): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setTrendLineExtend', extend, options, meta: { source: 'api' } });
+        return dispatchUserDrawingCommandToState({
+          type: 'setTrendLineExtend',
+          extend,
+          options,
+          meta: { source: 'api' },
+        });
       },
       setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
         return dispatchUserDrawingCommandToState({ type: 'setIconName', iconName, options, meta: { source: 'api' } });
@@ -1230,9 +1251,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const activeUserDrawingTextEditPrimitive = useMemo(
     () =>
       userDrawingPrimitives.find(
-        (
-          primitive,
-        ): primitive is MobileUserDrawingTextBoxPrimitive =>
+        (primitive): primitive is MobileUserDrawingTextBoxPrimitive =>
           isMobileUserDrawingTextBoxPrimitive(primitive) &&
           primitive.editing &&
           primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
@@ -1264,7 +1283,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
       fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
       fontWeight: activeUserDrawingTextEditPrimitive.style.fontWeight === 'bold' ? ('700' as const) : ('400' as const),
-      fontStyle: activeUserDrawingTextEditPrimitive.style.fontStyle === 'italic' ? ('italic' as const) : ('normal' as const),
+      fontStyle:
+        activeUserDrawingTextEditPrimitive.style.fontStyle === 'italic' ? ('italic' as const) : ('normal' as const),
       textDecorationLine: resolveUserDrawingTextDecorationLine(activeUserDrawingTextEditPrimitive.style),
       borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
     };
@@ -1990,10 +2010,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
       if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
-        const result = resolveMobileUserDrawingDoubleTapEditIntent(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
-          source: 'touch',
-          hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-        });
+        const result = resolveMobileUserDrawingDoubleTapEditIntent(
+          effectiveUserDrawingState,
+          { x, y },
+          userDrawingSpacesByPaneId,
+          {
+            source: 'touch',
+            hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+          },
+        );
 
         if (result.intent.type !== 'pane') {
           if (result.changed) {
@@ -2045,9 +2070,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return false;
       }
 
-      const result = resolveUserDrawingContextActionsAtPoint(effectiveUserDrawingState, { x, y }, userDrawingSpacesByPaneId, {
-        hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-      });
+      const result = resolveUserDrawingContextActionsAtPoint(
+        effectiveUserDrawingState,
+        { x, y },
+        userDrawingSpacesByPaneId,
+        {
+          hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
+        },
+      );
       if (!result.hit) {
         closeContextMenu();
         return false;
@@ -2078,22 +2108,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
 
       setContextMenuItems(
-        result.items.map((item): ContextMenuItem => ({
-          position: item.groupId === 'visibility' ? 'bottom' : 'top',
-          text: item.label,
-          enabled: item.enabled,
-          click: () => {
-            if (!item.enabled) return;
-            dispatchMobileUserDrawingActionCommand(item.command, {
-              state: userDrawingStateRef.current,
-              source: 'contextMenu',
-              createId: createUserDrawingId,
-              dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
-              onUserDrawingPropertiesOpen,
-              onUserDrawingObjectTreeOpen,
-            });
-          },
-        })),
+        result.items.map(
+          (item): ContextMenuItem => ({
+            position: item.groupId === 'visibility' ? 'bottom' : 'top',
+            text: item.label,
+            enabled: item.enabled,
+            click: () => {
+              if (!item.enabled) return;
+              dispatchMobileUserDrawingActionCommand(item.command, {
+                state: userDrawingStateRef.current,
+                source: 'contextMenu',
+                createId: createUserDrawingId,
+                dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
+                onUserDrawingPropertiesOpen,
+                onUserDrawingObjectTreeOpen,
+              });
+            },
+          }),
+        ),
       );
       setContextMenuPosition({
         x,
@@ -4666,14 +4698,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onUserDrawingIconNameChange={(iconName) => {
               dispatchUserDrawingCommandToState({ type: 'setIconName', iconName, meta: { source: 'toolbar' } });
             }}
-            onUserDrawingVisibilityChange={(visible) => {
-              dispatchUserDrawingCommandToState({ type: 'setVisibility', visible, meta: { source: 'toolbar' } });
+            onUserDrawingVisibilityChange={(visible, options) => {
+              dispatchUserDrawingCommandToState({
+                type: 'setVisibility',
+                visible,
+                options,
+                meta: { source: 'toolbar' },
+              });
             }}
-            onUserDrawingLockedChange={(locked, includeLocked) => {
+            onUserDrawingLockedChange={(locked, options) => {
               dispatchUserDrawingCommandToState({
                 type: 'setLocked',
                 locked,
-                options: { includeLocked },
+                options,
                 meta: { source: 'toolbar' },
               });
             }}

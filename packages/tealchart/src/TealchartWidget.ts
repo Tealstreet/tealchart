@@ -12,27 +12,29 @@ import type {
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  ResolveUserDrawingPropertiesSurfaceCommandOptions,
+  UpdateUserDrawingOptions,
+  UserDrawing,
   UserDrawingClipboard,
   UserDrawingCommandDispatchResult,
+  UserDrawingCommandEvent,
+  UserDrawingCommandHistory,
   UserDrawingCommandSource,
+  UserDrawingContextActionItem,
+  UserDrawingEditDrag,
+  UserDrawingHandleRole,
+  UserDrawingHitTestOptions,
+  UserDrawingIconName,
+  UserDrawingImageSourceInput,
+  UserDrawingInputPoint,
+  UserDrawingKeyboardFocusOwner,
+  UserDrawingKeyboardInput,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
   UserDrawingPropertiesIntent,
   UserDrawingPropertiesSurface,
   UserDrawingPropertiesSurfaceCommand,
-  ResolveUserDrawingPropertiesSurfaceCommandOptions,
-  UserDrawingContextActionItem,
-  UserDrawingEditDrag,
-  UserDrawing,
-  UserDrawingCommandHistory,
-  UserDrawingHandleRole,
-  UserDrawingHitTestOptions,
-  UserDrawingIconName,
-  UserDrawingImageSourceInput,
-  UserDrawingKeyboardFocusOwner,
-  UserDrawingInputPoint,
-  UserDrawingKeyboardInput,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
   UserDrawingState,
@@ -41,27 +43,27 @@ import type {
   UserDrawingTableCellsInput,
   UserDrawingTableColumnInput,
   UserDrawingTableRowInput,
-  UserDrawingTextAnnotation,
   UserDrawingTextAlign,
-  UserDrawingTrendLineExtend,
+  UserDrawingTextAnnotation,
   UserDrawingTool,
+  UserDrawingTrendLineExtend,
   UserDrawingZOrderAction,
-  UserDrawingCommandEvent,
-  UpdateUserDrawingOptions,
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
+import type { ChartThemeInput } from './theme';
 
 import { LOADING_OPACITY } from './constants';
+import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
   canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
   clearUserDrawingCommandHistory,
   createUserDrawingClipboard,
-  createUserDrawingCommandHistory,
   createUserDrawingCommandEvent,
+  createUserDrawingCommandHistory,
   createUserDrawingHistoryCommandEvent,
   createUserDrawingReplaceStateCommandEvent,
   createUserDrawingState,
@@ -84,7 +86,6 @@ import {
   serializeUserDrawingStateForLayout,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
 } from './drawings';
-import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
 import {
@@ -100,12 +101,11 @@ import { generateIndicatorId } from './state/indicatorActions';
 import { TealchartApi } from './TealchartApi';
 import { TealscriptManager } from './tealscript/TealscriptManager';
 import { chartThemeToRenderOptions, mergeChartThemeRenderOptions } from './theme';
-import type { ChartThemeInput } from './theme';
 import {
   Bar,
   ChartOverrides,
-  ContextMenuItem,
   ContextMenuCallback,
+  ContextMenuItem,
   DEFAULT_RENDER_OPTIONS,
   GapDetectionErrorState,
   GapDetectionEvent,
@@ -1090,11 +1090,11 @@ export class TealchartWidget {
       onUserDrawingIconNameChange: (iconName) => {
         this.setUserDrawingIconName(iconName);
       },
-      onUserDrawingVisibilityChange: (visible) => {
-        this.setUserDrawingVisibility(visible);
+      onUserDrawingVisibilityChange: (visible, options) => {
+        this.setUserDrawingVisibility(visible, options);
       },
-      onUserDrawingLockedChange: (locked, includeLocked) => {
-        this.setUserDrawingLocked(locked, { includeLocked });
+      onUserDrawingLockedChange: (locked, options) => {
+        this.setUserDrawingLocked(locked, options);
       },
       onUserDrawingPropertiesOpen: () => {
         this.openUserDrawingProperties();
@@ -2251,7 +2251,12 @@ export class TealchartWidget {
 
   setUserDrawingState(
     state: UserDrawingState,
-    options: { markLayoutDirty?: boolean; preserveHistory?: boolean; notifyCommand?: boolean; source?: UserDrawingCommandSource } = {},
+    options: {
+      markLayoutDirty?: boolean;
+      preserveHistory?: boolean;
+      notifyCommand?: boolean;
+      source?: UserDrawingCommandSource;
+    } = {},
   ): boolean {
     if (state === this._userDrawingState) return false;
     const previousState = this._userDrawingState;
@@ -2348,7 +2353,8 @@ export class TealchartWidget {
         meta: { source: 'keyboard' },
       });
     }
-    if (action.type === 'deleteSelected') return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
+    if (action.type === 'deleteSelected')
+      return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
     return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
   }
 
@@ -2460,10 +2466,7 @@ export class TealchartWidget {
     return this.dispatchUserDrawingCommand({ type: 'setTextAlign', textAlign, options, meta: { source: 'api' } });
   }
 
-  setUserDrawingTrendLineExtend(
-    extend: UserDrawingTrendLineExtend,
-    options: UpdateUserDrawingOptions = {},
-  ): boolean {
+  setUserDrawingTrendLineExtend(extend: UserDrawingTrendLineExtend, options: UpdateUserDrawingOptions = {}): boolean {
     return this.dispatchUserDrawingCommand({ type: 'setTrendLineExtend', extend, options, meta: { source: 'api' } });
   }
 
@@ -2496,7 +2499,13 @@ export class TealchartWidget {
   }
 
   setUserDrawingTableDimensions(rows: number, columns: number, options: UpdateUserDrawingOptions = {}): boolean {
-    return this.dispatchUserDrawingCommand({ type: 'setTableDimensions', rows, columns, options, meta: { source: 'api' } });
+    return this.dispatchUserDrawingCommand({
+      type: 'setTableDimensions',
+      rows,
+      columns,
+      options,
+      meta: { source: 'api' },
+    });
   }
 
   insertUserDrawingTableRow(
@@ -2516,7 +2525,13 @@ export class TealchartWidget {
     values?: UserDrawingTableColumnInput,
     options: UpdateUserDrawingOptions = {},
   ): boolean {
-    return this.dispatchUserDrawingCommand({ type: 'insertTableColumn', column, values, options, meta: { source: 'api' } });
+    return this.dispatchUserDrawingCommand({
+      type: 'insertTableColumn',
+      column,
+      values,
+      options,
+      meta: { source: 'api' },
+    });
   }
 
   deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
