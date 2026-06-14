@@ -20,5 +20,8 @@ export type { ContextMenuComponentProps } from './ContextMenuComponent';
 export { ChartTopBarComponent } from './ChartTopBarComponent';
 export type { ChartTopBarComponentProps } from './ChartTopBarComponent';
 
+export { UserDrawingObjectTreeSheet } from './UserDrawingObjectTreeSheet';
+export type { UserDrawingObjectTreeSheetProps } from './UserDrawingObjectTreeSheet';
+
 export { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 export type { TimeframeOption } from '../../state/chartState';

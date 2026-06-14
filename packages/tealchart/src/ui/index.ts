@@ -29,10 +29,7 @@ export {
 
 // Modal components
 export { Modal, type ModalOptions, type ModalState } from './Modal';
-export {
-  IndicatorsModal,
-  type IndicatorsModalOptions,
-} from './IndicatorsModal';
+export { IndicatorsModal, type IndicatorsModalOptions } from './IndicatorsModal';
 export {
   IndicatorSettingsModal,
   type IndicatorSettingsModalOptions,
@@ -40,17 +37,11 @@ export {
 } from './IndicatorSettingsModal';
 
 // Context menu
-export {
-  ContextMenu,
-  showContextMenu,
-  type ContextMenuOptions,
-} from './ContextMenu';
+export { ContextMenu, showContextMenu, type ContextMenuOptions } from './ContextMenu';
 
 // Toolbar components
-export {
-  ChartTopBar,
-  type ChartTopBarOptions,
-} from './ChartTopBar';
+export { ChartTopBar, type ChartTopBarOptions } from './ChartTopBar';
+export { UserDrawingObjectTreePanel, type UserDrawingObjectTreePanelOptions } from './UserDrawingObjectTreePanel';
 
 // Legend component
 export {
@@ -61,8 +52,4 @@ export {
 } from './ChartLegend';
 
 // Core chart component
-export {
-  ChartCore,
-  type ChartCoreOptions,
-  type IndicatorPaneInfo,
-} from './ChartCore';
+export { ChartCore, type ChartCoreOptions, type IndicatorPaneInfo } from './ChartCore';

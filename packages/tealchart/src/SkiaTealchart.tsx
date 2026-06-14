@@ -150,6 +150,7 @@ import { IndicatorSettingsModalMobile } from './mobile/components/IndicatorSetti
 import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
 import { OrderLineComponent } from './mobile/components/OrderLineComponent';
 import { PositionLineComponent } from './mobile/components/PositionLineComponent';
+import { UserDrawingObjectTreeSheet } from './mobile/components/UserDrawingObjectTreeSheet';
 import { UserDrawingSelectedActionSurfaceComponent } from './mobile/components/UserDrawingSelectedActionSurface';
 import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
@@ -601,6 +602,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [dispatchUserDrawingCommandToStateWithResult],
   );
 
+  const [userDrawingObjectTreeVisible, setUserDrawingObjectTreeVisible] = useState(false);
+
+  const handleUserDrawingObjectTreeOpen = useCallback(
+    (model: UserDrawingObjectTreeModel) => {
+      if (onUserDrawingObjectTreeOpen) {
+        onUserDrawingObjectTreeOpen(model);
+      } else {
+        setUserDrawingObjectTreeVisible(true);
+      }
+    },
+    [onUserDrawingObjectTreeOpen],
+  );
+
+  const dispatchUserDrawingObjectTreeActionToState = useCallback(
+    (action: UserDrawingObjectTreeDispatchAction): boolean => {
+      const commands = resolveUserDrawingObjectTreeDispatchActionCommands(userDrawingStateRef.current, action, {
+        createId: createUserDrawingId,
+        now: () => Date.now(),
+      });
+      let changed = false;
+      for (const command of commands) {
+        changed = dispatchUserDrawingCommandToState(command) || changed;
+      }
+      return changed;
+    },
+    [createUserDrawingId, dispatchUserDrawingCommandToState],
+  );
+
   const replaceUserDrawingState = useCallback(
     (nextState: UserDrawingState, source: 'api' | 'layout') => {
       const previousState = userDrawingStateRef.current;
@@ -1045,19 +1074,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       openUserDrawingObjectTree(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
         const model = resolveUserDrawingObjectTreeModel(userDrawingStateRef.current, options);
-        onUserDrawingObjectTreeOpen?.(model);
+        handleUserDrawingObjectTreeOpen(model);
         return model;
       },
       dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean {
-        const commands = resolveUserDrawingObjectTreeDispatchActionCommands(userDrawingStateRef.current, action, {
-          createId: createUserDrawingId,
-          now: () => Date.now(),
-        });
-        let changed = false;
-        for (const command of commands) {
-          changed = dispatchUserDrawingCommandToState(command) || changed;
-        }
-        return changed;
+        return dispatchUserDrawingObjectTreeActionToState(action);
       },
       getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null {
         return resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
@@ -1088,6 +1109,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       dispatchUserDrawingCommandToStateWithResult,
       notifyUserDrawingCommand,
       onUserDrawingObjectTreeOpen,
+      handleUserDrawingObjectTreeOpen,
+      dispatchUserDrawingObjectTreeActionToState,
       onUserDrawingPropertiesOpen,
       replaceUserDrawingState,
     ],
@@ -2158,7 +2181,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 createId: createUserDrawingId,
                 dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
                 onUserDrawingPropertiesOpen,
-                onUserDrawingObjectTreeOpen,
+                onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
               });
             },
           }),
@@ -2183,7 +2206,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       isPointInChartArea,
       measureUserDrawingTextLabelLine,
       notifyUserDrawingCommand,
-      onUserDrawingObjectTreeOpen,
+      handleUserDrawingObjectTreeOpen,
       onUserDrawingPropertiesOpen,
       userDrawingSpacesByPaneId,
       viewport,
@@ -4687,7 +4710,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         createId={createUserDrawingId}
         dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
         onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
-        onUserDrawingObjectTreeOpen={onUserDrawingObjectTreeOpen}
+        onUserDrawingObjectTreeOpen={handleUserDrawingObjectTreeOpen}
       />
 
       {/* Top Bar (overlay on top of chart) */}
@@ -4765,6 +4788,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         time={contextMenuPosition.time}
         pricePrecision={pricePrecision}
         onClose={handleContextMenuClose}
+      />
+
+      <UserDrawingObjectTreeSheet
+        visible={userDrawingObjectTreeVisible}
+        model={resolveUserDrawingObjectTreeModel(effectiveUserDrawingState)}
+        onDispatch={dispatchUserDrawingObjectTreeActionToState}
+        onClose={() => setUserDrawingObjectTreeVisible(false)}
       />
 
       {/* Indicators Modal */}
