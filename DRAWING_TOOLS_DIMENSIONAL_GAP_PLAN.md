@@ -155,12 +155,13 @@ Phase 4: Mobile handle/API integration
 
 ### Epic 2.3: History Validation
 
-Status: in progress. Shared history tests cover creation, duplicate/edit drag,
-text edits, style changes, lock/visibility, z-order, redo clearing, and
-coalescing. Web widget and mobile Skia command adapter tests now also validate
-tap/click-created drawings and selected action mutations: draft inputs stay out
-of history, final placement records one undoable transaction, action commands
-record undoable transactions, and redo restores the committed state.
+Status: shipped. Shared history tests cover creation, direct duplicate/delete,
+duplicate/edit drag, nudge, text edits, style changes, lock/visibility, z-order,
+redo clearing, and coalescing. Web widget and mobile Skia command adapter tests
+also validate tap/click-created drawings and selected action mutations: draft
+inputs stay out of history, final placement records one undoable transaction,
+action commands record undoable transactions, and redo restores the committed
+state.
 
 Phase 1: Shared tests
 
@@ -173,6 +174,8 @@ Phase 2: Web adapter tests
 - Confirm existing chart shortcuts and pane interactions are not hijacked.
 - Status: web widget tests cover keyboard delete, undo/redo, copy/paste,
   duplicate, and select-all ownership.
+- Status: web widget keyboard delete coverage now asserts undo restoration
+  through shared drawing history.
 
 Phase 3: Mobile adapter tests
 
@@ -181,6 +184,8 @@ Phase 3: Mobile adapter tests
 - Status: mobile command adapter tests cover undo/redo, copy/paste,
   duplicate, select-all, nudge, and draft cancellation through the shared
   keyboard/history path.
+- Status: mobile command adapter tests cover direct delete commands as
+  undoable history transactions.
 
 ## Gap 3: Real Drawing Gesture Placement
 
