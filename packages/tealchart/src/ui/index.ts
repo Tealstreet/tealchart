@@ -42,6 +42,7 @@ export { ContextMenu, showContextMenu, type ContextMenuOptions } from './Context
 // Toolbar components
 export { ChartTopBar, type ChartTopBarOptions } from './ChartTopBar';
 export { UserDrawingObjectTreePanel, type UserDrawingObjectTreePanelOptions } from './UserDrawingObjectTreePanel';
+export { UserDrawingPropertiesPanel, type UserDrawingPropertiesPanelOptions } from './UserDrawingPropertiesPanel';
 
 // Legend component
 export {
