@@ -122,6 +122,7 @@ import {
   createUserDrawingState,
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   dispatchUserDrawingCommand,
+  getUserDrawingAllDrawingsUpdateOptions,
   isUserDrawingDragPlacementTool,
   isUserDrawingPathFamilyTool,
   measureUserDrawingTextLines,
@@ -320,6 +321,10 @@ export interface SkiaTealchartHandle {
   pasteUserDrawingClipboard(): boolean;
   clearUserDrawingClipboard(): boolean;
   clearUserDrawings(): boolean;
+  hideAllUserDrawings(): boolean;
+  showAllUserDrawings(): boolean;
+  lockAllUserDrawings(): boolean;
+  unlockAllUserDrawings(): boolean;
   cancelUserDrawingDraft(): boolean;
   beginUserDrawingTextEdit(drawingId?: string): boolean;
   updateUserDrawingTextEdit(value: string): boolean;
@@ -844,6 +849,38 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       clearUserDrawings(): boolean {
         return dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
+      },
+      hideAllUserDrawings(): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setVisibility',
+          visible: false,
+          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current, { includeLocked: true }),
+          meta: { source: 'api' },
+        });
+      },
+      showAllUserDrawings(): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setVisibility',
+          visible: true,
+          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current, { includeLocked: true }),
+          meta: { source: 'api' },
+        });
+      },
+      lockAllUserDrawings(): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setLocked',
+          locked: true,
+          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current),
+          meta: { source: 'api' },
+        });
+      },
+      unlockAllUserDrawings(): boolean {
+        return dispatchUserDrawingCommandToState({
+          type: 'setLocked',
+          locked: false,
+          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current, { includeLocked: true }),
+          meta: { source: 'api' },
+        });
       },
       cancelUserDrawingDraft(): boolean {
         return dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'api' } });

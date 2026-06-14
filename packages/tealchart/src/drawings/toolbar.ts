@@ -1,4 +1,4 @@
-import type { UserDrawingZOrderAction } from './input';
+import type { UpdateUserDrawingOptions, UserDrawingZOrderAction } from './input';
 import type { UserDrawingSelectionActionAnchor } from './renderModel';
 import type {
   UserDrawing,
@@ -556,6 +556,16 @@ export function isUserDrawingGlobalToolbarAction(
   action: UserDrawingToolbarAction,
 ): action is UserDrawingGlobalToolbarAction {
   return USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS.has(action);
+}
+
+export function getUserDrawingAllDrawingsUpdateOptions(
+  state: Pick<UserDrawingState, 'drawings'>,
+  options: Pick<UpdateUserDrawingOptions, 'includeLocked'> = {},
+): UpdateUserDrawingOptions {
+  return {
+    drawingIds: state.drawings.map((drawing) => drawing.id),
+    ...(options.includeLocked === undefined ? {} : { includeLocked: options.includeLocked }),
+  };
 }
 
 export function getUserDrawingZOrderAction(action: UserDrawingToolbarAction): UserDrawingZOrderAction | null {

@@ -70,6 +70,7 @@ import {
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
+  getUserDrawingAllDrawingsUpdateOptions,
   isUserDrawingLayoutStateEqual,
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingFontFamily,
@@ -2424,6 +2425,31 @@ export class TealchartWidget {
 
   clearUserDrawings(): boolean {
     return this.dispatchUserDrawingCommand({ type: 'clear', meta: { source: 'api' } });
+  }
+
+  hideAllUserDrawings(): boolean {
+    return this.setUserDrawingVisibility(
+      false,
+      getUserDrawingAllDrawingsUpdateOptions(this._userDrawingState, { includeLocked: true }),
+    );
+  }
+
+  showAllUserDrawings(): boolean {
+    return this.setUserDrawingVisibility(
+      true,
+      getUserDrawingAllDrawingsUpdateOptions(this._userDrawingState, { includeLocked: true }),
+    );
+  }
+
+  lockAllUserDrawings(): boolean {
+    return this.setUserDrawingLocked(true, getUserDrawingAllDrawingsUpdateOptions(this._userDrawingState));
+  }
+
+  unlockAllUserDrawings(): boolean {
+    return this.setUserDrawingLocked(
+      false,
+      getUserDrawingAllDrawingsUpdateOptions(this._userDrawingState, { includeLocked: true }),
+    );
   }
 
   cancelUserDrawingDraft(): boolean {

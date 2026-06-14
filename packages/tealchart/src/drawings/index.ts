@@ -425,6 +425,7 @@ export {
 } from './types';
 export {
   getSelectedUserDrawing,
+  getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
