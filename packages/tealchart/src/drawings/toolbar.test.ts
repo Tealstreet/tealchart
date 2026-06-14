@@ -663,6 +663,7 @@ describe('user drawing toolbar descriptors', () => {
       'sendBackward',
       'bringToFront',
       'sendToBack',
+      'measure',
       'cancelDraft',
       'clearAll',
       'hideAll',
@@ -676,7 +677,8 @@ describe('user drawing toolbar descriptors', () => {
       USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
         isUserDrawingGlobalToolbarAction(descriptor.action),
       ).map((descriptor) => descriptor.action),
-    ).toEqual(['cancelDraft', 'clearAll', 'hideAll', 'showAll', 'lockAll', 'unlockAll']);
+    ).toEqual(['measure', 'cancelDraft', 'clearAll', 'hideAll', 'showAll', 'lockAll', 'unlockAll']);
+    expect(isUserDrawingToolbarActionEnabled(state, 'measure')).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);
     expect(
       isUserDrawingToolbarActionEnabled(

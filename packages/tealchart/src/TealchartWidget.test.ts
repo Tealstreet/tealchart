@@ -419,6 +419,12 @@ describe('TealchartWidget', () => {
       expect(widget.setUserDrawingMagnetMode('weak')).toBe(false);
       expect(widget.setUserDrawingMagnetMode('strong')).toBe(true);
       expect(widget.getUserDrawingMagnetMode()).toBe('strong');
+      expect(widget.getUserDrawingMeasureMode()).toBe('off');
+      expect(widget.setUserDrawingMeasureMode('on')).toBe(true);
+      expect(widget.getUserDrawingMeasureMode()).toBe('on');
+      expect(widget.setUserDrawingMeasureMode('on')).toBe(false);
+      expect(widget.setActiveUserDrawingTool('trendLine')).toBe(true);
+      expect(widget.getUserDrawingMeasureMode()).toBe('off');
 
       expect(widget.selectUserDrawing('missing')).toBe(false);
       expect(widget.addUserDrawing(drawing)).toBe(true);

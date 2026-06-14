@@ -157,6 +157,12 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingPlacementDragStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called when a two-anchor drawing tool drag commits placement */
   onUserDrawingPlacementDragEnd?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when temporary measure drag starts */
+  onUserDrawingMeasureStart?: (point: UserDrawingInputPoint) => boolean;
+  /** Called while temporary measure drag moves */
+  onUserDrawingMeasureMove?: (point: UserDrawingInputPoint) => boolean;
+  /** Called when temporary measure drag ends */
+  onUserDrawingMeasureEnd?: () => void;
   /** Called when path-tool pointer down starts collecting freehand samples */
   onUserDrawingPathDragStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called while an active path-tool drag collects freehand samples */
@@ -175,6 +181,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Called when the top bar should clear all user drawings */
   onUserDrawingClearAll?: () => void;
+  /** Called when the top bar should toggle temporary measure mode */
+  onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
   /** Called when the top bar should reorder selected user drawings */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Called when the top bar should update selected drawing style */
@@ -322,6 +330,7 @@ export class TealchartWidgetUI {
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,
+        onUserDrawingMeasureModeChange: options.onUserDrawingMeasureModeChange,
         onUserDrawingZOrderChange: options.onUserDrawingZOrderChange,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,
         onUserDrawingTextAlignChange: options.onUserDrawingTextAlignChange,
@@ -436,6 +445,9 @@ export class TealchartWidgetUI {
       onUserDrawingEditEnd: this.options.onUserDrawingEditEnd,
       onUserDrawingPlacementDragStart: this.options.onUserDrawingPlacementDragStart,
       onUserDrawingPlacementDragEnd: this.options.onUserDrawingPlacementDragEnd,
+      onUserDrawingMeasureStart: this.options.onUserDrawingMeasureStart,
+      onUserDrawingMeasureMove: this.options.onUserDrawingMeasureMove,
+      onUserDrawingMeasureEnd: this.options.onUserDrawingMeasureEnd,
       onUserDrawingPathDragStart: this.options.onUserDrawingPathDragStart,
       onUserDrawingPathDragMove: this.options.onUserDrawingPathDragMove,
       onUserDrawingPathDragEnd: this.options.onUserDrawingPathDragEnd,

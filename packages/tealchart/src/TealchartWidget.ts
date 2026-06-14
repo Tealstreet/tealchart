@@ -30,6 +30,7 @@ import type {
   UserDrawingKeyboardFocusOwner,
   UserDrawingKeyboardInput,
   UserDrawingMagnetMode,
+  UserDrawingMeasureMode,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -1069,6 +1070,9 @@ export class TealchartWidget {
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
       onUserDrawingPlacementDragStart: (point) => this._handleUserDrawingPlacementDragStart(point),
       onUserDrawingPlacementDragEnd: (point) => this._handleUserDrawingPlacementDragEnd(point),
+      onUserDrawingMeasureStart: (point) => this._handleUserDrawingMeasureStart(point),
+      onUserDrawingMeasureMove: (point) => this._handleUserDrawingMeasureMove(point),
+      onUserDrawingMeasureEnd: () => this._handleUserDrawingMeasureEnd(),
       onUserDrawingPathDragStart: (point) => this._handleUserDrawingPathDragStart(point),
       onUserDrawingPathDragMove: (point) => this._handleUserDrawingPathDragMove(point),
       onUserDrawingPathDragEnd: () => this._handleUserDrawingPathDragEnd(),
@@ -1082,6 +1086,7 @@ export class TealchartWidget {
       },
       onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
       onUserDrawingClearAll: () => this.clearUserDrawings(),
+      onUserDrawingMeasureModeChange: (enabled) => this.setUserDrawingMeasureMode(enabled ? 'on' : 'off'),
       onUserDrawingZOrderChange: (action) => {
         this.reorderUserDrawings(action);
       },
@@ -2323,6 +2328,18 @@ export class TealchartWidget {
     return this._userDrawingState.magnetMode ?? 'off';
   }
 
+  setUserDrawingMeasureMode(measureMode: UserDrawingMeasureMode): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'setMeasureMode',
+      measureMode,
+      meta: { source: 'api' },
+    });
+  }
+
+  getUserDrawingMeasureMode(): UserDrawingMeasureMode {
+    return this._userDrawingState.measureMode ?? 'off';
+  }
+
   canUndoUserDrawingCommand(): boolean {
     return canUndoUserDrawingCommandHistory(this._userDrawingHistory);
   }
@@ -2855,6 +2872,29 @@ export class TealchartWidget {
       options: {
         createId: () => this._createUserDrawingId(),
       },
+      meta: { source: 'pointer' },
+    });
+  }
+
+  private _handleUserDrawingMeasureStart(point: UserDrawingInputPoint): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'beginMeasure',
+      point,
+      meta: { source: 'pointer' },
+    });
+  }
+
+  private _handleUserDrawingMeasureMove(point: UserDrawingInputPoint): boolean {
+    return this.dispatchUserDrawingCommand({
+      type: 'updateMeasure',
+      point,
+      meta: { source: 'pointer' },
+    });
+  }
+
+  private _handleUserDrawingMeasureEnd(): void {
+    this.dispatchUserDrawingCommand({
+      type: 'endMeasure',
       meta: { source: 'pointer' },
     });
   }
