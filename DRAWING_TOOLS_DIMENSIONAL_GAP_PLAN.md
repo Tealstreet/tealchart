@@ -470,11 +470,15 @@ Phase 2: Web right-click menu
 
 - Status: right-click over a drawing shows drawing actions before falling back
   to the app-provided chart context menu outside drawings.
+- Status: DOM context-menu coverage now pins menu pointer/click isolation so
+  drawing menu actions cannot fall through to chart selection handlers.
 
 Phase 3: Mobile long-press menu
 
 - Status: long-press over a drawing in Skia select mode opens the native mobile
   context menu with matching drawing actions and command semantics.
+- Status: mobile context-menu component coverage now pins menu item taps to the
+  intended action/close path without bubbling into chart touch handlers.
 - Status: text-capable drawing context actions now begin text editing through
   the same command owner path on both web Canvas and mobile Skia.
 - Future work: add richer typography/fill/tool-specific context actions after

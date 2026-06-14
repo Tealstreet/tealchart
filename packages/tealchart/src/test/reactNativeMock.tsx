@@ -10,6 +10,19 @@ interface PressableProps {
   onPress?: () => void;
 }
 
+interface ModalProps {
+  animationType?: string;
+  children?: ReactNode;
+  onRequestClose?: () => void;
+  transparent?: boolean;
+  visible?: boolean;
+}
+
+interface TouchableWithoutFeedbackProps {
+  children?: ReactNode;
+  onPress?: () => void;
+}
+
 interface ViewProps {
   accessibilityLabel?: string;
   children?: ReactNode;
@@ -42,7 +55,14 @@ export function Pressable({ accessibilityLabel, accessibilityState, children, di
       aria-label={accessibilityLabel}
       aria-pressed={accessibilityState?.selected ? 'true' : 'false'}
       disabled={isDisabled}
-      onClick={isDisabled ? undefined : onPress}
+      onClick={
+        isDisabled
+          ? undefined
+          : (event) => {
+              event.stopPropagation();
+              onPress?.();
+            }
+      }
       type="button"
     >
       {typeof children === 'function' ? children({ pressed: false }) : children}
@@ -68,6 +88,24 @@ export function TouchableOpacity({ accessibilityLabel, children, disabled, onPre
     >
       {typeof children === 'function' ? children({ pressed: false }) : children}
     </button>
+  );
+}
+
+export function Modal({ children, visible }: ModalProps) {
+  if (!visible) return null;
+  return <div>{children}</div>;
+}
+
+export function TouchableWithoutFeedback({ children, onPress }: TouchableWithoutFeedbackProps) {
+  return (
+    <div
+      onClick={(event) => {
+        event.stopPropagation();
+        onPress?.();
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
