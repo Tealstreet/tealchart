@@ -17,6 +17,7 @@ import type {
 import {
   createUserDrawingFromDraft,
   DEFAULT_USER_DRAWING_STYLE,
+  getDefaultUserDrawingStyleForTool,
   isDrawingDraftReady,
   isUserDrawingPathFamilyTool,
   isUserDrawingTextAnnotation,
@@ -1008,7 +1009,7 @@ export function beginUserDrawingPathDrag(
       tool: state.activeTool,
       paneId: point.paneId,
       anchors: [point.anchor],
-      style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
+      style: normalizeUserDrawingStyle(options.style ?? getDefaultUserDrawingStyleForTool(state.activeTool)),
       startedAt: options.now?.() ?? Date.now(),
     },
     textEdit: null,

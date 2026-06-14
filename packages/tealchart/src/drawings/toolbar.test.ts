@@ -2384,6 +2384,48 @@ describe('user drawing toolbar descriptors', () => {
     });
   });
 
+  it('resolves freehand stroke presets for shared properties surfaces', () => {
+    const highlighterState = {
+      ...state,
+      selection: { drawingId: 'highlighter' },
+      drawings: [
+        {
+          id: 'highlighter',
+          kind: 'highlighter' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid' as const, opacity: 0.35 },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const surface = resolveUserDrawingPropertiesSurface(highlighterState);
+    const strokeGroup = surface.groups[0]!;
+
+    expect(strokeGroup).toMatchObject({ id: 'line', label: 'Stroke' });
+    expect(strokeGroup.controls.find((control) => control.id === 'lineWidth:8')).toMatchObject({
+      enabled: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { lineWidth: 8 } },
+    });
+    expect(strokeGroup.controls.find((control) => control.id === 'lineWidth:28')).toMatchObject({
+      label: 'Extra wide highlighter stroke width',
+      command: { type: 'updateStyle', style: { lineWidth: 28 } },
+    });
+    expect(strokeGroup.controls.find((control) => control.id === 'opacity:0.35')).toMatchObject({
+      enabled: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { opacity: 0.35 } },
+    });
+  });
+
   it('resolves shared properties surface controls for text and fill drawings', () => {
     const textState = {
       ...state,

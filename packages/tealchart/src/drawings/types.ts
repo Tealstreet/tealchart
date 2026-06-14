@@ -898,6 +898,29 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
   fontSize: 12,
 };
 
+export const DEFAULT_USER_DRAWING_PATH_STYLE: UserDrawingStyle = {
+  ...DEFAULT_USER_DRAWING_STYLE,
+  lineWidth: 2,
+};
+
+export const DEFAULT_USER_DRAWING_BRUSH_STYLE: UserDrawingStyle = {
+  ...DEFAULT_USER_DRAWING_STYLE,
+  lineWidth: 4,
+};
+
+export const DEFAULT_USER_DRAWING_HIGHLIGHTER_STYLE: UserDrawingStyle = {
+  ...DEFAULT_USER_DRAWING_STYLE,
+  lineWidth: 8,
+  opacity: 0.35,
+};
+
+export function getDefaultUserDrawingStyleForTool(tool: UserDrawingTool): UserDrawingStyle {
+  if (tool === 'path') return DEFAULT_USER_DRAWING_PATH_STYLE;
+  if (tool === 'brush') return DEFAULT_USER_DRAWING_BRUSH_STYLE;
+  if (tool === 'highlighter') return DEFAULT_USER_DRAWING_HIGHLIGHTER_STYLE;
+  return DEFAULT_USER_DRAWING_STYLE;
+}
+
 export const USER_DRAWING_FONT_SIZES = [8, 10, 12, 14, 16, 20, 24, 28, 32, 40] as const;
 export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] as const;
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
