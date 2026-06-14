@@ -6,6 +6,7 @@
 import type { WorkerError } from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEvent,
+  UserDrawingCommandEventListener,
   UserDrawingObjectTreeModel,
   UserDrawingPropertiesIntent,
   UserDrawingState,
@@ -414,6 +415,18 @@ export type WidgetEvent =
   | 'mouse_up'
   | 'user_drawing_command';
 
+export interface WidgetEventMap {
+  onAutoSaveNeeded: [];
+  layout_about_to_be_changed: [];
+  chart_loaded: [];
+  layout_changed: [];
+  mouse_down: [];
+  mouse_up: [];
+  user_drawing_command: [UserDrawingCommandEvent];
+}
+
+export type WidgetEventCallback<TEvent extends WidgetEvent = WidgetEvent> = (...args: WidgetEventMap[TEvent]) => void;
+
 /**
  * Resolution string type (matches TradingView's nominal type)
  */
@@ -734,7 +747,7 @@ export interface TealchartWidgetOptions {
    * replacement and layout import emit a non-undoable `replaceState` command
    * event when the committed drawing layout changes.
    */
-  onUserDrawingCommand?: (event: UserDrawingCommandEvent) => void;
+  onUserDrawingCommand?: UserDrawingCommandEventListener;
   /** Called when app or widget code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   /** Called when app or widget code asks to open selected drawing properties. */

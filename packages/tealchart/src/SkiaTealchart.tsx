@@ -23,6 +23,7 @@ import type {
   UpdateUserDrawingOptions,
   UserDrawingClipboard,
   UserDrawingCommandEvent,
+  UserDrawingCommandEventListener,
   UserDrawingObjectTreeDispatchAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeOptions,
@@ -408,8 +409,11 @@ export interface SkiaTealchartProps {
   userDrawingState?: UserDrawingState;
   /** Called when the chart updates user drawing state through input or its public API. */
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
-  /** Called after a user drawing command changes state. Direct state replacement does not emit this. */
-  onUserDrawingCommand?: (event: UserDrawingCommandEvent) => void;
+  /**
+   * Called after a user drawing command changes state. Direct state replacement and layout import emit
+   * a non-undoable `replaceState` command event when the committed drawing layout changes.
+   */
+  onUserDrawingCommand?: UserDrawingCommandEventListener;
   /** Called when app or handle code asks to open the user drawing object tree. */
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   /** Called when app or handle code asks to open selected drawing properties. */

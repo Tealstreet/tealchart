@@ -88,6 +88,7 @@ import type {
   UserDrawingObjectTreeAction,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
+  UserDrawingCommandEvent,
   UserDrawingPropertiesIntent,
   UserDrawingVisualEvidenceMatrix,
   UserDrawingVisualEvidenceState,
@@ -104,6 +105,10 @@ import type {
   UserDrawingTextMaxWidth,
   UserDrawingTextMaxWidthDescriptor,
   UserDrawingTextWrapDescriptor,
+  TealchartWidgetOptions,
+  UserDrawingCommandEventListener,
+  WidgetEventCallback,
+  WidgetEventMap,
 } from './index';
 import type {
   MobileUserDrawingAnchoredVolumeProfilePrimitive,
@@ -166,6 +171,7 @@ import {
   computeChartGeometry,
   computeTopLeftLegendRect,
   createUserDrawingClipboard,
+  createUserDrawingState,
   createUserDrawingVisualEvidencePrNoteTemplate,
   duplicateUserDrawing,
   formatTrendAngleDegrees,
@@ -294,6 +300,29 @@ describe('tealchart public entries', () => {
     expect(snapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
     expect(snapshot.chrome.topLeftLegend).toEqual({ x: 70, y: 40, width: 430, height: 44 });
     expect(legendRect).toEqual(snapshot.chrome.topLeftLegend);
+  });
+
+  it('exports typed drawing command event callbacks for web and mobile surfaces', () => {
+    const webSubscriptionCallback = ((event) => event.source) satisfies WidgetEventCallback<'user_drawing_command'>;
+    const webOptionCallback = ((event) => event.state.drawings.length) satisfies NonNullable<
+      TealchartWidgetOptions['onUserDrawingCommand']
+    >;
+    const crossPlatformCallback = ((event) => event.command.type) satisfies UserDrawingCommandEventListener;
+    const acceptsCommandTuple = (_tuple: WidgetEventMap['user_drawing_command']) => true;
+    const commandEvent: UserDrawingCommandEvent = {
+      command: { type: 'setActiveTool', tool: 'trendLine' },
+      previousState: createUserDrawingState(),
+      state: createUserDrawingState({ activeTool: 'trendLine' }),
+      source: 'api',
+    };
+
+    expect(webSubscriptionCallback).toBeTypeOf('function');
+    expect(webOptionCallback).toBeTypeOf('function');
+    expect(crossPlatformCallback).toBeTypeOf('function');
+    expect(acceptsCommandTuple).toBeTypeOf('function');
+    expect(commandEvent.command.type).toBe('setActiveTool');
+    expect(commandEvent.state.activeTool).toBe('trendLine');
+    expect(commandEvent.source).toBe('api');
   });
 
   it('exports shared and native drawing text alignment helpers', () => {
