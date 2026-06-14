@@ -1,11 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  cancelMobileUserDrawingDraft,
+  clearMobileUserDrawings,
   commitMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHistoryCommand,
   dispatchMobileUserDrawingHistoryCommandWithEvent,
   dispatchMobileUserDrawingKeyboardAction,
+  selectMobileUserDrawing,
+  selectMobileUserDrawings,
+  setMobileActiveUserDrawingTool,
 } from './drawingCommands';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
@@ -89,6 +94,36 @@ function createMobileStateWithTable(): UserDrawingState {
 }
 
 describe('mobile drawing handle command dispatch', () => {
+  it('exposes boolean results for no-op-capable Skia drawing command APIs', () => {
+    let state = createUserDrawingState();
+    const commit = (nextState: UserDrawingState) => {
+      state = nextState;
+    };
+
+    expect(setMobileActiveUserDrawingTool(state, 'select', commit)).toBe(false);
+    expect(setMobileActiveUserDrawingTool(state, 'rectangle', commit)).toBe(true);
+    expect(setMobileActiveUserDrawingTool(state, 'rectangle', commit)).toBe(false);
+
+    expect(selectMobileUserDrawing(state, 'missing', undefined, commit)).toBe(false);
+    state = createMobileStateWithTrendLine();
+    expect(selectMobileUserDrawing(state, 'line', undefined, commit)).toBe(false);
+    expect(selectMobileUserDrawing(state, null, undefined, commit)).toBe(true);
+    expect(selectMobileUserDrawings(state, ['line', 'missing'], commit)).toBe(true);
+    expect(selectMobileUserDrawings(state, ['line', 'missing'], commit)).toBe(false);
+
+    expect(clearMobileUserDrawings(state, commit)).toBe(true);
+    expect(clearMobileUserDrawings(state, commit)).toBe(false);
+
+    expect(cancelMobileUserDrawingDraft(state, commit)).toBe(false);
+    state = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'rectangle'), { paneId: 'main', anchor: anchorA }, {
+      createId: () => 'rect',
+      now: () => 30,
+      style,
+    });
+    expect(cancelMobileUserDrawingDraft(state, commit)).toBe(true);
+    expect(cancelMobileUserDrawingDraft(state, commit)).toBe(false);
+  });
+
   it('records complete drawing additions through the mobile command adapter', () => {
     const drawing: UserDrawing = {
       id: 'api-line',

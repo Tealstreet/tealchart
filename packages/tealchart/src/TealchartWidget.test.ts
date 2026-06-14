@@ -372,6 +372,50 @@ describe('TealchartWidget', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
+    it('returns command change booleans from no-op-capable public drawing APIs', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const drawing: UserDrawing = {
+        id: 'line',
+        kind: 'horizontalLine',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+        price: 100,
+      };
+      const testWidget = widget as unknown as {
+        _handleUserDrawingPlacementDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      expect(widget.setActiveUserDrawingTool('select')).toBe(false);
+      expect(widget.setActiveUserDrawingTool('rectangle')).toBe(true);
+      expect(widget.setActiveUserDrawingTool('rectangle')).toBe(false);
+
+      expect(widget.selectUserDrawing('missing')).toBe(false);
+      expect(widget.addUserDrawing(drawing)).toBe(true);
+      expect(widget.selectUserDrawing('line')).toBe(false);
+      expect(widget.selectUserDrawing(null)).toBe(true);
+      expect(widget.selectUserDrawings(['line', 'missing'])).toBe(true);
+      expect(widget.selectUserDrawings(['line', 'missing'])).toBe(false);
+
+      expect(widget.clearUserDrawings()).toBe(true);
+      expect(widget.clearUserDrawings()).toBe(false);
+
+      expect(widget.cancelUserDrawingDraft()).toBe(false);
+      expect(widget.setActiveUserDrawingTool('rectangle')).toBe(true);
+      expect(
+        testWidget._handleUserDrawingPlacementDragStart({
+          paneId: 'main',
+          anchor: { time: 1_000, price: 100 },
+        }),
+      ).toBe(true);
+      expect(widget.cancelUserDrawingDraft()).toBe(true);
+      expect(widget.cancelUserDrawingDraft()).toBe(false);
+    });
+
     it('adds complete user drawings through an undoable command-backed API', () => {
       const datafeed = createMockDatafeed();
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
