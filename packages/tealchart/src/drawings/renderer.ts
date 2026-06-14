@@ -163,13 +163,16 @@ function renderPathGeometry(
     geometry.drawing.style.lineStyle,
   );
   if (pressureSegments.length > 0) {
+    const originalLineDashOffset = ctx.lineDashOffset;
     for (const segment of pressureSegments) {
       ctx.lineWidth = segment.lineWidth;
+      ctx.lineDashOffset = segment.lineDashOffset;
       ctx.beginPath();
       ctx.moveTo(segment.start.x, segment.start.y);
       ctx.lineTo(segment.end.x, segment.end.y);
       ctx.stroke();
     }
+    ctx.lineDashOffset = originalLineDashOffset;
     return;
   }
 

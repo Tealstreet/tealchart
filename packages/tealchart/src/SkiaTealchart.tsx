@@ -3825,7 +3825,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                           strokeCap="round"
                           strokeJoin="round"
                         >
-                          {dash && <DashPathEffect intervals={dash} />}
+                          {dash && <DashPathEffect intervals={dash} phase={segment.lineDashOffset} />}
                         </SkiaPath>
                       );
                     })

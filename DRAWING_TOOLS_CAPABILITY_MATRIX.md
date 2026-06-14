@@ -142,10 +142,9 @@ summary:
   mobile Skia. They also use shared tool-specific stroke defaults and
   properties-surface stroke presets. Optional pressure metadata is preserved
   through web/mobile input, smoothing, command history, and layout restore.
-  Canvas and Skia derive matching variable-width solid pressure stroke segments
-  at render time, while dashed/dotted strokes preserve the continuous
-  single-path renderer. TradingView-grade behavior still needs richer brush
-  preset libraries and dash-phase-aware pressure rendering.
+  Canvas and Skia derive matching variable-width pressure stroke segments at
+  render time, including dash-phase continuity for dashed and dotted strokes.
+  TradingView-grade behavior still needs richer brush preset libraries.
 - `anchoredText` and `anchoredNote` currently share one-anchor input semantics,
   but their long-term behavior should be treated as `anchored-pane` placement.
 - `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars

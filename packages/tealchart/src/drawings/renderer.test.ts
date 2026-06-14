@@ -20,13 +20,22 @@ class RecordingCanvasContext implements CanvasContext {
   font = '12px sans-serif';
   textAlign: CanvasTextAlign = 'left';
   textBaseline: CanvasTextBaseline = 'alphabetic';
-  lineDashOffset = 0;
   globalAlpha = 1;
   lineCap: CanvasLineCap = 'butt';
   lineJoin: CanvasLineJoin = 'miter';
   readonly calls: string[] = [];
   private lineDash: number[] = [];
-  private readonly stateStack: { globalAlpha: number; lineDash: number[] }[] = [];
+  private _lineDashOffset = 0;
+  private readonly stateStack: { globalAlpha: number; lineDash: number[]; lineDashOffset: number }[] = [];
+
+  get lineDashOffset(): number {
+    return this._lineDashOffset;
+  }
+
+  set lineDashOffset(value: number) {
+    this._lineDashOffset = value;
+    this.calls.push(`lineDashOffset:${value}`);
+  }
 
   beginPath(): void {
     this.calls.push('beginPath');
@@ -76,7 +85,11 @@ class RecordingCanvasContext implements CanvasContext {
     this.calls.push(`drawImage:${source}:${x},${y},${width},${height}:${this.globalAlpha}`);
   }
   save(): void {
-    this.stateStack.push({ globalAlpha: this.globalAlpha, lineDash: [...this.lineDash] });
+    this.stateStack.push({
+      globalAlpha: this.globalAlpha,
+      lineDash: [...this.lineDash],
+      lineDashOffset: this.lineDashOffset,
+    });
     this.calls.push('save');
   }
   restore(): void {
@@ -84,6 +97,7 @@ class RecordingCanvasContext implements CanvasContext {
     if (previous) {
       this.globalAlpha = previous.globalAlpha;
       this.lineDash = previous.lineDash;
+      this._lineDashOffset = previous.lineDashOffset;
     }
     this.calls.push('restore');
   }
@@ -931,8 +945,9 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).not.toContain('stroke:#f5c542:8::1');
   });
 
-  it('preserves dashed pressure-aware path drawings as continuous stroked polylines', () => {
+  it('renders dashed pressure-aware path drawings with continuous dash phase offsets', () => {
     const ctx = new RecordingCanvasContext();
+    ctx.lineDashOffset = 3;
     const drawing: UserDrawing = {
       ...base,
       id: 'path',
@@ -949,9 +964,13 @@ describe('user drawing renderer', () => {
 
     expect(ctx.calls).toContain('moveTo:10,10');
     expect(ctx.calls).toContain('lineTo:50,50');
+    expect(ctx.calls).toContain('moveTo:50,50');
     expect(ctx.calls).toContain('lineTo:90,10');
-    expect(ctx.calls).toContain('stroke:#f5c542:8:6,4:1');
-    expect(ctx.calls.filter((call) => call.startsWith('stroke:#f5c542'))).toHaveLength(1);
+    expect(ctx.calls).toContain('lineDashOffset:0');
+    expect(ctx.calls).toContain(`lineDashOffset:${Math.hypot(40, -40)}`);
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls).toContain('stroke:#f5c542:5:6,4:1');
+    expect(ctx.lineDashOffset).toBe(3);
   });
 
   it('renders highlighter drawings as stroked polylines', () => {
