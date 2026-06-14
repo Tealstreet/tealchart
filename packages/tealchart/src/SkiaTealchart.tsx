@@ -1773,6 +1773,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         dimensions: chartDimensions,
         panes: userDrawingInputPanes,
         bars,
+        magnetMode: isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)
+          ? 'off'
+          : effectiveUserDrawingState.magnetMode ?? 'off',
       });
       if (!point) return false;
 
@@ -1813,6 +1816,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
           bars,
+          magnetMode: effectiveUserDrawingState.magnetMode ?? 'off',
         });
         if (!point) return false;
 
@@ -1934,6 +1938,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
           bars,
+          magnetMode: effectiveUserDrawingState.magnetMode ?? 'off',
         });
         if (!point || !userDrawingPlacementDragLastPointRef.current) return;
 

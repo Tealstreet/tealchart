@@ -8,6 +8,7 @@ import type {
   BarsPatternBarSnapshot,
   UserDrawing,
   UserDrawingAnchor,
+  UserDrawingMagnetMode,
   UserDrawingPanePosition,
   UserDrawingPathFamilyKind,
 } from './types';
@@ -568,6 +569,14 @@ export interface ResolveUserDrawingInputFromChartOptions {
   margins: Pick<ChartMargins, 'left' | 'right'>;
 }
 
+export interface ResolveUserDrawingMagnetInputPointOptions {
+  point: UserDrawingInputPoint;
+  mode?: UserDrawingMagnetMode;
+  space: DrawingCoordinateSpace;
+  screenPoint?: DrawingScreenPoint;
+  weakThresholdPx?: number;
+}
+
 export type ResolvedUserDrawingGeometry =
   | {
       kind: 'line' | 'arrowLine' | 'ray' | 'horizontalRay' | 'horizontalLine' | 'verticalLine';
@@ -1056,6 +1065,67 @@ export function resolveUserDrawingInputPointFromChart({
     chartLeft: margins.left,
     chartRight: width - margins.right,
   });
+}
+
+const DEFAULT_USER_DRAWING_WEAK_MAGNET_THRESHOLD_PX = 12;
+
+export function resolveUserDrawingMagnetInputPoint({
+  point,
+  mode = 'off',
+  space,
+  screenPoint = anchorToScreenPoint(point.anchor, space),
+  weakThresholdPx = DEFAULT_USER_DRAWING_WEAK_MAGNET_THRESHOLD_PX,
+}: ResolveUserDrawingMagnetInputPointOptions): UserDrawingInputPoint {
+  if (mode === 'off' || point.paneId !== space.pane.id || !space.bars || space.bars.length === 0) return point;
+
+  let nearestBar: Bar | null = null;
+  let nearestBarDistance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < space.bars.length; index += 1) {
+    const bar = space.bars[index]!;
+    const x = timeToDrawingX(bar.time, space);
+    if (x < space.chartLeft || x >= space.chartRight) continue;
+    const distance = Math.abs(x - screenPoint.x);
+    if (distance < nearestBarDistance) {
+      nearestBar = bar;
+      nearestBarDistance = distance;
+    }
+  }
+  if (!nearestBar) return point;
+
+  const candidates = [nearestBar.open, nearestBar.high, nearestBar.low, nearestBar.close];
+  let snappedPrice = candidates[0]!;
+  let snappedPoint: DrawingScreenPoint = {
+    x: timeToDrawingX(nearestBar.time, space),
+    y: priceToDrawingY(snappedPrice, space),
+  };
+  let snappedDistance = Math.hypot(snappedPoint.x - screenPoint.x, snappedPoint.y - screenPoint.y);
+
+  for (let index = 1; index < candidates.length; index += 1) {
+    const candidatePrice = candidates[index]!;
+    const candidatePoint = {
+      x: timeToDrawingX(nearestBar.time, space),
+      y: priceToDrawingY(candidatePrice, space),
+    };
+    const distance = Math.hypot(candidatePoint.x - screenPoint.x, candidatePoint.y - screenPoint.y);
+    if (distance < snappedDistance) {
+      snappedPrice = candidatePrice;
+      snappedPoint = candidatePoint;
+      snappedDistance = distance;
+    }
+  }
+
+  if (mode === 'weak' && snappedDistance > weakThresholdPx) return point;
+
+  const anchor: UserDrawingAnchor =
+    point.anchor.pressure === undefined
+      ? { time: nearestBar.time, price: snappedPrice }
+      : { time: nearestBar.time, price: snappedPrice, pressure: point.anchor.pressure };
+
+  return {
+    ...point,
+    anchor,
+    position: screenPointToPanePosition(snappedPoint, space),
+  };
 }
 
 export function resolveExtendedSegment(
