@@ -30,6 +30,7 @@ import type {
   UserDrawingHitTestOptions,
   UserDrawingIconName,
   UserDrawingImageSourceInput,
+  UserDrawingKeyboardFocusOwner,
   UserDrawingInputPoint,
   UserDrawingKeyboardInput,
   UserDrawingSelectionAtPointResult,
@@ -3101,8 +3102,8 @@ export class TealchartWidget {
    * If so, we should not process it as a hotkey
    */
   private _isInputElement(e: KeyboardEvent): boolean {
-    const target = e.target as HTMLElement;
-    if (!target) return false;
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return false;
 
     const tagName = target.tagName?.toUpperCase();
     if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') {
@@ -3110,11 +3111,20 @@ export class TealchartWidget {
     }
 
     // Also check for contenteditable elements
-    if (target.isContentEditable) {
+    if (target.isContentEditable || target.closest('[contenteditable="true"]')) {
       return true;
     }
 
     return false;
+  }
+
+  private _getKeyboardFocusOwner(e: KeyboardEvent): UserDrawingKeyboardFocusOwner {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return 'chart';
+    if (this._isInputElement(e)) return 'textInput';
+
+    const appControl = target.closest('button,a,[role="button"],[role="menuitem"],[role="option"],[aria-haspopup]');
+    return appControl ? 'appControl' : 'chart';
   }
 
   /**
@@ -3126,12 +3136,23 @@ export class TealchartWidget {
       return;
     }
 
-    // Don't capture events when user is typing in an input (e.g., modal search)
-    if (this._isInputElement(e)) {
+    const focusOwner = this._getKeyboardFocusOwner(e);
+
+    // Don't capture events when user is typing or focused in app-owned controls.
+    if (focusOwner !== 'chart') {
       return;
     }
 
-    if (this.dispatchUserDrawingKeyboardAction(e)) {
+    if (
+      this.dispatchUserDrawingKeyboardAction({
+        key: e.key,
+        ctrlKey: e.ctrlKey,
+        metaKey: e.metaKey,
+        altKey: e.altKey,
+        shiftKey: e.shiftKey,
+        focusOwner,
+      })
+    ) {
       e.stopPropagation();
       e.preventDefault();
       return;
