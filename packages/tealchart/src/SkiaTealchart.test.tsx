@@ -129,4 +129,49 @@ describe('SkiaTealchart drawing properties', () => {
     expect(nextState.selection).toEqual({ drawingId: 'selected' });
     expect(createPicture).toHaveBeenCalled();
   });
+
+  it('passes pressure segment dash phases into Skia dash effects', () => {
+    const pressureState: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'pressure-path',
+          kind: 'path',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'dashed' },
+          points: [
+            { time: 1_000_000, price: 52, pressure: 0 },
+            { time: 1_060_000, price: 53, pressure: 0 },
+            { time: 1_120_000, price: 54, pressure: 1 },
+          ],
+        },
+      ],
+    };
+
+    const { container } = render(
+      <SkiaTealchart
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={320}
+        height={240}
+        userDrawingState={pressureState}
+      />,
+    );
+
+    const pressureDashPhases = [...container.querySelectorAll('[data-skia="DashPathEffect"][data-phase]')].map((node) =>
+      Number(node.getAttribute('data-phase')),
+    );
+
+    expect(pressureDashPhases).toContain(0);
+    expect(pressureDashPhases.some((phase) => phase > 0)).toBe(true);
+  });
 });

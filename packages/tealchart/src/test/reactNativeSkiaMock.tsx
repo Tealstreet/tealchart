@@ -48,9 +48,23 @@ const canvas = {
 };
 
 function createSkiaComponent(name: string) {
-  return function SkiaComponent({ children, style, ...props }: { children?: ReactNode; style?: unknown }) {
+  return function SkiaComponent({
+    children,
+    phase,
+    style,
+    ...props
+  }: {
+    children?: ReactNode;
+    phase?: number;
+    style?: unknown;
+  }) {
     return (
-      <div data-skia={name} data-style={style === undefined ? undefined : JSON.stringify(style)} {...props}>
+      <div
+        data-props={Object.keys(props).length > 0 ? JSON.stringify(props) : undefined}
+        data-phase={phase}
+        data-skia={name}
+        data-style={style === undefined ? undefined : JSON.stringify(style)}
+      >
         {children}
       </div>
     );
