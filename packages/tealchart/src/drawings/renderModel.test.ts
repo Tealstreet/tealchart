@@ -103,6 +103,68 @@ describe('user drawing render model', () => {
     });
   });
 
+  it('resolves drag placement draft geometry to the same anchors as committed geometry', () => {
+    const draftState: UserDrawingState = {
+      version: 1,
+      activeTool: 'rectangle',
+      selection: null,
+      drawings: [],
+      draft: {
+        tool: 'rectangle',
+        paneId: 'main',
+        anchors: [{ time: 10, price: 90 }],
+        style,
+        startedAt: 2,
+      },
+      textEdit: null,
+    };
+    const committedState: UserDrawingState = {
+      ...draftState,
+      activeTool: 'select',
+      draft: null,
+      selection: { drawingId: 'rect' },
+      drawings: [
+        {
+          id: 'rect',
+          kind: 'rectangle',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 2,
+          updatedAt: 2,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 90, price: 10 },
+          ],
+        },
+      ],
+    };
+
+    const draftEntry = resolveUserDrawingRenderEntries(draftState, {
+      draftPreviewAnchor: { time: 90, price: 10 },
+      draftId: 'draft-rect',
+      now: 2,
+    })[0];
+    const committedEntry = resolveUserDrawingRenderEntries(committedState)[0];
+
+    expect(draftEntry).toMatchObject({
+      phase: 'draft',
+      drawing: {
+        id: 'draft-rect',
+        kind: 'rectangle',
+        points: [
+          { time: 10, price: 90 },
+          { time: 90, price: 10 },
+        ],
+      },
+    });
+    expect(draftEntry?.drawing).toMatchObject({
+      ...committedEntry?.drawing,
+      id: 'draft-rect',
+    });
+  });
+
   it('keeps drag-seeded multi-anchor drafts renderable after drag release', () => {
     const dragSeedTools = [
       'triangle',
