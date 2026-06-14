@@ -44,6 +44,13 @@ function createSelectedState(): UserDrawingState {
   };
 }
 
+function getMockViewStyle(element: HTMLElement): Record<string, unknown> {
+  const rawStyle = element.getAttribute('data-style');
+  expect(rawStyle).not.toBeNull();
+  const style = JSON.parse(rawStyle ?? '[]') as Array<Record<string, unknown> | null | false>;
+  return Object.assign({}, ...style.filter(Boolean));
+}
+
 describe('UserDrawingSelectedActionSurfaceComponent', () => {
   afterEach(() => {
     cleanup();
@@ -154,5 +161,30 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     });
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'select' }));
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'selectMany' }));
+  });
+
+  it('clamps mobile selected style popovers using the expanded surface height', () => {
+    const state = createSelectedState();
+
+    render(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={state}
+        surface={resolveUserDrawingSelectedActionSurface(state)}
+        anchor={{ ...selectionActionAnchor, anchor: { x: 160, y: 230 } }}
+        dimensions={{ width: 360, height: 240 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={vi.fn()}
+      />,
+    );
+
+    const surface = screen.getByLabelText('Selected drawing actions');
+    expect(getMockViewStyle(surface).top).toBe(162);
+
+    fireEvent.click(screen.getByLabelText('Style selected drawing'));
+
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
+    expect(getMockViewStyle(surface).top).toBe(128);
   });
 });

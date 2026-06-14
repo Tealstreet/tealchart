@@ -31,12 +31,18 @@ interface ViewProps {
   style?: unknown;
 }
 
-export function View({ accessibilityLabel, children, onStartShouldSetResponder, pointerEvents }: ViewProps) {
+function serializeStyle(style: unknown): string | undefined {
+  if (style === undefined) return undefined;
+  return JSON.stringify(style);
+}
+
+export function View({ accessibilityLabel, children, onStartShouldSetResponder, pointerEvents, style }: ViewProps) {
   return (
     <div
       aria-label={accessibilityLabel}
       data-pointer-events={pointerEvents}
       data-start-should-set-responder={onStartShouldSetResponder?.() ? 'true' : undefined}
+      data-style={serializeStyle(style)}
     >
       {children}
     </div>
