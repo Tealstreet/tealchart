@@ -30,7 +30,7 @@ export interface UserDrawingVisualEvidenceState {
   label: string;
   webEvidence: string;
   mobileEvidence: string;
-  status: {
+  status?: {
     web: UserDrawingVisualEvidenceStateStatus;
     mobile: UserDrawingVisualEvidenceStateStatus;
     notes: string;
@@ -213,12 +213,19 @@ export function createUserDrawingVisualEvidencePrNoteTemplate(
 ): string {
   const viewportLines = matrix.viewports.map((viewport) => `- ${viewport.label}:`).join('\n');
   const stateLines = matrix.states
-    .map((state) => `- [ ] ${state.label} (web: ${state.status.web}, mobile: ${state.status.mobile}), if affected`)
+    .map((state) =>
+      state.status
+        ? `- [ ] ${state.label} (web: ${state.status.web}, mobile: ${state.status.mobile}), if affected`
+        : `- [ ] ${state.label}, if affected`,
+    )
     .join('\n');
   const regressionCheckLines = matrix.regressionChecks.map((check) => `- [ ] ${check}`).join('\n');
   const knownGapLines = matrix.states
-    .filter((state) => state.status.web === 'known-gap' || state.status.mobile === 'known-gap')
-    .map((state) => `- ${state.label}: web ${state.status.web}, mobile ${state.status.mobile} - ${state.status.notes}`);
+    .filter((state) => state.status && (state.status.web === 'known-gap' || state.status.mobile === 'known-gap'))
+    .map((state) => {
+      const status = state.status!;
+      return `- ${state.label}: web ${status.web}, mobile ${status.mobile} - ${status.notes}`;
+    });
 
   return [
     '## Drawing Visual Evidence',
