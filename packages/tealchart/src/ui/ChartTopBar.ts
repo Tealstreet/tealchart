@@ -134,6 +134,8 @@ interface ChartTopBarState {
 
 const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
 const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
+const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
+const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
 
 const styles = {
   container: {
@@ -348,6 +350,23 @@ const styles = {
     paddingLeft: '3px',
   } as Partial<CSSStyleDeclaration>,
 
+  selectedActionSurfacePopover: {
+    position: 'absolute',
+    top: '34px',
+    left: '4px',
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '3px',
+    padding: '6px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: '6px',
+    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.34)',
+    zIndex: '9',
+    pointerEvents: 'auto',
+  } as Partial<CSSStyleDeclaration>,
+
   drawingGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -427,6 +446,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
   private selectedActionSurfaceEl: HTMLElement | null = null;
+  private selectedActionPopoverGroupId: string | null = null;
+  private selectedActionPopoverDrawingId: string | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -674,9 +695,24 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeSelectedActionSurface();
     const state = this.options.userDrawingState;
     const anchor = this.options.userDrawingSelectionActionAnchor;
-    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor)) return;
+    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor)) {
+      this.selectedActionPopoverGroupId = null;
+      this.selectedActionPopoverDrawingId = null;
+      return;
+    }
 
     const surface = resolveUserDrawingSelectedActionSurface(state);
+    const selectedDrawingId = surface.selectedDrawing?.id ?? null;
+    if (this.selectedActionPopoverDrawingId !== selectedDrawingId) {
+      this.selectedActionPopoverGroupId = null;
+      this.selectedActionPopoverDrawingId = selectedDrawingId;
+    }
+    const activePopoverGroup = surface.groups.find((group) => group.id === this.selectedActionPopoverGroupId);
+    const activePopoverHeight =
+      activePopoverGroup?.presentation?.type === 'popover'
+        ? SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y +
+          Math.max(SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT, SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT)
+        : SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT;
     const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
     const parentRect = parent.getBoundingClientRect();
     const position = resolveUserDrawingActionSurfacePosition({
@@ -687,7 +723,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       },
       surface: {
         width: SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
-        height: SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT,
+        height: activePopoverHeight,
       },
       inset: {
         left: 8,
@@ -716,41 +752,105 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       const groupEl = this.createElement('div', {
         style: {
           ...styles.selectedActionSurfaceGroup,
+          ...(group.presentation?.type === 'popover' ? { position: 'relative' } : {}),
           ...(groupIndex > 0 ? styles.selectedActionSurfaceGroupSeparated : {}),
         },
       });
-      for (const item of group.items) {
-        const btn = this.createElement('button', {
+
+      if (group.presentation?.type === 'popover') {
+        const trigger = this.createElement('button', {
           style: {
             ...styles.drawingButton,
-            ...(item.swatchColor ? styles.drawingSwatch : {}),
-            ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
-            opacity: item.enabled ? '1' : '0.35',
-            cursor: item.enabled ? 'pointer' : 'default',
+            backgroundColor: this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent',
+            color: this.selectedActionPopoverGroupId === group.id ? 'var(--accent, #5b8cff)' : 'var(--text2, #787b86)',
           },
-          textContent: item.icon,
+          textContent: group.presentation.triggerIcon ?? '⋯',
           attributes: {
             type: 'button',
-            title: item.label,
-            'aria-label': item.label,
+            title: group.presentation.triggerLabel ?? group.label,
+            'aria-label': group.presentation.triggerLabel ?? group.label,
+            'aria-expanded': this.selectedActionPopoverGroupId === group.id ? 'true' : 'false',
           },
         });
-        btn.disabled = !item.enabled;
-        if (item.enabled) {
-          btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
-          btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
-          btn.addEventListener('mouseleave', () => {
-            btn.style.backgroundColor = item.swatchColor ?? 'transparent';
-            btn.style.color = 'var(--text2, #787b86)';
+        trigger.addEventListener('click', () => {
+          this.selectedActionPopoverGroupId = this.selectedActionPopoverGroupId === group.id ? null : group.id;
+          this.renderSelectedActionSurface();
+        });
+        trigger.addEventListener('mouseenter', () => Object.assign(trigger.style, styles.drawingButtonHover));
+        trigger.addEventListener('mouseleave', () => {
+          trigger.style.backgroundColor =
+            this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent';
+          trigger.style.color =
+            this.selectedActionPopoverGroupId === group.id ? 'var(--accent, #5b8cff)' : 'var(--text2, #787b86)';
+        });
+        groupEl.appendChild(trigger);
+
+        if (this.selectedActionPopoverGroupId === group.id) {
+          const popover = this.createElement('div', {
+            style: {
+              ...styles.selectedActionSurfacePopover,
+              top: `${SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y}px`,
+              width: `${Math.min(group.presentation.popoverWidth ?? 296, SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH - 8)}px`,
+            },
+            attributes: {
+              'aria-label': group.presentation.popoverLabel ?? group.label,
+            },
           });
+          for (const item of group.items) {
+            popover.appendChild(this.createSelectedActionSurfaceButton(item, { keepPopoverOpen: true }));
+          }
+          el.appendChild(popover);
         }
-        groupEl.appendChild(btn);
+
+        el.appendChild(groupEl);
+        continue;
+      }
+
+      for (const item of group.items) {
+        groupEl.appendChild(this.createSelectedActionSurfaceButton(item));
       }
       el.appendChild(groupEl);
     }
 
     this.selectedActionSurfaceEl = el;
     parent.appendChild(el);
+  }
+
+  private createSelectedActionSurfaceButton(
+    item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number],
+    options: { keepPopoverOpen?: boolean } = {},
+  ): HTMLButtonElement {
+    const btn = this.createElement('button', {
+      style: {
+        ...styles.drawingButton,
+        ...(item.swatchColor ? styles.drawingSwatch : {}),
+        ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
+        opacity: item.enabled ? '1' : '0.35',
+        cursor: item.enabled ? 'pointer' : 'default',
+      },
+      textContent: item.icon,
+      attributes: {
+        type: 'button',
+        title: item.label,
+        'aria-label': item.label,
+      },
+    });
+    btn.disabled = !item.enabled;
+    if (item.enabled) {
+      btn.addEventListener('click', () => {
+        this.handleSelectedActionSurfaceItemClick(item);
+        if (!options.keepPopoverOpen) {
+          this.selectedActionPopoverGroupId = null;
+          this.renderSelectedActionSurface();
+        }
+      });
+      btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
+      btn.addEventListener('mouseleave', () => {
+        btn.style.backgroundColor = item.swatchColor ?? 'transparent';
+        btn.style.color = 'var(--text2, #787b86)';
+      });
+    }
+    return btn;
   }
 
   private renderDrawingToolRail(activeTool: UserDrawingTool): void {

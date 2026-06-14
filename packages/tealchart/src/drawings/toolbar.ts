@@ -219,9 +219,18 @@ export interface UserDrawingSelectedActionSurfaceItem {
   swatchColor?: string;
 }
 
+export interface UserDrawingSelectedActionSurfaceGroupPresentation {
+  type: 'inline' | 'popover';
+  triggerIcon?: string;
+  triggerLabel?: string;
+  popoverLabel?: string;
+  popoverWidth?: number;
+}
+
 export interface UserDrawingSelectedActionSurfaceGroup {
   id: UserDrawingSelectedActionSurfaceGroupId;
   label: string;
+  presentation?: UserDrawingSelectedActionSurfaceGroupPresentation;
   items: readonly UserDrawingSelectedActionSurfaceItem[];
 }
 
@@ -1063,6 +1072,13 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   return {
     id: 'style',
     label: 'Style',
+    presentation: {
+      type: 'popover',
+      triggerIcon: '◐',
+      triggerLabel: 'Style selected drawing',
+      popoverLabel: 'Selected drawing style controls',
+      popoverWidth: 296,
+    },
     items: [
       {
         id: `lineColor:${nextLineColor}`,

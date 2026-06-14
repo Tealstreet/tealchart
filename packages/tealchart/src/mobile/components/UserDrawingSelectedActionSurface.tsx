@@ -7,7 +7,7 @@ import type {
   UserDrawingState,
 } from '../../drawings';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import {
@@ -18,6 +18,8 @@ import { dispatchMobileUserDrawingActionCommand } from '../utils/drawingActionDi
 
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT = 70;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y = 30;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_HEIGHT = 74;
 
 export interface UserDrawingSelectedActionSurfaceProps {
   state: UserDrawingState;
@@ -42,7 +44,53 @@ export function UserDrawingSelectedActionSurfaceComponent({
   onUserDrawingPropertiesOpen,
   onUserDrawingObjectTreeOpen,
 }: UserDrawingSelectedActionSurfaceProps) {
-  if (!shouldRenderUserDrawingSelectedActionSurface(state, anchor)) return null;
+  const [activePopoverGroupId, setActivePopoverGroupId] = useState<string | null>(null);
+  const [activePopoverDrawingId, setActivePopoverDrawingId] = useState<string | null>(null);
+  const shouldRender = shouldRenderUserDrawingSelectedActionSurface(state, anchor);
+  const selectedDrawingId = surface.selectedDrawing?.id ?? null;
+  const activePopoverGroupIdForSelection =
+    activePopoverDrawingId === selectedDrawingId ? activePopoverGroupId : null;
+  const activePopoverGroup = surface.groups.find((group) => group.id === activePopoverGroupIdForSelection);
+  const activePopoverPresentation =
+    activePopoverGroup?.presentation?.type === 'popover' ? activePopoverGroup.presentation : null;
+  const surfaceHeight =
+    activePopoverGroup?.presentation?.type === 'popover'
+      ? MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y +
+        Math.max(MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT, MOBILE_USER_DRAWING_ACTION_POPOVER_HEIGHT)
+      : MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT;
+
+  useEffect(() => {
+    if (!shouldRender) {
+      setActivePopoverGroupId(null);
+      setActivePopoverDrawingId(null);
+    }
+  }, [shouldRender]);
+
+  useEffect(() => {
+    if (activePopoverDrawingId !== null && activePopoverDrawingId !== selectedDrawingId) {
+      setActivePopoverGroupId(null);
+      setActivePopoverDrawingId(selectedDrawingId);
+    }
+  }, [activePopoverDrawingId, selectedDrawingId]);
+
+  if (!shouldRender) return null;
+
+  const dispatchItem = (
+    item: UserDrawingSelectedActionSurface['groups'][number]['items'][number],
+    options: { keepPopoverOpen?: boolean } = {},
+  ) => {
+    dispatchMobileUserDrawingActionCommand(item.command, {
+      state,
+      source: 'toolbar',
+      createId,
+      dispatchUserDrawingCommand,
+      onUserDrawingPropertiesOpen,
+      onUserDrawingObjectTreeOpen,
+    });
+    if (!options.keepPopoverOpen) {
+      setActivePopoverGroupId(null);
+    }
+  };
 
   return (
     <View
@@ -54,7 +102,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
           viewport: { width: dimensions.width, height: dimensions.height },
           surface: {
             width: MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH,
-            height: MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT,
+            height: surfaceHeight,
           },
           inset: { left: 8, right: 8, top: topInset + 6, bottom: 8 },
         }),
@@ -66,10 +114,67 @@ export function UserDrawingSelectedActionSurfaceComponent({
           key={group.id}
           style={[
             styles.userDrawingActionSurfaceGroup,
+            group.presentation?.type === 'popover' && styles.userDrawingActionSurfaceGroupPopover,
             groupIndex > 0 && styles.userDrawingActionSurfaceGroupSeparated,
           ]}
         >
-          {group.items.map((item) => (
+          {group.presentation?.type === 'popover' ? (
+            <>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={group.presentation.triggerLabel ?? group.label}
+                accessibilityState={{ expanded: activePopoverGroupIdForSelection === group.id }}
+                activeOpacity={0.72}
+                style={[
+                  styles.userDrawingActionButton,
+                  activePopoverGroupIdForSelection === group.id && styles.userDrawingActionButtonActive,
+                ]}
+                onPress={() => {
+                  setActivePopoverDrawingId(selectedDrawingId);
+                  setActivePopoverGroupId(activePopoverGroupIdForSelection === group.id ? null : group.id);
+                }}
+              >
+                <Text style={styles.userDrawingActionButtonText}>{group.presentation.triggerIcon ?? '...'}</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            group.items.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                accessibilityRole="button"
+                accessibilityLabel={item.label}
+                disabled={!item.enabled}
+                activeOpacity={0.72}
+                style={[
+                  styles.userDrawingActionButton,
+                  item.swatchColor && { backgroundColor: item.swatchColor },
+                  !item.enabled && styles.userDrawingActionButtonDisabled,
+                ]}
+                onPress={() => dispatchItem(item)}
+              >
+                <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
+                  {item.icon}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+      ))}
+      {activePopoverGroup && activePopoverPresentation && (
+        <View
+          accessibilityLabel={activePopoverPresentation.popoverLabel ?? activePopoverGroup.label}
+          style={[
+            styles.userDrawingActionPopover,
+            {
+              width: Math.min(
+                activePopoverPresentation.popoverWidth ?? 296,
+                MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH - 8,
+              ),
+            },
+          ]}
+          pointerEvents="auto"
+        >
+          {activePopoverGroup.items.map((item) => (
             <TouchableOpacity
               key={item.id}
               accessibilityRole="button"
@@ -81,16 +186,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
                 item.swatchColor && { backgroundColor: item.swatchColor },
                 !item.enabled && styles.userDrawingActionButtonDisabled,
               ]}
-              onPress={() => {
-                dispatchMobileUserDrawingActionCommand(item.command, {
-                  state,
-                  source: 'toolbar',
-                  createId,
-                  dispatchUserDrawingCommand,
-                  onUserDrawingPropertiesOpen,
-                  onUserDrawingObjectTreeOpen,
-                });
-              }}
+              onPress={() => dispatchItem(item, { keepPopoverOpen: true })}
             >
               <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
                 {item.icon}
@@ -98,7 +194,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
             </TouchableOpacity>
           ))}
         </View>
-      ))}
+      )}
     </View>
   );
 }
@@ -124,6 +220,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
+  userDrawingActionSurfaceGroupPopover: {
+    position: 'relative',
+  },
   userDrawingActionSurfaceGroupSeparated: {
     borderLeftWidth: 1,
     borderLeftColor: '#363a45',
@@ -139,6 +238,9 @@ const styles = StyleSheet.create({
   userDrawingActionButtonDisabled: {
     opacity: 0.35,
   },
+  userDrawingActionButtonActive: {
+    backgroundColor: 'rgba(41, 98, 255, 0.18)',
+  },
   userDrawingActionButtonText: {
     color: '#d1d4dc',
     fontSize: 13,
@@ -146,5 +248,20 @@ const styles = StyleSheet.create({
   },
   userDrawingActionButtonTextDisabled: {
     color: '#787b86',
+  },
+  userDrawingActionPopover: {
+    position: 'absolute',
+    left: 4,
+    top: MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y,
+    zIndex: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 3,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: '#363a45',
+    borderRadius: 6,
+    backgroundColor: 'rgba(19, 23, 34, 0.98)',
   },
 });
