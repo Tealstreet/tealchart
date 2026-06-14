@@ -71,9 +71,14 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     );
 
     expect(screen.getByLabelText('Selected drawing actions').getAttribute('data-pointer-events')).toBe('auto');
+    expect(screen.queryByLabelText('Cycle selected drawing line color to #22c55e')).toBeNull();
 
     fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
     fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
+    fireEvent.click(screen.getByLabelText('Style selected drawing'));
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
+    fireEvent.click(screen.getByLabelText('Cycle selected drawing line color to #22c55e'));
 
     expect(onChartTouch).not.toHaveBeenCalled();
     expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
@@ -87,6 +92,11 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',
       options: { createId: expect.any(Function) },
+      meta: { source: 'toolbar' },
+    });
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { lineColor: '#22c55e' },
       meta: { source: 'toolbar' },
     });
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'select' }));

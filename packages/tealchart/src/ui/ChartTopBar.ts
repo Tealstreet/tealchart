@@ -348,6 +348,23 @@ const styles = {
     paddingLeft: '3px',
   } as Partial<CSSStyleDeclaration>,
 
+  selectedActionSurfacePopover: {
+    position: 'absolute',
+    top: '34px',
+    left: '0',
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '3px',
+    padding: '6px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: '6px',
+    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.34)',
+    zIndex: '9',
+    pointerEvents: 'auto',
+  } as Partial<CSSStyleDeclaration>,
+
   drawingGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -427,6 +444,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
   private selectedActionSurfaceEl: HTMLElement | null = null;
+  private selectedActionPopoverGroupId: string | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -716,41 +734,97 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       const groupEl = this.createElement('div', {
         style: {
           ...styles.selectedActionSurfaceGroup,
+          ...(group.presentation?.type === 'popover' ? { position: 'relative' } : {}),
           ...(groupIndex > 0 ? styles.selectedActionSurfaceGroupSeparated : {}),
         },
       });
-      for (const item of group.items) {
-        const btn = this.createElement('button', {
+
+      if (group.presentation?.type === 'popover') {
+        const trigger = this.createElement('button', {
           style: {
             ...styles.drawingButton,
-            ...(item.swatchColor ? styles.drawingSwatch : {}),
-            ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
-            opacity: item.enabled ? '1' : '0.35',
-            cursor: item.enabled ? 'pointer' : 'default',
+            backgroundColor: this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent',
+            color: this.selectedActionPopoverGroupId === group.id ? 'var(--accent, #5b8cff)' : 'var(--text2, #787b86)',
           },
-          textContent: item.icon,
+          textContent: group.presentation.triggerIcon ?? '⋯',
           attributes: {
             type: 'button',
-            title: item.label,
-            'aria-label': item.label,
+            title: group.presentation.triggerLabel ?? group.label,
+            'aria-label': group.presentation.triggerLabel ?? group.label,
+            'aria-expanded': this.selectedActionPopoverGroupId === group.id ? 'true' : 'false',
           },
         });
-        btn.disabled = !item.enabled;
-        if (item.enabled) {
-          btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
-          btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
-          btn.addEventListener('mouseleave', () => {
-            btn.style.backgroundColor = item.swatchColor ?? 'transparent';
-            btn.style.color = 'var(--text2, #787b86)';
+        trigger.addEventListener('click', () => {
+          this.selectedActionPopoverGroupId = this.selectedActionPopoverGroupId === group.id ? null : group.id;
+          this.renderSelectedActionSurface();
+        });
+        trigger.addEventListener('mouseenter', () => Object.assign(trigger.style, styles.drawingButtonHover));
+        trigger.addEventListener('mouseleave', () => {
+          trigger.style.backgroundColor =
+            this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent';
+          trigger.style.color =
+            this.selectedActionPopoverGroupId === group.id ? 'var(--accent, #5b8cff)' : 'var(--text2, #787b86)';
+        });
+        groupEl.appendChild(trigger);
+
+        if (this.selectedActionPopoverGroupId === group.id) {
+          const popover = this.createElement('div', {
+            style: {
+              ...styles.selectedActionSurfacePopover,
+              width: `${group.presentation.popoverWidth ?? 272}px`,
+            },
+            attributes: {
+              'aria-label': group.presentation.popoverLabel ?? `${group.label} controls`,
+            },
           });
+          for (const item of group.items) {
+            popover.appendChild(this.createSelectedActionSurfaceButton(item));
+          }
+          groupEl.appendChild(popover);
         }
-        groupEl.appendChild(btn);
+
+        el.appendChild(groupEl);
+        continue;
+      }
+
+      for (const item of group.items) {
+        groupEl.appendChild(this.createSelectedActionSurfaceButton(item));
       }
       el.appendChild(groupEl);
     }
 
     this.selectedActionSurfaceEl = el;
     parent.appendChild(el);
+  }
+
+  private createSelectedActionSurfaceButton(
+    item: ReturnType<typeof resolveUserDrawingSelectedActionSurface>['groups'][number]['items'][number],
+  ): HTMLButtonElement {
+    const btn = this.createElement('button', {
+      style: {
+        ...styles.drawingButton,
+        ...(item.swatchColor ? styles.drawingSwatch : {}),
+        ...(item.swatchColor ? { backgroundColor: item.swatchColor } : {}),
+        opacity: item.enabled ? '1' : '0.35',
+        cursor: item.enabled ? 'pointer' : 'default',
+      },
+      textContent: item.icon,
+      attributes: {
+        type: 'button',
+        title: item.label,
+        'aria-label': item.label,
+      },
+    });
+    btn.disabled = !item.enabled;
+    if (item.enabled) {
+      btn.addEventListener('click', () => this.handleSelectedActionSurfaceItemClick(item));
+      btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
+      btn.addEventListener('mouseleave', () => {
+        btn.style.backgroundColor = item.swatchColor ?? 'transparent';
+        btn.style.color = 'var(--text2, #787b86)';
+      });
+    }
+    return btn;
   }
 
   private renderDrawingToolRail(activeTool: UserDrawingTool): void {
