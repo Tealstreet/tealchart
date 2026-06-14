@@ -159,12 +159,13 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       status: {
         web: 'app-owned',
         mobile: 'app-owned',
-        notes: 'Both platforms expose app-owned object-tree open/dispatch APIs backed by the shared row model.',
+        notes: 'Both platforms expose app-owned object-tree open/dispatch APIs backed by shared row, selection, rename, and z-order action models.',
       },
       expectedChecks: [
         'Row order matches z-order.',
         'IDs remain stable.',
         'Hidden and locked state is clear.',
+        'Row and bulk actions resolve through the same shared command pipeline.',
       ],
     },
     {
