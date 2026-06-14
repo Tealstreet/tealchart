@@ -12,6 +12,7 @@ export type UserDrawingVisualEvidenceStateId =
   | 'contextMenuLongPress'
   | 'objectTree'
   | 'textPropertyEditing'
+  | 'keyboardModifierActions'
   | 'paneSplitIndicators';
 
 export type UserDrawingVisualEvidenceStateStatus = 'ready' | 'app-owned' | 'known-gap';
@@ -185,6 +186,24 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         'Selection and history state are preserved.',
         'Properties controls dispatch through the same shared command pipeline.',
         'Locked-target properties controls are disabled without platform-specific inference.',
+      ],
+    },
+    {
+      id: 'keyboardModifierActions',
+      label: 'Keyboard/modifier actions',
+      webEvidence: 'Chart-owned keyboard shortcuts, Shift placement constraints, and Shift-drag duplicate.',
+      mobileEvidence: 'Hardware-keyboard adapter actions plus touch-native duplicate and constraint override surfaces.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes:
+          'Both platforms route keyboard, duplicate-drag, nudge, copy/paste, select-all, and constrained-placement affordances through shared action and command models.',
+      },
+      expectedChecks: [
+        'Drawing shortcuts only run while chart keyboard focus owns the event.',
+        'Undo, redo, delete, duplicate, copy, paste, select-all, and nudge route through shared commands.',
+        'Web Shift-drag duplicate has a mobile touch-native duplicate-drag equivalent.',
+        'Web Shift placement constraints have a mobile host-controlled constraint equivalent.',
       ],
     },
     {
