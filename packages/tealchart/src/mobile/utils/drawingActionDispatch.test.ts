@@ -1,7 +1,8 @@
 import type { UserDrawingState, UserDrawingStyle } from '../../drawings';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clearChartStoreCache } from '../../state/chartState';
 import { dispatchMobileUserDrawingActionCommand } from './drawingActionDispatch';
 
 const style: UserDrawingStyle = {
@@ -71,6 +72,10 @@ function createSelectedTextState(): UserDrawingState {
 }
 
 describe('mobile drawing action dispatch', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('opens the shared object tree model from selected toolbar actions', () => {
     const onOpenObjectTree = vi.fn();
     const handled = dispatchMobileUserDrawingActionCommand(
