@@ -250,6 +250,7 @@ export class EventManager {
   private boundKeyDown: (e: KeyboardEvent) => void;
   private boundWindowMouseMove: (e: MouseEvent) => void;
   private boundWindowMouseUp: (e: MouseEvent) => void;
+  private boundWindowBlur: () => void;
   private boundDocumentMouseMove: (e: MouseEvent) => void;
 
   constructor(container: HTMLElement, callbacks: EventManagerCallbacks) {
@@ -269,6 +270,7 @@ export class EventManager {
     this.boundKeyDown = this.handleKeyDown.bind(this);
     this.boundWindowMouseMove = this.handleWindowMouseMove.bind(this);
     this.boundWindowMouseUp = this.handleWindowMouseUp.bind(this);
+    this.boundWindowBlur = this.handleWindowBlur.bind(this);
     this.boundDocumentMouseMove = this.handleDocumentMouseMove.bind(this);
 
     this.attach();
@@ -355,8 +357,7 @@ export class EventManager {
     this.container.removeEventListener('touchcancel', this.boundTouchEnd, { capture: true });
 
     // Window events (only if dragging was active)
-    window.removeEventListener('mousemove', this.boundWindowMouseMove);
-    window.removeEventListener('mouseup', this.boundWindowMouseUp);
+    this.detachWindowDragListeners();
 
     // Document events
     document.removeEventListener('keydown', this.boundKeyDown);
@@ -391,8 +392,7 @@ export class EventManager {
       this.state.draggedDivider = divider;
       this.callbacks.onCursorChange?.('ns-resize');
 
-      window.addEventListener('mousemove', this.boundWindowMouseMove);
-      window.addEventListener('mouseup', this.boundWindowMouseUp);
+      this.attachWindowDragListeners();
       return;
     }
 
@@ -401,8 +401,7 @@ export class EventManager {
       this.state.dragMode = 'pendingDrawing';
       this.state.dragStartX = x;
       this.state.dragStartY = y;
-      window.addEventListener('mousemove', this.boundWindowMouseMove);
-      window.addEventListener('mouseup', this.boundWindowMouseUp);
+      this.attachWindowDragListeners();
       return;
     }
 
@@ -412,8 +411,7 @@ export class EventManager {
       this.state.dragStartX = x;
       this.state.dragStartY = y;
       this.callbacks.onCursorChange?.('move');
-      window.addEventListener('mousemove', this.boundWindowMouseMove);
-      window.addEventListener('mouseup', this.boundWindowMouseUp);
+      this.attachWindowDragListeners();
       this.scheduleRender();
       return;
     }
@@ -446,8 +444,7 @@ export class EventManager {
     }
 
     // Add window listeners for off-canvas drag
-    window.addEventListener('mousemove', this.boundWindowMouseMove);
-    window.addEventListener('mouseup', this.boundWindowMouseUp);
+    this.attachWindowDragListeners();
 
     // Set cursor based on drag mode
     if (this.state.dragMode === 'pan') {
@@ -723,8 +720,7 @@ export class EventManager {
     this._pendingMouseDrawingDragOptions = undefined;
 
     // Remove window listeners
-    window.removeEventListener('mousemove', this.boundWindowMouseMove);
-    window.removeEventListener('mouseup', this.boundWindowMouseUp);
+    this.detachWindowDragListeners();
 
     this.scheduleRender();
   }
@@ -734,6 +730,44 @@ export class EventManager {
       this._pendingEventType = 'leave';
       this.scheduleInputProcessing();
     }
+  }
+
+  private attachWindowDragListeners(): void {
+    window.addEventListener('mousemove', this.boundWindowMouseMove);
+    window.addEventListener('mouseup', this.boundWindowMouseUp);
+    window.addEventListener('blur', this.boundWindowBlur);
+  }
+
+  private detachWindowDragListeners(): void {
+    window.removeEventListener('mousemove', this.boundWindowMouseMove);
+    window.removeEventListener('mouseup', this.boundWindowMouseUp);
+    window.removeEventListener('blur', this.boundWindowBlur);
+  }
+
+  private resetDragState(): void {
+    this.state.isDragging = false;
+    this.state.dragMode = 'none';
+    this.state.dragStartViewport = null;
+    this.state.draggedPaneId = null;
+    this.state.dragStartPaneYRange = null;
+    this.state.dragStartPaneHeight = 0;
+    this.state.draggedDivider = null;
+    this._pendingMouseDrawingDragOptions = undefined;
+  }
+
+  private handleWindowBlur(): void {
+    if (!this.state.isDragging) return;
+
+    if (this.state.dragMode === 'drawing') {
+      this.callbacks.onDrawingDragCancel?.('mouse');
+    } else if (this.state.dragMode === 'pan' || this.state.dragMode === 'priceAxisZoom') {
+      this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+    }
+
+    this.resetDragState();
+    this.detachWindowDragListeners();
+    this.callbacks.onCursorChange?.('crosshair');
+    this.scheduleRender();
   }
 
   private processMouseLeave(): void {
@@ -1146,16 +1180,8 @@ export class EventManager {
         this.callbacks.onViewportChange?.(this.state.dragStartViewport);
       }
 
-      this.state.isDragging = false;
-      this.state.dragMode = 'none';
-      this.state.dragStartViewport = null;
-      this.state.draggedPaneId = null;
-      this.state.dragStartPaneYRange = null;
-      this.state.dragStartPaneHeight = 0;
-      this.state.draggedDivider = null;
-
-      window.removeEventListener('mousemove', this.boundWindowMouseMove);
-      window.removeEventListener('mouseup', this.boundWindowMouseUp);
+      this.resetDragState();
+      this.detachWindowDragListeners();
 
       this.scheduleRender();
     }
