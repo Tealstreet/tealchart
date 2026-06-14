@@ -111,7 +111,7 @@ the intended TradingView-grade modes, not necessarily current behavior.
 | Patterns                    | XABCD, Cypher, ABCD, Triangle, Three Drives, Head and Shoulders, Elliott waves, Cyclic Lines, Time Cycles, Sine Line                                                                                            | Patterns plus Geometric time/cycle tools                                                                                                            | `partial` |
 | Predictions and measurement | Long/Short Position, Forecast, Date Range, Price Range, Date and Price Range, Bars Pattern, Projection, Fixed Range Volume Profile                                                                              | Forecasting/measurement category                                                                                                                    | `partial` |
 | Icons, stickers, emojis     | Icons, Stickers, Emojis                                                                                                                                                                                         | `icon`, `sticker`, `emoji`                                                                                                                          | `partial` |
-| Actions                     | Measure, Zoom In, Magnets, Stay in Drawing Mode, Lock All, Hide All, Remove Drawings                                                                                                                            | Clear all, hide/show all, and lock/unlock all are command-backed on web Canvas and mobile Skia; magnets/stay-mode/measure/zoom actions are deferred | `partial` |
+| Actions                     | Measure, Zoom In, Magnets, Stay in Drawing Mode, Lock All, Hide All, Remove Drawings                                                                                                                            | Clear all, hide/show all, lock/unlock all, stay mode, and magnet mode are command-backed on web Canvas and mobile Skia; measure/zoom actions are deferred | `partial` |
 
 ## PR Acceptance Checklist
 
@@ -154,8 +154,8 @@ summary:
   pattern tools need separate computed payload/property modeling before they can
   be considered complete.
 - Stay-in-drawing-mode and magnet-mode state ship as shared command state with
-  web widget and mobile Skia imperative APIs. Magnet-mode OHLC snapping remains
-  a tracked input/render behavior gap; measure/zoom drawing actions, alerts, and
-  templates remain tracked as TradingView action gaps deferred until the
-  remaining command, toolbar, context menu, and object tree foundations can use
-  them consistently.
+  web widget and mobile Skia imperative APIs. Weak/strong magnet-mode OHLC
+  snapping applies to anchor-based web Canvas and mobile Skia drawing input;
+  measure/zoom drawing actions, alerts, and templates remain tracked as
+  TradingView action gaps deferred until the remaining command, toolbar,
+  context menu, and object tree foundations can use them consistently.
