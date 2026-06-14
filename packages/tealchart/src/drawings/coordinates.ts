@@ -1078,16 +1078,19 @@ export function resolveUserDrawingMagnetInputPoint({
 }: ResolveUserDrawingMagnetInputPointOptions): UserDrawingInputPoint {
   if (mode === 'off' || point.paneId !== space.pane.id || !space.bars || space.bars.length === 0) return point;
 
-  let nearestBar = space.bars[0]!;
-  let nearestBarDistance = Math.abs(timeToDrawingX(nearestBar.time, space) - screenPoint.x);
-  for (let index = 1; index < space.bars.length; index += 1) {
+  let nearestBar: Bar | null = null;
+  let nearestBarDistance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < space.bars.length; index += 1) {
     const bar = space.bars[index]!;
-    const distance = Math.abs(timeToDrawingX(bar.time, space) - screenPoint.x);
+    const x = timeToDrawingX(bar.time, space);
+    if (x < space.chartLeft || x >= space.chartRight) continue;
+    const distance = Math.abs(x - screenPoint.x);
     if (distance < nearestBarDistance) {
       nearestBar = bar;
       nearestBarDistance = distance;
     }
   }
+  if (!nearestBar) return point;
 
   const candidates = [nearestBar.open, nearestBar.high, nearestBar.low, nearestBar.close];
   let snappedPrice = candidates[0]!;

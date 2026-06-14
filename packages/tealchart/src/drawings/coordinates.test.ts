@@ -197,6 +197,26 @@ describe('user drawing coordinates', () => {
     ).toBe(point);
   });
 
+  it('ignores offscreen bars when resolving magnet input', () => {
+    const point = {
+      paneId: 'main',
+      anchor: { time: 1_020, price: 104.4 },
+      position: { x: 0.01, y: 0.28 },
+    };
+
+    expect(
+      resolveUserDrawingMagnetInputPoint({
+        mode: 'strong',
+        space: {
+          ...space,
+          bars: [{ time: 900, open: 95, high: 105, low: 93, close: 101, volume: 1 }],
+        },
+        screenPoint: { x: 12, y: priceToDrawingY(104.4, space) },
+        point,
+      }),
+    ).toBe(point);
+  });
+
   it('resolves table cells from a one-anchor screen origin', () => {
     const table = resolveTableFromAnchor(
       { time: 2_000, price: 100 },
