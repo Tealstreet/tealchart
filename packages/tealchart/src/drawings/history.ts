@@ -64,6 +64,7 @@ function createHistorySnapshot(state: UserDrawingState): UserDrawingState {
     version: state.version,
     drawings: state.drawings,
     activeTool: state.activeTool,
+    stayInDrawingMode: state.stayInDrawingMode,
     selection: state.selection,
   });
 }
@@ -71,6 +72,7 @@ function createHistorySnapshot(state: UserDrawingState): UserDrawingState {
 function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
   switch (command.type) {
     case 'setActiveTool':
+    case 'setStayInDrawingMode':
     case 'select':
     case 'selectMany':
     case 'selectAtPoint':

@@ -88,6 +88,16 @@ describe('user drawing command history', () => {
     expect(history.undoStack).toHaveLength(0);
 
     result = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'setStayInDrawingMode',
+      stayInDrawingMode: false,
+      meta: { source: 'toolbar' },
+    });
+    state = result.state;
+    history = result.history;
+    expect(state.stayInDrawingMode).toBe(false);
+    expect(history.undoStack).toHaveLength(0);
+
+    result = dispatchUserDrawingCommandWithHistory(state, history, {
       type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
       options: { createId: () => 'rect', now: () => 10, style },
@@ -108,17 +118,21 @@ describe('user drawing command history', () => {
     history = result.history;
 
     expect(state.drawings).toHaveLength(1);
+    expect(state.activeTool).toBe('select');
     expect(history.undoStack).toHaveLength(1);
 
     const undo = undoUserDrawingCommand(state, history);
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings).toHaveLength(0);
     expect(undo.state.draft).toBeNull();
+    expect(undo.state.stayInDrawingMode).toBe(false);
 
     const redo = redoUserDrawingCommand(undo.state, undo.history);
     expect(redo.changed).toBe(true);
     expect(redo.state.drawings).toHaveLength(1);
     expect(redo.state.selection).toEqual({ drawingId: 'rect' });
+    expect(redo.state.activeTool).toBe('select');
+    expect(redo.state.stayInDrawingMode).toBe(false);
   });
 
   it('clears redo when a new committed command is recorded', () => {
