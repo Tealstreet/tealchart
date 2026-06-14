@@ -408,6 +408,7 @@ export {
   normalizeUserDrawingFontSize,
   normalizeUserDrawingFontStyle,
   normalizeUserDrawingFontWeight,
+  normalizeUserDrawingAnchorPressure,
   normalizeUserDrawingIconName,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,

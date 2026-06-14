@@ -1975,6 +1975,39 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores pressure metadata on freehand path-family drawings', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'pressure-brush',
+          kind: 'brush',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 10, pressure: 0.25 },
+            { time: 2, price: 12, pressure: 1.5 },
+            { time: 3, price: 11 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]).toMatchObject({
+      id: 'pressure-brush',
+      kind: 'brush',
+      points: [
+        { time: 1, price: 10, pressure: 0.25 },
+        { time: 2, price: 12, pressure: 1 },
+        { time: 3, price: 11 },
+      ],
+    });
+  });
+
   it('restores brush drawings', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
@@ -3260,6 +3293,14 @@ describe('drawing layout serialization', () => {
           { time: 1, price: 10 },
           { time: 2, price: 12 },
           { time: 'bad', price: 14 },
+        ]),
+      ),
+    ).toBeUndefined();
+    expect(
+      deserializeUserDrawingStateFromLayout(
+        createPayload([
+          { time: 1, price: 10 },
+          { time: 2, price: 12, pressure: 'bad' },
         ]),
       ),
     ).toBeUndefined();

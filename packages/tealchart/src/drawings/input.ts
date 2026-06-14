@@ -254,7 +254,9 @@ export function deleteUserDrawing(
 }
 
 function cloneAnchor(anchor: UserDrawingAnchor): UserDrawingAnchor {
-  return { time: anchor.time, price: anchor.price };
+  return anchor.pressure === undefined
+    ? { time: anchor.time, price: anchor.price }
+    : { time: anchor.time, price: anchor.price, pressure: anchor.pressure };
 }
 
 function cloneDrawingForDuplicate(drawing: UserDrawing, id: string, now: number): UserDrawing {
@@ -973,10 +975,16 @@ function isSameDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor): boolea
 }
 
 function interpolateUserDrawingAnchor(a: UserDrawingAnchor, b: UserDrawingAnchor, t: number): UserDrawingAnchor {
-  return {
+  const anchor: UserDrawingAnchor = {
     time: a.time + (b.time - a.time) * t,
     price: a.price + (b.price - a.price) * t,
   };
+  if (a.pressure !== undefined || b.pressure !== undefined) {
+    const startPressure = a.pressure ?? 1;
+    const endPressure = b.pressure ?? 1;
+    anchor.pressure = startPressure + (endPressure - startPressure) * t;
+  }
+  return anchor;
 }
 
 export function smoothUserDrawingPathAnchors(anchors: readonly UserDrawingAnchor[]): UserDrawingAnchor[] {

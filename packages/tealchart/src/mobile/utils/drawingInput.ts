@@ -4,7 +4,10 @@ import type { UserDrawingInputPoint } from '../../drawings';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from '../../drawings';
 import type { ChartDimensions, PaneInfo } from './coordinates';
 
-import { resolveUserDrawingInputPointFromChart } from '../../drawings';
+import {
+  normalizeUserDrawingAnchorPressure,
+  resolveUserDrawingInputPointFromChart,
+} from '../../drawings';
 
 export type MobileUserDrawingInputPane = PaneInfo | DrawingCoordinateSpace['pane'];
 
@@ -14,6 +17,7 @@ export interface ResolveMobileUserDrawingInputPointOptions {
   dimensions: ChartDimensions;
   panes: readonly MobileUserDrawingInputPane[];
   bars?: readonly Bar[];
+  pressure?: number;
 }
 
 export interface ResolveMobileUserDrawingPlacementConstraintOptions {
@@ -46,6 +50,7 @@ export function resolveMobileUserDrawingInputPoint({
   dimensions,
   panes,
   bars,
+  pressure,
 }: ResolveMobileUserDrawingInputPointOptions): UserDrawingInputPoint | null {
   const inputPoint = resolveUserDrawingInputPointFromChart({
     point,
@@ -63,8 +68,18 @@ export function resolveMobileUserDrawingInputPoint({
   });
   if (!inputPoint) return null;
 
+  const normalizedPressure = normalizeUserDrawingAnchorPressure(pressure);
+  const anchor =
+    normalizedPressure === undefined
+      ? inputPoint.anchor
+      : {
+          ...inputPoint.anchor,
+          pressure: normalizedPressure,
+        };
+
   return {
     ...inputPoint,
+    anchor,
     bars: inputPoint.paneId === 'main' && bars && bars.length > 0 ? bars : undefined,
   };
 }

@@ -56,6 +56,7 @@ import type {
 } from './drawings';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
+import type { ChartDrawingGestureOptions } from './mobile/hooks/useChartGestures';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
 import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
 import type {
@@ -1775,7 +1776,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const handleUserDrawingEditStart = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, options?: ChartDrawingGestureOptions) => {
       if (!viewport) return false;
       if (!isPointInChartArea(x, y)) return false;
 
@@ -1809,6 +1810,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
           bars,
+          pressure: options?.pressure,
         });
         if (!point) return false;
 
@@ -1879,7 +1881,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const handleUserDrawingEditMove = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, options?: ChartDrawingGestureOptions) => {
       if (viewport && isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)) {
         const point = resolveMobileUserDrawingInputPoint({
           point: { x, y },
@@ -1887,6 +1889,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
           bars,
+          pressure: options?.pressure,
         });
         if (!point) return;
 

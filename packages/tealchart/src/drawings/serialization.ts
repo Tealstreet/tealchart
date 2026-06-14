@@ -14,6 +14,7 @@ import type {
 import { createUserDrawingState } from './input';
 import {
   USER_DRAWING_SCHEMA_VERSION,
+  normalizeUserDrawingAnchorPressure,
   normalizeUserDrawingIconName,
   normalizeUserDrawingPanePosition,
   normalizeUserDrawingStyle,
@@ -303,7 +304,13 @@ function isLineStyle(value: unknown): value is UserDrawingLineStyle {
 
 function parseAnchor(value: unknown): UserDrawingAnchor | null {
   if (!isRecord(value) || !isFiniteNumber(value.time) || !isFiniteNumber(value.price)) return null;
-  return { time: value.time, price: value.price };
+  const anchor: UserDrawingAnchor = { time: value.time, price: value.price };
+  if ('pressure' in value) {
+    const pressure = normalizeUserDrawingAnchorPressure(value.pressure);
+    if (pressure === undefined) return null;
+    anchor.pressure = pressure;
+  }
+  return anchor;
 }
 
 function parsePanePosition(value: unknown): UserDrawingPanePosition | null {

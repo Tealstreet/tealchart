@@ -126,6 +126,12 @@ export type UserDrawingHandleRole = 'start' | 'end' | 'center' | 'topLeft' | 'to
 export interface UserDrawingAnchor {
   time: number;
   price: number;
+  pressure?: number;
+}
+
+export function normalizeUserDrawingAnchorPressure(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  return Math.max(0, Math.min(1, value));
 }
 
 export interface UserDrawingPanePosition {

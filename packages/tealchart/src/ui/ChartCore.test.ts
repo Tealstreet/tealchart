@@ -319,8 +319,8 @@ describe('ChartCore viewport management', () => {
         options?: { additiveSelection?: boolean },
       ): unknown;
       handleUserDrawingDragPending(x: number, y: number): boolean;
-      handleUserDrawingDragStart(x: number, y: number): boolean;
-      handleUserDrawingDragMove(x: number, y: number): boolean;
+      handleUserDrawingDragStart(x: number, y: number, options?: { pressure?: number }): boolean;
+      handleUserDrawingDragMove(x: number, y: number, options?: { pressure?: number }): boolean;
       handleUserDrawingDragEnd(): void;
     };
 
@@ -367,16 +367,16 @@ describe('ChartCore viewport management', () => {
       drawings: [],
     } satisfies UserDrawingState);
     expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
-    expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
+    expect(testCore.handleUserDrawingDragStart(100, 100, { pressure: 0.4 })).toBe(true);
     expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(expect.objectContaining({
       paneId: 'main',
-      anchor: { time: expect.any(Number), price: expect.any(Number) },
+      anchor: { time: expect.any(Number), price: expect.any(Number), pressure: 0.4 },
       position: { x: expect.any(Number), y: expect.any(Number) },
     }));
-    expect(testCore.handleUserDrawingDragMove(120, 110)).toBe(true);
+    expect(testCore.handleUserDrawingDragMove(120, 110, { pressure: 0.6 })).toBe(true);
     expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(expect.objectContaining({
       paneId: 'main',
-      anchor: { time: expect.any(Number), price: expect.any(Number) },
+      anchor: { time: expect.any(Number), price: expect.any(Number), pressure: 0.6 },
       position: { x: expect.any(Number), y: expect.any(Number) },
     }));
     testCore.handleUserDrawingDragEnd();
