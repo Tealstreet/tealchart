@@ -2237,20 +2237,23 @@ export class TealchartWidget {
     return serializeUserDrawingStateForLayout(this._userDrawingState);
   }
 
-  importUserDrawingStateFromLayout(state?: UserDrawingState | null): void {
+  importUserDrawingStateFromLayout(state?: UserDrawingState | null): boolean {
     this._userDrawingHistory = clearUserDrawingCommandHistory(this._userDrawingHistory);
-    this.setUserDrawingState(deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState(), {
+    const previousState = this._userDrawingState;
+    const nextState = deserializeUserDrawingStateFromLayout(state) ?? createUserDrawingState();
+    this.setUserDrawingState(nextState, {
       markLayoutDirty: false,
       notifyCommand: true,
       source: 'layout',
     });
+    return !isUserDrawingLayoutStateEqual(previousState, nextState);
   }
 
   setUserDrawingState(
     state: UserDrawingState,
     options: { markLayoutDirty?: boolean; preserveHistory?: boolean; notifyCommand?: boolean; source?: UserDrawingCommandSource } = {},
-  ): void {
-    if (state === this._userDrawingState) return;
+  ): boolean {
+    if (state === this._userDrawingState) return false;
     const previousState = this._userDrawingState;
     if (!options.preserveHistory) {
       this._userDrawingHistory = clearUserDrawingCommandHistory(this._userDrawingHistory);
@@ -2265,6 +2268,7 @@ export class TealchartWidget {
     if (shouldNotifyReplacement && !isUserDrawingLayoutStateEqual(previousState, state)) {
       this._emitUserDrawingReplaceStateCommandEvent(previousState, state, options.source ?? 'api');
     }
+    return true;
   }
 
   setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
