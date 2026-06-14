@@ -314,15 +314,21 @@ Phase 3: First proof tools
 Phase 1: Shared reducer tests
 
 - Verify click, drag, cancel, pane switch, stale draft, and threshold behavior.
+- Status: shared command coverage now guards cross-pane placement drag commits,
+  keeping the active draft intact and avoiding fabricated drawings.
 
 Phase 2: Web event tests
 
 - Verify mouse drag creates exact anchors and click does not fabricate size.
+- Status: web EventManager coverage now verifies sub-threshold pending drawing
+  movement still resolves as click input rather than drag placement.
 
 Phase 3: Mobile input tests
 
 - Verify touch drag creates exact anchors and Skia previews match committed
   geometry.
+- Status: mobile command-history coverage mirrors the shared cross-pane
+  placement regression, preserving the draft without adding undo history.
 
 ## Gap 4: Selection Action Surfaces
 

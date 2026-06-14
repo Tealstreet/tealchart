@@ -120,6 +120,37 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('keeps below-threshold pending drawing movement as click input', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 102, clientY: 103 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 102, clientY: 103 }));
+
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingDragStart).not.toHaveBeenCalled();
+    expect(onDrawingDragMove).not.toHaveBeenCalled();
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+    expect(onDrawingInput).toHaveBeenCalledWith(102, 103, 'mouse', { additiveSelection: false });
+
+    manager.dispose();
+  });
+
   it('keeps handled mouse drawing input from triggering pane double-click routing', () => {
     vi.useFakeTimers();
     const container = createContainer();

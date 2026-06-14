@@ -1054,6 +1054,31 @@ describe('mobile drawing handle command dispatch', () => {
     expect(cancelled.state.draft).toBeNull();
   });
 
+  it('keeps mobile placement drafts and history unchanged on cross-pane drag commits', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'beginPlacementDrag',
+      point: { paneId: 'main', anchor: anchorA },
+      meta: { source: 'touch', transactionKey: 'placement-drag' },
+    });
+    const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'commitPlacementDrag',
+      point: { paneId: 'indicator', anchor: anchorB },
+      options: { createId: () => 'rect', now: () => 42, style },
+      meta: { source: 'touch', transactionKey: 'placement-drag' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(started.history.undoStack).toHaveLength(0);
+    expect(started.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
+    expect(committed.changed).toBe(false);
+    expect(committed.history.undoStack).toHaveLength(0);
+    expect(committed.state).toBe(started.state);
+    expect(committed.state.drawings).toEqual([]);
+    expect(committed.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
+  });
+
   it('does not record a mobile placement drag that is explicitly cancelled', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const history = createUserDrawingCommandHistory();
