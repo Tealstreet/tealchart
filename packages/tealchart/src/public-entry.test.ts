@@ -86,6 +86,7 @@ import type {
   UserDrawingEditIntent,
   UserDrawingEditIntentKind,
   UserDrawingObjectTreeAction,
+  UserDrawingObjectTreeGroup,
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
   UserDrawingCommandEvent,
@@ -484,10 +485,20 @@ describe('tealchart public entries', () => {
       editable: true,
       zIndex: 0,
       orderIndex: 0,
-      groupIds: [],
+      groupIds: ['pane:main'],
+    };
+    const group: NonNever<UserDrawingObjectTreeGroup> = {
+      id: 'pane:main',
+      label: 'Main chart',
+      paneId: 'main',
+      rowIds: ['trend'],
+      drawingIds: ['trend'],
+      orderIndex: 0,
+      drawingCount: 1,
     };
     const model: NonNever<UserDrawingObjectTreeModel> = {
       rows: [row],
+      groups: [group],
       selectedIds: [],
       drawingCount: 1,
     };
@@ -498,6 +509,7 @@ describe('tealchart public entries', () => {
     };
 
     expect(model.rows[0]).toBe(row);
+    expect(model.groups?.[0]).toBe(group);
     expect(action.type).toBe('duplicate');
   });
 

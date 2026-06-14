@@ -91,7 +91,27 @@ describe('user drawing object tree model', () => {
       selected: false,
       editable: true,
     });
-    expect(model.rows[0]?.groupIds).toEqual([]);
+    expect(model.rows.map((row) => row.groupIds)).toEqual([['pane:volume'], ['pane:main'], ['pane:main']]);
+    expect(model.groups).toEqual([
+      {
+        id: 'pane:volume',
+        label: 'Pane volume',
+        paneId: 'volume',
+        rowIds: ['hline'],
+        drawingIds: ['hline'],
+        orderIndex: 0,
+        drawingCount: 1,
+      },
+      {
+        id: 'pane:main',
+        label: 'Main chart',
+        paneId: 'main',
+        rowIds: ['rect', 'trend'],
+        drawingIds: ['rect', 'trend'],
+        orderIndex: 1,
+        drawingCount: 2,
+      },
+    ]);
   });
 
   it('can resolve drawings in back-to-front order', () => {
@@ -292,6 +312,7 @@ describe('user drawing object tree model', () => {
 
     expect(model).toEqual({
       rows: [],
+      groups: [],
       selectedIds: [],
       drawingCount: 0,
     });

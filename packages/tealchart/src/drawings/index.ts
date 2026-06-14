@@ -541,6 +541,7 @@ export type {
   UserDrawingObjectTreeCommandOptions,
   UserDrawingObjectTreeDispatchCommandOptions,
   UserDrawingObjectTreeDispatchAction,
+  UserDrawingObjectTreeGroup,
   UserDrawingObjectTreeMutationAction,
   UserDrawingObjectTreeOptions,
   UserDrawingObjectTreeOrder,
