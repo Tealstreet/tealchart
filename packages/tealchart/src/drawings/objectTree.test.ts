@@ -7,6 +7,7 @@ import {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingObjectTreeRowDispatchAction,
 } from './objectTree';
 import { deserializeUserDrawingStateFromLayout, serializeUserDrawingStateForLayout } from './serialization';
 import { clearChartStoreCache } from '../state/chartState';
@@ -185,6 +186,67 @@ describe('user drawing object tree model', () => {
       ['bringToFront', false],
       ['sendToBack', false],
     ]);
+  });
+
+  it('resolves row action descriptors to app-dispatchable object-tree actions', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        createTrendLine({ id: 'trend', visible: false }),
+        createRectangle({ id: 'rect', locked: true }),
+        createHorizontalLine({ id: 'hline' }),
+      ],
+    });
+    const model = resolveUserDrawingObjectTreeModel(state);
+    const hiddenTrend = model.rows.find((row) => row.drawingId === 'trend')!;
+    const lockedRect = model.rows.find((row) => row.drawingId === 'rect')!;
+    const frontHline = model.rows.find((row) => row.drawingId === 'hline')!;
+
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(hiddenTrend, 'show')).toEqual({
+      type: 'show',
+      drawingIds: ['trend'],
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(hiddenTrend, 'rename', { name: 'Support' })).toEqual({
+      type: 'rename',
+      drawingId: 'trend',
+      name: 'Support',
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(hiddenTrend, 'rename')).toBeNull();
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(lockedRect, 'unlock')).toEqual({
+      type: 'unlock',
+      drawingIds: ['rect'],
+      includeLocked: true,
+    });
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(lockedRect, 'delete')).toBeNull();
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(frontHline, 'bringToFront')).toBeNull();
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(frontHline, 'sendToBack', { includeLocked: true })).toEqual({
+      type: 'sendToBack',
+      drawingIds: ['hline'],
+      includeLocked: true,
+    });
+  });
+
+  it('routes row unlock actions through locked drawing command protection', () => {
+    const state = createUserDrawingState({
+      drawings: [createRectangle({ id: 'rect', locked: true })],
+    });
+    const lockedRect = resolveUserDrawingObjectTreeModel(state).rows.find((row) => row.drawingId === 'rect')!;
+    const unlockAction = resolveUserDrawingObjectTreeRowDispatchAction(lockedRect, 'unlock');
+
+    expect(unlockAction).toEqual({
+      type: 'unlock',
+      drawingIds: ['rect'],
+      includeLocked: true,
+    });
+
+    const commands = resolveUserDrawingObjectTreeDispatchActionCommands(state, unlockAction!, {
+      createId: () => 'unused',
+      now: () => 51,
+    });
+    const next = reduceUserDrawingCommand(state, commands[0]!);
+
+    expect(next.drawings[0]).toMatchObject({ id: 'rect', locked: false, updatedAt: 51 });
   });
 
   it('uses optional drawing names as row labels', () => {

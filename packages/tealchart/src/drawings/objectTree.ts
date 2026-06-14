@@ -51,6 +51,11 @@ export interface UserDrawingObjectTreeRowAction {
   destructive?: boolean;
 }
 
+export interface ResolveUserDrawingObjectTreeRowDispatchActionOptions {
+  name?: string | null;
+  includeLocked?: boolean;
+}
+
 export interface UserDrawingObjectTreeGroup {
   id: string;
   label: string;
@@ -213,6 +218,31 @@ export function resolveUserDrawingObjectTreeModel(
     groups: resolveUserDrawingObjectTreeGroups(rows),
     selectedIds,
     drawingCount: state.drawings.length,
+  };
+}
+
+export function resolveUserDrawingObjectTreeRowDispatchAction(
+  row: UserDrawingObjectTreeRow,
+  actionType: UserDrawingObjectTreeRowActionType,
+  options: ResolveUserDrawingObjectTreeRowDispatchActionOptions = {},
+): UserDrawingObjectTreeDispatchAction | null {
+  const action = row.actions?.find((candidate) => candidate.type === actionType);
+  if (!action?.enabled) return null;
+
+  if (actionType === 'rename') {
+    if (options.name === undefined) return null;
+    return {
+      type: 'rename',
+      drawingId: row.drawingId,
+      name: options.name,
+      includeLocked: options.includeLocked,
+    };
+  }
+
+  return {
+    type: actionType,
+    drawingIds: [row.drawingId],
+    includeLocked: actionType === 'unlock' ? true : options.includeLocked,
   };
 }
 

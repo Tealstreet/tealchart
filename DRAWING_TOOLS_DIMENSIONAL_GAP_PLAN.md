@@ -532,6 +532,9 @@ Phase 1: Tree row model
 - Status: object-tree rows now expose shared action descriptors for rename,
   duplicate, delete, visibility, lock, and z-order controls with enabled state,
   so web and mobile app-owned panels can render matching row action affordances.
+- Status: shared row action descriptors resolve back to app-dispatchable
+  object-tree actions, so web and mobile app-owned panels can wire row buttons
+  without duplicating action mapping logic.
 
 Phase 2: Shared actions
 
