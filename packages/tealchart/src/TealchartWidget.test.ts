@@ -6,6 +6,7 @@ import type {
   PeriodParams,
   ResolutionString,
   TealchartWidgetOptions,
+  WidgetEventCallback,
 } from './types';
 import type { DrawingCoordinateSpace, UserDrawing, UserDrawingCommandEvent, UserDrawingState, UserDrawingTool } from './drawings';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
@@ -442,7 +443,7 @@ describe('TealchartWidget', () => {
     it('notifies option and subscription listeners after drawing commands change state', () => {
       const datafeed = createMockDatafeed();
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
-      const subscribed = vi.fn();
+      const subscribed = vi.fn<WidgetEventCallback<'user_drawing_command'>>();
       const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
       widget.subscribe('user_drawing_command', subscribed);
 
@@ -504,6 +505,10 @@ describe('TealchartWidget', () => {
         source: 'api',
       });
       expect(onCommand.mock.calls[2]![0].state.drawings.map((drawing) => drawing.id)).toEqual(['a']);
+
+      widget.unsubscribe('user_drawing_command', subscribed);
+      expect(widget.deleteSelectedUserDrawing()).toBe(true);
+      expect(subscribed).toHaveBeenCalledTimes(3);
     });
 
     it('continues subscription emission when the option command listener throws', () => {

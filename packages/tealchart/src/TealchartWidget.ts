@@ -116,6 +116,7 @@ import {
   TealchartWidgetOptions,
   Viewport,
   WidgetEvent,
+  WidgetEventCallback,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
@@ -3041,6 +3042,7 @@ export class TealchartWidget {
   /**
    * Subscribe to widget events
    */
+  subscribe<TEvent extends WidgetEvent>(event: TEvent, callback: WidgetEventCallback<TEvent>): void;
   subscribe(event: WidgetEvent, callback: EventCallback): void {
     this._eventEmitter.subscribe(event, callback);
   }
@@ -3048,6 +3050,7 @@ export class TealchartWidget {
   /**
    * Unsubscribe from widget events
    */
+  unsubscribe<TEvent extends WidgetEvent>(event: TEvent, callback: WidgetEventCallback<TEvent>): void;
   unsubscribe(event: WidgetEvent, callback: EventCallback): void {
     this._eventEmitter.unsubscribe(event, callback);
   }

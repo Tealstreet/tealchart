@@ -414,6 +414,18 @@ export type WidgetEvent =
   | 'mouse_up'
   | 'user_drawing_command';
 
+export interface WidgetEventMap {
+  onAutoSaveNeeded: [];
+  layout_about_to_be_changed: [];
+  chart_loaded: [];
+  layout_changed: [];
+  mouse_down: [];
+  mouse_up: [];
+  user_drawing_command: [UserDrawingCommandEvent];
+}
+
+export type WidgetEventCallback<TEvent extends WidgetEvent = WidgetEvent> = (...args: WidgetEventMap[TEvent]) => void;
+
 /**
  * Resolution string type (matches TradingView's nominal type)
  */

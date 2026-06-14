@@ -52,7 +52,7 @@ Sources:
 | Command transactions | Shared command envelope and history grouping exist | Widget APIs and gestures dispatch commands | Skia handles/adapters dispatch commands | `shipped` | Gap 2 polish |
 | Keyboard shortcuts | Shared keyboard action map exists | Delete/Escape/undo/redo/copy/paste/select-all/duplicate/nudge exist | Host-level hardware-keyboard adapter support exists for matching actions | `partial` | Gap 7 polish |
 | Public APIs | Shared command/API concepts exist | Web API coverage broad | Mobile handle coverage broad | `partial` | Gap 8 polish |
-| Event subscriptions | Shared command-event shape exists; direct state replacement/import remains silent | `onUserDrawingCommand` and subscription event exist for command dispatch | `onUserDrawingCommand` prop and command utility event path exist for command dispatch | `partial` | Gap 8 polish |
+| Event subscriptions | Shared command-event shape includes undoable commands, history commands, and non-undoable `replaceState` events | Typed `onUserDrawingCommand` option and `subscribe('user_drawing_command', ...)` event cover command dispatch plus direct state replacement/import | Typed `onUserDrawingCommand` prop and command utility event path cover command dispatch plus direct state replacement/import | `shipped` | Gap 8 polish |
 | Persistence | Versioned committed drawing layout schema exists | Layout save/load includes migrated drawings | Mobile import/export uses same unknown-safe schema | `shipped` | Gap 8 polish |
 | Visual parity evidence | Tests exist across render/input pieces; manual visual evidence checklist exists | Canvas tests exist plus desktop/narrow-desktop checklist | Skia render-model tests exist plus portrait/landscape checklist | `partial` | Gap 8 |
 
