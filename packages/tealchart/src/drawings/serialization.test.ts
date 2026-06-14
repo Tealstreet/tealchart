@@ -95,6 +95,7 @@ describe('drawing layout serialization', () => {
     expect(serializeUserDrawingStateForLayout(restored)?.magnetMode).toBe('strong');
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, stayInDrawingMode: undefined })?.stayInDrawingMode)
       .toBe(true);
+    expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: undefined })?.magnetMode).toBe('off');
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: 'future' })?.magnetMode).toBe('off');
   });
 
