@@ -151,6 +151,7 @@ import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile
 import { OrderLineComponent } from './mobile/components/OrderLineComponent';
 import { PositionLineComponent } from './mobile/components/PositionLineComponent';
 import { UserDrawingObjectTreeSheet } from './mobile/components/UserDrawingObjectTreeSheet';
+import { UserDrawingPropertiesSheet } from './mobile/components/UserDrawingPropertiesSheet';
 import { UserDrawingSelectedActionSurfaceComponent } from './mobile/components/UserDrawingSelectedActionSurface';
 import { useChartGestures } from './mobile/hooks/useChartGestures';
 import { useLabelCollision } from './mobile/hooks/useLabelCollision';
@@ -603,6 +604,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const [userDrawingObjectTreeVisible, setUserDrawingObjectTreeVisible] = useState(false);
+  const [userDrawingPropertiesVisible, setUserDrawingPropertiesVisible] = useState(false);
+  const [userDrawingPropertiesDrawingId, setUserDrawingPropertiesDrawingId] = useState<string | undefined>(undefined);
 
   const handleUserDrawingObjectTreeOpen = useCallback(
     (model: UserDrawingObjectTreeModel) => {
@@ -613,6 +616,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
     },
     [onUserDrawingObjectTreeOpen],
+  );
+
+  const handleUserDrawingPropertiesOpen = useCallback(
+    (intent: UserDrawingPropertiesIntent) => {
+      if (onUserDrawingPropertiesOpen) {
+        onUserDrawingPropertiesOpen(intent);
+      } else {
+        setUserDrawingPropertiesDrawingId(intent.drawingId);
+        setUserDrawingPropertiesVisible(true);
+      }
+    },
+    [onUserDrawingPropertiesOpen],
   );
 
   const dispatchUserDrawingObjectTreeActionToState = useCallback(
@@ -1095,7 +1110,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
         const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
         if (intent) {
-          onUserDrawingPropertiesOpen?.(intent);
+          handleUserDrawingPropertiesOpen(intent);
         }
         return intent;
       },
@@ -1110,8 +1125,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       notifyUserDrawingCommand,
       onUserDrawingObjectTreeOpen,
       handleUserDrawingObjectTreeOpen,
+      handleUserDrawingPropertiesOpen,
       dispatchUserDrawingObjectTreeActionToState,
-      onUserDrawingPropertiesOpen,
       replaceUserDrawingState,
     ],
   );
@@ -2088,7 +2103,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             }
           }
           if (result.propertiesIntent) {
-            onUserDrawingPropertiesOpen?.(result.propertiesIntent);
+            handleUserDrawingPropertiesOpen(result.propertiesIntent);
           }
           return;
         }
@@ -2117,7 +2132,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       margins,
       measureUserDrawingTextLabelLine,
       notifyUserDrawingCommand,
-      onUserDrawingPropertiesOpen,
+      handleUserDrawingPropertiesOpen,
       unifiedPaneLayout,
       userDrawingSpacesByPaneId,
     ],
@@ -2180,7 +2195,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 source: 'contextMenu',
                 createId: createUserDrawingId,
                 dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
-                onUserDrawingPropertiesOpen,
+                onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
                 onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
               });
             },
@@ -2207,7 +2222,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       measureUserDrawingTextLabelLine,
       notifyUserDrawingCommand,
       handleUserDrawingObjectTreeOpen,
-      onUserDrawingPropertiesOpen,
+      handleUserDrawingPropertiesOpen,
       userDrawingSpacesByPaneId,
       viewport,
     ],
@@ -4709,7 +4724,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         topInset={showTopBar ? TOP_BAR_SAFE_ZONE : 0}
         createId={createUserDrawingId}
         dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
-        onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+        onUserDrawingPropertiesOpen={handleUserDrawingPropertiesOpen}
         onUserDrawingObjectTreeOpen={handleUserDrawingObjectTreeOpen}
       />
 
@@ -4795,6 +4810,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         model={resolveUserDrawingObjectTreeModel(effectiveUserDrawingState)}
         onDispatch={dispatchUserDrawingObjectTreeActionToState}
         onClose={() => setUserDrawingObjectTreeVisible(false)}
+      />
+
+      <UserDrawingPropertiesSheet
+        visible={userDrawingPropertiesVisible}
+        surface={resolveUserDrawingPropertiesSurface(effectiveUserDrawingState, userDrawingPropertiesDrawingId)}
+        onDispatch={(command) =>
+          dispatchUserDrawingCommandToState(
+            resolveUserDrawingPropertiesSurfaceCommand(command, { drawingId: userDrawingPropertiesDrawingId }),
+          )
+        }
+        onClose={() => {
+          setUserDrawingPropertiesVisible(false);
+          setUserDrawingPropertiesDrawingId(undefined);
+        }}
       />
 
       {/* Indicators Modal */}
