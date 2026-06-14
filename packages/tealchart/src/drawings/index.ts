@@ -84,6 +84,7 @@ export {
   resolveTrendAngleFromSegment,
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
+  resolveUserDrawingMagnetInputPoint,
   resolveUserDrawingGeometry,
   screenPointToAnchor,
   screenPointToPanePosition,

@@ -103,6 +103,7 @@ import {
   resolveUserDrawingGeometry,
   resolveUserDrawingInputPoint,
   resolveUserDrawingInputPointFromChart,
+  resolveUserDrawingMagnetInputPoint,
   resolveXabcdPatternFromAnchors,
   screenPointToAnchor,
   timeToDrawingX,
@@ -143,6 +144,57 @@ describe('user drawing coordinates', () => {
     expect(drawingXToTime(110, space)).toBe(2_000);
     expect(priceToDrawingY(100, space)).toBe(70);
     expect(drawingYToPrice(70, space)).toBe(100);
+  });
+
+  it('snaps strong magnet input to the nearest bar OHLC point', () => {
+    const snapped = resolveUserDrawingMagnetInputPoint({
+      mode: 'strong',
+      space: {
+        ...space,
+        bars: [
+          { time: 1_500, open: 96, high: 104, low: 94, close: 102, volume: 1 },
+          { time: 2_500, open: 91, high: 108, low: 90, close: 99, volume: 1 },
+        ],
+      },
+      screenPoint: { x: 158, y: priceToDrawingY(103.6, space) },
+      point: {
+        paneId: 'main',
+        anchor: { time: 2_480, price: 103.6, pressure: 0.5 },
+        position: { x: 0.74, y: 0.32 },
+      },
+    });
+
+    expect(snapped.anchor).toEqual({ time: 2_500, price: 108, pressure: 0.5 });
+    expect(snapped.position).toEqual({ x: 0.75, y: 0.1 });
+  });
+
+  it('snaps weak magnet input only inside the screen threshold', () => {
+    const magnetSpace = {
+      ...space,
+      bars: [{ time: 2_000, open: 95, high: 105, low: 93, close: 101, volume: 1 }],
+    };
+    const point = {
+      paneId: 'main',
+      anchor: { time: 2_010, price: 104.4 },
+      position: { x: 0.51, y: 0.28 },
+    };
+
+    expect(
+      resolveUserDrawingMagnetInputPoint({
+        mode: 'weak',
+        space: magnetSpace,
+        screenPoint: { x: 111, y: priceToDrawingY(104.4, space) },
+        point,
+      }).anchor,
+    ).toEqual({ time: 2_000, price: 105 });
+    expect(
+      resolveUserDrawingMagnetInputPoint({
+        mode: 'weak',
+        space: magnetSpace,
+        screenPoint: { x: 180, y: priceToDrawingY(104.4, space) },
+        point,
+      }),
+    ).toBe(point);
   });
 
   it('resolves table cells from a one-anchor screen origin', () => {
