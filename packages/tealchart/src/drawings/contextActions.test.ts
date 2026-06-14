@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { clearChartStoreCache } from '../state/chartState';
 
 import { resolveUserDrawingContextActionsAtPoint } from './contextActions';
+import { resolveUserDrawingSelectedActionSurface } from './toolbar';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -67,7 +68,31 @@ const state: UserDrawingState = {
   textEdit: null,
 };
 
+const flattenSelectedActionSurface = (stateToFlatten: UserDrawingState) =>
+  resolveUserDrawingSelectedActionSurface(stateToFlatten).groups.flatMap((group) =>
+    group.items.map((item) => ({
+      id: item.id,
+      groupId: group.id,
+      label: item.label,
+      enabled: item.enabled,
+      destructive: item.destructive,
+      command: item.command,
+    })),
+  );
+
 describe('user drawing context actions', () => {
+  it('mirrors the selected-action surface when the context target is already selected', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'front' },
+    } satisfies UserDrawingState;
+
+    const result = resolveUserDrawingContextActionsAtPoint(selected, { x: 50, y: 40 }, new Map([['main', space]]));
+
+    expect(result.changed).toBe(false);
+    expect(result.items).toEqual(flattenSelectedActionSurface(selected));
+  });
+
   it('selects the hit drawing and resolves shared selected action items', () => {
     const result = resolveUserDrawingContextActionsAtPoint(state, { x: 50, y: 40 }, new Map([['main', space]]));
 
@@ -75,27 +100,7 @@ describe('user drawing context actions', () => {
     expect(result.changed).toBe(true);
     expect(result.drawingId).toBe('front');
     expect(result.state.selection).toEqual({ drawingId: 'front' });
-    expect(result.items.map((item) => [item.id, item.groupId, item.enabled, item.command])).toEqual([
-      ['openProperties', 'primary', true, { type: 'openProperties' }],
-      ['openObjectTree', 'primary', true, { type: 'openObjectTree' }],
-      ['editText', 'primary', false, { type: 'editText', drawingId: 'front' }],
-      ['duplicateSelected', 'primary', true, { type: 'toolbarAction', action: 'duplicateSelected' }],
-      ['deleteSelected', 'primary', true, { type: 'toolbarAction', action: 'deleteSelected' }],
-      ['lineColor:#22c55e', 'style', true, { type: 'updateStyle', style: { lineColor: '#22c55e' } }],
-      ['lineWidth:decrease', 'style', true, { type: 'updateStyle', style: { lineWidth: 1 } }],
-      ['lineWidth:increase', 'style', true, { type: 'updateStyle', style: { lineWidth: 3 } }],
-      ['lineStyle:dashed', 'style', true, { type: 'updateStyle', style: { lineStyle: 'dashed' } }],
-      ['opacity:0.75', 'style', true, { type: 'updateStyle', style: { opacity: 0.75 } }],
-      ['lineVisible:toggle', 'style', true, { type: 'updateStyle', style: { lineVisible: false } }],
-      ['bringForward', 'arrange', false, { type: 'toolbarAction', action: 'bringForward' }],
-      ['sendBackward', 'arrange', true, { type: 'toolbarAction', action: 'sendBackward' }],
-      ['bringToFront', 'arrange', false, { type: 'toolbarAction', action: 'bringToFront' }],
-      ['sendToBack', 'arrange', true, { type: 'toolbarAction', action: 'sendToBack' }],
-      ['hideSelected', 'visibility', true, { type: 'styleAction', action: 'hideSelected', visible: false }],
-      ['showSelected', 'visibility', false, { type: 'styleAction', action: 'showSelected' }],
-      ['lockSelected', 'visibility', true, { type: 'styleAction', action: 'lockSelected', locked: true }],
-      ['unlockSelected', 'visibility', false, { type: 'styleAction', action: 'unlockSelected' }],
-    ]);
+    expect(result.items).toEqual(flattenSelectedActionSurface(result.state));
   });
 
   it('preserves multi-selection when the hit drawing is already selected', () => {

@@ -362,8 +362,8 @@ z-order, visibility, and lock/unlock.
 The web floating toolbar, web context menu, mobile Skia action strip, and
 mobile long-press menu consume this shared model. Shared selection bounds and
 preferred action anchor geometry now resolve from the drawing render model for
-both Canvas and Skia callers. Rich text/tool-specific inline controls remain
-open.
+both Canvas and Skia callers. Further tool-specific inline controls should be
+added through the shared selected-action model when needed.
 
 Phase 1: Action availability model
 
@@ -376,8 +376,8 @@ Phase 1: Action availability model
   resolve from shared drawing state.
 - Status: text-capable drawings now expose a shared selected/context action for
   starting text edit on both web Canvas and mobile Skia.
-- Future work: add richer typography, geometry, and tool-specific actions to
-  the same model as those surfaces move out of the top bar.
+- Follow-up risk: add further tool-specific actions to the same model as new
+  drawing types need bespoke controls.
 
 Phase 2: Anchor geometry model
 
@@ -399,9 +399,9 @@ edit, quick stroke/fill/text appearance style, text alignment, trend-line
 extension, icon library, duplicate, delete, z-order, visibility, and lock/unlock
 actions.
 The surface is positioned from the shared selection action anchor model and
-dispatches existing drawing commands or app-owned properties UI. Rich
-text/tool-specific style controls still live in the top bar/properties
-surface and should migrate in later slices.
+dispatches existing drawing commands or app-owned properties UI. Further
+tool-specific style controls should migrate through the shared style-control
+grouping when both web and mobile surfaces are ready for them.
 
 Phase 1: DOM surface primitive
 
@@ -417,8 +417,8 @@ Phase 2: Initial actions
   controls, quick trend-line extension and icon library controls, duplicate,
   delete, z-order, hide/show, and lock/unlock actions moved out of the top bar
   into the floating toolbar for selected drawings.
-- Future work: migrate richer typography/tool-specific style actions after the
-  style-control grouping is ready for both web and mobile.
+- Follow-up risk: migrate any future tool-specific style actions after their
+  shared style-control grouping is ready for both web and mobile.
 
 Phase 3: Dismissal and focus
 
@@ -439,6 +439,10 @@ Phase 3: Dismissal and focus
   metadata, and both the web floating toolbar and mobile Skia action strip
   render the style actions behind the same anchored Style trigger instead of
   exposing every quick style action as flat toolbar chrome.
+- Status: shared context-action resolver coverage now asserts menu actions are
+  an exact flattening of the shared selected-action surface, so richer style
+  controls added to the toolbar model cannot silently diverge before the web
+  right-click and mobile long-press adapters consume the shared menu model.
 
 ### Epic 4.3: Mobile Selection Action Sheet
 
@@ -513,8 +517,9 @@ Phase 3: Mobile long-press menu
   intended action/close path without bubbling into chart touch handlers.
 - Status: text-capable drawing context actions now begin text editing through
   the same command owner path on both web Canvas and mobile Skia.
-- Future work: add richer typography/fill/tool-specific context actions after
-  the style popover model moves out of the top bar on both platforms.
+- Follow-up risk: add future tool-specific context actions only through the
+  shared selected-action surface so web right-click and mobile long-press stay
+  in lockstep.
 
 ## Gap 5: Object Tree and Layer Management
 
