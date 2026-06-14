@@ -166,6 +166,7 @@ export function createUserDrawingVisualEvidencePrNoteTemplate(
 ): string {
   const viewportLines = matrix.viewports.map((viewport) => `- ${viewport.label}:`).join('\n');
   const stateLines = matrix.states.map((state) => `- [ ] ${state.label}, if affected`).join('\n');
+  const regressionCheckLines = matrix.regressionChecks.map((check) => `- [ ] ${check}`).join('\n');
 
   return [
     '## Drawing Visual Evidence',
@@ -174,6 +175,9 @@ export function createUserDrawingVisualEvidencePrNoteTemplate(
     '',
     'Checked states:',
     stateLines,
+    '',
+    'Regression checks:',
+    regressionCheckLines,
     '',
     'Known visual gaps:',
   ].join('\n');
