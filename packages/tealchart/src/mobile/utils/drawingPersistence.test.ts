@@ -104,6 +104,8 @@ describe('mobile drawing persistence', () => {
     const result = replaceMobileUserDrawingState(previousState, history, state, 'api');
 
     expect(result.state).toBe(state);
+    expect(result.changed).toBe(true);
+    expect(result.layoutChanged).toBe(true);
     expect(result.event).toMatchObject({
       command: { type: 'replaceState' },
       source: 'api',
@@ -111,6 +113,12 @@ describe('mobile drawing persistence', () => {
     });
     expect(result.history.undoStack).toEqual([]);
     expect(result.history.redoStack).toEqual([]);
+
+    const unchanged = replaceMobileUserDrawingState(state, result.history, state, 'layout');
+    expect(unchanged.state).toBe(state);
+    expect(unchanged.changed).toBe(false);
+    expect(unchanged.layoutChanged).toBe(false);
+    expect(unchanged.event).toBeNull();
   });
 
   it('imports versionless legacy drawing payloads through the shared schema', () => {
