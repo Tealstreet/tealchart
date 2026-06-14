@@ -13,6 +13,7 @@ export type UserDrawingVisualEvidenceStateId =
   | 'objectTree'
   | 'textPropertyEditing'
   | 'keyboardModifierActions'
+  | 'apiEventsPersistence'
   | 'paneSplitIndicators';
 
 export type UserDrawingVisualEvidenceStateStatus = 'ready' | 'app-owned' | 'known-gap';
@@ -204,6 +205,24 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
         'Undo, redo, delete, duplicate, copy, paste, select-all, and nudge route through shared commands.',
         'Web Shift-drag duplicate has a mobile touch-native duplicate-drag equivalent.',
         'Web Shift placement constraints have a mobile host-controlled constraint equivalent.',
+      ],
+    },
+    {
+      id: 'apiEventsPersistence',
+      label: 'API/events/persistence',
+      webEvidence: 'Widget drawing APIs, command events, layout import/export, and persistence restore behavior.',
+      mobileEvidence: 'Skia handle APIs, command events, drawing import/export, and persistence restore behavior.',
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+        notes:
+          'Both platforms expose command-backed drawing APIs, matching command-event shapes, explicit no-op returns, and the same persisted drawing schema/migrations.',
+      },
+      expectedChecks: [
+        'Create, select, delete, duplicate, reorder, lock, hide, style, undo, redo, object-tree, and properties APIs have web and mobile siblings.',
+        'Changed drawing commands emit the same command-event shape on web Canvas and mobile Skia.',
+        'Unavailable targets return explicit no-op results without mutating drawing state.',
+        'Import/export uses the same versioned drawing layout schema and excludes transient draft, selection, text-edit, and history state.',
       ],
     },
     {

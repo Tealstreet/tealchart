@@ -30,6 +30,7 @@ describe('drawing visual evidence matrix', () => {
       'objectTree',
       'textPropertyEditing',
       'keyboardModifierActions',
+      'apiEventsPersistence',
       'paneSplitIndicators',
     ]);
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
@@ -119,6 +120,27 @@ describe('drawing visual evidence matrix', () => {
       ]),
     });
     expect(keyboardModifier?.status?.notes).toContain('shared action and command models');
+  });
+
+  it('tracks API, event, and persistence parity evidence', () => {
+    const apiEventsPersistence = USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.find(
+      (state) => state.id === 'apiEventsPersistence',
+    );
+
+    expect(apiEventsPersistence).toMatchObject({
+      status: {
+        web: 'ready',
+        mobile: 'ready',
+      },
+      expectedChecks: expect.arrayContaining([
+        'Create, select, delete, duplicate, reorder, lock, hide, style, undo, redo, object-tree, and properties APIs have web and mobile siblings.',
+        'Changed drawing commands emit the same command-event shape on web Canvas and mobile Skia.',
+        'Unavailable targets return explicit no-op results without mutating drawing state.',
+        'Import/export uses the same versioned drawing layout schema and excludes transient draft, selection, text-edit, and history state.',
+      ]),
+    });
+    expect(apiEventsPersistence?.status?.notes).toContain('command-backed drawing APIs');
+    expect(apiEventsPersistence?.status?.notes).toContain('persisted drawing schema/migrations');
   });
 
   it('keeps PR note generation compatible with custom legacy matrices without status fields', () => {
