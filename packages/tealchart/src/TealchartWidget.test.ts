@@ -408,6 +408,11 @@ describe('TealchartWidget', () => {
       expect(widget.setActiveUserDrawingTool('select')).toBe(false);
       expect(widget.setActiveUserDrawingTool('rectangle')).toBe(true);
       expect(widget.setActiveUserDrawingTool('rectangle')).toBe(false);
+      expect(widget.isUserDrawingStayInDrawingMode()).toBe(true);
+      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
+      expect(widget.isUserDrawingStayInDrawingMode()).toBe(false);
+      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(false);
+      expect(widget.setUserDrawingStayInDrawingMode(true)).toBe(true);
 
       expect(widget.selectUserDrawing('missing')).toBe(false);
       expect(widget.addUserDrawing(drawing)).toBe(true);
@@ -815,6 +820,37 @@ describe('TealchartWidget', () => {
         kind: 'trendLine',
       });
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it('applies one-shot web drawing placement when stay-in-drawing-mode is disabled', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      widget.setActiveUserDrawingTool('trendLine');
+      onCommand.mockClear();
+
+      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
+      expect(widget.getUserDrawingState().stayInDrawingMode).toBe(false);
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setStayInDrawingMode', stayInDrawingMode: false }),
+          source: 'api',
+        }),
+      );
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
+      expect(widget.getUserDrawingState().activeTool).toBe('trendLine');
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        activeTool: 'select',
+        stayInDrawingMode: false,
+        selection: { drawingId: 'drawing_1' },
+      });
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ id: 'drawing_1', kind: 'trendLine' });
     });
 
     it('creates web placement-drag drawings as independent undo entries', () => {
