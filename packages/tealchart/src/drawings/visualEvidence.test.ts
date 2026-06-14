@@ -80,6 +80,26 @@ describe('drawing visual evidence matrix', () => {
     expect(objectTree?.status?.notes).toContain('shared row, selection, rename, and z-order action models');
   });
 
+  it('tracks text/property edit lifecycle evidence', () => {
+    const textProperty = USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.find(
+      (state) => state.id === 'textPropertyEditing',
+    );
+
+    expect(textProperty).toMatchObject({
+      status: {
+        web: 'app-owned',
+        mobile: 'app-owned',
+      },
+      expectedChecks: expect.arrayContaining([
+        'Double-click and double-tap resolve through the same shared edit-intent model.',
+        'Text edits commit or cancel as one transaction.',
+        'Properties controls dispatch through the same shared command pipeline.',
+      ]),
+    });
+    expect(textProperty?.status?.notes).toContain('shared edit-intent');
+    expect(textProperty?.status?.notes).toContain('properties-surface control models');
+  });
+
   it('keeps PR note generation compatible with custom legacy matrices without status fields', () => {
     const template = createUserDrawingVisualEvidencePrNoteTemplate({
       viewports: [

@@ -176,11 +176,15 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       status: {
         web: 'app-owned',
         mobile: 'app-owned',
-        notes: 'Both platforms expose text edit and properties intents; host apps own the final properties surface.',
+        notes:
+          'Both platforms expose app-owned text edit and properties surfaces backed by shared edit-intent, command/history, and properties-surface control models.',
       },
       expectedChecks: [
+        'Double-click and double-tap resolve through the same shared edit-intent model.',
         'Text edits commit or cancel as one transaction.',
         'Selection and history state are preserved.',
+        'Properties controls dispatch through the same shared command pipeline.',
+        'Locked-target properties controls are disabled without platform-specific inference.',
       ],
     },
     {

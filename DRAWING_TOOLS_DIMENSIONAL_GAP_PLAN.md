@@ -716,6 +716,11 @@ Phase 3: History and focus
 - Status: mobile Skia property sheet consumers receive the same explicit
   properties-surface control enabled state as web, keeping locked-target
   disabled rendering platform-neutral.
+- Status: the visual evidence matrix now records the cross-platform
+  text/property edit lifecycle contract: double-click and double-tap resolve
+  through the shared edit-intent model, text commits remain one history
+  transaction, and app-owned properties surfaces dispatch through the shared
+  command/control model on web Canvas and mobile Skia.
 
 ## Gap 7: Keyboard and Modifier Behavior
 
