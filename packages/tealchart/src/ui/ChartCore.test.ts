@@ -574,6 +574,43 @@ describe('ChartCore viewport management', () => {
     },
   );
 
+  it('applies strong magnet mode to web drawing input points', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingInput = vi.fn(() => true);
+    const core = new ChartCore({
+      container,
+      width: 100,
+      height: 100,
+      margins: { top: 0, right: 0, bottom: 0, left: 0 },
+      onUserDrawingInput,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setBars([{ time: 50, open: 40, high: 80, low: 20, close: 60, volume: 1 }]);
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'trendLine',
+      magnetMode: 'strong',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const testCore = core as unknown as {
+      handleUserDrawingInput(x: number, y: number): unknown;
+    };
+
+    expect(testCore.handleUserDrawingInput(48, 18)).toBe(true);
+    expect(onUserDrawingInput).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paneId: 'main',
+        anchor: { time: 50, price: 80 },
+      }),
+    );
+
+    core.dispose();
+  });
+
   it('applies constrained cyclic line horizontal placement through ChartCore preview and commit', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingPlacementDragStart = vi.fn(() => true);
