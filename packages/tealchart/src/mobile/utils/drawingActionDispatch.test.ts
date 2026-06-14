@@ -104,8 +104,26 @@ describe('mobile drawing action dispatch', () => {
         },
       ],
       rows: [
-        expect.objectContaining({ drawingId: 'range', groupIds: ['pane:main'], label: 'Rectangle', selected: false }),
-        expect.objectContaining({ drawingId: 'line', groupIds: ['pane:main'], label: 'Breakout', selected: true }),
+        expect.objectContaining({
+          drawingId: 'range',
+          groupIds: ['pane:main'],
+          label: 'Rectangle',
+          selected: false,
+          actions: expect.arrayContaining([
+            expect.objectContaining({ type: 'rename', enabled: true }),
+            expect.objectContaining({ type: 'delete', enabled: true, destructive: true }),
+          ]),
+        }),
+        expect.objectContaining({
+          drawingId: 'line',
+          groupIds: ['pane:main'],
+          label: 'Breakout',
+          selected: true,
+          actions: expect.arrayContaining([
+            expect.objectContaining({ type: 'hide', enabled: true }),
+            expect.objectContaining({ type: 'lock', enabled: true }),
+          ]),
+        }),
       ],
       selectedIds: ['line'],
     });

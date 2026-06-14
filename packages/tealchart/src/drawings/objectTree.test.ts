@@ -96,6 +96,17 @@ describe('user drawing object tree model', () => {
       selected: false,
       editable: true,
     });
+    expect(model.rows[0]?.actions?.map((action) => [action.type, action.enabled])).toEqual([
+      ['rename', true],
+      ['duplicate', true],
+      ['delete', true],
+      ['hide', true],
+      ['lock', true],
+      ['bringForward', false],
+      ['sendBackward', true],
+      ['bringToFront', false],
+      ['sendToBack', true],
+    ]);
     expect(model.rows.map((row) => row.groupIds)).toEqual([['pane:volume'], ['pane:main'], ['pane:main']]);
     expect(model.groups).toEqual([
       {
@@ -151,6 +162,28 @@ describe('user drawing object tree model', () => {
       ['hline', false, true, false, true],
       ['rect', true, true, true, false],
       ['trend', true, false, false, true],
+    ]);
+    expect(model.rows.find((row) => row.drawingId === 'trend')?.actions?.map((action) => [action.type, action.enabled])).toEqual([
+      ['rename', true],
+      ['duplicate', true],
+      ['delete', true],
+      ['show', true],
+      ['lock', true],
+      ['bringForward', true],
+      ['sendBackward', false],
+      ['bringToFront', true],
+      ['sendToBack', false],
+    ]);
+    expect(model.rows.find((row) => row.drawingId === 'rect')?.actions?.map((action) => [action.type, action.enabled])).toEqual([
+      ['rename', false],
+      ['duplicate', false],
+      ['delete', false],
+      ['hide', false],
+      ['unlock', true],
+      ['bringForward', false],
+      ['sendBackward', false],
+      ['bringToFront', false],
+      ['sendToBack', false],
     ]);
   });
 

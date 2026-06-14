@@ -529,6 +529,9 @@ Phase 1: Tree row model
 - Status: the shared object-tree model now exposes pane groups with row IDs,
   drawing IDs, labels, order indexes, and counts so web and mobile app-owned
   layer panels can render the same section model.
+- Status: object-tree rows now expose shared action descriptors for rename,
+  duplicate, delete, visibility, lock, and z-order controls with enabled state,
+  so web and mobile app-owned panels can render matching row action affordances.
 
 Phase 2: Shared actions
 
