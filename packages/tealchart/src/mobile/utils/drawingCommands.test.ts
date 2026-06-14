@@ -1,16 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  cancelMobileUserDrawingDraft,
-  clearMobileUserDrawings,
   commitMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHandleCommand,
   dispatchMobileUserDrawingHistoryCommand,
   dispatchMobileUserDrawingHistoryCommandWithEvent,
   dispatchMobileUserDrawingKeyboardAction,
-  selectMobileUserDrawing,
-  selectMobileUserDrawings,
-  setMobileActiveUserDrawingTool,
 } from './drawingCommands';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
@@ -95,33 +90,118 @@ function createMobileStateWithTable(): UserDrawingState {
 
 describe('mobile drawing handle command dispatch', () => {
   it('exposes boolean results for no-op-capable Skia drawing command APIs', () => {
-    let state = createUserDrawingState();
-    const commit = (nextState: UserDrawingState) => {
-      state = nextState;
-    };
+    let history = createUserDrawingCommandHistory();
+    const onEvent = vi.fn();
+    let result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      createUserDrawingState(),
+      history,
+      { type: 'setActiveTool', tool: 'select', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).not.toHaveBeenCalled();
 
-    expect(setMobileActiveUserDrawingTool(state, 'select', commit)).toBe(false);
-    expect(setMobileActiveUserDrawingTool(state, 'rectangle', commit)).toBe(true);
-    expect(setMobileActiveUserDrawingTool(state, 'rectangle', commit)).toBe(false);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setActiveTool', tool: 'rectangle', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(1);
 
-    expect(selectMobileUserDrawing(state, 'missing', undefined, commit)).toBe(false);
-    state = createMobileStateWithTrendLine();
-    expect(selectMobileUserDrawing(state, 'line', undefined, commit)).toBe(false);
-    expect(selectMobileUserDrawing(state, null, undefined, commit)).toBe(true);
-    expect(selectMobileUserDrawings(state, ['line', 'missing'], commit)).toBe(true);
-    expect(selectMobileUserDrawings(state, ['line', 'missing'], commit)).toBe(false);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'setActiveTool', tool: 'rectangle', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
 
-    expect(clearMobileUserDrawings(state, commit)).toBe(true);
-    expect(clearMobileUserDrawings(state, commit)).toBe(false);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'select', drawingId: 'missing', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
 
-    expect(cancelMobileUserDrawingDraft(state, commit)).toBe(false);
-    state = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'rectangle'), { paneId: 'main', anchor: anchorA }, {
-      createId: () => 'rect',
-      now: () => 30,
-      style,
-    });
-    expect(cancelMobileUserDrawingDraft(state, commit)).toBe(true);
-    expect(cancelMobileUserDrawingDraft(state, commit)).toBe(false);
+    const lineState = createMobileStateWithTrendLine();
+    history = createUserDrawingCommandHistory();
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      lineState,
+      history,
+      { type: 'select', drawingId: 'line', meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'select', drawingId: null, meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(2);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(3);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      { type: 'selectMany', drawingIds: ['line', 'missing'], meta: { source: 'api' } },
+      onEvent,
+    );
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(3);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
+      type: 'clear',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(true);
+    expect(result.state.drawings).toEqual([]);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+    const undoClear = undoUserDrawingCommand(result.state, result.history);
+    expect(undoClear.changed).toBe(true);
+    expect(undoClear.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
+      type: 'clear',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
+      type: 'cancelDraft',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(false);
+    expect(onEvent).toHaveBeenCalledTimes(4);
+
+    const draftState = handleUserDrawingInput(
+      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'rect', now: () => 30, style },
+    );
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(draftState, createUserDrawingCommandHistory(), {
+      type: 'cancelDraft',
+      meta: { source: 'api' },
+    }, onEvent);
+    expect(result.changed).toBe(true);
+    expect(onEvent).toHaveBeenCalledTimes(5);
   });
 
   it('records complete drawing additions through the mobile command adapter', () => {

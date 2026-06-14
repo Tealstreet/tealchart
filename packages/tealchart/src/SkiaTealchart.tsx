@@ -182,13 +182,8 @@ import {
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import {
-  cancelMobileUserDrawingDraft,
-  clearMobileUserDrawings,
   dispatchMobileUserDrawingHistoryCommand,
   dispatchMobileUserDrawingKeyboardAction as dispatchMobileUserDrawingKeyboardActionToState,
-  selectMobileUserDrawing,
-  selectMobileUserDrawings,
-  setMobileActiveUserDrawingTool,
 } from './mobile/utils/drawingCommands';
 import { dispatchMobileUserDrawingActionCommand } from './mobile/utils/drawingActionDispatch';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
@@ -652,7 +647,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         replaceUserDrawingState(nextState, 'api');
       },
       setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
-        return setMobileActiveUserDrawingTool(userDrawingStateRef.current, tool, commitUserDrawingState);
+        return dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
       },
       canUndoUserDrawingCommand(): boolean {
         return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);
@@ -733,10 +728,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return result.changed;
       },
       selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): boolean {
-        return selectMobileUserDrawing(userDrawingStateRef.current, drawingId, handle, commitUserDrawingState);
+        return dispatchUserDrawingCommandToState({ type: 'select', drawingId, handle, meta: { source: 'api' } });
       },
       selectUserDrawings(drawingIds: readonly string[]): boolean {
-        return selectMobileUserDrawings(userDrawingStateRef.current, drawingIds, commitUserDrawingState);
+        return dispatchUserDrawingCommandToState({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
       },
       addUserDrawing(drawing: UserDrawing, options: { select?: boolean } = {}): boolean {
         return dispatchUserDrawingCommandToState({
@@ -846,10 +841,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         userDrawingClipboardRef.current = null;
       },
       clearUserDrawings(): boolean {
-        return clearMobileUserDrawings(userDrawingStateRef.current, commitUserDrawingState);
+        return dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
       },
       cancelUserDrawingDraft(): boolean {
-        return cancelMobileUserDrawingDraft(userDrawingStateRef.current, commitUserDrawingState);
+        return dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'api' } });
       },
       beginUserDrawingTextEdit(drawingId?: string): boolean {
         return dispatchUserDrawingCommandToState({ type: 'beginTextEdit', drawingId, meta: { source: 'api' } });
