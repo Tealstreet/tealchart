@@ -1443,6 +1443,17 @@ export class ChartCore {
     this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
     this.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
 
+    let closeMenu: ((e: MouseEvent) => void) | null = null;
+    let closeListenerAttached = false;
+    const cleanupMenu = () => {
+      this.contextMenu?.remove();
+      this.contextMenu = null;
+      if (closeMenu && closeListenerAttached) {
+        document.removeEventListener('click', closeMenu);
+        closeListenerAttached = false;
+      }
+    };
+
     for (const item of items) {
       const menuItem = div({
         style: {
@@ -1457,8 +1468,7 @@ export class ChartCore {
           event.stopPropagation();
           if (item.enabled === false) return;
           item.click();
-          this.contextMenu?.remove();
-          this.contextMenu = null;
+          cleanupMenu();
         },
         onMouseEnter: (e) => {
           if (item.enabled === false) return;
@@ -1474,14 +1484,16 @@ export class ChartCore {
     document.body.appendChild(this.contextMenu);
 
     // Close on click outside
-    const closeMenu = (e: MouseEvent) => {
+    closeMenu = (e: MouseEvent) => {
       if (this.contextMenu && !this.contextMenu.contains(e.target as Node)) {
-        this.contextMenu.remove();
-        this.contextMenu = null;
-        document.removeEventListener('click', closeMenu);
+        cleanupMenu();
       }
     };
-    setTimeout(() => document.addEventListener('click', closeMenu), 0);
+    setTimeout(() => {
+      if (!this.contextMenu || !closeMenu) return;
+      document.addEventListener('click', closeMenu);
+      closeListenerAttached = true;
+    }, 0);
   }
 
   // ============================================================================

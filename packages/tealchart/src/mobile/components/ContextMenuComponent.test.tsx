@@ -27,6 +27,8 @@ describe('ContextMenuComponent', () => {
       </div>,
     );
 
+    expect(screen.getByLabelText('Context menu').getAttribute('data-start-should-set-responder')).toBe('true');
+
     fireEvent.click(screen.getByText('Duplicate selected drawing'));
 
     expect(onItemClick).toHaveBeenCalledTimes(1);

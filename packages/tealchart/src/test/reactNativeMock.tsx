@@ -26,13 +26,18 @@ interface TouchableWithoutFeedbackProps {
 interface ViewProps {
   accessibilityLabel?: string;
   children?: ReactNode;
+  onStartShouldSetResponder?: () => boolean;
   pointerEvents?: string;
   style?: unknown;
 }
 
-export function View({ accessibilityLabel, children, pointerEvents }: ViewProps) {
+export function View({ accessibilityLabel, children, onStartShouldSetResponder, pointerEvents }: ViewProps) {
   return (
-    <div aria-label={accessibilityLabel} data-pointer-events={pointerEvents}>
+    <div
+      aria-label={accessibilityLabel}
+      data-pointer-events={pointerEvents}
+      data-start-should-set-responder={onStartShouldSetResponder?.() ? 'true' : undefined}
+    >
       {children}
     </div>
   );
