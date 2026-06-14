@@ -696,6 +696,67 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('routes EventManager measure drags through the temporary measure lifecycle', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingMeasureStart = vi.fn(() => true);
+    const onUserDrawingMeasureMove = vi.fn(() => true);
+    const onUserDrawingMeasureEnd = vi.fn();
+    const onUserDrawingCancelDraft = vi.fn();
+    const onUserDrawingPlacementDragStart = vi.fn(() => true);
+    const onUserDrawingPlacementDragEnd = vi.fn();
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onUserDrawingMeasureStart,
+      onUserDrawingMeasureMove,
+      onUserDrawingMeasureEnd,
+      onUserDrawingCancelDraft,
+      onUserDrawingPlacementDragStart,
+      onUserDrawingPlacementDragEnd,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'rectangle',
+      measureMode: 'on',
+      selection: { drawingId: 'selected' },
+      draft: null,
+      textEdit: null,
+      drawings: [
+        {
+          id: 'selected',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          price: 50,
+        },
+      ],
+    } satisfies UserDrawingState);
+
+    const eventCallbacks = eventManagerInstances.at(-1)?.callbacks;
+    expect(eventCallbacks).toBeDefined();
+    expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'mouse')).toBe(true);
+    expect(eventCallbacks?.onDrawingDragMove?.(140, 120, 'mouse')).toBe(true);
+    eventCallbacks?.onDrawingDragEnd?.('mouse');
+
+    expect(onUserDrawingMeasureStart).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
+    expect(onUserDrawingMeasureMove).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
+    expect(onUserDrawingMeasureEnd).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingPlacementDragStart).not.toHaveBeenCalled();
+    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalled();
+
+    expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'touch')).toBe(true);
+    eventCallbacks?.onDrawingDragCancel?.('touch');
+    expect(onUserDrawingCancelDraft).toHaveBeenCalledTimes(1);
+
+    core.dispose();
+  });
+
   it('constructs with canvas interactive lines', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
