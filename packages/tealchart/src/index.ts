@@ -439,6 +439,8 @@ export type {
   UserDrawingObjectTreeOptions,
   UserDrawingObjectTreeOrder,
   UserDrawingObjectTreeRow,
+  UserDrawingObjectTreeRowAction,
+  UserDrawingObjectTreeRowActionType,
   UserDrawingPropertiesIntent,
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UserDrawingPropertiesSurface,

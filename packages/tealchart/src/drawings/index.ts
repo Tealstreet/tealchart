@@ -546,6 +546,8 @@ export type {
   UserDrawingObjectTreeOptions,
   UserDrawingObjectTreeOrder,
   UserDrawingObjectTreeRow,
+  UserDrawingObjectTreeRowAction,
+  UserDrawingObjectTreeRowActionType,
   UserDrawingObjectTreeSelectionAction,
 } from './objectTree';
 export type {
