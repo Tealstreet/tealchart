@@ -137,6 +137,30 @@ describe('mobile user drawing input resolver', () => {
     });
   });
 
+  it('can leave path-family tap anchors unsnapped when callers disable magnet mode', () => {
+    const point = resolveMobileUserDrawingInputPoint({
+      point: { x: 143, y: 37 },
+      viewport: {
+        startTime: 1_000,
+        endTime: 3_000,
+        priceMin: 90,
+        priceMax: 110,
+      },
+      dimensions,
+      panes,
+      bars: [{ time: 2_000, open: 96, high: 105, low: 94, close: 102, volume: 1 }],
+      magnetMode: 'off',
+      pressure: 0.4,
+    });
+
+    expect(point).toMatchObject({
+      paneId: 'main',
+      anchor: { pressure: 0.4 },
+      bars: [{ time: 2_000, open: 96, high: 105, low: 94, close: 102, volume: 1 }],
+    });
+    expect(point?.anchor).not.toEqual({ time: 2_000, price: 105, pressure: 0.4 });
+  });
+
   it('rejects points in mobile chart margins', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
