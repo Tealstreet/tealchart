@@ -793,7 +793,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
               width: `${Math.min(group.presentation.popoverWidth ?? 296, SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH - 8)}px`,
             },
             attributes: {
-              'aria-label': group.presentation.popoverLabel ?? `${group.label} controls`,
+              'aria-label': group.presentation.popoverLabel ?? group.label,
             },
           });
           for (const item of group.items) {

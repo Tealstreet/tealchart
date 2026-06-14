@@ -162,7 +162,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
       ))}
       {activePopoverGroup && activePopoverPresentation && (
         <View
-          accessibilityLabel={activePopoverPresentation.popoverLabel ?? `${activePopoverGroup.label} controls`}
+          accessibilityLabel={activePopoverPresentation.popoverLabel ?? activePopoverGroup.label}
           style={[
             styles.userDrawingActionPopover,
             {
