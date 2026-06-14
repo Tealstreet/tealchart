@@ -89,6 +89,9 @@ import type {
   UserDrawingObjectTreeModel,
   UserDrawingObjectTreeRow,
   UserDrawingPropertiesIntent,
+  UserDrawingVisualEvidenceMatrix,
+  UserDrawingVisualEvidenceState,
+  UserDrawingVisualEvidenceViewport,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
   UserDrawingStyleToggleDescriptor,
@@ -163,6 +166,7 @@ import {
   computeChartGeometry,
   computeTopLeftLegendRect,
   createUserDrawingClipboard,
+  createUserDrawingVisualEvidencePrNoteTemplate,
   duplicateUserDrawing,
   formatTrendAngleDegrees,
   formatUserDrawingDateRangeBars,
@@ -213,6 +217,7 @@ import {
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
+  USER_DRAWING_VISUAL_EVIDENCE_MATRIX,
   resolveUserDrawingKeyboardAction,
   nudgeUserDrawingSelection,
   resolveUserDrawingPriceRangeMetrics,
@@ -325,6 +330,8 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingPropertiesIntent).toBeTypeOf('function');
     expect(resolveUserDrawingPropertiesSurface).toBeTypeOf('function');
     expect(resolveUserDrawingPropertiesSurfaceCommand).toBeTypeOf('function');
+    expect(createUserDrawingVisualEvidencePrNoteTemplate).toBeTypeOf('function');
+    expect(USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.length).toBeGreaterThan(0);
     expect(resolveUserDrawingKeyboardAction).toBeTypeOf('function');
     expect(nudgeUserDrawingSelection).toBeTypeOf('function');
     expect(selectUserDrawingsById).toBeTypeOf('function');
@@ -511,6 +518,32 @@ describe('tealchart public entries', () => {
 
     expect(options.drawingId).toBe('line');
     expect(intent.editable).toBe(true);
+  });
+
+  it('exports drawing visual evidence public types', () => {
+    const viewport: NonNever<UserDrawingVisualEvidenceViewport> = {
+      id: 'desktop',
+      label: 'Desktop',
+      width: 1280,
+      height: 900,
+      target: 'web',
+      notes: 'Include chart chrome',
+    };
+    const visualState: NonNever<UserDrawingVisualEvidenceState> = {
+      id: 'selectedDrawing',
+      label: 'Selected drawing',
+      webEvidence: 'Canvas handles',
+      mobileEvidence: 'Skia handles',
+      expectedChecks: ['Handles are stable'],
+    };
+    const matrix: NonNever<UserDrawingVisualEvidenceMatrix> = {
+      viewports: [viewport],
+      states: [visualState],
+      regressionChecks: ['Web and mobile remain paired'],
+    };
+
+    expect(matrix.viewports[0]?.target).toBe('web');
+    expect(matrix.states[0]?.id).toBe('selectedDrawing');
   });
 
   it('exports usable native channel primitive aliases', () => {
