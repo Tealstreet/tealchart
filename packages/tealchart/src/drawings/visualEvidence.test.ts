@@ -2,10 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  createUserDrawingVisualEvidencePrNoteTemplate,
-  USER_DRAWING_VISUAL_EVIDENCE_MATRIX,
-} from './visualEvidence';
+import { createUserDrawingVisualEvidencePrNoteTemplate, USER_DRAWING_VISUAL_EVIDENCE_MATRIX } from './visualEvidence';
 
 const readVisualEvidenceMarkdown = () => {
   const candidates = ['DRAWING_TOOLS_VISUAL_EVIDENCE.md', '../../DRAWING_TOOLS_VISUAL_EVIDENCE.md'];
@@ -16,16 +13,18 @@ const readVisualEvidenceMarkdown = () => {
   return readFileSync(path, 'utf8');
 };
 
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 describe('drawing visual evidence matrix', () => {
   it('keeps the markdown PR checklist aligned with the shared evidence matrix', () => {
     const markdown = readVisualEvidenceMarkdown();
 
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
       const status = state.status!;
-      expect(markdown).toContain(
-        `- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`,
+      expect(markdown).toContain(`- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`);
+      expect(markdown).toMatch(
+        new RegExp(`\\| ${escapeRegExp(state.label)}\\s+\\| \`${status.web}\`\\s+\\| \`${status.mobile}\`\\s+\\|`),
       );
-      expect(markdown).toContain(`| ${state.label} | \`${status.web}\` | \`${status.mobile}\` |`);
     }
   });
 
@@ -36,11 +35,15 @@ describe('drawing visual evidence matrix', () => {
       'mobilePortrait',
       'mobileLandscape',
     ]);
-    expect(USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.filter((viewport) => viewport.target === 'web')).toHaveLength(2);
-    expect(USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.filter((viewport) => viewport.target === 'mobile')).toHaveLength(2);
-    expect(USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.every((viewport) => viewport.width > 0 && viewport.height > 0)).toBe(
-      true,
+    expect(USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.filter((viewport) => viewport.target === 'web')).toHaveLength(
+      2,
     );
+    expect(
+      USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.filter((viewport) => viewport.target === 'mobile'),
+    ).toHaveLength(2);
+    expect(
+      USER_DRAWING_VISUAL_EVIDENCE_MATRIX.viewports.every((viewport) => viewport.width > 0 && viewport.height > 0),
+    ).toBe(true);
   });
 
   it('keeps each visual state paired across web Canvas and mobile Skia evidence', () => {
@@ -77,9 +80,7 @@ describe('drawing visual evidence matrix', () => {
     }
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
       const status = state.status!;
-      expect(template).toContain(
-        `- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`,
-      );
+      expect(template).toContain(`- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`);
     }
     expect(template).toContain('Regression checks:');
     for (const check of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.regressionChecks) {
@@ -94,8 +95,8 @@ describe('drawing visual evidence matrix', () => {
 
     expect(objectTree).toMatchObject({
       status: {
-        web: 'app-owned',
-        mobile: 'app-owned',
+        web: 'ready',
+        mobile: 'ready',
       },
       expectedChecks: expect.arrayContaining([
         'Row order matches z-order.',
@@ -106,9 +107,7 @@ describe('drawing visual evidence matrix', () => {
   });
 
   it('tracks text/property edit lifecycle evidence', () => {
-    const textProperty = USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.find(
-      (state) => state.id === 'textPropertyEditing',
-    );
+    const textProperty = USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states.find((state) => state.id === 'textPropertyEditing');
 
     expect(textProperty).toMatchObject({
       status: {
