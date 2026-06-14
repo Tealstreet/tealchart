@@ -82,6 +82,7 @@ import type {
   UserDrawingOpacityDescriptor,
   NudgeUserDrawingSelectionOptions,
   ResolveUserDrawingEditIntentOptions,
+  ResolveUserDrawingObjectTreeRowDispatchActionOptions,
   ResolveUserDrawingPropertiesIntentOptions,
   UserDrawingEditIntent,
   UserDrawingEditIntentKind,
@@ -224,6 +225,7 @@ import {
   resolveUserDrawingInfoLineMetrics,
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingObjectTreeRowDispatchAction,
   resolveUserDrawingPropertiesIntent,
   resolveUserDrawingPropertiesSurface,
   resolveUserDrawingPropertiesSurfaceCommand,
@@ -492,6 +494,7 @@ describe('tealchart public entries', () => {
     };
     const rowAction: NonNever<UserDrawingObjectTreeRowAction> = row.actions![0]!;
     const rowActionType: NonNever<UserDrawingObjectTreeRowActionType> = 'rename';
+    const rowDispatchOptions: NonNever<ResolveUserDrawingObjectTreeRowDispatchActionOptions> = { name: 'Breakout' };
     const group: NonNever<UserDrawingObjectTreeGroup> = {
       id: 'pane:main',
       label: 'Main chart',
@@ -516,6 +519,12 @@ describe('tealchart public entries', () => {
     expect(model.rows[0]).toBe(row);
     expect(model.groups?.[0]).toBe(group);
     expect(rowAction.type).toBe(rowActionType);
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(row, rowActionType, rowDispatchOptions)).toEqual({
+      type: 'rename',
+      drawingId: 'trend',
+      name: 'Breakout',
+      includeLocked: undefined,
+    });
     expect(action.type).toBe('duplicate');
   });
 
