@@ -153,8 +153,9 @@ summary:
 - `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars
   pattern tools need separate computed payload/property modeling before they can
   be considered complete.
-- Stay-in-drawing-mode ships as shared command state with web widget and mobile
-  Skia imperative APIs. Magnet modes, measure/zoom drawing actions, alerts, and
+- Stay-in-drawing-mode and magnet-mode state ship as shared command state with
+  web widget and mobile Skia imperative APIs. Magnet-mode OHLC snapping remains
+  a tracked input/render behavior gap; measure/zoom drawing actions, alerts, and
   templates remain tracked as TradingView action gaps deferred until the
   remaining command, toolbar, context menu, and object tree foundations can use
   them consistently.
