@@ -436,8 +436,10 @@ object-tree gaps stay visible.
   sampled path anchors on both platforms.
 - Optional normalized pressure metadata is now preserved on freehand anchors
   from web and mobile drag input through smoothing, command history, and layout
-  restore. Rendering still uses constant stroke widths until the variable-width
-  brush rendering phase lands.
+  restore. Web Canvas and mobile Skia derive matching variable-width solid
+  stroke segments from that pressure metadata at render time; dashed/dotted
+  strokes stay on the continuous single-path renderer until dash-phase-aware
+  pressure rendering lands.
 
 ## Shipped: Risk/Reward Position Tools
 
@@ -848,8 +850,9 @@ object-tree gaps stay visible.
   polyline geometry.
 - Drag input, sampled-path hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
-- Brush drag samples preserve optional pressure metadata on web and mobile, but
-  variable-width rendering remains an open follow-up.
+- Brush drag samples preserve optional pressure metadata on web and mobile, and
+  Canvas/Skia render matching variable-width solid pressure strokes from the
+  shared path-family segment model.
 
 ## Shipped: Highlighter Tool
 
@@ -860,7 +863,8 @@ object-tree gaps stay visible.
 - Drag input, sampled-path hit testing, whole-drawing moves, and point-index
   anchor editing use shared drawing behavior on both platforms.
 - Highlighter drag samples preserve optional pressure metadata on web and
-  mobile, but variable-width rendering remains an open follow-up.
+  mobile, and Canvas/Skia render matching variable-width solid pressure strokes
+  from the shared path-family segment model.
 
 ## Shipped: Note Tool
 

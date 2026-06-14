@@ -356,6 +356,7 @@ export type {
   UserDrawingContextActionsAtPointResult,
 } from './contextActions';
 export {
+  resolveUserDrawingPressureStrokeSegments,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
   resolveUserDrawingScreenBounds,
@@ -364,6 +365,7 @@ export {
 export type {
   ResolveUserDrawingRenderEntriesOptions,
   ResolveUserDrawingSelectionActionAnchorOptions,
+  UserDrawingPressureStrokeSegment,
   UserDrawingSelectionActionAnchor,
   UserDrawingRenderEntry,
   UserDrawingRenderPhase,
