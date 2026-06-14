@@ -16,6 +16,7 @@ import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import {
   getSelectedUserDrawing,
+  getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -1701,20 +1702,23 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       if (enabled) {
         btn.addEventListener('click', () => {
           if (item.command.type !== 'toolbarAction') return;
-          const drawingIds = state?.drawings.map((drawing) => drawing.id) ?? [];
+          const allDrawingOptions = state ? getUserDrawingAllDrawingsUpdateOptions(state) : { drawingIds: [] };
+          const allDrawingOptionsIncludingLocked = state
+            ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
+            : { drawingIds: [], includeLocked: true };
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
           if (item.command.action === 'hideAll') {
-            this.options.onUserDrawingVisibilityChange?.(false, { drawingIds, includeLocked: true });
+            this.options.onUserDrawingVisibilityChange?.(false, allDrawingOptionsIncludingLocked);
           }
           if (item.command.action === 'showAll') {
-            this.options.onUserDrawingVisibilityChange?.(true, { drawingIds, includeLocked: true });
+            this.options.onUserDrawingVisibilityChange?.(true, allDrawingOptionsIncludingLocked);
           }
           if (item.command.action === 'lockAll') {
-            this.options.onUserDrawingLockedChange?.(true, { drawingIds });
+            this.options.onUserDrawingLockedChange?.(true, allDrawingOptions);
           }
           if (item.command.action === 'unlockAll') {
-            this.options.onUserDrawingLockedChange?.(false, { drawingIds, includeLocked: true });
+            this.options.onUserDrawingLockedChange?.(false, allDrawingOptionsIncludingLocked);
           }
         });
         btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
