@@ -473,6 +473,10 @@ export {
 } from './toolbar';
 export { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 export {
+  createUserDrawingVisualEvidencePrNoteTemplate,
+  USER_DRAWING_VISUAL_EVIDENCE_MATRIX,
+} from './visualEvidence';
+export {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeModel,
@@ -484,6 +488,13 @@ export type {
   UserDrawingPropertiesSurfaceControl,
   UserDrawingPropertiesSurfaceGroup,
 } from './propertiesSurface';
+export type {
+  UserDrawingVisualEvidenceMatrix,
+  UserDrawingVisualEvidenceState,
+  UserDrawingVisualEvidenceStateId,
+  UserDrawingVisualEvidenceViewport,
+  UserDrawingVisualEvidenceViewportId,
+} from './visualEvidence';
 export type {
   UserDrawingFillColorDescriptor,
   UserDrawingFontFamilyDescriptor,

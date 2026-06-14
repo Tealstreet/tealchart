@@ -873,6 +873,9 @@ Phase 4: Visual parity checklist
 - Status: `DRAWING_TOOLS_VISUAL_EVIDENCE.md` defines required desktop/mobile
   viewport families, drawing states, regression checks, and a PR evidence
   template for manual visual parity capture.
+- Status: `USER_DRAWING_VISUAL_EVIDENCE_MATRIX` now mirrors the required
+  viewport/state checklist in typed package code, with a PR note template
+  generator and tests enforcing web/mobile evidence entries for every state.
 
 ## First Implementation Recommendation
 
