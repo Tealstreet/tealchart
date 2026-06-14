@@ -241,6 +241,7 @@ export { resolveUserDrawingKeyboardAction } from './keyboard';
 export type {
   UserDrawingKeyboardAction,
   UserDrawingKeyboardActionType,
+  UserDrawingKeyboardFocusOwner,
   UserDrawingKeyboardInput,
 } from './keyboard';
 export {

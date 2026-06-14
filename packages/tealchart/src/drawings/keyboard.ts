@@ -1,11 +1,14 @@
 import type { UserDrawingState } from './types';
 
+export type UserDrawingKeyboardFocusOwner = 'chart' | 'textInput' | 'appControl';
+
 export interface UserDrawingKeyboardInput {
   key: string;
   ctrlKey?: boolean;
   metaKey?: boolean;
   altKey?: boolean;
   shiftKey?: boolean;
+  focusOwner?: UserDrawingKeyboardFocusOwner;
 }
 
 export type UserDrawingKeyboardActionType =
@@ -38,6 +41,8 @@ export function resolveUserDrawingKeyboardAction(
   state: UserDrawingState,
   input: UserDrawingKeyboardInput,
 ): UserDrawingKeyboardAction | null {
+  if (input.focusOwner && input.focusOwner !== 'chart') return null;
+
   const key = input.key.toLowerCase();
 
   if (hasPrimaryModifier(input) && !input.altKey && !input.shiftKey && key === 'z') {
