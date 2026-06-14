@@ -94,22 +94,22 @@ describe('user drawing object tree model', () => {
     expect(model.rows.map((row) => row.groupIds)).toEqual([['pane:volume'], ['pane:main'], ['pane:main']]);
     expect(model.groups).toEqual([
       {
-        id: 'pane:volume',
-        label: 'Pane volume',
-        paneId: 'volume',
-        rowIds: ['hline'],
-        drawingIds: ['hline'],
-        orderIndex: 0,
-        drawingCount: 1,
-      },
-      {
         id: 'pane:main',
         label: 'Main chart',
         paneId: 'main',
         rowIds: ['rect', 'trend'],
         drawingIds: ['rect', 'trend'],
-        orderIndex: 1,
+        orderIndex: 0,
         drawingCount: 2,
+      },
+      {
+        id: 'pane:volume',
+        label: 'Pane volume',
+        paneId: 'volume',
+        rowIds: ['hline'],
+        drawingIds: ['hline'],
+        orderIndex: 1,
+        drawingCount: 1,
       },
     ]);
   });
@@ -123,6 +123,10 @@ describe('user drawing object tree model', () => {
 
     expect(model.rows.map((row) => row.drawingId)).toEqual(['trend', 'rect', 'hline']);
     expect(model.rows.map((row) => row.zIndex)).toEqual([0, 1, 2]);
+    expect(model.groups?.map((group) => [group.id, group.rowIds])).toEqual([
+      ['pane:main', ['trend', 'rect']],
+      ['pane:volume', ['hline']],
+    ]);
   });
 
   it('includes selection, visibility, lock, and editability metadata', () => {

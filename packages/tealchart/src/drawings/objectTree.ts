@@ -122,6 +122,13 @@ function getUserDrawingObjectTreePaneGroupLabel(paneId: string): string {
   return paneId === 'main' ? 'Main chart' : `Pane ${paneId}`;
 }
 
+function compareUserDrawingObjectTreePaneIds(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a === 'main') return -1;
+  if (b === 'main') return 1;
+  return a.localeCompare(b);
+}
+
 function resolveUserDrawingObjectTreeGroups(rows: readonly UserDrawingObjectTreeRow[]): readonly UserDrawingObjectTreeGroup[] {
   const groupRows = new Map<string, UserDrawingObjectTreeRow[]>();
   for (const row of rows) {
@@ -131,7 +138,9 @@ function resolveUserDrawingObjectTreeGroups(rows: readonly UserDrawingObjectTree
     else groupRows.set(groupId, [row]);
   }
 
-  return [...groupRows.entries()].map(([id, rowsForGroup], orderIndex) => {
+  return [...groupRows.entries()].sort(([, aRows], [, bRows]) =>
+    compareUserDrawingObjectTreePaneIds(aRows[0]?.paneId ?? '', bRows[0]?.paneId ?? ''),
+  ).map(([id, rowsForGroup], orderIndex) => {
     const paneId = rowsForGroup[0]?.paneId ?? '';
     return {
       id,
