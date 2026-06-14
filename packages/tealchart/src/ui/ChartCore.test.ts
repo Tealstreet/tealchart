@@ -446,8 +446,14 @@ describe('ChartCore viewport management', () => {
     const duplicateItem = [...document.body.querySelectorAll<HTMLElement>('div')].find(
       (el) => el.textContent === 'Duplicate selected drawing',
     );
-    duplicateItem?.click();
+    const onChartClickFallthrough = vi.fn();
+    document.body.addEventListener('click', onChartClickFallthrough);
+    duplicateItem?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    duplicateItem?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+    duplicateItem?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(drawingClick).toHaveBeenCalledTimes(1);
+    expect(onChartClickFallthrough).not.toHaveBeenCalled();
+    document.body.removeEventListener('click', onChartClickFallthrough);
 
     core.setUserDrawingState({
       version: 1,
