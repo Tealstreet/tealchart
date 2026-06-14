@@ -1077,7 +1077,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       triggerIcon: '◐',
       triggerLabel: 'Style selected drawing',
       popoverLabel: 'Selected drawing style controls',
-      popoverWidth: 272,
+      popoverWidth: 296,
     },
     items: [
       {
