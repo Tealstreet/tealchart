@@ -54,7 +54,7 @@ Sources:
 | Public APIs | Shared command/API concepts exist with explicit changed/no-op returns for no-op-capable commands | Web API coverage broad, including boolean returns for active-tool, selection, clear, cancel-draft, clipboard clear, state replacement, and layout import paths | Mobile handle coverage broad, including matching boolean returns for active-tool, selection, clear, cancel-draft, clipboard clear, state replacement, and layout import paths | `partial` | Gap 8 polish |
 | Event subscriptions | Shared command-event shape includes undoable commands, history commands, and non-undoable `replaceState` events | Typed `onUserDrawingCommand` option and `subscribe('user_drawing_command', ...)` event cover command dispatch plus direct state replacement/import | Typed `onUserDrawingCommand` prop and command utility event path cover command dispatch plus direct state replacement/import | `shipped` | Gap 8 polish |
 | Persistence | Versioned committed drawing layout schema exists | Layout save/load includes migrated drawings | Mobile import/export uses same unknown-safe schema | `shipped` | Gap 8 polish |
-| Visual parity evidence | Tests exist across render/input pieces; manual visual evidence checklist exists | Canvas tests exist plus desktop/narrow-desktop checklist | Skia render-model tests exist plus portrait/landscape checklist | `partial` | Gap 8 |
+| Visual parity evidence | Tests exist across render/input pieces; typed manual evidence matrix tracks per-state web/mobile status | Canvas tests exist plus desktop/narrow-desktop checklist with ready/app-owned/known-gap status | Skia render-model tests exist plus portrait/landscape checklist with matching status fields | `partial` | Gap 8 |
 
 ## Placement Mode Legend
 

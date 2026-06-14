@@ -905,6 +905,9 @@ Phase 4: Visual parity checklist
 - Status: `USER_DRAWING_VISUAL_EVIDENCE_MATRIX` now mirrors the required
   viewport/state checklist in typed package code, with a PR note template
   generator and tests enforcing web/mobile evidence entries for every state.
+- Status: each required state now carries explicit web/mobile evidence status
+  (`ready`, `app-owned`, or `known-gap`) so PR notes and tooling can separate
+  first-party surfaces from app-owned capture points and tracked visual gaps.
 
 ## First Implementation Recommendation
 

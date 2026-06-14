@@ -34,6 +34,11 @@ describe('drawing visual evidence matrix', () => {
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
       expect(state.webEvidence.length).toBeGreaterThan(0);
       expect(state.mobileEvidence.length).toBeGreaterThan(0);
+      expect(state.status).toBeDefined();
+      const status = state.status!;
+      expect(['ready', 'app-owned', 'known-gap']).toContain(status.web);
+      expect(['ready', 'app-owned', 'known-gap']).toContain(status.mobile);
+      expect(status.notes.length).toBeGreaterThan(0);
       expect(state.expectedChecks.length).toBeGreaterThan(0);
     }
   });
@@ -46,12 +51,44 @@ describe('drawing visual evidence matrix', () => {
       expect(template).toContain(`- ${viewport.label}:`);
     }
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
-      expect(template).toContain(`- [ ] ${state.label}, if affected`);
+      const status = state.status!;
+      expect(template).toContain(
+        `- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`,
+      );
     }
     expect(template).toContain('Regression checks:');
     for (const check of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.regressionChecks) {
       expect(template).toContain(`- [ ] ${check}`);
     }
     expect(template).toContain('Known visual gaps:');
+    expect(template).toContain('None recorded in the matrix for affected states.');
+  });
+
+  it('keeps PR note generation compatible with custom legacy matrices without status fields', () => {
+    const template = createUserDrawingVisualEvidencePrNoteTemplate({
+      viewports: [
+        {
+          id: 'desktop',
+          label: 'Desktop',
+          width: 1280,
+          height: 900,
+          target: 'web',
+          notes: 'Legacy custom matrix',
+        },
+      ],
+      states: [
+        {
+          id: 'selectedDrawing',
+          label: 'Selected drawing',
+          webEvidence: 'Canvas handles',
+          mobileEvidence: 'Skia handles',
+          expectedChecks: ['Handles are stable'],
+        },
+      ],
+      regressionChecks: ['No crash'],
+    });
+
+    expect(template).toContain('- [ ] Selected drawing, if affected');
+    expect(template).toContain('None recorded in the matrix for affected states.');
   });
 });
