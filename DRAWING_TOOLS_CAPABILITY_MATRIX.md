@@ -155,9 +155,10 @@ summary:
   volume-profile guide visibility, row-count, value-area percentage, and
   profile-width controls on web Canvas and mobile Skia. Long/short position
   drawings now expose a shared full/compact stats mode on web Canvas and mobile
-  Skia. Bars pattern drawings now expose a shared candlestick/line display mode
-  on web Canvas and mobile Skia. Position tools and bars pattern tools still
-  need richer computed payload/property modeling.
+  Skia. Bars pattern drawings now expose shared candlestick/line display mode
+  and up/down candle color controls on web Canvas and mobile Skia. Position
+  tools and bars pattern tools still need richer computed payload/property
+  modeling.
 - Stay-in-drawing-mode, magnet-mode, and transient measure-mode state ship as
   shared command state with web widget and mobile Skia imperative APIs.
   Weak/strong magnet-mode OHLC snapping applies to anchor-based web Canvas and

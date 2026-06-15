@@ -1554,10 +1554,11 @@ object-tree gaps stay visible.
   drawings with candlestick rendering as the default and close-line rendering
   as the alternate display.
 - Web selected-drawing properties panels and mobile Skia properties sheets
-  expose matching candlestick/line display presets through the shared
-  properties surface.
+  expose matching candlestick/line display presets plus up/down candle color
+  swatches through the shared properties surface.
 - Web Canvas and mobile Skia render paths consume the same resolved bars
-  geometry so line mode follows the computed close points on both platforms.
+  geometry so line mode follows the computed close points on both platforms and
+  candlestick mode uses matching configured up/down colors.
 
 ## Known Gaps
 

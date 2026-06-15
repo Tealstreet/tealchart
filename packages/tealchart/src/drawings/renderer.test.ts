@@ -846,6 +846,7 @@ describe('user drawing renderer', () => {
       ...base,
       id: 'bars',
       kind: 'barsPattern',
+      style: { ...base.style, barsPatternUpColor: '#38bdf8', barsPatternDownColor: '#f97316' },
       points: [
         { time: 10, price: 50 },
         { time: 20, price: 50 },
@@ -853,7 +854,7 @@ describe('user drawing renderer', () => {
       ],
       bars: [
         { time: 10, open: 50, high: 60, low: 49, close: 52 },
-        { time: 20, open: 52, high: 58, low: 51, close: 53 },
+        { time: 20, open: 53, high: 58, low: 51, close: 52 },
       ],
     };
 
@@ -861,9 +862,9 @@ describe('user drawing renderer', () => {
 
     expect(ctx.calls).toContain('moveTo:40,42');
     expect(ctx.calls).toContain('lineTo:40,53');
-    expect(ctx.calls).toContain('fillRect:36.5,50,7,2:#22c55e:1');
+    expect(ctx.calls).toContain('fillRect:36.5,50,7,2:#38bdf8:1');
     expect(ctx.calls).toContain('strokeRect:36.5,50,7,2:#f5c542:1');
-    expect(ctx.calls).toContain('fillRect:46.5,49,7,1:#22c55e:1');
+    expect(ctx.calls).toContain('fillRect:46.5,49,7,1:#f97316:1');
   });
 
   it('renders bars pattern line mode through CanvasContext', () => {
