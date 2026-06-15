@@ -36,6 +36,7 @@ import {
 
 export type UserDrawingToolbarAction =
   | 'measure'
+  | 'zoomIn'
   | 'duplicateSelected'
   | 'deleteSelected'
   | 'bringForward'
@@ -50,6 +51,7 @@ export type UserDrawingToolbarAction =
   | 'unlockAll';
 export type UserDrawingGlobalToolbarAction =
   | 'measure'
+  | 'zoomIn'
   | 'cancelDraft'
   | 'clearAll'
   | 'hideAll'
@@ -540,6 +542,7 @@ export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolba
   { action: 'bringToFront', icon: '⇧', label: 'Bring selected drawing to front' },
   { action: 'sendToBack', icon: '⇩', label: 'Send selected drawing to back' },
   { action: 'measure', icon: '↕', label: 'Measure date and price range' },
+  { action: 'zoomIn', icon: '+', label: 'Zoom in' },
   { action: 'cancelDraft', icon: '×', label: 'Cancel draft drawing' },
   { action: 'clearAll', icon: '⌧', label: 'Clear all drawings' },
   { action: 'hideAll', icon: '◌', label: 'Hide all drawings' },
@@ -550,6 +553,7 @@ export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolba
 
 const USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS: ReadonlySet<UserDrawingToolbarAction> = new Set([
   'measure',
+  'zoomIn',
   'cancelDraft',
   'clearAll',
   'hideAll',
@@ -1248,7 +1252,7 @@ export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawing
 }
 
 export function isUserDrawingToolbarActionEnabled(state: UserDrawingState, action: UserDrawingToolbarAction): boolean {
-  if (action === 'measure') return true;
+  if (action === 'measure' || action === 'zoomIn') return true;
   if (action === 'duplicateSelected' || action === 'deleteSelected') return hasUnlockedSelectedDrawing(state);
   const zOrderAction = getUserDrawingZOrderAction(action);
   if (zOrderAction) return reorderUserDrawings(state, zOrderAction) !== state;

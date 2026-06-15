@@ -183,6 +183,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingClearAll?: () => void;
   /** Called when the top bar should toggle temporary measure mode */
   onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
+  /** Called when the top bar should zoom the chart time range in */
+  onUserDrawingZoomIn?: () => void;
   /** Called when the top bar should reorder selected user drawings */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Called when the top bar should update selected drawing style */
@@ -331,6 +333,7 @@ export class TealchartWidgetUI {
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,
         onUserDrawingMeasureModeChange: options.onUserDrawingMeasureModeChange,
+        onUserDrawingZoomIn: options.onUserDrawingZoomIn,
         onUserDrawingZOrderChange: options.onUserDrawingZOrderChange,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,
         onUserDrawingTextAlignChange: options.onUserDrawingTextAlignChange,

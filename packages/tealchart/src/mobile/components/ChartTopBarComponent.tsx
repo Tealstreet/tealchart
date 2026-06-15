@@ -99,6 +99,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingClearAll?: () => void;
   /** Callback when temporary measure mode should toggle */
   onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
+  /** Callback when the drawing toolbar should zoom the chart time range in */
+  onUserDrawingZoomIn?: () => void;
   /** Callback when selected drawings should be reordered */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
@@ -135,6 +137,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
     onUserDrawingMeasureModeChange,
+    onUserDrawingZoomIn,
     onUserDrawingStyleChange,
     onUserDrawingTextAlignChange,
     onUserDrawingTrendLineExtendChange,
@@ -918,6 +921,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         if (descriptor.action === 'measure') {
                           onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on');
                         }
+                        if (descriptor.action === 'zoomIn') onUserDrawingZoomIn?.();
                         if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                         if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
                         if (descriptor.action === 'hideAll') {

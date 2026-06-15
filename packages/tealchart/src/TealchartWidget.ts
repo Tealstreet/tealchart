@@ -126,7 +126,7 @@ import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { ViewportController } from './viewport/ViewportController';
-import { intervalToMs } from './viewport/viewScale';
+import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
 
@@ -1087,6 +1087,7 @@ export class TealchartWidget {
       onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
       onUserDrawingClearAll: () => this.clearUserDrawings(),
       onUserDrawingMeasureModeChange: (enabled) => this.setUserDrawingMeasureMode(enabled ? 'on' : 'off'),
+      onUserDrawingZoomIn: () => this._handleUserDrawingZoomIn(),
       onUserDrawingZOrderChange: (action) => {
         this.reorderUserDrawings(action);
       },
@@ -2326,6 +2327,22 @@ export class TealchartWidget {
 
   getUserDrawingMagnetMode(): UserDrawingMagnetMode {
     return this._userDrawingState.magnetMode ?? 'off';
+  }
+
+  private _handleUserDrawingZoomIn(): void {
+    if (!this._viewport) return;
+
+    const nextViewport = zoomViewportTimeRange(this._viewport, VIEWPORT_ZOOM_IN_FACTOR);
+    if (nextViewport === this._viewport) return;
+
+    const fitted = this._viewportController.handleViewportChange(
+      nextViewport,
+      this._bars,
+      intervalToMs(this._interval),
+    );
+    this._viewport = fitted;
+    this._ui?.setViewport(fitted);
+    this._scheduler.markDirty(DIRTY.VIEWPORT);
   }
 
   setUserDrawingMeasureMode(measureMode: UserDrawingMeasureMode): boolean {

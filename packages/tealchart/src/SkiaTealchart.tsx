@@ -199,7 +199,7 @@ import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
 import { ViewportController } from './viewport/ViewportController';
-import { intervalToMs } from './viewport/viewScale';
+import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
@@ -1509,6 +1509,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       onViewportChange?.(vp);
     }
   }, [bars, interval, onViewportChange]);
+
+  const handleUserDrawingZoomIn = useCallback(() => {
+    if (!viewport) return;
+    handleViewportChange(zoomViewportTimeRange(viewport, VIEWPORT_ZOOM_IN_FACTOR));
+  }, [handleViewportChange, viewport]);
 
   // ==========================================================================
   // Crosshair State
@@ -4894,6 +4899,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 meta: { source: 'toolbar' },
               });
             }}
+            onUserDrawingZoomIn={handleUserDrawingZoomIn}
             onUserDrawingZOrderChange={(action) => {
               dispatchUserDrawingCommandToState({ type: 'reorder', action, meta: { source: 'toolbar' } });
             }}
