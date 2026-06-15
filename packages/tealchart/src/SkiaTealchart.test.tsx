@@ -1,4 +1,4 @@
-import type { UserDrawingState, UserDrawingTool } from './drawings';
+import type { UserDrawingObjectTreeModel, UserDrawingState, UserDrawingTool } from './drawings';
 import type { Bar, DatafeedConfiguration, IBasicDataFeed, LibrarySymbolInfo, PeriodParams, ResolutionString } from './types';
 import type { SkiaTealchartHandle } from './SkiaTealchart';
 
@@ -203,6 +203,51 @@ describe('SkiaTealchart drawing properties', () => {
     expect(nextState.drawings.find((drawing) => drawing.id === 'selected')?.style.lineColor).toBe('#f5c542');
     expect(nextState.selection).toEqual({ drawingId: 'selected' });
     expect(createPicture).toHaveBeenCalled();
+  });
+
+  it('opens the built-in object-tree sheet through the handle and dispatches z-order row actions', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={320}
+        height={240}
+        userDrawingState={initialDrawingState}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    let model: UserDrawingObjectTreeModel | undefined;
+    await act(async () => {
+      model = ref.current?.openUserDrawingObjectTree();
+    });
+
+    expect(model).toMatchObject({ drawingCount: 2 });
+    const sheet = await screen.findByLabelText('Drawing object tree');
+    expect(sheet).not.toBeNull();
+    expect(screen.getByText('Drawings (2)')).not.toBeNull();
+
+    await act(async () => {
+      fireEvent.click(within(sheet).getAllByLabelText('Send drawing to back')[0]!);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['target', 'selected']);
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'selected' });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({
+          type: 'reorder',
+          action: 'sendToBack',
+          meta: { source: 'objectTree', affectedIds: ['target'] },
+        }),
+        source: 'objectTree',
+      }),
+    );
   });
 
   it('exposes stay-in-drawing-mode through the mobile imperative handle', async () => {
