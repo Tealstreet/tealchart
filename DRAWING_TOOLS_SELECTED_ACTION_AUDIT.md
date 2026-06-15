@@ -24,6 +24,7 @@ The selected-action surface is shared:
 | Text edit | Web context, double-click, and selected actions route text-capable drawings into text edit. | Mobile action dispatch and double-tap edit intent share the same text/properties concepts. | `toolbar.test.ts` ensures text edit is only enabled for unlocked text drawings. |
 | Duplicate/delete/z-order | Web floating toolbar and context menu dispatch duplicate, delete, and z-order callbacks. | Mobile selected action strip dispatches the same command shapes through mobile command history. | Shared descriptor commands map to `toolbarAction` and history-backed commands. |
 | Style/visibility/lock | Web floating toolbar renders style popovers and visibility/lock controls. | Mobile action strip renders the same style groups and mutation commands. | Shared style descriptors define line, fill, text, opacity, visibility, and lock controls. |
+| Chrome-safe placement | `ChartTopBar.test.ts` covers the selected toolbar clamping below the top bar and clear of the left drawing rail when space allows. | `UserDrawingSelectedActionSurface.test.tsx` covers the same top/left rail clamp for the Skia/RN action strip. | `chartGeometry.test.ts` covers the shared left-rail avoidance inset helper, including constrained widths. |
 
 ## Findings
 
@@ -31,17 +32,22 @@ The selected-action surface is shared:
   layer already covers the north-star checklist.
 - Web and mobile both have local selected-action surfaces. The main product
   risk is polish and discoverability, not missing command plumbing.
+- The selected-action surface now uses chart chrome metrics to avoid the left
+  drawing rail when there is enough width, while staying in-bounds on narrower
+  mobile layouts where the full rail reservation cannot fit.
 - Future selected-action work should target a specific user-visible polish gap,
-  such as placement/clamping evidence, action density, mobile gesture dismissal,
-  or a tool-specific style control that is missing from both web and mobile.
+  such as action density, mobile gesture dismissal, or a tool-specific style
+  control that is missing from both web and mobile.
 
 ## Next Useful Gap
 
 Move to one of these narrow improvements:
 
 1. Add browser-level visual/e2e evidence that the web selected toolbar is
-   anchored near real selected geometry and avoids the left toolbar/top legend.
+   anchored near real selected geometry, beyond the current component-level
+   chrome clamp tests.
 2. Add mobile render/e2e evidence that the action strip remains reachable near
-   chart edges and does not block chart gestures outside the strip.
+   chart edges and does not block chart gestures outside the strip, beyond the
+   current component-level chrome clamp tests.
 3. Add one missing tool-specific selected style control only if it can be
    implemented in the shared descriptor and rendered by both web and mobile.

@@ -742,6 +742,57 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('keeps selected actions clear of the top bar and left drawing rail when space allows', () => {
+    const overlay = document.createElement('div');
+    overlay.getBoundingClientRect = () =>
+      ({
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        right: 720,
+        bottom: 360,
+        width: 720,
+        height: 360,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    document.body.appendChild(overlay);
+    const topLeftAnchor = {
+      ...selectionActionAnchor,
+      anchor: { x: 12, y: 24 },
+    };
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-selected-left-rail-clamp',
+      symbol: 'BTCUSDT',
+      drawingOverlayParent: overlay,
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      userDrawingSelectionActionAnchor: topLeftAnchor,
+    });
+    topBar.mount(document.body);
+
+    const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
+    expect(Number.parseFloat(selectedActionSurface?.style.left ?? 'NaN')).toBe(66);
+    expect(Number.parseFloat(selectedActionSurface?.style.top ?? 'NaN')).toBe(38);
+
+    topBar.unmount();
+  });
+
   it('dispatches hidden selected drawing show control', () => {
     const onVisibility = vi.fn();
     const topBar = new ChartTopBar({
