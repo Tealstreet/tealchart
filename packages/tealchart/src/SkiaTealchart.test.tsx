@@ -798,6 +798,56 @@ describe('SkiaTealchart drawing properties', () => {
     ]);
   });
 
+  it('clears redo when a new Skia drawing command lands after undo', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={320}
+        height={240}
+        userDrawingState={initialDrawingState}
+      />,
+    );
+
+    await act(async () => {
+      expect(ref.current?.duplicateSelectedUserDrawing()).toBe(true);
+    });
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_1',
+      'target',
+    ]);
+
+    await act(async () => {
+      expect(ref.current?.undoUserDrawingCommand()).toBe(true);
+    });
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['selected', 'target']);
+    expect(ref.current?.canRedoUserDrawingCommand()).toBe(true);
+
+    await act(async () => {
+      expect(ref.current?.duplicateSelectedUserDrawing()).toBe(true);
+    });
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_2',
+      'target',
+    ]);
+    expect(ref.current?.canRedoUserDrawingCommand()).toBe(false);
+
+    await act(async () => {
+      expect(ref.current?.redoUserDrawingCommand()).toBe(false);
+    });
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_2',
+      'target',
+    ]);
+  });
+
   it('copies selected drawings from the mobile selected action surface into the Skia clipboard', async () => {
     const ref = createRef<SkiaTealchartHandle>();
 

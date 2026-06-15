@@ -3147,6 +3147,46 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('clears redo when a new web drawing command lands after undo', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      expect(widget.duplicateSelectedUserDrawing()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_1']);
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+      expect(widget.canRedoUserDrawingCommand()).toBe(true);
+
+      expect(widget.duplicateSelectedUserDrawing()).toBe(true);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_2']);
+      expect(widget.canRedoUserDrawingCommand()).toBe(false);
+      expect(widget.redoUserDrawingCommand()).toBe(false);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_2']);
+
+      widget.remove();
+    });
+
     it('copies and pastes selected drawings from keyboard shortcuts while chart owns input', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
