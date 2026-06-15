@@ -2933,6 +2933,43 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('keeps Skia price range geometry visible when generated labels are hidden', () => {
+    const hiddenLabelStyle = { ...style, labelsVisible: false };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: hiddenLabelStyle,
+          points: [
+            { time: 10, price: 70 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'priceRange',
+      id: 'range',
+      clip,
+      rect: { x: 10, y: 10, width: 80, height: 20 },
+      labelPoint: { x: 50, y: 20 },
+      label: '',
+      style: hiddenLabelStyle,
+    });
+  });
+
   it('keeps price range labels stable when anchor order changes', () => {
     const state: UserDrawingState = {
       version: 1,
@@ -4167,6 +4204,52 @@ describe('mobile user drawing render model', () => {
         { text: 'D', point: { x: 70, y: 30 } },
       ],
       style,
+    });
+    expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(4);
+  });
+
+  it('keeps Skia ABCD pattern geometry visible when generated labels are hidden', () => {
+    const hiddenLabelStyle = { ...style, labelsVisible: false };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'abcd' },
+      drawings: [
+        {
+          id: 'abcd',
+          kind: 'abcdPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: hiddenLabelStyle,
+          points: [
+            { time: 10, price: 90 },
+            { time: 30, price: 70 },
+            { time: 50, price: 90 },
+            { time: 70, price: 70 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const model = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]), { handleRadius: 6 });
+
+    expect(model[0]).toMatchObject({
+      kind: 'abcdPattern',
+      id: 'abcd',
+      clip,
+      points: [
+        { x: 10, y: 10 },
+        { x: 30, y: 30 },
+        { x: 50, y: 10 },
+        { x: 70, y: 30 },
+      ],
+      labels: [],
+      style: hiddenLabelStyle,
     });
     expect(model.filter((primitive) => primitive.kind === 'handle')).toHaveLength(4);
   });

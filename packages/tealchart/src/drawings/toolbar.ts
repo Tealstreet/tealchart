@@ -1001,6 +1001,8 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const textMaxWidthEnabled = textWrapEnabled && selectedDrawing.style.textWrap === true;
   const narrowerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, -1) : null;
   const widerTextMaxWidth = textMaxWidthEnabled ? getAdjacentUserDrawingTextMaxWidth(selectedDrawing, 1) : null;
+  const labelsVisibleEnabled = supportsUserDrawingGeneratedLabelVisibilityControls(selectedDrawing);
+  const nextLabelsVisible = selectedDrawing.style.labelsVisible === false;
   const nextTextAlign = supportsUserDrawingTextAlignControls(selectedDrawing)
     ? getNextUserDrawingTextAlign(selectedDrawing)
     : null;
@@ -1159,6 +1161,15 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'setTextAlign', textAlign: nextTextAlign },
       }
     : null;
+  const labelsVisibleItem: UserDrawingSelectedActionSurfaceItem | null = labelsVisibleEnabled
+    ? {
+        id: 'labelsVisible:toggle',
+        icon: nextLabelsVisible ? 'T' : 'T-',
+        label: nextLabelsVisible ? 'Show selected drawing labels' : 'Hide selected drawing labels',
+        enabled: labelsVisibleEnabled && styleEnabled,
+        command: { type: 'updateStyle', style: { labelsVisible: nextLabelsVisible } },
+      }
+    : null;
   const trendLineExtendItem: UserDrawingSelectedActionSurfaceItem | null = nextTrendLineExtend
     ? {
         id: `extend:${nextTrendLineExtend}`,
@@ -1229,6 +1240,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
       ...(narrowerTextMaxWidthItem ? [narrowerTextMaxWidthItem] : []),
       ...(widerTextMaxWidthItem ? [widerTextMaxWidthItem] : []),
       ...(textAlignItem ? [textAlignItem] : []),
+      ...(labelsVisibleItem ? [labelsVisibleItem] : []),
       ...(trendLineExtendItem ? [trendLineExtendItem] : []),
       ...(iconNameItem ? [iconNameItem] : []),
     ],
@@ -1454,6 +1466,10 @@ export function supportsUserDrawingTextAppearanceControls(drawing: UserDrawing):
   return GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS.has(drawing.kind) || isUserDrawingTextAnnotation(drawing);
 }
 
+export function supportsUserDrawingGeneratedLabelVisibilityControls(drawing: UserDrawing): boolean {
+  return GENERATED_LABEL_VISIBILITY_DRAWING_KINDS.has(drawing.kind);
+}
+
 const GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS = new Set<UserDrawing['kind']>([
   'table',
   'infoLine',
@@ -1485,6 +1501,22 @@ const GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS = new Set<UserDrawing['kind'
   'fibWedge',
   'fibSpiral',
 ]);
+
+const GENERATED_LABEL_VISIBILITY_DRAWING_KINDS = new Set<UserDrawing['kind']>([
+  ...GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS,
+  'trianglePattern',
+  'abcdPattern',
+  'xabcdPattern',
+  'cypherPattern',
+  'threeDrivesPattern',
+  'headShouldersPattern',
+  'elliottImpulseWave',
+  'elliottCorrectiveWave',
+  'elliottDoubleComboWave',
+  'elliottTripleComboWave',
+  'elliottTriangleWave',
+]);
+GENERATED_LABEL_VISIBILITY_DRAWING_KINDS.delete('table');
 
 export function supportsUserDrawingRichTextControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'table' || isUserDrawingTextAnnotation(drawing);

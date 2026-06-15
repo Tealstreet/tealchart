@@ -361,6 +361,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.textLineThrough === 'boolean') style.textLineThrough = value.textLineThrough;
   if (typeof value.textWrap === 'boolean') style.textWrap = value.textWrap;
   if (isFiniteNumber(value.textMaxWidth)) style.textMaxWidth = value.textMaxWidth;
+  if (typeof value.labelsVisible === 'boolean') style.labelsVisible = value.labelsVisible;
   return normalizeUserDrawingStyle(style);
 }
 

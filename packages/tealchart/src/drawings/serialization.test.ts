@@ -957,6 +957,35 @@ describe('drawing layout serialization', () => {
     });
   });
 
+  it('restores generated label visibility style fields', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            labelsVisible: false,
+          },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]?.style.labelsVisible).toBe(false);
+  });
+
   it('normalizes restored drawing opacity', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,

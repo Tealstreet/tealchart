@@ -1408,6 +1408,10 @@ function clipRectFromSpace(space: DrawingCoordinateSpace): MobileUserDrawingClip
   };
 }
 
+function areMobileUserDrawingLabelsVisible(geometry: ResolvedUserDrawingGeometry): boolean {
+  return geometry.drawing.style.labelsVisible !== false;
+}
+
 function primitiveFromGeometry(
   geometry: ResolvedUserDrawingGeometry,
   clip: MobileUserDrawingClipRect,
@@ -1476,7 +1480,7 @@ function primitiveFromGeometry(
         start: geometry.angle.segment.start,
         end: geometry.angle.segment.end,
         labelPoint: geometry.angle.labelPoint,
-        label: geometry.angle.label,
+        label: areMobileUserDrawingLabelsVisible(geometry) ? geometry.angle.label : '',
         style: geometry.drawing.style,
       };
     case 'infoLine': {
@@ -1493,7 +1497,7 @@ function primitiveFromGeometry(
           x: (geometry.segment.start.x + geometry.segment.end.x) / 2,
           y: (geometry.segment.start.y + geometry.segment.end.y) / 2 - 4,
         },
-        label: geometry.infoMetrics.label,
+        label: areMobileUserDrawingLabelsVisible(geometry) ? geometry.infoMetrics.label : '',
         style: geometry.drawing.style,
       };
     }
@@ -1740,7 +1744,7 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
-          label: ray.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? ray.label : undefined,
           labelPoint: ray.labelPoint,
         })),
         style: geometry.drawing.style,
@@ -1757,7 +1761,7 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
-          label: ray.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? ray.label : undefined,
           labelPoint: ray.labelPoint,
         })),
         style: geometry.drawing.style,
@@ -1774,7 +1778,7 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibCircles.baseRadius,
         circles: geometry.fibCircles.circles.map((circle) => ({
           ratio: circle.ratio,
-          label: circle.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? circle.label : '',
           radius: circle.radius,
           labelPoint: circle.labelPoint,
         })),
@@ -1793,7 +1797,7 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibArcs.baseRadius,
         arcs: geometry.fibArcs.arcs.map((arc) => ({
           ratio: arc.ratio,
-          label: arc.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? arc.label : '',
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
@@ -1814,7 +1818,7 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibSpeedResistanceArcs.baseRadius,
         arcs: geometry.fibSpeedResistanceArcs.arcs.map((arc) => ({
           ratio: arc.ratio,
-          label: arc.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? arc.label : '',
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
@@ -1836,7 +1840,7 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibWedge.baseRadius,
         arcs: geometry.fibWedge.arcs.map((arc) => ({
           ratio: arc.ratio,
-          label: arc.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? arc.label : '',
           radius: arc.radius,
           startAngle: arc.startAngle,
           endAngle: arc.endAngle,
@@ -1861,7 +1865,7 @@ function primitiveFromGeometry(
         baseRadius: geometry.fibSpiral.baseRadius,
         startAngle: geometry.fibSpiral.startAngle,
         points: geometry.fibSpiral.points,
-        labels: geometry.fibSpiral.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.fibSpiral.labels : [],
         style: geometry.drawing.style,
       };
     case 'gannFan':
@@ -1876,7 +1880,7 @@ function primitiveFromGeometry(
           ratio: ray.ratio,
           start: ray.segment.start,
           end: ray.segment.end,
-          label: ray.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? ray.label : undefined,
           labelPoint: ray.labelPoint,
         })),
         style: geometry.drawing.style,
@@ -1894,7 +1898,7 @@ function primitiveFromGeometry(
         rect: geometry.gannBox.rect,
         levels: geometry.gannBox.levels.map((level) => ({
           ratio: level.ratio,
-          label: level.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? level.label : '',
           horizontal: level.horizontal,
           vertical: level.vertical,
           labelPoint: level.labelPoint,
@@ -1916,7 +1920,7 @@ function primitiveFromGeometry(
         points: geometry.fibChannel.polygon.points,
         levels: geometry.fibChannel.levels.map((level) => ({
           ratio: level.ratio,
-          label: level.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? level.label : '',
           start: level.segment.start,
           end: level.segment.end,
           labelPoint: level.labelPoint,
@@ -1933,7 +1937,7 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.fibTimeZone.levels.map((level) => ({
           ratio: level.ratio,
-          label: level.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? level.label : '',
           time: level.time,
           x: level.x,
           start: level.segment.start,
@@ -1952,7 +1956,7 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.trendBasedFibTime.levels.map((level) => ({
           ratio: level.ratio,
-          label: level.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? level.label : '',
           time: level.time,
           x: level.x,
           start: level.segment.start,
@@ -1971,7 +1975,7 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.cyclicLines.levels.map((level) => ({
           ratio: level.ratio,
-          label: level.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? level.label : '',
           time: level.time,
           x: level.x,
           start: level.segment.start,
@@ -1990,7 +1994,7 @@ function primitiveFromGeometry(
         clip,
         cycles: geometry.timeCycles.cycles.map((cycle) => ({
           ratio: cycle.ratio,
-          label: cycle.label,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? cycle.label : '',
           startTime: cycle.startTime,
           endTime: cycle.endTime,
           startBoundary: cycle.startBoundary,
@@ -2047,7 +2051,7 @@ function primitiveFromGeometry(
           x: geometry.rect.x + geometry.rect.width / 2,
           y: geometry.rect.y + geometry.rect.height / 2,
         },
-        label,
+        label: areMobileUserDrawingLabelsVisible(geometry) ? label : '',
         style: geometry.drawing.style,
       };
     }
@@ -2064,7 +2068,7 @@ function primitiveFromGeometry(
           x: geometry.rect.x + geometry.rect.width / 2,
           y: geometry.rect.y + geometry.rect.height / 2,
         },
-        label: geometry.dateMetrics.label,
+        label: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
         style: geometry.drawing.style,
       };
     }
@@ -2087,12 +2091,12 @@ function primitiveFromGeometry(
           x: geometry.rect.x + geometry.rect.width / 2,
           y: geometry.rect.y + geometry.rect.height / 2,
         },
-        priceLabel,
+        priceLabel: areMobileUserDrawingLabelsVisible(geometry) ? priceLabel : '',
         dateLabelPoint: {
           x: geometry.rect.x + geometry.rect.width / 2,
           y: geometry.rect.y + geometry.rect.height - fontSize,
         },
-        dateLabel: geometry.dateMetrics.label,
+        dateLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
         style: geometry.drawing.style,
       };
     }
@@ -2117,9 +2121,9 @@ function primitiveFromGeometry(
         rewardLabelPoint: { x: labelX, y: position.profitRect.y + position.profitRect.height / 2 },
         riskLabelPoint: { x: labelX, y: position.riskRect.y + position.riskRect.height / 2 },
         ratioLabelPoint: { x: labelX, y: position.entry.y - fontSize },
-        rewardLabel: position.rewardLabel,
-        riskLabel: position.riskLabel,
-        ratioLabel: position.ratioLabel,
+        rewardLabel: areMobileUserDrawingLabelsVisible(geometry) ? position.rewardLabel : '',
+        riskLabel: areMobileUserDrawingLabelsVisible(geometry) ? position.riskLabel : '',
+        ratioLabel: areMobileUserDrawingLabelsVisible(geometry) ? position.ratioLabel : '',
         style: geometry.drawing.style,
       };
     }
@@ -2134,9 +2138,9 @@ function primitiveFromGeometry(
         start: geometry.forecast.segment.start,
         end: geometry.forecast.segment.end,
         labelPoint: geometry.forecast.labelPoint,
-        sourceLabel: geometry.forecast.sourceLabel,
-        targetLabel: geometry.forecast.targetLabel,
-        changeLabel: geometry.forecast.changeLabel,
+        sourceLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.forecast.sourceLabel : '',
+        targetLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.forecast.targetLabel : '',
+        changeLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.forecast.changeLabel : '',
         style: geometry.drawing.style,
       };
     case 'projection':
@@ -2151,10 +2155,10 @@ function primitiveFromGeometry(
         pivot: geometry.projection.pivot,
         target: geometry.projection.target,
         labelPoint: geometry.projection.labelPoint,
-        startLabel: geometry.projection.startLabel,
-        pivotLabel: geometry.projection.pivotLabel,
-        targetLabel: geometry.projection.targetLabel,
-        changeLabel: geometry.projection.changeLabel,
+        startLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.projection.startLabel : '',
+        pivotLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.projection.pivotLabel : '',
+        targetLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.projection.targetLabel : '',
+        changeLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.projection.changeLabel : '',
         style: geometry.drawing.style,
       };
     case 'sector':
@@ -2184,7 +2188,7 @@ function primitiveFromGeometry(
         clip,
         levels: geometry.fib.levels.map((level) => ({
           ratio: level.ratio,
-          label: `${level.label} ${level.price.toFixed(2)}`,
+          label: areMobileUserDrawingLabelsVisible(geometry) ? `${level.label} ${level.price.toFixed(2)}` : '',
           price: level.price,
           start: level.segment.start,
           end: level.segment.end,
@@ -2214,7 +2218,7 @@ function primitiveFromGeometry(
         points: geometry.pattern.points,
         polygon: geometry.pattern.polygon.points,
         boundaries: geometry.pattern.boundaries,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'xabcdPattern':
@@ -2227,7 +2231,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'threeDrivesPattern':
@@ -2239,7 +2243,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'elliottImpulseWave':
@@ -2251,7 +2255,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'elliottCorrectiveWave':
@@ -2264,7 +2268,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'elliottTriangleWave':
@@ -2277,7 +2281,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'headShouldersPattern':
@@ -2290,7 +2294,7 @@ function primitiveFromGeometry(
         clip,
         points: geometry.pattern.polyline.points,
         neckline: geometry.pattern.neckline,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'abcdPattern':
@@ -2302,7 +2306,7 @@ function primitiveFromGeometry(
         opacity,
         clip,
         points: geometry.pattern.polyline.points,
-        labels: geometry.pattern.labels,
+        labels: areMobileUserDrawingLabelsVisible(geometry) ? geometry.pattern.labels : [],
         style: geometry.drawing.style,
       };
     case 'textLabel':
