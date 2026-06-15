@@ -2387,7 +2387,8 @@ describe('TealchartWidget', () => {
     it('exposes object tree model, open callback, and shared action dispatch', () => {
       const datafeed = createMockDatafeed();
       const onOpenObjectTree = vi.fn();
-      const widget = createWidget(datafeed, { onUserDrawingObjectTreeOpen: onOpenObjectTree });
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingObjectTreeOpen: onOpenObjectTree, onUserDrawingCommand: onCommand });
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
         selection: { drawingId: 'line' },
@@ -2455,21 +2456,54 @@ describe('TealchartWidget', () => {
       const targetRow = widget.getUserDrawingObjectTreeModel().rows.find((row) => row.drawingId === 'target')!;
       const hideTargetAction = resolveUserDrawingObjectTreeRowDispatchAction(targetRow, 'hide');
       expect(hideTargetAction).toEqual({ type: 'hide', drawingIds: ['target'], includeLocked: undefined });
+      onCommand.mockClear();
       expect(hideTargetAction && widget.dispatchUserDrawingObjectTreeAction(hideTargetAction)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([
         expect.objectContaining({ id: 'line', visible: true }),
         expect.objectContaining({ id: 'target', visible: false }),
       ]);
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'line' });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({
+            type: 'setVisibility',
+            visible: false,
+            meta: { source: 'objectTree', affectedIds: ['target'] },
+          }),
+          source: 'objectTree',
+        }),
+      );
 
+      onCommand.mockClear();
       expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'lock', drawingIds: ['target'] })).toBe(true);
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({
+            type: 'setLocked',
+            locked: true,
+            meta: { source: 'objectTree', affectedIds: ['target'] },
+          }),
+          source: 'objectTree',
+        }),
+      );
       const lockedTargetRow = widget.getUserDrawingObjectTreeModel().rows.find((row) => row.drawingId === 'target')!;
       const unlockTargetAction = resolveUserDrawingObjectTreeRowDispatchAction(lockedTargetRow, 'unlock');
       expect(unlockTargetAction).toEqual({ type: 'unlock', drawingIds: ['target'], includeLocked: true });
+      onCommand.mockClear();
       expect(unlockTargetAction && widget.dispatchUserDrawingObjectTreeAction(unlockTargetAction)).toBe(true);
       expect(widget.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
         locked: false,
       });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({
+            type: 'setLocked',
+            locked: false,
+            meta: { source: 'objectTree', affectedIds: ['target'] },
+          }),
+          source: 'objectTree',
+        }),
+      );
 
       expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'select', drawingId: 'target', additive: true })).toBe(
         true,
@@ -2501,12 +2535,24 @@ describe('TealchartWidget', () => {
         name: 'Range box',
         includeLocked: undefined,
       });
+      onCommand.mockClear();
       expect(renameTargetAction && widget.dispatchUserDrawingObjectTreeAction(renameTargetAction)).toBe(true);
       expect(widget.getUserDrawingObjectTreeModel().rows[0]).toMatchObject({
         drawingId: 'target',
         label: 'Range box',
         customName: 'Range box',
       });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({
+            type: 'setName',
+            drawingId: 'target',
+            name: 'Range box',
+            meta: { source: 'objectTree', affectedIds: ['target'] },
+          }),
+          source: 'objectTree',
+        }),
+      );
 
       expect(widget.dispatchUserDrawingObjectTreeAction({ type: 'duplicate', drawingIds: ['line'] })).toBe(true);
       expect(widget.getUserDrawingState()).toMatchObject({
