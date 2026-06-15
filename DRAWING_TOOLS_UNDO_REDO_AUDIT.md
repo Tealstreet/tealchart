@@ -34,6 +34,8 @@ Mobile command-history tests cover:
 
 - API add, duplicate, delete, clear, and toolbar command dispatch.
 - Rendered mobile toolbar undo/redo dispatch and disabled-state changes.
+- Skia imperative handle redo-clearing after a new undoable command follows an
+  undo.
 - Style, visibility, lock, and z-order mutations through the shared history.
 - Tap placement, drag placement, path-family creation, cancellation, and
   cross-pane rejection.
@@ -54,6 +56,9 @@ Mobile command-history tests cover:
   evidence, but browser/device visual QA is still thin.
 - The history classification checklist intentionally mirrors the reducer
   switch today; a later cleanup can move both to one exported classifier table.
+- Web and Skia component-level tests now pin redo clearing after a new duplicate
+  command follows undo, so this invariant is covered at the platform state owner
+  boundary rather than only in shared reducer tests.
 
 ## Follow-Up
 
