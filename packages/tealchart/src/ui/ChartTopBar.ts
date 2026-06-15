@@ -303,6 +303,7 @@ const styles = {
     }px)`,
     overflowY: 'auto',
     padding: '10px',
+    boxSizing: 'border-box',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '6px',
     backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
