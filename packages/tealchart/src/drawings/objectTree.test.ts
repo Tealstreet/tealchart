@@ -254,6 +254,74 @@ describe('user drawing object tree model', () => {
     });
   });
 
+  it('keeps the Epic C object-tree checklist in the shared row and selection model', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        createTrendLine({ id: 'trend', visible: false }),
+        createRectangle({ id: 'rect', name: 'Range box' }),
+        createHorizontalLine({ id: 'locked', locked: true }),
+      ],
+      selection: { drawingId: 'trend', drawingIds: ['trend', 'locked'] },
+    });
+    const model = resolveUserDrawingObjectTreeModel(state);
+    const rowById = new Map(model.rows.map((row) => [row.drawingId, row]));
+    const selectionActionByType = new Map(model.selectionActions?.map((action) => [action.type, action]) ?? []);
+
+    expect(model.groups?.map((group) => [group.id, group.drawingCount])).toEqual([
+      ['pane:main', 2],
+      ['pane:volume', 1],
+    ]);
+    expect(rowById.get('rect')).toMatchObject({
+      label: 'Range box',
+      defaultLabel: 'Rectangle',
+      customName: 'Range box',
+      editable: true,
+      selected: false,
+    });
+    expect(rowById.get('locked')).toMatchObject({
+      editable: false,
+      locked: true,
+      selected: true,
+    });
+    expect(rowById.get('trend')?.actions?.map((action) => [action.type, action.enabled, action.destructive ?? false])).toEqual([
+      ['rename', true, false],
+      ['duplicate', true, false],
+      ['delete', true, true],
+      ['show', true, false],
+      ['lock', true, false],
+      ['bringForward', true, false],
+      ['sendBackward', false, false],
+      ['bringToFront', true, false],
+      ['sendToBack', false, false],
+    ]);
+    expect(rowById.get('locked')?.actions?.map((action) => [action.type, action.enabled])).toEqual([
+      ['rename', false],
+      ['duplicate', false],
+      ['delete', false],
+      ['hide', false],
+      ['unlock', true],
+      ['bringForward', false],
+      ['sendBackward', false],
+      ['bringToFront', false],
+      ['sendToBack', false],
+    ]);
+    expect(selectionActionByType.get('duplicate')).toMatchObject({ enabled: true, selectedCount: 2 });
+    expect(selectionActionByType.get('delete')).toMatchObject({ enabled: true, selectedCount: 2, destructive: true });
+    expect(selectionActionByType.get('unlock')).toMatchObject({ enabled: true, selectedCount: 2 });
+    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'unlock')).toEqual({
+      type: 'unlock',
+      drawingIds: ['trend', 'locked'],
+      includeLocked: true,
+    });
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(rowById.get('rect')!, 'rename', { name: 'Supply' })).toEqual({
+      type: 'rename',
+      drawingId: 'rect',
+      name: 'Supply',
+      includeLocked: undefined,
+    });
+    expect(resolveUserDrawingObjectTreeRowDispatchAction(rowById.get('locked')!, 'delete')).toBeNull();
+  });
+
   it('routes row unlock actions through locked drawing command protection', () => {
     const state = createUserDrawingState({
       drawings: [createRectangle({ id: 'rect', locked: true })],

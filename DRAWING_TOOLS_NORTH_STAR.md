@@ -121,6 +121,8 @@ Phase C1: Context menu parity
   expose shared context actions.
 - Include z-order, duplicate, delete, lock/hide, properties, and object-tree
   navigation.
+- Current context/object-tree evidence is recorded in
+  `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`.
 
 Phase C2: Object tree polish
 
@@ -190,10 +192,11 @@ next PR.
 
 ## Current Next Move
 
-Start with Epic A, Phase A1. Before changing more implementation, reproduce and
-record the actual placement behavior for the core tools listed above against the
-current shipped placement claims in `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md` and
-`DRAWING_TOOLS_CAPABILITY_MATRIX.md`. The first fix should target the
-highest-friction verified placement bug or UX gap, not an assumed stale issue.
+Placement, selected-action, and object-tree audits are now recorded in
+`DRAWING_TOOLS_PLACEMENT_AUDIT.md`, `DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`,
+and `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`.
 
-Phase A1 evidence is recorded in `DRAWING_TOOLS_PLACEMENT_AUDIT.md`.
+Move next to Epic D, Phase D1. Audit handle drag, whole-object move,
+cancel/interruption, locked/hidden drawings, stale IDs, and undo transaction
+boundaries across web Canvas and mobile Skia before adding more shape-specific
+controls.
