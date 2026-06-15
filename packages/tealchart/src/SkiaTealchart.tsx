@@ -631,6 +631,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [dispatchUserDrawingCommandToStateWithResult],
   );
 
+  const copySelectedUserDrawingToClipboard = useCallback(
+    (state: UserDrawingState = userDrawingStateRef.current): boolean => {
+      const clipboard = createUserDrawingClipboard(state);
+      if (!clipboard) return false;
+      userDrawingClipboardRef.current = clipboard;
+      return true;
+    },
+    [],
+  );
+
   const [userDrawingObjectTreeVisible, setUserDrawingObjectTreeVisible] = useState(false);
   const [userDrawingPropertiesVisible, setUserDrawingPropertiesVisible] = useState(false);
   const [userDrawingPropertiesDrawingId, setUserDrawingPropertiesDrawingId] = useState<string | undefined>(undefined);
@@ -929,10 +939,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         });
       },
       copySelectedUserDrawing(): boolean {
-        const clipboard = createUserDrawingClipboard(userDrawingStateRef.current);
-        if (!clipboard) return false;
-        userDrawingClipboardRef.current = clipboard;
-        return true;
+        return copySelectedUserDrawingToClipboard();
       },
       pasteUserDrawingClipboard(): boolean {
         return dispatchUserDrawingCommandToState({
@@ -1175,6 +1182,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }),
     [
       commitUserDrawingState,
+      copySelectedUserDrawingToClipboard,
       constrainUserDrawingPlacement,
       createUserDrawingId,
       duplicateUserDrawingOnEditDrag,
@@ -2322,8 +2330,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
                 onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
                 onUserDrawingCopySelected: () => {
-                  const clipboard = createUserDrawingClipboard(userDrawingStateRef.current);
-                  if (clipboard) userDrawingClipboardRef.current = clipboard;
+                  copySelectedUserDrawingToClipboard();
                 },
               });
             },
@@ -2343,6 +2350,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       chartDimensions,
       closeContextMenu,
       commitUserDrawingState,
+      copySelectedUserDrawingToClipboard,
       createUserDrawingId,
       dispatchUserDrawingCommandToState,
       effectiveUserDrawingState,
@@ -4972,8 +4980,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         onUserDrawingPropertiesOpen={handleUserDrawingPropertiesOpen}
         onUserDrawingObjectTreeOpen={handleUserDrawingObjectTreeOpen}
         onUserDrawingCopySelected={() => {
-          const clipboard = createUserDrawingClipboard(effectiveUserDrawingState);
-          if (clipboard) userDrawingClipboardRef.current = clipboard;
+          copySelectedUserDrawingToClipboard(effectiveUserDrawingState);
         }}
       />
 
