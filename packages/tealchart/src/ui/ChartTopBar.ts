@@ -962,11 +962,16 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         closeActiveFlyout();
         const railRect = rail.getBoundingClientRect();
         const buttonRect = categoryButton.getBoundingClientRect();
-        const flyoutTop = Math.max(0, buttonRect.top - railRect.top);
+        const railHeight =
+          railRect.height ||
+          Math.max(160, window.innerHeight - computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) - TIME_AXIS_HEIGHT);
+        const rawFlyoutTop = Math.max(0, buttonRect.top - railRect.top);
+        const remainingHeight = Math.max(0, railHeight - rawFlyoutTop);
+        const flyoutTop =
+          remainingHeight > 0 && remainingHeight < 160 ? Math.max(0, railHeight - 160) : rawFlyoutTop;
+        const flyoutHeight = Math.max(120, railHeight - flyoutTop);
         flyout.style.top = `${flyoutTop}px`;
-        if (railRect.height > 0) {
-          flyout.style.maxHeight = `${Math.max(160, railRect.height - flyoutTop)}px`;
-        }
+        flyout.style.maxHeight = `${flyoutHeight}px`;
         flyout.style.display = 'block';
         categoryButton.setAttribute('aria-expanded', 'true');
         activeFlyout = { id: category.id, button: categoryButton, flyout };
