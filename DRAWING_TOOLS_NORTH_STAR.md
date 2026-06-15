@@ -152,6 +152,8 @@ Phase D2: Double-click/double-tap edit
 - Text drawings should enter text edit.
 - Non-text drawings should open properties when appropriate.
 - App-owned callbacks and built-in fallbacks should match across platforms.
+- Current D2 double-edit evidence is recorded in
+  `DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`.
 
 Phase D3: Duplicate and modifier behavior
 
@@ -194,11 +196,11 @@ next PR.
 
 ## Current Next Move
 
-Placement, selected-action, object-tree, and edit-lifecycle audits are recorded in
-`DRAWING_TOOLS_PLACEMENT_AUDIT.md`, `DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`,
-`DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`, and
-`DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`.
+Placement, selected-action, object-tree, edit-lifecycle, and double-edit audits
+are recorded in `DRAWING_TOOLS_PLACEMENT_AUDIT.md`,
+`DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`, `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`,
+`DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`, and
+`DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`.
 
-Move next to Epic D, Phase D2. Verify double-click and double-tap behavior for
-text and non-text drawings, including app-owned callbacks and built-in
-fallbacks, before adding more shape-specific controls.
+Move next to Epic D, Phase D3. Verify duplicate and modifier behavior, starting
+with web Shift-drag duplicate and the mobile duplicate-edit-mode sibling.
