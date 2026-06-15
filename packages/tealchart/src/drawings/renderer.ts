@@ -12,6 +12,7 @@ import type {
   TableDrawing,
   UserDrawingTextAnnotation,
   UserDrawingTextAnnotationKind,
+  UserDrawingMeasurementLabelAlignment,
 } from './types';
 
 import { resolveDrawingArrowHead } from './arrowGeometry';
@@ -1254,11 +1255,11 @@ function renderEllipseGeometry(
   }
 }
 
-function resolveMeasurementLabelX(
-  rect: { x: number; width: number },
-  fontSize: number,
-  alignment: unknown,
-): number {
+function resolveMeasurementLabelAlignment(alignment: unknown): UserDrawingMeasurementLabelAlignment {
+  return normalizeUserDrawingMeasurementLabelAlignment(alignment);
+}
+
+function resolveMeasurementLabelX(rect: { x: number; width: number }, fontSize: number, alignment: unknown): number {
   const labelAlignment = normalizeUserDrawingMeasurementLabelAlignment(alignment);
   if (labelAlignment === 'left') return rect.x + fontSize;
   if (labelAlignment === 'right') return rect.x + rect.width - fontSize;
@@ -1334,7 +1335,7 @@ function renderPriceRangeGeometry(
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
-  ctx.textAlign = 'center';
+  ctx.textAlign = resolveMeasurementLabelAlignment(drawing.style.measurementLabelAlignment);
   ctx.textBaseline = 'middle';
   const labelPoint = resolveMeasurementLabelPoint(
     rect,
@@ -1371,7 +1372,7 @@ function renderDateRangeGeometry(
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
-  ctx.textAlign = 'center';
+  ctx.textAlign = resolveMeasurementLabelAlignment(drawing.style.measurementLabelAlignment);
   ctx.textBaseline = 'middle';
   const labelPoint = resolveMeasurementLabelPoint(
     rect,
@@ -1409,7 +1410,7 @@ function renderDatePriceRangeGeometry(
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
-  ctx.textAlign = 'center';
+  ctx.textAlign = resolveMeasurementLabelAlignment(drawing.style.measurementLabelAlignment);
   ctx.textBaseline = 'middle';
   const labelPoints = resolveDatePriceRangeLabelPoints(
     rect,

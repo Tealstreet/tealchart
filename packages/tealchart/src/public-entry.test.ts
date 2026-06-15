@@ -1074,6 +1074,7 @@ describe('tealchart public entries', () => {
       priceLabel: '+1.00 (+1.00%)',
       dateLabelPoint: { x: 5, y: 8 },
       dateLabel: '1 minute',
+      measurementLabelAlignment: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const riskRewardPrimitive: NonNever<MobileUserDrawingRiskRewardPositionPrimitive> = {

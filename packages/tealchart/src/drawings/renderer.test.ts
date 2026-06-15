@@ -640,7 +640,7 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):78,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):78,50:#111:right:1:12px sans-serif');
   });
 
   it('keeps price range geometry visible when generated labels are hidden', () => {
@@ -759,7 +759,7 @@ describe('user drawing renderer', () => {
       ],
     });
 
-    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:22,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:22,50:#111:left:1:12px sans-serif');
   });
 
   it('renders date and price ranges with price and duration labels', () => {
@@ -843,8 +843,8 @@ describe('user drawing renderer', () => {
       ],
     });
 
-    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):22,50:#111:center:1:12px sans-serif');
-    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:22,78:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):22,50:#111:left:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:22,78:#111:left:1:12px sans-serif');
   });
 
   it('renders long position risk and reward boxes through CanvasContext', () => {
