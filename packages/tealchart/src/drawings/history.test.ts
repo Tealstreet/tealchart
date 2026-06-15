@@ -80,7 +80,12 @@ type MissingUserDrawingHistoryCommandType = Exclude<
   | (typeof undoableUserDrawingHistoryCommandTypes)[number]
   | (typeof transientUserDrawingHistoryCommandTypes)[number]
 >;
+type OverlappingUserDrawingHistoryCommandType = Extract<
+  (typeof undoableUserDrawingHistoryCommandTypes)[number],
+  (typeof transientUserDrawingHistoryCommandTypes)[number]
+>;
 const allUserDrawingHistoryCommandTypesCovered: Record<MissingUserDrawingHistoryCommandType, never> = {};
+const noUserDrawingHistoryCommandTypeOverlap: Record<OverlappingUserDrawingHistoryCommandType, never> = {};
 
 afterEach(() => {
   clearChartStoreCache();
@@ -102,6 +107,7 @@ function createStateWithTrendLine() {
 describe('user drawing command history', () => {
   it('keeps the Epic E undo/redo command-type checklist classified', () => {
     expect(allUserDrawingHistoryCommandTypesCovered).toEqual({});
+    expect(noUserDrawingHistoryCommandTypeOverlap).toEqual({});
     expect(undoableUserDrawingHistoryCommandTypes).toEqual(
       expect.arrayContaining([
         'handleInput',
