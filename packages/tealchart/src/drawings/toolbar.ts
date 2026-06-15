@@ -731,6 +731,13 @@ export const USER_DRAWING_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityDescri
   })),
 ];
 
+export const USER_DRAWING_FILL_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityDescriptor[] = [
+  ...USER_DRAWING_OPACITIES.map((opacity) => ({
+    opacity,
+    label: `${Math.round(opacity * 100)} percent fill opacity`,
+  })),
+];
+
 export const USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
   { width: 2, label: 'Fine freehand stroke width' },
   { width: 4, label: 'Medium freehand stroke width' },
@@ -767,6 +774,10 @@ export function getUserDrawingLineWidthDescriptors(drawing: UserDrawing): readon
 export function getUserDrawingOpacityDescriptors(drawing: UserDrawing): readonly UserDrawingOpacityDescriptor[] {
   if (drawing.kind === 'highlighter') return USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS;
   return USER_DRAWING_OPACITY_DESCRIPTORS;
+}
+
+export function getUserDrawingFillOpacityDescriptors(_drawing: UserDrawing): readonly UserDrawingOpacityDescriptor[] {
+  return USER_DRAWING_FILL_OPACITY_DESCRIPTORS;
 }
 
 export const USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS: readonly UserDrawingStyleToggleDescriptor[] = [
@@ -965,6 +976,9 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   const nextLineStyle = getNextUserDrawingLineStyle(selectedDrawing);
   const nextLineVisible = selectedDrawing.style.lineVisible === false;
   const currentOpacity = normalizeUserDrawingOpacity(selectedDrawing.style.opacity ?? DEFAULT_USER_DRAWING_STYLE.opacity ?? 1);
+  const currentFillOpacity = normalizeUserDrawingOpacity(
+    selectedDrawing.style.fillOpacity ?? DEFAULT_USER_DRAWING_STYLE.fillOpacity ?? 1,
+  );
   const lineWidthItems: UserDrawingSelectedActionSurfaceItem[] = getUserDrawingLineWidthDescriptors(selectedDrawing).map(
     (descriptor) => ({
       id: `lineWidth:${descriptor.width}`,
@@ -987,6 +1001,16 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
   );
   const nextFillColor = fillColorEnabled ? getNextUserDrawingFillColor(selectedDrawing) : null;
   const nextFillVisible = selectedDrawing.style.fillVisible === false;
+  const fillOpacityItems: UserDrawingSelectedActionSurfaceItem[] = fillVisibilityEnabled
+    ? getUserDrawingFillOpacityDescriptors(selectedDrawing).map((descriptor) => ({
+        id: `fillOpacity:${descriptor.opacity}`,
+        icon: String(Math.round(descriptor.opacity * 100)),
+        label: descriptor.label,
+        enabled: fillVisibilityEnabled,
+        selected: currentFillOpacity === descriptor.opacity,
+        command: { type: 'updateStyle', style: { fillOpacity: descriptor.opacity } },
+      }))
+    : [];
   const textEnabled = isUserDrawingTextToolbarEnabled(state);
   const nextTextColor = textEnabled ? getNextUserDrawingTextColor(selectedDrawing) : null;
   const smallerFontSize = textEnabled ? getAdjacentUserDrawingFontSize(selectedDrawing, -1) : null;
@@ -1227,6 +1251,7 @@ function resolveUserDrawingSelectedStyleActionSurfaceGroup(
         command: { type: 'updateStyle', style: { lineVisible: nextLineVisible } },
       },
       ...(fillColorItem ? [fillColorItem] : []),
+      ...fillOpacityItems,
       ...(fillVisibilityItem ? [fillVisibilityItem] : []),
       ...(textColorItem ? [textColorItem] : []),
       ...(smallerFontSizeItem ? [smallerFontSizeItem] : []),
@@ -1613,6 +1638,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
     selectedDrawing?.style.lineVisible ?? '',
     selectedDrawing?.style.fillVisible ?? '',
     selectedDrawing?.style.fillColor ?? '',
+    selectedDrawing?.style.fillOpacity ?? '',
     selectedDrawing?.style.textColor ?? '',
     selectedDrawing?.style.fontSize ?? '',
     selectedDrawing?.style.fontFamily ?? '',

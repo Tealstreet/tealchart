@@ -434,6 +434,7 @@ export {
 export {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingFillOpacityDescriptors,
   getUserDrawingLineWidthDescriptors,
   getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
@@ -466,6 +467,7 @@ export {
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FILL_OPACITY_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_FONT_STYLE_DESCRIPTORS,

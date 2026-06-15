@@ -93,6 +93,22 @@ function areUserDrawingLabelsVisible(drawing: UserDrawing): boolean {
   return drawing.style.labelsVisible !== false;
 }
 
+function withUserDrawingFillOpacity(ctx: CanvasContext, drawing: UserDrawing, render: () => void): void {
+  const fillOpacity = normalizeUserDrawingOpacity(drawing.style.fillOpacity ?? 1);
+  if (fillOpacity >= 1) {
+    render();
+    return;
+  }
+
+  const previousGlobalAlpha = ctx.globalAlpha;
+  ctx.globalAlpha *= fillOpacity;
+  try {
+    render();
+  } finally {
+    ctx.globalAlpha = previousGlobalAlpha;
+  }
+}
+
 function renderLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { segment: unknown }>,
@@ -265,10 +281,12 @@ function renderFixedRangeVolumeProfileGeometry(
   const { drawing, volumeProfile } = geometry;
   if (drawing.style.fillVisible !== false) {
     ctx.fillStyle = drawing.style.fillColor ?? drawing.style.lineColor;
-    for (const bin of volumeProfile.bins) {
-      if (bin.volume <= 0 || bin.rect.width <= 0 || bin.rect.height <= 0) continue;
-      ctx.fillRect(bin.rect.x, bin.rect.y, bin.rect.width, bin.rect.height);
-    }
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      for (const bin of volumeProfile.bins) {
+        if (bin.volume <= 0 || bin.rect.width <= 0 || bin.rect.height <= 0) continue;
+        ctx.fillRect(bin.rect.x, bin.rect.y, bin.rect.width, bin.rect.height);
+      }
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -339,7 +357,9 @@ function renderPolygonGeometry(
 
   if (geometry.drawing.style.fillVisible !== false && fillColor) {
     ctx.fillStyle = fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, geometry.drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (geometry.drawing.style.lineVisible !== false) {
@@ -374,7 +394,9 @@ function renderPitchforkGeometry(
         ctx.lineTo(point.x, point.y);
       }
       ctx.closePath();
-      ctx.fill();
+      withUserDrawingFillOpacity(ctx, geometry.drawing, () => {
+        ctx.fill();
+      });
     }
   }
 
@@ -408,7 +430,9 @@ function renderPitchfanGeometry(
       ctx.lineTo(first.x, first.y);
       ctx.lineTo(second.x, second.y);
       ctx.closePath();
-      ctx.fill();
+      withUserDrawingFillOpacity(ctx, geometry.drawing, () => {
+        ctx.fill();
+      });
     }
   }
 
@@ -485,7 +509,9 @@ function renderGannBoxGeometry(
   const { drawing, gannBox } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(gannBox.rect.x, gannBox.rect.y, gannBox.rect.width, gannBox.rect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(gannBox.rect.x, gannBox.rect.y, gannBox.rect.width, gannBox.rect.height);
+    });
   }
 
   if (drawing.style.lineVisible === false) return;
@@ -531,7 +557,9 @@ function renderFibChannelGeometry(
       }
       ctx.closePath();
       ctx.fillStyle = geometry.drawing.style.fillColor;
-      ctx.fill();
+      withUserDrawingFillOpacity(ctx, geometry.drawing, () => {
+        ctx.fill();
+      });
     }
   }
 
@@ -710,7 +738,9 @@ function renderProjectionGeometry(
     ctx.lineTo(projection.target.x, projection.target.y);
     ctx.closePath();
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -752,7 +782,9 @@ function renderSectorGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUser
     }
     ctx.closePath();
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (drawing.style.lineVisible === false) return;
@@ -831,7 +863,9 @@ function renderTrianglePatternGeometry(
     }
     ctx.closePath();
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -897,7 +931,9 @@ function renderRectangleGeometry(
   const { rect, drawing } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -945,7 +981,9 @@ function renderImagePlaceholder(
   const { rect, drawing } = geometry;
   if (drawing.style.fillVisible !== false) {
     ctx.fillStyle = drawing.style.fillColor ?? 'rgba(127, 127, 127, 0.12)';
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1001,7 +1039,9 @@ function renderCircleGeometry(
 
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1116,7 +1156,9 @@ function renderFibWedgeGeometry(
     );
     ctx.closePath();
     ctx.fillStyle = geometry.drawing.style.fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, geometry.drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (geometry.drawing.style.lineVisible === false) return;
@@ -1193,7 +1235,9 @@ function renderEllipseGeometry(
 
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fill();
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1209,7 +1253,9 @@ function renderPriceRangeGeometry(
   const { rect, drawing } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1238,7 +1284,9 @@ function renderDateRangeGeometry(
   const { rect, drawing } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1267,7 +1315,9 @@ function renderDatePriceRangeGeometry(
   const { rect, drawing } = geometry;
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1301,10 +1351,12 @@ function renderRiskRewardPositionGeometry(
   const labelX = position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
 
   if (drawing.style.fillVisible !== false) {
-    ctx.fillStyle = RISK_REWARD_PROFIT_FILL;
-    ctx.fillRect(position.profitRect.x, position.profitRect.y, position.profitRect.width, position.profitRect.height);
-    ctx.fillStyle = RISK_REWARD_RISK_FILL;
-    ctx.fillRect(position.riskRect.x, position.riskRect.y, position.riskRect.width, position.riskRect.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillStyle = RISK_REWARD_PROFIT_FILL;
+      ctx.fillRect(position.profitRect.x, position.profitRect.y, position.profitRect.width, position.profitRect.height);
+      ctx.fillStyle = RISK_REWARD_RISK_FILL;
+      ctx.fillRect(position.riskRect.x, position.riskRect.y, position.riskRect.width, position.riskRect.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1390,7 +1442,9 @@ function renderBarsPatternGeometry(
 
     if (geometry.drawing.style.fillVisible !== false) {
       ctx.fillStyle = color;
-      ctx.fillRect(bodyX, bodyTop, bar.bodyWidth, bodyHeight);
+      withUserDrawingFillOpacity(ctx, geometry.drawing, () => {
+        ctx.fillRect(bodyX, bodyTop, bar.bodyWidth, bodyHeight);
+      });
     }
 
     if (geometry.drawing.style.lineVisible !== false) {
@@ -1501,16 +1555,20 @@ function renderTextLabelGeometry(
 
   if (balloonLayout && drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
-    ctx.beginPath();
-    ctx.moveTo(balloonLayout.tail.left.x, balloonLayout.tail.left.y);
-    ctx.lineTo(balloonLayout.tail.tip.x, balloonLayout.tail.tip.y);
-    ctx.lineTo(balloonLayout.tail.right.x, balloonLayout.tail.right.y);
-    ctx.closePath();
-    ctx.fill();
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
+      ctx.beginPath();
+      ctx.moveTo(balloonLayout.tail.left.x, balloonLayout.tail.left.y);
+      ctx.lineTo(balloonLayout.tail.tip.x, balloonLayout.tail.tip.y);
+      ctx.lineTo(balloonLayout.tail.right.x, balloonLayout.tail.right.y);
+      ctx.closePath();
+      ctx.fill();
+    });
   } else if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(layout.box.x, layout.box.y, layout.box.width, layout.box.height);
+    });
   }
 
   if (balloonLayout && drawing.style.lineVisible !== false) {
@@ -1564,7 +1622,9 @@ function renderTableGeometry(ctx: CanvasContext, geometry: Extract<ResolvedUserD
 
   if (drawing.style.fillVisible !== false && drawing.style.fillColor) {
     ctx.fillStyle = drawing.style.fillColor;
-    ctx.fillRect(table.bounds.x, table.bounds.y, table.bounds.width, table.bounds.height);
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fillRect(table.bounds.x, table.bounds.y, table.bounds.width, table.bounds.height);
+    });
   }
 
   if (drawing.style.lineVisible !== false) {
@@ -1613,7 +1673,11 @@ function renderPinGeometry(
   ctx.fillStyle = drawing.style.fillColor ?? drawing.style.lineColor;
   ctx.beginPath();
   ctx.arc(point.x, point.y - stem, radius, 0, Math.PI * 2);
-  ctx.fill();
+  if (drawing.style.fillVisible !== false) {
+    withUserDrawingFillOpacity(ctx, drawing, () => {
+      ctx.fill();
+    });
+  }
   ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(point.x, point.y - stem + radius);

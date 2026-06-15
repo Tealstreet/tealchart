@@ -2334,6 +2334,22 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('lineTo:50,50');
   });
 
+  it('suppresses pin marker fills from style visibility flags', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'pin',
+      kind: 'pin',
+      style: { ...style, fillVisible: false },
+      point: { time: 50, price: 50 },
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls.some((call) => call.startsWith('fill:'))).toBe(false);
+    expect(ctx.calls.some((call) => call.startsWith('stroke:#f5c542:2:'))).toBe(true);
+  });
+
   it('renders icon drawings with shared polygon geometry', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
@@ -2485,13 +2501,13 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:Note:38,50:#111:left:1:12px sans-serif');
   });
 
-  it('applies drawing style opacity while restoring canvas alpha', () => {
+  it('applies drawing and fill style opacity independently while restoring canvas alpha', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
       ...base,
       id: 'rect',
       kind: 'rectangle',
-      style: { ...style, opacity: 0.5 },
+      style: { ...style, opacity: 0.5, fillOpacity: 0.25 },
       points: [
         { time: 10, price: 90 },
         { time: 90, price: 10 },
@@ -2500,7 +2516,7 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12):0.5');
+    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12):0.125');
     expect(ctx.calls).toContain('strokeRect:10,10,80,80:#f5c542:0.5');
     expect(ctx.globalAlpha).toBe(1);
   });
