@@ -27,6 +27,7 @@ import {
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
+  supportsUserDrawingGeneratedLabelVisibilityControls,
   supportsUserDrawingRichTextControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextAppearanceControls,
@@ -223,78 +224,89 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  if (supportsUserDrawingTextAppearanceControls(drawing)) {
+  if (
+    supportsUserDrawingTextAppearanceControls(drawing) ||
+    supportsUserDrawingGeneratedLabelVisibilityControls(drawing)
+  ) {
     groups.push({
       id: 'text',
       label: 'Text',
       controls: [
-        ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS.map((descriptor) => ({
-          id: `textColor:${descriptor.textColor}`,
-          type: 'swatch' as const,
-          label: descriptor.label,
-          value: descriptor.textColor,
-          selected: colorsMatch(drawing.style.textColor, descriptor.textColor),
-          command: { type: 'updateStyle' as const, style: { textColor: descriptor.textColor } },
-        })),
-        ...USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => ({
-          id: `fontSize:${descriptor.fontSize}`,
-          type: 'option' as const,
-          label: descriptor.label,
-          value: descriptor.fontSize,
-          selected: drawing.style.fontSize === descriptor.fontSize,
-          command: { type: 'updateStyle' as const, style: { fontSize: descriptor.fontSize } },
-        })),
-        ...USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => ({
-          id: `fontFamily:${descriptor.fontFamily}`,
-          type: 'option' as const,
-          label: descriptor.label,
-          icon: descriptor.icon,
-          value: descriptor.fontFamily,
-          selected: drawing.style.fontFamily === descriptor.fontFamily,
-          command: { type: 'updateStyle' as const, style: { fontFamily: descriptor.fontFamily } },
-        })),
-        ...USER_DRAWING_FONT_WEIGHT_DESCRIPTORS.map((descriptor) => ({
-          id: `fontWeight:${descriptor.fontWeight}`,
-          type: 'option' as const,
-          label: descriptor.label,
-          icon: descriptor.icon,
-          value: descriptor.fontWeight,
-          selected: drawing.style.fontWeight === descriptor.fontWeight,
-          command: { type: 'updateStyle' as const, style: { fontWeight: descriptor.fontWeight } },
-        })),
-        ...USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => ({
-          id: `fontStyle:${descriptor.fontStyle}`,
-          type: 'option' as const,
-          label: descriptor.label,
-          icon: descriptor.icon,
-          value: descriptor.fontStyle,
-          selected: drawing.style.fontStyle === descriptor.fontStyle,
-          command: { type: 'updateStyle' as const, style: { fontStyle: descriptor.fontStyle } },
-        })),
-        ...USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => ({
-          id: descriptor.textUnderline ? 'textUnderline' : 'textLineThrough',
-          type: 'option' as const,
-          label: descriptor.label,
-          icon: descriptor.icon,
-          value: descriptor.textUnderline ? drawing.style.textUnderline === true : drawing.style.textLineThrough === true,
-          selected: descriptor.textUnderline ? drawing.style.textUnderline === true : drawing.style.textLineThrough === true,
-          command: {
-            type: 'updateStyle' as const,
-            style: descriptor.textUnderline
-              ? { textUnderline: drawing.style.textUnderline !== true }
-              : { textLineThrough: drawing.style.textLineThrough !== true },
-          },
-        })),
-        ...(supportsUserDrawingTextAlignControls(drawing)
-          ? USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => ({
-              id: `textAlign:${descriptor.textAlign}`,
-              type: 'option' as const,
-              label: descriptor.label,
-              icon: descriptor.icon,
-              value: descriptor.textAlign,
-              selected: 'textAlign' in drawing && drawing.textAlign === descriptor.textAlign,
-              command: { type: 'setTextAlign' as const, textAlign: descriptor.textAlign },
-            }))
+        ...(supportsUserDrawingTextAppearanceControls(drawing)
+          ? [
+              ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS.map((descriptor) => ({
+                id: `textColor:${descriptor.textColor}`,
+                type: 'swatch' as const,
+                label: descriptor.label,
+                value: descriptor.textColor,
+                selected: colorsMatch(drawing.style.textColor, descriptor.textColor),
+                command: { type: 'updateStyle' as const, style: { textColor: descriptor.textColor } },
+              })),
+              ...USER_DRAWING_FONT_SIZE_DESCRIPTORS.map((descriptor) => ({
+                id: `fontSize:${descriptor.fontSize}`,
+                type: 'option' as const,
+                label: descriptor.label,
+                value: descriptor.fontSize,
+                selected: drawing.style.fontSize === descriptor.fontSize,
+                command: { type: 'updateStyle' as const, style: { fontSize: descriptor.fontSize } },
+              })),
+              ...USER_DRAWING_FONT_FAMILY_DESCRIPTORS.map((descriptor) => ({
+                id: `fontFamily:${descriptor.fontFamily}`,
+                type: 'option' as const,
+                label: descriptor.label,
+                icon: descriptor.icon,
+                value: descriptor.fontFamily,
+                selected: drawing.style.fontFamily === descriptor.fontFamily,
+                command: { type: 'updateStyle' as const, style: { fontFamily: descriptor.fontFamily } },
+              })),
+              ...USER_DRAWING_FONT_WEIGHT_DESCRIPTORS.map((descriptor) => ({
+                id: `fontWeight:${descriptor.fontWeight}`,
+                type: 'option' as const,
+                label: descriptor.label,
+                icon: descriptor.icon,
+                value: descriptor.fontWeight,
+                selected: drawing.style.fontWeight === descriptor.fontWeight,
+                command: { type: 'updateStyle' as const, style: { fontWeight: descriptor.fontWeight } },
+              })),
+              ...USER_DRAWING_FONT_STYLE_DESCRIPTORS.map((descriptor) => ({
+                id: `fontStyle:${descriptor.fontStyle}`,
+                type: 'option' as const,
+                label: descriptor.label,
+                icon: descriptor.icon,
+                value: descriptor.fontStyle,
+                selected: drawing.style.fontStyle === descriptor.fontStyle,
+                command: { type: 'updateStyle' as const, style: { fontStyle: descriptor.fontStyle } },
+              })),
+              ...USER_DRAWING_TEXT_DECORATION_DESCRIPTORS.map((descriptor) => ({
+                id: descriptor.textUnderline ? 'textUnderline' : 'textLineThrough',
+                type: 'option' as const,
+                label: descriptor.label,
+                icon: descriptor.icon,
+                value: descriptor.textUnderline
+                  ? drawing.style.textUnderline === true
+                  : drawing.style.textLineThrough === true,
+                selected: descriptor.textUnderline
+                  ? drawing.style.textUnderline === true
+                  : drawing.style.textLineThrough === true,
+                command: {
+                  type: 'updateStyle' as const,
+                  style: descriptor.textUnderline
+                    ? { textUnderline: drawing.style.textUnderline !== true }
+                    : { textLineThrough: drawing.style.textLineThrough !== true },
+                },
+              })),
+              ...(supportsUserDrawingTextAlignControls(drawing)
+                ? USER_DRAWING_TEXT_ALIGN_DESCRIPTORS.map((descriptor) => ({
+                    id: `textAlign:${descriptor.textAlign}`,
+                    type: 'option' as const,
+                    label: descriptor.label,
+                    icon: descriptor.icon,
+                    value: descriptor.textAlign,
+                    selected: 'textAlign' in drawing && drawing.textAlign === descriptor.textAlign,
+                    command: { type: 'setTextAlign' as const, textAlign: descriptor.textAlign },
+                  }))
+                : []),
+            ]
           : []),
         ...(supportsUserDrawingRichTextControls(drawing) && supportsUserDrawingTextWrapControls(drawing)
           ? [
@@ -315,6 +327,21 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
                 selected: drawing.style.textMaxWidth === descriptor.textMaxWidth,
                 command: { type: 'updateStyle' as const, style: { textMaxWidth: descriptor.textMaxWidth } },
               })),
+            ]
+          : []),
+        ...(supportsUserDrawingGeneratedLabelVisibilityControls(drawing)
+          ? [
+              {
+                id: 'labelsVisible',
+                type: 'option' as const,
+                label: drawing.style.labelsVisible === false ? 'Show generated labels' : 'Hide generated labels',
+                value: drawing.style.labelsVisible !== false,
+                selected: drawing.style.labelsVisible !== false,
+                command: {
+                  type: 'updateStyle' as const,
+                  style: { labelsVisible: drawing.style.labelsVisible === false },
+                },
+              },
             ]
           : []),
       ],

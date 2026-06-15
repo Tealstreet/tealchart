@@ -1357,6 +1357,15 @@ object-tree gaps stay visible.
 - Web and mobile top bars keep those label controls in parity while continuing
   to hide rich text decoration controls for generated labels.
 
+## Shipped: Generated Label Visibility Controls
+
+- Shared drawing style now preserves `labelsVisible` for generated-label
+  drawing families.
+- Web selected-action/properties surfaces and mobile Skia surfaces expose the
+  same generated-label visibility commands.
+- Web Canvas renderers and mobile Skia render-model primitives suppress
+  generated labels while preserving drawing bodies.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices
