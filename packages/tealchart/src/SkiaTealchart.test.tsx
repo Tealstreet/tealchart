@@ -193,6 +193,113 @@ describe('SkiaTealchart drawing properties', () => {
     });
   });
 
+  it('mirrors drawing command history and keyboard dispatch through the mobile imperative handle', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onStateChange = vi.fn();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={320}
+        height={240}
+        userDrawingState={initialDrawingState}
+        onUserDrawingStateChange={onStateChange}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    expect(ref.current?.canUndoUserDrawingCommand()).toBe(false);
+
+    await act(async () => {
+      expect(ref.current?.duplicateSelectedUserDrawing()).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_1',
+      'target',
+    ]);
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+    expect(ref.current?.canUndoUserDrawingCommand()).toBe(true);
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'duplicate' }),
+        source: 'api',
+      }),
+    );
+
+    await act(async () => {
+      expect(ref.current?.undoUserDrawingCommand()).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['selected', 'target']);
+    expect(ref.current?.canRedoUserDrawingCommand()).toBe(true);
+
+    await act(async () => {
+      expect(ref.current?.redoUserDrawingCommand()).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_1',
+      'target',
+    ]);
+
+    await act(async () => {
+      expect(ref.current?.dispatchUserDrawingKeyboardAction({ key: 'z', metaKey: true })).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['selected', 'target']);
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'undo' }),
+        source: 'keyboard',
+      }),
+    );
+
+    await act(async () => {
+      expect(ref.current?.dispatchUserDrawingKeyboardAction({ key: 'c', metaKey: true })).toBe(true);
+      expect(ref.current?.dispatchUserDrawingKeyboardAction({ key: 'v', metaKey: true })).toBe(true);
+    });
+
+    const pastedState = ref.current?.getUserDrawingState();
+    expect(pastedState?.drawings.map((drawing) => drawing.id)).toEqual(['selected', 'target', 'drawing_2']);
+    expect(pastedState?.selection).toEqual({ drawingId: 'drawing_2' });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'paste' }),
+        source: 'keyboard',
+      }),
+    );
+
+    await act(async () => {
+      expect(ref.current?.dispatchUserDrawingKeyboardAction({ key: 'Delete' })).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['selected', 'target']);
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'delete' }),
+        source: 'keyboard',
+      }),
+    );
+    expect(ref.current?.canUndoUserDrawingCommand()).toBe(true);
+
+    await act(async () => {
+      expect(ref.current?.undoUserDrawingCommand()).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'target',
+      'drawing_2',
+    ]);
+  });
+
   it('passes pressure segment dash phases into Skia dash effects', () => {
     const pressureState: UserDrawingState = {
       version: 1,
