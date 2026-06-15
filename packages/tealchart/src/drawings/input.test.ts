@@ -57,6 +57,14 @@ const anchorB = { time: 2_000, price: 110 };
 const anchorC = { time: 2_000, price: 95 };
 const anchorD = { time: 3_000, price: 115 };
 const anchorE = { time: 4_000, price: 105 };
+const northStarTwoAnchorDragPlacementTools: UserDrawingTool[] = [
+  'trendLine',
+  'rectangle',
+  'circle',
+  'ellipse',
+  'priceRange',
+  'datePriceRange',
+];
 const expandedDragPlacementTools: UserDrawingTool[] = [
   'trendAngle',
   'priceRange',
@@ -255,6 +263,31 @@ describe('user drawing input controller', () => {
       points: [anchorA, anchorB],
     });
   });
+
+  it.each(northStarTwoAnchorDragPlacementTools)(
+    'commits north-star %s drag placement from exact gesture endpoints',
+    (tool) => {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const started = beginUserDrawingPlacementDrag(
+        state,
+        { paneId: 'main', anchor: anchorA },
+        { now: () => 10, style },
+      );
+      const committed = commitUserDrawingPlacementDrag(
+        started,
+        { paneId: 'main', anchor: anchorB },
+        { createId: () => `drag-${tool}`, now: () => 11, style },
+      );
+
+      expect(committed.draft, tool).toBeNull();
+      expect(committed.selection, tool).toEqual({ drawingId: `drag-${tool}` });
+      expect(committed.drawings[0], tool).toMatchObject({
+        id: `drag-${tool}`,
+        kind: tool,
+        points: [anchorA, anchorB],
+      });
+    },
+  );
 
   it('switches to select after drag placement when stay-in-drawing-mode is disabled', () => {
     const state = setUserDrawingTool(
