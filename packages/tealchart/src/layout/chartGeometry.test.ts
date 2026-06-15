@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   clampRectToBounds,
+  computeLeftToolRailAvoidanceInset,
   computeLeftToolRailTop,
   computeChartGeometry,
   computePaneGeometry,
@@ -142,6 +143,13 @@ describe('chart geometry', () => {
     expect(webSnapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
     expect(mobileSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 36 });
     expect(mobileSnapshot.chrome.leftTools).toEqual({ x: 0, y: 36, width: 52, height: 284 });
+  });
+
+  it('computes overlay insets that avoid the left drawing rail when space allows', () => {
+    expect(computeLeftToolRailAvoidanceInset(WEB_CHART_CHROME_METRICS, 800, 304)).toBe(66);
+    expect(computeLeftToolRailAvoidanceInset(MOBILE_CHART_CHROME_METRICS, 800, 304)).toBe(68);
+    expect(computeLeftToolRailAvoidanceInset(WEB_CHART_CHROME_METRICS, 340, 304)).toBe(28);
+    expect(computeLeftToolRailAvoidanceInset(MOBILE_CHART_CHROME_METRICS, 300, 304)).toBe(8);
   });
 
   it('tracks optional top-left legend overlay metadata without reserving canvas space', () => {
