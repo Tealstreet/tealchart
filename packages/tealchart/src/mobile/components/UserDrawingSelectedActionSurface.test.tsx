@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { resolveUserDrawingSelectedActionSurface } from '../../drawings';
+import { clearChartStoreCache } from '../../state/chartState';
 import { UserDrawingSelectedActionSurfaceComponent } from './UserDrawingSelectedActionSurface';
 
 const style: UserDrawingStyle = {
@@ -84,6 +85,7 @@ function getMockViewStyle(element: HTMLElement): Record<string, unknown> {
 describe('UserDrawingSelectedActionSurfaceComponent', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('keeps mobile selected action taps inside the toolbar boundary', () => {
@@ -216,5 +218,25 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
     expect(getMockViewStyle(surface).top).toBe(83);
+  });
+
+  it('keeps mobile selected actions clear of the top bar and left drawing rail when space allows', () => {
+    const state = createSelectedState();
+
+    render(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={state}
+        surface={resolveUserDrawingSelectedActionSurface(state)}
+        anchor={{ ...selectionActionAnchor, anchor: { x: 12, y: 24 } }}
+        dimensions={{ width: 480, height: 320 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={vi.fn()}
+      />,
+    );
+
+    const surface = screen.getByLabelText('Selected drawing actions');
+    expect(getMockViewStyle(surface).left).toBe(68);
+    expect(getMockViewStyle(surface).top).toBe(46);
   });
 });
