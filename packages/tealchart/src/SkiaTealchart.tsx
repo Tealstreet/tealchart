@@ -555,6 +555,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
   const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
   const [userDrawingDuplicateEditDragOverride, setUserDrawingDuplicateEditDragOverride] = useState<boolean | null>(null);
+  const [userDrawingSelectedActionPopoverDismissSignal, setUserDrawingSelectedActionPopoverDismissSignal] = useState(0);
   const userDrawingMeasureLastPointRef = useRef<UserDrawingInputPoint | null>(null);
 
   const commitUserDrawingState = useCallback(
@@ -2167,6 +2168,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
       revealResetButtonIfInBottomRegion(x, y);
+      setUserDrawingSelectedActionPopoverDismissSignal((value) => value + 1);
 
       if (handleUserDrawingTap(x, y)) return;
 
@@ -5006,6 +5008,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         anchor={userDrawingSelectionActionAnchor}
         dimensions={dimensions}
         topInset={showTopBar ? TOP_BAR_SAFE_ZONE : 0}
+        dismissPopoverSignal={userDrawingSelectedActionPopoverDismissSignal}
         createId={createUserDrawingId}
         dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
         onUserDrawingDuplicateEditDragChange={(enabled) => {

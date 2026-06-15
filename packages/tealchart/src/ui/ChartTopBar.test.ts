@@ -885,6 +885,53 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('dismisses selected style popovers from outside chart gestures without swallowing them', () => {
+    const chartSurface = document.createElement('div');
+    const chartGestureTarget = document.createElement('button');
+    chartGestureTarget.setAttribute('aria-label', 'Chart gesture target');
+    chartSurface.appendChild(chartGestureTarget);
+    document.body.appendChild(chartSurface);
+    const onChartMouseDown = vi.fn();
+    chartSurface.addEventListener('mousedown', onChartMouseDown);
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-selected-style-outside-dismiss',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
+    });
+    topBar.mount(chartSurface);
+
+    openSelectedDrawingStylePopover();
+    chartGestureTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    expect(onChartMouseDown).toHaveBeenCalledTimes(1);
+    expect(
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Style selected drawing"]')
+        ?.getAttribute('aria-expanded'),
+    ).toBe('false');
+    expect(document.querySelector<HTMLElement>('[aria-label="Selected drawing style controls"]')).toBeNull();
+
+    topBar.unmount();
+    chartSurface.remove();
+  });
+
   it('clamps selected style popovers inside the overlay height', () => {
     const overlay = document.createElement('div');
     overlay.getBoundingClientRect = () =>

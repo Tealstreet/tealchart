@@ -241,6 +241,57 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(onUserDrawingDuplicateEditDragChange).toHaveBeenCalledWith(false);
   });
 
+  it('dismisses mobile selected style popovers from host chart gestures without blocking chart taps', () => {
+    const state = createSelectedState();
+    const onChartTouch = vi.fn();
+    const { rerender } = render(
+      <div onClick={onChartTouch}>
+        <UserDrawingSelectedActionSurfaceComponent
+          state={state}
+          surface={resolveUserDrawingSelectedActionSurface(state)}
+          anchor={selectionActionAnchor}
+          dimensions={{ width: 360, height: 240 }}
+          topInset={40}
+          dismissPopoverSignal={0}
+          createId={() => 'copy'}
+          dispatchUserDrawingCommand={vi.fn()}
+        />
+        <button aria-label="Chart gesture target" type="button">
+          Chart
+        </button>
+      </div>,
+    );
+
+    fireEvent.click(screen.getByLabelText('Style selected drawing'));
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
+
+    fireEvent.click(screen.getByLabelText('Chart gesture target'));
+    expect(onChartTouch).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+
+    rerender(
+      <div onClick={onChartTouch}>
+        <UserDrawingSelectedActionSurfaceComponent
+          state={state}
+          surface={resolveUserDrawingSelectedActionSurface(state)}
+          anchor={selectionActionAnchor}
+          dimensions={{ width: 360, height: 240 }}
+          topInset={40}
+          dismissPopoverSignal={1}
+          createId={() => 'copy'}
+          dispatchUserDrawingCommand={vi.fn()}
+        />
+        <button aria-label="Chart gesture target" type="button">
+          Chart
+        </button>
+      </div>,
+    );
+
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
+  });
+
   it('clamps mobile selected style popovers using the expanded surface height', () => {
     const state = createSelectedTextState();
 

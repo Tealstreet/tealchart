@@ -51,6 +51,7 @@ export interface UserDrawingSelectedActionSurfaceProps {
   anchor: UserDrawingSelectionActionAnchor | null;
   dimensions: { width: number; height: number };
   topInset: number;
+  dismissPopoverSignal?: number;
   createId: () => string;
   dispatchUserDrawingCommand: (command: UserDrawingCommand) => void;
   onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
@@ -65,6 +66,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
   anchor,
   dimensions,
   topInset,
+  dismissPopoverSignal,
   createId,
   dispatchUserDrawingCommand,
   onUserDrawingDuplicateEditDragChange,
@@ -107,6 +109,10 @@ export function UserDrawingSelectedActionSurfaceComponent({
       setActivePopoverDrawingId(selectedDrawingId);
     }
   }, [activePopoverDrawingId, selectedDrawingId]);
+
+  useEffect(() => {
+    setActivePopoverGroupId(null);
+  }, [dismissPopoverSignal]);
 
   if (!shouldRender) return null;
 
