@@ -22,12 +22,12 @@ Tools audited here:
 
 | Tool | Placement mode | Shared evidence | Web evidence | Mobile evidence | Remaining proof |
 | --- | --- | --- | --- | --- | --- |
-| `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
-| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement plus browser mouse/touch event routing | `SkiaTealchart.test.tsx`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity | Browser/device smoke with sidebar tool |
-| `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
-| `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
-| `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
-| `datePriceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
+| `trendLine` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
+| `rectangle` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement plus browser mouse/touch event routing | `SkiaTealchart.test.tsx`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity | Browser/device smoke with sidebar tool |
+| `circle` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
+| `ellipse` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
+| `priceRange` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
+| `datePriceRange` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
 | `longPosition` | Drag seeds first two anchors, final tap commits | `placement.test.ts`, `input.test.ts` drag-seed test | `TealchartWidget.test.ts` drag-seed widget test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` risk/reward render tests | Browser/device smoke with sidebar tool |
 | `brush` | Path drag | `input.test.ts` path-drag smoothing/commit tests | `TealchartWidget.test.ts` path-family drag test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` pressure/render tests | Browser/device smoke with sidebar tool |
 | `textLabel` | Single-anchor click/tap | `input.test.ts` single-anchor and text-edit state tests | `TealchartWidget.test.ts` context/double-click edit tests | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` text edit/render tests | Browser/device smoke with sidebar tool |
@@ -68,6 +68,13 @@ Tools audited here:
   `Rectangle` selection through an aborted Pan gesture and verifies touch
   cancellation clears the draft without committing a rectangle or creating an
   undo entry.
+- Web `ChartCore` and rendered mobile `SkiaTealchart` coverage now prove
+  two-anchor drag-placement tools swallow tap/click placement at the adapter
+  layer, while drag-seeded tools such as `longPosition` still accept final
+  anchor taps after seed drags. The web adapter only consumes valid chart-area
+  taps, so axes/out-of-pane clicks are not swallowed. This prevents first-party
+  UI from leaving a one-anchor rectangle-style draft that can later finish as a
+  surprising shape; real drag endpoints remain the two-anchor placement path.
 - The earlier "random rectangle" concern should be treated as a UI regression
   only if reproduced through the sidebar/pointer path. The shared state layer
   currently behaves correctly.
