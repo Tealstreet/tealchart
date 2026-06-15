@@ -171,6 +171,7 @@ export interface UserDrawingStyle {
   volumeProfileGuidesVisible?: boolean;
   volumeProfileRowCount?: number;
   volumeProfileValueAreaRatio?: number;
+  volumeProfileWidthRatio?: number;
 }
 
 export interface UserDrawingBase {
@@ -957,6 +958,8 @@ export const MAX_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 200;
 export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS = [12, 24, 48] as const;
 export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO = 0.7;
 export const USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS = [0.5, 0.7, 0.8] as const;
+export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO = 1;
+export const USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS = [0.25, 0.5, 1] as const;
 export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
@@ -964,6 +967,7 @@ export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
 export type UserDrawingVolumeProfileRowCount = (typeof USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS)[number];
 export type UserDrawingVolumeProfileValueAreaRatio = (typeof USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS)[number];
+export type UserDrawingVolumeProfileWidthRatio = (typeof USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25, 0.1] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
@@ -1015,6 +1019,11 @@ export function normalizeUserDrawingVolumeProfileValueAreaRatio(valueAreaRatio: 
   return Math.max(0, Math.min(1, valueAreaRatio));
 }
 
+export function normalizeUserDrawingVolumeProfileWidthRatio(widthRatio: number): number {
+  if (!Number.isFinite(widthRatio)) return DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO;
+  return Math.max(0.05, Math.min(1, widthRatio));
+}
+
 export function normalizeUserDrawingIconName(iconName: unknown): UserDrawingIconName {
   return USER_DRAWING_ICON_NAMES.includes(iconName as UserDrawingIconName)
     ? (iconName as UserDrawingIconName)
@@ -1048,6 +1057,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.volumeProfileValueAreaRatio === undefined
       ? undefined
       : normalizeUserDrawingVolumeProfileValueAreaRatio(style.volumeProfileValueAreaRatio);
+  const volumeProfileWidthRatio =
+    style.volumeProfileWidthRatio === undefined
+      ? undefined
+      : normalizeUserDrawingVolumeProfileWidthRatio(style.volumeProfileWidthRatio);
   if (
     fontSize === style.fontSize &&
     fontFamily === style.fontFamily &&
@@ -1057,7 +1070,8 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth &&
     volumeProfileRowCount === style.volumeProfileRowCount &&
-    volumeProfileValueAreaRatio === style.volumeProfileValueAreaRatio
+    volumeProfileValueAreaRatio === style.volumeProfileValueAreaRatio &&
+    volumeProfileWidthRatio === style.volumeProfileWidthRatio
   ) {
     return style;
   }
@@ -1073,6 +1087,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
     ...(volumeProfileRowCount === undefined ? {} : { volumeProfileRowCount }),
     ...(volumeProfileValueAreaRatio === undefined ? {} : { volumeProfileValueAreaRatio }),
+    ...(volumeProfileWidthRatio === undefined ? {} : { volumeProfileWidthRatio }),
   };
 }
 

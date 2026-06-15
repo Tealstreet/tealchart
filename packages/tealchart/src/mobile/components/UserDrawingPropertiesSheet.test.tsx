@@ -175,6 +175,8 @@ describe('UserDrawingPropertiesSheet', () => {
     expect(screen.getByLabelText('24 volume profile rows').getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByLabelText('70 percent value area').getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByLabelText('80 percent value area').getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByLabelText('100 percent profile width').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('50 percent profile width').getAttribute('aria-pressed')).toBe('false');
 
     fireEvent.click(screen.getByLabelText('Hide volume profile guides'));
     expect(onDispatch).toHaveBeenCalledWith({
@@ -190,6 +192,11 @@ describe('UserDrawingPropertiesSheet', () => {
     expect(onDispatch).toHaveBeenCalledWith({
       type: 'updateStyle',
       style: { volumeProfileValueAreaRatio: 0.8 },
+    });
+    fireEvent.click(screen.getByLabelText('50 percent profile width'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { volumeProfileWidthRatio: 0.5 },
     });
   });
 

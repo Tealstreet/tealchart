@@ -2896,6 +2896,18 @@ describe('user drawing toolbar descriptors', () => {
       selected: false,
       command: { type: 'updateStyle', style: { volumeProfileValueAreaRatio: 0.8 } },
     });
+    expect(visibleGeometryGroup?.controls.find((control) => control.id === 'volumeProfileWidthRatio:1')).toMatchObject({
+      label: '100 percent profile width',
+      value: 1,
+      selected: true,
+      command: { type: 'updateStyle', style: { volumeProfileWidthRatio: 1 } },
+    });
+    expect(visibleGeometryGroup?.controls.find((control) => control.id === 'volumeProfileWidthRatio:0.5')).toMatchObject({
+      label: '50 percent profile width',
+      value: 0.5,
+      selected: false,
+      command: { type: 'updateStyle', style: { volumeProfileWidthRatio: 0.5 } },
+    });
 
     const hiddenGeometryGroup = resolveUserDrawingPropertiesSurface({
       ...volumeProfileState,
@@ -2938,6 +2950,19 @@ describe('user drawing toolbar descriptors', () => {
     expect(
       valueAreaGeometryGroup?.controls.find((control) => control.id === 'volumeProfileValueAreaRatio:0.8'),
     ).toMatchObject({
+      selected: true,
+    });
+
+    const widthGeometryGroup = resolveUserDrawingPropertiesSurface({
+      ...volumeProfileState,
+      drawings: [
+        {
+          ...volumeProfileState.drawings[0]!,
+          style: { ...volumeProfileState.drawings[0]!.style, volumeProfileWidthRatio: 0.5 },
+        },
+      ],
+    }).groups.find((group) => group.id === 'geometry');
+    expect(widthGeometryGroup?.controls.find((control) => control.id === 'volumeProfileWidthRatio:0.5')).toMatchObject({
       selected: true,
     });
   });
