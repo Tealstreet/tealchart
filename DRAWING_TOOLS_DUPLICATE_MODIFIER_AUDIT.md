@@ -34,14 +34,17 @@ Scope: Epic D, Phase D3 in `DRAWING_TOOLS_NORTH_STAR.md`.
   edit-drag mode.
 - Rendered selected-action tests cover the visible duplicate-drag toggle on the
   web floating toolbar and mobile selected action strip.
+- Skia component tests now cover the rendered mobile selected action strip
+  toggling duplicate-drag mode before a real Skia edit pan duplicates and moves
+  the selected drawing.
 - Visual evidence records keyboard and modifier parity across web Canvas and
   mobile Skia.
 
 ## Known Gaps
 
 - Mobile duplicate mode remains host-driven for app-owned toolbars, but the
-  built-in selected action strip now exposes the same duplicate-drag toggle
-  concept as web.
+  built-in selected action strip now exposes and exercises the same
+  duplicate-drag toggle concept as web.
 - Constraint and duplicate mode are parity-equivalent, not gesture-identical,
   because mobile touch needs explicit host controls rather than hardware Shift.
 - Manual QA still needs a real-device pass for long-press toolbar flows once
