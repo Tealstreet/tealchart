@@ -1096,7 +1096,6 @@ describe('tealchart public entries', () => {
       rewardLabel: 'Reward +1.00 (+1.00%)',
       riskLabel: 'Risk -1.00 (-1.00%)',
       ratioLabel: 'R:R 1.00',
-      riskRewardLabelAlignment: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const barsPatternPrimitive: NonNever<MobileUserDrawingBarsPatternPrimitive> = {
