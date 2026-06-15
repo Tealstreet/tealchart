@@ -467,6 +467,7 @@ export {
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
+  supportsUserDrawingVolumeProfileGuideControls,
   USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FILL_OPACITY_DESCRIPTORS,

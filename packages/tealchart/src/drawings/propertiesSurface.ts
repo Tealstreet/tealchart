@@ -40,6 +40,7 @@ import {
   supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
+  supportsUserDrawingVolumeProfileGuideControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -408,6 +409,29 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
         selected: drawing.extend === descriptor.extend,
         command: { type: 'setTrendLineExtend' as const, extend: descriptor.extend },
       })),
+    });
+  }
+
+  if (supportsUserDrawingVolumeProfileGuideControls(drawing)) {
+    groups.push({
+      id: 'geometry',
+      label: 'Geometry',
+      controls: [
+        {
+          id: 'volumeProfileGuidesVisible',
+          type: 'option' as const,
+          label:
+            drawing.style.volumeProfileGuidesVisible === false
+              ? 'Show volume profile guides'
+              : 'Hide volume profile guides',
+          value: drawing.style.volumeProfileGuidesVisible !== false,
+          selected: drawing.style.volumeProfileGuidesVisible !== false,
+          command: {
+            type: 'updateStyle' as const,
+            style: { volumeProfileGuidesVisible: drawing.style.volumeProfileGuidesVisible === false },
+          },
+        },
+      ],
     });
   }
 

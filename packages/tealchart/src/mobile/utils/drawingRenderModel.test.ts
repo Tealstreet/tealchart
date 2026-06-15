@@ -2497,6 +2497,64 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('omits fixed range volume profile guide primitives when guide visibility is disabled', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'fixedRangeVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, volumeProfileGuidesVisible: false },
+          points: [
+            { time: 10, price: 80 },
+            { time: 90, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+                { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+                { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+              ],
+            },
+          ],
+        ]),
+      )[0],
+    ).toMatchObject({
+      kind: 'fixedRangeVolumeProfile',
+      id: 'volume-profile',
+      bounds: { x: 10, y: 20, width: 80, height: 60 },
+      guides: [],
+      bins: expect.arrayContaining([
+        expect.objectContaining({
+          priceMin: 75,
+          priceMax: 80,
+          volume: 20,
+          rect: { x: 10, y: 20, width: 80, height: 5 },
+        }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready anchored volume profile primitives', () => {
     const state: UserDrawingState = {
       version: 1,

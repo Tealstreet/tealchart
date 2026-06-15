@@ -2837,6 +2837,55 @@ describe('user drawing toolbar descriptors', () => {
     });
   });
 
+  it('resolves volume profile guide visibility in shared properties surfaces', () => {
+    const volumeProfileState = {
+      ...state,
+      selection: { drawingId: 'volume-profile' },
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'fixedRangeVolumeProfile' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const visibleGeometryGroup = resolveUserDrawingPropertiesSurface(volumeProfileState).groups.find(
+      (group) => group.id === 'geometry',
+    );
+    expect(visibleGeometryGroup?.controls.find((control) => control.id === 'volumeProfileGuidesVisible')).toMatchObject({
+      label: 'Hide volume profile guides',
+      value: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { volumeProfileGuidesVisible: false } },
+    });
+
+    const hiddenGeometryGroup = resolveUserDrawingPropertiesSurface({
+      ...volumeProfileState,
+      drawings: [
+        {
+          ...volumeProfileState.drawings[0]!,
+          style: { ...volumeProfileState.drawings[0]!.style, volumeProfileGuidesVisible: false },
+        },
+      ],
+    }).groups.find((group) => group.id === 'geometry');
+    expect(hiddenGeometryGroup?.controls.find((control) => control.id === 'volumeProfileGuidesVisible')).toMatchObject({
+      label: 'Show volume profile guides',
+      value: false,
+      selected: false,
+      command: { type: 'updateStyle', style: { volumeProfileGuidesVisible: true } },
+    });
+  });
+
   it('resolves locked and targeted properties surfaces', () => {
     const lockedState = {
       ...state,

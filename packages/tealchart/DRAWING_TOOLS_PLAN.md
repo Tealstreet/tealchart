@@ -1496,6 +1496,16 @@ object-tree gaps stay visible.
 - Web and mobile category flyouts now expose matching pin controls so users can
   keep a tool category open while choosing multiple tools.
 
+## Shipped: Volume Profile Guide Visibility Controls
+
+- Shared drawing style now preserves `volumeProfileGuidesVisible` for anchored
+  and fixed-range volume profile drawings.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose the same guide visibility control through the shared properties
+  surface.
+- Web Canvas and mobile Skia render paths suppress point-of-control and
+  value-area guide overlays while preserving volume bins and profile bounds.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.
