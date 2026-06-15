@@ -71,9 +71,10 @@ Tools audited here:
 - Web `ChartCore` and rendered mobile `SkiaTealchart` coverage now prove
   two-anchor drag-placement tools swallow tap/click placement at the adapter
   layer, while drag-seeded tools such as `longPosition` still accept final
-  anchor taps. This prevents first-party UI from leaving a one-anchor
-  rectangle-style draft that can later finish as a surprising shape; real drag
-  endpoints remain the two-anchor placement path.
+  anchor taps after seed drags. The web adapter only consumes valid chart-area
+  taps, so axes/out-of-pane clicks are not swallowed. This prevents first-party
+  UI from leaving a one-anchor rectangle-style draft that can later finish as a
+  surprising shape; real drag endpoints remain the two-anchor placement path.
 - The earlier "random rectangle" concern should be treated as a UI regression
   only if reproduced through the sidebar/pointer path. The shared state layer
   currently behaves correctly.

@@ -639,22 +639,25 @@ describe('ChartCore viewport management', () => {
     };
 
     expect(testCore.handleUserDrawingInput(48, 18)).toEqual({ handled: true });
+    expect(testCore.handleUserDrawingInput(120, 18)).toBe(false);
     expect(onUserDrawingInput).not.toHaveBeenCalled();
 
     core.dispose();
   });
 
-  it('keeps drag-seeded tool taps available for final anchors', async () => {
+  it('keeps drag-seeded tool final taps available after seed drags', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingInput = vi.fn(() => true);
+    const onUserDrawingPlacementDragStart = vi.fn(() => true);
+    const onUserDrawingPlacementDragEnd = vi.fn(() => true);
     const core = new ChartCore({
       container,
       width: 100,
       height: 100,
       margins: { top: 0, right: 0, bottom: 0, left: 0 },
       onUserDrawingInput,
-      onUserDrawingPlacementDragStart: vi.fn(() => true),
-      onUserDrawingPlacementDragEnd: vi.fn(() => true),
+      onUserDrawingPlacementDragStart,
+      onUserDrawingPlacementDragEnd,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
     core.setUserDrawingState({
@@ -668,8 +671,17 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
 
     const testCore = core as unknown as {
+      handleUserDrawingDragStart(x: number, y: number): boolean;
+      handleUserDrawingDragMove(x: number, y: number): boolean;
+      handleUserDrawingDragEnd(): void;
       handleUserDrawingInput(x: number, y: number): unknown;
     };
+
+    expect(testCore.handleUserDrawingDragStart(20, 20)).toBe(true);
+    expect(testCore.handleUserDrawingDragMove(48, 18)).toBe(true);
+    testCore.handleUserDrawingDragEnd();
+    expect(onUserDrawingPlacementDragStart).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledTimes(1);
 
     expect(testCore.handleUserDrawingInput(48, 18)).toBe(true);
     expect(onUserDrawingInput).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
