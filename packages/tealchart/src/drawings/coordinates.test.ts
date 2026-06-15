@@ -2819,6 +2819,61 @@ describe('user drawing coordinates', () => {
     expect(geometry.kind === 'fixedRangeVolumeProfile' ? geometry.volumeProfile.bins : []).toHaveLength(6);
   });
 
+  it('resolves fixed range volume profile guides with configured value areas', () => {
+    const profileSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 },
+      pane: { ...space.pane, yMin: 0, yMax: 100 },
+      chartLeft: 0,
+      chartRight: 100,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      ],
+    };
+    const drawing: FixedRangeVolumeProfileDrawing = {
+      id: 'profile',
+      kind: 'fixedRangeVolumeProfile',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { ...style, volumeProfileValueAreaRatio: 0.5 },
+      points: [
+        { time: 10, price: 80 },
+        { time: 90, price: 20 },
+      ],
+    };
+
+    expect(resolveUserDrawingGeometry(drawing, profileSpace)).toMatchObject({
+      kind: 'fixedRangeVolumeProfile',
+      volumeProfile: {
+        guides: [
+          {
+            kind: 'pointOfControl',
+            price: 77.5,
+            volume: 20,
+            segment: { start: { x: 10, y: 42.5 }, end: { x: 90, y: 42.5 } },
+          },
+          {
+            kind: 'valueAreaHigh',
+            price: 80,
+            volume: 20,
+            segment: { start: { x: 10, y: 40 }, end: { x: 90, y: 40 } },
+          },
+          {
+            kind: 'valueAreaLow',
+            price: 75,
+            volume: 20,
+            segment: { start: { x: 10, y: 45 }, end: { x: 90, y: 45 } },
+          },
+        ],
+      },
+    });
+  });
+
   it('resolves anchored volume profile bins from anchor through latest bar', () => {
     const profileSpace: DrawingCoordinateSpace = {
       ...space,
@@ -2927,6 +2982,37 @@ describe('user drawing coordinates', () => {
     expect(configuredGeometry.kind === 'anchoredVolumeProfile' ? configuredGeometry.volumeProfile.bins : []).toHaveLength(
       6,
     );
+
+    expect(
+      resolveUserDrawingGeometry(
+        { ...drawing, style: { ...style, volumeProfileValueAreaRatio: 0.5 } },
+        profileSpace,
+      ),
+    ).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      volumeProfile: {
+        guides: [
+          {
+            kind: 'pointOfControl',
+            price: 77.5,
+            volume: 20,
+            segment: { start: { x: 10, y: 42.5 }, end: { x: 100, y: 42.5 } },
+          },
+          {
+            kind: 'valueAreaHigh',
+            price: 80,
+            volume: 20,
+            segment: { start: { x: 10, y: 40 }, end: { x: 100, y: 40 } },
+          },
+          {
+            kind: 'valueAreaLow',
+            price: 75,
+            volume: 20,
+            segment: { start: { x: 10, y: 45 }, end: { x: 100, y: 45 } },
+          },
+        ],
+      },
+    });
 
     expect(
       resolveUserDrawingGeometry(

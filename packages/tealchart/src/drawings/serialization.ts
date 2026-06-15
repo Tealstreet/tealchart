@@ -367,6 +367,9 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
     style.volumeProfileGuidesVisible = value.volumeProfileGuidesVisible;
   }
   if (isFiniteNumber(value.volumeProfileRowCount)) style.volumeProfileRowCount = value.volumeProfileRowCount;
+  if (isFiniteNumber(value.volumeProfileValueAreaRatio)) {
+    style.volumeProfileValueAreaRatio = value.volumeProfileValueAreaRatio;
+  }
   return normalizeUserDrawingStyle(style);
 }
 

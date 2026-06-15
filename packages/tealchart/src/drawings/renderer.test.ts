@@ -2157,6 +2157,35 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillRect:10,70,20,10:rgba(245, 197, 66, 0.12):1');
   });
 
+  it('renders fixed range volume profile guides with configured value areas', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'volume-profile',
+      kind: 'fixedRangeVolumeProfile',
+      style: { ...style, volumeProfileValueAreaRatio: 0.5 },
+      points: [
+        { time: 10, price: 80 },
+        { time: 90, price: 20 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      ],
+    });
+
+    expect(ctx.calls).toContain('moveTo:10,20');
+    expect(ctx.calls).toContain('lineTo:90,20');
+    expect(ctx.calls).toContain('moveTo:10,25');
+    expect(ctx.calls).toContain('lineTo:90,25');
+    expect(ctx.calls).not.toContain('lineTo:90,45');
+  });
+
   it('renders anchored volume profiles as shared volume bins', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
