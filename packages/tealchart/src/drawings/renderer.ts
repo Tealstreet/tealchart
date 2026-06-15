@@ -32,6 +32,7 @@ import {
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
   DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
+  normalizeUserDrawingMeasurementLabelAlignment,
   normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingBarsPatternDisplayMode,
@@ -1253,15 +1254,27 @@ function renderEllipseGeometry(
   }
 }
 
+function resolveMeasurementLabelX(
+  rect: { x: number; width: number },
+  fontSize: number,
+  alignment: unknown,
+): number {
+  const labelAlignment = normalizeUserDrawingMeasurementLabelAlignment(alignment);
+  if (labelAlignment === 'left') return rect.x + fontSize;
+  if (labelAlignment === 'right') return rect.x + rect.width - fontSize;
+  return rect.x + rect.width / 2;
+}
+
 function resolveMeasurementLabelPoint(
   rect: { x: number; y: number; width: number; height: number },
   fontSize: number,
   position: unknown,
+  alignment: unknown,
 ): DrawingScreenPoint {
   const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
     position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   );
-  const x = rect.x + rect.width / 2;
+  const x = resolveMeasurementLabelX(rect, fontSize, alignment);
   if (labelPosition === 'top') return { x, y: rect.y + fontSize };
   if (labelPosition === 'bottom') return { x, y: rect.y + rect.height - fontSize };
   return { x, y: rect.y + rect.height / 2 };
@@ -1271,11 +1284,12 @@ function resolveDatePriceRangeLabelPoints(
   rect: { x: number; y: number; width: number; height: number },
   fontSize: number,
   position: unknown,
+  alignment: unknown,
 ): { price: DrawingScreenPoint; date: DrawingScreenPoint } {
   const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
     position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   );
-  const x = rect.x + rect.width / 2;
+  const x = resolveMeasurementLabelX(rect, fontSize, alignment);
   if (labelPosition === 'top') {
     return {
       price: { x, y: rect.y + fontSize },
@@ -1322,7 +1336,12 @@ function renderPriceRangeGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const labelPoint = resolveMeasurementLabelPoint(rect, fontSize, drawing.style.measurementLabelPosition);
+  const labelPoint = resolveMeasurementLabelPoint(
+    rect,
+    fontSize,
+    drawing.style.measurementLabelPosition,
+    drawing.style.measurementLabelAlignment,
+  );
   ctx.fillText(label, labelPoint.x, labelPoint.y);
 }
 
@@ -1354,7 +1373,12 @@ function renderDateRangeGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const labelPoint = resolveMeasurementLabelPoint(rect, fontSize, drawing.style.measurementLabelPosition);
+  const labelPoint = resolveMeasurementLabelPoint(
+    rect,
+    fontSize,
+    drawing.style.measurementLabelPosition,
+    drawing.style.measurementLabelAlignment,
+  );
   ctx.fillText(label, labelPoint.x, labelPoint.y);
 }
 
@@ -1387,7 +1411,12 @@ function renderDatePriceRangeGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const labelPoints = resolveDatePriceRangeLabelPoints(rect, fontSize, drawing.style.measurementLabelPosition);
+  const labelPoints = resolveDatePriceRangeLabelPoints(
+    rect,
+    fontSize,
+    drawing.style.measurementLabelPosition,
+    drawing.style.measurementLabelAlignment,
+  );
   ctx.fillText(priceLabel, labelPoints.price.x, labelPoints.price.y);
   ctx.fillText(dateLabel, labelPoints.date.x, labelPoints.date.y);
 }

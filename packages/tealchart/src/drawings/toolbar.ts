@@ -9,6 +9,7 @@ import type {
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
+  UserDrawingMeasurementLabelAlignment,
   UserDrawingMeasurementLabelPosition,
   UserDrawingRiskRewardLabelAlignment,
   UserDrawingRiskRewardStatsMode,
@@ -37,6 +38,7 @@ import {
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAMES,
+  USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS,
   USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
@@ -203,6 +205,11 @@ export interface UserDrawingRiskRewardStatsModeDescriptor {
 
 export interface UserDrawingRiskRewardLabelAlignmentDescriptor {
   alignment: UserDrawingRiskRewardLabelAlignment;
+  label: string;
+}
+
+export interface UserDrawingMeasurementLabelAlignmentDescriptor {
+  alignment: UserDrawingMeasurementLabelAlignment;
   label: string;
 }
 
@@ -825,6 +832,17 @@ export const USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS: readonly User
         : alignment === 'right'
           ? 'Right position labels'
           : 'Center position labels',
+  }));
+
+export const USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT_DESCRIPTORS: readonly UserDrawingMeasurementLabelAlignmentDescriptor[] =
+  USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS.map((alignment) => ({
+    alignment,
+    label:
+      alignment === 'left'
+        ? 'Left aligned measurement label'
+        : alignment === 'right'
+          ? 'Right aligned measurement label'
+          : 'Center aligned measurement label',
   }));
 
 export const USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS: readonly UserDrawingMeasurementLabelPositionDescriptor[] =
