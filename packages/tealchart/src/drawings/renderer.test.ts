@@ -735,6 +735,33 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,88:#111:center:1:12px sans-serif');
   });
 
+  it('renders date range labels at the configured horizontal alignment', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      style: { ...base.style, measurementLabelAlignment: 'left' },
+      points: [
+        { time: 10_000, price: 90 },
+        { time: 70_000, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    });
+
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:22,50:#111:center:1:12px sans-serif');
+  });
+
   it('renders date and price ranges with price and duration labels', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
