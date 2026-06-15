@@ -2636,8 +2636,28 @@ describe('user drawing toolbar descriptors', () => {
     } satisfies UserDrawingState;
 
     const surface = resolveUserDrawingPropertiesSurface(highlighterState);
-    const strokeGroup = surface.groups[0]!;
+    const templateGroup = surface.groups[0]!;
+    const strokeGroup = surface.groups[1]!;
 
+    expect(surface.groups.map((group) => group.id)).toEqual(['template', 'line']);
+    expect(templateGroup).toMatchObject({ id: 'template', label: 'Templates' });
+    expect(templateGroup.controls.find((control) => control.id === 'template:highlighter-yellow')).toMatchObject({
+      label: 'Yellow highlighter template',
+      enabled: true,
+      selected: true,
+      command: {
+        type: 'updateStyle',
+        style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid', opacity: 0.35 },
+      },
+    });
+    expect(templateGroup.controls.find((control) => control.id === 'template:highlighter-pink')).toMatchObject({
+      label: 'Pink highlighter template',
+      selected: false,
+      command: {
+        type: 'updateStyle',
+        style: { lineColor: '#ec4899', lineWidth: 12, lineStyle: 'solid', opacity: 0.25 },
+      },
+    });
     expect(strokeGroup).toMatchObject({ id: 'line', label: 'Stroke' });
     expect(strokeGroup.controls.find((control) => control.id === 'lineWidth:8')).toMatchObject({
       enabled: true,

@@ -140,14 +140,15 @@ summary:
 - `path`, `brush`, and `highlighter` use sampled freehand drag input with undo
   transaction grouping and shared commit-time smoothing on both web Canvas and
   mobile Skia. They also use shared tool-specific stroke defaults and
-  properties-surface stroke presets. Optional pressure metadata is preserved
-  through web/mobile input, smoothing, command history, and layout restore.
-  Canvas and Skia derive matching variable-width pressure stroke segments at
-  render time, including dash-phase continuity for dashed and dotted strokes.
-  Web floating toolbars, web context menus, mobile action strips, and mobile
-  long-press menus now expose the same selected stroke-width and opacity preset
-  commands from the shared selected-action model. TradingView-grade behavior
-  still needs saved brush template libraries.
+  properties-surface stroke presets and built-in template presets. Optional
+  pressure metadata is preserved through web/mobile input, smoothing, command
+  history, and layout restore. Canvas and Skia derive matching variable-width
+  pressure stroke segments at render time, including dash-phase continuity for
+  dashed and dotted strokes. Web floating toolbars, web context menus, mobile
+  action strips, and mobile long-press menus now expose the same selected
+  stroke-width and opacity preset commands from the shared selected-action
+  model. TradingView-grade behavior still needs user-saved custom brush
+  template libraries.
 - `anchoredText` and `anchoredNote` currently share one-anchor input semantics,
   but their long-term behavior should be treated as `anchored-pane` placement.
 - `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars

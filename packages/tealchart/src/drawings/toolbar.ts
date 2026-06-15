@@ -2,6 +2,7 @@ import type { UpdateUserDrawingOptions, UserDrawingZOrderAction } from './input'
 import type { UserDrawingSelectionActionAnchor } from './renderModel';
 import type {
   UserDrawing,
+  UserDrawingPathFamilyKind,
   UserDrawingFontFamily,
   UserDrawingFontStyle,
   UserDrawingFontWeight,
@@ -213,6 +214,23 @@ export interface UserDrawingLineStyleDescriptor {
 export interface UserDrawingOpacityDescriptor {
   opacity: number;
   label: string;
+}
+
+export type UserDrawingBrushTemplateId =
+  | 'path-clean'
+  | 'path-dashed'
+  | 'brush-pencil'
+  | 'brush-marker'
+  | 'highlighter-yellow'
+  | 'highlighter-green'
+  | 'highlighter-pink';
+
+export interface UserDrawingBrushTemplateDescriptor {
+  template: UserDrawingBrushTemplateId;
+  tool: UserDrawingPathFamilyKind;
+  icon: string;
+  label: string;
+  style: Pick<UserDrawingStyle, 'lineColor' | 'lineWidth' | 'lineStyle' | 'opacity'>;
 }
 
 export interface UserDrawingStyleToggleDescriptor {
@@ -761,6 +779,58 @@ export const USER_DRAWING_HIGHLIGHTER_OPACITY_DESCRIPTORS: readonly UserDrawingO
   { opacity: 0.1, label: '10 percent highlighter opacity' },
 ] as const;
 
+export const USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS: readonly UserDrawingBrushTemplateDescriptor[] = [
+  {
+    template: 'path-clean',
+    tool: 'path',
+    icon: 'P',
+    label: 'Clean path template',
+    style: { lineColor: '#d1d4dc', lineWidth: 2, lineStyle: 'solid', opacity: 1 },
+  },
+  {
+    template: 'path-dashed',
+    tool: 'path',
+    icon: 'P',
+    label: 'Dashed path template',
+    style: { lineColor: '#38bdf8', lineWidth: 2, lineStyle: 'dashed', opacity: 1 },
+  },
+  {
+    template: 'brush-pencil',
+    tool: 'brush',
+    icon: 'B',
+    label: 'Pencil brush template',
+    style: { lineColor: '#f8fafc', lineWidth: 2, lineStyle: 'solid', opacity: 1 },
+  },
+  {
+    template: 'brush-marker',
+    tool: 'brush',
+    icon: 'B',
+    label: 'Marker brush template',
+    style: { lineColor: '#38bdf8', lineWidth: 8, lineStyle: 'solid', opacity: 0.75 },
+  },
+  {
+    template: 'highlighter-yellow',
+    tool: 'highlighter',
+    icon: 'H',
+    label: 'Yellow highlighter template',
+    style: { lineColor: '#f5c542', lineWidth: 8, lineStyle: 'solid', opacity: 0.35 },
+  },
+  {
+    template: 'highlighter-green',
+    tool: 'highlighter',
+    icon: 'H',
+    label: 'Green highlighter template',
+    style: { lineColor: '#22c55e', lineWidth: 12, lineStyle: 'solid', opacity: 0.35 },
+  },
+  {
+    template: 'highlighter-pink',
+    tool: 'highlighter',
+    icon: 'H',
+    label: 'Pink highlighter template',
+    style: { lineColor: '#ec4899', lineWidth: 12, lineStyle: 'solid', opacity: 0.25 },
+  },
+] as const;
+
 export function getUserDrawingLineWidthPreviewFontSize(width: number): number {
   return Math.min(10 + width, 20);
 }
@@ -778,6 +848,13 @@ export function getUserDrawingOpacityDescriptors(drawing: UserDrawing): readonly
 
 export function getUserDrawingFillOpacityDescriptors(_drawing: UserDrawing): readonly UserDrawingOpacityDescriptor[] {
   return USER_DRAWING_FILL_OPACITY_DESCRIPTORS;
+}
+
+export function getUserDrawingBrushTemplateDescriptors(
+  drawing: UserDrawing,
+): readonly UserDrawingBrushTemplateDescriptor[] {
+  if (!isUserDrawingPathFamilyTool(drawing.kind)) return [];
+  return USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS.filter((descriptor) => descriptor.tool === drawing.kind);
 }
 
 export const USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS: readonly UserDrawingStyleToggleDescriptor[] = [

@@ -926,6 +926,15 @@ object-tree gaps stay visible.
   mobile, and Canvas/Skia render matching variable-width pressure strokes from
   the shared path-family segment model with dash-phase continuity.
 
+## Shipped: Brush Template Presets
+
+- Shared brush-template descriptors define built-in style bundles for `path`,
+  `brush`, and `highlighter` drawings.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose the same template controls through the shared properties surface.
+- Template application dispatches normal drawing style commands, preserving
+  command history, undo/redo, and existing Canvas/Skia rendering behavior.
+
 ## Shipped: Note Tool
 
 - Shared drawing state supports the single-anchor `note` annotation and persists
@@ -1497,6 +1506,7 @@ object-tree gaps stay visible.
   price/date ranges, risk/reward positions, and bars pattern.
 - Additional rich text label controls, richer table editing UI, and multiline
   editor polish.
-- More complete style controls, including per-tool property panels.
+- More complete style controls, including per-tool property panels and
+  user-saved custom template libraries.
 - Cross-device/server sync policy for host apps that need drawing collaboration
   or layout conflict resolution.
