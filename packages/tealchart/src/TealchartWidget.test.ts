@@ -2972,6 +2972,75 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('nudges selected drawings from arrow keys while chart owns input', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const testWidget = widget as unknown as {
+        _isHovered: boolean;
+        _ui?: {
+          getChartCore?: () => {
+            getUserDrawingSpacesForCurrentViewport: () => Map<string, DrawingCoordinateSpace>;
+          };
+        };
+      };
+      testWidget._ui!.getChartCore = () => ({
+        getUserDrawingSpacesForCurrentViewport: () => new Map([['main', userDrawingSpace]]),
+      });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'line' },
+        drawings: [
+          {
+            id: 'line',
+            kind: 'trendLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            points: [
+              { time: 10, price: 20 },
+              { time: 20, price: 40 },
+            ],
+            extend: 'none',
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      const nudge = new KeyboardEvent('keydown', { key: 'ArrowRight', cancelable: true });
+      document.dispatchEvent(nudge);
+
+      const [moved] = widget.getUserDrawingState().drawings;
+      expect(nudge.defaultPrevented).toBe(true);
+      expect(moved).toMatchObject({
+        id: 'line',
+        kind: 'trendLine',
+        points: [
+          { time: 11, price: 20 },
+          { time: 21, price: 40 },
+        ],
+      });
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+      expect(widget.undoUserDrawingCommand()).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'line',
+        kind: 'trendLine',
+        points: [
+          { time: 10, price: 20 },
+          { time: 20, price: 40 },
+        ],
+      });
+
+      widget.remove();
+    });
+
     it('clears drawing command history when user drawing state is externally replaced', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
