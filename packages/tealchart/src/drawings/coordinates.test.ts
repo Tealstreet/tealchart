@@ -2893,6 +2893,41 @@ describe('user drawing coordinates', () => {
       },
     });
 
+    const configuredGeometry = resolveUserDrawingGeometry(
+      { ...drawing, style: { ...style, volumeProfileRowCount: 6 } },
+      profileSpace,
+    );
+    expect(configuredGeometry).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      volumeProfile: {
+        maxVolume: 20,
+        totalVolume: 35,
+        bins: expect.arrayContaining([
+          expect.objectContaining({
+            priceMin: 70,
+            priceMax: 80,
+            volume: 20,
+            rect: { x: 10, y: 40, width: 90, height: 10 },
+          }),
+          expect.objectContaining({
+            priceMin: 50,
+            priceMax: 60,
+            volume: 10,
+            rect: { x: 10, y: 60, width: 45, height: 10 },
+          }),
+          expect.objectContaining({
+            priceMin: 20,
+            priceMax: 30,
+            volume: 5,
+            rect: { x: 10, y: 90, width: 22.5, height: 10 },
+          }),
+        ]),
+      },
+    });
+    expect(configuredGeometry.kind === 'anchoredVolumeProfile' ? configuredGeometry.volumeProfile.bins : []).toHaveLength(
+      6,
+    );
+
     expect(
       resolveUserDrawingGeometry(
         {
