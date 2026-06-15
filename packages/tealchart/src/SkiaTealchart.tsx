@@ -131,6 +131,7 @@ import {
   measureUserDrawingTextLines,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
+  normalizeUserDrawingOpacity,
   redoUserDrawingCommand as redoUserDrawingCommandHistory,
   resolveUserDrawingContextActionsAtPoint,
   resolveUserDrawingObjectTreeDispatchActionCommands,
@@ -223,6 +224,16 @@ function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): 
     case 'solid':
       return null;
   }
+}
+
+function UserDrawingSkiaFill({
+  style,
+  children,
+}: {
+  style: UserDrawingStyle;
+  children: React.ReactNode;
+}) {
+  return <Group opacity={normalizeUserDrawingOpacity(style.fillOpacity ?? 1)}>{children}</Group>;
 }
 
 function LoadedUserDrawingSkiaImage({ primitive }: { primitive: MobileUserDrawingImagePrimitive }) {
@@ -2797,7 +2808,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -2859,7 +2872,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={path} color={primitive.style.fillColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={path} color={primitive.style.fillColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -2964,7 +2979,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -3002,12 +3019,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     path.lineTo(second.x, second.y);
                     path.close();
                     return (
-                      <SkiaPath
-                        key={`${band.fromRatio}-${band.toRatio}`}
-                        path={path}
-                        color={primitive.style.fillColor}
-                        style="fill"
-                      />
+                      <UserDrawingSkiaFill key={`${band.fromRatio}-${band.toRatio}`} style={primitive.style}>
+                        <SkiaPath path={path} color={primitive.style.fillColor} style="fill" />
+                      </UserDrawingSkiaFill>
                     );
                   })}
                 {primitive.style.lineVisible !== false && (
@@ -3084,7 +3098,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={path} color={primitive.style.fillColor} />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={path} color={primitive.style.fillColor} />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false &&
                   primitive.levels.map((level) => (
@@ -3255,7 +3271,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && (
-                  <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -3298,7 +3316,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && (
-                  <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -3321,13 +3341,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <Rect
@@ -3355,14 +3377,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor ?? 'rgba(127, 127, 127, 0.12)'}
-                    style="fill"
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor ?? 'rgba(127, 127, 127, 0.12)'}
+                      style="fill"
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <>
@@ -3430,13 +3454,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -3472,12 +3498,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Circle
-                    cx={primitive.center.x}
-                    cy={primitive.center.y}
-                    r={primitive.radius}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Circle
+                      cx={primitive.center.x}
+                      cy={primitive.center.y}
+                      r={primitive.radius}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <Circle
@@ -3614,7 +3642,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <>
@@ -3677,13 +3707,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Oval
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Oval
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <Oval
@@ -3723,7 +3755,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -4013,15 +4047,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 {primitive.style.fillVisible !== false &&
                   primitive.bins.map((bin) =>
                     bin.volume > 0 && bin.rect.width > 0 && bin.rect.height > 0 ? (
-                      <Rect
-                        key={`${primitive.id}:bin:${bin.priceMin}:${bin.priceMax}`}
-                        x={bin.rect.x}
-                        y={bin.rect.y}
-                        width={bin.rect.width}
-                        height={bin.rect.height}
-                        color={fillColor}
-                        style="fill"
-                      />
+                      <UserDrawingSkiaFill key={`${primitive.id}:bin:${bin.priceMin}:${bin.priceMax}`} style={primitive.style}>
+                        <Rect
+                          x={bin.rect.x}
+                          y={bin.rect.y}
+                          width={bin.rect.width}
+                          height={bin.rect.height}
+                          color={fillColor}
+                          style="fill"
+                        />
+                      </UserDrawingSkiaFill>
                     ) : null,
                   )}
                 {primitive.style.lineVisible !== false && (
@@ -4075,7 +4110,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={path} color={primitive.style.fillColor} />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={path} color={primitive.style.fillColor} />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -4113,7 +4150,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <SkiaPath path={path} color={primitive.style.fillColor} />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <SkiaPath path={path} color={primitive.style.fillColor} />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <SkiaPath
@@ -4153,7 +4192,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && (
-                  <>
+                  <UserDrawingSkiaFill style={primitive.style}>
                     <Rect
                       x={primitive.profitRect.x}
                       y={primitive.profitRect.y}
@@ -4168,7 +4207,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       height={primitive.riskRect.height}
                       color="rgba(244, 63, 94, 0.18)"
                     />
-                  </>
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <>
@@ -4258,7 +4297,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                         />
                       )}
                       {primitive.style.fillVisible !== false && (
-                        <Rect x={bodyX} y={bodyTop} width={bar.bodyWidth} height={bodyHeight} color={color} />
+                        <UserDrawingSkiaFill style={primitive.style}>
+                          <Rect x={bodyX} y={bodyTop} width={bar.bodyWidth} height={bodyHeight} color={color} />
+                        </UserDrawingSkiaFill>
                       )}
                       {primitive.style.lineVisible !== false && (
                         <Rect
@@ -4287,13 +4328,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <Rect
@@ -4338,13 +4381,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <Rect
@@ -4428,13 +4473,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.rect.x}
+                      y={primitive.rect.y}
+                      width={primitive.rect.width}
+                      height={primitive.rect.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <Rect
@@ -4469,12 +4516,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const color = primitive.style.lineColor;
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                <Circle
-                  cx={primitive.point.x}
-                  cy={primitive.point.y - stem}
-                  r={radius}
-                  color={primitive.style.fillColor ?? color}
-                />
+                {primitive.style.fillVisible !== false && (
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Circle
+                      cx={primitive.point.x}
+                      cy={primitive.point.y - stem}
+                      r={radius}
+                      color={primitive.style.fillColor ?? color}
+                    />
+                  </UserDrawingSkiaFill>
+                )}
                 <Circle
                   cx={primitive.point.x}
                   cy={primitive.point.y - stem}
@@ -4501,6 +4552,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const textPrimitive: MobileUserDrawingTextBoxPrimitive = primitive;
             const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
             if (!font) return null;
+            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
             const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
             const textWrapWidth = primitive.style.textWrap ? primitive.style.textMaxWidth : undefined;
             const measuredLines = measureUserDrawingTextLines(
@@ -4543,7 +4595,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   </SkiaLine>
                 )}
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <>
+                  <UserDrawingSkiaFill style={primitive.style}>
                     <Rect
                       x={layout.box.x}
                       y={layout.box.y}
@@ -4552,7 +4604,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       color={primitive.style.fillColor}
                     />
                     {balloonTailPath && <SkiaPath path={balloonTailPath} color={primitive.style.fillColor} />}
-                  </>
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false && (
                   <>
@@ -4604,13 +4656,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <Rect
-                    x={primitive.table.bounds.x}
-                    y={primitive.table.bounds.y}
-                    width={primitive.table.bounds.width}
-                    height={primitive.table.bounds.height}
-                    color={primitive.style.fillColor}
-                  />
+                  <UserDrawingSkiaFill style={primitive.style}>
+                    <Rect
+                      x={primitive.table.bounds.x}
+                      y={primitive.table.bounds.y}
+                      width={primitive.table.bounds.width}
+                      height={primitive.table.bounds.height}
+                      color={primitive.style.fillColor}
+                    />
+                  </UserDrawingSkiaFill>
                 )}
                 {primitive.style.lineVisible !== false &&
                   primitive.table.cells.map((cell) => (

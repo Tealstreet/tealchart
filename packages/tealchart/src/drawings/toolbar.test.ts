@@ -36,6 +36,7 @@ import {
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+  USER_DRAWING_FILL_OPACITY_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
   USER_DRAWING_FONT_STYLE_DESCRIPTORS,
@@ -249,6 +250,7 @@ describe('user drawing toolbar descriptors', () => {
     }
     for (const descriptor of [
       ...USER_DRAWING_FILL_COLOR_DESCRIPTORS,
+      ...USER_DRAWING_FILL_OPACITY_DESCRIPTORS,
       ...USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
       ...USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
       ...USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -1847,6 +1849,7 @@ describe('user drawing toolbar descriptors', () => {
             lineWidth: 1,
             lineStyle: 'solid' as const,
             fillColor: 'rgba(245, 197, 66, 0.12)',
+            fillOpacity: 0.5,
           },
           points: [
             { time: 1, price: 10 },
@@ -1868,6 +1871,11 @@ describe('user drawing toolbar descriptors', () => {
     expect(styleItems.find((item) => item.id === 'opacity:0.75')).toMatchObject({
       enabled: true,
       command: { type: 'updateStyle', style: { opacity: 0.75 } },
+    });
+    expect(styleItems.find((item) => item.id === 'fillOpacity:0.5')).toMatchObject({
+      enabled: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { fillOpacity: 0.5 } },
     });
     expect(styleItems.find((item) => item.id === 'lineVisible:toggle')).toMatchObject({
       enabled: true,
@@ -2445,6 +2453,12 @@ describe('user drawing toolbar descriptors', () => {
     expect(
       getUserDrawingToolbarStateKey({
         ...first,
+        drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, fillOpacity: 0.5 } }],
+      }),
+    ).not.toBe(getUserDrawingToolbarStateKey(first));
+    expect(
+      getUserDrawingToolbarStateKey({
+        ...first,
         drawings: [{ ...first.drawings[0]!, style: { ...first.drawings[0]!.style, opacity: 0.5 } }],
       }),
     ).not.toBe(getUserDrawingToolbarStateKey(first));
@@ -2659,6 +2673,7 @@ describe('user drawing toolbar descriptors', () => {
             lineWidth: 1,
             lineStyle: 'solid' as const,
             fillColor: 'rgba(245, 197, 66, 0.12)',
+            fillOpacity: 0.25,
             textColor: '#d1d4dc',
             fontSize: 14,
             textWrap: true,
@@ -2681,6 +2696,12 @@ describe('user drawing toolbar descriptors', () => {
     ).toMatchObject({
       selected: true,
       command: { type: 'updateStyle', style: { fillColor: 'rgba(245, 197, 66, 0.12)' } },
+    });
+    expect(
+      surface.groups.find((group) => group.id === 'fill')?.controls.find((control) => control.id === 'fillOpacity:0.25'),
+    ).toMatchObject({
+      selected: true,
+      command: { type: 'updateStyle', style: { fillOpacity: 0.25 } },
     });
     expect(
       surface.groups
@@ -2873,7 +2894,20 @@ describe('user drawing toolbar descriptors', () => {
       .groups.find((group) => group.id === 'fill')
       ?.controls.map((control) => control.id);
 
-    expect(fillControls).toEqual(['lineVisible:true', 'fillVisible:true']);
+    expect(fillControls).toEqual([
+      'fillOpacity:1',
+      'fillOpacity:0.75',
+      'fillOpacity:0.5',
+      'fillOpacity:0.25',
+      'fillOpacity:0.1',
+      'lineVisible:true',
+      'fillVisible:true',
+    ]);
+    expect(
+      resolveUserDrawingPropertiesSurface(riskRewardState)
+        .groups.find((group) => group.id === 'fill')
+        ?.controls.find((control) => control.id === 'fillOpacity:1'),
+    ).toMatchObject({ selected: true });
   });
 
   it('matches properties surface colors case-insensitively', () => {
