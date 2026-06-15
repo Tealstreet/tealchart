@@ -1548,6 +1548,17 @@ object-tree gaps stay visible.
 - Web Canvas and mobile Skia render paths consume the same shared risk/reward
   metrics so compact stats labels match across platforms.
 
+## Shipped: Bars Pattern Display Mode Controls
+
+- Shared drawing style now preserves `barsPatternDisplayMode` for bars pattern
+  drawings with candlestick rendering as the default and close-line rendering
+  as the alternate display.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose matching candlestick/line display presets through the shared
+  properties surface.
+- Web Canvas and mobile Skia render paths consume the same resolved bars
+  geometry so line mode follows the computed close points on both platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.

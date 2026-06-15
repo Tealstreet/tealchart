@@ -28,6 +28,8 @@ import {
   resolveUserDrawingTextLabelLayout,
 } from './textLayout';
 import {
+  DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingFontStyle,
@@ -1424,6 +1426,25 @@ function renderBarsPatternGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'barsPattern' }>,
 ): void {
+  const displayMode = normalizeUserDrawingBarsPatternDisplayMode(
+    geometry.drawing.style.barsPatternDisplayMode ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  );
+
+  if (displayMode === 'line') {
+    if (geometry.drawing.style.lineVisible === false || geometry.pattern.bars.length === 0) return;
+    applyStrokeStyle(ctx, geometry.drawing);
+    ctx.beginPath();
+    geometry.pattern.bars.forEach((bar, index) => {
+      if (index === 0) {
+        ctx.moveTo(bar.x, bar.closeY);
+      } else {
+        ctx.lineTo(bar.x, bar.closeY);
+      }
+    });
+    ctx.stroke();
+    return;
+  }
+
   if (geometry.drawing.style.lineVisible === false && geometry.drawing.style.fillVisible === false) return;
 
   ctx.setLineDash([]);

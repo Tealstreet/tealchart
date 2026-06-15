@@ -3227,7 +3227,7 @@ describe('drawing layout serialization', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', barsPatternDisplayMode: 'line' },
           points: [
             { time: 1, price: 100 },
             { time: 2, price: 110 },
@@ -3244,6 +3244,7 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings[0]).toMatchObject({
       id: 'bars',
       kind: 'barsPattern',
+      style: { barsPatternDisplayMode: 'line' },
       points: [
         { time: 1, price: 100 },
         { time: 2, price: 110 },
@@ -3254,7 +3255,9 @@ describe('drawing layout serialization', () => {
         { time: 2, open: 102, high: 105, low: 101, close: 101 },
       ],
     });
-    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(1);
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toMatchObject([
+      { id: 'bars', style: { barsPatternDisplayMode: 'line' } },
+    ]);
   });
 
   it('restores parallel channel drawings', () => {

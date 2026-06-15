@@ -22,6 +22,7 @@ import type {
   UserDrawingRenderPhase,
   UserDrawingState,
   UserDrawingStyle,
+  UserDrawingBarsPatternDisplayMode,
   BrushDrawing,
   HighlighterDrawing,
   PathDrawing,
@@ -30,6 +31,8 @@ import type {
 } from '../../drawings';
 
 import {
+  DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingOpacity,
@@ -832,6 +835,8 @@ export type MobileUserDrawingPrimitive =
         bodyWidth: number;
         up: boolean;
       }[];
+      displayMode: UserDrawingBarsPatternDisplayMode;
+      linePoints: readonly DrawingScreenPoint[];
       bounds: { x: number; y: number; width: number; height: number };
       style: UserDrawingStyle;
     }
@@ -2197,6 +2202,9 @@ function primitiveFromGeometry(
         style: geometry.drawing.style,
       };
     case 'barsPattern':
+      const displayMode = normalizeUserDrawingBarsPatternDisplayMode(
+        geometry.drawing.style.barsPatternDisplayMode ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+      );
       return {
         kind: 'barsPattern',
         id: geometry.drawing.id,
@@ -2205,6 +2213,8 @@ function primitiveFromGeometry(
         opacity,
         clip,
         bars: geometry.pattern.bars,
+        displayMode,
+        linePoints: geometry.pattern.bars.map((bar) => ({ x: bar.x, y: bar.closeY })),
         bounds: geometry.pattern.bounds,
         style: geometry.drawing.style,
       };
