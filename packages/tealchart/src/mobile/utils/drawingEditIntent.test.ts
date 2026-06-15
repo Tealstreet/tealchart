@@ -169,4 +169,20 @@ describe('mobile user drawing edit intent', () => {
     expect(result.state).toBe(state);
     expect(result.propertiesIntent).toBeNull();
   });
+
+  it('keeps locked text double-tap aligned with shared pane fallback behavior', () => {
+    const state = stateWith([createTextAnnotation('textLabel')]);
+    const lockedState = {
+      ...state,
+      drawings: state.drawings.map((drawing) => ({ ...drawing, locked: true })),
+    };
+    const result = resolveMobileUserDrawingDoubleTapEditIntent(lockedState, { x: 50, y: 50 }, spacesByPaneId, {
+      hitTest: { labelWidth: 64, labelHeight: 24 },
+    });
+
+    expect(result.intent.type).toBe('pane');
+    expect(result.changed).toBe(false);
+    expect(result.state).toBe(lockedState);
+    expect(result.propertiesIntent).toBeNull();
+  });
 });
