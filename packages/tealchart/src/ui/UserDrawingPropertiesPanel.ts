@@ -128,6 +128,7 @@ export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesP
     this.options = options;
     this.el.setAttribute('role', 'dialog');
     this.el.setAttribute('aria-label', 'Drawing properties');
+    this.el.setAttribute('data-tealchart-user-drawing-properties-panel', 'true');
     this.el.addEventListener('mousedown', (event) => event.stopPropagation());
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());
@@ -153,7 +154,10 @@ export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesP
       body.appendChild(div({ style: styles.empty, text: 'No editable drawing' }));
     } else {
       for (const group of surface.groups) {
-        const controls = div({ style: styles.controls });
+        const controls = div({
+          style: styles.controls,
+          attrs: { 'data-tealchart-user-drawing-properties-controls': group.id },
+        });
         for (const control of group.controls) {
           controls.appendChild(this.createControl(control));
         }
