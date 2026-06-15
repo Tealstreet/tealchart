@@ -320,6 +320,28 @@ const styles = {
     marginBottom: '6px',
   } as Partial<CSSStyleDeclaration>,
 
+  drawingToolFlyoutHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    marginBottom: '6px',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolPinButton: {
+    width: '26px',
+    height: '26px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: 'var(--text2, #787b86)',
+    cursor: 'pointer',
+    fontSize: '13px',
+    lineHeight: '26px',
+    padding: '0',
+    textAlign: 'center',
+  } as Partial<CSSStyleDeclaration>,
+
   drawingToolFlyoutButton: {
     display: 'grid',
     gridTemplateColumns: '28px 1fr',
@@ -474,6 +496,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
+  private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
   private selectedActionSurfaceEl: HTMLElement | null = null;
   private selectedActionPopoverGroupId: string | null = null;
@@ -908,11 +931,21 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       id: string;
       button: HTMLButtonElement;
       flyout: HTMLElement;
+      pinButton: HTMLButtonElement;
     } | null = null;
+    const updatePinButton = (pinButton: HTMLButtonElement, categoryId: string) => {
+      const pinned = this.pinnedDrawingToolCategoryId === categoryId;
+      pinButton.textContent = pinned ? '●' : '○';
+      pinButton.title = pinned ? 'Unpin drawing tools' : 'Pin drawing tools';
+      pinButton.setAttribute('aria-label', pinned ? 'Unpin drawing tools' : 'Pin drawing tools');
+      pinButton.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+      Object.assign(pinButton.style, pinned ? styles.drawingButtonActive : styles.drawingToolPinButton);
+    };
     const closeActiveFlyout = () => {
       if (!activeFlyout) return;
       activeFlyout.flyout.style.display = 'none';
       activeFlyout.button.setAttribute('aria-expanded', 'false');
+      updatePinButton(activeFlyout.pinButton, activeFlyout.id);
       activeFlyout = null;
     };
 
@@ -955,11 +988,27 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           'aria-label': `${category.label} tools`,
         },
       });
-      flyout.appendChild(
-        this.createElement('div', { style: styles.drawingToolFlyoutTitle, textContent: category.label }),
+      const pinButton = this.createElement('button', {
+        style: styles.drawingToolPinButton,
+        attributes: {
+          type: 'button',
+        },
+      });
+      updatePinButton(pinButton, category.id);
+      const flyoutHeader = this.createElement('div', { style: styles.drawingToolFlyoutHeader });
+      flyoutHeader.appendChild(
+        this.createElement('div', {
+          style: { ...styles.drawingToolFlyoutTitle, marginBottom: '0' },
+          textContent: category.label,
+        }),
       );
+      flyoutHeader.appendChild(pinButton);
+      flyout.appendChild(flyoutHeader);
       const showFlyout = () => {
         if (activeFlyout?.id === category.id) return;
+        if (activeFlyout && this.pinnedDrawingToolCategoryId === activeFlyout.id) {
+          this.pinnedDrawingToolCategoryId = null;
+        }
         closeActiveFlyout();
         const railRect = rail.getBoundingClientRect();
         const buttonRect = categoryButton.getBoundingClientRect();
@@ -975,17 +1024,25 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         flyout.style.maxHeight = `${flyoutHeight}px`;
         flyout.style.display = 'block';
         categoryButton.setAttribute('aria-expanded', 'true');
-        activeFlyout = { id: category.id, button: categoryButton, flyout };
+        updatePinButton(pinButton, category.id);
+        activeFlyout = { id: category.id, button: categoryButton, flyout, pinButton };
       };
       const hideFlyout = () => {
         if (activeFlyout?.id !== category.id) return;
+        if (this.pinnedDrawingToolCategoryId === category.id) return;
         flyout.style.display = 'none';
         categoryButton.setAttribute('aria-expanded', 'false');
+        updatePinButton(pinButton, category.id);
         activeFlyout = null;
       };
+      pinButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        this.pinnedDrawingToolCategoryId = this.pinnedDrawingToolCategoryId === category.id ? null : category.id;
+        updatePinButton(pinButton, category.id);
+      });
       categoryButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        if (flyout.style.display === 'block') hideFlyout();
+        if (flyout.style.display === 'block' && this.pinnedDrawingToolCategoryId !== category.id) hideFlyout();
         else showFlyout();
       });
       railItem.addEventListener('mouseenter', showFlyout);
@@ -1017,7 +1074,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             this.recentDrawingToolsByCategory[selectedCategory.id] = descriptor.tool;
           }
           this.options.onUserDrawingToolSelect?.(descriptor.tool);
-          closeActiveFlyout();
+          if (this.pinnedDrawingToolCategoryId !== category.id) closeActiveFlyout();
         });
         btn.addEventListener('mouseenter', () => {
           if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
@@ -1043,10 +1100,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const closeOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
       const target = event.target;
       if (target instanceof Node && rail.contains(target)) return;
+      if (activeFlyout && this.pinnedDrawingToolCategoryId === activeFlyout.id) return;
       closeActiveFlyout();
     };
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeActiveFlyout();
+      if (event.key === 'Escape') {
+        this.pinnedDrawingToolCategoryId = null;
+        closeActiveFlyout();
+      }
     };
     document.addEventListener('mousedown', closeOnOutsidePointer);
     document.addEventListener('touchstart', closeOnOutsidePointer);
@@ -1056,6 +1117,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       () => document.removeEventListener('touchstart', closeOnOutsidePointer),
       () => document.removeEventListener('keydown', closeOnEscape),
     );
+
+    if (this.pinnedDrawingToolCategoryId) {
+      const pinnedCategoryButton = rail.querySelector<HTMLButtonElement>(
+        `button[aria-controls="tealchart-drawing-tools-${this.pinnedDrawingToolCategoryId}"]`,
+      );
+      pinnedCategoryButton?.click();
+    }
   }
 
   private renderDrawingToolbar(): HTMLElement {
