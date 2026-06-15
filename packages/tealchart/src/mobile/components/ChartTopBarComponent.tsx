@@ -18,7 +18,7 @@ import type {
 
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   getSelectedUserDrawing,
@@ -122,6 +122,12 @@ export interface ChartTopBarComponentProps {
 
 const TOP_BAR_HEIGHT = MOBILE_CHART_CHROME_METRICS.topBarHeight;
 type PressableStyleState = { pressed: boolean };
+const getMobileWindowHeight = (): number => {
+  const dimensionsHeight = Dimensions?.get?.('window')?.height;
+  if (typeof dimensionsHeight === 'number' && dimensionsHeight > 0) return dimensionsHeight;
+  if (typeof window !== 'undefined' && window.innerHeight > 0) return window.innerHeight;
+  return 640;
+};
 
 export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
   ({
@@ -148,6 +154,32 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
+    const [windowHeight, setWindowHeight] = useState(getMobileWindowHeight);
+    const drawingToolAvailableHeight = Math.max(
+      160,
+      windowHeight -
+        computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS) -
+        TIME_AXIS_HEIGHT -
+        MOBILE_CHART_CHROME_METRICS.leftToolRailTopGap,
+    );
+    const drawingToolBoundsStyle = useMemo(
+      () => ({ maxHeight: drawingToolAvailableHeight }),
+      [drawingToolAvailableHeight],
+    );
+
+    useEffect(() => {
+      if (!Dimensions?.addEventListener) {
+        if (typeof window === 'undefined') return undefined;
+        const handleResize = () => setWindowHeight(getMobileWindowHeight());
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }
+      const subscription = Dimensions.addEventListener('change', ({ window }) => {
+        setWindowHeight(window.height || getMobileWindowHeight());
+      });
+      return () => subscription.remove();
+    }, []);
+
     // Filter timeframes by supported resolutions (if set by datafeed)
     const timeframes = useMemo(() => {
       if (!supportedResolutions || supportedResolutions.length === 0) {
@@ -231,8 +263,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         )}
 
         {userDrawingState && (
-          <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
-            <View style={styles.drawingToolRailList} accessibilityLabel="Drawing tool category list">
+          <View style={[styles.drawingToolRail, drawingToolBoundsStyle]} accessibilityLabel="Drawing tool categories">
+            <View
+              style={[styles.drawingToolRailList, drawingToolBoundsStyle]}
+              accessibilityLabel="Drawing tool category list"
+            >
               <ScrollView contentContainerStyle={styles.drawingToolRailContent} showsVerticalScrollIndicator={false}>
                 {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
                   const activeCategory = category.tools.includes(userDrawingState.activeTool);
@@ -268,12 +303,15 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
             </View>
 
             {expandedDrawingCategory && (
-              <View style={styles.drawingToolFlyout} accessibilityLabel={`${expandedDrawingCategory.label} tools`}>
+              <View
+                style={[styles.drawingToolFlyout, drawingToolBoundsStyle]}
+                accessibilityLabel={`${expandedDrawingCategory.label} tools`}
+              >
                 <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
                   {expandedDrawingCategory.label}
                 </Text>
                 <View
-                  style={styles.drawingToolFlyoutList}
+                  style={[styles.drawingToolFlyoutList, drawingToolBoundsStyle]}
                   accessibilityLabel={`${expandedDrawingCategory.label} tool list`}
                 >
                   <ScrollView showsVerticalScrollIndicator={false}>
@@ -1134,17 +1172,16 @@ const styles = StyleSheet.create({
     top: computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS),
     left: MOBILE_CHART_CHROME_METRICS.leftToolRailInset,
     zIndex: 8,
-    maxHeight: '78%',
     paddingVertical: 6,
     paddingHorizontal: 4,
     borderWidth: 1,
     borderColor: '#363a45',
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.96)',
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   drawingToolRailList: {
-    maxHeight: '100%',
+    overflow: 'hidden',
   },
   drawingToolRailContent: {
     gap: 4,
@@ -1169,7 +1206,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 42,
     width: 250,
-    maxHeight: 420 - TIME_AXIS_HEIGHT - MOBILE_CHART_CHROME_METRICS.leftToolRailTopGap,
     padding: 10,
     borderWidth: 1,
     borderColor: '#363a45',
@@ -1177,7 +1213,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(19, 23, 34, 0.98)',
   },
   drawingToolFlyoutList: {
-    maxHeight: 420 - TIME_AXIS_HEIGHT - MOBILE_CHART_CHROME_METRICS.leftToolRailTopGap,
+    overflow: 'hidden',
   },
   drawingToolFlyoutTitle: {
     fontSize: 11,
