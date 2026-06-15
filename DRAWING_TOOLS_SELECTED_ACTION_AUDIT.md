@@ -19,7 +19,7 @@ The selected-action surface is shared:
 
 | Area | Web evidence | Mobile evidence | Shared evidence |
 | --- | --- | --- | --- |
-| Local action surface | `ChartTopBar.test.ts` renders the chart-overlay selected drawing actions, blocks toolbar click fallthrough, and proves outside-surface chart-area clicks still pass through. | `UserDrawingSelectedActionSurface.test.tsx` renders the anchored Skia/RN action strip, blocks toolbar tap fallthrough, and proves adjacent chart gesture taps still pass through. | `toolbar.test.ts` covers descriptor groups, enabled state, and the Epic B checklist. |
+| Local action surface | `ChartTopBar.test.ts` renders the chart-overlay selected drawing actions, blocks toolbar click fallthrough, and keeps sibling chart-surface events outside the toolbar target observable. | `UserDrawingSelectedActionSurface.test.tsx` renders the anchored Skia/RN action strip and blocks toolbar tap fallthrough; `ChartTopBarComponent.test.tsx` keeps the mobile overlay container `box-none` while the strip remains `auto`. | `toolbar.test.ts` covers descriptor groups, enabled state, and the Epic B checklist. |
 | Properties and object tree | `TealchartWidget.test.ts` and `ChartTopBar.test.ts` cover built-in/app-owned open paths. | `drawingActionDispatch.test.ts` covers mobile toolbar/context object-tree and properties dispatch. | Properties/object-tree commands come from the selected-action model. |
 | Text edit | Web context, double-click, and selected actions route text-capable drawings into text edit. `ChartTopBar.test.ts` now verifies the rendered floating toolbar keeps properties reachable for non-text drawings, enables local text edit for unlocked text drawings, and disables it for locked text drawings. | Mobile action dispatch and double-tap edit intent share the same text/properties concepts. `UserDrawingSelectedActionSurface.test.tsx` now verifies the rendered action strip matches the same non-text, unlocked text, and locked text behavior. | `toolbar.test.ts` ensures text edit is only enabled for unlocked text drawings. |
 | Copy/duplicate/delete/z-order | Web floating toolbar and context menu dispatch copy, duplicate, delete, and z-order callbacks. | Mobile selected action strip dispatches the same selected-object commands, with copy writing the mobile clipboard and mutations flowing through mobile command history. | Shared descriptor commands map local copy to `copySelected` and mutations to history-backed command actions. |
@@ -47,9 +47,10 @@ The selected-action surface is shared:
 - Rendered web and mobile selected-action surfaces now prove the same local
   text-edit availability rules for representative non-text, unlocked text, and
   locked text drawings while keeping properties reachable.
-- Rendered web and mobile selected-action surface tests now prove the surface is
-  not a full-chart gesture blocker: toolbar interactions stay contained while
-  outside/adjacent chart-area events still reach chart handlers.
+- Rendered web and mobile selected-action surface tests now cover the unit-level
+  gesture boundary: toolbar interactions stay contained, web sibling chart
+  events outside the toolbar target still bubble, and the mobile overlay keeps a
+  `box-none` host with an `auto` action strip.
 - Future selected-action work should target a specific user-visible polish gap,
   such as action density, mobile gesture dismissal, or a tool-specific style
   control that is missing from both web and mobile.
@@ -61,7 +62,8 @@ Move to one of these narrow improvements:
 1. Add browser-level visual/e2e evidence that the web selected toolbar is
    anchored near real selected geometry, beyond the current component-level
    chrome clamp tests.
-2. Add browser/device visual evidence for selected action density and dismissal
-   behavior once the final popover polish is in place.
+2. Add browser/device hit-test evidence that selected action overlays do not
+   block chart gestures outside the strip, then cover action density and
+   dismissal behavior once the final popover polish is in place.
 3. Add one missing tool-specific selected style control only if it can be
    implemented in the shared descriptor and rendered by both web and mobile.
