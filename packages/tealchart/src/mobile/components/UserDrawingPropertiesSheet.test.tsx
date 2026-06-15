@@ -140,6 +140,45 @@ describe('UserDrawingPropertiesSheet', () => {
     expect(onDispatch).toHaveBeenCalledWith({ type: 'updateStyle', style: { opacity: 0.35 } });
   });
 
+  it('renders volume profile guide visibility from the shared properties surface', () => {
+    const onDispatch = vi.fn(() => true);
+    const volumeProfileState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'volume-profile' },
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'anchoredVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 45 },
+        },
+      ],
+    };
+
+    render(
+      <UserDrawingPropertiesSheet
+        visible
+        surface={resolveUserDrawingPropertiesSurface(volumeProfileState)}
+        onDispatch={onDispatch}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Geometry')).not.toBeNull();
+    expect(screen.getByLabelText('Hide volume profile guides').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(screen.getByLabelText('Hide volume profile guides'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { volumeProfileGuidesVisible: false },
+    });
+  });
+
   it('renders an empty state', () => {
     render(
       <UserDrawingPropertiesSheet

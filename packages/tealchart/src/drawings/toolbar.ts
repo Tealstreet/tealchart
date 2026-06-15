@@ -1572,6 +1572,10 @@ export function supportsUserDrawingGeneratedLabelVisibilityControls(drawing: Use
   return GENERATED_LABEL_VISIBILITY_DRAWING_KINDS.has(drawing.kind);
 }
 
+export function supportsUserDrawingVolumeProfileGuideControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
+}
+
 const GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS = new Set<UserDrawing['kind']>([
   'table',
   'infoLine',

@@ -1681,7 +1681,8 @@ function primitiveFromGeometry(
           volume: bin.volume,
           rect: bin.rect,
         })),
-        guides: geometry.volumeProfile.guides,
+        guides:
+          geometry.drawing.style.volumeProfileGuidesVisible === false ? [] : geometry.volumeProfile.guides,
         maxVolume: geometry.volumeProfile.maxVolume,
         totalVolume: geometry.volumeProfile.totalVolume,
         style: geometry.drawing.style,
