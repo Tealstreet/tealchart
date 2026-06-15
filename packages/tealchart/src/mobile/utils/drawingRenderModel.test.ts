@@ -2714,6 +2714,74 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready anchored volume profile primitives with configured row counts', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'anchored-volume-profile',
+          kind: 'anchoredVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, volumeProfileRowCount: 6 },
+          point: { time: 10, price: 75 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const primitive = resolveMobileUserDrawingRenderModel(
+      state,
+      new Map([
+        [
+          space.pane.id,
+          {
+            ...space,
+            bars: [
+              { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+              { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+              { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+            ],
+          },
+        ],
+      ]),
+    )[0];
+
+    expect(primitive).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      id: 'anchored-volume-profile',
+      maxVolume: 20,
+      totalVolume: 35,
+      bins: expect.arrayContaining([
+        expect.objectContaining({
+          priceMin: 70,
+          priceMax: 80,
+          volume: 20,
+          rect: { x: 10, y: 20, width: 90, height: 10 },
+        }),
+        expect.objectContaining({
+          priceMin: 50,
+          priceMax: 60,
+          volume: 10,
+          rect: { x: 10, y: 40, width: 45, height: 10 },
+        }),
+        expect.objectContaining({
+          priceMin: 20,
+          priceMax: 30,
+          volume: 5,
+          rect: { x: 10, y: 70, width: 22.5, height: 10 },
+        }),
+      ]),
+    });
+    expect(primitive?.kind === 'anchoredVolumeProfile' ? primitive.bins : []).toHaveLength(6);
+  });
+
   it('returns Skia-ready Fibonacci retracement primitives', () => {
     const state: UserDrawingState = {
       version: 1,
