@@ -147,6 +147,7 @@ import type {
   MobileUserDrawingBrushPrimitive,
   MobileUserDrawingCalloutPrimitive,
   MobileUserDrawingCommentPrimitive,
+  MobileUserDrawingCrossLinePrimitive,
   MobileUserDrawingCurvePrimitive,
   MobileUserDrawingCyclicLinesPrimitive,
   MobileUserDrawingDatePriceRangePrimitive,
@@ -1029,6 +1030,17 @@ describe('tealchart public entries', () => {
       arrowHead: null,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const crossLinePrimitive: NonNever<MobileUserDrawingCrossLinePrimitive> = {
+      kind: 'crossLine',
+      id: 'cross-line',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      horizontal: { start: { x: 0, y: 5 }, end: { x: 10, y: 5 } },
+      vertical: { start: { x: 5, y: 0 }, end: { x: 5, y: 10 } },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const arrowMarkerPrimitive: NonNever<MobileUserDrawingArrowMarkerPrimitive> = {
       kind: 'arrowMarker',
       id: 'arrow-marker',
@@ -1370,6 +1382,7 @@ describe('tealchart public entries', () => {
     expect(gannSquarePrimitive.kind).toBe('gannSquare');
     expect(gannSquareFixedPrimitive.kind).toBe('gannSquareFixed');
     expect(linePrimitive.kind).toBe('line');
+    expect(crossLinePrimitive.kind).toBe('crossLine');
     expect(arrowMarkerPrimitive.kind).toBe('arrowMarker');
     expect(arrowMarkPrimitive.kind).toBe('arrowMark');
     expect(curvePrimitive.kind).toBe('curve');
