@@ -809,7 +809,7 @@ export type MobileUserDrawingPrimitive =
       rewardLabel: string;
       riskLabel: string;
       ratioLabel: string;
-      riskRewardLabelAlignment: UserDrawingRiskRewardLabelAlignment;
+      riskRewardLabelAlignment?: UserDrawingRiskRewardLabelAlignment;
       style: UserDrawingStyle;
     }
   | {
@@ -2615,14 +2615,19 @@ export function resolveMobileUserDrawingMeasurementLabelPosition(
   const textX = measuredTextBounds.x ?? 0;
   const textY = measuredTextBounds.y ?? -fontSize;
   const textHeight = measuredTextBounds.height ?? fontSize;
+  const horizontalAlignment =
+    primitive.measurementLabelAlignment ??
+    normalizeUserDrawingRiskRewardLabelAlignment(
+      primitive.riskRewardLabelAlignment ?? primitive.style.riskRewardLabelAlignment,
+    );
 
   return {
     fontSize,
     fontFamily,
     x:
-      (primitive.measurementLabelAlignment ?? primitive.riskRewardLabelAlignment) === 'left'
+      horizontalAlignment === 'left'
         ? primitive.labelPoint.x - textX
-        : (primitive.measurementLabelAlignment ?? primitive.riskRewardLabelAlignment) === 'right'
+        : horizontalAlignment === 'right'
           ? primitive.labelPoint.x - textX - measuredTextBounds.width
           : primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
     y: primitive.labelPoint.y - textY - textHeight / 2,
