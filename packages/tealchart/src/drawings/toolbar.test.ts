@@ -2276,7 +2276,13 @@ describe('user drawing toolbar descriptors', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            textColor: '#f5c542',
+            fontFamily: 'sans-serif',
+          },
           points: [
             { time: 1, price: 10 },
             { time: 2, price: 12 },
@@ -2289,6 +2295,18 @@ describe('user drawing toolbar descriptors', () => {
     expect(patternItems.find((item) => item.id === 'labelsVisible:toggle')).toMatchObject({
       enabled: true,
       command: { type: 'updateStyle', style: { labelsVisible: false } },
+    });
+    expect(patternItems.find((item) => item.id === 'textColor:#22c55e')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textColor: '#22c55e' } },
+    });
+    expect(patternItems.find((item) => item.id === 'fontSize:increase')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontSize: 14 } },
+    });
+    expect(patternItems.find((item) => item.id === 'fontFamily:serif')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
     });
   });
 
@@ -2746,7 +2764,13 @@ describe('user drawing toolbar descriptors', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            textColor: '#f5c542',
+            fontFamily: 'sans-serif',
+          },
           points: [
             { time: 1, price: 10 },
             { time: 2, price: 12 },
@@ -2756,13 +2780,20 @@ describe('user drawing toolbar descriptors', () => {
         },
       ],
     });
-    expect(patternSurface.groups.find((group) => group.id === 'text')?.controls).toEqual([
-      expect.objectContaining({
-        id: 'labelsVisible',
-        label: 'Hide generated labels',
-        command: { type: 'updateStyle', style: { labelsVisible: false } },
-      }),
-    ]);
+    const patternTextControls = patternSurface.groups.find((group) => group.id === 'text')?.controls;
+    expect(patternTextControls?.find((control) => control.id === 'textColor:#22c55e')).toMatchObject({
+      command: { type: 'updateStyle', style: { textColor: '#22c55e' } },
+    });
+    expect(patternTextControls?.find((control) => control.id === 'fontSize:14')).toMatchObject({
+      command: { type: 'updateStyle', style: { fontSize: 14 } },
+    });
+    expect(patternTextControls?.find((control) => control.id === 'fontFamily:serif')).toMatchObject({
+      command: { type: 'updateStyle', style: { fontFamily: 'serif' } },
+    });
+    expect(patternTextControls?.find((control) => control.id === 'labelsVisible')).toMatchObject({
+      label: 'Hide generated labels',
+      command: { type: 'updateStyle', style: { labelsVisible: false } },
+    });
   });
 
   it('resolves locked and targeted properties surfaces', () => {
