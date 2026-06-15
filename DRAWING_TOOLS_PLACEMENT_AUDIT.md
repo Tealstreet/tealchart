@@ -22,12 +22,12 @@ Tools audited here:
 
 | Tool | Placement mode | Shared evidence | Web evidence | Mobile evidence | Remaining proof |
 | --- | --- | --- | --- | --- | --- |
-| `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` drag/input routing | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
-| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `TealchartWidget.test.ts` undoable drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` draft/commit render parity | Manual pointer/touch smoke with sidebar tool |
-| `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | Web routing uses shared drag placement path | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
-| `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | Web routing uses shared drag placement path | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
-| `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | Web routing uses shared drag placement path | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
-| `datePriceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | Web routing uses shared drag placement path | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
+| `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
+| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` draft/commit render parity | Manual pointer/touch smoke with sidebar tool |
+| `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
+| `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
+| `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
+| `datePriceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
 | `longPosition` | Drag seeds first two anchors, final tap commits | `placement.test.ts`, `input.test.ts` drag-seed test | `TealchartWidget.test.ts` drag-seed widget test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` risk/reward render tests | Manual pointer/touch smoke with sidebar tool |
 | `brush` | Path drag | `input.test.ts` path-drag smoothing/commit tests | `TealchartWidget.test.ts` path-family drag test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` pressure/render tests | Manual pointer/touch smoke with sidebar tool |
 | `textLabel` | Single-anchor click/tap | `input.test.ts` single-anchor and text-edit state tests | `TealchartWidget.test.ts` context/double-click edit tests | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` text edit/render tests | Manual tap/click smoke with sidebar tool |
@@ -39,6 +39,9 @@ Tools audited here:
   and drag end anchors exactly.
 - Web and mobile both route drawing placement through shared commands/history.
   Mobile has explicit command-history coverage for the same endpoint semantics.
+- Web widget-level tests now cover exact drag endpoints and undo restoration
+  for the north-star two-anchor tools: `trendLine`, `rectangle`, `circle`,
+  `ellipse`, `priceRange`, and `datePriceRange`.
 - Web and mobile toolbar tests both exercise `Rectangle` selection from the
   rendered drawing-tool categories. This covers the tool-selection side of the
   reported rectangle workflow.

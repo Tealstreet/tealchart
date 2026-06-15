@@ -945,6 +945,56 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
+      'creates web %s placement-drag drawings from exact endpoints',
+      (tool) => {
+        const datafeed = createMockDatafeed();
+        const widget = createWidget(datafeed);
+        widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
+
+        const testWidget = widget as unknown as {
+          _handleUserDrawingPlacementDragStart(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+          _handleUserDrawingPlacementDragEnd(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+        };
+
+        expect(
+          testWidget._handleUserDrawingPlacementDragStart({
+            paneId: 'main',
+            anchor: { time: 1_000, price: 100 },
+          }),
+        ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingPlacementDragEnd({
+            paneId: 'main',
+            anchor: { time: 2_000, price: 110 },
+          }),
+        ).toBe(true);
+
+        expect(widget.getUserDrawingState().draft).toBeNull();
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+        expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+          id: 'drawing_1',
+          kind: tool,
+          points: [
+            { time: 1_000, price: 100 },
+            { time: 2_000, price: 110 },
+          ],
+        });
+        expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+        expect(widget.undoUserDrawingCommand()).toBe(true);
+        expect(widget.getUserDrawingState().drawings).toEqual([]);
+
+        widget.remove();
+      },
+    );
+
     it('seeds web multi-anchor placement from drag before final input', () => {
       const dragSeedTools: UserDrawingTool[] = [
         'triangle',
