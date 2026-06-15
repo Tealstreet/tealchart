@@ -1587,6 +1587,57 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'h', price: 50 })]);
     });
 
+    it('duplicates selected drawings from chart-surface drag input when duplicate-drag mode is enabled', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const initial = widget.getUserDrawingState();
+      widget.setUserDrawingState({
+        ...initial,
+        activeTool: 'select',
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      const testWidget = widget as unknown as {
+        _handleUserDrawingEditStart(
+          point: { x: number; y: number },
+          spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          options?: DrawingDragEventOptions,
+        ): boolean;
+        _handleUserDrawingEditMove(point: { x: number; y: number }): boolean;
+        _handleUserDrawingEditEnd(): void;
+        _setUserDrawingDuplicateEditDragEnabled(enabled: boolean): void;
+      };
+
+      testWidget._setUserDrawingDuplicateEditDragEnabled(true);
+
+      expect(testWidget._handleUserDrawingEditStart({ x: 40, y: 50 }, new Map([['main', userDrawingSpace]]))).toBe(
+        true,
+      );
+      expect(testWidget._handleUserDrawingEditMove({ x: 40, y: 60 })).toBe(true);
+      testWidget._handleUserDrawingEditEnd();
+
+      expect(widget.getUserDrawingState().drawings).toHaveLength(2);
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_1']);
+      expect(widget.getUserDrawingState().drawings[1]).toMatchObject({ id: 'drawing_1', price: 40 });
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+    });
+
     it('applies public drawing action commands through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();

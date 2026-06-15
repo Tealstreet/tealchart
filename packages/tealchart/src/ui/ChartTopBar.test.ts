@@ -279,6 +279,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onTextEdit = vi.fn();
     const onVisibility = vi.fn();
     const onLocked = vi.fn();
+    const onDuplicateEditDrag = vi.fn();
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-actions',
       symbol: 'BTCUSDT',
@@ -325,6 +326,7 @@ describe('ChartTopBar drawing toolbar', () => {
       userDrawingCommandAvailability: { canUndo: true, canRedo: true },
       userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingDuplicateSelected: onDuplicate,
+      onUserDrawingDuplicateEditDragChange: onDuplicateEditDrag,
       onUserDrawingCopySelected: onCopy,
       onUserDrawingDeleteSelected: onDelete,
       onUserDrawingCancelDraft: onCancel,
@@ -366,6 +368,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Copy selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate while dragging selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing forward"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Send selected drawing backward"]')?.click();
@@ -376,6 +379,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onObjectTree).toHaveBeenCalledTimes(1);
     expect(onCopy).toHaveBeenCalledTimes(1);
     expect(onDuplicate).toHaveBeenCalledTimes(1);
+    expect(onDuplicateEditDrag).toHaveBeenCalledWith(true);
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onZOrder).toHaveBeenCalledWith('bringForward');
     expect(onZOrder).toHaveBeenCalledWith('sendBackward');

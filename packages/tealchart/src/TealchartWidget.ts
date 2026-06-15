@@ -189,6 +189,7 @@ export class TealchartWidget {
   private _userDrawingEditDrag: UserDrawingEditDrag | null = null;
   private _userDrawingEditDragTransactionKey = 'edit-drag';
   private _userDrawingEditDragTransactionCounter = 0;
+  private _userDrawingDuplicateEditDragEnabled = false;
   private _userDrawingIdCounter = 0;
   private _userDrawingTextMeasureCtx: CanvasRenderingContext2D | null = null;
 
@@ -1064,7 +1065,8 @@ export class TealchartWidget {
       onUserDrawingInput: (point) => this._handleUserDrawingInput(point),
       onUserDrawingSelection: (point, spacesByPaneId, options) =>
         this._handleUserDrawingSelection(point, spacesByPaneId, options),
-      onUserDrawingEditStart: (point, spacesByPaneId) => this._handleUserDrawingEditStart(point, spacesByPaneId),
+      onUserDrawingEditStart: (point, spacesByPaneId, options) =>
+        this._handleUserDrawingEditStart(point, spacesByPaneId, options),
       onUserDrawingContextMenu: (point, spacesByPaneId) => this._handleUserDrawingContextMenu(point, spacesByPaneId),
       onUserDrawingEditMove: (point) => this._handleUserDrawingEditMove(point),
       onUserDrawingEditEnd: () => this._handleUserDrawingEditEnd(),
@@ -1086,6 +1088,10 @@ export class TealchartWidget {
       },
       onUserDrawingCopySelected: () => {
         this.copySelectedUserDrawing();
+      },
+      userDrawingDuplicateEditDragEnabled: this._userDrawingDuplicateEditDragEnabled,
+      onUserDrawingDuplicateEditDragChange: (enabled) => {
+        this._setUserDrawingDuplicateEditDragEnabled(enabled);
       },
       onUserDrawingDeleteSelected: () => {
         this.deleteSelectedUserDrawing();
@@ -3002,9 +3008,10 @@ export class TealchartWidget {
   ): boolean {
     if (this._userDrawingState.activeTool !== 'select') return false;
 
-    const transactionKey = `${options?.duplicateOnDrag ? 'duplicate-drag' : 'edit-drag'}-${++this._userDrawingEditDragTransactionCounter}`;
+    const duplicateOnDrag = options?.duplicateOnDrag === true || this._userDrawingDuplicateEditDragEnabled;
+    const transactionKey = `${duplicateOnDrag ? 'duplicate-drag' : 'edit-drag'}-${++this._userDrawingEditDragTransactionCounter}`;
     const previousState = this._userDrawingState;
-    const result = options?.duplicateOnDrag
+    const result = duplicateOnDrag
       ? this.dispatchUserDrawingCommandWithResult({
           type: 'beginDuplicateEditDragAtPoint',
           point,
@@ -3029,10 +3036,15 @@ export class TealchartWidget {
     this._userDrawingEditDrag = result.editDrag;
     this._userDrawingEditDragTransactionKey = transactionKey;
     this.setUserDrawingState(result.state, { preserveHistory: true });
-    if (!options?.duplicateOnDrag) {
+    if (!duplicateOnDrag) {
       this._emitUserDrawingCommandEvent(previousState, result);
     }
     return true;
+  }
+
+  private _setUserDrawingDuplicateEditDragEnabled(enabled: boolean): void {
+    this._userDrawingDuplicateEditDragEnabled = enabled;
+    this._ui?.setUserDrawingDuplicateEditDragEnabled?.(enabled);
   }
 
   private _handleUserDrawingContextMenu(

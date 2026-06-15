@@ -553,6 +553,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingPlacementDragLastPointRef = useRef<UserDrawingInputPoint | null>(null);
   const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
   const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
+  const [userDrawingDuplicateEditDragOverride, setUserDrawingDuplicateEditDragOverride] = useState<boolean | null>(null);
   const userDrawingMeasureLastPointRef = useRef<UserDrawingInputPoint | null>(null);
 
   const commitUserDrawingState = useCallback(
@@ -931,9 +932,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       setUserDrawingDuplicateEditDrag(duplicate: boolean): void {
         userDrawingDuplicateEditDragOverrideRef.current = duplicate;
+        setUserDrawingDuplicateEditDragOverride(duplicate);
       },
       clearUserDrawingDuplicateEditDrag(): void {
         userDrawingDuplicateEditDragOverrideRef.current = null;
+        setUserDrawingDuplicateEditDragOverride(null);
       },
       isUserDrawingDuplicateEditDragEnabled(): boolean {
         return resolveMobileUserDrawingDuplicateEditDragEnabled({
@@ -1387,8 +1390,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [effectiveUserDrawingState, userDrawingSpacesByPaneId],
   );
   const userDrawingSelectedActionSurface = useMemo(
-    () => resolveUserDrawingSelectedActionSurface(effectiveUserDrawingState),
-    [effectiveUserDrawingState],
+    () =>
+      resolveUserDrawingSelectedActionSurface(effectiveUserDrawingState, {
+        duplicateEditDragEnabled: resolveMobileUserDrawingDuplicateEditDragEnabled({
+          propDuplicate: duplicateUserDrawingOnEditDrag,
+          overrideDuplicate: userDrawingDuplicateEditDragOverride,
+        }),
+      }),
+    [duplicateUserDrawingOnEditDrag, effectiveUserDrawingState, userDrawingDuplicateEditDragOverride],
   );
   const resolveConstrainedUserDrawingPlacementPoint = useCallback(
     (point: UserDrawingInputPoint): UserDrawingInputPoint =>
@@ -4994,6 +5003,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         topInset={showTopBar ? TOP_BAR_SAFE_ZONE : 0}
         createId={createUserDrawingId}
         dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
+        onUserDrawingDuplicateEditDragChange={(enabled) => {
+          userDrawingDuplicateEditDragOverrideRef.current = enabled;
+          setUserDrawingDuplicateEditDragOverride(enabled);
+        }}
         onUserDrawingPropertiesOpen={handleUserDrawingPropertiesOpen}
         onUserDrawingObjectTreeOpen={handleUserDrawingObjectTreeOpen}
         onUserDrawingCopySelected={() => {

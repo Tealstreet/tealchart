@@ -102,6 +102,10 @@ export type UserDrawingSelectedActionSurfaceCommand =
       type: 'copySelected';
     }
   | {
+      type: 'setDuplicateEditDrag';
+      duplicate: boolean;
+    }
+  | {
       type: 'updateStyle';
       style: Partial<UserDrawingStyle>;
     }
@@ -347,6 +351,10 @@ export interface UserDrawingSelectedActionSurfaceGroup {
 export interface UserDrawingSelectedActionSurface {
   selectedDrawing: UserDrawing | null;
   groups: readonly UserDrawingSelectedActionSurfaceGroup[];
+}
+
+export interface UserDrawingSelectedActionSurfaceOptions {
+  duplicateEditDragEnabled?: boolean;
 }
 
 export interface UserDrawingActionSurfacePositionOptions {
@@ -1067,6 +1075,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
         command: { type: 'toolbarAction', action: 'duplicateSelected' },
       },
       {
+        id: 'duplicateEditDrag',
+        icon: '⇱',
+        label: 'Duplicate while dragging selected drawing',
+        enabled: false,
+        command: { type: 'setDuplicateEditDrag', duplicate: true },
+      },
+      {
         ...getUserDrawingToolbarActionDescriptor('deleteSelected'),
         id: 'deleteSelected',
         enabled: false,
@@ -1571,8 +1586,12 @@ export function isUserDrawingToolbarActionEnabled(
   return false;
 }
 
-export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState): UserDrawingSelectedActionSurface {
+export function resolveUserDrawingSelectedActionSurface(
+  state: UserDrawingState,
+  options: UserDrawingSelectedActionSurfaceOptions = {},
+): UserDrawingSelectedActionSurface {
   const selectedDrawing = getSelectedUserDrawing(state);
+  const duplicateEditDragEnabled = options.duplicateEditDragEnabled === true;
   const styleGroup = resolveUserDrawingSelectedStyleActionSurfaceGroup(state, selectedDrawing);
   const groups = styleGroup
     ? [
@@ -1612,6 +1631,20 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
           return {
             ...item,
             enabled: hasUnlockedSelectedDrawing(state),
+          };
+        }
+        if (item.command.type === 'setDuplicateEditDrag') {
+          return {
+            ...item,
+            enabled: hasUnlockedSelectedDrawing(state),
+            selected: duplicateEditDragEnabled,
+            label: duplicateEditDragEnabled
+              ? 'Stop duplicating while dragging selected drawing'
+              : 'Duplicate while dragging selected drawing',
+            command: {
+              type: 'setDuplicateEditDrag',
+              duplicate: !duplicateEditDragEnabled,
+            },
           };
         }
         if (
