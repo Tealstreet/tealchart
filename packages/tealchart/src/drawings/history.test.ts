@@ -279,6 +279,53 @@ describe('user drawing command history', () => {
     expect(undo.state.drawings[0]).toEqual(editStart.state.drawings[0]);
   });
 
+  it('keeps the Epic D edit-drag transaction checklist in shared history', () => {
+    let state = createStateWithTrendLine();
+    let history = createUserDrawingCommandHistory();
+
+    const editStart = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'beginEditDragAtPoint',
+      point: { x: 100, y: 200 },
+      spacesByPaneId,
+      meta: { source: 'pointer', transactionKey: 'edit-drag-checklist' },
+    });
+
+    expect(editStart.changed).toBe(true);
+    expect(editStart.history.undoStack).toHaveLength(0);
+    expect(editStart.editDrag).not.toBeNull();
+    if (!editStart.editDrag) throw new Error('expected edit drag');
+
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(editStart.state, editStart.history, {
+      type: 'applyEditDrag',
+      drag: editStart.editDrag,
+      point: { x: 110, y: 190 },
+      meta: { source: 'pointer', transactionKey: 'edit-drag-checklist' },
+    }));
+    ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'applyEditDrag',
+      drag: editStart.editDrag,
+      point: { x: 120, y: 180 },
+      meta: { source: 'pointer', transactionKey: 'edit-drag-checklist' },
+    }));
+
+    expect(history.undoStack).toHaveLength(1);
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings[0]).toEqual(editStart.state.drawings[0]);
+
+    const stale = dispatchUserDrawingCommandWithHistory(
+      { ...state, drawings: [] },
+      history,
+      {
+        type: 'applyEditDrag',
+        drag: editStart.editDrag,
+        point: { x: 140, y: 160 },
+        meta: { source: 'pointer', transactionKey: 'edit-drag-checklist' },
+      },
+    );
+    expect(stale.changed).toBe(false);
+    expect(stale.history).toBe(history);
+  });
+
   it('coalesces duplicate edit-drag start and moves into one undo entry', () => {
     let state = createUserDrawingState();
     let history = createUserDrawingCommandHistory();
