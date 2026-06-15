@@ -2995,6 +2995,66 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
+    it('does not capture drawing shortcuts from textarea, select, or contenteditable targets', () => {
+      const datafeed = createMockDatafeed();
+      const container = document.createElement('div');
+      const textarea = document.createElement('textarea');
+      const select = document.createElement('select');
+      const option = document.createElement('option');
+      const editable = document.createElement('div');
+      const onChange = vi.fn();
+      option.value = 'one';
+      option.textContent = 'One';
+      select.appendChild(option);
+      editable.contentEditable = 'true';
+      container.appendChild(textarea);
+      container.appendChild(select);
+      container.appendChild(editable);
+      const widget = createWidget(datafeed, { container, onUserDrawingStateChange: onChange });
+      const testWidget = widget as unknown as { _isHovered: boolean };
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      testWidget._isHovered = true;
+      for (const target of [textarea, select, editable]) {
+        const event = new KeyboardEvent('keydown', { key: 'Delete', bubbles: true, cancelable: true });
+        target.dispatchEvent(event);
+
+        expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h']);
+        expect(event.defaultPrevented).toBe(false);
+      }
+      expect(widget.canUndoUserDrawingCommand()).toBe(false);
+      expect(onChange).toHaveBeenCalledTimes(1);
+
+      const chartDelete = new KeyboardEvent('keydown', { key: 'Delete', cancelable: true });
+      document.dispatchEvent(chartDelete);
+
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(chartDelete.defaultPrevented).toBe(true);
+      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+
+      widget.remove();
+    });
+
     it('clears selected drawing actions with Escape while chart owns keyboard input', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
