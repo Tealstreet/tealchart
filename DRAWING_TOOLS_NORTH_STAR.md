@@ -178,6 +178,8 @@ Phase E2: Web keyboard ownership
 
 - Ctrl/Cmd+Z, redo, Delete, copy/paste, select-all, nudge, Escape.
 - Confirm chart shortcuts are not hijacked outside drawing focus.
+- Current E2 web keyboard ownership evidence is recorded in
+  `DRAWING_TOOLS_WEB_KEYBOARD_AUDIT.md`.
 
 Phase E3: Mobile command parity
 
@@ -209,7 +211,8 @@ Recorded audit evidence:
 - `DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`
 - `DRAWING_TOOLS_DUPLICATE_MODIFIER_AUDIT.md`
 - `DRAWING_TOOLS_UNDO_REDO_AUDIT.md`
+- `DRAWING_TOOLS_WEB_KEYBOARD_AUDIT.md`
 
-Move next to Epic E, Phase E2. Verify web keyboard ownership and shortcut
-routing for undo/redo, delete, duplicate, copy/paste, select-all, nudge, and
-Escape without stealing focus from app-owned inputs.
+Move next to Epic E, Phase E3. Verify mobile command parity for imperative
+handle and host-toolbar paths that mirror web drawing keyboard/history
+behavior.

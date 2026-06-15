@@ -1,11 +1,29 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { resolveUserDrawingKeyboardAction } from './keyboard';
+import type { UserDrawingKeyboardActionType } from './keyboard';
 import { createUserDrawingState, setUserDrawingTool, handleUserDrawingInput } from './input';
 import { clearChartStoreCache } from '../state/chartState';
 import type { UserDrawingState } from './types';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
+const coveredUserDrawingKeyboardActionTypes = [
+  'undo',
+  'redo',
+  'copySelected',
+  'paste',
+  'duplicateSelected',
+  'nudge',
+  'selectAll',
+  'clearSelection',
+  'deleteSelected',
+  'cancelDraft',
+] as const satisfies readonly UserDrawingKeyboardActionType[];
+type MissingUserDrawingKeyboardActionType = Exclude<
+  UserDrawingKeyboardActionType,
+  (typeof coveredUserDrawingKeyboardActionTypes)[number]
+>;
+const allUserDrawingKeyboardActionTypesCovered: Record<MissingUserDrawingKeyboardActionType, never> = {};
 
 afterEach(() => {
   clearChartStoreCache();
@@ -40,6 +58,22 @@ function withDraft(): UserDrawingState {
 }
 
 describe('user drawing keyboard actions', () => {
+  it('keeps the Epic E keyboard action checklist exhaustive', () => {
+    expect(allUserDrawingKeyboardActionTypesCovered).toEqual({});
+    expect(coveredUserDrawingKeyboardActionTypes).toEqual([
+      'undo',
+      'redo',
+      'copySelected',
+      'paste',
+      'duplicateSelected',
+      'nudge',
+      'selectAll',
+      'clearSelection',
+      'deleteSelected',
+      'cancelDraft',
+    ]);
+  });
+
   it('ignores drawing shortcuts when chart does not own keyboard focus', () => {
     const state = withSelection();
 
