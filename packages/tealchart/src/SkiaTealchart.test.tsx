@@ -229,6 +229,61 @@ describe('SkiaTealchart drawing properties', () => {
     );
   });
 
+  it('routes rendered mobile drawing toolbar undo and redo through Skia history', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={initialDrawingState}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await act(async () => {
+      expect(ref.current?.duplicateSelectedUserDrawing()).toBe(true);
+    });
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_1',
+      'target',
+    ]);
+
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Undo drawing command'));
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['selected', 'target']);
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'undo' }),
+        source: 'toolbar',
+      }),
+    );
+
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Redo drawing command'));
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_1',
+      'target',
+    ]);
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'redo' }),
+        source: 'toolbar',
+      }),
+    );
+  });
+
   it('mirrors drawing command history and keyboard dispatch through the mobile imperative handle', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onStateChange = vi.fn();

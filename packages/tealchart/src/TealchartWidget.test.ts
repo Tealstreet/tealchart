@@ -40,12 +40,18 @@ const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
 const widgetUiOptionsCalls: Array<{
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  onUserDrawingUndo?: () => void;
+  onUserDrawingRedo?: () => void;
 }> = [];
 
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
   TealchartWidgetUI: class {
-    constructor(options: { onUserDrawingToolSelect?: (tool: UserDrawingTool) => void }) {
+    constructor(options: {
+      onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+      onUserDrawingUndo?: () => void;
+      onUserDrawingRedo?: () => void;
+    }) {
       widgetUiOptionsCalls.push(options);
     }
     setBars(bars: Bar[]) {
@@ -60,6 +66,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setUserDrawingState(state: UserDrawingState) {
       setUserDrawingStateCalls.push(state);
     }
+    setUserDrawingCommandAvailability() {}
     setLoading() {}
     setOrderLines() {}
     setPositionLines() {}
@@ -994,6 +1001,50 @@ describe('TealchartWidget', () => {
         ],
       });
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+
+      widget.remove();
+    });
+
+    it('routes widget UI toolbar undo and redo through drawing history', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+
+      expect(
+        widget.addUserDrawing(
+          {
+            id: 'line',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+          { select: true },
+        ),
+      ).toBe(true);
+      onCommand.mockClear();
+
+      widgetUiOptionsCalls.at(-1)?.onUserDrawingUndo?.();
+      expect(widget.getUserDrawingState().drawings).toEqual([]);
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'undo' }),
+          source: 'toolbar',
+        }),
+      );
+
+      widgetUiOptionsCalls.at(-1)?.onUserDrawingRedo?.();
+      expect(widget.getUserDrawingState().drawings).toEqual([expect.objectContaining({ id: 'line' })]);
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'redo' }),
+          source: 'toolbar',
+        }),
+      );
 
       widget.remove();
     });

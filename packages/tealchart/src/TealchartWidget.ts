@@ -1077,7 +1077,10 @@ export class TealchartWidget {
       onUserDrawingPathDragMove: (point) => this._handleUserDrawingPathDragMove(point),
       onUserDrawingPathDragEnd: () => this._handleUserDrawingPathDragEnd(),
       userDrawingState: this._userDrawingState,
+      userDrawingCommandAvailability: this._getUserDrawingCommandAvailability(),
       onUserDrawingToolSelect: (tool) => this._setActiveUserDrawingToolFromToolbar(tool),
+      onUserDrawingUndo: () => this._undoUserDrawingCommand('toolbar'),
+      onUserDrawingRedo: () => this._redoUserDrawingCommand('toolbar'),
       onUserDrawingDuplicateSelected: () => {
         this.duplicateSelectedUserDrawing();
       },
@@ -2290,6 +2293,7 @@ export class TealchartWidget {
       this._userDrawingHistory = clearUserDrawingCommandHistory(this._userDrawingHistory);
     }
     this._userDrawingState = state;
+    this._ui?.setUserDrawingCommandAvailability(this._getUserDrawingCommandAvailability());
     this._options.onUserDrawingStateChange?.(state);
     this._refreshUserDrawingObjectTreePanel();
     this._refreshUserDrawingPropertiesPanel();
@@ -2370,6 +2374,13 @@ export class TealchartWidget {
 
   canRedoUserDrawingCommand(): boolean {
     return canRedoUserDrawingCommandHistory(this._userDrawingHistory);
+  }
+
+  private _getUserDrawingCommandAvailability() {
+    return {
+      canUndo: this.canUndoUserDrawingCommand(),
+      canRedo: this.canRedoUserDrawingCommand(),
+    };
   }
 
   undoUserDrawingCommand(): boolean {
