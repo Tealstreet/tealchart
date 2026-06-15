@@ -52,6 +52,8 @@ import {
 } from './types';
 
 export type UserDrawingToolbarAction =
+  | 'undo'
+  | 'redo'
   | 'measure'
   | 'zoomIn'
   | 'duplicateSelected'
@@ -67,6 +69,8 @@ export type UserDrawingToolbarAction =
   | 'lockAll'
   | 'unlockAll';
 export type UserDrawingGlobalToolbarAction =
+  | 'undo'
+  | 'redo'
   | 'measure'
   | 'zoomIn'
   | 'cancelDraft'
@@ -143,6 +147,11 @@ export interface UserDrawingToolbarActionDescriptor {
   action: UserDrawingToolbarAction;
   icon: string;
   label: string;
+}
+
+export interface UserDrawingCommandAvailability {
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export interface UserDrawingLineColorDescriptor {
@@ -619,6 +628,8 @@ export const USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS: readonly UserDrawingToolCat
 ] as const;
 
 export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolbarActionDescriptor[] = [
+  { action: 'undo', icon: '↶', label: 'Undo drawing command' },
+  { action: 'redo', icon: '↷', label: 'Redo drawing command' },
   { action: 'duplicateSelected', icon: '⧉', label: 'Duplicate selected drawing' },
   { action: 'deleteSelected', icon: '⌫', label: 'Delete selected drawing' },
   { action: 'bringForward', icon: '↑', label: 'Bring selected drawing forward' },
@@ -636,6 +647,8 @@ export const USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS: readonly UserDrawingToolba
 ] as const;
 
 const USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS: ReadonlySet<UserDrawingToolbarAction> = new Set([
+  'undo',
+  'redo',
   'measure',
   'zoomIn',
   'cancelDraft',
@@ -650,6 +663,12 @@ export function isUserDrawingGlobalToolbarAction(
   action: UserDrawingToolbarAction,
 ): action is UserDrawingGlobalToolbarAction {
   return USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS.has(action);
+}
+
+function getUserDrawingToolbarActionDescriptor(action: UserDrawingToolbarAction): UserDrawingToolbarActionDescriptor {
+  const descriptor = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.find((item) => item.action === action);
+  if (!descriptor) throw new Error(`Unknown user drawing toolbar action: ${action}`);
+  return descriptor;
 }
 
 export function getUserDrawingAllDrawingsUpdateOptions(
@@ -1042,13 +1061,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
         command: { type: 'copySelected' },
       },
       {
-        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[0]!,
+        ...getUserDrawingToolbarActionDescriptor('duplicateSelected'),
         id: 'duplicateSelected',
         enabled: false,
         command: { type: 'toolbarAction', action: 'duplicateSelected' },
       },
       {
-        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[1]!,
+        ...getUserDrawingToolbarActionDescriptor('deleteSelected'),
         id: 'deleteSelected',
         enabled: false,
         command: { type: 'toolbarAction', action: 'deleteSelected' },
@@ -1061,25 +1080,25 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
     label: 'Arrange',
     items: [
       {
-        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[2]!,
+        ...getUserDrawingToolbarActionDescriptor('bringForward'),
         id: 'bringForward',
         enabled: false,
         command: { type: 'toolbarAction', action: 'bringForward' },
       },
       {
-        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[3]!,
+        ...getUserDrawingToolbarActionDescriptor('sendBackward'),
         id: 'sendBackward',
         enabled: false,
         command: { type: 'toolbarAction', action: 'sendBackward' },
       },
       {
-        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[4]!,
+        ...getUserDrawingToolbarActionDescriptor('bringToFront'),
         id: 'bringToFront',
         enabled: false,
         command: { type: 'toolbarAction', action: 'bringToFront' },
       },
       {
-        ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[5]!,
+        ...getUserDrawingToolbarActionDescriptor('sendToBack'),
         id: 'sendToBack',
         enabled: false,
         command: { type: 'toolbarAction', action: 'sendToBack' },
@@ -1532,7 +1551,13 @@ export function resolveUserDrawingToolCategoryButtonTool(
   return category.tools[0]!;
 }
 
-export function isUserDrawingToolbarActionEnabled(state: UserDrawingState, action: UserDrawingToolbarAction): boolean {
+export function isUserDrawingToolbarActionEnabled(
+  state: UserDrawingState,
+  action: UserDrawingToolbarAction,
+  availability: UserDrawingCommandAvailability = {},
+): boolean {
+  if (action === 'undo') return availability.canUndo === true;
+  if (action === 'redo') return availability.canRedo === true;
   if (action === 'measure' || action === 'zoomIn') return true;
   if (action === 'duplicateSelected' || action === 'deleteSelected') return hasUnlockedSelectedDrawing(state);
   const zOrderAction = getUserDrawingZOrderAction(action);

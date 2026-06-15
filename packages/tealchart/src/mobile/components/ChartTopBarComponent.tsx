@@ -8,6 +8,7 @@
 import type {
   UpdateUserDrawingOptions,
   UserDrawingIconName,
+  UserDrawingCommandAvailability,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -91,8 +92,14 @@ export interface ChartTopBarComponentProps {
   supportedResolutions?: string[] | null;
   /** Current user drawing state for toolbar highlighting and action availability */
   userDrawingState?: UserDrawingState;
+  /** Current drawing command history availability for undo/redo toolbar actions */
+  userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when the drawing toolbar should undo the last drawing command */
+  onUserDrawingUndo?: () => void;
+  /** Callback when the drawing toolbar should redo the last undone drawing command */
+  onUserDrawingRedo?: () => void;
   /** Callback when the selected drawing should be duplicated */
   onUserDrawingDuplicateSelected?: () => void;
   /** Callback when the selected drawing should be deleted */
@@ -145,7 +152,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     accentColor = '#2962ff',
     supportedResolutions,
     userDrawingState,
+    userDrawingCommandAvailability,
     onUserDrawingToolSelect,
+    onUserDrawingUndo,
+    onUserDrawingRedo,
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
     onUserDrawingMeasureModeChange,
@@ -1061,7 +1071,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
                   isUserDrawingGlobalToolbarAction(descriptor.action),
                 ).map((descriptor) => {
-                  const enabled = isUserDrawingToolbarActionEnabled(userDrawingState, descriptor.action);
+                  const enabled = isUserDrawingToolbarActionEnabled(
+                    userDrawingState,
+                    descriptor.action,
+                    userDrawingCommandAvailability,
+                  );
                   const active = descriptor.action === 'measure' && userDrawingState.measureMode === 'on';
                   return (
                     <Pressable
@@ -1078,6 +1092,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                             includeLocked: true,
                           },
                         );
+                        if (descriptor.action === 'undo') onUserDrawingUndo?.();
+                        if (descriptor.action === 'redo') onUserDrawingRedo?.();
                         if (descriptor.action === 'measure') {
                           onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on');
                         }
