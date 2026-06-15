@@ -39,15 +39,18 @@ Tools audited here:
   and drag end anchors exactly.
 - Web and mobile both route drawing placement through shared commands/history.
   Mobile has explicit command-history coverage for the same endpoint semantics.
+- Web and mobile toolbar tests both exercise `Rectangle` selection from the
+  rendered drawing-tool categories. This covers the tool-selection side of the
+  reported rectangle workflow.
 - The earlier "random rectangle" concern should be treated as a UI regression
   only if reproduced through the sidebar/pointer path. The shared state layer
   currently behaves correctly.
 
 ## Follow-Up Order
 
-1. Add a lightweight manual or browser-level smoke harness for sidebar tool
-   selection plus pointer drag, because the remaining risk is integration
-   routing rather than state mutation.
+1. Add a lightweight browser-level smoke harness for sidebar tool selection plus
+   pointer drag, because the remaining risk is end-to-end integration routing
+   rather than state mutation or toolbar selection.
 2. Move to Epic B once the smoke path is covered or manually verified:
    selected-object local action surface.
 3. Keep placement fixes narrow. If a tool regresses, fix the web pointer path
