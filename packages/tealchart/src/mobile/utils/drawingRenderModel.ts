@@ -758,7 +758,7 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       rect: { x: number; y: number; width: number; height: number };
       labelPoint: DrawingScreenPoint;
-      measurementLabelAlignment: UserDrawingMeasurementLabelAlignment;
+      measurementLabelAlignment?: UserDrawingMeasurementLabelAlignment;
       label: string;
       style: UserDrawingStyle;
     }
@@ -771,7 +771,7 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       rect: { x: number; y: number; width: number; height: number };
       labelPoint: DrawingScreenPoint;
-      measurementLabelAlignment: UserDrawingMeasurementLabelAlignment;
+      measurementLabelAlignment?: UserDrawingMeasurementLabelAlignment;
       label: string;
       style: UserDrawingStyle;
     }
@@ -787,7 +787,7 @@ export type MobileUserDrawingPrimitive =
       priceLabel: string;
       dateLabelPoint: DrawingScreenPoint;
       dateLabel: string;
-      measurementLabelAlignment: UserDrawingMeasurementLabelAlignment;
+      measurementLabelAlignment?: UserDrawingMeasurementLabelAlignment;
       style: UserDrawingStyle;
     }
   | {
@@ -2616,10 +2616,13 @@ export function resolveMobileUserDrawingMeasurementLabelPosition(
   const textY = measuredTextBounds.y ?? -fontSize;
   const textHeight = measuredTextBounds.height ?? fontSize;
   const horizontalAlignment =
-    primitive.measurementLabelAlignment ??
-    normalizeUserDrawingRiskRewardLabelAlignment(
-      primitive.riskRewardLabelAlignment ?? primitive.style.riskRewardLabelAlignment,
-    );
+    primitive.measurementLabelAlignment !== undefined || primitive.style.measurementLabelAlignment !== undefined
+      ? normalizeUserDrawingMeasurementLabelAlignment(
+          primitive.measurementLabelAlignment ?? primitive.style.measurementLabelAlignment,
+        )
+      : normalizeUserDrawingRiskRewardLabelAlignment(
+          primitive.riskRewardLabelAlignment ?? primitive.style.riskRewardLabelAlignment,
+        );
 
   return {
     fontSize,
