@@ -168,6 +168,7 @@ export interface UserDrawingStyle {
   textWrap?: boolean;
   textMaxWidth?: number;
   labelsVisible?: boolean;
+  riskRewardStatsMode?: UserDrawingRiskRewardStatsMode;
   volumeProfileGuidesVisible?: boolean;
   volumeProfileRowCount?: number;
   volumeProfileValueAreaRatio?: number;
@@ -952,6 +953,8 @@ export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] a
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240, 320, 480] as const;
+export const DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE = 'full';
+export const USER_DRAWING_RISK_REWARD_STATS_MODES = ['full', 'compact'] as const;
 export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 12;
 export const MIN_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 2;
 export const MAX_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 200;
@@ -965,6 +968,7 @@ export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
+export type UserDrawingRiskRewardStatsMode = (typeof USER_DRAWING_RISK_REWARD_STATS_MODES)[number];
 export type UserDrawingVolumeProfileRowCount = (typeof USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS)[number];
 export type UserDrawingVolumeProfileValueAreaRatio = (typeof USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS)[number];
 export type UserDrawingVolumeProfileWidthRatio = (typeof USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS)[number];
@@ -1004,6 +1008,12 @@ export function normalizeUserDrawingTextMaxWidth(textMaxWidth: number): UserDraw
   return USER_DRAWING_TEXT_MAX_WIDTHS.reduce((nearest, candidate) =>
     Math.abs(candidate - textMaxWidth) < Math.abs(nearest - textMaxWidth) ? candidate : nearest,
   );
+}
+
+export function normalizeUserDrawingRiskRewardStatsMode(statsMode: unknown): UserDrawingRiskRewardStatsMode {
+  return USER_DRAWING_RISK_REWARD_STATS_MODES.includes(statsMode as UserDrawingRiskRewardStatsMode)
+    ? (statsMode as UserDrawingRiskRewardStatsMode)
+    : DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE;
 }
 
 export function normalizeUserDrawingVolumeProfileRowCount(rowCount: number): number {
@@ -1049,6 +1059,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fillOpacity === undefined ? undefined : normalizeUserDrawingOpacity(style.fillOpacity);
   const textMaxWidth =
     style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
+  const riskRewardStatsMode =
+    style.riskRewardStatsMode === undefined
+      ? undefined
+      : normalizeUserDrawingRiskRewardStatsMode(style.riskRewardStatsMode);
   const volumeProfileRowCount =
     style.volumeProfileRowCount === undefined
       ? undefined
@@ -1069,6 +1083,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     opacity === style.opacity &&
     fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth &&
+    riskRewardStatsMode === style.riskRewardStatsMode &&
     volumeProfileRowCount === style.volumeProfileRowCount &&
     volumeProfileValueAreaRatio === style.volumeProfileValueAreaRatio &&
     volumeProfileWidthRatio === style.volumeProfileWidthRatio
@@ -1085,6 +1100,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(opacity === undefined ? {} : { opacity }),
     ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
+    ...(riskRewardStatsMode === undefined ? {} : { riskRewardStatsMode }),
     ...(volumeProfileRowCount === undefined ? {} : { volumeProfileRowCount }),
     ...(volumeProfileValueAreaRatio === undefined ? {} : { volumeProfileValueAreaRatio }),
     ...(volumeProfileWidthRatio === undefined ? {} : { volumeProfileWidthRatio }),

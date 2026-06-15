@@ -363,6 +363,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.textWrap === 'boolean') style.textWrap = value.textWrap;
   if (isFiniteNumber(value.textMaxWidth)) style.textMaxWidth = value.textMaxWidth;
   if (typeof value.labelsVisible === 'boolean') style.labelsVisible = value.labelsVisible;
+  if (typeof value.riskRewardStatsMode === 'string') style.riskRewardStatsMode = value.riskRewardStatsMode as UserDrawingStyle['riskRewardStatsMode'];
   if (typeof value.volumeProfileGuidesVisible === 'boolean') {
     style.volumeProfileGuidesVisible = value.volumeProfileGuidesVisible;
   }

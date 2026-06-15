@@ -435,6 +435,18 @@ describe('user drawing coordinates', () => {
     expect(position.rewardLabel).toBe('Reward +10.00 (+10.00%)');
     expect(position.riskLabel).toBe('Risk -5.00 (-5.00%)');
     expect(position.ratioLabel).toBe('R:R 2.00');
+
+    const compactPosition = resolveRiskRewardPositionFromAnchors(
+      'longPosition',
+      { time: 1_000, price: 100 },
+      { time: 3_000, price: 110 },
+      { time: 3_000, price: 95 },
+      space,
+      { statsMode: 'compact' },
+    );
+    expect(compactPosition.rewardLabel).toBe('+10.00 (+10.00%)');
+    expect(compactPosition.riskLabel).toBe('-5.00 (-5.00%)');
+    expect(compactPosition.ratioLabel).toBe('R:R 2.00');
   });
 
   it('includes stop anchor time in risk reward horizontal extents', () => {

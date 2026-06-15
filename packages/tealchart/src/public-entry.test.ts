@@ -104,6 +104,8 @@ import type {
   UserDrawingVisualEvidenceViewport,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
+  UserDrawingRiskRewardStatsMode,
+  UserDrawingRiskRewardStatsModeDescriptor,
   UserDrawingStyleToggleDescriptor,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
@@ -277,6 +279,8 @@ import {
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_ICON_NAMES,
   USER_DRAWING_OPACITY_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_DECORATION_DESCRIPTORS,
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
@@ -290,6 +294,7 @@ import {
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS,
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
+  normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
   normalizeUserDrawingVolumeProfileWidthRatio,
@@ -1409,6 +1414,9 @@ describe('tealchart public entries', () => {
     const wrapDescriptor: UserDrawingTextWrapDescriptor = USER_DRAWING_TEXT_WRAP_DESCRIPTORS[1]!;
     const maxWidth: UserDrawingTextMaxWidth = USER_DRAWING_TEXT_MAX_WIDTHS[1]!;
     const maxWidthDescriptor: UserDrawingTextMaxWidthDescriptor = USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS[1]!;
+    const riskRewardStatsMode: UserDrawingRiskRewardStatsMode = USER_DRAWING_RISK_REWARD_STATS_MODES[1]!;
+    const riskRewardStatsModeDescriptor: UserDrawingRiskRewardStatsModeDescriptor =
+      USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS[1]!;
     const volumeProfileRowCount: UserDrawingVolumeProfileRowCount = USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS[1]!;
     const volumeProfileRowCountDescriptor: UserDrawingVolumeProfileRowCountDescriptor =
       USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS[1]!;
@@ -1433,6 +1441,8 @@ describe('tealchart public entries', () => {
     expect(wrapDescriptor.textWrap).toBe(true);
     expect(maxWidth).toBe(180);
     expect(maxWidthDescriptor.textMaxWidth).toBe(180);
+    expect(riskRewardStatsMode).toBe('compact');
+    expect(riskRewardStatsModeDescriptor.statsMode).toBe('compact');
     expect(volumeProfileRowCount).toBe(24);
     expect(volumeProfileRowCountDescriptor.rowCount).toBe(24);
     expect(volumeProfileValueAreaRatio).toBe(0.7);
@@ -1443,6 +1453,7 @@ describe('tealchart public entries', () => {
     expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
+    expect(normalizeUserDrawingRiskRewardStatsMode('future')).toBe('full');
     expect(normalizeUserDrawingVolumeProfileRowCount(24.4)).toBe(24);
     expect(normalizeUserDrawingVolumeProfileValueAreaRatio(1.5)).toBe(1);
     expect(normalizeUserDrawingVolumeProfileWidthRatio(-1)).toBe(0.05);
