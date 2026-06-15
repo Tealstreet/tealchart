@@ -55,9 +55,11 @@ Do not spend new PRs on these unless they directly unblock a UX epic:
 
 ## Next Epics
 
-### Epic A: Real Draw Workflow Audit and Fixes
+### Epic A: Real Draw Workflow Verification and Fixes
 
-Goal: prove the core tools draw the object the user intended.
+Goal: prove the shipped placement foundation produces the object the user
+intended in real web and mobile workflows, then fix any reproduced regressions
+or UX gaps.
 
 Phase A1: Audit current placement behavior
 
@@ -66,14 +68,17 @@ Phase A1: Audit current placement behavior
   `longPosition`, `brush`, `textLabel`.
 - Document whether each supports click placement, drag placement, draft preview,
   cancel, and mobile sibling behavior.
-- Any "random-sized" or surprising placement is a bug unless explicitly
-  documented as a placeholder-only tool.
+- Treat existing placement docs and tests as claims to verify, not assumptions
+  to redo. Any reproduced "random-sized" or surprising placement is a bug unless
+  explicitly documented as a placeholder-only tool.
 
-Phase A2: Fix two-anchor drag-to-draw for core tools
+Phase A2: Fix reproduced placement gaps
 
-- Start with `rectangle`, `circle`, `ellipse`, `trendLine`, and range tools.
-- Web: pointer down/move/up should size the draft from the actual gesture.
-- Mobile: touch begin/update/end should produce the same anchor semantics.
+- Start with the highest-friction verified gap from Phase A1.
+- Web: pointer down/move/up should size drag-capable drafts from the actual
+  gesture.
+- Mobile: touch begin/update/end should produce the same anchor semantics for
+  the sibling tool.
 - Keep click-to-place only where it has a deliberate TradingView-like meaning.
 
 Phase A3: Visual/interaction evidence
@@ -185,7 +190,7 @@ next PR.
 ## Current Next Move
 
 Start with Epic A, Phase A1. Before changing more implementation, reproduce and
-record the actual placement behavior for the core tools listed above. The first
-fix should target the highest-friction real drawing bug, currently suspected to
-be shape tools creating surprising or randomly sized objects instead of using
-the user's drag gesture.
+record the actual placement behavior for the core tools listed above against the
+current shipped placement claims in `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md` and
+`DRAWING_TOOLS_CAPABILITY_MATRIX.md`. The first fix should target the
+highest-friction verified placement bug or UX gap, not an assumed stale issue.
