@@ -26,6 +26,7 @@ function createStateWithTransientFields(): UserDrawingState {
       opacity: 0.75,
       lineVisible: false,
       fillVisible: true,
+      fillOpacity: 0.25,
     },
     points: [
       { time: 1000, price: 10 },
@@ -81,6 +82,7 @@ describe('drawing layout serialization', () => {
     expect(persisted?.version).toBe(USER_DRAWING_LAYOUT_SCHEMA_VERSION);
     expect(persisted?.drawings).toHaveLength(1);
     expect(persisted?.drawings[0]?.id).toBe('trend_1');
+    expect(persisted?.drawings[0]?.style.fillOpacity).toBe(0.25);
     expect(persisted?.activeTool).toBe('select');
     expect(persisted?.stayInDrawingMode).toBe(false);
     expect(persisted?.magnetMode).toBe('weak');

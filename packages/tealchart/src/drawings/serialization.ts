@@ -352,6 +352,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.lineVisible === 'boolean') style.lineVisible = value.lineVisible;
   if (typeof value.fillVisible === 'boolean') style.fillVisible = value.fillVisible;
   if (typeof value.fillColor === 'string') style.fillColor = value.fillColor;
+  if (isFiniteNumber(value.fillOpacity)) style.fillOpacity = value.fillOpacity;
   if (typeof value.textColor === 'string') style.textColor = value.textColor;
   if (isFiniteNumber(value.fontSize)) style.fontSize = value.fontSize;
   if (typeof value.fontFamily === 'string') style.fontFamily = value.fontFamily;

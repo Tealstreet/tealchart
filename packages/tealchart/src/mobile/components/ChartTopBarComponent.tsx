@@ -23,6 +23,7 @@ import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react
 import {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingFillOpacityDescriptors,
   getUserDrawingLineWidthDescriptors,
   getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
@@ -694,6 +695,35 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                               </Pressable>
                             );
                           })}
+
+                        {getUserDrawingFillOpacityDescriptors(selectedDrawing).map((descriptor) => {
+                          const active = (selectedDrawing.style.fillOpacity ?? 1) === descriptor.opacity;
+                          return (
+                            <Pressable
+                              key={descriptor.opacity}
+                              accessibilityRole="button"
+                              accessibilityLabel={descriptor.label}
+                              accessibilityState={{ disabled: !fillVisibilityControlsEnabled, selected: active }}
+                              disabled={!fillVisibilityControlsEnabled}
+                              onPress={() => onUserDrawingStyleChange?.({ fillOpacity: descriptor.opacity })}
+                              style={({ pressed }: PressableStyleState) => [
+                                styles.drawingButton,
+                                active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                                fillVisibilityControlsEnabled && pressed && !active && styles.drawingButtonPressed,
+                                !fillVisibilityControlsEnabled && styles.drawingButtonDisabled,
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.drawingButtonText,
+                                  { color: active ? accentColor : textSecondaryColor, fontSize: 10 },
+                                ]}
+                              >
+                                {Math.round(descriptor.opacity * 100)}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
 
                         <View style={styles.innerDivider} />
                       </>

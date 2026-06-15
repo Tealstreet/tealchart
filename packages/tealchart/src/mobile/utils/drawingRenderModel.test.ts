@@ -57,7 +57,7 @@ describe('mobile user drawing render model', () => {
   });
 
   it('returns Skia-ready primitives for selected drawings and draft previews', () => {
-    const fadedStyle = { ...style, opacity: 0.5 };
+    const fadedStyle = { ...style, opacity: 0.5, fillColor: 'rgba(245, 197, 66, 0.12)', fillOpacity: 0.25 };
     const state: UserDrawingState = {
       version: 1,
       activeTool: 'rectangle',

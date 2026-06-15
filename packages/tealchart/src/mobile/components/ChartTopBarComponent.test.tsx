@@ -262,6 +262,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Orange fill color'));
     fireEvent.click(screen.getByLabelText('5 pixel line width'));
     fireEvent.click(screen.getByLabelText('10 percent opacity'));
+    expect(screen.getByLabelText('100 percent fill opacity').getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByLabelText('50 percent fill opacity'));
     fireEvent.click(screen.getByLabelText('Toggle drawing border'));
     fireEvent.click(screen.getByLabelText('Toggle drawing fill'));
 
@@ -269,6 +271,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
     expect(onStyle).toHaveBeenCalledWith({ lineWidth: 5 });
     expect(onStyle).toHaveBeenCalledWith({ opacity: 0.1 });
+    expect(onStyle).toHaveBeenCalledWith({ fillOpacity: 0.5 });
     expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
     expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
     expect(screen.queryByLabelText('Green text color')).toBeNull();

@@ -231,6 +231,17 @@ object-tree gaps stay visible.
 - Web top bar and mobile top bar expose matching selected drawing opacity
   controls through shared descriptors.
 
+## Shipped: Fill Opacity Controls
+
+- Shared drawing style supports normalized fill opacity independent from whole
+  drawing opacity.
+- Web Canvas applies fill opacity only while rendering fill regions, preserving
+  stroke, text, and selection opacity.
+- Mobile Skia wraps fill primitives with matching fill-only opacity while
+  preserving the existing object opacity group for strokes and labels.
+- Shared selected-action and properties surfaces expose fill-opacity controls
+  for drawings with visible fill behavior.
+
 ## Shipped: Fill and Border Toggles
 
 - Shared drawing style supports explicit fill and border visibility flags.

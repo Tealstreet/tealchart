@@ -157,6 +157,7 @@ export interface UserDrawingStyle {
   lineVisible?: boolean;
   fillVisible?: boolean;
   fillColor?: string;
+  fillOpacity?: number;
   textColor?: string;
   fontSize?: number;
   fontFamily?: string;
@@ -914,6 +915,7 @@ export const DEFAULT_USER_DRAWING_STYLE: UserDrawingStyle = {
   lineVisible: true,
   fillVisible: true,
   fillColor: 'rgba(245, 197, 66, 0.12)',
+  fillOpacity: 1,
   textColor: '#f5c542',
   fontSize: 12,
 };
@@ -1010,6 +1012,8 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fontWeight === undefined ? undefined : normalizeUserDrawingFontWeight(style.fontWeight);
   const fontStyle = style.fontStyle === undefined ? undefined : normalizeUserDrawingFontStyle(style.fontStyle);
   const opacity = style.opacity === undefined ? undefined : normalizeUserDrawingOpacity(style.opacity);
+  const fillOpacity =
+    style.fillOpacity === undefined ? undefined : normalizeUserDrawingOpacity(style.fillOpacity);
   const textMaxWidth =
     style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
   if (
@@ -1018,6 +1022,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     fontWeight === style.fontWeight &&
     fontStyle === style.fontStyle &&
     opacity === style.opacity &&
+    fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth
   ) {
     return style;
@@ -1030,6 +1035,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(fontWeight === undefined ? {} : { fontWeight }),
     ...(fontStyle === undefined ? {} : { fontStyle }),
     ...(opacity === undefined ? {} : { opacity }),
+    ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
   };
 }

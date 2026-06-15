@@ -19,9 +19,14 @@ import type {
   UserDrawingTrendLineExtend,
 } from './types';
 
-import { isUserDrawingPathFamilyTool } from './types';
+import {
+  DEFAULT_USER_DRAWING_STYLE,
+  isUserDrawingPathFamilyTool,
+  normalizeUserDrawingOpacity,
+} from './types';
 import {
   getUserDrawingLineWidthDescriptors,
+  getUserDrawingFillOpacityDescriptors,
   getUserDrawingOpacityDescriptors,
   getSelectedUserDrawing,
   supportsUserDrawingFillColorControls,
@@ -154,6 +159,10 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
   const editable = !drawing.locked;
   const lineWidthDescriptors = getUserDrawingLineWidthDescriptors(drawing);
   const opacityDescriptors = getUserDrawingOpacityDescriptors(drawing);
+  const fillOpacityDescriptors = getUserDrawingFillOpacityDescriptors(drawing);
+  const currentFillOpacity = normalizeUserDrawingOpacity(
+    drawing.style.fillOpacity ?? DEFAULT_USER_DRAWING_STYLE.fillOpacity ?? 1,
+  );
   const groups: UserDrawingPropertiesSurfaceGroupDraft[] = [
     {
       id: 'line',
@@ -211,6 +220,14 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
               command: { type: 'updateStyle' as const, style: { fillColor: descriptor.fillColor } },
             }))
           : []),
+        ...fillOpacityDescriptors.map((descriptor) => ({
+          id: `fillOpacity:${descriptor.opacity}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.opacity,
+          selected: currentFillOpacity === descriptor.opacity,
+          command: { type: 'updateStyle' as const, style: { fillOpacity: descriptor.opacity } },
+        })),
         ...USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS.map((descriptor) => ({
           id: `${descriptor.style}:${drawing.style[descriptor.style] !== false}`,
           type: 'option' as const,
