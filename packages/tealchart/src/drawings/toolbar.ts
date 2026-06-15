@@ -117,6 +117,8 @@ export interface UserDrawingToolCategoryDescriptor {
   tools: readonly UserDrawingTool[];
 }
 
+export type UserDrawingRecentToolByCategory = Readonly<Record<string, UserDrawingTool | undefined>>;
+
 export interface UserDrawingToolbarActionDescriptor {
   action: UserDrawingToolbarAction;
   icon: string;
@@ -1249,6 +1251,25 @@ export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawing
   return (
     USER_DRAWING_TOOL_DESCRIPTORS.find((descriptor) => descriptor.tool === tool) ?? USER_DRAWING_TOOL_DESCRIPTORS[0]!
   );
+}
+
+export function getUserDrawingToolCategoryDescriptorForTool(
+  tool: UserDrawingTool,
+): UserDrawingToolCategoryDescriptor | null {
+  return USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.tools.includes(tool)) ?? null;
+}
+
+export function resolveUserDrawingToolCategoryButtonTool(
+  category: UserDrawingToolCategoryDescriptor,
+  activeTool: UserDrawingTool,
+  recentToolsByCategory: UserDrawingRecentToolByCategory = {},
+): UserDrawingTool {
+  if (category.tools.includes(activeTool)) return activeTool;
+
+  const recentTool = recentToolsByCategory[category.id];
+  if (recentTool && category.tools.includes(recentTool)) return recentTool;
+
+  return category.tools[0]!;
 }
 
 export function isUserDrawingToolbarActionEnabled(state: UserDrawingState, action: UserDrawingToolbarAction): boolean {

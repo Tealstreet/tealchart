@@ -26,6 +26,7 @@ import {
   getUserDrawingLineWidthDescriptors,
   getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
+  getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -35,6 +36,7 @@ import {
   isUserDrawingTextAnnotation,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveUserDrawingToolCategoryButtonTool,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
@@ -158,11 +160,25 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     // This makes the component work both controlled and uncontrolled
     const [internalInterval, setInternalInterval] = useState(interval);
     const [expandedDrawingCategoryId, setExpandedDrawingCategoryId] = useState<string | null>(null);
+    const [recentDrawingToolsByCategory, setRecentDrawingToolsByCategory] = useState<
+      Record<string, UserDrawingTool | undefined>
+    >({});
 
     // Sync internal state when prop changes (controlled mode)
     useEffect(() => {
       setInternalInterval(interval);
     }, [interval]);
+
+    useEffect(() => {
+      if (!userDrawingState) return;
+      const category = getUserDrawingToolCategoryDescriptorForTool(userDrawingState.activeTool);
+      if (!category) return;
+      setRecentDrawingToolsByCategory((current) =>
+        current[category.id] === userDrawingState.activeTool
+          ? current
+          : { ...current, [category.id]: userDrawingState.activeTool },
+      );
+    }, [userDrawingState?.activeTool]);
 
     // Handle timeframe selection
     // 1. Update internal state immediately (instant visual feedback)
@@ -217,7 +233,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
           <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
             {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
               const activeCategory = category.tools.includes(userDrawingState.activeTool);
-              const categoryTool = activeCategory ? userDrawingState.activeTool : category.tools[0]!;
+              const categoryTool = resolveUserDrawingToolCategoryButtonTool(
+                category,
+                userDrawingState.activeTool,
+                recentDrawingToolsByCategory,
+              );
               const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
               const expanded = expandedDrawingCategoryId === category.id;
               return (
@@ -257,6 +277,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       accessibilityLabel={descriptor.label}
                       accessibilityState={{ selected: active }}
                       onPress={() => {
+                        const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
+                        if (selectedCategory) {
+                          setRecentDrawingToolsByCategory((current) => ({
+                            ...current,
+                            [selectedCategory.id]: descriptor.tool,
+                          }));
+                        }
                         onUserDrawingToolSelect?.(descriptor.tool);
                         setExpandedDrawingCategoryId(null);
                       }}

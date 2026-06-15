@@ -20,6 +20,7 @@ import {
   getUserDrawingLineWidthDescriptors,
   getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingOpacityDescriptors,
+  getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
@@ -31,6 +32,7 @@ import {
   isUserDrawingToolbarActionEnabled,
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
+  resolveUserDrawingToolCategoryButtonTool,
   shouldRenderUserDrawingSelectedActionSurface,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -453,6 +455,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
+  private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
   private selectedActionSurfaceEl: HTMLElement | null = null;
   private selectedActionPopoverGroupId: string | null = null;
   private selectedActionPopoverDrawingId: string | null = null;
@@ -890,7 +893,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     for (const category of USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS) {
       const activeCategory = category.tools.includes(activeTool);
-      const categoryTool = activeCategory ? activeTool : category.tools[0]!;
+      if (activeCategory) {
+        this.recentDrawingToolsByCategory[category.id] = activeTool;
+      }
+      const categoryTool = resolveUserDrawingToolCategoryButtonTool(
+        category,
+        activeTool,
+        this.recentDrawingToolsByCategory,
+      );
       const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
       const flyoutId = `tealchart-drawing-tools-${category.id}`;
       const railItem = this.createElement('div', {
@@ -965,6 +975,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           this.createElement('span', { style: styles.drawingToolFlyoutLabel, textContent: descriptor.label }),
         );
         btn.addEventListener('click', () => {
+          const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
+          if (selectedCategory) {
+            this.recentDrawingToolsByCategory[selectedCategory.id] = descriptor.tool;
+          }
           this.options.onUserDrawingToolSelect?.(descriptor.tool);
           closeActiveFlyout();
         });
