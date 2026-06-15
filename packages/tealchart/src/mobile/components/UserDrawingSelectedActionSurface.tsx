@@ -19,7 +19,30 @@ import { dispatchMobileUserDrawingActionCommand } from '../utils/drawingActionDi
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT = 70;
 const MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y = 30;
-const MOBILE_USER_DRAWING_ACTION_POPOVER_HEIGHT = 74;
+const MOBILE_USER_DRAWING_ACTION_BUTTON_SIZE = 24;
+const MOBILE_USER_DRAWING_ACTION_GAP = 3;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_PADDING = 6;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_BORDER_WIDTH = 1;
+const MOBILE_USER_DRAWING_ACTION_POPOVER_MIN_HEIGHT = 74;
+
+function resolveMobileUserDrawingActionPopoverHeight(itemCount: number, width: number): number {
+  const contentWidth = Math.max(1, width - MOBILE_USER_DRAWING_ACTION_POPOVER_PADDING * 2);
+  const columns = Math.max(
+    1,
+    Math.floor(
+      (contentWidth + MOBILE_USER_DRAWING_ACTION_GAP) /
+        (MOBILE_USER_DRAWING_ACTION_BUTTON_SIZE + MOBILE_USER_DRAWING_ACTION_GAP),
+    ),
+  );
+  const rows = Math.max(1, Math.ceil(itemCount / columns));
+  return Math.max(
+    MOBILE_USER_DRAWING_ACTION_POPOVER_MIN_HEIGHT,
+    rows * MOBILE_USER_DRAWING_ACTION_BUTTON_SIZE +
+      Math.max(0, rows - 1) * MOBILE_USER_DRAWING_ACTION_GAP +
+      MOBILE_USER_DRAWING_ACTION_POPOVER_PADDING * 2 +
+      MOBILE_USER_DRAWING_ACTION_POPOVER_BORDER_WIDTH * 2,
+  );
+}
 
 export interface UserDrawingSelectedActionSurfaceProps {
   state: UserDrawingState;
@@ -53,10 +76,17 @@ export function UserDrawingSelectedActionSurfaceComponent({
   const activePopoverGroup = surface.groups.find((group) => group.id === activePopoverGroupIdForSelection);
   const activePopoverPresentation =
     activePopoverGroup?.presentation?.type === 'popover' ? activePopoverGroup.presentation : null;
+  const activePopoverWidth = activePopoverPresentation
+    ? Math.min(activePopoverPresentation.popoverWidth ?? 296, MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH - 8)
+    : 0;
+  const activePopoverHeight =
+    activePopoverGroup && activePopoverPresentation
+      ? resolveMobileUserDrawingActionPopoverHeight(activePopoverGroup.items.length, activePopoverWidth)
+      : 0;
   const surfaceHeight =
     activePopoverGroup?.presentation?.type === 'popover'
       ? MOBILE_USER_DRAWING_ACTION_POPOVER_OFFSET_Y +
-        Math.max(MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT, MOBILE_USER_DRAWING_ACTION_POPOVER_HEIGHT)
+        Math.max(MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT, activePopoverHeight)
       : MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT;
 
   useEffect(() => {
@@ -168,10 +198,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
           style={[
             styles.userDrawingActionPopover,
             {
-              width: Math.min(
-                activePopoverPresentation.popoverWidth ?? 296,
-                MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH - 8,
-              ),
+              width: activePopoverWidth,
             },
           ]}
           pointerEvents="auto"
