@@ -60,7 +60,7 @@ export const UserDrawingPropertiesSheet: React.FC<UserDrawingPropertiesSheetProp
                     surface.groups.map((group) => (
                       <View key={group.id} style={styles.group}>
                         <Text style={styles.groupLabel}>{group.label}</Text>
-                        <View style={styles.controls}>
+                        <View accessibilityLabel={`Drawing properties controls for ${group.label}`} style={styles.controls}>
                           {group.controls.map((control) => (
                             <Pressable
                               key={control.id}

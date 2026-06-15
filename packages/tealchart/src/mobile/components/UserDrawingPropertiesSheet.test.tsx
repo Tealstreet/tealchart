@@ -66,6 +66,10 @@ describe('UserDrawingPropertiesSheet', () => {
     );
 
     expect(screen.getByLabelText('Drawing properties').getAttribute('data-start-should-set-responder')).toBe('true');
+    const sheet = screen.getByLabelText('Drawing properties');
+    expect(sheet.getAttribute('data-style')).toContain('"maxHeight":"72%"');
+    const lineControls = screen.getByLabelText('Drawing properties controls for Line');
+    expect(lineControls.getAttribute('data-style')).toContain('"flexWrap":"wrap"');
     expect(screen.getByText('horizontalLine properties')).not.toBeNull();
     expect(screen.getByText('Line')).not.toBeNull();
 
