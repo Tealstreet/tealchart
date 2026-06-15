@@ -22,15 +22,15 @@ Tools audited here:
 
 | Tool | Placement mode | Shared evidence | Web evidence | Mobile evidence | Remaining proof |
 | --- | --- | --- | --- | --- | --- |
-| `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
-| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement | `SkiaTealchart.test.tsx`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity | Manual browser/device smoke with sidebar tool |
-| `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
-| `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
-| `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
-| `datePriceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
-| `longPosition` | Drag seeds first two anchors, final tap commits | `placement.test.ts`, `input.test.ts` drag-seed test | `TealchartWidget.test.ts` drag-seed widget test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` risk/reward render tests | Manual pointer/touch smoke with sidebar tool |
-| `brush` | Path drag | `input.test.ts` path-drag smoothing/commit tests | `TealchartWidget.test.ts` path-family drag test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` pressure/render tests | Manual pointer/touch smoke with sidebar tool |
-| `textLabel` | Single-anchor click/tap | `input.test.ts` single-anchor and text-edit state tests | `TealchartWidget.test.ts` context/double-click edit tests | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` text edit/render tests | Manual tap/click smoke with sidebar tool |
+| `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
+| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement plus browser mouse/touch event routing | `SkiaTealchart.test.tsx`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity | Browser/device smoke with sidebar tool |
+| `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
+| `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
+| `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
+| `datePriceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
+| `longPosition` | Drag seeds first two anchors, final tap commits | `placement.test.ts`, `input.test.ts` drag-seed test | `TealchartWidget.test.ts` drag-seed widget test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` risk/reward render tests | Browser/device smoke with sidebar tool |
+| `brush` | Path drag | `input.test.ts` path-drag smoothing/commit tests | `TealchartWidget.test.ts` path-family drag test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` pressure/render tests | Browser/device smoke with sidebar tool |
+| `textLabel` | Single-anchor click/tap | `input.test.ts` single-anchor and text-edit state tests | `TealchartWidget.test.ts` context/double-click edit tests | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` text edit/render tests | Browser/device smoke with sidebar tool |
 
 ## Phase A1 Findings
 
@@ -39,6 +39,11 @@ Tools audited here:
   and drag end anchors exactly.
 - Web and mobile both route drawing placement through shared commands/history.
   Mobile has explicit command-history coverage for the same endpoint semantics.
+- The browser event boundary has unit coverage for mouse and DOM touch input:
+  `EventManager.test.ts` verifies pending drag promotion, final
+  mouseup/touchend delivery when RAF has not processed a move frame, below
+  threshold tap fallback, pressure forwarding, shift modifier forwarding, and
+  touchcancel cancellation paths.
 - Web widget-level tests now cover exact drag endpoints and undo restoration
   for the north-star two-anchor tools: `trendLine`, `rectangle`, `circle`,
   `ellipse`, `priceRange`, and `datePriceRange`.
@@ -66,9 +71,9 @@ Tools audited here:
 ## Follow-Up Order
 
 1. Add a lightweight browser/device smoke harness for sidebar tool selection
-   plus pointer/touch drag, because the remaining risk is real host event
-   delivery rather than state mutation, toolbar selection, Skia gesture
-   callbacks, or render-model geometry.
+   plus pointer/touch drag, because the remaining risk is real browser/native
+   integration rather than unit-level event routing, state mutation, toolbar
+   selection, Skia gesture callbacks, or render-model geometry.
 2. Move to Epic B once the smoke path is covered or manually verified:
    selected-object local action surface.
 3. Keep placement fixes narrow. If a tool regresses, fix the web pointer path
