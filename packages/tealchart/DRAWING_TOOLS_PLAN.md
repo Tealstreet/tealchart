@@ -1582,6 +1582,17 @@ object-tree gaps stay visible.
 - Web Canvas and mobile Skia render paths resolve matching reward, risk, and
   risk/reward ratio label points from the configured alignment.
 
+## Shipped: Range Measurement Label Alignment Controls
+
+- Shared drawing style now preserves `measurementLabelAlignment` for price
+  range, date range, and date-and-price range drawings with center as the
+  default and left/right as alternate text alignment points.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose matching measurement-label alignment presets through the shared
+  properties surface.
+- Web Canvas and mobile Skia render paths resolve matching price, duration, and
+  combined measurement label x positions from the configured alignment.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.

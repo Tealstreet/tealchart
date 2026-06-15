@@ -15,6 +15,7 @@ import {
   normalizeUserDrawingFontStyle,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingBarsPatternDisplayMode,
+  normalizeUserDrawingMeasurementLabelAlignment,
   normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingRiskRewardStatsMode,
@@ -27,6 +28,7 @@ import {
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
+  USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS,
   USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
@@ -262,6 +264,17 @@ describe('user drawing types', () => {
       normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, measurementLabelPosition: 'future' as never }),
     ).toMatchObject({
       measurementLabelPosition: 'center',
+    });
+  });
+
+  it('normalizes measurement label alignments to supported cross-platform values', () => {
+    expect(USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS).toEqual(['left', 'center', 'right']);
+    expect(normalizeUserDrawingMeasurementLabelAlignment('right')).toBe('right');
+    expect(normalizeUserDrawingMeasurementLabelAlignment('future')).toBe('center');
+    expect(
+      normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, measurementLabelAlignment: 'future' as never }),
+    ).toMatchObject({
+      measurementLabelAlignment: 'center',
     });
   });
 

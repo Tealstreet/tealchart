@@ -33,6 +33,7 @@ import type {
 import {
   DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  normalizeUserDrawingMeasurementLabelAlignment,
   normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingBarsPatternDisplayMode,
@@ -1420,15 +1421,23 @@ function areMobileUserDrawingLabelsVisible(geometry: ResolvedUserDrawingGeometry
   return geometry.drawing.style.labelsVisible !== false;
 }
 
+function resolveMobileMeasurementLabelX(rect: DrawingScreenRect, fontSize: number, alignment: unknown): number {
+  const labelAlignment = normalizeUserDrawingMeasurementLabelAlignment(alignment);
+  if (labelAlignment === 'left') return rect.x + fontSize;
+  if (labelAlignment === 'right') return rect.x + rect.width - fontSize;
+  return rect.x + rect.width / 2;
+}
+
 function resolveMobileMeasurementLabelPoint(
   rect: DrawingScreenRect,
   fontSize: number,
   position: unknown,
+  alignment: unknown,
 ): DrawingScreenPoint {
   const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
     position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   );
-  const x = rect.x + rect.width / 2;
+  const x = resolveMobileMeasurementLabelX(rect, fontSize, alignment);
   if (labelPosition === 'top') return { x, y: rect.y + fontSize };
   if (labelPosition === 'bottom') return { x, y: rect.y + rect.height - fontSize };
   return { x, y: rect.y + rect.height / 2 };
@@ -1438,11 +1447,12 @@ function resolveMobileDatePriceRangeLabelPoints(
   rect: DrawingScreenRect,
   fontSize: number,
   position: unknown,
+  alignment: unknown,
 ): { price: DrawingScreenPoint; date: DrawingScreenPoint } {
   const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
     position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   );
-  const x = rect.x + rect.width / 2;
+  const x = resolveMobileMeasurementLabelX(rect, fontSize, alignment);
   if (labelPosition === 'top') {
     return {
       price: { x, y: rect.y + fontSize },
@@ -2102,6 +2112,7 @@ function primitiveFromGeometry(
           geometry.rect,
           fontSize,
           geometry.drawing.style.measurementLabelPosition,
+          geometry.drawing.style.measurementLabelAlignment,
         ),
         label: areMobileUserDrawingLabelsVisible(geometry) ? label : '',
         style: geometry.drawing.style,
@@ -2120,6 +2131,7 @@ function primitiveFromGeometry(
           geometry.rect,
           normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12),
           geometry.drawing.style.measurementLabelPosition,
+          geometry.drawing.style.measurementLabelAlignment,
         ),
         label: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
         style: geometry.drawing.style,
@@ -2136,6 +2148,7 @@ function primitiveFromGeometry(
         geometry.rect,
         fontSize,
         geometry.drawing.style.measurementLabelPosition,
+        geometry.drawing.style.measurementLabelAlignment,
       );
       return {
         kind: 'datePriceRange',

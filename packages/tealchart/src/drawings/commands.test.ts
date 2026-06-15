@@ -394,6 +394,7 @@ describe('user drawing command dispatch', () => {
       duplicated,
       {
         barsPatternDisplayMode: 'future' as never,
+        measurementLabelAlignment: 'future' as never,
         riskRewardLabelAlignment: 'future' as never,
         riskRewardStatsMode: 'future' as never,
         volumeProfileGuidesVisible: false,
@@ -405,6 +406,7 @@ describe('user drawing command dispatch', () => {
     );
     const guideHiddenDrawing = guidesHidden.drawings.find((drawing) => drawing.id === 'trend-line-copy');
     expect(guideHiddenDrawing?.style.barsPatternDisplayMode).toBe('candles');
+    expect(guideHiddenDrawing?.style.measurementLabelAlignment).toBe('center');
     expect(guideHiddenDrawing?.style.riskRewardLabelAlignment).toBe('center');
     expect(guideHiddenDrawing?.style.riskRewardStatsMode).toBe('full');
     expect(guideHiddenDrawing?.style.volumeProfileGuidesVisible).toBe(false);
