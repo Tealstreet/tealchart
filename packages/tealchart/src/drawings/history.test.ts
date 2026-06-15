@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { DrawingCoordinateSpace } from './coordinates';
+import type { UserDrawingCommand } from './commands';
 
 import {
   createUserDrawingCommandHistory,
@@ -22,6 +23,64 @@ const coordinateSpace: DrawingCoordinateSpace = {
   chartRight: 300,
 };
 const spacesByPaneId = new Map([['main', coordinateSpace]]);
+const undoableUserDrawingHistoryCommandTypes = [
+  'handleInput',
+  'add',
+  'applyEditDrag',
+  'beginDuplicateEditDragAtPoint',
+  'nudge',
+  'delete',
+  'duplicate',
+  'paste',
+  'clear',
+  'commitPlacementDrag',
+  'commitPathDrag',
+  'commitTextEdit',
+  'setText',
+  'setTextContent',
+  'updateStyle',
+  'setTextAlign',
+  'setTrendLineExtend',
+  'setIconName',
+  'setImageSource',
+  'setName',
+  'setTableCells',
+  'setTableCell',
+  'setTableDimensions',
+  'insertTableRow',
+  'deleteTableRow',
+  'insertTableColumn',
+  'deleteTableColumn',
+  'setVisibility',
+  'setLocked',
+  'reorder',
+] as const satisfies readonly UserDrawingCommand['type'][];
+const transientUserDrawingHistoryCommandTypes = [
+  'setActiveTool',
+  'setStayInDrawingMode',
+  'setMagnetMode',
+  'setMeasureMode',
+  'select',
+  'selectMany',
+  'selectAtPoint',
+  'beginEditDragAtPoint',
+  'cancelDraft',
+  'beginPlacementDrag',
+  'beginMeasure',
+  'updateMeasure',
+  'endMeasure',
+  'beginPathDrag',
+  'appendPathDragPoint',
+  'beginTextEdit',
+  'updateTextEdit',
+  'cancelTextEdit',
+] as const satisfies readonly UserDrawingCommand['type'][];
+type MissingUserDrawingHistoryCommandType = Exclude<
+  UserDrawingCommand['type'],
+  | (typeof undoableUserDrawingHistoryCommandTypes)[number]
+  | (typeof transientUserDrawingHistoryCommandTypes)[number]
+>;
+const allUserDrawingHistoryCommandTypesCovered: Record<MissingUserDrawingHistoryCommandType, never> = {};
 
 afterEach(() => {
   clearChartStoreCache();
@@ -41,6 +100,46 @@ function createStateWithTrendLine() {
 }
 
 describe('user drawing command history', () => {
+  it('keeps the Epic E undo/redo command-type checklist classified', () => {
+    expect(allUserDrawingHistoryCommandTypesCovered).toEqual({});
+    expect(undoableUserDrawingHistoryCommandTypes).toEqual(
+      expect.arrayContaining([
+        'handleInput',
+        'commitPlacementDrag',
+        'commitPathDrag',
+        'applyEditDrag',
+        'beginDuplicateEditDragAtPoint',
+        'duplicate',
+        'delete',
+        'paste',
+        'clear',
+        'nudge',
+        'updateStyle',
+        'setVisibility',
+        'setLocked',
+        'reorder',
+        'commitTextEdit',
+        'setTableCell',
+      ]),
+    );
+    expect(transientUserDrawingHistoryCommandTypes).toEqual(
+      expect.arrayContaining([
+        'setActiveTool',
+        'selectAtPoint',
+        'beginEditDragAtPoint',
+        'beginPlacementDrag',
+        'beginPathDrag',
+        'appendPathDragPoint',
+        'beginTextEdit',
+        'updateTextEdit',
+        'cancelTextEdit',
+        'beginMeasure',
+        'updateMeasure',
+        'endMeasure',
+      ]),
+    );
+  });
+
   it('records public add drawing commands as undoable creations', () => {
     const state = createUserDrawingState();
     const history = createUserDrawingCommandHistory();

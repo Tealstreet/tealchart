@@ -171,6 +171,8 @@ Phase E1: Coverage audit
 
 - Create, drag-place, edit handles, move, duplicate, delete, z-order,
   lock/hide, style, text edit, and object-tree/context actions.
+- Current E1 undo/redo evidence is recorded in
+  `DRAWING_TOOLS_UNDO_REDO_AUDIT.md`.
 
 Phase E2: Web keyboard ownership
 
@@ -198,13 +200,16 @@ next PR.
 
 ## Current Next Move
 
-Placement, selected-action, object-tree, edit-lifecycle, and double-edit audits
-are recorded in `DRAWING_TOOLS_PLACEMENT_AUDIT.md`,
-`DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`, `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`,
-`DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`, and
-`DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`, and
-`DRAWING_TOOLS_DUPLICATE_MODIFIER_AUDIT.md`.
+Recorded audit evidence:
 
-Move next to Epic E, Phase E1. Verify undo/redo confidence across common
-user-visible mutations, starting with the shared command history matrix and
-matching mobile command-history siblings.
+- `DRAWING_TOOLS_PLACEMENT_AUDIT.md`
+- `DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`
+- `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`
+- `DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`
+- `DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`
+- `DRAWING_TOOLS_DUPLICATE_MODIFIER_AUDIT.md`
+- `DRAWING_TOOLS_UNDO_REDO_AUDIT.md`
+
+Move next to Epic E, Phase E2. Verify web keyboard ownership and shortcut
+routing for undo/redo, delete, duplicate, copy/paste, select-all, nudge, and
+Escape without stealing focus from app-owned inputs.
