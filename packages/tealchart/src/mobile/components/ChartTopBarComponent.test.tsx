@@ -52,7 +52,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
   });
 
   it('shows the active tool icon on its category button', () => {
-    render(
+    const { rerender } = render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
         interval="1"
@@ -62,6 +62,21 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
     expect(screen.getByLabelText('Lines drawing tools').textContent).toBe(
       getUserDrawingToolDescriptor('horizontalLine').icon,
+    );
+
+    rerender(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'rectangle' }}
+      />,
+    );
+
+    expect(screen.getByLabelText('Lines drawing tools').textContent).toBe(
+      getUserDrawingToolDescriptor('horizontalLine').icon,
+    );
+    expect(screen.getByLabelText('Geometric Shapes drawing tools').textContent).toBe(
+      getUserDrawingToolDescriptor('rectangle').icon,
     );
   });
 
