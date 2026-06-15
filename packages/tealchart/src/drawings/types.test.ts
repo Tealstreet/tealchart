@@ -17,12 +17,14 @@ import {
   normalizeUserDrawingStyle,
   normalizeUserDrawingTextMaxWidth,
   normalizeUserDrawingVolumeProfileRowCount,
+  normalizeUserDrawingVolumeProfileValueAreaRatio,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
+  USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
 } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
@@ -217,6 +219,17 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingVolumeProfileRowCount(Number.NaN)).toBe(12);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, volumeProfileRowCount: 24.4 })).toMatchObject({
       volumeProfileRowCount: 24,
+    });
+  });
+
+  it('normalizes volume profile value-area ratios to alpha-like ratios', () => {
+    expect(USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS).toEqual([0.5, 0.7, 0.8]);
+    expect(normalizeUserDrawingVolumeProfileValueAreaRatio(-0.5)).toBe(0);
+    expect(normalizeUserDrawingVolumeProfileValueAreaRatio(0.65)).toBe(0.65);
+    expect(normalizeUserDrawingVolumeProfileValueAreaRatio(2)).toBe(1);
+    expect(normalizeUserDrawingVolumeProfileValueAreaRatio(Number.NaN)).toBe(0.7);
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, volumeProfileValueAreaRatio: 2 })).toMatchObject({
+      volumeProfileValueAreaRatio: 1,
     });
   });
 

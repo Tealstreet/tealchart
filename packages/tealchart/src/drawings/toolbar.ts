@@ -15,6 +15,7 @@ import type {
   UserDrawingTool,
   UserDrawingTrendLineExtend,
   UserDrawingVolumeProfileRowCount,
+  UserDrawingVolumeProfileValueAreaRatio,
 } from './types';
 
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
@@ -35,6 +36,7 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
+  USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
 } from './types';
 
 export type UserDrawingToolbarAction =
@@ -186,6 +188,11 @@ export interface UserDrawingTextMaxWidthDescriptor {
 
 export interface UserDrawingVolumeProfileRowCountDescriptor {
   rowCount: UserDrawingVolumeProfileRowCount;
+  label: string;
+}
+
+export interface UserDrawingVolumeProfileValueAreaRatioDescriptor {
+  valueAreaRatio: UserDrawingVolumeProfileValueAreaRatio;
   label: string;
 }
 
@@ -767,6 +774,12 @@ export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS: readonly UserDra
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS.map((rowCount) => ({
     rowCount,
     label: `${rowCount} volume profile rows`,
+  }));
+
+export const USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO_DESCRIPTORS: readonly UserDrawingVolumeProfileValueAreaRatioDescriptor[] =
+  USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS.map((valueAreaRatio) => ({
+    valueAreaRatio,
+    label: `${Math.round(valueAreaRatio * 100)} percent value area`,
   }));
 
 export const USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
@@ -1590,6 +1603,10 @@ export function supportsUserDrawingVolumeProfileGuideControls(drawing: UserDrawi
 }
 
 export function supportsUserDrawingVolumeProfileRowCountControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
+}
+
+export function supportsUserDrawingVolumeProfileValueAreaControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
 }
 
