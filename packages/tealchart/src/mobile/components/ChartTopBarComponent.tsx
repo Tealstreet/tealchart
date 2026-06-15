@@ -122,6 +122,8 @@ export interface ChartTopBarComponentProps {
 
 const TOP_BAR_HEIGHT = MOBILE_CHART_CHROME_METRICS.topBarHeight;
 type PressableStyleState = { pressed: boolean };
+const MIN_DRAWING_TOOL_OVERLAY_HEIGHT = 96;
+const DRAWING_TOOL_FLYOUT_NON_LIST_HEIGHT = 44;
 const getMobileWindowHeight = (): number => {
   const dimensionsHeight = Dimensions?.get?.('window')?.height;
   if (typeof dimensionsHeight === 'number' && dimensionsHeight > 0) return dimensionsHeight;
@@ -156,7 +158,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
   }) => {
     const [windowHeight, setWindowHeight] = useState(getMobileWindowHeight);
     const drawingToolAvailableHeight = Math.max(
-      160,
+      MIN_DRAWING_TOOL_OVERLAY_HEIGHT,
       windowHeight -
         computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS) -
         TIME_AXIS_HEIGHT -
@@ -164,6 +166,15 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     );
     const drawingToolBoundsStyle = useMemo(
       () => ({ maxHeight: drawingToolAvailableHeight }),
+      [drawingToolAvailableHeight],
+    );
+    const drawingToolFlyoutListBoundsStyle = useMemo(
+      () => ({
+        maxHeight: Math.max(
+          MIN_DRAWING_TOOL_OVERLAY_HEIGHT,
+          drawingToolAvailableHeight - DRAWING_TOOL_FLYOUT_NON_LIST_HEIGHT,
+        ),
+      }),
       [drawingToolAvailableHeight],
     );
 
@@ -311,7 +322,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   {expandedDrawingCategory.label}
                 </Text>
                 <View
-                  style={[styles.drawingToolFlyoutList, drawingToolBoundsStyle]}
+                  style={[styles.drawingToolFlyoutList, drawingToolFlyoutListBoundsStyle]}
                   accessibilityLabel={`${expandedDrawingCategory.label} tool list`}
                 >
                   <ScrollView showsVerticalScrollIndicator={false}>
