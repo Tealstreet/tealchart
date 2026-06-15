@@ -3227,7 +3227,14 @@ describe('drawing layout serialization', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', barsPatternDisplayMode: 'line' },
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            barsPatternDisplayMode: 'line',
+            barsPatternUpColor: '#38bdf8',
+            barsPatternDownColor: '#f97316',
+          },
           points: [
             { time: 1, price: 100 },
             { time: 2, price: 110 },
@@ -3244,7 +3251,11 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings[0]).toMatchObject({
       id: 'bars',
       kind: 'barsPattern',
-      style: { barsPatternDisplayMode: 'line' },
+      style: {
+        barsPatternDisplayMode: 'line',
+        barsPatternUpColor: '#38bdf8',
+        barsPatternDownColor: '#f97316',
+      },
       points: [
         { time: 1, price: 100 },
         { time: 2, price: 110 },
@@ -3256,7 +3267,14 @@ describe('drawing layout serialization', () => {
       ],
     });
     expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toMatchObject([
-      { id: 'bars', style: { barsPatternDisplayMode: 'line' } },
+      {
+        id: 'bars',
+        style: {
+          barsPatternDisplayMode: 'line',
+          barsPatternUpColor: '#38bdf8',
+          barsPatternDownColor: '#f97316',
+        },
+      },
     ]);
   });
 

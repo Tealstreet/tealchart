@@ -102,6 +102,7 @@ import type {
   UserDrawingVisualEvidenceState,
   UserDrawingVisualEvidenceStateStatus,
   UserDrawingVisualEvidenceViewport,
+  UserDrawingBarsPatternColorDescriptor,
   UserDrawingBarsPatternDisplayMode,
   UserDrawingBarsPatternDisplayModeDescriptor,
   UserDrawingPriceRangeMetrics,
@@ -271,8 +272,10 @@ import {
   setUserDrawingTrendLineExtend,
   splitUserDrawingTextLines,
   getUserDrawingBrushTemplateDescriptors,
+  USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
+  USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS,
   USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
@@ -1424,6 +1427,10 @@ describe('tealchart public entries', () => {
     const barsPatternDisplayMode: UserDrawingBarsPatternDisplayMode = USER_DRAWING_BARS_PATTERN_DISPLAY_MODES[1]!;
     const barsPatternDisplayModeDescriptor: UserDrawingBarsPatternDisplayModeDescriptor =
       USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS[1]!;
+    const barsPatternUpColorDescriptor: UserDrawingBarsPatternColorDescriptor =
+      USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS[1]!;
+    const barsPatternDownColorDescriptor: UserDrawingBarsPatternColorDescriptor =
+      USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS[1]!;
     const riskRewardStatsMode: UserDrawingRiskRewardStatsMode = USER_DRAWING_RISK_REWARD_STATS_MODES[1]!;
     const riskRewardStatsModeDescriptor: UserDrawingRiskRewardStatsModeDescriptor =
       USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS[1]!;
@@ -1453,6 +1460,8 @@ describe('tealchart public entries', () => {
     expect(maxWidthDescriptor.textMaxWidth).toBe(180);
     expect(barsPatternDisplayMode).toBe('line');
     expect(barsPatternDisplayModeDescriptor.displayMode).toBe('line');
+    expect(barsPatternUpColorDescriptor.color).toBe('#38bdf8');
+    expect(barsPatternDownColorDescriptor.color).toBe('#f97316');
     expect(riskRewardStatsMode).toBe('compact');
     expect(riskRewardStatsModeDescriptor.statsMode).toBe('compact');
     expect(volumeProfileRowCount).toBe(24);

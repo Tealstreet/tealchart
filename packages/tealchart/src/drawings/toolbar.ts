@@ -202,6 +202,11 @@ export interface UserDrawingBarsPatternDisplayModeDescriptor {
   label: string;
 }
 
+export interface UserDrawingBarsPatternColorDescriptor {
+  color: string;
+  label: string;
+}
+
 export interface UserDrawingVolumeProfileRowCountDescriptor {
   rowCount: UserDrawingVolumeProfileRowCount;
   label: string;
@@ -802,6 +807,18 @@ export const USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS: readonly UserDr
     displayMode,
     label: displayMode === 'line' ? 'Line bars pattern' : 'Candlestick bars pattern',
   }));
+
+export const USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS: readonly UserDrawingBarsPatternColorDescriptor[] = [
+  { color: '#22c55e', label: 'Green up bars' },
+  { color: '#38bdf8', label: 'Blue up bars' },
+  { color: '#f5c542', label: 'Gold up bars' },
+] as const;
+
+export const USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS: readonly UserDrawingBarsPatternColorDescriptor[] = [
+  { color: '#f43f5e', label: 'Red down bars' },
+  { color: '#f97316', label: 'Orange down bars' },
+  { color: '#a855f7', label: 'Purple down bars' },
+] as const;
 
 export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS: readonly UserDrawingVolumeProfileRowCountDescriptor[] =
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS.map((rowCount) => ({
@@ -1654,6 +1671,10 @@ export function supportsUserDrawingVolumeProfileWidthControls(drawing: UserDrawi
 }
 
 export function supportsUserDrawingBarsPatternDisplayModeControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'barsPattern';
+}
+
+export function supportsUserDrawingBarsPatternColorControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'barsPattern';
 }
 
