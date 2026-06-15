@@ -226,6 +226,90 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(getMockViewStyle(surface).top).toBe(83);
   });
 
+  it('exposes local text edit only for selected text drawings while keeping properties reachable', () => {
+    const onUserDrawingPropertiesOpen = vi.fn();
+    const dispatchUserDrawingCommand = vi.fn();
+    const lineState = createSelectedState();
+    const { rerender } = render(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={lineState}
+        surface={resolveUserDrawingSelectedActionSurface(lineState)}
+        anchor={selectionActionAnchor}
+        dimensions={{ width: 360, height: 240 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={dispatchUserDrawingCommand}
+        onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
+    expect(screen.getByLabelText('Edit drawing text').getAttribute('aria-disabled')).toBe('true');
+    expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        drawingId: 'line',
+        type: 'properties',
+      }),
+    );
+
+    const textState = createSelectedTextState();
+    rerender(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={textState}
+        surface={resolveUserDrawingSelectedActionSurface(textState)}
+        anchor={{ ...selectionActionAnchor, drawingIds: ['text'] }}
+        dimensions={{ width: 360, height: 240 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={dispatchUserDrawingCommand}
+        onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Edit drawing text'));
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'beginTextEdit',
+      drawingId: 'text',
+      meta: { source: 'toolbar' },
+    });
+    fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
+    expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        drawingId: 'text',
+        type: 'properties',
+      }),
+    );
+
+    const lockedTextState: UserDrawingState = {
+      ...textState,
+      drawings: [{ ...textState.drawings[0]!, locked: true }],
+    };
+    rerender(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={lockedTextState}
+        surface={resolveUserDrawingSelectedActionSurface(lockedTextState)}
+        anchor={{ ...selectionActionAnchor, drawingIds: ['text'] }}
+        dimensions={{ width: 360, height: 240 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={dispatchUserDrawingCommand}
+        onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Edit drawing text'));
+    expect(screen.getByLabelText('Edit drawing text').getAttribute('aria-disabled')).toBe('true');
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
+    expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        drawingId: 'text',
+        type: 'properties',
+      }),
+    );
+    expect(onUserDrawingPropertiesOpen).toHaveBeenCalledTimes(3);
+  });
+
   it('keeps mobile selected actions clear of the top bar and left drawing rail when space allows', () => {
     const state = createSelectedState();
 
