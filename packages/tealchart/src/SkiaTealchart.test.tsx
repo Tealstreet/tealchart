@@ -36,6 +36,20 @@ function getLatestDrawingPanGesture(): MockGesture {
   return pan;
 }
 
+function getLatestSingleTapGesture(): MockGesture {
+  const tapMock = Gesture.Tap as unknown as MockGestureFactory;
+  const tap = [...tapMock.mock.results]
+    .reverse()
+    .map((result) => result.value)
+    .find((gesture) => gesture.__callbacks?.onEnd && !gesture.__callbacks?.numberOfPointers && !gesture.__callbacks?.numberOfTaps);
+
+  if (!tap) {
+    throw new Error('Expected SkiaTealchart to register a single tap gesture');
+  }
+
+  return tap;
+}
+
 function runGestureCallback(gesture: MockGesture, name: string, ...args: unknown[]): void {
   const callback = gesture.__callbacks?.[name]?.[0];
   if (typeof callback !== 'function') {
@@ -135,6 +149,7 @@ describe('SkiaTealchart drawing properties', () => {
     cleanup();
     clearChartStoreCache();
     (Gesture.Pan as unknown as MockGestureFactory).mockClear();
+    (Gesture.Tap as unknown as MockGestureFactory).mockClear();
   });
 
   it('opens the built-in properties sheet through the handle and dispatches controls to the pinned drawing', async () => {
@@ -329,6 +344,89 @@ describe('SkiaTealchart drawing properties', () => {
       points: [beginCommand?.point.anchor, commitCommand?.point.anchor],
     });
     expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+  });
+
+  it('swallows rectangle taps so mobile users must drag real endpoints', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Rectangle'));
+    });
+    onCommand.mockClear();
+
+    const tap = getLatestSingleTapGesture();
+    await act(async () => {
+      runGestureCallback(tap, 'onEnd', { x: 130, y: 95 });
+    });
+
+    expect(onCommand).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'handleInput' }),
+      }),
+    );
+    expect(ref.current?.getUserDrawingState()).toMatchObject({
+      activeTool: 'rectangle',
+      selection: null,
+      draft: null,
+      drawings: [],
+    });
+  });
+
+  it('keeps drag-seeded mobile taps available for final anchors', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await act(async () => {
+      expect(ref.current?.setActiveUserDrawingTool('longPosition')).toBe(true);
+    });
+    onCommand.mockClear();
+
+    const tap = getLatestSingleTapGesture();
+    await act(async () => {
+      runGestureCallback(tap, 'onEnd', { x: 130, y: 95 });
+    });
+
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'handleInput' }),
+      }),
+    );
+    expect(ref.current?.getUserDrawingState()).toMatchObject({
+      activeTool: 'longPosition',
+      selection: null,
+      draft: expect.objectContaining({ tool: 'longPosition' }),
+      drawings: [],
+    });
   });
 
   it('cancels rendered toolbar rectangle placement when Skia pan gestures abort', async () => {
