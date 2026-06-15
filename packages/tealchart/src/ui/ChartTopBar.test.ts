@@ -134,6 +134,14 @@ describe('ChartTopBar drawing toolbar', () => {
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
     expect(linesCategory?.textContent).toBe(getUserDrawingToolDescriptor('horizontalLine').icon);
 
+    topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'rectangle' });
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.textContent).toBe(
+      getUserDrawingToolDescriptor('horizontalLine').icon,
+    );
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]')?.textContent,
+    ).toBe(getUserDrawingToolDescriptor('rectangle').icon);
+
     topBar.unmount();
   });
 
