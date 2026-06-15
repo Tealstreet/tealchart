@@ -44,10 +44,11 @@ Object-tree behavior is shared:
   regression evidence that surface interactions do not bubble through the
   jsdom/RN-test wrappers or dismiss the mobile sheet before a row/action can
   complete.
-- Built-in web and mobile object-tree surfaces now both have component-level
-  z-order evidence: the web panel dispatches row z-order actions through
-  `TealchartWidget`, and the mobile sheet dispatches row z-order actions through
-  `SkiaTealchart`.
+- Built-in web and mobile object-tree surfaces now both have owner-boundary row
+  action evidence: the web panel dispatches row actions through
+  `TealchartWidget` with `objectTree` command metadata, and the mobile sheet
+  dispatches rename, visibility, lock/unlock, and z-order row actions through
+  live `SkiaTealchart` drawing state.
 - Built-in web and mobile object-tree surfaces now both pin basic reachability
   layout constraints: the web panel stays viewport-capped with wrapped row
   actions, while the mobile sheet stays height-capped with wrapped row actions.

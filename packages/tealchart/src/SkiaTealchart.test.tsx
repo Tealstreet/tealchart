@@ -220,7 +220,7 @@ describe('SkiaTealchart drawing properties', () => {
     expect(createPicture).toHaveBeenCalled();
   });
 
-  it('opens the built-in object-tree sheet through the handle and dispatches z-order row actions', async () => {
+  it('opens the built-in object-tree sheet through the handle and dispatches row actions', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onCommand = vi.fn();
 
@@ -246,6 +246,87 @@ describe('SkiaTealchart drawing properties', () => {
     const sheet = await screen.findByLabelText('Drawing object tree');
     expect(sheet).not.toBeNull();
     expect(screen.getByText('Drawings (2)')).not.toBeNull();
+
+    await act(async () => {
+      fireEvent.click(within(sheet).getAllByLabelText('Rename drawing')[0]!);
+    });
+    await act(async () => {
+      fireEvent.change(within(sheet).getByLabelText('Rename Horizontal line'), {
+        target: { value: 'Target liquidity' },
+      });
+    });
+    await act(async () => {
+      fireEvent.click(within(sheet).getByLabelText('Save drawing name'));
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
+      name: 'Target liquidity',
+    });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({
+          type: 'setName',
+          drawingId: 'target',
+          name: 'Target liquidity',
+          meta: { source: 'objectTree', affectedIds: ['target'] },
+        }),
+        source: 'objectTree',
+      }),
+    );
+
+    await act(async () => {
+      fireEvent.click(within(sheet).getAllByLabelText('Hide drawing')[0]!);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
+      visible: false,
+    });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({
+          type: 'setVisibility',
+          visible: false,
+          meta: { source: 'objectTree', affectedIds: ['target'] },
+        }),
+        source: 'objectTree',
+      }),
+    );
+
+    await act(async () => {
+      fireEvent.click(within(sheet).getAllByLabelText('Lock drawing')[0]!);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
+      locked: true,
+    });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({
+          type: 'setLocked',
+          locked: true,
+          meta: { source: 'objectTree', affectedIds: ['target'] },
+        }),
+        source: 'objectTree',
+      }),
+    );
+
+    await act(async () => {
+      fireEvent.click(within(sheet).getAllByLabelText('Unlock drawing')[0]!);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.find((drawing) => drawing.id === 'target')).toMatchObject({
+      locked: false,
+    });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({
+          type: 'setLocked',
+          locked: false,
+          meta: { source: 'objectTree', affectedIds: ['target'] },
+        }),
+        source: 'objectTree',
+      }),
+    );
 
     await act(async () => {
       fireEvent.click(within(sheet).getAllByLabelText('Send drawing to back')[0]!);
