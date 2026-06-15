@@ -67,9 +67,14 @@ describe('UserDrawingObjectTreeSheet', () => {
 
     expect(screen.getByLabelText('Drawing object tree').getAttribute('data-start-should-set-responder')).toBe('true');
     expect(screen.getByText('Drawings (2)')).not.toBeNull();
+    fireEvent.click(screen.getByLabelText('Drawing object tree'));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(onChartTouch).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByLabelText('Select Rectangle'));
     expect(onDispatch).toHaveBeenCalledWith({ type: 'select', drawingId: 'target' });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(onChartTouch).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getAllByLabelText('Rename drawing')[0]!);
     fireEvent.change(screen.getByLabelText('Rename Rectangle'), { target: { value: 'Range box' } });
@@ -89,6 +94,8 @@ describe('UserDrawingObjectTreeSheet', () => {
       name: 'Keyboard range',
       includeLocked: undefined,
     });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(onChartTouch).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getAllByLabelText('Hide drawing')[0]!);
     expect(onDispatch).toHaveBeenCalledWith({
@@ -111,6 +118,8 @@ describe('UserDrawingObjectTreeSheet', () => {
     });
     expect(screen.getAllByText('Top').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Back').length).toBeGreaterThan(0);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(onChartTouch).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByLabelText('Close drawing object tree'));
     expect(onClose).toHaveBeenCalledTimes(1);
