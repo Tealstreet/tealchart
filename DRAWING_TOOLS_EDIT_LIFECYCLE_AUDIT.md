@@ -33,6 +33,9 @@ Edit lifecycle behavior is shared:
   duplicate edit drags, and history transaction coalescing are already shared.
 - Web and mobile both enter edit drags through command results and only record
   layout-changing apply/commit commands.
+- Built-in web and mobile properties surfaces now both pin basic reachability
+  layout constraints: the web panel stays viewport-capped with wrapped control
+  groups, while the mobile sheet stays height-capped with wrapped controls.
 - Remaining D-domain risk is higher-level lifecycle polish: double-click versus
   properties intent, app-owned versus built-in fallback behavior, and visual
   proof that gesture cancellation feels correct.
