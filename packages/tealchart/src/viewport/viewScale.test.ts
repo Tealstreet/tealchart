@@ -10,6 +10,8 @@ import {
   getVisiblePlotRange,
   intervalToMs,
   restoreViewport,
+  VIEWPORT_ZOOM_IN_FACTOR,
+  zoomViewportTimeRange,
 } from './viewScale';
 
 // ---------------------------------------------------------------------------
@@ -87,6 +89,45 @@ describe('intervalToMs', () => {
   it('defaults to 1 hour for unknown resolutions', () => {
     expect(intervalToMs('unknown')).toBe(3_600_000);
     expect(intervalToMs('')).toBe(3_600_000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// zoomViewportTimeRange
+// ---------------------------------------------------------------------------
+
+describe('zoomViewportTimeRange', () => {
+  it('zooms the time range around the viewport center and preserves price range', () => {
+    const viewport: Viewport = {
+      startTime: 1_000,
+      endTime: 2_000,
+      priceMin: 40_000,
+      priceMax: 50_000,
+    };
+
+    expect(zoomViewportTimeRange(viewport, VIEWPORT_ZOOM_IN_FACTOR)).toEqual({
+      startTime: 1_100,
+      endTime: 1_900,
+      priceMin: 40_000,
+      priceMax: 50_000,
+    });
+  });
+
+  it('returns the original viewport for invalid factors or ranges', () => {
+    const viewport: Viewport = {
+      startTime: 2_000,
+      endTime: 1_000,
+      priceMin: 40_000,
+      priceMax: 50_000,
+    };
+
+    expect(zoomViewportTimeRange(viewport, VIEWPORT_ZOOM_IN_FACTOR)).toBe(viewport);
+    expect(zoomViewportTimeRange({ ...viewport, startTime: 1_000, endTime: 2_000 }, 0)).toEqual({
+      startTime: 1_000,
+      endTime: 2_000,
+      priceMin: 40_000,
+      priceMax: 50_000,
+    });
   });
 });
 

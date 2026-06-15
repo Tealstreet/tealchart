@@ -143,6 +143,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onCancel = vi.fn();
     const onClear = vi.fn();
     const onMeasureModeChange = vi.fn();
+    const onZoomIn = vi.fn();
     const onZOrder = vi.fn();
     const onProperties = vi.fn();
     const onObjectTree = vi.fn();
@@ -198,6 +199,7 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingCancelDraft: onCancel,
       onUserDrawingClearAll: onClear,
       onUserDrawingMeasureModeChange: onMeasureModeChange,
+      onUserDrawingZoomIn: onZoomIn,
       onUserDrawingZOrderChange: onZOrder,
       onUserDrawingPropertiesOpen: onProperties,
       onUserDrawingObjectTreeOpen: onObjectTree,
@@ -284,6 +286,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Zoom in"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.click();
@@ -291,6 +294,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.click();
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onMeasureModeChange).toHaveBeenCalledWith(true);
+    expect(onZoomIn).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
     expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
@@ -332,6 +336,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.disabled).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Zoom in"]')?.disabled).toBe(false);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.disabled).toBe(true);

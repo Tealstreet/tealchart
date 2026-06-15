@@ -71,6 +71,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     const onCancel = vi.fn();
     const onClear = vi.fn();
     const onMeasureModeChange = vi.fn();
+    const onZoomIn = vi.fn();
     const onZOrder = vi.fn();
     const onVisibility = vi.fn();
     const onLocked = vi.fn();
@@ -130,6 +131,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
         onUserDrawingCancelDraft={onCancel}
         onUserDrawingClearAll={onClear}
         onUserDrawingMeasureModeChange={onMeasureModeChange}
+        onUserDrawingZoomIn={onZoomIn}
         onUserDrawingZOrderChange={onZOrder}
         onUserDrawingVisibilityChange={onVisibility}
         onUserDrawingLockedChange={onLocked}
@@ -144,6 +146,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Send selected drawing to back')).toBeNull();
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
     fireEvent.click(screen.getByLabelText('Measure date and price range'));
+    fireEvent.click(screen.getByLabelText('Zoom in'));
     fireEvent.click(screen.getByLabelText('Clear all drawings'));
     fireEvent.click(screen.getByLabelText('Hide all drawings'));
     fireEvent.click(screen.getByLabelText('Show all drawings'));
@@ -154,6 +157,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onDelete).not.toHaveBeenCalled();
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onMeasureModeChange).toHaveBeenCalledWith(true);
+    expect(onZoomIn).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
