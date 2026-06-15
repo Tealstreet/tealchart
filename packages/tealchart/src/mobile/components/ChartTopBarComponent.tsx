@@ -65,6 +65,7 @@ import {
 } from '../../drawings';
 import { computeLeftToolRailTop, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
+import { TIME_AXIS_HEIGHT } from '../../types';
 
 export interface ChartTopBarComponentProps {
   /** Current symbol (e.g., "BTC/USDT") */
@@ -231,77 +232,88 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
         {userDrawingState && (
           <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
-            {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
-              const activeCategory = category.tools.includes(userDrawingState.activeTool);
-              const categoryTool = resolveUserDrawingToolCategoryButtonTool(
-                category,
-                userDrawingState.activeTool,
-                recentDrawingToolsByCategory,
-              );
-              const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
-              const expanded = expandedDrawingCategoryId === category.id;
-              return (
-                <Pressable
-                  key={category.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${category.label} drawing tools`}
-                  accessibilityState={{ expanded, selected: activeCategory }}
-                  onPress={() => setExpandedDrawingCategoryId(expanded ? null : category.id)}
-                  style={({ pressed }: PressableStyleState) => [
-                    styles.drawingToolCategoryButton,
-                    activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                    pressed && !activeCategory && styles.drawingButtonPressed,
-                  ]}
-                >
-                  <Text
-                    style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}
-                  >
-                    {categoryToolDescriptor.icon}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            <View style={styles.drawingToolRailList} accessibilityLabel="Drawing tool category list">
+              <ScrollView contentContainerStyle={styles.drawingToolRailContent} showsVerticalScrollIndicator={false}>
+                {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
+                  const activeCategory = category.tools.includes(userDrawingState.activeTool);
+                  const categoryTool = resolveUserDrawingToolCategoryButtonTool(
+                    category,
+                    userDrawingState.activeTool,
+                    recentDrawingToolsByCategory,
+                  );
+                  const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
+                  const expanded = expandedDrawingCategoryId === category.id;
+                  return (
+                    <Pressable
+                      key={category.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${category.label} drawing tools`}
+                      accessibilityState={{ expanded, selected: activeCategory }}
+                      onPress={() => setExpandedDrawingCategoryId(expanded ? null : category.id)}
+                      style={({ pressed }: PressableStyleState) => [
+                        styles.drawingToolCategoryButton,
+                        activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                        pressed && !activeCategory && styles.drawingButtonPressed,
+                      ]}
+                    >
+                      <Text
+                        style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}
+                      >
+                        {categoryToolDescriptor.icon}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
 
             {expandedDrawingCategory && (
               <View style={styles.drawingToolFlyout} accessibilityLabel={`${expandedDrawingCategory.label} tools`}>
                 <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
                   {expandedDrawingCategory.label}
                 </Text>
-                {expandedDrawingCategory.tools.map((tool) => {
-                  const descriptor = getUserDrawingToolDescriptor(tool);
-                  const active = userDrawingState.activeTool === descriptor.tool;
-                  return (
-                    <Pressable
-                      key={descriptor.tool}
-                      accessibilityRole="button"
-                      accessibilityLabel={descriptor.label}
-                      accessibilityState={{ selected: active }}
-                      onPress={() => {
-                        const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
-                        if (selectedCategory) {
-                          setRecentDrawingToolsByCategory((current) => ({
-                            ...current,
-                            [selectedCategory.id]: descriptor.tool,
-                          }));
-                        }
-                        onUserDrawingToolSelect?.(descriptor.tool);
-                        setExpandedDrawingCategoryId(null);
-                      }}
-                      style={({ pressed }: PressableStyleState) => [
-                        styles.drawingToolFlyoutButton,
-                        active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                        pressed && !active && styles.drawingButtonPressed,
-                      ]}
-                    >
-                      <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
-                        {descriptor.icon}
-                      </Text>
-                      <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
-                        {descriptor.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+                <View
+                  style={styles.drawingToolFlyoutList}
+                  accessibilityLabel={`${expandedDrawingCategory.label} tool list`}
+                >
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {expandedDrawingCategory.tools.map((tool) => {
+                      const descriptor = getUserDrawingToolDescriptor(tool);
+                      const active = userDrawingState.activeTool === descriptor.tool;
+                      return (
+                        <Pressable
+                          key={descriptor.tool}
+                          accessibilityRole="button"
+                          accessibilityLabel={descriptor.label}
+                          accessibilityState={{ selected: active }}
+                          onPress={() => {
+                            const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
+                            if (selectedCategory) {
+                              setRecentDrawingToolsByCategory((current) => ({
+                                ...current,
+                                [selectedCategory.id]: descriptor.tool,
+                              }));
+                            }
+                            onUserDrawingToolSelect?.(descriptor.tool);
+                            setExpandedDrawingCategoryId(null);
+                          }}
+                          style={({ pressed }: PressableStyleState) => [
+                            styles.drawingToolFlyoutButton,
+                            active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                            pressed && !active && styles.drawingButtonPressed,
+                          ]}
+                        >
+                          <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
+                            {descriptor.icon}
+                          </Text>
+                          <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
+                            {descriptor.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
               </View>
             )}
           </View>
@@ -1122,12 +1134,19 @@ const styles = StyleSheet.create({
     top: computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS),
     left: MOBILE_CHART_CHROME_METRICS.leftToolRailInset,
     zIndex: 8,
+    maxHeight: '78%',
     paddingVertical: 6,
     paddingHorizontal: 4,
     borderWidth: 1,
     borderColor: '#363a45',
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.96)',
+    overflow: 'hidden',
+  },
+  drawingToolRailList: {
+    maxHeight: '100%',
+  },
+  drawingToolRailContent: {
     gap: 4,
   },
   drawingToolDismissLayer: {
@@ -1150,12 +1169,15 @@ const styles = StyleSheet.create({
     top: 0,
     left: 42,
     width: 250,
-    maxHeight: 420,
+    maxHeight: 420 - TIME_AXIS_HEIGHT - MOBILE_CHART_CHROME_METRICS.leftToolRailTopGap,
     padding: 10,
     borderWidth: 1,
     borderColor: '#363a45',
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.98)',
+  },
+  drawingToolFlyoutList: {
+    maxHeight: 420 - TIME_AXIS_HEIGHT - MOBILE_CHART_CHROME_METRICS.leftToolRailTopGap,
   },
   drawingToolFlyoutTitle: {
     fontSize: 11,

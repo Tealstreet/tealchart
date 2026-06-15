@@ -1446,10 +1446,12 @@ object-tree gaps stay visible.
 - Web and mobile category buttons now show the active tool for the active
   category, otherwise the most recent tool used in that category, falling back
   to the category default.
+- Web and mobile category rails and flyouts now use bounded scroll containers
+  so all categories/tools remain reachable on shorter chart viewports.
 
 ## Known Gaps
 
-- Full TradingView-style drawing toolbar overflow and pinning polish.
+- Full TradingView-style drawing toolbar pinning and advanced polish.
 - TradingView advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
