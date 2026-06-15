@@ -2759,6 +2759,66 @@ describe('user drawing coordinates', () => {
     });
   });
 
+  it('resolves fixed range volume profile bins with configured row counts', () => {
+    const profileSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 },
+      pane: { ...space.pane, yMin: 0, yMax: 100 },
+      chartLeft: 0,
+      chartRight: 100,
+      bars: [
+        { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+        { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+        { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+      ],
+    };
+    const drawing: FixedRangeVolumeProfileDrawing = {
+      id: 'profile',
+      kind: 'fixedRangeVolumeProfile',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: { ...style, volumeProfileRowCount: 6 },
+      points: [
+        { time: 10, price: 80 },
+        { time: 90, price: 20 },
+      ],
+    };
+
+    const geometry = resolveUserDrawingGeometry(drawing, profileSpace);
+
+    expect(geometry).toMatchObject({
+      kind: 'fixedRangeVolumeProfile',
+      volumeProfile: {
+        maxVolume: 20,
+        totalVolume: 35,
+        bins: expect.arrayContaining([
+          expect.objectContaining({
+            priceMin: 70,
+            priceMax: 80,
+            volume: 20,
+            rect: { x: 10, y: 40, width: 80, height: 10 },
+          }),
+          expect.objectContaining({
+            priceMin: 50,
+            priceMax: 60,
+            volume: 10,
+            rect: { x: 10, y: 60, width: 40, height: 10 },
+          }),
+          expect.objectContaining({
+            priceMin: 20,
+            priceMax: 30,
+            volume: 5,
+            rect: { x: 10, y: 90, width: 20, height: 10 },
+          }),
+        ]),
+      },
+    });
+    expect(geometry.kind === 'fixedRangeVolumeProfile' ? geometry.volumeProfile.bins : []).toHaveLength(6);
+  });
+
   it('resolves anchored volume profile bins from anchor through latest bar', () => {
     const profileSpace: DrawingCoordinateSpace = {
       ...space,

@@ -171,11 +171,18 @@ describe('UserDrawingPropertiesSheet', () => {
 
     expect(screen.getByText('Geometry')).not.toBeNull();
     expect(screen.getByLabelText('Hide volume profile guides').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('12 volume profile rows').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('24 volume profile rows').getAttribute('aria-pressed')).toBe('false');
 
     fireEvent.click(screen.getByLabelText('Hide volume profile guides'));
     expect(onDispatch).toHaveBeenCalledWith({
       type: 'updateStyle',
       style: { volumeProfileGuidesVisible: false },
+    });
+    fireEvent.click(screen.getByLabelText('24 volume profile rows'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { volumeProfileRowCount: 24 },
     });
   });
 

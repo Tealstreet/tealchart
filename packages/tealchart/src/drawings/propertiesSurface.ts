@@ -17,12 +17,15 @@ import type {
   UserDrawingTextAlign,
   UserDrawingTextMaxWidth,
   UserDrawingTrendLineExtend,
+  UserDrawingVolumeProfileRowCount,
 } from './types';
 
 import {
+  DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
   DEFAULT_USER_DRAWING_STYLE,
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingOpacity,
+  normalizeUserDrawingVolumeProfileRowCount,
 } from './types';
 import {
   type UserDrawingBrushTemplateId,
@@ -41,6 +44,7 @@ import {
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
   supportsUserDrawingVolumeProfileGuideControls,
+  supportsUserDrawingVolumeProfileRowCountControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -56,6 +60,7 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS,
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
+  USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS,
 } from './toolbar';
 
 export type UserDrawingPropertiesSurfaceCommand =
@@ -93,7 +98,8 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingBrushTemplateId
         | UserDrawingTextAlign
         | UserDrawingTextMaxWidth
-        | UserDrawingTrendLineExtend;
+        | UserDrawingTrendLineExtend
+        | UserDrawingVolumeProfileRowCount;
     });
 
 type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
@@ -412,25 +418,45 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  if (supportsUserDrawingVolumeProfileGuideControls(drawing)) {
+  if (supportsUserDrawingVolumeProfileGuideControls(drawing) || supportsUserDrawingVolumeProfileRowCountControls(drawing)) {
+    const currentVolumeProfileRowCount = normalizeUserDrawingVolumeProfileRowCount(
+      drawing.style.volumeProfileRowCount ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
+    );
     groups.push({
       id: 'geometry',
       label: 'Geometry',
       controls: [
-        {
-          id: 'volumeProfileGuidesVisible',
-          type: 'option' as const,
-          label:
-            drawing.style.volumeProfileGuidesVisible === false
-              ? 'Show volume profile guides'
-              : 'Hide volume profile guides',
-          value: drawing.style.volumeProfileGuidesVisible !== false,
-          selected: drawing.style.volumeProfileGuidesVisible !== false,
-          command: {
-            type: 'updateStyle' as const,
-            style: { volumeProfileGuidesVisible: drawing.style.volumeProfileGuidesVisible === false },
-          },
-        },
+        ...(supportsUserDrawingVolumeProfileRowCountControls(drawing)
+          ? USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS.map((descriptor) => ({
+              id: `volumeProfileRowCount:${descriptor.rowCount}`,
+              type: 'option' as const,
+              label: descriptor.label,
+              value: descriptor.rowCount,
+              selected: currentVolumeProfileRowCount === descriptor.rowCount,
+              command: {
+                type: 'updateStyle' as const,
+                style: { volumeProfileRowCount: descriptor.rowCount },
+              },
+            }))
+          : []),
+        ...(supportsUserDrawingVolumeProfileGuideControls(drawing)
+          ? [
+              {
+                id: 'volumeProfileGuidesVisible',
+                type: 'option' as const,
+                label:
+                  drawing.style.volumeProfileGuidesVisible === false
+                    ? 'Show volume profile guides'
+                    : 'Hide volume profile guides',
+                value: drawing.style.volumeProfileGuidesVisible !== false,
+                selected: drawing.style.volumeProfileGuidesVisible !== false,
+                command: {
+                  type: 'updateStyle' as const,
+                  style: { volumeProfileGuidesVisible: drawing.style.volumeProfileGuidesVisible === false },
+                },
+              },
+            ]
+          : []),
       ],
     });
   }
