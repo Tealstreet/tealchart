@@ -33,6 +33,7 @@ import {
   supportsUserDrawingMeasurementLabelPositionControls,
   supportsUserDrawingRichTextControls,
   supportsUserDrawingRiskRewardStatsModeControls,
+  supportsUserDrawingRiskRewardLabelAlignmentControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextControls,
@@ -54,6 +55,7 @@ import {
   USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
@@ -3194,9 +3196,15 @@ describe('user drawing toolbar descriptors', () => {
         ?.controls.find((control) => control.id === 'fillOpacity:1'),
     ).toMatchObject({ selected: true });
     expect(supportsUserDrawingRiskRewardStatsModeControls(riskRewardState.drawings[0]!)).toBe(true);
+    expect(supportsUserDrawingRiskRewardLabelAlignmentControls(riskRewardState.drawings[0]!)).toBe(true);
     expect(USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS.map((descriptor) => descriptor.statsMode)).toEqual([
       'full',
       'compact',
+    ]);
+    expect(USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS.map((descriptor) => descriptor.alignment)).toEqual([
+      'left',
+      'center',
+      'right',
     ]);
     expect(
       resolveUserDrawingPropertiesSurface(riskRewardState)
@@ -3214,6 +3222,24 @@ describe('user drawing toolbar descriptors', () => {
         label: 'Compact position stats',
         selected: false,
         command: { type: 'updateStyle', style: { riskRewardStatsMode: 'compact' } },
+      },
+      {
+        id: 'riskRewardLabelAlignment:left',
+        label: 'Left position labels',
+        selected: false,
+        command: { type: 'updateStyle', style: { riskRewardLabelAlignment: 'left' } },
+      },
+      {
+        id: 'riskRewardLabelAlignment:center',
+        label: 'Center position labels',
+        selected: true,
+        command: { type: 'updateStyle', style: { riskRewardLabelAlignment: 'center' } },
+      },
+      {
+        id: 'riskRewardLabelAlignment:right',
+        label: 'Right position labels',
+        selected: false,
+        command: { type: 'updateStyle', style: { riskRewardLabelAlignment: 'right' } },
       },
     ]);
   });
