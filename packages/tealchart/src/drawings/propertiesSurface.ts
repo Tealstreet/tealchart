@@ -447,25 +447,32 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  if (supportsUserDrawingBarsPatternDisplayModeControls(drawing) || supportsUserDrawingBarsPatternColorControls(drawing)) {
+  if (supportsUserDrawingBarsPatternDisplayModeControls(drawing)) {
     const currentBarsPatternDisplayMode = normalizeUserDrawingBarsPatternDisplayMode(
       drawing.style.barsPatternDisplayMode ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
     );
     groups.push({
+      id: 'geometry',
+      label: 'Geometry',
+      controls: USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => ({
+        id: `barsPatternDisplayMode:${descriptor.displayMode}`,
+        type: 'option' as const,
+        label: descriptor.label,
+        value: descriptor.displayMode,
+        selected: currentBarsPatternDisplayMode === descriptor.displayMode,
+        command: {
+          type: 'updateStyle' as const,
+          style: { barsPatternDisplayMode: descriptor.displayMode },
+        },
+      })),
+    });
+  }
+
+  if (supportsUserDrawingBarsPatternColorControls(drawing)) {
+    groups.push({
       id: 'pattern',
       label: 'Bars Pattern',
       controls: [
-        ...USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => ({
-          id: `barsPatternDisplayMode:${descriptor.displayMode}`,
-          type: 'option' as const,
-          label: descriptor.label,
-          value: descriptor.displayMode,
-          selected: currentBarsPatternDisplayMode === descriptor.displayMode,
-          command: {
-            type: 'updateStyle' as const,
-            style: { barsPatternDisplayMode: descriptor.displayMode },
-          },
-        })),
         ...USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS.map((descriptor) => ({
           id: `barsPatternUpColor:${descriptor.color}`,
           type: 'swatch' as const,

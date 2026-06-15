@@ -2889,7 +2889,7 @@ describe('user drawing toolbar descriptors', () => {
     ]);
     expect(
       resolveUserDrawingPropertiesSurface(barsPatternState)
-        .groups.find((group) => group.id === 'pattern')
+        .groups.find((group) => group.id === 'geometry')
         ?.controls,
     ).toMatchObject([
       {
@@ -2904,6 +2904,12 @@ describe('user drawing toolbar descriptors', () => {
         selected: false,
         command: { type: 'updateStyle', style: { barsPatternDisplayMode: 'line' } },
       },
+    ]);
+    expect(
+      resolveUserDrawingPropertiesSurface(barsPatternState)
+        .groups.find((group) => group.id === 'pattern')
+        ?.controls,
+    ).toMatchObject([
       {
         id: 'barsPatternUpColor:#22c55e',
         label: 'Green up bars',
