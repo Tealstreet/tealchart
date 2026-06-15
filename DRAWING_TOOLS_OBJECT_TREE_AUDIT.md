@@ -21,7 +21,7 @@ Object-tree behavior is shared:
 
 | Area | Web evidence | Mobile evidence | Shared evidence |
 | --- | --- | --- | --- |
-| Built-in surface | `TealchartWidget.test.ts` covers the web built-in object-tree fallback when no app-owned callback is provided. | `UserDrawingObjectTreeSheet.test.tsx` covers the built-in mobile sheet. | `objectTree.test.ts` covers row/group model generation. |
+| Built-in surface | `TealchartWidget.test.ts` covers the web built-in object-tree fallback when no app-owned callback is provided, including panel pointer/context-event bubbling isolation in jsdom. | `UserDrawingObjectTreeSheet.test.tsx` covers the built-in mobile sheet, including the responder boundary flag and mocked tap isolation while row/actions are used. | `objectTree.test.ts` covers row/group model generation. |
 | App-owned entry points | Web selected actions and context menus can open object-tree callbacks. `ContextMenu.test.ts` now verifies the rendered web context menu exposes and dispatches the object-tree entry without chart click fallthrough. | Mobile selected action strip and long-press context menus can open object-tree callbacks. `ContextMenuComponent.test.tsx` now verifies the rendered mobile context menu exposes and dispatches the same object-tree entry without chart tap fallthrough. | Selected/context action descriptors share the same object-tree open command concept. |
 | Row actions | Web panel rows dispatch select, rename, hide/show, lock/unlock, duplicate, delete, and z-order actions. | Mobile sheet rows dispatch the same row actions through the shared resolver. | `objectTree.test.ts` covers row action enablement and dispatch shape. |
 | Bulk actions | Web object-tree hosts can use the shared selected-row descriptors. | Mobile object-tree hosts can use the same selected-row descriptors. | `objectTree.test.ts` covers additive/range selection and selected mutation commands. |
@@ -35,13 +35,18 @@ Object-tree behavior is shared:
   selected-action model, web right-click paths, and mobile long-press paths.
 - Rendered web and mobile context menu surfaces now both prove the object-tree
   entry is present and isolated from chart event fallthrough.
+- Built-in web and mobile object-tree surfaces now both have focused unit-level
+  regression evidence that surface interactions do not bubble through the
+  jsdom/RN-test wrappers or dismiss the mobile sheet before a row/action can
+  complete.
 - The next useful C-domain work is visual polish or app integration evidence,
   not another command model layer.
 
 ## Follow-Up Risks
 
-- Browser-level visual evidence for panel placement and clipping is still thin.
-- Mobile object-tree sheet ergonomics should be rechecked on small screens once
-  more drawing actions are added.
+- Browser-level evidence for real chart-container pointer isolation, panel
+  placement, and clipping is still thin.
+- Mobile object-tree sheet ergonomics and native responder isolation should be
+  rechecked on small screens once more drawing actions are added.
 - Future row or context actions must be added through the shared resolvers so
   web and mobile stay in lockstep.

@@ -2291,6 +2291,30 @@ describe('TealchartWidget', () => {
       const rectangleRow = panel?.querySelector<HTMLElement>('[aria-label="Select Rectangle"]');
       expect(rectangleRow?.getAttribute('aria-pressed')).toBe('false');
 
+      const onChartMouseDown = vi.fn();
+      const onChartMouseUp = vi.fn();
+      const onChartClick = vi.fn();
+      const onChartContextMenu = vi.fn();
+      document.body.addEventListener('mousedown', onChartMouseDown);
+      document.body.addEventListener('mouseup', onChartMouseUp);
+      document.body.addEventListener('click', onChartClick);
+      document.body.addEventListener('contextmenu', onChartContextMenu);
+      try {
+        panel?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        panel?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+        panel?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        panel?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
+        expect(onChartMouseDown).not.toHaveBeenCalled();
+        expect(onChartMouseUp).not.toHaveBeenCalled();
+        expect(onChartClick).not.toHaveBeenCalled();
+        expect(onChartContextMenu).not.toHaveBeenCalled();
+      } finally {
+        document.body.removeEventListener('mousedown', onChartMouseDown);
+        document.body.removeEventListener('mouseup', onChartMouseUp);
+        document.body.removeEventListener('click', onChartClick);
+        document.body.removeEventListener('contextmenu', onChartContextMenu);
+      }
+
       rectangleRow?.click();
       expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'target' });
       expect(panel?.querySelector<HTMLElement>('[aria-label="Select Rectangle"]')?.getAttribute('aria-pressed')).toBe(
