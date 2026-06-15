@@ -212,7 +212,8 @@ Recorded audit evidence:
 - `DRAWING_TOOLS_DUPLICATE_MODIFIER_AUDIT.md`
 - `DRAWING_TOOLS_UNDO_REDO_AUDIT.md`
 - `DRAWING_TOOLS_WEB_KEYBOARD_AUDIT.md`
+- `DRAWING_TOOLS_MOBILE_COMMAND_PARITY_AUDIT.md`
 
-Move next to Epic E, Phase E3. Verify mobile command parity for imperative
-handle and host-toolbar paths that mirror web drawing keyboard/history
-behavior.
+Move next to Epic A. Use the existing placement audit as the starting point,
+then verify and fix the highest-friction drag-to-draw gap across web Canvas and
+mobile Skia.
