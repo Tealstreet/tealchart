@@ -21,7 +21,7 @@ The selected-action surface is shared:
 | --- | --- | --- | --- |
 | Local action surface | `ChartTopBar.test.ts` renders the chart-overlay selected drawing actions and blocks chart click fallthrough. | `UserDrawingSelectedActionSurface.test.tsx` renders the anchored Skia/RN action strip and blocks chart tap fallthrough. | `toolbar.test.ts` covers descriptor groups, enabled state, and the Epic B checklist. |
 | Properties and object tree | `TealchartWidget.test.ts` and `ChartTopBar.test.ts` cover built-in/app-owned open paths. | `drawingActionDispatch.test.ts` covers mobile toolbar/context object-tree and properties dispatch. | Properties/object-tree commands come from the selected-action model. |
-| Text edit | Web context, double-click, and selected actions route text-capable drawings into text edit. | Mobile action dispatch and double-tap edit intent share the same text/properties concepts. | `toolbar.test.ts` ensures text edit is only enabled for unlocked text drawings. |
+| Text edit | Web context, double-click, and selected actions route text-capable drawings into text edit. `ChartTopBar.test.ts` now verifies the rendered floating toolbar keeps properties reachable for non-text drawings, enables local text edit for unlocked text drawings, and disables it for locked text drawings. | Mobile action dispatch and double-tap edit intent share the same text/properties concepts. `UserDrawingSelectedActionSurface.test.tsx` now verifies the rendered action strip matches the same non-text, unlocked text, and locked text behavior. | `toolbar.test.ts` ensures text edit is only enabled for unlocked text drawings. |
 | Copy/duplicate/delete/z-order | Web floating toolbar and context menu dispatch copy, duplicate, delete, and z-order callbacks. | Mobile selected action strip dispatches the same selected-object commands, with copy writing the mobile clipboard and mutations flowing through mobile command history. | Shared descriptor commands map local copy to `copySelected` and mutations to history-backed command actions. |
 | Style/visibility/lock | Web floating toolbar renders style popovers and visibility/lock controls. | Mobile action strip renders the same style groups and mutation commands. | Shared style descriptors define line, fill, text, opacity, visibility, and lock controls. |
 | Chrome-safe placement | `ChartTopBar.test.ts` covers the selected toolbar clamping below the top bar and clear of the left drawing rail when space allows. | `UserDrawingSelectedActionSurface.test.tsx` covers the same top/left rail clamp for the Skia/RN action strip. | `chartGeometry.test.ts` covers the shared left-rail avoidance inset helper, including constrained widths. |
@@ -37,6 +37,9 @@ The selected-action surface is shared:
   mobile layouts where the full rail reservation cannot fit.
 - Copy selected is now locally reachable from the selected-object surface on
   both web and mobile, not only through keyboard/API command paths.
+- Rendered web and mobile selected-action surfaces now prove the same local
+  text-edit availability rules for representative non-text, unlocked text, and
+  locked text drawings while keeping properties reachable.
 - Future selected-action work should target a specific user-visible polish gap,
   such as action density, mobile gesture dismissal, or a tool-specific style
   control that is missing from both web and mobile.

@@ -523,6 +523,93 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('exposes local text edit only for selected text drawings while keeping properties reachable', () => {
+    const onProperties = vi.fn();
+    const onTextEdit = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-selected-text-action-parity',
+      symbol: 'BTCUSDT',
+      userDrawingState: {
+        ...baseDrawingState,
+        selection: { drawingId: 'line' },
+        drawings: [
+          {
+            id: 'line',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+            price: 10,
+          },
+        ],
+      },
+      userDrawingSelectionActionAnchor: selectionActionAnchor,
+      onUserDrawingPropertiesOpen: onProperties,
+      onUserDrawingTextEditOpen: onTextEdit,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.disabled).toBe(true);
+    expect(onProperties).toHaveBeenCalledTimes(1);
+
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.click();
+    expect(onTextEdit).toHaveBeenCalledWith('label');
+    document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
+    expect(onProperties).toHaveBeenCalledTimes(2);
+
+    topBar.setUserDrawingState({
+      ...baseDrawingState,
+      selection: { drawingId: 'locked-label' },
+      drawings: [
+        {
+          id: 'locked-label',
+          kind: 'textLabel',
+          paneId: 'main',
+          visible: true,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          point: { time: 1, price: 10 },
+          text: 'Locked',
+          textAlign: 'center',
+        },
+      ],
+    });
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.click();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.disabled).toBe(true);
+    expect(onTextEdit).toHaveBeenCalledTimes(1);
+    document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
+    expect(onProperties).toHaveBeenCalledTimes(3);
+
+    topBar.unmount();
+  });
+
   it('dispatches selected drawing style controls', () => {
     const onStyle = vi.fn();
     const onVisibility = vi.fn();
