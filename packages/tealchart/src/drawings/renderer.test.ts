@@ -909,9 +909,9 @@ describe('user drawing renderer', () => {
 
     renderUserDrawing(ctx, drawing, space);
 
-    expect(ctx.calls).toContain('fillText:Reward +30.00 (+60.00%):78,35:#111:center:1:12px sans-serif');
-    expect(ctx.calls).toContain('fillText:Risk -10.00 (-20.00%):78,55:#111:center:1:12px sans-serif');
-    expect(ctx.calls).toContain('fillText:R:R 3.00:78,38:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Reward +30.00 (+60.00%):78,35:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Risk -10.00 (-20.00%):78,55:#111:right:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:R:R 3.00:78,38:#111:right:1:12px sans-serif');
   });
 
   it('renders forecast projection lines and labels through CanvasContext', () => {

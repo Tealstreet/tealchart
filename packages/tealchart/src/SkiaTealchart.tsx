@@ -4179,15 +4179,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const riskTextBounds = font ? font.measureText(primitive.riskLabel) : { width: 0 };
             const ratioTextBounds = font ? font.measureText(primitive.ratioLabel) : { width: 0 };
             const rewardLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
-              { labelPoint: primitive.rewardLabelPoint, style: primitive.style },
+              {
+                labelPoint: primitive.rewardLabelPoint,
+                riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
+                style: primitive.style,
+              },
               rewardTextBounds,
             );
             const riskLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
-              { labelPoint: primitive.riskLabelPoint, style: primitive.style },
+              {
+                labelPoint: primitive.riskLabelPoint,
+                riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
+                style: primitive.style,
+              },
               riskTextBounds,
             );
             const ratioLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
-              { labelPoint: primitive.ratioLabelPoint, style: primitive.style },
+              {
+                labelPoint: primitive.ratioLabelPoint,
+                riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
+                style: primitive.style,
+              },
               ratioTextBounds,
             );
 

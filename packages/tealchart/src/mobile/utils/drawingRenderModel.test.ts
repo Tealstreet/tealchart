@@ -4017,12 +4017,31 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
       kind: 'riskRewardPosition',
       rewardLabelPoint: { x: 22, y: 35 },
       riskLabelPoint: { x: 22, y: 55 },
       ratioLabelPoint: { x: 22, y: 38 },
+      riskRewardLabelAlignment: 'left',
       style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'riskRewardPosition') throw new Error('expected risk reward primitive');
+    expect(
+      resolveMobileUserDrawingRiskRewardLabelPosition(
+        {
+          labelPoint: primitive.rewardLabelPoint,
+          riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
+          style: primitive.style,
+        },
+        { x: 0, y: -10, width: 84, height: 14 },
+      ),
+    ).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: 22,
+      y: 38,
     });
   });
 
