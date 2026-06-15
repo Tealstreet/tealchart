@@ -129,6 +129,7 @@ import {
   DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
   dispatchUserDrawingCommand,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingPlacementMode,
   isUserDrawingDragPlacementTool,
   isUserDrawingPathFamilyTool,
   measureUserDrawingTextLines,
@@ -1835,6 +1836,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           }
         }
         return (selection.hit ?? false) || selection.changed;
+      }
+
+      if (getUserDrawingPlacementMode(effectiveUserDrawingState.activeTool) === 'dragTwoAnchor') {
+        return true;
       }
 
       const point = resolveMobileUserDrawingInputPoint({
