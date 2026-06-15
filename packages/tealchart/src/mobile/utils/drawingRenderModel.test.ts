@@ -18,6 +18,7 @@ import {
   isMobileUserDrawingTextBoxPrimitive,
   resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
+  resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingRiskRewardLabelPosition,
@@ -3449,6 +3450,50 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready price range labels at the configured horizontal alignment', () => {
+    const alignedStyle = { ...style, measurementLabelAlignment: 'right' as const };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: alignedStyle,
+          points: [
+            { time: 10, price: 10 },
+            { time: 90, price: 90 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'priceRange',
+      labelPoint: { x: 78, y: 50 },
+      measurementLabelAlignment: 'right',
+      label: '+80.00 (+800.00%)',
+      style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: -6,
+      y: 53,
+    });
+  });
+
   it('keeps Skia price range geometry visible when generated labels are hidden', () => {
     const hiddenLabelStyle = { ...style, labelsVisible: false };
     const state: UserDrawingState = {
@@ -3609,6 +3654,60 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready date range labels at the configured horizontal alignment', () => {
+    const alignedStyle = { ...style, measurementLabelAlignment: 'right' as const };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'date-range',
+          kind: 'dateRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: alignedStyle,
+          points: [
+            { time: 10_000, price: 90 },
+            { time: 70_000, price: 10 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const durationSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'dateRange',
+      labelPoint: { x: 58, y: 50 },
+      measurementLabelAlignment: 'right',
+      label: '3 bars, 1 minute',
+      style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'dateRange') throw new Error('expected date range primitive');
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: -26,
+      y: 53,
+    });
+  });
+
   it('returns Skia-ready date and price range primitives with shared labels', () => {
     const state: UserDrawingState = {
       version: 1,
@@ -3702,6 +3801,71 @@ describe('mobile user drawing render model', () => {
       priceLabel: '+80.00 (+800.00%)',
       dateLabel: '3 bars, 1 minute',
       style: positionedStyle,
+    });
+  });
+
+  it('returns Skia-ready date and price range labels at the configured horizontal alignment', () => {
+    const alignedStyle = { ...style, measurementLabelAlignment: 'left' as const };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'date-price-range',
+          kind: 'datePriceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: alignedStyle,
+          points: [
+            { time: 10_000, price: 90 },
+            { time: 70_000, price: 10 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const durationSpace: DrawingCoordinateSpace = {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    };
+
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]));
+
+    expect(primitive).toMatchObject({
+      kind: 'datePriceRange',
+      priceLabelPoint: { x: 22, y: 50 },
+      dateLabelPoint: { x: 22, y: 78 },
+      measurementLabelAlignment: 'left',
+      priceLabel: '+80.00 (+800.00%)',
+      dateLabel: '3 bars, 1 minute',
+      style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'datePriceRange') throw new Error('expected date price range primitive');
+    expect(
+      resolveMobileUserDrawingMeasurementLabelPosition(
+        {
+          labelPoint: primitive.priceLabelPoint,
+          measurementLabelAlignment: primitive.measurementLabelAlignment,
+          style: primitive.style,
+        },
+        { x: 0, y: -10, width: 84, height: 14 },
+      ),
+    ).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: 22,
+      y: 53,
     });
   });
 

@@ -4403,11 +4403,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             const priceTextBounds = font ? font.measureText(primitive.priceLabel) : { width: 0 };
             const dateTextBounds = font ? font.measureText(primitive.dateLabel) : { width: 0 };
             const priceLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
-              { labelPoint: primitive.priceLabelPoint, style: primitive.style },
+              {
+                labelPoint: primitive.priceLabelPoint,
+                measurementLabelAlignment: primitive.measurementLabelAlignment,
+                style: primitive.style,
+              },
               priceTextBounds,
             );
             const dateLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
-              { labelPoint: primitive.dateLabelPoint, style: primitive.style },
+              {
+                labelPoint: primitive.dateLabelPoint,
+                measurementLabelAlignment: primitive.measurementLabelAlignment,
+                style: primitive.style,
+              },
               dateTextBounds,
             );
 

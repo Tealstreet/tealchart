@@ -168,6 +168,7 @@ export interface UserDrawingStyle {
   textWrap?: boolean;
   textMaxWidth?: number;
   labelsVisible?: boolean;
+  measurementLabelAlignment?: UserDrawingMeasurementLabelAlignment;
   measurementLabelPosition?: UserDrawingMeasurementLabelPosition;
   riskRewardLabelAlignment?: UserDrawingRiskRewardLabelAlignment;
   barsPatternDisplayMode?: UserDrawingBarsPatternDisplayMode;
@@ -960,6 +961,8 @@ export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240, 320, 480] as const;
 export const DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION = 'center';
 export const USER_DRAWING_MEASUREMENT_LABEL_POSITIONS = ['center', 'top', 'bottom'] as const;
+export const DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT = 'center';
+export const USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS = ['left', 'center', 'right'] as const;
 export const DEFAULT_USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT = 'center';
 export const USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS = ['left', 'center', 'right'] as const;
 export const DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE = 'candles';
@@ -981,6 +984,7 @@ export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
+export type UserDrawingMeasurementLabelAlignment = (typeof USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS)[number];
 export type UserDrawingMeasurementLabelPosition = (typeof USER_DRAWING_MEASUREMENT_LABEL_POSITIONS)[number];
 export type UserDrawingRiskRewardLabelAlignment = (typeof USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS)[number];
 export type UserDrawingBarsPatternDisplayMode = (typeof USER_DRAWING_BARS_PATTERN_DISPLAY_MODES)[number];
@@ -1040,6 +1044,14 @@ export function normalizeUserDrawingMeasurementLabelPosition(
     : DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION;
 }
 
+export function normalizeUserDrawingMeasurementLabelAlignment(
+  alignment: unknown,
+): UserDrawingMeasurementLabelAlignment {
+  return USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS.includes(alignment as UserDrawingMeasurementLabelAlignment)
+    ? (alignment as UserDrawingMeasurementLabelAlignment)
+    : DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT;
+}
+
 export function normalizeUserDrawingRiskRewardLabelAlignment(alignment: unknown): UserDrawingRiskRewardLabelAlignment {
   return USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS.includes(alignment as UserDrawingRiskRewardLabelAlignment)
     ? (alignment as UserDrawingRiskRewardLabelAlignment)
@@ -1097,6 +1109,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fillOpacity === undefined ? undefined : normalizeUserDrawingOpacity(style.fillOpacity);
   const textMaxWidth =
     style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
+  const measurementLabelAlignment =
+    style.measurementLabelAlignment === undefined
+      ? undefined
+      : normalizeUserDrawingMeasurementLabelAlignment(style.measurementLabelAlignment);
   const measurementLabelPosition =
     style.measurementLabelPosition === undefined
       ? undefined
@@ -1133,6 +1149,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     opacity === style.opacity &&
     fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth &&
+    measurementLabelAlignment === style.measurementLabelAlignment &&
     measurementLabelPosition === style.measurementLabelPosition &&
     riskRewardLabelAlignment === style.riskRewardLabelAlignment &&
     barsPatternDisplayMode === style.barsPatternDisplayMode &&
@@ -1153,6 +1170,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(opacity === undefined ? {} : { opacity }),
     ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
+    ...(measurementLabelAlignment === undefined ? {} : { measurementLabelAlignment }),
     ...(measurementLabelPosition === undefined ? {} : { measurementLabelPosition }),
     ...(riskRewardLabelAlignment === undefined ? {} : { riskRewardLabelAlignment }),
     ...(barsPatternDisplayMode === undefined ? {} : { barsPatternDisplayMode }),

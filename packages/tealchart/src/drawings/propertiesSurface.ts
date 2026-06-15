@@ -13,6 +13,7 @@ import type {
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
+  UserDrawingMeasurementLabelAlignment,
   UserDrawingMeasurementLabelPosition,
   UserDrawingRiskRewardLabelAlignment,
   UserDrawingRiskRewardStatsMode,
@@ -28,6 +29,7 @@ import type {
 
 import {
   DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
+  DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
   DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
@@ -39,6 +41,7 @@ import {
   DEFAULT_USER_DRAWING_STYLE,
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingMeasurementLabelPosition,
+  normalizeUserDrawingMeasurementLabelAlignment,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingRiskRewardStatsMode,
@@ -81,6 +84,7 @@ import {
   USER_DRAWING_FONT_STYLE_DESCRIPTORS,
   USER_DRAWING_FONT_WEIGHT_DESCRIPTORS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
+  USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT_DESCRIPTORS,
   USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
@@ -130,6 +134,7 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingFontWeight
         | UserDrawingIconName
         | UserDrawingLineStyle
+        | UserDrawingMeasurementLabelAlignment
         | UserDrawingMeasurementLabelPosition
         | UserDrawingRiskRewardLabelAlignment
         | UserDrawingBrushTemplateId
@@ -460,23 +465,39 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
   }
 
   if (supportsUserDrawingMeasurementLabelPositionControls(drawing)) {
+    const currentMeasurementLabelAlignment = normalizeUserDrawingMeasurementLabelAlignment(
+      drawing.style.measurementLabelAlignment ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT,
+    );
     const currentMeasurementLabelPosition = normalizeUserDrawingMeasurementLabelPosition(
       drawing.style.measurementLabelPosition ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
     );
     groups.push({
       id: 'labels',
       label: 'Labels',
-      controls: USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS.map((descriptor) => ({
-        id: `measurementLabelPosition:${descriptor.position}`,
-        type: 'option' as const,
-        label: descriptor.label,
-        value: descriptor.position,
-        selected: currentMeasurementLabelPosition === descriptor.position,
-        command: {
-          type: 'updateStyle' as const,
-          style: { measurementLabelPosition: descriptor.position },
-        },
-      })),
+      controls: [
+        ...USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS.map((descriptor) => ({
+          id: `measurementLabelPosition:${descriptor.position}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.position,
+          selected: currentMeasurementLabelPosition === descriptor.position,
+          command: {
+            type: 'updateStyle' as const,
+            style: { measurementLabelPosition: descriptor.position },
+          },
+        })),
+        ...USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT_DESCRIPTORS.map((descriptor) => ({
+          id: `measurementLabelAlignment:${descriptor.alignment}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.alignment,
+          selected: currentMeasurementLabelAlignment === descriptor.alignment,
+          command: {
+            type: 'updateStyle' as const,
+            style: { measurementLabelAlignment: descriptor.alignment },
+          },
+        })),
+      ],
     });
   }
 

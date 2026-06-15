@@ -976,6 +976,7 @@ describe('drawing layout serialization', () => {
             lineWidth: 1,
             lineStyle: 'solid',
             labelsVisible: false,
+            measurementLabelAlignment: 'right',
             measurementLabelPosition: 'bottom',
           },
           points: [
@@ -987,6 +988,7 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings[0]?.style.labelsVisible).toBe(false);
+    expect(restored?.drawings[0]?.style.measurementLabelAlignment).toBe('right');
     expect(restored?.drawings[0]?.style.measurementLabelPosition).toBe('bottom');
   });
 
