@@ -344,11 +344,17 @@ describe('UserDrawingPropertiesSheet', () => {
     expect(screen.getByText('Labels')).not.toBeNull();
     expect(screen.getByLabelText('Center measurement label').getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByLabelText('Top measurement label').getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByLabelText('Right aligned measurement label').getAttribute('aria-pressed')).toBe('false');
 
     fireEvent.click(screen.getByLabelText('Top measurement label'));
     expect(onDispatch).toHaveBeenCalledWith({
       type: 'updateStyle',
       style: { measurementLabelPosition: 'top' },
+    });
+    fireEvent.click(screen.getByLabelText('Right aligned measurement label'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { measurementLabelAlignment: 'right' },
     });
   });
 

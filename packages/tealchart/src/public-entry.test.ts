@@ -107,6 +107,8 @@ import type {
   UserDrawingBarsPatternColorDescriptor,
   UserDrawingBarsPatternDisplayMode,
   UserDrawingBarsPatternDisplayModeDescriptor,
+  UserDrawingMeasurementLabelAlignment,
+  UserDrawingMeasurementLabelAlignmentDescriptor,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardLabelAlignment,
   UserDrawingRiskRewardLabelAlignmentDescriptor,
@@ -289,6 +291,8 @@ import {
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_ICON_NAMES,
+  USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT_DESCRIPTORS,
+  USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS,
   USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
   USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
@@ -310,6 +314,7 @@ import {
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS,
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
   normalizeUserDrawingBarsPatternDisplayMode,
+  normalizeUserDrawingMeasurementLabelAlignment,
   normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingRiskRewardStatsMode,
@@ -1069,6 +1074,7 @@ describe('tealchart public entries', () => {
       priceLabel: '+1.00 (+1.00%)',
       dateLabelPoint: { x: 5, y: 8 },
       dateLabel: '1 minute',
+      measurementLabelAlignment: 'center',
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
     const riskRewardPrimitive: NonNever<MobileUserDrawingRiskRewardPositionPrimitive> = {
@@ -1441,6 +1447,10 @@ describe('tealchart public entries', () => {
       USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS[1]!;
     const barsPatternDownColorDescriptor: UserDrawingBarsPatternColorDescriptor =
       USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS[1]!;
+    const measurementLabelAlignment: UserDrawingMeasurementLabelAlignment =
+      USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENTS[2]!;
+    const measurementLabelAlignmentDescriptor: UserDrawingMeasurementLabelAlignmentDescriptor =
+      USER_DRAWING_MEASUREMENT_LABEL_ALIGNMENT_DESCRIPTORS[2]!;
     const measurementLabelPosition: UserDrawingMeasurementLabelPosition = USER_DRAWING_MEASUREMENT_LABEL_POSITIONS[1]!;
     const measurementLabelPositionDescriptor: UserDrawingMeasurementLabelPositionDescriptor =
       USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS[1]!;
@@ -1479,6 +1489,8 @@ describe('tealchart public entries', () => {
     expect(barsPatternDisplayModeDescriptor.displayMode).toBe('line');
     expect(barsPatternUpColorDescriptor.color).toBe('#38bdf8');
     expect(barsPatternDownColorDescriptor.color).toBe('#f97316');
+    expect(measurementLabelAlignment).toBe('right');
+    expect(measurementLabelAlignmentDescriptor.alignment).toBe('right');
     expect(measurementLabelPosition).toBe('top');
     expect(measurementLabelPositionDescriptor.position).toBe('top');
     expect(riskRewardLabelAlignment).toBe('right');
@@ -1496,6 +1508,7 @@ describe('tealchart public entries', () => {
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
     expect(normalizeUserDrawingBarsPatternDisplayMode('future')).toBe('candles');
+    expect(normalizeUserDrawingMeasurementLabelAlignment('future')).toBe('center');
     expect(normalizeUserDrawingMeasurementLabelPosition('future')).toBe('center');
     expect(normalizeUserDrawingRiskRewardLabelAlignment('future')).toBe('center');
     expect(normalizeUserDrawingRiskRewardStatsMode('future')).toBe('full');
