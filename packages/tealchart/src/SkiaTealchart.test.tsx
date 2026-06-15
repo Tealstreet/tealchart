@@ -564,48 +564,46 @@ describe('SkiaTealchart drawing properties', () => {
     },
   );
 
-  it('swallows rectangle taps so mobile users must drag real endpoints', async () => {
-    const ref = createRef<SkiaTealchartHandle>();
-    const onCommand = vi.fn();
+  it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
+    'swallows %s taps so mobile users must drag real endpoints',
+    async (tool) => {
+      const ref = createRef<SkiaTealchartHandle>();
+      const onCommand = vi.fn();
 
-    render(
-      <SkiaTealchart
-        ref={ref}
-        datafeed={createDatafeed()}
-        symbol="BTCUSDT"
-        interval="60"
-        width={360}
-        height={260}
-        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
-        onUserDrawingCommand={onCommand}
-      />,
-    );
+      render(
+        <SkiaTealchart
+          ref={ref}
+          datafeed={createDatafeed()}
+          symbol="BTCUSDT"
+          interval="60"
+          width={360}
+          height={260}
+          userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+          onUserDrawingCommand={onCommand}
+        />,
+      );
 
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
-    });
-    await act(async () => {
-      fireEvent.click(await screen.findByLabelText('Rectangle'));
-    });
-    onCommand.mockClear();
+      await selectRenderedMobileDrawingTool(tool);
+      onCommand.mockClear();
 
-    const tap = getLatestSingleTapGesture();
-    await act(async () => {
-      runGestureCallback(tap, 'onEnd', { x: 130, y: 95 });
-    });
+      const tap = getLatestSingleTapGesture();
+      await act(async () => {
+        runGestureCallback(tap, 'onEnd', { x: 130, y: 95 });
+      });
 
-    expect(onCommand).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        command: expect.objectContaining({ type: 'handleInput' }),
-      }),
-    );
-    expect(ref.current?.getUserDrawingState()).toMatchObject({
-      activeTool: 'rectangle',
-      selection: null,
-      draft: null,
-      drawings: [],
-    });
-  });
+      expect(onCommand).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'handleInput' }),
+        }),
+      );
+      expect(ref.current?.getUserDrawingState()).toMatchObject({
+        activeTool: tool,
+        selection: null,
+        draft: null,
+        drawings: [],
+      });
+    },
+  );
 
   it('dismisses selected style popovers when Skia chart pan gestures start', async () => {
     render(
