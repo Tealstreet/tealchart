@@ -1,7 +1,8 @@
 import type { UnifiedPaneLayout } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   clampRectToBounds,
   computeLeftToolRailAvoidanceInset,
@@ -40,6 +41,10 @@ const paneLayout: UnifiedPaneLayout = {
 };
 
 describe('chart geometry', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('normalizes rect dimensions and applies insets', () => {
     expect(rect(1, 2, -10, 20)).toEqual({ x: 1, y: 2, width: 0, height: 20 });
     expect(insetRect(rect(0, 0, 100, 80), { top: 10, right: 20, bottom: 5, left: 4 })).toEqual({
