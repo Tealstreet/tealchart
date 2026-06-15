@@ -8,6 +8,7 @@ import {
   getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingToolbarStateKey,
+  getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
@@ -21,6 +22,7 @@ import {
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingStyleToolbarAction,
+  resolveUserDrawingToolCategoryButtonTool,
   shouldRenderUserDrawingSelectedActionSurface,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
@@ -206,6 +208,27 @@ describe('user drawing toolbar descriptors', () => {
       'crossLine',
       'arrowLine',
     ]);
+  });
+
+  it('resolves category button tools from active tool, recent tool, then category default', () => {
+    const linesCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.id === 'lines')!;
+    const shapesCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find(
+      (category) => category.id === 'geometric-shapes',
+    )!;
+
+    expect(getUserDrawingToolCategoryDescriptorForTool('horizontalLine')).toBe(linesCategory);
+    expect(getUserDrawingToolCategoryDescriptorForTool('rectangle')).toBe(shapesCategory);
+    expect(resolveUserDrawingToolCategoryButtonTool(linesCategory, 'horizontalLine')).toBe('horizontalLine');
+    expect(
+      resolveUserDrawingToolCategoryButtonTool(linesCategory, 'rectangle', {
+        lines: 'horizontalRay',
+      }),
+    ).toBe('horizontalRay');
+    expect(
+      resolveUserDrawingToolCategoryButtonTool(linesCategory, 'rectangle', {
+        lines: 'rectangle',
+      }),
+    ).toBe('trendLine');
   });
 
   it('provides compact icons and accessible labels for tools and actions', () => {
