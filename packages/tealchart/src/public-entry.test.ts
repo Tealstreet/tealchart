@@ -81,6 +81,7 @@ import type {
   UserDrawingMagnetMode,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
+  UserDrawingBrushTemplateDescriptor,
   NudgeUserDrawingSelectionOptions,
   ResolveUserDrawingEditIntentOptions,
   ResolveUserDrawingObjectTreeRowDispatchActionOptions,
@@ -259,6 +260,8 @@ import {
   setUserDrawingTextAlign,
   setUserDrawingTrendLineExtend,
   splitUserDrawingTextLines,
+  getUserDrawingBrushTemplateDescriptors,
+  USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_STYLE_DESCRIPTORS,
@@ -1328,6 +1331,32 @@ describe('tealchart public entries', () => {
       0.5,
       0.25,
       0.1,
+    ]);
+  });
+
+  it('exports shared drawing brush template helpers', () => {
+    const descriptor: UserDrawingBrushTemplateDescriptor = USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS.find(
+      (template) => template.template === 'brush-marker',
+    )!;
+    const drawing: BrushDrawing = {
+      id: 'brush',
+      kind: 'brush',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style: descriptor.style,
+      points: [
+        { time: 1, price: 10 },
+        { time: 2, price: 12 },
+      ],
+    };
+
+    expect(USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS.map((template) => template.template)).toContain('brush-marker');
+    expect(getUserDrawingBrushTemplateDescriptors(drawing).map((template) => template.tool)).toEqual([
+      'brush',
+      'brush',
     ]);
   });
 
