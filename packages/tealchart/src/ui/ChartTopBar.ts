@@ -516,6 +516,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
   private selectedActionSurfaceEl: HTMLElement | null = null;
+  private selectedActionSurfaceCleanup: Array<() => void> = [];
   private selectedActionPopoverGroupId: string | null = null;
   private selectedActionPopoverDrawingId: string | null = null;
 
@@ -699,6 +700,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private removeSelectedActionSurface(): void {
+    for (const cleanup of this.selectedActionSurfaceCleanup) {
+      cleanup();
+    }
+    this.selectedActionSurfaceCleanup = [];
     this.selectedActionSurfaceEl?.remove();
     this.selectedActionSurfaceEl = null;
   }
@@ -906,6 +911,31 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     this.selectedActionSurfaceEl = el;
     parent.appendChild(el);
+
+    const closeActivePopover = () => {
+      if (!this.selectedActionPopoverGroupId) return;
+      this.selectedActionPopoverGroupId = null;
+      this.renderSelectedActionSurface();
+    };
+    const closePopoverOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
+      if (!this.selectedActionPopoverGroupId) return;
+      const target = event.target;
+      if (target instanceof Node && el.contains(target)) return;
+      closeActivePopover();
+    };
+    const closePopoverOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeActivePopover();
+      }
+    };
+    document.addEventListener('mousedown', closePopoverOnOutsidePointer);
+    document.addEventListener('touchstart', closePopoverOnOutsidePointer);
+    document.addEventListener('keydown', closePopoverOnEscape);
+    this.selectedActionSurfaceCleanup.push(
+      () => document.removeEventListener('mousedown', closePopoverOnOutsidePointer),
+      () => document.removeEventListener('touchstart', closePopoverOnOutsidePointer),
+      () => document.removeEventListener('keydown', closePopoverOnEscape),
+    );
   }
 
   private createSelectedActionSurfaceButton(
