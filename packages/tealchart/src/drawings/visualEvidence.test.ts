@@ -14,6 +14,14 @@ const readVisualEvidenceMarkdown = () => {
 };
 
 const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const getMarkdownTableRow = (markdown: string, label: string): string => {
+  const rowPattern = new RegExp(`^\\|\\s*${escapeRegExp(label)}\\s*\\|`);
+  const row = markdown.split('\n').find((line) => rowPattern.test(line));
+  if (!row) {
+    throw new Error(`Unable to find visual evidence markdown row for ${label}`);
+  }
+  return row;
+};
 
 describe('drawing visual evidence matrix', () => {
   it('keeps the markdown PR checklist aligned with the shared evidence matrix', () => {
@@ -21,11 +29,22 @@ describe('drawing visual evidence matrix', () => {
 
     for (const state of USER_DRAWING_VISUAL_EVIDENCE_MATRIX.states) {
       const status = state.status!;
+      const tableRow = getMarkdownTableRow(markdown, state.label);
       expect(markdown).toContain(`- [ ] ${state.label} (web: ${status.web}, mobile: ${status.mobile}), if affected`);
       expect(markdown).toMatch(
         new RegExp(`\\| ${escapeRegExp(state.label)}\\s+\\| \`${status.web}\`\\s+\\| \`${status.mobile}\`\\s+\\|`),
       );
+      for (const expectedCheck of state.expectedChecks) {
+        expect(tableRow).toContain(expectedCheck);
+      }
     }
+  });
+
+  it('keeps the markdown PR note template aligned with the generated helper', () => {
+    const markdown = readVisualEvidenceMarkdown();
+    const templateMatch = markdown.match(/```markdown\n(?<template>[\s\S]*?)\n```/);
+
+    expect(templateMatch?.groups?.template).toBe(createUserDrawingVisualEvidencePrNoteTemplate());
   });
 
   it('defines required web and mobile viewport families', () => {
