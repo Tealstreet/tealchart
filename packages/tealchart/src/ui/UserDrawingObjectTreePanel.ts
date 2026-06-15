@@ -165,6 +165,7 @@ export class UserDrawingObjectTreePanel {
       attrs: {
         role: 'dialog',
         'aria-label': 'Drawing object tree',
+        'data-tealchart-user-drawing-object-tree-panel': 'true',
       },
     });
     this.el.addEventListener('mousedown', (event) => event.stopPropagation());
@@ -306,7 +307,10 @@ export class UserDrawingObjectTreePanel {
   }
 
   private createRowActions(row: UserDrawingObjectTreeRow): HTMLDivElement {
-    const actions = div({ style: styles.rowActions });
+    const actions = div({
+      style: styles.rowActions,
+      attrs: { 'data-tealchart-user-drawing-object-tree-row-actions': row.drawingId },
+    });
     if (this.editingDrawingId === row.drawingId) {
       actions.appendChild(
         button({

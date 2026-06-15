@@ -127,7 +127,10 @@ export const UserDrawingObjectTreeSheet: React.FC<UserDrawingObjectTreeSheetProp
                                     </Text>
                                   </View>
                                 </Pressable>
-                                <View style={styles.rowActions}>
+                                <View
+                                  accessibilityLabel={`Drawing actions for ${row.label}`}
+                                  style={styles.rowActions}
+                                >
                                   {isEditing ? (
                                     <>
                                       <Pressable
