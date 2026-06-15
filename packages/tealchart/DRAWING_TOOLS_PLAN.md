@@ -1366,6 +1366,15 @@ object-tree gaps stay visible.
 - Web Canvas renderers and mobile Skia render-model primitives suppress
   generated labels while preserving drawing bodies.
 
+## Shipped: Pattern Label Text Appearance Controls
+
+- Shared toolbar eligibility now exposes text color, font size, and font family
+  controls for generated pattern labels.
+- Web selected-action/properties surfaces and mobile Skia surfaces dispatch the
+  same style commands for pattern-label drawing families.
+- Web Canvas and mobile Skia renderers already consume those shared style
+  values for pattern labels, so the controls now match existing render parity.
+
 ## Shipped: Text Wrap Off Control
 
 - Shared text-wrap descriptors now include explicit wrap-on and wrap-off choices

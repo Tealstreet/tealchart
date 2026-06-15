@@ -1500,10 +1500,6 @@ const GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS = new Set<UserDrawing['kind'
   'fibSpeedResistanceArcs',
   'fibWedge',
   'fibSpiral',
-]);
-
-const GENERATED_LABEL_VISIBILITY_DRAWING_KINDS = new Set<UserDrawing['kind']>([
-  ...GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS,
   'trianglePattern',
   'abcdPattern',
   'xabcdPattern',
@@ -1515,6 +1511,10 @@ const GENERATED_LABEL_VISIBILITY_DRAWING_KINDS = new Set<UserDrawing['kind']>([
   'elliottDoubleComboWave',
   'elliottTripleComboWave',
   'elliottTriangleWave',
+]);
+
+const GENERATED_LABEL_VISIBILITY_DRAWING_KINDS = new Set<UserDrawing['kind']>([
+  ...GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS,
 ]);
 GENERATED_LABEL_VISIBILITY_DRAWING_KINDS.delete('table');
 
