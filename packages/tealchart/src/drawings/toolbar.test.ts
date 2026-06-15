@@ -1749,6 +1749,78 @@ describe('user drawing toolbar descriptors', () => {
     ]);
   });
 
+  it('keeps the Epic B selected-action checklist in the shared surface model', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'label' },
+      drawings: [
+        {
+          id: 'label',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const, textColor: '#fff' },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'left' as const,
+        },
+        {
+          id: 'back',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 8,
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const items = resolveUserDrawingSelectedActionSurface(selected).groups.flatMap((group) => group.items);
+    const itemById = new Map(items.map((item) => [item.id, item]));
+
+    expect(itemById.get('openProperties')).toMatchObject({ enabled: true, command: { type: 'openProperties' } });
+    expect(itemById.get('openObjectTree')).toMatchObject({ enabled: true, command: { type: 'openObjectTree' } });
+    expect(itemById.get('editText')).toMatchObject({
+      enabled: true,
+      command: { type: 'editText', drawingId: 'label' },
+    });
+    expect(itemById.get('duplicateSelected')).toMatchObject({
+      enabled: true,
+      command: { type: 'toolbarAction', action: 'duplicateSelected' },
+    });
+    expect(itemById.get('deleteSelected')).toMatchObject({
+      enabled: true,
+      destructive: true,
+      command: { type: 'toolbarAction', action: 'deleteSelected' },
+    });
+    expect(itemById.get('bringForward')).toMatchObject({ command: { type: 'toolbarAction', action: 'bringForward' } });
+    expect(itemById.get('sendBackward')).toMatchObject({ command: { type: 'toolbarAction', action: 'sendBackward' } });
+    expect(itemById.get('bringToFront')).toMatchObject({ command: { type: 'toolbarAction', action: 'bringToFront' } });
+    expect(itemById.get('sendToBack')).toMatchObject({ command: { type: 'toolbarAction', action: 'sendToBack' } });
+    expect(itemById.get('hideSelected')).toMatchObject({
+      enabled: true,
+      command: { type: 'styleAction', action: 'hideSelected', visible: false },
+    });
+    expect(itemById.get('lockSelected')).toMatchObject({
+      enabled: true,
+      command: { type: 'styleAction', action: 'lockSelected', locked: true },
+    });
+    expect(itemById.get('lineColor:#f5c542')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { lineColor: '#f5c542' } },
+    });
+    expect(itemById.get('textColor:#f5c542')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { textColor: '#f5c542' } },
+    });
+  });
+
   it('hides selected action surfaces during transient editing states', () => {
     const anchor = {
       anchor: { x: 100, y: 80 },
