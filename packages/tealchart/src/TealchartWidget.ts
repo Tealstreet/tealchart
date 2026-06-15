@@ -3137,11 +3137,21 @@ export class TealchartWidget {
 
     if (command.type === 'toolbarAction') {
       if (command.action === 'duplicateSelected') {
-        this.duplicateSelectedUserDrawing();
+        this.dispatchUserDrawingCommand({
+          type: 'duplicate',
+          options: {
+            createId: () => this._createUserDrawingId(),
+          },
+          meta: { source: 'contextMenu' },
+        });
       } else if (command.action === 'deleteSelected') {
-        this.deleteSelectedUserDrawing();
+        this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'contextMenu' } });
       } else {
-        this.reorderUserDrawings(command.action);
+        this.dispatchUserDrawingCommand({
+          type: 'reorder',
+          action: command.action,
+          meta: { source: 'contextMenu' },
+        });
       }
     }
   }
