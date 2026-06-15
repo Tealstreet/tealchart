@@ -22,7 +22,7 @@ Object-tree behavior is shared:
 | Area | Web evidence | Mobile evidence | Shared evidence |
 | --- | --- | --- | --- |
 | Built-in surface | `TealchartWidget.test.ts` covers the web built-in object-tree fallback when no app-owned callback is provided. | `UserDrawingObjectTreeSheet.test.tsx` covers the built-in mobile sheet. | `objectTree.test.ts` covers row/group model generation. |
-| App-owned entry points | Web selected actions and context menus can open object-tree callbacks. | Mobile selected action strip and long-press context menus can open object-tree callbacks. | Selected/context action descriptors share the same object-tree open command concept. |
+| App-owned entry points | Web selected actions and context menus can open object-tree callbacks. `ContextMenu.test.ts` now verifies the rendered web context menu exposes and dispatches the object-tree entry without chart click fallthrough. | Mobile selected action strip and long-press context menus can open object-tree callbacks. `ContextMenuComponent.test.tsx` now verifies the rendered mobile context menu exposes and dispatches the same object-tree entry without chart tap fallthrough. | Selected/context action descriptors share the same object-tree open command concept. |
 | Row actions | Web panel rows dispatch select, rename, hide/show, lock/unlock, duplicate, delete, and z-order actions. | Mobile sheet rows dispatch the same row actions through the shared resolver. | `objectTree.test.ts` covers row action enablement and dispatch shape. |
 | Bulk actions | Web object-tree hosts can use the shared selected-row descriptors. | Mobile object-tree hosts can use the same selected-row descriptors. | `objectTree.test.ts` covers additive/range selection and selected mutation commands. |
 | Layering | Web renderer tests assert committed drawing paint order follows drawing z-order. | Mobile render-model tests assert Skia primitive order follows drawing z-order. | `visualEvidence.test.ts` tracks object-tree row, action, and layering evidence as ready on both platforms. |
@@ -33,6 +33,8 @@ Object-tree behavior is shared:
   exists and has web and mobile built-in surfaces.
 - Context menu and object-tree open commands are already shared between the
   selected-action model, web right-click paths, and mobile long-press paths.
+- Rendered web and mobile context menu surfaces now both prove the object-tree
+  entry is present and isolated from chart event fallthrough.
 - The next useful C-domain work is visual polish or app integration evidence,
   not another command model layer.
 

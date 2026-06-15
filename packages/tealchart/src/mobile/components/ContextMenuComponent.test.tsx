@@ -35,4 +35,33 @@ describe('ContextMenuComponent', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onChartTouch).not.toHaveBeenCalled();
   });
+
+  it('renders and dispatches the drawing object-tree context action', () => {
+    const onChartTouch = vi.fn();
+    const onObjectTree = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <div onClick={onChartTouch}>
+        <ContextMenuComponent
+          visible
+          items={[
+            { text: 'Open selected drawing properties', click: vi.fn(), position: 'top' },
+            { text: 'Open drawing object tree', click: onObjectTree, position: 'top' },
+          ]}
+          x={20}
+          y={20}
+          price={10}
+          time={1}
+          onClose={onClose}
+        />
+      </div>,
+    );
+
+    fireEvent.click(screen.getByText('Open drawing object tree'));
+
+    expect(onObjectTree).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onChartTouch).not.toHaveBeenCalled();
+  });
 });
