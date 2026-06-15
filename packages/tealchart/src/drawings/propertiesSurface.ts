@@ -12,6 +12,7 @@ import type {
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
+  UserDrawingRiskRewardStatsMode,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -23,12 +24,14 @@ import type {
 } from './types';
 
 import {
+  DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
   DEFAULT_USER_DRAWING_STYLE,
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingOpacity,
+  normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
   normalizeUserDrawingVolumeProfileWidthRatio,
@@ -45,6 +48,7 @@ import {
   supportsUserDrawingIconControls,
   supportsUserDrawingGeneratedLabelVisibilityControls,
   supportsUserDrawingRichTextControls,
+  supportsUserDrawingRiskRewardStatsModeControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextWrapControls,
@@ -61,6 +65,7 @@ import {
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -106,6 +111,7 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingIconName
         | UserDrawingLineStyle
         | UserDrawingBrushTemplateId
+        | UserDrawingRiskRewardStatsMode
         | UserDrawingTextAlign
         | UserDrawingTextMaxWidth
         | UserDrawingTrendLineExtend
@@ -117,7 +123,7 @@ export type UserDrawingPropertiesSurfaceControl =
 type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
 
 export interface UserDrawingPropertiesSurfaceGroup {
-  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'icon';
+  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'position' | 'icon';
   label: string;
   controls: readonly UserDrawingPropertiesSurfaceControl[];
 }
@@ -426,6 +432,27 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
         value: descriptor.extend,
         selected: drawing.extend === descriptor.extend,
         command: { type: 'setTrendLineExtend' as const, extend: descriptor.extend },
+      })),
+    });
+  }
+
+  if (supportsUserDrawingRiskRewardStatsModeControls(drawing)) {
+    const currentRiskRewardStatsMode = normalizeUserDrawingRiskRewardStatsMode(
+      drawing.style.riskRewardStatsMode ?? DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE,
+    );
+    groups.push({
+      id: 'position',
+      label: 'Position',
+      controls: USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS.map((descriptor) => ({
+        id: `riskRewardStatsMode:${descriptor.statsMode}`,
+        type: 'option' as const,
+        label: descriptor.label,
+        value: descriptor.statsMode,
+        selected: currentRiskRewardStatsMode === descriptor.statsMode,
+        command: {
+          type: 'updateStyle' as const,
+          style: { riskRewardStatsMode: descriptor.statsMode },
+        },
       })),
     });
   }
