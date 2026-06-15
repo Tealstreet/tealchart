@@ -1006,6 +1006,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       flyout.appendChild(flyoutHeader);
       const showFlyout = () => {
         if (activeFlyout?.id === category.id) return;
+        if (activeFlyout && this.pinnedDrawingToolCategoryId === activeFlyout.id) {
+          this.pinnedDrawingToolCategoryId = null;
+        }
         closeActiveFlyout();
         const railRect = rail.getBoundingClientRect();
         const buttonRect = categoryButton.getBoundingClientRect();
