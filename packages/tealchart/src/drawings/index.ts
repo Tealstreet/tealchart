@@ -434,6 +434,7 @@ export {
 export {
   getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingBrushTemplateDescriptors,
   getUserDrawingFillOpacityDescriptors,
   getUserDrawingLineWidthDescriptors,
   getUserDrawingLineWidthPreviewFontSize,
@@ -466,6 +467,7 @@ export {
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
+  USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FILL_OPACITY_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
@@ -518,6 +520,8 @@ export type {
   UserDrawingVisualEvidenceViewportId,
 } from './visualEvidence';
 export type {
+  UserDrawingBrushTemplateDescriptor,
+  UserDrawingBrushTemplateId,
   UserDrawingFillColorDescriptor,
   UserDrawingFontFamilyDescriptor,
   UserDrawingFontSizeDescriptor,
