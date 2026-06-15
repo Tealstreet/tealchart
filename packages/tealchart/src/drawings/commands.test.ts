@@ -664,6 +664,23 @@ describe('user drawing command dispatch', () => {
     expect(command.state.drawings.map((drawing) => drawing.id)).toEqual(['trend-line', 'trend-line-copy']);
     expect(command.state.selection).toEqual({ drawingId: 'trend-line-copy' });
     expect(command.editDrag?.startDrawing.id).toBe('trend-line-copy');
+    if (!command.editDrag) throw new Error('expected duplicate edit drag metadata');
+
+    const moved = dispatchUserDrawingCommand(command.state, {
+      type: 'applyEditDrag',
+      drag: command.editDrag,
+      point: { x: 170, y: 130 },
+      meta: { source: 'pointer', transactionKey: 'duplicate-drag' },
+    });
+    const copiedDrawing = moved.state.drawings.find((drawing) => drawing.id === 'trend-line-copy');
+    const originalDrawing = moved.state.drawings.find((drawing) => drawing.id === 'trend-line');
+    expect(copiedDrawing?.kind).toBe('trendLine');
+    expect(originalDrawing?.kind).toBe('trendLine');
+    if (copiedDrawing?.kind !== 'trendLine' || originalDrawing?.kind !== 'trendLine') {
+      throw new Error('expected trend line drawings');
+    }
+    expect(copiedDrawing.points).not.toEqual(originalDrawing.points);
+    expect(moved.state.selection).toEqual({ drawingId: 'trend-line-copy' });
   });
 
   it('wraps selected drawing nudges through edit-drag geometry', () => {
