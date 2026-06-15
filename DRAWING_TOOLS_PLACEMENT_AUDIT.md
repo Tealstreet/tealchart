@@ -23,7 +23,7 @@ Tools audited here:
 | Tool | Placement mode | Shared evidence | Web evidence | Mobile evidence | Remaining proof |
 | --- | --- | --- | --- | --- | --- |
 | `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
-| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement and host mouse routing | `SkiaTealchart.test.tsx`, `EventManager.test.ts`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity and host touch routing | Browser/device smoke with sidebar tool |
+| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement plus browser mouse/touch event routing | `SkiaTealchart.test.tsx`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity | Browser/device smoke with sidebar tool |
 | `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
 | `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
 | `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
@@ -39,8 +39,8 @@ Tools audited here:
   and drag end anchors exactly.
 - Web and mobile both route drawing placement through shared commands/history.
   Mobile has explicit command-history coverage for the same endpoint semantics.
-- The host event boundary has unit coverage for both web mouse and touch-like
-  input: `EventManager.test.ts` verifies pending drag promotion, final
+- The browser event boundary has unit coverage for mouse and DOM touch input:
+  `EventManager.test.ts` verifies pending drag promotion, final
   mouseup/touchend delivery when RAF has not processed a move frame, below
   threshold tap fallback, pressure forwarding, shift modifier forwarding, and
   touchcancel cancellation paths.
