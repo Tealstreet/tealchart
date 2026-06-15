@@ -15,6 +15,7 @@ export interface DispatchMobileUserDrawingActionCommandOptions {
   dispatchUserDrawingCommand: (command: UserDrawingCommand) => void;
   onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
+  onUserDrawingCopySelected?: () => void;
 }
 
 export function dispatchMobileUserDrawingActionCommand(
@@ -40,6 +41,11 @@ export function dispatchMobileUserDrawingActionCommand(
       drawingId: command.drawingId,
       meta: { source: options.source },
     });
+    return true;
+  }
+
+  if (command.type === 'copySelected') {
+    options.onUserDrawingCopySelected?.();
     return true;
   }
 

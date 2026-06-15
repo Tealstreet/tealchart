@@ -1690,6 +1690,50 @@ describe('TealchartWidget', () => {
       expect(widget.pasteUserDrawingClipboard()).toBe(false);
     });
 
+    it('copies selected drawings from the web drawing context menu into the widget clipboard', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'select',
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+        ],
+      });
+
+      const contextItems = (
+        widget as unknown as {
+          _handleUserDrawingContextMenu(
+            point: { x: number; y: number },
+            spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          ): Array<{ text: string; enabled: boolean; click: () => void }>;
+        }
+      )._handleUserDrawingContextMenu({ x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+
+      const copyItem = contextItems.find((item) => item.text === 'Copy selected drawing');
+      expect(copyItem).toMatchObject({ enabled: true });
+      copyItem?.click();
+
+      expect(widget.pasteUserDrawingClipboard()).toBe(true);
+      expect(widget.getUserDrawingState().drawings).toHaveLength(2);
+      expect(widget.getUserDrawingState().selection?.drawingId).not.toBe('h');
+    });
+
     it('reorders selected or targeted drawings through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();
