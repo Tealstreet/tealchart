@@ -169,6 +169,8 @@ export interface UserDrawingStyle {
   textMaxWidth?: number;
   labelsVisible?: boolean;
   barsPatternDisplayMode?: UserDrawingBarsPatternDisplayMode;
+  barsPatternUpColor?: string;
+  barsPatternDownColor?: string;
   riskRewardStatsMode?: UserDrawingRiskRewardStatsMode;
   volumeProfileGuidesVisible?: boolean;
   volumeProfileRowCount?: number;
@@ -956,6 +958,8 @@ export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240, 320, 480] as const;
 export const DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE = 'candles';
 export const USER_DRAWING_BARS_PATTERN_DISPLAY_MODES = ['candles', 'line'] as const;
+export const DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR = '#22c55e';
+export const DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR = '#f43f5e';
 export const DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE = 'full';
 export const USER_DRAWING_RISK_REWARD_STATS_MODES = ['full', 'compact'] as const;
 export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 12;

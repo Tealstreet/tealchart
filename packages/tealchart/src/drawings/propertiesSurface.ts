@@ -26,6 +26,8 @@ import type {
 
 import {
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
+  DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
   DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
@@ -46,6 +48,7 @@ import {
   getUserDrawingFillOpacityDescriptors,
   getUserDrawingOpacityDescriptors,
   getSelectedUserDrawing,
+  supportsUserDrawingBarsPatternColorControls,
   supportsUserDrawingBarsPatternDisplayModeControls,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -61,7 +64,9 @@ import {
   supportsUserDrawingVolumeProfileRowCountControls,
   supportsUserDrawingVolumeProfileValueAreaControls,
   supportsUserDrawingVolumeProfileWidthControls,
+  USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS,
+  USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -129,7 +134,7 @@ export type UserDrawingPropertiesSurfaceControl =
 type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
 
 export interface UserDrawingPropertiesSurfaceGroup {
-  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'position' | 'icon';
+  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'pattern' | 'position' | 'icon';
   label: string;
   controls: readonly UserDrawingPropertiesSurfaceControl[];
 }
@@ -442,24 +447,54 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  if (supportsUserDrawingBarsPatternDisplayModeControls(drawing)) {
+  if (supportsUserDrawingBarsPatternDisplayModeControls(drawing) || supportsUserDrawingBarsPatternColorControls(drawing)) {
     const currentBarsPatternDisplayMode = normalizeUserDrawingBarsPatternDisplayMode(
       drawing.style.barsPatternDisplayMode ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
     );
     groups.push({
-      id: 'geometry',
-      label: 'Geometry',
-      controls: USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => ({
-        id: `barsPatternDisplayMode:${descriptor.displayMode}`,
-        type: 'option' as const,
-        label: descriptor.label,
-        value: descriptor.displayMode,
-        selected: currentBarsPatternDisplayMode === descriptor.displayMode,
-        command: {
-          type: 'updateStyle' as const,
-          style: { barsPatternDisplayMode: descriptor.displayMode },
-        },
-      })),
+      id: 'pattern',
+      label: 'Bars Pattern',
+      controls: [
+        ...USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => ({
+          id: `barsPatternDisplayMode:${descriptor.displayMode}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.displayMode,
+          selected: currentBarsPatternDisplayMode === descriptor.displayMode,
+          command: {
+            type: 'updateStyle' as const,
+            style: { barsPatternDisplayMode: descriptor.displayMode },
+          },
+        })),
+        ...USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS.map((descriptor) => ({
+          id: `barsPatternUpColor:${descriptor.color}`,
+          type: 'swatch' as const,
+          label: descriptor.label,
+          value: descriptor.color,
+          selected: colorsMatch(
+            drawing.style.barsPatternUpColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
+            descriptor.color,
+          ),
+          command: {
+            type: 'updateStyle' as const,
+            style: { barsPatternUpColor: descriptor.color },
+          },
+        })),
+        ...USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS.map((descriptor) => ({
+          id: `barsPatternDownColor:${descriptor.color}`,
+          type: 'swatch' as const,
+          label: descriptor.label,
+          value: descriptor.color,
+          selected: colorsMatch(
+            drawing.style.barsPatternDownColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
+            descriptor.color,
+          ),
+          command: {
+            type: 'updateStyle' as const,
+            style: { barsPatternDownColor: descriptor.color },
+          },
+        })),
+      ],
     });
   }
 

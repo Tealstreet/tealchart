@@ -24,6 +24,7 @@ import {
   resolveUserDrawingStyleToolbarAction,
   resolveUserDrawingToolCategoryButtonTool,
   shouldRenderUserDrawingSelectedActionSurface,
+  supportsUserDrawingBarsPatternColorControls,
   supportsUserDrawingBarsPatternDisplayModeControls,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
@@ -37,7 +38,9 @@ import {
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
+  USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS,
+  USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FILL_OPACITY_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
@@ -2868,14 +2871,25 @@ describe('user drawing toolbar descriptors', () => {
       ],
     };
 
+    expect(supportsUserDrawingBarsPatternColorControls(barsPatternState.drawings[0]!)).toBe(true);
     expect(supportsUserDrawingBarsPatternDisplayModeControls(barsPatternState.drawings[0]!)).toBe(true);
     expect(USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => descriptor.displayMode)).toEqual([
       'candles',
       'line',
     ]);
+    expect(USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS.map((descriptor) => descriptor.color)).toEqual([
+      '#22c55e',
+      '#38bdf8',
+      '#f5c542',
+    ]);
+    expect(USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS.map((descriptor) => descriptor.color)).toEqual([
+      '#f43f5e',
+      '#f97316',
+      '#a855f7',
+    ]);
     expect(
       resolveUserDrawingPropertiesSurface(barsPatternState)
-        .groups.find((group) => group.id === 'geometry')
+        .groups.find((group) => group.id === 'pattern')
         ?.controls,
     ).toMatchObject([
       {
@@ -2889,6 +2903,42 @@ describe('user drawing toolbar descriptors', () => {
         label: 'Line bars pattern',
         selected: false,
         command: { type: 'updateStyle', style: { barsPatternDisplayMode: 'line' } },
+      },
+      {
+        id: 'barsPatternUpColor:#22c55e',
+        label: 'Green up bars',
+        selected: true,
+        command: { type: 'updateStyle', style: { barsPatternUpColor: '#22c55e' } },
+      },
+      {
+        id: 'barsPatternUpColor:#38bdf8',
+        label: 'Blue up bars',
+        selected: false,
+        command: { type: 'updateStyle', style: { barsPatternUpColor: '#38bdf8' } },
+      },
+      {
+        id: 'barsPatternUpColor:#f5c542',
+        label: 'Gold up bars',
+        selected: false,
+        command: { type: 'updateStyle', style: { barsPatternUpColor: '#f5c542' } },
+      },
+      {
+        id: 'barsPatternDownColor:#f43f5e',
+        label: 'Red down bars',
+        selected: true,
+        command: { type: 'updateStyle', style: { barsPatternDownColor: '#f43f5e' } },
+      },
+      {
+        id: 'barsPatternDownColor:#f97316',
+        label: 'Orange down bars',
+        selected: false,
+        command: { type: 'updateStyle', style: { barsPatternDownColor: '#f97316' } },
+      },
+      {
+        id: 'barsPatternDownColor:#a855f7',
+        label: 'Purple down bars',
+        selected: false,
+        command: { type: 'updateStyle', style: { barsPatternDownColor: '#a855f7' } },
       },
     ]);
   });

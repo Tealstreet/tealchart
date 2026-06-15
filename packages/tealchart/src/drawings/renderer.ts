@@ -29,6 +29,8 @@ import {
 } from './textLayout';
 import {
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
+  DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -53,8 +55,6 @@ const RISK_REWARD_PROFIT_FILL = 'rgba(34, 197, 94, 0.18)';
 const RISK_REWARD_RISK_FILL = 'rgba(244, 63, 94, 0.18)';
 const RISK_REWARD_PROFIT_STROKE = '#22c55e';
 const RISK_REWARD_RISK_STROKE = '#f43f5e';
-const BARS_PATTERN_UP_COLOR = '#22c55e';
-const BARS_PATTERN_DOWN_COLOR = '#f43f5e';
 
 interface UserDrawingImageCacheRecord {
   status: 'loading' | 'loaded' | 'error';
@@ -1449,8 +1449,10 @@ function renderBarsPatternGeometry(
 
   ctx.setLineDash([]);
   ctx.lineWidth = Math.max(1, geometry.drawing.style.lineWidth);
+  const upColor = geometry.drawing.style.barsPatternUpColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR;
+  const downColor = geometry.drawing.style.barsPatternDownColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR;
   for (const bar of geometry.pattern.bars) {
-    const color = bar.up ? BARS_PATTERN_UP_COLOR : BARS_PATTERN_DOWN_COLOR;
+    const color = bar.up ? upColor : downColor;
     const bodyTop = Math.min(bar.openY, bar.closeY);
     const bodyHeight = Math.max(1, Math.abs(bar.closeY - bar.openY));
     const bodyX = bar.x - bar.bodyWidth / 2;

@@ -3954,7 +3954,12 @@ describe('mobile user drawing render model', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { ...style, barsPatternDisplayMode: 'line' },
+          style: {
+            ...style,
+            barsPatternDisplayMode: 'line',
+            barsPatternUpColor: '#38bdf8',
+            barsPatternDownColor: '#f97316',
+          },
           points: [
             { time: 10, price: 50 },
             { time: 20, price: 50 },
@@ -3973,6 +3978,10 @@ describe('mobile user drawing render model', () => {
     expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
       kind: 'barsPattern',
       displayMode: 'line',
+      style: {
+        barsPatternUpColor: '#38bdf8',
+        barsPatternDownColor: '#f97316',
+      },
       linePoints: [
         { x: 40, y: 50 },
         { x: 50, y: 49 },
