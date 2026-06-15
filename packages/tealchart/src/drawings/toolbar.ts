@@ -16,6 +16,7 @@ import type {
   UserDrawingTrendLineExtend,
   UserDrawingVolumeProfileRowCount,
   UserDrawingVolumeProfileValueAreaRatio,
+  UserDrawingVolumeProfileWidthRatio,
 } from './types';
 
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
@@ -37,6 +38,7 @@ import {
   USER_DRAWING_TREND_LINE_EXTENDS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
+  USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
 } from './types';
 
 export type UserDrawingToolbarAction =
@@ -193,6 +195,11 @@ export interface UserDrawingVolumeProfileRowCountDescriptor {
 
 export interface UserDrawingVolumeProfileValueAreaRatioDescriptor {
   valueAreaRatio: UserDrawingVolumeProfileValueAreaRatio;
+  label: string;
+}
+
+export interface UserDrawingVolumeProfileWidthRatioDescriptor {
+  widthRatio: UserDrawingVolumeProfileWidthRatio;
   label: string;
 }
 
@@ -780,6 +787,12 @@ export const USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO_DESCRIPTORS: readonly 
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS.map((valueAreaRatio) => ({
     valueAreaRatio,
     label: `${Math.round(valueAreaRatio * 100)} percent value area`,
+  }));
+
+export const USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS: readonly UserDrawingVolumeProfileWidthRatioDescriptor[] =
+  USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS.map((widthRatio) => ({
+    widthRatio,
+    label: `${Math.round(widthRatio * 100)} percent profile width`,
   }));
 
 export const USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
@@ -1607,6 +1620,10 @@ export function supportsUserDrawingVolumeProfileRowCountControls(drawing: UserDr
 }
 
 export function supportsUserDrawingVolumeProfileValueAreaControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
+}
+
+export function supportsUserDrawingVolumeProfileWidthControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
 }
 

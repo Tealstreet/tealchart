@@ -370,6 +370,7 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (isFiniteNumber(value.volumeProfileValueAreaRatio)) {
     style.volumeProfileValueAreaRatio = value.volumeProfileValueAreaRatio;
   }
+  if (isFiniteNumber(value.volumeProfileWidthRatio)) style.volumeProfileWidthRatio = value.volumeProfileWidthRatio;
   return normalizeUserDrawingStyle(style);
 }
 

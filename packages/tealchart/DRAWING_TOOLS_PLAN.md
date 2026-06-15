@@ -1526,6 +1526,17 @@ object-tree gaps stay visible.
   guide overlays from the configured ratio while preserving the existing
   70-percent default.
 
+## Shipped: Volume Profile Width Controls
+
+- Shared drawing style now preserves bounded `volumeProfileWidthRatio` settings
+  for anchored and fixed-range volume profile drawings.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose matching 25/50/100 percent profile-width presets through the shared
+  properties surface.
+- Web Canvas and mobile Skia render paths scale matching volume bins and guide
+  overlays inside the unchanged profile bounds while preserving the existing
+  100-percent default.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.

@@ -21,11 +21,13 @@ import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
 import {
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
+  DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
   normalizeUserDrawingFontSize,
   normalizeUserDrawingPanePosition,
   normalizeUserDrawingTableCells,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
+  normalizeUserDrawingVolumeProfileWidthRatio,
 } from './types';
 
 export interface DrawingScreenPoint {
@@ -2587,6 +2589,7 @@ interface ResolveVolumeProfileOptions {
   priceMax: number;
   rowCount: number;
   valueAreaRatio: number;
+  widthRatio: number;
   space: DrawingCoordinateSpace;
 }
 
@@ -2596,6 +2599,7 @@ function resolveFixedRangeVolumeProfileGuides(
   maxVolume: number,
   totalVolume: number,
   valueAreaRatio: number,
+  widthRatio: number,
 ): DrawingScreenVolumeProfileGuide[] {
   if (maxVolume <= 0 || totalVolume <= 0 || bounds.width <= 0) return [];
 
@@ -2629,7 +2633,7 @@ function resolveFixedRangeVolumeProfileGuides(
   }
 
   const xStart = bounds.x;
-  const xEnd = bounds.x + bounds.width;
+  const xEnd = bounds.x + bounds.width * normalizeUserDrawingVolumeProfileWidthRatio(widthRatio);
   const pointOfControlY = pointOfControlBin.rect.y + pointOfControlBin.rect.height / 2;
   const valueAreaHighBin = bins[valueAreaHighIndex]!;
   const valueAreaLowBin = bins[valueAreaLowIndex]!;
@@ -2662,7 +2666,7 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
-  options: { rowCount?: number; valueAreaRatio?: number } = {},
+  options: { rowCount?: number; valueAreaRatio?: number; widthRatio?: number } = {},
 ): DrawingScreenFixedRangeVolumeProfile {
   const firstPoint = anchorToScreenPoint(first, space);
   const secondPoint = anchorToScreenPoint(second, space);
@@ -2684,6 +2688,7 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
     priceMax,
     rowCount: options.rowCount ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
     valueAreaRatio: options.valueAreaRatio ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
+    widthRatio: options.widthRatio ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
     space,
   });
 }
@@ -2696,6 +2701,7 @@ function resolveVolumeProfile({
   priceMax,
   rowCount,
   valueAreaRatio,
+  widthRatio,
   space,
 }: ResolveVolumeProfileOptions): DrawingScreenFixedRangeVolumeProfile {
   const priceRange = priceMax - priceMin;
@@ -2716,12 +2722,13 @@ function resolveVolumeProfile({
   const maxVolume = Math.max(0, ...volumes);
   const totalVolume = volumes.reduce((sum, volume) => sum + volume, 0);
   const binHeight = priceRange / binCount;
+  const profileWidth = bounds.width * normalizeUserDrawingVolumeProfileWidthRatio(widthRatio);
   const bins = volumes.map((volume, index) => {
     const binPriceMin = priceMin + binHeight * index;
     const binPriceMax = priceMin + binHeight * (index + 1);
     const yTop = priceToDrawingY(binPriceMax, space);
     const yBottom = priceToDrawingY(binPriceMin, space);
-    const width = maxVolume > 0 ? bounds.width * (volume / maxVolume) : 0;
+    const width = maxVolume > 0 ? profileWidth * (volume / maxVolume) : 0;
     return {
       priceMin: binPriceMin,
       priceMax: binPriceMax,
@@ -2738,7 +2745,7 @@ function resolveVolumeProfile({
   return {
     bounds,
     bins,
-    guides: resolveFixedRangeVolumeProfileGuides(bounds, bins, maxVolume, totalVolume, valueAreaRatio),
+    guides: resolveFixedRangeVolumeProfileGuides(bounds, bins, maxVolume, totalVolume, valueAreaRatio, widthRatio),
     maxVolume,
     totalVolume,
   };
@@ -2747,7 +2754,7 @@ function resolveVolumeProfile({
 export function resolveAnchoredVolumeProfileFromAnchor(
   anchor: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
-  options: { rowCount?: number; valueAreaRatio?: number } = {},
+  options: { rowCount?: number; valueAreaRatio?: number; widthRatio?: number } = {},
 ): DrawingScreenFixedRangeVolumeProfile {
   const anchorPoint = anchorToScreenPoint(anchor, space);
   const profileBars = (space.bars ?? []).filter((bar) => bar.time >= anchor.time && bar.volume > 0);
@@ -2773,6 +2780,7 @@ export function resolveAnchoredVolumeProfileFromAnchor(
     priceMax,
     rowCount: options.rowCount ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
     valueAreaRatio: options.valueAreaRatio ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
+    widthRatio: options.widthRatio ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
     space,
   });
 }
@@ -3575,6 +3583,7 @@ export function resolveUserDrawingGeometry(
         volumeProfile: resolveAnchoredVolumeProfileFromAnchor(drawing.point, space, {
           rowCount: drawing.style.volumeProfileRowCount,
           valueAreaRatio: drawing.style.volumeProfileValueAreaRatio,
+          widthRatio: drawing.style.volumeProfileWidthRatio,
         }),
       };
     case 'fixedRangeVolumeProfile':
@@ -3584,6 +3593,7 @@ export function resolveUserDrawingGeometry(
         volumeProfile: resolveFixedRangeVolumeProfileFromAnchors(drawing.points[0], drawing.points[1], space, {
           rowCount: drawing.style.volumeProfileRowCount,
           valueAreaRatio: drawing.style.volumeProfileValueAreaRatio,
+          widthRatio: drawing.style.volumeProfileWidthRatio,
         }),
       };
     case 'triangle':
