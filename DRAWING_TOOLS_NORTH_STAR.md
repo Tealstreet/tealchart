@@ -194,3 +194,5 @@ record the actual placement behavior for the core tools listed above against the
 current shipped placement claims in `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md` and
 `DRAWING_TOOLS_CAPABILITY_MATRIX.md`. The first fix should target the
 highest-friction verified placement bug or UX gap, not an assumed stale issue.
+
+Phase A1 evidence is recorded in `DRAWING_TOOLS_PLACEMENT_AUDIT.md`.
