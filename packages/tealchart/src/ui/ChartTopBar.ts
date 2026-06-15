@@ -1,6 +1,7 @@
 import type {
   UpdateUserDrawingOptions,
   UserDrawingIconName,
+  UserDrawingCommandAvailability,
   UserDrawingSelectionActionAnchor,
   UserDrawingState,
   UserDrawingStyle,
@@ -95,10 +96,16 @@ export interface ChartTopBarOptions extends ComponentOptions {
   layoutCallbacks?: LayoutSelectorCallbacks;
   /** Current user drawing state for toolbar highlighting and action availability */
   userDrawingState?: UserDrawingState;
+  /** Current drawing command history availability for undo/redo toolbar actions */
+  userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Resolved selected drawing action surface anchor in chart screen coordinates */
   userDrawingSelectionActionAnchor?: UserDrawingSelectionActionAnchor | null;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when the drawing toolbar should undo the last drawing command */
+  onUserDrawingUndo?: () => void;
+  /** Callback when the drawing toolbar should redo the last undone drawing command */
+  onUserDrawingRedo?: () => void;
   /** Callback when the selected drawing should be duplicated */
   onUserDrawingDuplicateSelected?: () => void;
   /** Callback when the selected drawing should be copied */
@@ -1825,7 +1832,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     for (const item of globalActionDescriptors.map((descriptor) => ({
       ...descriptor,
       id: descriptor.action,
-      enabled: state ? isUserDrawingToolbarActionEnabled(state, descriptor.action) : false,
+      enabled: state
+        ? isUserDrawingToolbarActionEnabled(state, descriptor.action, this.options.userDrawingCommandAvailability)
+        : false,
       command: { type: 'toolbarAction' as const, action: descriptor.action },
     }))) {
       const enabled = item.enabled;
@@ -1853,6 +1862,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           const allDrawingOptionsIncludingLocked = state
             ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
             : { drawingIds: [], includeLocked: true };
+          if (item.command.action === 'undo') this.options.onUserDrawingUndo?.();
+          if (item.command.action === 'redo') this.options.onUserDrawingRedo?.();
           if (item.command.action === 'measure') this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on');
           if (item.command.action === 'zoomIn') this.options.onUserDrawingZoomIn?.();
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
@@ -1969,6 +1980,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   setUserDrawingState(state: UserDrawingState, options: { render?: boolean } = {}): void {
     this.options.userDrawingState = state;
+    if (options.render !== false) this.render();
+  }
+
+  setUserDrawingCommandAvailability(availability: UserDrawingCommandAvailability, options: { render?: boolean } = {}): void {
+    this.options.userDrawingCommandAvailability = availability;
     if (options.render !== false) this.render();
   }
 

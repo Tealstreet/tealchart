@@ -120,6 +120,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     const onClear = vi.fn();
     const onMeasureModeChange = vi.fn();
     const onZoomIn = vi.fn();
+    const onUndo = vi.fn();
+    const onRedo = vi.fn();
     const onZOrder = vi.fn();
     const onVisibility = vi.fn();
     const onLocked = vi.fn();
@@ -174,8 +176,11 @@ describe('ChartTopBarComponent drawing toolbar', () => {
             },
           ],
         }}
+        userDrawingCommandAvailability={{ canUndo: true, canRedo: true }}
         onUserDrawingDuplicateSelected={onDuplicate}
         onUserDrawingDeleteSelected={onDelete}
+        onUserDrawingUndo={onUndo}
+        onUserDrawingRedo={onRedo}
         onUserDrawingCancelDraft={onCancel}
         onUserDrawingClearAll={onClear}
         onUserDrawingMeasureModeChange={onMeasureModeChange}
@@ -192,6 +197,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.queryByLabelText('Send selected drawing backward')).toBeNull();
     expect(screen.queryByLabelText('Bring selected drawing to front')).toBeNull();
     expect(screen.queryByLabelText('Send selected drawing to back')).toBeNull();
+    fireEvent.click(screen.getByLabelText('Undo drawing command'));
+    fireEvent.click(screen.getByLabelText('Redo drawing command'));
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
     fireEvent.click(screen.getByLabelText('Measure date and price range'));
     fireEvent.click(screen.getByLabelText('Zoom in'));
@@ -203,6 +210,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
     expect(onDuplicate).not.toHaveBeenCalled();
     expect(onDelete).not.toHaveBeenCalled();
+    expect(onUndo).toHaveBeenCalledTimes(1);
+    expect(onRedo).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onMeasureModeChange).toHaveBeenCalledWith(true);
     expect(onZoomIn).toHaveBeenCalledTimes(1);

@@ -230,6 +230,8 @@ describe('ChartTopBar drawing toolbar', () => {
     const onClear = vi.fn();
     const onMeasureModeChange = vi.fn();
     const onZoomIn = vi.fn();
+    const onUndo = vi.fn();
+    const onRedo = vi.fn();
     const onZOrder = vi.fn();
     const onCopy = vi.fn();
     const onProperties = vi.fn();
@@ -280,6 +282,7 @@ describe('ChartTopBar drawing toolbar', () => {
           },
         ],
       },
+      userDrawingCommandAvailability: { canUndo: true, canRedo: true },
       userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingDuplicateSelected: onDuplicate,
       onUserDrawingCopySelected: onCopy,
@@ -288,6 +291,8 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingClearAll: onClear,
       onUserDrawingMeasureModeChange: onMeasureModeChange,
       onUserDrawingZoomIn: onZoomIn,
+      onUserDrawingUndo: onUndo,
+      onUserDrawingRedo: onRedo,
       onUserDrawingZOrderChange: onZOrder,
       onUserDrawingPropertiesOpen: onProperties,
       onUserDrawingObjectTreeOpen: onObjectTree,
@@ -374,6 +379,8 @@ describe('ChartTopBar drawing toolbar', () => {
       ],
     });
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')).toBeNull();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Undo drawing command"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Redo drawing command"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Zoom in"]')?.click();
@@ -382,6 +389,8 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.click();
+    expect(onUndo).toHaveBeenCalledTimes(1);
+    expect(onRedo).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onMeasureModeChange).toHaveBeenCalledWith(true);
     expect(onZoomIn).toHaveBeenCalledTimes(1);
@@ -432,6 +441,44 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.disabled).toBe(true);
+
+    topBar.unmount();
+  });
+
+  it('rerenders drawing toolbar undo and redo availability changes', () => {
+    const onUndo = vi.fn();
+    const onRedo = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-undo-redo-availability',
+      symbol: 'BTCUSDT',
+      userDrawingState: baseDrawingState,
+      userDrawingCommandAvailability: { canUndo: false, canRedo: false },
+      onUserDrawingUndo: onUndo,
+      onUserDrawingRedo: onRedo,
+    });
+    topBar.mount(document.body);
+
+    const getUndo = () => document.querySelector<HTMLButtonElement>('button[aria-label="Undo drawing command"]');
+    const getRedo = () => document.querySelector<HTMLButtonElement>('button[aria-label="Redo drawing command"]');
+
+    expect(getUndo()?.disabled).toBe(true);
+    expect(getRedo()?.disabled).toBe(true);
+
+    topBar.setUserDrawingCommandAvailability({ canUndo: true, canRedo: false });
+    getUndo()?.click();
+    getRedo()?.click();
+    expect(getUndo()?.disabled).toBe(false);
+    expect(getRedo()?.disabled).toBe(true);
+    expect(onUndo).toHaveBeenCalledTimes(1);
+    expect(onRedo).not.toHaveBeenCalled();
+
+    topBar.setUserDrawingCommandAvailability({ canUndo: false, canRedo: true });
+    getUndo()?.click();
+    getRedo()?.click();
+    expect(getUndo()?.disabled).toBe(true);
+    expect(getRedo()?.disabled).toBe(false);
+    expect(onUndo).toHaveBeenCalledTimes(1);
+    expect(onRedo).toHaveBeenCalledTimes(1);
 
     topBar.unmount();
   });

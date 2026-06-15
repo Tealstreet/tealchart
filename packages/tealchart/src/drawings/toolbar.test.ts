@@ -694,6 +694,8 @@ describe('user drawing toolbar descriptors', () => {
 
   it('resolves action availability from toolbar-relevant state', () => {
     expect(USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.map((descriptor) => descriptor.action)).toEqual([
+      'undo',
+      'redo',
       'duplicateSelected',
       'deleteSelected',
       'bringForward',
@@ -715,7 +717,22 @@ describe('user drawing toolbar descriptors', () => {
       USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
         isUserDrawingGlobalToolbarAction(descriptor.action),
       ).map((descriptor) => descriptor.action),
-    ).toEqual(['measure', 'zoomIn', 'cancelDraft', 'clearAll', 'hideAll', 'showAll', 'lockAll', 'unlockAll']);
+    ).toEqual([
+      'undo',
+      'redo',
+      'measure',
+      'zoomIn',
+      'cancelDraft',
+      'clearAll',
+      'hideAll',
+      'showAll',
+      'lockAll',
+      'unlockAll',
+    ]);
+    expect(isUserDrawingToolbarActionEnabled(state, 'undo')).toBe(false);
+    expect(isUserDrawingToolbarActionEnabled(state, 'redo')).toBe(false);
+    expect(isUserDrawingToolbarActionEnabled(state, 'undo', { canUndo: true })).toBe(true);
+    expect(isUserDrawingToolbarActionEnabled(state, 'redo', { canRedo: true })).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'measure')).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'zoomIn')).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'deleteSelected')).toBe(false);

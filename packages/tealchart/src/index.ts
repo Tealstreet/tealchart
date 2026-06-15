@@ -551,6 +551,7 @@ export type {
   UserDrawingCommandEventListener,
   UserDrawingHistoryCommand,
   UserDrawingReplaceStateCommand,
+  UserDrawingCommandAvailability,
   UserDrawingCommandMetadata,
   UserDrawingCommandSource,
   UserDrawingInputOptions,

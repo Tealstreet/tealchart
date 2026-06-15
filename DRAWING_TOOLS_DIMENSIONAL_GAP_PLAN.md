@@ -145,6 +145,9 @@ Phase 3: Web keyboard/API integration
 - Expose widget APIs for undo/redo drawing commands.
 - Status: web widget APIs and keyboard shortcuts route undo/redo through the
   shared drawing history while preserving chart focus/input ownership rules.
+- Status: web drawing toolbar descriptors now expose undo/redo actions with
+  command-history availability, and toolbar clicks emit `toolbar` command
+  metadata.
 
 Phase 4: Mobile handle/API integration
 
@@ -152,6 +155,8 @@ Phase 4: Mobile handle/API integration
 - Add mobile-safe command dispatch so app toolbars can trigger undo/redo.
 - Status: mobile Skia handle and keyboard adapters route undo/redo through the
   same shared drawing history and expose matching app-toolbar dispatch paths.
+- Status: mobile Skia top-bar descriptors now expose undo/redo actions with the
+  same command-history availability and `toolbar` command metadata.
 
 ### Epic 2.3: History Validation
 
