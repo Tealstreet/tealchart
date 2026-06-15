@@ -363,6 +363,9 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.textWrap === 'boolean') style.textWrap = value.textWrap;
   if (isFiniteNumber(value.textMaxWidth)) style.textMaxWidth = value.textMaxWidth;
   if (typeof value.labelsVisible === 'boolean') style.labelsVisible = value.labelsVisible;
+  if (typeof value.measurementLabelPosition === 'string') {
+    style.measurementLabelPosition = value.measurementLabelPosition as UserDrawingStyle['measurementLabelPosition'];
+  }
   if (typeof value.barsPatternDisplayMode === 'string') {
     style.barsPatternDisplayMode = value.barsPatternDisplayMode as UserDrawingStyle['barsPatternDisplayMode'];
   }

@@ -168,6 +168,7 @@ export interface UserDrawingStyle {
   textWrap?: boolean;
   textMaxWidth?: number;
   labelsVisible?: boolean;
+  measurementLabelPosition?: UserDrawingMeasurementLabelPosition;
   barsPatternDisplayMode?: UserDrawingBarsPatternDisplayMode;
   barsPatternUpColor?: string;
   barsPatternDownColor?: string;
@@ -956,6 +957,8 @@ export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] a
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240, 320, 480] as const;
+export const DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION = 'center';
+export const USER_DRAWING_MEASUREMENT_LABEL_POSITIONS = ['center', 'top', 'bottom'] as const;
 export const DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE = 'candles';
 export const USER_DRAWING_BARS_PATTERN_DISPLAY_MODES = ['candles', 'line'] as const;
 export const DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR = '#22c55e';
@@ -975,6 +978,7 @@ export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
+export type UserDrawingMeasurementLabelPosition = (typeof USER_DRAWING_MEASUREMENT_LABEL_POSITIONS)[number];
 export type UserDrawingBarsPatternDisplayMode = (typeof USER_DRAWING_BARS_PATTERN_DISPLAY_MODES)[number];
 export type UserDrawingRiskRewardStatsMode = (typeof USER_DRAWING_RISK_REWARD_STATS_MODES)[number];
 export type UserDrawingVolumeProfileRowCount = (typeof USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS)[number];
@@ -1022,6 +1026,14 @@ export function normalizeUserDrawingRiskRewardStatsMode(statsMode: unknown): Use
   return USER_DRAWING_RISK_REWARD_STATS_MODES.includes(statsMode as UserDrawingRiskRewardStatsMode)
     ? (statsMode as UserDrawingRiskRewardStatsMode)
     : DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE;
+}
+
+export function normalizeUserDrawingMeasurementLabelPosition(
+  position: unknown,
+): UserDrawingMeasurementLabelPosition {
+  return USER_DRAWING_MEASUREMENT_LABEL_POSITIONS.includes(position as UserDrawingMeasurementLabelPosition)
+    ? (position as UserDrawingMeasurementLabelPosition)
+    : DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION;
 }
 
 export function normalizeUserDrawingBarsPatternDisplayMode(
@@ -1075,6 +1087,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fillOpacity === undefined ? undefined : normalizeUserDrawingOpacity(style.fillOpacity);
   const textMaxWidth =
     style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
+  const measurementLabelPosition =
+    style.measurementLabelPosition === undefined
+      ? undefined
+      : normalizeUserDrawingMeasurementLabelPosition(style.measurementLabelPosition);
   const barsPatternDisplayMode =
     style.barsPatternDisplayMode === undefined
       ? undefined
@@ -1103,6 +1119,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     opacity === style.opacity &&
     fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth &&
+    measurementLabelPosition === style.measurementLabelPosition &&
     barsPatternDisplayMode === style.barsPatternDisplayMode &&
     riskRewardStatsMode === style.riskRewardStatsMode &&
     volumeProfileRowCount === style.volumeProfileRowCount &&
@@ -1121,6 +1138,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(opacity === undefined ? {} : { opacity }),
     ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
+    ...(measurementLabelPosition === undefined ? {} : { measurementLabelPosition }),
     ...(barsPatternDisplayMode === undefined ? {} : { barsPatternDisplayMode }),
     ...(riskRewardStatsMode === undefined ? {} : { riskRewardStatsMode }),
     ...(volumeProfileRowCount === undefined ? {} : { volumeProfileRowCount }),

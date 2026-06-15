@@ -15,6 +15,7 @@ import {
   normalizeUserDrawingFontStyle,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingBarsPatternDisplayMode,
+  normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingStyle,
   normalizeUserDrawingTextMaxWidth,
@@ -25,6 +26,7 @@ import {
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
+  USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
@@ -236,6 +238,17 @@ describe('user drawing types', () => {
       normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, barsPatternDisplayMode: 'future' as never }),
     ).toMatchObject({
       barsPatternDisplayMode: 'candles',
+    });
+  });
+
+  it('normalizes measurement label positions to supported cross-platform values', () => {
+    expect(USER_DRAWING_MEASUREMENT_LABEL_POSITIONS).toEqual(['center', 'top', 'bottom']);
+    expect(normalizeUserDrawingMeasurementLabelPosition('top')).toBe('top');
+    expect(normalizeUserDrawingMeasurementLabelPosition('future')).toBe('center');
+    expect(
+      normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, measurementLabelPosition: 'future' as never }),
+    ).toMatchObject({
+      measurementLabelPosition: 'center',
     });
   });
 

@@ -31,7 +31,9 @@ import type {
 } from '../../drawings';
 
 import {
+  DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+  normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -1417,6 +1419,47 @@ function areMobileUserDrawingLabelsVisible(geometry: ResolvedUserDrawingGeometry
   return geometry.drawing.style.labelsVisible !== false;
 }
 
+function resolveMobileMeasurementLabelPoint(
+  rect: DrawingScreenRect,
+  fontSize: number,
+  position: unknown,
+): DrawingScreenPoint {
+  const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
+    position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
+  );
+  const x = rect.x + rect.width / 2;
+  if (labelPosition === 'top') return { x, y: rect.y + fontSize };
+  if (labelPosition === 'bottom') return { x, y: rect.y + rect.height - fontSize };
+  return { x, y: rect.y + rect.height / 2 };
+}
+
+function resolveMobileDatePriceRangeLabelPoints(
+  rect: DrawingScreenRect,
+  fontSize: number,
+  position: unknown,
+): { price: DrawingScreenPoint; date: DrawingScreenPoint } {
+  const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
+    position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
+  );
+  const x = rect.x + rect.width / 2;
+  if (labelPosition === 'top') {
+    return {
+      price: { x, y: rect.y + fontSize },
+      date: { x, y: rect.y + fontSize * 2 },
+    };
+  }
+  if (labelPosition === 'bottom') {
+    return {
+      price: { x, y: rect.y + rect.height - fontSize * 2 },
+      date: { x, y: rect.y + rect.height - fontSize },
+    };
+  }
+  return {
+    price: { x, y: rect.y + rect.height / 2 },
+    date: { x, y: rect.y + rect.height - fontSize },
+  };
+}
+
 function primitiveFromGeometry(
   geometry: ResolvedUserDrawingGeometry,
   clip: MobileUserDrawingClipRect,
@@ -2045,6 +2088,7 @@ function primitiveFromGeometry(
         drawing.kind === 'priceRange'
           ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
           : '';
+      const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
       return {
         kind: 'priceRange',
         id: geometry.drawing.id,
@@ -2053,10 +2097,11 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rect: geometry.rect,
-        labelPoint: {
-          x: geometry.rect.x + geometry.rect.width / 2,
-          y: geometry.rect.y + geometry.rect.height / 2,
-        },
+        labelPoint: resolveMobileMeasurementLabelPoint(
+          geometry.rect,
+          fontSize,
+          geometry.drawing.style.measurementLabelPosition,
+        ),
         label: areMobileUserDrawingLabelsVisible(geometry) ? label : '',
         style: geometry.drawing.style,
       };
@@ -2070,10 +2115,11 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rect: geometry.rect,
-        labelPoint: {
-          x: geometry.rect.x + geometry.rect.width / 2,
-          y: geometry.rect.y + geometry.rect.height / 2,
-        },
+        labelPoint: resolveMobileMeasurementLabelPoint(
+          geometry.rect,
+          normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12),
+          geometry.drawing.style.measurementLabelPosition,
+        ),
         label: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
         style: geometry.drawing.style,
       };
@@ -2085,6 +2131,11 @@ function primitiveFromGeometry(
           ? resolveUserDrawingVisualPriceRangeMetrics(drawing.points[0], drawing.points[1]).label
           : '';
       const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+      const labelPoints = resolveMobileDatePriceRangeLabelPoints(
+        geometry.rect,
+        fontSize,
+        geometry.drawing.style.measurementLabelPosition,
+      );
       return {
         kind: 'datePriceRange',
         id: geometry.drawing.id,
@@ -2093,15 +2144,9 @@ function primitiveFromGeometry(
         opacity,
         clip,
         rect: geometry.rect,
-        priceLabelPoint: {
-          x: geometry.rect.x + geometry.rect.width / 2,
-          y: geometry.rect.y + geometry.rect.height / 2,
-        },
+        priceLabelPoint: labelPoints.price,
         priceLabel: areMobileUserDrawingLabelsVisible(geometry) ? priceLabel : '',
-        dateLabelPoint: {
-          x: geometry.rect.x + geometry.rect.width / 2,
-          y: geometry.rect.y + geometry.rect.height - fontSize,
-        },
+        dateLabelPoint: labelPoints.date,
         dateLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
         style: geometry.drawing.style,
       };
