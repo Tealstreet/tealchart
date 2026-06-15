@@ -4097,6 +4097,27 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('positions risk reward labels from risk reward alignment when measurement alignment also exists', () => {
+    expect(
+      resolveMobileUserDrawingRiskRewardLabelPosition(
+        {
+          labelPoint: { x: 78, y: 35 },
+          style: {
+            ...style,
+            measurementLabelAlignment: 'left',
+            riskRewardLabelAlignment: 'right',
+          },
+        },
+        { x: 0, y: -10, width: 84, height: 14 },
+      ),
+    ).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: -6,
+      y: 38,
+    });
+  });
+
   it('returns Skia-ready forecast primitives', () => {
     const state: UserDrawingState = {
       version: 1,
