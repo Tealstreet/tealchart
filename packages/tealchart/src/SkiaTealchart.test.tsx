@@ -300,6 +300,37 @@ describe('SkiaTealchart drawing properties', () => {
     ]);
   });
 
+  it('copies selected drawings from the mobile selected action surface into the Skia clipboard', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={initialDrawingState}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Copy selected drawing'));
+    });
+
+    await act(async () => {
+      expect(ref.current?.pasteUserDrawingClipboard()).toBe(true);
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'target',
+      'drawing_1',
+    ]);
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+  });
+
   it('passes pressure segment dash phases into Skia dash effects', () => {
     const pressureState: UserDrawingState = {
       version: 1,

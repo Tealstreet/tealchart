@@ -93,6 +93,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     const onChartTouch = vi.fn();
     const dispatchUserDrawingCommand = vi.fn();
     const onUserDrawingPropertiesOpen = vi.fn();
+    const onUserDrawingCopySelected = vi.fn();
 
     const { rerender } = render(
       <div onClick={onChartTouch}>
@@ -105,6 +106,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           createId={() => 'copy'}
           dispatchUserDrawingCommand={dispatchUserDrawingCommand}
           onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+          onUserDrawingCopySelected={onUserDrawingCopySelected}
         />
       </div>,
     );
@@ -113,6 +115,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(screen.queryByLabelText('Cycle selected drawing line color to #22c55e')).toBeNull();
 
     fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
+    fireEvent.click(screen.getByLabelText('Copy selected drawing'));
     fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
     fireEvent.click(screen.getByLabelText('Style selected drawing'));
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
@@ -145,6 +148,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           createId={() => 'copy'}
           dispatchUserDrawingCommand={dispatchUserDrawingCommand}
           onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+          onUserDrawingCopySelected={onUserDrawingCopySelected}
         />
       </div>,
     );
@@ -161,6 +165,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           createId={() => 'copy'}
           dispatchUserDrawingCommand={dispatchUserDrawingCommand}
           onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
+          onUserDrawingCopySelected={onUserDrawingCopySelected}
         />
       </div>,
     );
@@ -176,6 +181,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
         type: 'properties',
       }),
     );
+    expect(onUserDrawingCopySelected).toHaveBeenCalledTimes(1);
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',
       options: { createId: expect.any(Function) },

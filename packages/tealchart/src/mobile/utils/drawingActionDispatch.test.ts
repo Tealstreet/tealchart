@@ -160,6 +160,7 @@ describe('mobile drawing action dispatch', () => {
     const dispatchUserDrawingCommand = vi.fn();
     const onOpenProperties = vi.fn();
     const onOpenObjectTree = vi.fn();
+    const onCopySelected = vi.fn();
 
     dispatchMobileUserDrawingActionCommand(
       { type: 'openProperties' },
@@ -191,6 +192,16 @@ describe('mobile drawing action dispatch', () => {
       },
     );
     dispatchMobileUserDrawingActionCommand(
+      { type: 'copySelected' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'copy',
+        dispatchUserDrawingCommand,
+        onUserDrawingCopySelected: onCopySelected,
+      },
+    );
+    dispatchMobileUserDrawingActionCommand(
       { type: 'toolbarAction', action: 'duplicateSelected' },
       {
         state: createSelectedState(),
@@ -209,6 +220,7 @@ describe('mobile drawing action dispatch', () => {
       }),
     );
     expect(onOpenObjectTree).toHaveBeenCalledTimes(1);
+    expect(onCopySelected).toHaveBeenCalledTimes(1);
     expect(dispatchUserDrawingCommand).toHaveBeenCalledTimes(2);
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'updateStyle',
