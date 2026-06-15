@@ -364,6 +364,12 @@ describe('ChartTopBar drawing toolbar', () => {
     document.body.removeEventListener('mouseup', onSurfaceMouseUpFallthrough);
     document.body.removeEventListener('click', onSurfaceClickFallthrough);
 
+    const onOutsideSurfaceClick = vi.fn();
+    document.body.addEventListener('click', onOutsideSurfaceClick);
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(onOutsideSurfaceClick).toHaveBeenCalledTimes(1);
+    document.body.removeEventListener('click', onOutsideSurfaceClick);
+
     document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Copy selected drawing"]')?.click();
