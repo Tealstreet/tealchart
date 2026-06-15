@@ -719,6 +719,18 @@ describe('mobile drawing handle command dispatch', () => {
       expect(result.history).toBe(history);
       expect(result.command).toBeUndefined();
     }
+
+    const chartOwned = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      history,
+      { key: 'Delete', focusOwner: 'chart' },
+      { createId: () => 'copy' },
+    );
+
+    expect(chartOwned.action?.type).toBe('deleteSelected');
+    expect(chartOwned.changed).toBe(true);
+    expect(chartOwned.state.drawings).toEqual([]);
+    expect(chartOwned.history.undoStack).toHaveLength(1);
   });
 
   it('routes mobile escape keyboard action to draft cancellation without recording undo history', () => {
