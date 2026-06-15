@@ -5,8 +5,10 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
 ## Current Contract
 
 - Web drawing shortcuts only run while the chart owns keyboard input.
-- Text inputs, textareas, selects, contenteditable elements, and app-owned
-  controls keep their native keyboard events.
+- Input controls and app-owned controls keep their native keyboard events in
+  widget-level tests. Textareas, selects, and contenteditable targets use the
+  same implementation-level owner detection and still need explicit widget
+  regressions.
 - Widget keydown handling routes drawing shortcuts through the shared keyboard
   resolver before legacy widget shortcuts.
 - Shared keyboard action resolution is reused by mobile Skia host keyboard
@@ -20,6 +22,8 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
   duplicate, and select-all paths.
 - `TealchartWidget.test.ts` covers chart-owned undo, redo, copy, paste,
   duplicate, select-all, and Escape selection dismissal.
+- `TealchartWidget.test.ts` covers chart-owned Arrow-key nudge with undo
+  restoration.
 - `keyboard.test.ts` covers focus-owner refusal for text input and app control
   owners and now keeps the keyboard action type checklist exhaustive.
 
@@ -35,6 +39,8 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
 
 - Web shortcut tests are unit-level jsdom coverage, not browser screenshot or
   manual keyboard QA.
+- Textarea, select, and contenteditable ownership are covered by shared owner
+  detection, but not by explicit widget-level jsdom cases yet.
 - Built-in toolbar affordances for visible undo/redo buttons are not part of
   this phase.
 - App integrations still need to decide which native mobile host surface sends
