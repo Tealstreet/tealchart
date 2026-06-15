@@ -303,6 +303,49 @@ describe('UserDrawingPropertiesSheet', () => {
     });
   });
 
+  it('renders range label position controls from the shared properties surface', () => {
+    const onDispatch = vi.fn(() => true);
+    const rangeState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'range' },
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+          ],
+        },
+      ],
+    };
+
+    render(
+      <UserDrawingPropertiesSheet
+        visible
+        surface={resolveUserDrawingPropertiesSurface(rangeState)}
+        onDispatch={onDispatch}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Labels')).not.toBeNull();
+    expect(screen.getByLabelText('Center measurement label').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('Top measurement label').getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(screen.getByLabelText('Top measurement label'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { measurementLabelPosition: 'top' },
+    });
+  });
+
   it('renders an empty state', () => {
     render(
       <UserDrawingPropertiesSheet

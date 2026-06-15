@@ -1560,6 +1560,17 @@ object-tree gaps stay visible.
   geometry so line mode follows the computed close points on both platforms and
   candlestick mode uses matching configured up/down colors.
 
+## Shipped: Range Measurement Label Position Controls
+
+- Shared drawing style now preserves `measurementLabelPosition` for price range,
+  date range, and date-and-price range drawings with center as the default and
+  top/bottom as alternate label placements.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose matching measurement-label position presets through the shared
+  properties surface.
+- Web Canvas and mobile Skia render paths resolve the same range label points so
+  price, duration, and combined measurement labels move consistently.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.
