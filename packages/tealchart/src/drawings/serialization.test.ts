@@ -976,6 +976,7 @@ describe('drawing layout serialization', () => {
             lineWidth: 1,
             lineStyle: 'solid',
             labelsVisible: false,
+            measurementLabelPosition: 'bottom',
           },
           points: [
             { time: 1, price: 10 },
@@ -986,6 +987,7 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings[0]?.style.labelsVisible).toBe(false);
+    expect(restored?.drawings[0]?.style.measurementLabelPosition).toBe('bottom');
   });
 
   it('restores volume profile style fields', () => {

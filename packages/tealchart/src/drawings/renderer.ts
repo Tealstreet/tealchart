@@ -1,5 +1,5 @@
 import type { CanvasContext } from '../rendering/CanvasContext';
-import type { DrawingCoordinateSpace, ResolvedUserDrawingGeometry } from './coordinates';
+import type { DrawingCoordinateSpace, DrawingScreenPoint, ResolvedUserDrawingGeometry } from './coordinates';
 import type { ResolveUserDrawingRenderEntriesOptions } from './renderModel';
 import type {
   UserDrawing,
@@ -28,9 +28,11 @@ import {
   resolveUserDrawingTextLabelLayout,
 } from './textLayout';
 import {
+  DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
   DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
+  normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -1250,6 +1252,47 @@ function renderEllipseGeometry(
   }
 }
 
+function resolveMeasurementLabelPoint(
+  rect: { x: number; y: number; width: number; height: number },
+  fontSize: number,
+  position: unknown,
+): DrawingScreenPoint {
+  const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
+    position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
+  );
+  const x = rect.x + rect.width / 2;
+  if (labelPosition === 'top') return { x, y: rect.y + fontSize };
+  if (labelPosition === 'bottom') return { x, y: rect.y + rect.height - fontSize };
+  return { x, y: rect.y + rect.height / 2 };
+}
+
+function resolveDatePriceRangeLabelPoints(
+  rect: { x: number; y: number; width: number; height: number },
+  fontSize: number,
+  position: unknown,
+): { price: DrawingScreenPoint; date: DrawingScreenPoint } {
+  const labelPosition = normalizeUserDrawingMeasurementLabelPosition(
+    position ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
+  );
+  const x = rect.x + rect.width / 2;
+  if (labelPosition === 'top') {
+    return {
+      price: { x, y: rect.y + fontSize },
+      date: { x, y: rect.y + fontSize * 2 },
+    };
+  }
+  if (labelPosition === 'bottom') {
+    return {
+      price: { x, y: rect.y + rect.height - fontSize * 2 },
+      date: { x, y: rect.y + rect.height - fontSize },
+    };
+  }
+  return {
+    price: { x, y: rect.y + rect.height / 2 },
+    date: { x, y: rect.y + rect.height - fontSize },
+  };
+}
+
 function renderPriceRangeGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { kind: 'priceRange' }>,
@@ -1278,7 +1321,8 @@ function renderPriceRangeGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2);
+  const labelPoint = resolveMeasurementLabelPoint(rect, fontSize, drawing.style.measurementLabelPosition);
+  ctx.fillText(label, labelPoint.x, labelPoint.y);
 }
 
 function renderDateRangeGeometry(
@@ -1309,7 +1353,8 @@ function renderDateRangeGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2);
+  const labelPoint = resolveMeasurementLabelPoint(rect, fontSize, drawing.style.measurementLabelPosition);
+  ctx.fillText(label, labelPoint.x, labelPoint.y);
 }
 
 function renderDatePriceRangeGeometry(
@@ -1341,8 +1386,9 @@ function renderDatePriceRangeGeometry(
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(priceLabel, rect.x + rect.width / 2, rect.y + rect.height / 2);
-  ctx.fillText(dateLabel, rect.x + rect.width / 2, rect.y + rect.height - fontSize);
+  const labelPoints = resolveDatePriceRangeLabelPoints(rect, fontSize, drawing.style.measurementLabelPosition);
+  ctx.fillText(priceLabel, labelPoints.price.x, labelPoints.price.y);
+  ctx.fillText(dateLabel, labelPoints.date.x, labelPoints.date.y);
 }
 
 function renderRiskRewardPositionGeometry(

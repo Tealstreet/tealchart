@@ -13,6 +13,7 @@ import type {
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
+  UserDrawingMeasurementLabelPosition,
   UserDrawingRiskRewardStatsMode,
   UserDrawingState,
   UserDrawingStyle,
@@ -25,6 +26,7 @@ import type {
 } from './types';
 
 import {
+  DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
   DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
@@ -34,6 +36,7 @@ import {
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
   DEFAULT_USER_DRAWING_STYLE,
   isUserDrawingPathFamilyTool,
+  normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingRiskRewardStatsMode,
@@ -53,6 +56,7 @@ import {
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
+  supportsUserDrawingMeasurementLabelPositionControls,
   supportsUserDrawingGeneratedLabelVisibilityControls,
   supportsUserDrawingRichTextControls,
   supportsUserDrawingRiskRewardStatsModeControls,
@@ -73,6 +77,7 @@ import {
   USER_DRAWING_FONT_STYLE_DESCRIPTORS,
   USER_DRAWING_FONT_WEIGHT_DESCRIPTORS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
+  USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
@@ -120,6 +125,7 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingFontWeight
         | UserDrawingIconName
         | UserDrawingLineStyle
+        | UserDrawingMeasurementLabelPosition
         | UserDrawingBrushTemplateId
         | UserDrawingBarsPatternDisplayMode
         | UserDrawingRiskRewardStatsMode
@@ -134,7 +140,7 @@ export type UserDrawingPropertiesSurfaceControl =
 type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
 
 export interface UserDrawingPropertiesSurfaceGroup {
-  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'pattern' | 'position' | 'icon';
+  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'labels' | 'pattern' | 'position' | 'icon';
   label: string;
   controls: readonly UserDrawingPropertiesSurfaceControl[];
 }
@@ -443,6 +449,27 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
         value: descriptor.extend,
         selected: drawing.extend === descriptor.extend,
         command: { type: 'setTrendLineExtend' as const, extend: descriptor.extend },
+      })),
+    });
+  }
+
+  if (supportsUserDrawingMeasurementLabelPositionControls(drawing)) {
+    const currentMeasurementLabelPosition = normalizeUserDrawingMeasurementLabelPosition(
+      drawing.style.measurementLabelPosition ?? DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
+    );
+    groups.push({
+      id: 'labels',
+      label: 'Labels',
+      controls: USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS.map((descriptor) => ({
+        id: `measurementLabelPosition:${descriptor.position}`,
+        type: 'option' as const,
+        label: descriptor.label,
+        value: descriptor.position,
+        selected: currentMeasurementLabelPosition === descriptor.position,
+        command: {
+          type: 'updateStyle' as const,
+          style: { measurementLabelPosition: descriptor.position },
+        },
       })),
     });
   }

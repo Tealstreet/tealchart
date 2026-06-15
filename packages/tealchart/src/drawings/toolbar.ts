@@ -9,6 +9,7 @@ import type {
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
+  UserDrawingMeasurementLabelPosition,
   UserDrawingRiskRewardStatsMode,
   UserDrawingState,
   UserDrawingStyle,
@@ -35,6 +36,7 @@ import {
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAMES,
+  USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
@@ -194,6 +196,11 @@ export interface UserDrawingTextMaxWidthDescriptor {
 
 export interface UserDrawingRiskRewardStatsModeDescriptor {
   statsMode: UserDrawingRiskRewardStatsMode;
+  label: string;
+}
+
+export interface UserDrawingMeasurementLabelPositionDescriptor {
+  position: UserDrawingMeasurementLabelPosition;
   label: string;
 }
 
@@ -800,6 +807,17 @@ export const USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS: readonly UserDrawi
   USER_DRAWING_RISK_REWARD_STATS_MODES.map((statsMode) => ({
     statsMode,
     label: statsMode === 'compact' ? 'Compact position stats' : 'Full position stats',
+  }));
+
+export const USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS: readonly UserDrawingMeasurementLabelPositionDescriptor[] =
+  USER_DRAWING_MEASUREMENT_LABEL_POSITIONS.map((position) => ({
+    position,
+    label:
+      position === 'top'
+        ? 'Top measurement label'
+        : position === 'bottom'
+          ? 'Bottom measurement label'
+          : 'Center measurement label',
   }));
 
 export const USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS: readonly UserDrawingBarsPatternDisplayModeDescriptor[] =
@@ -1652,6 +1670,10 @@ export function supportsUserDrawingTextAppearanceControls(drawing: UserDrawing):
 
 export function supportsUserDrawingGeneratedLabelVisibilityControls(drawing: UserDrawing): boolean {
   return GENERATED_LABEL_VISIBILITY_DRAWING_KINDS.has(drawing.kind);
+}
+
+export function supportsUserDrawingMeasurementLabelPositionControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'priceRange' || drawing.kind === 'dateRange' || drawing.kind === 'datePriceRange';
 }
 
 export function supportsUserDrawingVolumeProfileGuideControls(drawing: UserDrawing): boolean {

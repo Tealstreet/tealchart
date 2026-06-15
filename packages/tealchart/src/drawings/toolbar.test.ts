@@ -30,6 +30,7 @@ import {
   supportsUserDrawingFillControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
+  supportsUserDrawingMeasurementLabelPositionControls,
   supportsUserDrawingRichTextControls,
   supportsUserDrawingRiskRewardStatsModeControls,
   supportsUserDrawingTextAlignControls,
@@ -50,6 +51,7 @@ import {
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
+  USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
@@ -2777,6 +2779,27 @@ describe('user drawing toolbar descriptors', () => {
     } satisfies UserDrawingState;
 
     const visibleTextGroup = resolveUserDrawingPropertiesSurface(rangeState).groups.find((group) => group.id === 'text');
+    const labelGroup = resolveUserDrawingPropertiesSurface(rangeState).groups.find((group) => group.id === 'labels');
+    expect(supportsUserDrawingMeasurementLabelPositionControls(rangeState.drawings[0]!)).toBe(true);
+    expect(USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS.map((descriptor) => descriptor.position)).toEqual([
+      'center',
+      'top',
+      'bottom',
+    ]);
+    expect(labelGroup).toMatchObject({ id: 'labels', label: 'Labels' });
+    expect(labelGroup?.controls.find((control) => control.id === 'measurementLabelPosition:center')).toMatchObject({
+      label: 'Center measurement label',
+      value: 'center',
+      selected: true,
+      command: { type: 'updateStyle', style: { measurementLabelPosition: 'center' } },
+    });
+    expect(labelGroup?.controls.find((control) => control.id === 'measurementLabelPosition:top')).toMatchObject({
+      label: 'Top measurement label',
+      value: 'top',
+      selected: false,
+      command: { type: 'updateStyle', style: { measurementLabelPosition: 'top' } },
+    });
+
     expect(visibleTextGroup?.controls.find((control) => control.id === 'labelsVisible')).toMatchObject({
       label: 'Hide generated labels',
       value: true,

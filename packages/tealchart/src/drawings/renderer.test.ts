@@ -606,6 +606,25 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:+20.00 (+28.57%):50,20:#111:center:1:12px sans-serif');
   });
 
+  it('renders price range labels at the configured vertical position', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'range',
+      kind: 'priceRange',
+      style: { ...base.style, measurementLabelPosition: 'top' },
+      points: [
+        { time: 10, price: 10 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,10,80,80:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):50,22:#111:center:1:12px sans-serif');
+  });
+
   it('keeps price range geometry visible when generated labels are hidden', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
@@ -671,6 +690,33 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,50:#111:center:1:12px sans-serif');
   });
 
+  it('renders date range labels at the configured vertical position', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-range',
+      kind: 'dateRange',
+      style: { ...base.style, measurementLabelPosition: 'bottom' },
+      points: [
+        { time: 10_000, price: 90 },
+        { time: 70_000, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    });
+
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,88:#111:center:1:12px sans-serif');
+  });
+
   it('renders date and price ranges with price and duration labels', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
@@ -697,6 +743,34 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillRect:10,10,60,80:rgba(245, 197, 66, 0.12):1');
     expect(ctx.calls).toContain('strokeRect:10,10,60,80:#f5c542:1');
     expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):40,50:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,78:#111:center:1:12px sans-serif');
+  });
+
+  it('renders date and price range labels at the configured vertical position', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'date-price-range',
+      kind: 'datePriceRange',
+      style: { ...base.style, measurementLabelPosition: 'bottom' },
+      points: [
+        { time: 10_000, price: 90 },
+        { time: 70_000, price: 10 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, {
+      ...space,
+      viewport: { ...space.viewport, startTime: 0, endTime: 100_000 },
+      bars: [
+        { time: 10_000, open: 90, high: 95, low: 85, close: 92, volume: 100 },
+        { time: 40_000, open: 70, high: 75, low: 65, close: 72, volume: 100 },
+        { time: 70_000, open: 10, high: 15, low: 5, close: 12, volume: 100 },
+        { time: 90_000, open: 20, high: 25, low: 15, close: 22, volume: 100 },
+      ],
+    });
+
+    expect(ctx.calls).toContain('fillText:+80.00 (+800.00%):40,66:#111:center:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:3 bars, 1 minute:40,78:#111:center:1:12px sans-serif');
   });
 
