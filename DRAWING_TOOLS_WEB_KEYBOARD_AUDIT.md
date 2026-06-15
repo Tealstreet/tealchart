@@ -6,9 +6,8 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
 
 - Web drawing shortcuts only run while the chart owns keyboard input.
 - Input controls and app-owned controls keep their native keyboard events in
-  widget-level tests. Textareas, selects, and contenteditable targets use the
-  same implementation-level owner detection and still need explicit widget
-  regressions.
+  widget-level tests. Textareas, selects, and contenteditable targets now have
+  explicit widget-level regressions for drawing shortcut ownership.
 - Widget keydown handling routes drawing shortcuts through the shared keyboard
   resolver before legacy widget shortcuts.
 - Shared keyboard action resolution is reused by mobile Skia host keyboard
@@ -20,6 +19,9 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
   undo restoration.
 - `TealchartWidget.test.ts` covers input and app-control refusal for Delete,
   duplicate, and select-all paths.
+- `TealchartWidget.test.ts` explicitly covers textarea, select, and
+  contenteditable refusal for chart-owned Delete behavior, then verifies the
+  same shortcut still runs when the chart owns the event.
 - `TealchartWidget.test.ts` covers chart-owned undo, redo, copy, paste,
   duplicate, select-all, and Escape selection dismissal.
 - `TealchartWidget.test.ts` covers chart-owned Arrow-key nudge with undo
@@ -31,7 +33,8 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
 
 - `drawingCommands.test.ts` covers mobile hardware-keyboard dispatch for undo,
   redo, delete, duplicate, copy, paste, select-all, nudge, Escape draft cancel,
-  and Escape selected-action dismissal.
+  and Escape selected-action dismissal, including explicit refusal for
+  `textInput`/`appControl` owners and acceptance for `chart`.
 - Mobile keyboard dispatch uses `resolveUserDrawingKeyboardAction`, matching the
   web resolver and focus-owner contract.
 
@@ -39,8 +42,6 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
 
 - Web shortcut tests are unit-level jsdom coverage, not browser screenshot or
   manual keyboard QA.
-- Textarea, select, and contenteditable ownership are covered by shared owner
-  detection, but not by explicit widget-level jsdom cases yet.
 - Built-in toolbar affordances for visible undo/redo buttons are not part of
   this phase.
 - App integrations still need to decide which native mobile host surface sends
