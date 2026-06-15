@@ -32,6 +32,14 @@ const anchorB = { time: 2_000, price: 110 };
 const anchorC = { time: 3_000, price: 120 };
 const anchorD = { time: 4_000, price: 130 };
 const anchorE = { time: 5_000, price: 140 };
+const northStarTwoAnchorDragPlacementTools: UserDrawingTool[] = [
+  'trendLine',
+  'rectangle',
+  'circle',
+  'ellipse',
+  'priceRange',
+  'datePriceRange',
+];
 const expandedDragPlacementTools: UserDrawingTool[] = [
   'trendAngle',
   'priceRange',
@@ -486,6 +494,39 @@ describe('mobile drawing handle command dispatch', () => {
       id: 'line',
       kind: 'trendLine',
       points: [anchorA, anchorB],
+    });
+  });
+
+  it('records mobile text-label tap placement as one undoable drawing creation', () => {
+    let state = setUserDrawingTool(createUserDrawingState(), 'textLabel');
+    let history = createUserDrawingCommandHistory();
+
+    ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'label', now: () => 22, style, text: 'Label' },
+      meta: { source: 'touch', transactionKey: 'label-placement' },
+    }));
+
+    expect(state.draft).toBeNull();
+    expect(state.selection).toEqual({ drawingId: 'label' });
+    expect(state.drawings[0]).toMatchObject({
+      id: 'label',
+      kind: 'textLabel',
+      point: anchorA,
+      text: 'Label',
+    });
+    expect(history.undoStack).toHaveLength(1);
+
+    const undo = undoUserDrawingCommand(state, history);
+    expect(undo.state.drawings).toEqual([]);
+
+    const redo = redoUserDrawingCommand(undo.state, undo.history);
+    expect(redo.state.drawings[0]).toMatchObject({
+      id: 'label',
+      kind: 'textLabel',
+      point: anchorA,
+      text: 'Label',
     });
   });
 
@@ -1018,6 +1059,34 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.changed).toBe(true);
     expect(undo.state.drawings).toEqual([expect.objectContaining({ id: 'rect-1' })]);
   });
+
+  it.each(northStarTwoAnchorDragPlacementTools)(
+    'records mobile %s drag placement from exact touch endpoints',
+    (tool) => {
+      const state = setUserDrawingTool(createUserDrawingState(), tool);
+      const history = createUserDrawingCommandHistory();
+      const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+        type: 'beginPlacementDrag',
+        point: { paneId: 'main', anchor: anchorA },
+        meta: { source: 'touch', transactionKey: `${tool}-placement` },
+      });
+      const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+        type: 'commitPlacementDrag',
+        point: { paneId: 'main', anchor: anchorB },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
+        meta: { source: 'touch' },
+      });
+
+      expect(started.changed, tool).toBe(true);
+      expect(committed.changed, tool).toBe(true);
+      expect(committed.history.undoStack, tool).toHaveLength(1);
+      expect(committed.state.drawings[0], tool).toMatchObject({
+        id: `${tool}-drawing`,
+        kind: tool,
+        points: [anchorA, anchorB],
+      });
+    },
+  );
 
   it('records expanded mobile two-anchor placement tools through the same drag lifecycle', () => {
     for (const tool of expandedDragPlacementTools) {
