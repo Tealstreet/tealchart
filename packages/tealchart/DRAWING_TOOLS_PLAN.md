@@ -147,6 +147,17 @@ object-tree gaps stay visible.
 - Mobile Skia top-bar actions, imperative handle APIs, touch drag input, and
   render-model conversion expose the same temporary measurement behavior.
 
+## Shipped: Zoom In Action
+
+- Shared drawing toolbar descriptors expose Zoom In as a global drawing action
+  that is always enabled and does not require selected drawings.
+- Web top-bar actions call the widget viewport controller with shared
+  center-anchored zoom math.
+- Mobile Skia top-bar actions call the same shared viewport zoom helper through
+  the mobile viewport-change path.
+- Zoom In is viewport-only and intentionally does not create drawing history or
+  layout-persisted drawing state.
+
 ## Shipped: Z-Order Toolbar Controls
 
 - Shared toolbar action descriptors include bring-forward, send-backward,
