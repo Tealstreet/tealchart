@@ -2606,23 +2606,16 @@ export function resolveMobileUserDrawingBalloonLayout(
   };
 }
 
-export function resolveMobileUserDrawingMeasurementLabelPosition(
+function resolveMobileUserDrawingAlignedLabelPosition(
   primitive: MobileUserDrawingMeasurementLabelTarget,
   measuredTextBounds: MobileUserDrawingTextBounds,
+  horizontalAlignment: UserDrawingMeasurementLabelAlignment | UserDrawingRiskRewardLabelAlignment,
 ): MobileUserDrawingMeasurementLabelPosition {
   const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(primitive.style.fontFamily ?? 'sans-serif');
   const textX = measuredTextBounds.x ?? 0;
   const textY = measuredTextBounds.y ?? -fontSize;
   const textHeight = measuredTextBounds.height ?? fontSize;
-  const horizontalAlignment =
-    primitive.measurementLabelAlignment !== undefined || primitive.style.measurementLabelAlignment !== undefined
-      ? normalizeUserDrawingMeasurementLabelAlignment(
-          primitive.measurementLabelAlignment ?? primitive.style.measurementLabelAlignment,
-        )
-      : normalizeUserDrawingRiskRewardLabelAlignment(
-          primitive.riskRewardLabelAlignment ?? primitive.style.riskRewardLabelAlignment,
-        );
 
   return {
     fontSize,
@@ -2637,6 +2630,19 @@ export function resolveMobileUserDrawingMeasurementLabelPosition(
   };
 }
 
+export function resolveMobileUserDrawingMeasurementLabelPosition(
+  primitive: MobileUserDrawingMeasurementLabelTarget,
+  measuredTextBounds: MobileUserDrawingTextBounds,
+): MobileUserDrawingMeasurementLabelPosition {
+  return resolveMobileUserDrawingAlignedLabelPosition(
+    primitive,
+    measuredTextBounds,
+    normalizeUserDrawingMeasurementLabelAlignment(
+      primitive.measurementLabelAlignment ?? primitive.style.measurementLabelAlignment,
+    ),
+  );
+}
+
 export function resolveMobileUserDrawingPriceRangeLabelPosition(
   primitive: MobileUserDrawingMeasurementLabelPrimitive,
   measuredTextBounds: MobileUserDrawingTextBounds,
@@ -2648,7 +2654,13 @@ export function resolveMobileUserDrawingRiskRewardLabelPosition(
   primitive: MobileUserDrawingMeasurementLabelTarget,
   measuredTextBounds: MobileUserDrawingTextBounds,
 ): MobileUserDrawingRiskRewardLabelPosition {
-  return resolveMobileUserDrawingMeasurementLabelPosition(primitive, measuredTextBounds);
+  return resolveMobileUserDrawingAlignedLabelPosition(
+    primitive,
+    measuredTextBounds,
+    normalizeUserDrawingRiskRewardLabelAlignment(
+      primitive.riskRewardLabelAlignment ?? primitive.style.riskRewardLabelAlignment,
+    ),
+  );
 }
 
 export function resolveMobileUserDrawingInfoLineLabelPosition(
