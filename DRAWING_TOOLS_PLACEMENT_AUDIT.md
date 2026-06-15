@@ -28,9 +28,9 @@ Tools audited here:
 | `ellipse` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
 | `priceRange` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Browser/device smoke with sidebar tool |
 | `datePriceRange` | Drag two anchors in first-party UI; reducer/API still supports explicit multi-click input | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts` endpoint test | Browser/device smoke with sidebar tool |
-| `longPosition` | Drag seeds first two anchors, final tap commits | `placement.test.ts`, `input.test.ts` drag-seed test | `TealchartWidget.test.ts` drag-seed widget test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` risk/reward render tests | Browser/device smoke with sidebar tool |
-| `brush` | Path drag | `input.test.ts` path-drag smoothing/commit tests | `TealchartWidget.test.ts` path-family drag test | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` pressure/render tests | Browser/device smoke with sidebar tool |
-| `textLabel` | Single-anchor click/tap | `input.test.ts` single-anchor and text-edit state tests | `TealchartWidget.test.ts` context/double-click edit tests | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` text edit/render tests | Browser/device smoke with sidebar tool |
+| `longPosition` | Drag seeds first two anchors, final tap commits | `placement.test.ts`, `input.test.ts` drag-seed test | `TealchartWidget.test.ts` rendered-toolbar drag-seed/final-input widget test | `SkiaTealchart.test.tsx` rendered-toolbar pan-seed/final-tap component test, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` risk/reward render tests | Browser/device smoke with sidebar tool |
+| `brush` | Path drag | `input.test.ts` path-drag smoothing/commit tests | `TealchartWidget.test.ts` rendered-toolbar path drag test | `SkiaTealchart.test.tsx` rendered-toolbar pan path-drag test, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` pressure/render tests | Browser/device smoke with sidebar tool |
+| `textLabel` | Single-anchor click/tap | `input.test.ts` single-anchor and text-edit state tests | `TealchartWidget.test.ts` rendered-toolbar single-input widget test, context/double-click edit tests | `SkiaTealchart.test.tsx` rendered-toolbar tap component test, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` text edit/render tests | Browser/device smoke with sidebar tool |
 
 ## Phase A1 Findings
 
@@ -56,7 +56,8 @@ Tools audited here:
 - Web widget-level placement coverage now also starts from the widget UI
   toolbar selection callback for the audited two-anchor tools (`trendLine`,
   `rectangle`, `circle`, `ellipse`, `priceRange`, and `datePriceRange`),
-  verifies `toolbar` command metadata, and then commits exact drag endpoints.
+  `longPosition`, `brush`, and `textLabel`, verifies `toolbar` command
+  metadata, and then commits through each tool family's real placement path.
 - Mobile Skia component coverage now exercises the rendered drawing toolbar and
   verifies `Rectangle` selection reaches Skia drawing state with `toolbar`
   command metadata.
@@ -69,6 +70,10 @@ Tools audited here:
   `Rectangle` selection through an aborted Pan gesture and verifies touch
   cancellation clears the draft without committing a rectangle or creating an
   undo entry.
+- Mobile Skia component coverage now also starts from rendered toolbar
+  selection for `longPosition`, `brush`, and `textLabel`, then drives pan/tap
+  gestures through the component boundary and verifies touch command metadata,
+  resolved anchors, committed drawing kind, and selection state.
 - Web `ChartCore` and rendered mobile `SkiaTealchart` coverage now prove
   two-anchor drag-placement tools swallow tap/click placement at the adapter
   layer, while drag-seeded tools such as `longPosition` still accept final
