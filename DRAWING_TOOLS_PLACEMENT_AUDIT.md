@@ -42,9 +42,12 @@ Tools audited here:
 - Web widget-level tests now cover exact drag endpoints and undo restoration
   for the north-star two-anchor tools: `trendLine`, `rectangle`, `circle`,
   `ellipse`, `priceRange`, and `datePriceRange`.
-- Web and mobile toolbar tests both exercise `Rectangle` selection from the
-  rendered drawing-tool categories. This covers the tool-selection side of the
-  reported rectangle workflow.
+- Web and mobile toolbar tests both exercise the rendered drawing-tool
+  categories for the audited placement tools: `trendLine`, `rectangle`,
+  `circle`, `ellipse`, `priceRange`, `datePriceRange`, `longPosition`,
+  `brush`, and `textLabel`. This covers the sidebar-selection side of the
+  reported rectangle workflow and prevents common placement tools from dropping
+  out of the first-party drawing rail on either platform.
 - Web widget-level placement coverage now also starts from the widget UI
   toolbar `rectangle` selection callback, verifies `toolbar` command metadata,
   and then commits exact drag endpoints.
@@ -58,9 +61,9 @@ Tools audited here:
 ## Follow-Up Order
 
 1. Add a lightweight browser/device smoke harness for sidebar tool selection
-   plus pointer/touch drag, because the remaining risk is end-to-end coordinate
-   routing through real DOM/RN gestures rather than state mutation, toolbar
-   selection, or render-model geometry.
+   plus pointer/touch drag, because the remaining risk is full runtime
+   coordinate routing through real DOM/RN gestures rather than state mutation,
+   toolbar selection, or render-model geometry.
 2. Move to Epic B once the smoke path is covered or manually verified:
    selected-object local action surface.
 3. Keep placement fixes narrow. If a tool regresses, fix the web pointer path
