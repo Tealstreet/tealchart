@@ -51,6 +51,8 @@ Mobile command-history tests cover:
   history classification, but they need more end-to-end product workflow QA.
 - Undo/redo UI buttons and disabled-state presentation are not fully audited in
   this phase.
+- The history classification checklist intentionally mirrors the reducer
+  switch today; a later cleanup can move both to one exported classifier table.
 
 ## Follow-Up
 
@@ -58,5 +60,7 @@ Mobile command-history tests cover:
   widget boundary.
 - Epic E3 should verify mobile imperative handle and host-toolbar parity for
   the same history commands.
+- Consider replacing the private history reducer switch plus checklist arrays
+  with one exported typed command-history classification table.
 - Later toolbar/object-tree phases should add interaction-level tests around
   visible undoable actions rather than only reducer-level coverage.
