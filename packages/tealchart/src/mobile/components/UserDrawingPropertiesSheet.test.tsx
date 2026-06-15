@@ -126,9 +126,16 @@ describe('UserDrawingPropertiesSheet', () => {
       />,
     );
 
+    expect(screen.getByText('Templates')).not.toBeNull();
+    expect(screen.getByLabelText('Yellow highlighter template').getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByText('Stroke')).not.toBeNull();
     expect(screen.getByLabelText('Medium highlighter stroke width').getAttribute('aria-pressed')).toBe('true');
 
+    fireEvent.click(screen.getByLabelText('Pink highlighter template'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { lineColor: '#ec4899', lineWidth: 12, lineStyle: 'solid', opacity: 0.25 },
+    });
     fireEvent.click(screen.getByLabelText('35 percent highlighter opacity'));
     expect(onDispatch).toHaveBeenCalledWith({ type: 'updateStyle', style: { opacity: 0.35 } });
   });

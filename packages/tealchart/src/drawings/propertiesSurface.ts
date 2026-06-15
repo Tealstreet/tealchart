@@ -25,7 +25,9 @@ import {
   normalizeUserDrawingOpacity,
 } from './types';
 import {
+  type UserDrawingBrushTemplateId,
   getUserDrawingLineWidthDescriptors,
+  getUserDrawingBrushTemplateDescriptors,
   getUserDrawingFillOpacityDescriptors,
   getUserDrawingOpacityDescriptors,
   getSelectedUserDrawing,
@@ -87,6 +89,7 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingFontWeight
         | UserDrawingIconName
         | UserDrawingLineStyle
+        | UserDrawingBrushTemplateId
         | UserDrawingTextAlign
         | UserDrawingTextMaxWidth
         | UserDrawingTrendLineExtend;
@@ -95,7 +98,7 @@ export type UserDrawingPropertiesSurfaceControl =
 type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
 
 export interface UserDrawingPropertiesSurfaceGroup {
-  id: 'line' | 'fill' | 'text' | 'geometry' | 'icon';
+  id: 'template' | 'line' | 'fill' | 'text' | 'geometry' | 'icon';
   label: string;
   controls: readonly UserDrawingPropertiesSurfaceControl[];
 }
@@ -122,6 +125,15 @@ function normalizeSurfaceColor(value: string | undefined): string {
 
 function colorsMatch(a: string | undefined, b: string): boolean {
   return normalizeSurfaceColor(a) === normalizeSurfaceColor(b);
+}
+
+function styleMatchesTemplate(drawing: UserDrawing, style: Partial<UserDrawingStyle>): boolean {
+  return (
+    (style.lineColor === undefined || colorsMatch(drawing.style.lineColor, style.lineColor)) &&
+    (style.lineWidth === undefined || drawing.style.lineWidth === style.lineWidth) &&
+    (style.lineStyle === undefined || drawing.style.lineStyle === style.lineStyle) &&
+    (style.opacity === undefined || normalizeUserDrawingOpacity(drawing.style.opacity ?? 1) === style.opacity)
+  );
 }
 
 function enablePropertiesSurfaceControl(
@@ -159,11 +171,29 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
   const editable = !drawing.locked;
   const lineWidthDescriptors = getUserDrawingLineWidthDescriptors(drawing);
   const opacityDescriptors = getUserDrawingOpacityDescriptors(drawing);
+  const brushTemplateDescriptors = getUserDrawingBrushTemplateDescriptors(drawing);
   const fillOpacityDescriptors = getUserDrawingFillOpacityDescriptors(drawing);
   const currentFillOpacity = normalizeUserDrawingOpacity(
     drawing.style.fillOpacity ?? DEFAULT_USER_DRAWING_STYLE.fillOpacity ?? 1,
   );
   const groups: UserDrawingPropertiesSurfaceGroupDraft[] = [
+    ...(brushTemplateDescriptors.length > 0
+      ? [
+          {
+            id: 'template' as const,
+            label: 'Templates',
+            controls: brushTemplateDescriptors.map((descriptor) => ({
+              id: `template:${descriptor.template}`,
+              type: 'option' as const,
+              label: descriptor.label,
+              icon: descriptor.icon,
+              value: descriptor.template,
+              selected: styleMatchesTemplate(drawing, descriptor.style),
+              command: { type: 'updateStyle' as const, style: descriptor.style },
+            })),
+          },
+        ]
+      : []),
     {
       id: 'line',
       label: isUserDrawingPathFamilyTool(drawing.kind) ? 'Stroke' : 'Line',
