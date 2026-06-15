@@ -959,51 +959,57 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
-    it('commits exact rectangle endpoints after widget UI toolbar tool selection', () => {
-      const datafeed = createMockDatafeed();
-      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
-      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
-      const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: {
-          paneId: string;
-          anchor: { time: number; price: number };
-        }): boolean;
-        _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
-      };
+    it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
+      'commits exact %s endpoints after widget UI toolbar tool selection',
+      (tool) => {
+        const datafeed = createMockDatafeed();
+        const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+        const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+        const testWidget = widget as unknown as {
+          _handleUserDrawingPlacementDragStart(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+          _handleUserDrawingPlacementDragEnd(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+        };
 
-      widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.('rectangle');
-      expect(widget.getUserDrawingState().activeTool).toBe('rectangle');
-      expect(onCommand).toHaveBeenCalledWith(
-        expect.objectContaining({
-          command: expect.objectContaining({ type: 'setActiveTool', tool: 'rectangle' }),
-          source: 'toolbar',
-        }),
-      );
-      expect(
-        testWidget._handleUserDrawingPlacementDragStart({
-          paneId: 'main',
-          anchor: { time: 1_500, price: 90 },
-        }),
-      ).toBe(true);
-      expect(
-        testWidget._handleUserDrawingPlacementDragEnd({
-          paneId: 'main',
-          anchor: { time: 2_500, price: 125 },
-        }),
-      ).toBe(true);
+        widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.(tool);
+        expect(widget.getUserDrawingState().activeTool).toBe(tool);
+        expect(onCommand).toHaveBeenCalledWith(
+          expect.objectContaining({
+            command: expect.objectContaining({ type: 'setActiveTool', tool }),
+            source: 'toolbar',
+          }),
+        );
+        expect(
+          testWidget._handleUserDrawingPlacementDragStart({
+            paneId: 'main',
+            anchor: { time: 1_500, price: 90 },
+          }),
+        ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingPlacementDragEnd({
+            paneId: 'main',
+            anchor: { time: 2_500, price: 125 },
+          }),
+        ).toBe(true);
 
-      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
-        id: 'drawing_1',
-        kind: 'rectangle',
-        points: [
-          { time: 1_500, price: 90 },
-          { time: 2_500, price: 125 },
-        ],
-      });
-      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+        expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+          id: 'drawing_1',
+          kind: tool,
+          points: [
+            { time: 1_500, price: 90 },
+            { time: 2_500, price: 125 },
+          ],
+        });
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
 
-      widget.remove();
-    });
+        widget.remove();
+      },
+    );
 
     it('routes widget UI toolbar undo and redo through drawing history', () => {
       const datafeed = createMockDatafeed();
