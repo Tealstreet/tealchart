@@ -1,5 +1,20 @@
 # Drawing Tools Plan
 
+## North Star
+
+Use `DRAWING_TOOLS_NORTH_STAR.md` as the first planning document for the next
+drawing-tools push. The current priority is TradingView-grade user markup UX,
+not more isolated primitive/export hardening.
+
+Next work should begin with the north-star Epic A audit/fix loop:
+
+- Reproduce real placement behavior for common tools.
+- Fix surprising or random-sized shape placement with real drag-to-draw flows.
+- Prove every user-facing improvement on both web Canvas and mobile Skia.
+
+Primitive/API compatibility work should only be the next PR when it directly
+unblocks one of the north-star UX epics.
+
 ## Shipped
 
 - Selection, editing primitives, and drawing style controls exist for both web Canvas and mobile Skia paths.
@@ -37,4 +52,4 @@
 - TradingView-grade grouped toolbar affordances need continued parity work across web and mobile.
 - Drag-to-draw, floating selected-object actions, context menu, object tree,
   advanced grouped transactions, and modifier behavior are tracked in
-  `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`.
+  `DRAWING_TOOLS_NORTH_STAR.md` and `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`.

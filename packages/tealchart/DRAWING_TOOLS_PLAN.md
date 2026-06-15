@@ -3,6 +3,13 @@
 This tracks user markup work for Tealchart. Web Canvas and mobile Skia must land
 matching behavior in the same PR for every user-facing drawing feature.
 
+The repo-root `DRAWING_TOOLS_NORTH_STAR.md` is the current directional planning
+document. Use it first for the next drawing-tools push. The priority is now
+visible TradingView-grade drawing UX: real placement behavior, local selected
+actions, context/object-tree workflow, edit lifecycle polish, and undo/redo
+confidence. Isolated primitive/export hardening should only happen when it
+directly unblocks one of those UX epics.
+
 Detailed capability status and the ordered foundational roadmap now live in the
 repo-root `DRAWING_TOOLS_CAPABILITY_MATRIX.md` and
 `DRAWING_TOOLS_DIMENSIONAL_GAP_PLAN.md`. Shared interaction terms, state
