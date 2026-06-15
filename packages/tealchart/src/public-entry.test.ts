@@ -140,6 +140,8 @@ import type {
   MobileUserDrawingAnchoredVolumeProfilePrimitive,
   MobileUserDrawingAnchoredVwapPrimitive,
   MobileUserDrawingArcPrimitive,
+  MobileUserDrawingArrowMarkPrimitive,
+  MobileUserDrawingArrowMarkerPrimitive,
   MobileUserDrawingBalloonPrimitive,
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingBrushPrimitive,
@@ -1027,6 +1029,34 @@ describe('tealchart public entries', () => {
       arrowHead: null,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const arrowMarkerPrimitive: NonNever<MobileUserDrawingArrowMarkerPrimitive> = {
+      kind: 'arrowMarker',
+      id: 'arrow-marker',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [
+        { x: 0, y: 5 },
+        { x: 10, y: 5 },
+        { x: 6, y: 2 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+    const arrowMarkPrimitive: NonNever<MobileUserDrawingArrowMarkPrimitive> = {
+      kind: 'arrowMark',
+      id: 'arrow-mark',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      points: [
+        { x: 5, y: 0 },
+        { x: 10, y: 8 },
+        { x: 0, y: 8 },
+      ],
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const curvePrimitive: NonNever<MobileUserDrawingCurvePrimitive> = {
       kind: 'curve',
       id: 'curve',
@@ -1340,6 +1370,8 @@ describe('tealchart public entries', () => {
     expect(gannSquarePrimitive.kind).toBe('gannSquare');
     expect(gannSquareFixedPrimitive.kind).toBe('gannSquareFixed');
     expect(linePrimitive.kind).toBe('line');
+    expect(arrowMarkerPrimitive.kind).toBe('arrowMarker');
+    expect(arrowMarkPrimitive.kind).toBe('arrowMark');
     expect(curvePrimitive.kind).toBe('curve');
     expect(arcPrimitive.kind).toBe('arc');
     expect(datePricePrimitive.kind).toBe('datePriceRange');
