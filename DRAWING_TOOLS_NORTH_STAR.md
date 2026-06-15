@@ -98,6 +98,7 @@ Phase B1: Anchor and action model audit
   mobile.
 - Confirm the shared selected-action descriptors cover delete, duplicate,
   lock/hide, z-order, style, text edit, and properties/object-tree open.
+- Current evidence is recorded in `DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`.
 
 Phase B2: Web floating toolbar polish
 
