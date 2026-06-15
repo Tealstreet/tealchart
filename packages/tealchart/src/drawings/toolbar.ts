@@ -10,6 +10,7 @@ import type {
   UserDrawingIconName,
   UserDrawingLineStyle,
   UserDrawingMeasurementLabelPosition,
+  UserDrawingRiskRewardLabelAlignment,
   UserDrawingRiskRewardStatsMode,
   UserDrawingState,
   UserDrawingStyle,
@@ -39,6 +40,7 @@ import {
   USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
@@ -196,6 +198,11 @@ export interface UserDrawingTextMaxWidthDescriptor {
 
 export interface UserDrawingRiskRewardStatsModeDescriptor {
   statsMode: UserDrawingRiskRewardStatsMode;
+  label: string;
+}
+
+export interface UserDrawingRiskRewardLabelAlignmentDescriptor {
+  alignment: UserDrawingRiskRewardLabelAlignment;
   label: string;
 }
 
@@ -807,6 +814,17 @@ export const USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS: readonly UserDrawi
   USER_DRAWING_RISK_REWARD_STATS_MODES.map((statsMode) => ({
     statsMode,
     label: statsMode === 'compact' ? 'Compact position stats' : 'Full position stats',
+  }));
+
+export const USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS: readonly UserDrawingRiskRewardLabelAlignmentDescriptor[] =
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS.map((alignment) => ({
+    alignment,
+    label:
+      alignment === 'left'
+        ? 'Left position labels'
+        : alignment === 'right'
+          ? 'Right position labels'
+          : 'Center position labels',
   }));
 
 export const USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS: readonly UserDrawingMeasurementLabelPositionDescriptor[] =
@@ -1701,6 +1719,10 @@ export function supportsUserDrawingBarsPatternColorControls(drawing: UserDrawing
 }
 
 export function supportsUserDrawingRiskRewardStatsModeControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'longPosition' || drawing.kind === 'shortPosition';
+}
+
+export function supportsUserDrawingRiskRewardLabelAlignmentControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'longPosition' || drawing.kind === 'shortPosition';
 }
 

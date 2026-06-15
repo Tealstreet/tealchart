@@ -236,11 +236,17 @@ describe('UserDrawingPropertiesSheet', () => {
     expect(screen.getByText('Position')).not.toBeNull();
     expect(screen.getByLabelText('Full position stats').getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByLabelText('Compact position stats').getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByLabelText('Center position labels').getAttribute('aria-pressed')).toBe('true');
 
     fireEvent.click(screen.getByLabelText('Compact position stats'));
     expect(onDispatch).toHaveBeenCalledWith({
       type: 'updateStyle',
       style: { riskRewardStatsMode: 'compact' },
+    });
+    fireEvent.click(screen.getByLabelText('Right position labels'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { riskRewardLabelAlignment: 'right' },
     });
   });
 

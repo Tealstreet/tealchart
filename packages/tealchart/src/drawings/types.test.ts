@@ -16,6 +16,7 @@ import {
   normalizeUserDrawingOpacity,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingMeasurementLabelPosition,
+  normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingStyle,
   normalizeUserDrawingTextMaxWidth,
@@ -27,6 +28,7 @@ import {
   USER_DRAWING_OPACITIES,
   USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
   USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
@@ -227,6 +229,17 @@ describe('user drawing types', () => {
       normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, riskRewardStatsMode: 'future' as never }),
     ).toMatchObject({
       riskRewardStatsMode: 'full',
+    });
+  });
+
+  it('normalizes risk reward label alignments to supported cross-platform values', () => {
+    expect(USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS).toEqual(['left', 'center', 'right']);
+    expect(normalizeUserDrawingRiskRewardLabelAlignment('right')).toBe('right');
+    expect(normalizeUserDrawingRiskRewardLabelAlignment('future')).toBe('center');
+    expect(
+      normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, riskRewardLabelAlignment: 'future' as never }),
+    ).toMatchObject({
+      riskRewardLabelAlignment: 'center',
     });
   });
 

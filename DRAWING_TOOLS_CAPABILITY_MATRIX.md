@@ -155,9 +155,10 @@ summary:
   volume-profile guide visibility, row-count, value-area percentage, and
   profile-width controls on web Canvas and mobile Skia. Long/short position
   drawings now expose a shared full/compact stats mode on web Canvas and mobile
-  Skia. Price, date, and date-price range drawings now expose shared
-  center/top/bottom measurement-label position controls on web Canvas and mobile
-  Skia. Bars pattern drawings now expose shared candlestick/line display mode
+  Skia. Long/short position drawings now also expose shared left/center/right
+  position-label alignment controls. Price, date, and date-price range drawings
+  now expose shared center/top/bottom measurement-label position controls on web
+  Canvas and mobile Skia. Bars pattern drawings now expose shared candlestick/line display mode
   and up/down candle color controls on web Canvas and mobile Skia. Position
   tools and bars pattern tools still need richer computed payload/property
   modeling.

@@ -14,6 +14,7 @@ import type {
   UserDrawingIconName,
   UserDrawingLineStyle,
   UserDrawingMeasurementLabelPosition,
+  UserDrawingRiskRewardLabelAlignment,
   UserDrawingRiskRewardStatsMode,
   UserDrawingState,
   UserDrawingStyle,
@@ -31,6 +32,7 @@ import {
   DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
   DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
   DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE,
+  DEFAULT_USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
@@ -40,6 +42,7 @@ import {
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingRiskRewardStatsMode,
+  normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
   normalizeUserDrawingVolumeProfileWidthRatio,
@@ -60,6 +63,7 @@ import {
   supportsUserDrawingGeneratedLabelVisibilityControls,
   supportsUserDrawingRichTextControls,
   supportsUserDrawingRiskRewardStatsModeControls,
+  supportsUserDrawingRiskRewardLabelAlignmentControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextWrapControls,
@@ -81,6 +85,7 @@ import {
   USER_DRAWING_LINE_COLOR_DESCRIPTORS,
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
   USER_DRAWING_TEXT_COLOR_DESCRIPTORS,
@@ -126,6 +131,7 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingIconName
         | UserDrawingLineStyle
         | UserDrawingMeasurementLabelPosition
+        | UserDrawingRiskRewardLabelAlignment
         | UserDrawingBrushTemplateId
         | UserDrawingBarsPatternDisplayMode
         | UserDrawingRiskRewardStatsMode
@@ -532,24 +538,43 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  if (supportsUserDrawingRiskRewardStatsModeControls(drawing)) {
+  if (
+    supportsUserDrawingRiskRewardStatsModeControls(drawing) ||
+    supportsUserDrawingRiskRewardLabelAlignmentControls(drawing)
+  ) {
     const currentRiskRewardStatsMode = normalizeUserDrawingRiskRewardStatsMode(
       drawing.style.riskRewardStatsMode ?? DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE,
+    );
+    const currentRiskRewardLabelAlignment = normalizeUserDrawingRiskRewardLabelAlignment(
+      drawing.style.riskRewardLabelAlignment ?? DEFAULT_USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT,
     );
     groups.push({
       id: 'position',
       label: 'Position',
-      controls: USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS.map((descriptor) => ({
-        id: `riskRewardStatsMode:${descriptor.statsMode}`,
-        type: 'option' as const,
-        label: descriptor.label,
-        value: descriptor.statsMode,
-        selected: currentRiskRewardStatsMode === descriptor.statsMode,
-        command: {
-          type: 'updateStyle' as const,
-          style: { riskRewardStatsMode: descriptor.statsMode },
-        },
-      })),
+      controls: [
+        ...USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS.map((descriptor) => ({
+          id: `riskRewardStatsMode:${descriptor.statsMode}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.statsMode,
+          selected: currentRiskRewardStatsMode === descriptor.statsMode,
+          command: {
+            type: 'updateStyle' as const,
+            style: { riskRewardStatsMode: descriptor.statsMode },
+          },
+        })),
+        ...USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS.map((descriptor) => ({
+          id: `riskRewardLabelAlignment:${descriptor.alignment}`,
+          type: 'option' as const,
+          label: descriptor.label,
+          value: descriptor.alignment,
+          selected: currentRiskRewardLabelAlignment === descriptor.alignment,
+          command: {
+            type: 'updateStyle' as const,
+            style: { riskRewardLabelAlignment: descriptor.alignment },
+          },
+        })),
+      ],
     });
   }
 
