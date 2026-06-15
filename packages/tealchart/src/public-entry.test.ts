@@ -146,12 +146,14 @@ import type {
   MobileUserDrawingBarsPatternPrimitive,
   MobileUserDrawingBrushPrimitive,
   MobileUserDrawingCalloutPrimitive,
+  MobileUserDrawingCirclePrimitive,
   MobileUserDrawingCommentPrimitive,
   MobileUserDrawingCrossLinePrimitive,
   MobileUserDrawingCurvePrimitive,
   MobileUserDrawingCyclicLinesPrimitive,
   MobileUserDrawingDatePriceRangePrimitive,
   MobileUserDrawingDisjointChannelPrimitive,
+  MobileUserDrawingEllipsePrimitive,
   MobileUserDrawingFibChannelPrimitive,
   MobileUserDrawingFibCirclesPrimitive,
   MobileUserDrawingFibFanPrimitive,
@@ -1030,6 +1032,31 @@ describe('tealchart public entries', () => {
       arrowHead: null,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const circlePrimitive: NonNever<MobileUserDrawingCirclePrimitive> = {
+      kind: 'circle',
+      id: 'circle',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 5 },
+      radius: 5,
+      rect: { x: 0, y: 0, width: 10, height: 10 },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
+    const ellipsePrimitive: NonNever<MobileUserDrawingEllipsePrimitive> = {
+      kind: 'ellipse',
+      id: 'ellipse',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      center: { x: 5, y: 5 },
+      radiusX: 6,
+      radiusY: 3,
+      rect: { x: -1, y: 2, width: 12, height: 6 },
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
     const crossLinePrimitive: NonNever<MobileUserDrawingCrossLinePrimitive> = {
       kind: 'crossLine',
       id: 'cross-line',
@@ -1382,6 +1409,8 @@ describe('tealchart public entries', () => {
     expect(gannSquarePrimitive.kind).toBe('gannSquare');
     expect(gannSquareFixedPrimitive.kind).toBe('gannSquareFixed');
     expect(linePrimitive.kind).toBe('line');
+    expect(circlePrimitive.kind).toBe('circle');
+    expect(ellipsePrimitive.kind).toBe('ellipse');
     expect(crossLinePrimitive.kind).toBe('crossLine');
     expect(arrowMarkerPrimitive.kind).toBe('arrowMarker');
     expect(arrowMarkPrimitive.kind).toBe('arrowMark');
