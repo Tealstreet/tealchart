@@ -193,6 +193,42 @@ describe('SkiaTealchart drawing properties', () => {
     });
   });
 
+  it('routes rendered mobile drawing toolbar selection into Skia drawing state', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onStateChange = vi.fn();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingStateChange={onStateChange}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Rectangle'));
+    });
+
+    expect(ref.current?.getUserDrawingState().activeTool).toBe('rectangle');
+    expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ activeTool: 'rectangle' }));
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setActiveTool', tool: 'rectangle' }),
+        source: 'toolbar',
+      }),
+    );
+  });
+
   it('mirrors drawing command history and keyboard dispatch through the mobile imperative handle', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onStateChange = vi.fn();
