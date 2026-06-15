@@ -54,16 +54,17 @@ Tools audited here:
   reported rectangle workflow and prevents common placement tools from dropping
   out of the first-party drawing rail on either platform.
 - Web widget-level placement coverage now also starts from the widget UI
-  toolbar `rectangle` selection callback, verifies `toolbar` command metadata,
-  and then commits exact drag endpoints.
+  toolbar selection callback for the audited two-anchor tools (`trendLine`,
+  `rectangle`, `circle`, `ellipse`, `priceRange`, and `datePriceRange`),
+  verifies `toolbar` command metadata, and then commits exact drag endpoints.
 - Mobile Skia component coverage now exercises the rendered drawing toolbar and
   verifies `Rectangle` selection reaches Skia drawing state with `toolbar`
   command metadata.
 - Mobile Skia component coverage now also drives the mocked Pan gesture
-  lifecycle after rendered toolbar `Rectangle` selection and verifies the
-  begin/commit commands resolve concrete expected anchors from the touch
-  coordinates and that the committed drawing uses those anchors rather than a
-  generated size.
+  lifecycle after rendered toolbar selection for the same audited two-anchor
+  tools and verifies the begin/commit commands resolve concrete expected
+  anchors from the touch coordinates and that the committed drawing uses those
+  anchors rather than a generated size.
 - Mobile Skia component coverage now also drives the rendered toolbar
   `Rectangle` selection through an aborted Pan gesture and verifies touch
   cancellation clears the draft without committing a rectangle or creating an
@@ -83,8 +84,8 @@ Tools audited here:
 
 1. Add a lightweight browser/device smoke harness for sidebar tool selection
    plus pointer/touch drag, because the remaining risk is real browser/native
-   integration rather than unit-level event routing, state mutation, toolbar
-   selection, Skia gesture callbacks, or render-model geometry.
+   integration rather than unit-level event routing, state mutation, rendered
+   toolbar selection, Skia gesture callbacks, or render-model geometry.
 2. Move to Epic B once the smoke path is covered or manually verified:
    selected-object local action surface.
 3. Keep placement fixes narrow. If a tool regresses, fix the web pointer path

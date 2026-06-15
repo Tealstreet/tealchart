@@ -1,4 +1,4 @@
-import type { UserDrawingState } from './drawings';
+import type { UserDrawingState, UserDrawingTool } from './drawings';
 import type { Bar, DatafeedConfiguration, IBasicDataFeed, LibrarySymbolInfo, PeriodParams, ResolutionString } from './types';
 import type { SkiaTealchartHandle } from './SkiaTealchart';
 
@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createPicture } from '@shopify/react-native-skia';
 import { Gesture } from 'react-native-gesture-handler';
+import { getUserDrawingToolCategoryDescriptorForTool, getUserDrawingToolDescriptor } from './drawings';
 import { SkiaTealchart } from './SkiaTealchart';
 import { clearChartStoreCache } from './state/chartState';
 
@@ -65,6 +66,19 @@ function expectAnchorToBeCloseTo(
 ): void {
   expect(anchor?.time).toBeCloseTo(expected.time, 6);
   expect(anchor?.price).toBeCloseTo(expected.price, 6);
+}
+
+async function selectRenderedMobileDrawingTool(tool: UserDrawingTool): Promise<void> {
+  const category = getUserDrawingToolCategoryDescriptorForTool(tool);
+  if (!category) throw new Error(`Expected toolbar category for ${tool}`);
+  const descriptor = getUserDrawingToolDescriptor(tool);
+
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText(`${category.label} drawing tools`));
+  });
+  await act(async () => {
+    fireEvent.click(await screen.findByLabelText(descriptor.label));
+  });
 }
 
 function createBars(): Bar[] {
@@ -288,7 +302,9 @@ describe('SkiaTealchart drawing properties', () => {
     );
   });
 
-  it('commits exact rectangle endpoints through rendered toolbar selection and Skia pan gestures', async () => {
+  it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
+    'commits exact %s endpoints through rendered toolbar selection and Skia pan gestures',
+    async (tool) => {
     const ref = createRef<SkiaTealchartHandle>();
     const onCommand = vi.fn();
 
@@ -305,12 +321,14 @@ describe('SkiaTealchart drawing properties', () => {
       />,
     );
 
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
-    });
-    await act(async () => {
-      fireEvent.click(await screen.findByLabelText('Rectangle'));
-    });
+    await selectRenderedMobileDrawingTool(tool);
+    expect(ref.current?.getUserDrawingState().activeTool).toBe(tool);
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setActiveTool', tool }),
+        source: 'toolbar',
+      }),
+    );
 
     const pan = getLatestDrawingPanGesture();
     await act(async () => {
@@ -340,11 +358,12 @@ describe('SkiaTealchart drawing properties', () => {
     });
     expect(drawing).toMatchObject({
       id: 'drawing_1',
-      kind: 'rectangle',
+      kind: tool,
       points: [beginCommand?.point.anchor, commitCommand?.point.anchor],
     });
     expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
-  });
+    },
+  );
 
   it('swallows rectangle taps so mobile users must drag real endpoints', async () => {
     const ref = createRef<SkiaTealchartHandle>();
