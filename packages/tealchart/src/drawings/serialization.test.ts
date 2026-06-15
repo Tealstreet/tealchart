@@ -3002,7 +3002,10 @@ describe('drawing layout serialization', () => {
       { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact' } },
       { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full' } },
     ]);
-    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(2);
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toMatchObject([
+      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact' } },
+      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full' } },
+    ]);
   });
 
   it('restores forecast drawings', () => {
