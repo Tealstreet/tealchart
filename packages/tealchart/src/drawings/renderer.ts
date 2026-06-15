@@ -1468,7 +1468,7 @@ function renderRiskRewardPositionGeometry(
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
-  ctx.textAlign = 'center';
+  ctx.textAlign = labelAlignment;
   ctx.textBaseline = 'middle';
   ctx.fillText(position.rewardLabel, labelX, position.profitRect.y + position.profitRect.height / 2);
   ctx.fillText(position.riskLabel, labelX, position.riskRect.y + position.riskRect.height / 2);
