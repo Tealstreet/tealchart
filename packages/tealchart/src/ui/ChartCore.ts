@@ -1593,7 +1593,7 @@ export class ChartCore {
     }
 
     if (this.userDrawingState && getUserDrawingPlacementMode(this.userDrawingState.activeTool) === 'dragTwoAnchor') {
-      return { handled: true };
+      return this.resolveUserDrawingInputPoint(x, y) ? { handled: true } : false;
     }
 
     if (!this.options.onUserDrawingInput) return false;

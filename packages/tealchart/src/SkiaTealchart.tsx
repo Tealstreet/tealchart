@@ -1838,10 +1838,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return (selection.hit ?? false) || selection.changed;
       }
 
-      if (getUserDrawingPlacementMode(effectiveUserDrawingState.activeTool) === 'dragTwoAnchor') {
-        return true;
-      }
-
       const point = resolveMobileUserDrawingInputPoint({
         point: { x, y },
         viewport,
@@ -1853,6 +1849,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           : effectiveUserDrawingState.magnetMode ?? 'off',
       });
       if (!point) return false;
+
+      if (getUserDrawingPlacementMode(effectiveUserDrawingState.activeTool) === 'dragTwoAnchor') {
+        return true;
+      }
 
       return dispatchUserDrawingCommandToState({
         type: 'handleInput',

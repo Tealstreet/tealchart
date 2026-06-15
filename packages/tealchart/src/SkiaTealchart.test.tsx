@@ -389,7 +389,7 @@ describe('SkiaTealchart drawing properties', () => {
     });
   });
 
-  it('keeps drag-seeded mobile taps available for final anchors', async () => {
+  it('keeps drag-seeded mobile final taps available after seed drags', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onCommand = vi.fn();
 
@@ -409,6 +409,20 @@ describe('SkiaTealchart drawing properties', () => {
     await act(async () => {
       expect(ref.current?.setActiveUserDrawingTool('longPosition')).toBe(true);
     });
+
+    const pan = getLatestDrawingPanGesture();
+    await act(async () => {
+      runGestureCallback(pan, 'onBegin', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onStart', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onUpdate', { x: 245, y: 165, translationX: 115, translationY: 70 });
+      runGestureCallback(pan, 'onFinalize', { x: 245, y: 165 }, true);
+    });
+    expect(ref.current?.getUserDrawingState()).toMatchObject({
+      activeTool: 'longPosition',
+      selection: null,
+      draft: expect.objectContaining({ tool: 'longPosition' }),
+      drawings: [],
+    });
     onCommand.mockClear();
 
     const tap = getLatestSingleTapGesture();
@@ -423,9 +437,9 @@ describe('SkiaTealchart drawing properties', () => {
     );
     expect(ref.current?.getUserDrawingState()).toMatchObject({
       activeTool: 'longPosition',
-      selection: null,
-      draft: expect.objectContaining({ tool: 'longPosition' }),
-      drawings: [],
+      selection: { drawingId: 'drawing_1' },
+      draft: null,
+      drawings: [expect.objectContaining({ id: 'drawing_1', kind: 'longPosition' })],
     });
   });
 
