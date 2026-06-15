@@ -1675,6 +1675,7 @@ describe('user drawing toolbar descriptors', () => {
       ['editText', false, false],
       ['copySelected', true, false],
       ['duplicateSelected', true, false],
+      ['duplicateEditDrag', true, false],
       ['deleteSelected', true, true],
     ]);
     expect(style.items.map((item) => [item.id, item.enabled, item.command, item.swatchColor])).toEqual([
@@ -1815,6 +1816,24 @@ describe('user drawing toolbar descriptors', () => {
     expect(itemById.get('duplicateSelected')).toMatchObject({
       enabled: true,
       command: { type: 'toolbarAction', action: 'duplicateSelected' },
+    });
+    expect(itemById.get('duplicateEditDrag')).toMatchObject({
+      enabled: true,
+      selected: false,
+      label: 'Duplicate while dragging selected drawing',
+      command: { type: 'setDuplicateEditDrag', duplicate: true },
+    });
+    expect(
+      new Map(
+        resolveUserDrawingSelectedActionSurface(selected, { duplicateEditDragEnabled: true })
+          .groups.flatMap((group) => group.items)
+          .map((item) => [item.id, item]),
+      ).get('duplicateEditDrag'),
+    ).toMatchObject({
+      enabled: true,
+      selected: true,
+      label: 'Stop duplicating while dragging selected drawing',
+      command: { type: 'setDuplicateEditDrag', duplicate: false },
     });
     expect(itemById.get('deleteSelected')).toMatchObject({
       enabled: true,
@@ -2483,6 +2502,7 @@ describe('user drawing toolbar descriptors', () => {
     const items = resolveUserDrawingSelectedActionSurface(locked).groups.flatMap((group) => group.items);
 
     expect(items.find((item) => item.id === 'duplicateSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'duplicateEditDrag')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'copySelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'deleteSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lineColor:#f5c542')?.enabled).toBe(false);
