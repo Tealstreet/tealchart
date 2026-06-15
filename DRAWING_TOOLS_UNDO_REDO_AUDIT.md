@@ -33,6 +33,7 @@ Shared command-history tests cover:
 Mobile command-history tests cover:
 
 - API add, duplicate, delete, clear, and toolbar command dispatch.
+- Rendered mobile toolbar undo/redo dispatch and disabled-state changes.
 - Style, visibility, lock, and z-order mutations through the shared history.
 - Tap placement, drag placement, path-family creation, cancellation, and
   cross-pane rejection.
@@ -49,8 +50,8 @@ Mobile command-history tests cover:
   undoable actions in a TradingView-grade editing workflow.
 - Table row/column and rich text mutations are covered by command dispatch and
   history classification, but they need more end-to-end product workflow QA.
-- Undo/redo UI buttons and disabled-state presentation are not fully audited in
-  this phase.
+- Undo/redo UI disabled-state presentation now has web and mobile unit-level
+  evidence, but browser/device visual QA is still thin.
 - The history classification checklist intentionally mirrors the reducer
   switch today; a later cleanup can move both to one exported classifier table.
 
@@ -58,8 +59,8 @@ Mobile command-history tests cover:
 
 - Epic E2 should verify web keyboard ownership and shortcut routing at the
   widget boundary.
-- Epic E3 should verify mobile imperative handle and host-toolbar parity for
-  the same history commands.
+- Epic E3 should continue verifying mobile imperative handle and host-toolbar
+  parity for the same history commands as more host integrations appear.
 - Consider replacing the private history reducer switch plus checklist arrays
   with one exported typed command-history classification table.
 - Later toolbar/object-tree phases should add interaction-level tests around
