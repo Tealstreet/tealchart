@@ -1,4 +1,4 @@
-import type { UserDrawingState } from '../../drawings';
+import type { UserDrawingState, UserDrawingTool } from '../../drawings';
 
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -15,6 +15,18 @@ const baseDrawingState: UserDrawingState = {
   textEdit: null,
   drawings: [],
 };
+
+const auditedPlacementToolbarTools: Array<{ tool: UserDrawingTool; label: string; categoryLabel: string }> = [
+  { tool: 'trendLine', label: 'Trend line', categoryLabel: 'Lines' },
+  { tool: 'rectangle', label: 'Rectangle', categoryLabel: 'Geometric Shapes' },
+  { tool: 'circle', label: 'Circle', categoryLabel: 'Geometric Shapes' },
+  { tool: 'ellipse', label: 'Ellipse', categoryLabel: 'Geometric Shapes' },
+  { tool: 'priceRange', label: 'Price range', categoryLabel: 'Forecasting and Measurement' },
+  { tool: 'datePriceRange', label: 'Date and price range', categoryLabel: 'Forecasting and Measurement' },
+  { tool: 'longPosition', label: 'Long position', categoryLabel: 'Forecasting and Measurement' },
+  { tool: 'brush', label: 'Brush', categoryLabel: 'Brushes' },
+  { tool: 'textLabel', label: 'Text label', categoryLabel: 'Annotations' },
+];
 
 describe('ChartTopBarComponent drawing toolbar', () => {
   afterEach(() => {
@@ -56,6 +68,29 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
     fireEvent.click(screen.getByLabelText('Rectangle'));
     expect(onTool).toHaveBeenCalledWith('rectangle');
+  });
+
+  it('dispatches audited placement tools from the rendered mobile drawing sidebar', () => {
+    const onTool = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={baseDrawingState}
+        onUserDrawingToolSelect={onTool}
+      />,
+    );
+
+    for (const { tool, label, categoryLabel } of auditedPlacementToolbarTools) {
+      const category = screen.getByLabelText(`${categoryLabel} drawing tools`);
+      fireEvent.click(category);
+
+      fireEvent.click(screen.getByLabelText(label));
+      expect(onTool).toHaveBeenLastCalledWith(tool);
+      expect(category.getAttribute('aria-expanded')).toBe('false');
+    }
+
+    expect(onTool).toHaveBeenCalledTimes(auditedPlacementToolbarTools.length);
   });
 
   it('keeps a drawing tool flyout open when pinned', () => {
