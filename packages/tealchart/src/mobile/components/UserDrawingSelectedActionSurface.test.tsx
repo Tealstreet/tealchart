@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { resolveUserDrawingSelectedActionSurface } from '../../drawings';
+import { clearChartStoreCache } from '../../state/chartState';
 import { UserDrawingSelectedActionSurfaceComponent } from './UserDrawingSelectedActionSurface';
 
 const style: UserDrawingStyle = {
@@ -84,6 +85,7 @@ function getMockViewStyle(element: HTMLElement): Record<string, unknown> {
 describe('UserDrawingSelectedActionSurfaceComponent', () => {
   afterEach(() => {
     cleanup();
+    clearChartStoreCache();
   });
 
   it('keeps mobile selected action taps inside the toolbar boundary', () => {
