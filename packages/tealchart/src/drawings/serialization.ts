@@ -372,6 +372,9 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.barsPatternUpColor === 'string') style.barsPatternUpColor = value.barsPatternUpColor;
   if (typeof value.barsPatternDownColor === 'string') style.barsPatternDownColor = value.barsPatternDownColor;
   if (typeof value.riskRewardStatsMode === 'string') style.riskRewardStatsMode = value.riskRewardStatsMode as UserDrawingStyle['riskRewardStatsMode'];
+  if (typeof value.riskRewardLabelAlignment === 'string') {
+    style.riskRewardLabelAlignment = value.riskRewardLabelAlignment as UserDrawingStyle['riskRewardLabelAlignment'];
+  }
   if (typeof value.volumeProfileGuidesVisible === 'boolean') {
     style.volumeProfileGuidesVisible = value.volumeProfileGuidesVisible;
   }

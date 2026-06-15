@@ -2975,7 +2975,13 @@ describe('drawing layout serialization', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', riskRewardStatsMode: 'compact' },
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            riskRewardStatsMode: 'compact',
+            riskRewardLabelAlignment: 'right',
+          },
           points: [
             { time: 1, price: 100 },
             { time: 2, price: 110 },
@@ -2990,7 +2996,13 @@ describe('drawing layout serialization', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', riskRewardStatsMode: 'future' },
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            riskRewardStatsMode: 'future',
+            riskRewardLabelAlignment: 'future',
+          },
           points: [
             { time: 1, price: 100 },
             { time: 2, price: 90 },
@@ -3001,12 +3013,12 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings).toMatchObject([
-      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact' } },
-      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full' } },
+      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact', riskRewardLabelAlignment: 'right' } },
+      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full', riskRewardLabelAlignment: 'center' } },
     ]);
     expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toMatchObject([
-      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact' } },
-      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full' } },
+      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact', riskRewardLabelAlignment: 'right' } },
+      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full', riskRewardLabelAlignment: 'center' } },
     ]);
   });
 

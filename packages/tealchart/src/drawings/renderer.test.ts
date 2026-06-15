@@ -820,6 +820,27 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).not.toContain('fillText:Risk -10.00 (-20.00%):50,55:#111:center:1:12px sans-serif');
   });
 
+  it('renders risk reward position labels at the configured horizontal alignment', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'long',
+      kind: 'longPosition',
+      style: { ...style, riskRewardLabelAlignment: 'right' },
+      points: [
+        { time: 10, price: 50 },
+        { time: 90, price: 80 },
+        { time: 90, price: 40 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillText:Reward +30.00 (+60.00%):78,35:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:Risk -10.00 (-20.00%):78,55:#111:center:1:12px sans-serif');
+    expect(ctx.calls).toContain('fillText:R:R 3.00:78,38:#111:center:1:12px sans-serif');
+  });
+
   it('renders forecast projection lines and labels through CanvasContext', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {

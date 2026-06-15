@@ -33,6 +33,7 @@ import {
   DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
   DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
   normalizeUserDrawingMeasurementLabelPosition,
+  normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -1398,7 +1399,15 @@ function renderRiskRewardPositionGeometry(
   const { drawing, position } = geometry;
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
-  const labelX = position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
+  const labelAlignment = normalizeUserDrawingRiskRewardLabelAlignment(drawing.style.riskRewardLabelAlignment);
+  const labelLeft = Math.min(position.entryLine.start.x, position.entryLine.end.x) + fontSize;
+  const labelRight = Math.max(position.entryLine.start.x, position.entryLine.end.x) - fontSize;
+  const labelX =
+    labelAlignment === 'left'
+      ? labelLeft
+      : labelAlignment === 'right'
+        ? labelRight
+        : position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
 
   if (drawing.style.fillVisible !== false) {
     withUserDrawingFillOpacity(ctx, drawing, () => {
