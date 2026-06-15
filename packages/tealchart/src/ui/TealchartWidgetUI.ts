@@ -33,6 +33,7 @@ import type {
 import type { IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
+import type { DrawingDragEventOptions } from '../interaction/EventManager';
 
 import {
   anchorToScreenPoint,
@@ -144,6 +145,7 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingEditStart?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+    options?: DrawingDragEventOptions,
   ) => boolean;
   /** Called when select-mode context menu input may target a user drawing */
   onUserDrawingContextMenu?: (
@@ -174,6 +176,8 @@ export interface TealchartWidgetUIOptions {
   userDrawingState?: UserDrawingState;
   /** Initial/current drawing command history availability for undo/redo toolbar actions */
   userDrawingCommandAvailability?: UserDrawingCommandAvailability;
+  /** Whether selected drawing edit drags should duplicate before moving. */
+  userDrawingDuplicateEditDragEnabled?: boolean;
   /** Called when a drawing tool is selected from the top bar */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   /** Called when the top bar should undo the last drawing command */
@@ -182,6 +186,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingRedo?: () => void;
   /** Called when the top bar should duplicate the selected user drawing */
   onUserDrawingDuplicateSelected?: () => void;
+  /** Called when selected drawing duplicate-drag mode should change */
+  onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
   /** Called when the top bar should copy the selected user drawing */
   onUserDrawingCopySelected?: () => void;
   /** Called when the top bar should delete the selected user drawing */
@@ -337,10 +343,12 @@ export class TealchartWidgetUI {
         },
         userDrawingState: options.userDrawingState,
         userDrawingCommandAvailability: options.userDrawingCommandAvailability,
+        userDrawingDuplicateEditDragEnabled: options.userDrawingDuplicateEditDragEnabled,
         onUserDrawingToolSelect: options.onUserDrawingToolSelect,
         onUserDrawingUndo: options.onUserDrawingUndo,
         onUserDrawingRedo: options.onUserDrawingRedo,
         onUserDrawingDuplicateSelected: options.onUserDrawingDuplicateSelected,
+        onUserDrawingDuplicateEditDragChange: options.onUserDrawingDuplicateEditDragChange,
         onUserDrawingCopySelected: options.onUserDrawingCopySelected,
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
@@ -589,6 +597,11 @@ export class TealchartWidgetUI {
     } else {
       this.topBar?.setUserDrawingCommandAvailability(availability, { render: false });
     }
+  }
+
+  setUserDrawingDuplicateEditDragEnabled(enabled: boolean): void {
+    this.options.userDrawingDuplicateEditDragEnabled = enabled;
+    this.topBar?.setUserDrawingDuplicateEditDragEnabled(enabled);
   }
 
   private getUserDrawingToolbarStateKey(state: UserDrawingState): string {
