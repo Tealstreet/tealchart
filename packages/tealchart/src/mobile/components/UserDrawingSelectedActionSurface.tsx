@@ -14,6 +14,7 @@ import {
   resolveUserDrawingActionSurfacePosition,
   shouldRenderUserDrawingSelectedActionSurface,
 } from '../../drawings';
+import { computeLeftToolRailAvoidanceInset, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { dispatchMobileUserDrawingActionCommand } from '../utils/drawingActionDispatch';
 
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
@@ -134,7 +135,16 @@ export function UserDrawingSelectedActionSurfaceComponent({
             width: MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH,
             height: surfaceHeight,
           },
-          inset: { left: 8, right: 8, top: topInset + 6, bottom: 8 },
+          inset: {
+            left: computeLeftToolRailAvoidanceInset(
+              MOBILE_CHART_CHROME_METRICS,
+              dimensions.width,
+              MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH,
+            ),
+            right: 8,
+            top: topInset + 6,
+            bottom: 8,
+          },
         }),
       ]}
       pointerEvents="auto"

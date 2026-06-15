@@ -60,7 +60,11 @@ import {
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
 } from '../drawings';
-import { computeLeftToolRailTop, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import {
+  computeLeftToolRailAvoidanceInset,
+  computeLeftToolRailTop,
+  WEB_CHART_CHROME_METRICS,
+} from '../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
 import { Component } from './Component';
@@ -773,18 +777,23 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         : SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT;
     const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
     const parentRect = parent.getBoundingClientRect();
+    const viewport = {
+      width: parentRect.width || window.innerWidth,
+      height: parentRect.height || window.innerHeight,
+    };
     const position = resolveUserDrawingActionSurfacePosition({
       anchor: anchor.anchor,
-      viewport: {
-        width: parentRect.width || window.innerWidth,
-        height: parentRect.height || window.innerHeight,
-      },
+      viewport,
       surface: {
         width: SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
         height: activePopoverHeight,
       },
       inset: {
-        left: 8,
+        left: computeLeftToolRailAvoidanceInset(
+          WEB_CHART_CHROME_METRICS,
+          viewport.width,
+          SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
+        ),
         right: 8,
         top: WEB_CHART_CHROME_METRICS.topBarHeight + 6,
         bottom: 8,

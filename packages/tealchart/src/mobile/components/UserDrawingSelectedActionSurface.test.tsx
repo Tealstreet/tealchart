@@ -217,4 +217,24 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
     expect(getMockViewStyle(surface).top).toBe(83);
   });
+
+  it('keeps mobile selected actions clear of the top bar and left drawing rail when space allows', () => {
+    const state = createSelectedState();
+
+    render(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={state}
+        surface={resolveUserDrawingSelectedActionSurface(state)}
+        anchor={{ ...selectionActionAnchor, anchor: { x: 12, y: 24 } }}
+        dimensions={{ width: 480, height: 320 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={vi.fn()}
+      />,
+    );
+
+    const surface = screen.getByLabelText('Selected drawing actions');
+    expect(getMockViewStyle(surface).left).toBe(68);
+    expect(getMockViewStyle(surface).top).toBe(46);
+  });
 });

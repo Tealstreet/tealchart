@@ -148,6 +148,19 @@ export function computeLeftToolRailTop(metrics: Pick<ChartChromeMetrics, 'topBar
   return metrics.topBarHeight + metrics.leftToolRailTopGap;
 }
 
+export function computeLeftToolRailAvoidanceInset(
+  metrics: Pick<ChartChromeMetrics, 'leftToolRailInset' | 'leftToolRailWidth'>,
+  viewportWidth: number,
+  surfaceWidth: number,
+  rightInset = 8,
+  gap = 8,
+): number {
+  const baseInset = metrics.leftToolRailInset;
+  const preferredInset = metrics.leftToolRailInset + metrics.leftToolRailWidth + gap;
+  const maxFittingInset = viewportWidth - rightInset - surfaceWidth;
+  return Math.max(baseInset, Math.min(preferredInset, maxFittingInset));
+}
+
 export function computeTopLeftLegendRect(
   metrics: ChartChromeMetrics,
   bounds: Rect,
