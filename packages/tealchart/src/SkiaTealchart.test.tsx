@@ -331,6 +331,62 @@ describe('SkiaTealchart drawing properties', () => {
     expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
   });
 
+  it('cancels rendered toolbar rectangle placement when Skia pan gestures abort', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Rectangle'));
+    });
+
+    const pan = getLatestDrawingPanGesture();
+    await act(async () => {
+      runGestureCallback(pan, 'onBegin', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onStart', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onUpdate', { x: 245, y: 165, translationX: 115, translationY: 70 });
+      runGestureCallback(pan, 'onFinalize', { x: 245, y: 165 }, false);
+    });
+
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'beginPlacementDrag', meta: { source: 'touch' } }),
+      }),
+    );
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'cancelDraft', meta: { source: 'touch' } }),
+      }),
+    );
+    expect(onCommand).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'commitPlacementDrag' }),
+      }),
+    );
+    expect(ref.current?.getUserDrawingState()).toMatchObject({
+      activeTool: 'rectangle',
+      selection: null,
+      draft: null,
+      drawings: [],
+    });
+    expect(ref.current?.canUndoUserDrawingCommand()).toBe(false);
+  });
+
   it('routes rendered mobile drawing toolbar undo and redo through Skia history', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onCommand = vi.fn();
