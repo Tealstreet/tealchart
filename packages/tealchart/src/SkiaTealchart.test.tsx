@@ -526,7 +526,7 @@ describe('SkiaTealchart drawing properties', () => {
     expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
   });
 
-  it('keeps drag-seeded mobile final taps available after seed drags', async () => {
+  it('keeps rendered toolbar drag-seeded mobile final taps available after seed drags', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onCommand = vi.fn();
 
@@ -543,9 +543,14 @@ describe('SkiaTealchart drawing properties', () => {
       />,
     );
 
-    await act(async () => {
-      expect(ref.current?.setActiveUserDrawingTool('longPosition')).toBe(true);
-    });
+    await selectRenderedMobileDrawingTool('longPosition');
+    expect(ref.current?.getUserDrawingState().activeTool).toBe('longPosition');
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setActiveTool', tool: 'longPosition' }),
+        source: 'toolbar',
+      }),
+    );
 
     const pan = getLatestDrawingPanGesture();
     await act(async () => {
@@ -553,6 +558,23 @@ describe('SkiaTealchart drawing properties', () => {
       runGestureCallback(pan, 'onStart', { x: 130, y: 95 });
       runGestureCallback(pan, 'onUpdate', { x: 245, y: 165, translationX: 115, translationY: 70 });
       runGestureCallback(pan, 'onFinalize', { x: 245, y: 165 }, true);
+    });
+    const beginCommand = onCommand.mock.calls.find(
+      ([event]) => event.command.type === 'beginPlacementDrag',
+    )?.[0].command;
+    const commitCommand = onCommand.mock.calls.find(
+      ([event]) => event.command.type === 'commitPlacementDrag',
+    )?.[0].command;
+
+    expect(beginCommand).toMatchObject({ type: 'beginPlacementDrag', meta: { source: 'touch' } });
+    expect(commitCommand).toMatchObject({ type: 'commitPlacementDrag', meta: { source: 'touch' } });
+    expectAnchorToBeCloseTo(beginCommand?.point.anchor, {
+      time: 1_116_161.616161616,
+      price: 55.39393939393939,
+    });
+    expectAnchorToBeCloseTo(commitCommand?.point.anchor, {
+      time: 1_223_030.303030303,
+      price: 49.45454545454545,
     });
     expect(ref.current?.getUserDrawingState()).toMatchObject({
       activeTool: 'longPosition',
@@ -567,17 +589,141 @@ describe('SkiaTealchart drawing properties', () => {
       runGestureCallback(tap, 'onEnd', { x: 130, y: 95 });
     });
 
-    expect(onCommand).toHaveBeenCalledWith(
-      expect.objectContaining({
-        command: expect.objectContaining({ type: 'handleInput' }),
-      }),
-    );
+    const inputCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'handleInput')?.[0].command;
+    const drawing = ref.current?.getUserDrawingState().drawings[0];
+
+    expect(inputCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
+    expectAnchorToBeCloseTo(inputCommand?.point.anchor, {
+      time: 1_116_161.616161616,
+      price: 55.39393939393939,
+    });
     expect(ref.current?.getUserDrawingState()).toMatchObject({
       activeTool: 'longPosition',
       selection: { drawingId: 'drawing_1' },
       draft: null,
-      drawings: [expect.objectContaining({ id: 'drawing_1', kind: 'longPosition' })],
+      drawings: [
+        expect.objectContaining({
+          id: 'drawing_1',
+          kind: 'longPosition',
+          points: [beginCommand?.point.anchor, commitCommand?.point.anchor, inputCommand?.point.anchor],
+        }),
+      ],
     });
+    expect(drawing).toMatchObject({
+      id: 'drawing_1',
+      kind: 'longPosition',
+      points: [beginCommand?.point.anchor, commitCommand?.point.anchor, inputCommand?.point.anchor],
+    });
+  });
+
+  it('commits rendered toolbar brush path drags through Skia pan gestures', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await selectRenderedMobileDrawingTool('brush');
+    expect(ref.current?.getUserDrawingState().activeTool).toBe('brush');
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setActiveTool', tool: 'brush' }),
+        source: 'toolbar',
+      }),
+    );
+
+    const pan = getLatestDrawingPanGesture();
+    await act(async () => {
+      runGestureCallback(pan, 'onBegin', { x: 130, y: 95, stylusData: { pressure: 0.4 } });
+      runGestureCallback(pan, 'onStart', { x: 130, y: 95, stylusData: { pressure: 0.4 } });
+      runGestureCallback(pan, 'onUpdate', { x: 245, y: 165, translationX: 115, translationY: 70 });
+      runGestureCallback(pan, 'onFinalize', { x: 245, y: 165 }, true);
+    });
+
+    const beginCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'beginPathDrag')?.[0].command;
+    const appendCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'appendPathDragPoint')?.[0]
+      .command;
+    const commitCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'commitPathDrag')?.[0]
+      .command;
+    const drawing = ref.current?.getUserDrawingState().drawings[0];
+
+    expect(beginCommand).toMatchObject({ type: 'beginPathDrag', meta: { source: 'touch', transactionKey: 'path-drag' } });
+    expect(appendCommand).toMatchObject({
+      type: 'appendPathDragPoint',
+      meta: { source: 'touch', transactionKey: 'path-drag' },
+    });
+    expect(commitCommand).toMatchObject({ type: 'commitPathDrag', meta: { source: 'touch' } });
+    expectAnchorToBeCloseTo(beginCommand?.point.anchor, {
+      time: 1_116_161.616161616,
+      price: 55.39393939393939,
+    });
+    expectAnchorToBeCloseTo(appendCommand?.point.anchor, {
+      time: 1_223_030.303030303,
+      price: 49.45454545454545,
+    });
+    expect(drawing).toMatchObject({
+      id: 'drawing_1',
+      kind: 'brush',
+      points: expect.arrayContaining([beginCommand?.point.anchor, appendCommand?.point.anchor]),
+    });
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+  });
+
+  it('commits rendered toolbar text labels from Skia taps', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await selectRenderedMobileDrawingTool('textLabel');
+    expect(ref.current?.getUserDrawingState().activeTool).toBe('textLabel');
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'setActiveTool', tool: 'textLabel' }),
+        source: 'toolbar',
+      }),
+    );
+
+    const tap = getLatestSingleTapGesture();
+    await act(async () => {
+      runGestureCallback(tap, 'onEnd', { x: 130, y: 95 });
+    });
+
+    const inputCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'handleInput')?.[0].command;
+    const drawing = ref.current?.getUserDrawingState().drawings[0];
+
+    expect(inputCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
+    expectAnchorToBeCloseTo(inputCommand?.point.anchor, {
+      time: 1_116_161.616161616,
+      price: 55.39393939393939,
+    });
+    expect(drawing).toMatchObject({
+      id: 'drawing_1',
+      kind: 'textLabel',
+      point: inputCommand?.point.anchor,
+    });
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
   });
 
   it('cancels rendered toolbar rectangle placement when Skia pan gestures abort', async () => {
