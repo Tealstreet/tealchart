@@ -36,6 +36,8 @@ export interface UseChartGesturesOptions {
   isAutoScale?: (paneId: string) => boolean;
   /** Called for active chart-surface touches so overlays can react without owning gestures */
   onInteraction?: (x: number, y: number) => void;
+  /** Called once when a chart gesture starts so transient overlays can dismiss without tracking gesture updates */
+  onGestureStart?: (x: number, y: number) => void;
   /** Called before chart pan starts so drawing edits can claim the gesture */
   onDrawingEditStart?: (x: number, y: number, options?: ChartDrawingGestureOptions) => boolean;
   /** Called while a claimed drawing edit gesture moves */
@@ -70,6 +72,7 @@ export function useChartGestures({
   onAutoScaleDisabled,
   isAutoScale,
   onInteraction,
+  onGestureStart,
   onDrawingEditStart,
   onDrawingEditMove,
   onDrawingEditEnd,
@@ -218,6 +221,7 @@ export function useChartGestures({
   // Handler for pan start - processes zone detection and sets up initial values
   const handlePanStartAndSetValues = useCallback(
     (x: number, y: number, options?: ChartDrawingGestureOptions): boolean => {
+      onGestureStart?.(x, y);
       onInteraction?.(x, y);
       savedTranslateX.value = 0;
       savedTranslateY.value = 0;
@@ -253,6 +257,7 @@ export function useChartGestures({
       onSwipeBlockChange,
       onAutoScaleDisabled,
       onInteraction,
+      onGestureStart,
       onDrawingEditStart,
       gestureZoneValue,
       priceAxisStartRange,
@@ -380,6 +385,9 @@ export function useChartGestures({
         if (drawingEditClaimed.value) return;
 
         savedScale.value = 1;
+        if (onGestureStart) {
+          runOnJS(onGestureStart)(event.focalX, event.focalY);
+        }
         if (onInteraction) {
           runOnJS(onInteraction)(event.focalX, event.focalY);
         }
@@ -393,6 +401,7 @@ export function useChartGestures({
       });
   }, [
     enabled,
+    onGestureStart,
     onInteraction,
     updateViewportFromPinch,
     savedScale,
