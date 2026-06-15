@@ -1448,10 +1448,12 @@ object-tree gaps stay visible.
   to the category default.
 - Web and mobile category rails and flyouts now use bounded scroll containers
   so all categories/tools remain reachable on shorter chart viewports.
+- Web and mobile category flyouts now expose matching pin controls so users can
+  keep a tool category open while choosing multiple tools.
 
 ## Known Gaps
 
-- Full TradingView-style drawing toolbar pinning and advanced polish.
+- Full TradingView-style drawing toolbar advanced polish.
 - TradingView advanced
   Fibonacci tools beyond retracement/extension/trend-based extension/fan/speed-resistance fan/fib arcs/speed-resistance arcs/circles/wedge/spiral/channel/time-zone/trend-based time,
   Gann tools beyond fan/box/square, pattern tools beyond Elliott Triangle Wave/Elliott Corrective Wave/Elliott Impulse Wave/Head and Shoulders/Three Drives/Triangle/ABCD/XABCD, remaining advanced volume profile tools, image upload picker/storage lifecycle controls, and additional curved geometry.
