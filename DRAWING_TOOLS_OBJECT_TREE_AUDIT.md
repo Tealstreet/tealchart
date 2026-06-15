@@ -21,7 +21,7 @@ Object-tree behavior is shared:
 
 | Area | Web evidence | Mobile evidence | Shared evidence |
 | --- | --- | --- | --- |
-| Built-in surface | `TealchartWidget.test.ts` covers the web built-in object-tree fallback when no app-owned callback is provided, including panel pointer/context-event bubbling isolation in jsdom. | `UserDrawingObjectTreeSheet.test.tsx` covers the built-in mobile sheet, including the responder boundary flag and mocked tap isolation while row/actions are used. | `objectTree.test.ts` covers row/group model generation. |
+| Built-in surface | `TealchartWidget.test.ts` covers the web built-in object-tree fallback when no app-owned callback is provided, including panel pointer/context-event bubbling isolation in jsdom and row z-order actions. | `UserDrawingObjectTreeSheet.test.tsx` covers the built-in mobile sheet, including the responder boundary flag and mocked tap isolation while row/actions are used. `SkiaTealchart.test.tsx` now covers opening the rendered sheet through the Skia handle and dispatching a z-order row action through live Skia drawing state. | `objectTree.test.ts` covers row/group model generation. |
 | App-owned entry points | Web selected actions and context menus can open object-tree callbacks. `ContextMenu.test.ts` now verifies the rendered web context menu exposes and dispatches the object-tree entry without chart click fallthrough. | Mobile selected action strip and long-press context menus can open object-tree callbacks. `ContextMenuComponent.test.tsx` now verifies the rendered mobile context menu exposes and dispatches the same object-tree entry without chart tap fallthrough. | Selected/context action descriptors share the same object-tree open command concept. |
 | Row actions | Web panel rows dispatch select, rename, hide/show, lock/unlock, duplicate, delete, and z-order actions. | Mobile sheet rows dispatch the same row actions through the shared resolver. | `objectTree.test.ts` covers row action enablement and dispatch shape. |
 | Bulk actions | Web object-tree hosts can use the shared selected-row descriptors. | Mobile object-tree hosts can use the same selected-row descriptors. | `objectTree.test.ts` covers additive/range selection and selected mutation commands. |
@@ -39,6 +39,10 @@ Object-tree behavior is shared:
   regression evidence that surface interactions do not bubble through the
   jsdom/RN-test wrappers or dismiss the mobile sheet before a row/action can
   complete.
+- Built-in web and mobile object-tree surfaces now both have component-level
+  z-order evidence: the web panel dispatches row z-order actions through
+  `TealchartWidget`, and the mobile sheet dispatches row z-order actions through
+  `SkiaTealchart`.
 - Built-in web and mobile object-tree surfaces now both pin basic reachability
   layout constraints: the web panel stays viewport-capped with wrapped row
   actions, while the mobile sheet stays height-capped with wrapped row actions.
@@ -48,7 +52,7 @@ Object-tree behavior is shared:
 ## Follow-Up Risks
 
 - Browser-level evidence for real chart-container pointer isolation remains
-  thinner than unit-level panel placement and clipping evidence.
+  thinner than unit-level panel placement, clipping, and row-action evidence.
 - Mobile object-tree sheet ergonomics and native responder isolation should be
   rechecked on small screens once more drawing actions are added.
 - Future row or context actions must be added through the shared resolvers so
