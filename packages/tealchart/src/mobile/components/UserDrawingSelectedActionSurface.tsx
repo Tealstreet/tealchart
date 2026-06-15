@@ -53,6 +53,7 @@ export interface UserDrawingSelectedActionSurfaceProps {
   topInset: number;
   createId: () => string;
   dispatchUserDrawingCommand: (command: UserDrawingCommand) => void;
+  onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
   onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   onUserDrawingCopySelected?: () => void;
@@ -66,6 +67,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
   topInset,
   createId,
   dispatchUserDrawingCommand,
+  onUserDrawingDuplicateEditDragChange,
   onUserDrawingPropertiesOpen,
   onUserDrawingObjectTreeOpen,
   onUserDrawingCopySelected,
@@ -120,6 +122,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
       onUserDrawingPropertiesOpen,
       onUserDrawingObjectTreeOpen,
       onUserDrawingCopySelected,
+      onUserDrawingDuplicateEditDragChange,
     });
     if (!options.keepPopoverOpen) {
       setActivePopoverGroupId(null);

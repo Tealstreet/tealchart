@@ -94,6 +94,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     const dispatchUserDrawingCommand = vi.fn();
     const onUserDrawingPropertiesOpen = vi.fn();
     const onUserDrawingCopySelected = vi.fn();
+    const onUserDrawingDuplicateEditDragChange = vi.fn();
 
     const { rerender } = render(
       <div onClick={onChartTouch}>
@@ -107,6 +108,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           dispatchUserDrawingCommand={dispatchUserDrawingCommand}
           onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
           onUserDrawingCopySelected={onUserDrawingCopySelected}
+          onUserDrawingDuplicateEditDragChange={onUserDrawingDuplicateEditDragChange}
         />
       </div>,
     );
@@ -117,6 +119,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     fireEvent.click(screen.getByLabelText('Open selected drawing properties'));
     fireEvent.click(screen.getByLabelText('Copy selected drawing'));
     fireEvent.click(screen.getByLabelText('Duplicate selected drawing'));
+    fireEvent.click(screen.getByLabelText('Duplicate while dragging selected drawing'));
     fireEvent.click(screen.getByLabelText('Style selected drawing'));
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
@@ -182,6 +185,7 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
       }),
     );
     expect(onUserDrawingCopySelected).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingDuplicateEditDragChange).toHaveBeenCalledWith(true);
     expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
       type: 'duplicate',
       options: { createId: expect.any(Function) },
@@ -199,6 +203,31 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     });
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'select' }));
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'selectMany' }));
+  });
+
+  it('marks mobile duplicate-drag mode as selected when host mode is enabled', () => {
+    const state = createSelectedState();
+    const onUserDrawingDuplicateEditDragChange = vi.fn();
+
+    render(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={state}
+        surface={resolveUserDrawingSelectedActionSurface(state, { duplicateEditDragEnabled: true })}
+        anchor={selectionActionAnchor}
+        dimensions={{ width: 360, height: 240 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={vi.fn()}
+        onUserDrawingDuplicateEditDragChange={onUserDrawingDuplicateEditDragChange}
+      />,
+    );
+
+    const duplicateDrag = screen.getByLabelText('Stop duplicating while dragging selected drawing');
+    expect(screen.queryByLabelText('Duplicate while dragging selected drawing')).toBeNull();
+
+    fireEvent.click(duplicateDrag);
+
+    expect(onUserDrawingDuplicateEditDragChange).toHaveBeenCalledWith(false);
   });
 
   it('clamps mobile selected style popovers using the expanded surface height', () => {

@@ -37,6 +37,10 @@ The selected-action surface is shared:
   mobile layouts where the full rail reservation cannot fit.
 - Copy selected is now locally reachable from the selected-object surface on
   both web and mobile, not only through keyboard/API command paths.
+- Duplicate-while-dragging is now locally reachable from the selected-object
+  surface on both web and mobile. Web keeps Shift-drag as a shortcut while the
+  local action provides a pointer-only mode; mobile toggles the existing
+  touch-native duplicate edit-drag override from the same shared descriptor.
 - Rendered web and mobile selected-action surfaces now prove the same local
   text-edit availability rules for representative non-text, unlocked text, and
   locked text drawings while keeping properties reachable.

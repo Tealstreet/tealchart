@@ -16,6 +16,7 @@ export interface DispatchMobileUserDrawingActionCommandOptions {
   onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
   onUserDrawingCopySelected?: () => void;
+  onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
 }
 
 export function dispatchMobileUserDrawingActionCommand(
@@ -46,6 +47,11 @@ export function dispatchMobileUserDrawingActionCommand(
 
   if (command.type === 'copySelected') {
     options.onUserDrawingCopySelected?.();
+    return true;
+  }
+
+  if (command.type === 'setDuplicateEditDrag') {
+    options.onUserDrawingDuplicateEditDragChange?.(command.duplicate);
     return true;
   }
 

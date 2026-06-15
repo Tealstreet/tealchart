@@ -100,6 +100,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Resolved selected drawing action surface anchor in chart screen coordinates */
   userDrawingSelectionActionAnchor?: UserDrawingSelectionActionAnchor | null;
+  /** Whether selected drawing edit drags should duplicate before moving. */
+  userDrawingDuplicateEditDragEnabled?: boolean;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   /** Callback when the drawing toolbar should undo the last drawing command */
@@ -110,6 +112,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingDuplicateSelected?: () => void;
   /** Callback when the selected drawing should be copied */
   onUserDrawingCopySelected?: () => void;
+  /** Callback when selected drawing duplicate-drag mode should change */
+  onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
   /** Callback when the selected drawing should be deleted */
   onUserDrawingDeleteSelected?: () => void;
   /** Callback when the active drawing draft should be cancelled */
@@ -722,6 +726,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
+    if (item.command.type === 'setDuplicateEditDrag') {
+      this.options.onUserDrawingDuplicateEditDragChange?.(item.command.duplicate);
+      return;
+    }
+
     if (item.command.type === 'styleAction') {
       if (item.command.visible !== undefined) {
         this.options.onUserDrawingVisibilityChange?.(item.command.visible);
@@ -777,7 +786,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       return;
     }
 
-    const surface = resolveUserDrawingSelectedActionSurface(state);
+    const surface = resolveUserDrawingSelectedActionSurface(state, {
+      duplicateEditDragEnabled: this.options.userDrawingDuplicateEditDragEnabled,
+    });
     const selectedDrawingId = surface.selectedDrawing?.id ?? null;
     if (this.selectedActionPopoverDrawingId !== selectedDrawingId) {
       this.selectedActionPopoverGroupId = null;
@@ -1986,6 +1997,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   setUserDrawingCommandAvailability(availability: UserDrawingCommandAvailability, options: { render?: boolean } = {}): void {
     this.options.userDrawingCommandAvailability = availability;
     if (options.render !== false) this.render();
+  }
+
+  setUserDrawingDuplicateEditDragEnabled(enabled: boolean): void {
+    this.options.userDrawingDuplicateEditDragEnabled = enabled;
+    this.renderSelectedActionSurface();
   }
 
   setUserDrawingSelectionActionAnchor(anchor: UserDrawingSelectionActionAnchor | null): void {
