@@ -157,6 +157,7 @@ import type {
   MobileUserDrawingFibSpiralPrimitive,
   MobileUserDrawingFibTimeZonePrimitive,
   MobileUserDrawingFibWedgePrimitive,
+  MobileUserDrawingFixedRangeVolumeProfilePrimitive,
   MobileUserDrawingFlatTopBottomPrimitive,
   MobileUserDrawingForecastPrimitive,
   MobileUserDrawingGannBoxPrimitive,
@@ -1291,6 +1292,27 @@ describe('tealchart public entries', () => {
       totalVolume: 10,
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
+    const fixedRangeVolumeProfilePrimitive: NonNever<MobileUserDrawingFixedRangeVolumeProfilePrimitive> = {
+      kind: 'fixedRangeVolumeProfile',
+      id: 'fixed-range-volume-profile',
+      phase: 'committed',
+      selected: false,
+      opacity: 1,
+      clip,
+      bounds: { x: 0, y: 0, width: 10, height: 10 },
+      bins: [{ priceMin: 1, priceMax: 2, volume: 10, rect: { x: 0, y: 0, width: 5, height: 2 } }],
+      guides: [
+        {
+          kind: 'pointOfControl',
+          price: 1.5,
+          volume: 10,
+          segment: { start: { x: 0, y: 1 }, end: { x: 10, y: 1 } },
+        },
+      ],
+      maxVolume: 10,
+      totalVolume: 10,
+      style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+    };
 
     expect(channelPrimitive.kind).toBe('parallelChannel');
     expect(regressionPrimitive.kind).toBe('regressionTrend');
@@ -1336,6 +1358,7 @@ describe('tealchart public entries', () => {
     expect(tablePrimitive.kind).toBe('table');
     expect(anchoredVwapPrimitive.kind).toBe('anchoredVwap');
     expect(anchoredVolumeProfilePrimitive.kind).toBe('anchoredVolumeProfile');
+    expect(fixedRangeVolumeProfilePrimitive.kind).toBe('fixedRangeVolumeProfile');
   });
 
   it('exports usable native risk reward label position helpers', () => {
