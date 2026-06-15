@@ -35,6 +35,7 @@ import Konva from 'konva';
 import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
 import {
+  getUserDrawingPlacementMode,
   isUserDrawingDragPlacementTool,
   isUserDrawingPathFamilyTool,
   renderUserDrawingLayer,
@@ -1589,6 +1590,10 @@ export class ChartCore {
       return source === 'touch' && (selection?.hit === true || selection?.changed === true)
         ? { handled: true, allowPaneDoubleClick: true }
         : false;
+    }
+
+    if (this.userDrawingState && getUserDrawingPlacementMode(this.userDrawingState.activeTool) === 'dragTwoAnchor') {
+      return this.resolveUserDrawingInputPoint(x, y) ? { handled: true } : false;
     }
 
     if (!this.options.onUserDrawingInput) return false;

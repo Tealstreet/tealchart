@@ -588,7 +588,7 @@ describe('ChartCore viewport management', () => {
     core.setBars([{ time: 50, open: 40, high: 80, low: 20, close: 60, volume: 1 }]);
     core.setUserDrawingState({
       version: 1,
-      activeTool: 'trendLine',
+      activeTool: 'horizontalLine',
       magnetMode: 'strong',
       selection: null,
       draft: null,
@@ -607,6 +607,84 @@ describe('ChartCore viewport management', () => {
         anchor: { time: 50, price: 80 },
       }),
     );
+
+    core.dispose();
+  });
+
+  it('swallows click placement for drag-placement tools so web users must drag real endpoints', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingInput = vi.fn(() => true);
+    const core = new ChartCore({
+      container,
+      width: 100,
+      height: 100,
+      margins: { top: 0, right: 0, bottom: 0, left: 0 },
+      onUserDrawingInput,
+      onUserDrawingPlacementDragStart: vi.fn(() => true),
+      onUserDrawingPlacementDragEnd: vi.fn(() => true),
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'rectangle',
+      magnetMode: 'off',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const testCore = core as unknown as {
+      handleUserDrawingInput(x: number, y: number): unknown;
+    };
+
+    expect(testCore.handleUserDrawingInput(48, 18)).toEqual({ handled: true });
+    expect(testCore.handleUserDrawingInput(120, 18)).toBe(false);
+    expect(onUserDrawingInput).not.toHaveBeenCalled();
+
+    core.dispose();
+  });
+
+  it('keeps drag-seeded tool final taps available after seed drags', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onUserDrawingInput = vi.fn(() => true);
+    const onUserDrawingPlacementDragStart = vi.fn(() => true);
+    const onUserDrawingPlacementDragEnd = vi.fn(() => true);
+    const core = new ChartCore({
+      container,
+      width: 100,
+      height: 100,
+      margins: { top: 0, right: 0, bottom: 0, left: 0 },
+      onUserDrawingInput,
+      onUserDrawingPlacementDragStart,
+      onUserDrawingPlacementDragEnd,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    core.setUserDrawingState({
+      version: 1,
+      activeTool: 'longPosition',
+      magnetMode: 'off',
+      selection: null,
+      draft: null,
+      textEdit: null,
+      drawings: [],
+    } satisfies UserDrawingState);
+
+    const testCore = core as unknown as {
+      handleUserDrawingDragStart(x: number, y: number): boolean;
+      handleUserDrawingDragMove(x: number, y: number): boolean;
+      handleUserDrawingDragEnd(): void;
+      handleUserDrawingInput(x: number, y: number): unknown;
+    };
+
+    expect(testCore.handleUserDrawingDragStart(20, 20)).toBe(true);
+    expect(testCore.handleUserDrawingDragMove(48, 18)).toBe(true);
+    testCore.handleUserDrawingDragEnd();
+    expect(onUserDrawingPlacementDragStart).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledTimes(1);
+
+    expect(testCore.handleUserDrawingInput(48, 18)).toBe(true);
+    expect(onUserDrawingInput).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
 
     core.dispose();
   });
