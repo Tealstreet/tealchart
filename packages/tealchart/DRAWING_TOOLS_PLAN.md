@@ -242,6 +242,13 @@ object-tree gaps stay visible.
 - Shared selected-action and properties surfaces expose fill-opacity controls
   for drawings with visible fill behavior.
 
+## Shipped: Mobile Selected Action Popover Clamp
+
+- Mobile Skia selected-action popovers derive their clamp height from the
+  actual wrapped action count instead of a fixed estimate.
+- Large shared Style popovers, including text and fill controls, stay inside
+  the mobile chart viewport in parity with the web floating toolbar clamp.
+
 ## Shipped: Fill and Border Toggles
 
 - Shared drawing style supports explicit fill and border visibility flags.

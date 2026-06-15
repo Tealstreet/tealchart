@@ -488,6 +488,9 @@ Phase 3: Dismissal and focus
 - Status: mobile Skia consumes the same shared popover-group metadata as web
   for selected drawing style controls, with RN coverage for opening the Style
   popover and dispatching a style command through the mobile adapter.
+- Status: mobile selected-action popover clamping now derives height from the
+  actual wrapped action count, so large shared Style popovers stay inside the
+  chart viewport like the web floating toolbar.
 
 ### Epic 4.4: Drawing Context Menu
 
