@@ -34,6 +34,7 @@ import {
   DEFAULT_USER_DRAWING_MEASUREMENT_LABEL_POSITION,
   DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
   normalizeUserDrawingMeasurementLabelPosition,
+  normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingFontFamily,
   normalizeUserDrawingFontSize,
@@ -2154,8 +2155,18 @@ function primitiveFromGeometry(
     case 'longPosition':
     case 'shortPosition': {
       const { position } = geometry;
-      const labelX = position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
       const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
+      const labelAlignment = normalizeUserDrawingRiskRewardLabelAlignment(
+        geometry.drawing.style.riskRewardLabelAlignment,
+      );
+      const labelLeft = Math.min(position.entryLine.start.x, position.entryLine.end.x) + fontSize;
+      const labelRight = Math.max(position.entryLine.start.x, position.entryLine.end.x) - fontSize;
+      const labelX =
+        labelAlignment === 'left'
+          ? labelLeft
+          : labelAlignment === 'right'
+            ? labelRight
+            : position.entryLine.start.x + (position.entryLine.end.x - position.entryLine.start.x) / 2;
       return {
         kind: 'riskRewardPosition',
         id: geometry.drawing.id,

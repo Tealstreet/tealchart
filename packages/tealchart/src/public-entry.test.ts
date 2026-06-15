@@ -108,6 +108,8 @@ import type {
   UserDrawingBarsPatternDisplayMode,
   UserDrawingBarsPatternDisplayModeDescriptor,
   UserDrawingPriceRangeMetrics,
+  UserDrawingRiskRewardLabelAlignment,
+  UserDrawingRiskRewardLabelAlignmentDescriptor,
   UserDrawingRiskRewardMetrics,
   UserDrawingRiskRewardStatsMode,
   UserDrawingRiskRewardStatsModeDescriptor,
@@ -290,6 +292,8 @@ import {
   USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
   USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS,
   USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
@@ -307,6 +311,7 @@ import {
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
   normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingMeasurementLabelPosition,
+  normalizeUserDrawingRiskRewardLabelAlignment,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
@@ -1439,6 +1444,10 @@ describe('tealchart public entries', () => {
     const measurementLabelPosition: UserDrawingMeasurementLabelPosition = USER_DRAWING_MEASUREMENT_LABEL_POSITIONS[1]!;
     const measurementLabelPositionDescriptor: UserDrawingMeasurementLabelPositionDescriptor =
       USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS[1]!;
+    const riskRewardLabelAlignment: UserDrawingRiskRewardLabelAlignment =
+      USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENTS[2]!;
+    const riskRewardLabelAlignmentDescriptor: UserDrawingRiskRewardLabelAlignmentDescriptor =
+      USER_DRAWING_RISK_REWARD_LABEL_ALIGNMENT_DESCRIPTORS[2]!;
     const riskRewardStatsMode: UserDrawingRiskRewardStatsMode = USER_DRAWING_RISK_REWARD_STATS_MODES[1]!;
     const riskRewardStatsModeDescriptor: UserDrawingRiskRewardStatsModeDescriptor =
       USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS[1]!;
@@ -1472,6 +1481,8 @@ describe('tealchart public entries', () => {
     expect(barsPatternDownColorDescriptor.color).toBe('#f97316');
     expect(measurementLabelPosition).toBe('top');
     expect(measurementLabelPositionDescriptor.position).toBe('top');
+    expect(riskRewardLabelAlignment).toBe('right');
+    expect(riskRewardLabelAlignmentDescriptor.alignment).toBe('right');
     expect(riskRewardStatsMode).toBe('compact');
     expect(riskRewardStatsModeDescriptor.statsMode).toBe('compact');
     expect(volumeProfileRowCount).toBe(24);
@@ -1486,6 +1497,7 @@ describe('tealchart public entries', () => {
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
     expect(normalizeUserDrawingBarsPatternDisplayMode('future')).toBe('candles');
     expect(normalizeUserDrawingMeasurementLabelPosition('future')).toBe('center');
+    expect(normalizeUserDrawingRiskRewardLabelAlignment('future')).toBe('center');
     expect(normalizeUserDrawingRiskRewardStatsMode('future')).toBe('full');
     expect(normalizeUserDrawingVolumeProfileRowCount(24.4)).toBe(24);
     expect(normalizeUserDrawingVolumeProfileValueAreaRatio(1.5)).toBe(1);

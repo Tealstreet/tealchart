@@ -3826,6 +3826,42 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready risk reward labels at the configured horizontal alignment', () => {
+    const alignedStyle = { ...style, riskRewardLabelAlignment: 'left' as const };
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'long',
+          kind: 'longPosition',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: alignedStyle,
+          points: [
+            { time: 10, price: 50 },
+            { time: 90, price: 80 },
+            { time: 90, price: 40 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'riskRewardPosition',
+      rewardLabelPoint: { x: 22, y: 35 },
+      riskLabelPoint: { x: 22, y: 55 },
+      ratioLabelPoint: { x: 22, y: 38 },
+      style: alignedStyle,
+    });
+  });
+
   it('positions risk reward labels with a Skia baseline offset', () => {
     const state: UserDrawingState = {
       version: 1,
