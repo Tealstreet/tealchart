@@ -110,6 +110,9 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           onUserDrawingCopySelected={onUserDrawingCopySelected}
           onUserDrawingDuplicateEditDragChange={onUserDrawingDuplicateEditDragChange}
         />
+        <button aria-label="Chart gesture target" type="button">
+          Chart
+        </button>
       </div>,
     );
 
@@ -153,6 +156,9 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
           onUserDrawingCopySelected={onUserDrawingCopySelected}
         />
+        <button aria-label="Chart gesture target" type="button">
+          Chart
+        </button>
       </div>,
     );
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
@@ -170,12 +176,17 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           onUserDrawingPropertiesOpen={onUserDrawingPropertiesOpen}
           onUserDrawingCopySelected={onUserDrawingCopySelected}
         />
+        <button aria-label="Chart gesture target" type="button">
+          Chart
+        </button>
       </div>,
     );
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
     expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
 
     expect(onChartTouch).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByLabelText('Chart gesture target'));
+    expect(onChartTouch).toHaveBeenCalledTimes(1);
     expect(onUserDrawingPropertiesOpen).toHaveBeenCalledWith(
       expect.objectContaining({
         drawingId: 'line',
