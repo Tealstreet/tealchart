@@ -988,6 +988,32 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings[0]?.style.labelsVisible).toBe(false);
   });
 
+  it('restores volume profile guide visibility style fields', () => {
+    const restored = deserializeUserDrawingStateFromLayout({
+      version: 1,
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'anchoredVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid',
+            volumeProfileGuidesVisible: false,
+          },
+          point: { time: 1, price: 10 },
+        },
+      ],
+    });
+
+    expect(restored?.drawings[0]?.style.volumeProfileGuidesVisible).toBe(false);
+  });
+
   it('normalizes restored drawing opacity', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
