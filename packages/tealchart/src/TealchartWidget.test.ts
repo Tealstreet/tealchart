@@ -1011,6 +1011,155 @@ describe('TealchartWidget', () => {
       },
     );
 
+    it('seeds long position anchors after widget UI toolbar tool selection', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      const testWidget = widget as unknown as {
+        _handleUserDrawingPlacementDragStart(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
+        _handleUserDrawingPlacementDragEnd(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
+        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.('longPosition');
+      expect(widget.getUserDrawingState().activeTool).toBe('longPosition');
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setActiveTool', tool: 'longPosition' }),
+          source: 'toolbar',
+        }),
+      );
+
+      expect(
+        testWidget._handleUserDrawingPlacementDragStart({
+          paneId: 'main',
+          anchor: { time: 1_000, price: 100 },
+        }),
+      ).toBe(true);
+      expect(
+        testWidget._handleUserDrawingPlacementDragEnd({
+          paneId: 'main',
+          anchor: { time: 2_000, price: 110 },
+        }),
+      ).toBe(true);
+      expect(widget.getUserDrawingState()).toMatchObject({
+        activeTool: 'longPosition',
+        selection: null,
+        draft: {
+          tool: 'longPosition',
+          paneId: 'main',
+          anchors: [
+            { time: 1_000, price: 100 },
+            { time: 2_000, price: 110 },
+          ],
+        },
+        drawings: [],
+      });
+
+      expect(
+        testWidget._handleUserDrawingInput({
+          paneId: 'main',
+          anchor: { time: 3_000, price: 90 },
+        }),
+      ).toBe(true);
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'drawing_1',
+        kind: 'longPosition',
+        points: [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 110 },
+          { time: 3_000, price: 90 },
+        ],
+      });
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+
+      widget.remove();
+    });
+
+    it('commits brush path drags after widget UI toolbar tool selection', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      const testWidget = widget as unknown as {
+        _handleUserDrawingPathDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingPathDragMove(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingPathDragEnd(): void;
+      };
+
+      widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.('brush');
+      expect(widget.getUserDrawingState().activeTool).toBe('brush');
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setActiveTool', tool: 'brush' }),
+          source: 'toolbar',
+        }),
+      );
+
+      expect(testWidget._handleUserDrawingPathDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(
+        true,
+      );
+      expect(testWidget._handleUserDrawingPathDragMove({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
+        true,
+      );
+      expect(testWidget._handleUserDrawingPathDragMove({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(
+        true,
+      );
+      testWidget._handleUserDrawingPathDragEnd();
+
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'drawing_1',
+        kind: 'brush',
+        paneId: 'main',
+        points: [
+          { time: 1, price: 10 },
+          { time: 1.25, price: 12.5 },
+          { time: 1.75, price: 17.5 },
+          { time: 2.25, price: 22.5 },
+          { time: 2.75, price: 27.5 },
+          { time: 3, price: 30 },
+        ],
+      });
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+
+      widget.remove();
+    });
+
+    it('commits text labels after widget UI toolbar tool selection', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+      const testWidget = widget as unknown as {
+        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+      };
+
+      widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.('textLabel');
+      expect(widget.getUserDrawingState().activeTool).toBe('textLabel');
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setActiveTool', tool: 'textLabel' }),
+          source: 'toolbar',
+        }),
+      );
+
+      expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 4_000, price: 80 } })).toBe(true);
+
+      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+        id: 'drawing_1',
+        kind: 'textLabel',
+        paneId: 'main',
+        point: { time: 4_000, price: 80 },
+      });
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+
+      widget.remove();
+    });
+
     it('routes widget UI toolbar undo and redo through drawing history', () => {
       const datafeed = createMockDatafeed();
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
