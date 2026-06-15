@@ -1077,7 +1077,7 @@ export class TealchartWidget {
       onUserDrawingPathDragMove: (point) => this._handleUserDrawingPathDragMove(point),
       onUserDrawingPathDragEnd: () => this._handleUserDrawingPathDragEnd(),
       userDrawingState: this._userDrawingState,
-      onUserDrawingToolSelect: (tool) => this.setActiveUserDrawingTool(tool),
+      onUserDrawingToolSelect: (tool) => this._setActiveUserDrawingToolFromToolbar(tool),
       onUserDrawingDuplicateSelected: () => {
         this.duplicateSelectedUserDrawing();
       },
@@ -2306,6 +2306,10 @@ export class TealchartWidget {
 
   setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
     return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'api' } });
+  }
+
+  private _setActiveUserDrawingToolFromToolbar(tool: UserDrawingTool): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'toolbar' } });
   }
 
   setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean {
