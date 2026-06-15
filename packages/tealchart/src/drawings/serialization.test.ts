@@ -2973,7 +2973,7 @@ describe('drawing layout serialization', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', riskRewardStatsMode: 'compact' },
           points: [
             { time: 1, price: 100 },
             { time: 2, price: 110 },
@@ -2988,7 +2988,7 @@ describe('drawing layout serialization', () => {
           locked: false,
           createdAt: 1,
           updatedAt: 1,
-          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid', riskRewardStatsMode: 'future' },
           points: [
             { time: 1, price: 100 },
             { time: 2, price: 90 },
@@ -2999,10 +2999,13 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings).toMatchObject([
-      { id: 'long', kind: 'longPosition' },
-      { id: 'short', kind: 'shortPosition' },
+      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact' } },
+      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full' } },
     ]);
-    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toHaveLength(2);
+    expect(serializeUserDrawingStateForLayout(restored!)?.drawings).toMatchObject([
+      { id: 'long', kind: 'longPosition', style: { riskRewardStatsMode: 'compact' } },
+      { id: 'short', kind: 'shortPosition', style: { riskRewardStatsMode: 'full' } },
+    ]);
   });
 
   it('restores forecast drawings', () => {

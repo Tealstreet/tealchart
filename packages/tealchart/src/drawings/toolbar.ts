@@ -8,6 +8,7 @@ import type {
   UserDrawingFontWeight,
   UserDrawingIconName,
   UserDrawingLineStyle,
+  UserDrawingRiskRewardStatsMode,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -34,6 +35,7 @@ import {
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAMES,
   USER_DRAWING_OPACITIES,
+  USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
@@ -185,6 +187,11 @@ export interface UserDrawingTextWrapDescriptor {
 
 export interface UserDrawingTextMaxWidthDescriptor {
   textMaxWidth: UserDrawingTextMaxWidth;
+  label: string;
+}
+
+export interface UserDrawingRiskRewardStatsModeDescriptor {
+  statsMode: UserDrawingRiskRewardStatsMode;
   label: string;
 }
 
@@ -776,6 +783,12 @@ export const USER_DRAWING_FILL_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityD
     label: `${Math.round(opacity * 100)} percent fill opacity`,
   })),
 ];
+
+export const USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS: readonly UserDrawingRiskRewardStatsModeDescriptor[] =
+  USER_DRAWING_RISK_REWARD_STATS_MODES.map((statsMode) => ({
+    statsMode,
+    label: statsMode === 'compact' ? 'Compact position stats' : 'Full position stats',
+  }));
 
 export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS: readonly UserDrawingVolumeProfileRowCountDescriptor[] =
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS.map((rowCount) => ({
@@ -1625,6 +1638,10 @@ export function supportsUserDrawingVolumeProfileValueAreaControls(drawing: UserD
 
 export function supportsUserDrawingVolumeProfileWidthControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
+}
+
+export function supportsUserDrawingRiskRewardStatsModeControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'longPosition' || drawing.kind === 'shortPosition';
 }
 
 const GENERATED_LABEL_TEXT_APPEARANCE_DRAWING_KINDS = new Set<UserDrawing['kind']>([

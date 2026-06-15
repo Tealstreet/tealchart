@@ -1537,6 +1537,17 @@ object-tree gaps stay visible.
   overlays inside the unchanged profile bounds while preserving the existing
   100-percent default.
 
+## Shipped: Risk/Reward Position Stats Mode Controls
+
+- Shared drawing style now preserves `riskRewardStatsMode` for long and short
+  position drawings with `full` as the default and `compact` as the alternate
+  stats layout.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose matching full/compact position-stat presets through the shared
+  properties surface.
+- Web Canvas and mobile Skia render paths consume the same shared risk/reward
+  metrics so compact stats labels match across platforms.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.
