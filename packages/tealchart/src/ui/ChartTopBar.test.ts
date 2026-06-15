@@ -139,6 +139,35 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('clears a pinned drawing tool flyout when switching categories', () => {
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-tools-pinned-switch',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, activeTool: 'trendLine' },
+    });
+    topBar.mount(document.body);
+
+    const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    linesCategory?.click();
+    document
+      .getElementById('tealchart-drawing-tools-lines')
+      ?.querySelector<HTMLButtonElement>('button[aria-label="Pin drawing tools"]')
+      ?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]')?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
+
+    topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'rectangle' });
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.getAttribute(
+        'aria-expanded',
+      ),
+    ).toBe('false');
+
+    topBar.unmount();
+  });
+
   it('mounts drawing tools in a dedicated overlay parent when provided', () => {
     const overlayParent = document.createElement('div');
     const chromeParent = document.createElement('div');
