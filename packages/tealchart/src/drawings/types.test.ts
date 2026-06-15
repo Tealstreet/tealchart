@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontSize,
   normalizeUserDrawingFontStyle,
   normalizeUserDrawingOpacity,
+  normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingStyle,
   normalizeUserDrawingTextMaxWidth,
@@ -23,6 +24,7 @@ import {
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
@@ -223,6 +225,17 @@ describe('user drawing types', () => {
       normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, riskRewardStatsMode: 'future' as never }),
     ).toMatchObject({
       riskRewardStatsMode: 'full',
+    });
+  });
+
+  it('normalizes bars pattern display modes to supported cross-platform values', () => {
+    expect(USER_DRAWING_BARS_PATTERN_DISPLAY_MODES).toEqual(['candles', 'line']);
+    expect(normalizeUserDrawingBarsPatternDisplayMode('line')).toBe('line');
+    expect(normalizeUserDrawingBarsPatternDisplayMode('future')).toBe('candles');
+    expect(
+      normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, barsPatternDisplayMode: 'future' as never }),
+    ).toMatchObject({
+      barsPatternDisplayMode: 'candles',
     });
   });
 

@@ -2,6 +2,7 @@ import type { UpdateUserDrawingOptions, UserDrawingZOrderAction } from './input'
 import type { UserDrawingSelectionActionAnchor } from './renderModel';
 import type {
   UserDrawing,
+  UserDrawingBarsPatternDisplayMode,
   UserDrawingPathFamilyKind,
   UserDrawingFontFamily,
   UserDrawingFontStyle,
@@ -35,6 +36,7 @@ import {
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAMES,
   USER_DRAWING_OPACITIES,
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
@@ -192,6 +194,11 @@ export interface UserDrawingTextMaxWidthDescriptor {
 
 export interface UserDrawingRiskRewardStatsModeDescriptor {
   statsMode: UserDrawingRiskRewardStatsMode;
+  label: string;
+}
+
+export interface UserDrawingBarsPatternDisplayModeDescriptor {
+  displayMode: UserDrawingBarsPatternDisplayMode;
   label: string;
 }
 
@@ -788,6 +795,12 @@ export const USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS: readonly UserDrawi
   USER_DRAWING_RISK_REWARD_STATS_MODES.map((statsMode) => ({
     statsMode,
     label: statsMode === 'compact' ? 'Compact position stats' : 'Full position stats',
+  }));
+
+export const USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS: readonly UserDrawingBarsPatternDisplayModeDescriptor[] =
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODES.map((displayMode) => ({
+    displayMode,
+    label: displayMode === 'line' ? 'Line bars pattern' : 'Candlestick bars pattern',
   }));
 
 export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS: readonly UserDrawingVolumeProfileRowCountDescriptor[] =
@@ -1638,6 +1651,10 @@ export function supportsUserDrawingVolumeProfileValueAreaControls(drawing: UserD
 
 export function supportsUserDrawingVolumeProfileWidthControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
+}
+
+export function supportsUserDrawingBarsPatternDisplayModeControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'barsPattern';
 }
 
 export function supportsUserDrawingRiskRewardStatsModeControls(drawing: UserDrawing): boolean {

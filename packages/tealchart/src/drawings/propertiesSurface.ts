@@ -7,6 +7,7 @@ import type {
 } from './input';
 import type {
   UserDrawing,
+  UserDrawingBarsPatternDisplayMode,
   UserDrawingFontFamily,
   UserDrawingFontStyle,
   UserDrawingFontWeight,
@@ -24,12 +25,14 @@ import type {
 } from './types';
 
 import {
+  DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
   DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO,
   DEFAULT_USER_DRAWING_STYLE,
   isUserDrawingPathFamilyTool,
+  normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingVolumeProfileRowCount,
@@ -43,6 +46,7 @@ import {
   getUserDrawingFillOpacityDescriptors,
   getUserDrawingOpacityDescriptors,
   getSelectedUserDrawing,
+  supportsUserDrawingBarsPatternDisplayModeControls,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
@@ -57,6 +61,7 @@ import {
   supportsUserDrawingVolumeProfileRowCountControls,
   supportsUserDrawingVolumeProfileValueAreaControls,
   supportsUserDrawingVolumeProfileWidthControls,
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -111,6 +116,7 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingIconName
         | UserDrawingLineStyle
         | UserDrawingBrushTemplateId
+        | UserDrawingBarsPatternDisplayMode
         | UserDrawingRiskRewardStatsMode
         | UserDrawingTextAlign
         | UserDrawingTextMaxWidth
@@ -432,6 +438,27 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
         value: descriptor.extend,
         selected: drawing.extend === descriptor.extend,
         command: { type: 'setTrendLineExtend' as const, extend: descriptor.extend },
+      })),
+    });
+  }
+
+  if (supportsUserDrawingBarsPatternDisplayModeControls(drawing)) {
+    const currentBarsPatternDisplayMode = normalizeUserDrawingBarsPatternDisplayMode(
+      drawing.style.barsPatternDisplayMode ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE,
+    );
+    groups.push({
+      id: 'geometry',
+      label: 'Geometry',
+      controls: USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => ({
+        id: `barsPatternDisplayMode:${descriptor.displayMode}`,
+        type: 'option' as const,
+        label: descriptor.label,
+        value: descriptor.displayMode,
+        selected: currentBarsPatternDisplayMode === descriptor.displayMode,
+        command: {
+          type: 'updateStyle' as const,
+          style: { barsPatternDisplayMode: descriptor.displayMode },
+        },
       })),
     });
   }
