@@ -988,7 +988,7 @@ describe('drawing layout serialization', () => {
     expect(restored?.drawings[0]?.style.labelsVisible).toBe(false);
   });
 
-  it('restores volume profile guide visibility style fields', () => {
+  it('restores volume profile style fields', () => {
     const restored = deserializeUserDrawingStateFromLayout({
       version: 1,
       drawings: [
@@ -1005,6 +1005,7 @@ describe('drawing layout serialization', () => {
             lineWidth: 1,
             lineStyle: 'solid',
             volumeProfileGuidesVisible: false,
+            volumeProfileRowCount: 24.4,
           },
           point: { time: 1, price: 10 },
         },
@@ -1012,6 +1013,7 @@ describe('drawing layout serialization', () => {
     });
 
     expect(restored?.drawings[0]?.style.volumeProfileGuidesVisible).toBe(false);
+    expect(restored?.drawings[0]?.style.volumeProfileRowCount).toBe(24);
   });
 
   it('normalizes restored drawing opacity', () => {
