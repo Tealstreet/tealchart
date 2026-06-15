@@ -281,6 +281,7 @@ describe('UserDrawingPropertiesSheet', () => {
       />,
     );
 
+    expect(screen.getByText('Geometry')).not.toBeNull();
     expect(screen.getByText('Bars Pattern')).not.toBeNull();
     expect(screen.getByLabelText('Candlestick bars pattern').getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByLabelText('Line bars pattern').getAttribute('aria-pressed')).toBe('false');
