@@ -79,6 +79,8 @@ import type {
   UserDrawingIconNameDescriptor,
   UserDrawingInfoLineMetrics,
   UserDrawingMagnetMode,
+  UserDrawingMeasurementLabelPosition,
+  UserDrawingMeasurementLabelPositionDescriptor,
   UserDrawingMeasuredTextLine,
   UserDrawingOpacityDescriptor,
   UserDrawingBrushTemplateDescriptor,
@@ -285,6 +287,8 @@ import {
   USER_DRAWING_FONT_WEIGHTS,
   USER_DRAWING_ICON_NAME_DESCRIPTORS,
   USER_DRAWING_ICON_NAMES,
+  USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS,
+  USER_DRAWING_MEASUREMENT_LABEL_POSITIONS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
   USER_DRAWING_RISK_REWARD_STATS_MODES,
@@ -302,6 +306,7 @@ import {
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS,
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
   normalizeUserDrawingBarsPatternDisplayMode,
+  normalizeUserDrawingMeasurementLabelPosition,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
@@ -1431,6 +1436,9 @@ describe('tealchart public entries', () => {
       USER_DRAWING_BARS_PATTERN_UP_COLOR_DESCRIPTORS[1]!;
     const barsPatternDownColorDescriptor: UserDrawingBarsPatternColorDescriptor =
       USER_DRAWING_BARS_PATTERN_DOWN_COLOR_DESCRIPTORS[1]!;
+    const measurementLabelPosition: UserDrawingMeasurementLabelPosition = USER_DRAWING_MEASUREMENT_LABEL_POSITIONS[1]!;
+    const measurementLabelPositionDescriptor: UserDrawingMeasurementLabelPositionDescriptor =
+      USER_DRAWING_MEASUREMENT_LABEL_POSITION_DESCRIPTORS[1]!;
     const riskRewardStatsMode: UserDrawingRiskRewardStatsMode = USER_DRAWING_RISK_REWARD_STATS_MODES[1]!;
     const riskRewardStatsModeDescriptor: UserDrawingRiskRewardStatsModeDescriptor =
       USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS[1]!;
@@ -1462,6 +1470,8 @@ describe('tealchart public entries', () => {
     expect(barsPatternDisplayModeDescriptor.displayMode).toBe('line');
     expect(barsPatternUpColorDescriptor.color).toBe('#38bdf8');
     expect(barsPatternDownColorDescriptor.color).toBe('#f97316');
+    expect(measurementLabelPosition).toBe('top');
+    expect(measurementLabelPositionDescriptor.position).toBe('top');
     expect(riskRewardStatsMode).toBe('compact');
     expect(riskRewardStatsModeDescriptor.statsMode).toBe('compact');
     expect(volumeProfileRowCount).toBe(24);
@@ -1475,6 +1485,7 @@ describe('tealchart public entries', () => {
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
     expect(normalizeUserDrawingBarsPatternDisplayMode('future')).toBe('candles');
+    expect(normalizeUserDrawingMeasurementLabelPosition('future')).toBe('center');
     expect(normalizeUserDrawingRiskRewardStatsMode('future')).toBe('full');
     expect(normalizeUserDrawingVolumeProfileRowCount(24.4)).toBe(24);
     expect(normalizeUserDrawingVolumeProfileValueAreaRatio(1.5)).toBe(1);
