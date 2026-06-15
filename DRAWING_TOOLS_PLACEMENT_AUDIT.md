@@ -45,8 +45,9 @@ Tools audited here:
 - Web and mobile toolbar tests both exercise `Rectangle` selection from the
   rendered drawing-tool categories. This covers the tool-selection side of the
   reported rectangle workflow.
-- Web widget-level placement coverage now also starts from a toolbar-style
-  `rectangle` selection callback before committing exact drag endpoints.
+- Web widget-level placement coverage now also starts from the widget UI
+  toolbar `rectangle` selection callback, verifies `toolbar` command metadata,
+  and then commits exact drag endpoints.
 - Mobile Skia component coverage now exercises the rendered drawing toolbar and
   verifies `Rectangle` selection reaches Skia drawing state with `toolbar`
   command metadata.

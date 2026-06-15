@@ -38,10 +38,16 @@ const setDrawingsCalls: DrawingOutput[][] = [];
 const setUserDrawingStateCalls: UserDrawingState[] = [];
 const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
+const widgetUiOptionsCalls: Array<{
+  onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+}> = [];
 
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
   TealchartWidgetUI: class {
+    constructor(options: { onUserDrawingToolSelect?: (tool: UserDrawingTool) => void }) {
+      widgetUiOptionsCalls.push(options);
+    }
     setBars(bars: Bar[]) {
       setBarsCalls.push([...bars]);
     }
@@ -250,6 +256,7 @@ describe('TealchartWidget', () => {
     setUserDrawingStateCalls.length = 0;
     setRenderOptionsCalls.length = 0;
     setExecutionLinesCalls.length = 0;
+    widgetUiOptionsCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
     // the callback synchronously sets it to null (assignment order issue).
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
@@ -945,12 +952,10 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
-    it('commits exact rectangle endpoints after a toolbar-style tool selection', () => {
+    it('commits exact rectangle endpoints after widget UI toolbar tool selection', () => {
       const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
-      const handleToolbarToolSelect = (tool: UserDrawingTool) => {
-        widget.setActiveUserDrawingTool(tool);
-      };
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
       const testWidget = widget as unknown as {
         _handleUserDrawingPlacementDragStart(point: {
           paneId: string;
@@ -959,8 +964,14 @@ describe('TealchartWidget', () => {
         _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
       };
 
-      handleToolbarToolSelect('rectangle');
+      widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.('rectangle');
       expect(widget.getUserDrawingState().activeTool).toBe('rectangle');
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setActiveTool', tool: 'rectangle' }),
+          source: 'toolbar',
+        }),
+      );
       expect(
         testWidget._handleUserDrawingPlacementDragStart({
           paneId: 'main',
