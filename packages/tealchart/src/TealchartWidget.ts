@@ -1081,6 +1081,9 @@ export class TealchartWidget {
       onUserDrawingDuplicateSelected: () => {
         this.duplicateSelectedUserDrawing();
       },
+      onUserDrawingCopySelected: () => {
+        this.copySelectedUserDrawing();
+      },
       onUserDrawingDeleteSelected: () => {
         this.deleteSelectedUserDrawing();
       },
@@ -3077,6 +3080,11 @@ export class TealchartWidget {
 
     if (command.type === 'editText') {
       this.beginUserDrawingTextEdit(command.drawingId);
+      return;
+    }
+
+    if (command.type === 'copySelected') {
+      this.copySelectedUserDrawing();
       return;
     }
 

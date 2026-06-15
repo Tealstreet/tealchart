@@ -175,6 +175,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   /** Called when the top bar should duplicate the selected user drawing */
   onUserDrawingDuplicateSelected?: () => void;
+  /** Called when the top bar should copy the selected user drawing */
+  onUserDrawingCopySelected?: () => void;
   /** Called when the top bar should delete the selected user drawing */
   onUserDrawingDeleteSelected?: () => void;
   /** Called when the top bar should cancel the active user drawing draft */
@@ -329,6 +331,7 @@ export class TealchartWidgetUI {
         userDrawingState: options.userDrawingState,
         onUserDrawingToolSelect: options.onUserDrawingToolSelect,
         onUserDrawingDuplicateSelected: options.onUserDrawingDuplicateSelected,
+        onUserDrawingCopySelected: options.onUserDrawingCopySelected,
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,

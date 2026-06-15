@@ -231,6 +231,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const onMeasureModeChange = vi.fn();
     const onZoomIn = vi.fn();
     const onZOrder = vi.fn();
+    const onCopy = vi.fn();
     const onProperties = vi.fn();
     const onObjectTree = vi.fn();
     const onTextEdit = vi.fn();
@@ -281,6 +282,7 @@ describe('ChartTopBar drawing toolbar', () => {
       },
       userDrawingSelectionActionAnchor: selectionActionAnchor,
       onUserDrawingDuplicateSelected: onDuplicate,
+      onUserDrawingCopySelected: onCopy,
       onUserDrawingDeleteSelected: onDelete,
       onUserDrawingCancelDraft: onCancel,
       onUserDrawingClearAll: onClear,
@@ -317,6 +319,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Copy selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing forward"]')?.click();
@@ -326,6 +329,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
     expect(onProperties).toHaveBeenCalledTimes(1);
     expect(onObjectTree).toHaveBeenCalledTimes(1);
+    expect(onCopy).toHaveBeenCalledTimes(1);
     expect(onDuplicate).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onZOrder).toHaveBeenCalledWith('bringForward');
