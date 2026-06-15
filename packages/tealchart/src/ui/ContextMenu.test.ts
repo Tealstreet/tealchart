@@ -34,6 +34,33 @@ describe('ContextMenu', () => {
     document.body.removeEventListener('click', onChartClick);
   });
 
+  it('renders and dispatches the drawing object-tree context action', () => {
+    const onChartClick = vi.fn();
+    const onObjectTree = vi.fn();
+    document.body.addEventListener('click', onChartClick);
+
+    const menu = showContextMenu({
+      x: 20,
+      y: 20,
+      items: [
+        { text: 'Open selected drawing properties', click: vi.fn(), position: 'top' },
+        { text: 'Open drawing object tree', click: onObjectTree, position: 'top' },
+      ],
+    });
+
+    const item = Array.from(menu.getElement().querySelectorAll<HTMLElement>('div')).find(
+      (element) => element.textContent === 'Open drawing object tree',
+    );
+    expect(item).not.toBeNull();
+
+    item?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onObjectTree).toHaveBeenCalledTimes(1);
+    expect(onChartClick).not.toHaveBeenCalled();
+    expect(document.body.contains(menu.getElement())).toBe(false);
+    document.body.removeEventListener('click', onChartClick);
+  });
+
   it('does not attach delayed outside listeners after item-click close', () => {
     vi.useFakeTimers();
     const onItemClick = vi.fn();
