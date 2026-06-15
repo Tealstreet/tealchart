@@ -12,6 +12,8 @@ import type { Bar, Viewport, ViewScaleState } from '../types';
 
 import { TealchartRenderer } from '../TealchartRenderer';
 
+export const VIEWPORT_ZOOM_IN_FACTOR = 0.8;
+
 /**
  * Convert a resolution string (e.g., "1", "5", "15", "60", "240", "1h", "1D", "1W")
  * to its duration in milliseconds.
@@ -199,6 +201,22 @@ export function applyAutoScale(viewport: Viewport, bars: Bar[], padding: number 
     ...viewport,
     priceMax: bbox.highest + dataRange * padding,
     priceMin: bbox.lowest - dataRange * padding,
+  };
+}
+
+export function zoomViewportTimeRange(viewport: Viewport, factor: number): Viewport {
+  if (!Number.isFinite(factor) || factor <= 0) return viewport;
+
+  const timeRange = viewport.endTime - viewport.startTime;
+  if (!Number.isFinite(timeRange) || timeRange <= 0) return viewport;
+
+  const center = viewport.startTime + timeRange / 2;
+  const newTimeRange = timeRange * factor;
+
+  return {
+    ...viewport,
+    startTime: center - newTimeRange / 2,
+    endTime: center + newTimeRange / 2,
   };
 }
 

@@ -102,6 +102,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingClearAll?: () => void;
   /** Callback when temporary measure mode should toggle */
   onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
+  /** Callback when the drawing toolbar should zoom the chart time range in */
+  onUserDrawingZoomIn?: () => void;
   /** Callback when selected drawings should be reordered */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
@@ -1716,6 +1718,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
             : { drawingIds: [], includeLocked: true };
           if (item.command.action === 'measure') this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on');
+          if (item.command.action === 'zoomIn') this.options.onUserDrawingZoomIn?.();
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
           if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
           if (item.command.action === 'hideAll') {
