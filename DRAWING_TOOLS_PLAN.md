@@ -22,6 +22,9 @@ unblocks one of the north-star UX epics.
 - Top-left legend overlay metadata is represented in shared geometry; mobile currently reports no separate legend region.
 - Chart chrome geometry helpers and metrics are exported for app-level toolbar and overlay integration.
 - Web top-left legend shifts right of the drawing rail when left drawing tools are visible.
+- Web indicator pane legends use the same left-rail avoidance metadata as the
+  main top-left legend; mobile keeps the sibling contract explicit by reporting
+  no separate top-left legend region.
 - The web drawing rail mounts into a transparent chart overlay root; mobile uses the sibling full-chart overlay region for tap-away dismissal.
 
 ## Current Direction
@@ -49,7 +52,8 @@ unblocks one of the north-star UX epics.
 ## Known Gaps
 
 - Public layout helpers expose metadata only; they do not yet drive every internal overlay placement.
-- Indicator legend collision avoidance still needs to consume the shared top-left legend metadata end to end.
+- Additional app-owned overlays still need to consume chart chrome metadata as
+  they are introduced.
 - TradingView-grade grouped toolbar affordances need continued parity work across web and mobile.
 - Drag-to-draw, floating selected-object actions, context menu, object tree,
   advanced grouped transactions, and modifier behavior are tracked in
