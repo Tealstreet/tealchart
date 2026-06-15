@@ -4,10 +4,14 @@ import React from 'react';
 import { vi } from 'vitest';
 
 function createGesture() {
-  const gesture: Record<string, unknown> = {};
+  const callbacks: Record<string, unknown[]> = {};
+  const gesture: Record<string, unknown> = { __callbacks: callbacks };
   const proxy = new Proxy(gesture, {
     get(target, prop: string) {
-      target[prop] ??= () => proxy;
+      target[prop] ??= (...args: unknown[]) => {
+        callbacks[prop] = args;
+        return proxy;
+      };
       return target[prop];
     },
   });

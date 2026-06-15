@@ -7,8 +7,51 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createPicture } from '@shopify/react-native-skia';
+import { Gesture } from 'react-native-gesture-handler';
 import { SkiaTealchart } from './SkiaTealchart';
 import { clearChartStoreCache } from './state/chartState';
+
+interface MockGesture {
+  __callbacks?: Record<string, unknown[]>;
+}
+
+interface MockGestureFactory {
+  mockClear(): void;
+  mock: {
+    results: Array<{ value: MockGesture }>;
+  };
+}
+
+function getLatestDrawingPanGesture(): MockGesture {
+  const panMock = Gesture.Pan as unknown as MockGestureFactory;
+  const pan = [...panMock.mock.results]
+    .reverse()
+    .map((result) => result.value)
+    .find((gesture) => gesture.__callbacks?.onFinalize);
+
+  if (!pan) {
+    throw new Error('Expected SkiaTealchart to register a drawing pan gesture');
+  }
+
+  return pan;
+}
+
+function runGestureCallback(gesture: MockGesture, name: string, ...args: unknown[]): void {
+  const callback = gesture.__callbacks?.[name]?.[0];
+  if (typeof callback !== 'function') {
+    throw new Error(`Expected ${name} gesture callback to be registered`);
+  }
+
+  callback(...args);
+}
+
+function expectAnchorToBeCloseTo(
+  anchor: { time: number; price: number } | undefined,
+  expected: { time: number; price: number },
+): void {
+  expect(anchor?.time).toBeCloseTo(expected.time, 6);
+  expect(anchor?.price).toBeCloseTo(expected.price, 6);
+}
 
 function createBars(): Bar[] {
   return Array.from({ length: 5 }, (_, index) => ({
@@ -91,6 +134,7 @@ describe('SkiaTealchart drawing properties', () => {
   afterEach(() => {
     cleanup();
     clearChartStoreCache();
+    (Gesture.Pan as unknown as MockGestureFactory).mockClear();
   });
 
   it('opens the built-in properties sheet through the handle and dispatches controls to the pinned drawing', async () => {
@@ -227,6 +271,64 @@ describe('SkiaTealchart drawing properties', () => {
         source: 'toolbar',
       }),
     );
+  });
+
+  it('commits exact rectangle endpoints through rendered toolbar selection and Skia pan gestures', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Rectangle'));
+    });
+
+    const pan = getLatestDrawingPanGesture();
+    await act(async () => {
+      runGestureCallback(pan, 'onBegin', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onStart', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onUpdate', { x: 245, y: 165, translationX: 115, translationY: 70 });
+      runGestureCallback(pan, 'onFinalize', { x: 245, y: 165 }, true);
+    });
+
+    const beginCommand = onCommand.mock.calls.find(
+      ([event]) => event.command.type === 'beginPlacementDrag',
+    )?.[0].command;
+    const commitCommand = onCommand.mock.calls.find(
+      ([event]) => event.command.type === 'commitPlacementDrag',
+    )?.[0].command;
+    const drawing = ref.current?.getUserDrawingState().drawings[0];
+
+    expect(beginCommand).toMatchObject({ type: 'beginPlacementDrag', meta: { source: 'touch' } });
+    expect(commitCommand).toMatchObject({ type: 'commitPlacementDrag', meta: { source: 'touch' } });
+    expectAnchorToBeCloseTo(beginCommand?.point.anchor, {
+      time: 1_116_161.616161616,
+      price: 55.39393939393939,
+    });
+    expectAnchorToBeCloseTo(commitCommand?.point.anchor, {
+      time: 1_223_030.303030303,
+      price: 49.45454545454545,
+    });
+    expect(drawing).toMatchObject({
+      id: 'drawing_1',
+      kind: 'rectangle',
+      points: [beginCommand?.point.anchor, commitCommand?.point.anchor],
+    });
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
   });
 
   it('routes rendered mobile drawing toolbar undo and redo through Skia history', async () => {
