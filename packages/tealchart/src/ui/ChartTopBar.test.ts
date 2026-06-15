@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { UserDrawingState } from '../drawings';
+import type { UserDrawingState, UserDrawingTool } from '../drawings';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -16,6 +16,18 @@ const baseDrawingState: UserDrawingState = {
   textEdit: null,
   drawings: [],
 };
+
+const auditedPlacementToolbarTools: Array<{ tool: UserDrawingTool; label: string; categoryLabel: string }> = [
+  { tool: 'trendLine', label: 'Trend line', categoryLabel: 'Lines' },
+  { tool: 'rectangle', label: 'Rectangle', categoryLabel: 'Geometric Shapes' },
+  { tool: 'circle', label: 'Circle', categoryLabel: 'Geometric Shapes' },
+  { tool: 'ellipse', label: 'Ellipse', categoryLabel: 'Geometric Shapes' },
+  { tool: 'priceRange', label: 'Price range', categoryLabel: 'Forecasting and Measurement' },
+  { tool: 'datePriceRange', label: 'Date and price range', categoryLabel: 'Forecasting and Measurement' },
+  { tool: 'longPosition', label: 'Long position', categoryLabel: 'Forecasting and Measurement' },
+  { tool: 'brush', label: 'Brush', categoryLabel: 'Brushes' },
+  { tool: 'textLabel', label: 'Text label', categoryLabel: 'Annotations' },
+];
 
 const selectionActionAnchor = {
   anchor: { x: 160, y: 80 },
@@ -117,6 +129,34 @@ describe('ChartTopBar drawing toolbar', () => {
       document.querySelector<HTMLButtonElement>('button[aria-label="Rectangle"]')?.getAttribute('aria-pressed'),
     ).toBe('true');
 
+    topBar.unmount();
+  });
+
+  it('dispatches audited placement tools from the rendered drawing sidebar', () => {
+    const onTool = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-placement-audit-tools',
+      symbol: 'BTCUSDT',
+      userDrawingState: baseDrawingState,
+      onUserDrawingToolSelect: onTool,
+    });
+    topBar.mount(document.body);
+
+    for (const { tool, label, categoryLabel } of auditedPlacementToolbarTools) {
+      const category = document.querySelector<HTMLButtonElement>(
+        `button[aria-label="${categoryLabel} drawing tools"]`,
+      );
+      expect(category, categoryLabel).not.toBeNull();
+      category?.click();
+
+      const button = document.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`);
+      expect(button, label).not.toBeNull();
+      button?.click();
+      expect(onTool).toHaveBeenLastCalledWith(tool);
+      expect(category?.getAttribute('aria-expanded')).toBe('false');
+    }
+
+    expect(onTool).toHaveBeenCalledTimes(auditedPlacementToolbarTools.length);
     topBar.unmount();
   });
 
