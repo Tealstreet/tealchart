@@ -18,6 +18,7 @@ import {
   isMobileUserDrawingTextBoxPrimitive,
   resolveMobileUserDrawingBalloonLayout,
   resolveMobileUserDrawingInfoLineLabelPosition,
+  resolveMobileUserDrawingMeasurementLabelPosition,
   resolveMobileUserDrawingPriceRangeLabelPosition,
   resolveMobileUserDrawingRenderModel,
   resolveMobileUserDrawingRiskRewardLabelPosition,
@@ -3475,11 +3476,21 @@ describe('mobile user drawing render model', () => {
       textEdit: null,
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]));
+
+    expect(primitive).toMatchObject({
       kind: 'priceRange',
       labelPoint: { x: 78, y: 50 },
+      measurementLabelAlignment: 'right',
       label: '+80.00 (+800.00%)',
       style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'priceRange') throw new Error('expected price range primitive');
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: -6,
+      y: 53,
     });
   });
 
@@ -3679,11 +3690,21 @@ describe('mobile user drawing render model', () => {
       ],
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]));
+
+    expect(primitive).toMatchObject({
       kind: 'dateRange',
       labelPoint: { x: 58, y: 50 },
+      measurementLabelAlignment: 'right',
       label: '3 bars, 1 minute',
       style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'dateRange') throw new Error('expected date range primitive');
+    expect(resolveMobileUserDrawingPriceRangeLabelPosition(primitive, { x: 0, y: -10, width: 84, height: 14 })).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: -26,
+      y: 53,
     });
   });
 
@@ -3819,13 +3840,32 @@ describe('mobile user drawing render model', () => {
       ],
     };
 
-    expect(resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]))[0]).toMatchObject({
+    const [primitive] = resolveMobileUserDrawingRenderModel(state, new Map([[durationSpace.pane.id, durationSpace]]));
+
+    expect(primitive).toMatchObject({
       kind: 'datePriceRange',
       priceLabelPoint: { x: 22, y: 50 },
       dateLabelPoint: { x: 22, y: 78 },
+      measurementLabelAlignment: 'left',
       priceLabel: '+80.00 (+800.00%)',
       dateLabel: '3 bars, 1 minute',
       style: alignedStyle,
+    });
+    if (!primitive || primitive.kind !== 'datePriceRange') throw new Error('expected date price range primitive');
+    expect(
+      resolveMobileUserDrawingMeasurementLabelPosition(
+        {
+          labelPoint: primitive.priceLabelPoint,
+          measurementLabelAlignment: primitive.measurementLabelAlignment,
+          style: primitive.style,
+        },
+        { x: 0, y: -10, width: 84, height: 14 },
+      ),
+    ).toEqual({
+      fontSize: 12,
+      fontFamily: 'sans-serif',
+      x: 22,
+      y: 53,
     });
   });
 

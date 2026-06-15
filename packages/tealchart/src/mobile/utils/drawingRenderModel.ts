@@ -28,6 +28,7 @@ import type {
   PathDrawing,
   TableDrawing,
   UserDrawingTextAnnotation,
+  UserDrawingMeasurementLabelAlignment,
 } from '../../drawings';
 
 import {
@@ -756,6 +757,7 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       rect: { x: number; y: number; width: number; height: number };
       labelPoint: DrawingScreenPoint;
+      measurementLabelAlignment: UserDrawingMeasurementLabelAlignment;
       label: string;
       style: UserDrawingStyle;
     }
@@ -768,6 +770,7 @@ export type MobileUserDrawingPrimitive =
       clip: MobileUserDrawingClipRect;
       rect: { x: number; y: number; width: number; height: number };
       labelPoint: DrawingScreenPoint;
+      measurementLabelAlignment: UserDrawingMeasurementLabelAlignment;
       label: string;
       style: UserDrawingStyle;
     }
@@ -783,6 +786,7 @@ export type MobileUserDrawingPrimitive =
       priceLabel: string;
       dateLabelPoint: DrawingScreenPoint;
       dateLabel: string;
+      measurementLabelAlignment: UserDrawingMeasurementLabelAlignment;
       style: UserDrawingStyle;
     }
   | {
@@ -1367,6 +1371,7 @@ export interface MobileUserDrawingMeasurementLabelPosition {
 
 export interface MobileUserDrawingMeasurementLabelTarget {
   labelPoint: DrawingScreenPoint;
+  measurementLabelAlignment?: UserDrawingMeasurementLabelAlignment;
   style: UserDrawingStyle;
 }
 
@@ -1426,6 +1431,10 @@ function resolveMobileMeasurementLabelX(rect: DrawingScreenRect, fontSize: numbe
   if (labelAlignment === 'left') return rect.x + fontSize;
   if (labelAlignment === 'right') return rect.x + rect.width - fontSize;
   return rect.x + rect.width / 2;
+}
+
+function resolveMobileMeasurementLabelAlignment(alignment: unknown): UserDrawingMeasurementLabelAlignment {
+  return normalizeUserDrawingMeasurementLabelAlignment(alignment);
 }
 
 function resolveMobileMeasurementLabelPoint(
@@ -2114,6 +2123,7 @@ function primitiveFromGeometry(
           geometry.drawing.style.measurementLabelPosition,
           geometry.drawing.style.measurementLabelAlignment,
         ),
+        measurementLabelAlignment: resolveMobileMeasurementLabelAlignment(geometry.drawing.style.measurementLabelAlignment),
         label: areMobileUserDrawingLabelsVisible(geometry) ? label : '',
         style: geometry.drawing.style,
       };
@@ -2133,6 +2143,7 @@ function primitiveFromGeometry(
           geometry.drawing.style.measurementLabelPosition,
           geometry.drawing.style.measurementLabelAlignment,
         ),
+        measurementLabelAlignment: resolveMobileMeasurementLabelAlignment(geometry.drawing.style.measurementLabelAlignment),
         label: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
         style: geometry.drawing.style,
       };
@@ -2162,6 +2173,7 @@ function primitiveFromGeometry(
         priceLabel: areMobileUserDrawingLabelsVisible(geometry) ? priceLabel : '',
         dateLabelPoint: labelPoints.date,
         dateLabel: areMobileUserDrawingLabelsVisible(geometry) ? geometry.dateMetrics.label : '',
+        measurementLabelAlignment: resolveMobileMeasurementLabelAlignment(geometry.drawing.style.measurementLabelAlignment),
         style: geometry.drawing.style,
       };
     }
@@ -2603,7 +2615,12 @@ export function resolveMobileUserDrawingMeasurementLabelPosition(
   return {
     fontSize,
     fontFamily,
-    x: primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
+    x:
+      primitive.measurementLabelAlignment === 'left'
+        ? primitive.labelPoint.x - textX
+        : primitive.measurementLabelAlignment === 'right'
+          ? primitive.labelPoint.x - textX - measuredTextBounds.width
+          : primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
     y: primitive.labelPoint.y - textY - textHeight / 2,
   };
 }
