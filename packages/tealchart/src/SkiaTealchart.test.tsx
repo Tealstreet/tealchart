@@ -51,6 +51,20 @@ function getLatestSingleTapGesture(): MockGesture {
   return tap;
 }
 
+function getLatestLongPressGesture(): MockGesture {
+  const longPressMock = Gesture.LongPress as unknown as MockGestureFactory;
+  const longPress = [...longPressMock.mock.results]
+    .reverse()
+    .map((result) => result.value)
+    .find((gesture) => gesture.__callbacks?.onStart);
+
+  if (!longPress) {
+    throw new Error('Expected SkiaTealchart to register a long-press gesture');
+  }
+
+  return longPress;
+}
+
 function runGestureCallback(gesture: MockGesture, name: string, ...args: unknown[]): void {
   const callback = gesture.__callbacks?.[name]?.[0];
   if (typeof callback !== 'function') {
@@ -164,6 +178,7 @@ describe('SkiaTealchart drawing properties', () => {
     clearChartStoreCache();
     (Gesture.Pan as unknown as MockGestureFactory).mockClear();
     (Gesture.Tap as unknown as MockGestureFactory).mockClear();
+    (Gesture.LongPress as unknown as MockGestureFactory).mockClear();
   });
 
   it('opens the built-in properties sheet through the handle and dispatches controls to the pinned drawing', async () => {
@@ -246,6 +261,100 @@ describe('SkiaTealchart drawing properties', () => {
           meta: { source: 'objectTree', affectedIds: ['target'] },
         }),
         source: 'objectTree',
+      }),
+    );
+  });
+
+  it('selects and duplicates hit drawings from the rendered Skia long-press context menu', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+    const onCommand = vi.fn();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null }}
+        onUserDrawingCommand={onCommand}
+      />,
+    );
+
+    const longPress = getLatestLongPressGesture();
+    await act(async () => {
+      runGestureCallback(longPress, 'onStart', { x: 130, y: 158 });
+    });
+
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'selected' });
+    expect(await screen.findByLabelText('Context menu')).not.toBeNull();
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'selectAtPoint', meta: { source: 'contextMenu' } }),
+        source: 'contextMenu',
+      }),
+    );
+
+    await act(async () => {
+      fireEvent.click(await screen.findByText('Duplicate selected drawing'));
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual([
+      'selected',
+      'drawing_1',
+      'target',
+    ]);
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'duplicate', meta: { source: 'contextMenu' } }),
+        source: 'contextMenu',
+      }),
+    );
+
+    await act(async () => {
+      runGestureCallback(longPress, 'onStart', { x: 130, y: 158 });
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByText('Delete selected drawing'));
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['target']);
+    expect(ref.current?.getUserDrawingState().selection).toBeNull();
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({ type: 'delete', meta: { source: 'contextMenu' } }),
+        source: 'contextMenu',
+      }),
+    );
+
+    await act(async () => {
+      expect(
+        ref.current?.setUserDrawingState({
+          ...initialDrawingState,
+          activeTool: 'select',
+          selection: { drawingId: 'selected' },
+        }),
+      ).toBe(true);
+    });
+    await act(async () => {
+      runGestureCallback(longPress, 'onStart', { x: 130, y: 158 });
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByText('Bring selected drawing forward'));
+    });
+
+    expect(ref.current?.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['target', 'selected']);
+    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'selected' });
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: expect.objectContaining({
+          type: 'reorder',
+          action: 'bringForward',
+          meta: { source: 'contextMenu' },
+        }),
+        source: 'contextMenu',
       }),
     );
   });
