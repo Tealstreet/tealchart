@@ -250,6 +250,51 @@ describe('SkiaTealchart drawing properties', () => {
     );
   });
 
+  it('duplicates the selected drawing from the rendered action strip before a Skia edit pan', async () => {
+    const ref = createRef<SkiaTealchartHandle>();
+
+    render(
+      <SkiaTealchart
+        ref={ref}
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={{
+          ...initialDrawingState,
+          activeTool: 'select',
+          selection: { drawingId: 'selected' },
+          drawings: [initialDrawingState.drawings[0]!],
+        }}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Duplicate while dragging selected drawing'));
+    });
+
+    expect(ref.current?.isUserDrawingDuplicateEditDragEnabled()).toBe(true);
+    expect(screen.getByLabelText('Stop duplicating while dragging selected drawing')).not.toBeNull();
+
+    const pan = getLatestDrawingPanGesture();
+    await act(async () => {
+      runGestureCallback(pan, 'onBegin', { x: 130, y: 158 });
+      runGestureCallback(pan, 'onStart', { x: 130, y: 158 });
+      runGestureCallback(pan, 'onUpdate', { x: 130, y: 178, translationX: 0, translationY: 20 });
+      runGestureCallback(pan, 'onFinalize', { x: 130, y: 178 }, true);
+    });
+
+    const nextState = ref.current?.getUserDrawingState();
+    const duplicate = nextState?.drawings[1];
+    expect(nextState?.drawings).toHaveLength(2);
+    expect(nextState?.drawings[0]).toMatchObject({ id: 'selected', price: 50 });
+    expect(duplicate).toMatchObject({ id: 'drawing_1', kind: 'horizontalLine' });
+    if (duplicate?.kind !== 'horizontalLine') throw new Error('Expected duplicate to remain a horizontal line');
+    expect(duplicate.price).toBeLessThan(50);
+    expect(nextState?.selection).toEqual({ drawingId: 'drawing_1' });
+  });
+
   it('exposes stay-in-drawing-mode through the mobile imperative handle', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onStateChange = vi.fn();
