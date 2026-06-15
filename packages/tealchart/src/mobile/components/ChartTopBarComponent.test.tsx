@@ -36,7 +36,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
   it('renders categorized drawing tools and dispatches tool changes', () => {
     const onTool = vi.fn();
-    render(
+    const { container } = render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
         interval="1"
@@ -45,6 +45,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
+    expect(container.firstElementChild?.getAttribute('data-pointer-events')).toBe('box-none');
     expect(screen.getByLabelText('Lines drawing tools')).toBeTruthy();
     expect(screen.getByLabelText('Channels drawing tools')).toBeTruthy();
     expect(screen.getByLabelText('Gann and Fibonacci drawing tools')).toBeTruthy();

@@ -342,7 +342,12 @@ describe('ChartTopBar drawing toolbar', () => {
       onUserDrawingVisibilityChange: onVisibility,
       onUserDrawingLockedChange: onLocked,
     });
-    topBar.mount(document.body);
+    const chartSurface = document.createElement('div');
+    const chartGestureTarget = document.createElement('button');
+    chartGestureTarget.setAttribute('aria-label', 'Chart gesture target');
+    chartSurface.appendChild(chartGestureTarget);
+    document.body.appendChild(chartSurface);
+    topBar.mount(chartSurface);
 
     const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
     expect(selectedActionSurface).not.toBeNull();
@@ -363,6 +368,12 @@ describe('ChartTopBar drawing toolbar', () => {
     document.body.removeEventListener('mousedown', onSurfaceMouseDownFallthrough);
     document.body.removeEventListener('mouseup', onSurfaceMouseUpFallthrough);
     document.body.removeEventListener('click', onSurfaceClickFallthrough);
+
+    const onChartAreaClick = vi.fn();
+    chartSurface.addEventListener('click', onChartAreaClick);
+    chartGestureTarget.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(onChartAreaClick).toHaveBeenCalledTimes(1);
+    chartSurface.removeEventListener('click', onChartAreaClick);
 
     document.querySelector<HTMLButtonElement>('button[aria-label="Open selected drawing properties"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
@@ -487,6 +498,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.disabled).toBe(true);
 
     topBar.unmount();
+    chartSurface.remove();
   });
 
   it('rerenders drawing toolbar undo and redo availability changes', () => {
