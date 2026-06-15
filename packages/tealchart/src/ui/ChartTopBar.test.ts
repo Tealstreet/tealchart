@@ -61,11 +61,16 @@ describe('ChartTopBar drawing toolbar', () => {
       'button[aria-label="Geometric Shapes drawing tools"]',
     );
     const categoryRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
+    const categoryList = document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]');
 
     expect(linesCategory).not.toBeNull();
     expect(shapesCategory).not.toBeNull();
     expect(categoryRail).not.toBeNull();
+    expect(categoryList).not.toBeNull();
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
+    expect(categoryRail?.style.overflow).toBe('visible');
+    expect(categoryList?.style.overflowY).toBe('auto');
+    expect(categoryList?.style.maxHeight).not.toBe('');
     expect(shapesCategory?.getAttribute('aria-pressed')).toBe('true');
     expect(linesCategory?.getAttribute('aria-pressed')).toBe('false');
     expect(linesCategory?.getAttribute('aria-haspopup')).toBe('menu');

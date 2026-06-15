@@ -18,7 +18,7 @@ import type {
 
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   getSelectedUserDrawing,
@@ -65,6 +65,7 @@ import {
 } from '../../drawings';
 import { computeLeftToolRailTop, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
+import { TIME_AXIS_HEIGHT } from '../../types';
 
 export interface ChartTopBarComponentProps {
   /** Current symbol (e.g., "BTC/USDT") */
@@ -121,6 +122,14 @@ export interface ChartTopBarComponentProps {
 
 const TOP_BAR_HEIGHT = MOBILE_CHART_CHROME_METRICS.topBarHeight;
 type PressableStyleState = { pressed: boolean };
+const MIN_DRAWING_TOOL_OVERLAY_HEIGHT = 96;
+const DRAWING_TOOL_FLYOUT_NON_LIST_HEIGHT = 44;
+const getMobileWindowHeight = (): number => {
+  const dimensionsHeight = Dimensions?.get?.('window')?.height;
+  if (typeof dimensionsHeight === 'number' && dimensionsHeight > 0) return dimensionsHeight;
+  if (typeof window !== 'undefined' && window.innerHeight > 0) return window.innerHeight;
+  return 640;
+};
 
 export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
   ({
@@ -147,6 +156,38 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
+    const [windowHeight, setWindowHeight] = useState(getMobileWindowHeight);
+    const drawingToolAvailableHeight = Math.max(
+      MIN_DRAWING_TOOL_OVERLAY_HEIGHT,
+      windowHeight -
+        computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS) -
+        TIME_AXIS_HEIGHT -
+        MOBILE_CHART_CHROME_METRICS.leftToolRailTopGap,
+    );
+    const drawingToolBoundsStyle = useMemo(
+      () => ({ maxHeight: drawingToolAvailableHeight }),
+      [drawingToolAvailableHeight],
+    );
+    const drawingToolFlyoutListBoundsStyle = useMemo(
+      () => ({
+        maxHeight: Math.max(0, drawingToolAvailableHeight - DRAWING_TOOL_FLYOUT_NON_LIST_HEIGHT),
+      }),
+      [drawingToolAvailableHeight],
+    );
+
+    useEffect(() => {
+      if (!Dimensions?.addEventListener) {
+        if (typeof window === 'undefined') return undefined;
+        const handleResize = () => setWindowHeight(getMobileWindowHeight());
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }
+      const subscription = Dimensions.addEventListener('change', ({ window }) => {
+        setWindowHeight(window.height || getMobileWindowHeight());
+      });
+      return () => subscription.remove();
+    }, []);
+
     // Filter timeframes by supported resolutions (if set by datafeed)
     const timeframes = useMemo(() => {
       if (!supportedResolutions || supportedResolutions.length === 0) {
@@ -230,78 +271,95 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         )}
 
         {userDrawingState && (
-          <View style={styles.drawingToolRail} accessibilityLabel="Drawing tool categories">
-            {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
-              const activeCategory = category.tools.includes(userDrawingState.activeTool);
-              const categoryTool = resolveUserDrawingToolCategoryButtonTool(
-                category,
-                userDrawingState.activeTool,
-                recentDrawingToolsByCategory,
-              );
-              const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
-              const expanded = expandedDrawingCategoryId === category.id;
-              return (
-                <Pressable
-                  key={category.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${category.label} drawing tools`}
-                  accessibilityState={{ expanded, selected: activeCategory }}
-                  onPress={() => setExpandedDrawingCategoryId(expanded ? null : category.id)}
-                  style={({ pressed }: PressableStyleState) => [
-                    styles.drawingToolCategoryButton,
-                    activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                    pressed && !activeCategory && styles.drawingButtonPressed,
-                  ]}
-                >
-                  <Text
-                    style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}
-                  >
-                    {categoryToolDescriptor.icon}
-                  </Text>
-                </Pressable>
-              );
-            })}
-
-            {expandedDrawingCategory && (
-              <View style={styles.drawingToolFlyout} accessibilityLabel={`${expandedDrawingCategory.label} tools`}>
-                <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
-                  {expandedDrawingCategory.label}
-                </Text>
-                {expandedDrawingCategory.tools.map((tool) => {
-                  const descriptor = getUserDrawingToolDescriptor(tool);
-                  const active = userDrawingState.activeTool === descriptor.tool;
+          <View style={[styles.drawingToolRail, drawingToolBoundsStyle]} accessibilityLabel="Drawing tool categories">
+            <View
+              style={[styles.drawingToolRailList, drawingToolBoundsStyle]}
+              accessibilityLabel="Drawing tool category list"
+            >
+              <ScrollView contentContainerStyle={styles.drawingToolRailContent} showsVerticalScrollIndicator={false}>
+                {USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category) => {
+                  const activeCategory = category.tools.includes(userDrawingState.activeTool);
+                  const categoryTool = resolveUserDrawingToolCategoryButtonTool(
+                    category,
+                    userDrawingState.activeTool,
+                    recentDrawingToolsByCategory,
+                  );
+                  const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
+                  const expanded = expandedDrawingCategoryId === category.id;
                   return (
                     <Pressable
-                      key={descriptor.tool}
+                      key={category.id}
                       accessibilityRole="button"
-                      accessibilityLabel={descriptor.label}
-                      accessibilityState={{ selected: active }}
-                      onPress={() => {
-                        const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
-                        if (selectedCategory) {
-                          setRecentDrawingToolsByCategory((current) => ({
-                            ...current,
-                            [selectedCategory.id]: descriptor.tool,
-                          }));
-                        }
-                        onUserDrawingToolSelect?.(descriptor.tool);
-                        setExpandedDrawingCategoryId(null);
-                      }}
+                      accessibilityLabel={`${category.label} drawing tools`}
+                      accessibilityState={{ expanded, selected: activeCategory }}
+                      onPress={() => setExpandedDrawingCategoryId(expanded ? null : category.id)}
                       style={({ pressed }: PressableStyleState) => [
-                        styles.drawingToolFlyoutButton,
-                        active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                        pressed && !active && styles.drawingButtonPressed,
+                        styles.drawingToolCategoryButton,
+                        activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                        pressed && !activeCategory && styles.drawingButtonPressed,
                       ]}
                     >
-                      <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
-                        {descriptor.icon}
-                      </Text>
-                      <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
-                        {descriptor.label}
+                      <Text
+                        style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}
+                      >
+                        {categoryToolDescriptor.icon}
                       </Text>
                     </Pressable>
                   );
                 })}
+              </ScrollView>
+            </View>
+
+            {expandedDrawingCategory && (
+              <View
+                style={[styles.drawingToolFlyout, drawingToolBoundsStyle]}
+                accessibilityLabel={`${expandedDrawingCategory.label} tools`}
+              >
+                <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
+                  {expandedDrawingCategory.label}
+                </Text>
+                <View
+                  style={[styles.drawingToolFlyoutList, drawingToolFlyoutListBoundsStyle]}
+                  accessibilityLabel={`${expandedDrawingCategory.label} tool list`}
+                >
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {expandedDrawingCategory.tools.map((tool) => {
+                      const descriptor = getUserDrawingToolDescriptor(tool);
+                      const active = userDrawingState.activeTool === descriptor.tool;
+                      return (
+                        <Pressable
+                          key={descriptor.tool}
+                          accessibilityRole="button"
+                          accessibilityLabel={descriptor.label}
+                          accessibilityState={{ selected: active }}
+                          onPress={() => {
+                            const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
+                            if (selectedCategory) {
+                              setRecentDrawingToolsByCategory((current) => ({
+                                ...current,
+                                [selectedCategory.id]: descriptor.tool,
+                              }));
+                            }
+                            onUserDrawingToolSelect?.(descriptor.tool);
+                            setExpandedDrawingCategoryId(null);
+                          }}
+                          style={({ pressed }: PressableStyleState) => [
+                            styles.drawingToolFlyoutButton,
+                            active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                            pressed && !active && styles.drawingButtonPressed,
+                          ]}
+                        >
+                          <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
+                            {descriptor.icon}
+                          </Text>
+                          <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
+                            {descriptor.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
               </View>
             )}
           </View>
@@ -1128,6 +1186,12 @@ const styles = StyleSheet.create({
     borderColor: '#363a45',
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.96)',
+    overflow: 'visible',
+  },
+  drawingToolRailList: {
+    overflow: 'hidden',
+  },
+  drawingToolRailContent: {
     gap: 4,
   },
   drawingToolDismissLayer: {
@@ -1150,12 +1214,14 @@ const styles = StyleSheet.create({
     top: 0,
     left: 42,
     width: 250,
-    maxHeight: 420,
     padding: 10,
     borderWidth: 1,
     borderColor: '#363a45',
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.98)',
+  },
+  drawingToolFlyoutList: {
+    overflow: 'hidden',
   },
   drawingToolFlyoutTitle: {
     fontSize: 11,

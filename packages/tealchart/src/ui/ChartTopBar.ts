@@ -62,6 +62,7 @@ import {
 } from '../drawings';
 import { computeLeftToolRailTop, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
+import { TIME_AXIS_HEIGHT } from '../types';
 import { Component } from './Component';
 import { LayoutSelector } from './LayoutSelector';
 
@@ -247,14 +248,28 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '4px',
     padding: '6px 4px',
+    boxSizing: 'border-box',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '6px',
     backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.96))',
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
     zIndex: '7',
     pointerEvents: 'auto',
+    overflow: 'visible',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolRailList: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    maxHeight: `calc(100vh - ${
+      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + WEB_CHART_CHROME_METRICS.leftToolRailTopGap
+    }px)`,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    scrollbarWidth: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolRailItem: {
@@ -283,13 +298,17 @@ const styles = {
     left: '40px',
     display: 'none',
     minWidth: '240px',
-    maxHeight: '420px',
+    maxHeight: `calc(100vh - ${
+      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + WEB_CHART_CHROME_METRICS.leftToolRailTopGap
+    }px)`,
     overflowY: 'auto',
     padding: '10px',
+    boxSizing: 'border-box',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '6px',
     backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
     boxShadow: '0 12px 32px rgba(0, 0, 0, 0.32)',
+    zIndex: '2',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolFlyoutTitle: {
@@ -879,6 +898,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         'aria-label': 'Drawing tool categories',
       },
     });
+    const railList = this.createElement('div', {
+      style: styles.drawingToolRailList,
+      attributes: {
+        'aria-label': 'Drawing tool category list',
+      },
+    });
     let activeFlyout: {
       id: string;
       button: HTMLButtonElement;
@@ -936,6 +961,18 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       const showFlyout = () => {
         if (activeFlyout?.id === category.id) return;
         closeActiveFlyout();
+        const railRect = rail.getBoundingClientRect();
+        const buttonRect = categoryButton.getBoundingClientRect();
+        const railHeight =
+          railRect.height ||
+          Math.max(160, window.innerHeight - computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) - TIME_AXIS_HEIGHT);
+        const rawFlyoutTop = Math.max(0, buttonRect.top - railRect.top);
+        const remainingHeight = Math.max(0, railHeight - rawFlyoutTop);
+        const flyoutTop =
+          remainingHeight > 0 && remainingHeight < 160 ? Math.max(0, railHeight - 160) : rawFlyoutTop;
+        const flyoutHeight = Math.max(120, railHeight - flyoutTop);
+        flyout.style.top = `${flyoutTop}px`;
+        flyout.style.maxHeight = `${flyoutHeight}px`;
         flyout.style.display = 'block';
         categoryButton.setAttribute('aria-expanded', 'true');
         activeFlyout = { id: category.id, button: categoryButton, flyout };
@@ -995,10 +1032,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
 
       railItem.appendChild(categoryButton);
-      railItem.appendChild(flyout);
-      rail.appendChild(railItem);
+      railList.appendChild(railItem);
+      rail.appendChild(flyout);
     }
 
+    rail.appendChild(railList);
     this.drawingToolRailEl = rail;
     (this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el).appendChild(rail);
 
