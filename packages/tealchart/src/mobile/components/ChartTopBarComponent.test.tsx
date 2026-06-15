@@ -52,6 +52,10 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Trend line'));
 
     expect(onTool).toHaveBeenCalledWith('trendLine');
+
+    fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
+    fireEvent.click(screen.getByLabelText('Rectangle'));
+    expect(onTool).toHaveBeenCalledWith('rectangle');
   });
 
   it('keeps a drawing tool flyout open when pinned', () => {

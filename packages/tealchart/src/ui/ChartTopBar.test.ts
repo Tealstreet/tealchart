@@ -105,6 +105,18 @@ describe('ChartTopBar drawing toolbar', () => {
       document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.getAttribute('aria-pressed'),
     ).toBe('true');
 
+    const currentShapesCategory = document.querySelector<HTMLButtonElement>(
+      'button[aria-label="Geometric Shapes drawing tools"]',
+    );
+    currentShapesCategory?.click();
+    expect(currentShapesCategory?.getAttribute('aria-expanded')).toBe('true');
+    document.querySelector<HTMLButtonElement>('button[aria-label="Rectangle"]')?.click();
+    expect(onTool).toHaveBeenCalledWith('rectangle');
+    topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'rectangle' });
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Rectangle"]')?.getAttribute('aria-pressed'),
+    ).toBe('true');
+
     topBar.unmount();
   });
 
