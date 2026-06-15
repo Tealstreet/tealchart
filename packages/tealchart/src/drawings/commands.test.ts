@@ -392,12 +392,13 @@ describe('user drawing command dispatch', () => {
 
     const guidesHidden = updateUserDrawingStyle(
       duplicated,
-      { volumeProfileGuidesVisible: false, volumeProfileRowCount: 24.4 },
+      { volumeProfileGuidesVisible: false, volumeProfileRowCount: 24.4, volumeProfileValueAreaRatio: 1.5 },
       { drawingId: 'trend-line-copy', now: () => 41 },
     );
     const guideHiddenDrawing = guidesHidden.drawings.find((drawing) => drawing.id === 'trend-line-copy');
     expect(guideHiddenDrawing?.style.volumeProfileGuidesVisible).toBe(false);
     expect(guideHiddenDrawing?.style.volumeProfileRowCount).toBe(24);
+    expect(guideHiddenDrawing?.style.volumeProfileValueAreaRatio).toBe(1);
     expect(guideHiddenDrawing?.updatedAt).toBe(41);
 
     expect(dispatchUserDrawingCommand(duplicated, { type: 'setLocked', locked: true, options: { now: () => 42 } }).state).toEqual(

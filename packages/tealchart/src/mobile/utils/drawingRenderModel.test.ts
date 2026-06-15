@@ -2626,6 +2626,74 @@ describe('mobile user drawing render model', () => {
     expect(primitive?.kind === 'fixedRangeVolumeProfile' ? primitive.bins : []).toHaveLength(6);
   });
 
+  it('returns Skia-ready fixed range volume profile guides with configured value areas', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'fixedRangeVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, volumeProfileValueAreaRatio: 0.5 },
+          points: [
+            { time: 10, price: 80 },
+            { time: 90, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+                { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+                { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+              ],
+            },
+          ],
+        ]),
+      )[0],
+    ).toMatchObject({
+      kind: 'fixedRangeVolumeProfile',
+      id: 'volume-profile',
+      guides: [
+        {
+          kind: 'pointOfControl',
+          price: 77.5,
+          volume: 20,
+          segment: { start: { x: 10, y: 22.5 }, end: { x: 90, y: 22.5 } },
+        },
+        {
+          kind: 'valueAreaHigh',
+          price: 80,
+          volume: 20,
+          segment: { start: { x: 10, y: 20 }, end: { x: 90, y: 20 } },
+        },
+        {
+          kind: 'valueAreaLow',
+          price: 75,
+          volume: 20,
+          segment: { start: { x: 10, y: 25 }, end: { x: 90, y: 25 } },
+        },
+      ],
+    });
+  });
+
   it('returns Skia-ready anchored volume profile primitives', () => {
     const state: UserDrawingState = {
       version: 1,
@@ -2780,6 +2848,71 @@ describe('mobile user drawing render model', () => {
       ]),
     });
     expect(primitive?.kind === 'anchoredVolumeProfile' ? primitive.bins : []).toHaveLength(6);
+  });
+
+  it('returns Skia-ready anchored volume profile guides with configured value areas', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'anchored-volume-profile',
+          kind: 'anchoredVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, volumeProfileValueAreaRatio: 0.5 },
+          point: { time: 10, price: 75 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+                { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+                { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+              ],
+            },
+          ],
+        ]),
+      )[0],
+    ).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      id: 'anchored-volume-profile',
+      guides: [
+        {
+          kind: 'pointOfControl',
+          price: 77.5,
+          volume: 20,
+          segment: { start: { x: 10, y: 22.5 }, end: { x: 100, y: 22.5 } },
+        },
+        {
+          kind: 'valueAreaHigh',
+          price: 80,
+          volume: 20,
+          segment: { start: { x: 10, y: 20 }, end: { x: 100, y: 20 } },
+        },
+        {
+          kind: 'valueAreaLow',
+          price: 75,
+          volume: 20,
+          segment: { start: { x: 10, y: 25 }, end: { x: 100, y: 25 } },
+        },
+      ],
+    });
   });
 
   it('returns Skia-ready Fibonacci retracement primitives', () => {

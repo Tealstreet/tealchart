@@ -170,6 +170,7 @@ export interface UserDrawingStyle {
   labelsVisible?: boolean;
   volumeProfileGuidesVisible?: boolean;
   volumeProfileRowCount?: number;
+  volumeProfileValueAreaRatio?: number;
 }
 
 export interface UserDrawingBase {
@@ -954,12 +955,15 @@ export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 12;
 export const MIN_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 2;
 export const MAX_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 200;
 export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS = [12, 24, 48] as const;
+export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO = 0.7;
+export const USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS = [0.5, 0.7, 0.8] as const;
 export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
 export type UserDrawingVolumeProfileRowCount = (typeof USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS)[number];
+export type UserDrawingVolumeProfileValueAreaRatio = (typeof USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25, 0.1] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
@@ -1006,6 +1010,11 @@ export function normalizeUserDrawingVolumeProfileRowCount(rowCount: number): num
   );
 }
 
+export function normalizeUserDrawingVolumeProfileValueAreaRatio(valueAreaRatio: number): number {
+  if (!Number.isFinite(valueAreaRatio)) return DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO;
+  return Math.max(0, Math.min(1, valueAreaRatio));
+}
+
 export function normalizeUserDrawingIconName(iconName: unknown): UserDrawingIconName {
   return USER_DRAWING_ICON_NAMES.includes(iconName as UserDrawingIconName)
     ? (iconName as UserDrawingIconName)
@@ -1035,6 +1044,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.volumeProfileRowCount === undefined
       ? undefined
       : normalizeUserDrawingVolumeProfileRowCount(style.volumeProfileRowCount);
+  const volumeProfileValueAreaRatio =
+    style.volumeProfileValueAreaRatio === undefined
+      ? undefined
+      : normalizeUserDrawingVolumeProfileValueAreaRatio(style.volumeProfileValueAreaRatio);
   if (
     fontSize === style.fontSize &&
     fontFamily === style.fontFamily &&
@@ -1043,7 +1056,8 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     opacity === style.opacity &&
     fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth &&
-    volumeProfileRowCount === style.volumeProfileRowCount
+    volumeProfileRowCount === style.volumeProfileRowCount &&
+    volumeProfileValueAreaRatio === style.volumeProfileValueAreaRatio
   ) {
     return style;
   }
@@ -1058,6 +1072,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
     ...(volumeProfileRowCount === undefined ? {} : { volumeProfileRowCount }),
+    ...(volumeProfileValueAreaRatio === undefined ? {} : { volumeProfileValueAreaRatio }),
   };
 }
 

@@ -18,14 +18,17 @@ import type {
   UserDrawingTextMaxWidth,
   UserDrawingTrendLineExtend,
   UserDrawingVolumeProfileRowCount,
+  UserDrawingVolumeProfileValueAreaRatio,
 } from './types';
 
 import {
   DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
+  DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
   DEFAULT_USER_DRAWING_STYLE,
   isUserDrawingPathFamilyTool,
   normalizeUserDrawingOpacity,
   normalizeUserDrawingVolumeProfileRowCount,
+  normalizeUserDrawingVolumeProfileValueAreaRatio,
 } from './types';
 import {
   type UserDrawingBrushTemplateId,
@@ -45,6 +48,7 @@ import {
   supportsUserDrawingTrendLineExtendControls,
   supportsUserDrawingVolumeProfileGuideControls,
   supportsUserDrawingVolumeProfileRowCountControls,
+  supportsUserDrawingVolumeProfileValueAreaControls,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
   USER_DRAWING_FONT_SIZE_DESCRIPTORS,
@@ -61,6 +65,7 @@ import {
   USER_DRAWING_TEXT_WRAP_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS,
+  USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO_DESCRIPTORS,
 } from './toolbar';
 
 export type UserDrawingPropertiesSurfaceCommand =
@@ -99,7 +104,8 @@ export type UserDrawingPropertiesSurfaceControl =
         | UserDrawingTextAlign
         | UserDrawingTextMaxWidth
         | UserDrawingTrendLineExtend
-        | UserDrawingVolumeProfileRowCount;
+        | UserDrawingVolumeProfileRowCount
+        | UserDrawingVolumeProfileValueAreaRatio;
     });
 
 type UserDrawingPropertiesSurfaceControlDraft = Omit<UserDrawingPropertiesSurfaceControl, 'enabled'>;
@@ -418,9 +424,16 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
     });
   }
 
-  if (supportsUserDrawingVolumeProfileGuideControls(drawing) || supportsUserDrawingVolumeProfileRowCountControls(drawing)) {
+  if (
+    supportsUserDrawingVolumeProfileGuideControls(drawing) ||
+    supportsUserDrawingVolumeProfileRowCountControls(drawing) ||
+    supportsUserDrawingVolumeProfileValueAreaControls(drawing)
+  ) {
     const currentVolumeProfileRowCount = normalizeUserDrawingVolumeProfileRowCount(
       drawing.style.volumeProfileRowCount ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
+    );
+    const currentVolumeProfileValueAreaRatio = normalizeUserDrawingVolumeProfileValueAreaRatio(
+      drawing.style.volumeProfileValueAreaRatio ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO,
     );
     groups.push({
       id: 'geometry',
@@ -436,6 +449,19 @@ export function resolveUserDrawingPropertiesSurface(state: UserDrawingState, dra
               command: {
                 type: 'updateStyle' as const,
                 style: { volumeProfileRowCount: descriptor.rowCount },
+              },
+            }))
+          : []),
+        ...(supportsUserDrawingVolumeProfileValueAreaControls(drawing)
+          ? USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO_DESCRIPTORS.map((descriptor) => ({
+              id: `volumeProfileValueAreaRatio:${descriptor.valueAreaRatio}`,
+              type: 'option' as const,
+              label: descriptor.label,
+              value: descriptor.valueAreaRatio,
+              selected: currentVolumeProfileValueAreaRatio === descriptor.valueAreaRatio,
+              command: {
+                type: 'updateStyle' as const,
+                style: { volumeProfileValueAreaRatio: descriptor.valueAreaRatio },
               },
             }))
           : []),
