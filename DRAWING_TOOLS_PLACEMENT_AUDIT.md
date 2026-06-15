@@ -23,7 +23,7 @@ Tools audited here:
 | Tool | Placement mode | Shared evidence | Web evidence | Mobile evidence | Remaining proof |
 | --- | --- | --- | --- | --- | --- |
 | `trendLine` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `EventManager.test.ts`, `TealchartWidget.test.ts` exact endpoint drag/input routing | `drawingCommands.test.ts` endpoint test | Manual pointer/touch smoke with sidebar tool |
-| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` draft/commit render parity | Manual pointer/touch smoke with sidebar tool |
+| `rectangle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint/cancel tests | `ChartCore.test.ts`, `TealchartWidget.test.ts` exact endpoint undoable drag placement | `SkiaTealchart.test.tsx`, `drawingCommands.test.ts`, `drawingRenderModel.test.ts` toolbar-selected mocked touch drag endpoint parity | Manual browser/device smoke with sidebar tool |
 | `circle` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
 | `ellipse` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
 | `priceRange` | Drag two anchors, click two anchors | `placement.test.ts`, `input.test.ts` endpoint test | `TealchartWidget.test.ts` exact endpoint drag placement | `drawingCommands.test.ts`, `drawingRenderModel.test.ts` Skia primitive tests | Manual pointer/touch smoke with sidebar tool |
@@ -54,6 +54,11 @@ Tools audited here:
 - Mobile Skia component coverage now exercises the rendered drawing toolbar and
   verifies `Rectangle` selection reaches Skia drawing state with `toolbar`
   command metadata.
+- Mobile Skia component coverage now also drives the mocked Pan gesture
+  lifecycle after rendered toolbar `Rectangle` selection and verifies the
+  begin/commit commands resolve concrete expected anchors from the touch
+  coordinates and that the committed drawing uses those anchors rather than a
+  generated size.
 - The earlier "random rectangle" concern should be treated as a UI regression
   only if reproduced through the sidebar/pointer path. The shared state layer
   currently behaves correctly.
@@ -61,9 +66,9 @@ Tools audited here:
 ## Follow-Up Order
 
 1. Add a lightweight browser/device smoke harness for sidebar tool selection
-   plus pointer/touch drag, because the remaining risk is full runtime
-   coordinate routing through real DOM/RN gestures rather than state mutation,
-   toolbar selection, or render-model geometry.
+   plus pointer/touch drag, because the remaining risk is real host event
+   delivery rather than state mutation, toolbar selection, Skia gesture
+   callbacks, or render-model geometry.
 2. Move to Epic B once the smoke path is covered or manually verified:
    selected-object local action surface.
 3. Keep placement fixes narrow. If a tool regresses, fix the web pointer path
