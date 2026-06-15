@@ -1580,7 +1580,8 @@ object-tree gaps stay visible.
   expose matching position-label alignment presets through the shared
   properties surface.
 - Web Canvas and mobile Skia render paths resolve matching reward, risk, and
-  risk/reward ratio label points from the configured alignment.
+  risk/reward ratio label points from the configured alignment and align the
+  text edge for left/right modes.
 
 ## Shipped: Range Measurement Label Alignment Controls
 

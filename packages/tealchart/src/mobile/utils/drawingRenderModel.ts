@@ -29,6 +29,7 @@ import type {
   TableDrawing,
   UserDrawingTextAnnotation,
   UserDrawingMeasurementLabelAlignment,
+  UserDrawingRiskRewardLabelAlignment,
 } from '../../drawings';
 
 import {
@@ -808,6 +809,7 @@ export type MobileUserDrawingPrimitive =
       rewardLabel: string;
       riskLabel: string;
       ratioLabel: string;
+      riskRewardLabelAlignment: UserDrawingRiskRewardLabelAlignment;
       style: UserDrawingStyle;
     }
   | {
@@ -1372,6 +1374,7 @@ export interface MobileUserDrawingMeasurementLabelPosition {
 export interface MobileUserDrawingMeasurementLabelTarget {
   labelPoint: DrawingScreenPoint;
   measurementLabelAlignment?: UserDrawingMeasurementLabelAlignment;
+  riskRewardLabelAlignment?: UserDrawingRiskRewardLabelAlignment;
   style: UserDrawingStyle;
 }
 
@@ -2211,6 +2214,7 @@ function primitiveFromGeometry(
         rewardLabel: areMobileUserDrawingLabelsVisible(geometry) ? position.rewardLabel : '',
         riskLabel: areMobileUserDrawingLabelsVisible(geometry) ? position.riskLabel : '',
         ratioLabel: areMobileUserDrawingLabelsVisible(geometry) ? position.ratioLabel : '',
+        riskRewardLabelAlignment: labelAlignment,
         style: geometry.drawing.style,
       };
     }
@@ -2616,9 +2620,9 @@ export function resolveMobileUserDrawingMeasurementLabelPosition(
     fontSize,
     fontFamily,
     x:
-      primitive.measurementLabelAlignment === 'left'
+      (primitive.measurementLabelAlignment ?? primitive.riskRewardLabelAlignment) === 'left'
         ? primitive.labelPoint.x - textX
-        : primitive.measurementLabelAlignment === 'right'
+        : (primitive.measurementLabelAlignment ?? primitive.riskRewardLabelAlignment) === 'right'
           ? primitive.labelPoint.x - textX - measuredTextBounds.width
           : primitive.labelPoint.x - textX - measuredTextBounds.width / 2,
     y: primitive.labelPoint.y - textY - textHeight / 2,
