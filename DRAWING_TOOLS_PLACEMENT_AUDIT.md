@@ -64,6 +64,10 @@ Tools audited here:
   begin/commit commands resolve concrete expected anchors from the touch
   coordinates and that the committed drawing uses those anchors rather than a
   generated size.
+- Mobile Skia component coverage now also drives the rendered toolbar
+  `Rectangle` selection through an aborted Pan gesture and verifies touch
+  cancellation clears the draft without committing a rectangle or creating an
+  undo entry.
 - The earlier "random rectangle" concern should be treated as a UI regression
   only if reproduced through the sidebar/pointer path. The shared state layer
   currently behaves correctly.
