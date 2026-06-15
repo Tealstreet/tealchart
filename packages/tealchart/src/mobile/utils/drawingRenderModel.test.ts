@@ -2694,6 +2694,83 @@ describe('mobile user drawing render model', () => {
     });
   });
 
+  it('returns Skia-ready fixed range volume profile primitives with configured profile widths', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'volume-profile',
+          kind: 'fixedRangeVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, volumeProfileWidthRatio: 0.5 },
+          points: [
+            { time: 10, price: 80 },
+            { time: 90, price: 20 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+                { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+                { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+              ],
+            },
+          ],
+        ]),
+      )[0],
+    ).toMatchObject({
+      kind: 'fixedRangeVolumeProfile',
+      id: 'volume-profile',
+      bounds: { x: 10, y: 20, width: 80, height: 60 },
+      guides: [
+        {
+          kind: 'pointOfControl',
+          segment: { start: { x: 10, y: 22.5 }, end: { x: 50, y: 22.5 } },
+        },
+        {
+          kind: 'valueAreaHigh',
+          segment: { start: { x: 10, y: 20 }, end: { x: 50, y: 20 } },
+        },
+        {
+          kind: 'valueAreaLow',
+          segment: { start: { x: 10, y: 45 }, end: { x: 50, y: 45 } },
+        },
+      ],
+      bins: expect.arrayContaining([
+        expect.objectContaining({
+          priceMin: 75,
+          priceMax: 80,
+          volume: 20,
+          rect: { x: 10, y: 20, width: 40, height: 5 },
+        }),
+        expect.objectContaining({
+          priceMin: 55,
+          priceMax: 60,
+          volume: 10,
+          rect: { x: 10, y: 40, width: 20, height: 5 },
+        }),
+      ]),
+    });
+  });
+
   it('returns Skia-ready anchored volume profile primitives', () => {
     const state: UserDrawingState = {
       version: 1,
@@ -2912,6 +2989,80 @@ describe('mobile user drawing render model', () => {
           segment: { start: { x: 10, y: 25 }, end: { x: 100, y: 25 } },
         },
       ],
+    });
+  });
+
+  it('returns Skia-ready anchored volume profile primitives with configured profile widths', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: null,
+      drawings: [
+        {
+          id: 'anchored-volume-profile',
+          kind: 'anchoredVolumeProfile',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, volumeProfileWidthRatio: 0.5 },
+          point: { time: 10, price: 75 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(
+      resolveMobileUserDrawingRenderModel(
+        state,
+        new Map([
+          [
+            space.pane.id,
+            {
+              ...space,
+              bars: [
+                { time: 10, open: 70, high: 80, low: 70, close: 75, volume: 20 },
+                { time: 50, open: 50, high: 60, low: 50, close: 55, volume: 10 },
+                { time: 90, open: 20, high: 30, low: 20, close: 25, volume: 5 },
+              ],
+            },
+          ],
+        ]),
+      )[0],
+    ).toMatchObject({
+      kind: 'anchoredVolumeProfile',
+      id: 'anchored-volume-profile',
+      bounds: { x: 10, y: 20, width: 90, height: 60 },
+      guides: [
+        {
+          kind: 'pointOfControl',
+          segment: { start: { x: 10, y: 22.5 }, end: { x: 55, y: 22.5 } },
+        },
+        {
+          kind: 'valueAreaHigh',
+          segment: { start: { x: 10, y: 20 }, end: { x: 55, y: 20 } },
+        },
+        {
+          kind: 'valueAreaLow',
+          segment: { start: { x: 10, y: 45 }, end: { x: 55, y: 45 } },
+        },
+      ],
+      bins: expect.arrayContaining([
+        expect.objectContaining({
+          priceMin: 75,
+          priceMax: 80,
+          volume: 20,
+          rect: { x: 10, y: 20, width: 45, height: 5 },
+        }),
+        expect.objectContaining({
+          priceMin: 55,
+          priceMax: 60,
+          volume: 10,
+          rect: { x: 10, y: 40, width: 22.5, height: 5 },
+        }),
+      ]),
     });
   });
 

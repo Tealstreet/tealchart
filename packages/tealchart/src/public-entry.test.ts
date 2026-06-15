@@ -118,6 +118,8 @@ import type {
   UserDrawingVolumeProfileRowCountDescriptor,
   UserDrawingVolumeProfileValueAreaRatio,
   UserDrawingVolumeProfileValueAreaRatioDescriptor,
+  UserDrawingVolumeProfileWidthRatio,
+  UserDrawingVolumeProfileWidthRatioDescriptor,
   TealchartWidgetOptions,
   UserDrawingCommandEventListener,
   WidgetEventCallback,
@@ -286,8 +288,11 @@ import {
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO_DESCRIPTORS,
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
+  USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS,
+  USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
+  normalizeUserDrawingVolumeProfileWidthRatio,
 } from './index';
 import {
   resolveMobileUserDrawingMeasurementLabelPosition,
@@ -1411,6 +1416,10 @@ describe('tealchart public entries', () => {
       USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS[1]!;
     const volumeProfileValueAreaRatioDescriptor: UserDrawingVolumeProfileValueAreaRatioDescriptor =
       USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIO_DESCRIPTORS[1]!;
+    const volumeProfileWidthRatio: UserDrawingVolumeProfileWidthRatio =
+      USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS[1]!;
+    const volumeProfileWidthRatioDescriptor: UserDrawingVolumeProfileWidthRatioDescriptor =
+      USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS[1]!;
     expect(fontSize).toBe(12);
     expect(fontFamily).toBe('sans-serif');
     expect(fontStyle).toBe('italic');
@@ -1428,12 +1437,15 @@ describe('tealchart public entries', () => {
     expect(volumeProfileRowCountDescriptor.rowCount).toBe(24);
     expect(volumeProfileValueAreaRatio).toBe(0.7);
     expect(volumeProfileValueAreaRatioDescriptor.valueAreaRatio).toBe(0.7);
+    expect(volumeProfileWidthRatio).toBe(0.5);
+    expect(volumeProfileWidthRatioDescriptor.widthRatio).toBe(0.5);
     expect(normalizeUserDrawingFontFamily('serif')).toBe('serif');
     expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
     expect(normalizeUserDrawingVolumeProfileRowCount(24.4)).toBe(24);
     expect(normalizeUserDrawingVolumeProfileValueAreaRatio(1.5)).toBe(1);
+    expect(normalizeUserDrawingVolumeProfileWidthRatio(-1)).toBe(0.05);
   });
 
   it('exports shared drawing text layout helpers', () => {

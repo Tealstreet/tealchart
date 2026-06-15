@@ -18,6 +18,7 @@ import {
   normalizeUserDrawingTextMaxWidth,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
+  normalizeUserDrawingVolumeProfileWidthRatio,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
@@ -25,6 +26,7 @@ import {
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
+  USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
 } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
@@ -230,6 +232,17 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingVolumeProfileValueAreaRatio(Number.NaN)).toBe(0.7);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, volumeProfileValueAreaRatio: 2 })).toMatchObject({
       volumeProfileValueAreaRatio: 1,
+    });
+  });
+
+  it('normalizes volume profile width ratios to bounded ratios', () => {
+    expect(USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS).toEqual([0.25, 0.5, 1]);
+    expect(normalizeUserDrawingVolumeProfileWidthRatio(-0.5)).toBe(0.05);
+    expect(normalizeUserDrawingVolumeProfileWidthRatio(0.65)).toBe(0.65);
+    expect(normalizeUserDrawingVolumeProfileWidthRatio(2)).toBe(1);
+    expect(normalizeUserDrawingVolumeProfileWidthRatio(Number.NaN)).toBe(1);
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, volumeProfileWidthRatio: -1 })).toMatchObject({
+      volumeProfileWidthRatio: 0.05,
     });
   });
 
