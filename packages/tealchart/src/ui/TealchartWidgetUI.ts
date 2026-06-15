@@ -4,6 +4,7 @@ import type {
   DrawingScreenPoint,
   UpdateUserDrawingOptions,
   UserDrawingIconName,
+  UserDrawingCommandAvailability,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
@@ -171,8 +172,14 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingPathDragEnd?: () => void;
   /** Initial/current user drawing state for top-bar controls */
   userDrawingState?: UserDrawingState;
+  /** Initial/current drawing command history availability for undo/redo toolbar actions */
+  userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Called when a drawing tool is selected from the top bar */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Called when the top bar should undo the last drawing command */
+  onUserDrawingUndo?: () => void;
+  /** Called when the top bar should redo the last undone drawing command */
+  onUserDrawingRedo?: () => void;
   /** Called when the top bar should duplicate the selected user drawing */
   onUserDrawingDuplicateSelected?: () => void;
   /** Called when the top bar should copy the selected user drawing */
@@ -307,7 +314,7 @@ export class TealchartWidgetUI {
     // Create top bar - positioned absolutely over the chart
     if (options.showTopBar !== false) {
       this.currentUserDrawingToolbarStateKey = options.userDrawingState
-        ? getUserDrawingToolbarStateKey(options.userDrawingState)
+        ? this.getUserDrawingToolbarStateKey(options.userDrawingState)
         : null;
       const topBarWrapper = div({
         style: {
@@ -329,7 +336,10 @@ export class TealchartWidgetUI {
           this.indicatorsModal?.toggle();
         },
         userDrawingState: options.userDrawingState,
+        userDrawingCommandAvailability: options.userDrawingCommandAvailability,
         onUserDrawingToolSelect: options.onUserDrawingToolSelect,
+        onUserDrawingUndo: options.onUserDrawingUndo,
+        onUserDrawingRedo: options.onUserDrawingRedo,
         onUserDrawingDuplicateSelected: options.onUserDrawingDuplicateSelected,
         onUserDrawingCopySelected: options.onUserDrawingCopySelected,
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
@@ -553,7 +563,7 @@ export class TealchartWidgetUI {
   setUserDrawingState(state: UserDrawingState): void {
     this.options.userDrawingState = state;
     this.legend?.setAvoidLeftTools(this.shouldAvoidLegendLeftTools());
-    const toolbarStateKey = getUserDrawingToolbarStateKey(state);
+    const toolbarStateKey = this.getUserDrawingToolbarStateKey(state);
     if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
       this.currentUserDrawingToolbarStateKey = toolbarStateKey;
       this.topBar?.setUserDrawingState(state);
@@ -563,6 +573,31 @@ export class TealchartWidgetUI {
     this.chartCore?.setUserDrawingState(state);
     this.updateUserDrawingSelectionActionAnchor();
     this.renderUserDrawingTextEditor(state);
+  }
+
+  setUserDrawingCommandAvailability(availability: UserDrawingCommandAvailability): void {
+    this.options.userDrawingCommandAvailability = availability;
+    const state = this.options.userDrawingState;
+    if (!state) {
+      this.topBar?.setUserDrawingCommandAvailability(availability);
+      return;
+    }
+    const toolbarStateKey = this.getUserDrawingToolbarStateKey(state);
+    if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
+      this.currentUserDrawingToolbarStateKey = toolbarStateKey;
+      this.topBar?.setUserDrawingCommandAvailability(availability);
+    } else {
+      this.topBar?.setUserDrawingCommandAvailability(availability, { render: false });
+    }
+  }
+
+  private getUserDrawingToolbarStateKey(state: UserDrawingState): string {
+    const availability = this.options.userDrawingCommandAvailability;
+    return [
+      getUserDrawingToolbarStateKey(state),
+      availability?.canUndo === true ? 'undo' : 'no-undo',
+      availability?.canRedo === true ? 'redo' : 'no-redo',
+    ].join('|');
   }
 
   private updateUserDrawingSelectionActionAnchor(): void {

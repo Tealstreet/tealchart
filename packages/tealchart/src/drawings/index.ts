@@ -596,6 +596,7 @@ export type {
   UserDrawingSelectedActionSurfaceGroupId,
   UserDrawingSelectedActionSurfaceGroupPresentation,
   UserDrawingSelectedActionSurfaceItem,
+  UserDrawingCommandAvailability,
   UserDrawingTextAlignDescriptor,
   UserDrawingTextColorDescriptor,
   UserDrawingTextDecorationDescriptor,

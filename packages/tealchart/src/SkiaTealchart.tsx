@@ -28,6 +28,7 @@ import type {
   UserDrawingCommandEvent,
   UserDrawingCommandEventListener,
   UserDrawingCommandHistory,
+  UserDrawingCommandSource,
   UserDrawingEditDrag,
   UserDrawingFontFamily,
   UserDrawingHandleRole,
@@ -641,6 +642,46 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [],
   );
 
+  const undoUserDrawingCommandFromSource = useCallback(
+    (source: UserDrawingCommandSource): boolean => {
+      const previousState = userDrawingStateRef.current;
+      const result = undoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
+      userDrawingHistoryRef.current = result.history;
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+        const event = createUserDrawingHistoryCommandEvent(
+          previousState,
+          result.state,
+          { type: 'undo', meta: { source } },
+          true,
+        );
+        if (event) notifyUserDrawingCommand(event);
+      }
+      return result.changed;
+    },
+    [commitUserDrawingState, notifyUserDrawingCommand],
+  );
+
+  const redoUserDrawingCommandFromSource = useCallback(
+    (source: UserDrawingCommandSource): boolean => {
+      const previousState = userDrawingStateRef.current;
+      const result = redoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
+      userDrawingHistoryRef.current = result.history;
+      if (result.changed) {
+        commitUserDrawingState(result.state);
+        const event = createUserDrawingHistoryCommandEvent(
+          previousState,
+          result.state,
+          { type: 'redo', meta: { source } },
+          true,
+        );
+        if (event) notifyUserDrawingCommand(event);
+      }
+      return result.changed;
+    },
+    [commitUserDrawingState, notifyUserDrawingCommand],
+  );
+
   const [userDrawingObjectTreeVisible, setUserDrawingObjectTreeVisible] = useState(false);
   const [userDrawingPropertiesVisible, setUserDrawingPropertiesVisible] = useState(false);
   const [userDrawingPropertiesDrawingId, setUserDrawingPropertiesDrawingId] = useState<string | undefined>(undefined);
@@ -777,36 +818,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return canRedoUserDrawingCommandHistory(userDrawingHistoryRef.current);
       },
       undoUserDrawingCommand(): boolean {
-        const previousState = userDrawingStateRef.current;
-        const result = undoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
-        userDrawingHistoryRef.current = result.history;
-        if (result.changed) {
-          commitUserDrawingState(result.state);
-          const event = createUserDrawingHistoryCommandEvent(
-            previousState,
-            result.state,
-            { type: 'undo', meta: { source: 'api' } },
-            true,
-          );
-          if (event) notifyUserDrawingCommand(event);
-        }
-        return result.changed;
+        return undoUserDrawingCommandFromSource('api');
       },
       redoUserDrawingCommand(): boolean {
-        const previousState = userDrawingStateRef.current;
-        const result = redoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
-        userDrawingHistoryRef.current = result.history;
-        if (result.changed) {
-          commitUserDrawingState(result.state);
-          const event = createUserDrawingHistoryCommandEvent(
-            previousState,
-            result.state,
-            { type: 'redo', meta: { source: 'api' } },
-            true,
-          );
-          if (event) notifyUserDrawingCommand(event);
-        }
-        return result.changed;
+        return redoUserDrawingCommandFromSource('api');
       },
       dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean {
         const previousState = userDrawingStateRef.current;
@@ -1189,10 +1204,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       dispatchUserDrawingCommandToState,
       dispatchUserDrawingCommandToStateWithResult,
       notifyUserDrawingCommand,
+      redoUserDrawingCommandFromSource,
       onUserDrawingObjectTreeOpen,
       handleUserDrawingObjectTreeOpen,
       handleUserDrawingPropertiesOpen,
       dispatchUserDrawingObjectTreeActionToState,
+      undoUserDrawingCommandFromSource,
       replaceUserDrawingState,
     ],
   );
@@ -4995,9 +5012,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onIndicatorsPress={handleIndicatorsPress}
             supportedResolutions={supportedResolutions}
             userDrawingState={effectiveUserDrawingState}
+            userDrawingCommandAvailability={{
+              canUndo: canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current),
+              canRedo: canRedoUserDrawingCommandHistory(userDrawingHistoryRef.current),
+            }}
             onUserDrawingToolSelect={(tool) =>
               dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'toolbar' } })
             }
+            onUserDrawingUndo={() => {
+              undoUserDrawingCommandFromSource('toolbar');
+            }}
+            onUserDrawingRedo={() => {
+              redoUserDrawingCommandFromSource('toolbar');
+            }}
             onUserDrawingDuplicateSelected={() => {
               dispatchUserDrawingCommandToState({
                 type: 'duplicate',
