@@ -170,10 +170,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     );
     const drawingToolFlyoutListBoundsStyle = useMemo(
       () => ({
-        maxHeight: Math.max(
-          MIN_DRAWING_TOOL_OVERLAY_HEIGHT,
-          drawingToolAvailableHeight - DRAWING_TOOL_FLYOUT_NON_LIST_HEIGHT,
-        ),
+        maxHeight: Math.max(0, drawingToolAvailableHeight - DRAWING_TOOL_FLYOUT_NON_LIST_HEIGHT),
       }),
       [drawingToolAvailableHeight],
     );
