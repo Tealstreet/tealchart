@@ -7,6 +7,7 @@
 
 import type { ActiveIndicator, IndicatorPaneInfo } from './ChartLegend';
 
+import { computeTopLeftLegendRect, rect, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
 
@@ -19,6 +20,8 @@ export interface IndicatorPaneLegendOptions {
   paneId: string;
   /** Top position of the pane */
   top: number;
+  /** Whether the pane legend should avoid the left drawing tools rail */
+  avoidLeftTools?: boolean;
   /** Callback when visibility toggle is clicked */
   onToggleIndicator?: (indicatorId: string) => void;
   /** Callback when settings button is clicked */
@@ -40,7 +43,6 @@ interface IndicatorPaneLegendState {
 const styles = {
   container: {
     position: 'absolute',
-    left: '12px',
     zIndex: '4',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '11px',
@@ -84,6 +86,16 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 };
 
+function resolvePaneLegendLeft(avoidLeftTools: boolean): string {
+  const origin = computeTopLeftLegendRect(
+    WEB_CHART_CHROME_METRICS,
+    rect(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER),
+    0,
+    { avoidLeftTools },
+  );
+  return `${origin?.x ?? 12}px`;
+}
+
 // ============================================================================
 // IndicatorPaneLegend Class
 // ============================================================================
@@ -106,7 +118,9 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
 
     this.options = options;
     Object.assign(this.el.style, styles.container);
+    this.el.setAttribute('data-tealchart-indicator-pane-legend', options.paneId);
     this.el.style.top = `${options.top + 4}px`;
+    this.applyLeftPosition();
   }
 
   // ============================================================================
@@ -116,6 +130,12 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
   setPosition(top: number): void {
     this.options.top = top;
     this.el.style.top = `${top + 4}px`;
+  }
+
+  setAvoidLeftTools(avoidLeftTools: boolean): void {
+    if (avoidLeftTools === Boolean(this.options.avoidLeftTools)) return;
+    this.options.avoidLeftTools = avoidLeftTools;
+    this.applyLeftPosition();
   }
 
   setIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
@@ -142,6 +162,10 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     for (const indicator of this.state.indicators) {
       this.el.appendChild(this.createIndicatorRow(indicator));
     }
+  }
+
+  private applyLeftPosition(): void {
+    this.el.style.left = resolvePaneLegendLeft(Boolean(this.options.avoidLeftTools));
   }
 
   private createIndicatorRow(indicator: ActiveIndicator): HTMLElement {

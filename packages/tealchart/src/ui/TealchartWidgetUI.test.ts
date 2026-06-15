@@ -1,4 +1,5 @@
 import type { UserDrawingState } from '../drawings';
+import type { PaneLayout } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -193,6 +194,58 @@ describe('TealchartWidgetUI user drawing text editor', () => {
     expect(editor?.value).toBe('Draft callout');
     expect(editor?.style.left).not.toBe('');
     expect(editor?.style.top).not.toBe('');
+    ui.dispose();
+  });
+});
+
+describe('TealchartWidgetUI legend layout', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    clearChartStoreCache();
+  });
+
+  it('moves indicator pane legends right when drawing tools own the left rail', () => {
+    stubCanvasContext();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ui = new TealchartWidgetUI({
+      container,
+      chartKey: 'indicator-pane-legend-left-rail',
+      symbol: 'BTCUSDT',
+      interval: '60',
+    });
+    const chartRoot = container.querySelector<HTMLElement>('[data-tealchart-root="true"]');
+    const chartArea = chartRoot?.firstElementChild as HTMLElement | null;
+    if (!chartArea) throw new Error('Expected chart area to mount');
+    Object.defineProperty(chartArea, 'clientHeight', { configurable: true, value: 600 });
+
+    const paneLayout: PaneLayout = {
+      mainPaneHeight: 0.7,
+      volumePaneHeight: 0,
+      indicatorPanes: [
+        { id: 'pane_1', heightRatio: 0.3, indicatorIds: ['rsi'], yMin: 0, yMax: 100, fixedRange: true },
+      ],
+    };
+
+    ui.setPaneLayout(paneLayout);
+    ui.setActiveIndicators(
+      [{ id: 'rsi', name: 'RSI', isVisible: true, inputs: { length: 14 } }],
+      {
+        rsi: {
+          overlay: false,
+          name: 'RSI',
+          inputs: { length: 14 },
+        },
+      },
+    );
+
+    const paneLegend = container.querySelector<HTMLElement>('[data-tealchart-indicator-pane-legend="pane_1"]');
+    expect(paneLegend).not.toBeNull();
+    expect(paneLegend?.style.left).toBe('12px');
+
+    ui.setUserDrawingState({ ...drawingState, textEdit: null });
+    expect(paneLegend?.style.left).toBe('70px');
+
     ui.dispose();
   });
 });

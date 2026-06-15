@@ -140,6 +140,8 @@ describe('chart geometry', () => {
       paneLayout,
       topBarHeight: MOBILE_CHART_CHROME_METRICS.topBarHeight,
       leftToolRailWidth: MOBILE_CHART_CHROME_METRICS.leftToolRailWidth,
+      topLeftLegend: true,
+      chromeMetrics: MOBILE_CHART_CHROME_METRICS,
     });
 
     expect(computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)).toBe(40);
@@ -148,6 +150,7 @@ describe('chart geometry', () => {
     expect(webSnapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
     expect(mobileSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 36 });
     expect(mobileSnapshot.chrome.leftTools).toEqual({ x: 0, y: 36, width: 52, height: 284 });
+    expect(mobileSnapshot.chrome.topLeftLegend).toBeUndefined();
   });
 
   it('computes overlay insets that avoid the left drawing rail when space allows', () => {
