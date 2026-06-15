@@ -66,6 +66,10 @@ describe('UserDrawingObjectTreeSheet', () => {
     );
 
     expect(screen.getByLabelText('Drawing object tree').getAttribute('data-start-should-set-responder')).toBe('true');
+    const sheet = screen.getByLabelText('Drawing object tree');
+    expect(sheet.getAttribute('data-style')).toContain('"maxHeight":"72%"');
+    const targetActions = screen.getByLabelText('Drawing actions for Rectangle');
+    expect(targetActions.getAttribute('data-style')).toContain('"flexWrap":"wrap"');
     expect(screen.getByText('Drawings (2)')).not.toBeNull();
     fireEvent.click(screen.getByLabelText('Drawing object tree'));
     expect(onClose).not.toHaveBeenCalled();
