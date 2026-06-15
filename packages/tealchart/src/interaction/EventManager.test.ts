@@ -242,6 +242,40 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('routes measure-style mouse drags through pending start, move, and end', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const onPan = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+        onViewportChangeInternal: onPan,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 140, clientY: 120 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 140, clientY: 120 }));
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse');
+    expect(onDrawingDragMove).toHaveBeenCalledWith(140, 120, 'mouse');
+    expect(onDrawingDragEnd).toHaveBeenCalledWith('mouse');
+    expect(onPan).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
   it('passes pen pointer pressure through pending drawing drags', () => {
     const container = createContainer();
     const onDrawingInput = vi.fn(() => true);
@@ -684,6 +718,42 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 1 });
     expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'touch', { pressure: 1 });
     expect(onDrawingDragCancel).toHaveBeenCalledOnce();
+    expect(onDrawingDragCancel).toHaveBeenCalledWith('touch');
+    expect(onDrawingDragEnd).not.toHaveBeenCalled();
+
+    manager.dispose();
+  });
+
+  it('routes measure-style touchcancel through pending start, move, and cancel', () => {
+    const container = createContainer();
+    const onDrawingInput = vi.fn(() => true);
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const onDrawingDragEnd = vi.fn();
+    const onDrawingDragCancel = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingInput,
+        onDrawingDragPending,
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd,
+        onDrawingDragCancel,
+      }),
+    );
+
+    const startTouch = createTouch(container, { clientX: 100, clientY: 100, force: 0.2 });
+    const moveTouch = createTouch(container, { clientX: 140, clientY: 120, force: 0.8 });
+    dispatchTouchEvent(container, 'touchstart', [startTouch], [startTouch]);
+    dispatchTouchEvent(container, 'touchmove', [moveTouch], [moveTouch]);
+    dispatchTouchEvent(container, 'touchcancel', [], [moveTouch]);
+
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 0.2 });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'touch', { pressure: 0.2 });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(140, 120, 'touch', { pressure: 0.8 });
     expect(onDrawingDragCancel).toHaveBeenCalledWith('touch');
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
 
