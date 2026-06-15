@@ -1006,6 +1006,7 @@ describe('drawing layout serialization', () => {
             lineStyle: 'solid',
             volumeProfileGuidesVisible: false,
             volumeProfileRowCount: 24.4,
+            volumeProfileValueAreaRatio: 1.5,
           },
           point: { time: 1, price: 10 },
         },
@@ -1014,6 +1015,7 @@ describe('drawing layout serialization', () => {
 
     expect(restored?.drawings[0]?.style.volumeProfileGuidesVisible).toBe(false);
     expect(restored?.drawings[0]?.style.volumeProfileRowCount).toBe(24);
+    expect(restored?.drawings[0]?.style.volumeProfileValueAreaRatio).toBe(1);
   });
 
   it('normalizes restored drawing opacity', () => {

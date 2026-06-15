@@ -1515,6 +1515,17 @@ object-tree gaps stay visible.
 - Web Canvas and mobile Skia render paths resolve matching volume profile bins
   from the configured row count while preserving the existing 12-row default.
 
+## Shipped: Volume Profile Value-Area Controls
+
+- Shared drawing style now preserves bounded `volumeProfileValueAreaRatio`
+  settings for anchored and fixed-range volume profile drawings.
+- Web selected-drawing properties panels and mobile Skia properties sheets
+  expose matching 50/70/80 percent value-area presets through the shared
+  properties surface.
+- Web Canvas and mobile Skia render paths resolve matching value-area high/low
+  guide overlays from the configured ratio while preserving the existing
+  70-percent default.
+
 ## Known Gaps
 
 - Full TradingView-style drawing toolbar advanced polish.
