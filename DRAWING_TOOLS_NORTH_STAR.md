@@ -160,6 +160,8 @@ Phase D3: Duplicate and modifier behavior
 - Web Shift+drag duplicate should be reliable and undoable.
 - Mobile should expose an equivalent duplicate-edit mode through host toolbar or
   handle APIs.
+- Current D3 duplicate/modifier evidence is recorded in
+  `DRAWING_TOOLS_DUPLICATE_MODIFIER_AUDIT.md`.
 
 ### Epic E: Undo/Redo Confidence Pass
 
@@ -200,7 +202,9 @@ Placement, selected-action, object-tree, edit-lifecycle, and double-edit audits
 are recorded in `DRAWING_TOOLS_PLACEMENT_AUDIT.md`,
 `DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`, `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`,
 `DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`, and
-`DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`.
+`DRAWING_TOOLS_DOUBLE_EDIT_AUDIT.md`, and
+`DRAWING_TOOLS_DUPLICATE_MODIFIER_AUDIT.md`.
 
-Move next to Epic D, Phase D3. Verify duplicate and modifier behavior, starting
-with web Shift-drag duplicate and the mobile duplicate-edit-mode sibling.
+Move next to Epic E, Phase E1. Verify undo/redo confidence across common
+user-visible mutations, starting with the shared command history matrix and
+matching mobile command-history siblings.
