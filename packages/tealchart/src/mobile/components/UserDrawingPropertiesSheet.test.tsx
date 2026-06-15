@@ -244,6 +244,54 @@ describe('UserDrawingPropertiesSheet', () => {
     });
   });
 
+  it('renders bars pattern display controls from the shared properties surface', () => {
+    const onDispatch = vi.fn(() => true);
+    const barsPatternState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'bars' },
+      drawings: [
+        {
+          id: 'bars',
+          kind: 'barsPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+            { time: 3, price: 105 },
+          ],
+          bars: [
+            { time: 1, open: 100, high: 104, low: 99, close: 102 },
+            { time: 2, open: 102, high: 105, low: 101, close: 101 },
+          ],
+        },
+      ],
+    };
+
+    render(
+      <UserDrawingPropertiesSheet
+        visible
+        surface={resolveUserDrawingPropertiesSurface(barsPatternState)}
+        onDispatch={onDispatch}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Geometry')).not.toBeNull();
+    expect(screen.getByLabelText('Candlestick bars pattern').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('Line bars pattern').getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(screen.getByLabelText('Line bars pattern'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { barsPatternDisplayMode: 'line' },
+    });
+  });
+
   it('renders an empty state', () => {
     render(
       <UserDrawingPropertiesSheet

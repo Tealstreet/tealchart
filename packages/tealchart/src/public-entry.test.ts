@@ -102,6 +102,8 @@ import type {
   UserDrawingVisualEvidenceState,
   UserDrawingVisualEvidenceStateStatus,
   UserDrawingVisualEvidenceViewport,
+  UserDrawingBarsPatternDisplayMode,
+  UserDrawingBarsPatternDisplayModeDescriptor,
   UserDrawingPriceRangeMetrics,
   UserDrawingRiskRewardMetrics,
   UserDrawingRiskRewardStatsMode,
@@ -269,6 +271,8 @@ import {
   setUserDrawingTrendLineExtend,
   splitUserDrawingTextLines,
   getUserDrawingBrushTemplateDescriptors,
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS,
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODES,
   USER_DRAWING_BRUSH_TEMPLATE_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
@@ -294,6 +298,7 @@ import {
   USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS,
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIO_DESCRIPTORS,
   USER_DRAWING_VOLUME_PROFILE_WIDTH_RATIOS,
+  normalizeUserDrawingBarsPatternDisplayMode,
   normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingVolumeProfileRowCount,
   normalizeUserDrawingVolumeProfileValueAreaRatio,
@@ -1082,6 +1087,8 @@ describe('tealchart public entries', () => {
       opacity: 1,
       clip,
       bars: [{ time: 1, x: 0, openY: 5, highY: 0, lowY: 10, closeY: 4, bodyWidth: 4, up: true }],
+      displayMode: 'candles',
+      linePoints: [{ x: 0, y: 4 }],
       bounds: { x: -2, y: 0, width: 4, height: 10 },
       style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
     };
@@ -1414,6 +1421,9 @@ describe('tealchart public entries', () => {
     const wrapDescriptor: UserDrawingTextWrapDescriptor = USER_DRAWING_TEXT_WRAP_DESCRIPTORS[1]!;
     const maxWidth: UserDrawingTextMaxWidth = USER_DRAWING_TEXT_MAX_WIDTHS[1]!;
     const maxWidthDescriptor: UserDrawingTextMaxWidthDescriptor = USER_DRAWING_TEXT_MAX_WIDTH_DESCRIPTORS[1]!;
+    const barsPatternDisplayMode: UserDrawingBarsPatternDisplayMode = USER_DRAWING_BARS_PATTERN_DISPLAY_MODES[1]!;
+    const barsPatternDisplayModeDescriptor: UserDrawingBarsPatternDisplayModeDescriptor =
+      USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS[1]!;
     const riskRewardStatsMode: UserDrawingRiskRewardStatsMode = USER_DRAWING_RISK_REWARD_STATS_MODES[1]!;
     const riskRewardStatsModeDescriptor: UserDrawingRiskRewardStatsModeDescriptor =
       USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS[1]!;
@@ -1441,6 +1451,8 @@ describe('tealchart public entries', () => {
     expect(wrapDescriptor.textWrap).toBe(true);
     expect(maxWidth).toBe(180);
     expect(maxWidthDescriptor.textMaxWidth).toBe(180);
+    expect(barsPatternDisplayMode).toBe('line');
+    expect(barsPatternDisplayModeDescriptor.displayMode).toBe('line');
     expect(riskRewardStatsMode).toBe('compact');
     expect(riskRewardStatsModeDescriptor.statsMode).toBe('compact');
     expect(volumeProfileRowCount).toBe(24);
@@ -1453,6 +1465,7 @@ describe('tealchart public entries', () => {
     expect(normalizeUserDrawingFontStyle('oblique')).toBe('normal');
     expect(normalizeUserDrawingFontWeight('heavy')).toBe('normal');
     expect(normalizeUserDrawingTextMaxWidth(190)).toBe(180);
+    expect(normalizeUserDrawingBarsPatternDisplayMode('future')).toBe('candles');
     expect(normalizeUserDrawingRiskRewardStatsMode('future')).toBe('full');
     expect(normalizeUserDrawingVolumeProfileRowCount(24.4)).toBe(24);
     expect(normalizeUserDrawingVolumeProfileValueAreaRatio(1.5)).toBe(1);

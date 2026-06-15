@@ -393,6 +393,7 @@ describe('user drawing command dispatch', () => {
     const guidesHidden = updateUserDrawingStyle(
       duplicated,
       {
+        barsPatternDisplayMode: 'future' as never,
         riskRewardStatsMode: 'future' as never,
         volumeProfileGuidesVisible: false,
         volumeProfileRowCount: 24.4,
@@ -402,6 +403,7 @@ describe('user drawing command dispatch', () => {
       { drawingId: 'trend-line-copy', now: () => 41 },
     );
     const guideHiddenDrawing = guidesHidden.drawings.find((drawing) => drawing.id === 'trend-line-copy');
+    expect(guideHiddenDrawing?.style.barsPatternDisplayMode).toBe('candles');
     expect(guideHiddenDrawing?.style.riskRewardStatsMode).toBe('full');
     expect(guideHiddenDrawing?.style.volumeProfileGuidesVisible).toBe(false);
     expect(guideHiddenDrawing?.style.volumeProfileRowCount).toBe(24);
