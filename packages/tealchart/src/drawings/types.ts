@@ -168,6 +168,7 @@ export interface UserDrawingStyle {
   textWrap?: boolean;
   textMaxWidth?: number;
   labelsVisible?: boolean;
+  barsPatternDisplayMode?: UserDrawingBarsPatternDisplayMode;
   riskRewardStatsMode?: UserDrawingRiskRewardStatsMode;
   volumeProfileGuidesVisible?: boolean;
   volumeProfileRowCount?: number;
@@ -953,6 +954,8 @@ export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] a
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240, 320, 480] as const;
+export const DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE = 'candles';
+export const USER_DRAWING_BARS_PATTERN_DISPLAY_MODES = ['candles', 'line'] as const;
 export const DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE = 'full';
 export const USER_DRAWING_RISK_REWARD_STATS_MODES = ['full', 'compact'] as const;
 export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 12;
@@ -968,6 +971,7 @@ export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
+export type UserDrawingBarsPatternDisplayMode = (typeof USER_DRAWING_BARS_PATTERN_DISPLAY_MODES)[number];
 export type UserDrawingRiskRewardStatsMode = (typeof USER_DRAWING_RISK_REWARD_STATS_MODES)[number];
 export type UserDrawingVolumeProfileRowCount = (typeof USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS)[number];
 export type UserDrawingVolumeProfileValueAreaRatio = (typeof USER_DRAWING_VOLUME_PROFILE_VALUE_AREA_RATIOS)[number];
@@ -1016,6 +1020,14 @@ export function normalizeUserDrawingRiskRewardStatsMode(statsMode: unknown): Use
     : DEFAULT_USER_DRAWING_RISK_REWARD_STATS_MODE;
 }
 
+export function normalizeUserDrawingBarsPatternDisplayMode(
+  displayMode: unknown,
+): UserDrawingBarsPatternDisplayMode {
+  return USER_DRAWING_BARS_PATTERN_DISPLAY_MODES.includes(displayMode as UserDrawingBarsPatternDisplayMode)
+    ? (displayMode as UserDrawingBarsPatternDisplayMode)
+    : DEFAULT_USER_DRAWING_BARS_PATTERN_DISPLAY_MODE;
+}
+
 export function normalizeUserDrawingVolumeProfileRowCount(rowCount: number): number {
   if (!Number.isFinite(rowCount)) return DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT;
   return Math.max(
@@ -1059,6 +1071,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fillOpacity === undefined ? undefined : normalizeUserDrawingOpacity(style.fillOpacity);
   const textMaxWidth =
     style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
+  const barsPatternDisplayMode =
+    style.barsPatternDisplayMode === undefined
+      ? undefined
+      : normalizeUserDrawingBarsPatternDisplayMode(style.barsPatternDisplayMode);
   const riskRewardStatsMode =
     style.riskRewardStatsMode === undefined
       ? undefined
@@ -1083,6 +1099,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     opacity === style.opacity &&
     fillOpacity === style.fillOpacity &&
     textMaxWidth === style.textMaxWidth &&
+    barsPatternDisplayMode === style.barsPatternDisplayMode &&
     riskRewardStatsMode === style.riskRewardStatsMode &&
     volumeProfileRowCount === style.volumeProfileRowCount &&
     volumeProfileValueAreaRatio === style.volumeProfileValueAreaRatio &&
@@ -1100,6 +1117,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(opacity === undefined ? {} : { opacity }),
     ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
+    ...(barsPatternDisplayMode === undefined ? {} : { barsPatternDisplayMode }),
     ...(riskRewardStatsMode === undefined ? {} : { riskRewardStatsMode }),
     ...(volumeProfileRowCount === undefined ? {} : { volumeProfileRowCount }),
     ...(volumeProfileValueAreaRatio === undefined ? {} : { volumeProfileValueAreaRatio }),

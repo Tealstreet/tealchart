@@ -3927,11 +3927,56 @@ describe('mobile user drawing render model', () => {
       selected: true,
       clip,
       bounds: { x: 36.5, y: 42, width: 17, height: 11 },
+      displayMode: 'candles',
+      linePoints: [
+        { x: 40, y: 50 },
+        { x: 50, y: 49 },
+      ],
       bars: [
         { time: 40, x: 40, openY: 52, highY: 42, lowY: 53, closeY: 50, bodyWidth: 7, up: true },
         { time: 50, x: 50, openY: 50, highY: 44, lowY: 51, closeY: 49, bodyWidth: 7, up: true },
       ],
       style,
+    });
+  });
+
+  it('returns Skia-ready bars pattern line display primitives', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'bars' },
+      drawings: [
+        {
+          id: 'bars',
+          kind: 'barsPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { ...style, barsPatternDisplayMode: 'line' },
+          points: [
+            { time: 10, price: 50 },
+            { time: 20, price: 50 },
+            { time: 40, price: 50 },
+          ],
+          bars: [
+            { time: 10, open: 50, high: 60, low: 49, close: 52 },
+            { time: 20, open: 52, high: 58, low: 51, close: 53 },
+          ],
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+
+    expect(resolveMobileUserDrawingRenderModel(state, new Map([[space.pane.id, space]]))[0]).toMatchObject({
+      kind: 'barsPattern',
+      displayMode: 'line',
+      linePoints: [
+        { x: 40, y: 50 },
+        { x: 50, y: 49 },
+      ],
     });
   });
 

@@ -4277,6 +4277,35 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           }
 
           if (primitive.kind === 'barsPattern') {
+            if (primitive.displayMode === 'line') {
+              const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
+              const path = Skia.Path.Make();
+              primitive.linePoints.forEach((point, index) => {
+                if (index === 0) {
+                  path.moveTo(point.x, point.y);
+                } else {
+                  path.lineTo(point.x, point.y);
+                }
+              });
+
+              return (
+                <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
+                  {primitive.style.lineVisible !== false && primitive.linePoints.length > 0 && (
+                    <SkiaPath
+                      path={path}
+                      color={primitive.style.lineColor}
+                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                      style="stroke"
+                      strokeCap="round"
+                      strokeJoin="round"
+                    >
+                      {dash && <DashPathEffect intervals={dash} />}
+                    </SkiaPath>
+                  )}
+                </Group>
+              );
+            }
+
             return (
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.bars.map((bar) => {

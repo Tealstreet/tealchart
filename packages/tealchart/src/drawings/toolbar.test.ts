@@ -24,6 +24,7 @@ import {
   resolveUserDrawingStyleToolbarAction,
   resolveUserDrawingToolCategoryButtonTool,
   shouldRenderUserDrawingSelectedActionSurface,
+  supportsUserDrawingBarsPatternDisplayModeControls,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillControls,
   supportsUserDrawingFillVisibilityControls,
@@ -36,6 +37,7 @@ import {
   supportsUserDrawingTextStyleControls,
   supportsUserDrawingTextWrapControls,
   supportsUserDrawingTrendLineExtendControls,
+  USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS,
   USER_DRAWING_FILL_COLOR_DESCRIPTORS,
   USER_DRAWING_FILL_OPACITY_DESCRIPTORS,
   USER_DRAWING_FONT_FAMILY_DESCRIPTORS,
@@ -2837,6 +2839,58 @@ describe('user drawing toolbar descriptors', () => {
       label: 'Hide generated labels',
       command: { type: 'updateStyle', style: { labelsVisible: false } },
     });
+  });
+
+  it('resolves bars pattern display controls in shared properties surfaces', () => {
+    const barsPatternState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'bars' },
+      drawings: [
+        {
+          id: 'bars',
+          kind: 'barsPattern',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+            { time: 3, price: 105 },
+          ],
+          bars: [
+            { time: 1, open: 100, high: 104, low: 99, close: 102 },
+            { time: 2, open: 102, high: 105, low: 101, close: 101 },
+          ],
+        },
+      ],
+    };
+
+    expect(supportsUserDrawingBarsPatternDisplayModeControls(barsPatternState.drawings[0]!)).toBe(true);
+    expect(USER_DRAWING_BARS_PATTERN_DISPLAY_MODE_DESCRIPTORS.map((descriptor) => descriptor.displayMode)).toEqual([
+      'candles',
+      'line',
+    ]);
+    expect(
+      resolveUserDrawingPropertiesSurface(barsPatternState)
+        .groups.find((group) => group.id === 'geometry')
+        ?.controls,
+    ).toMatchObject([
+      {
+        id: 'barsPatternDisplayMode:candles',
+        label: 'Candlestick bars pattern',
+        selected: true,
+        command: { type: 'updateStyle', style: { barsPatternDisplayMode: 'candles' } },
+      },
+      {
+        id: 'barsPatternDisplayMode:line',
+        label: 'Line bars pattern',
+        selected: false,
+        command: { type: 'updateStyle', style: { barsPatternDisplayMode: 'line' } },
+      },
+    ]);
   });
 
   it('resolves volume profile guide visibility in shared properties surfaces', () => {
