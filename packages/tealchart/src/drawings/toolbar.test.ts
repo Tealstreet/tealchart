@@ -2192,6 +2192,106 @@ describe('user drawing toolbar descriptors', () => {
     expect(styleItems.some((item) => item.id.startsWith('textAlign:'))).toBe(false);
   });
 
+  it('toggles generated label visibility for selected generated-label drawings', () => {
+    const selected = {
+      ...state,
+      selection: { drawingId: 'range' },
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: {
+            lineColor: '#fff',
+            lineWidth: 1,
+            lineStyle: 'solid' as const,
+            textColor: '#f5c542',
+          },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const visibleItems = resolveUserDrawingSelectedActionSurface(selected).groups.find(
+      (group) => group.id === 'style',
+    )!.items;
+    expect(visibleItems.find((item) => item.id === 'labelsVisible:toggle')).toMatchObject({
+      enabled: true,
+      label: 'Hide selected drawing labels',
+      command: { type: 'updateStyle', style: { labelsVisible: false } },
+    });
+
+    const hiddenItems = resolveUserDrawingSelectedActionSurface({
+      ...selected,
+      drawings: [
+        {
+          ...selected.drawings[0]!,
+          style: { ...selected.drawings[0]!.style, labelsVisible: false },
+        },
+      ],
+    }).groups.find((group) => group.id === 'style')!.items;
+    expect(hiddenItems.find((item) => item.id === 'labelsVisible:toggle')).toMatchObject({
+      enabled: true,
+      label: 'Show selected drawing labels',
+      command: { type: 'updateStyle', style: { labelsVisible: true } },
+    });
+
+    const textItems = resolveUserDrawingSelectedActionSurface({
+      ...state,
+      selection: { drawingId: 'text' },
+      drawings: [
+        {
+          id: 'text',
+          kind: 'textLabel' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          point: { time: 1, price: 10 },
+          text: 'Note',
+          textAlign: 'left' as const,
+        },
+      ],
+    }).groups.find((group) => group.id === 'style')!.items;
+    expect(textItems.some((item) => item.id === 'labelsVisible:toggle')).toBe(false);
+
+    const patternItems = resolveUserDrawingSelectedActionSurface({
+      ...state,
+      selection: { drawingId: 'abcd' },
+      drawings: [
+        {
+          id: 'abcd',
+          kind: 'abcdPattern' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 10 },
+            { time: 4, price: 12 },
+          ],
+        },
+      ],
+    }).groups.find((group) => group.id === 'style')!.items;
+    expect(patternItems.find((item) => item.id === 'labelsVisible:toggle')).toMatchObject({
+      enabled: true,
+      command: { type: 'updateStyle', style: { labelsVisible: false } },
+    });
+  });
+
   it('clamps selected action surfaces inside shared safe viewport insets', () => {
     expect(
       resolveUserDrawingActionSurfacePosition({
@@ -2586,6 +2686,83 @@ describe('user drawing toolbar descriptors', () => {
       selected: true,
       command: { type: 'updateStyle', style: { textWrap: true } },
     });
+  });
+
+  it('resolves generated label visibility in shared properties surfaces', () => {
+    const rangeState = {
+      ...state,
+      selection: { drawingId: 'range' },
+      drawings: [
+        {
+          id: 'range',
+          kind: 'priceRange' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+          ],
+        },
+      ],
+    } satisfies UserDrawingState;
+
+    const visibleTextGroup = resolveUserDrawingPropertiesSurface(rangeState).groups.find((group) => group.id === 'text');
+    expect(visibleTextGroup?.controls.find((control) => control.id === 'labelsVisible')).toMatchObject({
+      label: 'Hide generated labels',
+      value: true,
+      selected: true,
+      command: { type: 'updateStyle', style: { labelsVisible: false } },
+    });
+
+    const hiddenTextGroup = resolveUserDrawingPropertiesSurface({
+      ...rangeState,
+      drawings: [
+        {
+          ...rangeState.drawings[0]!,
+          style: { ...rangeState.drawings[0]!.style, labelsVisible: false },
+        },
+      ],
+    }).groups.find((group) => group.id === 'text');
+    expect(hiddenTextGroup?.controls.find((control) => control.id === 'labelsVisible')).toMatchObject({
+      label: 'Show generated labels',
+      value: false,
+      selected: false,
+      command: { type: 'updateStyle', style: { labelsVisible: true } },
+    });
+
+    const patternSurface = resolveUserDrawingPropertiesSurface({
+      ...state,
+      selection: { drawingId: 'abcd' },
+      drawings: [
+        {
+          id: 'abcd',
+          kind: 'abcdPattern' as const,
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          points: [
+            { time: 1, price: 10 },
+            { time: 2, price: 12 },
+            { time: 3, price: 10 },
+            { time: 4, price: 12 },
+          ],
+        },
+      ],
+    });
+    expect(patternSurface.groups.find((group) => group.id === 'text')?.controls).toEqual([
+      expect.objectContaining({
+        id: 'labelsVisible',
+        label: 'Hide generated labels',
+        command: { type: 'updateStyle', style: { labelsVisible: false } },
+      }),
+    ]);
   });
 
   it('resolves locked and targeted properties surfaces', () => {
