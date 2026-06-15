@@ -555,6 +555,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
   const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
   const [userDrawingDuplicateEditDragOverride, setUserDrawingDuplicateEditDragOverride] = useState<boolean | null>(null);
+  const [userDrawingSelectedActionPopoverDismissSignal, setUserDrawingSelectedActionPopoverDismissSignal] = useState(0);
   const userDrawingMeasureLastPointRef = useRef<UserDrawingInputPoint | null>(null);
 
   const commitUserDrawingState = useCallback(
@@ -2148,6 +2149,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
   }, [dispatchUserDrawingCommandToState]);
 
+  const dismissUserDrawingSelectedActionPopover = useCallback(() => {
+    setUserDrawingSelectedActionPopoverDismissSignal((value) => value + 1);
+  }, []);
+
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
     bars,
@@ -2158,6 +2163,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onAutoScaleDisabled: handleAutoScaleDisabled,
     isAutoScale: getIsAutoScale,
     onInteraction: revealResetButtonIfInBottomRegion,
+    onGestureStart: dismissUserDrawingSelectedActionPopover,
     onDrawingEditStart: handleUserDrawingEditStart,
     onDrawingEditMove: handleUserDrawingEditMove,
     onDrawingEditEnd: handleUserDrawingEditEnd,
@@ -2167,6 +2173,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
       revealResetButtonIfInBottomRegion(x, y);
+      dismissUserDrawingSelectedActionPopover();
 
       if (handleUserDrawingTap(x, y)) return;
 
@@ -2182,6 +2189,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [
       crosshairVisible,
+      dismissUserDrawingSelectedActionPopover,
       handleCrosshairMove,
       handleUserDrawingTap,
       isPointInChartArea,
@@ -2195,6 +2203,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       Gesture.Pan()
         .enabled(isMobileCrosshairPanGestureEnabled(effectiveUserDrawingState.activeTool, crosshairVisible))
         .onStart((event) => {
+          runOnJS(dismissUserDrawingSelectedActionPopover)();
           runOnJS(revealResetButtonIfInBottomRegion)(event.x, event.y);
           crosshairDragStartX.value = lastCrosshairPosition.x;
           crosshairDragStartY.value = lastCrosshairPosition.y;
@@ -2214,6 +2223,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       effectiveUserDrawingState.activeTool,
       crosshairDragStartX,
       crosshairDragStartY,
+      dismissUserDrawingSelectedActionPopover,
       handleCrosshairMove,
       lastCrosshairPosition,
       revealResetButtonIfInBottomRegion,
@@ -2239,14 +2249,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         .maxDuration(250)
         .maxDistance(10)
         .onEnd((event) => {
+          runOnJS(dismissUserDrawingSelectedActionPopover)();
           runOnJS(handleUserDrawingTap)(event.x, event.y, true);
         }),
-    [handleUserDrawingTap],
+    [dismissUserDrawingSelectedActionPopover, handleUserDrawingTap],
   );
 
   // Double-tap handler for pane maximize/restore
   const handleDoubleTap = useCallback(
     (x: number, y: number) => {
+      dismissUserDrawingSelectedActionPopover();
+
       if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
         const result = resolveMobileUserDrawingDoubleTapEditIntent(
           effectiveUserDrawingState,
@@ -2289,6 +2302,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [
       commitUserDrawingState,
       coreResult.core,
+      dismissUserDrawingSelectedActionPopover,
       dimensions.height,
       effectiveUserDrawingState,
       isPointInChartArea,
@@ -2421,9 +2435,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         .minDuration(500)
         .maxDistance(10)
         .onStart((event) => {
+          runOnJS(dismissUserDrawingSelectedActionPopover)();
           runOnJS(handleUserDrawingContextMenu)(event.x, event.y);
         }),
-    [effectiveUserDrawingState.activeTool, handleUserDrawingContextMenu],
+    [dismissUserDrawingSelectedActionPopover, effectiveUserDrawingState.activeTool, handleUserDrawingContextMenu],
   );
 
   // Combine all gestures
@@ -5006,6 +5021,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         anchor={userDrawingSelectionActionAnchor}
         dimensions={dimensions}
         topInset={showTopBar ? TOP_BAR_SAFE_ZONE : 0}
+        dismissPopoverSignal={userDrawingSelectedActionPopoverDismissSignal}
         createId={createUserDrawingId}
         dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
         onUserDrawingDuplicateEditDragChange={(enabled) => {

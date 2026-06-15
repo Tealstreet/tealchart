@@ -389,6 +389,34 @@ describe('SkiaTealchart drawing properties', () => {
     });
   });
 
+  it('dismisses selected style popovers when Skia chart pan gestures start', async () => {
+    render(
+      <SkiaTealchart
+        datafeed={createDatafeed()}
+        symbol="BTCUSDT"
+        interval="60"
+        width={360}
+        height={260}
+        userDrawingState={initialDrawingState}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(await screen.findByLabelText('Style selected drawing'));
+    });
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
+
+    const pan = getLatestDrawingPanGesture();
+    await act(async () => {
+      runGestureCallback(pan, 'onBegin', { x: 130, y: 95 });
+      runGestureCallback(pan, 'onStart', { x: 130, y: 95 });
+    });
+
+    expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByLabelText('Selected drawing style controls')).toBeNull();
+  });
+
   it('keeps drag-seeded mobile final taps available after seed drags', async () => {
     const ref = createRef<SkiaTealchartHandle>();
     const onCommand = vi.fn();
