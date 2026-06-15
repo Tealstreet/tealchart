@@ -54,7 +54,8 @@ The selected-action surface is shared:
 - Open selected style popovers now dismiss from outside chart gestures on both
   web and mobile without taking over the full chart surface: web uses
   cleanup-managed document listeners that do not stop propagation, while mobile
-  closes from a Skia host dismiss signal emitted by base chart taps.
+  closes from Skia host dismiss signals emitted by chart tap, pan/pinch start,
+  crosshair pan, double tap, additive tap, and long-press gesture starts.
 - Future selected-action work should target a specific user-visible polish gap,
   such as action density or a tool-specific style control that is missing from
   both web and mobile.
