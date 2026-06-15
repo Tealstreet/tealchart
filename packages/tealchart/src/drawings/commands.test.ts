@@ -390,6 +390,15 @@ describe('user drawing command dispatch', () => {
       }).state,
     ).toEqual(updateUserDrawingStyle(duplicated, { lineColor: '#00ff88' }, { now: () => 41 }));
 
+    const guidesHidden = updateUserDrawingStyle(
+      duplicated,
+      { volumeProfileGuidesVisible: false },
+      { drawingId: 'trend-line-copy', now: () => 41 },
+    );
+    const guideHiddenDrawing = guidesHidden.drawings.find((drawing) => drawing.id === 'trend-line-copy');
+    expect(guideHiddenDrawing?.style.volumeProfileGuidesVisible).toBe(false);
+    expect(guideHiddenDrawing?.updatedAt).toBe(41);
+
     expect(dispatchUserDrawingCommand(duplicated, { type: 'setLocked', locked: true, options: { now: () => 42 } }).state).toEqual(
       setUserDrawingLocked(duplicated, true, { now: () => 42 }),
     );

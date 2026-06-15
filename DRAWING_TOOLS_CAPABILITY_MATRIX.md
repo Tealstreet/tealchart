@@ -151,9 +151,11 @@ summary:
   template libraries.
 - `anchoredText` and `anchoredNote` currently share one-anchor input semantics,
   but their long-term behavior should be treated as `anchored-pane` placement.
-- `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, position tools, and bars
-  pattern tools need separate computed payload/property modeling before they can
-  be considered complete.
+- `fixedRangeVolumeProfile` and `anchoredVolumeProfile` now expose shared
+  volume-profile guide visibility controls on web Canvas and mobile Skia, but
+  still need richer computed settings such as rows, value-area percentage, and
+  profile width before they can be considered complete. Position tools and bars
+  pattern tools also need separate computed payload/property modeling.
 - Stay-in-drawing-mode, magnet-mode, and transient measure-mode state ship as
   shared command state with web widget and mobile Skia imperative APIs.
   Weak/strong magnet-mode OHLC snapping applies to anchor-based web Canvas and

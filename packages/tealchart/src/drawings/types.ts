@@ -168,6 +168,7 @@ export interface UserDrawingStyle {
   textWrap?: boolean;
   textMaxWidth?: number;
   labelsVisible?: boolean;
+  volumeProfileGuidesVisible?: boolean;
 }
 
 export interface UserDrawingBase {
