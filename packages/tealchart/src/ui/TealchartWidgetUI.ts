@@ -570,7 +570,7 @@ export class TealchartWidgetUI {
    */
   setUserDrawingState(state: UserDrawingState): void {
     this.options.userDrawingState = state;
-    this.legend?.setAvoidLeftTools(this.shouldAvoidLegendLeftTools());
+    this.updateLegendLeftToolAvoidance();
     const toolbarStateKey = this.getUserDrawingToolbarStateKey(state);
     if (toolbarStateKey !== this.currentUserDrawingToolbarStateKey) {
       this.currentUserDrawingToolbarStateKey = toolbarStateKey;
@@ -622,6 +622,14 @@ export class TealchartWidgetUI {
 
   private shouldAvoidLegendLeftTools(): boolean {
     return this.options.showTopBar !== false && Boolean(this.options.userDrawingState);
+  }
+
+  private updateLegendLeftToolAvoidance(): void {
+    const avoidLeftTools = this.shouldAvoidLegendLeftTools();
+    this.legend?.setAvoidLeftTools(avoidLeftTools);
+    for (const legend of this.indicatorPaneLegends.values()) {
+      legend.setAvoidLeftTools(avoidLeftTools);
+    }
   }
 
   private removeUserDrawingTextEditor(): void {
@@ -961,6 +969,7 @@ export class TealchartWidgetUI {
         legend = new IndicatorPaneLegend({
           paneId: pane.id,
           top: currentTop,
+          avoidLeftTools: this.shouldAvoidLegendLeftTools(),
           onToggleIndicator: this.options.onToggleIndicator,
           onSettingsIndicator: (indicatorId) => this.openIndicatorSettings(indicatorId),
           onRemoveIndicator: this.options.onRemoveIndicator,
@@ -970,6 +979,7 @@ export class TealchartWidgetUI {
       } else {
         // Update position
         legend.setPosition(currentTop);
+        legend.setAvoidLeftTools(this.shouldAvoidLegendLeftTools());
       }
 
       // Update indicators
