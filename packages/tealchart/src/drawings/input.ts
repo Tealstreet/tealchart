@@ -698,6 +698,14 @@ function replaceUserDrawing(
   };
 }
 
+function userDrawingStylesEqual(a: UserDrawingStyle, b: UserDrawingStyle): boolean {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)] as (keyof UserDrawingStyle)[]);
+  for (const key of keys) {
+    if (!Object.is(a[key], b[key])) return false;
+  }
+  return true;
+}
+
 export function updateUserDrawingStyle(
   state: UserDrawingState,
   style: Partial<UserDrawingStyle>,
@@ -715,24 +723,7 @@ export function updateUserDrawingStyle(
       ...target.drawing.style,
       ...style,
     });
-    if (
-      nextStyle.lineColor === target.drawing.style.lineColor &&
-      nextStyle.lineWidth === target.drawing.style.lineWidth &&
-      nextStyle.lineStyle === target.drawing.style.lineStyle &&
-      nextStyle.opacity === target.drawing.style.opacity &&
-      nextStyle.lineVisible === target.drawing.style.lineVisible &&
-      nextStyle.fillVisible === target.drawing.style.fillVisible &&
-      nextStyle.fillColor === target.drawing.style.fillColor &&
-      nextStyle.textColor === target.drawing.style.textColor &&
-      nextStyle.fontSize === target.drawing.style.fontSize &&
-      nextStyle.fontFamily === target.drawing.style.fontFamily &&
-      nextStyle.fontWeight === target.drawing.style.fontWeight &&
-      nextStyle.fontStyle === target.drawing.style.fontStyle &&
-      nextStyle.textUnderline === target.drawing.style.textUnderline &&
-      nextStyle.textLineThrough === target.drawing.style.textLineThrough &&
-      nextStyle.textWrap === target.drawing.style.textWrap &&
-      nextStyle.textMaxWidth === target.drawing.style.textMaxWidth
-    ) {
+    if (userDrawingStylesEqual(nextStyle, target.drawing.style)) {
       continue;
     }
     changed = true;

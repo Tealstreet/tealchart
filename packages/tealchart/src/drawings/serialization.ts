@@ -363,6 +363,9 @@ function parseStyle(value: unknown): UserDrawingStyle | null {
   if (typeof value.textWrap === 'boolean') style.textWrap = value.textWrap;
   if (isFiniteNumber(value.textMaxWidth)) style.textMaxWidth = value.textMaxWidth;
   if (typeof value.labelsVisible === 'boolean') style.labelsVisible = value.labelsVisible;
+  if (typeof value.volumeProfileGuidesVisible === 'boolean') {
+    style.volumeProfileGuidesVisible = value.volumeProfileGuidesVisible;
+  }
   return normalizeUserDrawingStyle(style);
 }
 
