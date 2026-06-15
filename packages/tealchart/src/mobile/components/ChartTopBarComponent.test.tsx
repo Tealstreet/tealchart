@@ -271,6 +271,53 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onMeasureModeChange).toHaveBeenCalledWith(false);
   });
 
+  it('rerenders mobile drawing toolbar undo and redo availability changes', () => {
+    const { rerender } = render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={baseDrawingState}
+        userDrawingCommandAvailability={{ canUndo: false, canRedo: false }}
+      />,
+    );
+
+    const getUndo = () => screen.getByLabelText('Undo drawing command') as HTMLButtonElement;
+    const getRedo = () => screen.getByLabelText('Redo drawing command') as HTMLButtonElement;
+
+    expect(getUndo().disabled).toBe(true);
+    expect(getUndo().getAttribute('aria-disabled')).toBe('true');
+    expect(getRedo().disabled).toBe(true);
+    expect(getRedo().getAttribute('aria-disabled')).toBe('true');
+
+    rerender(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={baseDrawingState}
+        userDrawingCommandAvailability={{ canUndo: true, canRedo: false }}
+      />,
+    );
+
+    expect(getUndo().disabled).toBe(false);
+    expect(getUndo().getAttribute('aria-disabled')).toBeNull();
+    expect(getRedo().disabled).toBe(true);
+    expect(getRedo().getAttribute('aria-disabled')).toBe('true');
+
+    rerender(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={baseDrawingState}
+        userDrawingCommandAvailability={{ canUndo: false, canRedo: true }}
+      />,
+    );
+
+    expect(getUndo().disabled).toBe(true);
+    expect(getUndo().getAttribute('aria-disabled')).toBe('true');
+    expect(getRedo().disabled).toBe(false);
+    expect(getRedo().getAttribute('aria-disabled')).toBeNull();
+  });
+
   it('dispatches selected rectangle fill style controls without text controls', () => {
     const onStyle = vi.fn();
     render(
