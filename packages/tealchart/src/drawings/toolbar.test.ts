@@ -2868,6 +2868,18 @@ describe('user drawing toolbar descriptors', () => {
       selected: true,
       command: { type: 'updateStyle', style: { volumeProfileGuidesVisible: false } },
     });
+    expect(visibleGeometryGroup?.controls.find((control) => control.id === 'volumeProfileRowCount:12')).toMatchObject({
+      label: '12 volume profile rows',
+      value: 12,
+      selected: true,
+      command: { type: 'updateStyle', style: { volumeProfileRowCount: 12 } },
+    });
+    expect(visibleGeometryGroup?.controls.find((control) => control.id === 'volumeProfileRowCount:24')).toMatchObject({
+      label: '24 volume profile rows',
+      value: 24,
+      selected: false,
+      command: { type: 'updateStyle', style: { volumeProfileRowCount: 24 } },
+    });
 
     const hiddenGeometryGroup = resolveUserDrawingPropertiesSurface({
       ...volumeProfileState,
@@ -2883,6 +2895,19 @@ describe('user drawing toolbar descriptors', () => {
       value: false,
       selected: false,
       command: { type: 'updateStyle', style: { volumeProfileGuidesVisible: true } },
+    });
+
+    const rowCountGeometryGroup = resolveUserDrawingPropertiesSurface({
+      ...volumeProfileState,
+      drawings: [
+        {
+          ...volumeProfileState.drawings[0]!,
+          style: { ...volumeProfileState.drawings[0]!.style, volumeProfileRowCount: 24 },
+        },
+      ],
+    }).groups.find((group) => group.id === 'geometry');
+    expect(rowCountGeometryGroup?.controls.find((control) => control.id === 'volumeProfileRowCount:24')).toMatchObject({
+      selected: true,
     });
   });
 

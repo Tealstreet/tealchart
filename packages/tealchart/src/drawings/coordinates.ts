@@ -18,7 +18,13 @@ import { resolveUserDrawingDateRangeMetrics } from './dateRange';
 import { resolveUserDrawingIconGeometry } from './iconGeometry';
 import { resolveUserDrawingInfoLineMetrics } from './infoLine';
 import { resolveUserDrawingRiskRewardMetrics } from './riskReward';
-import { normalizeUserDrawingFontSize, normalizeUserDrawingPanePosition, normalizeUserDrawingTableCells } from './types';
+import {
+  DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
+  normalizeUserDrawingFontSize,
+  normalizeUserDrawingPanePosition,
+  normalizeUserDrawingTableCells,
+  normalizeUserDrawingVolumeProfileRowCount,
+} from './types';
 
 export interface DrawingScreenPoint {
   x: number;
@@ -2571,7 +2577,6 @@ export function resolveAnchoredVwapFromAnchor(
   };
 }
 
-const FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT = 12;
 const FIXED_RANGE_VOLUME_PROFILE_VALUE_AREA_RATIO = 0.7;
 
 interface ResolveVolumeProfileOptions {
@@ -2580,6 +2585,7 @@ interface ResolveVolumeProfileOptions {
   endTime: number;
   priceMin: number;
   priceMax: number;
+  rowCount: number;
   space: DrawingCoordinateSpace;
 }
 
@@ -2653,6 +2659,7 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
   first: UserDrawingAnchor,
   second: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
+  options: { rowCount?: number } = {},
 ): DrawingScreenFixedRangeVolumeProfile {
   const firstPoint = anchorToScreenPoint(first, space);
   const secondPoint = anchorToScreenPoint(second, space);
@@ -2666,7 +2673,15 @@ export function resolveFixedRangeVolumeProfileFromAnchors(
   const endTime = Math.max(first.time, second.time);
   const priceMin = Math.min(first.price, second.price);
   const priceMax = Math.max(first.price, second.price);
-  return resolveVolumeProfile({ bounds, startTime, endTime, priceMin, priceMax, space });
+  return resolveVolumeProfile({
+    bounds,
+    startTime,
+    endTime,
+    priceMin,
+    priceMax,
+    rowCount: options.rowCount ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
+    space,
+  });
 }
 
 function resolveVolumeProfile({
@@ -2675,25 +2690,27 @@ function resolveVolumeProfile({
   endTime,
   priceMin,
   priceMax,
+  rowCount,
   space,
 }: ResolveVolumeProfileOptions): DrawingScreenFixedRangeVolumeProfile {
   const priceRange = priceMax - priceMin;
-  const volumes = Array.from({ length: FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT }, () => 0);
+  const binCount = normalizeUserDrawingVolumeProfileRowCount(rowCount);
+  const volumes = Array.from({ length: binCount }, () => 0);
 
   if (priceRange > 0) {
     for (const bar of space.bars ?? []) {
       if (bar.time < startTime || bar.time > endTime || bar.volume <= 0) continue;
       const typicalPrice = (bar.high + bar.low + bar.close) / 3;
       if (typicalPrice < priceMin || typicalPrice > priceMax) continue;
-      const rawIndex = Math.floor(((typicalPrice - priceMin) / priceRange) * FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT);
-      const index = Math.max(0, Math.min(FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT - 1, rawIndex));
+      const rawIndex = Math.floor(((typicalPrice - priceMin) / priceRange) * binCount);
+      const index = Math.max(0, Math.min(binCount - 1, rawIndex));
       volumes[index] += bar.volume;
     }
   }
 
   const maxVolume = Math.max(0, ...volumes);
   const totalVolume = volumes.reduce((sum, volume) => sum + volume, 0);
-  const binHeight = priceRange / FIXED_RANGE_VOLUME_PROFILE_BIN_COUNT;
+  const binHeight = priceRange / binCount;
   const bins = volumes.map((volume, index) => {
     const binPriceMin = priceMin + binHeight * index;
     const binPriceMax = priceMin + binHeight * (index + 1);
@@ -2725,6 +2742,7 @@ function resolveVolumeProfile({
 export function resolveAnchoredVolumeProfileFromAnchor(
   anchor: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
+  options: { rowCount?: number } = {},
 ): DrawingScreenFixedRangeVolumeProfile {
   const anchorPoint = anchorToScreenPoint(anchor, space);
   const profileBars = (space.bars ?? []).filter((bar) => bar.time >= anchor.time && bar.volume > 0);
@@ -2748,6 +2766,7 @@ export function resolveAnchoredVolumeProfileFromAnchor(
     endTime,
     priceMin,
     priceMax,
+    rowCount: options.rowCount ?? DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
     space,
   });
 }
@@ -3547,13 +3566,17 @@ export function resolveUserDrawingGeometry(
       return {
         kind: 'anchoredVolumeProfile',
         drawing,
-        volumeProfile: resolveAnchoredVolumeProfileFromAnchor(drawing.point, space),
+        volumeProfile: resolveAnchoredVolumeProfileFromAnchor(drawing.point, space, {
+          rowCount: drawing.style.volumeProfileRowCount,
+        }),
       };
     case 'fixedRangeVolumeProfile':
       return {
         kind: 'fixedRangeVolumeProfile',
         drawing,
-        volumeProfile: resolveFixedRangeVolumeProfileFromAnchors(drawing.points[0], drawing.points[1], space),
+        volumeProfile: resolveFixedRangeVolumeProfileFromAnchors(drawing.points[0], drawing.points[1], space, {
+          rowCount: drawing.style.volumeProfileRowCount,
+        }),
       };
     case 'triangle':
       return {

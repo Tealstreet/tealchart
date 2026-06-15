@@ -16,11 +16,13 @@ import {
   normalizeUserDrawingOpacity,
   normalizeUserDrawingStyle,
   normalizeUserDrawingTextMaxWidth,
+  normalizeUserDrawingVolumeProfileRowCount,
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
+  USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
 } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
@@ -204,6 +206,17 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingTextMaxWidth(440)).toBe(480);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, textMaxWidth: 190 })).toMatchObject({
       textMaxWidth: 180,
+    });
+  });
+
+  it('normalizes volume profile row counts to bounded integer values', () => {
+    expect(USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS).toEqual([12, 24, 48]);
+    expect(normalizeUserDrawingVolumeProfileRowCount(1)).toBe(2);
+    expect(normalizeUserDrawingVolumeProfileRowCount(24.4)).toBe(24);
+    expect(normalizeUserDrawingVolumeProfileRowCount(999)).toBe(200);
+    expect(normalizeUserDrawingVolumeProfileRowCount(Number.NaN)).toBe(12);
+    expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, volumeProfileRowCount: 24.4 })).toMatchObject({
+      volumeProfileRowCount: 24,
     });
   });
 

@@ -14,6 +14,7 @@ import type {
   UserDrawingTextMaxWidth,
   UserDrawingTool,
   UserDrawingTrendLineExtend,
+  UserDrawingVolumeProfileRowCount,
 } from './types';
 
 import { getUserDrawingSelectionIds, reorderUserDrawings } from './input';
@@ -33,6 +34,7 @@ import {
   USER_DRAWING_OPACITIES,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_TREND_LINE_EXTENDS,
+  USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
 } from './types';
 
 export type UserDrawingToolbarAction =
@@ -179,6 +181,11 @@ export interface UserDrawingTextWrapDescriptor {
 
 export interface UserDrawingTextMaxWidthDescriptor {
   textMaxWidth: UserDrawingTextMaxWidth;
+  label: string;
+}
+
+export interface UserDrawingVolumeProfileRowCountDescriptor {
+  rowCount: UserDrawingVolumeProfileRowCount;
   label: string;
 }
 
@@ -755,6 +762,12 @@ export const USER_DRAWING_FILL_OPACITY_DESCRIPTORS: readonly UserDrawingOpacityD
     label: `${Math.round(opacity * 100)} percent fill opacity`,
   })),
 ];
+
+export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNT_DESCRIPTORS: readonly UserDrawingVolumeProfileRowCountDescriptor[] =
+  USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS.map((rowCount) => ({
+    rowCount,
+    label: `${rowCount} volume profile rows`,
+  }));
 
 export const USER_DRAWING_FREEHAND_LINE_WIDTH_DESCRIPTORS: readonly UserDrawingLineWidthDescriptor[] = [
   { width: 2, label: 'Fine freehand stroke width' },
@@ -1573,6 +1586,10 @@ export function supportsUserDrawingGeneratedLabelVisibilityControls(drawing: Use
 }
 
 export function supportsUserDrawingVolumeProfileGuideControls(drawing: UserDrawing): boolean {
+  return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
+}
+
+export function supportsUserDrawingVolumeProfileRowCountControls(drawing: UserDrawing): boolean {
   return drawing.kind === 'anchoredVolumeProfile' || drawing.kind === 'fixedRangeVolumeProfile';
 }
 

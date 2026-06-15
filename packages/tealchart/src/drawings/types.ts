@@ -169,6 +169,7 @@ export interface UserDrawingStyle {
   textMaxWidth?: number;
   labelsVisible?: boolean;
   volumeProfileGuidesVisible?: boolean;
+  volumeProfileRowCount?: number;
 }
 
 export interface UserDrawingBase {
@@ -949,11 +950,16 @@ export const USER_DRAWING_FONT_FAMILIES = ['sans-serif', 'serif', 'monospace'] a
 export const USER_DRAWING_FONT_WEIGHTS = ['normal', 'bold'] as const;
 export const USER_DRAWING_FONT_STYLES = ['normal', 'italic'] as const;
 export const USER_DRAWING_TEXT_MAX_WIDTHS = [120, 180, 240, 320, 480] as const;
+export const DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 12;
+export const MIN_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 2;
+export const MAX_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT = 200;
+export const USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS = [12, 24, 48] as const;
 export type UserDrawingFontSize = (typeof USER_DRAWING_FONT_SIZES)[number];
 export type UserDrawingFontFamily = (typeof USER_DRAWING_FONT_FAMILIES)[number];
 export type UserDrawingFontWeight = (typeof USER_DRAWING_FONT_WEIGHTS)[number];
 export type UserDrawingFontStyle = (typeof USER_DRAWING_FONT_STYLES)[number];
 export type UserDrawingTextMaxWidth = (typeof USER_DRAWING_TEXT_MAX_WIDTHS)[number];
+export type UserDrawingVolumeProfileRowCount = (typeof USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS)[number];
 export const USER_DRAWING_OPACITIES = [1, 0.75, 0.5, 0.25, 0.1] as const;
 
 export function normalizeUserDrawingFontSize(fontSize: number): UserDrawingFontSize {
@@ -992,6 +998,14 @@ export function normalizeUserDrawingTextMaxWidth(textMaxWidth: number): UserDraw
   );
 }
 
+export function normalizeUserDrawingVolumeProfileRowCount(rowCount: number): number {
+  if (!Number.isFinite(rowCount)) return DEFAULT_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT;
+  return Math.max(
+    MIN_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT,
+    Math.min(MAX_USER_DRAWING_VOLUME_PROFILE_ROW_COUNT, Math.round(rowCount)),
+  );
+}
+
 export function normalizeUserDrawingIconName(iconName: unknown): UserDrawingIconName {
   return USER_DRAWING_ICON_NAMES.includes(iconName as UserDrawingIconName)
     ? (iconName as UserDrawingIconName)
@@ -1017,6 +1031,10 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     style.fillOpacity === undefined ? undefined : normalizeUserDrawingOpacity(style.fillOpacity);
   const textMaxWidth =
     style.textMaxWidth === undefined ? undefined : normalizeUserDrawingTextMaxWidth(style.textMaxWidth);
+  const volumeProfileRowCount =
+    style.volumeProfileRowCount === undefined
+      ? undefined
+      : normalizeUserDrawingVolumeProfileRowCount(style.volumeProfileRowCount);
   if (
     fontSize === style.fontSize &&
     fontFamily === style.fontFamily &&
@@ -1024,7 +1042,8 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     fontStyle === style.fontStyle &&
     opacity === style.opacity &&
     fillOpacity === style.fillOpacity &&
-    textMaxWidth === style.textMaxWidth
+    textMaxWidth === style.textMaxWidth &&
+    volumeProfileRowCount === style.volumeProfileRowCount
   ) {
     return style;
   }
@@ -1038,6 +1057,7 @@ export function normalizeUserDrawingStyle(style: UserDrawingStyle): UserDrawingS
     ...(opacity === undefined ? {} : { opacity }),
     ...(fillOpacity === undefined ? {} : { fillOpacity }),
     ...(textMaxWidth === undefined ? {} : { textMaxWidth }),
+    ...(volumeProfileRowCount === undefined ? {} : { volumeProfileRowCount }),
   };
 }
 
