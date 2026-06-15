@@ -44,6 +44,36 @@ function createSelectedState(): UserDrawingState {
   };
 }
 
+function createSelectedTextState(): UserDrawingState {
+  return {
+    ...createSelectedState(),
+    selection: { drawingId: 'text' },
+    drawings: [
+      {
+        id: 'text',
+        name: 'Note',
+        kind: 'textLabel',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: {
+          ...style,
+          fillColor: 'rgba(245, 197, 66, 0.12)',
+          textColor: '#f5c542',
+          fontSize: 12,
+          textWrap: true,
+          textMaxWidth: 180,
+        },
+        point: { time: 1, price: 50 },
+        text: 'Wrapped note',
+        textAlign: 'center',
+      },
+    ],
+  };
+}
+
 function getMockViewStyle(element: HTMLElement): Record<string, unknown> {
   const rawStyle = element.getAttribute('data-style');
   expect(rawStyle).not.toBeNull();
@@ -164,13 +194,13 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
   });
 
   it('clamps mobile selected style popovers using the expanded surface height', () => {
-    const state = createSelectedState();
+    const state = createSelectedTextState();
 
     render(
       <UserDrawingSelectedActionSurfaceComponent
         state={state}
         surface={resolveUserDrawingSelectedActionSurface(state)}
-        anchor={{ ...selectionActionAnchor, anchor: { x: 160, y: 230 } }}
+        anchor={{ ...selectionActionAnchor, drawingIds: ['text'], anchor: { x: 160, y: 230 } }}
         dimensions={{ width: 360, height: 240 }}
         topInset={40}
         createId={() => 'copy'}
@@ -185,6 +215,6 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
 
     expect(screen.getByLabelText('Style selected drawing').getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByLabelText('Selected drawing style controls')).not.toBeNull();
-    expect(getMockViewStyle(surface).top).toBe(128);
+    expect(getMockViewStyle(surface).top).toBe(83);
   });
 });
