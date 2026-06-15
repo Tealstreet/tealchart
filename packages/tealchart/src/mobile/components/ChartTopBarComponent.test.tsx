@@ -45,12 +45,39 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.getByLabelText('Geometric Shapes drawing tools').getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByLabelText('Rectangle')).toBeTruthy();
     expect(screen.getByLabelText('Geometric Shapes tool list')).toBeTruthy();
+    expect(screen.getByLabelText('Pin drawing tools')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Close drawing tools'));
     expect(screen.queryByLabelText('Rectangle')).toBeNull();
     fireEvent.click(screen.getByLabelText('Lines drawing tools'));
     fireEvent.click(screen.getByLabelText('Trend line'));
 
     expect(onTool).toHaveBeenCalledWith('trendLine');
+  });
+
+  it('keeps a drawing tool flyout open when pinned', () => {
+    const onTool = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'rectangle' }}
+        onUserDrawingToolSelect={onTool}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Lines drawing tools'));
+    fireEvent.click(screen.getByLabelText('Pin drawing tools'));
+    expect(screen.getByLabelText('Unpin drawing tools')).toBeTruthy();
+
+    fireEvent.click(screen.getByLabelText('Trend line'));
+    expect(onTool).toHaveBeenCalledWith('trendLine');
+    expect(screen.getByLabelText('Trend line')).toBeTruthy();
+    expect(screen.queryByLabelText('Close drawing tools')).toBeNull();
+
+    fireEvent.click(screen.getByLabelText('Unpin drawing tools'));
+    expect(screen.getByLabelText('Pin drawing tools')).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('Trend line'));
+    expect(screen.queryByLabelText('Trend line')).toBeNull();
   });
 
   it('shows the active tool icon on its category button', () => {

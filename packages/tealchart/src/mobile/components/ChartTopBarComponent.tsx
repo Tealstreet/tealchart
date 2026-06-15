@@ -201,6 +201,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     // This makes the component work both controlled and uncontrolled
     const [internalInterval, setInternalInterval] = useState(interval);
     const [expandedDrawingCategoryId, setExpandedDrawingCategoryId] = useState<string | null>(null);
+    const [pinnedDrawingCategoryId, setPinnedDrawingCategoryId] = useState<string | null>(null);
     const [recentDrawingToolsByCategory, setRecentDrawingToolsByCategory] = useState<
       Record<string, UserDrawingTool | undefined>
     >({});
@@ -261,7 +262,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
     return (
       <View style={styles.container} pointerEvents="box-none">
-        {expandedDrawingCategory && (
+        {expandedDrawingCategory && pinnedDrawingCategoryId !== expandedDrawingCategory.id && (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Close drawing tools"
@@ -292,7 +293,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       accessibilityRole="button"
                       accessibilityLabel={`${category.label} drawing tools`}
                       accessibilityState={{ expanded, selected: activeCategory }}
-                      onPress={() => setExpandedDrawingCategoryId(expanded ? null : category.id)}
+                      onPress={() => {
+                        if (expanded && pinnedDrawingCategoryId === category.id) return;
+                        setExpandedDrawingCategoryId(expanded ? null : category.id);
+                        if (!expanded || pinnedDrawingCategoryId !== category.id) {
+                          setPinnedDrawingCategoryId(null);
+                        }
+                      }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingToolCategoryButton,
                         activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
@@ -315,9 +322,45 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 style={[styles.drawingToolFlyout, drawingToolBoundsStyle]}
                 accessibilityLabel={`${expandedDrawingCategory.label} tools`}
               >
-                <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
-                  {expandedDrawingCategory.label}
-                </Text>
+                <View style={styles.drawingToolFlyoutHeader}>
+                  <Text style={[styles.drawingToolFlyoutTitle, { color: textSecondaryColor }]}>
+                    {expandedDrawingCategory.label}
+                  </Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={
+                      pinnedDrawingCategoryId === expandedDrawingCategory.id
+                        ? 'Unpin drawing tools'
+                        : 'Pin drawing tools'
+                    }
+                    accessibilityState={{ selected: pinnedDrawingCategoryId === expandedDrawingCategory.id }}
+                    onPress={() =>
+                      setPinnedDrawingCategoryId((current) =>
+                        current === expandedDrawingCategory.id ? null : expandedDrawingCategory.id,
+                      )
+                    }
+                    style={({ pressed }: PressableStyleState) => [
+                      styles.drawingToolPinButton,
+                      pinnedDrawingCategoryId === expandedDrawingCategory.id && [
+                        styles.drawingButtonActive,
+                        { backgroundColor: `${accentColor}33` },
+                      ],
+                      pressed && pinnedDrawingCategoryId !== expandedDrawingCategory.id && styles.drawingButtonPressed,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.drawingButtonText,
+                        {
+                          color:
+                            pinnedDrawingCategoryId === expandedDrawingCategory.id ? accentColor : textSecondaryColor,
+                        },
+                      ]}
+                    >
+                      {pinnedDrawingCategoryId === expandedDrawingCategory.id ? '●' : '○'}
+                    </Text>
+                  </Pressable>
+                </View>
                 <View
                   style={[styles.drawingToolFlyoutList, drawingToolFlyoutListBoundsStyle]}
                   accessibilityLabel={`${expandedDrawingCategory.label} tool list`}
@@ -341,7 +384,9 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                               }));
                             }
                             onUserDrawingToolSelect?.(descriptor.tool);
-                            setExpandedDrawingCategoryId(null);
+                            if (pinnedDrawingCategoryId !== expandedDrawingCategory.id) {
+                              setExpandedDrawingCategoryId(null);
+                            }
                           }}
                           style={({ pressed }: PressableStyleState) => [
                             styles.drawingToolFlyoutButton,
@@ -1220,6 +1265,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'rgba(19, 23, 34, 0.98)',
   },
+  drawingToolFlyoutHeader: {
+    marginBottom: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
   drawingToolFlyoutList: {
     overflow: 'hidden',
   },
@@ -1227,7 +1279,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
-    marginBottom: 6,
+  },
+  drawingToolPinButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   drawingToolFlyoutButton: {
     minHeight: 34,

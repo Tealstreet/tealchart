@@ -85,6 +85,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.body.textContent).toContain('Channels');
     expect(document.body.textContent).toContain('Gann and Fibonacci');
     expect(rectangle?.getAttribute('aria-pressed')).toBe('true');
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Pin drawing tools"]')).not.toBeNull();
     trendLine?.click();
     expect(onTool).toHaveBeenCalledWith('trendLine');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
@@ -103,6 +104,66 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(
       document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.getAttribute('aria-pressed'),
     ).toBe('true');
+
+    topBar.unmount();
+  });
+
+  it('keeps a drawing tool flyout open when pinned', () => {
+    const onTool = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-tools-pinned',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, activeTool: 'rectangle' },
+      onUserDrawingToolSelect: onTool,
+    });
+    topBar.mount(document.body);
+
+    const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    linesCategory?.click();
+    const pinButton = document
+      .getElementById('tealchart-drawing-tools-lines')
+      ?.querySelector<HTMLButtonElement>('button[aria-label="Pin drawing tools"]');
+    expect(pinButton).not.toBeNull();
+    pinButton?.click();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Unpin drawing tools"]')).not.toBeNull();
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.click();
+    expect(onTool).toHaveBeenCalledWith('trendLine');
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+    document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
+
+    topBar.unmount();
+  });
+
+  it('clears a pinned drawing tool flyout when switching categories', () => {
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-tools-pinned-switch',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, activeTool: 'trendLine' },
+    });
+    topBar.mount(document.body);
+
+    const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    linesCategory?.click();
+    document
+      .getElementById('tealchart-drawing-tools-lines')
+      ?.querySelector<HTMLButtonElement>('button[aria-label="Pin drawing tools"]')
+      ?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]')?.click();
+    expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
+
+    topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'rectangle' });
+    expect(
+      document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.getAttribute(
+        'aria-expanded',
+      ),
+    ).toBe('false');
 
     topBar.unmount();
   });
