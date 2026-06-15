@@ -358,4 +358,24 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
     expect(getMockViewStyle(surface).left).toBe(68);
     expect(getMockViewStyle(surface).top).toBe(46);
   });
+
+  it('keeps mobile selected actions at the base inset when full rail avoidance cannot fit', () => {
+    const state = createSelectedState();
+
+    render(
+      <UserDrawingSelectedActionSurfaceComponent
+        state={state}
+        surface={resolveUserDrawingSelectedActionSurface(state)}
+        anchor={{ ...selectionActionAnchor, anchor: { x: 12, y: 24 } }}
+        dimensions={{ width: 300, height: 240 }}
+        topInset={40}
+        createId={() => 'copy'}
+        dispatchUserDrawingCommand={vi.fn()}
+      />,
+    );
+
+    const surface = screen.getByLabelText('Selected drawing actions');
+    expect(getMockViewStyle(surface).left).toBe(8);
+    expect(getMockViewStyle(surface).top).toBe(46);
+  });
 });

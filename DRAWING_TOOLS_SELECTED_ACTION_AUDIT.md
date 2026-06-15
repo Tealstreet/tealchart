@@ -24,7 +24,7 @@ The selected-action surface is shared:
 | Text edit | Web context, double-click, and selected actions route text-capable drawings into text edit. `ChartTopBar.test.ts` now verifies the rendered floating toolbar keeps properties reachable for non-text drawings, enables local text edit for unlocked text drawings, and disables it for locked text drawings. | Mobile action dispatch and double-tap edit intent share the same text/properties concepts. `UserDrawingSelectedActionSurface.test.tsx` now verifies the rendered action strip matches the same non-text, unlocked text, and locked text behavior. | `toolbar.test.ts` ensures text edit is only enabled for unlocked text drawings. |
 | Copy/duplicate/delete/z-order | Web floating toolbar and context menu dispatch copy, duplicate, delete, and z-order callbacks. | Mobile selected action strip dispatches the same selected-object commands, with copy writing the mobile clipboard and mutations flowing through mobile command history. | Shared descriptor commands map local copy to `copySelected` and mutations to history-backed command actions. |
 | Style/visibility/lock | Web floating toolbar renders style popovers and visibility/lock controls. | Mobile action strip renders the same style groups and mutation commands. | Shared style descriptors define line, fill, text, opacity, visibility, and lock controls. |
-| Chrome-safe placement | `ChartTopBar.test.ts` covers the selected toolbar clamping below the top bar and clear of the left drawing rail when space allows. | `UserDrawingSelectedActionSurface.test.tsx` covers the same top/left rail clamp for the Skia/RN action strip. | `chartGeometry.test.ts` covers the shared left-rail avoidance inset helper, including constrained widths. |
+| Chrome-safe placement | `ChartTopBar.test.ts` covers the selected toolbar clamping below the top bar, clear of the left drawing rail when space allows, and falling back to the maximum fitting inset on constrained widths. | `UserDrawingSelectedActionSurface.test.tsx` covers the same top/left rail clamp for the Skia/RN action strip and the base-inset fallback when the full rail reservation cannot fit. | `chartGeometry.test.ts` covers the shared left-rail avoidance inset helper, including constrained widths. |
 
 ## Findings
 
@@ -35,6 +35,9 @@ The selected-action surface is shared:
 - The selected-action surface now uses chart chrome metrics to avoid the left
   drawing rail when there is enough width, while staying in-bounds on narrower
   mobile layouts where the full rail reservation cannot fit.
+- Rendered web and mobile selected-action surface tests now pin the constrained
+  width fallback path, so the left-rail avoidance logic cannot silently push
+  the toolbar off-screen when the viewport is narrow.
 - Copy selected is now locally reachable from the selected-object surface on
   both web and mobile, not only through keyboard/API command paths.
 - Duplicate-while-dragging is now locally reachable from the selected-object
@@ -55,8 +58,8 @@ Move to one of these narrow improvements:
 1. Add browser-level visual/e2e evidence that the web selected toolbar is
    anchored near real selected geometry, beyond the current component-level
    chrome clamp tests.
-2. Add mobile render/e2e evidence that the action strip remains reachable near
-   chart edges and does not block chart gestures outside the strip, beyond the
-   current component-level chrome clamp tests.
+2. Add mobile render/e2e evidence that the action strip does not block chart
+   gestures outside the strip, beyond the current component-level chrome clamp
+   tests.
 3. Add one missing tool-specific selected style control only if it can be
    implemented in the shared descriptor and rendered by both web and mobile.
