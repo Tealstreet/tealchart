@@ -89,6 +89,10 @@ function applyStrokeStyle(ctx: CanvasContext, drawing: UserDrawing): void {
   ctx.lineJoin = 'round';
 }
 
+function areUserDrawingLabelsVisible(drawing: UserDrawing): boolean {
+  return drawing.style.labelsVisible !== false;
+}
+
 function renderLineGeometry(
   ctx: CanvasContext,
   geometry: Extract<ResolvedUserDrawingGeometry, { segment: unknown }>,
@@ -124,6 +128,8 @@ function renderTrendAngleGeometry(
     ctx.lineTo(geometry.angle.segment.end.x, geometry.angle.segment.end.y);
     ctx.stroke();
   }
+
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
@@ -433,6 +439,8 @@ function renderFibFanGeometry(
   }
   ctx.stroke();
 
+  if (!areUserDrawingLabelsVisible(drawing)) return;
+
   ctx.font = `${normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12)}px ${normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif')}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textBaseline = 'bottom';
@@ -457,6 +465,8 @@ function renderGannFanGeometry(
     ctx.lineTo(ray.segment.end.x, ray.segment.end.y);
   }
   ctx.stroke();
+
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   ctx.font = `${normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12)}px ${normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif')}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
@@ -493,6 +503,8 @@ function renderGannBoxGeometry(
     ctx.lineTo(angle.end.x, angle.end.y);
   }
   ctx.stroke();
+
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -533,6 +545,8 @@ function renderFibChannelGeometry(
   }
   ctx.stroke();
 
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -563,6 +577,8 @@ function renderFibTimeZoneGeometry(
     ctx.lineTo(level.segment.end.x, level.segment.end.y);
   }
   ctx.stroke();
+
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
@@ -596,6 +612,8 @@ function renderTimeCyclesGeometry(
     }
   }
   ctx.stroke();
+
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
@@ -635,6 +653,8 @@ function renderInfoLineGeometry(
   }
 
   if (geometry.drawing.kind !== 'infoLine') return;
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
   const label = geometry.infoMetrics.label;
@@ -662,6 +682,8 @@ function renderForecastGeometry(
     ctx.lineTo(forecast.segment.end.x, forecast.segment.end.y);
     ctx.stroke();
   }
+
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -699,6 +721,8 @@ function renderProjectionGeometry(
     ctx.lineTo(projection.projectionSegment.end.x, projection.projectionSegment.end.y);
     ctx.stroke();
   }
+
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -778,6 +802,8 @@ function renderPatternGeometry(
     ctx.stroke();
   }
 
+  if (!areUserDrawingLabelsVisible(drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -818,6 +844,8 @@ function renderTrianglePatternGeometry(
     ctx.stroke();
   }
 
+  if (!areUserDrawingLabelsVisible(drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -848,6 +876,8 @@ function renderHeadShouldersPatternGeometry(
     ctx.lineTo(pattern.neckline.end.x, pattern.neckline.end.y);
     ctx.stroke();
   }
+
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -994,6 +1024,8 @@ function renderFibCirclesGeometry(
   }
   ctx.stroke();
 
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -1024,6 +1056,8 @@ function renderFibSpeedResistanceArcsGeometry(
   }
   ctx.stroke();
 
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -1047,6 +1081,8 @@ function renderFibArcsGeometry(
     ctx.arc(geometry.fibArcs.center.x, geometry.fibArcs.center.y, arc.radius, arc.startAngle, arc.endAngle);
   }
   ctx.stroke();
+
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
@@ -1100,6 +1136,8 @@ function renderFibWedgeGeometry(
   }
   ctx.stroke();
 
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
+
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -1127,6 +1165,8 @@ function renderFibSpiralGeometry(
     ctx.lineTo(point.x, point.y);
   }
   ctx.stroke();
+
+  if (!areUserDrawingLabelsVisible(geometry.drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(geometry.drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(geometry.drawing.style.fontFamily ?? 'sans-serif');
@@ -1178,6 +1218,7 @@ function renderPriceRangeGeometry(
   }
 
   if (drawing.kind !== 'priceRange') return;
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -1206,6 +1247,7 @@ function renderDateRangeGeometry(
   }
 
   if (drawing.kind !== 'dateRange') return;
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -1234,6 +1276,7 @@ function renderDatePriceRangeGeometry(
   }
 
   if (drawing.kind !== 'datePriceRange') return;
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   const fontSize = normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12);
   const fontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
@@ -1280,6 +1323,8 @@ function renderRiskRewardPositionGeometry(
     }
   }
 
+  if (!areUserDrawingLabelsVisible(drawing)) return;
+
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;
   ctx.textAlign = 'center';
@@ -1309,6 +1354,8 @@ function renderFibLevelGeometry(
       ctx.stroke();
     }
   }
+
+  if (!areUserDrawingLabelsVisible(drawing)) return;
 
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = drawing.style.textColor ?? drawing.style.lineColor;

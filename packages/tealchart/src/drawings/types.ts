@@ -166,6 +166,7 @@ export interface UserDrawingStyle {
   textLineThrough?: boolean;
   textWrap?: boolean;
   textMaxWidth?: number;
+  labelsVisible?: boolean;
 }
 
 export interface UserDrawingBase {

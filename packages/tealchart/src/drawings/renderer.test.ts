@@ -606,6 +606,26 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:+20.00 (+28.57%):50,20:#111:center:1:12px sans-serif');
   });
 
+  it('keeps price range geometry visible when generated labels are hidden', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'range',
+      kind: 'priceRange',
+      style: { ...base.style, labelsVisible: false },
+      points: [
+        { time: 10, price: 70 },
+        { time: 90, price: 90 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('fillRect:10,10,80,20:rgba(245, 197, 66, 0.12):1');
+    expect(ctx.calls).toContain('strokeRect:10,10,80,20:#f5c542:1');
+    expect(ctx.calls.some((call) => call.startsWith('fillText:+20.00'))).toBe(false);
+  });
+
   it('renders price range labels from visual low to high when anchors are reversed', () => {
     const ctx = new RecordingCanvasContext();
     const drawing: UserDrawing = {
@@ -1286,6 +1306,31 @@ describe('user drawing renderer', () => {
     expect(ctx.calls).toContain('fillText:B:30,24:#111:center:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:C:50,4:#111:center:1:12px sans-serif');
     expect(ctx.calls).toContain('fillText:D:70,24:#111:center:1:12px sans-serif');
+  });
+
+  it('keeps ABCD pattern geometry visible when generated labels are hidden', () => {
+    const ctx = new RecordingCanvasContext();
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'abcd',
+      kind: 'abcdPattern',
+      style: { ...base.style, labelsVisible: false },
+      points: [
+        { time: 10, price: 90 },
+        { time: 30, price: 70 },
+        { time: 50, price: 90 },
+        { time: 70, price: 70 },
+      ],
+    };
+
+    renderUserDrawing(ctx, drawing, space);
+
+    expect(ctx.calls).toContain('moveTo:10,10');
+    expect(ctx.calls).toContain('lineTo:30,30');
+    expect(ctx.calls).toContain('lineTo:70,30');
+    expect(ctx.calls).toContain('stroke:#f5c542:2:6,4:1');
+    expect(ctx.calls.some((call) => call.startsWith('fillText:A'))).toBe(false);
+    expect(ctx.calls.some((call) => call.startsWith('fillText:D'))).toBe(false);
   });
 
   it('renders triangle pattern drawings as filled labeled AC/BD boundaries', () => {
