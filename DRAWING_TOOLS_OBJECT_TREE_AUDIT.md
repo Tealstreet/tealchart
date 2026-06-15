@@ -39,13 +39,16 @@ Object-tree behavior is shared:
   regression evidence that surface interactions do not bubble through the
   jsdom/RN-test wrappers or dismiss the mobile sheet before a row/action can
   complete.
+- Built-in web and mobile object-tree surfaces now both pin basic reachability
+  layout constraints: the web panel stays viewport-capped with wrapped row
+  actions, while the mobile sheet stays height-capped with wrapped row actions.
 - The next useful C-domain work is visual polish or app integration evidence,
   not another command model layer.
 
 ## Follow-Up Risks
 
-- Browser-level evidence for real chart-container pointer isolation, panel
-  placement, and clipping is still thin.
+- Browser-level evidence for real chart-container pointer isolation remains
+  thinner than unit-level panel placement and clipping evidence.
 - Mobile object-tree sheet ergonomics and native responder isolation should be
   rechecked on small screens once more drawing actions are added.
 - Future row or context actions must be added through the shared resolvers so
