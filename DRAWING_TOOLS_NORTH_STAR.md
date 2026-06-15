@@ -144,6 +144,8 @@ Phase D1: Handle and whole-object edit audit
 - Verify drag handles, whole-object move, cancel/interruption, locked drawings,
   hidden drawings, and stale IDs.
 - Ensure each gesture creates one undo entry.
+- Current D1 edit-lifecycle evidence is recorded in
+  `DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`.
 
 Phase D2: Double-click/double-tap edit
 
@@ -192,11 +194,11 @@ next PR.
 
 ## Current Next Move
 
-Placement, selected-action, and object-tree audits are now recorded in
+Placement, selected-action, object-tree, and edit-lifecycle audits are recorded in
 `DRAWING_TOOLS_PLACEMENT_AUDIT.md`, `DRAWING_TOOLS_SELECTED_ACTION_AUDIT.md`,
-and `DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`.
+`DRAWING_TOOLS_OBJECT_TREE_AUDIT.md`, and
+`DRAWING_TOOLS_EDIT_LIFECYCLE_AUDIT.md`.
 
-Move next to Epic D, Phase D1. Audit handle drag, whole-object move,
-cancel/interruption, locked/hidden drawings, stale IDs, and undo transaction
-boundaries across web Canvas and mobile Skia before adding more shape-specific
-controls.
+Move next to Epic D, Phase D2. Verify double-click and double-tap behavior for
+text and non-text drawings, including app-owned callbacks and built-in
+fallbacks, before adding more shape-specific controls.
