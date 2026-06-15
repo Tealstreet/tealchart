@@ -11,6 +11,7 @@ import type {
   UserDrawingMagnetMode,
   UserDrawingPanePosition,
   UserDrawingPathFamilyKind,
+  UserDrawingRiskRewardStatsMode,
 } from './types';
 
 import { resolveDrawingArrowMark, resolveDrawingArrowMarker } from './arrowGeometry';
@@ -1470,6 +1471,7 @@ export function resolveRiskRewardPositionFromAnchors(
   targetAnchor: UserDrawingAnchor,
   stopAnchor: UserDrawingAnchor,
   space: DrawingCoordinateSpace,
+  options: { statsMode?: UserDrawingRiskRewardStatsMode } = {},
 ): DrawingScreenRiskRewardPosition {
   const entry = anchorToScreenPoint(entryAnchor, space);
   const target = anchorToScreenPoint(targetAnchor, space);
@@ -1477,7 +1479,9 @@ export function resolveRiskRewardPositionFromAnchors(
   const left = Math.min(entry.x, target.x, stop.x);
   const right = Math.max(entry.x, target.x, stop.x);
   const width = right - left;
-  const metrics = resolveUserDrawingRiskRewardMetrics(kind, entryAnchor, targetAnchor, stopAnchor);
+  const metrics = resolveUserDrawingRiskRewardMetrics(kind, entryAnchor, targetAnchor, stopAnchor, {
+    statsMode: options.statsMode,
+  });
 
   return {
     entry,
@@ -3318,6 +3322,7 @@ export function resolveUserDrawingGeometry(
           drawing.points[1],
           drawing.points[2],
           space,
+          { statsMode: drawing.style.riskRewardStatsMode },
         ),
       };
     case 'forecast':

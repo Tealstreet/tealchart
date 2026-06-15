@@ -29,6 +29,7 @@ import {
   supportsUserDrawingFillVisibilityControls,
   supportsUserDrawingIconControls,
   supportsUserDrawingRichTextControls,
+  supportsUserDrawingRiskRewardStatsModeControls,
   supportsUserDrawingTextAlignControls,
   supportsUserDrawingTextAppearanceControls,
   supportsUserDrawingTextControls,
@@ -45,6 +46,7 @@ import {
   USER_DRAWING_LINE_STYLE_DESCRIPTORS,
   USER_DRAWING_LINE_WIDTH_DESCRIPTORS,
   USER_DRAWING_OPACITY_DESCRIPTORS,
+  USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOGGLE_DESCRIPTORS,
   USER_DRAWING_STYLE_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TEXT_ALIGN_DESCRIPTORS,
@@ -3058,6 +3060,29 @@ describe('user drawing toolbar descriptors', () => {
         .groups.find((group) => group.id === 'fill')
         ?.controls.find((control) => control.id === 'fillOpacity:1'),
     ).toMatchObject({ selected: true });
+    expect(supportsUserDrawingRiskRewardStatsModeControls(riskRewardState.drawings[0]!)).toBe(true);
+    expect(USER_DRAWING_RISK_REWARD_STATS_MODE_DESCRIPTORS.map((descriptor) => descriptor.statsMode)).toEqual([
+      'full',
+      'compact',
+    ]);
+    expect(
+      resolveUserDrawingPropertiesSurface(riskRewardState)
+        .groups.find((group) => group.id === 'position')
+        ?.controls,
+    ).toMatchObject([
+      {
+        id: 'riskRewardStatsMode:full',
+        label: 'Full position stats',
+        selected: true,
+        command: { type: 'updateStyle', style: { riskRewardStatsMode: 'full' } },
+      },
+      {
+        id: 'riskRewardStatsMode:compact',
+        label: 'Compact position stats',
+        selected: false,
+        command: { type: 'updateStyle', style: { riskRewardStatsMode: 'compact' } },
+      },
+    ]);
   });
 
   it('matches properties surface colors case-insensitively', () => {

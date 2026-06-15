@@ -14,6 +14,7 @@ import {
   normalizeUserDrawingFontSize,
   normalizeUserDrawingFontStyle,
   normalizeUserDrawingOpacity,
+  normalizeUserDrawingRiskRewardStatsMode,
   normalizeUserDrawingStyle,
   normalizeUserDrawingTextMaxWidth,
   normalizeUserDrawingVolumeProfileRowCount,
@@ -22,6 +23,7 @@ import {
   USER_DRAWING_FONT_FAMILIES,
   USER_DRAWING_FONT_STYLES,
   USER_DRAWING_OPACITIES,
+  USER_DRAWING_RISK_REWARD_STATS_MODES,
   USER_DRAWING_SCHEMA_VERSION,
   USER_DRAWING_TEXT_MAX_WIDTHS,
   USER_DRAWING_VOLUME_PROFILE_ROW_COUNTS,
@@ -210,6 +212,17 @@ describe('user drawing types', () => {
     expect(normalizeUserDrawingTextMaxWidth(440)).toBe(480);
     expect(normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, textMaxWidth: 190 })).toMatchObject({
       textMaxWidth: 180,
+    });
+  });
+
+  it('normalizes risk reward stats modes to supported cross-platform values', () => {
+    expect(USER_DRAWING_RISK_REWARD_STATS_MODES).toEqual(['full', 'compact']);
+    expect(normalizeUserDrawingRiskRewardStatsMode('compact')).toBe('compact');
+    expect(normalizeUserDrawingRiskRewardStatsMode('future')).toBe('full');
+    expect(
+      normalizeUserDrawingStyle({ ...DEFAULT_USER_DRAWING_STYLE, riskRewardStatsMode: 'future' as never }),
+    ).toMatchObject({
+      riskRewardStatsMode: 'full',
     });
   });
 

@@ -200,6 +200,50 @@ describe('UserDrawingPropertiesSheet', () => {
     });
   });
 
+  it('renders risk reward stats mode controls from the shared properties surface', () => {
+    const onDispatch = vi.fn(() => true);
+    const riskRewardState: UserDrawingState = {
+      ...state,
+      selection: { drawingId: 'long' },
+      drawings: [
+        {
+          id: 'long',
+          kind: 'longPosition',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 3,
+          updatedAt: 3,
+          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
+          points: [
+            { time: 1, price: 100 },
+            { time: 2, price: 110 },
+            { time: 2, price: 95 },
+          ],
+        },
+      ],
+    };
+
+    render(
+      <UserDrawingPropertiesSheet
+        visible
+        surface={resolveUserDrawingPropertiesSurface(riskRewardState)}
+        onDispatch={onDispatch}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Position')).not.toBeNull();
+    expect(screen.getByLabelText('Full position stats').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('Compact position stats').getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(screen.getByLabelText('Compact position stats'));
+    expect(onDispatch).toHaveBeenCalledWith({
+      type: 'updateStyle',
+      style: { riskRewardStatsMode: 'compact' },
+    });
+  });
+
   it('renders an empty state', () => {
     render(
       <UserDrawingPropertiesSheet

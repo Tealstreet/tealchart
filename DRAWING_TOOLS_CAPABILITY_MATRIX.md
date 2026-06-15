@@ -153,8 +153,10 @@ summary:
   but their long-term behavior should be treated as `anchored-pane` placement.
 - `fixedRangeVolumeProfile` and `anchoredVolumeProfile` now expose shared
   volume-profile guide visibility, row-count, value-area percentage, and
-  profile-width controls on web Canvas and mobile Skia. Position tools and bars
-  pattern tools still need separate computed payload/property modeling.
+  profile-width controls on web Canvas and mobile Skia. Long/short position
+  drawings now expose a shared full/compact stats mode on web Canvas and mobile
+  Skia. Position tools and bars pattern tools still need richer computed
+  payload/property modeling.
 - Stay-in-drawing-mode, magnet-mode, and transient measure-mode state ship as
   shared command state with web widget and mobile Skia imperative APIs.
   Weak/strong magnet-mode OHLC snapping applies to anchor-based web Canvas and
