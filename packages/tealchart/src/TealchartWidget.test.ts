@@ -2044,6 +2044,132 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().selection?.drawingId).not.toBe('h');
     });
 
+    it('selects and duplicates hit drawings from the web drawing context menu', () => {
+      const datafeed = createMockDatafeed();
+      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'select',
+        selection: null,
+        drawings: [
+          {
+            id: 'h',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 1,
+            updatedAt: 1,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 50,
+          },
+          {
+            id: 'far',
+            kind: 'horizontalLine',
+            paneId: 'main',
+            visible: true,
+            locked: false,
+            createdAt: 2,
+            updatedAt: 2,
+            style: {
+              lineColor: '#f5c542',
+              lineWidth: 1,
+              lineStyle: 'solid',
+            },
+            price: 60,
+          },
+        ],
+      });
+
+      const contextItems = (
+        widget as unknown as {
+          _handleUserDrawingContextMenu(
+            point: { x: number; y: number },
+            spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          ): Array<{ text: string; enabled: boolean; click: () => void }>;
+        }
+      )._handleUserDrawingContextMenu({ x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'selectAtPoint', meta: { source: 'contextMenu' } }),
+          source: 'contextMenu',
+        }),
+      );
+
+      const duplicateItem = contextItems.find((item) => item.text === 'Duplicate selected drawing');
+      expect(duplicateItem).toMatchObject({ enabled: true });
+      duplicateItem?.click();
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'drawing_1', 'far']);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'duplicate', meta: { source: 'contextMenu' } }),
+          source: 'contextMenu',
+        }),
+      );
+
+      const deleteItems = (
+        widget as unknown as {
+          _handleUserDrawingContextMenu(
+            point: { x: number; y: number },
+            spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          ): Array<{ text: string; enabled: boolean; click: () => void }>;
+        }
+      )._handleUserDrawingContextMenu({ x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+      const deleteItem = deleteItems.find((item) => item.text === 'Delete selected drawing');
+      expect(deleteItem).toMatchObject({ enabled: true });
+      deleteItem?.click();
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['h', 'far']);
+      expect(widget.getUserDrawingState().selection).toBeNull();
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'delete', meta: { source: 'contextMenu' } }),
+          source: 'contextMenu',
+        }),
+      );
+
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        selection: { drawingId: 'h' },
+      });
+      const reorderItems = (
+        widget as unknown as {
+          _handleUserDrawingContextMenu(
+            point: { x: number; y: number },
+            spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+          ): Array<{ text: string; enabled: boolean; click: () => void }>;
+        }
+      )._handleUserDrawingContextMenu({ x: 50, y: 50 }, new Map([['main', userDrawingSpace]]));
+      const bringForwardItem = reorderItems.find((item) => item.text === 'Bring selected drawing forward');
+      expect(bringForwardItem).toMatchObject({ enabled: true });
+      bringForwardItem?.click();
+
+      expect(widget.getUserDrawingState().drawings.map((drawing) => drawing.id)).toEqual(['far', 'h']);
+      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'h' });
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({
+            type: 'reorder',
+            action: 'bringForward',
+            meta: { source: 'contextMenu' },
+          }),
+          source: 'contextMenu',
+        }),
+      );
+
+      widget.remove();
+    });
+
     it('reorders selected or targeted drawings through the widget state owner', () => {
       const datafeed = createMockDatafeed();
       const onChange = vi.fn();
