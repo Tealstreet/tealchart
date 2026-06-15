@@ -55,6 +55,7 @@ export interface UserDrawingSelectedActionSurfaceProps {
   dispatchUserDrawingCommand: (command: UserDrawingCommand) => void;
   onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
   onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
+  onUserDrawingCopySelected?: () => void;
 }
 
 export function UserDrawingSelectedActionSurfaceComponent({
@@ -67,6 +68,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
   dispatchUserDrawingCommand,
   onUserDrawingPropertiesOpen,
   onUserDrawingObjectTreeOpen,
+  onUserDrawingCopySelected,
 }: UserDrawingSelectedActionSurfaceProps) {
   const [activePopoverGroupId, setActivePopoverGroupId] = useState<string | null>(null);
   const [activePopoverDrawingId, setActivePopoverDrawingId] = useState<string | null>(null);
@@ -117,6 +119,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
       dispatchUserDrawingCommand,
       onUserDrawingPropertiesOpen,
       onUserDrawingObjectTreeOpen,
+      onUserDrawingCopySelected,
     });
     if (!options.keepPopoverOpen) {
       setActivePopoverGroupId(null);

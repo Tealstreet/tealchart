@@ -101,6 +101,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   /** Callback when the selected drawing should be duplicated */
   onUserDrawingDuplicateSelected?: () => void;
+  /** Callback when the selected drawing should be copied */
+  onUserDrawingCopySelected?: () => void;
   /** Callback when the selected drawing should be deleted */
   onUserDrawingDeleteSelected?: () => void;
   /** Callback when the active drawing draft should be cancelled */
@@ -705,6 +707,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     if (item.command.type === 'editText') {
       this.options.onUserDrawingTextEditOpen?.(item.command.drawingId);
+      return;
+    }
+
+    if (item.command.type === 'copySelected') {
+      this.options.onUserDrawingCopySelected?.();
       return;
     }
 

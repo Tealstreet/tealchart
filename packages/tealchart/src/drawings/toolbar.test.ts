@@ -1656,6 +1656,7 @@ describe('user drawing toolbar descriptors', () => {
       ['openProperties', true, false],
       ['openObjectTree', true, false],
       ['editText', false, false],
+      ['copySelected', true, false],
       ['duplicateSelected', true, false],
       ['deleteSelected', true, true],
     ]);
@@ -1789,6 +1790,10 @@ describe('user drawing toolbar descriptors', () => {
     expect(itemById.get('editText')).toMatchObject({
       enabled: true,
       command: { type: 'editText', drawingId: 'label' },
+    });
+    expect(itemById.get('copySelected')).toMatchObject({
+      enabled: true,
+      command: { type: 'copySelected' },
     });
     expect(itemById.get('duplicateSelected')).toMatchObject({
       enabled: true,
@@ -2461,6 +2466,7 @@ describe('user drawing toolbar descriptors', () => {
     const items = resolveUserDrawingSelectedActionSurface(locked).groups.flatMap((group) => group.items);
 
     expect(items.find((item) => item.id === 'duplicateSelected')?.enabled).toBe(false);
+    expect(items.find((item) => item.id === 'copySelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'deleteSelected')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lineColor:#f5c542')?.enabled).toBe(false);
     expect(items.find((item) => item.id === 'lineWidth:2')?.enabled).toBe(false);

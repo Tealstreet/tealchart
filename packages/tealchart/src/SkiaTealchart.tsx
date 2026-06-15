@@ -2321,6 +2321,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
                 onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
                 onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
+                onUserDrawingCopySelected: () => {
+                  const clipboard = createUserDrawingClipboard(userDrawingStateRef.current);
+                  if (clipboard) userDrawingClipboardRef.current = clipboard;
+                },
               });
             },
           }),
@@ -4967,6 +4971,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
         onUserDrawingPropertiesOpen={handleUserDrawingPropertiesOpen}
         onUserDrawingObjectTreeOpen={handleUserDrawingObjectTreeOpen}
+        onUserDrawingCopySelected={() => {
+          const clipboard = createUserDrawingClipboard(effectiveUserDrawingState);
+          if (clipboard) userDrawingClipboardRef.current = clipboard;
+        }}
       />
 
       {/* Top Bar (overlay on top of chart) */}

@@ -95,6 +95,9 @@ export type UserDrawingSelectedActionSurfaceCommand =
       drawingId: string;
     }
   | {
+      type: 'copySelected';
+    }
+  | {
       type: 'updateStyle';
       style: Partial<UserDrawingStyle>;
     }
@@ -1032,6 +1035,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
         command: { type: 'editText', drawingId: '' },
       },
       {
+        id: 'copySelected',
+        icon: '⧉',
+        label: 'Copy selected drawing',
+        enabled: false,
+        command: { type: 'copySelected' },
+      },
+      {
         ...USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS[0]!,
         id: 'duplicateSelected',
         enabled: false,
@@ -1571,6 +1581,12 @@ export function resolveUserDrawingSelectedActionSurface(state: UserDrawingState)
             ...item,
             enabled,
             command: { type: 'editText', drawingId: selectedDrawing?.id ?? '' },
+          };
+        }
+        if (item.command.type === 'copySelected') {
+          return {
+            ...item,
+            enabled: hasUnlockedSelectedDrawing(state),
           };
         }
         if (
