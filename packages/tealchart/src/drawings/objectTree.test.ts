@@ -183,7 +183,7 @@ describe('user drawing object tree model', () => {
       ['rename', false],
       ['duplicate', false],
       ['delete', false],
-      ['hide', false],
+      ['hide', true],
       ['unlock', true],
       ['bringForward', false],
       ['sendBackward', false],
@@ -193,7 +193,7 @@ describe('user drawing object tree model', () => {
     expect(model.selectionActions?.map((action) => [action.type, action.enabled, action.selectedCount])).toEqual([
       ['duplicate', true, 2],
       ['delete', true, 2],
-      ['hide', false, 2],
+      ['hide', true, 2],
       ['show', true, 2],
       ['lock', true, 2],
       ['unlock', true, 2],
@@ -205,14 +205,20 @@ describe('user drawing object tree model', () => {
     expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'show')).toEqual({
       type: 'show',
       drawingIds: ['trend', 'rect'],
-      includeLocked: undefined,
+      includeLocked: true,
     });
     expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'unlock')).toEqual({
       type: 'unlock',
       drawingIds: ['trend', 'rect'],
       includeLocked: true,
     });
-    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'hide')).toBeNull();
+    // Visibility is lock-independent, so hiding a selection that includes a
+    // locked drawing is allowed and forces includeLocked on the dispatch.
+    expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, 'hide')).toEqual({
+      type: 'hide',
+      drawingIds: ['trend', 'rect'],
+      includeLocked: true,
+    });
   });
 
   it('resolves row action descriptors to app-dispatchable object-tree actions', () => {
@@ -231,7 +237,7 @@ describe('user drawing object tree model', () => {
     expect(resolveUserDrawingObjectTreeRowDispatchAction(hiddenTrend, 'show')).toEqual({
       type: 'show',
       drawingIds: ['trend'],
-      includeLocked: undefined,
+      includeLocked: true,
     });
     expect(resolveUserDrawingObjectTreeRowDispatchAction(hiddenTrend, 'rename', { name: 'Support' })).toEqual({
       type: 'rename',
@@ -298,7 +304,7 @@ describe('user drawing object tree model', () => {
       ['rename', false],
       ['duplicate', false],
       ['delete', false],
-      ['hide', false],
+      ['hide', true],
       ['unlock', true],
       ['bringForward', false],
       ['sendBackward', false],
@@ -342,6 +348,26 @@ describe('user drawing object tree model', () => {
     const next = reduceUserDrawingCommand(state, commands[0]!);
 
     expect(next.drawings[0]).toMatchObject({ id: 'rect', locked: false, updatedAt: 51 });
+  });
+
+  it('hides a locked drawing through the object-tree command path', () => {
+    const state = createUserDrawingState({
+      drawings: [createRectangle({ id: 'rect', locked: true })],
+    });
+    const lockedRect = resolveUserDrawingObjectTreeModel(state).rows.find((row) => row.drawingId === 'rect')!;
+    const hideAction = resolveUserDrawingObjectTreeRowDispatchAction(lockedRect, 'hide');
+
+    expect(hideAction).toEqual({ type: 'hide', drawingIds: ['rect'], includeLocked: true });
+
+    const commands = resolveUserDrawingObjectTreeDispatchActionCommands(state, hideAction!, {
+      createId: () => 'unused',
+      now: () => 71,
+    });
+    const next = reduceUserDrawingCommand(state, commands[0]!);
+
+    // Lock freezes geometry/style but visibility is independent: the locked
+    // drawing is hidden and stays locked.
+    expect(next.drawings[0]).toMatchObject({ id: 'rect', locked: true, visible: false, updatedAt: 71 });
   });
 
   it('routes selected bulk actions through app-dispatchable object-tree commands', () => {

@@ -597,7 +597,7 @@ describe('tealchart public entries', () => {
     expect(resolveUserDrawingObjectTreeSelectionDispatchAction(model, selectionActionType)).toEqual({
       type: 'hide',
       drawingIds: ['trend'],
-      includeLocked: undefined,
+      includeLocked: true,
     });
     expect(resolveUserDrawingObjectTreeDrawingDispatchAction(model, 'trend', rowActionType, rowDispatchOptions)).toEqual({
       type: 'rename',

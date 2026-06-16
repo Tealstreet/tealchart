@@ -105,7 +105,7 @@ describe('UserDrawingObjectTreeSheet', () => {
     expect(onDispatch).toHaveBeenCalledWith({
       type: 'hide',
       drawingIds: ['target'],
-      includeLocked: undefined,
+      includeLocked: true,
     });
     fireEvent.click(screen.getAllByLabelText('Send drawing to back')[0]!);
     expect(onDispatch).toHaveBeenCalledWith({
