@@ -64,6 +64,7 @@ import {
 import {
   computeLeftToolRailAvoidanceInset,
   computeLeftToolRailTop,
+  computeTopLeftLegendRect,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
@@ -811,6 +812,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       width: parentRect.width || window.innerWidth,
       height: parentRect.height || window.innerHeight,
     };
+    const legendRect = computeTopLeftLegendRect(
+      WEB_CHART_CHROME_METRICS,
+      { x: 0, y: 0, width: viewport.width, height: viewport.height },
+    );
     const position = resolveUserDrawingActionSurfacePosition({
       anchor: anchor.anchor,
       viewport,
@@ -828,6 +833,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         top: WEB_CHART_CHROME_METRICS.topBarHeight + 6,
         bottom: 8,
       },
+      avoidRects: legendRect ? [legendRect] : undefined,
     });
 
     const el = this.createElement('div', {
