@@ -209,6 +209,13 @@ function hitTestResolvedGeometry(
     geometry.kind === 'dateRange' ||
     geometry.kind === 'datePriceRange'
   ) {
+    // A visible fill makes the whole interior grabbable, like long/short
+    // positions; an unfilled shape is grabbable only near its edges.
+    const hasVisibleFill =
+      geometry.drawing.style.fillVisible !== false && Boolean(geometry.drawing.style.fillColor);
+    if (hasVisibleFill && pointInRect(point, geometry.rect)) {
+      return { drawing: geometry.drawing, distance: 0 };
+    }
     const distance = distanceToRectEdge(point, geometry.rect);
     return distance <= options.tolerance ? { drawing: geometry.drawing, distance } : null;
   }
