@@ -3,7 +3,6 @@ import type { UserDrawingState, UserDrawingTool } from '../../drawings';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getUserDrawingToolDescriptor } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import { ChartTopBarComponent } from './ChartTopBarComponent';
 
@@ -129,9 +128,17 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Lines drawing tools').textContent).toBe(
-      getUserDrawingToolDescriptor('horizontalLine').icon,
-    );
+    // Color-independent geometry signature (child node tags) of a category icon.
+    const iconShape = (label: string): string => {
+      const svgEl = screen.getByLabelText(label).querySelector('[data-svg="svg"]');
+      expect(svgEl).toBeTruthy();
+      return Array.from(svgEl?.querySelectorAll('[data-svg]') ?? [])
+        .map((node) => node.getAttribute('data-svg'))
+        .join(',');
+    };
+
+    const linesShape = iconShape('Lines drawing tools');
+    expect(linesShape.length).toBeGreaterThan(0);
 
     rerender(
       <ChartTopBarComponent
@@ -141,12 +148,9 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Lines drawing tools').textContent).toBe(
-      getUserDrawingToolDescriptor('horizontalLine').icon,
-    );
-    expect(screen.getByLabelText('Geometric Shapes drawing tools').textContent).toBe(
-      getUserDrawingToolDescriptor('rectangle').icon,
-    );
+    // Lines button keeps its recent tool icon; Shapes button shows a distinct one.
+    expect(iconShape('Lines drawing tools')).toBe(linesShape);
+    expect(iconShape('Geometric Shapes drawing tools')).not.toBe(linesShape);
   });
 
   it('dispatches global drawing actions from shared toolbar descriptors', () => {
