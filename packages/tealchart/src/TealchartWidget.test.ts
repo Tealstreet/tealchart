@@ -422,11 +422,11 @@ describe('TealchartWidget', () => {
       expect(widget.setActiveUserDrawingTool('select')).toBe(false);
       expect(widget.setActiveUserDrawingTool('rectangle')).toBe(true);
       expect(widget.setActiveUserDrawingTool('rectangle')).toBe(false);
-      expect(widget.isUserDrawingStayInDrawingMode()).toBe(true);
-      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
       expect(widget.isUserDrawingStayInDrawingMode()).toBe(false);
-      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(false);
       expect(widget.setUserDrawingStayInDrawingMode(true)).toBe(true);
+      expect(widget.isUserDrawingStayInDrawingMode()).toBe(true);
+      expect(widget.setUserDrawingStayInDrawingMode(true)).toBe(false);
+      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
       expect(widget.getUserDrawingMagnetMode()).toBe('off');
       expect(widget.setUserDrawingMagnetMode('weak')).toBe(true);
       expect(widget.getUserDrawingMagnetMode()).toBe('weak');
@@ -741,12 +741,12 @@ describe('TealchartWidget', () => {
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
       const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
 
-      expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
+      expect(widget.setUserDrawingStayInDrawingMode(true)).toBe(true);
       expect(widget.setUserDrawingMagnetMode('strong')).toBe(true);
       const settingsOnlyExport = widget.exportUserDrawingStateForLayout();
       expect(settingsOnlyExport).toMatchObject({
         drawings: [],
-        stayInDrawingMode: false,
+        stayInDrawingMode: true,
         magnetMode: 'strong',
       });
 
@@ -809,7 +809,7 @@ describe('TealchartWidget', () => {
       onCommand.mockClear();
       expect(widget.importUserDrawingStateFromLayout(undefined)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([]);
-      expect(widget.isUserDrawingStayInDrawingMode()).toBe(true);
+      expect(widget.isUserDrawingStayInDrawingMode()).toBe(false);
       expect(widget.getUserDrawingMagnetMode()).toBe('off');
       expect(onCommand).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -870,6 +870,7 @@ describe('TealchartWidget', () => {
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
       const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
       widget.setActiveUserDrawingTool('trendLine');
+      widget.setUserDrawingStayInDrawingMode(true);
       onCommand.mockClear();
 
       expect(widget.setUserDrawingStayInDrawingMode(false)).toBe(true);
@@ -907,7 +908,11 @@ describe('TealchartWidget', () => {
     it('creates web placement-drag drawings as independent undo entries', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
-      widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: 'rectangle' });
+      widget.setUserDrawingState({
+        ...widget.getUserDrawingState(),
+        activeTool: 'rectangle',
+        stayInDrawingMode: true,
+      });
 
       const testWidget = widget as unknown as {
         _handleUserDrawingPlacementDragStart(point: {
@@ -1477,7 +1482,11 @@ describe('TealchartWidget', () => {
       for (const tool of pathFamilyTools) {
         const datafeed = createMockDatafeed();
         const widget = createWidget(datafeed);
-        widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
+        widget.setUserDrawingState({
+          ...widget.getUserDrawingState(),
+          activeTool: tool,
+          stayInDrawingMode: true,
+        });
 
         const testWidget = widget as unknown as {
           _handleUserDrawingPathDragStart(point: { paneId: string; anchor: { time: number; price: number } }): boolean;

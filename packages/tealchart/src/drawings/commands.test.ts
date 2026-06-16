@@ -216,10 +216,10 @@ describe('user drawing command dispatch', () => {
 
   it('wraps stay-in-drawing-mode reducer without changing behavior', () => {
     const initial = createUserDrawingState();
-    const direct = setUserDrawingStayInDrawingMode(initial, false);
+    const direct = setUserDrawingStayInDrawingMode(initial, true);
     const command = dispatchUserDrawingCommand(initial, {
       type: 'setStayInDrawingMode',
-      stayInDrawingMode: false,
+      stayInDrawingMode: true,
       meta: { source: 'toolbar', timestamp: 2 },
     });
 
@@ -229,7 +229,7 @@ describe('user drawing command dispatch', () => {
 
     const unchanged = dispatchUserDrawingCommand(command.state, {
       type: 'setStayInDrawingMode',
-      stayInDrawingMode: false,
+      stayInDrawingMode: true,
       meta: { source: 'toolbar' },
     });
 

@@ -134,18 +134,18 @@ describe('mobile drawing handle command dispatch', () => {
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(
       result.state,
       result.history,
-      { type: 'setStayInDrawingMode', stayInDrawingMode: false, meta: { source: 'api' } },
+      { type: 'setStayInDrawingMode', stayInDrawingMode: true, meta: { source: 'api' } },
       onEvent,
     );
     expect(result.changed).toBe(true);
-    expect(result.state.stayInDrawingMode).toBe(false);
+    expect(result.state.stayInDrawingMode).toBe(true);
     expect(result.history.undoStack).toHaveLength(0);
     expect(onEvent).toHaveBeenCalledTimes(2);
 
     result = dispatchMobileUserDrawingHistoryCommandWithEvent(
       result.state,
       result.history,
-      { type: 'setStayInDrawingMode', stayInDrawingMode: false, meta: { source: 'api' } },
+      { type: 'setStayInDrawingMode', stayInDrawingMode: true, meta: { source: 'api' } },
       onEvent,
     );
     expect(result.changed).toBe(false);
@@ -1021,7 +1021,7 @@ describe('mobile drawing handle command dispatch', () => {
   });
 
   it('records consecutive mobile two-anchor placement drags as independent undo entries', () => {
-    let state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    let state = setUserDrawingTool(createUserDrawingState({ stayInDrawingMode: true }), 'rectangle');
     let history = createUserDrawingCommandHistory();
     const drag = (id: string, firstAnchor = anchorA, secondAnchor = anchorB) => {
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
@@ -1318,7 +1318,7 @@ describe('mobile drawing handle command dispatch', () => {
     const pathFamilyTools: UserDrawingTool[] = ['brush', 'highlighter'];
 
     for (const tool of pathFamilyTools) {
-      let state = setUserDrawingTool(createUserDrawingState(), tool);
+      let state = setUserDrawingTool(createUserDrawingState({ stayInDrawingMode: true }), tool);
       let history = createUserDrawingCommandHistory();
       const drag = (id: string, firstAnchor = anchorA, secondAnchor = anchorB) => {
         const started = dispatchMobileUserDrawingHistoryCommand(state, history, {

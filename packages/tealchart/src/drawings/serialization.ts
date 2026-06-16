@@ -1282,14 +1282,14 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
 export function serializeUserDrawingStateForLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
   if (
     !state ||
-    (state.drawings.length === 0 && state.stayInDrawingMode !== false && (state.magnetMode ?? 'off') === 'off')
+    (state.drawings.length === 0 && state.stayInDrawingMode !== true && (state.magnetMode ?? 'off') === 'off')
   )
     return undefined;
 
   return createUserDrawingState({
     version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings: state.drawings.map(cloneUserDrawing),
-    stayInDrawingMode: state.stayInDrawingMode !== false,
+    stayInDrawingMode: state.stayInDrawingMode === true,
     magnetMode: state.magnetMode ?? 'off',
   });
 }
@@ -1301,12 +1301,12 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
 
   const drawings = state.drawings.map(parseUserDrawing).filter((drawing): drawing is UserDrawing => drawing !== null);
   const magnetMode = state.magnetMode === 'weak' || state.magnetMode === 'strong' ? state.magnetMode : 'off';
-  if (drawings.length === 0 && state.stayInDrawingMode !== false && magnetMode === 'off') return undefined;
+  if (drawings.length === 0 && state.stayInDrawingMode !== true && magnetMode === 'off') return undefined;
 
   return createUserDrawingState({
     version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings,
-    stayInDrawingMode: state.stayInDrawingMode !== false,
+    stayInDrawingMode: state.stayInDrawingMode === true,
     magnetMode,
   });
 }

@@ -211,7 +211,7 @@ describe('mobile drawing persistence', () => {
         },
       ],
       activeTool: 'select',
-      stayInDrawingMode: true,
+      stayInDrawingMode: false,
       magnetMode: 'off',
       selection: null,
       draft: null,
