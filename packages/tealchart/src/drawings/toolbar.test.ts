@@ -2532,6 +2532,45 @@ describe('user drawing toolbar descriptors', () => {
     ).toEqual({ left: 20, top: 130 });
   });
 
+  it('flips the selected action surface below the selection when chrome blocks the space above', () => {
+    // Selection near the top: above-placement clamps/avoids the legend down onto
+    // the object body, so the surface flips below the selection bounds.
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 100, y: 60 },
+        viewport: { width: 320, height: 400 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        avoidRects: [{ x: 12, y: 30, width: 200, height: 44 }],
+        selectionBounds: { x: 40, y: 60, width: 120, height: 80 },
+      }),
+    ).toEqual({ left: 40, top: 146 });
+
+    // Baseline: with room above, the surface stays above and does not flip.
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 100, y: 200 },
+        viewport: { width: 320, height: 400 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        selectionBounds: { x: 40, y: 200, width: 120, height: 80 },
+      }),
+    ).toEqual({ left: 40, top: 158 });
+
+    // When below the selection also collides (tall object near the bottom), the
+    // surface keeps the pushed-down position rather than landing off-screen.
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 100, y: 50 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        avoidRects: [{ x: 12, y: 30, width: 200, height: 44 }],
+        selectionBounds: { x: 40, y: 50, width: 120, height: 140 },
+      }),
+    ).toEqual({ left: 40, top: 80 });
+  });
+
   it('keeps locked selected action surface mutations disabled except unlock', () => {
     const locked = {
       ...state,

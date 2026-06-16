@@ -1001,6 +1001,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const topLeftAnchor = {
       ...selectionActionAnchor,
       anchor: { x: 12, y: 24 },
+      bounds: { x: 0, y: 24, width: 24, height: 24 },
     };
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-selected-left-rail-clamp',
@@ -1053,6 +1054,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const topLeftAnchor = {
       ...selectionActionAnchor,
       anchor: { x: 12, y: 24 },
+      bounds: { x: 0, y: 24, width: 24, height: 24 },
     };
     const topBar = new ChartTopBar({
       chartKey: 'topbar-drawing-selected-constrained-left-clamp',
