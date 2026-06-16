@@ -983,7 +983,7 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
-  it('keeps selected actions clear of the top bar and left drawing rail when space allows', () => {
+  it('keeps selected actions clear of the top bar, left drawing rail, and symbol legend when space allows', () => {
     const overlay = document.createElement('div');
     overlay.getBoundingClientRect = () =>
       ({
@@ -1029,7 +1029,8 @@ describe('ChartTopBar drawing toolbar', () => {
 
     const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
     expect(Number.parseFloat(selectedActionSurface?.style.left ?? 'NaN')).toBe(66);
-    expect(Number.parseFloat(selectedActionSurface?.style.top ?? 'NaN')).toBe(38);
+    // Anchor sits under the top-left legend (y 40..84), so the surface drops below it.
+    expect(Number.parseFloat(selectedActionSurface?.style.top ?? 'NaN')).toBe(90);
 
     topBar.unmount();
   });
@@ -1081,7 +1082,8 @@ describe('ChartTopBar drawing toolbar', () => {
     try {
       const selectedActionSurface = document.querySelector<HTMLElement>('[aria-label="Selected drawing actions"]');
       expect(Number.parseFloat(selectedActionSurface?.style.left ?? 'NaN')).toBe(28);
-      expect(Number.parseFloat(selectedActionSurface?.style.top ?? 'NaN')).toBe(38);
+      // Anchor sits under the top-left legend (y 40..84), so the surface drops below it.
+      expect(Number.parseFloat(selectedActionSurface?.style.top ?? 'NaN')).toBe(90);
     } finally {
       topBar.unmount();
     }

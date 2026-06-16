@@ -363,7 +363,15 @@ export interface UserDrawingActionSurfacePositionOptions {
   surface: { width: number; height: number };
   inset?: Partial<{ left: number; right: number; top: number; bottom: number }>;
   offsetY?: number;
+  /**
+   * Chrome rectangles the surface must not cover (e.g. the symbol/OHLC legend).
+   * When the clamped surface overlaps one, it drops below that rectangle so live
+   * chart content stays readable.
+   */
+  avoidRects?: ReadonlyArray<{ x: number; y: number; width: number; height: number }>;
 }
+
+const SELECTED_ACTION_SURFACE_AVOIDANCE_GAP = 6;
 
 export interface UserDrawingActionSurfacePosition {
   left: number;
@@ -1693,6 +1701,7 @@ export function resolveUserDrawingActionSurfacePosition({
   surface,
   inset = {},
   offsetY = -42,
+  avoidRects,
 }: UserDrawingActionSurfacePositionOptions): UserDrawingActionSurfacePosition {
   const leftInset = inset.left ?? 8;
   const rightInset = inset.right ?? 8;
@@ -1701,10 +1710,23 @@ export function resolveUserDrawingActionSurfacePosition({
   const preferredLeft = anchor.x - surface.width / 2;
   const preferredTop = anchor.y + offsetY;
 
-  return {
-    left: clampNumber(preferredLeft, leftInset, viewport.width - rightInset - surface.width),
-    top: clampNumber(preferredTop, topInset, viewport.height - bottomInset - surface.height),
-  };
+  const minTop = topInset;
+  const maxTop = viewport.height - bottomInset - surface.height;
+  const left = clampNumber(preferredLeft, leftInset, viewport.width - rightInset - surface.width);
+  let top = clampNumber(preferredTop, minTop, maxTop);
+
+  for (const obstacle of avoidRects ?? []) {
+    const overlaps =
+      left < obstacle.x + obstacle.width &&
+      left + surface.width > obstacle.x &&
+      top < obstacle.y + obstacle.height &&
+      top + surface.height > obstacle.y;
+    if (overlaps) {
+      top = clampNumber(obstacle.y + obstacle.height + SELECTED_ACTION_SURFACE_AVOIDANCE_GAP, minTop, maxTop);
+    }
+  }
+
+  return { left, top };
 }
 
 function hasUnlockedSelectedDrawing(state: UserDrawingState): boolean {
