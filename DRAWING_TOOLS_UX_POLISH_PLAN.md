@@ -73,17 +73,43 @@ renders sharp, TradingView-like marks on web and mobile.
 
 ### Epic G: Floating Selected-Object Popover (web parity with mobile)
 
-Show selected-drawing actions as a floating popover anchored above the drawing,
-not injected into the top bar (per product direction). Mobile already has a
-surface; bring web to parity and unify on the shared surface model.
+Show ALL selected-drawing controls as a floating popover anchored above the
+drawing, not injected into the top bar (per product direction).
 
-- G1 — Web floating popover host. New DOM overlay built from
-  `resolveUserDrawingSelectedActionSurface` + positioned by
-  `resolveUserDrawingActionSurfacePosition`, clamped to chart bounds, chrome
-  -avoiding, flip-below when blocked.
-- G2 — Remove the inline top-bar selected-object controls; route the same
-  commands through the popover. Keep keyboard/object-tree paths intact.
-- G3 — Mobile parity audit + the "more" overflow menu; shared QA.
+Scoping (verified 2026-06-16): the floating overlay **already exists** on web
+(`ChartTopBar.renderSelectedActionSurface`, `position:absolute` z-index 8,
+mounted to `drawingOverlayParent`, positioned via
+`resolveUserDrawingActionSurfacePosition` with chrome-avoid + flip-below) and on
+mobile (`UserDrawingSelectedActionSurface.tsx`). It renders the high-level
+object actions (duplicate, delete, copy, arrange, visibility) + a `style`
+popover group. The redundant part is the **inline style/text controls still
+injected into the top bar** by `renderDrawingToolbar()` (line color, width,
+style, opacity, fill, icon, full text formatting — ChartTopBar.ts ~1257-1903).
+So Epic G is migration/removal, not greenfield.
+
+- G1 — VERIFIED (2026-06-16): `resolveUserDrawingSelectedStyleActionSurfaceGroup`
+  (toolbar.ts:1237) already builds the full style/text set as a popover group:
+  line color, line width, line style, line visibility, opacity, fill color, fill
+  visibility, fill opacity, text color, font size +/-, font family/weight/style,
+  text wrap, text max-width, labels visible, text align, trend-line extend, icon
+  name — matching the inline top-bar block one-for-one. No resolver gap; G2 is a
+  clean removal of the inline block.
+- G2 — DONE (2026-06-16): removed the inline selected-object style/text block
+  from `renderDrawingToolbar()` (web `ChartTopBar.ts`) and the matching
+  `{selectedDrawing && (...)}` block from the mobile top bar
+  (`ChartTopBarComponent.tsx`), plus all now-dead imports/consts. The top bar
+  keeps only the tool rail + global actions; per-object styling lives solely in
+  the floating surface. Tests: web `ChartTopBar.test.ts` style tests migrated to
+  drive the floating style popover (inline halves stripped); pure-inline
+  component tests deleted (per-kind capability is owned by `toolbar.test.ts` +
+  `capabilityMatrix.test.ts`); mobile inline-style component tests deleted (the
+  mobile surface is the separate `UserDrawingSelectedActionSurface`, covered by
+  its own test). Full suite 1845 pass; package + premys consumer typecheck clean.
+- G3 — DONE (2026-06-16): live Chrome MCP QA — drew a trend line, confirmed the
+  floating surface anchors above the drawing with the full style popover (line
+  color/width/style, opacity, visibility, trend-line extension) and zero inline
+  style controls leaking into the top bar. Floating-surface positioning/tracking
+  was already delivered in Epic B (chrome-avoid + flip-below).
 
 ### Epic H: Drawing Tool Favorites
 
