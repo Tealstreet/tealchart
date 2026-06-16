@@ -835,7 +835,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const onPointerDown = (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
-      const parentRect = parent.getBoundingClientRect();
       const startLeft = bar.offsetLeft;
       const startTop = bar.offsetTop;
       const startX = event.clientX;
@@ -843,6 +842,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       handle.style.cursor = 'grabbing';
 
       const onMove = (moveEvent: MouseEvent) => {
+        const parentRect = parent.getBoundingClientRect();
         const barWidth = bar.offsetWidth;
         const barHeight = bar.offsetHeight;
         const maxLeft = Math.max(0, (parentRect.width || window.innerWidth) - barWidth - 8);

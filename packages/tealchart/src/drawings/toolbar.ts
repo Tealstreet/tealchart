@@ -1561,6 +1561,12 @@ export function getUserDrawingToolDescriptor(tool: UserDrawingTool): UserDrawing
   );
 }
 
+const USER_DRAWING_TOOL_SET: ReadonlySet<string> = new Set(USER_DRAWING_TOOL_DESCRIPTORS.map((descriptor) => descriptor.tool));
+
+export function isUserDrawingTool(value: unknown): value is UserDrawingTool {
+  return typeof value === 'string' && USER_DRAWING_TOOL_SET.has(value);
+}
+
 export function getUserDrawingToolCategoryDescriptorForTool(
   tool: UserDrawingTool,
 ): UserDrawingToolCategoryDescriptor | null {
@@ -2000,7 +2006,6 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
   return [
     state.activeTool,
     (state.favoriteTools ?? []).join(','),
-    state.favoriteToolbarPosition ? `${state.favoriteToolbarPosition.x},${state.favoriteToolbarPosition.y}` : '',
     state.selection?.drawingId ?? '',
     state.selection?.handle ?? '',
     state.draft ? 'draft' : '',

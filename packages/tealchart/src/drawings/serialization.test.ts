@@ -126,8 +126,11 @@ describe('drawing layout serialization', () => {
 
     expect(serializeUserDrawingStateForLayout(createUserDrawingState({ favoriteTools: [] }))).toBeUndefined();
     expect(
-      deserializeUserDrawingStateFromLayout({ version: persisted?.version, drawings: [], favoriteTools: [1, 'rectangle', 'rectangle'] })
-        ?.favoriteTools,
+      deserializeUserDrawingStateFromLayout({
+        version: persisted?.version,
+        drawings: [],
+        favoriteTools: [1, 'rectangle', 'rectangle', 'not_a_real_tool'],
+      })?.favoriteTools,
     ).toEqual(['rectangle']);
     expect(
       deserializeUserDrawingStateFromLayout({

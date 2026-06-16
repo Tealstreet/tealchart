@@ -9,10 +9,10 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
-  UserDrawingTool,
 } from './types';
 
 import { createUserDrawingState } from './input';
+import { isUserDrawingTool } from './toolbar';
 import {
   USER_DRAWING_SCHEMA_VERSION,
   normalizeUserDrawingAnchorPressure,
@@ -1315,7 +1315,7 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
   const drawings = state.drawings.map(parseUserDrawing).filter((drawing): drawing is UserDrawing => drawing !== null);
   const magnetMode = state.magnetMode === 'weak' || state.magnetMode === 'strong' ? state.magnetMode : 'off';
   const favoriteTools = Array.isArray(state.favoriteTools)
-    ? [...new Set(state.favoriteTools.filter((tool): tool is UserDrawingTool => typeof tool === 'string'))]
+    ? [...new Set(state.favoriteTools.filter(isUserDrawingTool))]
     : [];
   const favoriteToolbarPosition =
     isRecord(state.favoriteToolbarPosition) &&
