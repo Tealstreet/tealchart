@@ -900,7 +900,7 @@ describe('mobile drawing handle command dispatch', () => {
 
     const copyRow = resolveUserDrawingObjectTreeModel(state).rows.find((row) => row.drawingId === 'copy')!;
     const hideCopyAction = resolveUserDrawingObjectTreeRowDispatchAction(copyRow, 'hide')!;
-    expect(hideCopyAction).toEqual({ type: 'hide', drawingIds: ['copy'], includeLocked: undefined });
+    expect(hideCopyAction).toEqual({ type: 'hide', drawingIds: ['copy'], includeLocked: true });
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, hideCopyAction, {
       createId: () => 'unused',
       now: () => 46,

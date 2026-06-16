@@ -55,6 +55,35 @@ Object-tree behavior is shared:
 - The next useful C-domain work is visual polish or app integration evidence,
   not another command model layer.
 
+## Browser Evidence (web Canvas, Chrome MCP)
+
+Live QA of the built-in web object-tree panel (premys wires no app-owned
+object-tree/context-menu callbacks, so the built-in fallback is exercised):
+
+- Hide/Show, Rename (inline input), Lock/Unlock, and z-order enable/disable state
+  all work and update live as drawings change.
+- Reproduced gap: hiding was disabled whenever a drawing was locked. Lock should
+  freeze geometry/style, not visibility. Fixed in the shared resolver
+  (`objectTree.ts`): hide/show row + bulk actions are now enabled regardless of
+  lock, and the dispatch forces `includeLocked` for the lock-independent actions
+  (unlock/hide/show) so the visibility change actually applies. Verified live: a
+  locked drawing now hides from the object tree and the row reads "hidden
+  locked". Shared `objectTree.test.ts` adds an end-to-end hide-locked case; web
+  (`TealchartWidget`, `public-entry`) and mobile (`UserDrawingObjectTreeSheet`,
+  `drawingCommands`) dispatch tests pin the `includeLocked` shape.
+
+Not browser-testable in this harness (premys wires no context-menu callback),
+deferred to dedicated follow-ups:
+
+- Right-click drawing context menu regardless of active tool. Requires relaxing
+  the mobile long-press gesture enablement (`SkiaTealchart` `.enabled(activeTool
+  === 'select')`), which risks interfering with drawing gestures and needs device
+  verification.
+- Reverting to the cursor tool after placing a drawing (`stayInDrawingMode`
+  default). This is a deliberately-tested behavior (many tests pin "tool stays
+  after placement") and touches layout-serialization defaults; it warrants an
+  isolated PR with explicit back-compat + test handling.
+
 ## Follow-Up Risks
 
 - Browser-level evidence for real chart-container pointer isolation remains
