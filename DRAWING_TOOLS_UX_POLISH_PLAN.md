@@ -111,14 +111,24 @@ So Epic G is migration/removal, not greenfield.
   style controls leaking into the top bar. Floating-surface positioning/tracking
   was already delivered in Epic B (chrome-avoid + flip-below).
 
-### Epic H: Drawing Tool Favorites
+### Epic H: Drawing Tool Favorites — DONE (2026-06-16)
 
-- H1 — Favorites data model. `favoriteTools: UserDrawingTool[]` in drawing
-  state with toggle/set commands (mirrors stayInDrawingMode/magnetMode), plus a
-  change callback so the consumer persists (premys: localStorage).
-- H2 — Star toggles in category flyout rows (web + mobile).
-- H3 — Horizontal favorites quick-access bar surfacing starred tools (web +
-  mobile), with empty-state and overflow behavior.
+- H1 — DONE. `favoriteTools: readonly UserDrawingTool[]` on UserDrawingState
+  (mirrors stayInDrawingMode/magnetMode): set/toggle commands, non-undoable +
+  preserved across undo/redo, persisted in layout serialization, resolvers
+  `getUserDrawingFavoriteTools`/`isUserDrawingToolFavorite`. Persistence rides
+  the existing `onUserDrawingStateChange` + serialize/deserialize — no new
+  host callback.
+- H2 — DONE. Star toggle on every flyout tool row (web + mobile). Critical
+  fix: `getUserDrawingToolbarStateKey` now includes favorites so a toggle
+  re-renders the memoized top bar (only live QA caught this — unit tests
+  construct ChartTopBar directly and bypass the UI memo gate).
+- H3 — DONE. Horizontal floating favorites bar, **draggable** to reposition,
+  shown only when favorites exist (per product choice 2026-06-16: floating
+  horizontal, not a vertical rail section). Position is state-backed
+  (`favoriteToolbarPosition`), so it survives re-renders and reloads. Web uses
+  pointer drag with overlay clamping; mobile uses gesture-handler Pan +
+  reanimated (OrderLine idiom). Live web QA: render + drag + persist verified.
 
 ### Epic I: Bottom-Rail Toolbar Toggles
 
