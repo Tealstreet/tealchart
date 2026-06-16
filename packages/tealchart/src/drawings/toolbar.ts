@@ -1715,7 +1715,9 @@ export function resolveUserDrawingActionSurfacePosition({
   const left = clampNumber(preferredLeft, leftInset, viewport.width - rightInset - surface.width);
   let top = clampNumber(preferredTop, minTop, maxTop);
 
-  for (const obstacle of avoidRects ?? []) {
+  // Top-down so a drop past one obstacle is re-checked against any lower one.
+  const obstacles = [...(avoidRects ?? [])].sort((a, b) => a.y - b.y);
+  for (const obstacle of obstacles) {
     const overlaps =
       left < obstacle.x + obstacle.width &&
       left + surface.width > obstacle.x &&

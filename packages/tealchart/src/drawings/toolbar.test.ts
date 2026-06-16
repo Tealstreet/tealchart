@@ -2515,6 +2515,21 @@ describe('user drawing toolbar descriptors', () => {
         avoidRects: [{ x: 12, y: 40, width: 200, height: 44 }],
       }),
     ).toEqual({ left: 20, top: 118 });
+
+    // Stacked obstacles cascade regardless of input order: dropping past the
+    // upper rect must re-check the lower one (verifies the y-sorted pass).
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 80, y: 20 },
+        viewport: { width: 320, height: 400 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        avoidRects: [
+          { x: 12, y: 80, width: 200, height: 44 },
+          { x: 12, y: 40, width: 200, height: 44 },
+        ],
+      }),
+    ).toEqual({ left: 20, top: 130 });
   });
 
   it('keeps locked selected action surface mutations disabled except unlock', () => {
