@@ -1195,7 +1195,7 @@ export const DEFAULT_USER_DRAWING_STATE: UserDrawingState = {
   version: USER_DRAWING_SCHEMA_VERSION,
   drawings: [],
   activeTool: 'select',
-  stayInDrawingMode: true,
+  stayInDrawingMode: false,
   magnetMode: 'off',
   measureMode: 'off',
   measure: null,

@@ -79,10 +79,20 @@ deferred to dedicated follow-ups:
   the mobile long-press gesture enablement (`SkiaTealchart` `.enabled(activeTool
   === 'select')`), which risks interfering with drawing gestures and needs device
   verification.
-- Reverting to the cursor tool after placing a drawing (`stayInDrawingMode`
-  default). This is a deliberately-tested behavior (many tests pin "tool stays
-  after placement") and touches layout-serialization defaults; it warrants an
-  isolated PR with explicit back-compat + test handling.
+- Right-click context menu while a drawing tool is active is now unblocked by the
+  revert-to-cursor change below (you return to `select` after placing), but the
+  built-in/app context-menu surface still isn't wired in this harness.
+
+Shipped as a dedicated follow-up:
+
+- Reverting to the cursor tool after placing a drawing: `stayInDrawingMode` now
+  defaults to `false`, so committing a placement resets the active tool to
+  `select` and selects the new drawing (TradingView default). The toggle still
+  lets power users stay in the drawing tool. Layout serialization treats revert
+  as the omittable default and only persists an explicit `true`. Verified live:
+  after drawing a rectangle the tool reverts to the cursor (a second drag pans
+  instead of drawing another). This also unblocks double-click-to-properties and
+  right-click selection, which gate on `activeTool === 'select'`.
 
 ## Follow-Up Risks
 

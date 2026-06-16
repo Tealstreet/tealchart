@@ -591,7 +591,7 @@ describe('user drawing command history', () => {
   });
 
   it('bounds undo stack capacity', () => {
-    let state = createUserDrawingState();
+    let state = createUserDrawingState({ stayInDrawingMode: true });
     let history = createUserDrawingCommandHistory({ capacity: 1 });
 
     ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {
@@ -629,7 +629,7 @@ describe('user drawing command history', () => {
   });
 
   it('records style, visibility, lock, and z-order commands as undoable transactions', () => {
-    let state = createUserDrawingState();
+    let state = createUserDrawingState({ stayInDrawingMode: true });
     let history = createUserDrawingCommandHistory();
 
     ({ state, history } = dispatchUserDrawingCommandWithHistory(state, history, {

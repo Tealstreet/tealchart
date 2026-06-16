@@ -97,18 +97,18 @@ describe('drawing layout serialization', () => {
     const persisted = serializeUserDrawingStateForLayout(
       createUserDrawingState({
         ...createStateWithTransientFields(),
-        stayInDrawingMode: false,
+        stayInDrawingMode: true,
         magnetMode: 'strong',
       }),
     );
     const restored = deserializeUserDrawingStateFromLayout(persisted);
 
-    expect(restored?.stayInDrawingMode).toBe(false);
+    expect(restored?.stayInDrawingMode).toBe(true);
     expect(restored?.magnetMode).toBe('strong');
-    expect(serializeUserDrawingStateForLayout(restored)?.stayInDrawingMode).toBe(false);
+    expect(serializeUserDrawingStateForLayout(restored)?.stayInDrawingMode).toBe(true);
     expect(serializeUserDrawingStateForLayout(restored)?.magnetMode).toBe('strong');
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, stayInDrawingMode: undefined })?.stayInDrawingMode)
-      .toBe(true);
+      .toBe(false);
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: undefined })?.magnetMode).toBe('off');
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: 'future' })?.magnetMode).toBe('off');
   });
@@ -178,15 +178,15 @@ describe('drawing layout serialization', () => {
     expect(serializeUserDrawingStateForLayout(createUserDrawingState())).toBeUndefined();
   });
 
-  it('persists disabled stay-in-drawing-mode without committed drawings', () => {
-    const persisted = serializeUserDrawingStateForLayout(createUserDrawingState({ stayInDrawingMode: false }));
+  it('persists enabled stay-in-drawing-mode without committed drawings', () => {
+    const persisted = serializeUserDrawingStateForLayout(createUserDrawingState({ stayInDrawingMode: true }));
     const restored = deserializeUserDrawingStateFromLayout(persisted);
 
     expect(persisted).toMatchObject({
       version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
       drawings: [],
       activeTool: 'select',
-      stayInDrawingMode: false,
+      stayInDrawingMode: true,
       selection: null,
       draft: null,
       textEdit: null,
@@ -194,11 +194,15 @@ describe('drawing layout serialization', () => {
     expect(restored).toMatchObject({
       drawings: [],
       activeTool: 'select',
-      stayInDrawingMode: false,
+      stayInDrawingMode: true,
       selection: null,
       draft: null,
       textEdit: null,
     });
+  });
+
+  it('omits disabled stay-in-drawing-mode without committed drawings', () => {
+    expect(serializeUserDrawingStateForLayout(createUserDrawingState({ stayInDrawingMode: false }))).toBeUndefined();
   });
 
   it('persists magnet mode without committed drawings', () => {
@@ -209,7 +213,7 @@ describe('drawing layout serialization', () => {
       version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
       drawings: [],
       activeTool: 'select',
-      stayInDrawingMode: true,
+      stayInDrawingMode: false,
       magnetMode: 'weak',
       selection: null,
       draft: null,
@@ -218,7 +222,7 @@ describe('drawing layout serialization', () => {
     expect(restored).toMatchObject({
       drawings: [],
       activeTool: 'select',
-      stayInDrawingMode: true,
+      stayInDrawingMode: false,
       magnetMode: 'weak',
       selection: null,
       draft: null,
