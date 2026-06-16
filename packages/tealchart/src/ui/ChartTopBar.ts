@@ -31,6 +31,9 @@ import {
   isUserDrawingTextAnnotation,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveDrawingSelectedActionIconName,
+  resolveDrawingToolIconName,
+  resolveDrawingToolbarActionIconName,
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingToolCategoryButtonTool,
@@ -70,6 +73,7 @@ import {
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
 import { Component } from './Component';
+import { renderDrawingIcon } from './dom';
 import { LayoutSelector } from './LayoutSelector';
 
 /**
@@ -958,7 +962,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         opacity: item.enabled ? '1' : '0.35',
         cursor: item.enabled ? 'pointer' : 'default',
       },
-      textContent: item.icon,
       attributes: {
         type: 'button',
         title: item.label,
@@ -966,6 +969,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         ...(item.selected !== undefined ? { 'aria-pressed': item.selected ? 'true' : 'false' } : {}),
       },
     });
+    this.setDrawingIconContent(btn, resolveDrawingSelectedActionIconName(item.command, item.swatchColor), item.icon, 18);
     btn.disabled = !item.enabled;
     if (item.enabled) {
       btn.addEventListener('click', () => {
@@ -983,6 +987,25 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       });
     }
     return btn;
+  }
+
+  /**
+   * Populate an element with a tool/action icon: the shared SVG when authored,
+   * otherwise the descriptor's glyph fallback.
+   */
+  private setDrawingIconContent(
+    el: HTMLElement,
+    iconName: string | undefined,
+    glyph: string,
+    size: number,
+  ): void {
+    el.textContent = '';
+    const iconEl = iconName ? renderDrawingIcon(iconName, { size }) : null;
+    if (iconEl) {
+      el.appendChild(iconEl);
+    } else {
+      el.textContent = glyph;
+    }
   }
 
   private renderDrawingToolRail(activeTool: UserDrawingTool): void {
@@ -1040,7 +1063,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           ...styles.drawingToolCategoryButton,
           ...(activeCategory ? styles.drawingButtonActive : {}),
         },
-        textContent: categoryToolDescriptor.icon,
         attributes: {
           type: 'button',
           title: category.label,
@@ -1051,6 +1073,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           'aria-pressed': activeCategory ? 'true' : 'false',
         },
       });
+      this.setDrawingIconContent(
+        categoryButton,
+        resolveDrawingToolIconName(categoryTool),
+        categoryToolDescriptor.icon,
+        20,
+      );
       const flyout = this.createElement('div', {
         style: styles.drawingToolFlyout,
         attributes: {
@@ -1133,9 +1161,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             'aria-pressed': isActive ? 'true' : 'false',
           },
         });
-        btn.appendChild(
-          this.createElement('span', { style: styles.drawingToolFlyoutIcon, textContent: descriptor.icon }),
-        );
+        const flyoutIcon = this.createElement('span', { style: styles.drawingToolFlyoutIcon });
+        this.setDrawingIconContent(flyoutIcon, resolveDrawingToolIconName(descriptor.tool), descriptor.icon, 18);
+        btn.appendChild(flyoutIcon);
         btn.appendChild(
           this.createElement('span', { style: styles.drawingToolFlyoutLabel, textContent: descriptor.label }),
         );
@@ -1894,7 +1922,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           opacity: enabled ? '1' : '0.35',
           cursor: enabled ? 'pointer' : 'default',
         },
-        textContent: item.icon,
         attributes: {
           type: 'button',
           title: item.label,
@@ -1902,6 +1929,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           'aria-pressed': active ? 'true' : 'false',
         },
       });
+      this.setDrawingIconContent(btn, resolveDrawingToolbarActionIconName(item.command.action), item.icon, 18);
       btn.disabled = !enabled;
       if (enabled) {
         btn.addEventListener('click', () => {

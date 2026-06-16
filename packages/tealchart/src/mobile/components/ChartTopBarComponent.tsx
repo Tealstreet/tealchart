@@ -38,6 +38,8 @@ import {
   isUserDrawingTextAnnotation,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveDrawingToolIconName,
+  resolveDrawingToolbarActionIconName,
   resolveUserDrawingToolCategoryButtonTool,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -65,6 +67,7 @@ import {
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
   USER_DRAWING_TREND_LINE_EXTEND_DESCRIPTORS,
 } from '../../drawings';
+import { DrawingToolIcon } from './DrawingToolIcon';
 import { computeLeftToolRailTop, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../../types';
@@ -297,6 +300,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     recentDrawingToolsByCategory,
                   );
                   const categoryToolDescriptor = getUserDrawingToolDescriptor(categoryTool);
+                  const categoryIconName = resolveDrawingToolIconName(categoryTool);
                   const expanded = expandedDrawingCategoryId === category.id;
                   return (
                     <Pressable
@@ -317,11 +321,22 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         pressed && !activeCategory && styles.drawingButtonPressed,
                       ]}
                     >
-                      <Text
-                        style={[styles.drawingButtonText, { color: activeCategory ? accentColor : textSecondaryColor }]}
-                      >
-                        {categoryToolDescriptor.icon}
-                      </Text>
+                      {categoryIconName ? (
+                        <DrawingToolIcon
+                          name={categoryIconName}
+                          size={20}
+                          color={activeCategory ? accentColor : textSecondaryColor}
+                        />
+                      ) : (
+                        <Text
+                          style={[
+                            styles.drawingButtonText,
+                            { color: activeCategory ? accentColor : textSecondaryColor },
+                          ]}
+                        >
+                          {categoryToolDescriptor.icon}
+                        </Text>
+                      )}
                     </Pressable>
                   );
                 })}
@@ -379,6 +394,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   <ScrollView showsVerticalScrollIndicator={false}>
                     {expandedDrawingCategory.tools.map((tool) => {
                       const descriptor = getUserDrawingToolDescriptor(tool);
+                      const flyoutIconName = resolveDrawingToolIconName(descriptor.tool);
                       const active = userDrawingState.activeTool === descriptor.tool;
                       return (
                         <Pressable
@@ -405,9 +421,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                             pressed && !active && styles.drawingButtonPressed,
                           ]}
                         >
-                          <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
-                            {descriptor.icon}
-                          </Text>
+                          {flyoutIconName ? (
+                            <DrawingToolIcon name={flyoutIconName} size={18} color={textSecondaryColor} />
+                          ) : (
+                            <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
+                              {descriptor.icon}
+                            </Text>
+                          )}
                           <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
                             {descriptor.label}
                           </Text>
@@ -1077,6 +1097,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     userDrawingCommandAvailability,
                   );
                   const active = descriptor.action === 'measure' && userDrawingState.measureMode === 'on';
+                  const actionIconName = resolveDrawingToolbarActionIconName(descriptor.action);
                   return (
                     <Pressable
                       key={descriptor.action}
@@ -1120,15 +1141,23 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         enabled && pressed && !active && styles.drawingButtonPressed,
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.drawingButtonText,
-                          { color: active ? accentColor : textSecondaryColor },
-                          !enabled && styles.drawingButtonTextDisabled,
-                        ]}
-                      >
-                        {descriptor.icon}
-                      </Text>
+                      {actionIconName ? (
+                        <DrawingToolIcon
+                          name={actionIconName}
+                          size={18}
+                          color={active ? accentColor : textSecondaryColor}
+                        />
+                      ) : (
+                        <Text
+                          style={[
+                            styles.drawingButtonText,
+                            { color: active ? accentColor : textSecondaryColor },
+                            !enabled && styles.drawingButtonTextDisabled,
+                          ]}
+                        >
+                          {descriptor.icon}
+                        </Text>
+                      )}
                     </Pressable>
                   );
                 })}
