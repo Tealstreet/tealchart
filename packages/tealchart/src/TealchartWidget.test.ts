@@ -2455,7 +2455,7 @@ describe('TealchartWidget', () => {
 
       const targetRow = widget.getUserDrawingObjectTreeModel().rows.find((row) => row.drawingId === 'target')!;
       const hideTargetAction = resolveUserDrawingObjectTreeRowDispatchAction(targetRow, 'hide');
-      expect(hideTargetAction).toEqual({ type: 'hide', drawingIds: ['target'], includeLocked: undefined });
+      expect(hideTargetAction).toEqual({ type: 'hide', drawingIds: ['target'], includeLocked: true });
       onCommand.mockClear();
       expect(hideTargetAction && widget.dispatchUserDrawingObjectTreeAction(hideTargetAction)).toBe(true);
       expect(widget.getUserDrawingState().drawings).toEqual([
@@ -2515,7 +2515,7 @@ describe('TealchartWidget', () => {
       expect(selectedHideAction).toEqual({
         type: 'hide',
         drawingIds: ['line', 'target'],
-        includeLocked: undefined,
+        includeLocked: true,
       });
       expect(selectedHideAction && widget.dispatchUserDrawingObjectTreeAction(selectedHideAction)).toBe(true);
       expect(widget.getUserDrawingState().drawings.map((drawing) => [drawing.id, drawing.visible])).toEqual([
