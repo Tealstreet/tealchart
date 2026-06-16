@@ -70,6 +70,33 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onTool).toHaveBeenCalledWith('rectangle');
   });
 
+  it('toggles tool favorites from the flyout star buttons without selecting the tool', () => {
+    const onTool = vi.fn();
+    const onToggleFavorite = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'select', favoriteTools: ['trendLine'] }}
+        onUserDrawingToolSelect={onTool}
+        onUserDrawingToggleFavoriteTool={onToggleFavorite}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Lines drawing tools'));
+
+    const removeTrend = screen.getByLabelText('Remove Trend line from favorites');
+    expect(removeTrend.getAttribute('aria-pressed')).toBe('true');
+    const addHorizontal = screen.getByLabelText('Add Horizontal line to favorites');
+    expect(addHorizontal.getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(addHorizontal);
+    expect(onToggleFavorite).toHaveBeenCalledWith('horizontalLine');
+    fireEvent.click(removeTrend);
+    expect(onToggleFavorite).toHaveBeenCalledWith('trendLine');
+    expect(onTool).not.toHaveBeenCalled();
+  });
+
   it('dispatches audited placement tools from the rendered mobile drawing sidebar', () => {
     const onTool = vi.fn();
     render(

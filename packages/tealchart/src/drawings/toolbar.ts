@@ -1999,6 +1999,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
 
   return [
     state.activeTool,
+    (state.favoriteTools ?? []).join(','),
     state.selection?.drawingId ?? '',
     state.selection?.handle ?? '',
     state.draft ? 'draft' : '',
