@@ -9,6 +9,7 @@ import type {
   UpdateUserDrawingOptions,
   UserDrawingIconName,
   UserDrawingCommandAvailability,
+  UserDrawingMagnetMode,
   UserDrawingFavoriteToolbarPosition,
   UserDrawingState,
   UserDrawingStyle,
@@ -88,6 +89,10 @@ export interface ChartTopBarComponentProps {
   onUserDrawingClearAll?: () => void;
   /** Callback when temporary measure mode should toggle */
   onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
+  /** Callback when magnet (snap) mode should change */
+  onUserDrawingMagnetModeChange?: (magnetMode: UserDrawingMagnetMode) => void;
+  /** Callback when keep-drawing (stay in drawing) mode should toggle */
+  onUserDrawingStayInDrawingModeChange?: (stayInDrawingMode: boolean) => void;
   /** Callback when the drawing toolbar should zoom the chart time range in */
   onUserDrawingZoomIn?: () => void;
   /** Callback when selected drawings should be reordered */
@@ -146,6 +151,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingCancelDraft,
     onUserDrawingClearAll,
     onUserDrawingMeasureModeChange,
+    onUserDrawingMagnetModeChange,
+    onUserDrawingStayInDrawingModeChange,
     onUserDrawingZoomIn,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
@@ -233,6 +240,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         : null;
 
     const favoriteTools = getUserDrawingFavoriteTools(userDrawingState);
+    const magnetActive = (userDrawingState?.magnetMode ?? 'off') !== 'off';
+    const stayInDrawingActive = userDrawingState?.stayInDrawingMode === true;
     const favoritesDefaultX =
       MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 16;
     const favoritesDefaultY = TOP_BAR_HEIGHT + 40;
@@ -377,6 +386,36 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   );
                 })}
               </ScrollView>
+            </View>
+
+            <View style={styles.drawingRailToggleGroup}>
+              <View style={styles.drawingRailToggleDivider} />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={magnetActive ? 'Magnet snap on' : 'Magnet snap off'}
+                accessibilityState={{ selected: magnetActive }}
+                onPress={() => onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong')}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  magnetActive && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  pressed && !magnetActive && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="magnet" size={20} color={magnetActive ? accentColor : textSecondaryColor} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={stayInDrawingActive ? 'Keep drawing mode on' : 'Keep drawing mode off'}
+                accessibilityState={{ selected: stayInDrawingActive }}
+                onPress={() => onUserDrawingStayInDrawingModeChange?.(!stayInDrawingActive)}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  stayInDrawingActive && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  pressed && !stayInDrawingActive && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="pencil" size={20} color={stayInDrawingActive ? accentColor : textSecondaryColor} />
+              </Pressable>
             </View>
 
             {expandedDrawingCategory && (
@@ -834,6 +873,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  drawingRailToggleGroup: {
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  drawingRailToggleDivider: {
+    width: 24,
+    height: 1,
+    backgroundColor: '#2a2e39',
+    marginVertical: 2,
   },
   favoritesBar: {
     position: 'absolute',

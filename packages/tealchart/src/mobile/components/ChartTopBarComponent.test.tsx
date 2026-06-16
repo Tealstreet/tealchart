@@ -70,6 +70,28 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onTool).toHaveBeenCalledWith('rectangle');
   });
 
+  it('toggles magnet and keep-drawing modes from the rail bottom toggles', () => {
+    const onMagnet = vi.fn();
+    const onStay = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'select', magnetMode: 'off', stayInDrawingMode: false }}
+        onUserDrawingMagnetModeChange={onMagnet}
+        onUserDrawingStayInDrawingModeChange={onStay}
+      />,
+    );
+
+    const magnet = screen.getByLabelText('Magnet snap off');
+    expect(magnet.getAttribute('aria-pressed')).toBe('false');
+    fireEvent.click(magnet);
+    expect(onMagnet).toHaveBeenCalledWith('strong');
+
+    fireEvent.click(screen.getByLabelText('Keep drawing mode off'));
+    expect(onStay).toHaveBeenCalledWith(true);
+  });
+
   it('renders the floating favorites bar and selects tools from it', () => {
     const onTool = vi.fn();
     render(
