@@ -113,6 +113,35 @@ describe('drawing layout serialization', () => {
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: 'future' })?.magnetMode).toBe('off');
   });
 
+  it('round-trips favorite tools and toolbar position through layout state even without drawings', () => {
+    const persisted = serializeUserDrawingStateForLayout(
+      createUserDrawingState({ favoriteTools: ['trendLine', 'rectangle'], favoriteToolbarPosition: { x: 140, y: 72 } }),
+    );
+    expect(persisted?.favoriteTools).toEqual(['trendLine', 'rectangle']);
+    expect(persisted?.favoriteToolbarPosition).toEqual({ x: 140, y: 72 });
+
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+    expect(restored?.favoriteTools).toEqual(['trendLine', 'rectangle']);
+    expect(restored?.favoriteToolbarPosition).toEqual({ x: 140, y: 72 });
+
+    expect(serializeUserDrawingStateForLayout(createUserDrawingState({ favoriteTools: [] }))).toBeUndefined();
+    expect(
+      deserializeUserDrawingStateFromLayout({
+        version: persisted?.version,
+        drawings: [],
+        favoriteTools: [1, 'rectangle', 'rectangle', 'not_a_real_tool'],
+      })?.favoriteTools,
+    ).toEqual(['rectangle']);
+    expect(
+      deserializeUserDrawingStateFromLayout({
+        version: persisted?.version,
+        drawings: [],
+        favoriteTools: ['rectangle'],
+        favoriteToolbarPosition: { x: 'nan', y: 5 },
+      })?.favoriteToolbarPosition ?? null,
+    ).toBeNull();
+  });
+
   it('persists user-facing drawing names and trims restored legacy names', () => {
     const legacyPayload = {
       drawings: [

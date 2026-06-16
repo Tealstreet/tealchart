@@ -133,6 +133,41 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('toggles tool favorites from the flyout star buttons without selecting the tool', () => {
+    const onTool = vi.fn();
+    const onToggleFavorite = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-drawing-favorites',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, favoriteTools: ['trendLine'] },
+      onUserDrawingToolSelect: onTool,
+      onUserDrawingToggleFavoriteTool: onToggleFavorite,
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.click();
+
+    const removeTrend = document.querySelector<HTMLButtonElement>(
+      'button[aria-label="Remove Trend line from favorites"]',
+    );
+    expect(removeTrend).not.toBeNull();
+    expect(removeTrend?.getAttribute('aria-pressed')).toBe('true');
+
+    const addHorizontal = document.querySelector<HTMLButtonElement>(
+      'button[aria-label="Add Horizontal line to favorites"]',
+    );
+    expect(addHorizontal).not.toBeNull();
+    expect(addHorizontal?.getAttribute('aria-pressed')).toBe('false');
+
+    addHorizontal?.click();
+    expect(onToggleFavorite).toHaveBeenCalledWith('horizontalLine');
+    removeTrend?.click();
+    expect(onToggleFavorite).toHaveBeenCalledWith('trendLine');
+    expect(onTool).not.toHaveBeenCalled();
+
+    topBar.unmount();
+  });
+
   it('dispatches audited placement tools from the rendered drawing sidebar', () => {
     const onTool = vi.fn();
     const topBar = new ChartTopBar({
@@ -238,6 +273,43 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(categoryRail).not.toBeNull();
     expect(overlayParent.contains(categoryRail)).toBe(true);
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
+
+    topBar.unmount();
+  });
+
+  it('renders a draggable floating favorites bar that selects tools and reports moves', () => {
+    const overlayParent = document.createElement('div');
+    document.body.append(overlayParent);
+    const onTool = vi.fn();
+    const onMove = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-favorites-bar',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, favoriteTools: ['trendLine', 'horizontalLine'] },
+      drawingOverlayParent: overlayParent,
+      onUserDrawingToolSelect: onTool,
+      onUserDrawingFavoriteToolbarMove: onMove,
+    });
+    topBar.mount(document.body);
+
+    const bar = overlayParent.querySelector<HTMLElement>('[aria-label="Favorite drawing tools"]');
+    expect(bar).not.toBeNull();
+    const handle = bar?.querySelector<HTMLElement>('[aria-label="Drag favorites toolbar"]');
+    expect(handle).not.toBeNull();
+    const tools = Array.from(bar?.querySelectorAll('button[aria-label]') ?? []).map((b) => b.getAttribute('aria-label'));
+    expect(tools).toEqual(['Trend line', 'Horizontal line']);
+
+    bar?.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.click();
+    expect(onTool).toHaveBeenCalledWith('trendLine');
+
+    handle?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: 100, clientY: 100, button: 0 }));
+    document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 160, clientY: 140 }));
+    document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: 160, clientY: 140 }));
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMove.mock.calls[0]?.[0]).toMatchObject({ x: expect.any(Number), y: expect.any(Number) });
+
+    topBar.setUserDrawingState({ ...baseDrawingState, favoriteTools: [] });
+    expect(overlayParent.querySelector('[aria-label="Favorite drawing tools"]')).toBeNull();
 
     topBar.unmount();
   });
