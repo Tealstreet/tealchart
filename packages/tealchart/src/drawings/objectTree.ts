@@ -197,7 +197,7 @@ function resolveUserDrawingObjectTreeRowActions(
     { type: 'rename', label: 'Rename drawing', enabled: editable },
     { type: 'duplicate', label: 'Duplicate drawing', enabled: editable },
     { type: 'delete', label: 'Delete drawing', enabled: editable, destructive: true },
-    { type: drawing.visible ? 'hide' : 'show', label: drawing.visible ? 'Hide drawing' : 'Show drawing', enabled: editable },
+    { type: drawing.visible ? 'hide' : 'show', label: drawing.visible ? 'Hide drawing' : 'Show drawing', enabled: true },
     { type: drawing.locked ? 'unlock' : 'lock', label: drawing.locked ? 'Unlock drawing' : 'Lock drawing', enabled: true },
     { type: 'bringForward', label: 'Bring drawing forward', enabled: editable && drawingIndex < drawingCount - 1 },
     { type: 'sendBackward', label: 'Send drawing backward', enabled: editable && drawingIndex > 0 },
@@ -215,16 +215,17 @@ function resolveUserDrawingObjectTreeSelectionActions(
   const editableRows = selectedRows.filter((row) => row.editable);
   const hasEditable = editableRows.length > 0;
   const hasLocked = selectedRows.some((row) => row.locked);
-  const hasVisibleEditable = editableRows.some((row) => row.visible);
-  const hasHiddenEditable = editableRows.some((row) => !row.visible);
+  // Visibility is lock-independent: a locked drawing can still be hidden/shown.
+  const hasVisible = selectedRows.some((row) => row.visible);
+  const hasHidden = selectedRows.some((row) => !row.visible);
   const canBringForward = editableRows.some((row) => row.zIndex < drawingCount - 1);
   const canSendBackward = editableRows.some((row) => row.zIndex > 0);
 
   return [
     { type: 'duplicate', label: 'Duplicate selected drawings', enabled: hasEditable, selectedCount },
     { type: 'delete', label: 'Delete selected drawings', enabled: hasEditable, selectedCount, destructive: true },
-    { type: 'hide', label: 'Hide selected drawings', enabled: hasVisibleEditable, selectedCount },
-    { type: 'show', label: 'Show selected drawings', enabled: hasHiddenEditable, selectedCount },
+    { type: 'hide', label: 'Hide selected drawings', enabled: hasVisible, selectedCount },
+    { type: 'show', label: 'Show selected drawings', enabled: hasHidden, selectedCount },
     { type: 'lock', label: 'Lock selected drawings', enabled: hasEditable, selectedCount },
     { type: 'unlock', label: 'Unlock selected drawings', enabled: hasLocked, selectedCount },
     { type: 'bringForward', label: 'Bring selected drawings forward', enabled: canBringForward, selectedCount },
@@ -295,6 +296,12 @@ export function resolveUserDrawingObjectTreeModel(
   };
 }
 
+// Actions that are independent of a drawing's lock: they must still apply when a
+// drawing is locked (lock freezes geometry/style, not visibility or lock itself).
+function resolvesIncludeLocked(actionType: string, requested: boolean | undefined): boolean | undefined {
+  return actionType === 'unlock' || actionType === 'hide' || actionType === 'show' ? true : requested;
+}
+
 export function resolveUserDrawingObjectTreeSelectionDispatchAction(
   model: UserDrawingObjectTreeModel,
   actionType: UserDrawingObjectTreeSelectionActionType,
@@ -306,7 +313,7 @@ export function resolveUserDrawingObjectTreeSelectionDispatchAction(
   return {
     type: actionType,
     drawingIds: model.selectedIds,
-    includeLocked: actionType === 'unlock' ? true : options.includeLocked,
+    includeLocked: resolvesIncludeLocked(actionType, options.includeLocked),
   };
 }
 
@@ -341,7 +348,7 @@ export function resolveUserDrawingObjectTreeRowDispatchAction(
   return {
     type: actionType,
     drawingIds: [row.drawingId],
-    includeLocked: actionType === 'unlock' ? true : options.includeLocked,
+    includeLocked: resolvesIncludeLocked(actionType, options.includeLocked),
   };
 }
 
