@@ -16,6 +16,7 @@ import {
   commitUserDrawingTextEdit,
   createUserDrawingState,
   setUserDrawingFavoriteTools,
+  setUserDrawingFavoriteToolbarPosition,
   toggleUserDrawingFavoriteTool,
   deleteUserDrawingTableColumn,
   deleteUserDrawingTableRow,
@@ -242,6 +243,11 @@ describe('user drawing input controller', () => {
 
     const unchanged = setUserDrawingFavoriteTools(set, ['rectangle', 'trendLine']);
     expect(unchanged).toBe(set);
+
+    const moved = setUserDrawingFavoriteToolbarPosition(initial, { x: 24, y: 48 });
+    expect(moved.favoriteToolbarPosition).toEqual({ x: 24, y: 48 });
+    expect(setUserDrawingFavoriteToolbarPosition(moved, { x: 24, y: 48 })).toBe(moved);
+    expect(setUserDrawingFavoriteToolbarPosition(moved, null).favoriteToolbarPosition ?? null).toBeNull();
   });
 
   it('switches to select after click placement when stay-in-drawing-mode is disabled', () => {

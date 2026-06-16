@@ -61,6 +61,7 @@ const transientUserDrawingHistoryCommandTypes = [
   'setMagnetMode',
   'setFavoriteTools',
   'toggleFavoriteTool',
+  'setFavoriteToolbarPosition',
   'setMeasureMode',
   'select',
   'selectMany',

@@ -1301,6 +1301,9 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
     stayInDrawingMode: state.stayInDrawingMode === true,
     magnetMode: state.magnetMode ?? 'off',
     favoriteTools: [...favoriteTools],
+    favoriteToolbarPosition: state.favoriteToolbarPosition
+      ? { x: state.favoriteToolbarPosition.x, y: state.favoriteToolbarPosition.y }
+      : null,
   });
 }
 
@@ -1314,6 +1317,12 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
   const favoriteTools = Array.isArray(state.favoriteTools)
     ? [...new Set(state.favoriteTools.filter((tool): tool is UserDrawingTool => typeof tool === 'string'))]
     : [];
+  const favoriteToolbarPosition =
+    isRecord(state.favoriteToolbarPosition) &&
+    isFiniteNumber(state.favoriteToolbarPosition.x) &&
+    isFiniteNumber(state.favoriteToolbarPosition.y)
+      ? { x: state.favoriteToolbarPosition.x, y: state.favoriteToolbarPosition.y }
+      : null;
   if (drawings.length === 0 && state.stayInDrawingMode !== true && magnetMode === 'off' && favoriteTools.length === 0)
     return undefined;
 
@@ -1323,6 +1332,7 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
     stayInDrawingMode: state.stayInDrawingMode === true,
     magnetMode,
     favoriteTools,
+    favoriteToolbarPosition,
   });
 }
 

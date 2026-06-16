@@ -37,6 +37,7 @@ import type {
   UserDrawingTrendLineExtend,
   UserDrawingMagnetMode,
   UserDrawingMeasureMode,
+  UserDrawingFavoriteToolbarPosition,
 } from './types';
 import { isUserDrawingLayoutStateEqual } from './serialization';
 
@@ -67,6 +68,7 @@ import {
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   selectUserDrawingsById,
+  setUserDrawingFavoriteToolbarPosition,
   setUserDrawingFavoriteTools,
   setUserDrawingIconName,
   setUserDrawingImageSource,
@@ -124,6 +126,10 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'setMagnetMode'; magnetMode: UserDrawingMagnetMode })
   | (UserDrawingCommandBase & { type: 'setFavoriteTools'; favoriteTools: readonly UserDrawingTool[] })
   | (UserDrawingCommandBase & { type: 'toggleFavoriteTool'; tool: UserDrawingTool })
+  | (UserDrawingCommandBase & {
+      type: 'setFavoriteToolbarPosition';
+      position: UserDrawingFavoriteToolbarPosition | null;
+    })
   | (UserDrawingCommandBase & { type: 'setMeasureMode'; measureMode: UserDrawingMeasureMode })
   | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
@@ -436,6 +442,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return setUserDrawingFavoriteTools(state, command.favoriteTools);
     case 'toggleFavoriteTool':
       return toggleUserDrawingFavoriteTool(state, command.tool);
+    case 'setFavoriteToolbarPosition':
+      return setUserDrawingFavoriteToolbarPosition(state, command.position);
     case 'setMeasureMode':
       return setUserDrawingMeasureMode(state, command.measureMode);
     case 'add':

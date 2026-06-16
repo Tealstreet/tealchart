@@ -277,6 +277,43 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('renders a draggable floating favorites bar that selects tools and reports moves', () => {
+    const overlayParent = document.createElement('div');
+    document.body.append(overlayParent);
+    const onTool = vi.fn();
+    const onMove = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-favorites-bar',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, favoriteTools: ['trendLine', 'horizontalLine'] },
+      drawingOverlayParent: overlayParent,
+      onUserDrawingToolSelect: onTool,
+      onUserDrawingFavoriteToolbarMove: onMove,
+    });
+    topBar.mount(document.body);
+
+    const bar = overlayParent.querySelector<HTMLElement>('[aria-label="Favorite drawing tools"]');
+    expect(bar).not.toBeNull();
+    const handle = bar?.querySelector<HTMLElement>('[aria-label="Drag favorites toolbar"]');
+    expect(handle).not.toBeNull();
+    const tools = Array.from(bar?.querySelectorAll('button[aria-label]') ?? []).map((b) => b.getAttribute('aria-label'));
+    expect(tools).toEqual(['Trend line', 'Horizontal line']);
+
+    bar?.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.click();
+    expect(onTool).toHaveBeenCalledWith('trendLine');
+
+    handle?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: 100, clientY: 100, button: 0 }));
+    document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 160, clientY: 140 }));
+    document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: 160, clientY: 140 }));
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMove.mock.calls[0]?.[0]).toMatchObject({ x: expect.any(Number), y: expect.any(Number) });
+
+    topBar.setUserDrawingState({ ...baseDrawingState, favoriteTools: [] });
+    expect(overlayParent.querySelector('[aria-label="Favorite drawing tools"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
   it('shows the active tool icon on its category button', () => {
     const topBar = new ChartTopBar({
       chartKey: 'topbar-active-category-icon',

@@ -70,6 +70,34 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onTool).toHaveBeenCalledWith('rectangle');
   });
 
+  it('renders the floating favorites bar and selects tools from it', () => {
+    const onTool = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'select', favoriteTools: ['trendLine', 'horizontalLine'] }}
+        onUserDrawingToolSelect={onTool}
+      />,
+    );
+
+    expect(screen.getByLabelText('Drag favorites toolbar')).toBeTruthy();
+    // tool buttons appear in the floating bar (the rail is collapsed, so labels are unique here)
+    fireEvent.click(screen.getByLabelText('Trend line'));
+    expect(onTool).toHaveBeenCalledWith('trendLine');
+  });
+
+  it('hides the floating favorites bar when there are no favorites', () => {
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{ ...baseDrawingState, activeTool: 'select', favoriteTools: [] }}
+      />,
+    );
+    expect(screen.queryByLabelText('Drag favorites toolbar')).toBeNull();
+  });
+
   it('toggles tool favorites from the flyout star buttons without selecting the tool', () => {
     const onTool = vi.fn();
     const onToggleFavorite = vi.fn();
