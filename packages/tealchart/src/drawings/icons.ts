@@ -1,5 +1,5 @@
 import type { UserDrawingTool } from './types';
-import type { UserDrawingToolbarAction } from './toolbar';
+import type { UserDrawingSelectedActionSurfaceCommand, UserDrawingToolbarAction } from './toolbar';
 
 /**
  * Platform-neutral line-icon registry for drawing tools and toolbar actions.
@@ -149,7 +149,9 @@ export const DRAWING_ICONS = {
   unlock: def([rect(5, 11, 14, 10, 2), p('M8 11V7a4 4 0 0 1 7.9-1')]),
   copy: def([rect(9, 9, 12, 12, 2), p('M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1')]),
   gear: def([circle(12, 12, 3), p('M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z')]),
-  star: def([p('M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z')]),
+  star: def([
+    { tag: 'path', attrs: { d: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' }, filled: true },
+  ]),
   starOutline: def([p('M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z')]),
   magnet: def([
     p('M6 15l-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15'),
@@ -158,6 +160,8 @@ export const DRAWING_ICONS = {
   ]),
   pencil: def([p('M17 3a2.83 2.83 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z'), line(15, 5, 19, 9)]),
   more: def([dot(5, 12, 1.6), dot(12, 12, 1.6), dot(19, 12, 1.6)]),
+  undo: def([polyline('9 14 4 9 9 4'), p('M4 9h10.5a5.5 5.5 0 0 1 0 11H9')]),
+  redo: def([polyline('15 14 20 9 15 4'), p('M20 9H9.5a5.5 5.5 0 0 0 0 11H15')]),
   plus: def([line(12, 5, 12, 19), line(5, 12, 19, 12)]),
   close: def([line(18, 6, 6, 18), line(6, 6, 18, 18)]),
   arrowUp: def([line(12, 19, 12, 5), polyline('6 11 12 5 18 11')]),
@@ -201,4 +205,35 @@ export function resolveDrawingToolbarActionIconName(action: UserDrawingToolbarAc
     return TOOLBAR_ACTION_ICON_ALIASES[action];
   }
   return action in DRAWING_ICONS ? (action as DrawingIconName) : undefined;
+}
+
+/** Resolve the shared icon for a selected-object action surface item (web + mobile). */
+export function resolveDrawingSelectedActionIconName(
+  command: UserDrawingSelectedActionSurfaceCommand,
+  swatchColor?: string,
+): DrawingIconName | undefined {
+  if (swatchColor) return undefined;
+  switch (command.type) {
+    case 'toolbarAction':
+      return resolveDrawingToolbarActionIconName(command.action);
+    case 'styleAction':
+      switch (command.action) {
+        case 'hideSelected':
+          return 'eyeOff';
+        case 'showSelected':
+          return 'eye';
+        case 'lockSelected':
+          return 'lock';
+        case 'unlockSelected':
+          return 'unlock';
+        default:
+          return undefined;
+      }
+    case 'openProperties':
+      return 'gear';
+    case 'editText':
+      return 'pencil';
+    default:
+      return undefined;
+  }
 }

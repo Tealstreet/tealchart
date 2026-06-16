@@ -542,6 +542,7 @@ export {
   DRAWING_ICON_DEFAULT_VIEWBOX,
   DRAWING_ICONS,
   getDrawingIconDefinition,
+  resolveDrawingSelectedActionIconName,
   resolveDrawingToolIconName,
   resolveDrawingToolbarActionIconName,
 } from './icons';
