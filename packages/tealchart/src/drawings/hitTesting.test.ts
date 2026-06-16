@@ -344,6 +344,27 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
   });
 
+  it('hits the interior of a filled rectangle', () => {
+    const drawing: UserDrawing = {
+      ...base,
+      id: 'filled-rect',
+      kind: 'rectangle',
+      style: { ...style, fillColor: 'rgba(245, 197, 66, 0.12)' },
+      points: [
+        { time: 10, price: 90 },
+        { time: 90, price: 10 },
+      ],
+    };
+
+    // Center is grabbable when filled, even with a tiny edge tolerance...
+    const center = hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 });
+    expect(center?.drawing.id).toBe('filled-rect');
+    expect(center?.handle).toBeUndefined();
+    // ...but hiding the fill returns to edge-only grabbing.
+    const fillHidden: UserDrawing = { ...drawing, style: { ...drawing.style, fillVisible: false } };
+    expect(hitTestUserDrawing(fillHidden, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+  });
+
   it('hits image annotation edges and corner handles', () => {
     const drawing: UserDrawing = {
       ...base,

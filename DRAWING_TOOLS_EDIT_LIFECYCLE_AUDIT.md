@@ -40,6 +40,27 @@ Edit lifecycle behavior is shared:
   properties intent, app-owned versus built-in fallback behavior, and visual
   proof that gesture cancellation feels correct.
 
+## Browser Evidence (web Canvas, Chrome MCP)
+
+Live QA of the edit lifecycle (now reachable because placement reverts to the
+select tool):
+
+- Handle drag resizes a selected rectangle; a single toolbar undo reverts the
+  whole resize (one undo transaction). Verified.
+- Reproduced defect: clicking or dragging the **interior/fill** of a rectangle
+  did nothing — the shape was only grabbable within `DEFAULT_TOLERANCE` (6px) of
+  its border, so the fill could not select or move it and an interior drag fell
+  through to chart pan. Long/short positions already grabbed by interior
+  (`pointInRect`); rectangles/images/price-range/date-range used edge distance
+  only. Fixed in shared `hitTesting.ts`: a shape with a visible fill
+  (`style.fillVisible !== false && style.fillColor`) is now grabbable across its
+  whole interior, while unfilled shapes stay edge-only. Verified live: an
+  interior click now selects a filled rectangle and an interior drag moves it
+  (the chart no longer pans). Shared `hitTesting.test.ts` covers filled-interior
+  vs fill-hidden edge-only.
+- Double-click on a non-text drawing opens its properties panel (confirmed live
+  once the tool returns to select mode).
+
 ## Next Useful Gap
 
 Move to D2:
