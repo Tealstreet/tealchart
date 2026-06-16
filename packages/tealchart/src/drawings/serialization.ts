@@ -1279,6 +1279,10 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
   }
 }
 
+// Revert-to-cursor is the default, so only an explicit `stayInDrawingMode: true`
+// is persisted; a default (revert) empty state omits to `undefined`. Older
+// layouts that stored an explicit boolean keep it on load; ones that omitted it
+// were empty-default states and correctly adopt the current default.
 export function serializeUserDrawingStateForLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
   if (
     !state ||
