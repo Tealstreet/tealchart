@@ -2481,6 +2481,42 @@ describe('user drawing toolbar descriptors', () => {
     ).toEqual({ left: 8, top: 78 });
   });
 
+  it('drops selected action surfaces below an overlapping legend rect', () => {
+    // Anchor near the top-left: without avoidance the surface clamps to top:38,
+    // overlapping a legend at y:40..84, so it should drop to legendBottom + gap.
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 80, y: 20 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        avoidRects: [{ x: 12, y: 40, width: 200, height: 44 }],
+      }),
+    ).toEqual({ left: 20, top: 90 });
+
+    // A surface clear of the legend horizontally is left untouched.
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 300, y: 20 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        avoidRects: [{ x: 12, y: 40, width: 120, height: 44 }],
+      }),
+    ).toEqual({ left: 192, top: 38 });
+
+    // A surface already below the legend stays where it is.
+    expect(
+      resolveUserDrawingActionSurfacePosition({
+        anchor: { x: 80, y: 160 },
+        viewport: { width: 320, height: 220 },
+        surface: { width: 120, height: 40 },
+        inset: { left: 8, right: 8, top: 38, bottom: 8 },
+        avoidRects: [{ x: 12, y: 40, width: 200, height: 44 }],
+      }),
+    ).toEqual({ left: 20, top: 118 });
+  });
+
   it('keeps locked selected action surface mutations disabled except unlock', () => {
     const locked = {
       ...state,
