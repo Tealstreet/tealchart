@@ -8,6 +8,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingFavoriteToolbarPosition,
+  UserDrawingMagnetMode,
   UserDrawingSelectionInputOptions,
   UserDrawingState,
   UserDrawingStyle,
@@ -203,6 +204,10 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingClearAll?: () => void;
   /** Called when the top bar should toggle temporary measure mode */
   onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
+  /** Called when the rail should change magnet (snap) mode */
+  onUserDrawingMagnetModeChange?: (magnetMode: UserDrawingMagnetMode) => void;
+  /** Called when the rail should toggle keep-drawing (stay in drawing) mode */
+  onUserDrawingStayInDrawingModeChange?: (stayInDrawingMode: boolean) => void;
   /** Called when the top bar should zoom the chart time range in */
   onUserDrawingZoomIn?: () => void;
   /** Called when the top bar should reorder selected user drawings */
@@ -361,6 +366,8 @@ export class TealchartWidgetUI {
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,
         onUserDrawingClearAll: options.onUserDrawingClearAll,
         onUserDrawingMeasureModeChange: options.onUserDrawingMeasureModeChange,
+        onUserDrawingMagnetModeChange: options.onUserDrawingMagnetModeChange,
+        onUserDrawingStayInDrawingModeChange: options.onUserDrawingStayInDrawingModeChange,
         onUserDrawingZoomIn: options.onUserDrawingZoomIn,
         onUserDrawingZOrderChange: options.onUserDrawingZOrderChange,
         onUserDrawingStyleChange: options.onUserDrawingStyleChange,

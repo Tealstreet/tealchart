@@ -2005,6 +2005,8 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
 
   return [
     state.activeTool,
+    state.magnetMode ?? 'off',
+    state.stayInDrawingMode === true ? 'stay' : '',
     (state.favoriteTools ?? []).join(','),
     state.selection?.drawingId ?? '',
     state.selection?.handle ?? '',

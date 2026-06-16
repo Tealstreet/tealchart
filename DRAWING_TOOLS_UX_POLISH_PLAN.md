@@ -135,11 +135,21 @@ So Epic G is migration/removal, not greenfield.
 Surface the rail toggles shown in TradingView's drawing rail: magnet/snap,
 keep-drawing (stayInDrawingMode), lock-all, hide-all, and clear-all (trash).
 
-- I1 — Magnet + keep-drawing toggles (state exists; render rail buttons +
-  active state, wire setters) web + mobile.
-- I2 — Lock-all / unlock-all and hide-all / show-all toggle buttons reflecting
-  aggregate state, web + mobile.
-- I3 — Clear-all (trash) confirm flow; tooltip/hover labels; QA.
+- I1 — DONE (2026-06-16). Magnet (snap) + keep-drawing (stayInDrawingMode)
+  toggle buttons at the bottom of the vertical drawing rail, web + mobile.
+  Magnet toggles off↔strong; keep-drawing toggles the boolean; both show
+  active state. New callbacks `onUserDrawingMagnetModeChange` /
+  `onUserDrawingStayInDrawingModeChange` threaded ChartTopBar →
+  TealchartWidgetUI → TealchartWidget (existing setUserDrawingMagnetMode /
+  setUserDrawingStayInDrawingMode setters); mobile via SkiaTealchart dispatch.
+  `getUserDrawingToolbarStateKey` now includes magnetMode + stayInDrawingMode
+  so a toggle re-renders the memoized rail (same gate as favorites). Tests
+  web + mobile; live web QA confirms toggle + active state.
+- I2 / I3 — DEFERRED pending product input: lock-all / hide-all / clear-all
+  already exist as buttons in the top action row (undo/redo/measure/zoom/
+  clear/hide/show/lock/unlock). Adding rail duplicates would be confusing, so
+  whether to relocate them into the rail (and add a clear-all confirm flow) is
+  a product decision flagged in the Epic I PR.
 
 ## Sequencing & Dependencies
 
