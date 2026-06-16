@@ -21,6 +21,7 @@ import {
   getUserDrawingToolDescriptor,
   isUserDrawingGlobalToolbarAction,
   isUserDrawingToolbarActionEnabled,
+  isUserDrawingToolFavorite,
   resolveDrawingSelectedActionIconName,
   resolveDrawingToolIconName,
   resolveDrawingToolbarActionIconName,
@@ -76,6 +77,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   userDrawingDuplicateEditDragEnabled?: boolean;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when a drawing tool's favorite (starred) status is toggled */
+  onUserDrawingToggleFavoriteTool?: (tool: UserDrawingTool) => void;
   /** Callback when the drawing toolbar should undo the last drawing command */
   onUserDrawingUndo?: () => void;
   /** Callback when the drawing toolbar should redo the last undone drawing command */
@@ -359,6 +362,32 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '2px',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutStar: {
+    flex: '0 0 auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '26px',
+    minHeight: '32px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: 'var(--text2, #787b86)',
+    cursor: 'pointer',
+    opacity: '0.5',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolFlyoutStarActive: {
+    color: 'var(--accent, #f5c518)',
+    opacity: '1',
   } as Partial<CSSStyleDeclaration>,
 
   selectedActionSurface: {
@@ -976,6 +1005,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private renderDrawingToolRail(activeTool: UserDrawingTool): void {
+    const drawingState = this.options.userDrawingState;
     const rail = this.createElement('div', {
       style: styles.drawingToolRail,
       attributes: {
@@ -1116,10 +1146,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       for (const tool of category.tools) {
         const descriptor = getUserDrawingToolDescriptor(tool);
         const isActive = activeTool === descriptor.tool;
+        const row = this.createElement('div', { style: styles.drawingToolFlyoutRow });
         const btn = this.createElement('button', {
           style: {
             ...styles.drawingToolFlyoutButton,
             ...(isActive ? styles.drawingButtonActive : {}),
+            flex: '1 1 auto',
+            minWidth: '0',
+            width: 'auto',
           },
           attributes: {
             type: 'button',
@@ -1151,7 +1185,28 @@ export class ChartTopBar extends Component<ChartTopBarState> {
             btn.style.color = 'var(--text, #d1d4dc)';
           }
         });
-        flyout.appendChild(btn);
+        row.appendChild(btn);
+
+        const isFavorite = isUserDrawingToolFavorite(descriptor.tool, drawingState);
+        const starButton = this.createElement('button', {
+          style: {
+            ...styles.drawingToolFlyoutStar,
+            ...(isFavorite ? styles.drawingToolFlyoutStarActive : {}),
+          },
+          attributes: {
+            type: 'button',
+            title: isFavorite ? 'Remove from favorites' : 'Add to favorites',
+            'aria-label': isFavorite ? `Remove ${descriptor.label} from favorites` : `Add ${descriptor.label} to favorites`,
+            'aria-pressed': isFavorite ? 'true' : 'false',
+          },
+        });
+        this.setDrawingIconContent(starButton, isFavorite ? 'star' : 'starOutline', isFavorite ? '★' : '☆', 16);
+        starButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          this.options.onUserDrawingToggleFavoriteTool?.(descriptor.tool);
+        });
+        row.appendChild(starButton);
+        flyout.appendChild(row);
       }
 
       railItem.appendChild(categoryButton);

@@ -5053,6 +5053,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             onUserDrawingToolSelect={(tool) =>
               dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'toolbar' } })
             }
+            onUserDrawingToggleFavoriteTool={(tool) =>
+              dispatchUserDrawingCommandToState({ type: 'toggleFavoriteTool', tool, meta: { source: 'toolbar' } })
+            }
             onUserDrawingUndo={() => {
               undoUserDrawingCommandFromSource('toolbar');
             }}

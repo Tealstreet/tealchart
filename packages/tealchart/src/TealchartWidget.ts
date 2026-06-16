@@ -1081,6 +1081,7 @@ export class TealchartWidget {
       userDrawingState: this._userDrawingState,
       userDrawingCommandAvailability: this._getUserDrawingCommandAvailability(),
       onUserDrawingToolSelect: (tool) => this._setActiveUserDrawingToolFromToolbar(tool),
+      onUserDrawingToggleFavoriteTool: (tool) => this._toggleUserDrawingFavoriteToolFromToolbar(tool),
       onUserDrawingUndo: () => this._undoUserDrawingCommand('toolbar'),
       onUserDrawingRedo: () => this._redoUserDrawingCommand('toolbar'),
       onUserDrawingDuplicateSelected: () => {
@@ -2320,6 +2321,18 @@ export class TealchartWidget {
 
   private _setActiveUserDrawingToolFromToolbar(tool: UserDrawingTool): boolean {
     return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool, meta: { source: 'toolbar' } });
+  }
+
+  private _toggleUserDrawingFavoriteToolFromToolbar(tool: UserDrawingTool): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'toggleFavoriteTool', tool, meta: { source: 'toolbar' } });
+  }
+
+  setUserDrawingFavoriteTools(favoriteTools: readonly UserDrawingTool[]): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'setFavoriteTools', favoriteTools, meta: { source: 'api' } });
+  }
+
+  getUserDrawingFavoriteTools(): readonly UserDrawingTool[] {
+    return this._userDrawingState.favoriteTools ?? [];
   }
 
   setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean {

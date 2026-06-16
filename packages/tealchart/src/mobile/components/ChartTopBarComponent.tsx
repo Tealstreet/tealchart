@@ -27,6 +27,7 @@ import {
   getUserDrawingToolDescriptor,
   isUserDrawingGlobalToolbarAction,
   isUserDrawingToolbarActionEnabled,
+  isUserDrawingToolFavorite,
   resolveDrawingToolIconName,
   resolveDrawingToolbarActionIconName,
   resolveUserDrawingToolCategoryButtonTool,
@@ -65,6 +66,8 @@ export interface ChartTopBarComponentProps {
   userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when a drawing tool's favorite (starred) status is toggled */
+  onUserDrawingToggleFavoriteTool?: (tool: UserDrawingTool) => void;
   /** Callback when the drawing toolbar should undo the last drawing command */
   onUserDrawingUndo?: () => void;
   /** Callback when the drawing toolbar should redo the last undone drawing command */
@@ -123,6 +126,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     userDrawingState,
     userDrawingCommandAvailability,
     onUserDrawingToolSelect,
+    onUserDrawingToggleFavoriteTool,
     onUserDrawingUndo,
     onUserDrawingRedo,
     onUserDrawingCancelDraft,
@@ -336,42 +340,65 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       const descriptor = getUserDrawingToolDescriptor(tool);
                       const flyoutIconName = resolveDrawingToolIconName(descriptor.tool);
                       const active = userDrawingState.activeTool === descriptor.tool;
+                      const favorite = isUserDrawingToolFavorite(descriptor.tool, userDrawingState);
                       return (
-                        <Pressable
-                          key={descriptor.tool}
-                          accessibilityRole="button"
-                          accessibilityLabel={descriptor.label}
-                          accessibilityState={{ selected: active }}
-                          onPress={() => {
-                            const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
-                            if (selectedCategory) {
-                              setRecentDrawingToolsByCategory((current) => ({
-                                ...current,
-                                [selectedCategory.id]: descriptor.tool,
-                              }));
-                            }
-                            onUserDrawingToolSelect?.(descriptor.tool);
-                            if (pinnedDrawingCategoryId !== expandedDrawingCategory.id) {
-                              setExpandedDrawingCategoryId(null);
-                            }
-                          }}
-                          style={({ pressed }: PressableStyleState) => [
-                            styles.drawingToolFlyoutButton,
-                            active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                            pressed && !active && styles.drawingButtonPressed,
-                          ]}
-                        >
-                          {flyoutIconName ? (
-                            <DrawingToolIcon name={flyoutIconName} size={18} color={textSecondaryColor} />
-                          ) : (
-                            <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
-                              {descriptor.icon}
+                        <View key={descriptor.tool} style={styles.drawingToolFlyoutRow}>
+                          <Pressable
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ selected: active }}
+                            onPress={() => {
+                              const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
+                              if (selectedCategory) {
+                                setRecentDrawingToolsByCategory((current) => ({
+                                  ...current,
+                                  [selectedCategory.id]: descriptor.tool,
+                                }));
+                              }
+                              onUserDrawingToolSelect?.(descriptor.tool);
+                              if (pinnedDrawingCategoryId !== expandedDrawingCategory.id) {
+                                setExpandedDrawingCategoryId(null);
+                              }
+                            }}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingToolFlyoutButton,
+                              styles.drawingToolFlyoutButtonGrow,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              pressed && !active && styles.drawingButtonPressed,
+                            ]}
+                          >
+                            {flyoutIconName ? (
+                              <DrawingToolIcon name={flyoutIconName} size={18} color={textSecondaryColor} />
+                            ) : (
+                              <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
+                                {descriptor.icon}
+                              </Text>
+                            )}
+                            <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
+                              {descriptor.label}
                             </Text>
-                          )}
-                          <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
-                            {descriptor.label}
-                          </Text>
-                        </Pressable>
+                          </Pressable>
+                          <Pressable
+                            accessibilityRole="button"
+                            accessibilityLabel={
+                              favorite
+                                ? `Remove ${descriptor.label} from favorites`
+                                : `Add ${descriptor.label} to favorites`
+                            }
+                            accessibilityState={{ selected: favorite }}
+                            onPress={() => onUserDrawingToggleFavoriteTool?.(descriptor.tool)}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingToolFlyoutStar,
+                              pressed && styles.drawingButtonPressed,
+                            ]}
+                          >
+                            <DrawingToolIcon
+                              name={favorite ? 'star' : 'starOutline'}
+                              size={16}
+                              color={favorite ? '#f5c518' : textSecondaryColor}
+                            />
+                          </Pressable>
+                        </View>
                       );
                     })}
                   </ScrollView>
@@ -716,6 +743,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  drawingToolFlyoutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   drawingToolFlyoutButton: {
     minHeight: 34,
     borderRadius: 4,
@@ -723,6 +754,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 8,
+  },
+  drawingToolFlyoutButtonGrow: {
+    flex: 1,
+  },
+  drawingToolFlyoutStar: {
+    width: 32,
+    minHeight: 34,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   drawingToolFlyoutIcon: {
     width: 28,

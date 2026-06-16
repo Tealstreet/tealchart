@@ -235,6 +235,14 @@ describe('user drawing toolbar descriptors', () => {
     expect(isUserDrawingToolFavorite('trendLine', null)).toBe(false);
   });
 
+  it('changes the toolbar state key when favorite tools change', () => {
+    const without = getUserDrawingToolbarStateKey(createUserDrawingState());
+    const withTrend = getUserDrawingToolbarStateKey(createUserDrawingState({ favoriteTools: ['trendLine'] }));
+    const withRect = getUserDrawingToolbarStateKey(createUserDrawingState({ favoriteTools: ['rectangle'] }));
+    expect(withTrend).not.toBe(without);
+    expect(withTrend).not.toBe(withRect);
+  });
+
   it('resolves category button tools from active tool, recent tool, then category default', () => {
     const linesCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.id === 'lines')!;
     const shapesCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find(
