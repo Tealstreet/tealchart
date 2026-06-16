@@ -139,6 +139,14 @@ export function UserDrawingSelectedActionSurfaceComponent({
     }
   };
 
+  // null until the mobile chrome metrics declare a top-left legend rect.
+  const legendRect = computeTopLeftLegendRect(MOBILE_CHART_CHROME_METRICS, {
+    x: 0,
+    y: 0,
+    width: dimensions.width,
+    height: dimensions.height,
+  });
+
   return (
     <View
       accessibilityLabel="Selected drawing actions"
@@ -161,15 +169,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
             top: topInset + 6,
             bottom: 8,
           },
-          avoidRects: (() => {
-            const legendRect = computeTopLeftLegendRect(MOBILE_CHART_CHROME_METRICS, {
-              x: 0,
-              y: 0,
-              width: dimensions.width,
-              height: dimensions.height,
-            });
-            return legendRect ? [legendRect] : undefined;
-          })(),
+          avoidRects: legendRect ? [legendRect] : undefined,
         }),
       ]}
       pointerEvents="auto"
