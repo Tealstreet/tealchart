@@ -11,6 +11,7 @@ export default defineConfig({
     alias: {
       'react-native': fileURLToPath(new URL('./src/test/reactNativeMock.tsx', import.meta.url)),
       '@shopify/react-native-skia': fileURLToPath(new URL('./src/test/reactNativeSkiaMock.tsx', import.meta.url)),
+      'react-native-svg': fileURLToPath(new URL('./src/test/reactNativeSvgMock.tsx', import.meta.url)),
       '@expo/vector-icons': fileURLToPath(new URL('./src/test/expoVectorIconsMock.tsx', import.meta.url)),
       'react-native-gesture-handler': fileURLToPath(new URL('./src/test/gestureHandlerMock.tsx', import.meta.url)),
       'react-native-reanimated': fileURLToPath(new URL('./src/test/reanimatedMock.tsx', import.meta.url)),

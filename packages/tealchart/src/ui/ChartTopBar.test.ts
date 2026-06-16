@@ -4,9 +4,10 @@ import type { UserDrawingState, UserDrawingTool } from '../drawings';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getUserDrawingToolDescriptor } from '../drawings';
+import { resolveDrawingToolIconName } from '../drawings';
 import { clearChartStoreCache } from '../state/chartState';
 import { ChartTopBar } from './ChartTopBar';
+import { renderDrawingIcon } from './dom';
 
 const baseDrawingState: UserDrawingState = {
   version: 1,
@@ -249,16 +250,24 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
+    const expectedIcon = (tool: UserDrawingTool): string => {
+      const iconName = resolveDrawingToolIconName(tool);
+      return renderDrawingIcon(iconName ?? '', { size: 20 })?.outerHTML ?? '';
+    };
+
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
-    expect(linesCategory?.textContent).toBe(getUserDrawingToolDescriptor('horizontalLine').icon);
+    expect(linesCategory?.querySelector('svg')?.outerHTML).toBe(expectedIcon('horizontalLine'));
 
     topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'rectangle' });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.textContent).toBe(
-      getUserDrawingToolDescriptor('horizontalLine').icon,
-    );
     expect(
-      document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]')?.textContent,
-    ).toBe(getUserDrawingToolDescriptor('rectangle').icon);
+      document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.querySelector('svg')
+        ?.outerHTML,
+    ).toBe(expectedIcon('horizontalLine'));
+    expect(
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes drawing tools"]')
+        ?.querySelector('svg')?.outerHTML,
+    ).toBe(expectedIcon('rectangle'));
 
     topBar.unmount();
   });
