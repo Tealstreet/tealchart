@@ -2,6 +2,7 @@ import type {
   UpdateUserDrawingOptions,
   UserDrawingFavoriteToolbarPosition,
   UserDrawingIconName,
+  UserDrawingMagnetMode,
   UserDrawingCommandAvailability,
   UserDrawingSelectionActionAnchor,
   UserDrawingState,
@@ -101,6 +102,10 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingClearAll?: () => void;
   /** Callback when temporary measure mode should toggle */
   onUserDrawingMeasureModeChange?: (enabled: boolean) => void;
+  /** Callback when magnet (snap) mode should change */
+  onUserDrawingMagnetModeChange?: (magnetMode: UserDrawingMagnetMode) => void;
+  /** Callback when keep-drawing (stay in drawing mode) should toggle */
+  onUserDrawingStayInDrawingModeChange?: (stayInDrawingMode: boolean) => void;
   /** Callback when the drawing toolbar should zoom the chart time range in */
   onUserDrawingZoomIn?: () => void;
   /** Callback when selected drawings should be reordered */
@@ -270,6 +275,21 @@ const styles = {
 
   drawingToolRailItem: {
     position: 'relative',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingRailToggleGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    marginTop: '4px',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingRailToggleDivider: {
+    width: '24px',
+    height: '1px',
+    backgroundColor: 'var(--border, #2a2e39)',
+    margin: '2px 0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolCategoryButton: {
@@ -745,6 +765,62 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.drawingToolRailCleanup = [];
     this.drawingToolRailEl?.remove();
     this.drawingToolRailEl = null;
+  }
+
+  private renderDrawingRailToggles(rail: HTMLElement, state?: UserDrawingState): void {
+    const toggles = this.createElement('div', { style: styles.drawingRailToggleGroup });
+    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
+
+    const magnetActive = (state?.magnetMode ?? 'off') !== 'off';
+    toggles.appendChild(
+      this.createDrawingRailToggleButton('magnet', magnetActive ? 'Magnet snap on' : 'Magnet snap off', magnetActive, () =>
+        this.options.onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong'),
+      ),
+    );
+
+    const stayActive = state?.stayInDrawingMode === true;
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        'pencil',
+        stayActive ? 'Keep drawing mode on' : 'Keep drawing mode off',
+        stayActive,
+        () => this.options.onUserDrawingStayInDrawingModeChange?.(!stayActive),
+      ),
+    );
+
+    rail.appendChild(toggles);
+  }
+
+  private createDrawingRailToggleButton(
+    iconName: string,
+    label: string,
+    active: boolean,
+    onClick: () => void,
+  ): HTMLButtonElement {
+    const btn = this.createElement('button', {
+      style: {
+        ...styles.drawingToolCategoryButton,
+        ...(active ? styles.drawingButtonActive : {}),
+      },
+      attributes: {
+        type: 'button',
+        title: label,
+        'aria-label': label,
+        'aria-pressed': active ? 'true' : 'false',
+      },
+    });
+    this.setDrawingIconContent(btn, iconName, '', 20);
+    btn.addEventListener('click', onClick);
+    btn.addEventListener('mouseenter', () => {
+      if (!active) Object.assign(btn.style, styles.drawingButtonHover);
+    });
+    btn.addEventListener('mouseleave', () => {
+      if (!active) {
+        btn.style.backgroundColor = 'transparent';
+        btn.style.color = 'var(--text2, #787b86)';
+      }
+    });
+    return btn;
   }
 
   private removeDrawingFavoritesBar(): void {
@@ -1380,6 +1456,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
 
     rail.appendChild(railList);
+    this.renderDrawingRailToggles(rail, drawingState);
     this.drawingToolRailEl = rail;
     (this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el).appendChild(rail);
 

@@ -277,6 +277,39 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('toggles magnet and keep-drawing modes from the rail bottom toggles', () => {
+    const onMagnet = vi.fn();
+    const onStay = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-rail-toggles',
+      symbol: 'BTCUSDT',
+      userDrawingState: { ...baseDrawingState, magnetMode: 'off', stayInDrawingMode: false },
+      onUserDrawingMagnetModeChange: onMagnet,
+      onUserDrawingStayInDrawingModeChange: onStay,
+    });
+    topBar.mount(document.body);
+
+    const magnet = document.querySelector<HTMLButtonElement>('button[aria-label="Magnet snap off"]');
+    const stay = document.querySelector<HTMLButtonElement>('button[aria-label="Keep drawing mode off"]');
+    expect(magnet).not.toBeNull();
+    expect(stay).not.toBeNull();
+    expect(magnet?.getAttribute('aria-pressed')).toBe('false');
+
+    magnet?.click();
+    expect(onMagnet).toHaveBeenCalledWith('strong');
+    stay?.click();
+    expect(onStay).toHaveBeenCalledWith(true);
+
+    topBar.setUserDrawingState({ ...baseDrawingState, magnetMode: 'strong', stayInDrawingMode: true });
+    const magnetOn = document.querySelector<HTMLButtonElement>('button[aria-label="Magnet snap on"]');
+    expect(magnetOn?.getAttribute('aria-pressed')).toBe('true');
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Keep drawing mode on"]')).not.toBeNull();
+    magnetOn?.click();
+    expect(onMagnet).toHaveBeenCalledWith('off');
+
+    topBar.unmount();
+  });
+
   it('renders a draggable floating favorites bar that selects tools and reports moves', () => {
     const overlayParent = document.createElement('div');
     document.body.append(overlayParent);

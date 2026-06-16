@@ -5092,6 +5092,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 meta: { source: 'toolbar' },
               });
             }}
+            onUserDrawingMagnetModeChange={(magnetMode) => {
+              dispatchUserDrawingCommandToState({ type: 'setMagnetMode', magnetMode, meta: { source: 'toolbar' } });
+            }}
+            onUserDrawingStayInDrawingModeChange={(stayInDrawingMode) => {
+              dispatchUserDrawingCommandToState({
+                type: 'setStayInDrawingMode',
+                stayInDrawingMode,
+                meta: { source: 'toolbar' },
+              });
+            }}
             onUserDrawingZoomIn={handleUserDrawingZoomIn}
             onUserDrawingZOrderChange={(action) => {
               dispatchUserDrawingCommandToState({ type: 'reorder', action, meta: { source: 'toolbar' } });
