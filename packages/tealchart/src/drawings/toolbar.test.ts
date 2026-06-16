@@ -4,11 +4,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
 import { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
+import { createUserDrawingState } from './input';
 import {
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingFavoriteTools,
   getUserDrawingLineWidthPreviewFontSize,
   getUserDrawingToolbarStateKey,
   getUserDrawingToolCategoryDescriptorForTool,
+  isUserDrawingToolFavorite,
   getUserDrawingToolDescriptor,
   getUserDrawingZOrderAction,
   isUserDrawingFillToolbarEnabled,
@@ -221,6 +224,31 @@ describe('user drawing toolbar descriptors', () => {
       'crossLine',
       'arrowLine',
     ]);
+  });
+
+  it('resolves favorite tools and favorite membership from drawing state', () => {
+    const state = createUserDrawingState({ favoriteTools: ['trendLine', 'rectangle'] });
+    expect(getUserDrawingFavoriteTools(state)).toEqual(['trendLine', 'rectangle']);
+    expect(isUserDrawingToolFavorite('trendLine', state)).toBe(true);
+    expect(isUserDrawingToolFavorite('horizontalLine', state)).toBe(false);
+    expect(getUserDrawingFavoriteTools(null)).toEqual([]);
+    expect(isUserDrawingToolFavorite('trendLine', null)).toBe(false);
+  });
+
+  it('changes the toolbar state key when favorite tools change but not when only the bar moves', () => {
+    const without = getUserDrawingToolbarStateKey(createUserDrawingState());
+    const withTrend = getUserDrawingToolbarStateKey(createUserDrawingState({ favoriteTools: ['trendLine'] }));
+    const withRect = getUserDrawingToolbarStateKey(createUserDrawingState({ favoriteTools: ['rectangle'] }));
+    expect(withTrend).not.toBe(without);
+    expect(withTrend).not.toBe(withRect);
+
+    // The floating bar repositions in place (and from state on the next render), so a
+    // drag-only move must NOT change the key — otherwise every drag-end forces a full
+    // top-bar rebuild.
+    const moved = getUserDrawingToolbarStateKey(
+      createUserDrawingState({ favoriteTools: ['trendLine'], favoriteToolbarPosition: { x: 120, y: 64 } }),
+    );
+    expect(moved).toBe(withTrend);
   });
 
   it('resolves category button tools from active tool, recent tool, then category default', () => {

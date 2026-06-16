@@ -7,6 +7,7 @@ import type {
   UserDrawingCommandAvailability,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
+  UserDrawingFavoriteToolbarPosition,
   UserDrawingSelectionInputOptions,
   UserDrawingState,
   UserDrawingStyle,
@@ -180,6 +181,10 @@ export interface TealchartWidgetUIOptions {
   userDrawingDuplicateEditDragEnabled?: boolean;
   /** Called when a drawing tool is selected from the top bar */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Called when a drawing tool's favorite (starred) status is toggled from the top bar */
+  onUserDrawingToggleFavoriteTool?: (tool: UserDrawingTool) => void;
+  /** Called when the floating favorites toolbar is dragged to a new position */
+  onUserDrawingFavoriteToolbarMove?: (position: UserDrawingFavoriteToolbarPosition) => void;
   /** Called when the top bar should undo the last drawing command */
   onUserDrawingUndo?: () => void;
   /** Called when the top bar should redo the last undone drawing command */
@@ -345,6 +350,8 @@ export class TealchartWidgetUI {
         userDrawingCommandAvailability: options.userDrawingCommandAvailability,
         userDrawingDuplicateEditDragEnabled: options.userDrawingDuplicateEditDragEnabled,
         onUserDrawingToolSelect: options.onUserDrawingToolSelect,
+        onUserDrawingToggleFavoriteTool: options.onUserDrawingToggleFavoriteTool,
+        onUserDrawingFavoriteToolbarMove: options.onUserDrawingFavoriteToolbarMove,
         onUserDrawingUndo: options.onUserDrawingUndo,
         onUserDrawingRedo: options.onUserDrawingRedo,
         onUserDrawingDuplicateSelected: options.onUserDrawingDuplicateSelected,

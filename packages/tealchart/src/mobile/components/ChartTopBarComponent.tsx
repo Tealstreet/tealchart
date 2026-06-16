@@ -9,6 +9,7 @@ import type {
   UpdateUserDrawingOptions,
   UserDrawingIconName,
   UserDrawingCommandAvailability,
+  UserDrawingFavoriteToolbarPosition,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -20,13 +21,17 @@ import type {
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import {
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingFavoriteTools,
   getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
   isUserDrawingGlobalToolbarAction,
   isUserDrawingToolbarActionEnabled,
+  isUserDrawingToolFavorite,
   resolveDrawingToolIconName,
   resolveDrawingToolbarActionIconName,
   resolveUserDrawingToolCategoryButtonTool,
@@ -65,6 +70,10 @@ export interface ChartTopBarComponentProps {
   userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Callback when a drawing tool is selected */
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
+  /** Callback when a drawing tool's favorite (starred) status is toggled */
+  onUserDrawingToggleFavoriteTool?: (tool: UserDrawingTool) => void;
+  /** Callback when the floating favorites toolbar is dragged to a new position */
+  onUserDrawingFavoriteToolbarMove?: (position: UserDrawingFavoriteToolbarPosition) => void;
   /** Callback when the drawing toolbar should undo the last drawing command */
   onUserDrawingUndo?: () => void;
   /** Callback when the drawing toolbar should redo the last undone drawing command */
@@ -108,6 +117,13 @@ const getMobileWindowHeight = (): number => {
   return 640;
 };
 
+const getMobileWindowWidth = (): number => {
+  const dimensionsWidth = Dimensions?.get?.('window')?.width;
+  if (typeof dimensionsWidth === 'number' && dimensionsWidth > 0) return dimensionsWidth;
+  if (typeof window !== 'undefined' && window.innerWidth > 0) return window.innerWidth;
+  return 390;
+};
+
 export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
   ({
     symbol,
@@ -123,6 +139,8 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     userDrawingState,
     userDrawingCommandAvailability,
     onUserDrawingToolSelect,
+    onUserDrawingToggleFavoriteTool,
+    onUserDrawingFavoriteToolbarMove,
     onUserDrawingUndo,
     onUserDrawingRedo,
     onUserDrawingCancelDraft,
@@ -214,8 +232,86 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         ? USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.id === expandedDrawingCategoryId)
         : null;
 
+    const favoriteTools = getUserDrawingFavoriteTools(userDrawingState);
+    const favoritesDefaultX =
+      MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 16;
+    const favoritesDefaultY = TOP_BAR_HEIGHT + 40;
+    const favoritesPosition = userDrawingState?.favoriteToolbarPosition ?? null;
+    const favoritesBarWidth = 22 + favoriteTools.length * 34 + 8;
+    const favoritesMaxX = Math.max(0, getMobileWindowWidth() - favoritesBarWidth - 8);
+    const favoritesMaxY = Math.max(0, windowHeight - 52);
+    const favPosX = useSharedValue(favoritesPosition?.x ?? favoritesDefaultX);
+    const favPosY = useSharedValue(favoritesPosition?.y ?? favoritesDefaultY);
+    const favStartX = useSharedValue(0);
+    const favStartY = useSharedValue(0);
+
+    useEffect(() => {
+      favPosX.value = favoritesPosition?.x ?? favoritesDefaultX;
+      favPosY.value = favoritesPosition?.y ?? favoritesDefaultY;
+    }, [favPosX, favPosY, favoritesPosition?.x, favoritesPosition?.y, favoritesDefaultX, favoritesDefaultY]);
+
+    const commitFavoritesMove = useCallback(
+      (x: number, y: number) => onUserDrawingFavoriteToolbarMove?.({ x: Math.round(x), y: Math.round(y) }),
+      [onUserDrawingFavoriteToolbarMove],
+    );
+
+    const favoritesPanGesture = useMemo(
+      () =>
+        Gesture.Pan()
+          .onBegin(() => {
+            'worklet';
+            favStartX.value = favPosX.value;
+            favStartY.value = favPosY.value;
+          })
+          .onUpdate((event) => {
+            'worklet';
+            favPosX.value = Math.min(Math.max(favStartX.value + event.translationX, 0), favoritesMaxX);
+            favPosY.value = Math.min(Math.max(favStartY.value + event.translationY, 0), favoritesMaxY);
+          })
+          .onEnd(() => {
+            'worklet';
+            runOnJS(commitFavoritesMove)(favPosX.value, favPosY.value);
+          }),
+      [favPosX, favPosY, favStartX, favStartY, favoritesMaxX, favoritesMaxY, commitFavoritesMove],
+    );
+
+    const favoritesAnimatedStyle = useAnimatedStyle(() => ({ left: favPosX.value, top: favPosY.value }));
+
     return (
       <View style={styles.container} pointerEvents="box-none">
+        {favoriteTools.length > 0 && (
+          <Animated.View
+            accessibilityLabel="Favorite drawing tools"
+            style={[styles.favoritesBar, favoritesAnimatedStyle]}
+          >
+            <GestureDetector gesture={favoritesPanGesture}>
+              <View accessibilityLabel="Drag favorites toolbar" style={styles.favoritesHandle}>
+                <Text style={[styles.favoritesHandleText, { color: textSecondaryColor }]}>⠿</Text>
+              </View>
+            </GestureDetector>
+            {favoriteTools.map((tool) => {
+              const descriptor = getUserDrawingToolDescriptor(tool);
+              const iconName = resolveDrawingToolIconName(tool);
+              const active = userDrawingState?.activeTool === tool;
+              return (
+                <Pressable
+                  key={tool}
+                  accessibilityRole="button"
+                  accessibilityLabel={descriptor.label}
+                  accessibilityState={{ selected: active }}
+                  onPress={() => onUserDrawingToolSelect?.(tool)}
+                  style={[styles.favoritesButton, active && { backgroundColor: `${accentColor}33` }]}
+                >
+                  {iconName ? (
+                    <DrawingToolIcon name={iconName} size={18} color={active ? accentColor : textColor} />
+                  ) : (
+                    <Text style={{ color: active ? accentColor : textColor }}>{descriptor.icon}</Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </Animated.View>
+        )}
         {expandedDrawingCategory && pinnedDrawingCategoryId !== expandedDrawingCategory.id && (
           <Pressable
             accessibilityRole="button"
@@ -336,42 +432,65 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       const descriptor = getUserDrawingToolDescriptor(tool);
                       const flyoutIconName = resolveDrawingToolIconName(descriptor.tool);
                       const active = userDrawingState.activeTool === descriptor.tool;
+                      const favorite = isUserDrawingToolFavorite(descriptor.tool, userDrawingState);
                       return (
-                        <Pressable
-                          key={descriptor.tool}
-                          accessibilityRole="button"
-                          accessibilityLabel={descriptor.label}
-                          accessibilityState={{ selected: active }}
-                          onPress={() => {
-                            const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
-                            if (selectedCategory) {
-                              setRecentDrawingToolsByCategory((current) => ({
-                                ...current,
-                                [selectedCategory.id]: descriptor.tool,
-                              }));
-                            }
-                            onUserDrawingToolSelect?.(descriptor.tool);
-                            if (pinnedDrawingCategoryId !== expandedDrawingCategory.id) {
-                              setExpandedDrawingCategoryId(null);
-                            }
-                          }}
-                          style={({ pressed }: PressableStyleState) => [
-                            styles.drawingToolFlyoutButton,
-                            active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
-                            pressed && !active && styles.drawingButtonPressed,
-                          ]}
-                        >
-                          {flyoutIconName ? (
-                            <DrawingToolIcon name={flyoutIconName} size={18} color={textSecondaryColor} />
-                          ) : (
-                            <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
-                              {descriptor.icon}
+                        <View key={descriptor.tool} style={styles.drawingToolFlyoutRow}>
+                          <Pressable
+                            accessibilityRole="button"
+                            accessibilityLabel={descriptor.label}
+                            accessibilityState={{ selected: active }}
+                            onPress={() => {
+                              const selectedCategory = getUserDrawingToolCategoryDescriptorForTool(descriptor.tool);
+                              if (selectedCategory) {
+                                setRecentDrawingToolsByCategory((current) => ({
+                                  ...current,
+                                  [selectedCategory.id]: descriptor.tool,
+                                }));
+                              }
+                              onUserDrawingToolSelect?.(descriptor.tool);
+                              if (pinnedDrawingCategoryId !== expandedDrawingCategory.id) {
+                                setExpandedDrawingCategoryId(null);
+                              }
+                            }}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingToolFlyoutButton,
+                              styles.drawingToolFlyoutButtonGrow,
+                              active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                              pressed && !active && styles.drawingButtonPressed,
+                            ]}
+                          >
+                            {flyoutIconName ? (
+                              <DrawingToolIcon name={flyoutIconName} size={18} color={textSecondaryColor} />
+                            ) : (
+                              <Text style={[styles.drawingToolFlyoutIcon, { color: textSecondaryColor }]}>
+                                {descriptor.icon}
+                              </Text>
+                            )}
+                            <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
+                              {descriptor.label}
                             </Text>
-                          )}
-                          <Text style={[styles.drawingToolFlyoutLabel, { color: active ? accentColor : textColor }]}>
-                            {descriptor.label}
-                          </Text>
-                        </Pressable>
+                          </Pressable>
+                          <Pressable
+                            accessibilityRole="button"
+                            accessibilityLabel={
+                              favorite
+                                ? `Remove ${descriptor.label} from favorites`
+                                : `Add ${descriptor.label} to favorites`
+                            }
+                            accessibilityState={{ selected: favorite }}
+                            onPress={() => onUserDrawingToggleFavoriteTool?.(descriptor.tool)}
+                            style={({ pressed }: PressableStyleState) => [
+                              styles.drawingToolFlyoutStar,
+                              pressed && styles.drawingButtonPressed,
+                            ]}
+                          >
+                            <DrawingToolIcon
+                              name={favorite ? 'star' : 'starOutline'}
+                              size={16}
+                              color={favorite ? '#f5c518' : textSecondaryColor}
+                            />
+                          </Pressable>
+                        </View>
                       );
                     })}
                   </ScrollView>
@@ -716,6 +835,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  favoritesBar: {
+    position: 'absolute',
+    zIndex: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: '#1e222d',
+    borderWidth: 1,
+    borderColor: '#2a2e39',
+  },
+  favoritesHandle: {
+    width: 18,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoritesHandleText: {
+    fontSize: 12,
+  },
+  favoritesButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  drawingToolFlyoutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   drawingToolFlyoutButton: {
     minHeight: 34,
     borderRadius: 4,
@@ -723,6 +875,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 8,
+  },
+  drawingToolFlyoutButtonGrow: {
+    flex: 1,
+  },
+  drawingToolFlyoutStar: {
+    width: 32,
+    minHeight: 34,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   drawingToolFlyoutIcon: {
     width: 28,

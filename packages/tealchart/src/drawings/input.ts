@@ -14,6 +14,7 @@ import type {
   UserDrawingPanePosition,
   UserDrawingMagnetMode,
   UserDrawingMeasureMode,
+  UserDrawingFavoriteToolbarPosition,
 } from './types';
 
 import {
@@ -133,6 +134,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     activeTool: 'select',
     stayInDrawingMode: false,
     magnetMode: 'off',
+    favoriteTools: [],
     measureMode: 'off',
     measure: null,
     selection: null,
@@ -184,6 +186,39 @@ export function setUserDrawingMagnetMode(state: UserDrawingState, magnetMode: Us
   return {
     ...state,
     magnetMode,
+  };
+}
+
+export function setUserDrawingFavoriteTools(
+  state: UserDrawingState,
+  favoriteTools: readonly UserDrawingTool[],
+): UserDrawingState {
+  const next = [...new Set(favoriteTools)];
+  const current = state.favoriteTools ?? [];
+  if (current.length === next.length && current.every((tool, index) => tool === next[index])) return state;
+  return {
+    ...state,
+    favoriteTools: next,
+  };
+}
+
+export function toggleUserDrawingFavoriteTool(state: UserDrawingState, tool: UserDrawingTool): UserDrawingState {
+  const current = state.favoriteTools ?? [];
+  const next = current.includes(tool) ? current.filter((favorite) => favorite !== tool) : [...current, tool];
+  return setUserDrawingFavoriteTools(state, next);
+}
+
+export function setUserDrawingFavoriteToolbarPosition(
+  state: UserDrawingState,
+  position: UserDrawingFavoriteToolbarPosition | null,
+): UserDrawingState {
+  const current = state.favoriteToolbarPosition ?? null;
+  if (current === position || (current && position && current.x === position.x && current.y === position.y)) {
+    return state;
+  }
+  return {
+    ...state,
+    favoriteToolbarPosition: position,
   };
 }
 

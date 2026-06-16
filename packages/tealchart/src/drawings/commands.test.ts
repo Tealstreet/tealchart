@@ -75,6 +75,9 @@ const coveredUserDrawingCommandTypes = [
   'setActiveTool',
   'setStayInDrawingMode',
   'setMagnetMode',
+  'setFavoriteTools',
+  'toggleFavoriteTool',
+  'setFavoriteToolbarPosition',
   'setMeasureMode',
   'add',
   'select',
@@ -258,6 +261,62 @@ describe('user drawing command dispatch', () => {
 
     expect(unchanged.state).toBe(command.state);
     expect(unchanged.changed).toBe(false);
+  });
+
+  it('toggles and sets favorite tools without recording history', () => {
+    const initial = createUserDrawingState();
+    const added = dispatchUserDrawingCommand(initial, {
+      type: 'toggleFavoriteTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    });
+    expect(added.state.favoriteTools).toEqual(['trendLine']);
+    expect(added.changed).toBe(true);
+
+    const removed = dispatchUserDrawingCommand(added.state, {
+      type: 'toggleFavoriteTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    });
+    expect(removed.state.favoriteTools).toEqual([]);
+
+    const replaced = dispatchUserDrawingCommand(removed.state, {
+      type: 'setFavoriteTools',
+      favoriteTools: ['rectangle', 'horizontalLine', 'rectangle'],
+      meta: { source: 'toolbar' },
+    });
+    expect(replaced.state.favoriteTools).toEqual(['rectangle', 'horizontalLine']);
+
+    const unchanged = dispatchUserDrawingCommand(replaced.state, {
+      type: 'setFavoriteTools',
+      favoriteTools: ['rectangle', 'horizontalLine'],
+      meta: { source: 'toolbar' },
+    });
+    expect(unchanged.state).toBe(replaced.state);
+    expect(unchanged.changed).toBe(false);
+
+    const moved = dispatchUserDrawingCommand(replaced.state, {
+      type: 'setFavoriteToolbarPosition',
+      position: { x: 120, y: 64 },
+      meta: { source: 'toolbar' },
+    });
+    expect(moved.state.favoriteToolbarPosition).toEqual({ x: 120, y: 64 });
+    expect(moved.changed).toBe(true);
+
+    const movedSame = dispatchUserDrawingCommand(moved.state, {
+      type: 'setFavoriteToolbarPosition',
+      position: { x: 120, y: 64 },
+      meta: { source: 'toolbar' },
+    });
+    expect(movedSame.state).toBe(moved.state);
+    expect(movedSame.changed).toBe(false);
+
+    const cleared = dispatchUserDrawingCommand(moved.state, {
+      type: 'setFavoriteToolbarPosition',
+      position: null,
+      meta: { source: 'toolbar' },
+    });
+    expect(cleared.state.favoriteToolbarPosition ?? null).toBeNull();
   });
 
   it('wraps temporary measure commands without creating drawings', () => {
