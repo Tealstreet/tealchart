@@ -214,6 +214,22 @@ Recorded audit evidence:
 - `DRAWING_TOOLS_WEB_KEYBOARD_AUDIT.md`
 - `DRAWING_TOOLS_MOBILE_COMMAND_PARITY_AUDIT.md`
 
-Move next to Epic A. Use the existing placement audit as the starting point,
-then verify and fix the highest-friction drag-to-draw gap across web Canvas and
-mobile Skia.
+Epics A–E have each had a browser-driven QA pass (web Canvas, Chrome MCP) with
+the highest-friction reproduced gaps fixed in shared layers (web + mobile):
+
+- A (placement): selected-action surface flips below the object instead of
+  covering it when chrome blocks the space above.
+- B (selected action): same surface fix; surface anchors near real geometry.
+- C (object tree): hide/show works on locked drawings (lock and visibility are
+  orthogonal).
+- Placement default: placing a drawing now reverts to the cursor tool and
+  selects the new drawing (TradingView default), unblocking double-click
+  properties, right-click selection, and edit drags that gate on select mode.
+- D (edit lifecycle): filled area shapes are grabbable by their whole interior,
+  not just a 6px border, so they can be selected and moved by their fill.
+- E (undo/redo + keyboard): browser-verified that delete, undo, redo, escape,
+  copy/paste, and select-all own keyboard input correctly; no defect reproduced.
+
+Next useful moves are recorded per-domain in the audit docs above (e.g. mobile
+device QA, the right-click context menu surface in app integrations, and a
+fill-aware interior grab for image placeholders).
