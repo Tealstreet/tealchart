@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DRAWING_ICONS,
   getDrawingIconDefinition,
+  resolveDrawingSelectedActionIconName,
   resolveDrawingToolIconName,
   resolveDrawingToolbarActionIconName,
 } from './icons';
@@ -44,5 +45,18 @@ describe('drawing icon registry', () => {
 
   it('returns undefined for tools without an authored icon', () => {
     expect(resolveDrawingToolIconName('gannSquareFixed')).toBeUndefined();
+  });
+
+  it('resolves selected-action commands to authored icons', () => {
+    expect(resolveDrawingSelectedActionIconName({ type: 'toolbarAction', action: 'deleteSelected' })).toBe('trash');
+    expect(resolveDrawingSelectedActionIconName({ type: 'styleAction', action: 'hideSelected' })).toBe('eyeOff');
+    expect(resolveDrawingSelectedActionIconName({ type: 'styleAction', action: 'lockSelected' })).toBe('lock');
+    expect(resolveDrawingSelectedActionIconName({ type: 'openProperties' })).toBe('gear');
+    expect(resolveDrawingSelectedActionIconName({ type: 'editText', drawingId: 'd1' })).toBe('pencil');
+  });
+
+  it('skips icons for color swatch items and unmapped commands', () => {
+    expect(resolveDrawingSelectedActionIconName({ type: 'toolbarAction', action: 'deleteSelected' }, '#ff0000')).toBeUndefined();
+    expect(resolveDrawingSelectedActionIconName({ type: 'openObjectTree' })).toBeUndefined();
   });
 });

@@ -39,6 +39,7 @@ import {
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
   resolveDrawingToolIconName,
+  resolveDrawingToolbarActionIconName,
   resolveUserDrawingToolCategoryButtonTool,
   supportsUserDrawingFillColorControls,
   supportsUserDrawingFillVisibilityControls,
@@ -1096,6 +1097,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     userDrawingCommandAvailability,
                   );
                   const active = descriptor.action === 'measure' && userDrawingState.measureMode === 'on';
+                  const actionIconName = resolveDrawingToolbarActionIconName(descriptor.action);
                   return (
                     <Pressable
                       key={descriptor.action}
@@ -1139,15 +1141,23 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         enabled && pressed && !active && styles.drawingButtonPressed,
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.drawingButtonText,
-                          { color: active ? accentColor : textSecondaryColor },
-                          !enabled && styles.drawingButtonTextDisabled,
-                        ]}
-                      >
-                        {descriptor.icon}
-                      </Text>
+                      {actionIconName ? (
+                        <DrawingToolIcon
+                          name={actionIconName}
+                          size={18}
+                          color={active ? accentColor : textSecondaryColor}
+                        />
+                      ) : (
+                        <Text
+                          style={[
+                            styles.drawingButtonText,
+                            { color: active ? accentColor : textSecondaryColor },
+                            !enabled && styles.drawingButtonTextDisabled,
+                          ]}
+                        >
+                          {descriptor.icon}
+                        </Text>
+                      )}
                     </Pressable>
                   );
                 })}

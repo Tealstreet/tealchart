@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import {
+  resolveDrawingSelectedActionIconName,
   resolveUserDrawingActionSurfacePosition,
   shouldRenderUserDrawingSelectedActionSurface,
 } from '../../drawings';
@@ -20,6 +21,22 @@ import {
   MOBILE_CHART_CHROME_METRICS,
 } from '../../layout/chartGeometry';
 import { dispatchMobileUserDrawingActionCommand } from '../utils/drawingActionDispatch';
+import { DrawingToolIcon } from './DrawingToolIcon';
+
+type UserDrawingActionSurfaceItem = UserDrawingSelectedActionSurface['groups'][number]['items'][number];
+
+/** Renders a selected-action item's shared SVG icon, falling back to its glyph. */
+function ActionItemIcon({ item }: { item: UserDrawingActionSurfaceItem }): React.ReactElement {
+  const iconName = resolveDrawingSelectedActionIconName(item.command, item.swatchColor);
+  if (iconName) {
+    return <DrawingToolIcon name={iconName} size={18} color={item.enabled ? '#d1d4dc' : '#787b86'} />;
+  }
+  return (
+    <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
+      {item.icon}
+    </Text>
+  );
+}
 
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_WIDTH = 304;
 export const MOBILE_USER_DRAWING_ACTION_SURFACE_HEIGHT = 70;
@@ -220,9 +237,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
                 ]}
                 onPress={() => dispatchItem(item)}
               >
-                <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
-                  {item.icon}
-                </Text>
+                <ActionItemIcon item={item} />
               </TouchableOpacity>
             ))
           )}
@@ -255,9 +270,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
               ]}
               onPress={() => dispatchItem(item, { keepPopoverOpen: true })}
             >
-              <Text style={[styles.userDrawingActionButtonText, !item.enabled && styles.userDrawingActionButtonTextDisabled]}>
-                {item.icon}
-              </Text>
+              <ActionItemIcon item={item} />
             </TouchableOpacity>
           ))}
         </View>

@@ -64,6 +64,12 @@ renders sharp, TradingView-like marks on web and mobile.
   `drawings/icons.test.ts` (registry integrity + resolver coverage), updated
   web/mobile top-bar tests. Mirror gate excludes `src/mobile/**`; the mobile
   sibling is typecheck-verified in the premys consumer.
+- F4 (review pass) — Wired toolbar **action** icons too via shared
+  `resolveDrawingSelectedActionIconName` / `resolveDrawingToolbarActionIconName`:
+  global toolbar actions (undo/redo/measure/zoom/clear/hide/show/lock/unlock)
+  and the selected-object action buttons render SVG on both web (`ChartTopBar`)
+  and mobile (`ChartTopBarComponent` + `UserDrawingSelectedActionSurface`).
+  `star` is filled. Live web QA: the action toolbar row is fully iconified.
 
 ### Epic G: Floating Selected-Object Popover (web parity with mobile)
 

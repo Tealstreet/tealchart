@@ -31,7 +31,9 @@ import {
   isUserDrawingTextAnnotation,
   isUserDrawingTextToolbarEnabled,
   isUserDrawingToolbarActionEnabled,
+  resolveDrawingSelectedActionIconName,
   resolveDrawingToolIconName,
+  resolveDrawingToolbarActionIconName,
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingToolCategoryButtonTool,
@@ -960,7 +962,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         opacity: item.enabled ? '1' : '0.35',
         cursor: item.enabled ? 'pointer' : 'default',
       },
-      textContent: item.icon,
       attributes: {
         type: 'button',
         title: item.label,
@@ -968,6 +969,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         ...(item.selected !== undefined ? { 'aria-pressed': item.selected ? 'true' : 'false' } : {}),
       },
     });
+    this.setDrawingIconContent(btn, resolveDrawingSelectedActionIconName(item.command, item.swatchColor), item.icon, 18);
     btn.disabled = !item.enabled;
     if (item.enabled) {
       btn.addEventListener('click', () => {
@@ -1920,7 +1922,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           opacity: enabled ? '1' : '0.35',
           cursor: enabled ? 'pointer' : 'default',
         },
-        textContent: item.icon,
         attributes: {
           type: 'button',
           title: item.label,
@@ -1928,6 +1929,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           'aria-pressed': active ? 'true' : 'false',
         },
       });
+      this.setDrawingIconContent(btn, resolveDrawingToolbarActionIconName(item.command.action), item.icon, 18);
       btn.disabled = !enabled;
       if (enabled) {
         btn.addEventListener('click', () => {
