@@ -14,6 +14,7 @@ import type {
   UserDrawingPanePosition,
   UserDrawingMagnetMode,
   UserDrawingMeasureMode,
+  UserDrawingFavoriteToolbarPosition,
 } from './types';
 
 import {
@@ -205,6 +206,20 @@ export function toggleUserDrawingFavoriteTool(state: UserDrawingState, tool: Use
   const current = state.favoriteTools ?? [];
   const next = current.includes(tool) ? current.filter((favorite) => favorite !== tool) : [...current, tool];
   return setUserDrawingFavoriteTools(state, next);
+}
+
+export function setUserDrawingFavoriteToolbarPosition(
+  state: UserDrawingState,
+  position: UserDrawingFavoriteToolbarPosition | null,
+): UserDrawingState {
+  const current = state.favoriteToolbarPosition ?? null;
+  if (current === position || (current && position && current.x === position.x && current.y === position.y)) {
+    return state;
+  }
+  return {
+    ...state,
+    favoriteToolbarPosition: position,
+  };
 }
 
 export function setUserDrawingMeasureMode(state: UserDrawingState, measureMode: UserDrawingMeasureMode): UserDrawingState {

@@ -905,6 +905,11 @@ export interface UserDrawingMeasure {
   startedAt: number;
 }
 
+export interface UserDrawingFavoriteToolbarPosition {
+  x: number;
+  y: number;
+}
+
 export interface UserDrawingState {
   version: number;
   drawings: readonly UserDrawing[];
@@ -912,6 +917,7 @@ export interface UserDrawingState {
   stayInDrawingMode?: boolean;
   magnetMode?: UserDrawingMagnetMode;
   favoriteTools?: readonly UserDrawingTool[];
+  favoriteToolbarPosition?: UserDrawingFavoriteToolbarPosition | null;
   measureMode?: UserDrawingMeasureMode;
   measure?: UserDrawingMeasure | null;
   selection: UserDrawingSelection | null;

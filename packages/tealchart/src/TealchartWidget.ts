@@ -29,6 +29,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingKeyboardFocusOwner,
   UserDrawingKeyboardInput,
+  UserDrawingFavoriteToolbarPosition,
   UserDrawingMagnetMode,
   UserDrawingMeasureMode,
   UserDrawingObjectTreeDispatchAction,
@@ -1082,6 +1083,7 @@ export class TealchartWidget {
       userDrawingCommandAvailability: this._getUserDrawingCommandAvailability(),
       onUserDrawingToolSelect: (tool) => this._setActiveUserDrawingToolFromToolbar(tool),
       onUserDrawingToggleFavoriteTool: (tool) => this._toggleUserDrawingFavoriteToolFromToolbar(tool),
+      onUserDrawingFavoriteToolbarMove: (position) => this._setUserDrawingFavoriteToolbarPositionFromToolbar(position),
       onUserDrawingUndo: () => this._undoUserDrawingCommand('toolbar'),
       onUserDrawingRedo: () => this._redoUserDrawingCommand('toolbar'),
       onUserDrawingDuplicateSelected: () => {
@@ -2325,6 +2327,10 @@ export class TealchartWidget {
 
   private _toggleUserDrawingFavoriteToolFromToolbar(tool: UserDrawingTool): boolean {
     return this.dispatchUserDrawingCommand({ type: 'toggleFavoriteTool', tool, meta: { source: 'toolbar' } });
+  }
+
+  private _setUserDrawingFavoriteToolbarPositionFromToolbar(position: UserDrawingFavoriteToolbarPosition): boolean {
+    return this.dispatchUserDrawingCommand({ type: 'setFavoriteToolbarPosition', position, meta: { source: 'toolbar' } });
   }
 
   setUserDrawingFavoriteTools(favoriteTools: readonly UserDrawingTool[]): boolean {

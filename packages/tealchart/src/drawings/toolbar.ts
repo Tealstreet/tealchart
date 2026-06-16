@@ -2000,6 +2000,7 @@ export function getUserDrawingToolbarStateKey(state: UserDrawingState): string {
   return [
     state.activeTool,
     (state.favoriteTools ?? []).join(','),
+    state.favoriteToolbarPosition ? `${state.favoriteToolbarPosition.x},${state.favoriteToolbarPosition.y}` : '',
     state.selection?.drawingId ?? '',
     state.selection?.handle ?? '',
     state.draft ? 'draft' : '',

@@ -750,6 +750,7 @@ export type {
   UserDrawingVolumeProfileWidthRatio,
   UserDrawingPathFamilyKind,
   UserDrawingLineStyle,
+  UserDrawingFavoriteToolbarPosition,
   UserDrawingMagnetMode,
   UserDrawingMeasure,
   UserDrawingMeasureMode,

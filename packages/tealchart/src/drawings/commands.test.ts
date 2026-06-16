@@ -77,6 +77,7 @@ const coveredUserDrawingCommandTypes = [
   'setMagnetMode',
   'setFavoriteTools',
   'toggleFavoriteTool',
+  'setFavoriteToolbarPosition',
   'setMeasureMode',
   'add',
   'select',
@@ -293,6 +294,29 @@ describe('user drawing command dispatch', () => {
     });
     expect(unchanged.state).toBe(replaced.state);
     expect(unchanged.changed).toBe(false);
+
+    const moved = dispatchUserDrawingCommand(replaced.state, {
+      type: 'setFavoriteToolbarPosition',
+      position: { x: 120, y: 64 },
+      meta: { source: 'toolbar' },
+    });
+    expect(moved.state.favoriteToolbarPosition).toEqual({ x: 120, y: 64 });
+    expect(moved.changed).toBe(true);
+
+    const movedSame = dispatchUserDrawingCommand(moved.state, {
+      type: 'setFavoriteToolbarPosition',
+      position: { x: 120, y: 64 },
+      meta: { source: 'toolbar' },
+    });
+    expect(movedSame.state).toBe(moved.state);
+    expect(movedSame.changed).toBe(false);
+
+    const cleared = dispatchUserDrawingCommand(moved.state, {
+      type: 'setFavoriteToolbarPosition',
+      position: null,
+      meta: { source: 'toolbar' },
+    });
+    expect(cleared.state.favoriteToolbarPosition ?? null).toBeNull();
   });
 
   it('wraps temporary measure commands without creating drawings', () => {

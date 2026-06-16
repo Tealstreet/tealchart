@@ -1,5 +1,6 @@
 import type {
   UpdateUserDrawingOptions,
+  UserDrawingFavoriteToolbarPosition,
   UserDrawingIconName,
   UserDrawingCommandAvailability,
   UserDrawingSelectionActionAnchor,
@@ -19,6 +20,7 @@ import {
   getUserDrawingAllDrawingsUpdateOptions,
   getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
+  getUserDrawingFavoriteTools,
   isUserDrawingGlobalToolbarAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingToolFavorite,
@@ -79,6 +81,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   /** Callback when a drawing tool's favorite (starred) status is toggled */
   onUserDrawingToggleFavoriteTool?: (tool: UserDrawingTool) => void;
+  /** Callback when the floating favorites toolbar is dragged to a new position */
+  onUserDrawingFavoriteToolbarMove?: (position: UserDrawingFavoriteToolbarPosition) => void;
   /** Callback when the drawing toolbar should undo the last drawing command */
   onUserDrawingUndo?: () => void;
   /** Callback when the drawing toolbar should redo the last undone drawing command */
@@ -390,6 +394,44 @@ const styles = {
     opacity: '1',
   } as Partial<CSSStyleDeclaration>,
 
+  drawingFavoritesBar: {
+    position: 'absolute',
+    zIndex: '7',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '2px',
+    padding: '3px 4px',
+    borderRadius: '8px',
+    backgroundColor: 'var(--bg, #1e222d)',
+    border: '1px solid var(--border, #2a2e39)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingFavoritesBarHandle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '16px',
+    alignSelf: 'stretch',
+    color: 'var(--text2, #787b86)',
+    cursor: 'grab',
+    fontSize: '12px',
+    userSelect: 'none',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingFavoritesBarButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '30px',
+    height: '30px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: 'var(--text, #d1d4dc)',
+    cursor: 'pointer',
+  } as Partial<CSSStyleDeclaration>,
+
   selectedActionSurface: {
     position: 'absolute',
     display: 'flex',
@@ -514,6 +556,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
+  private drawingFavoritesBarEl: HTMLElement | null = null;
+  private drawingFavoritesBarCleanup: Array<() => void> = [];
   private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
   private selectedActionSurfaceEl: HTMLElement | null = null;
@@ -557,6 +601,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   protected onUnmount(): void {
     this.removeDrawingToolRail();
+    this.removeDrawingFavoritesBar();
     this.removeSelectedActionSurface();
     this.layoutSelector?.dispose();
     this.layoutSelector = null;
@@ -569,6 +614,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   protected render(): void {
     this.el.innerHTML = '';
     this.removeDrawingToolRail();
+    this.removeDrawingFavoritesBar();
     this.removeSelectedActionSurface();
     this.timeframeButtons.clear();
 
@@ -674,6 +720,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       this.el.appendChild(this.createElement('div', { style: styles.divider }));
       this.el.appendChild(this.renderDrawingToolbar());
       this.renderSelectedActionSurface();
+      this.renderDrawingFavoritesBar();
     }
 
     // Spacer
@@ -698,6 +745,124 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.drawingToolRailCleanup = [];
     this.drawingToolRailEl?.remove();
     this.drawingToolRailEl = null;
+  }
+
+  private removeDrawingFavoritesBar(): void {
+    for (const cleanup of this.drawingFavoritesBarCleanup) {
+      cleanup();
+    }
+    this.drawingFavoritesBarCleanup = [];
+    this.drawingFavoritesBarEl?.remove();
+    this.drawingFavoritesBarEl = null;
+  }
+
+  private renderDrawingFavoritesBar(): void {
+    const state = this.options.userDrawingState;
+    const favoriteTools = getUserDrawingFavoriteTools(state);
+    if (favoriteTools.length === 0) return;
+
+    const activeTool = state?.activeTool ?? 'select';
+    const parent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
+    const bar = this.createElement('div', {
+      style: styles.drawingFavoritesBar,
+      attributes: { 'aria-label': 'Favorite drawing tools' },
+    });
+
+    const handle = this.createElement('div', {
+      style: styles.drawingFavoritesBarHandle,
+      textContent: '⠿',
+      attributes: { 'aria-label': 'Drag favorites toolbar', title: 'Drag to move' },
+    });
+    bar.appendChild(handle);
+
+    for (const tool of favoriteTools) {
+      const descriptor = getUserDrawingToolDescriptor(tool);
+      const isActive = activeTool === tool;
+      const btn = this.createElement('button', {
+        style: {
+          ...styles.drawingFavoritesBarButton,
+          ...(isActive ? styles.drawingButtonActive : {}),
+        },
+        attributes: {
+          type: 'button',
+          title: descriptor.label,
+          'aria-label': descriptor.label,
+          'aria-pressed': isActive ? 'true' : 'false',
+        },
+      });
+      this.setDrawingIconContent(btn, resolveDrawingToolIconName(tool), descriptor.icon, 18);
+      btn.addEventListener('click', () => this.options.onUserDrawingToolSelect?.(tool));
+      btn.addEventListener('mouseenter', () => {
+        if (!isActive) Object.assign(btn.style, styles.drawingButtonHover);
+      });
+      btn.addEventListener('mouseleave', () => {
+        if (!isActive) {
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = 'var(--text, #d1d4dc)';
+        }
+      });
+      bar.appendChild(btn);
+    }
+
+    parent.appendChild(bar);
+    this.drawingFavoritesBarEl = bar;
+    this.positionDrawingFavoritesBar(bar, parent, state?.favoriteToolbarPosition ?? null);
+    this.attachDrawingFavoritesBarDrag(bar, handle, parent);
+  }
+
+  private positionDrawingFavoritesBar(
+    bar: HTMLElement,
+    parent: HTMLElement,
+    position: UserDrawingFavoriteToolbarPosition | null,
+  ): void {
+    const parentRect = parent.getBoundingClientRect();
+    const viewportWidth = parentRect.width || window.innerWidth;
+    const viewportHeight = parentRect.height || window.innerHeight;
+    const barWidth = bar.offsetWidth || 0;
+    const barHeight = bar.offsetHeight || 0;
+    const defaultLeft =
+      WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 16;
+    const defaultTop = WEB_CHART_CHROME_METRICS.topBarHeight + 38;
+    const maxLeft = Math.max(0, viewportWidth - barWidth - 8);
+    const maxTop = Math.max(0, viewportHeight - barHeight - 8);
+    const left = Math.min(Math.max(0, position?.x ?? defaultLeft), maxLeft);
+    const top = Math.min(Math.max(0, position?.y ?? defaultTop), maxTop);
+    bar.style.left = `${left}px`;
+    bar.style.top = `${top}px`;
+  }
+
+  private attachDrawingFavoritesBarDrag(bar: HTMLElement, handle: HTMLElement, parent: HTMLElement): void {
+    const onPointerDown = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const parentRect = parent.getBoundingClientRect();
+      const startLeft = bar.offsetLeft;
+      const startTop = bar.offsetTop;
+      const startX = event.clientX;
+      const startY = event.clientY;
+      handle.style.cursor = 'grabbing';
+
+      const onMove = (moveEvent: MouseEvent) => {
+        const barWidth = bar.offsetWidth;
+        const barHeight = bar.offsetHeight;
+        const maxLeft = Math.max(0, (parentRect.width || window.innerWidth) - barWidth - 8);
+        const maxTop = Math.max(0, (parentRect.height || window.innerHeight) - barHeight - 8);
+        const left = Math.min(Math.max(0, startLeft + (moveEvent.clientX - startX)), maxLeft);
+        const top = Math.min(Math.max(0, startTop + (moveEvent.clientY - startY)), maxTop);
+        bar.style.left = `${left}px`;
+        bar.style.top = `${top}px`;
+      };
+      const onUp = () => {
+        handle.style.cursor = 'grab';
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        this.options.onUserDrawingFavoriteToolbarMove?.({ x: bar.offsetLeft, y: bar.offsetTop });
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    };
+    handle.addEventListener('mousedown', onPointerDown);
+    this.drawingFavoritesBarCleanup.push(() => handle.removeEventListener('mousedown', onPointerDown));
   }
 
   private removeSelectedActionSurface(): void {
