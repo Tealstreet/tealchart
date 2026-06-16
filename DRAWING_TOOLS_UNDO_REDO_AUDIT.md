@@ -44,10 +44,23 @@ Mobile command-history tests cover:
 - Hardware-keyboard command adapters for undo, redo, delete, duplicate,
   copy/paste, select-all, and nudge.
 
+## Browser Evidence (web Canvas, Chrome MCP)
+
+Live undo/redo QA against the running app:
+
+- Toolbar undo reverts a handle-drag resize as a single transaction (one undo
+  per gesture).
+- Keyboard Cmd+Z / Cmd+Shift+Z undo and redo a delete, restoring and removing
+  the drawing; redo is cleared once a new undoable command follows an undo.
+- Copy/paste and select-all/delete flow through the same history.
+
+These confirm the reducer/adapter behavior end-to-end on web. See
+`DRAWING_TOOLS_WEB_KEYBOARD_AUDIT.md` for the keyboard-ownership evidence.
+
 ## Known Gaps
 
-- This audit proves reducer and adapter behavior, not pixel-level manual UX
-  coverage.
+- This audit proves reducer and adapter behavior; web browser QA for the core
+  undo/redo path is now recorded above. Pixel-level/device QA is still thin.
 - Web and mobile still need a selected popover toolbar that exposes the common
   undoable actions in a TradingView-grade editing workflow.
 - Table row/column and rich text mutations are covered by command dispatch and
