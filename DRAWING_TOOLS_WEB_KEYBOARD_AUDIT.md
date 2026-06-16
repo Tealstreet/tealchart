@@ -38,10 +38,30 @@ Scope: Epic E, Phase E2 in `DRAWING_TOOLS_NORTH_STAR.md`.
 - Mobile keyboard dispatch uses `resolveUserDrawingKeyboardAction`, matching the
   web resolver and focus-owner contract.
 
+## Browser Evidence (web Canvas, Chrome MCP)
+
+Live keyboard QA against the running app (shortcuts require the chart to own
+keyboard input — the widget sets `_isHovered` and focuses its container on
+`mouseenter`, so a synthetic `mouseenter` on the container is needed before each
+key):
+
+- Delete removes the selected drawing; Cmd+Z restores it; Cmd+Shift+Z redoes the
+  delete; Cmd+Z again restores. Verified live.
+- Escape clears the selection, and also closes an open built-in panel
+  (object tree / properties) instead of running chart shortcuts.
+- Cmd+C / Cmd+V duplicates the selected drawing (object-tree count 1 → 2).
+- Cmd+A select-all followed by Delete clears all drawings — but only when no
+  built-in panel is open: while the object-tree/properties panel is open the
+  keydown handler intentionally processes only Escape, suppressing chart
+  shortcuts. Verified both states live.
+- Arrow-key nudge runs on the selected drawing.
+
+No keyboard-ownership defect reproduced; this closes the browser-QA gap below.
+
 ## Known Gaps
 
-- Web shortcut tests are unit-level jsdom coverage, not browser screenshot or
-  manual keyboard QA.
+- Web shortcut tests are unit-level jsdom coverage; browser keyboard QA is now
+  recorded above for the core shortcut set.
 - Built-in toolbar affordances for visible undo/redo buttons are not part of
   this phase.
 - App integrations still need to decide which native mobile host surface sends
