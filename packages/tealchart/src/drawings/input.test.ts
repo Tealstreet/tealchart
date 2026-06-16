@@ -122,7 +122,7 @@ describe('user drawing input controller', () => {
       version: 1,
       drawings: [],
       activeTool: 'select',
-      stayInDrawingMode: true,
+      stayInDrawingMode: false,
       selection: null,
       draft: null,
       textEdit: null,
@@ -191,10 +191,17 @@ describe('user drawing input controller', () => {
 
   it('accumulates a two-anchor draft then commits a drawing', () => {
     const options = { createId: () => 'drawing-1', now: () => 20 };
-    const first = handleUserDrawingInput(setUserDrawingTool(createUserDrawingState(), 'trendLine'), {
-      paneId: 'main',
-      anchor: anchorA,
-    }, options);
+    const first = handleUserDrawingInput(
+      setUserDrawingTool(
+        setUserDrawingStayInDrawingMode(createUserDrawingState(), true),
+        'trendLine',
+      ),
+      {
+        paneId: 'main',
+        anchor: anchorA,
+      },
+      options,
+    );
 
     expect(first.draft).toMatchObject({
       tool: 'trendLine',
@@ -233,7 +240,10 @@ describe('user drawing input controller', () => {
   });
 
   it('commits two-anchor drag placement from the drag start and end anchors', () => {
-    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const state = setUserDrawingTool(
+      setUserDrawingStayInDrawingMode(createUserDrawingState(), true),
+      'rectangle',
+    );
     const started = beginUserDrawingPlacementDrag(
       state,
       { paneId: 'main', anchor: anchorA, position: { x: 10, y: 20 } },
@@ -642,7 +652,7 @@ describe('user drawing input controller', () => {
     const rawPoints = [anchorA, anchorB, { time: 3_000, price: 90 }];
     const smoothedPoints = smoothUserDrawingPathAnchors(rawPoints);
     const started = beginUserDrawingPathDrag(
-      setUserDrawingTool(createUserDrawingState(), 'path'),
+      setUserDrawingTool(setUserDrawingStayInDrawingMode(createUserDrawingState(), true), 'path'),
       { paneId: 'main', anchor: anchorA },
       { now: () => 10, style },
     );

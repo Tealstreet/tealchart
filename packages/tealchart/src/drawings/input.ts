@@ -131,7 +131,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     version: USER_DRAWING_SCHEMA_VERSION,
     drawings: [],
     activeTool: 'select',
-    stayInDrawingMode: true,
+    stayInDrawingMode: false,
     magnetMode: 'off',
     measureMode: 'off',
     measure: null,
