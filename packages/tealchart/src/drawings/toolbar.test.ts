@@ -251,6 +251,12 @@ describe('user drawing toolbar descriptors', () => {
     expect(moved).toBe(withTrend);
   });
 
+  it('changes the toolbar state key when magnet or keep-drawing toggles flip', () => {
+    const base = getUserDrawingToolbarStateKey(createUserDrawingState());
+    expect(getUserDrawingToolbarStateKey(createUserDrawingState({ magnetMode: 'strong' }))).not.toBe(base);
+    expect(getUserDrawingToolbarStateKey(createUserDrawingState({ stayInDrawingMode: true }))).not.toBe(base);
+  });
+
   it('resolves category button tools from active tool, recent tool, then category default', () => {
     const linesCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.id === 'lines')!;
     const shapesCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find(
