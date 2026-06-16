@@ -170,6 +170,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
             bottom: 8,
           },
           avoidRects: legendRect ? [legendRect] : undefined,
+          selectionBounds: anchor.bounds,
         }),
       ]}
       pointerEvents="auto"

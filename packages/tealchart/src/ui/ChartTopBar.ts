@@ -834,6 +834,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         bottom: 8,
       },
       avoidRects: legendRect ? [legendRect] : undefined,
+      selectionBounds: anchor.bounds,
     });
 
     const el = this.createElement('div', {

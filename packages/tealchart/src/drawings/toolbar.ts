@@ -369,6 +369,12 @@ export interface UserDrawingActionSurfacePositionOptions {
    * chart content stays readable.
    */
   avoidRects?: ReadonlyArray<{ x: number; y: number; width: number; height: number }>;
+  /**
+   * Screen bounds of the selected drawing. When chrome avoidance pushes the
+   * surface down onto the object, it flips below these bounds (TradingView-style)
+   * so the selected drawing stays visible.
+   */
+  selectionBounds?: { x: number; y: number; width: number; height: number };
 }
 
 const SELECTED_ACTION_SURFACE_AVOIDANCE_GAP = 6;
@@ -1702,6 +1708,7 @@ export function resolveUserDrawingActionSurfacePosition({
   inset = {},
   offsetY = -42,
   avoidRects,
+  selectionBounds,
 }: UserDrawingActionSurfacePositionOptions): UserDrawingActionSurfacePosition {
   const leftInset = inset.left ?? 8;
   const rightInset = inset.right ?? 8;
@@ -1713,18 +1720,35 @@ export function resolveUserDrawingActionSurfacePosition({
   const minTop = topInset;
   const maxTop = viewport.height - bottomInset - surface.height;
   const left = clampNumber(preferredLeft, leftInset, viewport.width - rightInset - surface.width);
-  let top = clampNumber(preferredTop, minTop, maxTop);
+
+  const overlapsRect = (candidateTop: number, rect: { x: number; y: number; width: number; height: number }) =>
+    left < rect.x + rect.width &&
+    left + surface.width > rect.x &&
+    candidateTop < rect.y + rect.height &&
+    candidateTop + surface.height > rect.y;
 
   // Top-down so a drop past one obstacle is re-checked against any lower one.
   const obstacles = [...(avoidRects ?? [])].sort((a, b) => a.y - b.y);
-  for (const obstacle of obstacles) {
-    const overlaps =
-      left < obstacle.x + obstacle.width &&
-      left + surface.width > obstacle.x &&
-      top < obstacle.y + obstacle.height &&
-      top + surface.height > obstacle.y;
-    if (overlaps) {
-      top = clampNumber(obstacle.y + obstacle.height + SELECTED_ACTION_SURFACE_AVOIDANCE_GAP, minTop, maxTop);
+  const avoidChrome = (candidateTop: number) => {
+    let resolved = candidateTop;
+    for (const obstacle of obstacles) {
+      if (overlapsRect(resolved, obstacle)) {
+        resolved = clampNumber(obstacle.y + obstacle.height + SELECTED_ACTION_SURFACE_AVOIDANCE_GAP, minTop, maxTop);
+      }
+    }
+    return resolved;
+  };
+
+  let top = avoidChrome(clampNumber(preferredTop, minTop, maxTop));
+
+  // If chrome avoidance (or the top clamp) pushed the surface down onto the
+  // selected drawing, flip it below the selection so the object stays visible.
+  if (selectionBounds && top > preferredTop && overlapsRect(top, selectionBounds)) {
+    const belowTop = avoidChrome(
+      clampNumber(selectionBounds.y + selectionBounds.height + SELECTED_ACTION_SURFACE_AVOIDANCE_GAP, minTop, maxTop),
+    );
+    if (!overlapsRect(belowTop, selectionBounds)) {
+      top = belowTop;
     }
   }
 
