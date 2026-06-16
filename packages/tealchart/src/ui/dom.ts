@@ -5,6 +5,8 @@
  * without React overhead.
  */
 
+import { DRAWING_ICON_DEFAULT_VIEWBOX, getDrawingIconDefinition } from '../drawings/icons';
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -428,6 +430,52 @@ export const icons = {
     }, ['ƒ']),
   ]),
 };
+
+/**
+ * Render a drawing-tool/action icon from the shared registry as an inline SVG.
+ * Returns null when the name has no authored icon, so callers can fall back to
+ * the descriptor's glyph.
+ */
+export function renderDrawingIcon(
+  name: string,
+  options?: { size?: number; color?: string; strokeWidth?: number },
+): SVGElement | null {
+  const definition = getDrawingIconDefinition(name);
+  if (!definition) return null;
+
+  const size = options?.size ?? 18;
+  const color = options?.color ?? 'currentColor';
+  const strokeWidth = options?.strokeWidth ?? 1.8;
+
+  const children = definition.nodes.map((node) => {
+    const attrs: Record<string, string> = {};
+    for (const [key, value] of Object.entries(node.attrs)) {
+      attrs[key] = String(value);
+    }
+    if (node.filled) {
+      attrs.fill = color;
+      attrs.stroke = 'none';
+    } else {
+      attrs.fill = 'none';
+      attrs.stroke = color;
+      attrs['stroke-width'] = String(strokeWidth);
+      attrs['stroke-linecap'] = 'round';
+      attrs['stroke-linejoin'] = 'round';
+    }
+    return svg(node.tag, attrs);
+  });
+
+  return svg(
+    'svg',
+    {
+      width: String(size),
+      height: String(size),
+      viewBox: definition.viewBox ?? DRAWING_ICON_DEFAULT_VIEWBOX,
+      fill: 'none',
+    },
+    children,
+  );
+}
 
 // Inject keyframes for spinner animation
 if (typeof document !== 'undefined') {

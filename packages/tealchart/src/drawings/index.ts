@@ -539,6 +539,15 @@ export {
 export { resolveUserDrawingPropertiesSurface, resolveUserDrawingPropertiesSurfaceCommand } from './propertiesSurface';
 export { createUserDrawingVisualEvidencePrNoteTemplate, USER_DRAWING_VISUAL_EVIDENCE_MATRIX } from './visualEvidence';
 export {
+  DRAWING_ICON_DEFAULT_VIEWBOX,
+  DRAWING_ICONS,
+  getDrawingIconDefinition,
+  resolveDrawingSelectedActionIconName,
+  resolveDrawingToolIconName,
+  resolveDrawingToolbarActionIconName,
+} from './icons';
+export type { DrawingIconDefinition, DrawingIconName, DrawingIconNode, DrawingIconNodeTag } from './icons';
+export {
   resolveUserDrawingObjectTreeActionCommands,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeDrawingDispatchAction,
