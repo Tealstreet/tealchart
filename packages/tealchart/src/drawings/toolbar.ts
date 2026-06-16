@@ -1567,6 +1567,14 @@ export function getUserDrawingToolCategoryDescriptorForTool(
   return USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.find((category) => category.tools.includes(tool)) ?? null;
 }
 
+export function getUserDrawingFavoriteTools(state?: UserDrawingState | null): readonly UserDrawingTool[] {
+  return state?.favoriteTools ?? [];
+}
+
+export function isUserDrawingToolFavorite(tool: UserDrawingTool, state?: UserDrawingState | null): boolean {
+  return (state?.favoriteTools ?? []).includes(tool);
+}
+
 export function resolveUserDrawingToolCategoryButtonTool(
   category: UserDrawingToolCategoryDescriptor,
   activeTool: UserDrawingTool,

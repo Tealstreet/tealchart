@@ -76,6 +76,7 @@ function applyHistorySnapshot(snapshot: UserDrawingState, currentState: UserDraw
     ...snapshot,
     stayInDrawingMode: currentState.stayInDrawingMode !== false,
     magnetMode: currentState.magnetMode ?? 'off',
+    favoriteTools: currentState.favoriteTools ?? [],
     measureMode: currentState.measureMode ?? 'off',
   });
 }
@@ -85,6 +86,8 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'setActiveTool':
     case 'setStayInDrawingMode':
     case 'setMagnetMode':
+    case 'setFavoriteTools':
+    case 'toggleFavoriteTool':
     case 'setMeasureMode':
     case 'select':
     case 'selectMany':

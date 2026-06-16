@@ -113,6 +113,22 @@ describe('drawing layout serialization', () => {
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: 'future' })?.magnetMode).toBe('off');
   });
 
+  it('round-trips favorite tools through layout state even without drawings', () => {
+    const persisted = serializeUserDrawingStateForLayout(
+      createUserDrawingState({ favoriteTools: ['trendLine', 'rectangle'] }),
+    );
+    expect(persisted?.favoriteTools).toEqual(['trendLine', 'rectangle']);
+
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+    expect(restored?.favoriteTools).toEqual(['trendLine', 'rectangle']);
+
+    expect(serializeUserDrawingStateForLayout(createUserDrawingState({ favoriteTools: [] }))).toBeUndefined();
+    expect(
+      deserializeUserDrawingStateFromLayout({ version: persisted?.version, drawings: [], favoriteTools: [1, 'rectangle', 'rectangle'] })
+        ?.favoriteTools,
+    ).toEqual(['rectangle']);
+  });
+
   it('persists user-facing drawing names and trims restored legacy names', () => {
     const legacyPayload = {
       drawings: [

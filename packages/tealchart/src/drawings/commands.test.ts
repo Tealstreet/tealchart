@@ -75,6 +75,8 @@ const coveredUserDrawingCommandTypes = [
   'setActiveTool',
   'setStayInDrawingMode',
   'setMagnetMode',
+  'setFavoriteTools',
+  'toggleFavoriteTool',
   'setMeasureMode',
   'add',
   'select',
@@ -257,6 +259,39 @@ describe('user drawing command dispatch', () => {
     });
 
     expect(unchanged.state).toBe(command.state);
+    expect(unchanged.changed).toBe(false);
+  });
+
+  it('toggles and sets favorite tools without recording history', () => {
+    const initial = createUserDrawingState();
+    const added = dispatchUserDrawingCommand(initial, {
+      type: 'toggleFavoriteTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    });
+    expect(added.state.favoriteTools).toEqual(['trendLine']);
+    expect(added.changed).toBe(true);
+
+    const removed = dispatchUserDrawingCommand(added.state, {
+      type: 'toggleFavoriteTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    });
+    expect(removed.state.favoriteTools).toEqual([]);
+
+    const replaced = dispatchUserDrawingCommand(removed.state, {
+      type: 'setFavoriteTools',
+      favoriteTools: ['rectangle', 'horizontalLine', 'rectangle'],
+      meta: { source: 'toolbar' },
+    });
+    expect(replaced.state.favoriteTools).toEqual(['rectangle', 'horizontalLine']);
+
+    const unchanged = dispatchUserDrawingCommand(replaced.state, {
+      type: 'setFavoriteTools',
+      favoriteTools: ['rectangle', 'horizontalLine'],
+      meta: { source: 'toolbar' },
+    });
+    expect(unchanged.state).toBe(replaced.state);
     expect(unchanged.changed).toBe(false);
   });
 

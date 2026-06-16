@@ -911,6 +911,7 @@ export interface UserDrawingState {
   activeTool: UserDrawingTool;
   stayInDrawingMode?: boolean;
   magnetMode?: UserDrawingMagnetMode;
+  favoriteTools?: readonly UserDrawingTool[];
   measureMode?: UserDrawingMeasureMode;
   measure?: UserDrawingMeasure | null;
   selection: UserDrawingSelection | null;

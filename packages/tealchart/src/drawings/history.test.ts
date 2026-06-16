@@ -59,6 +59,8 @@ const transientUserDrawingHistoryCommandTypes = [
   'setActiveTool',
   'setStayInDrawingMode',
   'setMagnetMode',
+  'setFavoriteTools',
+  'toggleFavoriteTool',
   'setMeasureMode',
   'select',
   'selectMany',
@@ -213,6 +215,16 @@ describe('user drawing command history', () => {
     expect(history.undoStack).toHaveLength(0);
 
     result = dispatchUserDrawingCommandWithHistory(state, history, {
+      type: 'toggleFavoriteTool',
+      tool: 'trendLine',
+      meta: { source: 'toolbar' },
+    });
+    state = result.state;
+    history = result.history;
+    expect(state.favoriteTools).toEqual(['trendLine']);
+    expect(history.undoStack).toHaveLength(0);
+
+    result = dispatchUserDrawingCommandWithHistory(state, history, {
       type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
       options: { createId: () => 'rect', now: () => 10, style },
@@ -242,6 +254,7 @@ describe('user drawing command history', () => {
     expect(undo.state.draft).toBeNull();
     expect(undo.state.stayInDrawingMode).toBe(false);
     expect(undo.state.magnetMode).toBe('weak');
+    expect(undo.state.favoriteTools).toEqual(['trendLine']);
 
     const redo = redoUserDrawingCommand(undo.state, undo.history);
     expect(redo.changed).toBe(true);
@@ -250,6 +263,7 @@ describe('user drawing command history', () => {
     expect(redo.state.activeTool).toBe('select');
     expect(redo.state.stayInDrawingMode).toBe(false);
     expect(redo.state.magnetMode).toBe('weak');
+    expect(redo.state.favoriteTools).toEqual(['trendLine']);
   });
 
   it('preserves current non-undoable drawing mode settings across undo and redo snapshots', () => {

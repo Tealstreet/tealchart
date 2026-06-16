@@ -15,6 +15,8 @@ import {
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
+  setUserDrawingFavoriteTools,
+  toggleUserDrawingFavoriteTool,
   deleteUserDrawingTableColumn,
   deleteUserDrawingTableRow,
   deleteUserDrawing,
@@ -222,6 +224,24 @@ describe('user drawing input controller', () => {
       createdAt: 20,
       updatedAt: 20,
     });
+  });
+
+  it('toggles, dedupes, and replaces favorite tools immutably', () => {
+    const initial = createUserDrawingState();
+    expect(initial.favoriteTools).toEqual([]);
+
+    const added = toggleUserDrawingFavoriteTool(initial, 'trendLine');
+    expect(added.favoriteTools).toEqual(['trendLine']);
+    expect(added).not.toBe(initial);
+
+    const removed = toggleUserDrawingFavoriteTool(added, 'trendLine');
+    expect(removed.favoriteTools).toEqual([]);
+
+    const set = setUserDrawingFavoriteTools(initial, ['rectangle', 'trendLine', 'rectangle']);
+    expect(set.favoriteTools).toEqual(['rectangle', 'trendLine']);
+
+    const unchanged = setUserDrawingFavoriteTools(set, ['rectangle', 'trendLine']);
+    expect(unchanged).toBe(set);
   });
 
   it('switches to select after click placement when stay-in-drawing-mode is disabled', () => {
