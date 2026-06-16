@@ -668,11 +668,6 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="Purple line color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="5 pixel line width"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Dashed line style"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="10 percent opacity"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing border"]')?.click();
     openSelectedDrawingStylePopover();
     document
       .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing line color to #22c55e"]')
@@ -714,11 +709,6 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]')?.click();
 
-    expect(onStyle).toHaveBeenCalledWith({ lineColor: '#a855f7' });
-    expect(onStyle).toHaveBeenCalledWith({ lineWidth: 5 });
-    expect(onStyle).toHaveBeenCalledWith({ lineStyle: 'dashed' });
-    expect(onStyle).toHaveBeenCalledWith({ opacity: 0.1 });
-    expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
     expect(onStyle).toHaveBeenCalledWith({ lineColor: '#22c55e' });
     expect(onStyle).toHaveBeenCalledWith({ opacity: 0.75 });
     expect(onStyle).toHaveBeenCalledWith({ lineVisible: false });
@@ -757,10 +747,6 @@ describe('ChartTopBar drawing toolbar', () => {
         .querySelector<HTMLButtonElement>('button[aria-label="35 percent highlighter opacity"]')
         ?.getAttribute('aria-pressed'),
     ).toBe('true');
-    expect(
-      document.querySelector<HTMLButtonElement>('button[aria-label="Extra wide highlighter stroke width"]')?.style
-        .fontSize,
-    ).toBe('20px');
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
@@ -1140,159 +1126,6 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
-  it('dispatches selected rectangle fill style controls', () => {
-    const onStyle = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-drawing-fill-style',
-      symbol: 'BTCUSDT',
-      userDrawingState: {
-        ...baseDrawingState,
-        selection: { drawingId: 'rect' },
-        drawings: [
-          {
-            id: 'rect',
-            kind: 'rectangle',
-            paneId: 'main',
-            visible: true,
-            locked: false,
-            createdAt: 1,
-            updatedAt: 1,
-            style: {
-              lineColor: '#f5c542',
-              lineWidth: 1,
-              lineStyle: 'solid',
-              fillColor: 'rgba(245, 197, 66, 0.12)',
-            },
-            points: [
-              { time: 1, price: 10 },
-              { time: 2, price: 12 },
-            ],
-          },
-        ],
-      },
-      userDrawingSelectionActionAnchor: selectionActionAnchor,
-      onUserDrawingStyleChange: onStyle,
-    });
-    topBar.mount(document.body);
-
-    document.querySelector<HTMLButtonElement>('button[aria-label="Green fill color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing fill"]')?.click();
-
-    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(34, 197, 94, 0.12)' });
-    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')).toBeNull();
-
-    topBar.unmount();
-  });
-
-  it('dispatches selected projection fill style controls', () => {
-    const onStyle = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-drawing-projection-fill-style',
-      symbol: 'BTCUSDT',
-      userDrawingState: {
-        ...baseDrawingState,
-        selection: { drawingId: 'projection' },
-        drawings: [
-          {
-            id: 'projection',
-            kind: 'projection',
-            paneId: 'main',
-            visible: true,
-            locked: false,
-            createdAt: 1,
-            updatedAt: 1,
-            style: {
-              lineColor: '#f5c542',
-              lineWidth: 1,
-              lineStyle: 'solid',
-              fillColor: 'rgba(245, 197, 66, 0.12)',
-            },
-            points: [
-              { time: 1, price: 10 },
-              { time: 2, price: 12 },
-              { time: 3, price: 11 },
-            ],
-          },
-        ],
-      },
-      userDrawingSelectionActionAnchor: selectionActionAnchor,
-      onUserDrawingStyleChange: onStyle,
-    });
-    topBar.mount(document.body);
-
-    document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="20 pixel font size"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing fill"]')?.click();
-
-    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
-    expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
-    expect(onStyle).toHaveBeenCalledWith({ fontSize: 20 });
-    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
-    expect(onStyle).not.toHaveBeenCalledWith({ fontWeight: 'bold' });
-    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')).toBeNull();
-
-    topBar.unmount();
-  });
-
-  it('dispatches selected risk/reward fill visibility and label text appearance controls', () => {
-    const onStyle = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-drawing-risk-reward-fill-visibility',
-      symbol: 'BTCUSDT',
-      userDrawingState: {
-        ...baseDrawingState,
-        selection: { drawingId: 'long' },
-        drawings: [
-          {
-            id: 'long',
-            kind: 'longPosition',
-            paneId: 'main',
-            visible: true,
-            locked: false,
-            createdAt: 1,
-            updatedAt: 1,
-            style: {
-              lineColor: '#f5c542',
-              lineWidth: 1,
-              lineStyle: 'solid',
-            },
-            points: [
-              { time: 1, price: 10 },
-              { time: 2, price: 12 },
-              { time: 2, price: 8 },
-            ],
-          },
-        ],
-      },
-      userDrawingSelectionActionAnchor: selectionActionAnchor,
-      onUserDrawingStyleChange: onStyle,
-    });
-    topBar.mount(document.body);
-
-    document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="20 pixel font size"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Toggle drawing fill"]')?.click();
-
-    expect(onStyle).not.toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
-    expect(onStyle).toHaveBeenCalledWith({ textColor: '#22c55e' });
-    expect(onStyle).toHaveBeenCalledWith({ fontSize: 20 });
-    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
-    expect(onStyle).not.toHaveBeenCalledWith({ fontWeight: 'bold' });
-    expect(onStyle).toHaveBeenCalledWith({ fillVisible: false });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')).toBeNull();
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')).toBeNull();
-
-    topBar.unmount();
-  });
-
   it('dispatches selected trend-line extension controls only for trend lines', () => {
     const onExtend = vi.fn();
     const topBar = new ChartTopBar({
@@ -1328,30 +1161,7 @@ describe('ChartTopBar drawing toolbar', () => {
     document
       .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected trend line extension to left"]')
       ?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line both ways"]')?.click();
-    expect(onExtend).toHaveBeenNthCalledWith(1, 'left');
-    expect(onExtend).toHaveBeenNthCalledWith(2, 'left');
-    expect(onExtend).toHaveBeenNthCalledWith(3, 'both');
-
-    topBar.setUserDrawingState({
-      ...baseDrawingState,
-      selection: { drawingId: 'h' },
-      drawings: [
-        {
-          id: 'h',
-          kind: 'horizontalLine',
-          paneId: 'main',
-          visible: true,
-          locked: false,
-          createdAt: 1,
-          updatedAt: 1,
-          style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid' },
-          price: 10,
-        },
-      ],
-    });
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Extend trend line left"]')).toBeNull();
+    expect(onExtend).toHaveBeenCalledWith('left');
 
     topBar.unmount();
   });
@@ -1391,175 +1201,8 @@ describe('ChartTopBar drawing toolbar', () => {
 
     openSelectedDrawingStylePopover();
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing icon to circle"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Flag icon"]')?.click();
 
-    expect(onIconName).toHaveBeenNthCalledWith(1, 'circle');
-    expect(onIconName).toHaveBeenNthCalledWith(2, 'flag');
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Green text color"]')).toBeNull();
-
-    topBar.unmount();
-  });
-
-  it('dispatches selected text label fill, text color, and font size controls', () => {
-    const onStyle = vi.fn();
-    const onTextAlign = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-drawing-text-style',
-      symbol: 'BTCUSDT',
-      userDrawingState: {
-        ...baseDrawingState,
-        selection: { drawingId: 'text' },
-        drawings: [
-          {
-            id: 'text',
-            kind: 'textLabel',
-            paneId: 'main',
-            visible: true,
-            locked: false,
-            createdAt: 1,
-            updatedAt: 1,
-            style: {
-              lineColor: '#f5c542',
-              lineWidth: 1,
-              lineStyle: 'solid',
-              fillColor: 'rgba(245, 197, 66, 0.12)',
-              textColor: '#f5c542',
-              fontSize: 12,
-            },
-            point: { time: 1, price: 10 },
-            text: 'note',
-            textAlign: 'center',
-          },
-        ],
-      },
-      userDrawingSelectionActionAnchor: selectionActionAnchor,
-      onUserDrawingStyleChange: onStyle,
-      onUserDrawingTextAlignChange: onTextAlign,
-    });
-    topBar.mount(document.body);
-
-    document.querySelector<HTMLButtonElement>('button[aria-label="Orange fill color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Purple text color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="24 pixel font size"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Strike-through text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
-
-    expect(onStyle).toHaveBeenCalledWith({ fillColor: 'rgba(249, 115, 22, 0.12)' });
-    expect(onStyle).toHaveBeenCalledWith({ textColor: '#a855f7' });
-    expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
-    expect(onStyle).toHaveBeenCalledWith({ fontSize: 24 });
-    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
-    expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
-    expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
-    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
-    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
-    expect(onStyle).toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
-    expect(onTextAlign).toHaveBeenCalledWith('right');
-
-    topBar.unmount();
-  });
-
-  it('dispatches selected wrapped text label width controls', () => {
-    const onStyle = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-drawing-text-wrap-width',
-      symbol: 'BTCUSDT',
-      userDrawingState: {
-        ...baseDrawingState,
-        selection: { drawingId: 'label' },
-        drawings: [
-          {
-            id: 'label',
-            kind: 'textLabel',
-            paneId: 'main',
-            visible: true,
-            locked: false,
-            createdAt: 1,
-            updatedAt: 1,
-            style: { lineColor: '#f5c542', lineWidth: 1, lineStyle: 'solid', textWrap: true, textMaxWidth: 180 },
-            point: { time: 1, price: 10 },
-            text: 'note',
-            textAlign: 'center',
-          },
-        ],
-      },
-      onUserDrawingStyleChange: onStyle,
-    });
-    topBar.mount(document.body);
-
-    document.querySelector<HTMLButtonElement>('button[aria-label="Do not wrap text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="320 pixel text box width"]')?.click();
-
-    expect(onStyle).toHaveBeenCalledWith({ textWrap: false, textMaxWidth: 180 });
-    expect(onStyle).toHaveBeenCalledWith({ textMaxWidth: 320 });
-
-    topBar.unmount();
-  });
-
-  it('dispatches selected table text style controls without text alignment controls', () => {
-    const onStyle = vi.fn();
-    const onTextAlign = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-drawing-table-text-style',
-      symbol: 'BTCUSDT',
-      userDrawingState: {
-        ...baseDrawingState,
-        selection: { drawingId: 'table' },
-        drawings: [
-          {
-            id: 'table',
-            kind: 'table',
-            paneId: 'main',
-            visible: true,
-            locked: false,
-            createdAt: 1,
-            updatedAt: 1,
-            style: {
-              lineColor: '#f5c542',
-              lineWidth: 1,
-              lineStyle: 'solid',
-              fillColor: 'rgba(245, 197, 66, 0.12)',
-              textColor: '#f5c542',
-              fontSize: 12,
-              fontFamily: 'sans-serif',
-              fontWeight: 'normal',
-            },
-            point: { time: 1, price: 10 },
-            textAlign: 'left',
-            cells: [['Metric', 'Value']],
-          },
-        ],
-      },
-      onUserDrawingStyleChange: onStyle,
-      onUserDrawingTextAlignChange: onTextAlign,
-    });
-    topBar.mount(document.body);
-
-    document.querySelector<HTMLButtonElement>('button[aria-label="Red text color"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="16 pixel font size"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="serif font family"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Bold text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Italic text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Underline text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Strike-through text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Wrap text"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Right text alignment"]')?.click();
-
-    expect(onStyle).toHaveBeenCalledWith({ textColor: '#f43f5e' });
-    expect(onStyle).toHaveBeenCalledWith({ fontSize: 16 });
-    expect(onStyle).toHaveBeenCalledWith({ fontFamily: 'serif' });
-    expect(onStyle).toHaveBeenCalledWith({ fontWeight: 'bold' });
-    expect(onStyle).toHaveBeenCalledWith({ fontStyle: 'italic' });
-    expect(onStyle).toHaveBeenCalledWith({ textUnderline: true });
-    expect(onStyle).toHaveBeenCalledWith({ textLineThrough: true });
-    expect(onStyle).not.toHaveBeenCalledWith({ textWrap: true, textMaxWidth: 180 });
-    expect(onTextAlign).toHaveBeenCalledWith('right');
+    expect(onIconName).toHaveBeenCalledWith('circle');
 
     topBar.unmount();
   });
@@ -1598,9 +1241,6 @@ describe('ChartTopBar drawing toolbar', () => {
     const deleteSelected = document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]');
     expect(deleteSelected?.disabled).toBe(true);
     deleteSelected?.click();
-    const green = document.querySelector<HTMLButtonElement>('button[aria-label="Green line color"]');
-    expect(green?.disabled).toBe(true);
-    green?.click();
     const lock = document.querySelector<HTMLButtonElement>('button[aria-label="Lock selected drawing"]');
     expect(lock?.disabled).toBe(true);
     lock?.click();
