@@ -9,6 +9,7 @@ import type {
   UserDrawingStyle,
   UserDrawingTextAlign,
   UserDrawingTextAnnotation,
+  UserDrawingTool,
 } from './types';
 
 import { createUserDrawingState } from './input';
@@ -1284,9 +1285,13 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
 // layouts that stored an explicit boolean keep it on load; ones that omitted it
 // were empty-default states and correctly adopt the current default.
 export function serializeUserDrawingStateForLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
+  const favoriteTools = state?.favoriteTools ?? [];
   if (
     !state ||
-    (state.drawings.length === 0 && state.stayInDrawingMode !== true && (state.magnetMode ?? 'off') === 'off')
+    (state.drawings.length === 0 &&
+      state.stayInDrawingMode !== true &&
+      (state.magnetMode ?? 'off') === 'off' &&
+      favoriteTools.length === 0)
   )
     return undefined;
 
@@ -1295,6 +1300,7 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
     drawings: state.drawings.map(cloneUserDrawing),
     stayInDrawingMode: state.stayInDrawingMode === true,
     magnetMode: state.magnetMode ?? 'off',
+    favoriteTools: [...favoriteTools],
   });
 }
 
@@ -1305,13 +1311,18 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
 
   const drawings = state.drawings.map(parseUserDrawing).filter((drawing): drawing is UserDrawing => drawing !== null);
   const magnetMode = state.magnetMode === 'weak' || state.magnetMode === 'strong' ? state.magnetMode : 'off';
-  if (drawings.length === 0 && state.stayInDrawingMode !== true && magnetMode === 'off') return undefined;
+  const favoriteTools = Array.isArray(state.favoriteTools)
+    ? [...new Set(state.favoriteTools.filter((tool): tool is UserDrawingTool => typeof tool === 'string'))]
+    : [];
+  if (drawings.length === 0 && state.stayInDrawingMode !== true && magnetMode === 'off' && favoriteTools.length === 0)
+    return undefined;
 
   return createUserDrawingState({
     version: USER_DRAWING_LAYOUT_SCHEMA_VERSION,
     drawings,
     stayInDrawingMode: state.stayInDrawingMode === true,
     magnetMode,
+    favoriteTools,
   });
 }
 
