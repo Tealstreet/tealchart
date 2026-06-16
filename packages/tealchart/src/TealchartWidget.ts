@@ -1102,6 +1102,9 @@ export class TealchartWidget {
       onUserDrawingCancelDraft: () => this.cancelUserDrawingDraft(),
       onUserDrawingClearAll: () => this.clearUserDrawings(),
       onUserDrawingMeasureModeChange: (enabled) => this.setUserDrawingMeasureMode(enabled ? 'on' : 'off'),
+      onUserDrawingMagnetModeChange: (magnetMode) => this.setUserDrawingMagnetMode(magnetMode),
+      onUserDrawingStayInDrawingModeChange: (stayInDrawingMode) =>
+        this.setUserDrawingStayInDrawingMode(stayInDrawingMode),
       onUserDrawingZoomIn: () => this._handleUserDrawingZoomIn(),
       onUserDrawingZOrderChange: (action) => {
         this.reorderUserDrawings(action);
