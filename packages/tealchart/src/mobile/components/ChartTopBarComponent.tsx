@@ -129,10 +129,6 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingClearAll,
     onUserDrawingMeasureModeChange,
     onUserDrawingZoomIn,
-    onUserDrawingStyleChange,
-    onUserDrawingTextAlignChange,
-    onUserDrawingTrendLineExtendChange,
-    onUserDrawingIconNameChange,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
@@ -746,17 +742,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   drawingButtonActive: {},
-  drawingSwatchButton: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#363a45',
-    marginHorizontal: 3,
-  },
-  drawingSwatchButtonActive: {
-    borderWidth: 2,
-  },
   drawingButtonPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
@@ -769,12 +754,6 @@ const styles = StyleSheet.create({
   },
   drawingButtonTextDisabled: {
     opacity: 0.8,
-  },
-  innerDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: '#363a45',
-    marginHorizontal: 4,
   },
 });
 

@@ -1158,10 +1158,12 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     openSelectedDrawingStylePopover();
+    const extendCallsBefore = onExtend.mock.calls.length;
     document
       .querySelector<HTMLButtonElement>('button[aria-label="Cycle selected trend line extension to left"]')
       ?.click();
-    expect(onExtend).toHaveBeenCalledWith('left');
+    expect(onExtend).toHaveBeenCalledTimes(extendCallsBefore + 1);
+    expect(onExtend).toHaveBeenLastCalledWith('left');
 
     topBar.unmount();
   });
@@ -1200,9 +1202,11 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     openSelectedDrawingStylePopover();
+    const iconCallsBefore = onIconName.mock.calls.length;
     document.querySelector<HTMLButtonElement>('button[aria-label="Cycle selected drawing icon to circle"]')?.click();
 
-    expect(onIconName).toHaveBeenCalledWith('circle');
+    expect(onIconName).toHaveBeenCalledTimes(iconCallsBefore + 1);
+    expect(onIconName).toHaveBeenLastCalledWith('circle');
 
     topBar.unmount();
   });
