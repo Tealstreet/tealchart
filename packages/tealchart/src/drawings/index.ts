@@ -477,6 +477,7 @@ export {
   isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
   isUserDrawingTextToolbarEnabled,
+  isUserDrawingTool,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingToolFavorite,
   resolveUserDrawingActionSurfacePosition,

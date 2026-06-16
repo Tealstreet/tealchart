@@ -237,7 +237,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
       MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 16;
     const favoritesDefaultY = TOP_BAR_HEIGHT + 40;
     const favoritesPosition = userDrawingState?.favoriteToolbarPosition ?? null;
-    const favoritesBarWidth = 22 + favoriteTools.length * 36 + 8;
+    const favoritesBarWidth = 22 + favoriteTools.length * 34 + 8;
     const favoritesMaxX = Math.max(0, getMobileWindowWidth() - favoritesBarWidth - 8);
     const favoritesMaxY = Math.max(0, windowHeight - 52);
     const favPosX = useSharedValue(favoritesPosition?.x ?? favoritesDefaultX);
