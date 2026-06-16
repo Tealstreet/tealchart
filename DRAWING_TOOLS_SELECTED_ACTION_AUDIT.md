@@ -60,15 +60,34 @@ The selected-action surface is shared:
   such as action density or a tool-specific style control that is missing from
   both web and mobile.
 
+## Browser Evidence (web Canvas, Chrome MCP)
+
+Live drag-to-draw QA of the web selected-action surface across positions:
+
+- Mid-chart selection: surface anchors just above the selection top, centered on
+  the selection (nominal placement). Confirmed via synthetic drag + DOM measure.
+- Right-edge selection: surface stays above and clamps within the viewport; only
+  the nominal top-edge overlap remains. No defect.
+- Top-edge selection (reproduced defect): when the top-bar/legend blocked the
+  space above, chrome avoidance dropped the surface *onto the selected drawing*,
+  covering its interior. Fixed by flipping the surface below the selection
+  bounds when chrome avoidance would otherwise push it onto the object.
+
+The fix is in the shared resolver `resolveUserDrawingActionSurfacePosition`
+(`drawings/toolbar.ts`): callers now pass the selection `bounds`, and the
+resolver flips below `bounds` when the chrome-avoided top still covers the
+object. Web (`ChartTopBar`) and mobile (`UserDrawingSelectedActionSurface`) both
+pass `selectionBounds: anchor.bounds`. Shared resolver tests, rendered web
+`ChartTopBar.test.ts`, and rendered mobile
+`UserDrawingSelectedActionSurface.test.tsx` pin the above/flip/below-blocked
+cases.
+
 ## Next Useful Gap
 
 Move to one of these narrow improvements:
 
-1. Add browser-level visual/e2e evidence that the web selected toolbar is
-   anchored near real selected geometry, beyond the current component-level
-   chrome clamp tests.
-2. Add browser/device hit-test evidence that selected action overlays do not
+1. Add browser/device hit-test evidence that selected action overlays do not
    block chart gestures outside the strip, then cover action density once the
    final popover polish is in place.
-3. Add one missing tool-specific selected style control only if it can be
+2. Add one missing tool-specific selected style control only if it can be
    implemented in the shared descriptor and rendered by both web and mobile.
