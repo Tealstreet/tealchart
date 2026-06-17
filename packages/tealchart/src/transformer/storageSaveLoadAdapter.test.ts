@@ -121,6 +121,36 @@ describe('StorageSaveLoadAdapter', () => {
     expect(await other.getAllCharts()).toEqual([]);
   });
 
+  it('serializes concurrent saves so the index keeps every entry', async () => {
+    // A delayed async backend would interleave a naive read-modify-write.
+    const map = new Map<string, string>();
+    const delayed: AsyncStorageLike = {
+      getItem: (k) => new Promise((r) => setTimeout(() => r(map.has(k) ? map.get(k)! : null), 1)),
+      setItem: (k, v) =>
+        new Promise((r) =>
+          setTimeout(() => {
+            map.set(k, v);
+            r();
+          }, 1),
+        ),
+      removeItem: (k) =>
+        new Promise((r) =>
+          setTimeout(() => {
+            map.delete(k);
+            r();
+          }, 1),
+        ),
+    };
+    let n = 0;
+    const concurrent = new StorageSaveLoadAdapter(createAsyncStorageKeyValueStorage(delayed), {
+      generateId: () => `c-${n++}`,
+    });
+    await Promise.all(Array.from({ length: 6 }, (_, i) => concurrent.saveChart(makeChart({ name: `L${i}` }))));
+    const all = await concurrent.getAllCharts();
+    expect(all).toHaveLength(6);
+    expect(new Set(all.map((c) => c.id)).size).toBe(6);
+  });
+
   it('works over an async (AsyncStorage-like) backend', async () => {
     const backend = makeAsyncStorage();
     const asyncAdapter = new StorageSaveLoadAdapter(createAsyncStorageKeyValueStorage(backend), {
@@ -129,6 +159,15 @@ describe('StorageSaveLoadAdapter', () => {
     const id = await asyncAdapter.saveChart(makeChart({ name: 'Async' }));
     expect(id).toBe('async-1');
     expect(await asyncAdapter.getAllCharts()).toEqual([{ id, name: 'Async', symbol: 'BTCUSDT' }]);
+  });
+});
+
+describe('default id generation', () => {
+  it('produces unique ids across rapid saves', async () => {
+    const storage = makeSyncStorage();
+    const adapter = new StorageSaveLoadAdapter(storage);
+    const idsOut = await Promise.all(Array.from({ length: 50 }, () => adapter.saveChart(makeChart())));
+    expect(new Set(idsOut).size).toBe(50);
   });
 });
 

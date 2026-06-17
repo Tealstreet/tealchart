@@ -46,7 +46,8 @@ export const DEFAULT_LAYOUT_STORAGE_NAMESPACE = 'tealchart:layouts';
 let idCounter = 0;
 function defaultGenerateId(): string {
   idCounter += 1;
-  return `${Date.now().toString(36)}-${idCounter.toString(36)}`;
+  const rand = Math.random().toString(36).slice(2, 8);
+  return `${Date.now().toString(36)}-${idCounter.toString(36)}-${rand}`;
 }
 
 /**
@@ -57,11 +58,22 @@ export class StorageSaveLoadAdapter implements ISaveLoadAdapter {
   private readonly storage: TealchartKeyValueStorage;
   private readonly namespace: string;
   private readonly generateId: () => string;
+  // Serializes index read-modify-write so concurrent autosaves can't corrupt it.
+  private mutationQueue: Promise<unknown> = Promise.resolve();
 
   constructor(storage: TealchartKeyValueStorage, options: StorageSaveLoadAdapterOptions = {}) {
     this.storage = storage;
     this.namespace = options.namespace ?? DEFAULT_LAYOUT_STORAGE_NAMESPACE;
     this.generateId = options.generateId ?? defaultGenerateId;
+  }
+
+  private enqueue<T>(fn: () => Promise<T>): Promise<T> {
+    const run = this.mutationQueue.then(fn, fn);
+    this.mutationQueue = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
   }
 
   private indexKey(): string {
@@ -96,22 +108,22 @@ export class StorageSaveLoadAdapter implements ISaveLoadAdapter {
   }
 
   async saveChart(data: TvChartData): Promise<string> {
-    const hasId = data.id != null && String(data.id) !== '';
-    const id = hasId ? String(data.id) : this.generateId();
-    const record: TvChartData = { ...data, id };
-    await this.storage.setItem(this.chartKey(id), JSON.stringify(record));
-
-    const index = await this.readIndex();
-    const meta: LayoutIndexEntry = {
-      id,
-      name: data.name,
-      symbol: data.symbol,
-      resolution: data.resolution,
-    };
-    const next = index.filter((entry) => entry.id !== id);
-    next.push(meta);
-    await this.writeIndex(next);
-    return id;
+    return this.enqueue(async () => {
+      const hasId = data.id != null && String(data.id) !== '';
+      const id = hasId ? String(data.id) : this.generateId();
+      const meta: LayoutIndexEntry = {
+        id,
+        name: data.name,
+        symbol: data.symbol,
+        resolution: data.resolution,
+      };
+      // Index first so a failed blob write leaves a recoverable phantom entry
+      // (loads empty, can be deleted) rather than an invisible orphaned blob.
+      const index = await this.readIndex();
+      await this.writeIndex([...index.filter((entry) => entry.id !== id), meta]);
+      await this.storage.setItem(this.chartKey(id), JSON.stringify({ ...data, id }));
+      return id;
+    });
   }
 
   async getChartContent(chartId: string | number): Promise<string> {
@@ -131,11 +143,15 @@ export class StorageSaveLoadAdapter implements ISaveLoadAdapter {
   }
 
   async removeChart(id: string | number): Promise<void> {
-    const key = String(id);
-    await this.storage.removeItem(this.chartKey(key));
-    const index = await this.readIndex();
-    const next = index.filter((entry) => entry.id !== key);
-    if (next.length !== index.length) await this.writeIndex(next);
+    await this.enqueue(async () => {
+      const key = String(id);
+      // Drop the index entry first so the layout disappears from listings even
+      // if the blob removal fails (a stale blob is harmless and overwritten on reuse).
+      const index = await this.readIndex();
+      const next = index.filter((entry) => entry.id !== key);
+      if (next.length !== index.length) await this.writeIndex(next);
+      await this.storage.removeItem(this.chartKey(key));
+    });
   }
 }
 
