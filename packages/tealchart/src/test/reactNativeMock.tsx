@@ -164,3 +164,18 @@ export const StyleSheet = {
 export const Platform = {
   OS: 'ios',
 };
+
+export interface AlertButton {
+  text?: string;
+  style?: 'default' | 'cancel' | 'destructive';
+  onPress?: () => void;
+}
+
+// Records the buttons from the most recent Alert.alert call so tests can
+// simulate the user pressing one (the native dialog is not rendered here).
+export const Alert = {
+  lastButtons: [] as AlertButton[],
+  alert(_title?: string, _message?: string, buttons?: AlertButton[]): void {
+    Alert.lastButtons = buttons ?? [];
+  },
+};
