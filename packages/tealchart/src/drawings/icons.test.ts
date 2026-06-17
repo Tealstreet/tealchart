@@ -43,8 +43,11 @@ describe('drawing icon registry', () => {
     }
   });
 
-  it('returns undefined for tools without an authored icon', () => {
-    expect(resolveDrawingToolIconName('gannSquareFixed')).toBeUndefined();
+  it('authors an SVG icon for every drawing tool (no glyph fallbacks)', () => {
+    const missing = USER_DRAWING_TOOL_DESCRIPTORS.filter(
+      (descriptor) => !resolveDrawingToolIconName(descriptor.tool),
+    ).map((descriptor) => descriptor.tool);
+    expect(missing, `tools still falling back to glyphs: ${missing.join(', ')}`).toEqual([]);
   });
 
   it('resolves selected-action commands to authored icons', () => {
