@@ -414,7 +414,7 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
-  it('passes Shift placement constraints through pending mouse drags', () => {
+  it('passes Shift placement constraints (without cloning) through pending mouse drags', () => {
     const container = createContainer();
     const onDrawingDragPending = vi.fn(() => true);
     const onDrawingDragStart = vi.fn(() => true);
@@ -434,18 +434,39 @@ describe('EventManager drawing drag routing', () => {
     );
     window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 130, clientY: 110, shiftKey: true }));
 
-    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', {
-      constrainedPlacement: true,
-      duplicateOnDrag: true,
-    });
-    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', {
-      constrainedPlacement: true,
-      duplicateOnDrag: true,
-    });
-    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', {
-      constrainedPlacement: true,
-      duplicateOnDrag: true,
-    });
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', { constrainedPlacement: true });
+
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
+    manager.dispose();
+  });
+
+  it.each([
+    ['Alt', { altKey: true }],
+    ['Ctrl', { ctrlKey: true }],
+    ['Meta', { metaKey: true }],
+  ])('clones via %s-drag without constraining placement', (_label, modifier) => {
+    const container = createContainer();
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onDrawingDragPending: vi.fn(() => true),
+        onDrawingDragStart,
+        onDrawingDragMove,
+        onDrawingDragEnd: vi.fn(),
+      }),
+    );
+
+    container.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100, ...modifier }),
+    );
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 130, clientY: 110, ...modifier }));
+
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { duplicateOnDrag: true });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', { duplicateOnDrag: true });
 
     window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
     manager.dispose();
