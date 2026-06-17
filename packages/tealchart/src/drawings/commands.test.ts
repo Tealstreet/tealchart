@@ -78,6 +78,7 @@ const coveredUserDrawingCommandTypes = [
   'setFavoriteTools',
   'toggleFavoriteTool',
   'setFavoriteToolbarPosition',
+  'setDefaultStyleByKind',
   'setMeasureMode',
   'add',
   'select',

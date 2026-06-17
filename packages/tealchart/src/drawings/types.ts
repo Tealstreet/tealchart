@@ -918,6 +918,8 @@ export interface UserDrawingState {
   magnetMode?: UserDrawingMagnetMode;
   favoriteTools?: readonly UserDrawingTool[];
   favoriteToolbarPosition?: UserDrawingFavoriteToolbarPosition | null;
+  // Per-kind default styles: new drawings of a kind inherit the saved default.
+  defaultStylesByKind?: Partial<Record<UserDrawingKind, UserDrawingStyle>>;
   measureMode?: UserDrawingMeasureMode;
   measure?: UserDrawingMeasure | null;
   selection: UserDrawingSelection | null;

@@ -113,6 +113,30 @@ describe('drawing layout serialization', () => {
     expect(deserializeUserDrawingStateFromLayout({ ...persisted, magnetMode: 'future' })?.magnetMode).toBe('off');
   });
 
+  it('round-trips per-kind default styles and drops invalid kinds', () => {
+    const persisted = serializeUserDrawingStateForLayout(
+      createUserDrawingState({
+        defaultStylesByKind: {
+          trendLine: { lineColor: '#123456', lineWidth: 3, lineStyle: 'dashed' },
+        },
+      }),
+    );
+    expect(persisted).toBeDefined();
+    const restored = deserializeUserDrawingStateFromLayout(persisted);
+    expect(restored?.defaultStylesByKind?.trendLine).toMatchObject({
+      lineColor: '#123456',
+      lineWidth: 3,
+      lineStyle: 'dashed',
+    });
+
+    // Unknown/invalid kind keys are dropped on restore.
+    const withGarbage = deserializeUserDrawingStateFromLayout({
+      ...persisted,
+      defaultStylesByKind: { notATool: { lineColor: '#fff' }, select: { lineColor: '#000' } },
+    });
+    expect(withGarbage).toBeUndefined();
+  });
+
   it('round-trips favorite tools and toolbar position through layout state even without drawings', () => {
     const persisted = serializeUserDrawingStateForLayout(
       createUserDrawingState({ favoriteTools: ['trendLine', 'rectangle'], favoriteToolbarPosition: { x: 140, y: 72 } }),
