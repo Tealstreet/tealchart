@@ -755,6 +755,12 @@ export {
   getAllLayouts,
   deleteLayout,
   migrateFromLocalStorage,
+  // Storage-backed SaveLoad adapter
+  StorageSaveLoadAdapter,
+  DEFAULT_LAYOUT_STORAGE_NAMESPACE,
+  createLocalStorageKeyValueStorage,
+  createAsyncStorageKeyValueStorage,
+  createLocalStorageSaveLoadAdapter,
   // Indicator mapping utilities
   findMappingByCustomId,
   findMappingByTvStudyId,
@@ -773,6 +779,9 @@ export type {
   IndicatorMapping,
   ISaveLoadAdapter,
   LayoutMetadata,
+  TealchartKeyValueStorage,
+  AsyncStorageLike,
+  StorageSaveLoadAdapterOptions,
 } from './transformer';
 
 // Internationalization support
