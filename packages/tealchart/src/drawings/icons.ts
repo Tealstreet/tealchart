@@ -138,6 +138,77 @@ export const DRAWING_ICONS = {
   arrowMarkLeft: def([line(20, 12, 5, 12), polyline('11 6 5 12 11 18')]),
   arrowMarkRight: def([line(4, 12, 19, 12), polyline('13 6 19 12 13 18')]),
 
+  // --- Info / projection ---
+  infoLine: def([line(4, 20, 18, 6), circle(20, 4, 2.5), dot(20, 3.5, 0.8), line(20, 5, 20, 7)]),
+  forecast: def([polyline('4 18 10 12 14 15 20 6'), polyline('17 6 20 6 20 9')]),
+  projection: def([dot(4, 18, 2), line(4, 18, 20, 6), line(4, 18, 20, 18), p('M20 6 A14 12 0 0 1 20 18')]),
+  sector: def([line(5, 19, 5, 7), line(5, 19, 17, 19), p('M5 7 A12 12 0 0 1 17 19')]),
+
+  // --- Fibonacci ---
+  fibExtension: def([polyline('5 19 12 10 19 10'), line(5, 19, 19, 19), line(5, 14, 19, 14), line(5, 8, 19, 8), line(5, 3, 19, 3)]),
+  trendBasedFibExtension: def([polyline('4 20 12 10 20 10'), dot(4, 20), dot(12, 10), dot(20, 10), line(6, 16, 22, 16), line(6, 12, 22, 12), line(6, 7, 22, 7)]),
+  fibFan: def([line(4, 20, 4, 4), line(4, 20, 20, 20), line(4, 20, 20, 4), line(4, 20, 20, 10), line(4, 20, 20, 14)]),
+  fibSpeedResistanceFan: def([rect(4, 4, 16, 16), line(4, 20, 20, 4), line(4, 20, 14, 4), line(4, 20, 20, 10)]),
+  fibArcs: def([line(4, 20, 20, 20), p('M4 20 Q4 12 12 12'), p('M4 20 Q4 8 16 8'), p('M4 20 Q4 4 20 4')]),
+  fibSpeedResistanceArcs: def([line(4, 20, 20, 4), p('M4 20 Q4 12 12 12'), p('M4 20 Q4 6 18 6'), p('M4 20 Q4 4 20 4')]),
+  fibCircles: def([dot(12, 12), circle(12, 12, 4), circle(12, 12, 7), circle(12, 12, 11)]),
+  fibWedge: def([line(4, 20, 4, 6), line(4, 20, 20, 20), p('M4 6 A16 16 0 0 1 20 20')]),
+  fibSpiral: def([p('M12 12 Q12 8 16 8 Q20 8 20 12 Q20 18 12 18 Q4 18 4 12 Q4 4 14 4')]),
+  fibChannel: def([line(4, 18, 20, 10), line(4, 14, 20, 6), line(4, 10, 20, 2)]),
+  fibTimeZone: def([line(5, 4, 5, 20), line(8, 4, 8, 20), line(11, 4, 11, 20), line(16, 4, 16, 20), line(21, 4, 21, 20)]),
+  trendBasedFibTime: def([line(4, 18, 20, 6), dot(4, 18), dot(20, 6), line(8, 4, 8, 20), line(12, 4, 12, 20), line(17, 4, 17, 20)]),
+
+  // --- Gann ---
+  gannFan: def([line(3, 21, 3, 3), line(3, 21, 21, 21), line(3, 21, 21, 3), line(3, 21, 19, 9), line(3, 21, 9, 19)]),
+  gannBox: def([rect(4, 4, 16, 16, 1), line(4, 4, 20, 20), line(12, 4, 12, 20), line(4, 12, 20, 12)]),
+  gannSquare: def([rect(4, 4, 16, 16, 1), line(4, 4, 20, 20), line(4, 20, 20, 4)]),
+  gannSquareFixed: def([rect(4, 4, 16, 16, 1), line(4, 4, 20, 20), line(4, 20, 20, 4), dot(4, 20, 2.5)]),
+
+  // --- Pitchfork variants ---
+  schiffPitchfork: def([line(8, 18, 12, 12), line(12, 12, 12, 3), line(12, 12, 5, 6), line(12, 12, 19, 6)]),
+  modifiedSchiffPitchfork: def([line(5, 20, 10, 14), line(10, 14, 12, 3), line(10, 14, 4, 8), line(10, 14, 18, 8)]),
+  insidePitchfork: def([line(12, 3, 12, 12), line(6, 7, 6, 21), line(18, 7, 18, 21), line(6, 12, 18, 12), line(12, 12, 12, 21)]),
+  pitchfan: def([line(5, 19, 5, 5), line(5, 19, 19, 5), line(5, 19, 19, 12), line(5, 19, 19, 19)]),
+
+  // --- Harmonic / Elliott patterns ---
+  abcdPattern: def([polyline('3 18 9 7 15 18 21 7')]),
+  xabcdPattern: def([polyline('2 12 6 19 11 6 16 19 22 8')]),
+  cypherPattern: def([polyline('2 10 7 19 13 5 18 16 22 10')]),
+  threeDrivesPattern: def([polyline('2 19 6 14 9 17 13 10 16 13 21 5')]),
+  headShouldersPattern: def([polyline('2 19 5 19 7 13 9 19 12 6 15 19 17 13 19 19 22 19')]),
+  elliottImpulseWave: def([polyline('2 19 6 12 9 16 13 7 17 12 21 4')]),
+  elliottCorrectiveWave: def([polyline('3 8 9 18 15 11 21 18')]),
+  elliottDoubleComboWave: def([polyline('2 18 5 9 9 16 13 9 17 16 21 8')]),
+  elliottTripleComboWave: def([polyline('2 17 5 9 8 15 11 9 14 15 17 9 21 16')]),
+  elliottTriangleWave: def([polyline('3 5 7 19 11 9 15 16 19 12')]),
+
+  // --- Volume / VWAP ---
+  anchoredVwap: def([dot(4, 12, 2), p('M6 12 C9 8 11 16 14 12 C17 8 19 14 21 12')]),
+  anchoredVolumeProfile: def([line(4, 4, 4, 20), line(4, 8, 14, 8), line(4, 12, 18, 12), line(4, 16, 11, 16), line(4, 20, 16, 20)]),
+  fixedRangeVolumeProfile: def([rect(3, 3, 18, 18, 1), line(6, 7, 16, 7), line(6, 11, 13, 11), line(6, 15, 18, 15), line(6, 19, 10, 19)]),
+
+  // --- Curves / cycles ---
+  curve: def([p('M4 20 Q12 4 20 12')]),
+  doubleCurve: def([p('M4 18 Q12 6 20 12'), p('M4 12 Q12 0 20 6')]),
+  arc: def([p('M6 18 A10 10 0 0 1 18 6'), dot(6, 18, 2), dot(18, 6, 2)]),
+  polyline: def([polyline('4 18 8 10 12 15 16 7 20 12'), dot(4, 18, 1.5), dot(12, 15, 1.5), dot(20, 12, 1.5)]),
+  cyclicLines: def([line(5, 4, 5, 20), line(9, 4, 9, 20), line(13, 4, 13, 20), line(17, 4, 17, 20), line(21, 4, 21, 20)]),
+  timeCycles: def([line(3, 18, 21, 18), p('M3 18 A4 5 0 0 1 11 18'), p('M11 18 A4 5 0 0 1 19 18')]),
+  sineLine: def([p('M3 12 C5 6 7 6 9 12 C11 18 13 18 15 12 C17 6 19 6 21 12')]),
+
+  // --- Annotations / markers ---
+  anchoredNote: def([rect(5, 3, 14, 10, 1), line(7, 6, 15, 6), line(7, 9, 13, 9), dot(19, 18, 2), line(15, 12, 19, 16)]),
+  priceLabel: def([p('M7 5h12v14H7l-5-7 5-7z')]),
+  priceNote: def([p('M7 5h12v14H7l-5-7 5-7z'), line(9, 9, 16, 9), line(9, 12, 14, 12)]),
+  pin: def([p('M12 2a6 6 0 0 1 6 6c0 4-6 14-6 14S6 12 6 8a6 6 0 0 1 6-6z'), circle(12, 8, 2)]),
+  icon: def([rect(5, 5, 14, 14, 3), p('M12 8l1.2 2.4L16 11l-2 1.9.5 2.7L12 14.4 9.5 15.6l.5-2.7L8 11l2.8-.6z')]),
+  image: def([rect(3, 4, 18, 16, 2), circle(8, 9, 2), polyline('3 18 8 12 12 15 16 10 21 18')]),
+  emoji: def([circle(12, 12, 9), dot(9, 10, 1.5), dot(15, 10, 1.5), p('M8 14s1.5 3 4 3 4-3 4-3')]),
+  sticker: def([p('M4 4h16v10l-6 6H4z'), polyline('20 14 14 14 14 20')]),
+  balloon: def([p('M4 4h16v12H13l-3 4-1-4H4z')]),
+  signpost: def([line(12, 14, 12, 22), rect(4, 4, 16, 10, 1), line(7, 9, 17, 9)]),
+  table: def([rect(3, 3, 18, 18, 1), line(3, 9, 21, 9), line(3, 15, 21, 15), line(9, 3, 9, 21), line(15, 3, 15, 21)]),
+
   // --- Shared semantic icons (reused by tools + toolbar actions) ---
   eye: def([p('M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'), circle(12, 12, 3)]),
   eyeOff: def([
