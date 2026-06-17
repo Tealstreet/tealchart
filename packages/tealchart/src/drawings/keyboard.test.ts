@@ -18,6 +18,7 @@ const coveredUserDrawingKeyboardActionTypes = [
   'clearSelection',
   'deleteSelected',
   'cancelDraft',
+  'selectTool',
 ] as const satisfies readonly UserDrawingKeyboardActionType[];
 type MissingUserDrawingKeyboardActionType = Exclude<
   UserDrawingKeyboardActionType,
@@ -71,7 +72,38 @@ describe('user drawing keyboard actions', () => {
       'clearSelection',
       'deleteSelected',
       'cancelDraft',
+      'selectTool',
     ]);
+  });
+
+  it('selects a drawing tool from Alt + physical key, by code not key char', () => {
+    const state = createUserDrawingState();
+
+    // macOS yields a special character in `key` (e.g. Alt+T -> '†'); match on code.
+    expect(resolveUserDrawingKeyboardAction(state, { key: '†', code: 'KeyT', altKey: true })).toEqual({
+      type: 'selectTool',
+      tool: 'trendLine',
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(state, { key: 'h', code: 'KeyH', altKey: true })).toEqual({
+      type: 'selectTool',
+      tool: 'horizontalLine',
+      preventDefault: true,
+    });
+    expect(resolveUserDrawingKeyboardAction(state, { key: 'f', code: 'KeyF', altKey: true })).toEqual({
+      type: 'selectTool',
+      tool: 'fibRetracement',
+      preventDefault: true,
+    });
+  });
+
+  it('does not fire tool hotkeys without Alt, with extra modifiers, or for unmapped keys', () => {
+    const state = createUserDrawingState();
+
+    expect(resolveUserDrawingKeyboardAction(state, { key: 't', code: 'KeyT' })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(state, { key: 't', code: 'KeyT', altKey: true, ctrlKey: true })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(state, { key: 't', code: 'KeyT', altKey: true, shiftKey: true })).toBeNull();
+    expect(resolveUserDrawingKeyboardAction(state, { key: 'k', code: 'KeyK', altKey: true })).toBeNull();
   });
 
   it('ignores drawing shortcuts when chart does not own keyboard focus', () => {
