@@ -145,11 +145,17 @@ keep-drawing (stayInDrawingMode), lock-all, hide-all, and clear-all (trash).
   `getUserDrawingToolbarStateKey` now includes magnetMode + stayInDrawingMode
   so a toggle re-renders the memoized rail (same gate as favorites). Tests
   web + mobile; live web QA confirms toggle + active state.
-- I2 / I3 — DEFERRED pending product input: lock-all / hide-all / clear-all
-  already exist as buttons in the top action row (undo/redo/measure/zoom/
-  clear/hide/show/lock/unlock). Adding rail duplicates would be confusing, so
-  whether to relocate them into the rail (and add a clear-all confirm flow) is
-  a product decision flagged in the Epic I PR.
+- I2 / I3 — DONE (2026-06-17, per product decision to relocate). lock-all,
+  hide-all/show-all, and clear-all moved out of the top action row into the
+  bottom of the vertical drawing rail (web + mobile). Each renders as a single
+  state-aware toggle (lock↔unlock, hide↔show, reflecting + flipping on
+  all-locked / all-hidden) and is disabled when there are no drawings. Clear-all
+  gains a destructive confirm step (web `confirm()`, mobile `Alert.alert`).
+  Shared `isUserDrawingRailToolbarAction` predicate splits the five actions out
+  of the top row; the memo state key already tracks has-locked/has-hidden/
+  drawings.length so no key change was needed. Tests web + mobile; live web QA
+  confirmed render, enable/disable, toggle flip + active state, and the
+  clear-all confirm (accept clears, cancel does not).
 
 ## Sequencing & Dependencies
 
