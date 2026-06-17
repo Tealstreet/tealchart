@@ -30,6 +30,7 @@ import type {
   UserDrawingHandleRole,
   UserDrawingIconName,
   UserDrawing,
+  UserDrawingKind,
   UserDrawingState,
   UserDrawingStyle,
   UserDrawingTextAlign,
@@ -68,6 +69,7 @@ import {
   resolveUserDrawingSelectionAtPoint,
   selectUserDrawingById,
   selectUserDrawingsById,
+  setUserDrawingDefaultStyleByKind,
   setUserDrawingFavoriteToolbarPosition,
   setUserDrawingFavoriteTools,
   setUserDrawingIconName,
@@ -130,6 +132,7 @@ export type UserDrawingCommand =
       type: 'setFavoriteToolbarPosition';
       position: UserDrawingFavoriteToolbarPosition | null;
     })
+  | (UserDrawingCommandBase & { type: 'setDefaultStyleByKind'; kind: UserDrawingKind; style: UserDrawingStyle })
   | (UserDrawingCommandBase & { type: 'setMeasureMode'; measureMode: UserDrawingMeasureMode })
   | (UserDrawingCommandBase & { type: 'add'; drawing: UserDrawing; options?: AddUserDrawingOptions })
   | (UserDrawingCommandBase & { type: 'select'; drawingId: string | null; handle?: UserDrawingHandleRole })
@@ -444,6 +447,8 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return toggleUserDrawingFavoriteTool(state, command.tool);
     case 'setFavoriteToolbarPosition':
       return setUserDrawingFavoriteToolbarPosition(state, command.position);
+    case 'setDefaultStyleByKind':
+      return setUserDrawingDefaultStyleByKind(state, command.kind, command.style);
     case 'setMeasureMode':
       return setUserDrawingMeasureMode(state, command.measureMode);
     case 'add':

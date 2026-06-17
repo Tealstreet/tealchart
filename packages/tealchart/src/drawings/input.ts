@@ -3,6 +3,7 @@ import type {
   UserDrawingAnchor,
   BarsPatternBarSnapshot,
   UserDrawing,
+  UserDrawingKind,
   UserDrawingSelection,
   UserDrawingState,
   UserDrawingIconName,
@@ -135,6 +136,7 @@ export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}
     stayInDrawingMode: false,
     magnetMode: 'off',
     favoriteTools: [],
+    defaultStylesByKind: {},
     measureMode: 'off',
     measure: null,
     selection: null,
@@ -219,6 +221,20 @@ export function setUserDrawingFavoriteToolbarPosition(
   return {
     ...state,
     favoriteToolbarPosition: position,
+  };
+}
+
+export function setUserDrawingDefaultStyleByKind(
+  state: UserDrawingState,
+  kind: UserDrawingKind,
+  style: UserDrawingStyle,
+): UserDrawingState {
+  return {
+    ...state,
+    defaultStylesByKind: {
+      ...(state.defaultStylesByKind ?? {}),
+      [kind]: normalizeUserDrawingStyle({ ...style }),
+    },
   };
 }
 
@@ -1025,6 +1041,20 @@ export function endUserDrawingMeasure(state: UserDrawingState): UserDrawingState
   };
 }
 
+// New drawings inherit the saved per-kind default style when one exists,
+// otherwise the option style, otherwise the tool's built-in baseline.
+function resolveNewDraftStyle(
+  state: UserDrawingState,
+  tool: UserDrawingTool,
+  optionStyle: UserDrawingStyle | undefined,
+  fallbackStyle: UserDrawingStyle,
+): UserDrawingStyle {
+  // The saved per-kind default is authoritative for new drawings, so it wins over
+  // a caller-provided baseline; an explicit absence falls back to it then the tool default.
+  const saved = tool === 'select' ? undefined : state.defaultStylesByKind?.[tool];
+  return normalizeUserDrawingStyle(saved ?? optionStyle ?? fallbackStyle);
+}
+
 export function handleUserDrawingInput(
   state: UserDrawingState,
   point: UserDrawingInputPoint,
@@ -1051,7 +1081,7 @@ export function handleUserDrawingInput(
           paneId: point.paneId,
           anchors: [point.anchor],
           positions: point.position ? [normalizeUserDrawingPanePosition(point.position)] : undefined,
-          style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
+          style: resolveNewDraftStyle(state, state.activeTool, options.style, DEFAULT_USER_DRAWING_STYLE),
           text: options.text,
           barsPatternBars: state.activeTool === 'barsPattern' ? point.bars : undefined,
           startedAt,
@@ -1137,7 +1167,12 @@ export function beginUserDrawingPathDrag(
       tool: state.activeTool,
       paneId: point.paneId,
       anchors: [point.anchor],
-      style: normalizeUserDrawingStyle(options.style ?? getDefaultUserDrawingStyleForTool(state.activeTool)),
+      style: resolveNewDraftStyle(
+        state,
+        state.activeTool,
+        options.style,
+        getDefaultUserDrawingStyleForTool(state.activeTool),
+      ),
       startedAt: options.now?.() ?? Date.now(),
     },
     textEdit: null,
@@ -1159,7 +1194,7 @@ export function beginUserDrawingPlacementDrag(
       paneId: point.paneId,
       anchors: [point.anchor],
       positions: point.position ? [normalizeUserDrawingPanePosition(point.position)] : undefined,
-      style: normalizeUserDrawingStyle(options.style ?? DEFAULT_USER_DRAWING_STYLE),
+      style: resolveNewDraftStyle(state, state.activeTool, options.style, DEFAULT_USER_DRAWING_STYLE),
       text: options.text,
       barsPatternBars: state.activeTool === 'barsPattern' ? point.bars : undefined,
       startedAt: options.now?.() ?? Date.now(),

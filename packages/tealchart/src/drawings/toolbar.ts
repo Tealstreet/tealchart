@@ -106,6 +106,9 @@ export type UserDrawingSelectedActionSurfaceCommand =
       duplicate: boolean;
     }
   | {
+      type: 'saveSelectedStyleAsDefault';
+    }
+  | {
       type: 'updateStyle';
       style: Partial<UserDrawingStyle>;
     }
@@ -1110,6 +1113,13 @@ const USER_DRAWING_SELECTED_ACTION_SURFACE_ACTIONS: readonly UserDrawingSelected
         command: { type: 'setDuplicateEditDrag', duplicate: true },
       },
       {
+        id: 'saveSelectedStyleAsDefault',
+        icon: '★',
+        label: 'Set as default style for this drawing type',
+        enabled: false,
+        command: { type: 'saveSelectedStyleAsDefault' },
+      },
+      {
         ...getUserDrawingToolbarActionDescriptor('deleteSelected'),
         id: 'deleteSelected',
         enabled: false,
@@ -1688,6 +1698,11 @@ export function resolveUserDrawingSelectedActionSurface(
               duplicate: !duplicateEditDragEnabled,
             },
           };
+        }
+        if (item.command.type === 'saveSelectedStyleAsDefault') {
+          // Gate on the primary selection's lock state — that's the drawing whose
+          // style the dispatch (getSelectedUserDrawing) actually captures.
+          return { ...item, enabled: selectedDrawing !== null && !selectedDrawing.locked };
         }
         if (
           item.command.type === 'updateStyle' ||
