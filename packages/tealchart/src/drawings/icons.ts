@@ -201,7 +201,7 @@ export const DRAWING_ICONS = {
   priceLabel: def([p('M7 5h12v14H7l-5-7 5-7z')]),
   priceNote: def([p('M7 5h12v14H7l-5-7 5-7z'), line(9, 9, 16, 9), line(9, 12, 14, 12)]),
   pin: def([p('M12 2a6 6 0 0 1 6 6c0 4-6 14-6 14S6 12 6 8a6 6 0 0 1 6-6z'), circle(12, 8, 2)]),
-  icon: def([rect(5, 5, 14, 14, 3), p('M12 8l1.2 2.4L16 11l-2 1.9.5 2.7L12 14.4 9.5 15.6l.5-2.7L8 11l2.8-.6z')]),
+  icon: def([rect(5, 5, 14, 14, 3), p('M12 8l1.2 2.4L16 11l-2 1.9 .5 2.7L12 14.4 9.5 15.6l.5-2.7L8 11l2.8-.6z')]),
   image: def([rect(3, 4, 18, 16, 2), circle(8, 9, 2), polyline('3 18 8 12 12 15 16 10 21 18')]),
   emoji: def([circle(12, 12, 9), dot(9, 10, 1.5), dot(15, 10, 1.5), p('M8 14s1.5 3 4 3 4-3 4-3')]),
   sticker: def([p('M4 4h16v10l-6 6H4z'), polyline('20 14 14 14 14 20')]),
