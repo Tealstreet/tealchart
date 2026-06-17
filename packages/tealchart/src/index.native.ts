@@ -15,6 +15,8 @@ export type { SkiaTealchartHandle, SkiaTealchartProps, SkiaTealscriptIndicatorOp
 // Mobile-specific components
 export { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 export type { ChartTopBarComponentProps } from './mobile/components/ChartTopBarComponent';
+export { LayoutSelectorSheet } from './mobile/components/LayoutSelectorSheet';
+export type { LayoutSelectorSheetProps } from './mobile/components/LayoutSelectorSheet';
 // AVAILABLE_TIMEFRAMES / TimeframeOption are defined in chartState, not the top bar component.
 export { AVAILABLE_TIMEFRAMES as MOBILE_TIMEFRAMES } from './state/chartState';
 export type { TimeframeOption as MobileTimeframeOption } from './state/chartState';
@@ -49,6 +51,12 @@ export type {
   UseTealchartLayoutPersistenceOptions,
   UseTealchartLayoutPersistenceResult,
 } from './mobile/hooks/useTealchartLayoutPersistence';
+
+export { useTealchartNamedDrawingLayouts } from './mobile/hooks/useTealchartNamedDrawingLayouts';
+export type {
+  UseTealchartNamedDrawingLayoutsOptions,
+  UseTealchartNamedDrawingLayoutsResult,
+} from './mobile/hooks/useTealchartNamedDrawingLayouts';
 
 // Mobile utilities
 export { priceToY, yToPrice, timeToX, xToTime, getGestureZone } from './mobile/utils/coordinates';
