@@ -87,4 +87,24 @@ describe('LayoutSelectorSheet', () => {
     renderSheet({ layouts: [], currentLayoutId: null });
     expect(screen.getByText('No saved layouts')).toBeTruthy();
   });
+
+  it('exits the rename editor if the edited layout is removed', () => {
+    const props = {
+      visible: true,
+      layouts,
+      currentLayoutId: 'a' as string | number | null,
+      onSaveAs: vi.fn(),
+      onLoad: vi.fn(),
+      onRename: vi.fn(),
+      onDelete: vi.fn(),
+      onClose: vi.fn(),
+    };
+    const { rerender } = render(<LayoutSelectorSheet {...props} />);
+    fireEvent.click(screen.getByLabelText('Rename layout Scalp'));
+    expect(screen.getByLabelText('Edit layout name')).toBeTruthy();
+
+    rerender(<LayoutSelectorSheet {...props} layouts={[layouts[1]]} />);
+    expect(screen.queryByLabelText('Edit layout name')).toBeNull();
+    expect(screen.getByLabelText('Load layout Swing')).toBeTruthy();
+  });
 });

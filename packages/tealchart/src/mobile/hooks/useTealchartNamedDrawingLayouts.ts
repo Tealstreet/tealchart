@@ -121,7 +121,15 @@ export function useTealchartNamedDrawingLayouts(
     async (id: string | number, name: string): Promise<void> => {
       const content = await adapter.getChartContent(id);
       const existing = layouts.find((l) => sameId(id, l.id));
-      await adapter.saveChart({ id, name, symbol: existing?.symbol ?? symbol, resolution, content });
+      // Never re-save empty content (would make the layout unloadable); fall back
+      // to an empty-layout marker if the stored content is missing.
+      await adapter.saveChart({
+        id,
+        name,
+        symbol: existing?.symbol ?? symbol,
+        resolution,
+        content: content || JSON.stringify(null),
+      });
       await refresh();
     },
     [adapter, layouts, symbol, resolution, refresh],
