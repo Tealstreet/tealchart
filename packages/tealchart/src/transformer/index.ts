@@ -63,3 +63,17 @@ export {
   deleteLayout,
   migrateFromLocalStorage,
 } from './saveLoadIntegration';
+
+// Storage-backed SaveLoad adapter (default localStorage / AsyncStorage persistence)
+export type {
+  TealchartKeyValueStorage,
+  AsyncStorageLike,
+  StorageSaveLoadAdapterOptions,
+} from './storageSaveLoadAdapter';
+export {
+  StorageSaveLoadAdapter,
+  DEFAULT_LAYOUT_STORAGE_NAMESPACE,
+  createLocalStorageKeyValueStorage,
+  createAsyncStorageKeyValueStorage,
+  createLocalStorageSaveLoadAdapter,
+} from './storageSaveLoadAdapter';

@@ -102,6 +102,7 @@ import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore, hasChartStore } from './state/chartState';
+import { createLocalStorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
 import { generateIndicatorId } from './state/indicatorActions';
 import { TealchartApi } from './TealchartApi';
 import { TealscriptManager } from './tealscript/TealscriptManager';
@@ -131,6 +132,25 @@ import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
+
+/** Auto-save debounce applied only when the default localStorage adapter is used. */
+const DEFAULT_AUTO_SAVE_DELAY_SECONDS = 1;
+
+/**
+ * Fall back to a localStorage-backed layout adapter (with a short auto-save delay)
+ * when no save_load_adapter is supplied and persistence is not opted out. Returns
+ * a shallow clone so the caller's options object is never mutated.
+ */
+export function resolveDefaultLayoutPersistence(options: TealchartWidgetOptions): TealchartWidgetOptions {
+  if (options.save_load_adapter || options.disable_default_layout_persistence) return options;
+  const defaultAdapter = createLocalStorageSaveLoadAdapter();
+  if (!defaultAdapter) return options;
+  return {
+    ...options,
+    save_load_adapter: defaultAdapter,
+    auto_save_delay: options.auto_save_delay ?? DEFAULT_AUTO_SAVE_DELAY_SECONDS,
+  };
+}
 
 /**
  * Main widget class (equivalent to TradingView's IChartingLibraryWidget)
@@ -251,7 +271,7 @@ export class TealchartWidget {
 
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
-    this._options = options;
+    this._options = resolveDefaultLayoutPersistence(options);
     this._datafeed = options.datafeed;
     this._symbol = options.symbol;
 
