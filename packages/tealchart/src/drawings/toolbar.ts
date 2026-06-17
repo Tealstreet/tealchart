@@ -1700,7 +1700,9 @@ export function resolveUserDrawingSelectedActionSurface(
           };
         }
         if (item.command.type === 'saveSelectedStyleAsDefault') {
-          return { ...item, enabled: hasUnlockedSelectedDrawing(state) };
+          // Gate on the primary selection's lock state — that's the drawing whose
+          // style the dispatch (getSelectedUserDrawing) actually captures.
+          return { ...item, enabled: selectedDrawing !== null && !selectedDrawing.locked };
         }
         if (
           item.command.type === 'updateStyle' ||

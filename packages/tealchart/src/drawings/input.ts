@@ -1049,8 +1049,10 @@ function resolveNewDraftStyle(
   optionStyle: UserDrawingStyle | undefined,
   fallbackStyle: UserDrawingStyle,
 ): UserDrawingStyle {
+  // The saved per-kind default is authoritative for new drawings, so it wins over
+  // a caller-provided baseline; an explicit absence falls back to it then the tool default.
   const saved = tool === 'select' ? undefined : state.defaultStylesByKind?.[tool];
-  return normalizeUserDrawingStyle(optionStyle ?? saved ?? fallbackStyle);
+  return normalizeUserDrawingStyle(saved ?? optionStyle ?? fallbackStyle);
 }
 
 export function handleUserDrawingInput(

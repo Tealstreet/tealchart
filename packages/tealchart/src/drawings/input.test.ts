@@ -223,6 +223,14 @@ describe('user drawing input controller', () => {
       { createId: () => 'r-1', now: () => 6 },
     );
     expect(rectDraft.draft?.style.lineColor).not.toBe('#00ff00');
+
+    // The saved default is authoritative — it wins over a caller-provided style.
+    const overridden = handleUserDrawingInput(
+      setUserDrawingTool(withDefault, 'trendLine'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'tl-2', now: () => 7, style: { lineColor: '#ff0000', lineWidth: 1, lineStyle: 'solid' } },
+    );
+    expect(overridden.draft?.style.lineColor).toBe('#00ff00');
   });
 
   it('accumulates a two-anchor draft then commits a drawing', () => {
