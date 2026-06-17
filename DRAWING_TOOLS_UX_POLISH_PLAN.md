@@ -157,18 +157,37 @@ keep-drawing (stayInDrawingMode), lock-all, hide-all, and clear-all (trash).
   confirmed render, enable/disable, toggle flip + active state, and the
   clear-all confirm (accept clears, cancel does not).
 
+### Epic J: Long-Tail SVG Icon Coverage — DONE (2026-06-17)
+
+Authored SVG geometry for the ~55 remaining drawing tools that fell back to
+Unicode glyphs, so the **entire** tool palette renders sharp line-icons on web
+and mobile (shared `drawings/icons.ts` registry — adding a tool key auto-enables
+both platforms via `resolveDrawingToolIconName`). Families covered: info/
+projection (infoLine, forecast, projection, sector), the full Fibonacci set
+(extension, trend-based extension, fan, speed-resistance fan, arcs, speed-
+resistance arcs, circles, wedge, spiral, channel, time zone, trend-based time),
+Gann (fan, box, square, square-fixed), pitchfork variants (schiff, modified
+schiff, inside, pitchfan), harmonic/Elliott patterns (ABCD, XABCD, cypher, three
+drives, head-and-shoulders, impulse, corrective, double/triple combo, triangle),
+volume/VWAP (anchored VWAP, anchored + fixed-range volume profile), curves/cycles
+(curve, double curve, arc, polyline, cyclic lines, time cycles, sine), and
+annotations/markers (anchored note, price label, price note, pin, icon, image,
+emoji, sticker, balloon, signpost, table). `icons.test.ts` now asserts **zero
+glyph fallbacks** across `USER_DRAWING_TOOL_DESCRIPTORS`. Live web QA: rendered a
+contact sheet of all 55 in the running app — every one resolves to SVG and reads
+as its tool.
+
 ## Sequencing & Dependencies
 
-F → (G, H, I). Icons are foundational: G/H/I all render icons, so authoring the
-icon system first avoids re-iconing. After F, G is highest UX value (selected
-editing), then H (favorites), then I (rail toggles).
+F → (G, H, I) → J. Icons are foundational: G/H/I all render icons, so authoring
+the core icon system (F) first avoids re-iconing; J back-fills the long tail once
+the structural epics are done. After F, G is highest UX value (selected editing),
+then H (favorites), then I (rail toggles), then J (icon completeness).
 
 ## Out of Scope / Follow-Ups
 
 - Multi-chart "sync drawings to all charts" (the chain-link rail item) — a
   layout/host concern, not single-chart tealchart; revisit if premys grows
   multi-pane layouts.
-- Full SVG coverage of the long-tail ~100 tools (Gann, fib, pitchfork variants,
-  patterns) — authored opportunistically; glyph fallback meanwhile.
 - Mobile on-device visual QA of all of the above (shared layer + tests cover
   parity; device pass is a recorded follow-up).
