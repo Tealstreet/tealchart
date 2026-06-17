@@ -414,7 +414,7 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
-  it('passes Shift placement constraints through pending mouse drags', () => {
+  it('passes Shift placement constraints (without cloning) through pending mouse drags', () => {
     const container = createContainer();
     const onDrawingDragPending = vi.fn(() => true);
     const onDrawingDragStart = vi.fn(() => true);
@@ -434,20 +434,88 @@ describe('EventManager drawing drag routing', () => {
     );
     window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 130, clientY: 110, shiftKey: true }));
 
-    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', {
-      constrainedPlacement: true,
-      duplicateOnDrag: true,
-    });
-    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', {
-      constrainedPlacement: true,
-      duplicateOnDrag: true,
-    });
-    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', {
-      constrainedPlacement: true,
-      duplicateOnDrag: true,
-    });
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', { constrainedPlacement: true });
 
     window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
+    manager.dispose();
+  });
+
+  it.each([
+    ['Alt', { altKey: true }],
+    ['Ctrl', { ctrlKey: true }],
+    ['Meta', { metaKey: true }],
+  ])('clones via %s-mouse-drag without constraining placement', (_label, modifier) => {
+    const container = createContainer();
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const manager = new EventManager(
+      container,
+      createCallbacks({ onDrawingDragPending, onDrawingDragStart, onDrawingDragMove, onDrawingDragEnd: vi.fn() }),
+    );
+
+    container.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100, ...modifier }),
+    );
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 130, clientY: 110, ...modifier }));
+
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { duplicateOnDrag: true });
+    expect(onDrawingDragStart).toHaveBeenCalledWith(100, 100, 'mouse', { duplicateOnDrag: true });
+    expect(onDrawingDragMove).toHaveBeenCalledWith(130, 110, 'mouse', { duplicateOnDrag: true });
+
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 130, clientY: 110 }));
+    manager.dispose();
+  });
+
+  it('clones via Alt-pointer-drag (touch-pen pointer path)', () => {
+    const container = createContainer();
+    const onDrawingDragPending = vi.fn(() => true);
+    const onDrawingDragStart = vi.fn(() => true);
+    const onDrawingDragMove = vi.fn(() => true);
+    const manager = new EventManager(
+      container,
+      createCallbacks({ onDrawingDragPending, onDrawingDragStart, onDrawingDragMove, onDrawingDragEnd: vi.fn() }),
+    );
+
+    container.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100,
+        pointerId: 1,
+        pointerType: 'pen',
+        altKey: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent('pointermove', { bubbles: true, clientX: 130, clientY: 110, pointerId: 1, pointerType: 'pen', altKey: true }),
+    );
+
+    // PointerEvent carries a default pressure of 0, which the drag options surface.
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { duplicateOnDrag: true, pressure: 0 });
+
+    window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 0, clientX: 130, clientY: 110, pointerId: 1, pointerType: 'pen' }));
+    manager.dispose();
+  });
+
+  it('lets Shift win over a clone modifier: Shift+Alt-drag constrains without cloning', () => {
+    const container = createContainer();
+    const onDrawingDragPending = vi.fn(() => true);
+    const manager = new EventManager(
+      container,
+      createCallbacks({ onDrawingDragPending, onDrawingDragStart: vi.fn(() => true), onDrawingDragEnd: vi.fn() }),
+    );
+
+    container.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100, shiftKey: true, altKey: true }),
+    );
+
+    expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });
+
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
     manager.dispose();
   });
 
