@@ -1586,28 +1586,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       if (enabled) {
         btn.addEventListener('click', () => {
           if (item.command.type !== 'toolbarAction') return;
-          const allDrawingOptions = state ? getUserDrawingAllDrawingsUpdateOptions(state) : { drawingIds: [] };
-          const allDrawingOptionsIncludingLocked = state
-            ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
-            : { drawingIds: [], includeLocked: true };
           if (item.command.action === 'undo') this.options.onUserDrawingUndo?.();
           if (item.command.action === 'redo') this.options.onUserDrawingRedo?.();
           if (item.command.action === 'measure') this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on');
           if (item.command.action === 'zoomIn') this.options.onUserDrawingZoomIn?.();
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
-          if (item.command.action === 'clearAll') this.options.onUserDrawingClearAll?.();
-          if (item.command.action === 'hideAll') {
-            this.options.onUserDrawingVisibilityChange?.(false, allDrawingOptionsIncludingLocked);
-          }
-          if (item.command.action === 'showAll') {
-            this.options.onUserDrawingVisibilityChange?.(true, allDrawingOptionsIncludingLocked);
-          }
-          if (item.command.action === 'lockAll') {
-            this.options.onUserDrawingLockedChange?.(true, allDrawingOptions);
-          }
-          if (item.command.action === 'unlockAll') {
-            this.options.onUserDrawingLockedChange?.(false, allDrawingOptionsIncludingLocked);
-          }
         });
         btn.addEventListener('mouseenter', () => {
           if (!active) Object.assign(btn.style, styles.drawingButtonHover);

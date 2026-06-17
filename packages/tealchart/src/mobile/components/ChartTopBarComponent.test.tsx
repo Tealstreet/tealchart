@@ -33,6 +33,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
   afterEach(() => {
     cleanup();
     clearChartStoreCache();
+    Alert.lastButtons = [];
   });
 
   it('renders categorized drawing tools and dispatches tool changes', () => {

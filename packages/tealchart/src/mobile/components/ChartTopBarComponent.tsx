@@ -696,13 +696,6 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       accessibilityState={{ disabled: !enabled, selected: active }}
                       disabled={!enabled}
                       onPress={() => {
-                        const allDrawingOptions = getUserDrawingAllDrawingsUpdateOptions(userDrawingState);
-                        const allDrawingOptionsIncludingLocked = getUserDrawingAllDrawingsUpdateOptions(
-                          userDrawingState,
-                          {
-                            includeLocked: true,
-                          },
-                        );
                         if (descriptor.action === 'undo') onUserDrawingUndo?.();
                         if (descriptor.action === 'redo') onUserDrawingRedo?.();
                         if (descriptor.action === 'measure') {
@@ -710,19 +703,6 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         }
                         if (descriptor.action === 'zoomIn') onUserDrawingZoomIn?.();
                         if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
-                        if (descriptor.action === 'clearAll') onUserDrawingClearAll?.();
-                        if (descriptor.action === 'hideAll') {
-                          onUserDrawingVisibilityChange?.(false, allDrawingOptionsIncludingLocked);
-                        }
-                        if (descriptor.action === 'showAll') {
-                          onUserDrawingVisibilityChange?.(true, allDrawingOptionsIncludingLocked);
-                        }
-                        if (descriptor.action === 'lockAll') {
-                          onUserDrawingLockedChange?.(true, allDrawingOptions);
-                        }
-                        if (descriptor.action === 'unlockAll') {
-                          onUserDrawingLockedChange?.(false, allDrawingOptionsIncludingLocked);
-                        }
                       }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingButton,
