@@ -1,8 +1,18 @@
 import type { TealchartWidgetOptions } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from './state/chartState';
 import { resolveDefaultLayoutPersistence } from './TealchartWidget';
+
+afterEach(() => {
+  clearChartStoreCache();
+  try {
+    localStorage.clear();
+  } catch {
+    // ignore
+  }
+});
 
 function baseOptions(extra: Partial<TealchartWidgetOptions> = {}): TealchartWidgetOptions {
   return {

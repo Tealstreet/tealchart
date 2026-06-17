@@ -131,7 +131,7 @@ export class StorageSaveLoadAdapter implements ISaveLoadAdapter {
     if (!raw) return '';
     try {
       const parsed = JSON.parse(raw) as TvChartData;
-      return parsed.content ?? '';
+      return typeof parsed.content === 'string' ? parsed.content : '';
     } catch {
       return '';
     }
@@ -160,8 +160,15 @@ export class StorageSaveLoadAdapter implements ISaveLoadAdapter {
  * is unavailable (SSR, hardened environments). All access is failure-tolerant.
  */
 export function createLocalStorageKeyValueStorage(): TealchartKeyValueStorage | null {
-  if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return null;
-  const ls = window.localStorage;
+  let ls: Storage;
+  try {
+    // Accessing window.localStorage can throw SecurityError in hardened /
+    // privacy contexts (e.g. blocked storage), not merely be undefined.
+    if (typeof window === 'undefined' || !window.localStorage) return null;
+    ls = window.localStorage;
+  } catch {
+    return null;
+  }
   return {
     getItem: (key) => {
       try {
