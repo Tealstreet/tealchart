@@ -765,13 +765,21 @@ export interface TealchartWidgetOptions {
   showTopBar?: boolean;
   /**
    * SaveLoadAdapter for loading/saving layouts (same pattern as TradingView's save_load_adapter)
-   * When provided, enables layout selector UI in the top bar
+   * When provided, enables layout selector UI in the top bar.
+   * When omitted, the widget falls back to a localStorage-backed adapter so
+   * layouts persist by default (see disable_default_layout_persistence).
    */
   save_load_adapter?: import('./transformer').ISaveLoadAdapter;
+  /**
+   * Opt out of the default localStorage-backed layout persistence used when no
+   * save_load_adapter is supplied. Set true for fully ephemeral charts.
+   */
+  disable_default_layout_persistence?: boolean;
   /**
    * Auto-save delay in seconds (same pattern as TradingView's auto_save_delay)
    * When set, automatically saves the layout after this many seconds of inactivity
    * following a change. Set to 0 or omit to disable auto-save.
+   * Defaults to a short delay only when the default localStorage adapter is used.
    */
   auto_save_delay?: number;
   /**

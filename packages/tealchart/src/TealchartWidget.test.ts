@@ -240,6 +240,9 @@ function createWidget(datafeed: MockDatafeed, overrides: Partial<TealchartWidget
     datafeed,
     gapDetection: { enabled: false },
     disableDebugOverlay: true,
+    // Keep the existing suite focused on widget behavior, not the default
+    // localStorage persistence (tests that need it pass their own adapter).
+    disable_default_layout_persistence: true,
     ...overrides,
   });
 }
@@ -286,6 +289,11 @@ describe('TealchartWidget', () => {
     // Chart stores are cached for the process lifetime; clear between tests so
     // per-chartKey interval persistence doesn't leak across tests.
     clearChartStoreCache();
+    try {
+      localStorage.clear();
+    } catch {
+      // ignore
+    }
   });
 
   // ============================================================================
