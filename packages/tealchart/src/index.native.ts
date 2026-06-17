@@ -40,11 +40,24 @@ export type { UseChartGesturesOptions, UseChartGesturesResult } from './mobile/h
 export { useLabelCollision } from './mobile/hooks/useLabelCollision';
 export type { LabelBounds } from './mobile/hooks/useLabelCollision';
 
+export {
+  useTealchartLayoutPersistence,
+  loadPersistedUserDrawingLayout,
+  savePersistedUserDrawingLayout,
+} from './mobile/hooks/useTealchartLayoutPersistence';
+export type {
+  UseTealchartLayoutPersistenceOptions,
+  UseTealchartLayoutPersistenceResult,
+} from './mobile/hooks/useTealchartLayoutPersistence';
+
 // Mobile utilities
 export { priceToY, yToPrice, timeToX, xToTime, getGestureZone } from './mobile/utils/coordinates';
 export type { ChartDimensions, GestureZone } from './mobile/utils/coordinates';
 export { resolveMobileUserDrawingInputPoint } from './mobile/utils/drawingInput';
-export type { MobileUserDrawingInputPane, ResolveMobileUserDrawingInputPointOptions } from './mobile/utils/drawingInput';
+export type {
+  MobileUserDrawingInputPane,
+  ResolveMobileUserDrawingInputPointOptions,
+} from './mobile/utils/drawingInput';
 export {
   exportMobileUserDrawingStateForLayout,
   importMobileUserDrawingStateFromLayout,
