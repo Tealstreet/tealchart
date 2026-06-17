@@ -131,6 +131,27 @@ describe('useTealchartLayoutPersistence', () => {
     expect(storage.map.has(KEY)).toBe(false);
   });
 
+  it('does not leak state across a storageKey change', async () => {
+    const storage = makeStorage();
+    await savePersistedUserDrawingLayout(storage, 'keyA', stateWithDrawing());
+
+    const { result, rerender } = renderHook(
+      ({ k }: { k: string }) => useTealchartLayoutPersistence({ storage, storageKey: k, autoSaveDelayMs: 10 }),
+      { initialProps: { k: 'keyA' } },
+    );
+    await waitFor(() => expect(result.current.ready).toBe(true));
+    expect(result.current.initialUserDrawingState?.drawings).toHaveLength(1);
+
+    rerender({ k: 'keyB' });
+    await waitFor(() => expect(result.current.initialUserDrawingState).toBeUndefined());
+    await act(async () => {
+      await result.current.saveNow();
+    });
+    // The previous key's state must not bleed into the new key.
+    expect(storage.map.has('keyB')).toBe(false);
+    expect(storage.map.has('keyA')).toBe(true);
+  });
+
   it('does not persist when disabled', async () => {
     const storage = makeStorage();
     const { result } = renderHook(() =>
