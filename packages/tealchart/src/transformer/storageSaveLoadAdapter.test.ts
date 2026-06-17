@@ -3,6 +3,7 @@ import type { TvChartData } from './types';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   createAsyncStorageKeyValueStorage,
   createLocalStorageKeyValueStorage,
@@ -10,6 +11,15 @@ import {
   DEFAULT_LAYOUT_STORAGE_NAMESPACE,
   StorageSaveLoadAdapter,
 } from './storageSaveLoadAdapter';
+
+afterEach(() => {
+  clearChartStoreCache();
+  try {
+    localStorage.clear();
+  } catch {
+    // ignore
+  }
+});
 
 function makeSyncStorage(): TealchartKeyValueStorage & { map: Map<string, string> } {
   const map = new Map<string, string>();
@@ -108,6 +118,14 @@ describe('StorageSaveLoadAdapter', () => {
     expect(await adapter.getChartContent('bad')).toBe('');
   });
 
+  it('returns empty content when a record has a non-string content field', async () => {
+    storage.map.set(
+      `${DEFAULT_LAYOUT_STORAGE_NAMESPACE}:chart:weird`,
+      JSON.stringify({ id: 'weird', name: 'x', symbol: 'y', resolution: '60', content: { not: 'a string' } }),
+    );
+    expect(await adapter.getChartContent('weird')).toBe('');
+  });
+
   it('tolerates a corrupt index', async () => {
     storage.map.set(`${DEFAULT_LAYOUT_STORAGE_NAMESPACE}:index`, 'not-an-array');
     expect(await adapter.getAllCharts()).toEqual([]);
@@ -195,6 +213,19 @@ describe('createLocalStorageKeyValueStorage / createLocalStorageSaveLoadAdapter'
 
   it('returns null when window/localStorage is unavailable', () => {
     delete (globalThis as { window?: unknown }).window;
+    expect(createLocalStorageKeyValueStorage()).toBeNull();
+    expect(createLocalStorageSaveLoadAdapter()).toBeNull();
+  });
+
+  it('returns null when accessing localStorage throws (SecurityError / hardened context)', () => {
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {
+        get localStorage(): Storage {
+          throw new Error('SecurityError');
+        },
+      },
+    });
     expect(createLocalStorageKeyValueStorage()).toBeNull();
     expect(createLocalStorageSaveLoadAdapter()).toBeNull();
   });
