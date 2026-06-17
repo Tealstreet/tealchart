@@ -1,6 +1,6 @@
 import type { LayoutMetadata } from '../../transformer';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
 import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -42,6 +42,14 @@ export const LayoutSelectorSheet = memo(
     const [newName, setNewName] = useState('');
     const [editingId, setEditingId] = useState<string | number | null>(null);
     const [editingName, setEditingName] = useState('');
+
+    // Exit the rename editor if the edited layout disappears (deleted elsewhere).
+    useEffect(() => {
+      if (editingId !== null && !layouts.some((l) => sameId(editingId, l.id))) {
+        setEditingId(null);
+        setEditingName('');
+      }
+    }, [editingId, layouts]);
 
     const submitNew = useCallback(() => {
       const name = newName.trim();

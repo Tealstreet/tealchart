@@ -1,5 +1,5 @@
 import type { UserDrawing, UserDrawingState } from '../../drawings';
-import type { AsyncStorageLike } from '../../transformer';
+import type { AsyncStorageLike, ISaveLoadAdapter, TvChartData } from '../../transformer';
 
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -113,5 +113,31 @@ describe('useTealchartNamedDrawingLayouts', () => {
     const activeId = result.current.currentLayoutId!;
     const content = await adapter.getChartContent(activeId);
     expect(content).toContain('trendLine');
+  });
+
+  it('never re-saves empty content on rename', async () => {
+    const saved: TvChartData[] = [];
+    const fakeAdapter: ISaveLoadAdapter = {
+      saveChart: async (data) => {
+        saved.push(data);
+        return String(data.id ?? 'x');
+      },
+      getChartContent: async () => '', // simulate a missing/corrupt record
+      getAllCharts: async () => [{ id: 'x', name: 'X', symbol: '' }],
+      removeChart: async () => {},
+    };
+    const { result } = renderHook(() =>
+      useTealchartNamedDrawingLayouts({
+        adapter: fakeAdapter,
+        getDrawingState: () => undefined,
+        applyDrawingState: vi.fn(),
+      }),
+    );
+    await waitFor(() => expect(result.current.ready).toBe(true));
+    await act(async () => {
+      await result.current.rename('x', 'Renamed');
+    });
+    expect(saved.at(-1)?.content).toBe(JSON.stringify(null));
+    expect(saved.at(-1)?.content).not.toBe('');
   });
 });
