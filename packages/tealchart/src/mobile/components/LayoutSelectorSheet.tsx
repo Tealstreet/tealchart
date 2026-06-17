@@ -4,6 +4,8 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 
 import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { useChartTranslations } from '../../i18n';
+
 export interface LayoutSelectorSheetProps {
   visible: boolean;
   layouts: LayoutMetadata[];
@@ -37,8 +39,9 @@ export const LayoutSelectorSheet = memo(
     onDelete,
     onClose,
     onSaveCurrent,
-    title = 'Layouts',
+    title,
   }: LayoutSelectorSheetProps) => {
+    const t = useChartTranslations();
     const [newName, setNewName] = useState('');
     const [editingId, setEditingId] = useState<string | number | null>(null);
     const [editingName, setEditingName] = useState('');
@@ -77,12 +80,12 @@ export const LayoutSelectorSheet = memo(
 
     const confirmDelete = useCallback(
       (layout: LayoutMetadata) => {
-        Alert.alert('Delete layout', `Delete "${layout.name}"?`, [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Delete', style: 'destructive', onPress: () => onDelete(layout.id) },
+        Alert.alert(t.deleteLayout, layout.name, [
+          { text: t.cancel, style: 'cancel' },
+          { text: t.delete, style: 'destructive', onPress: () => onDelete(layout.id) },
         ]);
       },
-      [onDelete],
+      [onDelete, t.deleteLayout, t.cancel, t.delete],
     );
 
     if (!visible) return null;
@@ -92,7 +95,7 @@ export const LayoutSelectorSheet = memo(
         <Pressable accessibilityLabel="Dismiss layouts" style={styles.backdrop} onPress={onClose} />
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text>{title}</Text>
+            <Text>{title ?? t.layouts}</Text>
             <Pressable accessibilityLabel="Close layouts" onPress={onClose}>
               <Text>✕</Text>
             </Pressable>
@@ -104,23 +107,23 @@ export const LayoutSelectorSheet = memo(
               value={newName}
               onChangeText={setNewName}
               onSubmitEditing={submitNew}
-              placeholder="New layout name"
+              placeholder={t.newLayoutName}
               style={styles.input}
             />
             <Pressable accessibilityLabel="Save new layout" disabled={!newName.trim()} onPress={submitNew}>
-              <Text>Save</Text>
+              <Text>{t.save}</Text>
             </Pressable>
           </View>
 
           {onSaveCurrent && currentLayoutId != null ? (
             <Pressable accessibilityLabel="Update current layout" onPress={onSaveCurrent}>
-              <Text>Update current</Text>
+              <Text>{t.saveCurrentLayout}</Text>
             </Pressable>
           ) : null}
 
           <ScrollView>
             {layouts.length === 0 ? (
-              <Text>No saved layouts</Text>
+              <Text>{t.noLayoutsFound}</Text>
             ) : (
               layouts.map((layout) => {
                 const isCurrent = sameId(currentLayoutId, layout.id);
@@ -154,13 +157,13 @@ export const LayoutSelectorSheet = memo(
                       <Text>{isCurrent ? `• ${layout.name}` : layout.name}</Text>
                     </Pressable>
                     <Pressable accessibilityLabel={`Rename layout ${layout.name}`} onPress={() => beginRename(layout)}>
-                      <Text>Rename</Text>
+                      <Text>{t.rename}</Text>
                     </Pressable>
                     <Pressable
                       accessibilityLabel={`Delete layout ${layout.name}`}
                       onPress={() => confirmDelete(layout)}
                     >
-                      <Text>Delete</Text>
+                      <Text>{t.delete}</Text>
                     </Pressable>
                   </View>
                 );
