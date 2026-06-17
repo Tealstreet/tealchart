@@ -34,6 +34,7 @@ import {
   resolveUserDrawingToolCategoryButtonTool,
   shouldRenderUserDrawingSelectedActionSurface,
   USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS,
+  USER_DRAWING_TOOL_HOTKEYS,
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../drawings';
 import {
@@ -53,6 +54,16 @@ import { LayoutSelector } from './LayoutSelector';
  *
  * Contains symbol info, timeframe selector, and indicators button.
  */
+
+// tool -> 'Alt+T' label, derived from the shared hotkey map (codes like 'KeyT').
+const DRAWING_TOOL_HOTKEY_LABEL: ReadonlyMap<UserDrawingTool, string> = new Map(
+  Object.entries(USER_DRAWING_TOOL_HOTKEYS).map(([code, tool]) => [tool, `Alt+${code.replace('Key', '')}`]),
+);
+
+function drawingToolTitleWithHotkey(tool: UserDrawingTool, label: string): string {
+  const hotkey = DRAWING_TOOL_HOTKEY_LABEL.get(tool);
+  return hotkey ? `${label} (${hotkey})` : label;
+}
 
 // ============================================================================
 // Types
@@ -916,7 +927,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         },
         attributes: {
           type: 'button',
-          title: descriptor.label,
+          title: drawingToolTitleWithHotkey(tool, descriptor.label),
           'aria-label': descriptor.label,
           'aria-pressed': isActive ? 'true' : 'false',
         },
@@ -1453,7 +1464,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           },
           attributes: {
             type: 'button',
-            title: descriptor.label,
+            title: drawingToolTitleWithHotkey(descriptor.tool, descriptor.label),
             'aria-label': descriptor.label,
             'aria-pressed': isActive ? 'true' : 'false',
           },
