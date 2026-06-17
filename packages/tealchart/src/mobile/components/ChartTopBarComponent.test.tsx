@@ -3,6 +3,8 @@ import type { UserDrawingState, UserDrawingTool } from '../../drawings';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Alert } from '../../test/reactNativeMock';
+
 import { clearChartStoreCache } from '../../state/chartState';
 import { ChartTopBarComponent } from './ChartTopBarComponent';
 
@@ -319,11 +321,13 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     fireEvent.click(screen.getByLabelText('Cancel draft drawing'));
     fireEvent.click(screen.getByLabelText('Measure date and price range'));
     fireEvent.click(screen.getByLabelText('Zoom in'));
-    fireEvent.click(screen.getByLabelText('Clear all drawings'));
+    // Mixed state: the rail shows the single "lock all" / "hide all" toggles.
+    expect(screen.queryByLabelText('Show all drawings')).toBeNull();
+    expect(screen.queryByLabelText('Unlock all drawings')).toBeNull();
     fireEvent.click(screen.getByLabelText('Hide all drawings'));
-    fireEvent.click(screen.getByLabelText('Show all drawings'));
     fireEvent.click(screen.getByLabelText('Lock all drawings'));
-    fireEvent.click(screen.getByLabelText('Unlock all drawings'));
+    fireEvent.click(screen.getByLabelText('Clear all drawings'));
+    Alert.lastButtons.find((button) => button.style === 'destructive')?.onPress?.();
 
     expect(onDuplicate).not.toHaveBeenCalled();
     expect(onDelete).not.toHaveBeenCalled();
@@ -334,9 +338,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(onZoomIn).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
-    expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onLocked).toHaveBeenCalledWith(true, { drawingIds: ['back', 'h', 'front'] });
-    expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['back', 'h', 'front'], includeLocked: true });
     expect(onZOrder).not.toHaveBeenCalled();
 
     rerender(
@@ -351,6 +353,47 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.getByLabelText('Measure date and price range').getAttribute('aria-pressed')).toBe('true');
     fireEvent.click(screen.getByLabelText('Measure date and price range'));
     expect(onMeasureModeChange).toHaveBeenCalledWith(false);
+  });
+
+  it('flips rail actions to inverse labels when all hidden/locked and cancels clear', () => {
+    const onVisibility = vi.fn();
+    const onLocked = vi.fn();
+    const onClear = vi.fn();
+    render(
+      <ChartTopBarComponent
+        symbol="BTCUSDT"
+        interval="1"
+        userDrawingState={{
+          ...baseDrawingState,
+          activeTool: 'trendLine',
+          drawings: [
+            {
+              id: 'a',
+              kind: 'horizontalLine',
+              paneId: 'main',
+              visible: false,
+              locked: true,
+              createdAt: 1,
+              updatedAt: 1,
+              style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' },
+              price: 10,
+            },
+          ],
+        }}
+        onUserDrawingVisibilityChange={onVisibility}
+        onUserDrawingLockedChange={onLocked}
+        onUserDrawingClearAll={onClear}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Unlock all drawings'));
+    fireEvent.click(screen.getByLabelText('Show all drawings'));
+    expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['a'], includeLocked: true });
+    expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['a'], includeLocked: true });
+
+    fireEvent.click(screen.getByLabelText('Clear all drawings'));
+    Alert.lastButtons.find((button) => button.style === 'cancel')?.onPress?.();
+    expect(onClear).not.toHaveBeenCalled();
   });
 
   it('rerenders mobile drawing toolbar undo and redo availability changes', () => {

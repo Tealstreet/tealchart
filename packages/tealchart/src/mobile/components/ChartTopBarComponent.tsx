@@ -21,7 +21,7 @@ import type {
 
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
@@ -31,6 +31,7 @@ import {
   getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
   isUserDrawingGlobalToolbarAction,
+  isUserDrawingRailToolbarAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingToolFavorite,
   resolveDrawingToolIconName,
@@ -242,6 +243,12 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const favoriteTools = getUserDrawingFavoriteTools(userDrawingState);
     const magnetActive = (userDrawingState?.magnetMode ?? 'off') !== 'off';
     const stayInDrawingActive = userDrawingState?.stayInDrawingMode === true;
+    const railDrawings = userDrawingState?.drawings ?? [];
+    const railHasDrawings = railDrawings.length > 0;
+    const railSomeUnlocked = railDrawings.some((drawing) => !drawing.locked);
+    const railAllLocked = railHasDrawings && !railSomeUnlocked;
+    const railSomeVisible = railDrawings.some((drawing) => drawing.visible !== false);
+    const railAllHidden = railHasDrawings && !railSomeVisible;
     const favoritesDefaultX =
       MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 16;
     const favoritesDefaultY = TOP_BAR_HEIGHT + 40;
@@ -415,6 +422,75 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 ]}
               >
                 <DrawingToolIcon name="pencil" size={20} color={stayInDrawingActive ? accentColor : textSecondaryColor} />
+              </Pressable>
+
+              <View style={styles.drawingRailToggleDivider} />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={railAllLocked ? 'Unlock all drawings' : 'Lock all drawings'}
+                accessibilityState={{ disabled: !railHasDrawings, selected: railAllLocked }}
+                disabled={!railHasDrawings}
+                onPress={() => {
+                  const options = railSomeUnlocked
+                    ? getUserDrawingAllDrawingsUpdateOptions(userDrawingState)
+                    : getUserDrawingAllDrawingsUpdateOptions(userDrawingState, { includeLocked: true });
+                  onUserDrawingLockedChange?.(railSomeUnlocked, options);
+                }}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  railAllLocked && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  !railHasDrawings && styles.drawingButtonDisabled,
+                  railHasDrawings && pressed && !railAllLocked && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon
+                  name={railAllLocked ? 'lock' : 'unlock'}
+                  size={20}
+                  color={railAllLocked ? accentColor : textSecondaryColor}
+                />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={railAllHidden ? 'Show all drawings' : 'Hide all drawings'}
+                accessibilityState={{ disabled: !railHasDrawings, selected: railAllHidden }}
+                disabled={!railHasDrawings}
+                onPress={() =>
+                  onUserDrawingVisibilityChange?.(
+                    !railSomeVisible,
+                    getUserDrawingAllDrawingsUpdateOptions(userDrawingState, { includeLocked: true }),
+                  )
+                }
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  railAllHidden && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  !railHasDrawings && styles.drawingButtonDisabled,
+                  railHasDrawings && pressed && !railAllHidden && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon
+                  name={railAllHidden ? 'eyeOff' : 'eye'}
+                  size={20}
+                  color={railAllHidden ? accentColor : textSecondaryColor}
+                />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Clear all drawings"
+                accessibilityState={{ disabled: !railHasDrawings }}
+                disabled={!railHasDrawings}
+                onPress={() =>
+                  Alert.alert('Clear all drawings', 'This cannot be undone.', [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Clear', style: 'destructive', onPress: () => onUserDrawingClearAll?.() },
+                  ])
+                }
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  !railHasDrawings && styles.drawingButtonDisabled,
+                  railHasDrawings && pressed && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="trash" size={20} color={textSecondaryColor} />
               </Pressable>
             </View>
 
@@ -600,8 +676,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 contentContainerStyle={styles.drawingContainer}
               >
 
-                {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
-                  isUserDrawingGlobalToolbarAction(descriptor.action),
+                {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
+                  (descriptor) =>
+                    isUserDrawingGlobalToolbarAction(descriptor.action) &&
+                    !isUserDrawingRailToolbarAction(descriptor.action),
                 ).map((descriptor) => {
                   const enabled = isUserDrawingToolbarActionEnabled(
                     userDrawingState,

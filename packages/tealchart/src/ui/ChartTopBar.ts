@@ -23,6 +23,7 @@ import {
   getUserDrawingToolDescriptor,
   getUserDrawingFavoriteTools,
   isUserDrawingGlobalToolbarAction,
+  isUserDrawingRailToolbarAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingToolFavorite,
   resolveDrawingSelectedActionIconName,
@@ -788,7 +789,56 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       ),
     );
 
+    this.appendDrawingRailActionButtons(toggles, state);
+
     rail.appendChild(toggles);
+  }
+
+  private appendDrawingRailActionButtons(toggles: HTMLElement, state?: UserDrawingState): void {
+    const drawings = state?.drawings ?? [];
+    const hasDrawings = drawings.length > 0;
+    const someUnlocked = drawings.some((drawing) => !drawing.locked);
+    const allLocked = hasDrawings && !someUnlocked;
+    const someVisible = drawings.some((drawing) => drawing.visible !== false);
+    const allHidden = hasDrawings && !someVisible;
+    const allOptions = state ? getUserDrawingAllDrawingsUpdateOptions(state) : { drawingIds: [] };
+    const allOptionsIncludingLocked = state
+      ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
+      : { drawingIds: [], includeLocked: true };
+
+    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
+
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        allLocked ? 'lock' : 'unlock',
+        allLocked ? 'Unlock all drawings' : 'Lock all drawings',
+        allLocked,
+        () => this.options.onUserDrawingLockedChange?.(someUnlocked, someUnlocked ? allOptions : allOptionsIncludingLocked),
+        hasDrawings,
+      ),
+    );
+
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        allHidden ? 'eyeOff' : 'eye',
+        allHidden ? 'Show all drawings' : 'Hide all drawings',
+        allHidden,
+        () => this.options.onUserDrawingVisibilityChange?.(!someVisible, allOptionsIncludingLocked),
+        hasDrawings,
+      ),
+    );
+
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        'trash',
+        'Clear all drawings',
+        false,
+        () => {
+          if (confirm('Clear all drawings? This cannot be undone.')) this.options.onUserDrawingClearAll?.();
+        },
+        hasDrawings,
+      ),
+    );
   }
 
   private createDrawingRailToggleButton(
@@ -796,11 +846,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     label: string,
     active: boolean,
     onClick: () => void,
+    enabled = true,
   ): HTMLButtonElement {
     const btn = this.createElement('button', {
       style: {
         ...styles.drawingToolCategoryButton,
         ...(active ? styles.drawingButtonActive : {}),
+        opacity: enabled ? '1' : '0.35',
+        cursor: enabled ? 'pointer' : 'default',
       },
       attributes: {
         type: 'button',
@@ -810,6 +863,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       },
     });
     this.setDrawingIconContent(btn, iconName, '', 20);
+    btn.disabled = !enabled;
+    if (!enabled) return btn;
     btn.addEventListener('click', onClick);
     btn.addEventListener('mouseenter', () => {
       if (!active) Object.assign(btn.style, styles.drawingButtonHover);
@@ -1497,8 +1552,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.renderDrawingToolRail(activeTool);
     group.appendChild(this.createElement('div', { style: styles.divider }));
 
-    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((descriptor) =>
-      isUserDrawingGlobalToolbarAction(descriptor.action),
+    const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
+      (descriptor) =>
+        isUserDrawingGlobalToolbarAction(descriptor.action) &&
+        !isUserDrawingRailToolbarAction(descriptor.action),
     );
     for (const item of globalActionDescriptors.map((descriptor) => ({
       ...descriptor,

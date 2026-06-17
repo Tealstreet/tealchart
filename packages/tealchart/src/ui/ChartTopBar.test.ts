@@ -310,6 +310,56 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('drives lock/hide/clear-all from the rail with inverse labels and a clear confirm', () => {
+    const onVisibility = vi.fn();
+    const onLocked = vi.fn();
+    const onClear = vi.fn();
+    const allHiddenLocked = {
+      ...baseDrawingState,
+      drawings: [
+        {
+          id: 'a',
+          kind: 'horizontalLine' as const,
+          paneId: 'main',
+          visible: false,
+          locked: true,
+          createdAt: 1,
+          updatedAt: 1,
+          style: { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const },
+          price: 10,
+        },
+      ],
+    };
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-rail-actions',
+      symbol: 'BTCUSDT',
+      userDrawingState: allHiddenLocked,
+      onUserDrawingVisibilityChange: onVisibility,
+      onUserDrawingLockedChange: onLocked,
+      onUserDrawingClearAll: onClear,
+    });
+    topBar.mount(document.body);
+
+    // Everything hidden + locked: the single toggles flip to their inverse labels.
+    const unlock = document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]');
+    const show = document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]');
+    expect(unlock?.getAttribute('aria-pressed')).toBe('true');
+    expect(show?.getAttribute('aria-pressed')).toBe('true');
+    unlock?.click();
+    expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['a'], includeLocked: true });
+    show?.click();
+    expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['a'], includeLocked: true });
+
+    // Cancelling the confirm must not clear.
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
+    expect(confirmSpy).toHaveBeenCalledTimes(1);
+    expect(onClear).not.toHaveBeenCalled();
+    confirmSpy.mockRestore();
+
+    topBar.unmount();
+  });
+
   it('renders a draggable floating favorites bar that selects tools and reports moves', () => {
     const overlayParent = document.createElement('div');
     document.body.append(overlayParent);
@@ -553,21 +603,24 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Cancel draft drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Zoom in"]')?.click();
+    // Mixed state (one visible+unlocked, one hidden+locked): the rail shows the
+    // single "lock all" / "hide all" toggles, not their inverse labels.
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.click();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')).toBeNull();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')).toBeNull();
     expect(onUndo).toHaveBeenCalledTimes(1);
     expect(onRedo).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onMeasureModeChange).toHaveBeenCalledWith(true);
     expect(onZoomIn).toHaveBeenCalledTimes(1);
+    expect(confirmSpy).toHaveBeenCalledTimes(1);
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onVisibility).toHaveBeenCalledWith(false, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
-    expect(onVisibility).toHaveBeenCalledWith(true, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
     expect(onLocked).toHaveBeenCalledWith(true, { drawingIds: ['h', 'hidden-locked'] });
-    expect(onLocked).toHaveBeenCalledWith(false, { drawingIds: ['h', 'hidden-locked'], includeLocked: true });
+    confirmSpy.mockRestore();
 
     topBar.setUserDrawingState({
       ...baseDrawingState,
@@ -607,9 +660,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Zoom in"]')?.disabled).toBe(false);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Clear all drawings"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Hide all drawings"]')?.disabled).toBe(true);
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Show all drawings"]')?.disabled).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Lock all drawings"]')?.disabled).toBe(true);
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Unlock all drawings"]')?.disabled).toBe(true);
 
     topBar.unmount();
     chartSurface.remove();

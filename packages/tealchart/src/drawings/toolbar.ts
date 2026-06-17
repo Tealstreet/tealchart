@@ -687,6 +687,20 @@ export function isUserDrawingGlobalToolbarAction(
   return USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS.has(action);
 }
 
+// Global actions that live in the bottom drawing rail (lock/hide/clear) rather
+// than the top action row, mirroring TradingView's rail layout.
+const USER_DRAWING_RAIL_TOOLBAR_ACTIONS: ReadonlySet<UserDrawingToolbarAction> = new Set([
+  'clearAll',
+  'hideAll',
+  'showAll',
+  'lockAll',
+  'unlockAll',
+]);
+
+export function isUserDrawingRailToolbarAction(action: UserDrawingToolbarAction): boolean {
+  return USER_DRAWING_RAIL_TOOLBAR_ACTIONS.has(action);
+}
+
 function getUserDrawingToolbarActionDescriptor(action: UserDrawingToolbarAction): UserDrawingToolbarActionDescriptor {
   const descriptor = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.find((item) => item.action === action);
   if (!descriptor) throw new Error(`Unknown user drawing toolbar action: ${action}`);
