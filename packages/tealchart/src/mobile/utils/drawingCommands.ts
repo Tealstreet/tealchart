@@ -146,6 +146,12 @@ export function dispatchMobileUserDrawingKeyboardAction(
     };
   }
 
+  if (action.type === 'selectTool') {
+    if (!action.tool) return { state, history, changed: false, action };
+    const command: UserDrawingCommand = { type: 'setActiveTool', tool: action.tool, meta: { source: 'keyboard' } };
+    return { ...dispatchUserDrawingCommandWithHistory(state, history, command), action, command };
+  }
+
   const command: UserDrawingCommand =
     action.type === 'deleteSelected'
       ? { type: 'delete', meta: { source: 'keyboard' } }
