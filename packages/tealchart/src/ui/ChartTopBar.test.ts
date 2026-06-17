@@ -99,6 +99,9 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.body.textContent).toContain('Gann and Fibonacci');
     expect(rectangle?.getAttribute('aria-pressed')).toBe('true');
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Pin drawing tools"]')).not.toBeNull();
+    // Flyout rows surface the keyboard hint so the hotkeys are discoverable.
+    expect(trendLine?.getAttribute('title')).toBe('Trend line (Alt+T)');
+    expect(rectangle?.getAttribute('title')).toBe('Rectangle');
     trendLine?.click();
     expect(onTool).toHaveBeenCalledWith('trendLine');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');

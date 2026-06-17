@@ -701,6 +701,21 @@ describe('mobile drawing handle command dispatch', () => {
     expect(redo.state.drawings).toEqual([]);
   });
 
+  it('selects a drawing tool from an Alt+code keyboard action', () => {
+    const state = createMobileStateWithTrendLine();
+    const history = createUserDrawingCommandHistory();
+    const result = dispatchMobileUserDrawingKeyboardAction(
+      state,
+      history,
+      { key: '†', code: 'KeyT', altKey: true },
+      { createId: () => 'x' },
+    );
+
+    expect(result.action?.type).toBe('selectTool');
+    expect(result.command?.type).toBe('setActiveTool');
+    expect(result.state.activeTool).toBe('trendLine');
+  });
+
   it('ignores mobile keyboard actions when chart does not own keyboard focus', () => {
     const state = createMobileStateWithTrendLine();
     const history = createUserDrawingCommandHistory();

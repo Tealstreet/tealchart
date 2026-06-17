@@ -1,9 +1,12 @@
-import type { UserDrawingState } from './types';
+import type { UserDrawingState, UserDrawingTool } from './types';
 
 export type UserDrawingKeyboardFocusOwner = 'chart' | 'textInput' | 'appControl';
 
 export interface UserDrawingKeyboardInput {
   key: string;
+  // Physical key code (e.g. 'KeyT'), layout-independent. Tool hotkeys match on
+  // this because Alt+letter yields a special character in `key` on macOS.
+  code?: string;
   ctrlKey?: boolean;
   metaKey?: boolean;
   altKey?: boolean;
@@ -21,13 +24,30 @@ export type UserDrawingKeyboardActionType =
   | 'selectAll'
   | 'clearSelection'
   | 'deleteSelected'
-  | 'cancelDraft';
+  | 'cancelDraft'
+  | 'selectTool';
 
 export interface UserDrawingKeyboardAction {
   type: UserDrawingKeyboardActionType;
   preventDefault: boolean;
   delta?: { x: number; y: number };
+  tool?: UserDrawingTool;
 }
+
+// Alt + physical key → drawing tool, TradingView-style. Keyed by `code` so it is
+// independent of keyboard layout and the special characters Alt/Option produces.
+export const USER_DRAWING_TOOL_HOTKEYS: Readonly<Record<string, UserDrawingTool>> = {
+  KeyT: 'trendLine',
+  KeyH: 'horizontalLine',
+  KeyV: 'verticalLine',
+  KeyC: 'crossLine',
+  KeyR: 'ray',
+  KeyE: 'extendedLine',
+  KeyF: 'fibRetracement',
+  KeyP: 'parallelChannel',
+  KeyB: 'brush',
+  KeyI: 'infoLine',
+};
 
 function hasPrimaryModifier(input: UserDrawingKeyboardInput): boolean {
   return input.ctrlKey === true || input.metaKey === true;
@@ -42,6 +62,13 @@ export function resolveUserDrawingKeyboardAction(
   input: UserDrawingKeyboardInput,
 ): UserDrawingKeyboardAction | null {
   if (input.focusOwner && input.focusOwner !== 'chart') return null;
+
+  // Alt + letter selects a drawing tool. Alt-only (no Ctrl/Meta/Shift) so it
+  // never collides with the editing shortcuts below, all of which require !alt.
+  if (input.altKey === true && !input.ctrlKey && !input.metaKey && !input.shiftKey && input.code) {
+    const tool = USER_DRAWING_TOOL_HOTKEYS[input.code];
+    if (tool) return { type: 'selectTool', tool, preventDefault: true };
+  }
 
   const key = input.key.toLowerCase();
 
