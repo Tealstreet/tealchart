@@ -133,10 +133,12 @@ function createDrawingDragOptions({
   return Object.keys(options).length > 0 ? options : undefined;
 }
 
+// Shift constrains placement (angle/axis); Alt/Ctrl/Cmd-drag drops a styled clone,
+// matching TradingView. The two are decoupled so a constrained drag never clones.
 function getMouseDrawingDragOptions(e: MouseEvent): DrawingDragEventOptions | undefined {
   return createDrawingDragOptions({
     constrainedPlacement: e.shiftKey,
-    duplicateOnDrag: e.shiftKey,
+    duplicateOnDrag: !e.shiftKey && (e.altKey || e.ctrlKey || e.metaKey),
     pressure: normalizeDrawingPressure((e as MouseEvent & { pressure?: number }).pressure),
   });
 }
@@ -150,7 +152,7 @@ function getTouchDrawingDragOptions(touch: Touch): DrawingDragEventOptions | und
 function getPointerDrawingDragOptions(e: PointerEvent): DrawingDragEventOptions | undefined {
   return createDrawingDragOptions({
     constrainedPlacement: e.shiftKey,
-    duplicateOnDrag: e.shiftKey,
+    duplicateOnDrag: !e.shiftKey && (e.altKey || e.ctrlKey || e.metaKey),
     pressure: normalizeDrawingPressure(e.pressure),
   });
 }
@@ -452,6 +454,8 @@ export class EventManager {
       this.state.dragStartY = y;
       this._pendingMouseDrawingDragStartOptions = drawingDragOptions;
       this.attachWindowDragListeners();
+      // Suppress the browser's Alt-drag text selection during a drawing drag.
+      e.preventDefault();
       return;
     }
 
@@ -463,6 +467,7 @@ export class EventManager {
       this.callbacks.onCursorChange?.('move');
       this.attachWindowDragListeners();
       this.scheduleRender();
+      e.preventDefault();
       return;
     }
 
