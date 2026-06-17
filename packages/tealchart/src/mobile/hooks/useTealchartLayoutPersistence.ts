@@ -97,6 +97,11 @@ export function useTealchartLayoutPersistence(
   passthroughRef.current = onUserDrawingStateChange;
 
   useEffect(() => {
+    // On (re)load — including a storageKey switch — drop any state carried over
+    // from the previous key so flush/saveNow can't write it to the new key and
+    // initialUserDrawingState never shows a stale value.
+    setInitialState(undefined);
+    latestState.current = undefined;
     if (!enabled) {
       loadedRef.current = false;
       setReady(true);
