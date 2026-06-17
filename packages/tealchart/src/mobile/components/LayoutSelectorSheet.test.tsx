@@ -85,7 +85,7 @@ describe('LayoutSelectorSheet', () => {
 
   it('shows an empty state', () => {
     renderSheet({ layouts: [], currentLayoutId: null });
-    expect(screen.getByText('No saved layouts')).toBeTruthy();
+    expect(screen.getByText('No layouts found')).toBeTruthy();
   });
 
   it('exits the rename editor if the edited layout is removed', () => {
