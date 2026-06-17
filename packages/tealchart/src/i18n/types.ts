@@ -16,6 +16,10 @@ export interface ChartTranslations {
   searchLayouts: string;
   noLayoutsFound: string;
   saveCurrentLayout: string;
+  save: string;
+  rename: string;
+  newLayoutName: string;
+  deleteLayout: string;
   saving: string;
   saved: string;
   saveFailed: string;
