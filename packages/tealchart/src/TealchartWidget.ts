@@ -2478,6 +2478,10 @@ export class TealchartWidget {
     }
     if (action.type === 'deleteSelected')
       return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
+    if (action.type === 'selectTool') {
+      if (!action.tool) return false;
+      return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool: action.tool, meta: { source: 'keyboard' } });
+    }
     return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
   }
 
@@ -3465,6 +3469,7 @@ export class TealchartWidget {
     if (
       this.dispatchUserDrawingKeyboardAction({
         key: e.key,
+        code: e.code,
         ctrlKey: e.ctrlKey,
         metaKey: e.metaKey,
         altKey: e.altKey,

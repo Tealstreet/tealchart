@@ -241,7 +241,7 @@ export type {
   UserDrawingCommandMetadata,
   UserDrawingCommandSource,
 } from './commands';
-export { resolveUserDrawingKeyboardAction } from './keyboard';
+export { resolveUserDrawingKeyboardAction, USER_DRAWING_TOOL_HOTKEYS } from './keyboard';
 export type {
   UserDrawingKeyboardAction,
   UserDrawingKeyboardActionType,
