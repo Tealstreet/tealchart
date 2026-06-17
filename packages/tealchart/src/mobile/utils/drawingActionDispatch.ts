@@ -6,7 +6,11 @@ import type {
   UserDrawingState,
 } from '../../drawings';
 
-import { resolveUserDrawingObjectTreeModel, resolveUserDrawingPropertiesIntent } from '../../drawings';
+import {
+  getSelectedUserDrawing,
+  resolveUserDrawingObjectTreeModel,
+  resolveUserDrawingPropertiesIntent,
+} from '../../drawings';
 
 export interface DispatchMobileUserDrawingActionCommandOptions {
   state: UserDrawingState;
@@ -52,6 +56,19 @@ export function dispatchMobileUserDrawingActionCommand(
 
   if (command.type === 'setDuplicateEditDrag') {
     options.onUserDrawingDuplicateEditDragChange?.(command.duplicate);
+    return true;
+  }
+
+  if (command.type === 'saveSelectedStyleAsDefault') {
+    const selected = getSelectedUserDrawing(options.state);
+    if (selected) {
+      options.dispatchUserDrawingCommand({
+        type: 'setDefaultStyleByKind',
+        kind: selected.kind,
+        style: selected.style,
+        meta: { source: options.source },
+      });
+    }
     return true;
   }
 

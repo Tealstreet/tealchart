@@ -106,6 +106,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingCopySelected?: () => void;
   /** Callback when selected drawing duplicate-drag mode should change */
   onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
+  /** Callback to save the selected drawing's style as the default for its kind */
+  onUserDrawingSaveSelectedStyleAsDefault?: () => void;
   /** Callback when the selected drawing should be deleted */
   onUserDrawingDeleteSelected?: () => void;
   /** Callback when the active drawing draft should be cancelled */
@@ -1041,6 +1043,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     if (item.command.type === 'setDuplicateEditDrag') {
       this.options.onUserDrawingDuplicateEditDragChange?.(item.command.duplicate);
+      return;
+    }
+
+    if (item.command.type === 'saveSelectedStyleAsDefault') {
+      this.options.onUserDrawingSaveSelectedStyleAsDefault?.();
       return;
     }
 

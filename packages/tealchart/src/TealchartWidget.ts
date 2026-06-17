@@ -73,6 +73,7 @@ import {
   deserializeUserDrawingStateFromLayout,
   dispatchUserDrawingCommand,
   dispatchUserDrawingCommandWithHistory,
+  getSelectedUserDrawing,
   getUserDrawingAllDrawingsUpdateOptions,
   isUserDrawingLayoutStateEqual,
   isUserDrawingPathFamilyTool,
@@ -1095,6 +1096,9 @@ export class TealchartWidget {
       userDrawingDuplicateEditDragEnabled: this._userDrawingDuplicateEditDragEnabled,
       onUserDrawingDuplicateEditDragChange: (enabled) => {
         this._setUserDrawingDuplicateEditDragEnabled(enabled);
+      },
+      onUserDrawingSaveSelectedStyleAsDefault: () => {
+        this.saveSelectedUserDrawingStyleAsDefault();
       },
       onUserDrawingDeleteSelected: () => {
         this.deleteSelectedUserDrawing();
@@ -2530,6 +2534,17 @@ export class TealchartWidget {
     if (!clipboard) return false;
     this._userDrawingClipboard = clipboard;
     return true;
+  }
+
+  saveSelectedUserDrawingStyleAsDefault(): boolean {
+    const selected = getSelectedUserDrawing(this._userDrawingState);
+    if (!selected) return false;
+    return this.dispatchUserDrawingCommand({
+      type: 'setDefaultStyleByKind',
+      kind: selected.kind,
+      style: selected.style,
+      meta: { source: 'toolbar' },
+    });
   }
 
   pasteUserDrawingClipboard(): boolean {
