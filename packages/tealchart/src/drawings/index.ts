@@ -473,6 +473,7 @@ export {
   isUserDrawingFillToolbarEnabled,
   isUserDrawingFillVisibilityToolbarEnabled,
   isUserDrawingGlobalToolbarAction,
+  isUserDrawingRailToolbarAction,
   isUserDrawingIconToolbarEnabled,
   isUserDrawingStyleToolbarActionEnabled,
   isUserDrawingStyleToolbarEnabled,
