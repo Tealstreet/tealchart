@@ -1721,6 +1721,7 @@ describe('user drawing toolbar descriptors', () => {
       ['copySelected', true, false],
       ['duplicateSelected', true, false],
       ['duplicateEditDrag', true, false],
+      ['saveSelectedStyleAsDefault', true, false],
       ['deleteSelected', true, true],
     ]);
     expect(style.items.map((item) => [item.id, item.enabled, item.command, item.swatchColor])).toEqual([

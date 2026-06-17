@@ -194,6 +194,8 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingDuplicateSelected?: () => void;
   /** Called when selected drawing duplicate-drag mode should change */
   onUserDrawingDuplicateEditDragChange?: (enabled: boolean) => void;
+  /** Called to save the selected drawing's style as its kind's default */
+  onUserDrawingSaveSelectedStyleAsDefault?: () => void;
   /** Called when the top bar should copy the selected user drawing */
   onUserDrawingCopySelected?: () => void;
   /** Called when the top bar should delete the selected user drawing */
@@ -361,6 +363,7 @@ export class TealchartWidgetUI {
         onUserDrawingRedo: options.onUserDrawingRedo,
         onUserDrawingDuplicateSelected: options.onUserDrawingDuplicateSelected,
         onUserDrawingDuplicateEditDragChange: options.onUserDrawingDuplicateEditDragChange,
+        onUserDrawingSaveSelectedStyleAsDefault: options.onUserDrawingSaveSelectedStyleAsDefault,
         onUserDrawingCopySelected: options.onUserDrawingCopySelected,
         onUserDrawingDeleteSelected: options.onUserDrawingDeleteSelected,
         onUserDrawingCancelDraft: options.onUserDrawingCancelDraft,

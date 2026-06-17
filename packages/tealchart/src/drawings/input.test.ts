@@ -37,6 +37,7 @@ import {
   setUserDrawingImageSource,
   setUserDrawingLocked,
   setUserDrawingMeasureMode,
+  setUserDrawingDefaultStyleByKind,
   setUserDrawingStayInDrawingMode,
   setUserDrawingTableCell,
   setUserDrawingTableCells,
@@ -190,6 +191,38 @@ describe('user drawing input controller', () => {
     expect(next).not.toBe(state);
     expect(next.textEdit).toBeNull();
     expect(next.selection).toEqual({ drawingId: 'label' });
+  });
+
+  it('applies a saved per-kind default style to new drawings of that kind', () => {
+    const withDefault = setUserDrawingDefaultStyleByKind(createUserDrawingState(), 'trendLine', {
+      lineColor: '#00ff00',
+      lineWidth: 4,
+      lineStyle: 'dashed',
+    });
+    expect(withDefault.defaultStylesByKind?.trendLine).toMatchObject({
+      lineColor: '#00ff00',
+      lineWidth: 4,
+      lineStyle: 'dashed',
+    });
+
+    const options = { createId: () => 'tl-1', now: () => 5 };
+    const draftState = handleUserDrawingInput(
+      setUserDrawingTool(withDefault, 'trendLine'),
+      { paneId: 'main', anchor: anchorA },
+      options,
+    );
+    expect(draftState.draft?.style).toMatchObject({ lineColor: '#00ff00', lineWidth: 4, lineStyle: 'dashed' });
+
+    const committed = handleUserDrawingInput(draftState, { paneId: 'main', anchor: anchorB }, options);
+    expect(committed.drawings[0]?.style).toMatchObject({ lineColor: '#00ff00', lineWidth: 4, lineStyle: 'dashed' });
+
+    // A kind without a saved default keeps the built-in baseline.
+    const rectDraft = handleUserDrawingInput(
+      setUserDrawingTool(withDefault, 'rectangle'),
+      { paneId: 'main', anchor: anchorA },
+      { createId: () => 'r-1', now: () => 6 },
+    );
+    expect(rectDraft.draft?.style.lineColor).not.toBe('#00ff00');
   });
 
   it('accumulates a two-anchor draft then commits a drawing', () => {

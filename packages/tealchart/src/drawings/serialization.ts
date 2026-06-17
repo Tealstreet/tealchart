@@ -3,6 +3,7 @@ import type {
   UserDrawing,
   UserDrawingAnchor,
   UserDrawingBase,
+  UserDrawingKind,
   UserDrawingLineStyle,
   UserDrawingPanePosition,
   UserDrawingState,
@@ -1284,14 +1285,38 @@ function parseUserDrawing(value: unknown): UserDrawing | null {
 // is persisted; a default (revert) empty state omits to `undefined`. Older
 // layouts that stored an explicit boolean keep it on load; ones that omitted it
 // were empty-default states and correctly adopt the current default.
+function serializeDefaultStylesByKind(
+  value?: Partial<Record<UserDrawingKind, UserDrawingStyle>>,
+): Partial<Record<UserDrawingKind, UserDrawingStyle>> {
+  const result: Partial<Record<UserDrawingKind, UserDrawingStyle>> = {};
+  if (!value) return result;
+  for (const [kind, style] of Object.entries(value)) {
+    if (style) result[kind as UserDrawingKind] = normalizeUserDrawingStyle({ ...style });
+  }
+  return result;
+}
+
+function parseDefaultStylesByKind(value: unknown): Partial<Record<UserDrawingKind, UserDrawingStyle>> {
+  const result: Partial<Record<UserDrawingKind, UserDrawingStyle>> = {};
+  if (!isRecord(value)) return result;
+  for (const [kind, raw] of Object.entries(value)) {
+    if (!isUserDrawingTool(kind) || kind === 'select') continue;
+    const style = parseStyle(raw);
+    if (style) result[kind] = style;
+  }
+  return result;
+}
+
 export function serializeUserDrawingStateForLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
   const favoriteTools = state?.favoriteTools ?? [];
+  const defaultStylesByKind = serializeDefaultStylesByKind(state?.defaultStylesByKind);
   if (
     !state ||
     (state.drawings.length === 0 &&
       state.stayInDrawingMode !== true &&
       (state.magnetMode ?? 'off') === 'off' &&
-      favoriteTools.length === 0)
+      favoriteTools.length === 0 &&
+      Object.keys(defaultStylesByKind).length === 0)
   )
     return undefined;
 
@@ -1304,6 +1329,7 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
     favoriteToolbarPosition: state.favoriteToolbarPosition
       ? { x: state.favoriteToolbarPosition.x, y: state.favoriteToolbarPosition.y }
       : null,
+    defaultStylesByKind,
   });
 }
 
@@ -1323,7 +1349,14 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
     isFiniteNumber(state.favoriteToolbarPosition.y)
       ? { x: state.favoriteToolbarPosition.x, y: state.favoriteToolbarPosition.y }
       : null;
-  if (drawings.length === 0 && state.stayInDrawingMode !== true && magnetMode === 'off' && favoriteTools.length === 0)
+  const defaultStylesByKind = parseDefaultStylesByKind(state.defaultStylesByKind);
+  if (
+    drawings.length === 0 &&
+    state.stayInDrawingMode !== true &&
+    magnetMode === 'off' &&
+    favoriteTools.length === 0 &&
+    Object.keys(defaultStylesByKind).length === 0
+  )
     return undefined;
 
   return createUserDrawingState({
@@ -1333,6 +1366,7 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
     magnetMode,
     favoriteTools,
     favoriteToolbarPosition,
+    defaultStylesByKind,
   });
 }
 

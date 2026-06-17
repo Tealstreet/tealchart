@@ -237,6 +237,7 @@ export const DRAWING_ICONS = {
   close: def([line(18, 6, 6, 18), line(6, 6, 18, 18)]),
   arrowUp: def([line(12, 19, 12, 5), polyline('6 11 12 5 18 11')]),
   arrowDown: def([line(12, 5, 12, 19), polyline('6 13 12 19 18 13')]),
+  saveDefault: def([p('M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z'), polyline('9 9 11 11 15 7')]),
   layerForward: def([p('M8 4h12v12'), rect(4, 8, 12, 12, 1.5)]),
   layerBackward: def([rect(8, 4, 12, 12, 1.5), p('M16 20H4V8')]),
   layerFront: def([p('M9 3h12v12'), p('M15 9H3v12h12z')]),
@@ -304,6 +305,8 @@ export function resolveDrawingSelectedActionIconName(
       return 'gear';
     case 'editText':
       return 'pencil';
+    case 'saveSelectedStyleAsDefault':
+      return 'saveDefault';
     default:
       return undefined;
   }

@@ -248,6 +248,28 @@ describe('mobile drawing action dispatch', () => {
     expect(dispatchUserDrawingCommand).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'selectMany' }));
   });
 
+  it('saves the selected drawing style as its kind default', () => {
+    const dispatchUserDrawingCommand = vi.fn();
+
+    const handled = dispatchMobileUserDrawingActionCommand(
+      { type: 'saveSelectedStyleAsDefault' },
+      {
+        state: createSelectedState(),
+        source: 'toolbar',
+        createId: () => 'x',
+        dispatchUserDrawingCommand,
+      },
+    );
+
+    expect(handled).toBe(true);
+    expect(dispatchUserDrawingCommand).toHaveBeenCalledWith({
+      type: 'setDefaultStyleByKind',
+      kind: 'horizontalLine',
+      style,
+      meta: { source: 'toolbar' },
+    });
+  });
+
   it('preserves source metadata when dispatching mobile mutation actions', () => {
     const dispatchUserDrawingCommand = vi.fn();
 
