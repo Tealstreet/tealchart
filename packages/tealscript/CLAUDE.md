@@ -8,9 +8,9 @@ Three-layer design: **Parser → Runtime → Worker**
 
 ### Parser (`src/parser/`)
 
-- `grammar.peggy` — Hand-written PEG grammar (~584 lines) for a PineScript v6 MVP subset
+- `grammar.peggy` — Hand-written PEG grammar for a PineScript v6 subset
 - `parser.ts` — Wrapper with error handling (`parse()`, `validate()`, `formatParseError()`)
-- `ast.ts` — Strongly-typed AST node definitions (~385 lines)
+- `ast.ts` — Strongly-typed AST node definitions
 - `generated.js` / `generated.d.ts` — Auto-generated Peggy parser output (git-tracked)
 
 **Rebuilding the parser:**
@@ -23,7 +23,7 @@ Always commit both `grammar.peggy` and the generated files together.
 
 ### Runtime (`src/runtime/`)
 
-- `engine.ts` — Core interpreter (~2142 lines). Evaluates AST bar-by-bar.
+- `engine.ts` — Core interpreter. Evaluates AST bar-by-bar.
 - `context.ts` — Execution state: OHLCV series, `barstate`, `syminfo`, `timeframe`, plots, inputs
 - `series.ts` — `Series<T>` class: time-series values with history access
 - `scope.ts` — Variable scoping with `var`/`varip`/regular semantics
@@ -39,7 +39,7 @@ Always commit both `grammar.peggy` and the generated files together.
 ### Worker (`src/worker/`)
 
 - `worker.ts` — Web Worker entry point
-- `TealScriptWorker.ts` — Main-thread wrapper (~339 lines)
+- `TealScriptWorker.ts` — Main-thread wrapper
 - `protocol.ts` — Message types between main thread and worker
 
 ## Series Semantics
@@ -80,11 +80,11 @@ Registered in `engine.ts` via `registerBuiltins()`:
 **Main → Worker:** `init`, `updateBars`, `updateBar`, `setInputs`, `dispose`
 **Worker → Main:** `ready`, `result` (plots + inputs), `error`, `parseError`
 
-## Grammar Features (MVP)
+## Grammar Features
 
 Supported: version annotations, indicator declarations, variable declarations (var/varip/typed), if/else, for, while, break/continue, binary/unary/ternary operators, function calls with named args, member access, index/history access, literals (number, string, boolean, color, na), comments.
 
-**Not supported in MVP:** Function definitions, user-defined types, imports, strategy declarations, libraries.
+**Not supported:** Function definitions, user-defined types, imports, strategy declarations, libraries.
 
 ## Commands
 
@@ -99,13 +99,13 @@ yarn lint             # ESLint
 
 ## Key Files
 
-| File                             | Lines | Purpose                    |
-| -------------------------------- | ----- | -------------------------- |
-| `src/runtime/engine.ts`          | ~2142 | Core interpreter           |
-| `src/parser/generated.js`        | ~4431 | Auto-generated parser      |
-| `src/parser/grammar.peggy`       | ~584  | PEG grammar                |
-| `src/parser/ast.ts`              | ~385  | AST type definitions       |
-| `src/worker/TealScriptWorker.ts` | ~339  | Main-thread worker wrapper |
+| File                             | Purpose                    |
+| -------------------------------- | -------------------------- |
+| `src/runtime/engine.ts`          | Core interpreter           |
+| `src/parser/generated.js`        | Auto-generated parser      |
+| `src/parser/grammar.peggy`       | PEG grammar                |
+| `src/parser/ast.ts`              | AST type definitions       |
+| `src/worker/TealScriptWorker.ts` | Main-thread worker wrapper |
 
 ## Gotchas
 
