@@ -14,6 +14,7 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type {
   CrosshairState as EventCrosshairState,
   DrawingDragEventOptions,
+  DrawingInputEventOptions,
   DrawingInputResult,
   PaneDividerInfo,
 } from '../interaction/EventManager';
@@ -36,7 +37,7 @@ import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
 import {
   getUserDrawingPlacementMode,
-  isUserDrawingDragPlacementTool,
+  hitTestUserDrawings,
   isUserDrawingPathFamilyTool,
   renderUserDrawingLayer,
   resolveUserDrawingInputPointFromChart,
@@ -137,10 +138,6 @@ export interface ChartCoreOptions {
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
   onUserDrawingEditEnd?: () => void;
-  /** Called when a two-anchor drawing tool drag starts placement */
-  onUserDrawingPlacementDragStart?: (point: UserDrawingInputPoint) => boolean;
-  /** Called when a two-anchor drawing tool drag commits placement */
-  onUserDrawingPlacementDragEnd?: (point: UserDrawingInputPoint) => boolean;
   /** Called when temporary measure drag starts */
   onUserDrawingMeasureStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called while temporary measure drag moves */
@@ -565,8 +562,6 @@ export class ChartCore {
   private drawings: DrawingOutput[] = [];
   private userDrawingState: UserDrawingState | null = null;
   private userDrawingDraftPreviewAnchor: UserDrawingAnchor | null = null;
-  private userDrawingPlacementDragStartPoint: UserDrawingInputPoint | null = null;
-  private userDrawingPlacementDragLastPoint: UserDrawingInputPoint | null = null;
   private userDrawingMeasureLastPoint: UserDrawingInputPoint | null = null;
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
@@ -789,6 +784,7 @@ export class ChartCore {
         }
         return false;
       },
+      isOverUnlockedUserDrawing: (x, y) => this.isOverUnlockedUserDrawing(x, y),
       onAutoScaleDisabled: (paneId: string) => this.options.onAutoScaleDisabled?.(paneId),
       isAutoScale: (paneId: string) => this.options.isAutoScale?.(paneId) ?? true,
       onViewportChange: (vp) => {
@@ -817,8 +813,18 @@ export class ChartCore {
           this.options.onRequestMoreBars?.(dir);
         }
       },
-      onCrossHairMoved: (x, y) => {
+      onCrossHairMoved: (x, y, options) => {
         this.crosshair = { visible: true, x, y };
+        // Preview the in-progress click-placed drawing following the cursor between clicks.
+        const draftTool = this.userDrawingState?.draft?.tool;
+        if (draftTool && getUserDrawingPlacementMode(draftTool) === 'click') {
+          const previewPoint = this.resolveUserDrawingInputPoint(x, y);
+          // Clear the preview when the cursor is over an unresolvable region so it never sticks.
+          this.userDrawingDraftPreviewAnchor = previewPoint
+            ? this.resolveConstrainedUserDrawingPlacementPoint(previewPoint, options).anchor
+            : null;
+          this.scheduleRender();
+        }
         const price = this.renderer.publicYToPriceWithLayout(
           y,
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
@@ -845,7 +851,8 @@ export class ChartCore {
           const dx = this.crosshair.x - b.x;
           const dy = this.crosshair.y - b.y;
           const overPlus = dx * dx + dy * dy <= b.r * b.r;
-          const wantCursor = overPlus ? 'pointer' : 'crosshair';
+          const wantCursor =
+            overPlus || this.isOverUnlockedUserDrawing(this.crosshair.x, this.crosshair.y) ? 'pointer' : 'crosshair';
           if (this.cursor !== wantCursor) {
             this.cursor = wantCursor;
             this.chartContainer.style.cursor = wantCursor;
@@ -1037,8 +1044,6 @@ export class ChartCore {
     this.userDrawingState = state;
     if (!state.draft) {
       this.userDrawingDraftPreviewAnchor = null;
-      this.userDrawingPlacementDragStartPoint = null;
-      this.userDrawingPlacementDragLastPoint = null;
       this.userDrawingMeasureLastPoint = null;
     }
     // No scheduleRender — paint() is called by the widget after pushing state
@@ -1169,6 +1174,18 @@ export class ChartCore {
     if (!this.stage) return false;
     const hit = this.stage.getIntersection({ x, y });
     return hit !== null && hit.listening();
+  }
+
+  /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */
+  private isOverUnlockedUserDrawing(x: number, y: number): boolean {
+    const state = this.userDrawingState;
+    if (!state || state.activeTool !== 'select' || !this.viewport) return false;
+    const drawings = state.drawings;
+    if (!drawings || drawings.length === 0) return false;
+    const hit = hitTestUserDrawings(drawings, { x, y }, this.getUserDrawingSpaces(this.viewport), {
+      labelHeight: 20,
+    });
+    return hit !== null && !hit.drawing.locked;
   }
 
   private handleOrderMove(orderId: string, newPrice: number): void {
@@ -1578,7 +1595,7 @@ export class ChartCore {
     x: number,
     y: number,
     source: 'mouse' | 'touch' = 'mouse',
-    options: { additiveSelection?: boolean } = {},
+    options: { additiveSelection?: boolean; constrainedPlacement?: boolean } = {},
   ): DrawingInputResult {
     if (!this.viewport) return false;
 
@@ -1595,14 +1612,11 @@ export class ChartCore {
         : false;
     }
 
-    if (this.userDrawingState && getUserDrawingPlacementMode(this.userDrawingState.activeTool) === 'dragTwoAnchor') {
-      return this.resolveUserDrawingInputPoint(x, y) ? { handled: true } : false;
-    }
-
     if (!this.options.onUserDrawingInput) return false;
 
     const point = this.resolveUserDrawingInputPoint(x, y);
-    return point ? this.options.onUserDrawingInput(point) : false;
+    if (!point) return false;
+    return this.options.onUserDrawingInput(this.resolveConstrainedUserDrawingPlacementPoint(point, options));
   }
 
   private resolveUserDrawingInputPoint(
@@ -1679,16 +1693,23 @@ export class ChartCore {
 
   private resolveConstrainedUserDrawingPlacementPoint(
     point: UserDrawingInputPoint,
-    options?: DrawingDragEventOptions,
+    options?: DrawingDragEventOptions | DrawingInputEventOptions,
   ): UserDrawingInputPoint {
     if (!this.viewport || !this.userDrawingState) return point;
     return resolveUserDrawingPlacementConstraint({
       tool: this.userDrawingState.activeTool,
-      startPoint: this.userDrawingPlacementDragStartPoint,
+      // Click placement constrains the pending anchor relative to the last-placed draft point.
+      startPoint: this.resolveClickPlacementConstraintStartPoint(),
       currentPoint: point,
       spacesByPaneId: this.getUserDrawingSpaces(this.viewport),
       options,
     });
+  }
+
+  private resolveClickPlacementConstraintStartPoint(): UserDrawingInputPoint | null {
+    const draft = this.userDrawingState?.draft;
+    if (!draft || draft.anchors.length === 0) return null;
+    return { paneId: draft.paneId, anchor: draft.anchors[draft.anchors.length - 1]! };
   }
 
   private handleUserDrawingDragStart(x: number, y: number, options?: DrawingDragEventOptions): boolean {
@@ -1698,17 +1719,6 @@ export class ChartCore {
       const point = this.resolveUserDrawingInputPoint(x, y);
       if (!point || this.options.onUserDrawingMeasureStart?.(point) !== true) return false;
       this.userDrawingMeasureLastPoint = point;
-      this.scheduleRender();
-      return true;
-    }
-
-    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
-      const point = this.resolveUserDrawingInputPoint(x, y);
-      if (!point || this.options.onUserDrawingPlacementDragStart?.(point) !== true) return false;
-      this.userDrawingPlacementDragStartPoint = point;
-      const previewPoint = this.resolveConstrainedUserDrawingPlacementPoint(point, options);
-      this.userDrawingDraftPreviewAnchor = previewPoint.anchor;
-      this.userDrawingPlacementDragLastPoint = previewPoint;
       this.scheduleRender();
       return true;
     }
@@ -1733,14 +1743,6 @@ export class ChartCore {
       !this.userDrawingState
     ) {
       return false;
-    }
-
-    if (isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
-      return (
-        !!this.options.onUserDrawingPlacementDragStart &&
-        !!this.options.onUserDrawingPlacementDragEnd &&
-        this.resolveUserDrawingInputPoint(x, y) !== null
-      );
     }
 
     if (this.userDrawingState.measureMode === 'on') {
@@ -1775,16 +1777,6 @@ export class ChartCore {
       return changed;
     }
 
-    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
-      const point = this.resolveUserDrawingInputPoint(x, y);
-      if (!point || !this.userDrawingPlacementDragLastPoint) return false;
-      const previewPoint = this.resolveConstrainedUserDrawingPlacementPoint(point, options);
-      this.userDrawingDraftPreviewAnchor = previewPoint.anchor;
-      this.userDrawingPlacementDragLastPoint = previewPoint;
-      this.scheduleRender();
-      return true;
-    }
-
     if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
       const point = this.resolveUserDrawingInputPoint(x, y, options);
       return point ? this.options.onUserDrawingPathDragMove?.(point) === true : false;
@@ -1802,19 +1794,6 @@ export class ChartCore {
       return;
     }
 
-    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
-      const point = this.userDrawingPlacementDragLastPoint;
-      this.userDrawingDraftPreviewAnchor = null;
-      this.userDrawingPlacementDragStartPoint = null;
-      this.userDrawingPlacementDragLastPoint = null;
-      if (point) {
-        this.options.onUserDrawingPlacementDragEnd?.(point);
-      } else {
-        this.scheduleRender();
-      }
-      return;
-    }
-
     if (this.userDrawingState && isUserDrawingPathFamilyTool(this.userDrawingState.activeTool)) {
       this.options.onUserDrawingPathDragEnd?.();
       return;
@@ -1826,15 +1805,6 @@ export class ChartCore {
   private handleUserDrawingDragCancel(): void {
     if (this.userDrawingState?.measureMode === 'on') {
       this.userDrawingMeasureLastPoint = null;
-      this.options.onUserDrawingCancelDraft?.();
-      this.scheduleRender();
-      return;
-    }
-
-    if (this.userDrawingState && isUserDrawingDragPlacementTool(this.userDrawingState.activeTool)) {
-      this.userDrawingDraftPreviewAnchor = null;
-      this.userDrawingPlacementDragStartPoint = null;
-      this.userDrawingPlacementDragLastPoint = null;
       this.options.onUserDrawingCancelDraft?.();
       this.scheduleRender();
       return;

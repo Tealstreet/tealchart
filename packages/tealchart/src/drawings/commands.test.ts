@@ -7,13 +7,11 @@ import { clearChartStoreCache } from '../state/chartState';
 import {
   addUserDrawing,
   appendUserDrawingPathDragPoint,
-  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
-  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingClipboard,
@@ -94,8 +92,6 @@ const coveredUserDrawingCommandTypes = [
   'clear',
   'cancelDraft',
   'handleInput',
-  'beginPlacementDrag',
-  'commitPlacementDrag',
   'beginMeasure',
   'updateMeasure',
   'endMeasure',
@@ -605,49 +601,26 @@ describe('user drawing command dispatch', () => {
     ).toEqual(commitUserDrawingPathDrag(appended, { createId: () => 'path-1', now: () => 61, style }));
   });
 
-  it('wraps two-anchor placement drag lifecycle reducers', () => {
-    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
-    const firstPoint = { paneId: 'main', anchor: anchorA };
-    const secondPoint = { paneId: 'main', anchor: anchorB };
-    const started = beginUserDrawingPlacementDrag(state, firstPoint, { now: () => 62, style });
-
-    expect(
-      dispatchUserDrawingCommand(state, {
-        type: 'beginPlacementDrag',
-        point: firstPoint,
-        options: { now: () => 62, style },
-      }).state,
-    ).toEqual(started);
-    expect(
-      dispatchUserDrawingCommand(started, {
-        type: 'commitPlacementDrag',
-        point: secondPoint,
-        options: { createId: () => 'rect-1', now: () => 63, style },
-      }).state,
-    ).toEqual(commitUserDrawingPlacementDrag(started, secondPoint, { createId: () => 'rect-1', now: () => 63, style }));
-  });
-
-  it('keeps active placement drafts unchanged when commit arrives from another pane', () => {
+  it('restarts click placement in the new pane instead of committing a cross-pane drawing', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const started = dispatchUserDrawingCommand(state, {
-      type: 'beginPlacementDrag',
+      type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
-      options: { now: () => 64, style },
-      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+      options: { createId: () => 'cross-pane-rect', now: () => 64, style },
+      meta: { source: 'pointer' },
     });
-    const committed = dispatchUserDrawingCommand(started.state, {
-      type: 'commitPlacementDrag',
+    const second = dispatchUserDrawingCommand(started.state, {
+      type: 'handleInput',
       point: { paneId: 'indicator', anchor: anchorB },
       options: { createId: () => 'cross-pane-rect', now: () => 65, style },
-      meta: { source: 'pointer', transactionKey: 'placement-drag' },
+      meta: { source: 'pointer' },
     });
 
     expect(started.changed).toBe(true);
     expect(started.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
-    expect(committed.changed).toBe(false);
-    expect(committed.state).toBe(started.state);
-    expect(committed.state.drawings).toEqual([]);
-    expect(committed.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
+    // A second click in a different pane restarts placement there rather than committing a cross-pane shape.
+    expect(second.state.drawings).toEqual([]);
+    expect(second.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'indicator', anchors: [anchorB] });
   });
 
   it('wraps point selection and edit drag reducers with hit metadata', () => {

@@ -269,14 +269,12 @@ export {
   addUserDrawing,
   beginUserDrawingMeasure,
   beginUserDrawingTextEdit,
-  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   appendUserDrawingPathDragPoint,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
   cloneUserDrawingSnapshot,
-  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingClipboard,
@@ -325,8 +323,7 @@ export type {
   UserDrawingInputOptions,
   UserDrawingImageSourceInput,
   UserDrawingInputPoint,
-  UserDrawingPlacementDragCommitOptions,
-  UserDrawingPlacementDragStartOptions,
+  UserDrawingMeasureStartOptions,
   UserDrawingPathDragOptions,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
@@ -340,7 +337,6 @@ export type {
 } from './input';
 export {
   getUserDrawingPlacementMode,
-  isUserDrawingDragPlacementTool,
   resolveUserDrawingPlacementConstraint,
 } from './placement';
 export type { UserDrawingPlacementConstraintOptions, UserDrawingPlacementMode } from './placement';

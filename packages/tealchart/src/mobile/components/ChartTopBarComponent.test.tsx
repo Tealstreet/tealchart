@@ -63,8 +63,8 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     expect(screen.getByLabelText('Pin drawing tools')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Close drawing tools'));
     expect(screen.queryByLabelText('Rectangle')).toBeNull();
+    // A tap on an inactive category activates that category's last-used tool directly.
     fireEvent.click(screen.getByLabelText('Lines drawing tools'));
-    fireEvent.click(screen.getByLabelText('Trend line'));
 
     expect(onTool).toHaveBeenCalledWith('trendLine');
 
@@ -130,12 +130,13 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       <ChartTopBarComponent
         symbol="BTCUSDT"
         interval="1"
-        userDrawingState={{ ...baseDrawingState, activeTool: 'select', favoriteTools: ['trendLine'] }}
+        userDrawingState={{ ...baseDrawingState, activeTool: 'trendLine', favoriteTools: ['trendLine'] }}
         onUserDrawingToolSelect={onTool}
         onUserDrawingToggleFavoriteTool={onToggleFavorite}
       />,
     );
 
+    // Lines is the active category, so a tap reveals its menu (mobile second-tap).
     fireEvent.click(screen.getByLabelText('Lines drawing tools'));
 
     const removeTrend = screen.getByLabelText('Remove Trend line from favorites');
@@ -152,7 +153,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
 
   it('dispatches audited placement tools from the rendered mobile drawing sidebar', () => {
     const onTool = vi.fn();
-    render(
+    const { rerender } = render(
       <ChartTopBarComponent
         symbol="BTCUSDT"
         interval="1"
@@ -162,12 +163,20 @@ describe('ChartTopBarComponent drawing toolbar', () => {
     );
 
     for (const { tool, label, categoryLabel } of auditedPlacementToolbarTools) {
-      const category = screen.getByLabelText(`${categoryLabel} drawing tools`);
-      fireEvent.click(category);
+      // Make the tool's category active so a tap reveals its menu (mobile second-tap).
+      rerender(
+        <ChartTopBarComponent
+          symbol="BTCUSDT"
+          interval="1"
+          userDrawingState={{ ...baseDrawingState, activeTool: tool }}
+          onUserDrawingToolSelect={onTool}
+        />,
+      );
+      fireEvent.click(screen.getByLabelText(`${categoryLabel} drawing tools`));
 
       fireEvent.click(screen.getByLabelText(label));
       expect(onTool).toHaveBeenLastCalledWith(tool);
-      expect(category.getAttribute('aria-expanded')).toBe('false');
+      expect(screen.getByLabelText(`${categoryLabel} drawing tools`).getAttribute('aria-expanded')).toBe('false');
     }
 
     expect(onTool).toHaveBeenCalledTimes(auditedPlacementToolbarTools.length);
@@ -179,7 +188,7 @@ describe('ChartTopBarComponent drawing toolbar', () => {
       <ChartTopBarComponent
         symbol="BTCUSDT"
         interval="1"
-        userDrawingState={{ ...baseDrawingState, activeTool: 'rectangle' }}
+        userDrawingState={{ ...baseDrawingState, activeTool: 'trendLine' }}
         onUserDrawingToolSelect={onTool}
       />,
     );

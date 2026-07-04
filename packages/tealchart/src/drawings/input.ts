@@ -34,7 +34,6 @@ import {
 import { hitTestUserDrawings } from './hitTesting';
 import type { DrawingCoordinateSpace, DrawingScreenPoint } from './coordinates';
 import type { UserDrawingHitTestOptions } from './hitTesting';
-import { isUserDrawingDragPlacementTool } from './placement';
 
 export interface UserDrawingInputPoint {
   paneId: string;
@@ -120,13 +119,11 @@ export interface UserDrawingPathDragOptions {
   style?: UserDrawingStyle;
 }
 
-export interface UserDrawingPlacementDragStartOptions {
+export interface UserDrawingMeasureStartOptions {
   now?: () => number;
   style?: UserDrawingStyle;
   text?: string;
 }
-
-export type UserDrawingPlacementDragCommitOptions = UserDrawingInputOptions;
 
 export function createUserDrawingState(overrides: Partial<UserDrawingState> = {}): UserDrawingState {
   return {
@@ -1003,7 +1000,7 @@ export function cancelUserDrawingDraft(state: UserDrawingState): UserDrawingStat
 export function beginUserDrawingMeasure(
   state: UserDrawingState,
   point: UserDrawingInputPoint,
-  options: UserDrawingPlacementDragStartOptions = {},
+  options: UserDrawingMeasureStartOptions = {},
 ): UserDrawingState {
   if ((state.measureMode ?? 'off') !== 'on') return state;
   const anchor: readonly [UserDrawingAnchor, UserDrawingAnchor] = [point.anchor, point.anchor];
@@ -1065,16 +1062,26 @@ export function handleUserDrawingInput(
   }
 
   const startedAt = options.now?.() ?? Date.now();
+  const activeDraft =
+    state.draft && state.draft.tool === state.activeTool && state.draft.paneId === point.paneId ? state.draft : null;
+
+  // Ignore a repeat click on the anchor just placed — it would otherwise commit a
+  // degenerate zero-size drawing (e.g. an accidental double-click during placement).
+  const lastAnchor = activeDraft?.anchors[activeDraft.anchors.length - 1];
+  if (lastAnchor && isSameDrawingAnchor(lastAnchor, point.anchor)) {
+    return state;
+  }
+
   const draft =
-    state.draft && state.draft.tool === state.activeTool && state.draft.paneId === point.paneId
+    activeDraft
       ? {
-          ...state.draft,
-          anchors: [...state.draft.anchors, point.anchor],
+          ...activeDraft,
+          anchors: [...activeDraft.anchors, point.anchor],
           positions: point.position
-            ? [...(state.draft.positions ?? []), normalizeUserDrawingPanePosition(point.position)]
-            : state.draft.positions,
-          text: options.text ?? state.draft.text,
-          barsPatternBars: state.activeTool === 'barsPattern' ? point.bars ?? state.draft.barsPatternBars : undefined,
+            ? [...(activeDraft.positions ?? []), normalizeUserDrawingPanePosition(point.position)]
+            : activeDraft.positions,
+          text: options.text ?? activeDraft.text,
+          barsPatternBars: state.activeTool === 'barsPattern' ? point.bars ?? activeDraft.barsPatternBars : undefined,
         }
       : {
           tool: state.activeTool,
@@ -1177,57 +1184,6 @@ export function beginUserDrawingPathDrag(
     },
     textEdit: null,
   };
-}
-
-export function beginUserDrawingPlacementDrag(
-  state: UserDrawingState,
-  point: UserDrawingInputPoint,
-  options: UserDrawingPlacementDragStartOptions = {},
-): UserDrawingState {
-  if (!isUserDrawingDragPlacementTool(state.activeTool)) return state;
-
-  return {
-    ...state,
-    selection: null,
-    draft: {
-      tool: state.activeTool,
-      paneId: point.paneId,
-      anchors: [point.anchor],
-      positions: point.position ? [normalizeUserDrawingPanePosition(point.position)] : undefined,
-      style: resolveNewDraftStyle(state, state.activeTool, options.style, DEFAULT_USER_DRAWING_STYLE),
-      text: options.text,
-      barsPatternBars: state.activeTool === 'barsPattern' ? point.bars : undefined,
-      startedAt: options.now?.() ?? Date.now(),
-    },
-    textEdit: null,
-  };
-}
-
-export function commitUserDrawingPlacementDrag(
-  state: UserDrawingState,
-  point: UserDrawingInputPoint,
-  options: UserDrawingPlacementDragCommitOptions,
-): UserDrawingState {
-  const draft = state.draft;
-  if (
-    !isUserDrawingDragPlacementTool(state.activeTool) ||
-    !draft ||
-    draft.tool !== state.activeTool ||
-    draft.paneId !== point.paneId
-  ) {
-    return state;
-  }
-
-  const startAnchor = draft.anchors[0];
-  if (!startAnchor || isSameDrawingAnchor(startAnchor, point.anchor)) {
-    return {
-      ...state,
-      draft: null,
-      textEdit: null,
-    };
-  }
-
-  return handleUserDrawingInput(state, point, options);
 }
 
 export function appendUserDrawingPathDragPoint(

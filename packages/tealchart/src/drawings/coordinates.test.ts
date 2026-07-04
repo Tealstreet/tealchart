@@ -347,13 +347,14 @@ describe('user drawing coordinates', () => {
   });
 
   it('extends rays toward the second anchor direction', () => {
-    expect(resolveRaySegment({ x: 100, y: 100 }, { x: 200, y: 50 }, 0, 300).end).toEqual({
-      x: 300,
-      y: 0,
+    // Base stays fixed; the far end extends through the second anchor to the chart edge.
+    expect(resolveRaySegment({ x: 100, y: 100 }, { x: 200, y: 50 }, 0, 300)).toEqual({
+      start: { x: 100, y: 100 },
+      end: { x: 300, y: 0 },
     });
-    expect(resolveRaySegment({ x: 100, y: 100 }, { x: 50, y: 50 }, 0, 300).start).toEqual({
-      x: 0,
-      y: 0,
+    expect(resolveRaySegment({ x: 100, y: 100 }, { x: 50, y: 50 }, 0, 300)).toEqual({
+      start: { x: 100, y: 100 },
+      end: { x: 0, y: 0 },
     });
   });
 
