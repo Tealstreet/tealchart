@@ -1788,12 +1788,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       // Update last position for context menu
       setLastCrosshairPosition({ x, y });
 
+      // Preview the in-progress click-placed drawing following the crosshair between taps.
+      const draftTool = effectiveUserDrawingState.draft?.tool;
+      if (draftTool && getUserDrawingPlacementMode(draftTool) === 'click' && viewport) {
+        const point = resolveMobileUserDrawingInputPoint({
+          point: { x, y },
+          viewport,
+          dimensions: chartDimensions,
+          panes: userDrawingInputPanes,
+          bars,
+          magnetMode: isUserDrawingPathFamilyTool(draftTool) ? 'off' : effectiveUserDrawingState.magnetMode ?? 'off',
+        });
+        if (point) setUserDrawingDraftPreviewAnchor(point.anchor);
+      }
+
       if (!viewport || !onCrossHairMoved) return;
       const price = yToPrice(y, viewport, chartDimensions);
       const time = xToTime(x, viewport, chartDimensions);
       onCrossHairMoved(price, time);
     },
-    [viewport, chartDimensions, onCrossHairMoved],
+    [viewport, chartDimensions, onCrossHairMoved, effectiveUserDrawingState, userDrawingInputPanes, bars],
   );
 
   const isPointInChartArea = useCallback(
@@ -1851,10 +1865,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           : effectiveUserDrawingState.magnetMode ?? 'off',
       });
       if (!point) return false;
-
-      if (getUserDrawingPlacementMode(effectiveUserDrawingState.activeTool) === 'dragTwoAnchor') {
-        return true;
-      }
 
       return dispatchUserDrawingCommandToState({
         type: 'handleInput',

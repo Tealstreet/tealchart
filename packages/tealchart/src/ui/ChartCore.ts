@@ -14,6 +14,7 @@ import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type {
   CrosshairState as EventCrosshairState,
   DrawingDragEventOptions,
+  DrawingInputEventOptions,
   DrawingInputResult,
   PaneDividerInfo,
 } from '../interaction/EventManager';
@@ -819,8 +820,17 @@ export class ChartCore {
           this.options.onRequestMoreBars?.(dir);
         }
       },
-      onCrossHairMoved: (x, y) => {
+      onCrossHairMoved: (x, y, options) => {
         this.crosshair = { visible: true, x, y };
+        // Preview the in-progress click-placed drawing following the cursor between clicks.
+        const draftTool = this.userDrawingState?.draft?.tool;
+        if (draftTool && getUserDrawingPlacementMode(draftTool) === 'click') {
+          const previewPoint = this.resolveUserDrawingInputPoint(x, y);
+          if (previewPoint) {
+            this.userDrawingDraftPreviewAnchor = this.resolveConstrainedUserDrawingPlacementPoint(previewPoint, options).anchor;
+            this.scheduleRender();
+          }
+        }
         const price = this.renderer.publicYToPriceWithLayout(
           y,
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
@@ -1593,7 +1603,7 @@ export class ChartCore {
     x: number,
     y: number,
     source: 'mouse' | 'touch' = 'mouse',
-    options: { additiveSelection?: boolean } = {},
+    options: { additiveSelection?: boolean; constrainedPlacement?: boolean } = {},
   ): DrawingInputResult {
     if (!this.viewport) return false;
 
@@ -1610,14 +1620,11 @@ export class ChartCore {
         : false;
     }
 
-    if (this.userDrawingState && getUserDrawingPlacementMode(this.userDrawingState.activeTool) === 'dragTwoAnchor') {
-      return this.resolveUserDrawingInputPoint(x, y) ? { handled: true } : false;
-    }
-
     if (!this.options.onUserDrawingInput) return false;
 
     const point = this.resolveUserDrawingInputPoint(x, y);
-    return point ? this.options.onUserDrawingInput(point) : false;
+    if (!point) return false;
+    return this.options.onUserDrawingInput(this.resolveConstrainedUserDrawingPlacementPoint(point, options));
   }
 
   private resolveUserDrawingInputPoint(
@@ -1694,16 +1701,24 @@ export class ChartCore {
 
   private resolveConstrainedUserDrawingPlacementPoint(
     point: UserDrawingInputPoint,
-    options?: DrawingDragEventOptions,
+    options?: DrawingDragEventOptions | DrawingInputEventOptions,
   ): UserDrawingInputPoint {
     if (!this.viewport || !this.userDrawingState) return point;
     return resolveUserDrawingPlacementConstraint({
       tool: this.userDrawingState.activeTool,
-      startPoint: this.userDrawingPlacementDragStartPoint,
+      // During click placement the constraint anchors to the last-placed draft point;
+      // during (legacy) drag placement it anchors to the drag start.
+      startPoint: this.userDrawingPlacementDragStartPoint ?? this.resolveClickPlacementConstraintStartPoint(),
       currentPoint: point,
       spacesByPaneId: this.getUserDrawingSpaces(this.viewport),
       options,
     });
+  }
+
+  private resolveClickPlacementConstraintStartPoint(): UserDrawingInputPoint | null {
+    const draft = this.userDrawingState?.draft;
+    if (!draft || draft.anchors.length === 0) return null;
+    return { paneId: draft.paneId, anchor: draft.anchors[draft.anchors.length - 1]! };
   }
 
   private handleUserDrawingDragStart(x: number, y: number, options?: DrawingDragEventOptions): boolean {

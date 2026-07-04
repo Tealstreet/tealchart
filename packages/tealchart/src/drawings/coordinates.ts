@@ -1167,18 +1167,19 @@ export function resolveRaySegment(
   paneTop?: number,
   paneBottom?: number,
 ): DrawingScreenSegment {
-  if (start.x === through.x && start.y !== through.y && paneTop !== undefined && paneBottom !== undefined) {
-    return {
-      start,
-      end: {
-        x: start.x,
-        y: through.y < start.y ? paneTop : paneBottom,
-      },
-    };
+  // Vertical ray — extend to the pane edge in the direction of `through`.
+  if (start.x === through.x) {
+    if (start.y === through.y || paneTop === undefined || paneBottom === undefined) {
+      return { start, end: through };
+    }
+    return { start, end: { x: start.x, y: through.y < start.y ? paneTop : paneBottom } };
   }
 
-  const extend = through.x >= start.x ? 'right' : 'left';
-  return resolveExtendedSegment(start, through, extend, chartLeft, chartRight);
+  // A ray keeps its base (`start`) fixed and extends through `through` to the
+  // chart edge on that side — so the line always passes through both points.
+  const targetX = through.x > start.x ? chartRight : chartLeft;
+  const slope = (through.y - start.y) / (through.x - start.x);
+  return { start, end: { x: targetX, y: start.y + slope * (targetX - start.x) } };
 }
 
 export function formatTrendAngleDegrees(angleDegrees: number): string {

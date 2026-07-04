@@ -137,7 +137,7 @@ describe('EventManager drawing drag routing', () => {
 
     expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse');
     expect(onDrawingDragStart).not.toHaveBeenCalled();
-    expect(onDrawingInput).toHaveBeenCalledWith(100, 100, 'mouse', { additiveSelection: false });
+    expect(onDrawingInput).toHaveBeenCalledWith(100, 100, 'mouse', { additiveSelection: false, constrainedPlacement: false });
 
     container.dispatchEvent(
       new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 120, clientY: 120, shiftKey: true }),
@@ -145,7 +145,7 @@ describe('EventManager drawing drag routing', () => {
     window.dispatchEvent(
       new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 120, clientY: 120, shiftKey: true }),
     );
-    expect(onDrawingInput).toHaveBeenLastCalledWith(120, 120, 'mouse', { additiveSelection: true });
+    expect(onDrawingInput).toHaveBeenLastCalledWith(120, 120, 'mouse', { additiveSelection: true, constrainedPlacement: true });
 
     manager.dispose();
   });
@@ -176,7 +176,7 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingDragStart).not.toHaveBeenCalled();
     expect(onDrawingDragMove).not.toHaveBeenCalled();
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
-    expect(onDrawingInput).toHaveBeenCalledWith(102, 103, 'mouse', { additiveSelection: false });
+    expect(onDrawingInput).toHaveBeenCalledWith(102, 103, 'mouse', { additiveSelection: false, constrainedPlacement: false });
 
     manager.dispose();
   });
