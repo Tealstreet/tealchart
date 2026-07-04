@@ -259,16 +259,16 @@ const styles = {
   drawingToolRail: {
     position: 'absolute',
     top: `${computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)}px`,
-    left: `${WEB_CHART_CHROME_METRICS.leftToolRailInset}px`,
+    left: '0',
+    bottom: `${TIME_AXIS_HEIGHT}px`,
+    width: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '6px 4px',
+    padding: '4px 0',
     boxSizing: 'border-box',
-    border: '1px solid var(--border, #363a45)',
-    borderRadius: '6px',
-    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.96))',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+    borderRight: '1px solid var(--border, #2a2e39)',
+    backgroundColor: 'var(--bg, #131722)',
     zIndex: '7',
     pointerEvents: 'auto',
     overflow: 'visible',
@@ -278,7 +278,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '4px',
+    gap: '2px',
     maxHeight: `calc(100vh - ${
       computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + WEB_CHART_CHROME_METRICS.leftToolRailTopGap
     }px)`,
@@ -295,37 +295,70 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '4px',
-    marginTop: '4px',
+    gap: '2px',
+    marginTop: '2px',
   } as Partial<CSSStyleDeclaration>,
 
   drawingRailToggleDivider: {
-    width: '24px',
+    width: '28px',
     height: '1px',
     backgroundColor: 'var(--border, #2a2e39)',
-    margin: '2px 0',
+    margin: '4px 0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolCategoryButton: {
-    width: '32px',
-    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '34px',
+    height: '34px',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--text2, #b2b5be)',
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    lineHeight: '32px',
     padding: '0',
-    textAlign: 'center',
     transition: 'background-color 0.15s, color 0.15s',
+  } as Partial<CSSStyleDeclaration>,
+
+  // Right-pointing flyout caret; revealed on hover only (see rail hover wiring).
+  drawingToolCategoryCaret: {
+    position: 'absolute',
+    right: '2px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '0',
+    height: '0',
+    borderTop: '3px solid transparent',
+    borderBottom: '3px solid transparent',
+    borderLeft: '4px solid var(--text2, #787b86)',
+    opacity: '0',
+    transition: 'opacity 0.12s',
+    pointerEvents: 'none',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolTooltip: {
+    position: 'absolute',
+    display: 'none',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    backgroundColor: 'var(--tooltip-bg, #363a45)',
+    color: 'var(--text, #d1d4dc)',
+    fontSize: '12px',
+    fontWeight: '500',
+    lineHeight: '1.4',
+    whiteSpace: 'nowrap',
+    pointerEvents: 'none',
+    zIndex: '9',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolFlyout: {
     position: 'absolute',
     top: '0',
-    left: '40px',
+    left: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     display: 'none',
     minWidth: '240px',
     maxHeight: `calc(100vh - ${
@@ -553,8 +586,14 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonActive: {
-    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.2))',
-    color: 'var(--accent, #2962ff)',
+    backgroundColor: 'var(--active-bg, rgba(255, 255, 255, 0.12))',
+    color: 'var(--text, #d1d4dc)',
+  } as Partial<CSSStyleDeclaration>,
+
+  // TradingView-style persistent toggle (e.g. magnet on): filled light glyph on dark.
+  drawingButtonToggleActive: {
+    backgroundColor: 'var(--text, #d1d4dc)',
+    color: 'var(--bg, #131722)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonHover: {
@@ -590,6 +629,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
+  private drawingRailTooltipEl: HTMLElement | null = null;
   private drawingFavoritesBarEl: HTMLElement | null = null;
   private drawingFavoritesBarCleanup: Array<() => void> = [];
   private pinnedDrawingToolCategoryId: string | null = null;
@@ -779,26 +819,77 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.drawingToolRailCleanup = [];
     this.drawingToolRailEl?.remove();
     this.drawingToolRailEl = null;
+    this.drawingRailTooltipEl?.remove();
+    this.drawingRailTooltipEl = null;
+  }
+
+  private showRailTooltip(anchor: HTMLElement, label: string): void {
+    const tooltip = this.drawingRailTooltipEl;
+    const parent = tooltip?.parentElement;
+    if (!tooltip || !parent) return;
+    tooltip.textContent = label;
+    tooltip.style.display = 'block';
+    const anchorRect = anchor.getBoundingClientRect();
+    const parentRect = parent.getBoundingClientRect();
+    tooltip.style.left = `${anchorRect.right - parentRect.left + 8}px`;
+    tooltip.style.top = `${anchorRect.top - parentRect.top + (anchorRect.height - tooltip.offsetHeight) / 2}px`;
+  }
+
+  private hideRailTooltip(): void {
+    if (this.drawingRailTooltipEl) this.drawingRailTooltipEl.style.display = 'none';
   }
 
   private renderDrawingRailToggles(rail: HTMLElement, state?: UserDrawingState): void {
     const toggles = this.createElement('div', { style: styles.drawingRailToggleGroup });
+
+    // Measure + zoom, promoted from the top bar into the rail to match TradingView.
+    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
+
+    const measureActive = state?.measureMode === 'on';
+    const measureEnabled = state
+      ? isUserDrawingToolbarActionEnabled(state, 'measure', this.options.userDrawingCommandAvailability)
+      : false;
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        'ruler',
+        'Measure date and price range',
+        measureActive,
+        () => this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on'),
+        measureEnabled,
+      ),
+    );
+
+    const zoomEnabled = state
+      ? isUserDrawingToolbarActionEnabled(state, 'zoomIn', this.options.userDrawingCommandAvailability)
+      : false;
+    toggles.appendChild(
+      this.createDrawingRailToggleButton('zoomIn', 'Zoom in', false, () => this.options.onUserDrawingZoomIn?.(), zoomEnabled),
+    );
+
+    // Magnet + draw-mode + lock + hide + link form one TradingView-style utility group.
     toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
 
     const magnetActive = (state?.magnetMode ?? 'off') !== 'off';
     toggles.appendChild(
-      this.createDrawingRailToggleButton('magnet', magnetActive ? 'Magnet snap on' : 'Magnet snap off', magnetActive, () =>
-        this.options.onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong'),
+      this.createDrawingRailToggleButton(
+        'magnet',
+        magnetActive ? 'Magnet snap on' : 'Magnet snap off',
+        magnetActive,
+        () => this.options.onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong'),
+        true,
+        true,
       ),
     );
 
     const stayActive = state?.stayInDrawingMode === true;
     toggles.appendChild(
       this.createDrawingRailToggleButton(
-        'pencil',
+        'drawLock',
         stayActive ? 'Keep drawing mode on' : 'Keep drawing mode off',
         stayActive,
         () => this.options.onUserDrawingStayInDrawingModeChange?.(!stayActive),
+        true,
+        true,
       ),
     );
 
@@ -819,8 +910,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
       : { drawingIds: [], includeLocked: true };
 
-    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
-
+    // magnet + draw-mode + lock + eye form one TradingView-style utility group.
     toggles.appendChild(
       this.createDrawingRailToggleButton(
         allLocked ? 'lock' : 'unlock',
@@ -843,6 +933,18 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     toggles.appendChild(
       this.createDrawingRailToggleButton(
+        'link',
+        'Objects tree',
+        false,
+        () => this.options.onUserDrawingObjectTreeOpen?.(),
+      ),
+    );
+
+    // Destructive action is isolated in its own group, like TradingView.
+    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
+
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
         'trash',
         'Clear all drawings',
         false,
@@ -860,17 +962,18 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     active: boolean,
     onClick: () => void,
     enabled = true,
+    strongActive = false,
   ): HTMLButtonElement {
+    const activeStyle = strongActive ? styles.drawingButtonToggleActive : styles.drawingButtonActive;
     const btn = this.createElement('button', {
       style: {
         ...styles.drawingToolCategoryButton,
-        ...(active ? styles.drawingButtonActive : {}),
+        ...(active ? activeStyle : {}),
         opacity: enabled ? '1' : '0.35',
         cursor: enabled ? 'pointer' : 'default',
       },
       attributes: {
         type: 'button',
-        title: label,
         'aria-label': label,
         'aria-pressed': active ? 'true' : 'false',
       },
@@ -881,12 +984,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     btn.addEventListener('click', onClick);
     btn.addEventListener('mouseenter', () => {
       if (!active) Object.assign(btn.style, styles.drawingButtonHover);
+      this.showRailTooltip(btn, label);
     });
     btn.addEventListener('mouseleave', () => {
       if (!active) {
         btn.style.backgroundColor = 'transparent';
-        btn.style.color = 'var(--text2, #787b86)';
+        btn.style.color = 'var(--text2, #b2b5be)';
       }
+      this.hideRailTooltip();
     });
     return btn;
   }
@@ -1376,13 +1481,21 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         },
         attributes: {
           type: 'button',
-          title: category.label,
           'aria-label': `${category.label} drawing tools`,
           'aria-expanded': 'false',
           'aria-haspopup': 'menu',
           'aria-controls': flyoutId,
           'aria-pressed': activeCategory ? 'true' : 'false',
         },
+      });
+      categoryButton.addEventListener('mouseenter', () => {
+        if (!category.tools.includes(activeTool)) Object.assign(categoryButton.style, styles.drawingButtonHover);
+      });
+      categoryButton.addEventListener('mouseleave', () => {
+        if (!category.tools.includes(activeTool)) {
+          categoryButton.style.backgroundColor = 'transparent';
+          categoryButton.style.color = 'var(--text2, #b2b5be)';
+        }
       });
       this.setDrawingIconContent(
         categoryButton,
@@ -1455,7 +1568,18 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         if (flyout.style.display === 'block' && this.pinnedDrawingToolCategoryId !== category.id) hideFlyout();
         else showFlyout();
       });
-      railItem.addEventListener('mouseenter', showFlyout);
+      const caret =
+        category.tools.length > 1
+          ? this.createElement('div', { style: styles.drawingToolCategoryCaret })
+          : null;
+      railItem.addEventListener('mouseenter', () => {
+        if (caret) caret.style.opacity = '1';
+        this.showRailTooltip(categoryButton, category.label);
+      });
+      railItem.addEventListener('mouseleave', () => {
+        if (caret) caret.style.opacity = '0';
+        this.hideRailTooltip();
+      });
 
       for (const tool of category.tools) {
         const descriptor = getUserDrawingToolDescriptor(tool);
@@ -1524,6 +1648,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
 
       railItem.appendChild(categoryButton);
+      if (caret) railItem.appendChild(caret);
       railList.appendChild(railItem);
       rail.appendChild(flyout);
     }
@@ -1531,7 +1656,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     rail.appendChild(railList);
     this.renderDrawingRailToggles(rail, drawingState);
     this.drawingToolRailEl = rail;
-    (this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el).appendChild(rail);
+    const overlayParent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
+    overlayParent.appendChild(rail);
+
+    const tooltip = this.createElement('div', { style: styles.drawingToolTooltip });
+    this.drawingRailTooltipEl = tooltip;
+    overlayParent.appendChild(tooltip);
 
     const closeOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
       const target = event.target;
@@ -1573,6 +1703,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
       (descriptor) =>
         isUserDrawingGlobalToolbarAction(descriptor.action) &&
+        // Rail actions (measure, zoom, lock, hide, clear) render in the vertical rail.
         !isUserDrawingRailToolbarAction(descriptor.action),
     );
     for (const item of globalActionDescriptors.map((descriptor) => ({
@@ -1584,11 +1715,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       command: { type: 'toolbarAction' as const, action: descriptor.action },
     }))) {
       const enabled = item.enabled;
-      const active = item.command.action === 'measure' && state?.measureMode === 'on';
+      // Only stateless actions (undo, redo, cancelDraft) remain here — measure and
+      // zoom moved to the rail — so these buttons never carry an active state.
       const btn = this.createElement('button', {
         style: {
           ...styles.drawingButton,
-          ...(active ? styles.drawingButtonActive : {}),
           opacity: enabled ? '1' : '0.35',
           cursor: enabled ? 'pointer' : 'default',
         },
@@ -1596,7 +1727,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           type: 'button',
           title: item.label,
           'aria-label': item.label,
-          'aria-pressed': active ? 'true' : 'false',
         },
       });
       this.setDrawingIconContent(btn, resolveDrawingToolbarActionIconName(item.command.action), item.icon, 18);
@@ -1606,20 +1736,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           if (item.command.type !== 'toolbarAction') return;
           if (item.command.action === 'undo') this.options.onUserDrawingUndo?.();
           if (item.command.action === 'redo') this.options.onUserDrawingRedo?.();
-          if (item.command.action === 'measure') this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on');
-          if (item.command.action === 'zoomIn') this.options.onUserDrawingZoomIn?.();
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
         });
         btn.addEventListener('mouseenter', () => {
-          if (!active) Object.assign(btn.style, styles.drawingButtonHover);
+          Object.assign(btn.style, styles.drawingButtonHover);
         });
         btn.addEventListener('mouseleave', () => {
-          if (active) {
-            Object.assign(btn.style, styles.drawingButtonActive);
-            return;
-          }
           btn.style.backgroundColor = 'transparent';
-          btn.style.color = 'var(--text2, #787b86)';
+          btn.style.color = 'var(--text2, #b2b5be)';
         });
       }
       group.appendChild(btn);

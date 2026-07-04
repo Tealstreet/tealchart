@@ -764,8 +764,10 @@ describe('user drawing toolbar descriptors', () => {
       'lockAll',
       'unlockAll',
     ]);
-    // lock/hide/clear live in the bottom rail, not the top action row.
+    // measure/zoom/lock/hide/clear live in the vertical rail, not the top action row.
     expect(USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter((d) => isUserDrawingRailToolbarAction(d.action)).map((d) => d.action)).toEqual([
+      'measure',
+      'zoomIn',
       'clearAll',
       'hideAll',
       'showAll',
@@ -773,7 +775,7 @@ describe('user drawing toolbar descriptors', () => {
       'unlockAll',
     ]);
     expect(isUserDrawingRailToolbarAction('undo')).toBe(false);
-    expect(isUserDrawingRailToolbarAction('measure')).toBe(false);
+    expect(isUserDrawingRailToolbarAction('measure')).toBe(true);
     expect(isUserDrawingToolbarActionEnabled(state, 'undo')).toBe(false);
     expect(isUserDrawingToolbarActionEnabled(state, 'redo')).toBe(false);
     expect(isUserDrawingToolbarActionEnabled(state, 'undo', { canUndo: true })).toBe(true);

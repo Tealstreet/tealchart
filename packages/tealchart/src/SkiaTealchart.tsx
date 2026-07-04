@@ -5103,6 +5103,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               });
             }}
             onUserDrawingZoomIn={handleUserDrawingZoomIn}
+            onUserDrawingObjectTreeOpen={() =>
+              handleUserDrawingObjectTreeOpen(resolveUserDrawingObjectTreeModel(effectiveUserDrawingState))
+            }
             onUserDrawingZOrderChange={(action) => {
               dispatchUserDrawingCommandToState({ type: 'reorder', action, meta: { source: 'toolbar' } });
             }}
