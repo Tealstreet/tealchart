@@ -51,6 +51,7 @@ import { TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
+import { applyChromeThemeVars } from './chromeTheme';
 import { div, span } from './dom';
 import { IndicatorPaneLegend } from './IndicatorPaneLegend';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
@@ -302,6 +303,8 @@ export class TealchartWidgetUI {
       },
     });
     this.rootEl.setAttribute('data-tealchart-root', 'true');
+    // Theme the DOM chrome (rail, flyout, tooltip, modals) to match the chart.
+    applyChromeThemeVars(this.rootEl, this.options.renderOptions);
 
     // Create chart area - takes full size of container (behind top bar)
     this.chartArea = div({
@@ -883,6 +886,7 @@ export class TealchartWidgetUI {
    */
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.options.renderOptions = { ...this.options.renderOptions, ...options };
+    applyChromeThemeVars(this.rootEl, this.options.renderOptions);
     this.chartCore?.setRenderOptions(options);
   }
 
