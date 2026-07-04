@@ -772,7 +772,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         <Text
                           style={[
                             styles.drawingButtonText,
-                            { color: active ? accentColor : textSecondaryColor },
+                            { color: textSecondaryColor },
                             !enabled && styles.drawingButtonTextDisabled,
                           ]}
                         >
