@@ -307,19 +307,52 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolCategoryButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     width: '34px',
     height: '34px',
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--text2, #b2b5be)',
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    lineHeight: '34px',
     padding: '0',
-    textAlign: 'center',
     transition: 'background-color 0.15s, color 0.15s',
+  } as Partial<CSSStyleDeclaration>,
+
+  // Right-pointing flyout caret; revealed on hover only (see rail hover wiring).
+  drawingToolCategoryCaret: {
+    position: 'absolute',
+    right: '2px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '0',
+    height: '0',
+    borderTop: '3px solid transparent',
+    borderBottom: '3px solid transparent',
+    borderLeft: '4px solid var(--text2, #787b86)',
+    opacity: '0',
+    transition: 'opacity 0.12s',
+    pointerEvents: 'none',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolTooltip: {
+    position: 'absolute',
+    display: 'none',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    backgroundColor: 'var(--tooltip-bg, #363a45)',
+    color: 'var(--text, #d1d4dc)',
+    fontSize: '12px',
+    fontWeight: '500',
+    lineHeight: '1.4',
+    whiteSpace: 'nowrap',
+    pointerEvents: 'none',
+    zIndex: '9',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolFlyout: {
@@ -596,6 +629,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
+  private drawingRailTooltipEl: HTMLElement | null = null;
   private drawingFavoritesBarEl: HTMLElement | null = null;
   private drawingFavoritesBarCleanup: Array<() => void> = [];
   private pinnedDrawingToolCategoryId: string | null = null;
@@ -785,10 +819,54 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.drawingToolRailCleanup = [];
     this.drawingToolRailEl?.remove();
     this.drawingToolRailEl = null;
+    this.drawingRailTooltipEl?.remove();
+    this.drawingRailTooltipEl = null;
+  }
+
+  private showRailTooltip(anchor: HTMLElement, label: string): void {
+    const tooltip = this.drawingRailTooltipEl;
+    const parent = tooltip?.parentElement;
+    if (!tooltip || !parent) return;
+    tooltip.textContent = label;
+    tooltip.style.display = 'block';
+    const anchorRect = anchor.getBoundingClientRect();
+    const parentRect = parent.getBoundingClientRect();
+    tooltip.style.left = `${anchorRect.right - parentRect.left + 8}px`;
+    tooltip.style.top = `${anchorRect.top - parentRect.top + (anchorRect.height - tooltip.offsetHeight) / 2}px`;
+  }
+
+  private hideRailTooltip(): void {
+    if (this.drawingRailTooltipEl) this.drawingRailTooltipEl.style.display = 'none';
   }
 
   private renderDrawingRailToggles(rail: HTMLElement, state?: UserDrawingState): void {
     const toggles = this.createElement('div', { style: styles.drawingRailToggleGroup });
+
+    // Measure + zoom, promoted from the top bar into the rail to match TradingView.
+    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
+
+    const measureActive = state?.measureMode === 'on';
+    const measureEnabled = state
+      ? isUserDrawingToolbarActionEnabled(state, 'measure', this.options.userDrawingCommandAvailability)
+      : false;
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        'ruler',
+        'Measure date and price range',
+        measureActive,
+        () => this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on'),
+        measureEnabled,
+      ),
+    );
+
+    const zoomEnabled = state
+      ? isUserDrawingToolbarActionEnabled(state, 'zoomIn', this.options.userDrawingCommandAvailability)
+      : false;
+    toggles.appendChild(
+      this.createDrawingRailToggleButton('zoomIn', 'Zoom in', false, () => this.options.onUserDrawingZoomIn?.(), zoomEnabled),
+    );
+
+    // Magnet + draw-mode + lock + hide + link form one TradingView-style utility group.
     toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
 
     const magnetActive = (state?.magnetMode ?? 'off') !== 'off';
@@ -806,7 +884,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const stayActive = state?.stayInDrawingMode === true;
     toggles.appendChild(
       this.createDrawingRailToggleButton(
-        'pencil',
+        'drawLock',
         stayActive ? 'Keep drawing mode on' : 'Keep drawing mode off',
         stayActive,
         () => this.options.onUserDrawingStayInDrawingModeChange?.(!stayActive),
@@ -853,6 +931,15 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       ),
     );
 
+    toggles.appendChild(
+      this.createDrawingRailToggleButton(
+        'link',
+        'Objects tree',
+        false,
+        () => this.options.onUserDrawingObjectTreeOpen?.(),
+      ),
+    );
+
     // Destructive action is isolated in its own group, like TradingView.
     toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
 
@@ -887,7 +974,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       },
       attributes: {
         type: 'button',
-        title: label,
         'aria-label': label,
         'aria-pressed': active ? 'true' : 'false',
       },
@@ -898,12 +984,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     btn.addEventListener('click', onClick);
     btn.addEventListener('mouseenter', () => {
       if (!active) Object.assign(btn.style, styles.drawingButtonHover);
+      this.showRailTooltip(btn, label);
     });
     btn.addEventListener('mouseleave', () => {
       if (!active) {
         btn.style.backgroundColor = 'transparent';
-        btn.style.color = 'var(--text2, #787b86)';
+        btn.style.color = 'var(--text2, #b2b5be)';
       }
+      this.hideRailTooltip();
     });
     return btn;
   }
@@ -1393,13 +1481,21 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         },
         attributes: {
           type: 'button',
-          title: category.label,
           'aria-label': `${category.label} drawing tools`,
           'aria-expanded': 'false',
           'aria-haspopup': 'menu',
           'aria-controls': flyoutId,
           'aria-pressed': activeCategory ? 'true' : 'false',
         },
+      });
+      categoryButton.addEventListener('mouseenter', () => {
+        if (!category.tools.includes(activeTool)) Object.assign(categoryButton.style, styles.drawingButtonHover);
+      });
+      categoryButton.addEventListener('mouseleave', () => {
+        if (!category.tools.includes(activeTool)) {
+          categoryButton.style.backgroundColor = 'transparent';
+          categoryButton.style.color = 'var(--text2, #b2b5be)';
+        }
       });
       this.setDrawingIconContent(
         categoryButton,
@@ -1472,7 +1568,18 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         if (flyout.style.display === 'block' && this.pinnedDrawingToolCategoryId !== category.id) hideFlyout();
         else showFlyout();
       });
-      railItem.addEventListener('mouseenter', showFlyout);
+      const caret =
+        category.tools.length > 1
+          ? this.createElement('div', { style: styles.drawingToolCategoryCaret })
+          : null;
+      railItem.addEventListener('mouseenter', () => {
+        if (caret) caret.style.opacity = '1';
+        this.showRailTooltip(categoryButton, category.label);
+      });
+      railItem.addEventListener('mouseleave', () => {
+        if (caret) caret.style.opacity = '0';
+        this.hideRailTooltip();
+      });
 
       for (const tool of category.tools) {
         const descriptor = getUserDrawingToolDescriptor(tool);
@@ -1541,6 +1648,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
 
       railItem.appendChild(categoryButton);
+      if (caret) railItem.appendChild(caret);
       railList.appendChild(railItem);
       rail.appendChild(flyout);
     }
@@ -1548,7 +1656,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     rail.appendChild(railList);
     this.renderDrawingRailToggles(rail, drawingState);
     this.drawingToolRailEl = rail;
-    (this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el).appendChild(rail);
+    const overlayParent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
+    overlayParent.appendChild(rail);
+
+    const tooltip = this.createElement('div', { style: styles.drawingToolTooltip });
+    this.drawingRailTooltipEl = tooltip;
+    overlayParent.appendChild(tooltip);
 
     const closeOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
       const target = event.target;
@@ -1590,7 +1703,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
       (descriptor) =>
         isUserDrawingGlobalToolbarAction(descriptor.action) &&
-        !isUserDrawingRailToolbarAction(descriptor.action),
+        !isUserDrawingRailToolbarAction(descriptor.action) &&
+        // Measure and zoom now live in the vertical rail (TradingView layout).
+        descriptor.action !== 'measure' &&
+        descriptor.action !== 'zoomIn',
     );
     for (const item of globalActionDescriptors.map((descriptor) => ({
       ...descriptor,

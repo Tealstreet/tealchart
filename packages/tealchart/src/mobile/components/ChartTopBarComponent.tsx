@@ -96,6 +96,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingStayInDrawingModeChange?: (stayInDrawingMode: boolean) => void;
   /** Callback when the drawing toolbar should zoom the chart time range in */
   onUserDrawingZoomIn?: () => void;
+  /** Callback when the drawing objects tree should open */
+  onUserDrawingObjectTreeOpen?: () => void;
   /** Callback when selected drawings should be reordered */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
@@ -155,6 +157,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingMagnetModeChange,
     onUserDrawingStayInDrawingModeChange,
     onUserDrawingZoomIn,
+    onUserDrawingObjectTreeOpen,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
@@ -243,6 +246,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const favoriteTools = getUserDrawingFavoriteTools(userDrawingState);
     const magnetActive = (userDrawingState?.magnetMode ?? 'off') !== 'off';
     const stayInDrawingActive = userDrawingState?.stayInDrawingMode === true;
+    const railMeasureActive = userDrawingState?.measureMode === 'on';
+    const railMeasureEnabled = userDrawingState
+      ? isUserDrawingToolbarActionEnabled(userDrawingState, 'measure', userDrawingCommandAvailability)
+      : false;
+    const railZoomEnabled = userDrawingState
+      ? isUserDrawingToolbarActionEnabled(userDrawingState, 'zoomIn', userDrawingCommandAvailability)
+      : false;
     const railDrawings = userDrawingState?.drawings ?? [];
     const railHasDrawings = railDrawings.length > 0;
     const railSomeUnlocked = railDrawings.some((drawing) => !drawing.locked);
@@ -396,6 +406,39 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
             </View>
 
             <View style={styles.drawingRailToggleGroup}>
+              {/* Measure + zoom, promoted from the top bar into the rail (TradingView layout). */}
+              <View style={styles.drawingRailToggleDivider} />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Measure date and price range"
+                accessibilityState={{ disabled: !railMeasureEnabled, selected: railMeasureActive }}
+                disabled={!railMeasureEnabled}
+                onPress={() => onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on')}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  railMeasureActive && styles.drawingButtonActive,
+                  !railMeasureEnabled && styles.drawingButtonDisabled,
+                  railMeasureEnabled && pressed && !railMeasureActive && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="ruler" size={20} color={railMeasureActive ? textColor : textSecondaryColor} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Zoom in"
+                accessibilityState={{ disabled: !railZoomEnabled }}
+                disabled={!railZoomEnabled}
+                onPress={() => onUserDrawingZoomIn?.()}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  !railZoomEnabled && styles.drawingButtonDisabled,
+                  railZoomEnabled && pressed && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="zoomIn" size={20} color={textSecondaryColor} />
+              </Pressable>
+
+              {/* Magnet + draw-mode + lock + hide + link utility group. */}
               <View style={styles.drawingRailToggleDivider} />
               <Pressable
                 accessibilityRole="button"
@@ -421,7 +464,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   pressed && !stayInDrawingActive && styles.drawingButtonPressed,
                 ]}
               >
-                <DrawingToolIcon name="pencil" size={20} color={stayInDrawingActive ? '#131722' : textSecondaryColor} />
+                <DrawingToolIcon name="drawLock" size={20} color={stayInDrawingActive ? '#131722' : textSecondaryColor} />
               </Pressable>
 
               <Pressable
@@ -471,6 +514,17 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   size={20}
                   color={railAllHidden ? textColor : textSecondaryColor}
                 />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Objects tree"
+                onPress={() => onUserDrawingObjectTreeOpen?.()}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  pressed && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="link" size={20} color={textSecondaryColor} />
               </Pressable>
               <View style={styles.drawingRailToggleDivider} />
               <Pressable
@@ -679,7 +733,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
                   (descriptor) =>
                     isUserDrawingGlobalToolbarAction(descriptor.action) &&
-                    !isUserDrawingRailToolbarAction(descriptor.action),
+                    !isUserDrawingRailToolbarAction(descriptor.action) &&
+                    // Measure and zoom now live in the vertical rail (TradingView layout).
+                    descriptor.action !== 'measure' &&
+                    descriptor.action !== 'zoomIn',
                 ).map((descriptor) => {
                   const enabled = isUserDrawingToolbarActionEnabled(
                     userDrawingState,
