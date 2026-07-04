@@ -1,0 +1,83 @@
+import type { RenderOptions } from '../types';
+
+/**
+ * Maps the chart theme's render colors onto the CSS custom properties used by
+ * the plain-DOM chrome (drawing rail, flyouts, tooltip, favorites bar,
+ * selected-action surface, top bar, modals, context menus). Applying these to a
+ * host element lets all descendant chrome track the chart background/accent in
+ * both dark and light mode instead of hardcoded fallbacks.
+ *
+ * Portaled chrome (elements appended to document.body) does not inherit vars
+ * from the widget root, so this is applied to those elements directly too.
+ */
+
+function parseHexColor(color: string): [number, number, number] | null {
+  const match = /^#?([0-9a-f]{6})$/i.exec(color.trim());
+  if (!match) return null;
+  const value = parseInt(match[1], 16);
+  return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+}
+
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+}
+
+/** Blend a hex color toward black (target 0) or white (target 255) by amount [0,1]. */
+function mixTowards(color: string, target: 0 | 255, amount: number): string {
+  const rgb = parseHexColor(color);
+  if (!rgb) return color;
+  const [r, g, b] = rgb.map((c) => Math.round(c + (target - c) * amount));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+/** Return `color` at the given alpha as rgba(); passes through non-hex colors. */
+function withAlpha(color: string, alpha: number): string {
+  const rgb = parseHexColor(color);
+  if (!rgb) return color;
+  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
+export function resolveChromeThemeVars(
+  renderOptions: Partial<RenderOptions> | undefined,
+): Record<string, string> {
+  const ro = renderOptions ?? {};
+  const bg = ro.backgroundColor ?? '#141416';
+  const text = ro.textColor ?? '#b2b5be';
+  const border = ro.gridColor ?? 'rgba(255, 255, 255, 0.08)';
+  const accent = ro.crosshairColor ?? '#2962ff';
+  const buy = ro.upColor ?? '#26a69a';
+  const sell = ro.downColor ?? '#ef5350';
+
+  const rgb = parseHexColor(bg);
+  const isDark = rgb ? relativeLuminance(rgb) < 0.5 : true;
+  const overlay = (alpha: number): string =>
+    isDark ? `rgba(255, 255, 255, ${alpha})` : `rgba(0, 0, 0, ${alpha})`;
+  const elevated = (amount: number): string => mixTowards(bg, isDark ? 255 : 0, amount);
+
+  return {
+    '--bg': bg,
+    '--text': text,
+    '--text2': text,
+    '--text3': withAlpha(text, 0.6),
+    '--border': border,
+    '--accent': accent,
+    '--accent-bg': withAlpha(accent, 0.16),
+    '--active-bg': overlay(0.12),
+    '--hover-bg': overlay(0.06),
+    '--tooltip-bg': elevated(0.14),
+    '--modal-bg': elevated(0.06),
+    '--input-bg': elevated(0.1),
+    '--buy-color': buy,
+    '--sell-color': sell,
+  };
+}
+
+export function applyChromeThemeVars(
+  el: HTMLElement,
+  renderOptions: Partial<RenderOptions> | undefined,
+): void {
+  const vars = resolveChromeThemeVars(renderOptions);
+  for (const [name, value] of Object.entries(vars)) {
+    el.style.setProperty(name, value);
+  }
+}

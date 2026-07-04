@@ -105,7 +105,7 @@ const contentStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   input: {
-    backgroundColor: 'var(--background2, #131722)',
+    backgroundColor: 'var(--bg, #131722)',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '4px',
     padding: '6px 10px',
@@ -116,7 +116,7 @@ const contentStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   select: {
-    backgroundColor: 'var(--background2, #131722)',
+    backgroundColor: 'var(--bg, #131722)',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '4px',
     padding: '6px 10px',
@@ -144,7 +144,7 @@ const contentStyles = {
     padding: '2px',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '4px',
-    backgroundColor: 'var(--background2, #131722)',
+    backgroundColor: 'var(--bg, #131722)',
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
 
@@ -179,7 +179,7 @@ const contentStyles = {
     alignItems: 'center',
     gap: '8px',
     padding: '6px 10px',
-    backgroundColor: 'var(--background2, #131722)',
+    backgroundColor: 'var(--bg, #131722)',
     borderRadius: '4px',
     border: '1px solid var(--border, #363a45)',
     cursor: 'pointer',
@@ -195,7 +195,7 @@ const contentStyles = {
   // Style popover
   popover: {
     position: 'absolute',
-    backgroundColor: 'var(--background, #1e222d)',
+    backgroundColor: 'var(--modal-bg, #1e222d)',
     borderRadius: '8px',
     border: '1px solid var(--border, #363a45)',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
@@ -238,7 +238,7 @@ const contentStyles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'var(--background2, #131722)',
+    backgroundColor: 'var(--bg, #131722)',
     border: '1px solid var(--border, #363a45)',
     borderRadius: '4px',
     cursor: 'pointer',
@@ -283,7 +283,7 @@ export class IndicatorSettingsModal extends Modal {
       closeOnEscape: true,
       position: 'absolute',
       align: 'center',
-      modalBackground: 'var(--background, #1e222d)',
+      modalBackground: 'var(--modal-bg, #1e222d)',
       border: '1px solid var(--border, #363a45)',
       maxHeight: 'min(80vh, calc(100% - 40px))',
       tabs: [
