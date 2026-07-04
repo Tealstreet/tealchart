@@ -267,12 +267,13 @@ describe('mobile drawing handle command dispatch', () => {
       meta: { source: 'api' },
     }));
     ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'beginPlacementDrag',
+      type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'rect', now: () => 20, style },
       meta: { source: 'touch' },
     }));
     ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'commitPlacementDrag',
+      type: 'handleInput',
       point: { paneId: 'main', anchor: anchorB },
       options: { createId: () => 'rect', now: () => 20, style },
       meta: { source: 'touch' },
@@ -1035,13 +1036,14 @@ describe('mobile drawing handle command dispatch', () => {
     expect(movedDrawing.points[1]?.time).toBe(2010);
   });
 
-  it('records consecutive mobile two-anchor placement drags as independent undo entries', () => {
+  it('records consecutive mobile two-anchor placement click sequences as independent undo entries', () => {
     let state = setUserDrawingTool(createUserDrawingState({ stayInDrawingMode: true }), 'rectangle');
     let history = createUserDrawingCommandHistory();
-    const drag = (id: string, firstAnchor = anchorA, secondAnchor = anchorB) => {
+    const place = (id: string, firstAnchor = anchorA, secondAnchor = anchorB) => {
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-        type: 'beginPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: firstAnchor },
+        options: { createId: () => id, now: () => 42, style },
         meta: { source: 'touch' },
       });
 
@@ -1050,7 +1052,7 @@ describe('mobile drawing handle command dispatch', () => {
       expect(started.state.draft?.anchors).toEqual([firstAnchor]);
 
       const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'commitPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: secondAnchor },
         options: { createId: () => id, now: () => 42, style },
         meta: { source: 'touch' },
@@ -1062,8 +1064,8 @@ describe('mobile drawing handle command dispatch', () => {
       history = committed.history;
     };
 
-    drag('rect-1');
-    drag('rect-2', { time: 3_000, price: 120 }, { time: 4_000, price: 130 });
+    place('rect-1');
+    place('rect-2', { time: 3_000, price: 120 }, { time: 4_000, price: 130 });
 
     expect(history.undoStack).toHaveLength(2);
     expect(state.drawings).toEqual([
@@ -1088,17 +1090,18 @@ describe('mobile drawing handle command dispatch', () => {
   });
 
   it.each(northStarTwoAnchorDragPlacementTools)(
-    'records mobile %s drag placement from exact touch endpoints',
+    'records mobile %s click placement from tapped anchors',
     (tool) => {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
       const history = createUserDrawingCommandHistory();
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-        type: 'beginPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorA },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch', transactionKey: `${tool}-placement` },
       });
       const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'commitPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorB },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
@@ -1115,16 +1118,17 @@ describe('mobile drawing handle command dispatch', () => {
     },
   );
 
-  it('records expanded mobile two-anchor placement tools through the same drag lifecycle', () => {
+  it('records expanded mobile two-anchor placement tools through the same click lifecycle', () => {
     for (const tool of expandedDragPlacementTools) {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
       const started = dispatchMobileUserDrawingHistoryCommand(state, createUserDrawingCommandHistory(), {
-        type: 'beginPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorA },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch', transactionKey: `${tool}-placement` },
       });
       const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'commitPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorB },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
@@ -1141,7 +1145,7 @@ describe('mobile drawing handle command dispatch', () => {
     }
   });
 
-  it('records mobile drag-seeded multi-anchor placement after the final tap', () => {
+  it('records mobile multi-anchor click placement after the final tap', () => {
     const dragSeedTools: UserDrawingTool[] = [
       'triangle',
       'parallelChannel',
@@ -1174,12 +1178,13 @@ describe('mobile drawing handle command dispatch', () => {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
       const history = createUserDrawingCommandHistory();
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-        type: 'beginPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorA, ...pointOptions },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
       });
       const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'commitPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorB, ...pointOptions },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
@@ -1211,19 +1216,20 @@ describe('mobile drawing handle command dispatch', () => {
     }
   });
 
-  it('records mobile drag-seeded four-anchor placement after the final tap', () => {
+  it('records mobile four-anchor click placement after the final tap', () => {
     const dragSeedTools: UserDrawingTool[] = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'];
 
     for (const tool of dragSeedTools) {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
       const history = createUserDrawingCommandHistory();
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-        type: 'beginPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorA },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
       });
       const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'commitPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorB },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
@@ -1262,7 +1268,7 @@ describe('mobile drawing handle command dispatch', () => {
     }
   });
 
-  it('records mobile drag-seeded five-anchor pattern placement after the final tap', () => {
+  it('records mobile five-anchor pattern click placement after the final tap', () => {
     const dragSeedTools: UserDrawingTool[] = [
       'xabcdPattern',
       'cypherPattern',
@@ -1277,12 +1283,13 @@ describe('mobile drawing handle command dispatch', () => {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
       const history = createUserDrawingCommandHistory();
       const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-        type: 'beginPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorA },
+        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
       });
       const seeded = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'commitPlacementDrag',
+        type: 'handleInput',
         point: { paneId: 'main', anchor: anchorB },
         options: { createId: () => `${tool}-drawing`, now: () => 43, style },
         meta: { source: 'touch' },
@@ -1452,58 +1459,65 @@ describe('mobile drawing handle command dispatch', () => {
     expect(cancelled.state.draft).toBeNull();
   });
 
-  it('does not record a mobile placement drag that ends at the start anchor', () => {
+  it('records a mobile placement click sequence with two distinct anchors', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const history = createUserDrawingCommandHistory();
     const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'beginPlacementDrag',
-      point: { paneId: 'main', anchor: anchorA },
-      meta: { source: 'touch' },
-    });
-    const cancelled = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-      type: 'commitPlacementDrag',
+      type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
       options: { createId: () => 'rect', now: () => 42, style },
       meta: { source: 'touch' },
-    });
-
-    expect(cancelled.changed).toBe(true);
-    expect(cancelled.history.undoStack).toHaveLength(0);
-    expect(cancelled.state.drawings).toEqual([]);
-    expect(cancelled.state.draft).toBeNull();
-  });
-
-  it('keeps mobile placement drafts and history unchanged on cross-pane drag commits', () => {
-    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
-    const history = createUserDrawingCommandHistory();
-    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'beginPlacementDrag',
-      point: { paneId: 'main', anchor: anchorA },
-      meta: { source: 'touch', transactionKey: 'placement-drag' },
     });
     const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-      type: 'commitPlacementDrag',
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => 'rect', now: () => 42, style },
+      meta: { source: 'touch' },
+    });
+
+    expect(started.changed).toBe(true);
+    expect(started.state.draft).toMatchObject({ tool: 'rectangle', anchors: [anchorA] });
+    expect(committed.changed).toBe(true);
+    expect(committed.history.undoStack).toHaveLength(1);
+    expect(committed.state.drawings[0]).toMatchObject({
+      id: 'rect',
+      kind: 'rectangle',
+      points: [anchorA, anchorB],
+    });
+    expect(committed.state.draft).toBeNull();
+  });
+
+  it('restarts the mobile placement draft when the next click lands in a different pane', () => {
+    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'rect', now: () => 42, style },
+      meta: { source: 'touch', transactionKey: 'placement' },
+    });
+    const restarted = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'handleInput',
       point: { paneId: 'indicator', anchor: anchorB },
       options: { createId: () => 'rect', now: () => 42, style },
-      meta: { source: 'touch', transactionKey: 'placement-drag' },
+      meta: { source: 'touch', transactionKey: 'placement' },
     });
 
     expect(started.changed).toBe(true);
     expect(started.history.undoStack).toHaveLength(0);
     expect(started.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
-    expect(committed.changed).toBe(false);
-    expect(committed.history.undoStack).toHaveLength(0);
-    expect(committed.state).toBe(started.state);
-    expect(committed.state.drawings).toEqual([]);
-    expect(committed.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'main', anchors: [anchorA] });
+    expect(restarted.history.undoStack).toHaveLength(0);
+    expect(restarted.state.drawings).toEqual([]);
+    expect(restarted.state.draft).toMatchObject({ tool: 'rectangle', paneId: 'indicator', anchors: [anchorB] });
   });
 
-  it('does not record a mobile placement drag that is explicitly cancelled', () => {
+  it('does not record a mobile placement click sequence that is explicitly cancelled', () => {
     const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
     const history = createUserDrawingCommandHistory();
     const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-      type: 'beginPlacementDrag',
+      type: 'handleInput',
       point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => 'rect', now: () => 42, style },
       meta: { source: 'touch' },
     });
     const cancelled = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
@@ -1512,6 +1526,7 @@ describe('mobile drawing handle command dispatch', () => {
     });
 
     expect(started.changed).toBe(true);
+    expect(started.state.draft).toMatchObject({ tool: 'rectangle', anchors: [anchorA] });
     expect(started.history.undoStack).toHaveLength(0);
     expect(cancelled.changed).toBe(true);
     expect(cancelled.history.undoStack).toHaveLength(0);

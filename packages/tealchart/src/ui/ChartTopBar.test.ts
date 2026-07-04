@@ -70,6 +70,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const trendLine = document.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]');
 
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
+    const linesMenu = document.querySelector<HTMLButtonElement>('button[aria-label="Lines menu"]');
     const shapesCategory = document.querySelector<HTMLButtonElement>(
       'button[aria-label="Geometric Shapes drawing tools"]',
     );
@@ -90,7 +91,8 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(linesCategory?.getAttribute('aria-controls')).toBe('tealchart-drawing-tools-lines');
     expect(document.getElementById('tealchart-drawing-tools-lines')?.getAttribute('role')).toBe('menu');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
-    linesCategory?.click();
+    // The caret button opens the category menu (a plain click activates the tool).
+    linesMenu?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     linesCategory?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
@@ -106,12 +108,12 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onTool).toHaveBeenCalledWith('trendLine');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
 
-    linesCategory?.click();
+    linesMenu?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
 
-    linesCategory?.click();
+    linesMenu?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
@@ -124,7 +126,7 @@ describe('ChartTopBar drawing toolbar', () => {
     const currentShapesCategory = document.querySelector<HTMLButtonElement>(
       'button[aria-label="Geometric Shapes drawing tools"]',
     );
-    currentShapesCategory?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Geometric Shapes menu"]')?.click();
     expect(currentShapesCategory?.getAttribute('aria-expanded')).toBe('true');
     document.querySelector<HTMLButtonElement>('button[aria-label="Rectangle"]')?.click();
     expect(onTool).toHaveBeenCalledWith('rectangle');
@@ -148,7 +150,7 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     topBar.mount(document.body);
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Lines menu"]')?.click();
 
     const removeTrend = document.querySelector<HTMLButtonElement>(
       'button[aria-label="Remove Trend line from favorites"]',
@@ -186,7 +188,7 @@ describe('ChartTopBar drawing toolbar', () => {
         `button[aria-label="${categoryLabel} drawing tools"]`,
       );
       expect(category, categoryLabel).not.toBeNull();
-      category?.click();
+      document.querySelector<HTMLButtonElement>(`button[aria-label="${categoryLabel} menu"]`)?.click();
 
       const button = document.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`);
       expect(button, label).not.toBeNull();
@@ -210,7 +212,7 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     const linesCategory = document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]');
-    linesCategory?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Lines menu"]')?.click();
     const pinButton = document
       .getElementById('tealchart-drawing-tools-lines')
       ?.querySelector<HTMLButtonElement>('button[aria-label="Pin drawing tools"]');

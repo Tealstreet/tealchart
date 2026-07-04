@@ -33,7 +33,6 @@ const undoableUserDrawingHistoryCommandTypes = [
   'duplicate',
   'paste',
   'clear',
-  'commitPlacementDrag',
   'commitPathDrag',
   'commitTextEdit',
   'setText',
@@ -69,7 +68,6 @@ const transientUserDrawingHistoryCommandTypes = [
   'selectAtPoint',
   'beginEditDragAtPoint',
   'cancelDraft',
-  'beginPlacementDrag',
   'beginMeasure',
   'updateMeasure',
   'endMeasure',
@@ -115,7 +113,6 @@ describe('user drawing command history', () => {
     expect(undoableUserDrawingHistoryCommandTypes).toEqual(
       expect.arrayContaining([
         'handleInput',
-        'commitPlacementDrag',
         'commitPathDrag',
         'applyEditDrag',
         'beginDuplicateEditDragAtPoint',
@@ -137,7 +134,6 @@ describe('user drawing command history', () => {
         'setActiveTool',
         'selectAtPoint',
         'beginEditDragAtPoint',
-        'beginPlacementDrag',
         'beginPathDrag',
         'appendPathDragPoint',
         'beginTextEdit',

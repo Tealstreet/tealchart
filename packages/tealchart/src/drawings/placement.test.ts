@@ -4,11 +4,7 @@ import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingInputPoint } from './input';
 import type { UserDrawingTool } from './types';
 
-import {
-  getUserDrawingPlacementMode,
-  isUserDrawingDragPlacementTool,
-  resolveUserDrawingPlacementConstraint,
-} from './placement';
+import { getUserDrawingPlacementMode, resolveUserDrawingPlacementConstraint } from './placement';
 import { USER_DRAWING_TOOL_DESCRIPTORS } from './toolbar';
 import { getRequiredAnchorCount, isUserDrawingPathFamilyTool } from './types';
 
@@ -19,7 +15,7 @@ const space: DrawingCoordinateSpace = {
   chartRight: 100,
 };
 
-const dragTwoAnchorTools: UserDrawingTool[] = [
+const twoAnchorTools: UserDrawingTool[] = [
   'trendLine',
   'trendAngle',
   'extendedLine',
@@ -55,7 +51,7 @@ const dragTwoAnchorTools: UserDrawingTool[] = [
   'timeCycles',
   'sineLine',
 ];
-const dragSeedTools: UserDrawingTool[] = [
+const multiAnchorTools: UserDrawingTool[] = [
   'triangle',
   'curve',
   'arc',
@@ -101,53 +97,34 @@ function point(time: number, price: number): UserDrawingInputPoint {
 }
 
 describe('user drawing placement modes', () => {
-  it('classifies select, click, path drag, two-anchor drag, and drag-seeded tools', () => {
+  it('classifies select, click, and path-drag placement families', () => {
     expect(getUserDrawingPlacementMode('select')).toBe('select');
     expect(getUserDrawingPlacementMode('horizontalLine')).toBe('click');
     expect(getUserDrawingPlacementMode('path')).toBe('pathDrag');
-    expect(getUserDrawingPlacementMode('rectangle')).toBe('dragTwoAnchor');
-    expect(getUserDrawingPlacementMode('trendLine')).toBe('dragTwoAnchor');
-    expect(getUserDrawingPlacementMode('ellipse')).toBe('dragTwoAnchor');
-    expect(getUserDrawingPlacementMode('triangle')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('parallelChannel')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('pitchfork')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('fibChannel')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('projection')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('longPosition')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('barsPattern')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('elliottCorrectiveWave')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('doubleCurve')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('trianglePattern')).toBe('dragSeed');
-    expect(getUserDrawingPlacementMode('xabcdPattern')).toBe('dragSeed');
+    expect(getUserDrawingPlacementMode('brush')).toBe('pathDrag');
+    expect(getUserDrawingPlacementMode('highlighter')).toBe('pathDrag');
   });
 
-  it('classifies supported two-anchor tools as drag placement tools', () => {
-    for (const tool of dragTwoAnchorTools) {
-      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(true);
-      expect(getUserDrawingPlacementMode(tool), tool).toBe('dragTwoAnchor');
+  it('places every two-anchor shape by clicking each anchor in turn', () => {
+    for (const tool of twoAnchorTools) {
+      expect(getUserDrawingPlacementMode(tool), tool).toBe('click');
     }
   });
 
-  it('classifies supported multi-anchor tools as drag-seeded placement tools', () => {
-    for (const tool of dragSeedTools) {
-      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(true);
-      expect(getUserDrawingPlacementMode(tool), tool).toBe('dragSeed');
+  it('places every multi-anchor shape by clicking each anchor in turn', () => {
+    for (const tool of multiAnchorTools) {
+      expect(getUserDrawingPlacementMode(tool), tool).toBe('click');
     }
   });
 
-  it('keeps unsupported multi-anchor tools in click placement until they get dedicated gesture semantics', () => {
-    expect(isUserDrawingDragPlacementTool('select')).toBe(false);
-    expect(getUserDrawingPlacementMode('select')).toBe('select');
-  });
-
-  it('keeps every registered multi-point tool on an explicit drag placement path', () => {
+  it('keeps every registered multi-point tool on click placement (path tools excepted)', () => {
     for (const { tool } of USER_DRAWING_TOOL_DESCRIPTORS) {
       const anchorCount = getRequiredAnchorCount(tool);
       if (tool === 'select' || anchorCount <= 1) {
         continue;
       }
 
-      const expectedMode = isUserDrawingPathFamilyTool(tool) ? 'pathDrag' : anchorCount === 2 ? 'dragTwoAnchor' : 'dragSeed';
+      const expectedMode = isUserDrawingPathFamilyTool(tool) ? 'pathDrag' : 'click';
       expect(getUserDrawingPlacementMode(tool), tool).toBe(expectedMode);
     }
   });

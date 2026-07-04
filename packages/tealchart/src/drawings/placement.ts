@@ -3,96 +3,17 @@ import type { UserDrawingInputPoint } from './input';
 import type { UserDrawingAnchor, UserDrawingTool } from './types';
 
 import { anchorToScreenPoint, screenPointToAnchor } from './coordinates';
-import { getRequiredAnchorCount, isUserDrawingPathFamilyTool } from './types';
+import { isUserDrawingPathFamilyTool } from './types';
 
-export type UserDrawingPlacementMode = 'select' | 'click' | 'dragTwoAnchor' | 'dragSeed' | 'pathDrag';
+export type UserDrawingPlacementMode = 'select' | 'click' | 'pathDrag';
 
-const DRAG_TWO_ANCHOR_TOOLS = new Set<UserDrawingTool>([
-  'trendLine',
-  'trendAngle',
-  'extendedLine',
-  'infoLine',
-  'arrowLine',
-  'arrowMarker',
-  'ray',
-  'rectangle',
-  'circle',
-  'ellipse',
-  'priceRange',
-  'dateRange',
-  'datePriceRange',
-  'forecast',
-  'fixedRangeVolumeProfile',
-  'callout',
-  'priceNote',
-  'image',
-  'fibRetracement',
-  'fibExtension',
-  'fibFan',
-  'fibSpeedResistanceFan',
-  'fibArcs',
-  'fibSpeedResistanceArcs',
-  'fibCircles',
-  'fibSpiral',
-  'gannFan',
-  'gannBox',
-  'gannSquare',
-  'gannSquareFixed',
-  'fibTimeZone',
-  'cyclicLines',
-  'timeCycles',
-  'sineLine',
-]);
-
-const DRAG_SEED_MULTI_ANCHOR_TOOLS = new Set<UserDrawingTool>([
-  'triangle',
-  'curve',
-  'arc',
-  'polyline',
-  'rotatedRectangle',
-  'parallelChannel',
-  'regressionTrend',
-  'flatTopBottom',
-  'pitchfork',
-  'schiffPitchfork',
-  'modifiedSchiffPitchfork',
-  'insidePitchfork',
-  'pitchfan',
-  'trendBasedFibExtension',
-  'fibWedge',
-  'fibChannel',
-  'trendBasedFibTime',
-  'projection',
-  'sector',
-  'longPosition',
-  'shortPosition',
-  'barsPattern',
-  'elliottCorrectiveWave',
-  'elliottDoubleComboWave',
-  'doubleCurve',
-  'disjointChannel',
-  'trianglePattern',
-  'abcdPattern',
-  'xabcdPattern',
-  'cypherPattern',
-  'threeDrivesPattern',
-  'headShouldersPattern',
-  'elliottImpulseWave',
-  'elliottTripleComboWave',
-  'elliottTriangleWave',
-]);
-
+// Every multi-point shape is placed by clicking each anchor in turn (TradingView
+// parity) — the shape is built and previewed point by point. Only freehand path
+// tools (path/brush/highlighter) still use a continuous drag gesture.
 export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingPlacementMode {
   if (tool === 'select') return 'select';
   if (isUserDrawingPathFamilyTool(tool)) return 'pathDrag';
-  if (DRAG_TWO_ANCHOR_TOOLS.has(tool) && getRequiredAnchorCount(tool) === 2) return 'dragTwoAnchor';
-  if (DRAG_SEED_MULTI_ANCHOR_TOOLS.has(tool) && getRequiredAnchorCount(tool) > 2) return 'dragSeed';
   return 'click';
-}
-
-export function isUserDrawingDragPlacementTool(tool: UserDrawingTool): boolean {
-  const mode = getUserDrawingPlacementMode(tool);
-  return mode === 'dragTwoAnchor' || mode === 'dragSeed';
 }
 
 export interface UserDrawingPlacementConstraintOptions {
