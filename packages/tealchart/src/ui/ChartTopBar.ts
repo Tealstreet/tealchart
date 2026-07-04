@@ -1703,10 +1703,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const globalActionDescriptors = USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
       (descriptor) =>
         isUserDrawingGlobalToolbarAction(descriptor.action) &&
-        !isUserDrawingRailToolbarAction(descriptor.action) &&
-        // Measure and zoom now live in the vertical rail (TradingView layout).
-        descriptor.action !== 'measure' &&
-        descriptor.action !== 'zoomIn',
+        // Rail actions (measure, zoom, lock, hide, clear) render in the vertical rail.
+        !isUserDrawingRailToolbarAction(descriptor.action),
     );
     for (const item of globalActionDescriptors.map((descriptor) => ({
       ...descriptor,
@@ -1717,11 +1715,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       command: { type: 'toolbarAction' as const, action: descriptor.action },
     }))) {
       const enabled = item.enabled;
-      const active = item.command.action === 'measure' && state?.measureMode === 'on';
+      // Only stateless actions (undo, redo, cancelDraft) remain here — measure and
+      // zoom moved to the rail — so these buttons never carry an active state.
       const btn = this.createElement('button', {
         style: {
           ...styles.drawingButton,
-          ...(active ? styles.drawingButtonActive : {}),
           opacity: enabled ? '1' : '0.35',
           cursor: enabled ? 'pointer' : 'default',
         },
@@ -1729,7 +1727,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           type: 'button',
           title: item.label,
           'aria-label': item.label,
-          'aria-pressed': active ? 'true' : 'false',
         },
       });
       this.setDrawingIconContent(btn, resolveDrawingToolbarActionIconName(item.command.action), item.icon, 18);
@@ -1739,20 +1736,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           if (item.command.type !== 'toolbarAction') return;
           if (item.command.action === 'undo') this.options.onUserDrawingUndo?.();
           if (item.command.action === 'redo') this.options.onUserDrawingRedo?.();
-          if (item.command.action === 'measure') this.options.onUserDrawingMeasureModeChange?.(state?.measureMode !== 'on');
-          if (item.command.action === 'zoomIn') this.options.onUserDrawingZoomIn?.();
           if (item.command.action === 'cancelDraft') this.options.onUserDrawingCancelDraft?.();
         });
         btn.addEventListener('mouseenter', () => {
-          if (!active) Object.assign(btn.style, styles.drawingButtonHover);
+          Object.assign(btn.style, styles.drawingButtonHover);
         });
         btn.addEventListener('mouseleave', () => {
-          if (active) {
-            Object.assign(btn.style, styles.drawingButtonActive);
-            return;
-          }
           btn.style.backgroundColor = 'transparent';
-          btn.style.color = 'var(--text2, #787b86)';
+          btn.style.color = 'var(--text2, #b2b5be)';
         });
       }
       group.appendChild(btn);

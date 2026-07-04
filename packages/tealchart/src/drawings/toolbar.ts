@@ -690,9 +690,11 @@ export function isUserDrawingGlobalToolbarAction(
   return USER_DRAWING_GLOBAL_TOOLBAR_ACTIONS.has(action);
 }
 
-// Global actions that live in the bottom drawing rail (lock/hide/clear) rather
-// than the top action row, mirroring TradingView's rail layout.
+// Global actions that live in the vertical drawing rail (measure/zoom plus
+// lock/hide/clear) rather than the top action row, mirroring TradingView.
 const USER_DRAWING_RAIL_TOOLBAR_ACTIONS: ReadonlySet<UserDrawingToolbarAction> = new Set([
+  'measure',
+  'zoomIn',
   'clearAll',
   'hideAll',
   'showAll',
