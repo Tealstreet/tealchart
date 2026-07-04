@@ -727,15 +727,11 @@ describe('ChartCore viewport management', () => {
 
   it('does not engage placement drag for click-placement tools', async () => {
     const { ChartCore } = await import('./ChartCore');
-    const onUserDrawingPlacementDragStart = vi.fn(() => true);
-    const onUserDrawingPlacementDragEnd = vi.fn();
     const onUserDrawingCancelDraft = vi.fn();
     const core = new ChartCore({
       container,
       width: 800,
       height: 600,
-      onUserDrawingPlacementDragStart,
-      onUserDrawingPlacementDragEnd,
       onUserDrawingCancelDraft,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
@@ -750,12 +746,10 @@ describe('ChartCore viewport management', () => {
 
     const eventCallbacks = eventManagerInstances.at(-1)?.callbacks;
     expect(eventCallbacks).toBeDefined();
-    // A drag gesture with a click-placement tool active must not start placement drag.
+    // A drag gesture with a click-placement tool active must not start any placement gesture.
     expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'mouse')).toBe(false);
     eventCallbacks?.onDrawingDragCancel?.('mouse');
 
-    expect(onUserDrawingPlacementDragStart).not.toHaveBeenCalled();
-    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalled();
     expect(onUserDrawingCancelDraft).not.toHaveBeenCalled();
 
     core.dispose();
@@ -767,8 +761,6 @@ describe('ChartCore viewport management', () => {
     const onUserDrawingMeasureMove = vi.fn(() => true);
     const onUserDrawingMeasureEnd = vi.fn();
     const onUserDrawingCancelDraft = vi.fn();
-    const onUserDrawingPlacementDragStart = vi.fn(() => true);
-    const onUserDrawingPlacementDragEnd = vi.fn();
     const core = new ChartCore({
       container,
       width: 800,
@@ -777,8 +769,6 @@ describe('ChartCore viewport management', () => {
       onUserDrawingMeasureMove,
       onUserDrawingMeasureEnd,
       onUserDrawingCancelDraft,
-      onUserDrawingPlacementDragStart,
-      onUserDrawingPlacementDragEnd,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
     core.setUserDrawingState({
@@ -812,8 +802,6 @@ describe('ChartCore viewport management', () => {
     expect(onUserDrawingMeasureStart).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
     expect(onUserDrawingMeasureMove).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
     expect(onUserDrawingMeasureEnd).toHaveBeenCalledTimes(1);
-    expect(onUserDrawingPlacementDragStart).not.toHaveBeenCalled();
-    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalled();
 
     expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'touch')).toBe(true);
     eventCallbacks?.onDrawingDragCancel?.('touch');

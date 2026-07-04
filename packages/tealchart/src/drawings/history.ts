@@ -98,7 +98,6 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'selectAtPoint':
     case 'beginEditDragAtPoint':
     case 'cancelDraft':
-    case 'beginPlacementDrag':
     case 'beginMeasure':
     case 'updateMeasure':
     case 'endMeasure':
@@ -117,7 +116,6 @@ function shouldRecordUserDrawingCommand(command: UserDrawingCommand): boolean {
     case 'duplicate':
     case 'paste':
     case 'clear':
-    case 'commitPlacementDrag':
     case 'commitPathDrag':
     case 'commitTextEdit':
     case 'setText':

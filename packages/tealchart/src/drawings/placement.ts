@@ -5,7 +5,7 @@ import type { UserDrawingAnchor, UserDrawingTool } from './types';
 import { anchorToScreenPoint, screenPointToAnchor } from './coordinates';
 import { isUserDrawingPathFamilyTool } from './types';
 
-export type UserDrawingPlacementMode = 'select' | 'click' | 'dragTwoAnchor' | 'dragSeed' | 'pathDrag';
+export type UserDrawingPlacementMode = 'select' | 'click' | 'pathDrag';
 
 // Every multi-point shape is placed by clicking each anchor in turn (TradingView
 // parity) — the shape is built and previewed point by point. Only freehand path
@@ -14,11 +14,6 @@ export function getUserDrawingPlacementMode(tool: UserDrawingTool): UserDrawingP
   if (tool === 'select') return 'select';
   if (isUserDrawingPathFamilyTool(tool)) return 'pathDrag';
   return 'click';
-}
-
-export function isUserDrawingDragPlacementTool(tool: UserDrawingTool): boolean {
-  const mode = getUserDrawingPlacementMode(tool);
-  return mode === 'dragTwoAnchor' || mode === 'dragSeed';
 }
 
 export interface UserDrawingPlacementConstraintOptions {

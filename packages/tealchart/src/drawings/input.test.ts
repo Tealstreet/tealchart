@@ -5,13 +5,11 @@ import {
   addUserDrawing,
   appendUserDrawingPathDragPoint,
   beginUserDrawingMeasure,
-  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
-  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingState,
@@ -410,34 +408,6 @@ describe('user drawing input controller', () => {
         points: [anchorA, anchorB],
       });
     }
-  });
-
-  it('ignores drag placement commands for tools without drag placement semantics', () => {
-    const horizontalLineState = setUserDrawingTool(createUserDrawingState(), 'horizontalLine');
-
-    expect(beginUserDrawingPlacementDrag(horizontalLineState, { paneId: 'main', anchor: anchorA })).toBe(
-      horizontalLineState,
-    );
-    expect(
-      commitUserDrawingPlacementDrag(horizontalLineState, { paneId: 'main', anchor: anchorB }, { createId: () => 'line' }),
-    ).toBe(horizontalLineState);
-  });
-
-  it('cancels two-anchor drag placement when the drag never reaches a distinct endpoint', () => {
-    const started = beginUserDrawingPlacementDrag(
-      setUserDrawingTool(createUserDrawingState(), 'rectangle'),
-      { paneId: 'main', anchor: anchorA },
-      { now: () => 10, style },
-    );
-    const cancelled = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorA }, {
-      createId: () => 'drag-rect',
-      now: () => 11,
-      style,
-    });
-
-    expect(cancelled.drawings).toEqual([]);
-    expect(cancelled.draft).toBeNull();
-    expect(cancelled.selection).toBeNull();
   });
 
   it('commits fixed range volume profiles from two anchors', () => {

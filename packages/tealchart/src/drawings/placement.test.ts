@@ -4,11 +4,7 @@ import type { DrawingCoordinateSpace } from './coordinates';
 import type { UserDrawingInputPoint } from './input';
 import type { UserDrawingTool } from './types';
 
-import {
-  getUserDrawingPlacementMode,
-  isUserDrawingDragPlacementTool,
-  resolveUserDrawingPlacementConstraint,
-} from './placement';
+import { getUserDrawingPlacementMode, resolveUserDrawingPlacementConstraint } from './placement';
 import { USER_DRAWING_TOOL_DESCRIPTORS } from './toolbar';
 import { getRequiredAnchorCount, isUserDrawingPathFamilyTool } from './types';
 
@@ -112,22 +108,13 @@ describe('user drawing placement modes', () => {
   it('places every two-anchor shape by clicking each anchor in turn', () => {
     for (const tool of twoAnchorTools) {
       expect(getUserDrawingPlacementMode(tool), tool).toBe('click');
-      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(false);
     }
   });
 
   it('places every multi-anchor shape by clicking each anchor in turn', () => {
     for (const tool of multiAnchorTools) {
       expect(getUserDrawingPlacementMode(tool), tool).toBe('click');
-      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(false);
     }
-  });
-
-  it('never reports a drag placement tool — only freehand path tools use a continuous gesture', () => {
-    for (const { tool } of USER_DRAWING_TOOL_DESCRIPTORS) {
-      expect(isUserDrawingDragPlacementTool(tool), tool).toBe(false);
-    }
-    expect(getUserDrawingPlacementMode('select')).toBe('select');
   });
 
   it('keeps every registered multi-point tool on click placement (path tools excepted)', () => {

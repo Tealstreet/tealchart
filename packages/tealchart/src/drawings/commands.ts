@@ -9,8 +9,7 @@ import type {
   UserDrawingInputPoint,
   UserDrawingClipboard,
   PasteUserDrawingOptions,
-  UserDrawingPlacementDragCommitOptions,
-  UserDrawingPlacementDragStartOptions,
+  UserDrawingMeasureStartOptions,
   UserDrawingPathDragOptions,
   UserDrawingTableCellInput,
   UserDrawingTableCellsInput,
@@ -46,14 +45,12 @@ import {
   addUserDrawing,
   appendUserDrawingPathDragPoint,
   beginUserDrawingMeasure,
-  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
   cloneUserDrawingSnapshot,
-  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   deleteUserDrawing,
@@ -172,19 +169,9 @@ export type UserDrawingCommand =
   | (UserDrawingCommandBase & { type: 'cancelDraft' })
   | (UserDrawingCommandBase & { type: 'handleInput'; point: UserDrawingInputPoint; options: UserDrawingInputOptions })
   | (UserDrawingCommandBase & {
-      type: 'beginPlacementDrag';
-      point: UserDrawingInputPoint;
-      options?: UserDrawingPlacementDragStartOptions;
-    })
-  | (UserDrawingCommandBase & {
-      type: 'commitPlacementDrag';
-      point: UserDrawingInputPoint;
-      options: UserDrawingPlacementDragCommitOptions;
-    })
-  | (UserDrawingCommandBase & {
       type: 'beginMeasure';
       point: UserDrawingInputPoint;
-      options?: UserDrawingPlacementDragStartOptions;
+      options?: UserDrawingMeasureStartOptions;
     })
   | (UserDrawingCommandBase & { type: 'updateMeasure'; point: UserDrawingInputPoint })
   | (UserDrawingCommandBase & { type: 'endMeasure' })
@@ -479,10 +466,6 @@ export function reduceUserDrawingCommand(state: UserDrawingState, command: UserD
       return cancelUserDrawingDraft(state);
     case 'handleInput':
       return handleUserDrawingInput(state, command.point, command.options);
-    case 'beginPlacementDrag':
-      return beginUserDrawingPlacementDrag(state, command.point, command.options);
-    case 'commitPlacementDrag':
-      return commitUserDrawingPlacementDrag(state, command.point, command.options);
     case 'beginMeasure':
       return beginUserDrawingMeasure(state, command.point, command.options);
     case 'updateMeasure':

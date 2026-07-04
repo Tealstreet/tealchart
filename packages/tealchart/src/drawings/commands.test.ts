@@ -7,13 +7,11 @@ import { clearChartStoreCache } from '../state/chartState';
 import {
   addUserDrawing,
   appendUserDrawingPathDragPoint,
-  beginUserDrawingPlacementDrag,
   beginUserDrawingPathDrag,
   beginUserDrawingTextEdit,
   cancelUserDrawingDraft,
   cancelUserDrawingTextEdit,
   clearUserDrawings,
-  commitUserDrawingPlacementDrag,
   commitUserDrawingPathDrag,
   commitUserDrawingTextEdit,
   createUserDrawingClipboard,
@@ -94,8 +92,6 @@ const coveredUserDrawingCommandTypes = [
   'clear',
   'cancelDraft',
   'handleInput',
-  'beginPlacementDrag',
-  'commitPlacementDrag',
   'beginMeasure',
   'updateMeasure',
   'endMeasure',
@@ -603,28 +599,6 @@ describe('user drawing command dispatch', () => {
         options: { createId: () => 'path-1', now: () => 61, style },
       }).state,
     ).toEqual(commitUserDrawingPathDrag(appended, { createId: () => 'path-1', now: () => 61, style }));
-  });
-
-  it('wraps two-anchor placement drag lifecycle reducers', () => {
-    const state = setUserDrawingTool(createUserDrawingState(), 'rectangle');
-    const firstPoint = { paneId: 'main', anchor: anchorA };
-    const secondPoint = { paneId: 'main', anchor: anchorB };
-    const started = beginUserDrawingPlacementDrag(state, firstPoint, { now: () => 62, style });
-
-    expect(
-      dispatchUserDrawingCommand(state, {
-        type: 'beginPlacementDrag',
-        point: firstPoint,
-        options: { now: () => 62, style },
-      }).state,
-    ).toEqual(started);
-    expect(
-      dispatchUserDrawingCommand(started, {
-        type: 'commitPlacementDrag',
-        point: secondPoint,
-        options: { createId: () => 'rect-1', now: () => 63, style },
-      }).state,
-    ).toEqual(commitUserDrawingPlacementDrag(started, secondPoint, { createId: () => 'rect-1', now: () => 63, style }));
   });
 
   it('restarts click placement in the new pane instead of committing a cross-pane drawing', () => {
