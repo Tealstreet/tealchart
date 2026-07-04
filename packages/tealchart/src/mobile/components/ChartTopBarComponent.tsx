@@ -263,8 +263,14 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const activeButtonStyle = { backgroundColor: darkBg ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)' };
     const pressedButtonStyle = { backgroundColor: darkBg ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' };
     const toggleActiveButtonStyle = { backgroundColor: textColor };
-    // Glyph sits on the light toggle fill; use the chart bg, or text if bg is transparent.
-    const toggleGlyphColor = backgroundColor && backgroundColor !== 'transparent' ? backgroundColor : textColor;
+    // Glyph sits on the toggle fill (textColor); use the chart bg, or a color that
+    // contrasts with the fill when no real background is injected (standalone default).
+    const toggleGlyphColor =
+      backgroundColor && backgroundColor !== 'transparent'
+        ? backgroundColor
+        : isDarkColor(textColor)
+          ? '#ffffff'
+          : '#000000';
     const railDrawings = userDrawingState?.drawings ?? [];
     const railHasDrawings = railDrawings.length > 0;
     const railSomeUnlocked = railDrawings.some((drawing) => !drawing.locked);
