@@ -323,19 +323,30 @@ const styles = {
     transition: 'background-color 0.15s, color 0.15s',
   } as Partial<CSSStyleDeclaration>,
 
-  // Right-pointing flyout caret; revealed on hover only (see rail hover wiring).
+  // Right-edge flyout-menu button (revealed on hover); click opens the category menu.
   drawingToolCategoryCaret: {
     position: 'absolute',
-    right: '2px',
-    top: '50%',
-    transform: 'translateY(-50%)',
+    right: '0',
+    top: '0',
+    bottom: '0',
+    width: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingRight: '2px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    opacity: '0',
+    transition: 'opacity 0.12s',
+  } as Partial<CSSStyleDeclaration>,
+
+  drawingToolCategoryCaretGlyph: {
     width: '0',
     height: '0',
     borderTop: '3px solid transparent',
     borderBottom: '3px solid transparent',
     borderLeft: '4px solid var(--text2, #787b86)',
-    opacity: '0',
-    transition: 'opacity 0.12s',
     pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
@@ -1563,15 +1574,37 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         this.pinnedDrawingToolCategoryId = this.pinnedDrawingToolCategoryId === category.id ? null : category.id;
         updatePinButton(pinButton, category.id);
       });
-      categoryButton.addEventListener('click', (event) => {
-        event.stopPropagation();
+      const toggleFlyout = () => {
         if (flyout.style.display === 'block' && this.pinnedDrawingToolCategoryId !== category.id) hideFlyout();
         else showFlyout();
+      };
+      const isMultiTool = category.tools.length > 1;
+      categoryButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        // TradingView model: a click (re)activates the category's last-used tool.
+        // A second click on the already-active category reveals the menu instead.
+        if (isMultiTool && activeCategory) {
+          toggleFlyout();
+          return;
+        }
+        closeActiveFlyout();
+        this.recentDrawingToolsByCategory[category.id] = categoryTool;
+        this.options.onUserDrawingToolSelect?.(categoryTool);
       });
-      const caret =
-        category.tools.length > 1
-          ? this.createElement('div', { style: styles.drawingToolCategoryCaret })
-          : null;
+      const caret = isMultiTool
+        ? this.createElement('button', {
+            style: styles.drawingToolCategoryCaret,
+            attributes: { type: 'button', tabindex: '-1', 'aria-label': `${category.label} menu` },
+          })
+        : null;
+      if (caret) {
+        caret.appendChild(this.createElement('span', { style: styles.drawingToolCategoryCaretGlyph }));
+        // The caret is its own button — clicking it always opens the menu.
+        caret.addEventListener('click', (event) => {
+          event.stopPropagation();
+          toggleFlyout();
+        });
+      }
       railItem.addEventListener('mouseenter', () => {
         if (caret) caret.style.opacity = '1';
         this.showRailTooltip(categoryButton, category.label);
