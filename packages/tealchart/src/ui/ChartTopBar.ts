@@ -259,16 +259,16 @@ const styles = {
   drawingToolRail: {
     position: 'absolute',
     top: `${computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)}px`,
-    left: `${WEB_CHART_CHROME_METRICS.leftToolRailInset}px`,
+    left: '0',
+    bottom: `${TIME_AXIS_HEIGHT}px`,
+    width: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '6px 4px',
+    padding: '4px 0',
     boxSizing: 'border-box',
-    border: '1px solid var(--border, #363a45)',
-    borderRadius: '6px',
-    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.96))',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+    borderRight: '1px solid var(--border, #2a2e39)',
+    backgroundColor: 'var(--bg, #131722)',
     zIndex: '7',
     pointerEvents: 'auto',
     overflow: 'visible',
@@ -278,7 +278,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '4px',
+    gap: '2px',
     maxHeight: `calc(100vh - ${
       computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + WEB_CHART_CHROME_METRICS.leftToolRailTopGap
     }px)`,
@@ -295,28 +295,28 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '4px',
-    marginTop: '4px',
+    gap: '2px',
+    marginTop: '2px',
   } as Partial<CSSStyleDeclaration>,
 
   drawingRailToggleDivider: {
-    width: '24px',
+    width: '28px',
     height: '1px',
     backgroundColor: 'var(--border, #2a2e39)',
-    margin: '2px 0',
+    margin: '4px 0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolCategoryButton: {
-    width: '32px',
-    height: '32px',
+    width: '34px',
+    height: '34px',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '4px',
     backgroundColor: 'transparent',
     color: 'var(--text2, #787b86)',
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    lineHeight: '32px',
+    lineHeight: '34px',
     padding: '0',
     textAlign: 'center',
     transition: 'background-color 0.15s, color 0.15s',
@@ -325,7 +325,7 @@ const styles = {
   drawingToolFlyout: {
     position: 'absolute',
     top: '0',
-    left: '40px',
+    left: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     display: 'none',
     minWidth: '240px',
     maxHeight: `calc(100vh - ${
@@ -553,8 +553,14 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonActive: {
-    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.2))',
-    color: 'var(--accent, #2962ff)',
+    backgroundColor: 'var(--active-bg, rgba(255, 255, 255, 0.12))',
+    color: 'var(--text, #d1d4dc)',
+  } as Partial<CSSStyleDeclaration>,
+
+  // TradingView-style persistent toggle (e.g. magnet on): filled light glyph on dark.
+  drawingButtonToggleActive: {
+    backgroundColor: 'var(--text, #d1d4dc)',
+    color: 'var(--bg, #131722)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonHover: {
@@ -787,8 +793,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     const magnetActive = (state?.magnetMode ?? 'off') !== 'off';
     toggles.appendChild(
-      this.createDrawingRailToggleButton('magnet', magnetActive ? 'Magnet snap on' : 'Magnet snap off', magnetActive, () =>
-        this.options.onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong'),
+      this.createDrawingRailToggleButton(
+        'magnet',
+        magnetActive ? 'Magnet snap on' : 'Magnet snap off',
+        magnetActive,
+        () => this.options.onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong'),
+        true,
+        true,
       ),
     );
 
@@ -799,6 +810,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         stayActive ? 'Keep drawing mode on' : 'Keep drawing mode off',
         stayActive,
         () => this.options.onUserDrawingStayInDrawingModeChange?.(!stayActive),
+        true,
+        true,
       ),
     );
 
@@ -819,8 +832,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       ? getUserDrawingAllDrawingsUpdateOptions(state, { includeLocked: true })
       : { drawingIds: [], includeLocked: true };
 
-    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
-
+    // magnet + draw-mode + lock + eye form one TradingView-style utility group.
     toggles.appendChild(
       this.createDrawingRailToggleButton(
         allLocked ? 'lock' : 'unlock',
@@ -841,6 +853,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       ),
     );
 
+    // Destructive action is isolated in its own group, like TradingView.
+    toggles.appendChild(this.createElement('div', { style: styles.drawingRailToggleDivider }));
+
     toggles.appendChild(
       this.createDrawingRailToggleButton(
         'trash',
@@ -860,11 +875,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     active: boolean,
     onClick: () => void,
     enabled = true,
+    strongActive = false,
   ): HTMLButtonElement {
+    const activeStyle = strongActive ? styles.drawingButtonToggleActive : styles.drawingButtonActive;
     const btn = this.createElement('button', {
       style: {
         ...styles.drawingToolCategoryButton,
-        ...(active ? styles.drawingButtonActive : {}),
+        ...(active ? activeStyle : {}),
         opacity: enabled ? '1' : '0.35',
         cursor: enabled ? 'pointer' : 'default',
       },
