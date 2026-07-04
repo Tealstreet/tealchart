@@ -304,6 +304,21 @@ describe('user drawing input controller', () => {
     expect(second.stayInDrawingMode).toBe(false);
   });
 
+  it('ignores a repeat click on the anchor just placed instead of committing a degenerate drawing', () => {
+    const options = { createId: () => 'dupe', now: () => 20 };
+    const drawingState = setUserDrawingTool(createUserDrawingState(), 'rectangle');
+    const first = handleUserDrawingInput(drawingState, { paneId: 'main', anchor: anchorA }, options);
+    const repeat = handleUserDrawingInput(first, { paneId: 'main', anchor: anchorA }, options);
+
+    expect(repeat).toBe(first);
+    expect(repeat.drawings).toEqual([]);
+    expect(repeat.draft?.anchors).toEqual([anchorA]);
+
+    const committed = handleUserDrawingInput(repeat, { paneId: 'main', anchor: anchorB }, options);
+    expect(committed.draft).toBeNull();
+    expect(committed.drawings[0]).toMatchObject({ id: 'dupe', kind: 'rectangle', points: [anchorA, anchorB] });
+  });
+
   it('commits two-anchor click placement from both click anchors', () => {
     const state = setUserDrawingTool(
       setUserDrawingStayInDrawingMode(createUserDrawingState(), true),

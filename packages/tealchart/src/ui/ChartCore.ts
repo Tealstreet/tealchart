@@ -819,10 +819,11 @@ export class ChartCore {
         const draftTool = this.userDrawingState?.draft?.tool;
         if (draftTool && getUserDrawingPlacementMode(draftTool) === 'click') {
           const previewPoint = this.resolveUserDrawingInputPoint(x, y);
-          if (previewPoint) {
-            this.userDrawingDraftPreviewAnchor = this.resolveConstrainedUserDrawingPlacementPoint(previewPoint, options).anchor;
-            this.scheduleRender();
-          }
+          // Clear the preview when the cursor is over an unresolvable region so it never sticks.
+          this.userDrawingDraftPreviewAnchor = previewPoint
+            ? this.resolveConstrainedUserDrawingPlacementPoint(previewPoint, options).anchor
+            : null;
+          this.scheduleRender();
         }
         const price = this.renderer.publicYToPriceWithLayout(
           y,
