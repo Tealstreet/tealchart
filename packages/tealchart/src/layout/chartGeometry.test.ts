@@ -144,7 +144,7 @@ describe('chart geometry', () => {
       chromeMetrics: MOBILE_CHART_CHROME_METRICS,
     });
 
-    expect(computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)).toBe(40);
+    expect(computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)).toBe(32);
     expect(computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS)).toBe(44);
     expect(webSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 32 });
     expect(webSnapshot.chrome.leftTools).toEqual({ x: 0, y: 32, width: 50, height: 288 });
