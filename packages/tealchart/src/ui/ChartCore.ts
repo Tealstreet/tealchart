@@ -36,6 +36,7 @@ import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
 import {
   getUserDrawingPlacementMode,
+  hitTestUserDrawings,
   isUserDrawingDragPlacementTool,
   isUserDrawingPathFamilyTool,
   renderUserDrawingLayer,
@@ -789,6 +790,7 @@ export class ChartCore {
         }
         return false;
       },
+      isOverUnlockedUserDrawing: (x, y) => this.isOverUnlockedUserDrawing(x, y),
       onAutoScaleDisabled: (paneId: string) => this.options.onAutoScaleDisabled?.(paneId),
       isAutoScale: (paneId: string) => this.options.isAutoScale?.(paneId) ?? true,
       onViewportChange: (vp) => {
@@ -845,7 +847,8 @@ export class ChartCore {
           const dx = this.crosshair.x - b.x;
           const dy = this.crosshair.y - b.y;
           const overPlus = dx * dx + dy * dy <= b.r * b.r;
-          const wantCursor = overPlus ? 'pointer' : 'crosshair';
+          const wantCursor =
+            overPlus || this.isOverUnlockedUserDrawing(this.crosshair.x, this.crosshair.y) ? 'pointer' : 'crosshair';
           if (this.cursor !== wantCursor) {
             this.cursor = wantCursor;
             this.chartContainer.style.cursor = wantCursor;
@@ -1169,6 +1172,18 @@ export class ChartCore {
     if (!this.stage) return false;
     const hit = this.stage.getIntersection({ x, y });
     return hit !== null && hit.listening();
+  }
+
+  /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */
+  private isOverUnlockedUserDrawing(x: number, y: number): boolean {
+    const state = this.userDrawingState;
+    if (!state || state.activeTool !== 'select' || !this.viewport) return false;
+    const drawings = state.drawings;
+    if (!drawings || drawings.length === 0) return false;
+    const hit = hitTestUserDrawings(drawings, { x, y }, this.getUserDrawingSpaces(this.viewport), {
+      labelHeight: 20,
+    });
+    return hit !== null && !hit.drawing.locked;
   }
 
   private handleOrderMove(orderId: string, newPrice: number): void {
