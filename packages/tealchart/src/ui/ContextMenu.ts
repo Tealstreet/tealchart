@@ -5,8 +5,9 @@
  * Supports nested submenus and dividers.
  */
 
-import type { ContextMenuItem } from '../types';
+import type { ContextMenuItem, RenderOptions } from '../types';
 
+import { applyChromeThemeVars } from './chromeTheme';
 import { div, span } from './dom';
 
 // ============================================================================
@@ -22,6 +23,8 @@ export interface ContextMenuOptions {
   y: number;
   /** Callback when menu is closed */
   onClose?: () => void;
+  /** Chart render options used to theme the menu (it portals to document.body). */
+  renderOptions?: Partial<RenderOptions>;
 }
 
 // ============================================================================
@@ -31,8 +34,8 @@ export interface ContextMenuOptions {
 const styles = {
   menu: {
     position: 'fixed',
-    backgroundColor: '#1e222d',
-    border: '1px solid #363a45',
+    backgroundColor: 'var(--bg, #1e222d)',
+    border: '1px solid var(--border, #363a45)',
     borderRadius: '4px',
     padding: '4px 0',
     minWidth: '160px',
@@ -46,7 +49,7 @@ const styles = {
 
   menuItem: {
     padding: '8px 12px',
-    color: '#d1d4dc',
+    color: 'var(--text, #d1d4dc)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -55,7 +58,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   menuItemHover: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
   } as Partial<CSSStyleDeclaration>,
 
   menuItemDisabled: {
@@ -65,7 +68,7 @@ const styles = {
 
   divider: {
     height: '1px',
-    backgroundColor: '#363a45',
+    backgroundColor: 'var(--border, #363a45)',
     margin: '4px 0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -87,14 +90,14 @@ const styles = {
 
   shortcut: {
     marginLeft: '16px',
-    color: '#787b86',
+    color: 'var(--text3, #787b86)',
     fontSize: '11px',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   submenuArrow: {
     marginLeft: 'auto',
-    color: '#787b86',
+    color: 'var(--text3, #787b86)',
     fontSize: '10px',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
@@ -148,6 +151,8 @@ export class ContextMenu {
 
   private createMenu(): HTMLDivElement {
     const menu = div({ style: styles.menu });
+    // Portaled to document.body, so theme it directly (can't inherit root vars).
+    applyChromeThemeVars(menu, this.options.renderOptions);
     menu.addEventListener('mousedown', (event) => event.stopPropagation());
     menu.addEventListener('mouseup', (event) => event.stopPropagation());
     menu.addEventListener('click', (event) => event.stopPropagation());
