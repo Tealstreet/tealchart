@@ -96,6 +96,8 @@ export interface ChartTopBarComponentProps {
   onUserDrawingStayInDrawingModeChange?: (stayInDrawingMode: boolean) => void;
   /** Callback when the drawing toolbar should zoom the chart time range in */
   onUserDrawingZoomIn?: () => void;
+  /** Callback when the drawing objects tree should open */
+  onUserDrawingObjectTreeOpen?: () => void;
   /** Callback when selected drawings should be reordered */
   onUserDrawingZOrderChange?: (action: UserDrawingZOrderAction) => void;
   /** Callback when selected drawing style should change */
@@ -155,6 +157,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     onUserDrawingMagnetModeChange,
     onUserDrawingStayInDrawingModeChange,
     onUserDrawingZoomIn,
+    onUserDrawingObjectTreeOpen,
     onUserDrawingVisibilityChange,
     onUserDrawingLockedChange,
   }) => {
@@ -243,6 +246,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     const favoriteTools = getUserDrawingFavoriteTools(userDrawingState);
     const magnetActive = (userDrawingState?.magnetMode ?? 'off') !== 'off';
     const stayInDrawingActive = userDrawingState?.stayInDrawingMode === true;
+    const railMeasureActive = userDrawingState?.measureMode === 'on';
+    const railMeasureEnabled = userDrawingState
+      ? isUserDrawingToolbarActionEnabled(userDrawingState, 'measure', userDrawingCommandAvailability)
+      : false;
+    const railZoomEnabled = userDrawingState
+      ? isUserDrawingToolbarActionEnabled(userDrawingState, 'zoomIn', userDrawingCommandAvailability)
+      : false;
     const railDrawings = userDrawingState?.drawings ?? [];
     const railHasDrawings = railDrawings.length > 0;
     const railSomeUnlocked = railDrawings.some((drawing) => !drawing.locked);
@@ -369,7 +379,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingToolCategoryButton,
-                        activeCategory && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                        activeCategory && styles.drawingButtonActive,
                         pressed && !activeCategory && styles.drawingButtonPressed,
                       ]}
                     >
@@ -377,13 +387,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                         <DrawingToolIcon
                           name={categoryIconName}
                           size={20}
-                          color={activeCategory ? accentColor : textSecondaryColor}
+                          color={activeCategory ? textColor : textSecondaryColor}
                         />
                       ) : (
                         <Text
                           style={[
                             styles.drawingButtonText,
-                            { color: activeCategory ? accentColor : textSecondaryColor },
+                            { color: activeCategory ? textColor : textSecondaryColor },
                           ]}
                         >
                           {categoryToolDescriptor.icon}
@@ -396,6 +406,39 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
             </View>
 
             <View style={styles.drawingRailToggleGroup}>
+              {/* Measure + zoom, promoted from the top bar into the rail (TradingView layout). */}
+              <View style={styles.drawingRailToggleDivider} />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Measure date and price range"
+                accessibilityState={{ disabled: !railMeasureEnabled, selected: railMeasureActive }}
+                disabled={!railMeasureEnabled}
+                onPress={() => onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on')}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  railMeasureActive && styles.drawingButtonActive,
+                  !railMeasureEnabled && styles.drawingButtonDisabled,
+                  railMeasureEnabled && pressed && !railMeasureActive && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="ruler" size={20} color={railMeasureActive ? textColor : textSecondaryColor} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Zoom in"
+                accessibilityState={{ disabled: !railZoomEnabled }}
+                disabled={!railZoomEnabled}
+                onPress={() => onUserDrawingZoomIn?.()}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  !railZoomEnabled && styles.drawingButtonDisabled,
+                  railZoomEnabled && pressed && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="zoomIn" size={20} color={textSecondaryColor} />
+              </Pressable>
+
+              {/* Magnet + draw-mode + lock + hide + link utility group. */}
               <View style={styles.drawingRailToggleDivider} />
               <Pressable
                 accessibilityRole="button"
@@ -404,11 +447,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 onPress={() => onUserDrawingMagnetModeChange?.(magnetActive ? 'off' : 'strong')}
                 style={({ pressed }: PressableStyleState) => [
                   styles.drawingToolCategoryButton,
-                  magnetActive && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  magnetActive && styles.drawingButtonToggleActive,
                   pressed && !magnetActive && styles.drawingButtonPressed,
                 ]}
               >
-                <DrawingToolIcon name="magnet" size={20} color={magnetActive ? accentColor : textSecondaryColor} />
+                <DrawingToolIcon name="magnet" size={20} color={magnetActive ? '#131722' : textSecondaryColor} />
               </Pressable>
               <Pressable
                 accessibilityRole="button"
@@ -417,14 +460,13 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 onPress={() => onUserDrawingStayInDrawingModeChange?.(!stayInDrawingActive)}
                 style={({ pressed }: PressableStyleState) => [
                   styles.drawingToolCategoryButton,
-                  stayInDrawingActive && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  stayInDrawingActive && styles.drawingButtonToggleActive,
                   pressed && !stayInDrawingActive && styles.drawingButtonPressed,
                 ]}
               >
-                <DrawingToolIcon name="pencil" size={20} color={stayInDrawingActive ? accentColor : textSecondaryColor} />
+                <DrawingToolIcon name="drawLock" size={20} color={stayInDrawingActive ? '#131722' : textSecondaryColor} />
               </Pressable>
 
-              <View style={styles.drawingRailToggleDivider} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={railAllLocked ? 'Unlock all drawings' : 'Lock all drawings'}
@@ -438,7 +480,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 }}
                 style={({ pressed }: PressableStyleState) => [
                   styles.drawingToolCategoryButton,
-                  railAllLocked && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  railAllLocked && styles.drawingButtonActive,
                   !railHasDrawings && styles.drawingButtonDisabled,
                   railHasDrawings && pressed && !railAllLocked && styles.drawingButtonPressed,
                 ]}
@@ -446,7 +488,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 <DrawingToolIcon
                   name={railAllLocked ? 'lock' : 'unlock'}
                   size={20}
-                  color={railAllLocked ? accentColor : textSecondaryColor}
+                  color={railAllLocked ? textColor : textSecondaryColor}
                 />
               </Pressable>
               <Pressable
@@ -462,7 +504,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 }
                 style={({ pressed }: PressableStyleState) => [
                   styles.drawingToolCategoryButton,
-                  railAllHidden && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
+                  railAllHidden && styles.drawingButtonActive,
                   !railHasDrawings && styles.drawingButtonDisabled,
                   railHasDrawings && pressed && !railAllHidden && styles.drawingButtonPressed,
                 ]}
@@ -470,9 +512,21 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 <DrawingToolIcon
                   name={railAllHidden ? 'eyeOff' : 'eye'}
                   size={20}
-                  color={railAllHidden ? accentColor : textSecondaryColor}
+                  color={railAllHidden ? textColor : textSecondaryColor}
                 />
               </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Objects tree"
+                onPress={() => onUserDrawingObjectTreeOpen?.()}
+                style={({ pressed }: PressableStyleState) => [
+                  styles.drawingToolCategoryButton,
+                  pressed && styles.drawingButtonPressed,
+                ]}
+              >
+                <DrawingToolIcon name="link" size={20} color={textSecondaryColor} />
+              </Pressable>
+              <View style={styles.drawingRailToggleDivider} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Clear all drawings"
@@ -679,6 +733,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
                   (descriptor) =>
                     isUserDrawingGlobalToolbarAction(descriptor.action) &&
+                    // Rail actions (measure, zoom, lock, hide, clear) render in the vertical rail.
                     !isUserDrawingRailToolbarAction(descriptor.action),
                 ).map((descriptor) => {
                   const enabled = isUserDrawingToolbarActionEnabled(
@@ -686,42 +741,38 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                     descriptor.action,
                     userDrawingCommandAvailability,
                   );
-                  const active = descriptor.action === 'measure' && userDrawingState.measureMode === 'on';
+                  // Only stateless actions (undo, redo, cancelDraft) remain here —
+                  // measure and zoom moved to the rail — so no active state applies.
                   const actionIconName = resolveDrawingToolbarActionIconName(descriptor.action);
                   return (
                     <Pressable
                       key={descriptor.action}
                       accessibilityRole="button"
                       accessibilityLabel={descriptor.label}
-                      accessibilityState={{ disabled: !enabled, selected: active }}
+                      accessibilityState={{ disabled: !enabled }}
                       disabled={!enabled}
                       onPress={() => {
                         if (descriptor.action === 'undo') onUserDrawingUndo?.();
                         if (descriptor.action === 'redo') onUserDrawingRedo?.();
-                        if (descriptor.action === 'measure') {
-                          onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on');
-                        }
-                        if (descriptor.action === 'zoomIn') onUserDrawingZoomIn?.();
                         if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                       }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingButton,
-                        active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
                         !enabled && styles.drawingButtonDisabled,
-                        enabled && pressed && !active && styles.drawingButtonPressed,
+                        enabled && pressed && styles.drawingButtonPressed,
                       ]}
                     >
                       {actionIconName ? (
                         <DrawingToolIcon
                           name={actionIconName}
                           size={18}
-                          color={active ? accentColor : textSecondaryColor}
+                          color={textSecondaryColor}
                         />
                       ) : (
                         <Text
                           style={[
                             styles.drawingButtonText,
-                            { color: active ? accentColor : textSecondaryColor },
+                            { color: textSecondaryColor },
                             !enabled && styles.drawingButtonTextDisabled,
                           ]}
                         >
@@ -868,21 +919,23 @@ const styles = StyleSheet.create({
   drawingToolRail: {
     position: 'absolute',
     top: computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS),
-    left: MOBILE_CHART_CHROME_METRICS.leftToolRailInset,
+    left: 0,
+    width: MOBILE_CHART_CHROME_METRICS.leftToolRailWidth,
     zIndex: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
-    borderWidth: 1,
-    borderColor: '#363a45',
-    borderRadius: 6,
-    backgroundColor: 'rgba(19, 23, 34, 0.96)',
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 0,
+    borderRightWidth: 1,
+    borderRightColor: '#2a2e39',
+    backgroundColor: '#131722',
     overflow: 'visible',
   },
   drawingToolRailList: {
     overflow: 'hidden',
   },
   drawingToolRailContent: {
-    gap: 4,
+    gap: 2,
+    alignItems: 'center',
   },
   drawingToolDismissLayer: {
     position: 'absolute',
@@ -902,7 +955,7 @@ const styles = StyleSheet.create({
   drawingToolFlyout: {
     position: 'absolute',
     top: 0,
-    left: 42,
+    left: MOBILE_CHART_CHROME_METRICS.leftToolRailWidth,
     width: 250,
     padding: 10,
     borderWidth: 1,
@@ -934,14 +987,14 @@ const styles = StyleSheet.create({
   },
   drawingRailToggleGroup: {
     alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
+    gap: 2,
+    marginTop: 2,
   },
   drawingRailToggleDivider: {
-    width: 24,
+    width: 28,
     height: 1,
     backgroundColor: '#2a2e39',
-    marginVertical: 2,
+    marginVertical: 4,
   },
   favoritesBar: {
     position: 'absolute',
@@ -1011,7 +1064,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  drawingButtonActive: {},
+  drawingButtonActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  // TradingView-style persistent toggle (e.g. magnet on): filled light glyph on dark.
+  drawingButtonToggleActive: {
+    backgroundColor: '#d1d4dc',
+  },
   drawingButtonPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
