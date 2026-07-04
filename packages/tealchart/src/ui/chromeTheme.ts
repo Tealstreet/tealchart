@@ -11,28 +11,45 @@ import type { RenderOptions } from '../types';
  * from the widget root, so this is applied to those elements directly too.
  */
 
-function parseHexColor(color: string): [number, number, number] | null {
-  const match = /^#?([0-9a-f]{6})$/i.exec(color.trim());
-  if (!match) return null;
-  const value = parseInt(match[1], 16);
-  return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+/** Parse a `#RRGGBB` hex or `rgb()/rgba()` color into [r, g, b]; null otherwise. */
+function parseColor(color: string): [number, number, number] | null {
+  const trimmed = color.trim();
+  const hex = /^#?([0-9a-f]{6})$/i.exec(trimmed);
+  if (hex) {
+    const value = parseInt(hex[1], 16);
+    return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+  }
+  const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(trimmed);
+  if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+  return null;
+}
+
+function gammaExpand(channel: number): number {
+  const c = channel / 255;
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }
 
 function relativeLuminance([r, g, b]: [number, number, number]): number {
-  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return 0.2126 * gammaExpand(r) + 0.7152 * gammaExpand(g) + 0.0722 * gammaExpand(b);
 }
 
-/** Blend a hex color toward black (target 0) or white (target 255) by amount [0,1]. */
+/** True when the color is dark enough to want light (white) overlays on top. */
+export function isDarkColor(color: string): boolean {
+  const rgb = parseColor(color);
+  return rgb ? relativeLuminance(rgb) < 0.4 : true;
+}
+
+/** Blend a color toward black (target 0) or white (target 255) by amount [0,1]. */
 function mixTowards(color: string, target: 0 | 255, amount: number): string {
-  const rgb = parseHexColor(color);
+  const rgb = parseColor(color);
   if (!rgb) return color;
   const [r, g, b] = rgb.map((c) => Math.round(c + (target - c) * amount));
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-/** Return `color` at the given alpha as rgba(); passes through non-hex colors. */
-function withAlpha(color: string, alpha: number): string {
-  const rgb = parseHexColor(color);
+/** Return `color` at the given alpha as rgba(); passes through unparseable colors. */
+export function withAlpha(color: string, alpha: number): string {
+  const rgb = parseColor(color);
   if (!rgb) return color;
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
@@ -48,17 +65,17 @@ export function resolveChromeThemeVars(
   const buy = ro.upColor ?? '#26a69a';
   const sell = ro.downColor ?? '#ef5350';
 
-  const rgb = parseHexColor(bg);
-  const isDark = rgb ? relativeLuminance(rgb) < 0.5 : true;
+  const dark = isDarkColor(bg);
   const overlay = (alpha: number): string =>
-    isDark ? `rgba(255, 255, 255, ${alpha})` : `rgba(0, 0, 0, ${alpha})`;
-  const elevated = (amount: number): string => mixTowards(bg, isDark ? 255 : 0, amount);
+    dark ? `rgba(255, 255, 255, ${alpha})` : `rgba(0, 0, 0, ${alpha})`;
+  const elevated = (amount: number): string => mixTowards(bg, dark ? 255 : 0, amount);
 
   return {
-    '--bg': bg,
+    // Primary / secondary / tertiary text form a brightness ladder from one color.
     '--text': text,
-    '--text2': text,
-    '--text3': withAlpha(text, 0.6),
+    '--text2': withAlpha(text, 0.75),
+    '--text3': withAlpha(text, 0.55),
+    '--bg': bg,
     '--border': border,
     '--accent': accent,
     '--accent-bg': withAlpha(accent, 0.16),

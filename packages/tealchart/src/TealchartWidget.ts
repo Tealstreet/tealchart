@@ -1267,6 +1267,8 @@ export class TealchartWidget {
       this._ui.setRenderOptions(this._renderOptions);
       this._ui.setSymbol(this._symbol);
       this._ui.setInterval(this._interval);
+      // Portaled panels can't inherit the root's live var changes — re-theme them.
+      this._userDrawingObjectTreePanel?.setRenderOptions(this._renderOptions);
     }
 
     // Always update opacity + loading dots
@@ -3319,9 +3321,10 @@ export class TealchartWidget {
 
     this._renderOptions = newOptions;
 
-    // Re-render if already mounted
+    // Re-render if already mounted. OPTIONS so color overrides also re-theme the
+    // renderer and the DOM chrome (CSS vars), matching changeTheme().
     if (this._ui && this._bars.length > 0) {
-      this._scheduler.markDirty(DIRTY.FULL);
+      this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
     }
   }
 

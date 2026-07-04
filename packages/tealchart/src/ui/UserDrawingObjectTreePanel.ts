@@ -181,6 +181,11 @@ export class UserDrawingObjectTreePanel {
     this.render();
   }
 
+  /** Re-apply theme vars (portaled to body, so it can't inherit live root changes). */
+  setRenderOptions(renderOptions: Partial<RenderOptions> | undefined): void {
+    applyChromeThemeVars(this.el, renderOptions);
+  }
+
   updateModel(model: UserDrawingObjectTreeModel): void {
     this.model = model;
     if (this.editingDrawingId && !this.model.rows.some((row) => row.drawingId === this.editingDrawingId)) {

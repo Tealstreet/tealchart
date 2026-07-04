@@ -41,6 +41,7 @@ import {
   USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS,
 } from '../../drawings';
 import { DrawingToolIcon } from './DrawingToolIcon';
+import { isDarkColor } from '../../ui/chromeTheme';
 import { computeLeftToolRailTop, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../../types';
@@ -116,17 +117,6 @@ export interface ChartTopBarComponentProps {
 }
 
 const TOP_BAR_HEIGHT = MOBILE_CHART_CHROME_METRICS.topBarHeight;
-
-/** True when a hex background is light enough to want dark (black) overlays. */
-function isLightColor(color: string): boolean {
-  const match = /^#?([0-9a-f]{6})$/i.exec(color.trim());
-  if (!match) return false;
-  const value = parseInt(match[1], 16);
-  const r = (value >> 16) & 255;
-  const g = (value >> 8) & 255;
-  const b = value & 255;
-  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.5;
-}
 
 type PressableStyleState = { pressed: boolean };
 const MIN_DRAWING_TOOL_OVERLAY_HEIGHT = 96;
@@ -269,10 +259,12 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
       : false;
     // Theme-aware button surfaces so active/pressed/toggle states read correctly
     // in both dark and light mode (overlays invert; the toggle fill uses text).
-    const lightBg = isLightColor(backgroundColor);
-    const activeButtonStyle = { backgroundColor: lightBg ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.12)' };
-    const pressedButtonStyle = { backgroundColor: lightBg ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)' };
+    const darkBg = isDarkColor(backgroundColor);
+    const activeButtonStyle = { backgroundColor: darkBg ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)' };
+    const pressedButtonStyle = { backgroundColor: darkBg ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' };
     const toggleActiveButtonStyle = { backgroundColor: textColor };
+    // Glyph sits on the light toggle fill; use the chart bg, or text if bg is transparent.
+    const toggleGlyphColor = backgroundColor && backgroundColor !== 'transparent' ? backgroundColor : textColor;
     const railDrawings = userDrawingState?.drawings ?? [];
     const railHasDrawings = railDrawings.length > 0;
     const railSomeUnlocked = railDrawings.some((drawing) => !drawing.locked);
@@ -328,7 +320,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         {favoriteTools.length > 0 && (
           <Animated.View
             accessibilityLabel="Favorite drawing tools"
-            style={[styles.favoritesBar, favoritesAnimatedStyle]}
+            style={[styles.favoritesBar, favoritesAnimatedStyle, { backgroundColor, borderColor }]}
           >
             <GestureDetector gesture={favoritesPanGesture}>
               <View accessibilityLabel="Drag favorites toolbar" style={styles.favoritesHandle}>
@@ -474,7 +466,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   pressed && !magnetActive && pressedButtonStyle,
                 ]}
               >
-                <DrawingToolIcon name="magnet" size={20} color={magnetActive ? backgroundColor : textSecondaryColor} />
+                <DrawingToolIcon name="magnet" size={20} color={magnetActive ? toggleGlyphColor : textSecondaryColor} />
               </Pressable>
               <Pressable
                 accessibilityRole="button"
@@ -487,7 +479,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                   pressed && !stayInDrawingActive && pressedButtonStyle,
                 ]}
               >
-                <DrawingToolIcon name="drawLock" size={20} color={stayInDrawingActive ? backgroundColor : textSecondaryColor} />
+                <DrawingToolIcon name="drawLock" size={20} color={stayInDrawingActive ? toggleGlyphColor : textSecondaryColor} />
               </Pressable>
 
               <Pressable
@@ -573,7 +565,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
             {expandedDrawingCategory && (
               <View
-                style={[styles.drawingToolFlyout, drawingToolBoundsStyle]}
+                style={[styles.drawingToolFlyout, drawingToolBoundsStyle, { backgroundColor, borderColor }]}
                 accessibilityLabel={`${expandedDrawingCategory.label} tools`}
               >
                 <View style={styles.drawingToolFlyoutHeader}>
@@ -703,11 +695,11 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 )}
               </View>
               {/* Divider after symbol */}
-              <View style={styles.divider} />
+              <View style={[styles.divider, { backgroundColor: borderColor }]} />
             </>
           ) : (
             /* Leading divider when no symbol */
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: borderColor }]} />
           )}
 
           {/* Timeframe selector - horizontal scroll */}
@@ -730,7 +722,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
           </ScrollView>
 
           {/* Divider */}
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
           {/* Indicators button */}
           <Pressable
@@ -746,7 +738,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
           {userDrawingState && (
             <>
-              <View style={styles.divider} />
+              <View style={[styles.divider, { backgroundColor: borderColor }]} />
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
