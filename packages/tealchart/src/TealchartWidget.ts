@@ -2843,6 +2843,7 @@ export class TealchartWidget {
 
     this._userDrawingObjectTreePanel = new UserDrawingObjectTreePanel({
       model,
+      renderOptions: this._renderOptions,
       onDispatch: (action) => this.dispatchUserDrawingObjectTreeAction(action),
       onClose: () => {
         this._userDrawingObjectTreePanel = null;
