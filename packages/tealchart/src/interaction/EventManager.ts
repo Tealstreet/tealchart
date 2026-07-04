@@ -69,6 +69,8 @@ export interface EventManagerCallbacks {
   isAutoScale?: (paneId: string) => boolean;
   /** Check if position is over interactive Konva element */
   isOverInteractiveElement?: (x: number, y: number) => boolean;
+  /** Whether the point is over a grabbable (unlocked) user drawing — for the hover cursor only. */
+  isOverUnlockedUserDrawing?: (x: number, y: number) => boolean;
   /** Get price from Y coordinate */
   getPriceFromY?: (y: number) => number;
   /** Get time from X coordinate */
@@ -654,6 +656,8 @@ export class EventManager {
       } else if (this.state.isOverPriceAxis) {
         this.callbacks.onCursorChange?.('ns-resize');
       } else if (this.state.isOverInteractive) {
+        this.callbacks.onCursorChange?.('pointer');
+      } else if (this.callbacks.isOverUnlockedUserDrawing?.(x, y)) {
         this.callbacks.onCursorChange?.('pointer');
       } else {
         this.callbacks.onCursorChange?.('crosshair');
