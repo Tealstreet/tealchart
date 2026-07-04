@@ -73,7 +73,8 @@ export const WEB_CHART_CHROME_METRICS: ChartChromeMetrics = {
   topBarHeight: 32,
   leftToolRailWidth: 50,
   leftToolRailInset: 8,
-  leftToolRailTopGap: 8,
+  // Rail sits flush under the top bar so their borders meet in a clean top-left "L".
+  leftToolRailTopGap: 0,
   topLeftLegendLeft: 12,
   topLeftLegendTopGap: 8,
   topLeftLegendWidth: 480,
