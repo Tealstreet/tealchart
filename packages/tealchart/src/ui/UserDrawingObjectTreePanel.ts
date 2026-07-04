@@ -9,12 +9,15 @@ import {
   USER_DRAWING_OBJECT_TREE_BUILT_IN_ROW_ACTIONS,
   USER_DRAWING_OBJECT_TREE_COMPACT_ACTION_LABELS,
 } from '../drawings';
+import type { RenderOptions } from '../types';
+import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, input, span } from './dom';
 
 export interface UserDrawingObjectTreePanelOptions {
   model: UserDrawingObjectTreeModel;
   onDispatch: (action: UserDrawingObjectTreeDispatchAction) => boolean;
   onClose?: () => void;
+  renderOptions?: Partial<RenderOptions>;
 }
 
 const styles = {
@@ -27,11 +30,11 @@ const styles = {
     maxHeight: 'min(560px, calc(100vh - 72px))',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'rgba(17, 19, 26, 0.96)',
-    border: '1px solid rgba(120, 123, 134, 0.28)',
+    backgroundColor: 'var(--bg, rgba(17, 19, 26, 0.96))',
+    border: '1px solid var(--border, rgba(120, 123, 134, 0.28))',
     borderRadius: '6px',
     boxShadow: '0 16px 44px rgba(0, 0, 0, 0.42)',
-    color: '#d1d4dc',
+    color: 'var(--text, #d1d4dc)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '12px',
     overflow: 'hidden',
@@ -43,8 +46,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 10px 0 12px',
-    borderBottom: '1px solid rgba(120, 123, 134, 0.18)',
-    backgroundColor: 'rgba(30, 34, 45, 0.86)',
+    borderBottom: '1px solid var(--border, rgba(120, 123, 134, 0.18))',
+    backgroundColor: 'var(--input-bg, rgba(30, 34, 45, 0.86))',
   } as Partial<CSSStyleDeclaration>,
   title: {
     fontSize: '13px',
@@ -56,7 +59,7 @@ const styles = {
     border: '0',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: '#9ca3af',
+    color: 'var(--text2, #9ca3af)',
     cursor: 'pointer',
     fontSize: '18px',
     lineHeight: '28px',
@@ -67,12 +70,12 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
   empty: {
     padding: '28px 12px',
-    color: '#787b86',
+    color: 'var(--text3, #787b86)',
     textAlign: 'center',
   } as Partial<CSSStyleDeclaration>,
   groupLabel: {
     padding: '8px 8px 4px',
-    color: '#787b86',
+    color: 'var(--text3, #787b86)',
     fontSize: '11px',
     fontWeight: '600',
     letterSpacing: '0',
@@ -88,8 +91,8 @@ const styles = {
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
   selectedRow: {
-    backgroundColor: 'rgba(41, 98, 255, 0.2)',
-    outline: '1px solid rgba(41, 98, 255, 0.36)',
+    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.2))',
+    outline: '1px solid var(--accent, rgba(41, 98, 255, 0.36))',
   } as Partial<CSSStyleDeclaration>,
   rowText: {
     minWidth: '0',
@@ -99,7 +102,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
   rowIcon: {
     width: '18px',
-    color: '#9ca3af',
+    color: 'var(--text2, #9ca3af)',
     textAlign: 'center',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
@@ -113,15 +116,15 @@ const styles = {
     flex: '1',
     height: '26px',
     padding: '0 8px',
-    border: '1px solid rgba(120, 123, 134, 0.42)',
+    border: '1px solid var(--border, rgba(120, 123, 134, 0.42))',
     borderRadius: '4px',
-    backgroundColor: 'rgba(7, 9, 14, 0.86)',
-    color: '#d1d4dc',
+    backgroundColor: 'var(--bg, rgba(7, 9, 14, 0.86))',
+    color: 'var(--text, #d1d4dc)',
     fontSize: '12px',
     outline: 'none',
   } as Partial<CSSStyleDeclaration>,
   rowMeta: {
-    color: '#787b86',
+    color: 'var(--text3, #787b86)',
     fontSize: '11px',
     marginLeft: '4px',
     flexShrink: '0',
@@ -140,7 +143,7 @@ const styles = {
     border: '0',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: '#9ca3af',
+    color: 'var(--text2, #9ca3af)',
     cursor: 'pointer',
     fontSize: '11px',
   } as Partial<CSSStyleDeclaration>,
@@ -168,12 +171,19 @@ export class UserDrawingObjectTreePanel {
         'data-tealchart-user-drawing-object-tree-panel': 'true',
       },
     });
+    // Portaled to document.body, so theme it directly (can't inherit root vars).
+    applyChromeThemeVars(this.el, options.renderOptions);
     this.el.addEventListener('mousedown', (event) => event.stopPropagation());
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());
     this.el.addEventListener('contextmenu', (event) => event.stopPropagation());
     document.body.appendChild(this.el);
     this.render();
+  }
+
+  /** Re-apply theme vars (portaled to body, so it can't inherit live root changes). */
+  setRenderOptions(renderOptions: Partial<RenderOptions> | undefined): void {
+    applyChromeThemeVars(this.el, renderOptions);
   }
 
   updateModel(model: UserDrawingObjectTreeModel): void {

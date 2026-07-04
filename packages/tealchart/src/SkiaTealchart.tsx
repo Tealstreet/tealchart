@@ -152,6 +152,7 @@ import {
 } from './drawings';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
+import { withAlpha } from './ui/chromeTheme';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
 import { IndicatorSettingsModalMobile } from './mobile/components/IndicatorSettingsModalMobile';
@@ -5044,6 +5045,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             interval={interval}
             onIntervalChange={onIntervalChange}
             onIndicatorsPress={handleIndicatorsPress}
+            backgroundColor={fullRenderOptions.backgroundColor}
+            textColor={fullRenderOptions.textColor}
+            textSecondaryColor={withAlpha(fullRenderOptions.textColor, 0.7)}
+            accentColor={fullRenderOptions.crosshairColor}
+            borderColor={fullRenderOptions.gridColor}
             supportedResolutions={supportedResolutions}
             userDrawingState={effectiveUserDrawingState}
             userDrawingCommandAvailability={{
