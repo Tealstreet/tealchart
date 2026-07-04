@@ -163,6 +163,11 @@ const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
 const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
 
+// The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); the
+// tool list and flyout cap their height to that content box so long lists don't
+// overflow into the padding / over the time axis.
+const LEFT_TOOL_RAIL_VERTICAL_PADDING = 8;
+
 const styles = {
   container: {
     display: 'flex',
@@ -282,7 +287,7 @@ const styles = {
     alignItems: 'center',
     gap: '2px',
     maxHeight: `calc(100vh - ${
-      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + WEB_CHART_CHROME_METRICS.leftToolRailTopGap
+      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
     }px)`,
     overflowY: 'auto',
     overflowX: 'hidden',
@@ -375,7 +380,7 @@ const styles = {
     display: 'none',
     minWidth: '240px',
     maxHeight: `calc(100vh - ${
-      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + WEB_CHART_CHROME_METRICS.leftToolRailTopGap
+      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
     }px)`,
     overflowY: 'auto',
     padding: '10px',
