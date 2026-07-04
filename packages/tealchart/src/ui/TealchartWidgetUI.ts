@@ -159,10 +159,6 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingEditMove?: (point: DrawingScreenPoint) => boolean;
   /** Called when an active user drawing edit drag ends */
   onUserDrawingEditEnd?: () => void;
-  /** Called when a two-anchor drawing tool drag starts placement */
-  onUserDrawingPlacementDragStart?: (point: UserDrawingInputPoint) => boolean;
-  /** Called when a two-anchor drawing tool drag commits placement */
-  onUserDrawingPlacementDragEnd?: (point: UserDrawingInputPoint) => boolean;
   /** Called when temporary measure drag starts */
   onUserDrawingMeasureStart?: (point: UserDrawingInputPoint) => boolean;
   /** Called while temporary measure drag moves */
@@ -487,8 +483,6 @@ export class TealchartWidgetUI {
       onUserDrawingContextMenu: this.options.onUserDrawingContextMenu,
       onUserDrawingEditMove: this.options.onUserDrawingEditMove,
       onUserDrawingEditEnd: this.options.onUserDrawingEditEnd,
-      onUserDrawingPlacementDragStart: this.options.onUserDrawingPlacementDragStart,
-      onUserDrawingPlacementDragEnd: this.options.onUserDrawingPlacementDragEnd,
       onUserDrawingMeasureStart: this.options.onUserDrawingMeasureStart,
       onUserDrawingMeasureMove: this.options.onUserDrawingMeasureMove,
       onUserDrawingMeasureEnd: this.options.onUserDrawingMeasureEnd,
