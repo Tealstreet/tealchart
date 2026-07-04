@@ -421,7 +421,7 @@ describe('TealchartWidget', () => {
         price: 100,
       };
       const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: {
+        _handleUserDrawingInput(point: {
           paneId: string;
           anchor: { time: number; price: number };
         }): boolean;
@@ -461,7 +461,7 @@ describe('TealchartWidget', () => {
       expect(widget.cancelUserDrawingDraft()).toBe(false);
       expect(widget.setActiveUserDrawingTool('rectangle')).toBe(true);
       expect(
-        testWidget._handleUserDrawingPlacementDragStart({
+        testWidget._handleUserDrawingInput({
           paneId: 'main',
           anchor: { time: 1_000, price: 100 },
         }),
@@ -913,7 +913,7 @@ describe('TealchartWidget', () => {
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({ id: 'drawing_1', kind: 'trendLine' });
     });
 
-    it('creates web placement-drag drawings as independent undo entries', () => {
+    it('creates web click-placement drawings as independent undo entries', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       widget.setUserDrawingState({
@@ -923,30 +923,26 @@ describe('TealchartWidget', () => {
       });
 
       const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: {
-          paneId: string;
-          anchor: { time: number; price: number };
-        }): boolean;
-        _handleUserDrawingPlacementDragEnd(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
       };
 
-      const drag = (offset: number) => {
+      const clickPlace = (offset: number) => {
         expect(
-          testWidget._handleUserDrawingPlacementDragStart({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: offset + 1, price: offset + 10 },
           }),
         ).toBe(true);
         expect(
-          testWidget._handleUserDrawingPlacementDragEnd({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: offset + 2, price: offset + 20 },
           }),
         ).toBe(true);
       };
 
-      drag(0);
-      drag(10);
+      clickPlace(0);
+      clickPlace(10);
 
       expect(widget.getUserDrawingState().drawings).toHaveLength(2);
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
@@ -979,11 +975,7 @@ describe('TealchartWidget', () => {
         const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
         const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
         const testWidget = widget as unknown as {
-          _handleUserDrawingPlacementDragStart(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: {
+          _handleUserDrawingInput(point: {
             paneId: string;
             anchor: { time: number; price: number };
           }): boolean;
@@ -998,13 +990,13 @@ describe('TealchartWidget', () => {
           }),
         );
         expect(
-          testWidget._handleUserDrawingPlacementDragStart({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: 1_500, price: 90 },
           }),
         ).toBe(true);
         expect(
-          testWidget._handleUserDrawingPlacementDragEnd({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: 2_500, price: 125 },
           }),
@@ -1024,19 +1016,11 @@ describe('TealchartWidget', () => {
       },
     );
 
-    it('seeds long position anchors after widget UI toolbar tool selection', () => {
+    it('places long position click anchors after widget UI toolbar tool selection', () => {
       const datafeed = createMockDatafeed();
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
       const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
       const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: {
-          paneId: string;
-          anchor: { time: number; price: number };
-        }): boolean;
-        _handleUserDrawingPlacementDragEnd(point: {
-          paneId: string;
-          anchor: { time: number; price: number };
-        }): boolean;
         _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
       };
 
@@ -1050,13 +1034,13 @@ describe('TealchartWidget', () => {
       );
 
       expect(
-        testWidget._handleUserDrawingPlacementDragStart({
+        testWidget._handleUserDrawingInput({
           paneId: 'main',
           anchor: { time: 1_000, price: 100 },
         }),
       ).toBe(true);
       expect(
-        testWidget._handleUserDrawingPlacementDragEnd({
+        testWidget._handleUserDrawingInput({
           paneId: 'main',
           anchor: { time: 2_000, price: 110 },
         }),
@@ -1218,31 +1202,27 @@ describe('TealchartWidget', () => {
     });
 
     it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
-      'creates web %s placement-drag drawings from exact endpoints',
+      'creates web %s click-placement drawings from exact endpoints',
       (tool) => {
         const datafeed = createMockDatafeed();
         const widget = createWidget(datafeed);
         widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
 
         const testWidget = widget as unknown as {
-          _handleUserDrawingPlacementDragStart(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: {
+          _handleUserDrawingInput(point: {
             paneId: string;
             anchor: { time: number; price: number };
           }): boolean;
         };
 
         expect(
-          testWidget._handleUserDrawingPlacementDragStart({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: 1_000, price: 100 },
           }),
         ).toBe(true);
         expect(
-          testWidget._handleUserDrawingPlacementDragEnd({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: 2_000, price: 110 },
           }),
@@ -1267,8 +1247,8 @@ describe('TealchartWidget', () => {
       },
     );
 
-    it('seeds web multi-anchor placement from drag before final input', () => {
-      const dragSeedTools: UserDrawingTool[] = [
+    it('places web multi-anchor drawings from clicks before final click', () => {
+      const clickPlacementTools: UserDrawingTool[] = [
         'triangle',
         'parallelChannel',
         'regressionTrend',
@@ -1291,7 +1271,7 @@ describe('TealchartWidget', () => {
         'elliottDoubleComboWave',
       ];
 
-      for (const tool of dragSeedTools) {
+      for (const tool of clickPlacementTools) {
         const bars = [
           { time: 1, open: 10, high: 14, low: 9, close: 12 },
           { time: 2, open: 12, high: 15, low: 11, close: 11 },
@@ -1302,26 +1282,18 @@ describe('TealchartWidget', () => {
         widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
 
         const testWidget = widget as unknown as {
-          _handleUserDrawingPlacementDragStart(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
         expect(
-          testWidget._handleUserDrawingPlacementDragStart({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: 1, price: 10 },
             ...pointOptions,
           }),
         ).toBe(true);
         expect(
-          testWidget._handleUserDrawingPlacementDragEnd({
+          testWidget._handleUserDrawingInput({
             paneId: 'main',
             anchor: { time: 2, price: 20 },
             ...pointOptions,
@@ -1361,32 +1333,20 @@ describe('TealchartWidget', () => {
       }
     });
 
-    it('seeds web four-anchor placement from drag before final inputs', () => {
-      const dragSeedTools: UserDrawingTool[] = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'];
+    it('places web four-anchor drawings from clicks before final clicks', () => {
+      const clickPlacementTools: UserDrawingTool[] = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'];
 
-      for (const tool of dragSeedTools) {
+      for (const tool of clickPlacementTools) {
         const datafeed = createMockDatafeed();
         const widget = createWidget(datafeed);
         widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
 
         const testWidget = widget as unknown as {
-          _handleUserDrawingPlacementDragStart(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
-        expect(
-          testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } }),
-        ).toBe(true);
-        expect(testWidget._handleUserDrawingPlacementDragEnd({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
-          true,
-        );
+        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
+        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
         expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(true);
         expect(widget.getUserDrawingState().drawings).toEqual([]);
         expect(widget.getUserDrawingState().draft).toMatchObject({
@@ -1417,8 +1377,8 @@ describe('TealchartWidget', () => {
       }
     });
 
-    it('seeds web five-anchor pattern placement from drag before final inputs', () => {
-      const dragSeedTools: UserDrawingTool[] = [
+    it('places web five-anchor pattern drawings from clicks before final clicks', () => {
+      const clickPlacementTools: UserDrawingTool[] = [
         'xabcdPattern',
         'cypherPattern',
         'threeDrivesPattern',
@@ -1428,29 +1388,17 @@ describe('TealchartWidget', () => {
         'elliottTriangleWave',
       ];
 
-      for (const tool of dragSeedTools) {
+      for (const tool of clickPlacementTools) {
         const datafeed = createMockDatafeed();
         const widget = createWidget(datafeed);
         widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
 
         const testWidget = widget as unknown as {
-          _handleUserDrawingPlacementDragStart(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
-          _handleUserDrawingPlacementDragEnd(point: {
-            paneId: string;
-            anchor: { time: number; price: number };
-          }): boolean;
           _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
         };
 
-        expect(
-          testWidget._handleUserDrawingPlacementDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } }),
-        ).toBe(true);
-        expect(testWidget._handleUserDrawingPlacementDragEnd({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
-          true,
-        );
+        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
+        expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
         expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(true);
         expect(testWidget._handleUserDrawingInput({ paneId: 'main', anchor: { time: 4, price: 40 } })).toBe(true);
         expect(widget.getUserDrawingState().drawings).toEqual([]);
@@ -3240,11 +3188,11 @@ describe('TealchartWidget', () => {
       expect(testWidget._paneManager.toggleMaximizePane).toHaveBeenCalledWith('main');
     });
 
-    it('does not record cancelled web placement drags in drawing undo history', () => {
+    it('does not record cancelled web click placements in drawing undo history', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       const testWidget = widget as unknown as {
-        _handleUserDrawingPlacementDragStart(point: {
+        _handleUserDrawingInput(point: {
           paneId: string;
           anchor: { time: number; price: number };
         }): boolean;
@@ -3252,7 +3200,7 @@ describe('TealchartWidget', () => {
       widget.setActiveUserDrawingTool('rectangle');
 
       expect(
-        testWidget._handleUserDrawingPlacementDragStart({
+        testWidget._handleUserDrawingInput({
           paneId: 'main',
           anchor: { time: 1_000, price: 100 },
         }),

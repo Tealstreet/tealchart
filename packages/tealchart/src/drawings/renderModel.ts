@@ -139,7 +139,7 @@ export function resolveUserDrawingRenderEntries(
   if (
     draftAnchors.length >= 2 &&
     draftAnchors.length < requiredAnchorCount &&
-    placementMode === 'dragSeed'
+    (placementMode === 'dragSeed' || placementMode === 'click')
   ) {
     const terminalAnchor = draftAnchors[draftAnchors.length - 1]!;
     draftAnchors = [

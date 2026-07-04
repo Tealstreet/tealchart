@@ -10,6 +10,7 @@ import type {
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
 import { TealchartRenderer } from '../TealchartRenderer';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
@@ -524,47 +525,43 @@ describe('ChartCore viewport management', () => {
   });
 
   it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(
-    'applies constrained %s placement options through ChartCore preview and commit',
+    'constrains the %s second click to a square when placement is constrained',
     async (tool) => {
       const { ChartCore } = await import('./ChartCore');
-      const onUserDrawingPlacementDragStart = vi.fn(() => true);
-      const onUserDrawingPlacementDragEnd = vi.fn(() => true);
+      const onUserDrawingInput = vi.fn(() => true);
       const core = new ChartCore({
         container,
         width: 800,
         height: 600,
-        onUserDrawingPlacementDragStart,
-        onUserDrawingPlacementDragEnd,
+        onUserDrawingInput,
       });
       core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+      const testCore = core as unknown as {
+        handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch', options?: { constrainedPlacement?: boolean }): unknown;
+        resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
+      };
+
+      const startAnchor = testCore.resolveUserDrawingInputPoint(100, 100)?.anchor;
       core.setUserDrawingState({
         version: 1,
         activeTool: tool,
         selection: null,
-        draft: null,
+        draft: { tool, paneId: 'main', anchors: [startAnchor!], style: DEFAULT_USER_DRAWING_STYLE, startedAt: 0 },
         textEdit: null,
         drawings: [],
       } satisfies UserDrawingState);
 
-      const testCore = core as unknown as {
-        handleUserDrawingDragStart(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
-        handleUserDrawingDragMove(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
-        handleUserDrawingDragEnd(): void;
-        resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
-      };
-
-      expect(testCore.handleUserDrawingDragStart(100, 100, { constrainedPlacement: true })).toBe(true);
-      expect(testCore.handleUserDrawingDragMove(160, 120, { constrainedPlacement: true })).toBe(true);
-      testCore.handleUserDrawingDragEnd();
+      testCore.handleUserDrawingInput(160, 120, 'mouse', { constrainedPlacement: true });
 
       const expectedConstrainedEnd = testCore.resolveUserDrawingInputPoint(160, 160);
-      expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledWith(
+      expect(onUserDrawingInput).toHaveBeenCalledWith(
         expect.objectContaining({
           paneId: 'main',
           anchor: expectedConstrainedEnd?.anchor,
         }),
       );
-      expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalledWith(
+      expect(onUserDrawingInput).not.toHaveBeenCalledWith(
         expect.objectContaining({
           anchor: testCore.resolveUserDrawingInputPoint(160, 120)?.anchor,
         }),
@@ -612,7 +609,7 @@ describe('ChartCore viewport management', () => {
   });
 
   it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
-    'swallows %s click placement so web users must drag real endpoints',
+    'commits %s from click placement of each anchor',
     async (tool) => {
       const { ChartCore } = await import('./ChartCore');
       const onUserDrawingInput = vi.fn(() => true);
@@ -622,8 +619,6 @@ describe('ChartCore viewport management', () => {
         height: 100,
         margins: { top: 0, right: 0, bottom: 0, left: 0 },
         onUserDrawingInput,
-        onUserDrawingPlacementDragStart: vi.fn(() => true),
-        onUserDrawingPlacementDragEnd: vi.fn(() => true),
       });
       core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
       core.setUserDrawingState({
@@ -638,29 +633,29 @@ describe('ChartCore viewport management', () => {
 
       const testCore = core as unknown as {
         handleUserDrawingInput(x: number, y: number): unknown;
+        resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
       };
 
-      expect(testCore.handleUserDrawingInput(48, 18)).toEqual({ handled: true });
-      expect(testCore.handleUserDrawingInput(120, 18)).toBe(false);
-      expect(onUserDrawingInput).not.toHaveBeenCalled();
+      const firstAnchor = testCore.resolveUserDrawingInputPoint(48, 18)?.anchor;
+      const secondAnchor = testCore.resolveUserDrawingInputPoint(72, 40)?.anchor;
+      expect(testCore.handleUserDrawingInput(48, 18)).toBe(true);
+      expect(testCore.handleUserDrawingInput(72, 40)).toBe(true);
+      expect(onUserDrawingInput).toHaveBeenNthCalledWith(1, expect.objectContaining({ paneId: 'main', anchor: firstAnchor }));
+      expect(onUserDrawingInput).toHaveBeenNthCalledWith(2, expect.objectContaining({ paneId: 'main', anchor: secondAnchor }));
 
       core.dispose();
     },
   );
 
-  it('keeps drag-seeded tool final taps available after seed drags', async () => {
+  it('commits a multi-anchor tool from a click on each anchor', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingInput = vi.fn(() => true);
-    const onUserDrawingPlacementDragStart = vi.fn(() => true);
-    const onUserDrawingPlacementDragEnd = vi.fn(() => true);
     const core = new ChartCore({
       container,
       width: 100,
       height: 100,
       margins: { top: 0, right: 0, bottom: 0, left: 0 },
       onUserDrawingInput,
-      onUserDrawingPlacementDragStart,
-      onUserDrawingPlacementDragEnd,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
     core.setUserDrawingState({
@@ -674,64 +669,54 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
 
     const testCore = core as unknown as {
-      handleUserDrawingDragStart(x: number, y: number): boolean;
-      handleUserDrawingDragMove(x: number, y: number): boolean;
-      handleUserDrawingDragEnd(): void;
       handleUserDrawingInput(x: number, y: number): unknown;
     };
 
-    expect(testCore.handleUserDrawingDragStart(20, 20)).toBe(true);
-    expect(testCore.handleUserDrawingDragMove(48, 18)).toBe(true);
-    testCore.handleUserDrawingDragEnd();
-    expect(onUserDrawingPlacementDragStart).toHaveBeenCalledTimes(1);
-    expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledTimes(1);
-
+    expect(testCore.handleUserDrawingInput(20, 20)).toBe(true);
     expect(testCore.handleUserDrawingInput(48, 18)).toBe(true);
+    expect(testCore.handleUserDrawingInput(70, 60)).toBe(true);
+    expect(onUserDrawingInput).toHaveBeenCalledTimes(3);
     expect(onUserDrawingInput).toHaveBeenCalledWith(expect.objectContaining({ paneId: 'main' }));
 
     core.dispose();
   });
 
-  it('applies constrained cyclic line horizontal placement through ChartCore preview and commit', async () => {
+  it('constrains the cyclic line second click to a horizontal baseline when placement is constrained', async () => {
     const { ChartCore } = await import('./ChartCore');
-    const onUserDrawingPlacementDragStart = vi.fn(() => true);
-    const onUserDrawingPlacementDragEnd = vi.fn(() => true);
+    const onUserDrawingInput = vi.fn(() => true);
     const core = new ChartCore({
       container,
       width: 800,
       height: 600,
-      onUserDrawingPlacementDragStart,
-      onUserDrawingPlacementDragEnd,
+      onUserDrawingInput,
     });
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    const testCore = core as unknown as {
+      handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch', options?: { constrainedPlacement?: boolean }): unknown;
+      resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
+    };
+
+    const startAnchor = testCore.resolveUserDrawingInputPoint(100, 100)?.anchor;
     core.setUserDrawingState({
       version: 1,
       activeTool: 'cyclicLines',
       selection: null,
-      draft: null,
+      draft: { tool: 'cyclicLines', paneId: 'main', anchors: [startAnchor!], style: DEFAULT_USER_DRAWING_STYLE, startedAt: 0 },
       textEdit: null,
       drawings: [],
     } satisfies UserDrawingState);
 
-    const testCore = core as unknown as {
-      handleUserDrawingDragStart(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
-      handleUserDrawingDragMove(x: number, y: number, options?: { constrainedPlacement?: boolean }): boolean;
-      handleUserDrawingDragEnd(): void;
-      resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
-    };
-
-    expect(testCore.handleUserDrawingDragStart(100, 100, { constrainedPlacement: true })).toBe(true);
-    expect(testCore.handleUserDrawingDragMove(160, 120, { constrainedPlacement: true })).toBe(true);
-    testCore.handleUserDrawingDragEnd();
+    testCore.handleUserDrawingInput(160, 120, 'mouse', { constrainedPlacement: true });
 
     const expectedConstrainedEnd = testCore.resolveUserDrawingInputPoint(160, 100);
-    expect(onUserDrawingPlacementDragEnd).toHaveBeenCalledWith(
+    expect(onUserDrawingInput).toHaveBeenCalledWith(
       expect.objectContaining({
         paneId: 'main',
         anchor: expectedConstrainedEnd?.anchor,
       }),
     );
-    expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalledWith(
+    expect(onUserDrawingInput).not.toHaveBeenCalledWith(
       expect.objectContaining({
         anchor: testCore.resolveUserDrawingInputPoint(160, 120)?.anchor,
       }),
@@ -740,7 +725,7 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
-  it('routes EventManager placement drag cancellation to draft cancellation', async () => {
+  it('does not engage placement drag for click-placement tools', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onUserDrawingPlacementDragStart = vi.fn(() => true);
     const onUserDrawingPlacementDragEnd = vi.fn();
@@ -765,14 +750,13 @@ describe('ChartCore viewport management', () => {
 
     const eventCallbacks = eventManagerInstances.at(-1)?.callbacks;
     expect(eventCallbacks).toBeDefined();
-    expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'mouse')).toBe(true);
-    expect(eventCallbacks?.onDrawingDragMove?.(140, 120, 'mouse')).toBe(true);
-
+    // A drag gesture with a click-placement tool active must not start placement drag.
+    expect(eventCallbacks?.onDrawingDragStart?.(100, 100, 'mouse')).toBe(false);
     eventCallbacks?.onDrawingDragCancel?.('mouse');
 
-    expect(onUserDrawingPlacementDragStart).toHaveBeenCalledTimes(1);
-    expect(onUserDrawingCancelDraft).toHaveBeenCalledTimes(1);
+    expect(onUserDrawingPlacementDragStart).not.toHaveBeenCalled();
     expect(onUserDrawingPlacementDragEnd).not.toHaveBeenCalled();
+    expect(onUserDrawingCancelDraft).not.toHaveBeenCalled();
 
     core.dispose();
   });

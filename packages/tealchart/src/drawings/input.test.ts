@@ -54,7 +54,7 @@ import {
   updateUserDrawingTextEdit,
 } from './input';
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { UserDrawing, UserDrawingTool } from './types';
+import type { UserDrawing, UserDrawingAnchor, UserDrawingState, UserDrawingTool } from './types';
 
 const anchorA = { time: 1_000, price: 100 };
 const anchorB = { time: 2_000, price: 110 };
@@ -306,15 +306,15 @@ describe('user drawing input controller', () => {
     expect(second.stayInDrawingMode).toBe(false);
   });
 
-  it('commits two-anchor drag placement from the drag start and end anchors', () => {
+  it('commits two-anchor click placement from both click anchors', () => {
     const state = setUserDrawingTool(
       setUserDrawingStayInDrawingMode(createUserDrawingState(), true),
       'rectangle',
     );
-    const started = beginUserDrawingPlacementDrag(
+    const started = handleUserDrawingInput(
       state,
       { paneId: 'main', anchor: anchorA, position: { x: 10, y: 20 } },
-      { now: () => 10, style },
+      { createId: () => 'click-rect', now: () => 10, style },
     );
 
     expect(started.draft).toMatchObject({
@@ -324,84 +324,88 @@ describe('user drawing input controller', () => {
       positions: [{ x: 1, y: 1 }],
     });
 
-    const committed = commitUserDrawingPlacementDrag(
+    const committed = handleUserDrawingInput(
       started,
       { paneId: 'main', anchor: anchorB, position: { x: 80, y: 60 } },
-      { createId: () => 'drag-rect', now: () => 11, style },
+      { createId: () => 'click-rect', now: () => 11, style },
     );
 
     expect(committed.draft).toBeNull();
-    expect(committed.selection).toEqual({ drawingId: 'drag-rect' });
+    expect(committed.selection).toEqual({ drawingId: 'click-rect' });
     expect(committed.activeTool).toBe('rectangle');
     expect(committed.drawings).toHaveLength(1);
     expect(committed.drawings[0]).toMatchObject({
-      id: 'drag-rect',
+      id: 'click-rect',
       kind: 'rectangle',
       points: [anchorA, anchorB],
     });
   });
 
   it.each(northStarTwoAnchorDragPlacementTools)(
-    'commits north-star %s drag placement from exact gesture endpoints',
+    'commits north-star %s click placement from exact click anchors',
     (tool) => {
       const state = setUserDrawingTool(createUserDrawingState(), tool);
-      const started = beginUserDrawingPlacementDrag(
+      const started = handleUserDrawingInput(
         state,
         { paneId: 'main', anchor: anchorA },
-        { now: () => 10, style },
+        { createId: () => `click-${tool}`, now: () => 10, style },
       );
-      const committed = commitUserDrawingPlacementDrag(
+      const committed = handleUserDrawingInput(
         started,
         { paneId: 'main', anchor: anchorB },
-        { createId: () => `drag-${tool}`, now: () => 11, style },
+        { createId: () => `click-${tool}`, now: () => 11, style },
       );
 
       expect(committed.draft, tool).toBeNull();
-      expect(committed.selection, tool).toEqual({ drawingId: `drag-${tool}` });
+      expect(committed.selection, tool).toEqual({ drawingId: `click-${tool}` });
       expect(committed.drawings[0], tool).toMatchObject({
-        id: `drag-${tool}`,
+        id: `click-${tool}`,
         kind: tool,
         points: [anchorA, anchorB],
       });
     },
   );
 
-  it('switches to select after drag placement when stay-in-drawing-mode is disabled', () => {
+  it('switches to select after click placement of a two-anchor tool when stay-in-drawing-mode is disabled', () => {
     const state = setUserDrawingTool(
       setUserDrawingStayInDrawingMode(createUserDrawingState(), false),
       'rectangle',
     );
-    const started = beginUserDrawingPlacementDrag(state, { paneId: 'main', anchor: anchorA }, { now: () => 10, style });
-    const committed = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorB }, {
-      createId: () => 'drag-rect',
+    const started = handleUserDrawingInput(state, { paneId: 'main', anchor: anchorA }, {
+      createId: () => 'click-rect',
+      now: () => 10,
+      style,
+    });
+    const committed = handleUserDrawingInput(started, { paneId: 'main', anchor: anchorB }, {
+      createId: () => 'click-rect',
       now: () => 11,
       style,
     });
 
     expect(committed.draft).toBeNull();
-    expect(committed.selection).toEqual({ drawingId: 'drag-rect' });
+    expect(committed.selection).toEqual({ drawingId: 'click-rect' });
     expect(committed.activeTool).toBe('select');
     expect(committed.stayInDrawingMode).toBe(false);
   });
 
-  it('commits expanded two-anchor tools through drag placement', () => {
+  it('commits expanded two-anchor tools through click placement', () => {
     for (const tool of expandedDragPlacementTools) {
-      const started = beginUserDrawingPlacementDrag(
+      const started = handleUserDrawingInput(
         setUserDrawingTool(createUserDrawingState(), tool),
         { paneId: 'main', anchor: anchorA },
-        { now: () => 10, style, text: 'Draft label' },
+        { createId: () => `click-${tool}`, now: () => 10, style, text: 'Draft label' },
       );
-      const committed = commitUserDrawingPlacementDrag(started, { paneId: 'main', anchor: anchorB }, {
-        createId: () => `drag-${tool}`,
+      const committed = handleUserDrawingInput(started, { paneId: 'main', anchor: anchorB }, {
+        createId: () => `click-${tool}`,
         now: () => 11,
         style,
         text: 'Draft label',
       });
 
       expect(committed.draft, tool).toBeNull();
-      expect(committed.selection, tool).toEqual({ drawingId: `drag-${tool}` });
+      expect(committed.selection, tool).toEqual({ drawingId: `click-${tool}` });
       expect(committed.drawings[0], tool).toMatchObject({
-        id: `drag-${tool}`,
+        id: `click-${tool}`,
         kind: tool,
         points: [anchorA, anchorB],
       });
@@ -899,8 +903,8 @@ describe('user drawing input controller', () => {
     expect(explicitHighlighter.draft?.style).toEqual(style);
   });
 
-  it('seeds supported multi-anchor drawings from placement drag before final click', () => {
-    const dragSeedTools = [
+  it('places multi-anchor drawings anchor by anchor through clicks', () => {
+    const threeAnchorTools = [
       'triangle',
       'curve',
       'arc',
@@ -922,10 +926,11 @@ describe('user drawing input controller', () => {
       'sector',
       'longPosition',
       'shortPosition',
+      'elliottCorrectiveWave',
+      'elliottDoubleComboWave',
     ] as const;
-    const specialThreeAnchorDragSeedTools = ['barsPattern', 'elliottCorrectiveWave', 'elliottDoubleComboWave'] as const;
-    const fourAnchorDragSeedTools = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'] as const;
-    const fiveAnchorDragSeedTools = [
+    const fourAnchorTools = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'] as const;
+    const fiveAnchorTools = [
       'xabcdPattern',
       'cypherPattern',
       'threeDrivesPattern',
@@ -935,223 +940,58 @@ describe('user drawing input controller', () => {
       'elliottTriangleWave',
     ] as const;
 
-    for (const tool of dragSeedTools) {
-      const state = setUserDrawingTool(createUserDrawingState(), tool);
-      const started = beginUserDrawingPlacementDrag(
-        state,
-        { paneId: 'main', anchor: anchorA },
-        { now: () => 10, style },
-      );
-      const seeded = commitUserDrawingPlacementDrag(
-        started,
-        { paneId: 'main', anchor: anchorB },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 11,
-          style,
-        },
-      );
-      const committed = handleUserDrawingInput(
-        seeded,
-        { paneId: 'main', anchor: anchorC },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 12,
-          style,
-        },
-      );
-
-      expect(started.draft?.anchors, tool).toEqual([anchorA]);
-      expect(seeded.drawings, tool).toEqual([]);
-      expect(seeded.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB],
+    // Click each anchor in turn; assert every intermediate draft grows by one anchor
+    // and nothing commits until the final required anchor is placed.
+    const placeByClicks = (tool: UserDrawingTool, anchors: UserDrawingAnchor[], extraPointFields: object = {}) => {
+      let state = setUserDrawingTool(createUserDrawingState(), tool);
+      const steps: UserDrawingState[] = [];
+      anchors.forEach((anchor, index) => {
+        state = handleUserDrawingInput(
+          state,
+          { paneId: 'main', anchor, ...extraPointFields },
+          { createId: () => `${tool}-drawing`, now: () => 10 + index, style },
+        );
+        steps.push(state);
       });
+      return steps;
+    };
+
+    const assertClickPlacement = (tool: UserDrawingTool, anchors: UserDrawingAnchor[], extraPointFields: object = {}, extraDrawingFields: object = {}) => {
+      const steps = placeByClicks(tool, anchors, extraPointFields);
+      anchors.forEach((_, index) => {
+        const step = steps[index]!;
+        if (index < anchors.length - 1) {
+          expect(step.drawings, tool).toEqual([]);
+          expect(step.draft, tool).toMatchObject({ tool, paneId: 'main', anchors: anchors.slice(0, index + 1) });
+        }
+      });
+      const committed = steps[steps.length - 1]!;
       expect(committed.draft, tool).toBeNull();
       expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
       expect(committed.drawings[0], tool).toMatchObject({
         id: `${tool}-drawing`,
         kind: tool,
-        points: [anchorA, anchorB, anchorC],
+        points: anchors,
+        ...extraDrawingFields,
       });
+    };
+
+    for (const tool of threeAnchorTools) {
+      assertClickPlacement(tool, [anchorA, anchorB, anchorC]);
     }
 
-    for (const tool of specialThreeAnchorDragSeedTools) {
-      const bars = [
-        { time: 1_000, open: 100, high: 104, low: 99, close: 102 },
-        { time: 2_000, open: 102, high: 105, low: 101, close: 101 },
-      ];
-      const pointOptions = tool === 'barsPattern' ? { bars } : {};
-      const state = setUserDrawingTool(createUserDrawingState(), tool);
-      const started = beginUserDrawingPlacementDrag(
-        state,
-        { paneId: 'main', anchor: anchorA, ...pointOptions },
-        { now: () => 10, style },
-      );
-      const seeded = commitUserDrawingPlacementDrag(
-        started,
-        { paneId: 'main', anchor: anchorB, ...pointOptions },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 11,
-          style,
-        },
-      );
-      const committed = handleUserDrawingInput(
-        seeded,
-        { paneId: 'main', anchor: anchorC, ...pointOptions },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 12,
-          style,
-        },
-      );
+    const bars = [
+      { time: 1_000, open: 100, high: 104, low: 99, close: 102 },
+      { time: 2_000, open: 102, high: 105, low: 101, close: 101 },
+    ];
+    assertClickPlacement('barsPattern', [anchorA, anchorB, anchorC], { bars }, { bars });
 
-      expect(started.draft?.anchors, tool).toEqual([anchorA]);
-      expect(seeded.drawings, tool).toEqual([]);
-      expect(seeded.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB],
-      });
-      expect(committed.draft, tool).toBeNull();
-      expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
-      expect(committed.drawings[0], tool).toMatchObject({
-        id: `${tool}-drawing`,
-        kind: tool,
-        points: [anchorA, anchorB, anchorC],
-        ...(tool === 'barsPattern' ? { bars } : {}),
-      });
+    for (const tool of fourAnchorTools) {
+      assertClickPlacement(tool, [anchorA, anchorB, anchorC, anchorD]);
     }
 
-    for (const tool of fourAnchorDragSeedTools) {
-      const state = setUserDrawingTool(createUserDrawingState(), tool);
-      const started = beginUserDrawingPlacementDrag(
-        state,
-        { paneId: 'main', anchor: anchorA },
-        { now: () => 10, style },
-      );
-      const seeded = commitUserDrawingPlacementDrag(
-        started,
-        { paneId: 'main', anchor: anchorB },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 11,
-          style,
-        },
-      );
-      const waitingForFourth = handleUserDrawingInput(
-        seeded,
-        { paneId: 'main', anchor: anchorC },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 12,
-          style,
-        },
-      );
-      const committed = handleUserDrawingInput(
-        waitingForFourth,
-        { paneId: 'main', anchor: anchorD },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 13,
-          style,
-        },
-      );
-
-      expect(started.draft?.anchors, tool).toEqual([anchorA]);
-      expect(seeded.drawings, tool).toEqual([]);
-      expect(seeded.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB],
-      });
-      expect(waitingForFourth.drawings, tool).toEqual([]);
-      expect(waitingForFourth.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB, anchorC],
-      });
-      expect(committed.draft, tool).toBeNull();
-      expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
-      expect(committed.drawings[0], tool).toMatchObject({
-        id: `${tool}-drawing`,
-        kind: tool,
-        points: [anchorA, anchorB, anchorC, anchorD],
-      });
-    }
-
-    for (const tool of fiveAnchorDragSeedTools) {
-      const state = setUserDrawingTool(createUserDrawingState(), tool);
-      const started = beginUserDrawingPlacementDrag(
-        state,
-        { paneId: 'main', anchor: anchorA },
-        { now: () => 10, style },
-      );
-      const seeded = commitUserDrawingPlacementDrag(
-        started,
-        { paneId: 'main', anchor: anchorB },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 11,
-          style,
-        },
-      );
-      const waitingForFourth = handleUserDrawingInput(
-        seeded,
-        { paneId: 'main', anchor: anchorC },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 12,
-          style,
-        },
-      );
-      const waitingForFifth = handleUserDrawingInput(
-        waitingForFourth,
-        { paneId: 'main', anchor: anchorD },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 13,
-          style,
-        },
-      );
-      const committed = handleUserDrawingInput(
-        waitingForFifth,
-        { paneId: 'main', anchor: anchorE },
-        {
-          createId: () => `${tool}-drawing`,
-          now: () => 14,
-          style,
-        },
-      );
-
-      expect(started.draft?.anchors, tool).toEqual([anchorA]);
-      expect(seeded.drawings, tool).toEqual([]);
-      expect(seeded.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB],
-      });
-      expect(waitingForFourth.drawings, tool).toEqual([]);
-      expect(waitingForFourth.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB, anchorC],
-      });
-      expect(waitingForFifth.drawings, tool).toEqual([]);
-      expect(waitingForFifth.draft, tool).toMatchObject({
-        tool,
-        paneId: 'main',
-        anchors: [anchorA, anchorB, anchorC, anchorD],
-      });
-      expect(committed.draft, tool).toBeNull();
-      expect(committed.selection, tool).toEqual({ drawingId: `${tool}-drawing` });
-      expect(committed.drawings[0], tool).toMatchObject({
-        id: `${tool}-drawing`,
-        kind: tool,
-        points: [anchorA, anchorB, anchorC, anchorD, anchorE],
-      });
+    for (const tool of fiveAnchorTools) {
+      assertClickPlacement(tool, [anchorA, anchorB, anchorC, anchorD, anchorE]);
     }
   });
 

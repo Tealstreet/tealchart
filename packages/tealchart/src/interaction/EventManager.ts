@@ -33,7 +33,7 @@ export interface EventManagerCallbacks {
   /** Called when more historical bars are needed */
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Called when crosshair position updates */
-  onCrossHairMoved?: (x: number, y: number) => void;
+  onCrossHairMoved?: (x: number, y: number, options?: DrawingInputEventOptions) => void;
   /** Called when crosshair visibility changes */
   onCrossHairVisibilityChange?: (visible: boolean) => void;
   /** Called on mouse down (for hotkey integration) */
@@ -100,6 +100,7 @@ export interface DrawingInputHandledResult {
 
 export interface DrawingInputEventOptions {
   additiveSelection?: boolean;
+  constrainedPlacement?: boolean;
 }
 
 export interface DrawingDragEventOptions {
@@ -558,6 +559,7 @@ export class EventManager {
   private _pendingEventType: 'none' | 'move' | 'drag' | 'touchmove' | 'leave' | 'docmove' = 'none';
   private _pendingMouseClientX = 0;
   private _pendingMouseClientY = 0;
+  private _pendingMouseShift = false;
   private _pendingMouseDrawingDragStartOptions: DrawingDragEventOptions | undefined;
   private _pendingMouseDrawingDragOptions: DrawingDragEventOptions | undefined;
   private _pendingTouchEvent: TouchEvent | null = null;
@@ -609,6 +611,7 @@ export class EventManager {
     // Store raw coordinates and defer ALL processing to RAF.
     this._pendingMouseClientX = e.clientX;
     this._pendingMouseClientY = e.clientY;
+    this._pendingMouseShift = e.shiftKey;
     this._pendingEventType = 'move';
     this.scheduleInputProcessing();
   }
@@ -642,7 +645,7 @@ export class EventManager {
       this.crosshair.x = x;
       this.crosshair.y = y;
       if (shouldShowCrosshair) {
-        this.callbacks.onCrossHairMoved?.(x, y);
+        this.callbacks.onCrossHairMoved?.(x, y, { constrainedPlacement: this._pendingMouseShift });
       }
       // Notify visibility change
       if (wasVisible !== shouldShowCrosshair) {
@@ -778,6 +781,7 @@ export class EventManager {
     if (wasClick && !wasDrawingDrag) {
       this.callbacks.onDrawingInput?.(pointerX, pointerY, 'mouse', {
         additiveSelection: e.shiftKey || e.metaKey || e.ctrlKey,
+        constrainedPlacement: e.shiftKey,
       });
     }
 
@@ -845,6 +849,7 @@ export class EventManager {
       wasClick && !wasDrawingDrag && e.button === 0
         ? this.callbacks.onDrawingInput?.(mouseX, mouseY, 'mouse', {
             additiveSelection: e.shiftKey || e.metaKey || e.ctrlKey,
+            constrainedPlacement: e.shiftKey,
           })
         : false;
     const handledDrawingInput = isDrawingInputHandled(drawingInputResult);
