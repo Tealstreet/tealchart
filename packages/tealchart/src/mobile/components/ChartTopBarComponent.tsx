@@ -733,46 +733,40 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                 {USER_DRAWING_TOOLBAR_ACTION_DESCRIPTORS.filter(
                   (descriptor) =>
                     isUserDrawingGlobalToolbarAction(descriptor.action) &&
-                    !isUserDrawingRailToolbarAction(descriptor.action) &&
-                    // Measure and zoom now live in the vertical rail (TradingView layout).
-                    descriptor.action !== 'measure' &&
-                    descriptor.action !== 'zoomIn',
+                    // Rail actions (measure, zoom, lock, hide, clear) render in the vertical rail.
+                    !isUserDrawingRailToolbarAction(descriptor.action),
                 ).map((descriptor) => {
                   const enabled = isUserDrawingToolbarActionEnabled(
                     userDrawingState,
                     descriptor.action,
                     userDrawingCommandAvailability,
                   );
-                  const active = descriptor.action === 'measure' && userDrawingState.measureMode === 'on';
+                  // Only stateless actions (undo, redo, cancelDraft) remain here —
+                  // measure and zoom moved to the rail — so no active state applies.
                   const actionIconName = resolveDrawingToolbarActionIconName(descriptor.action);
                   return (
                     <Pressable
                       key={descriptor.action}
                       accessibilityRole="button"
                       accessibilityLabel={descriptor.label}
-                      accessibilityState={{ disabled: !enabled, selected: active }}
+                      accessibilityState={{ disabled: !enabled }}
                       disabled={!enabled}
                       onPress={() => {
                         if (descriptor.action === 'undo') onUserDrawingUndo?.();
                         if (descriptor.action === 'redo') onUserDrawingRedo?.();
-                        if (descriptor.action === 'measure') {
-                          onUserDrawingMeasureModeChange?.(userDrawingState.measureMode !== 'on');
-                        }
-                        if (descriptor.action === 'zoomIn') onUserDrawingZoomIn?.();
                         if (descriptor.action === 'cancelDraft') onUserDrawingCancelDraft?.();
                       }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingButton,
-                        active && [styles.drawingButtonActive, { backgroundColor: `${accentColor}33` }],
                         !enabled && styles.drawingButtonDisabled,
-                        enabled && pressed && !active && styles.drawingButtonPressed,
+                        enabled && pressed && styles.drawingButtonPressed,
                       ]}
                     >
                       {actionIconName ? (
                         <DrawingToolIcon
                           name={actionIconName}
                           size={18}
-                          color={active ? accentColor : textSecondaryColor}
+                          color={textSecondaryColor}
                         />
                       ) : (
                         <Text

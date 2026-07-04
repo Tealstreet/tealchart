@@ -58,7 +58,6 @@ export const DRAWING_ICONS = {
     line(3, 12, 9, 12),
     line(15, 12, 21, 12),
   ]),
-  arrowPointer: def([p('M5 3l5 16 2.3-6.7L19 10z')]),
   crosshair: def([
     circle(12, 12, 9),
     line(12, 1.5, 12, 6),
