@@ -1799,7 +1799,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           bars,
           magnetMode: isUserDrawingPathFamilyTool(draftTool) ? 'off' : effectiveUserDrawingState.magnetMode ?? 'off',
         });
-        if (point) setUserDrawingDraftPreviewAnchor(resolveConstrainedUserDrawingPlacementPoint(point).anchor);
+        // Clear the preview when the crosshair is over an unresolvable region so it never sticks.
+        setUserDrawingDraftPreviewAnchor(point ? resolveConstrainedUserDrawingPlacementPoint(point).anchor : null);
       }
 
       if (!viewport || !onCrossHairMoved) return;

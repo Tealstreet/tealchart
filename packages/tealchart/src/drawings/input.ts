@@ -1062,16 +1062,26 @@ export function handleUserDrawingInput(
   }
 
   const startedAt = options.now?.() ?? Date.now();
+  const activeDraft =
+    state.draft && state.draft.tool === state.activeTool && state.draft.paneId === point.paneId ? state.draft : null;
+
+  // Ignore a repeat click on the anchor just placed — it would otherwise commit a
+  // degenerate zero-size drawing (e.g. an accidental double-click during placement).
+  const lastAnchor = activeDraft?.anchors[activeDraft.anchors.length - 1];
+  if (lastAnchor && isSameDrawingAnchor(lastAnchor, point.anchor)) {
+    return state;
+  }
+
   const draft =
-    state.draft && state.draft.tool === state.activeTool && state.draft.paneId === point.paneId
+    activeDraft
       ? {
-          ...state.draft,
-          anchors: [...state.draft.anchors, point.anchor],
+          ...activeDraft,
+          anchors: [...activeDraft.anchors, point.anchor],
           positions: point.position
-            ? [...(state.draft.positions ?? []), normalizeUserDrawingPanePosition(point.position)]
-            : state.draft.positions,
-          text: options.text ?? state.draft.text,
-          barsPatternBars: state.activeTool === 'barsPattern' ? point.bars ?? state.draft.barsPatternBars : undefined,
+            ? [...(activeDraft.positions ?? []), normalizeUserDrawingPanePosition(point.position)]
+            : activeDraft.positions,
+          text: options.text ?? activeDraft.text,
+          barsPatternBars: state.activeTool === 'barsPattern' ? point.bars ?? activeDraft.barsPatternBars : undefined,
         }
       : {
           tool: state.activeTool,
