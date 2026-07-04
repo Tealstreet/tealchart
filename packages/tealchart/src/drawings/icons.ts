@@ -51,7 +51,14 @@ const def = (nodes: DrawingIconNode[]): DrawingIconDefinition => ({ nodes });
 
 export const DRAWING_ICONS = {
   // --- Cursor / selection ---
-  select: def([p('M5 3l5 16 2.3-6.7L19 10z')]),
+  // Crosshair cursor to match TradingView's default pointer.
+  select: def([
+    line(12, 3, 12, 9),
+    line(12, 15, 12, 21),
+    line(3, 12, 9, 12),
+    line(15, 12, 21, 12),
+  ]),
+  arrowPointer: def([p('M5 3l5 16 2.3-6.7L19 10z')]),
   crosshair: def([
     circle(12, 12, 9),
     line(12, 1.5, 12, 6),
@@ -111,7 +118,16 @@ export const DRAWING_ICONS = {
     line(4, 19, 20, 19),
     line(4, 19, 20, 5),
   ]),
-  pitchfork: def([line(12, 3, 12, 21), line(5, 6, 5, 18), line(19, 6, 19, 18), line(5, 12, 19, 12)]),
+  pitchfork: def([
+    line(12, 4, 12, 11),
+    line(6, 11, 18, 11),
+    line(6, 11, 6, 20),
+    line(18, 11, 18, 20),
+    line(12, 11, 12, 20),
+    dot(12, 4, 1.5),
+    dot(6, 20, 1.5),
+    dot(18, 20, 1.5),
+  ]),
 
   // --- Brushes / annotations ---
   brush: def([
@@ -225,11 +241,38 @@ export const DRAWING_ICONS = {
   ]),
   starOutline: def([p('M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z')]),
   magnet: def([
-    p('M6 15l-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15'),
-    line(5, 8, 9, 12),
-    line(12, 15, 16, 19),
+    p('M7 4v7a5 5 0 0 0 10 0V4h-3v7a2 2 0 0 1-4 0V4z'),
+    line(7, 7, 10, 7),
+    line(14, 7, 17, 7),
   ]),
   pencil: def([p('M17 3a2.83 2.83 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z'), line(15, 5, 19, 9)]),
+  // Pencil with a small padlock — TradingView's "keep drawing mode" toggle.
+  drawLock: def([
+    p('M4 20l1-4L14 7l3 3-9 9z'),
+    line(12.5, 8.5, 15.5, 11.5),
+    rect(15, 15, 6, 5, 1),
+    p('M16.5 15v-1a1.5 1.5 0 0 1 3 0v1'),
+  ]),
+  // Ruler / measure.
+  ruler: def([
+    p('M4 14 14 4l6 6L10 20z'),
+    line(7, 11, 9, 13),
+    line(10, 8, 12, 10),
+    line(13, 5, 15, 7),
+  ]),
+  // Magnifier with plus — zoom in.
+  zoomIn: def([
+    circle(11, 11, 6),
+    line(15.5, 15.5, 21, 21),
+    line(11, 8.5, 11, 13.5),
+    line(8.5, 11, 13.5, 11),
+  ]),
+  // Interlocking links — object-tree / link.
+  link: def([
+    p('M9 15l6-6'),
+    p('M10.5 6.5l1.5-1.5a3.5 3.5 0 0 1 5 5l-1.5 1.5'),
+    p('M13.5 17.5l-1.5 1.5a3.5 3.5 0 0 1-5-5l1.5-1.5'),
+  ]),
   more: def([dot(5, 12, 1.6), dot(12, 12, 1.6), dot(19, 12, 1.6)]),
   undo: def([polyline('9 14 4 9 9 4'), p('M4 9h10.5a5.5 5.5 0 0 1 0 11H9')]),
   redo: def([polyline('15 14 20 9 15 4'), p('M20 9H9.5a5.5 5.5 0 0 0 0 11H15')]),
@@ -263,9 +306,8 @@ const TOOLBAR_ACTION_ICON_ALIASES: Partial<Record<UserDrawingToolbarAction, Draw
   sendBackward: 'layerBackward',
   bringToFront: 'layerFront',
   sendToBack: 'layerBack',
-  zoomIn: 'plus',
   cancelDraft: 'close',
-  measure: 'priceRange',
+  measure: 'ruler',
 };
 
 export function resolveDrawingToolIconName(tool: UserDrawingTool): DrawingIconName | undefined {
