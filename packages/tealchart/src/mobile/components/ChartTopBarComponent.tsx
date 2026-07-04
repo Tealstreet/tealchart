@@ -392,11 +392,17 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
                       accessibilityLabel={`${category.label} drawing tools`}
                       accessibilityState={{ expanded, selected: activeCategory }}
                       onPress={() => {
-                        if (expanded && pinnedDrawingCategoryId === category.id) return;
-                        setExpandedDrawingCategoryId(expanded ? null : category.id);
-                        if (!expanded || pinnedDrawingCategoryId !== category.id) {
-                          setPinnedDrawingCategoryId(null);
+                        // TradingView model: a tap (re)activates the category's last-used
+                        // tool; a second tap on the already-active category reveals the menu
+                        // (mobile's only way in — the caret is too small to thumb).
+                        if (category.tools.length > 1 && activeCategory) {
+                          setExpandedDrawingCategoryId(expanded ? null : category.id);
+                          if (expanded) setPinnedDrawingCategoryId(null);
+                          return;
                         }
+                        setExpandedDrawingCategoryId(null);
+                        setPinnedDrawingCategoryId(null);
+                        onUserDrawingToolSelect?.(categoryTool);
                       }}
                       style={({ pressed }: PressableStyleState) => [
                         styles.drawingToolCategoryButton,
