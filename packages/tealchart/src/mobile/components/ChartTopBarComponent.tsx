@@ -64,6 +64,7 @@ export interface ChartTopBarComponentProps {
   textSecondaryColor?: string;
   /** Accent color for active states */
   accentColor?: string;
+  borderColor?: string;
   /** Supported resolutions from datafeed (filters timeframe buttons) */
   supportedResolutions?: string[] | null;
   /** Current user drawing state for toolbar highlighting and action availability */
@@ -143,6 +144,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
     textColor = '#d1d4dc',
     textSecondaryColor = '#787b86',
     accentColor = '#2962ff',
+    borderColor = '#2a2e39',
     supportedResolutions,
     userDrawingState,
     userDrawingCommandAvailability,
@@ -348,7 +350,10 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
         )}
 
         {userDrawingState && (
-          <View style={[styles.drawingToolRail, drawingToolBoundsStyle]} accessibilityLabel="Drawing tool categories">
+          <View
+            style={[styles.drawingToolRail, drawingToolBoundsStyle, { backgroundColor, borderRightColor: borderColor }]}
+            accessibilityLabel="Drawing tool categories"
+          >
             <View
               style={[styles.drawingToolRailList, drawingToolBoundsStyle]}
               accessibilityLabel="Drawing tool category list"
@@ -407,7 +412,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
 
             <View style={styles.drawingRailToggleGroup}>
               {/* Measure + zoom, promoted from the top bar into the rail (TradingView layout). */}
-              <View style={styles.drawingRailToggleDivider} />
+              <View style={[styles.drawingRailToggleDivider, { backgroundColor: borderColor }]} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Measure date and price range"
@@ -439,7 +444,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
               </Pressable>
 
               {/* Magnet + draw-mode + lock + hide + link utility group. */}
-              <View style={styles.drawingRailToggleDivider} />
+              <View style={[styles.drawingRailToggleDivider, { backgroundColor: borderColor }]} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={magnetActive ? 'Magnet snap on' : 'Magnet snap off'}
@@ -526,7 +531,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
               >
                 <DrawingToolIcon name="link" size={20} color={textSecondaryColor} />
               </Pressable>
-              <View style={styles.drawingRailToggleDivider} />
+              <View style={[styles.drawingRailToggleDivider, { backgroundColor: borderColor }]} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Clear all drawings"

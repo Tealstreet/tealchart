@@ -70,6 +70,7 @@ import {
 } from '../types';
 import { safeToFixed } from '../utils/safeNumber';
 import { applyAutoScale } from '../viewport/viewScale';
+import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, icons } from './dom';
 
 // ============================================================================
@@ -1440,8 +1441,8 @@ export class ChartCore {
         position: 'fixed',
         left: `${screenX}px`,
         top: `${screenY}px`,
-        backgroundColor: '#1e222d',
-        border: '1px solid #363a45',
+        backgroundColor: 'var(--bg, #1e222d)',
+        border: '1px solid var(--border, #363a45)',
         borderRadius: '4px',
         padding: '4px 0',
         zIndex: '1000',
@@ -1449,6 +1450,8 @@ export class ChartCore {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
       },
     });
+    // Portaled to document.body, so it can't inherit the widget root's theme vars.
+    applyChromeThemeVars(this.contextMenu, this.options.renderOptions);
     this.contextMenu.addEventListener('mousedown', (event) => event.stopPropagation());
     this.contextMenu.addEventListener('mouseup', (event) => event.stopPropagation());
     this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
@@ -1459,7 +1462,7 @@ export class ChartCore {
         style: {
           padding: '8px 12px',
           fontSize: '12px',
-          color: '#d1d4dc',
+          color: 'var(--text, #d1d4dc)',
           cursor: item.enabled === false ? 'default' : 'pointer',
           opacity: item.enabled === false ? '0.5' : '1',
         },
@@ -1472,7 +1475,7 @@ export class ChartCore {
         },
         onMouseEnter: (e) => {
           if (item.enabled === false) return;
-          (e.target as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          (e.target as HTMLElement).style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
         },
         onMouseLeave: (e) => {
           (e.target as HTMLElement).style.backgroundColor = 'transparent';
