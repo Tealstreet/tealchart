@@ -903,6 +903,11 @@ export class EventManager {
       if (wasDrawingDrag) {
         this.callbacks.onDrawingDragEnd?.('mouse');
       }
+      // Clear the resize highlight when a divider drag ends (the hover mousemove
+      // path only clears it if the cursor is still inside the chart).
+      if (this.state.dragMode === 'paneDivider') {
+        this.callbacks.onPaneDividerHover?.(null);
+      }
       this.state.isDragging = false;
       this.state.dragMode = 'none';
 
@@ -986,6 +991,8 @@ export class EventManager {
       this.callbacks.onDrawingDragCancel?.('mouse');
     } else if (this.state.dragMode === 'pan' || this.state.dragMode === 'priceAxisZoom') {
       this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+    } else if (this.state.dragMode === 'paneDivider') {
+      this.callbacks.onPaneDividerHover?.(null);
     }
 
     this.resetDragState();
@@ -1576,7 +1583,9 @@ export class EventManager {
     if (!divider) return;
 
     const dims = this.callbacks.getDimensions();
-    const availableHeight = dims.height - dims.timeAxisHeight - dims.topMargin;
+    // Panes are laid out over height - timeAxisHeight (computePaneGeometry topOffset: 0,
+    // matching the renderer), so the drag ratio + highlight advance on that same basis.
+    const availableHeight = dims.height - dims.timeAxisHeight;
 
     // Calculate the delta in pixels from drag start
     const dy = y - this.state.dragStartY;
