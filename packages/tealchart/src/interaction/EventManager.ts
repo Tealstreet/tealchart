@@ -1466,6 +1466,8 @@ export class EventManager {
       // Cancel drag and revert viewport
       if (this.state.dragMode === 'drawing') {
         this.callbacks.onDrawingDragCancel?.('mouse');
+      } else if (this.state.dragMode === 'paneDivider') {
+        this.callbacks.onPaneDividerHover?.(null);
       }
 
       if (this.state.dragStartViewport) {
