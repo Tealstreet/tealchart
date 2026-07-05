@@ -144,6 +144,8 @@ describe('chart geometry', () => {
       chromeMetrics: MOBILE_CHART_CHROME_METRICS,
     });
 
+    // These describe the reserve model (rail below the top bar) that mobile uses. The web
+    // rail is now CSS-positioned flush to the top (top: 0); it does not read leftTools.y.
     expect(computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)).toBe(32);
     expect(computeLeftToolRailTop(MOBILE_CHART_CHROME_METRICS)).toBe(44);
     expect(webSnapshot.chrome.topBar).toEqual({ x: 0, y: 0, width: 500, height: 32 });
