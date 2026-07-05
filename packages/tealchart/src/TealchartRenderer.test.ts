@@ -4,6 +4,7 @@ import type { Bar, ComputedPane, ExecutionLineRenderData, PaneLayout, PriceLine,
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from './TealchartRenderer';
+import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
 import { TIME_AXIS_HEIGHT } from './types';
 
@@ -3253,5 +3254,28 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       vi.useRealTimers();
     });
+  });
+});
+
+describe('pane overlay geometry origin', () => {
+  // ChartCore positions the divider line + pane legends with computePaneGeometry at
+  // topOffset 0, on the assumption that it matches the renderer's computePanesLayout
+  // origin (panes laid out from y=0). If either origin changes, overlays drift off the
+  // rendered pane boundary (divider cuts through content). Lock them together.
+  it('computePaneGeometry(topOffset:0) matches renderer.computePanesLayout tops/bottoms', () => {
+    const renderer = new TealchartRenderer(createMockCtx(), { width: 800, height: 600 });
+    const layout: UnifiedPaneLayout = {
+      timeAxisHeight: TIME_AXIS_HEIGHT,
+      panes: [
+        { id: 'main', type: 'main', heightRatio: 0.7, yMin: 0, yMax: 0, fixedRange: false },
+        { id: 'pane_1', type: 'indicator', heightRatio: 0.3, yMin: 0, yMax: 100, fixedRange: true, indicatorIds: ['macd'] },
+      ],
+    };
+
+    const rendered = renderer.computePanesLayout(layout, 600);
+    const overlay = computePaneGeometry({ paneLayout: layout, height: 600, topOffset: 0 });
+
+    expect(overlay.map((p) => p.top)).toEqual(rendered.map((p) => p.top));
+    expect(overlay.map((p) => p.bottom)).toEqual(rendered.map((p) => p.bottom));
   });
 });
