@@ -1,8 +1,8 @@
 import type { Bar } from '../types';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { dedupeBarsByTime } from './dedupeBars';
+import { dedupeBarsByTime, resetBarWarnThrottleForTest } from './dedupeBars';
 
 const bar = (time: number, close = time): Bar => ({
   time,
@@ -14,6 +14,7 @@ const bar = (time: number, close = time): Bar => ({
 });
 
 describe('dedupeBarsByTime', () => {
+  beforeEach(() => resetBarWarnThrottleForTest());
   afterEach(() => vi.restoreAllMocks());
 
   it('returns the same reference when already strictly increasing', () => {
@@ -42,6 +43,15 @@ describe('dedupeBarsByTime', () => {
     const out = dedupeBarsByTime(bars);
     expect(out.map((b) => b.time)).toEqual([1, 2, 3]);
     expect(out.find((b) => b.time === 1)?.close).toBe(42); // last-seen for that time
+  });
+
+  it('re-sorts out-of-order bars with no duplicates and warns without "dropped"', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const out = dedupeBarsByTime([bar(3), bar(1), bar(2)]);
+    expect(out.map((b) => b.time)).toEqual([1, 2, 3]);
+    const msg = warn.mock.calls[0]?.[0] as string | undefined;
+    expect(msg).toMatch(/re-sorted out-of-order bars/);
+    expect(msg).not.toMatch(/dropped/);
   });
 
   it('collapses the observed 3-per-timestamp feed pattern', () => {
