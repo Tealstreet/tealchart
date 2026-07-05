@@ -73,7 +73,10 @@ export const WEB_CHART_CHROME_METRICS: ChartChromeMetrics = {
   topBarHeight: 32,
   leftToolRailWidth: 50,
   leftToolRailInset: 8,
-  // Rail sits flush under the top bar so their borders meet in a clean top-left "L".
+  // Unused on web: the web rail is CSS-positioned flush to the very top (ChartTopBar
+  // `drawingToolRail.top: 0`), with the top bar shifted right to form the top-left "L".
+  // computeLeftToolRailTop() / the leftTools reserve rect still describe the
+  // rail-below-top-bar model that mobile uses.
   leftToolRailTopGap: 0,
   topLeftLegendLeft: 12,
   topLeftLegendTopGap: 8,

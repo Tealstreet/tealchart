@@ -1255,6 +1255,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const legendRect = computeTopLeftLegendRect(
       WEB_CHART_CHROME_METRICS,
       { x: 0, y: 0, width: viewport.width, height: viewport.height },
+      0,
+      // The rail runs full height, so the legend clears it — match that in the avoid-rect.
+      { avoidLeftTools: true },
     );
     const position = resolveUserDrawingActionSurfacePosition({
       anchor: anchor.anchor,
