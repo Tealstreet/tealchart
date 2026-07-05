@@ -128,6 +128,7 @@ import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
+import { dedupeBarsByTime } from './utils/dedupeBars';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
@@ -591,6 +592,10 @@ export class TealchartWidget {
           return;
         }
 
+        // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
+        // don't render as overlapping bodies (feeds occasionally emit dupes).
+        bars = dedupeBarsByTime(bars, 'history load');
+
         // Atomic data transition: set all state before markDirty so it renders in one frame
         this._bars = bars;
 
@@ -801,7 +806,7 @@ export class TealchartWidget {
         const newBars = bars.filter((b) => !existingTimes.has(b.time));
 
         if (newBars.length > 0) {
-          this._bars = [...newBars, ...this._bars];
+          this._bars = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
 
           // Render prepended bars immediately; Tealscript plots realign on the
           // next worker callback. Gating the bar render on onPlotsUpdated means a

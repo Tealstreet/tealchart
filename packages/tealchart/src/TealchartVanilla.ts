@@ -8,6 +8,7 @@ import { WebCanvasContext } from './rendering';
 import { getChartStore } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
+import { dedupeBarsByTime } from './utils/dedupeBars';
 import { ChartTopBar } from './ui/ChartTopBar';
 import { IndicatorsModal } from './ui/IndicatorsModal';
 
@@ -346,7 +347,8 @@ export class SimpleChart {
    * Set bar data
    */
   setBars(bars: Bar[]): void {
-    this._bars = bars;
+    if (bars === this._bars) return;
+    this._bars = dedupeBarsByTime(bars);
     this._requestRender();
   }
 
