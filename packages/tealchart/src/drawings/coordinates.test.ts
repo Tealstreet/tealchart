@@ -316,7 +316,9 @@ describe('user drawing coordinates', () => {
   it('resolves chart-bound input points from margins', () => {
     expect(
       resolveUserDrawingInputPointFromChart({
-        point: { x: 110, y: 70 },
+        // Drawings map time across the full width (chartRight = width) to match candles,
+        // so the midpoint here is x = left + 0.5 * (width - left) = 10 + 0.5 * 240 = 130.
+        point: { x: 130, y: 70 },
         viewport: space.viewport,
         panes: [space.pane],
         width: 250,
@@ -326,6 +328,22 @@ describe('user drawing coordinates', () => {
       paneId: 'main',
       anchor: { time: 2_000, price: 100 },
       position: { x: 0.5, y: 0.5 },
+    });
+
+    // A point in [width - right, width) (under the price axis, where candles render)
+    // now resolves instead of being rejected: (220 - 10) / (250 - 10) = 0.875.
+    expect(
+      resolveUserDrawingInputPointFromChart({
+        point: { x: 220, y: 70 },
+        viewport: space.viewport,
+        panes: [space.pane],
+        width: 250,
+        margins: { left: 10, right: 40 },
+      }),
+    ).toEqual({
+      paneId: 'main',
+      anchor: { time: 2_750, price: 100 },
+      position: { x: 0.875, y: 0.5 },
     });
   });
 
