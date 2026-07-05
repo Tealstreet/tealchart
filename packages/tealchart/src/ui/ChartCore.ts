@@ -1685,7 +1685,8 @@ export class ChartCore {
         viewport: this.viewport,
         pane: inputPane,
         chartLeft: this.margins.left,
-        chartRight: this.options.width - this.margins.right,
+        // Match the candle/drawing time->x scale (full width) so magnet snapping lands on candles.
+        chartRight: this.options.width,
         bars: inputPoint.bars,
       },
     });
@@ -1840,7 +1841,9 @@ export class ChartCore {
           ...yRange,
         },
         chartLeft: this.margins.left,
-        chartRight: this.options.width - this.margins.right,
+        // Match the candle time->x scale (candles span the full width, under the price
+        // axis) so drawings stay pinned to candles as the viewport zooms.
+        chartRight: this.options.width,
         bars: pane.type === 'main' ? this.bars : undefined,
       });
     }
