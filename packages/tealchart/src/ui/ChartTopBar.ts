@@ -39,7 +39,6 @@ import {
 } from '../drawings';
 import {
   computeLeftToolRailAvoidanceInset,
-  computeLeftToolRailTop,
   computeTopLeftLegendRect,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
@@ -174,6 +173,9 @@ const styles = {
     alignItems: 'center',
     height: '32px',
     boxSizing: 'border-box',
+    // Start right of the left tool rail so the rail can run flush to the top: the rail's
+    // right border and the top bar's bottom border meet in a top-left "L".
+    marginLeft: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     padding: '0 8px',
     backgroundColor: 'var(--bg, #131722)',
     borderBottom: '1px solid var(--border, #2a2e39)',
@@ -265,7 +267,8 @@ const styles = {
 
   drawingToolRail: {
     position: 'absolute',
-    top: `${computeLeftToolRailTop(WEB_CHART_CHROME_METRICS)}px`,
+    // Flush with the very top; the top bar is shifted right to make room (top-left "L").
+    top: '0',
     left: '0',
     bottom: `${TIME_AXIS_HEIGHT}px`,
     width: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
@@ -287,7 +290,7 @@ const styles = {
     alignItems: 'center',
     gap: '2px',
     maxHeight: `calc(100vh - ${
-      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
+      TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
     }px)`,
     overflowY: 'auto',
     overflowX: 'hidden',
@@ -380,7 +383,7 @@ const styles = {
     display: 'none',
     minWidth: '240px',
     maxHeight: `calc(100vh - ${
-      computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) + TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
+      TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
     }px)`,
     overflowY: 'auto',
     padding: '10px',
@@ -1553,9 +1556,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         closeActiveFlyout();
         const railRect = rail.getBoundingClientRect();
         const buttonRect = categoryButton.getBoundingClientRect();
-        const railHeight =
-          railRect.height ||
-          Math.max(160, window.innerHeight - computeLeftToolRailTop(WEB_CHART_CHROME_METRICS) - TIME_AXIS_HEIGHT);
+        const railHeight = railRect.height || Math.max(160, window.innerHeight - TIME_AXIS_HEIGHT);
         const rawFlyoutTop = Math.max(0, buttonRect.top - railRect.top);
         const remainingHeight = Math.max(0, railHeight - rawFlyoutTop);
         const flyoutTop =
