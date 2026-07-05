@@ -1,0 +1,59 @@
+import type { Bar } from '../types';
+
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { dedupeBarsByTime } from './dedupeBars';
+
+const bar = (time: number, close = time): Bar => ({
+  time,
+  open: 1,
+  high: 2,
+  low: 0,
+  close,
+  volume: 1,
+});
+
+describe('dedupeBarsByTime', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('returns the same reference when already strictly increasing', () => {
+    const bars = [bar(1), bar(2), bar(3)];
+    expect(dedupeBarsByTime(bars)).toBe(bars);
+  });
+
+  it('returns short arrays unchanged', () => {
+    const one = [bar(1)];
+    expect(dedupeBarsByTime(one)).toBe(one);
+    expect(dedupeBarsByTime([])).toEqual([]);
+  });
+
+  it('drops duplicate timestamps, keeping the last occurrence', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const bars = [bar(1, 10), bar(2, 20), bar(2, 99), bar(3, 30)];
+    const out = dedupeBarsByTime(bars);
+    expect(out.map((b) => b.time)).toEqual([1, 2, 3]);
+    expect(out.find((b) => b.time === 2)?.close).toBe(99); // last wins
+    expect(console.warn).toHaveBeenCalledOnce();
+  });
+
+  it('re-sorts out-of-order bars and dedupes together', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const bars = [bar(3), bar(1), bar(2), bar(1, 42)];
+    const out = dedupeBarsByTime(bars);
+    expect(out.map((b) => b.time)).toEqual([1, 2, 3]);
+    expect(out.find((b) => b.time === 1)?.close).toBe(42); // last-seen for that time
+  });
+
+  it('collapses the observed 3-per-timestamp feed pattern', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const bars = [bar(1), bar(1), bar(1), bar(2), bar(2), bar(2)];
+    const out = dedupeBarsByTime(bars);
+    expect(out.map((b) => b.time)).toEqual([1, 2]);
+  });
+
+  it('does not warn when the array is clean', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    dedupeBarsByTime([bar(1), bar(2), bar(3)]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+});

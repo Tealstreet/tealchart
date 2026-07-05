@@ -35,6 +35,7 @@ import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
 import { computePaneGeometry } from '../layout/chartGeometry';
+import { dedupeBarsByTime } from '../utils/dedupeBars';
 import {
   getUserDrawingPlacementMode,
   hitTestUserDrawings,
@@ -938,7 +939,9 @@ export class ChartCore {
     // Reference check — skip if same array (real-time ticks use updateBar instead)
     if (bars === this.bars) return;
 
-    this.bars = bars;
+    // Render-source guard: dedupe duplicate/out-of-order timestamps so candles never
+    // draw as overlapping bodies, regardless of which feed path produced the array.
+    this.bars = dedupeBarsByTime(bars, 'render bars');
     if (bars.length > 0 && !this.viewport) {
       this.viewport = TealchartRenderer.calculateViewport(bars);
     }
