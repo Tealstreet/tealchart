@@ -346,12 +346,14 @@ describe('ChartCore viewport management', () => {
       allowPaneDoubleClick: true,
     });
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(4);
-    expect(testCore.handleUserDrawingInput(760, 100)).toBe(false);
+    // Drawings span the full width (under the price axis), so only clicks past the right
+    // edge (>= width) or in the time axis are out of bounds.
+    expect(testCore.handleUserDrawingInput(810, 100)).toBe(false);
     expect(testCore.handleUserDrawingInput(100, 590)).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(4);
     expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
     expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
-    expect(testCore.handleUserDrawingDragStart(760, 100)).toBe(false);
+    expect(testCore.handleUserDrawingDragStart(810, 100)).toBe(false);
     expect(onUserDrawingEditStart).toHaveBeenCalledTimes(1);
     expect(testCore.handleUserDrawingDragMove(110, 105)).toBe(true);
     expect(onUserDrawingEditMove).toHaveBeenCalledWith({ x: 110, y: 105 });
