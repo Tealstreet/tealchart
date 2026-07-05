@@ -1382,14 +1382,18 @@ export class ChartCore {
 
     this.chartContainer.appendChild(this.resetButton);
 
-    // Create circular hover zone (larger than button for easier targeting)
+    // Create circular hover zone (larger than button for easier targeting).
+    // Must sit above the chart canvas + Konva interactive layer (z-index 2) and
+    // crosshair overlay (z-index 3) so it actually receives hover; just below the
+    // button (z-index 10). Pointer events still bubble to chartContainer, so this
+    // does not block panning/crosshair.
     this.resetButtonHoverZone = div({
       style: {
         position: 'absolute',
         width: '100px',
         height: '100px',
         borderRadius: '50%',
-        zIndex: '1',
+        zIndex: '9',
         // Debug: uncomment to see hover zone
         // backgroundColor: 'rgba(255, 0, 0, 0.1)',
       },
@@ -1404,7 +1408,7 @@ export class ChartCore {
 
   private updateResetButtonPosition(): void {
     const centerX = this.options.width / 2;
-    const bottomY = this.options.height - this.margins.bottom - 60;
+    const bottomY = this.options.height - this.margins.bottom - 30;
 
     if (this.resetButton) {
       this.resetButton.style.left = `${centerX}px`;
