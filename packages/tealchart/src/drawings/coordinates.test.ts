@@ -316,7 +316,9 @@ describe('user drawing coordinates', () => {
   it('resolves chart-bound input points from margins', () => {
     expect(
       resolveUserDrawingInputPointFromChart({
-        point: { x: 110, y: 70 },
+        // Drawings map time across the full width (chartRight = width) to match candles,
+        // so the midpoint here is x = left + 0.5 * (width - left) = 10 + 0.5 * 240 = 130.
+        point: { x: 130, y: 70 },
         viewport: space.viewport,
         panes: [space.pane],
         width: 250,
