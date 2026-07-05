@@ -222,7 +222,14 @@ export interface CrosshairState {
 const TOUCH_TAP_THRESHOLD = 10; // Max movement in pixels for a touch to be considered a tap
 const TOUCH_TAP_TIMEOUT = 300; // Max duration in ms for a touch to be considered a tap
 const LONG_PRESS_DURATION = 500; // Duration for long-press context menu
-const ZOOM_FACTOR = 1.015; // Wheel zoom factor
+
+// Wheel-zoom inertia — tune for feel. Wheel input adds velocity (in log range-units)
+// that decays each frame, so a scroll flick starts fast and then eases out, and
+// rapid ticks accumulate into a faster glide.
+const WHEEL_ZOOM_IMPULSE = 0.00015; // velocity added per unit of wheel deltaY
+const ZOOM_FRICTION = 0.83; // per-frame velocity decay (higher = longer glide)
+const MAX_ZOOM_VELOCITY = 0.03; // clamp so a fast flick can't explode
+const MIN_ZOOM_VELOCITY = 0.00025; // below this the glide stops
 
 // ============================================================================
 // EventManager Class
@@ -358,6 +365,7 @@ export class EventManager {
   dispose(): void {
     this.detach();
     this.clearLongPressTimer();
+    this.cancelZoomMomentum();
     if (this._inputRafId !== null) {
       cancelAnimationFrame(this._inputRafId);
       this._inputRafId = null;
@@ -430,6 +438,9 @@ export class EventManager {
     if (this.callbacks.isOverInteractiveElement?.(x, y)) {
       return;
     }
+
+    // A new interaction interrupts an in-flight zoom glide.
+    this.cancelZoomMomentum();
 
     this.callbacks.onMouseDown?.();
 
@@ -564,6 +575,8 @@ export class EventManager {
   private _pendingMouseDrawingDragOptions: DrawingDragEventOptions | undefined;
   private _pendingTouchEvent: TouchEvent | null = null;
   private _inputRafId: number | null = null;
+  private zoomVelocity = 0;
+  private zoomMomentumRafId: number | null = null;
 
   /**
    * Schedule deferred input processing in next RAF frame.
@@ -608,6 +621,8 @@ export class EventManager {
   }
 
   private handleMouseMove(e: MouseEvent): void {
+    // Moving the mouse dead-stops an in-flight zoom glide immediately.
+    if (this.zoomMomentumRafId !== null) this.cancelZoomMomentum();
     // Store raw coordinates and defer ALL processing to RAF.
     this._pendingMouseClientX = e.clientX;
     this._pendingMouseClientY = e.clientY;
@@ -1040,14 +1055,48 @@ export class EventManager {
       const panAmount = e.deltaX * 0.5;
       const newViewport = this.panViewport(viewport, panAmount, dims.width);
       this.callbacks.onViewportChange?.(newViewport);
+      this.scheduleRender();
     } else {
-      // Vertical scroll = zoom
-      const zoomFactor = e.deltaY > 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
-      const newViewport = this.zoomViewport(viewport, zoomFactor, dims.width);
-      this.callbacks.onViewportChange?.(newViewport);
+      // Vertical scroll = zoom with inertia: add velocity and let the glide apply it.
+      this.zoomVelocity += e.deltaY * WHEEL_ZOOM_IMPULSE;
+      this.zoomVelocity = Math.max(-MAX_ZOOM_VELOCITY, Math.min(MAX_ZOOM_VELOCITY, this.zoomVelocity));
+      this.startZoomMomentum();
     }
+  }
 
-    this.scheduleRender();
+  private startZoomMomentum(): void {
+    if (this.zoomMomentumRafId !== null) return; // already gliding
+
+    const step = () => {
+      if (Math.abs(this.zoomVelocity) < MIN_ZOOM_VELOCITY) {
+        this.zoomVelocity = 0;
+        this.zoomMomentumRafId = null;
+        // Commit the settled viewport through the external callback.
+        this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+        return;
+      }
+
+      const dims = this.callbacks.getDimensions();
+      const factor = Math.exp(this.zoomVelocity);
+      const newViewport = this.zoomViewport(this.callbacks.getViewport(), factor, dims.width);
+      // Fire the external change each frame so the price axis auto-scale refits in real
+      // time (the internal path leaves the widget's auto-scale stale during the glide).
+      this.callbacks.onViewportChange?.(newViewport);
+      this.scheduleRender();
+
+      this.zoomVelocity *= ZOOM_FRICTION;
+      this.zoomMomentumRafId = requestAnimationFrame(step);
+    };
+
+    this.zoomMomentumRafId = requestAnimationFrame(step);
+  }
+
+  private cancelZoomMomentum(): void {
+    if (this.zoomMomentumRafId !== null) {
+      cancelAnimationFrame(this.zoomMomentumRafId);
+      this.zoomMomentumRafId = null;
+    }
+    this.zoomVelocity = 0;
   }
 
   // ============================================================================
@@ -1055,6 +1104,9 @@ export class EventManager {
   // ============================================================================
 
   private handleTouchStart(e: TouchEvent): void {
+    // A new touch interrupts an in-flight zoom glide.
+    this.cancelZoomMomentum();
+
     // Track all touches
     for (const touch of Array.from(e.changedTouches)) {
       this.activeTouches.set(touch.identifier, {
