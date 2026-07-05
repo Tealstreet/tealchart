@@ -21,14 +21,14 @@ export function dedupeBarsByTime(bars: Bar[], context = 'bars'): Bar[] {
   if (bars.length < 2) return bars;
 
   // Fast path: already strictly increasing → nothing to fix, keep the reference.
-  let clean = true;
+  let outOfOrder = false;
+  let hasDuplicate = false;
   for (let i = 1; i < bars.length; i++) {
-    if (bars[i]!.time <= bars[i - 1]!.time) {
-      clean = false;
-      break;
-    }
+    const delta = bars[i]!.time - bars[i - 1]!.time;
+    if (delta < 0) outOfOrder = true;
+    else if (delta === 0) hasDuplicate = true;
   }
-  if (clean) return bars;
+  if (!outOfOrder && !hasDuplicate) return bars;
 
   const sorted = [...bars].sort((a, b) => a.time - b.time);
   const result: Bar[] = [];
@@ -46,10 +46,10 @@ export function dedupeBarsByTime(bars: Bar[], context = 'bars'): Bar[] {
   const now = Date.now();
   if (now - lastWarnAt > WARN_THROTTLE_MS) {
     lastWarnAt = now;
-    console.warn(
-      `[tealchart] normalized ${context}: dropped ${dropped} duplicate-timestamp bar(s)` +
-        ` and/or re-sorted out-of-order bars (${bars.length} -> ${result.length}).`,
-    );
+    const actions: string[] = [];
+    if (outOfOrder) actions.push('re-sorted out-of-order bars');
+    if (dropped > 0) actions.push(`dropped ${dropped} duplicate-timestamp bar(s)`);
+    console.warn(`[tealchart] normalized ${context}: ${actions.join(' and ')} (${bars.length} -> ${result.length}).`);
   }
   return result;
 }

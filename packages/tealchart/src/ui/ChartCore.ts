@@ -942,8 +942,10 @@ export class ChartCore {
     // Render-source guard: dedupe duplicate/out-of-order timestamps so candles never
     // draw as overlapping bodies, regardless of which feed path produced the array.
     this.bars = dedupeBarsByTime(bars, 'render bars');
-    if (bars.length > 0 && !this.viewport) {
-      this.viewport = TealchartRenderer.calculateViewport(bars);
+    if (this.bars.length > 0 && !this.viewport) {
+      // Use the normalized bars: calculateViewport slices the trailing bars, which is
+      // only the newest candles when the array is sorted.
+      this.viewport = TealchartRenderer.calculateViewport(this.bars);
     }
     // No scheduleRender — paint() is called by the widget after pushing state
   }

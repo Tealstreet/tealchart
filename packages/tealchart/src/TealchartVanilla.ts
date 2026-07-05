@@ -347,6 +347,7 @@ export class SimpleChart {
    * Set bar data
    */
   setBars(bars: Bar[]): void {
+    if (bars === this._bars) return;
     this._bars = dedupeBarsByTime(bars);
     this._requestRender();
   }
