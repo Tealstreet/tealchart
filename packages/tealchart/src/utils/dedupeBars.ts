@@ -5,6 +5,11 @@ import type { Bar } from '../types';
 const WARN_THROTTLE_MS = 10_000;
 let lastWarnAt = 0;
 
+/** Test hook — reset the warn throttle so warnings are observable across cases. */
+export function resetBarWarnThrottleForTest(): void {
+  lastWarnAt = 0;
+}
+
 /**
  * Normalize a bar array so it is strictly increasing in time with no duplicate
  * timestamps. Feeds (REST history + websocket merges, gap-recovery refetches,
