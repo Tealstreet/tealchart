@@ -13,6 +13,7 @@ import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { Bar, IBasicDataFeed, LibrarySymbolInfo, ResolutionString, UnifiedPaneLayout, Viewport } from '../types';
 
 import { EventEmitter } from '../events/EventEmitter';
+import { dedupeBarsByTime } from '../utils/dedupeBars';
 import { PaneManager } from '../rendering/PaneManager';
 
 // Use generic PlotOutput type to avoid import issues across platforms
@@ -231,6 +232,9 @@ export class ChartWidgetCore {
       (bars) => {
         if (requestId !== this._loadBarsRequestId) return; // Stale
 
+        // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
+        // don't render as overlapping bodies (feeds occasionally emit dupes).
+        bars = dedupeBarsByTime(bars, 'history load');
         this._bars = bars;
         // Clear old plots — they belong to the old symbol/interval
         this._plots = [];
