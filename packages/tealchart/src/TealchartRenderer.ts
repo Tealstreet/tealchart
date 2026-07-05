@@ -3955,6 +3955,24 @@ export class TealchartRenderer {
   }
 
   /**
+   * Horizontal divider at the top edge of a pane. Rendered brighter than the
+   * grid (textColor at low alpha) so it reads as the draggable pane boundary
+   * without competing with grid lines.
+   */
+  private drawPaneSeparatorLine(topY: number): void {
+    const { ctx, options } = this;
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = options.textColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, topY);
+    ctx.lineTo(options.width, topY);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
    * Render indicator pane content
    */
   private renderIndicatorPaneContent(
@@ -3973,13 +3991,8 @@ export class TealchartRenderer {
     ctx.fillStyle = options.backgroundColor;
     ctx.fillRect(0, pane.top, options.width, pane.height);
 
-    // Draw pane separator at top
-    ctx.strokeStyle = options.gridColor;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, pane.top);
-    ctx.lineTo(options.width, pane.top);
-    ctx.stroke();
+    // Draw pane separator at top (draggable resize boundary)
+    this.drawPaneSeparatorLine(pane.top);
 
     // Note: Indicator legend is now rendered as React overlay in ChartContainer
     // for proper hover/click interactions (eye, settings, trash buttons)
@@ -4959,13 +4972,8 @@ export class TealchartRenderer {
     ctx.fillStyle = options.backgroundColor;
     ctx.fillRect(0, paneOffset.top, options.width, paneOffset.height);
 
-    // Draw pane separator line at top
-    ctx.strokeStyle = options.gridColor;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, paneOffset.top);
-    ctx.lineTo(options.width, paneOffset.top);
-    ctx.stroke();
+    // Draw pane separator line at top (draggable resize boundary)
+    this.drawPaneSeparatorLine(paneOffset.top);
 
     // Draw horizontal grid lines in the pane
     const gridLines = this.generatePaneGridLines(paneOffset.yMin, paneOffset.yMax, paneOffset.height);
