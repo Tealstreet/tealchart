@@ -61,6 +61,8 @@ export interface EventManagerCallbacks {
   getPaneAtY?: (y: number) => PaneInfo | null;
   /** Get divider at Y position (for pane resizing) */
   getDividerAtY?: (y: number) => PaneDividerInfo | null;
+  /** Called when the hovered pane divider changes (for the resize highlight) */
+  onPaneDividerHover?: (divider: PaneDividerInfo | null) => void;
   /** Called when pane heights change via divider drag */
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
@@ -646,6 +648,9 @@ export class EventManager {
     const divider = this.callbacks.getDividerAtY?.(y);
     this.state.isOverPaneDivider = divider !== null && divider !== undefined;
     this.state.hoveredDividerIndex = divider?.dividerIndex ?? -1;
+    if (!this.state.isDragging) {
+      this.callbacks.onPaneDividerHover?.(divider ?? null);
+    }
 
     // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
     const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
@@ -997,6 +1002,7 @@ export class EventManager {
       if (wasVisible) {
         this.callbacks.onCrossHairVisibilityChange?.(false);
       }
+      this.callbacks.onPaneDividerHover?.(null);
       this.scheduleRender();
     }
   }
@@ -1601,6 +1607,10 @@ export class EventManager {
       { paneId: divider.paneAboveId, heightRatio: newAboveRatio },
       { paneId: divider.paneBelowId, heightRatio: newBelowRatio },
     ]);
+
+    // Keep the resize highlight on the divider as it moves (clamped by min ratios).
+    const newDividerY = divider.y + (newAboveRatio - divider.paneAboveRatio) * availableHeight;
+    this.callbacks.onPaneDividerHover?.({ ...divider, y: newDividerY });
   }
 
   private panViewport(viewport: Viewport, pixelDelta: number, width: number): Viewport {

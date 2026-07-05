@@ -173,6 +173,12 @@ export interface ChartCoreOptions {
 /**
  * Convert legacy PaneLayout to UnifiedPaneLayout
  */
+// The renderer's computePanesLayout lays panes out from y=0 (candles draw behind the
+// transparent top bar). The divider line + pane legends sit on top of that drawn
+// content, so they must use the same origin; offsetting by margins.top would place
+// them below the real pane boundary and content would bleed past the divider.
+const PANE_OVERLAY_TOP_OFFSET = 0;
+
 function convertToUnifiedLayout(paneLayout?: PaneLayout): UnifiedPaneLayout {
   const timeAxisHeight = TIME_AXIS_HEIGHT;
 
@@ -575,6 +581,7 @@ export class ChartCore {
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
   private paneHeightOverrides = new Map<string, number>();
   private crosshair: EventCrosshairState = { visible: false, x: 0, y: 0 };
+  private hoveredPaneDivider: PaneDividerInfo | null = null;
   private showResetButton = false;
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
   private cursor = 'crosshair';
@@ -762,6 +769,13 @@ export class ChartCore {
       onDrawingDragEnd: () => this.handleUserDrawingDragEnd(),
       onDrawingDragCancel: () => this.handleUserDrawingDragCancel(),
       getDividerAtY: (y) => this.getDividerAtY(y),
+      onPaneDividerHover: (divider) => {
+        const changed =
+          (this.hoveredPaneDivider?.dividerIndex ?? -1) !== (divider?.dividerIndex ?? -1) ||
+          (this.hoveredPaneDivider?.y ?? -1) !== (divider?.y ?? -1);
+        this.hoveredPaneDivider = divider;
+        if (changed) this.renderCrosshairOverlay();
+      },
       onPaneHeightsChange: (heights) => {
         for (const { paneId, heightRatio } of heights) {
           this.paneHeightOverrides.set(paneId, heightRatio);
@@ -1309,7 +1323,7 @@ export class ChartCore {
     const panes = computePaneGeometry({
       paneLayout: this.getUnifiedLayout(),
       height: this.options.height,
-      topOffset: this.margins.top,
+      topOffset: PANE_OVERLAY_TOP_OFFSET,
     });
     return panes.filter((pane) => pane.type === 'indicator').map((pane) => ({ paneId: pane.id, top: pane.top }));
   }
@@ -1358,6 +1372,27 @@ export class ChartCore {
       this.chartContainer.remove();
     }
     // When preserveDom is true, old DOM stays visible until new widget paints first frame
+  }
+
+  // ============================================================================
+  // Private: Pane Divider Highlight
+  // ============================================================================
+
+  /**
+   * TradingView-style resize highlight: a soft halo band plus a solid line drawn
+   * over a hovered pane divider. Rendered on the crosshair overlay canvas.
+   */
+  private drawPaneDividerHighlight(ctx: CanvasRenderingContext2D, y: number, width: number): void {
+    ctx.save();
+    ctx.fillStyle = 'rgba(41, 98, 255, 0.12)';
+    ctx.fillRect(0, y - 3, width, 6);
+    ctx.strokeStyle = 'rgba(41, 98, 255, 0.6)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+    ctx.restore();
   }
 
   // ============================================================================
@@ -1878,7 +1913,7 @@ export class ChartCore {
     const computedPanes = computePaneGeometry({
       paneLayout: layout,
       height: this.options.height,
-      topOffset: this.margins.top,
+      topOffset: PANE_OVERLAY_TOP_OFFSET,
     });
 
     const DIVIDER_HIT_ZONE = 6; // Pixels around divider that count as "over divider"
@@ -2180,6 +2215,13 @@ export class ChartCore {
 
     // Clear the overlay
     ctx.clearRect(0, 0, width, height);
+
+    // Highlight the hovered pane divider (resize affordance). Drawn on the overlay
+    // so it tracks the cursor without repainting the main canvas. The crosshair is
+    // suppressed over a divider, so this must run before the visibility early-return.
+    if (this.hoveredPaneDivider) {
+      this.drawPaneDividerHighlight(ctx, this.hoveredPaneDivider.y, width);
+    }
 
     // Draw bracket drag preview (even when crosshair is hidden during drag)
     if (this._bracketDragState && this.viewport) {
