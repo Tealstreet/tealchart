@@ -1566,12 +1566,9 @@ export class EventManager {
   }
 
   private zoomViewport(viewport: Viewport, factor: number, _width: number): Viewport {
-    const timeRange = viewport.endTime - viewport.startTime;
-    const center = viewport.startTime + timeRange / 2;
-
-    const newTimeRange = timeRange * factor;
-    const newStartTime = center - newTimeRange / 2;
-    const newEndTime = center + newTimeRange / 2;
+    const newTimeRange = (viewport.endTime - viewport.startTime) * factor;
+    // Anchor the zoom on the far right edge of the canvas: endTime stays fixed.
+    const newStartTime = viewport.endTime - newTimeRange;
 
     // Request more bars if zooming out left
     if (newStartTime < viewport.startTime) {
@@ -1581,7 +1578,6 @@ export class EventManager {
     return {
       ...viewport,
       startTime: newStartTime,
-      endTime: newEndTime,
     };
   }
 
