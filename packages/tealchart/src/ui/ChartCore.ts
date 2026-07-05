@@ -1302,6 +1302,19 @@ export class ChartCore {
   }
 
   /**
+   * Pixel top of each indicator pane, from the same geometry the canvas renders
+   * (height overrides applied). Used to keep pane legends aligned during resize.
+   */
+  getIndicatorPaneTops(): { paneId: string; top: number }[] {
+    const panes = computePaneGeometry({
+      paneLayout: this.getUnifiedLayout(),
+      height: this.options.height,
+      topOffset: this.margins.top,
+    });
+    return panes.filter((pane) => pane.type === 'indicator').map((pane) => ({ paneId: pane.id, top: pane.top }));
+  }
+
+  /**
    * Get current bars
    */
   getBars(): Bar[] {
