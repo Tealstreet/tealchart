@@ -971,6 +971,8 @@ export class EventManager {
   }
 
   private handleWindowBlur(): void {
+    // A zoom glide runs without isDragging — stop it so it doesn't survive the blur.
+    this.cancelZoomMomentum();
     if (!this.state.isDragging) return;
 
     this.callbacks.onMouseUp?.();
@@ -1073,6 +1075,7 @@ export class EventManager {
         this.zoomMomentumRafId = null;
         // Commit the settled viewport through the external callback.
         this.callbacks.onViewportChange?.(this.callbacks.getViewport());
+        this.scheduleRender();
         return;
       }
 
@@ -1085,7 +1088,10 @@ export class EventManager {
       this.scheduleRender();
 
       this.zoomVelocity *= ZOOM_FRICTION;
-      this.zoomMomentumRafId = requestAnimationFrame(step);
+      // Skip re-scheduling if onViewportChange re-entrantly cancelled the glide.
+      if (this.zoomMomentumRafId !== null) {
+        this.zoomMomentumRafId = requestAnimationFrame(step);
+      }
     };
 
     this.zoomMomentumRafId = requestAnimationFrame(step);
@@ -1275,7 +1281,7 @@ export class EventManager {
         // Scale inverted: spreading fingers zooms out (shows more data)
         const scale = this.pinchStartDistance / currentDistance;
         const dims = this.callbacks.getDimensions();
-        const newViewport = this.zoomViewport(this.pinchStartViewport, scale, dims.width);
+        const newViewport = this.zoomViewport(this.pinchStartViewport, scale, dims.width, 'center');
         const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
         updateViewport?.(newViewport);
       }
@@ -1617,10 +1623,19 @@ export class EventManager {
     };
   }
 
-  private zoomViewport(viewport: Viewport, factor: number, _width: number): Viewport {
+  private zoomViewport(viewport: Viewport, factor: number, _width: number, anchor: 'right' | 'center' = 'right'): Viewport {
     const newTimeRange = (viewport.endTime - viewport.startTime) * factor;
-    // Anchor the zoom on the far right edge of the canvas: endTime stays fixed.
-    const newStartTime = viewport.endTime - newTimeRange;
+    // Wheel/momentum anchor on the far right edge (endTime fixed); pinch stays centered.
+    let newStartTime: number;
+    let newEndTime: number;
+    if (anchor === 'center') {
+      const center = (viewport.startTime + viewport.endTime) / 2;
+      newStartTime = center - newTimeRange / 2;
+      newEndTime = center + newTimeRange / 2;
+    } else {
+      newEndTime = viewport.endTime;
+      newStartTime = newEndTime - newTimeRange;
+    }
 
     // Request more bars if zooming out left
     if (newStartTime < viewport.startTime) {
@@ -1630,6 +1645,7 @@ export class EventManager {
     return {
       ...viewport,
       startTime: newStartTime,
+      endTime: newEndTime,
     };
   }
 
