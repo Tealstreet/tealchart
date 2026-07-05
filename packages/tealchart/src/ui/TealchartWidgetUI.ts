@@ -493,6 +493,7 @@ export class TealchartWidgetUI {
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,
       onPaneDoubleClick: this.options.onPaneDoubleClick,
+      onPaneHeightsChange: () => this.updateIndicatorPaneLegends(),
     });
   }
 
@@ -951,6 +952,11 @@ export class TealchartWidgetUI {
     // Calculate main pane height
     const mainPanePixelHeight = availableHeight * paneLayout.mainPaneHeight;
 
+    // Live pixel tops from ChartCore's rendered geometry (height overrides applied),
+    // so legends track panes while the user drags a divider to resize. Falls back to
+    // the ratio-accumulated position if geometry is unavailable.
+    const paneTops = new Map((this.chartCore?.getIndicatorPaneTops() ?? []).map((p) => [p.paneId, p.top]));
+
     // Track which pane IDs we've seen (to remove stale legends)
     const currentPaneIds = new Set<string>();
 
@@ -958,6 +964,7 @@ export class TealchartWidgetUI {
     let currentTop = mainPanePixelHeight;
     for (const pane of paneLayout.indicatorPanes) {
       const paneHeight = availableHeight * pane.heightRatio;
+      const legendTop = paneTops.get(pane.id) ?? currentTop;
       currentPaneIds.add(pane.id);
 
       // Get indicators for this pane
@@ -983,7 +990,7 @@ export class TealchartWidgetUI {
         // Create new legend
         legend = new IndicatorPaneLegend({
           paneId: pane.id,
-          top: currentTop,
+          top: legendTop,
           avoidLeftTools: this.shouldAvoidLegendLeftTools(),
           onToggleIndicator: this.options.onToggleIndicator,
           onSettingsIndicator: (indicatorId) => this.openIndicatorSettings(indicatorId),
@@ -993,7 +1000,7 @@ export class TealchartWidgetUI {
         this.indicatorPaneLegends.set(pane.id, legend);
       } else {
         // Update position
-        legend.setPosition(currentTop);
+        legend.setPosition(legendTop);
         legend.setAvoidLeftTools(this.shouldAvoidLegendLeftTools());
       }
 
