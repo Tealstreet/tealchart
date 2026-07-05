@@ -1074,7 +1074,9 @@ export function resolveUserDrawingInputPointFromChart({
     viewport,
     panes,
     chartLeft: margins.left,
-    chartRight: width - margins.right,
+    // Candles are drawn across the full width (under the price axis); drawings must use
+    // the same time->x scale or they drift off the candles as the viewport zooms.
+    chartRight: width,
   });
 }
 
