@@ -128,7 +128,7 @@ import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
-import { dedupeBarsByTime } from './utils/dedupeBars';
+import { barValuesEqual, dedupeBarsByTime } from './utils/dedupeBars';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
@@ -711,13 +711,7 @@ export class TealchartWidget {
         // Skip no-op ticks — an identical bar recomputes indicators and repaints
         // for zero visible change (feeds re-send unchanged bars as heartbeats).
         // Still record it so the gap-detection watchdog stays armed on quiet feeds.
-        if (
-          bar.close === lastBar.close &&
-          bar.open === lastBar.open &&
-          bar.high === lastBar.high &&
-          bar.low === lastBar.low &&
-          bar.volume === lastBar.volume
-        ) {
+        if (barValuesEqual(bar, lastBar)) {
           this._gapDetectionManager?.recordBar(bar.time);
           this._gapDetectionManager?.resetRetryState();
           return;

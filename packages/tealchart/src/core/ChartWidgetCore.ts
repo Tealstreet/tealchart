@@ -13,7 +13,7 @@ import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { Bar, IBasicDataFeed, LibrarySymbolInfo, ResolutionString, UnifiedPaneLayout, Viewport } from '../types';
 
 import { EventEmitter } from '../events/EventEmitter';
-import { dedupeBarsByTime } from '../utils/dedupeBars';
+import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
 import { PaneManager } from '../rendering/PaneManager';
 
 // Use generic PlotOutput type to avoid import issues across platforms
@@ -286,13 +286,7 @@ export class ChartWidgetCore {
       if (bar.time === lastBar.time) {
         // Skip no-op ticks — an identical bar recomputes indicators and repaints
         // for zero visible change (feeds re-send unchanged bars as heartbeats).
-        if (
-          bar.close === lastBar.close &&
-          bar.open === lastBar.open &&
-          bar.high === lastBar.high &&
-          bar.low === lastBar.low &&
-          bar.volume === lastBar.volume
-        ) {
+        if (barValuesEqual(bar, lastBar)) {
           return;
         }
         this._bars[this._bars.length - 1] = bar;
