@@ -22,7 +22,12 @@ export const DIRTY = {
   OPTIONS: 1 << 7, // Render options (colors, font) changed
   DATA_LOAD: 1 << 8, // Atomic data transition (symbol/interval/reset)
   USER_DRAWINGS: 1 << 9, // User-created drawing state changed
-  FULL: 0x3ff, // Everything
+  // Everything EXCEPT DATA_LOAD. DATA_LOAD force-clears indicator plots (see
+  // TealchartWidget._render) and must only be set explicitly by a real
+  // symbol/interval/reset transition — never implied by a plain "repaint all".
+  // Otherwise every markDirty(FULL) (indicator add/remove, layout, resize)
+  // blanks live indicator plots for a frame, causing visible flicker.
+  FULL: 0x3ff & ~(1 << 8), // 0x2ff
 } as const;
 
 export type DirtyFlags = number;

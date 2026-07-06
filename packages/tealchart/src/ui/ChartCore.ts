@@ -965,8 +965,10 @@ export class ChartCore {
         this.bars.push(bar);
       }
     }
-    // updateBar is the fast path — schedule an immediate repaint for this bar
-    this.scheduleRender();
+    // No scheduleRender — the caller (TealchartWidget._handleNewBar) marks
+    // DIRTY.BARS so the single widget render pipeline repaints this tick. A
+    // second RAF here would double-paint the canvas every tick (LINES/PLOTS
+    // already force a full repaint in the same frame).
   }
 
   /**
