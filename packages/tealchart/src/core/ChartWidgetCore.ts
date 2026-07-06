@@ -284,6 +284,17 @@ export class ChartWidgetCore {
     } else {
       const lastBar = this._bars[this._bars.length - 1];
       if (bar.time === lastBar.time) {
+        // Skip no-op ticks — an identical bar recomputes indicators and repaints
+        // for zero visible change (feeds re-send unchanged bars as heartbeats).
+        if (
+          bar.close === lastBar.close &&
+          bar.open === lastBar.open &&
+          bar.high === lastBar.high &&
+          bar.low === lastBar.low &&
+          bar.volume === lastBar.volume
+        ) {
+          return;
+        }
         this._bars[this._bars.length - 1] = bar;
       } else if (bar.time > lastBar.time) {
         this._bars.push(bar);
