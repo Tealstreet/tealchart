@@ -48,16 +48,33 @@ describe('RenderScheduler', () => {
         DIRTY.LAYOUT,
         DIRTY.OPTIONS,
         DIRTY.DATA_LOAD,
+        DIRTY.USER_DRAWINGS,
       ];
 
       // Each flag should be unique
       const unique = new Set(flags);
       expect(unique.size).toBe(flags.length);
+    });
 
-      // FULL should include all flags
-      for (const flag of flags) {
+    // FULL must repaint everything but NOT carry DATA_LOAD: DATA_LOAD force-clears
+    // indicator plots (TealchartWidget._render), so implying it from a plain
+    // "repaint all" blanks live indicators for a frame → flicker on add/remove.
+    it('FULL includes every render flag except DATA_LOAD', () => {
+      const renderFlags = [
+        DIRTY.CROSSHAIR,
+        DIRTY.VIEWPORT,
+        DIRTY.BARS,
+        DIRTY.PLOTS,
+        DIRTY.DRAWINGS,
+        DIRTY.LINES,
+        DIRTY.LAYOUT,
+        DIRTY.OPTIONS,
+        DIRTY.USER_DRAWINGS,
+      ];
+      for (const flag of renderFlags) {
         expect(DIRTY.FULL & flag).toBe(flag);
       }
+      expect(DIRTY.FULL & DIRTY.DATA_LOAD).toBe(0);
     });
   });
 

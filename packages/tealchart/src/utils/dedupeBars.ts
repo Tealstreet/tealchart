@@ -1,5 +1,21 @@
 import type { Bar } from '../types';
 
+/**
+ * True when two bars carry identical time + OHLCV. Used to drop no-op realtime
+ * ticks (feeds re-send unchanged bars as heartbeats) so an identical bar doesn't
+ * recompute indicators and repaint for zero visible change.
+ */
+export function barValuesEqual(a: Bar, b: Bar): boolean {
+  return (
+    a.time === b.time &&
+    a.open === b.open &&
+    a.high === b.high &&
+    a.low === b.low &&
+    a.close === b.close &&
+    a.volume === b.volume
+  );
+}
+
 // Feeds that misbehave often do so every tick; throttle the warning so it stays
 // informative without flooding the console.
 const WARN_THROTTLE_MS = 10_000;

@@ -2,7 +2,7 @@ import type { Bar } from '../types';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { dedupeBarsByTime, resetBarWarnThrottleForTest } from './dedupeBars';
+import { barValuesEqual, dedupeBarsByTime, resetBarWarnThrottleForTest } from './dedupeBars';
 
 const bar = (time: number, close = time): Bar => ({
   time,
@@ -65,5 +65,20 @@ describe('dedupeBarsByTime', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     dedupeBarsByTime([bar(1), bar(2), bar(3)]);
     expect(warn).not.toHaveBeenCalled();
+  });
+});
+
+describe('barValuesEqual', () => {
+  const full = (over: Partial<Bar> = {}): Bar => ({ time: 1, open: 1, high: 2, low: 0, close: 1.5, volume: 10, ...over });
+
+  it('is true for identical time + OHLCV', () => {
+    expect(barValuesEqual(full(), full())).toBe(true);
+  });
+
+  it('is false when any OHLCV field or time differs', () => {
+    expect(barValuesEqual(full(), full({ close: 1.6 }))).toBe(false);
+    expect(barValuesEqual(full(), full({ volume: 11 }))).toBe(false);
+    expect(barValuesEqual(full(), full({ high: 2.1 }))).toBe(false);
+    expect(barValuesEqual(full(), full({ time: 2 }))).toBe(false);
   });
 });

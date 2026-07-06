@@ -128,7 +128,7 @@ import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
-import { dedupeBarsByTime } from './utils/dedupeBars';
+import { barValuesEqual, dedupeBarsByTime } from './utils/dedupeBars';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
@@ -708,6 +708,14 @@ export class TealchartWidget {
     } else {
       const lastBar = this._bars[this._bars.length - 1];
       if (bar.time === lastBar.time) {
+        // Skip no-op ticks — an identical bar recomputes indicators and repaints
+        // for zero visible change (feeds re-send unchanged bars as heartbeats).
+        // Still record it so the gap-detection watchdog stays armed on quiet feeds.
+        if (barValuesEqual(bar, lastBar)) {
+          this._gapDetectionManager?.recordBar(bar.time);
+          this._gapDetectionManager?.resetRetryState();
+          return;
+        }
         // Update existing bar
         this._bars[this._bars.length - 1] = bar;
       } else if (bar.time > lastBar.time) {
@@ -728,8 +736,8 @@ export class TealchartWidget {
       this._tealScriptManager.updateBar(bar);
     }
 
-    // Lightweight real-time update — goes directly to ChartCore.updateBar()
-    // which handles mutation + scheduleRender internally.
+    // Lightweight real-time update — mutates ChartCore's bar array in place.
+    // The DIRTY.BARS mark below drives the single render for this tick.
     this._ui?.updateBar(bar, this._bars);
 
     // Auto-scale: refit price axis if a new tick extends beyond visible range
@@ -745,10 +753,10 @@ export class TealchartWidget {
       }
     }
 
-    // Schedule widget-level render to update last-trade price line,
-    // order/position lines, and other state. updateBar fast path already
-    // painted candles — we only need LINES for interactive line updates.
-    this._scheduler.markDirty(DIRTY.LINES);
+    // Single render for this tick: BARS repaints the candle, LINES refreshes
+    // the last-trade / order / position lines. The worker's PLOTS callback (if
+    // any) coalesces into the same RAF, so indicators repaint here too.
+    this._scheduler.markDirty(DIRTY.BARS | DIRTY.LINES);
   }
 
   private _loadMoreBars(direction: 'left' | 'right'): void {
