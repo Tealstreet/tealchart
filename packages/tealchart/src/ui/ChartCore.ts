@@ -936,7 +936,9 @@ export class ChartCore {
    * Uses reference equality check - bars array is always new when data changes
    */
   setBars(bars: Bar[]): void {
-    // Reference check — skip if same array (real-time ticks use updateBar instead)
+    // Reference check — skip if same array. Real-time ticks mutate the widget's
+    // shared bar array in place, so this is called with the same reference and
+    // the render still runs (paint() calls renderMainCanvas regardless).
     if (bars === this.bars) return;
 
     // Render-source guard: dedupe duplicate/out-of-order timestamps so candles never
@@ -948,25 +950,6 @@ export class ChartCore {
       this.viewport = TealchartRenderer.calculateViewport(this.bars);
     }
     // No scheduleRender — paint() is called by the widget after pushing state
-  }
-
-  /**
-   * Update a single bar (real-time) — fast path that mutates + paints directly.
-   * Bypasses the widget's render pipeline for low-latency candle updates.
-   */
-  updateBar(bar: Bar): void {
-    if (this.bars.length === 0) {
-      this.bars.push(bar);
-    } else {
-      const lastBar = this.bars[this.bars.length - 1];
-      if (bar.time === lastBar.time) {
-        this.bars[this.bars.length - 1] = bar;
-      } else if (bar.time > lastBar.time) {
-        this.bars.push(bar);
-      }
-    }
-    // updateBar is the fast path — schedule an immediate repaint for this bar
-    this.scheduleRender();
   }
 
   /**
@@ -1972,8 +1955,8 @@ export class ChartCore {
   // ============================================================================
 
   /**
-   * Legacy scheduleRender — kept for updateBar() fast path, resize(), and
-   * resetViewport() which are called from within ChartCore itself.
+   * Legacy scheduleRender — kept for resize(), resetViewport(), and interaction
+   * callbacks (pan/zoom/crosshair) that are driven from within ChartCore itself.
    * These trigger a full render via their own RAF (separate from widget scheduler).
    */
   private scheduleRender(): void {
