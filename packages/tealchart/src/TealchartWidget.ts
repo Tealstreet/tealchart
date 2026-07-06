@@ -710,6 +710,7 @@ export class TealchartWidget {
       if (bar.time === lastBar.time) {
         // Skip no-op ticks — an identical bar recomputes indicators and repaints
         // for zero visible change (feeds re-send unchanged bars as heartbeats).
+        // Still record it so the gap-detection watchdog stays armed on quiet feeds.
         if (
           bar.close === lastBar.close &&
           bar.open === lastBar.open &&
@@ -717,6 +718,8 @@ export class TealchartWidget {
           bar.low === lastBar.low &&
           bar.volume === lastBar.volume
         ) {
+          this._gapDetectionManager?.recordBar(bar.time);
+          this._gapDetectionManager?.resetRetryState();
           return;
         }
         // Update existing bar

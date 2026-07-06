@@ -526,13 +526,11 @@ export class TealchartWidgetUI {
   }
 
   /**
-   * Update a single bar (real-time tick) - lightweight path that
-   * bypasses the full setBars reference check and render pipeline.
+   * Update the legend for a real-time tick. The candle itself repaints via the
+   * widget's DIRTY.BARS render (ChartCore reads the shared bar array), so this
+   * only refreshes the legend's latest-bar readout.
    */
   updateBar(bar: Bar, bars: Bar[]): void {
-    this.chartCore?.updateBar(bar);
-
-    // Update legend with latest bar
     const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
     this.legend?.setBars(bar, previousBar);
   }
