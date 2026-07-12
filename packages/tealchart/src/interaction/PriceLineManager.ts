@@ -964,6 +964,7 @@ export class PriceLineManager {
 
           hitRect.on('dragstart', () => {
             const currentBound = this.getCurrentBound(group, bound);
+            const startPosition = hitRect.getAbsolutePosition();
             this.activeDrag = {
               node: hitRect,
               type: 'tpsl',
@@ -973,7 +974,8 @@ export class PriceLineManager {
               originalX,
               originalY,
               originalPrice: currentBound.price,
-              startCenterX,
+              originalAbsoluteY: startPosition.y + LABEL_HEIGHT / 2,
+              startCenterX: startPosition.x + buttonWidth / 2,
               partialEnabled: currentBound.partialEnabled ?? false,
               onCancel: () => {
                 this.options.onTPSLDragCancel?.();
@@ -987,12 +989,13 @@ export class PriceLineManager {
             const activeDrag = this.activeDrag;
             if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
 
-            const currentCenterX = hitRect.x() + buttonWidth / 2;
-            const currentCenterY = hitRect.y() + LABEL_HEIGHT / 2;
+            const currentPosition = hitRect.getAbsolutePosition();
+            const currentCenterX = currentPosition.x + buttonWidth / 2;
+            const currentCenterY = currentPosition.y + LABEL_HEIGHT / 2;
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
-              ? calculatePartialPercent(activeDrag.startCenterX || startCenterX, currentCenterX)
+              ? calculatePartialPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
               : 100;
 
             if (buttonType === 'tp') {
@@ -1001,7 +1004,7 @@ export class PriceLineManager {
                 activeDrag.positionId || currentBound.lineId,
                 price,
                 partialPercent,
-                activeDrag.startCenterX || startCenterX,
+                activeDrag.startCenterX ?? startCenterX,
                 currentCenterX,
               );
             } else {
@@ -1010,7 +1013,7 @@ export class PriceLineManager {
                 activeDrag.positionId || currentBound.lineId,
                 price,
                 partialPercent,
-                activeDrag.startCenterX || startCenterX,
+                activeDrag.startCenterX ?? startCenterX,
                 currentCenterX,
               );
             }
@@ -1020,17 +1023,20 @@ export class PriceLineManager {
             const activeDrag = this.activeDrag;
             if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
 
-            const currentCenterX = hitRect.x() + buttonWidth / 2;
-            const currentCenterY = hitRect.y() + LABEL_HEIGHT / 2;
-            const deltaX = Math.abs(currentCenterX - (activeDrag.startCenterX || startCenterX));
-            const deltaY = Math.abs(currentCenterY - (activeDrag.originalY + LABEL_HEIGHT / 2));
+            const currentPosition = hitRect.getAbsolutePosition();
+            const currentCenterX = currentPosition.x + buttonWidth / 2;
+            const currentCenterY = currentPosition.y + LABEL_HEIGHT / 2;
+            const deltaX = Math.abs(currentCenterX - (activeDrag.startCenterX ?? startCenterX));
+            const deltaY = Math.abs(
+              currentCenterY - (activeDrag.originalAbsoluteY ?? activeDrag.originalY + LABEL_HEIGHT / 2),
+            );
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
-              ? calculatePartialPercent(activeDrag.startCenterX || startCenterX, currentCenterX)
+              ? calculatePartialPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
               : undefined;
 
-            hitRect.x(activeDrag.originalX || originalX);
+            hitRect.x(activeDrag.originalX ?? originalX);
             hitRect.y(activeDrag.originalY);
             this.activeDrag = null;
 
