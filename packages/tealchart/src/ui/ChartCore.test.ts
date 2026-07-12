@@ -1200,7 +1200,7 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
-  it('keeps the grab cursor while EventManager hover processing runs over draggable order lines', async () => {
+  it('keeps the pointer cursor while EventManager hover processing runs over draggable order lines', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
       container,
@@ -1258,13 +1258,13 @@ describe('ChartCore viewport management', () => {
 
     eventManagerInstances[0]?.callbacks.onCrossHairMoved?.(123, 234);
     eventManagerInstances[0]?.callbacks.onCursorChange?.('pointer');
-    expect(chartContainer.style.cursor).toBe('grab');
+    expect(chartContainer.style.cursor).toBe('pointer');
 
     orderDragRect!.fire('mouseenter');
-    expect(chartContainer.style.cursor).toBe('grab');
+    expect(chartContainer.style.cursor).toBe('pointer');
 
     eventManagerInstances[0]?.callbacks.onCursorChange?.('pointer');
-    expect(chartContainer.style.cursor).toBe('grab');
+    expect(chartContainer.style.cursor).toBe('pointer');
 
     core.dispose();
   });
