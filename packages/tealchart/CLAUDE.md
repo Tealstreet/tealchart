@@ -166,6 +166,7 @@ When adding features like TP/SL drag preview, crosshair improvements, or new lin
 - Gap detection has exponential backoff — don't remove the debounce
 - Generated Konva layers must Z-order correctly: canvas → price lines → context menu
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
+- TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.
 - All crosshair rendering is canvas-drawn (+ button, price label, time label) — zero DOM mutations for performance
 - Event handlers (mousemove, drag, touch) defer all processing to RAF — event handler itself is near-zero cost
 - `style.cursor` writes are guarded (`this.cursor !== cursor`) to avoid triggering style recalculation
