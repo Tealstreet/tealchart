@@ -618,6 +618,23 @@ export class ChartCore {
 
   // RAF for full renders
   private rafId: number | null = null;
+
+  private applyCursor(cursor: string): void {
+    const nextCursor = this.priceLineManager?.isDragging() && cursor !== 'grabbing' ? 'grabbing' : cursor;
+    const wasDragging = this.cursor === 'grabbing';
+
+    this.cursor = nextCursor;
+    this.chartContainer.style.cursor = nextCursor;
+    if (this.stage) {
+      this.stage.container().style.cursor = nextCursor;
+    }
+
+    if (nextCursor === 'grabbing' || wasDragging) {
+      this.crosshair.visible = false;
+      this.renderCrosshairOverlay();
+    }
+  }
+
   constructor(options: ChartCoreOptions) {
     this.options = options;
     this.container = options.container;
@@ -733,18 +750,7 @@ export class ChartCore {
             this.renderCrosshairOverlay();
           },
           fontFamily: this.renderer.font,
-          onCursorChange: (cursor) => {
-            const wasDragging = this.cursor === 'grabbing';
-            this.cursor = cursor;
-            this.chartContainer.style.cursor = cursor;
-            if (this.stage) {
-              this.stage.container().style.cursor = cursor;
-            }
-            if (cursor === 'grabbing' || wasDragging) {
-              this.crosshair.visible = false;
-              this.renderCrosshairOverlay();
-            }
-          },
+          onCursorChange: (cursor) => this.applyCursor(cursor),
         });
       }
     }
@@ -877,18 +883,11 @@ export class ChartCore {
           const wantCursor =
             overPlus || this.isOverUnlockedUserDrawing(this.crosshair.x, this.crosshair.y) ? 'pointer' : 'crosshair';
           if (this.cursor !== wantCursor) {
-            this.cursor = wantCursor;
-            this.chartContainer.style.cursor = wantCursor;
+            this.applyCursor(wantCursor);
           }
         }
       },
-      onCursorChange: (cursor) => {
-        this.cursor = cursor;
-        this.chartContainer.style.cursor = cursor;
-        if (this.stage) {
-          this.stage.container().style.cursor = cursor;
-        }
-      },
+      onCursorChange: (cursor) => this.applyCursor(cursor),
       onPaneDoubleClick: (paneId, point) => {
         if (!this.viewport) return;
         this.options.onPaneDoubleClick?.(paneId, point, this.getUserDrawingSpaces(this.viewport));

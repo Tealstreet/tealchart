@@ -8,6 +8,7 @@ import type {
   UserDrawingTool,
 } from '../drawings';
 
+import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
@@ -20,6 +21,7 @@ interface EventManagerCallbackProbe {
   onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
   onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
   onDrawingDragCancel?: (source: 'mouse' | 'touch') => void;
+  onCursorChange?: (cursor: string) => void;
 }
 
 const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe }>);
@@ -102,12 +104,8 @@ interface CountdownManagerProbe {
   countdownTextNodes: Map<string, Array<{ targetTime: number }>>;
 }
 
-interface CachedGroupProbe {
-  getAttr(name: string): unknown;
-}
-
 interface PriceLineManagerProbe {
-  cachedLineGroups: Map<string, CachedGroupProbe>;
+  cachedLineGroups: Map<string, Konva.Group>;
   options: { fontFamily?: string };
 }
 
@@ -1136,6 +1134,68 @@ describe('ChartCore viewport management', () => {
 
     expect(refs.priceAxisRect?.listening()).toBe(false);
     expect(refs.priceAxisPrimaryText?.listening()).toBe(false);
+    core.dispose();
+  });
+
+  it('keeps the grabbing cursor while EventManager hover processing runs during order drags', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+    });
+
+    core.setBars(makeBars(5));
+    core.setOrderLines([
+      {
+        id: 'order-cursor',
+        price: 50010,
+        lineColor: '#ff0000',
+        lineStyle: 2,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        editable: true,
+        cancellable: true,
+        partialEnabled: false,
+        brackets: null,
+        text: 'Limit',
+        textShort: 'Lmt',
+        quantity: '1',
+        quantityShort: '1',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#ff0000',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#ff0000',
+        cancelButtonBackgroundColor: '#111111',
+        cancelButtonIconColor: '#ffffff',
+        cancelButtonBorderColor: '#ff0000',
+        cancelTooltip: 'Cancel',
+        modifyTooltip: 'Modify',
+        callbacks: {},
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const chartContainer = container.firstElementChild as HTMLElement;
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    const lineGroup = manager.cachedLineGroups.get('order-cursor');
+    const draggableRects = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) as
+      Konva.Rect[] | undefined;
+    const orderDragRect = draggableRects?.[0];
+
+    expect(orderDragRect).toBeDefined();
+
+    orderDragRect!.fire('dragstart');
+    expect(chartContainer.style.cursor).toBe('grabbing');
+
+    eventManagerInstances[0]?.callbacks.onCursorChange?.('crosshair');
+    expect(chartContainer.style.cursor).toBe('grabbing');
+
+    orderDragRect!.fire('dragend');
+    expect(chartContainer.style.cursor).toBe('crosshair');
     core.dispose();
   });
 });
