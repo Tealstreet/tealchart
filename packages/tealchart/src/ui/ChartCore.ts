@@ -623,8 +623,8 @@ export class ChartCore {
     let nextCursor = cursor;
     if (this.priceLineManager?.isDragging() && cursor !== 'grabbing') {
       nextCursor = 'grabbing';
-    } else if (cursor === 'pointer' && this.cursor === 'grab' && this.isOverKonvaDraggableElement(this.crosshair.x, this.crosshair.y)) {
-      nextCursor = 'grab';
+    } else if (cursor === 'pointer' || cursor === 'crosshair') {
+      nextCursor = this.getKonvaCursorAt(this.crosshair.x, this.crosshair.y) ?? cursor;
     }
     const wasDragging = this.cursor === 'grabbing';
 
@@ -1190,10 +1190,19 @@ export class ChartCore {
     return hit !== null && hit.listening();
   }
 
-  private isOverKonvaDraggableElement(x: number, y: number): boolean {
-    if (!this.stage) return false;
+  private getKonvaCursorAt(x: number, y: number): string | null {
+    if (!this.stage) return null;
     const hit = this.stage.getIntersection({ x, y });
-    return hit !== null && hit.listening() && hit.draggable();
+    if (hit === null || !hit.listening()) return null;
+
+    let node: Konva.Node | null = hit;
+    while (node && node !== this.stage) {
+      const cursor = node.getAttr('tealchartCursor');
+      if (typeof cursor === 'string') return cursor;
+      if (node.draggable()) return 'grab';
+      node = node.getParent();
+    }
+    return null;
   }
 
   /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */

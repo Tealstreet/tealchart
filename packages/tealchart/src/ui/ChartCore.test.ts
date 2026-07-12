@@ -1258,7 +1258,7 @@ describe('ChartCore viewport management', () => {
 
     eventManagerInstances[0]?.callbacks.onCrossHairMoved?.(123, 234);
     eventManagerInstances[0]?.callbacks.onCursorChange?.('pointer');
-    expect(chartContainer.style.cursor).toBe('pointer');
+    expect(chartContainer.style.cursor).toBe('grab');
 
     orderDragRect!.fire('mouseenter');
     expect(chartContainer.style.cursor).toBe('grab');
