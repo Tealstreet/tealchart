@@ -757,7 +757,7 @@ export class PriceLineManager {
         draggable: true,
         listening: true, // Explicitly enable listening
       });
-      dragRect.setAttr('tealchartCursor', 'grab');
+      dragRect.setAttr('tealchartCursor', 'pointer');
       dragRect.dragDistance(0);
 
       let dragStartY = 0;
@@ -822,7 +822,7 @@ export class PriceLineManager {
         this.options.onCursorChange?.('crosshair');
       });
 
-      dragRect.on('mouseenter', () => this.options.onCursorChange?.('grab'));
+      dragRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
       dragRect.on('mouseleave', () => {
         if (!this.activeDrag) {
           this.options.onCursorChange?.('crosshair');
