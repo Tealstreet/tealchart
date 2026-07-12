@@ -167,7 +167,7 @@ When adding features like TP/SL drag preview, crosshair improvements, or new lin
 - Generated Konva layers must Z-order correctly: canvas → price lines → context menu
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
 - TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.
-- Cursor writes are centralized through `ChartCore.applyCursor`; active Konva line drags must keep `grabbing` even when EventManager hover processing sees crosshair/pointer underneath.
+- Cursor writes are centralized through `ChartCore.applyCursor`; active Konva line drags must keep `grabbing`, and draggable line hovers must keep `grab`, even when EventManager hover processing sees crosshair/pointer underneath.
 - All crosshair rendering is canvas-drawn (+ button, price label, time label) — zero DOM mutations for performance
 - Event handlers (mousemove, drag, touch) defer all processing to RAF — event handler itself is near-zero cost
 - `style.cursor` writes are guarded (`this.cursor !== cursor`) to avoid triggering style recalculation

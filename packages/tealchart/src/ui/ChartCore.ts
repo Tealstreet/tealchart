@@ -620,7 +620,12 @@ export class ChartCore {
   private rafId: number | null = null;
 
   private applyCursor(cursor: string): void {
-    const nextCursor = this.priceLineManager?.isDragging() && cursor !== 'grabbing' ? 'grabbing' : cursor;
+    let nextCursor = cursor;
+    if (this.priceLineManager?.isDragging() && cursor !== 'grabbing') {
+      nextCursor = 'grabbing';
+    } else if (cursor === 'pointer' && this.cursor === 'grab' && this.isOverKonvaDraggableElement(this.crosshair.x, this.crosshair.y)) {
+      nextCursor = 'grab';
+    }
     const wasDragging = this.cursor === 'grabbing';
 
     this.cursor = nextCursor;
@@ -1183,6 +1188,12 @@ export class ChartCore {
     if (!this.stage) return false;
     const hit = this.stage.getIntersection({ x, y });
     return hit !== null && hit.listening();
+  }
+
+  private isOverKonvaDraggableElement(x: number, y: number): boolean {
+    if (!this.stage) return false;
+    const hit = this.stage.getIntersection({ x, y });
+    return hit !== null && hit.listening() && hit.draggable();
   }
 
   /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */
