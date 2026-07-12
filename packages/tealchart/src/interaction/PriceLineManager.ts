@@ -757,6 +757,7 @@ export class PriceLineManager {
         draggable: true,
         listening: true, // Explicitly enable listening
       });
+      dragRect.setAttr('tealchartCursor', 'grab');
       dragRect.dragDistance(0);
 
       let dragStartY = 0;
@@ -950,6 +951,7 @@ export class PriceLineManager {
             draggable: true,
             listening: true,
           });
+          hitRect.setAttr('tealchartCursor', 'pointer');
           hitRect.dragDistance(0);
           const buttonType = button.type;
           const originalX = currentX;
@@ -1098,6 +1100,7 @@ export class PriceLineManager {
             fill: 'rgba(0, 0, 0, 0.01)',
             listening: true,
           });
+          hitRect.setAttr('tealchartCursor', 'pointer');
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
@@ -1137,6 +1140,7 @@ export class PriceLineManager {
             fill: 'rgba(0, 0, 0, 0.01)',
             listening: true,
           });
+          hitRect.setAttr('tealchartCursor', 'pointer');
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
