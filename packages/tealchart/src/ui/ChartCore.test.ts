@@ -21,6 +21,7 @@ interface EventManagerCallbackProbe {
   onDrawingDragMove?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
   onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
   onDrawingDragCancel?: (source: 'mouse' | 'touch') => void;
+  onCrossHairMoved?: (x: number, y: number) => void;
   onCursorChange?: (cursor: string) => void;
 }
 
@@ -1196,6 +1197,75 @@ describe('ChartCore viewport management', () => {
 
     orderDragRect!.fire('dragend');
     expect(chartContainer.style.cursor).toBe('crosshair');
+    core.dispose();
+  });
+
+  it('keeps the grab cursor while EventManager hover processing runs over draggable order lines', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+    });
+
+    core.setBars(makeBars(5));
+    core.setOrderLines([
+      {
+        id: 'order-hover-cursor',
+        price: 50010,
+        lineColor: '#ff0000',
+        lineStyle: 2,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        editable: true,
+        cancellable: true,
+        partialEnabled: false,
+        brackets: null,
+        text: 'Limit',
+        textShort: 'Lmt',
+        quantity: '1',
+        quantityShort: '1',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#ff0000',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#ff0000',
+        cancelButtonBackgroundColor: '#111111',
+        cancelButtonIconColor: '#ffffff',
+        cancelButtonBorderColor: '#ff0000',
+        cancelTooltip: 'Cancel',
+        modifyTooltip: 'Modify',
+        callbacks: {},
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const chartContainer = container.firstElementChild as HTMLElement;
+    const probe = core as unknown as { priceLineManager: PriceLineManagerProbe; stage: Konva.Stage };
+    const lineGroup = probe.priceLineManager.cachedLineGroups.get('order-hover-cursor');
+    const draggableRects = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) as
+      Konva.Rect[] | undefined;
+    const orderDragRect = draggableRects?.[0];
+
+    expect(orderDragRect).toBeDefined();
+
+    const originalGetIntersection = probe.stage.getIntersection.bind(probe.stage);
+    vi.spyOn(probe.stage, 'getIntersection').mockImplementation((pos) => {
+      return pos.x === 123 && pos.y === 234 ? orderDragRect! : originalGetIntersection(pos);
+    });
+
+    eventManagerInstances[0]?.callbacks.onCrossHairMoved?.(123, 234);
+    eventManagerInstances[0]?.callbacks.onCursorChange?.('pointer');
+    expect(chartContainer.style.cursor).toBe('pointer');
+
+    orderDragRect!.fire('mouseenter');
+    expect(chartContainer.style.cursor).toBe('grab');
+
+    eventManagerInstances[0]?.callbacks.onCursorChange?.('pointer');
+    expect(chartContainer.style.cursor).toBe('grab');
+
     core.dispose();
   });
 });
