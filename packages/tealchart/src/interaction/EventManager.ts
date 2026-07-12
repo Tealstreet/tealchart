@@ -361,6 +361,26 @@ export class EventManager {
     return this.state.isDragging;
   }
 
+  private getActiveDragCursor(): string | null {
+    switch (this.state.dragMode) {
+      case 'pan':
+      case 'drawing':
+        return 'grabbing';
+      case 'priceAxisZoom':
+      case 'paneDivider':
+        return 'ns-resize';
+      default:
+        return null;
+    }
+  }
+
+  private applyActiveDragCursor(): void {
+    const cursor = this.getActiveDragCursor();
+    if (cursor) {
+      this.callbacks.onCursorChange?.(cursor);
+    }
+  }
+
   /**
    * Dispose and remove all event listeners
    */
@@ -480,7 +500,7 @@ export class EventManager {
       this.state.dragMode = 'drawing';
       this.state.dragStartX = x;
       this.state.dragStartY = y;
-      this.callbacks.onCursorChange?.('move');
+      this.applyActiveDragCursor();
       this.attachWindowDragListeners();
       this.scheduleRender();
       e.preventDefault();
@@ -562,7 +582,7 @@ export class EventManager {
     this._pendingMouseDrawingDragOptions = drawingDragOptions;
     this.attachPointerDragListeners();
     if (drawingDragStarted) {
-      this.callbacks.onCursorChange?.('move');
+      this.applyActiveDragCursor();
       this.scheduleRender();
     }
     e.preventDefault();
@@ -711,6 +731,7 @@ export class EventManager {
 
     // Handle pane divider dragging
     if (this.state.dragMode === 'paneDivider') {
+      this.applyActiveDragCursor();
       this.handlePaneDividerDrag(y);
       return;
     }
@@ -723,7 +744,7 @@ export class EventManager {
       const moveOptions = this._pendingMouseDrawingDragOptions;
       if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', startOptions)) {
         this.state.dragMode = 'drawing';
-        this.callbacks.onCursorChange?.('move');
+        this.applyActiveDragCursor();
         invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', moveOptions);
         this.scheduleRender();
       }
@@ -731,6 +752,7 @@ export class EventManager {
     }
 
     if (this.state.dragMode === 'drawing') {
+      this.applyActiveDragCursor();
       invokeDrawingDragCallback(
         this.callbacks.onDrawingDragMove,
         x,
@@ -748,12 +770,14 @@ export class EventManager {
     const dy = y - this.state.dragStartY;
 
     if (this.state.dragMode === 'pan') {
+      this.applyActiveDragCursor();
       this.handlePan(dx, dy);
       // Update crosshair to follow data during pan
       this.crosshair.x = this.state.dragStartCrosshairX + dx;
       this.crosshair.y = this.state.dragStartCrosshairY + dy;
       this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
     } else if (this.state.dragMode === 'priceAxisZoom') {
+      this.applyActiveDragCursor();
       this.handlePriceAxisZoom(dy);
     }
     // handlePan/handlePriceAxisZoom call onViewportChange(Internal) which schedules render
