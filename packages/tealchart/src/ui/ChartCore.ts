@@ -34,7 +34,7 @@ import type {
 import Konva from 'konva';
 
 import { EventManager } from '../interaction/EventManager';
-import { computePaneGeometry } from '../layout/chartGeometry';
+import { computePaneGeometry, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { dedupeBarsByTime } from '../utils/dedupeBars';
 import {
   getUserDrawingPlacementMode,
@@ -261,6 +261,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
     3: 'dashed',
     4: 'dotted',
   };
+  const lineColor = order.lineColor;
 
   const chartLabel: ChartLineLabel = {
     offsetPercent: order.lineLength,
@@ -270,9 +271,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               text: order.text,
               textShort: order.textShort || undefined,
-              backgroundColor: order.bodyBackgroundColor,
+              backgroundColor: lineColor,
               textColor: order.bodyTextColor,
-              borderColor: order.bodyBorderColor,
+              borderColor: lineColor,
             },
           ]
         : []),
@@ -281,9 +282,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               text: order.quantity,
               textShort: order.quantityShort || undefined,
-              backgroundColor: order.quantityBackgroundColor,
+              backgroundColor: lineColor,
               textColor: order.quantityTextColor,
-              borderColor: order.quantityBorderColor,
+              borderColor: lineColor,
             },
           ]
         : []),
@@ -294,9 +295,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               type: 'tp' as const,
               icon: 'TP',
-              backgroundColor: order.bodyBackgroundColor,
-              iconColor: '#22c55e',
-              borderColor: '#22c55e',
+              backgroundColor: lineColor,
+              iconColor: order.bodyTextColor,
+              borderColor: lineColor,
               tooltip: 'Drag to set Take Profit',
             },
           ]
@@ -306,9 +307,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               type: 'sl' as const,
               icon: 'SL',
-              backgroundColor: order.bodyBackgroundColor,
-              iconColor: '#f97316',
-              borderColor: '#f97316',
+              backgroundColor: lineColor,
+              iconColor: order.bodyTextColor,
+              borderColor: lineColor,
               tooltip: 'Drag to set Stop Loss',
             },
           ]
@@ -318,9 +319,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               type: 'cancel' as const,
               icon: '×',
-              backgroundColor: order.cancelButtonBackgroundColor,
+              backgroundColor: lineColor,
               iconColor: order.cancelButtonIconColor,
-              borderColor: order.cancelButtonBorderColor,
+              borderColor: lineColor,
               tooltip: order.cancelTooltip,
             },
           ]
@@ -341,7 +342,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
     draggable: order.editable,
     label: {
       primaryText: formatPrice(order.price),
-      backgroundColor: order.bodyBackgroundColor,
+      backgroundColor: lineColor,
       textColor: order.bodyTextColor,
     },
     chartLabel,
@@ -365,10 +366,11 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
 
   let pnlStateColor: string | undefined;
   if (position.profitState === 'positive') {
-    pnlStateColor = '#26a69a';
+    pnlStateColor = '#22c55e';
   } else if (position.profitState === 'negative') {
     pnlStateColor = '#ef5350';
   }
+  const lineColor = position.lineColor;
 
   const chartLabel: ChartLineLabel = {
     offsetPercent: position.lineLength,
@@ -378,9 +380,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               text: position.text,
               textShort: position.textShort || undefined,
-              backgroundColor: position.bodyBackgroundColor,
+              backgroundColor: lineColor,
               textColor: position.bodyTextColor,
-              borderColor: position.bodyBorderColor,
+              borderColor: lineColor,
             },
           ]
         : []),
@@ -389,9 +391,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               text: position.quantity,
               textShort: position.quantityShort || undefined,
-              backgroundColor: position.quantityBackgroundColor,
+              backgroundColor: lineColor,
               textColor: position.quantityTextColor,
-              borderColor: position.quantityBorderColor,
+              borderColor: lineColor,
             },
           ]
         : []),
@@ -400,9 +402,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               text: position.pnl,
               textShort: position.pnlShort || undefined,
-              backgroundColor: pnlStateColor ?? position.bodyBackgroundColor,
+              backgroundColor: pnlStateColor ?? lineColor,
               textColor: position.bodyTextColor,
-              borderColor: pnlStateColor ?? position.bodyBorderColor,
+              borderColor: pnlStateColor ?? lineColor,
             },
           ]
         : []),
@@ -413,9 +415,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               type: 'tp' as const,
               icon: 'TP',
-              backgroundColor: position.bodyBackgroundColor,
-              iconColor: '#22c55e',
-              borderColor: '#22c55e',
+              backgroundColor: lineColor,
+              iconColor: position.bodyTextColor,
+              borderColor: lineColor,
               tooltip: 'Drag to set Take Profit',
             },
           ]
@@ -425,9 +427,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               type: 'sl' as const,
               icon: 'SL',
-              backgroundColor: position.bodyBackgroundColor,
-              iconColor: '#f97316',
-              borderColor: '#f97316',
+              backgroundColor: lineColor,
+              iconColor: position.bodyTextColor,
+              borderColor: lineColor,
               tooltip: 'Drag to set Stop Loss',
             },
           ]
@@ -437,9 +439,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               type: 'reverse' as const,
               icon: '↩',
-              backgroundColor: position.reverseButtonBackgroundColor,
+              backgroundColor: lineColor,
               iconColor: position.reverseButtonIconColor,
-              borderColor: position.reverseButtonBorderColor,
+              borderColor: lineColor,
             },
           ]
         : []),
@@ -448,9 +450,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               type: 'close' as const,
               icon: '×',
-              backgroundColor: position.closeButtonBackgroundColor,
+              backgroundColor: lineColor,
               iconColor: position.closeButtonIconColor,
-              borderColor: position.closeButtonBorderColor,
+              borderColor: lineColor,
               tooltip: position.closeTooltip,
             },
           ]
@@ -471,7 +473,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     draggable: false,
     label: {
       primaryText: formatPrice(position.price),
-      backgroundColor: position.bodyBackgroundColor,
+      backgroundColor: lineColor,
       textColor: position.bodyTextColor,
     },
     chartLabel,
@@ -755,6 +757,8 @@ export class ChartCore {
             this.renderCrosshairOverlay();
           },
           fontFamily: this.renderer.font,
+          chartLabelMinX:
+            WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 2,
           onCursorChange: (cursor) => this.applyCursor(cursor),
         });
       }

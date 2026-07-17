@@ -123,7 +123,7 @@ Implements TradingView-compatible interfaces:
 
 Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the full string but stored internally as the clean symbol (`BTCUSDT`), including during initial widget construction. A prefix change with the same clean symbol must still reload data so adapters that key by `EXCHANGE:SYMBOL` get fresh symbol info and subscriptions.
 
-Position line body, quantity, and action-button colors represent position side; PnL must be passed separately with `setPnl` / `setProfitState` so web canvas/Konva and mobile Skia can color profit/loss independently of long/short side.
+Order and position trading-line labels derive their body, quantity, price-label, and action-button colors from `lineColor`. Defaults are blue for buy/unspecified lines and red should be supplied by consumers for sell/short lines. PnL must be passed separately with `setPnl` / `setProfitState`; it is the only label segment that flips to profit/loss color independently of `lineColor`.
 
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
@@ -170,6 +170,7 @@ When adding features like TP/SL drag preview, crosshair improvements, or new lin
 - Gap detection has exponential backoff — don't remove the debounce
 - Generated Konva layers must Z-order correctly: canvas → price lines → context menu
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
+- Trading-line labels and line segments must be clamped after the overlaid left drawing rail (`leftToolRailInset + leftToolRailWidth`) in both web and mobile paths. Do not place labels or left-extending line segments at raw `margins.left`.
 - TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.
 - Cursor writes are centralized through `ChartCore.applyCursor`; active Konva line drags must keep `grabbing`, and Konva hit targets set `tealchartCursor` (`pointer` for order-label drag handles and buttons) so EventManager hover processing cannot overwrite the intended cursor.
 - All crosshair rendering is canvas-drawn (+ button, price label, time label) — zero DOM mutations for performance

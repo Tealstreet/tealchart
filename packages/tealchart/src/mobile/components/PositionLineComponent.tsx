@@ -17,6 +17,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
+import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
 
@@ -46,8 +47,6 @@ export interface PositionLineComponentProps {
 const TOUCH_TARGET_HEIGHT = 44;
 const LABEL_HEIGHT = 18;
 const TP_SL_BUTTON_WIDTH = 24;
-const TP_COLOR = '#22c55e'; // Green for take profit
-const SL_COLOR = '#f97316'; // Orange for stop loss
 
 export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   position,
@@ -266,11 +265,20 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   }, [position.lineStyle]);
 
   // Calculate label positioning based on lineLength
+  const lineStartX = useMemo(
+    () =>
+      Math.max(
+        dimensions.margins.left,
+        MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 2,
+      ),
+    [dimensions.margins.left],
+  );
   const labelX = useMemo(() => {
     const maxLabelX = dimensions.width - dimensions.margins.right - 150;
-    const minLabelX = dimensions.margins.left;
+    const minLabelX = lineStartX;
     return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength)) / 100;
-  }, [position.lineLength, dimensions]);
+  }, [position.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
+  const lineColor = position.lineColor;
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? position.textShort : position.text;
@@ -288,9 +296,9 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         return undefined;
     }
   }, [position.profitState]);
-  const pnlBackgroundColor = pnlStateColor ?? position.bodyBackgroundColor;
-  const pnlBorderColor = pnlStateColor ?? position.bodyBorderColor;
-  const pnlTextColor = pnlStateColor ? position.bodyTextColor : '#9ca3af';
+  const pnlBackgroundColor = pnlStateColor ?? lineColor;
+  const pnlBorderColor = pnlStateColor ?? lineColor;
+  const pnlTextColor = position.bodyTextColor;
 
   // Format price for display
   const formattedPrice = safeToFixed(position.price, pricePrecision);
@@ -306,10 +314,10 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           style={[
             styles.lineSegment,
             {
-              left: dimensions.margins.left,
-              width: labelX - dimensions.margins.left - 2,
+              left: lineStartX,
+              width: Math.max(0, labelX - lineStartX - 2),
               top: TOUCH_TARGET_HEIGHT / 2,
-              borderBottomColor: position.lineColor,
+              borderBottomColor: lineColor,
               borderBottomWidth: position.lineWidth,
               borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
             },
@@ -332,8 +340,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: position.bodyBackgroundColor,
-              borderColor: position.bodyBorderColor,
+              backgroundColor: lineColor,
+              borderColor: lineColor,
               borderTopLeftRadius: 2,
               borderBottomLeftRadius: 2,
             },
@@ -347,8 +355,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: position.quantityBackgroundColor,
-              borderColor: position.quantityBorderColor,
+              backgroundColor: lineColor,
+              borderColor: lineColor,
               borderLeftWidth: 0,
             },
           ]}
@@ -380,14 +388,14 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: '#1e222d',
-                      borderColor: TP_COLOR,
+                      backgroundColor: lineColor,
+                      borderColor: lineColor,
                       borderTopLeftRadius: 2,
                       borderBottomLeftRadius: 2,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: TP_COLOR }]}>TP</Text>
+                  <Text style={[styles.bracketButtonText, { color: position.bodyTextColor }]}>TP</Text>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
@@ -399,15 +407,15 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: '#1e222d',
-                      borderColor: SL_COLOR,
+                      backgroundColor: lineColor,
+                      borderColor: lineColor,
                       borderTopRightRadius: 2,
                       borderBottomRightRadius: 2,
                       borderLeftWidth: 0,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: SL_COLOR }]}>SL</Text>
+                  <Text style={[styles.bracketButtonText, { color: position.bodyTextColor }]}>SL</Text>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
@@ -421,8 +429,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             style={({ pressed }) => [
               styles.actionButton,
               {
-                backgroundColor: position.closeButtonBackgroundColor,
-                borderColor: position.closeButtonBorderColor,
+                backgroundColor: lineColor,
+                borderColor: lineColor,
                 opacity: pressed ? 0.7 : 1,
                 borderTopRightRadius: position.reversible ? 0 : 2,
                 borderBottomRightRadius: position.reversible ? 0 : 2,
@@ -441,8 +449,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             style={({ pressed }) => [
               styles.actionButton,
               {
-                backgroundColor: position.reverseButtonBackgroundColor,
-                borderColor: position.reverseButtonBorderColor,
+                backgroundColor: lineColor,
+                borderColor: lineColor,
                 borderLeftWidth: 0,
                 opacity: pressed ? 0.7 : 1,
                 borderTopRightRadius: 2,
@@ -464,7 +472,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             left: labelX + 180, // After label
             right: dimensions.margins.right + 60,
             top: TOUCH_TARGET_HEIGHT / 2,
-            borderBottomColor: position.lineColor,
+            borderBottomColor: lineColor,
             borderBottomWidth: position.lineWidth,
             borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
           },
@@ -478,8 +486,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           {
             right: 4,
             top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT * 1.2) / 2,
-            backgroundColor: position.bodyBackgroundColor,
-            borderColor: position.lineColor,
+            backgroundColor: lineColor,
+            borderColor: lineColor,
           },
         ]}
       >

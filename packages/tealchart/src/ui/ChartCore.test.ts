@@ -114,6 +114,8 @@ interface LineContentRefsProbe {
   priceAxisRect?: { listening(): boolean };
   priceAxisPrimaryText?: { listening(): boolean };
   priceAxisSecondaryText?: { listening(): boolean };
+  segmentRects?: Array<{ fill(): string; x(): number }>;
+  buttonRects?: Array<{ fill(): string }>;
 }
 
 // ============================================================================
@@ -875,7 +877,7 @@ describe('ChartCore viewport management', () => {
         id: 'position-1',
         positionId: 'position-1',
         price: 50010,
-        lineColor: '#26a69a',
+        lineColor: '#2196F3',
         lineStyle: 0,
         lineLength: 100,
         extendLeft: true,
@@ -915,6 +917,43 @@ describe('ChartCore viewport management', () => {
         },
         callbacks: {},
       },
+      {
+        id: 'position-2',
+        positionId: 'position-2',
+        price: 50020,
+        lineColor: '#ef5350',
+        lineStyle: 0,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        text: 'Short',
+        textShort: 'Shrt',
+        quantity: '1 BTC',
+        quantityShort: '1',
+        pnl: '$12.50',
+        pnlShort: '12',
+        profitState: 'positive',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#111111',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#111111',
+        reverseButtonBackgroundColor: '#111111',
+        reverseButtonIconColor: '#ffffff',
+        reverseButtonBorderColor: '#111111',
+        closeButtonBackgroundColor: '#111111',
+        closeButtonIconColor: '#ffffff',
+        closeButtonBorderColor: '#111111',
+        closeTooltip: 'Close',
+        protectTooltipText: 'Protect',
+        partialEnabled: false,
+        reversible: false,
+        closeable: false,
+        brackets: null,
+        positionData: null,
+        callbacks: {},
+      },
     ]);
     core.paint(0xff);
 
@@ -931,13 +970,42 @@ describe('ChartCore viewport management', () => {
       textColor: '#ffffff',
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
-      backgroundColor: '#26a69a',
-      borderColor: '#26a69a',
+      backgroundColor: '#2196F3',
+      borderColor: '#2196F3',
+    });
+    expect(bound.chartLabel?.segments.find((segment) => segment.text === '1 BTC')).toMatchObject({
+      backgroundColor: '#2196F3',
+      borderColor: '#2196F3',
     });
     expect(bound.chartLabel?.buttons?.find((button) => button.type === 'close')).toMatchObject({
-      backgroundColor: '#26a69a',
-      borderColor: '#26a69a',
+      backgroundColor: '#2196F3',
+      borderColor: '#2196F3',
       iconColor: '#ffffff',
+    });
+    expect(bound.chartLabel?.buttons?.find((button) => button.type === 'reverse')).toMatchObject({
+      backgroundColor: '#2196F3',
+      borderColor: '#2196F3',
+      iconColor: '#ffffff',
+    });
+    const refs = manager.cachedLineGroups.get('position-1')?.getAttr('contentRefs') as LineContentRefsProbe;
+    expect(refs.segmentRects?.[0]?.fill()).toBe('#2196F3');
+    expect(refs.segmentRects?.[1]?.fill()).toBe('#2196F3');
+    expect(refs.segmentRects?.[2]?.fill()).toBe('#ef5350');
+    expect(refs.buttonRects?.[0]?.fill()).toBe('#2196F3');
+    expect(refs.segmentRects?.[0]?.x()).toBeGreaterThanOrEqual(60);
+
+    const positiveBound = manager.cachedLineGroups.get('position-2')?.getAttr('boundData') as {
+      chartLabel?: {
+        segments: Array<{ text: string; backgroundColor: string; borderColor: string }>;
+      };
+    };
+    expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === 'Short')).toMatchObject({
+      backgroundColor: '#ef5350',
+      borderColor: '#ef5350',
+    });
+    expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
+      backgroundColor: '#22c55e',
+      borderColor: '#22c55e',
     });
     expect(core.getViewport()).not.toBeNull();
     core.dispose();
@@ -1156,6 +1224,10 @@ describe('ChartCore viewport management', () => {
 
     expect(refs.priceAxisRect?.listening()).toBe(false);
     expect(refs.priceAxisPrimaryText?.listening()).toBe(false);
+    expect(refs.segmentRects?.[0]?.fill()).toBe('#ff0000');
+    expect(refs.segmentRects?.[1]?.fill()).toBe('#ff0000');
+    expect(refs.buttonRects?.[0]?.fill()).toBe('#ff0000');
+    expect(refs.segmentRects?.[0]?.x()).toBeGreaterThanOrEqual(60);
     core.dispose();
   });
 
