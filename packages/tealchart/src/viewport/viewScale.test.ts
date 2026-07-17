@@ -90,6 +90,16 @@ describe('intervalToMs', () => {
     expect(intervalToMs('unknown')).toBe(3_600_000);
     expect(intervalToMs('')).toBe(3_600_000);
   });
+
+  it('accepts numeric legacy resolutions', () => {
+    expect(intervalToMs(60)).toBe(3_600_000);
+    expect(intervalToMs(15)).toBe(900_000);
+  });
+
+  it('falls back for nullish resolutions', () => {
+    expect(intervalToMs(null)).toBe(3_600_000);
+    expect(intervalToMs(undefined)).toBe(3_600_000);
+  });
 });
 
 // ---------------------------------------------------------------------------

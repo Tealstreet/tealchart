@@ -717,6 +717,10 @@ export interface LibrarySymbolInfo {
   supported_resolutions?: ResolutionString[];
 }
 
+export interface SymbolExt extends LibrarySymbolInfo {
+  symbol: string;
+}
+
 /**
  * Period params for getBars
  */
@@ -733,8 +737,8 @@ export interface PeriodParams {
 export interface TealchartWidgetOptions {
   container: HTMLElement;
   symbol: string;
-  /** Initial interval. If omitted, uses persisted per-chart value from localStorage. */
-  interval?: ResolutionString;
+  /** Initial interval. Numeric legacy values are stringified; null/empty values use the persisted/default interval. */
+  interval?: ResolutionString | number | null;
   datafeed: IBasicDataFeed;
   /** Initial render options applied before overrides and symbol metadata. */
   renderOptions?: Partial<RenderOptions>;

@@ -14,6 +14,7 @@ import type { Bar, IBasicDataFeed, LibrarySymbolInfo, ResolutionString, UnifiedP
 
 import { EventEmitter } from '../events/EventEmitter';
 import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
+import { normalizeResolution, type ResolutionInput } from '../utils/normalizeResolution';
 import { PaneManager } from '../rendering/PaneManager';
 
 // Use generic PlotOutput type to avoid import issues across platforms
@@ -79,7 +80,7 @@ export interface ChartWidgetCoreOptions {
   symbol: string;
 
   // Optional
-  interval?: string;
+  interval?: ResolutionInput;
 
   // Platform-specific injections
   indicatorManager?: IIndicatorManager;
@@ -138,7 +139,7 @@ export class ChartWidgetCore {
   constructor(options: ChartWidgetCoreOptions) {
     this._datafeed = options.datafeed;
     this._symbol = options.symbol;
-    this._interval = (options.interval || '1h') as ResolutionString;
+    this._interval = normalizeResolution(options.interval, '1h');
 
     this._onBarsChanged = options.onBarsChanged;
     this._onPlotsChanged = options.onPlotsChanged;
@@ -339,8 +340,9 @@ export class ChartWidgetCore {
     this._onSymbolChange?.(symbol);
   }
 
-  setInterval(interval: string): void {
-    if (this._interval === interval) return;
+  setInterval(interval: ResolutionInput): void {
+    const normalizedInterval = normalizeResolution(interval, this._interval);
+    if (this._interval === normalizedInterval) return;
 
     // Unsubscribe from old
     if (this._barSubscriptionGuid) {
@@ -348,14 +350,14 @@ export class ChartWidgetCore {
       this._barSubscriptionGuid = null;
     }
 
-    this._interval = interval as ResolutionString;
+    this._interval = normalizedInterval;
     // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
     this._setLoading(true);
     this._scheduleRender();
     this._loadBars();
 
-    this._onIntervalChange?.(interval);
+    this._onIntervalChange?.(normalizedInterval);
   }
 
   // ============================================================================

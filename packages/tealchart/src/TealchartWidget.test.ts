@@ -3754,6 +3754,14 @@ describe('TealchartWidget', () => {
       expect(datafeed._resolveSymbolCalls).toContain('BTCUSDT');
     });
 
+    it('initial load resolves prefixed symbols while storing the clean symbol', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed, { symbol: 'BYBITV5:BTCUSDT' });
+
+      expect(widget.symbol()).toBe('BTCUSDT');
+      expect(datafeed._resolveSymbolCalls).toContain('BYBITV5:BTCUSDT');
+    });
+
     it('initial load calls getBars after resolveSymbol', () => {
       const datafeed = createMockDatafeed();
       createWidget(datafeed);
@@ -3905,6 +3913,15 @@ describe('TealchartWidget', () => {
   // Interval Switching
   // ============================================================================
   describe('interval switching', () => {
+    it('accepts numeric legacy intervals from consumers', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed, { interval: 60 });
+      completeInit(datafeed);
+
+      expect(widget.resolution()).toBe('60');
+      expect(datafeed._getBarsCalls[datafeed._getBarsCalls.length - 1].resolution).toBe('60');
+    });
+
     it('setResolution triggers unsubscribeBars', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
@@ -3925,6 +3942,18 @@ describe('TealchartWidget', () => {
       datafeed._resolveSymbolCb?.(defaultSymbolInfo);
       const lastGetBars = datafeed._getBarsCalls[datafeed._getBarsCalls.length - 1];
       expect(lastGetBars.resolution).toBe('15');
+    });
+
+    it('setResolution normalizes numeric legacy intervals before datafeed calls', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      widget.chart().setResolution(15);
+      datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+
+      expect(widget.resolution()).toBe('15');
+      expect(datafeed._getBarsCalls[datafeed._getBarsCalls.length - 1].resolution).toBe('15');
     });
 
     it('widget.resolution() reflects the new interval', () => {
@@ -4121,6 +4150,33 @@ describe('TealchartWidget', () => {
       expect(widget.symbol()).toBe('ETHUSDT');
     });
 
+    it('setSymbol reloads when the exchange prefix changes for the same clean symbol', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed, { symbol: 'BYBITV5:BTCUSDT' });
+      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000), {
+        ...defaultSymbolInfo,
+        name: 'BTCUSDT',
+        full_name: 'BYBITV5:BTCUSDT',
+        ticker: 'BYBITV5:BTCUSDT',
+        exchange: 'BYBITV5',
+      });
+
+      widget.setSymbol('BINANCE:BTCUSDT');
+
+      expect(widget.symbol()).toBe('BTCUSDT');
+      expect(datafeed._resolveSymbolCalls).toContain('BINANCE:BTCUSDT');
+      datafeed._resolveSymbolCb?.({
+        ...defaultSymbolInfo,
+        name: 'BTCUSDT',
+        full_name: 'BINANCE:BTCUSDT',
+        ticker: 'BINANCE:BTCUSDT',
+        exchange: 'BINANCE',
+      });
+      expect(datafeed._getBarsCalls[datafeed._getBarsCalls.length - 1].symbolInfo.full_name).toBe(
+        'BINANCE:BTCUSDT',
+      );
+    });
+
     it('setResolution updates interval and reloads bars', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
@@ -4174,6 +4230,18 @@ describe('TealchartWidget', () => {
       const widget = createWidget(datafeed);
       expect(widget.chart()).toBeDefined();
       expect(widget.activeChart()).toBeDefined();
+    });
+
+    it('activeChart().symbolExt() exposes TradingView-compatible symbol info', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed, undefined, { ...defaultSymbolInfo, name: 'BTCUSDT', exchange: 'BYBITV5' });
+
+      expect(widget.activeChart().symbolExt()).toMatchObject({
+        name: 'BTCUSDT',
+        symbol: 'BTCUSDT',
+        exchange: 'BYBITV5',
+      });
     });
 
     it('chartsCount() returns 1', () => {

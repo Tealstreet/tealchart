@@ -25,9 +25,12 @@ import {
   PositionLineOptions,
   PositionLineRenderData,
   ProfitState,
+  LibrarySymbolInfo,
   ResolutionString,
   StudyInfo,
+  SymbolExt,
 } from './types';
+import { normalizeResolution, type ResolutionInput } from './utils/normalizeResolution';
 import { createSyncPromise } from './utils/syncPromise';
 
 /**
@@ -55,6 +58,7 @@ export class TealchartApi {
   private _symbol: string;
   private _interval: ResolutionString;
   private _account?: string;
+  private _symbolInfo: LibrarySymbolInfo | null = null;
 
   // Subscriptions
   private _crossHairMovedSubscription: Subscription<(params: CrossHairMovedEventParams) => void>;
@@ -80,9 +84,9 @@ export class TealchartApi {
   private _onIntervalChange?: (interval: ResolutionString) => void;
   private _onResetData?: () => void;
 
-  constructor(symbol: string, interval: ResolutionString, account?: string) {
+  constructor(symbol: string, interval: ResolutionInput, account?: string) {
     this._symbol = symbol;
-    this._interval = interval;
+    this._interval = normalizeResolution(interval);
     this._account = account;
 
     this._crossHairMovedSubscription = new Subscription();
@@ -102,11 +106,33 @@ export class TealchartApi {
   }
 
   /**
+   * Get extended symbol info (TradingView compatibility).
+   */
+  symbolExt(): SymbolExt {
+    const symbolInfo = this._symbolInfo;
+    const symbol = ((symbolInfo as { symbol?: string } | null)?.symbol ?? symbolInfo?.name ?? this._symbol) as string;
+
+    return {
+      name: symbolInfo?.name ?? this._symbol,
+      ...symbolInfo,
+      symbol,
+    };
+  }
+
+  /**
+   * Update resolved symbol metadata.
+   */
+  setSymbolInfo(symbolInfo: LibrarySymbolInfo | null): void {
+    this._symbolInfo = symbolInfo;
+  }
+
+  /**
    * Set symbol (triggers onSymbolChanged subscription)
    */
   setSymbol(symbol: string): void {
     if (this._symbol !== symbol) {
       this._symbol = symbol;
+      this._symbolInfo = null;
       this._symbolChangedSubscription.emit();
       this._onSymbolChange?.(symbol);
     }
@@ -122,11 +148,12 @@ export class TealchartApi {
   /**
    * Set interval (triggers onIntervalChanged subscription)
    */
-  setResolution(interval: ResolutionString): void {
-    if (this._interval !== interval) {
-      this._interval = interval;
-      this._intervalChangedSubscription.emit(interval);
-      this._onIntervalChange?.(interval);
+  setResolution(interval: ResolutionInput): void {
+    const normalizedInterval = normalizeResolution(interval, this._interval);
+    if (this._interval !== normalizedInterval) {
+      this._interval = normalizedInterval;
+      this._intervalChangedSubscription.emit(normalizedInterval);
+      this._onIntervalChange?.(normalizedInterval);
     }
   }
 
