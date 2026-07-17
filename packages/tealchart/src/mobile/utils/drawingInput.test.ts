@@ -1,12 +1,9 @@
+import type { DrawingCoordinateSpace, UserDrawingTool } from '../../drawings';
 import type { ChartDimensions, PaneInfo } from './coordinates';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  resolveUserDrawingPlacementConstraint,
-  type DrawingCoordinateSpace,
-  type UserDrawingTool,
-} from '../../drawings';
+import { resolveUserDrawingPlacementConstraint } from '../../drawings';
 import { clearChartStoreCache } from '../../state/chartState';
 import {
   resolveMobileUserDrawingDuplicateEditDragEnabled,
@@ -44,7 +41,12 @@ const panes: PaneInfo[] = [
   },
 ];
 
-function createSpacesByPaneId(viewport: { startTime: number; endTime: number; priceMin: number; priceMax: number }): Map<string, DrawingCoordinateSpace> {
+function createSpacesByPaneId(viewport: {
+  startTime: number;
+  endTime: number;
+  priceMin: number;
+  priceMax: number;
+}): Map<string, DrawingCoordinateSpace> {
   return new Map<string, DrawingCoordinateSpace>(
     panes.map((pane) => [
       pane.id,
@@ -59,7 +61,7 @@ function createSpacesByPaneId(viewport: { startTime: number; endTime: number; pr
           yMax: pane.yMax,
         },
         chartLeft: dimensions.margins.left,
-        chartRight: dimensions.width - dimensions.margins.right,
+        chartRight: dimensions.width,
       },
     ]),
   );
@@ -73,7 +75,7 @@ describe('mobile user drawing input resolver', () => {
   it('normalizes mobile pane info before resolving anchors', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
-        point: { x: 144, y: 180 },
+        point: { x: 164, y: 180 },
         viewport: {
           startTime: 1_000,
           endTime: 3_000,
@@ -94,7 +96,7 @@ describe('mobile user drawing input resolver', () => {
   it('attaches normalized pressure metadata to resolved mobile anchors', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
-        point: { x: 144, y: 180 },
+        point: { x: 164, y: 180 },
         viewport: {
           startTime: 1_000,
           endTime: 3_000,
@@ -161,10 +163,10 @@ describe('mobile user drawing input resolver', () => {
     expect(point?.anchor).not.toEqual({ time: 2_000, price: 105, pressure: 0.4 });
   });
 
-  it('rejects points in mobile chart margins', () => {
+  it('rejects points outside the mobile chart width', () => {
     expect(
       resolveMobileUserDrawingInputPoint({
-        point: { x: 300, y: 180 },
+        point: { x: 320, y: 180 },
         viewport: {
           startTime: 1_000,
           endTime: 3_000,
@@ -257,7 +259,7 @@ describe('mobile user drawing input resolver', () => {
         options: { constrainedPlacement: true },
       });
 
-      expect(constrained.anchor.time).toBeCloseTo(1_588.235294);
+      expect(constrained.anchor.time).toBeCloseTo(1_512.820513);
       expect(constrained.anchor.price).toBeCloseTo(100);
     },
   );
@@ -294,7 +296,7 @@ describe('mobile user drawing input resolver', () => {
       options: { constrainedPlacement: true },
     });
 
-    expect(constrained.anchor.time).toBeCloseTo(1_588.235294);
+    expect(constrained.anchor.time).toBeCloseTo(1_512.820513);
     expect(constrained.anchor.price).toBeCloseTo(105.555555);
   });
 

@@ -12,30 +12,28 @@
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type {
-  CrosshairState as EventCrosshairState,
-  DrawingDragEventOptions,
-  DrawingInputEventOptions,
-  DrawingInputResult,
-  PaneDividerInfo,
-} from '../interaction/EventManager';
-import type { CanvasContext } from '../rendering/CanvasContext';
-import type { DirtyFlags } from '../rendering/RenderScheduler';
-import type { PlotStyleOverride } from '../state/chartState';
-import type {
-  UserDrawingAnchor,
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingAnchor,
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
   UserDrawingState,
 } from '../drawings';
+import type {
+  DrawingDragEventOptions,
+  DrawingInputEventOptions,
+  DrawingInputResult,
+  CrosshairState as EventCrosshairState,
+  PaneDividerInfo,
+} from '../interaction/EventManager';
+import type { CanvasContext } from '../rendering/CanvasContext';
+import type { DirtyFlags } from '../rendering/RenderScheduler';
+import type { PlotStyleOverride } from '../state/chartState';
 
 import Konva from 'konva';
 
-import { EventManager } from '../interaction/EventManager';
-import { computePaneGeometry, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
-import { dedupeBarsByTime } from '../utils/dedupeBars';
+import { STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from '../constants';
 import {
   getUserDrawingPlacementMode,
   hitTestUserDrawings,
@@ -45,7 +43,9 @@ import {
   resolveUserDrawingMagnetInputPoint,
   resolveUserDrawingPlacementConstraint,
 } from '../drawings';
+import { EventManager } from '../interaction/EventManager';
 import { PriceLineManager } from '../interaction/PriceLineManager';
+import { computePaneGeometry, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
@@ -70,6 +70,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from '../types';
+import { dedupeBarsByTime } from '../utils/dedupeBars';
 import { safeToFixed } from '../utils/safeNumber';
 import { applyAutoScale } from '../viewport/viewScale';
 import { applyChromeThemeVars } from './chromeTheme';
@@ -164,7 +165,11 @@ export interface ChartCoreOptions {
   /** Returns whether auto-scale is active for a given pane */
   isAutoScale?: (paneId: string) => boolean;
   /** Called on double-click/double-tap on a pane */
-  onPaneDoubleClick?: (paneId: string, point: DrawingScreenPoint, spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>) => void;
+  onPaneDoubleClick?: (
+    paneId: string,
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => void;
 }
 
 // ============================================================================
@@ -262,6 +267,10 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
     4: 'dotted',
   };
   const lineColor = order.lineColor;
+  const takeProfitColor = order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
+  const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
 
   const chartLabel: ChartLineLabel = {
     offsetPercent: order.lineLength,
@@ -295,9 +304,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               type: 'tp' as const,
               icon: 'TP',
-              backgroundColor: lineColor,
-              iconColor: order.bodyTextColor,
-              borderColor: lineColor,
+              backgroundColor: takeProfitColor,
+              iconColor: takeProfitTextColor,
+              borderColor: takeProfitColor,
               tooltip: 'Drag to set Take Profit',
             },
           ]
@@ -307,9 +316,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               type: 'sl' as const,
               icon: 'SL',
-              backgroundColor: lineColor,
-              iconColor: order.bodyTextColor,
-              borderColor: lineColor,
+              backgroundColor: stopLossColor,
+              iconColor: stopLossTextColor,
+              borderColor: stopLossColor,
               tooltip: 'Drag to set Stop Loss',
             },
           ]
@@ -371,6 +380,10 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     pnlStateColor = '#ef5350';
   }
   const lineColor = position.lineColor;
+  const takeProfitColor = position.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
+  const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
 
   const chartLabel: ChartLineLabel = {
     offsetPercent: position.lineLength,
@@ -415,9 +428,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               type: 'tp' as const,
               icon: 'TP',
-              backgroundColor: lineColor,
-              iconColor: position.bodyTextColor,
-              borderColor: lineColor,
+              backgroundColor: takeProfitColor,
+              iconColor: takeProfitTextColor,
+              borderColor: takeProfitColor,
               tooltip: 'Drag to set Take Profit',
             },
           ]
@@ -427,9 +440,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               type: 'sl' as const,
               icon: 'SL',
-              backgroundColor: lineColor,
-              iconColor: position.bodyTextColor,
-              borderColor: lineColor,
+              backgroundColor: stopLossColor,
+              iconColor: stopLossTextColor,
+              borderColor: stopLossColor,
               tooltip: 'Drag to set Stop Loss',
             },
           ]
@@ -486,20 +499,28 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
 }
 
 /**
- * Generate bracket lines (TP/SL) for a position
+ * Generate bracket lines (TP/SL) for an order or position
  */
-function positionToBracketLines(position: PositionLineRenderData, formatPrice: (price: number) => string): PriceLine[] {
+function tradingLineToBracketLines(
+  line: OrderLineRenderData | PositionLineRenderData,
+  formatPrice: (price: number) => string,
+): PriceLine[] {
   const bracketLines: PriceLine[] = [];
-  const brackets = position.brackets;
+  const brackets = line.brackets;
 
   if (!brackets) return bracketLines;
 
+  const takeProfitColor = brackets.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitTextColor = brackets.takeProfitTextColor ?? '#ffffff';
+  const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = brackets.stopLossTextColor ?? '#ffffff';
+
   if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
     bracketLines.push({
-      id: `${position.id}-tp`,
+      id: `${line.id}-tp`,
       price: brackets.takeProfit,
       lineStyle: 'dashed',
-      color: '#22c55e',
+      color: takeProfitColor,
       type: 'price',
       lineLength: 100,
       extendLeft: true,
@@ -508,18 +529,18 @@ function positionToBracketLines(position: PositionLineRenderData, formatPrice: (
       label: {
         primaryText: formatPrice(brackets.takeProfit),
         secondaryText: 'TP',
-        backgroundColor: '#22c55e',
-        textColor: '#ffffff',
+        backgroundColor: takeProfitColor,
+        textColor: takeProfitTextColor,
       },
     });
   }
 
   if (brackets.stopLoss !== undefined && brackets.stopLoss > 0) {
     bracketLines.push({
-      id: `${position.id}-sl`,
+      id: `${line.id}-sl`,
       price: brackets.stopLoss,
       lineStyle: 'dashed',
-      color: '#f97316',
+      color: stopLossColor,
       type: 'price',
       lineLength: 100,
       extendLeft: true,
@@ -528,8 +549,8 @@ function positionToBracketLines(position: PositionLineRenderData, formatPrice: (
       label: {
         primaryText: formatPrice(brackets.stopLoss),
         secondaryText: 'SL',
-        backgroundColor: '#f97316',
-        textColor: '#ffffff',
+        backgroundColor: stopLossColor,
+        textColor: stopLossTextColor,
       },
     });
   }
@@ -608,6 +629,7 @@ export class ChartCore {
     dragStartX: number;
     dragCurrentX: number;
     positionData: PositionData;
+    color: string;
   } | null = null;
 
   // Collision offset cache — keyed by geometry (IDs + prices + viewport).
@@ -757,8 +779,7 @@ export class ChartCore {
             this.renderCrosshairOverlay();
           },
           fontFamily: this.renderer.font,
-          chartLabelMinX:
-            WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 2,
+          chartLabelMinX: WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 2,
           onCursorChange: (cursor) => this.applyCursor(cursor),
         });
       }
@@ -1519,7 +1540,8 @@ export class ChartCore {
       this.viewport && this.userDrawingState?.activeTool === 'select'
         ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
         : undefined;
-    const items = (drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? [];
+    const items =
+      (drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? [];
     this.closeContextMenu();
     if (items.length === 0) return;
 
@@ -1810,10 +1832,7 @@ export class ChartCore {
   }
 
   private handleUserDrawingDragPending(x: number, y: number): boolean {
-    if (
-      !this.viewport ||
-      !this.userDrawingState
-    ) {
+    if (!this.viewport || !this.userDrawingState) {
       return false;
     }
 
@@ -2107,7 +2126,8 @@ export class ChartCore {
         return orderLineToPriceLine(o, formatPrice);
       }),
       ...this.positionLines.map((p) => positionLineToPriceLine(p, formatPrice)),
-      ...this.positionLines.flatMap((p) => positionToBracketLines(p, formatPrice)),
+      ...this.orderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice)),
+      ...this.positionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice)),
     ];
 
     // Skip the line being dragged — the Konva drag line replaces it during drag.
@@ -2193,8 +2213,9 @@ export class ChartCore {
       }
     }
 
-    const canvasLabelBounds = (dragLineId ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId) : this.labelBoundsCache)
-      .filter((bound) => bound.type !== 'order' && bound.type !== 'position');
+    const canvasLabelBounds = (
+      dragLineId ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId) : this.labelBoundsCache
+    ).filter((bound) => bound.type !== 'order' && bound.type !== 'position');
 
     // Render candles, grid, axes, volume, indicators, price lines on main canvas
     // Crosshair is NOT drawn here — it goes on the overlay canvas
@@ -2570,6 +2591,10 @@ export class ChartCore {
         dragStartX,
         dragCurrentX,
         positionData: position.positionData,
+        color:
+          type === 'tp'
+            ? (position.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR)
+            : (position.brackets?.stopLossColor ?? STOP_LOSS_COLOR),
       };
       this.renderCrosshairOverlay();
       return;
@@ -2588,6 +2613,10 @@ export class ChartCore {
         dragStartX,
         dragCurrentX,
         positionData: { entryPrice: order.price, isLong: true, notional: 0 },
+        color:
+          type === 'tp'
+            ? (order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR)
+            : (order.brackets?.stopLossColor ?? STOP_LOSS_COLOR),
       };
       this.renderCrosshairOverlay();
     }
@@ -2602,7 +2631,7 @@ export class ChartCore {
     if (!state || !this.viewport) return;
 
     const chartWidth = this.options.width - this.margins.right;
-    const color = state.type === 'tp' ? '#22c55e' : '#f97316';
+    const color = state.color;
     const bracketType = state.type === 'tp' ? 'TP' : 'SL';
     const isPartialMode = state.partialEnabled;
 

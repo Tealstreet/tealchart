@@ -113,7 +113,7 @@ import { LayoutChangeEvent, Platform, StyleSheet, Text, TextInput, TouchableOpac
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { LOADING_OPACITY } from './constants';
+import { LOADING_OPACITY, STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -151,7 +151,6 @@ import {
 } from './drawings';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
-import { withAlpha } from './ui/chromeTheme';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
 import { IndicatorSettingsModalMobile } from './mobile/components/IndicatorSettingsModalMobile';
@@ -201,6 +200,7 @@ import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasCont
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
+import { withAlpha } from './ui/chromeTheme';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
 import { ViewportController } from './viewport/ViewportController';
@@ -230,13 +230,7 @@ function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): 
   }
 }
 
-function UserDrawingSkiaFill({
-  style,
-  children,
-}: {
-  style: UserDrawingStyle;
-  children: React.ReactNode;
-}) {
+function UserDrawingSkiaFill({ style, children }: { style: UserDrawingStyle; children: React.ReactNode }) {
   return <Group opacity={normalizeUserDrawingOpacity(style.fillOpacity ?? 1)}>{children}</Group>;
 }
 
@@ -537,8 +531,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
-  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(
-    () => createUserDrawingState(propUserDrawingState),
+  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
+    createUserDrawingState(propUserDrawingState),
   );
   const effectiveUserDrawingState = uncontrolledUserDrawingState;
   const userDrawingStateRef = useRef(effectiveUserDrawingState);
@@ -552,7 +546,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
   const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
   const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
-  const [userDrawingDuplicateEditDragOverride, setUserDrawingDuplicateEditDragOverride] = useState<boolean | null>(null);
+  const [userDrawingDuplicateEditDragOverride, setUserDrawingDuplicateEditDragOverride] = useState<boolean | null>(
+    null,
+  );
   const [userDrawingSelectedActionPopoverDismissSignal, setUserDrawingSelectedActionPopoverDismissSignal] = useState(0);
   const userDrawingMeasureLastPointRef = useRef<UserDrawingInputPoint | null>(null);
 
@@ -1663,6 +1659,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     entryPrice: number;
     isLong: boolean;
     notional: number;
+    color: string;
   } | null>(null);
 
   const handleTPMove = useCallback(
@@ -1676,6 +1673,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: pos.positionData.entryPrice,
           isLong: pos.positionData.isLong,
           notional: pos.positionData.notional,
+          color: pos.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR,
         });
       }
     },
@@ -1693,6 +1691,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: pos.positionData.entryPrice,
           isLong: pos.positionData.isLong,
           notional: pos.positionData.notional,
+          color: pos.brackets?.stopLossColor ?? STOP_LOSS_COLOR,
         });
       }
     },
@@ -1711,6 +1710,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: order.price,
           isLong: true, // Approximation — actual side determined by OrderLineManager
           notional: 0,
+          color: order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR,
         });
       }
     },
@@ -1728,6 +1728,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: order.price,
           isLong: true, // Approximation — actual side determined by OrderLineManager
           notional: 0,
+          color: order.brackets?.stopLossColor ?? STOP_LOSS_COLOR,
         });
       }
     },
@@ -1797,7 +1798,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           dimensions: chartDimensions,
           panes: userDrawingInputPanes,
           bars,
-          magnetMode: isUserDrawingPathFamilyTool(draftTool) ? 'off' : effectiveUserDrawingState.magnetMode ?? 'off',
+          magnetMode: isUserDrawingPathFamilyTool(draftTool) ? 'off' : (effectiveUserDrawingState.magnetMode ?? 'off'),
         });
         // Clear the preview when the crosshair is over an unresolvable region so it never sticks.
         setUserDrawingDraftPreviewAnchor(point ? resolveConstrainedUserDrawingPlacementPoint(point).anchor : null);
@@ -1871,7 +1872,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         bars,
         magnetMode: isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)
           ? 'off'
-          : effectiveUserDrawingState.magnetMode ?? 'off',
+          : (effectiveUserDrawingState.magnetMode ?? 'off'),
       });
       if (!point) return false;
 
@@ -2315,27 +2316,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
 
       setContextMenuItems(
-        result.items.map(
-          (item): ContextMenuItem => ({
-            position: item.groupId === 'visibility' ? 'bottom' : 'top',
-            text: item.label,
-            enabled: item.enabled,
-            click: () => {
-              if (!item.enabled) return;
-              dispatchMobileUserDrawingActionCommand(item.command, {
-                state: userDrawingStateRef.current,
-                source: 'contextMenu',
-                createId: createUserDrawingId,
-                dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
-                onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
-                onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
-                onUserDrawingCopySelected: () => {
-                  copySelectedUserDrawingToClipboard();
-                },
-              });
-            },
-          }),
-        ),
+        result.items.map((item): ContextMenuItem => ({
+          position: item.groupId === 'visibility' ? 'bottom' : 'top',
+          text: item.label,
+          enabled: item.enabled,
+          click: () => {
+            if (!item.enabled) return;
+            dispatchMobileUserDrawingActionCommand(item.command, {
+              state: userDrawingStateRef.current,
+              source: 'contextMenu',
+              createId: createUserDrawingId,
+              dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
+              onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
+              onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
+              onUserDrawingCopySelected: () => {
+                copySelectedUserDrawingToClipboard();
+              },
+            });
+          },
+        })),
       );
       setContextMenuPosition({
         x,
@@ -2600,7 +2599,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const bracketPreview = useMemo(() => {
     if (!bracketDragState || !viewport) return null;
 
-    const { type, price, entryPrice, isLong, notional } = bracketDragState;
+    const { type, price, entryPrice, isLong, notional, color } = bracketDragState;
     const y = priceToY(price, viewport, chartDimensions);
 
     // PnL estimate: notional * (price - entry) / entry for long, inverted for short
@@ -2611,7 +2610,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     const pnlText = `${pnlSign}${safeToFixed(pnl, 2)}`;
     const labelText = `${type.toUpperCase()} ${priceText}  ${pnlText}`;
 
-    const color = type === 'tp' ? '#22c55e' : '#f97316';
     const chartLeft = chartDimensions.margins.left;
     const chartRight = chartDimensions.width - chartDimensions.margins.right;
 
@@ -3987,16 +3985,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                       );
                     })
                   : primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
+                      <SkiaPath
+                        path={path}
+                        color={primitive.style.lineColor}
+                        style="stroke"
+                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
+                        strokeCap="round"
+                        strokeJoin="round"
+                      >
+                        {dash && <DashPathEffect intervals={dash} />}
+                      </SkiaPath>
                     )}
                 {(primitive.kind === 'xabcdPattern' ||
                   primitive.kind === 'cypherPattern' ||
@@ -4062,7 +4060,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 {primitive.style.fillVisible !== false &&
                   primitive.bins.map((bin) =>
                     bin.volume > 0 && bin.rect.width > 0 && bin.rect.height > 0 ? (
-                      <UserDrawingSkiaFill key={`${primitive.id}:bin:${bin.priceMin}:${bin.priceMax}`} style={primitive.style}>
+                      <UserDrawingSkiaFill
+                        key={`${primitive.id}:bin:${bin.priceMin}:${bin.priceMax}`}
+                        style={primitive.style}
+                      >
                         <Rect
                           x={bin.rect.x}
                           y={bin.rect.y}
@@ -4337,8 +4338,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
                 {primitive.bars.map((bar) => {
                   const color = bar.up
-                    ? primitive.style.barsPatternUpColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR
-                    : primitive.style.barsPatternDownColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR;
+                    ? (primitive.style.barsPatternUpColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR)
+                    : (primitive.style.barsPatternDownColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR);
                   const bodyTop = Math.min(bar.openY, bar.closeY);
                   const bodyHeight = Math.max(1, Math.abs(bar.closeY - bar.openY));
                   const bodyX = bar.x - bar.bodyWidth / 2;

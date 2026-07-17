@@ -857,6 +857,10 @@ export type ProfitState = 'positive' | 'negative' | 'neutral';
 export interface BracketConfig {
   takeProfit?: number;
   stopLoss?: number;
+  takeProfitColor?: string;
+  takeProfitTextColor?: string;
+  stopLossColor?: string;
+  stopLossTextColor?: string;
 }
 
 /**
