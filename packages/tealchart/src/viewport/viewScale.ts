@@ -11,6 +11,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, Viewport, ViewScaleState } from '../types';
 
 import { TealchartRenderer } from '../TealchartRenderer';
+import { normalizeResolution, type ResolutionInput } from '../utils/normalizeResolution';
 
 export const VIEWPORT_ZOOM_IN_FACTOR = 0.8;
 
@@ -20,8 +21,8 @@ export const VIEWPORT_ZOOM_IN_FACTOR = 0.8;
  *
  * Extracted from TealchartWidget._getIntervalMs() so both web and mobile can share it.
  */
-export function intervalToMs(resolution: string): number {
-  const trimmed = resolution.trim();
+export function intervalToMs(resolution: ResolutionInput): number {
+  const trimmed = normalizeResolution(resolution);
   const upper = trimmed.toUpperCase();
 
   // Handle day/week resolutions without numeric prefix

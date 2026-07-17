@@ -129,6 +129,7 @@ import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { barValuesEqual, dedupeBarsByTime } from './utils/dedupeBars';
+import { normalizeResolution, type ResolutionInput } from './utils/normalizeResolution';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
@@ -153,6 +154,11 @@ export function resolveDefaultLayoutPersistence(options: TealchartWidgetOptions)
   };
 }
 
+const getCleanSymbol = (symbol: string): string => {
+  const parts = symbol.split(':');
+  return parts.length > 1 ? parts[1] : symbol;
+};
+
 /**
  * Main widget class (equivalent to TradingView's IChartingLibraryWidget)
  */
@@ -169,6 +175,7 @@ export class TealchartWidget {
 
   // Chart state
   private _symbol: string;
+  private _initialResolveSymbol: string;
   private _interval: ResolutionString;
   private _symbolInfo: LibrarySymbolInfo | null = null;
   private _bars: Bar[] = [];
@@ -274,10 +281,12 @@ export class TealchartWidget {
     this._container = container;
     this._options = resolveDefaultLayoutPersistence(options);
     this._datafeed = options.datafeed;
-    this._symbol = options.symbol;
+    this._symbol = getCleanSymbol(options.symbol);
+    this._initialResolveSymbol = options.symbol;
 
+    const providedInterval = normalizeResolution(options.interval, '');
     // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
-    this._intervalWasProvided = options.interval !== undefined && options.interval !== '';
+    this._intervalWasProvided = providedInterval !== '';
 
     // Generate chart key for per-chart state persistence
     // Use provided chartKey, or derive from account/panelId, or generate unique ID
@@ -294,9 +303,9 @@ export class TealchartWidget {
     // a prior widget persisted for this chartKey; otherwise default to '60' (1h).
     // Settings store is in-memory only — layout from adapter may override later.
     if (this._intervalWasProvided) {
-      this._interval = options.interval as ResolutionString;
+      this._interval = providedInterval;
     } else if (hadPersistedStore) {
-      this._interval = (this._chartStore.settings.get().interval as ResolutionString) || ('60' as ResolutionString);
+      this._interval = normalizeResolution(this._chartStore.settings.get().interval, '60');
     } else {
       this._interval = '60' as ResolutionString;
     }
@@ -478,7 +487,7 @@ export class TealchartWidget {
 
       // Resolve symbol
       this._datafeed.resolveSymbol(
-        this._symbol,
+        this._initialResolveSymbol,
         (symbolInfo) => {
           if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
             this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback (init)', {
@@ -487,6 +496,7 @@ export class TealchartWidget {
             return;
           }
           this._symbolInfo = symbolInfo;
+          this._chartApi.setSymbolInfo(symbolInfo);
           // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
           if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
             this._renderOptions = {
@@ -2056,6 +2066,7 @@ export class TealchartWidget {
           return;
         }
         this._symbolInfo = symbolInfo;
+        this._chartApi.setSymbolInfo(symbolInfo);
         // Update price precision from symbol's pricescale
         if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
           this._renderOptions = {
@@ -2083,10 +2094,15 @@ export class TealchartWidget {
     // The datafeed resolveSymbol receives the full string including prefix,
     // but our internal _symbol should be the clean symbol for comparisons.
     const parts = symbol.split(':');
-    const cleanSymbol = parts.length > 1 ? parts[1] : symbol;
+    const cleanSymbol = getCleanSymbol(symbol);
+    const requestedFullSymbol = parts.length > 1 ? symbol : null;
+    const currentFullSymbol = this._symbolInfo?.full_name ?? this._symbolInfo?.ticker ?? null;
 
     // Skip if symbol hasn't actually changed — prevents reload on click
-    if (this._symbol === cleanSymbol) {
+    if (
+      this._symbol === cleanSymbol &&
+      (!requestedFullSymbol || currentFullSymbol === requestedFullSymbol)
+    ) {
       return;
     }
 
@@ -4071,10 +4087,11 @@ export class TealchartWidget {
   /**
    * Set symbol
    */
-  setSymbol(symbol: string, interval?: ResolutionString, callback?: () => void): void {
+  setSymbol(symbol: string, interval?: ResolutionInput, callback?: () => void): void {
     this._chartApi.setSymbol(symbol);
-    if (interval) {
-      this._chartApi.setResolution(interval);
+    const normalizedInterval = normalizeResolution(interval, '');
+    if (normalizedInterval) {
+      this._chartApi.setResolution(normalizedInterval);
     }
     // Call callback after symbol change completes
     if (callback) {

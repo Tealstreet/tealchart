@@ -121,6 +121,8 @@ Implements TradingView-compatible interfaces:
 - `IOrderLineAdapter`, `IPositionLineAdapter` — trading line adapters
 - Layout save/load via `transformer/` (bidirectional conversion)
 
+Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the full string but stored internally as the clean symbol (`BTCUSDT`), including during initial widget construction. A prefix change with the same clean symbol must still reload data so adapters that key by `EXCHANGE:SYMBOL` get fresh symbol info and subscriptions.
+
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
 ## Commands
@@ -172,3 +174,4 @@ When adding features like TP/SL drag preview, crosshair improvements, or new lin
 - Event handlers (mousemove, drag, touch) defer all processing to RAF — event handler itself is near-zero cost
 - `style.cursor` writes are guarded (`this.cursor !== cursor`) to avoid triggering style recalculation
 - **Per-chart interval persistence**: the interval lives in the chartKey-scoped `chartStore.settings`. A widget created with an explicit `interval` uses (and persists) it; created without one, it restores the interval a prior widget with the same `chartKey` persisted, else defaults to `'60'`. `setResolution` writes the new interval back to the store (via `_handleIntervalChange` → `_startDataLoad`, which persists `newInterval`). The store is held in a **process-lifetime** `chartStoreCache` (`getChartStore`), so tests must call `clearChartStoreCache()` (from `state/chartState`) in `afterEach` to avoid interval bleed across tests.
+- Resolution inputs are normalized at Tealchart API boundaries and in shared viewport math. Accept string resolutions (`'1h'`, `'60'`) and legacy numeric minute resolutions (`60`); keep missing interval semantics intact where `undefined`/`null` means "not provided" (for example, widget construction and `setSymbol`).
