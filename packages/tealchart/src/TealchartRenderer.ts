@@ -1200,9 +1200,9 @@ export class TealchartRenderer {
     const pnl = line.pnlShort || line.pnl || '';
 
     // Calculate widths for each segment
-    const textWidth = text ? ctx.measureText(text).width + 8 : 0;
-    const pnlWidth = pnl ? ctx.measureText(pnl).width + 8 : 0;
-    const quantityWidth = quantity ? ctx.measureText(quantity).width + 8 : 0;
+    const textWidth = text ? ctx.measureText(text).width + 14 : 0;
+    const pnlWidth = pnl ? ctx.measureText(pnl).width + 14 : 0;
+    const quantityWidth = quantity ? ctx.measureText(quantity).width + 14 : 0;
     const reverseButtonWidth = line.reversible ? 18 : 0; // ↩ button (only if callback provided)
     const closeButtonWidth = line.closeable ? 18 : 0; // X button (only if callback provided)
     const labelHeight = 18;
@@ -1243,12 +1243,12 @@ export class TealchartRenderer {
       return;
     }
 
-    // Determine PnL color based on profit state
-    let pnlTextColor = line.bodyTextColor;
+    // Determine PnL segment color based on profit state
+    let pnlStateColor: string | undefined;
     if (line.profitState === 'positive') {
-      pnlTextColor = '#26a69a'; // Green
+      pnlStateColor = '#26a69a';
     } else if (line.profitState === 'negative') {
-      pnlTextColor = '#ef5350'; // Red
+      pnlStateColor = '#ef5350';
     }
 
     // Draw label boxes
@@ -1276,10 +1276,10 @@ export class TealchartRenderer {
         labelY,
         pnlWidth,
         labelHeight,
-        line.bodyBackgroundColor,
-        line.bodyBorderColor,
+        pnlStateColor ?? line.bodyBackgroundColor,
+        pnlStateColor ?? line.bodyBorderColor,
         pnl,
-        pnlTextColor,
+        line.bodyTextColor,
       );
       currentX += pnlWidth + 2;
     }

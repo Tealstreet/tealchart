@@ -875,7 +875,7 @@ describe('ChartCore viewport management', () => {
         id: 'position-1',
         positionId: 'position-1',
         price: 50010,
-        lineColor: '#00ff88',
+        lineColor: '#26a69a',
         lineStyle: 0,
         lineLength: 100,
         extendLeft: true,
@@ -884,21 +884,21 @@ describe('ChartCore viewport management', () => {
         textShort: 'Lng',
         quantity: '1 BTC',
         quantityShort: '1',
-        pnl: '+$12.50',
-        pnlShort: '+12',
-        profitState: 'positive',
-        bodyBackgroundColor: '#111111',
+        pnl: '-$12.50',
+        pnlShort: '-12',
+        profitState: 'negative',
+        bodyBackgroundColor: '#26a69a',
         bodyTextColor: '#ffffff',
-        bodyBorderColor: '#00ff88',
-        quantityBackgroundColor: '#111111',
+        bodyBorderColor: '#26a69a',
+        quantityBackgroundColor: '#26a69a',
         quantityTextColor: '#ffffff',
-        quantityBorderColor: '#00ff88',
+        quantityBorderColor: '#26a69a',
         reverseButtonBackgroundColor: '#111111',
         reverseButtonIconColor: '#ffffff',
-        reverseButtonBorderColor: '#00ff88',
-        closeButtonBackgroundColor: '#111111',
+        reverseButtonBorderColor: '#26a69a',
+        closeButtonBackgroundColor: '#26a69a',
         closeButtonIconColor: '#ffffff',
-        closeButtonBorderColor: '#00ff88',
+        closeButtonBorderColor: '#26a69a',
         closeTooltip: 'Close',
         protectTooltipText: 'Protect',
         partialEnabled: true,
@@ -918,6 +918,27 @@ describe('ChartCore viewport management', () => {
     ]);
     core.paint(0xff);
 
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    const bound = manager.cachedLineGroups.get('position-1')?.getAttr('boundData') as {
+      chartLabel?: {
+        segments: Array<{ text: string; backgroundColor: string; borderColor: string; textColor: string }>;
+        buttons?: Array<{ type: string; backgroundColor: string; borderColor: string; iconColor: string }>;
+      };
+    };
+    expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
+      backgroundColor: '#ef5350',
+      borderColor: '#ef5350',
+      textColor: '#ffffff',
+    });
+    expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
+      backgroundColor: '#26a69a',
+      borderColor: '#26a69a',
+    });
+    expect(bound.chartLabel?.buttons?.find((button) => button.type === 'close')).toMatchObject({
+      backgroundColor: '#26a69a',
+      borderColor: '#26a69a',
+      iconColor: '#ffffff',
+    });
     expect(core.getViewport()).not.toBeNull();
     core.dispose();
   });
