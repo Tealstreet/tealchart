@@ -71,6 +71,8 @@ export interface PriceLineManagerOptions {
   onContextMenuButtonClick?: (price: number, screenX: number, screenY: number) => void;
   /** Font family for Konva label rendering */
   fontFamily?: string;
+  /** Minimum X for trading labels and line segments, including overlaid chrome such as the left drawing rail. */
+  chartLabelMinX?: number;
 }
 
 export interface CrosshairState {
@@ -168,6 +170,10 @@ function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-s
 
 function getSegmentWidth(text: string, fontFamily: string): number {
   return Math.ceil(measureLabelTextWidth(text, 11, fontFamily)) + SEGMENT_HORIZONTAL_PADDING;
+}
+
+function getTradingLineMinX(options: PriceLineManagerOptions): number {
+  return Math.max(options.margins.left, options.chartLabelMinX ?? options.margins.left);
 }
 
 function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
@@ -698,7 +704,8 @@ export class PriceLineManager {
     // Calculate chart label dimensions
     let chartLabelWidth = 0;
     let segmentsWidth = 0;
-    let chartLabelX = margins.left;
+    const lineStartX = getTradingLineMinX(this.options);
+    let chartLabelX = lineStartX;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
     const { tpslButtons, orderedButtons } = getOrderedButtons(buttons);
@@ -716,32 +723,38 @@ export class PriceLineManager {
 
       const lineLength = bound.lineLength ?? 100;
       const maxLabelX = width - margins.right - chartLabelWidth;
-      const minLabelX = margins.left;
+      const minLabelX = lineStartX;
       chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
     // Left line segment
     if (chartLabel && chartLabel.segments.length > 0 && bound.extendLeft !== false) {
-      group.add(
-        new Konva.Line({
-          points: [margins.left, lineY, chartLabelX - 1, lineY],
-          stroke: bound.color,
-          strokeWidth: bound.lineWidth || 1,
-          dash: lineDash,
-        }),
-      );
+      if (chartLabelX - 1 > lineStartX) {
+        group.add(
+          new Konva.Line({
+            points: [lineStartX, lineY, chartLabelX - 1, lineY],
+            stroke: bound.color,
+            strokeWidth: bound.lineWidth || 1,
+            dash: lineDash,
+          }),
+        );
+      }
     }
 
-    // Right line segment (from end of segments to price axis)
+    // Right line segment (from end of full chart label to price axis)
     if (chartLabel && chartLabel.segments.length > 0) {
-      group.add(
-        new Konva.Line({
-          points: [chartLabelX + segmentsWidth + 2, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
-          stroke: bound.color,
-          strokeWidth: bound.lineWidth || 1,
-          dash: lineDash,
-        }),
-      );
+      const rightLineStartX = chartLabelX + chartLabelWidth + 2;
+      const rightLineEndX = priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING;
+      if (rightLineEndX > rightLineStartX) {
+        group.add(
+          new Konva.Line({
+            points: [rightLineStartX, lineY, rightLineEndX, lineY],
+            stroke: bound.color,
+            strokeWidth: bound.lineWidth || 1,
+            dash: lineDash,
+          }),
+        );
+      }
     }
 
     // Invisible drag handle for segments
@@ -1167,7 +1180,7 @@ export class PriceLineManager {
     if (!chartLabel || chartLabel.segments.length === 0) {
       group.add(
         new Konva.Line({
-          points: [margins.left, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
+          points: [lineStartX, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
           stroke: bound.color,
           strokeWidth: bound.lineWidth || 1,
           dash: lineDash,

@@ -18,6 +18,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
+import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
 
@@ -47,8 +48,6 @@ export interface OrderLineComponentProps {
 const TOUCH_TARGET_HEIGHT = 44; // Minimum touch target per accessibility guidelines
 const LABEL_HEIGHT = 18;
 const TP_SL_BUTTON_WIDTH = 24;
-const TP_COLOR = '#22c55e'; // Green for take profit
-const SL_COLOR = '#f97316'; // Orange for stop loss
 export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   order,
   viewport,
@@ -295,13 +294,22 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   }, [order.lineStyle]);
 
   // Calculate label positioning based on lineLength
+  const lineStartX = useMemo(
+    () =>
+      Math.max(
+        dimensions.margins.left,
+        MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 2,
+      ),
+    [dimensions.margins.left],
+  );
   const labelX = useMemo(() => {
     // lineLength=100 means line extends full width, label at LEFT edge
     // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
     const maxLabelX = dimensions.width - dimensions.margins.right - 120; // Approximate label width
-    const minLabelX = dimensions.margins.left;
+    const minLabelX = lineStartX;
     return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
-  }, [order.lineLength, dimensions]);
+  }, [order.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
+  const lineColor = order.lineColor;
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? order.textShort : order.text;
@@ -321,10 +329,10 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           style={[
             styles.lineSegment,
             {
-              left: dimensions.margins.left,
-              width: labelX - dimensions.margins.left - 2,
+              left: lineStartX,
+              width: Math.max(0, labelX - lineStartX - 2),
               top: TOUCH_TARGET_HEIGHT / 2,
-              borderBottomColor: order.lineColor,
+              borderBottomColor: lineColor,
               borderBottomWidth: order.lineWidth,
               borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
             },
@@ -361,8 +369,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: order.bodyBackgroundColor,
-              borderColor: order.bodyBorderColor,
+              backgroundColor: lineColor,
+              borderColor: lineColor,
               borderTopLeftRadius: 2,
               borderBottomLeftRadius: 2,
             },
@@ -376,8 +384,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: order.quantityBackgroundColor,
-              borderColor: order.quantityBorderColor,
+              backgroundColor: lineColor,
+              borderColor: lineColor,
               borderLeftWidth: 0,
             },
           ]}
@@ -392,8 +400,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             style={({ pressed }) => [
               styles.cancelButton,
               {
-                backgroundColor: order.cancelButtonBackgroundColor,
-                borderColor: order.cancelButtonBorderColor,
+                backgroundColor: lineColor,
+                borderColor: lineColor,
                 opacity: pressed ? 0.7 : 1,
               },
             ]}
@@ -413,12 +421,12 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: order.bodyBackgroundColor,
-                      borderColor: TP_COLOR,
+                      backgroundColor: lineColor,
+                      borderColor: lineColor,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: TP_COLOR }]}>TP</Text>
+                  <Text style={[styles.bracketButtonText, { color: order.bodyTextColor }]}>TP</Text>
                 </View>
               </Animated.View>
             </GestureDetector>
@@ -430,12 +438,12 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: order.bodyBackgroundColor,
-                      borderColor: SL_COLOR,
+                      backgroundColor: lineColor,
+                      borderColor: lineColor,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: SL_COLOR }]}>SL</Text>
+                  <Text style={[styles.bracketButtonText, { color: order.bodyTextColor }]}>SL</Text>
                 </View>
               </Animated.View>
             </GestureDetector>
@@ -451,7 +459,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             left: labelX + 100 + 2, // After label
             right: dimensions.margins.right + 60, // Before price axis label
             top: TOUCH_TARGET_HEIGHT / 2,
-            borderBottomColor: order.lineColor,
+            borderBottomColor: lineColor,
             borderBottomWidth: order.lineWidth,
             borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
           },
@@ -465,8 +473,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           {
             right: 4, // Small padding from edge
             top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT * 1.2) / 2,
-            backgroundColor: order.bodyBackgroundColor,
-            borderColor: order.lineColor,
+            backgroundColor: lineColor,
+            borderColor: lineColor,
           },
         ]}
       >

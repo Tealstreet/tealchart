@@ -6,6 +6,7 @@ import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCo
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
+import { WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
@@ -81,6 +82,13 @@ function formatCountdown(targetTimeMs: number): string {
   }
 
   return `${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function getTradingLineMinX(margins: ChartMargins): number {
+  return Math.max(
+    margins.left,
+    WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 2,
+  );
 }
 
 // Text width cache - avoids expensive ctx.measureText calls
@@ -815,7 +823,8 @@ export class TealchartRenderer {
     // Calculate chart label dimensions if present
     const chartLabel = bound.chartLabel;
     let chartLabelWidth = 0;
-    let chartLabelX = margins.left;
+    const lineStartX = getTradingLineMinX(margins);
+    let chartLabelX = lineStartX;
     const labelHeight = 18;
 
     if (chartLabel && chartLabel.segments.length > 0) {
@@ -834,7 +843,7 @@ export class TealchartRenderer {
       // lineLength=100 means line extends full width, label at LEFT edge
       // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
       const maxLabelX = options.width - margins.right - chartLabelWidth;
-      const minLabelX = margins.left;
+      const minLabelX = lineStartX;
       chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
@@ -851,9 +860,9 @@ export class TealchartRenderer {
     // Draw line from left margin to chart label (if chartLabel exists)
     if (chartLabel && chartLabel.segments.length > 0) {
       const lineEndX = chartLabelX - 4;
-      if (extendLeft) {
+      if (extendLeft && lineEndX > lineStartX) {
         ctx.beginPath();
-        ctx.moveTo(margins.left, lineY);
+        ctx.moveTo(lineStartX, lineY);
         ctx.lineTo(lineEndX, lineY);
         ctx.stroke();
       }
@@ -861,7 +870,7 @@ export class TealchartRenderer {
       // No chart label - draw line all the way to price axis label
       const priceAxisLabelX = options.width - bound.width;
       ctx.beginPath();
-      ctx.moveTo(margins.left, lineY);
+      ctx.moveTo(lineStartX, lineY);
       ctx.lineTo(priceAxisLabelX, lineY);
       ctx.stroke();
     }
@@ -1052,7 +1061,8 @@ export class TealchartRenderer {
     // lineLength=100 means line extends full width, label at LEFT edge
     // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
     const maxLabelX = options.width - margins.right - totalLabelWidth; // rightmost position
-    const minLabelX = margins.left; // leftmost position
+    const lineStartX = getTradingLineMinX(margins);
+    const minLabelX = lineStartX; // leftmost position after overlaid chart chrome
     const labelX = minLabelX + ((maxLabelX - minLabelX) * (100 - line.lineLength)) / 100;
     const labelY = lineY - labelHeight / 2;
 
@@ -1067,10 +1077,10 @@ export class TealchartRenderer {
       ctx.setLineDash([4, 4]); // dashed
     else if (line.lineStyle === 4) ctx.setLineDash([6, 3]); // long dashed
     ctx.beginPath();
-    if (line.extendLeft) {
-      ctx.moveTo(margins.left, lineY);
+    if (line.extendLeft && lineEndX > lineStartX) {
+      ctx.moveTo(lineStartX, lineY);
       ctx.lineTo(lineEndX, lineY);
-    } else {
+    } else if (!line.extendLeft) {
       ctx.moveTo(lineEndX, lineY);
       ctx.lineTo(options.width - margins.right, lineY);
     }
@@ -1093,8 +1103,8 @@ export class TealchartRenderer {
         labelY,
         textWidth,
         labelHeight,
-        line.bodyBackgroundColor,
-        line.bodyBorderColor,
+        line.lineColor,
+        line.lineColor,
         text,
         line.bodyTextColor,
       );
@@ -1108,8 +1118,8 @@ export class TealchartRenderer {
         labelY,
         quantityWidth,
         labelHeight,
-        line.quantityBackgroundColor,
-        line.quantityBorderColor,
+        line.lineColor,
+        line.lineColor,
         quantity,
         line.quantityTextColor,
       );
@@ -1123,8 +1133,8 @@ export class TealchartRenderer {
         labelY,
         16,
         labelHeight,
-        line.cancelButtonBackgroundColor,
-        line.cancelButtonBorderColor,
+        line.lineColor,
+        line.lineColor,
         line.cancelButtonIconColor,
       );
       currentX += 16 + 2;
@@ -1153,7 +1163,7 @@ export class TealchartRenderer {
       lineY,
       line.price,
       line.lineColor,
-      line.bodyBackgroundColor,
+      line.lineColor,
       line.bodyTextColor,
       viewport,
       priceHeight,
@@ -1212,7 +1222,8 @@ export class TealchartRenderer {
     // lineLength=100 means line extends full width, label at LEFT edge
     // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
     const maxLabelX = options.width - margins.right - totalLabelWidth; // rightmost position
-    const minLabelX = margins.left; // leftmost position
+    const lineStartX = getTradingLineMinX(margins);
+    const minLabelX = lineStartX; // leftmost position after overlaid chart chrome
     const labelX = minLabelX + ((maxLabelX - minLabelX) * (100 - line.lineLength)) / 100;
     const labelY = lineY - labelHeight / 2;
 
@@ -1227,10 +1238,10 @@ export class TealchartRenderer {
       ctx.setLineDash([4, 4]); // dashed
     else if (line.lineStyle === 4) ctx.setLineDash([6, 3]); // long dashed
     ctx.beginPath();
-    if (line.extendLeft) {
-      ctx.moveTo(margins.left, lineY);
+    if (line.extendLeft && lineEndX > lineStartX) {
+      ctx.moveTo(lineStartX, lineY);
       ctx.lineTo(lineEndX, lineY);
-    } else {
+    } else if (!line.extendLeft) {
       ctx.moveTo(lineEndX, lineY);
       ctx.lineTo(options.width - margins.right, lineY);
     }
@@ -1246,7 +1257,7 @@ export class TealchartRenderer {
     // Determine PnL segment color based on profit state
     let pnlStateColor: string | undefined;
     if (line.profitState === 'positive') {
-      pnlStateColor = '#26a69a';
+      pnlStateColor = '#22c55e';
     } else if (line.profitState === 'negative') {
       pnlStateColor = '#ef5350';
     }
@@ -1261,8 +1272,8 @@ export class TealchartRenderer {
         labelY,
         textWidth,
         labelHeight,
-        line.bodyBackgroundColor,
-        line.bodyBorderColor,
+        line.lineColor,
+        line.lineColor,
         text,
         line.bodyTextColor,
       );
@@ -1276,8 +1287,8 @@ export class TealchartRenderer {
         labelY,
         pnlWidth,
         labelHeight,
-        pnlStateColor ?? line.bodyBackgroundColor,
-        pnlStateColor ?? line.bodyBorderColor,
+        pnlStateColor ?? line.lineColor,
+        pnlStateColor ?? line.lineColor,
         pnl,
         line.bodyTextColor,
       );
@@ -1291,8 +1302,8 @@ export class TealchartRenderer {
         labelY,
         quantityWidth,
         labelHeight,
-        line.quantityBackgroundColor,
-        line.quantityBorderColor,
+        line.lineColor,
+        line.lineColor,
         quantity,
         line.quantityTextColor,
       );
@@ -1306,8 +1317,8 @@ export class TealchartRenderer {
         labelY,
         16,
         labelHeight,
-        line.reverseButtonBackgroundColor,
-        line.reverseButtonBorderColor,
+        line.lineColor,
+        line.lineColor,
         '↩',
         line.reverseButtonIconColor,
       );
@@ -1321,8 +1332,8 @@ export class TealchartRenderer {
         labelY,
         16,
         labelHeight,
-        line.closeButtonBackgroundColor,
-        line.closeButtonBorderColor,
+        line.lineColor,
+        line.lineColor,
         line.closeButtonIconColor,
       );
       currentX += closeButtonWidth + 2;
@@ -1351,7 +1362,7 @@ export class TealchartRenderer {
       lineY,
       line.price,
       line.lineColor,
-      line.bodyBackgroundColor,
+      line.lineColor,
       line.bodyTextColor,
       viewport,
       priceHeight,
@@ -4763,7 +4774,7 @@ export class TealchartRenderer {
     else if (bound.lineStyle === 'dotted') ctx.setLineDash([2, 2]);
 
     ctx.beginPath();
-    ctx.moveTo(margins.left, lineY);
+    ctx.moveTo(getTradingLineMinX(margins), lineY);
     ctx.lineTo(priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY);
     ctx.stroke();
 
@@ -4787,7 +4798,8 @@ export class TealchartRenderer {
     // Calculate chart label dimensions
     const chartLabel = bound.chartLabel;
     let chartLabelWidth = 0;
-    let chartLabelX = margins.left;
+    const lineStartX = getTradingLineMinX(margins);
+    let chartLabelX = lineStartX;
     const labelHeight = 18;
 
     if (chartLabel && chartLabel.segments.length > 0) {
@@ -4803,7 +4815,7 @@ export class TealchartRenderer {
       // lineLength=100 means line extends full width, label at LEFT edge
       // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
       const maxLabelX = options.width - margins.right - chartLabelWidth;
-      const minLabelX = margins.left;
+      const minLabelX = lineStartX;
       chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
@@ -4816,16 +4828,16 @@ export class TealchartRenderer {
 
     if (chartLabel && chartLabel.segments.length > 0) {
       const lineEndX = chartLabelX - 4;
-      if (extendLeft) {
+      if (extendLeft && lineEndX > lineStartX) {
         ctx.beginPath();
-        ctx.moveTo(margins.left, lineY);
+        ctx.moveTo(lineStartX, lineY);
         ctx.lineTo(lineEndX, lineY);
         ctx.stroke();
       }
     } else {
       const priceAxisLabelX = options.width - bound.width;
       ctx.beginPath();
-      ctx.moveTo(margins.left, lineY);
+      ctx.moveTo(lineStartX, lineY);
       ctx.lineTo(priceAxisLabelX, lineY);
       ctx.stroke();
     }
