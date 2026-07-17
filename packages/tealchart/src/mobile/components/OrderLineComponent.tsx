@@ -18,6 +18,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
+import { STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from '../../constants';
+import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
 import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
@@ -38,9 +40,9 @@ export interface OrderLineComponentProps {
   /** Callback when order is cancelled (fallback if no adapter callback) */
   onCancel?: (orderId: string) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
-  onTPMovePreview?: (orderId: string, price: number) => void;
+  onTPMovePreview?: (orderId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
-  onSLMovePreview?: (orderId: string, price: number) => void;
+  onSLMovePreview?: (orderId: string, price: number, partialPercent?: number) => void;
   /** Called when any TP/SL drag ends (to clear preview) */
   onTPSLDragEnd?: () => void;
 }
@@ -48,6 +50,12 @@ export interface OrderLineComponentProps {
 const TOUCH_TARGET_HEIGHT = 44; // Minimum touch target per accessibility guidelines
 const LABEL_HEIGHT = 18;
 const TP_SL_BUTTON_WIDTH = 24;
+const DRAG_THRESHOLD = 5;
+
+function isBracketDrag(event: { translationX?: number; translationY: number }): boolean {
+  return Math.abs(event.translationX ?? 0) > DRAG_THRESHOLD || Math.abs(event.translationY) > DRAG_THRESHOLD;
+}
+
 export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   order,
   viewport,
@@ -107,34 +115,34 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
   // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
-    (newPrice: number) => {
-      order.callbacks?.onTPMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      order.callbacks?.onTPMoveEnd?.(newPrice, partialPercent);
     },
     [order.callbacks],
   );
 
   // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
-    (newPrice: number) => {
-      order.callbacks?.onSLMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      order.callbacks?.onSLMoveEnd?.(newPrice, partialPercent);
     },
     [order.callbacks],
   );
 
   // Handle continuous TP move (for adapter callback + Skia drag preview)
   const handleTPMove = useCallback(
-    (price: number) => {
-      order.callbacks?.onTPMove?.(price);
-      onTPMovePreview?.(order.id, price);
+    (price: number, partialPercent: number) => {
+      order.callbacks?.onTPMove?.(price, partialPercent);
+      onTPMovePreview?.(order.id, price, partialPercent);
     },
     [order.callbacks, onTPMovePreview, order.id],
   );
 
   // Handle continuous SL move (for adapter callback + Skia drag preview)
   const handleSLMove = useCallback(
-    (price: number) => {
-      order.callbacks?.onSLMove?.(price);
-      onSLMovePreview?.(order.id, price);
+    (price: number, partialPercent: number) => {
+      order.callbacks?.onSLMove?.(price, partialPercent);
+      onSLMovePreview?.(order.id, price, partialPercent);
     },
     [order.callbacks, onSLMovePreview, order.id],
   );
@@ -156,22 +164,28 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       })
       .onUpdate((event) => {
         tpTranslateY.value = event.translationY;
-        if (Math.abs(event.translationY) >= 5) {
+        if (isBracketDrag(event)) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleTPMove)(dragPrice);
+          const partialPercent = order.partialEnabled
+            ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+            : 100;
+          runOnJS(handleTPMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
         tpDragging.value = false;
         const finalY = baseY + event.translationY;
         const newPrice = yToPrice(finalY, viewport, dimensions);
+        const partialPercent = order.partialEnabled
+          ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+          : undefined;
 
         runOnJS(handleTPSLDragEnd)();
 
-        if (Math.abs(event.translationY) < 5) {
-          runOnJS(handleTPClick)();
+        if (isBracketDrag(event)) {
+          runOnJS(handleTPDragEnd)(newPrice, partialPercent);
         } else {
-          runOnJS(handleTPDragEnd)(newPrice);
+          runOnJS(handleTPClick)();
         }
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -202,22 +216,28 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       })
       .onUpdate((event) => {
         slTranslateY.value = event.translationY;
-        if (Math.abs(event.translationY) >= 5) {
+        if (isBracketDrag(event)) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleSLMove)(dragPrice);
+          const partialPercent = order.partialEnabled
+            ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+            : 100;
+          runOnJS(handleSLMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
         slDragging.value = false;
         const finalY = baseY + event.translationY;
         const newPrice = yToPrice(finalY, viewport, dimensions);
+        const partialPercent = order.partialEnabled
+          ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+          : undefined;
 
         runOnJS(handleTPSLDragEnd)();
 
-        if (Math.abs(event.translationY) < 5) {
-          runOnJS(handleSLClick)();
+        if (isBracketDrag(event)) {
+          runOnJS(handleSLDragEnd)(newPrice, partialPercent);
         } else {
-          runOnJS(handleSLDragEnd)(newPrice);
+          runOnJS(handleSLClick)();
         }
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -310,6 +330,10 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
   }, [order.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
   const lineColor = order.lineColor;
+  const takeProfitColor = order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
+  const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? order.textShort : order.text;
@@ -421,12 +445,12 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: lineColor,
-                      borderColor: lineColor,
+                      backgroundColor: takeProfitColor,
+                      borderColor: takeProfitColor,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: order.bodyTextColor }]}>TP</Text>
+                  <Text style={[styles.bracketButtonText, { color: takeProfitTextColor }]}>TP</Text>
                 </View>
               </Animated.View>
             </GestureDetector>
@@ -438,12 +462,12 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: lineColor,
-                      borderColor: lineColor,
+                      backgroundColor: stopLossColor,
+                      borderColor: stopLossColor,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: order.bodyTextColor }]}>SL</Text>
+                  <Text style={[styles.bracketButtonText, { color: stopLossTextColor }]}>SL</Text>
                 </View>
               </Animated.View>
             </GestureDetector>

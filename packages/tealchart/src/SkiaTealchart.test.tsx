@@ -1,13 +1,21 @@
 import type { UserDrawingObjectTreeModel, UserDrawingState, UserDrawingTool } from './drawings';
-import type { Bar, DatafeedConfiguration, IBasicDataFeed, LibrarySymbolInfo, PeriodParams, ResolutionString } from './types';
 import type { SkiaTealchartHandle } from './SkiaTealchart';
+import type {
+  Bar,
+  DatafeedConfiguration,
+  IBasicDataFeed,
+  LibrarySymbolInfo,
+  PeriodParams,
+  ResolutionString,
+} from './types';
 
 import { createRef } from 'react';
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createPicture } from '@shopify/react-native-skia';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { Gesture } from 'react-native-gesture-handler';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { getUserDrawingToolCategoryDescriptorForTool, getUserDrawingToolDescriptor } from './drawings';
 import { SkiaTealchart } from './SkiaTealchart';
 import { clearChartStoreCache } from './state/chartState';
@@ -42,7 +50,10 @@ function getLatestSingleTapGesture(): MockGesture {
   const tap = [...tapMock.mock.results]
     .reverse()
     .map((result) => result.value)
-    .find((gesture) => gesture.__callbacks?.onEnd && !gesture.__callbacks?.numberOfPointers && !gesture.__callbacks?.numberOfTaps);
+    .find(
+      (gesture) =>
+        gesture.__callbacks?.onEnd && !gesture.__callbacks?.numberOfPointers && !gesture.__callbacks?.numberOfTaps,
+    );
 
   if (!tap) {
     throw new Error('Expected SkiaTealchart to register a single tap gesture');
@@ -86,10 +97,16 @@ async function selectRenderedMobileDrawingTool(tool: UserDrawingTool): Promise<v
   const category = getUserDrawingToolCategoryDescriptorForTool(tool);
   if (!category) throw new Error(`Expected toolbar category for ${tool}`);
   const descriptor = getUserDrawingToolDescriptor(tool);
+  const categoryButtonLabel = `${category.label} drawing tools`;
 
   await act(async () => {
-    fireEvent.click(screen.getByLabelText(`${category.label} drawing tools`));
+    fireEvent.click(screen.getByLabelText(categoryButtonLabel));
   });
+  if (!screen.queryByLabelText(descriptor.label)) {
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText(categoryButtonLabel));
+    });
+  }
   await act(async () => {
     fireEvent.click(await screen.findByLabelText(descriptor.label));
   });
@@ -565,12 +582,7 @@ describe('SkiaTealchart drawing properties', () => {
       />,
     );
 
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
-    });
-    await act(async () => {
-      fireEvent.click(await screen.findByLabelText('Rectangle'));
-    });
+    await selectRenderedMobileDrawingTool('rectangle');
 
     expect(ref.current?.getUserDrawingState().activeTool).toBe('rectangle');
     expect(onStateChange).toHaveBeenCalledWith(expect.objectContaining({ activeTool: 'rectangle' }));
@@ -585,63 +597,63 @@ describe('SkiaTealchart drawing properties', () => {
   it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
     'commits exact %s endpoints through rendered toolbar selection and Skia taps',
     async (tool) => {
-    const ref = createRef<SkiaTealchartHandle>();
-    const onCommand = vi.fn();
+      const ref = createRef<SkiaTealchartHandle>();
+      const onCommand = vi.fn();
 
-    render(
-      <SkiaTealchart
-        ref={ref}
-        datafeed={createDatafeed()}
-        symbol="BTCUSDT"
-        interval="60"
-        width={360}
-        height={260}
-        userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
-        onUserDrawingCommand={onCommand}
-      />,
-    );
+      render(
+        <SkiaTealchart
+          ref={ref}
+          datafeed={createDatafeed()}
+          symbol="BTCUSDT"
+          interval="60"
+          width={360}
+          height={260}
+          userDrawingState={{ ...initialDrawingState, activeTool: 'select', selection: null, drawings: [] }}
+          onUserDrawingCommand={onCommand}
+        />,
+      );
 
-    await selectRenderedMobileDrawingTool(tool);
-    expect(ref.current?.getUserDrawingState().activeTool).toBe(tool);
-    expect(onCommand).toHaveBeenCalledWith(
-      expect.objectContaining({
-        command: expect.objectContaining({ type: 'setActiveTool', tool }),
-        source: 'toolbar',
-      }),
-    );
+      await selectRenderedMobileDrawingTool(tool);
+      expect(ref.current?.getUserDrawingState().activeTool).toBe(tool);
+      expect(onCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          command: expect.objectContaining({ type: 'setActiveTool', tool }),
+          source: 'toolbar',
+        }),
+      );
 
-    const firstTap = getLatestSingleTapGesture();
-    await act(async () => {
-      runGestureCallback(firstTap, 'onEnd', { x: 130, y: 95 });
-    });
-    const secondTap = getLatestSingleTapGesture();
-    await act(async () => {
-      runGestureCallback(secondTap, 'onEnd', { x: 245, y: 165 });
-    });
+      const firstTap = getLatestSingleTapGesture();
+      await act(async () => {
+        runGestureCallback(firstTap, 'onEnd', { x: 130, y: 95 });
+      });
+      const secondTap = getLatestSingleTapGesture();
+      await act(async () => {
+        runGestureCallback(secondTap, 'onEnd', { x: 245, y: 165 });
+      });
 
-    const inputCommands = onCommand.mock.calls
-      .filter(([event]) => event.command.type === 'handleInput')
-      .map(([event]) => event.command);
-    const [firstAnchorCommand, secondAnchorCommand] = inputCommands;
-    const drawing = ref.current?.getUserDrawingState().drawings[0];
+      const inputCommands = onCommand.mock.calls
+        .filter(([event]) => event.command.type === 'handleInput')
+        .map(([event]) => event.command);
+      const [firstAnchorCommand, secondAnchorCommand] = inputCommands;
+      const drawing = ref.current?.getUserDrawingState().drawings[0];
 
-    expect(inputCommands).toHaveLength(2);
-    expect(firstAnchorCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
-    expect(secondAnchorCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
-    expectAnchorToBeCloseTo(firstAnchorCommand?.point.anchor, {
-      time: 1_116_161.616161616,
-      price: 55.39393939393939,
-    });
-    expectAnchorToBeCloseTo(secondAnchorCommand?.point.anchor, {
-      time: 1_223_030.303030303,
-      price: 49.45454545454545,
-    });
-    expect(drawing).toMatchObject({
-      id: 'drawing_1',
-      kind: tool,
-      points: [firstAnchorCommand?.point.anchor, secondAnchorCommand?.point.anchor],
-    });
-    expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+      expect(inputCommands).toHaveLength(2);
+      expect(firstAnchorCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
+      expect(secondAnchorCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
+      expectAnchorToBeCloseTo(firstAnchorCommand?.point.anchor, {
+        time: 1_097_183.0985915493,
+        price: 55.39393939393939,
+      });
+      expectAnchorToBeCloseTo(secondAnchorCommand?.point.anchor, {
+        time: 1_186_591.5492957747,
+        price: 49.45454545454545,
+      });
+      expect(drawing).toMatchObject({
+        id: 'drawing_1',
+        kind: tool,
+        points: [firstAnchorCommand?.point.anchor, secondAnchorCommand?.point.anchor],
+      });
+      expect(ref.current?.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
     },
   );
 
@@ -672,9 +684,8 @@ describe('SkiaTealchart drawing properties', () => {
         runGestureCallback(firstTap, 'onEnd', { x: 130, y: 95 });
       });
 
-      const firstAnchorCommand = onCommand.mock.calls.find(
-        ([event]) => event.command.type === 'handleInput',
-      )?.[0].command;
+      const firstAnchorCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'handleInput')?.[0]
+        .command;
       expect(firstAnchorCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
       expect(ref.current?.getUserDrawingState()).toMatchObject({
         activeTool: tool,
@@ -793,15 +804,15 @@ describe('SkiaTealchart drawing properties', () => {
       expect(command).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
     });
     expectAnchorToBeCloseTo(inputCommands[0]?.point.anchor, {
-      time: 1_116_161.616161616,
+      time: 1_097_183.0985915493,
       price: 55.39393939393939,
     });
     expectAnchorToBeCloseTo(inputCommands[1]?.point.anchor, {
-      time: 1_223_030.303030303,
+      time: 1_186_591.5492957747,
       price: 49.45454545454545,
     });
     expectAnchorToBeCloseTo(inputCommands[2]?.point.anchor, {
-      time: 1_116_161.616161616,
+      time: 1_097_183.0985915493,
       price: 55.39393939393939,
     });
     expect(ref.current?.getUserDrawingState()).toMatchObject({
@@ -860,22 +871,24 @@ describe('SkiaTealchart drawing properties', () => {
     const beginCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'beginPathDrag')?.[0].command;
     const appendCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'appendPathDragPoint')?.[0]
       .command;
-    const commitCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'commitPathDrag')?.[0]
-      .command;
+    const commitCommand = onCommand.mock.calls.find(([event]) => event.command.type === 'commitPathDrag')?.[0].command;
     const drawing = ref.current?.getUserDrawingState().drawings[0];
 
-    expect(beginCommand).toMatchObject({ type: 'beginPathDrag', meta: { source: 'touch', transactionKey: 'path-drag' } });
+    expect(beginCommand).toMatchObject({
+      type: 'beginPathDrag',
+      meta: { source: 'touch', transactionKey: 'path-drag' },
+    });
     expect(appendCommand).toMatchObject({
       type: 'appendPathDragPoint',
       meta: { source: 'touch', transactionKey: 'path-drag' },
     });
     expect(commitCommand).toMatchObject({ type: 'commitPathDrag', meta: { source: 'touch' } });
     expectAnchorToBeCloseTo(beginCommand?.point.anchor, {
-      time: 1_116_161.616161616,
+      time: 1_097_183.0985915493,
       price: 55.39393939393939,
     });
     expectAnchorToBeCloseTo(appendCommand?.point.anchor, {
-      time: 1_223_030.303030303,
+      time: 1_186_591.5492957747,
       price: 49.45454545454545,
     });
     expect(drawing).toMatchObject({
@@ -922,7 +935,7 @@ describe('SkiaTealchart drawing properties', () => {
 
     expect(inputCommand).toMatchObject({ type: 'handleInput', meta: { source: 'touch' } });
     expectAnchorToBeCloseTo(inputCommand?.point.anchor, {
-      time: 1_116_161.616161616,
+      time: 1_097_183.0985915493,
       price: 55.39393939393939,
     });
     expect(drawing).toMatchObject({
@@ -950,12 +963,7 @@ describe('SkiaTealchart drawing properties', () => {
       />,
     );
 
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('Geometric Shapes drawing tools'));
-    });
-    await act(async () => {
-      fireEvent.click(await screen.findByLabelText('Rectangle'));
-    });
+    await selectRenderedMobileDrawingTool('rectangle');
 
     const tap = getLatestSingleTapGesture();
     await act(async () => {

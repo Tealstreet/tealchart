@@ -17,6 +17,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
+import { STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from '../../constants';
+import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
 import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
@@ -37,9 +39,9 @@ export interface PositionLineComponentProps {
   /** Callback when position is reversed (fallback if no adapter callback) */
   onReverse?: (positionId: string) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
-  onTPMovePreview?: (positionId: string, price: number) => void;
+  onTPMovePreview?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
-  onSLMovePreview?: (positionId: string, price: number) => void;
+  onSLMovePreview?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Called when any TP/SL drag ends (to clear preview) */
   onTPSLDragEnd?: () => void;
 }
@@ -47,6 +49,11 @@ export interface PositionLineComponentProps {
 const TOUCH_TARGET_HEIGHT = 44;
 const LABEL_HEIGHT = 18;
 const TP_SL_BUTTON_WIDTH = 24;
+const DRAG_THRESHOLD = 5;
+
+function isBracketDrag(event: { translationX?: number; translationY: number }): boolean {
+  return Math.abs(event.translationX ?? 0) > DRAG_THRESHOLD || Math.abs(event.translationY) > DRAG_THRESHOLD;
+}
 
 export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   position,
@@ -103,34 +110,34 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
 
   // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
-    (newPrice: number) => {
-      position.callbacks?.onTPMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      position.callbacks?.onTPMoveEnd?.(newPrice, partialPercent);
     },
     [position.callbacks],
   );
 
   // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
-    (newPrice: number) => {
-      position.callbacks?.onSLMoveEnd?.(newPrice);
+    (newPrice: number, partialPercent?: number) => {
+      position.callbacks?.onSLMoveEnd?.(newPrice, partialPercent);
     },
     [position.callbacks],
   );
 
   // Handle continuous TP move (for adapter callback + Skia drag preview)
   const handleTPMove = useCallback(
-    (price: number) => {
-      position.callbacks?.onTPMove?.(price);
-      onTPMovePreview?.(position.id, price);
+    (price: number, partialPercent: number) => {
+      position.callbacks?.onTPMove?.(price, partialPercent);
+      onTPMovePreview?.(position.id, price, partialPercent);
     },
     [position.callbacks, onTPMovePreview, position.id],
   );
 
   // Handle continuous SL move (for adapter callback + Skia drag preview)
   const handleSLMove = useCallback(
-    (price: number) => {
-      position.callbacks?.onSLMove?.(price);
-      onSLMovePreview?.(position.id, price);
+    (price: number, partialPercent: number) => {
+      position.callbacks?.onSLMove?.(price, partialPercent);
+      onSLMovePreview?.(position.id, price, partialPercent);
     },
     [position.callbacks, onSLMovePreview, position.id],
   );
@@ -153,24 +160,30 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       .onUpdate((event) => {
         tpTranslateY.value = event.translationY;
         // Emit continuous move for Skia drag preview (only after drag threshold)
-        if (Math.abs(event.translationY) >= 5) {
+        if (isBracketDrag(event)) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleTPMove)(dragPrice);
+          const partialPercent = position.partialEnabled
+            ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+            : 100;
+          runOnJS(handleTPMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
         tpDragging.value = false;
         const finalY = baseY + event.translationY;
         const newPrice = yToPrice(finalY, viewport, dimensions);
+        const partialPercent = position.partialEnabled
+          ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+          : undefined;
 
         // Clear Skia drag preview
         runOnJS(handleTPSLDragEnd)();
 
         // Check if this was a tap vs drag
-        if (Math.abs(event.translationY) < 5) {
-          runOnJS(handleTPClick)();
+        if (isBracketDrag(event)) {
+          runOnJS(handleTPDragEnd)(newPrice, partialPercent);
         } else {
-          runOnJS(handleTPDragEnd)(newPrice);
+          runOnJS(handleTPClick)();
         }
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -203,24 +216,30 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       .onUpdate((event) => {
         slTranslateY.value = event.translationY;
         // Emit continuous move for Skia drag preview (only after drag threshold)
-        if (Math.abs(event.translationY) >= 5) {
+        if (isBracketDrag(event)) {
           const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
-          runOnJS(handleSLMove)(dragPrice);
+          const partialPercent = position.partialEnabled
+            ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+            : 100;
+          runOnJS(handleSLMove)(dragPrice, partialPercent);
         }
       })
       .onEnd((event) => {
         slDragging.value = false;
         const finalY = baseY + event.translationY;
         const newPrice = yToPrice(finalY, viewport, dimensions);
+        const partialPercent = position.partialEnabled
+          ? calculatePartialBracketPercentFromDelta(event.translationX ?? 0)
+          : undefined;
 
         // Clear Skia drag preview
         runOnJS(handleTPSLDragEnd)();
 
         // Check if this was a tap vs drag
-        if (Math.abs(event.translationY) < 5) {
-          runOnJS(handleSLClick)();
+        if (isBracketDrag(event)) {
+          runOnJS(handleSLDragEnd)(newPrice, partialPercent);
         } else {
-          runOnJS(handleSLDragEnd)(newPrice);
+          runOnJS(handleSLClick)();
         }
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
@@ -279,6 +298,10 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength)) / 100;
   }, [position.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
   const lineColor = position.lineColor;
+  const takeProfitColor = position.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
+  const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? position.textShort : position.text;
@@ -388,14 +411,14 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: lineColor,
-                      borderColor: lineColor,
+                      backgroundColor: takeProfitColor,
+                      borderColor: takeProfitColor,
                       borderTopLeftRadius: 2,
                       borderBottomLeftRadius: 2,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: position.bodyTextColor }]}>TP</Text>
+                  <Text style={[styles.bracketButtonText, { color: takeProfitTextColor }]}>TP</Text>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
@@ -407,15 +430,15 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                   style={[
                     styles.bracketButton,
                     {
-                      backgroundColor: lineColor,
-                      borderColor: lineColor,
+                      backgroundColor: stopLossColor,
+                      borderColor: stopLossColor,
                       borderTopRightRadius: 2,
                       borderBottomRightRadius: 2,
                       borderLeftWidth: 0,
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: position.bodyTextColor }]}>SL</Text>
+                  <Text style={[styles.bracketButtonText, { color: stopLossTextColor }]}>SL</Text>
                 </Pressable>
               </Animated.View>
             </GestureDetector>

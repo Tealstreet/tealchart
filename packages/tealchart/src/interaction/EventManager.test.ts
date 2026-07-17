@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
+import type { EventManagerCallbacks } from './EventManager';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
-import { EventManager, type EventManagerCallbacks } from './EventManager';
+import { EventManager } from './EventManager';
 
 function createContainer(): HTMLElement {
   const container = document.createElement('div');
@@ -84,6 +85,7 @@ function dispatchPointerEvent(
     clientY: number;
     pressure?: number;
     shiftKey?: boolean;
+    altKey?: boolean;
     metaKey?: boolean;
     ctrlKey?: boolean;
   },
@@ -97,6 +99,7 @@ function dispatchPointerEvent(
     clientY: { value: init.clientY },
     pressure: { value: init.pressure ?? 0.5 },
     shiftKey: { value: init.shiftKey ?? false },
+    altKey: { value: init.altKey ?? false },
     metaKey: { value: init.metaKey ?? false },
     ctrlKey: { value: init.ctrlKey ?? false },
   });
@@ -137,7 +140,10 @@ describe('EventManager drawing drag routing', () => {
 
     expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse');
     expect(onDrawingDragStart).not.toHaveBeenCalled();
-    expect(onDrawingInput).toHaveBeenCalledWith(100, 100, 'mouse', { additiveSelection: false, constrainedPlacement: false });
+    expect(onDrawingInput).toHaveBeenCalledWith(100, 100, 'mouse', {
+      additiveSelection: false,
+      constrainedPlacement: false,
+    });
 
     container.dispatchEvent(
       new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 120, clientY: 120, shiftKey: true }),
@@ -145,7 +151,10 @@ describe('EventManager drawing drag routing', () => {
     window.dispatchEvent(
       new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 120, clientY: 120, shiftKey: true }),
     );
-    expect(onDrawingInput).toHaveBeenLastCalledWith(120, 120, 'mouse', { additiveSelection: true, constrainedPlacement: true });
+    expect(onDrawingInput).toHaveBeenLastCalledWith(120, 120, 'mouse', {
+      additiveSelection: true,
+      constrainedPlacement: true,
+    });
 
     manager.dispose();
   });
@@ -176,7 +185,10 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingDragStart).not.toHaveBeenCalled();
     expect(onDrawingDragMove).not.toHaveBeenCalled();
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
-    expect(onDrawingInput).toHaveBeenCalledWith(102, 103, 'mouse', { additiveSelection: false, constrainedPlacement: false });
+    expect(onDrawingInput).toHaveBeenCalledWith(102, 103, 'mouse', {
+      additiveSelection: false,
+      constrainedPlacement: false,
+    });
 
     manager.dispose();
   });
@@ -186,10 +198,7 @@ describe('EventManager drawing drag routing', () => {
     const container = createContainer();
     const getPaneAtY = vi.fn(() => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 600 }));
     const onPaneDoubleClick = vi.fn();
-    const onDrawingInput = vi
-      .fn()
-      .mockReturnValueOnce({ handled: true })
-      .mockReturnValueOnce({ handled: true });
+    const onDrawingInput = vi.fn().mockReturnValueOnce({ handled: true }).mockReturnValueOnce({ handled: true });
     const manager = new EventManager(
       container,
       createCallbacks({
@@ -479,25 +488,25 @@ describe('EventManager drawing drag routing', () => {
       createCallbacks({ onDrawingDragPending, onDrawingDragStart, onDrawingDragMove, onDrawingDragEnd: vi.fn() }),
     );
 
-    container.dispatchEvent(
-      new PointerEvent('pointerdown', {
-        bubbles: true,
-        button: 0,
-        clientX: 100,
-        clientY: 100,
-        pointerId: 1,
-        pointerType: 'pen',
-        altKey: true,
-      }),
-    );
-    window.dispatchEvent(
-      new PointerEvent('pointermove', { bubbles: true, clientX: 130, clientY: 110, pointerId: 1, pointerType: 'pen', altKey: true }),
-    );
+    dispatchPointerEvent(container, 'pointerdown', {
+      clientX: 100,
+      clientY: 100,
+      pointerType: 'pen',
+      altKey: true,
+      pressure: 0,
+    });
+    dispatchPointerEvent(window, 'pointermove', {
+      clientX: 130,
+      clientY: 110,
+      pointerType: 'pen',
+      altKey: true,
+      pressure: 0,
+    });
 
     // PointerEvent carries a default pressure of 0, which the drag options surface.
     expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { duplicateOnDrag: true, pressure: 0 });
 
-    window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 0, clientX: 130, clientY: 110, pointerId: 1, pointerType: 'pen' }));
+    dispatchPointerEvent(window, 'pointerup', { clientX: 130, clientY: 110, pointerType: 'pen', pressure: 0 });
     manager.dispose();
   });
 
@@ -510,7 +519,14 @@ describe('EventManager drawing drag routing', () => {
     );
 
     container.dispatchEvent(
-      new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100, shiftKey: true, altKey: true }),
+      new MouseEvent('mousedown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100,
+        shiftKey: true,
+        altKey: true,
+      }),
     );
 
     expect(onDrawingDragPending).toHaveBeenCalledWith(100, 100, 'mouse', { constrainedPlacement: true });

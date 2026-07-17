@@ -1,20 +1,20 @@
 // @vitest-environment jsdom
 
-import type { Bar, Viewport } from '../types';
 import type {
   UserDrawingInputPoint,
   UserDrawingSelectionAtPointResult,
   UserDrawingState,
   UserDrawingTool,
 } from '../drawings';
+import type { Bar, Viewport } from '../types';
 
 import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
-import { TealchartRenderer } from '../TealchartRenderer';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
+import { TealchartRenderer } from '../TealchartRenderer';
 
 interface EventManagerCallbackProbe {
   onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
@@ -328,7 +328,9 @@ describe('ChartCore viewport management', () => {
 
     expect(testCore.handleUserDrawingInput(100, 100)).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
-    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), { additive: undefined });
+    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), {
+      additive: undefined,
+    });
     expect(testCore.handleUserDrawingInput(100, 100, 'mouse', { additiveSelection: true })).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
     expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), { additive: true });
@@ -372,17 +374,21 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
     expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
     expect(testCore.handleUserDrawingDragStart(100, 100, { pressure: 0.4 })).toBe(true);
-    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(expect.objectContaining({
-      paneId: 'main',
-      anchor: { time: expect.any(Number), price: expect.any(Number), pressure: 0.4 },
-      position: { x: expect.any(Number), y: expect.any(Number) },
-    }));
+    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paneId: 'main',
+        anchor: { time: expect.any(Number), price: expect.any(Number), pressure: 0.4 },
+        position: { x: expect.any(Number), y: expect.any(Number) },
+      }),
+    );
     expect(testCore.handleUserDrawingDragMove(120, 110, { pressure: 0.6 })).toBe(true);
-    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(expect.objectContaining({
-      paneId: 'main',
-      anchor: { time: expect.any(Number), price: expect.any(Number), pressure: 0.6 },
-      position: { x: expect.any(Number), y: expect.any(Number) },
-    }));
+    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paneId: 'main',
+        anchor: { time: expect.any(Number), price: expect.any(Number), pressure: 0.6 },
+        position: { x: expect.any(Number), y: expect.any(Number) },
+      }),
+    );
     testCore.handleUserDrawingDragEnd();
     expect(onUserDrawingPathDragEnd).toHaveBeenCalledTimes(1);
 
@@ -399,15 +405,19 @@ describe('ChartCore viewport management', () => {
     } satisfies UserDrawingState);
     expect(testCore.handleUserDrawingDragPending(100, 100)).toBe(true);
     expect(testCore.handleUserDrawingDragStart(100, 100)).toBe(true);
-    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(expect.objectContaining({
-      paneId: 'main',
-      anchor: { time: expect.any(Number), price: expect.any(Number) },
-    }));
+    expect(onUserDrawingPathDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paneId: 'main',
+        anchor: { time: expect.any(Number), price: expect.any(Number) },
+      }),
+    );
     expect(testCore.handleUserDrawingDragMove(120, 110)).toBe(true);
-    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(expect.objectContaining({
-      paneId: 'main',
-      anchor: { time: expect.any(Number), price: expect.any(Number) },
-    }));
+    expect(onUserDrawingPathDragMove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paneId: 'main',
+        anchor: { time: expect.any(Number), price: expect.any(Number) },
+      }),
+    );
     testCore.handleUserDrawingDragEnd();
     expect(onUserDrawingPathDragEnd).toHaveBeenCalledTimes(1);
 
@@ -418,9 +428,7 @@ describe('ChartCore viewport management', () => {
     const { ChartCore } = await import('./ChartCore');
     const drawingClick = vi.fn();
     const fallbackClick = vi.fn();
-    const onContextMenu = vi.fn(() => [
-      { position: 'top' as const, text: 'Fallback action', click: fallbackClick },
-    ]);
+    const onContextMenu = vi.fn(() => [{ position: 'top' as const, text: 'Fallback action', click: fallbackClick }]);
     const onUserDrawingContextMenu = vi.fn(() => [
       { position: 'top' as const, text: 'Duplicate selected drawing', click: drawingClick },
       { position: 'bottom' as const, text: 'Disabled drawing action', click: vi.fn(), enabled: false },
@@ -492,9 +500,7 @@ describe('ChartCore viewport management', () => {
 
   it('cleans up ChartCore context menu listeners when menus are replaced or disposed', async () => {
     const { ChartCore } = await import('./ChartCore');
-    const onContextMenu = vi.fn(() => [
-      { position: 'top' as const, text: 'Fallback action', click: vi.fn() },
-    ]);
+    const onContextMenu = vi.fn(() => [{ position: 'top' as const, text: 'Fallback action', click: vi.fn() }]);
     const addDocumentListener = vi.spyOn(document, 'addEventListener');
     const removeDocumentListener = vi.spyOn(document, 'removeEventListener');
     const core = new ChartCore({
@@ -541,7 +547,12 @@ describe('ChartCore viewport management', () => {
       core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
 
       const testCore = core as unknown as {
-        handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch', options?: { constrainedPlacement?: boolean }): unknown;
+        handleUserDrawingInput(
+          x: number,
+          y: number,
+          source?: 'mouse' | 'touch',
+          options?: { constrainedPlacement?: boolean },
+        ): unknown;
         resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
       };
 
@@ -643,8 +654,14 @@ describe('ChartCore viewport management', () => {
       const secondAnchor = testCore.resolveUserDrawingInputPoint(72, 40)?.anchor;
       expect(testCore.handleUserDrawingInput(48, 18)).toBe(true);
       expect(testCore.handleUserDrawingInput(72, 40)).toBe(true);
-      expect(onUserDrawingInput).toHaveBeenNthCalledWith(1, expect.objectContaining({ paneId: 'main', anchor: firstAnchor }));
-      expect(onUserDrawingInput).toHaveBeenNthCalledWith(2, expect.objectContaining({ paneId: 'main', anchor: secondAnchor }));
+      expect(onUserDrawingInput).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ paneId: 'main', anchor: firstAnchor }),
+      );
+      expect(onUserDrawingInput).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ paneId: 'main', anchor: secondAnchor }),
+      );
 
       core.dispose();
     },
@@ -696,7 +713,12 @@ describe('ChartCore viewport management', () => {
     core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
 
     const testCore = core as unknown as {
-      handleUserDrawingInput(x: number, y: number, source?: 'mouse' | 'touch', options?: { constrainedPlacement?: boolean }): unknown;
+      handleUserDrawingInput(
+        x: number,
+        y: number,
+        source?: 'mouse' | 'touch',
+        options?: { constrainedPlacement?: boolean },
+      ): unknown;
       resolveUserDrawingInputPoint(x: number, y: number): UserDrawingInputPoint | null;
     };
 
@@ -705,7 +727,13 @@ describe('ChartCore viewport management', () => {
       version: 1,
       activeTool: 'cyclicLines',
       selection: null,
-      draft: { tool: 'cyclicLines', paneId: 'main', anchors: [startAnchor!], style: DEFAULT_USER_DRAWING_STYLE, startedAt: 0 },
+      draft: {
+        tool: 'cyclicLines',
+        paneId: 'main',
+        anchors: [startAnchor!],
+        style: DEFAULT_USER_DRAWING_STYLE,
+        startedAt: 0,
+      },
       textEdit: null,
       drawings: [],
     } satisfies UserDrawingState);
@@ -819,8 +847,7 @@ describe('ChartCore viewport management', () => {
       container,
       width: 800,
       height: 600,
-      renderOptions: {
-      },
+      renderOptions: {},
     });
 
     core.setBars(makeBars(5));
@@ -861,14 +888,66 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('renders existing order bracket prices as standalone interactive lines', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: {},
+    });
+
+    core.setBars(makeBars(5));
+    core.setOrderLines([
+      {
+        id: 'order-1',
+        price: 50010,
+        lineColor: '#2196F3',
+        lineStyle: 2,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        editable: true,
+        cancellable: true,
+        partialEnabled: false,
+        brackets: {
+          takeProfit: 50100,
+          stopLoss: 49900,
+        },
+        text: 'Limit',
+        textShort: 'Lmt',
+        quantity: '1',
+        quantityShort: '1',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#2196F3',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#2196F3',
+        cancelButtonBackgroundColor: '#111111',
+        cancelButtonIconColor: '#ffffff',
+        cancelButtonBorderColor: '#2196F3',
+        cancelTooltip: 'Cancel',
+        modifyTooltip: 'Modify',
+        callbacks: {},
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    expect(manager.cachedLineGroups.has('order-1-tp')).toBe(true);
+    expect(manager.cachedLineGroups.has('order-1-sl')).toBe(true);
+
+    core.dispose();
+  });
+
   it('renders position lines on the experimental canvas interactive-line path', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
       container,
       width: 800,
       height: 600,
-      renderOptions: {
-      },
+      renderOptions: {},
     });
 
     core.setBars(makeBars(5));
@@ -1119,7 +1198,9 @@ describe('ChartCore viewport management', () => {
     core.paint(DIRTY.FULL);
 
     const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
-    const initialBound = manager.cachedLineGroups.get('position-1')?.getAttr('boundData') as { partialEnabled?: boolean };
+    const initialBound = manager.cachedLineGroups.get('position-1')?.getAttr('boundData') as {
+      partialEnabled?: boolean;
+    };
     expect(initialBound.partialEnabled).toBe(false);
     expect(manager.options.fontFamily).toBe('Mock Font');
 

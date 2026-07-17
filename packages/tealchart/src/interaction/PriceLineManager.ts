@@ -12,6 +12,7 @@ import type { ChartMargins, PendingOrderUpdate, PriceLineLabelBounds } from '../
 import Konva from 'konva';
 
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
+import { calculatePartialBracketPercent } from './partialBrackets';
 
 // ============================================================================
 // Types
@@ -127,18 +128,6 @@ function formatCountdown(targetTimeMs: number): string {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   return `${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
-/**
- * Calculate magnet percentage for partial TP/SL
- */
-function calculatePartialPercent(startX: number, currentX: number): number {
-  const deltaX = Math.abs(currentX - startX);
-  if (deltaX <= 27) return 100;
-  if (deltaX <= 82) return 75;
-  if (deltaX <= 137) return 50;
-  if (deltaX <= 192) return 25;
-  return 10;
 }
 
 let textMeasureContext: CanvasRenderingContext2D | null = null;
@@ -290,43 +279,41 @@ export class PriceLineManager {
     // Only include properties that require element rebuild when changed
     // Exclude: price, originalY, adjustedY (handled by position updates)
     return bounds
-      .map(
-        (b) => {
-          const segmentSignature =
-            b.chartLabel?.segments
-              ?.map((segment) =>
-                [
-                  segment.text,
-                  segment.textShort ?? '',
-                  segment.textColor,
-                  segment.backgroundColor,
-                  segment.borderColor,
-                ].join('~'),
-              )
-              .join('|') ?? '';
-          const buttonSignature =
-            b.chartLabel?.buttons
-              ?.map((button) => [button.type, button.backgroundColor, button.borderColor, button.iconColor].join('~'))
-              .join('|') ?? '';
-          return [
-            b.lineId,
-            b.type,
-            b.color,
-            b.lineStyle,
-            b.draggable ? '1' : '0',
-            b.width,
-            b.height,
-            b.lineLength ?? '',
-            b.countdownToTime !== undefined ? '1' : '0',
-            b.label?.primaryText ?? '',
-            b.label?.secondaryText ?? '',
-            b.label?.backgroundColor ?? '',
-            b.label?.textColor ?? '',
-            segmentSignature,
-            buttonSignature,
-          ].join('|');
-        },
-      )
+      .map((b) => {
+        const segmentSignature =
+          b.chartLabel?.segments
+            ?.map((segment) =>
+              [
+                segment.text,
+                segment.textShort ?? '',
+                segment.textColor,
+                segment.backgroundColor,
+                segment.borderColor,
+              ].join('~'),
+            )
+            .join('|') ?? '';
+        const buttonSignature =
+          b.chartLabel?.buttons
+            ?.map((button) => [button.type, button.backgroundColor, button.borderColor, button.iconColor].join('~'))
+            .join('|') ?? '';
+        return [
+          b.lineId,
+          b.type,
+          b.color,
+          b.lineStyle,
+          b.draggable ? '1' : '0',
+          b.width,
+          b.height,
+          b.lineLength ?? '',
+          b.countdownToTime !== undefined ? '1' : '0',
+          b.label?.primaryText ?? '',
+          b.label?.secondaryText ?? '',
+          b.label?.backgroundColor ?? '',
+          b.label?.textColor ?? '',
+          segmentSignature,
+          buttonSignature,
+        ].join('|');
+      })
       .sort()
       .join(';');
   }
@@ -904,8 +891,8 @@ export class PriceLineManager {
         const nextButton = orderedButtons[i + 1];
         const startsTPSLGroup = isTPSL && prevButton && prevButton.type !== 'tp' && prevButton.type !== 'sl';
         const isLastInline = !isTPSL && (!nextButton || nextButton.type === 'tp' || nextButton.type === 'sl');
-        const isFirstTPSL = isTPSL && (!prevButton || prevButton.type !== 'tp' && prevButton.type !== 'sl');
-        const isLastTPSL = isTPSL && (!nextButton || nextButton.type !== 'tp' && nextButton.type !== 'sl');
+        const isFirstTPSL = isTPSL && (!prevButton || (prevButton.type !== 'tp' && prevButton.type !== 'sl'));
+        const isLastTPSL = isTPSL && (!nextButton || (nextButton.type !== 'tp' && nextButton.type !== 'sl'));
 
         if (startsTPSLGroup || (i === 0 && isTPSL && tpslGap > 0)) {
           currentX += tpslGap;
@@ -1010,7 +997,7 @@ export class PriceLineManager {
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
-              ? calculatePartialPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
+              ? calculatePartialBracketPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
               : 100;
 
             if (buttonType === 'tp') {
@@ -1048,7 +1035,7 @@ export class PriceLineManager {
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
-              ? calculatePartialPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
+              ? calculatePartialBracketPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
               : undefined;
 
             hitRect.x(activeDrag.originalX ?? originalX);
