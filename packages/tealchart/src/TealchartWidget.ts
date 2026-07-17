@@ -154,9 +154,51 @@ export function resolveDefaultLayoutPersistence(options: TealchartWidgetOptions)
   };
 }
 
-const getCleanSymbol = (symbol: string): string => {
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const getCleanSymbol = (symbol: unknown): string | null => {
+  if (!isNonEmptyString(symbol)) {
+    return null;
+  }
   const parts = symbol.split(':');
   return parts.length > 1 ? parts[1] : symbol;
+};
+
+const getSymbolInfoValue = (
+  symbolInfo: (LibrarySymbolInfo & { symbol?: string }) | null,
+  key: 'symbol' | 'name' | 'full_name' | 'ticker',
+): string | null => {
+  const value = symbolInfo?.[key];
+  return isNonEmptyString(value) ? value : null;
+};
+
+const getSymbolExtSymbol = (
+  symbolInfo: (LibrarySymbolInfo & { symbol?: string }) | null,
+  fallbackSymbol: string,
+): string => {
+  return (
+    getSymbolInfoValue(symbolInfo, 'symbol') ??
+    getSymbolInfoValue(symbolInfo, 'name') ??
+    getCleanSymbol(getSymbolInfoValue(symbolInfo, 'full_name')) ??
+    getCleanSymbol(getSymbolInfoValue(symbolInfo, 'ticker')) ??
+    getCleanSymbol(fallbackSymbol) ??
+    ''
+  );
+};
+
+const getResolveSymbolName = (
+  symbolInfo: (LibrarySymbolInfo & { symbol?: string }) | null,
+  fallbackSymbol: string,
+  initialResolveSymbol: string,
+): string | null => {
+  return (
+    getSymbolInfoValue(symbolInfo, 'full_name') ??
+    getSymbolInfoValue(symbolInfo, 'ticker') ??
+    getSymbolInfoValue(symbolInfo, 'name') ??
+    (isNonEmptyString(fallbackSymbol) ? fallbackSymbol : null) ??
+    (isNonEmptyString(initialResolveSymbol) ? initialResolveSymbol : null)
+  );
 };
 
 /**
@@ -281,7 +323,7 @@ export class TealchartWidget {
     this._container = container;
     this._options = resolveDefaultLayoutPersistence(options);
     this._datafeed = options.datafeed;
-    this._symbol = getCleanSymbol(options.symbol);
+    this._symbol = getCleanSymbol(options.symbol) ?? '';
     this._initialResolveSymbol = options.symbol;
 
     const providedInterval = normalizeResolution(options.interval, '');
@@ -2052,7 +2094,24 @@ export class TealchartWidget {
 
     // Increment to invalidate any in-flight resolveSymbol callbacks
     const resolveRequestId = ++this._resolveSymbolRequestId;
-    const symbolToResolve = options.resolveSymbolName ?? this._symbol;
+    const symbolToResolve =
+      (isNonEmptyString(options.resolveSymbolName) ? options.resolveSymbolName : null) ??
+      getResolveSymbolName(
+        this._symbolInfo as (LibrarySymbolInfo & { symbol?: string }) | null,
+        this._symbol,
+        this._initialResolveSymbol,
+      );
+
+    if (!symbolToResolve) {
+      this._logger?.error(LogCategory.Datafeed, `Cannot resolve symbol (${options.reason})`, {
+        symbol: this._symbol,
+        initialResolveSymbol: this._initialResolveSymbol,
+        symbolInfo: this._symbolInfo,
+      });
+      this._isLoadingBars = false;
+      this._scheduler.markDirty(DIRTY.FULL);
+      return;
+    }
 
     // Resolve symbol and start loading bars
     this._datafeed.resolveSymbol(
@@ -2094,7 +2153,7 @@ export class TealchartWidget {
     // The datafeed resolveSymbol receives the full string including prefix,
     // but our internal _symbol should be the clean symbol for comparisons.
     const parts = symbol.split(':');
-    const cleanSymbol = getCleanSymbol(symbol);
+    const cleanSymbol = getCleanSymbol(symbol) ?? '';
     const requestedFullSymbol = parts.length > 1 ? symbol : null;
     const currentFullSymbol = this._symbolInfo?.full_name ?? this._symbolInfo?.ticker ?? null;
 
