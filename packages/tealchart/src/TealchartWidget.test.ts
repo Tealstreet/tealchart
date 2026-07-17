@@ -4177,6 +4177,24 @@ describe('TealchartWidget', () => {
       );
     });
 
+    it('resetData resolves the current full symbol when symbol info has an exchange prefix', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed, { symbol: 'BYBITV5:BTCUSDT' });
+      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000), {
+        ...defaultSymbolInfo,
+        name: 'BTCUSDT',
+        full_name: 'BYBITV5:BTCUSDT',
+        ticker: 'BYBITV5:BTCUSDT',
+        exchange: 'BYBITV5',
+      });
+
+      widget.chart().resetData();
+
+      expect(datafeed._resolveSymbolCalls[datafeed._resolveSymbolCalls.length - 1]).toBe(
+        'BYBITV5:BTCUSDT',
+      );
+    });
+
     it('setResolution updates interval and reloads bars', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
@@ -4240,6 +4258,25 @@ describe('TealchartWidget', () => {
       expect(widget.activeChart().symbolExt()).toMatchObject({
         name: 'BTCUSDT',
         symbol: 'BTCUSDT',
+        exchange: 'BYBITV5',
+      });
+    });
+
+    it('activeChart().symbolExt() derives symbol from full_name when resolved info is sparse', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed, undefined, {
+        ...defaultSymbolInfo,
+        name: undefined as unknown as string,
+        full_name: 'BYBITV5:BTCUSDT',
+        ticker: 'BYBITV5:BTCUSDT',
+        exchange: 'BYBITV5',
+      });
+
+      expect(widget.activeChart().symbolExt()).toMatchObject({
+        name: 'BTCUSDT',
+        symbol: 'BTCUSDT',
+        full_name: 'BYBITV5:BTCUSDT',
         exchange: 'BYBITV5',
       });
     });

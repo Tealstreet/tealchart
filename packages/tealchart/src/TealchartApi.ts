@@ -33,6 +33,39 @@ import {
 import { normalizeResolution, type ResolutionInput } from './utils/normalizeResolution';
 import { createSyncPromise } from './utils/syncPromise';
 
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const getCleanSymbol = (symbol: unknown): string | null => {
+  if (!isNonEmptyString(symbol)) {
+    return null;
+  }
+  const parts = symbol.split(':');
+  return parts.length > 1 ? parts[1] : symbol;
+};
+
+const getSymbolInfoValue = (
+  symbolInfo: (LibrarySymbolInfo & { symbol?: string }) | null,
+  key: 'symbol' | 'name' | 'full_name' | 'ticker',
+): string | null => {
+  const value = symbolInfo?.[key];
+  return isNonEmptyString(value) ? value : null;
+};
+
+const getSymbolExtSymbol = (
+  symbolInfo: (LibrarySymbolInfo & { symbol?: string }) | null,
+  fallbackSymbol: string,
+): string => {
+  return (
+    getSymbolInfoValue(symbolInfo, 'symbol') ??
+    getSymbolInfoValue(symbolInfo, 'name') ??
+    getCleanSymbol(getSymbolInfoValue(symbolInfo, 'full_name')) ??
+    getCleanSymbol(getSymbolInfoValue(symbolInfo, 'ticker')) ??
+    getCleanSymbol(fallbackSymbol) ??
+    ''
+  );
+};
+
 /**
  * Internal study state
  */
@@ -109,12 +142,13 @@ export class TealchartApi {
    * Get extended symbol info (TradingView compatibility).
    */
   symbolExt(): SymbolExt {
-    const symbolInfo = this._symbolInfo;
-    const symbol = ((symbolInfo as { symbol?: string } | null)?.symbol ?? symbolInfo?.name ?? this._symbol) as string;
+    const symbolInfo = this._symbolInfo as (LibrarySymbolInfo & { symbol?: string }) | null;
+    const symbol = getSymbolExtSymbol(symbolInfo, this._symbol);
+    const name = getSymbolInfoValue(symbolInfo, 'name') ?? symbol;
 
     return {
-      name: symbolInfo?.name ?? this._symbol,
       ...symbolInfo,
+      name,
       symbol,
     };
   }
