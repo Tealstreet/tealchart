@@ -87,7 +87,7 @@ export interface CrosshairState {
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
 const DRAG_THRESHOLD = 5;
-const SEGMENT_HORIZONTAL_PADDING = 8;
+const SEGMENT_HORIZONTAL_PADDING = 14;
 
 interface CachedLineContentRefs {
   priceAxisRect?: Konva.Rect;

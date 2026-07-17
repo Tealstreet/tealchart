@@ -277,17 +277,20 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const displayQuantity = useNarrowText ? position.quantityShort : position.quantity;
   const displayPnl = useNarrowText ? position.pnlShort : position.pnl;
 
-  // PnL color based on profit state
-  const pnlColor = useMemo(() => {
+  // PnL segment color based on profit state
+  const pnlStateColor = useMemo(() => {
     switch (position.profitState) {
       case 'positive':
         return '#22c55e';
       case 'negative':
         return '#ef4444';
       default:
-        return '#9ca3af';
+        return undefined;
     }
   }, [position.profitState]);
+  const pnlBackgroundColor = pnlStateColor ?? position.bodyBackgroundColor;
+  const pnlBorderColor = pnlStateColor ?? position.bodyBorderColor;
+  const pnlTextColor = pnlStateColor ? position.bodyTextColor : '#9ca3af';
 
   // Format price for display
   const formattedPrice = safeToFixed(position.price, pricePrecision);
@@ -358,13 +361,13 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: position.bodyBackgroundColor,
-              borderColor: position.bodyBorderColor,
+              backgroundColor: pnlBackgroundColor,
+              borderColor: pnlBorderColor,
               borderLeftWidth: 0,
             },
           ]}
         >
-          <Text style={[styles.labelText, { color: pnlColor }]}>{displayPnl}</Text>
+          <Text style={[styles.labelText, { color: pnlTextColor }]}>{displayPnl}</Text>
         </View>
 
         {/* TP/SL Buttons (if brackets enabled) */}
@@ -507,7 +510,7 @@ const styles = StyleSheet.create({
     height: LABEL_HEIGHT,
   },
   labelSegment: {
-    paddingHorizontal: 6,
+    paddingHorizontal: 7,
     paddingVertical: 2,
     borderWidth: 1,
     height: LABEL_HEIGHT,

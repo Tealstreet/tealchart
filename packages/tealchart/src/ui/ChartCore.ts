@@ -363,11 +363,11 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     4: 'dotted',
   };
 
-  let pnlTextColor = position.bodyTextColor;
+  let pnlStateColor: string | undefined;
   if (position.profitState === 'positive') {
-    pnlTextColor = '#26a69a';
+    pnlStateColor = '#26a69a';
   } else if (position.profitState === 'negative') {
-    pnlTextColor = '#ef5350';
+    pnlStateColor = '#ef5350';
   }
 
   const chartLabel: ChartLineLabel = {
@@ -400,9 +400,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               text: position.pnl,
               textShort: position.pnlShort || undefined,
-              backgroundColor: position.bodyBackgroundColor,
-              textColor: pnlTextColor,
-              borderColor: position.bodyBorderColor,
+              backgroundColor: pnlStateColor ?? position.bodyBackgroundColor,
+              textColor: position.bodyTextColor,
+              borderColor: pnlStateColor ?? position.bodyBorderColor,
             },
           ]
         : []),

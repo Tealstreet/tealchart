@@ -123,6 +123,8 @@ Implements TradingView-compatible interfaces:
 
 Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the full string but stored internally as the clean symbol (`BTCUSDT`), including during initial widget construction. A prefix change with the same clean symbol must still reload data so adapters that key by `EXCHANGE:SYMBOL` get fresh symbol info and subscriptions.
 
+Position line body, quantity, and action-button colors represent position side; PnL must be passed separately with `setPnl` / `setProfitState` so web canvas/Konva and mobile Skia can color profit/loss independently of long/short side.
+
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
 ## Commands
