@@ -1,7 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { clearChartStoreCache } from './state/chartState';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const srcRoot = resolve(__dirname);
 const packageRoot = resolve(srcRoot, '..');
@@ -78,13 +84,34 @@ describe('imperative chart API contract', () => {
     expect(source).not.toContain('onReverse={onPositionReverse}');
   });
 
-  it('re-snapshots native order lines when adapter move callbacks change', () => {
+  it('re-snapshots native trading lines when render-visible adapters change', () => {
     const apiSource = readSource('TealchartApi.ts');
-    const onMoveBlock =
-      apiSource.match(/onMove\(callback: \(price: number\) => void\) \{[\s\S]*?\n      \}/)?.[0] ?? '';
+    const renderVisibleMethods = [
+      'setTextShort',
+      'setQuantityShort',
+      'setPartialEnabled',
+      'setCancelTooltip',
+      'setModifyTooltip',
+      'setCloseTooltip',
+      'setProtectTooltipText',
+      'setPnlShort',
+      'setPositionData',
+      'onMove',
+      'onTPClick',
+      'onSLClick',
+      'onTPMove',
+      'onSLMove',
+      'onTPMoveEnd',
+      'onSLMoveEnd',
+    ];
 
-    expect(onMoveBlock).toContain('_onMoveCallback = callback;');
-    expect(onMoveBlock).toContain('notifyChange();');
+    for (const method of renderVisibleMethods) {
+      const blocks = apiSource.match(new RegExp(`${method}\\([\\s\\S]*?\\n      \\},`, 'g')) ?? [];
+      expect(blocks.length, method).toBeGreaterThan(0);
+      for (const block of blocks) {
+        expect(block, method).toContain('notifyChange();');
+      }
+    }
   });
 
   it('keeps native createStudy metadata on the imperative path', () => {
@@ -100,7 +127,7 @@ describe('imperative chart API contract', () => {
     expect(widgetSource).toContain('name: request.displayName,');
     expect(widgetSource).toContain('overlay: request.forceOverlay,');
     expect(widgetSource).toContain('indicatorId: request.studyId,');
-    expect(skiaSource).toContain('name: indicator?.name ?? request.displayName,');
-    expect(skiaSource).toContain('overlay: indicator?.overlay ?? request.forceOverlay,');
+    expect(skiaSource).toContain('name: request.options?.displayName ?? indicator?.name ?? request.displayName,');
+    expect(skiaSource).toContain('overlay: request.forceOverlay || (indicator?.overlay ?? false),');
   });
 });
