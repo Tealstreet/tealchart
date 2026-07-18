@@ -22,6 +22,7 @@ import type {
   UserDrawingCommandSource,
   UserDrawingContextActionItem,
   UserDrawingEditDrag,
+  UserDrawingFavoriteToolbarPosition,
   UserDrawingHandleRole,
   UserDrawingHitTestOptions,
   UserDrawingIconName,
@@ -29,7 +30,6 @@ import type {
   UserDrawingInputPoint,
   UserDrawingKeyboardFocusOwner,
   UserDrawingKeyboardInput,
-  UserDrawingFavoriteToolbarPosition,
   UserDrawingMagnetMode,
   UserDrawingMeasureMode,
   UserDrawingObjectTreeDispatchAction,
@@ -57,6 +57,7 @@ import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { ResolutionInput } from './utils/normalizeResolution';
 
 import { LOADING_OPACITY } from './constants';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
@@ -103,11 +104,11 @@ import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore, hasChartStore } from './state/chartState';
-import { createLocalStorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
 import { generateIndicatorId } from './state/indicatorActions';
-import { TealchartApi } from './TealchartApi';
+import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
 import { TealscriptManager } from './tealscript/TealscriptManager';
 import { chartThemeToRenderOptions, mergeChartThemeRenderOptions } from './theme';
+import { createLocalStorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
 import {
   Bar,
   ChartOverrides,
@@ -130,7 +131,7 @@ import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { barValuesEqual, dedupeBarsByTime } from './utils/dedupeBars';
-import { normalizeResolution, type ResolutionInput } from './utils/normalizeResolution';
+import { normalizeResolution } from './utils/normalizeResolution';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
@@ -155,8 +156,7 @@ export function resolveDefaultLayoutPersistence(options: TealchartWidgetOptions)
   };
 }
 
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === 'string' && value.trim().length > 0;
+const isNonEmptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
 
 const getCleanSymbol = (symbol: unknown): string | null => {
   if (!isNonEmptyString(symbol)) {
@@ -438,19 +438,31 @@ export class TealchartWidget {
       });
 
       // Set up study creation callback
-      this._chartApi.setOnStudyCreate(async (studyId, name, inputs) => {
+      this._chartApi.setOnStudyCreate(async (request) => {
         if (!this._tealScriptManager) return false;
         try {
           // For now, assume 'name' is the Tealscript code for built-in indicators
           // In the future, we can have a registry of built-in scripts
-          await this._tealScriptManager.addScript(studyId, name, inputs);
+          await this._tealScriptManager.addScript(request.studyId, request.name, request.inputs);
+          this._indicatorConfigMap.set(request.studyId, {
+            id: request.studyId,
+            name: request.displayName,
+            category: 'other',
+            overlay: request.forceOverlay,
+            code: request.name,
+          });
+          this._paneManager.addIndicator({
+            indicatorId: request.studyId,
+            overlay: request.forceOverlay,
+          });
           // Push current bars to the new script
           if (this._bars.length > 0) {
             this._tealScriptManager.setBars(this._bars);
           }
+          this._scheduler.markDirty(DIRTY.FULL);
           return true;
         } catch (error) {
-          this._logger?.error(LogCategory.Indicators, `Failed to create study ${studyId}`, error);
+          this._logger?.error(LogCategory.Indicators, `Failed to create study ${request.studyId}`, error);
           return false;
         }
       });
@@ -460,7 +472,10 @@ export class TealchartWidget {
         if (this._tealScriptManager) {
           this._tealScriptManager.removeScript(studyId);
         }
+        this._indicatorConfigMap.delete(studyId);
         this._indicatorDeclarationMap.delete(studyId);
+        this._paneManager.removeIndicator(studyId);
+        this._scheduler.markDirty(DIRTY.FULL);
       });
     }
 
@@ -1315,9 +1330,10 @@ export class TealchartWidget {
 
     // Lines changed (order/position updates, last-trade line)
     if (dirty & DIRTY.LINES) {
-      this._ui.setOrderLines(this._chartApi.getOrderLinesRenderData());
-      this._ui.setPositionLines(this._chartApi.getPositionLinesRenderData());
-      this._ui.setExecutionLines(this._chartApi.getExecutionLinesRenderData());
+      const lineRenderSnapshot = getTealchartApiLineRenderSnapshot(this._chartApi);
+      this._ui.setOrderLines(lineRenderSnapshot.orderLines);
+      this._ui.setPositionLines(lineRenderSnapshot.positionLines);
+      this._ui.setExecutionLines(lineRenderSnapshot.executionLines);
       this._updateLastTradeLine();
     }
 
@@ -2170,10 +2186,7 @@ export class TealchartWidget {
     const currentFullSymbol = this._symbolInfo?.full_name ?? this._symbolInfo?.ticker ?? null;
 
     // Skip if symbol hasn't actually changed — prevents reload on click
-    if (
-      this._symbol === cleanSymbol &&
-      (!requestedFullSymbol || currentFullSymbol === requestedFullSymbol)
-    ) {
+    if (this._symbol === cleanSymbol && (!requestedFullSymbol || currentFullSymbol === requestedFullSymbol)) {
       return;
     }
 
@@ -2457,7 +2470,11 @@ export class TealchartWidget {
   }
 
   private _setUserDrawingFavoriteToolbarPositionFromToolbar(position: UserDrawingFavoriteToolbarPosition): boolean {
-    return this.dispatchUserDrawingCommand({ type: 'setFavoriteToolbarPosition', position, meta: { source: 'toolbar' } });
+    return this.dispatchUserDrawingCommand({
+      type: 'setFavoriteToolbarPosition',
+      position,
+      meta: { source: 'toolbar' },
+    });
   }
 
   setUserDrawingFavoriteTools(favoriteTools: readonly UserDrawingTool[]): boolean {
@@ -2604,7 +2621,11 @@ export class TealchartWidget {
       return this.dispatchUserDrawingCommand({ type: 'delete', meta: { source: 'keyboard' } });
     if (action.type === 'selectTool') {
       if (!action.tool) return false;
-      return this.dispatchUserDrawingCommand({ type: 'setActiveTool', tool: action.tool, meta: { source: 'keyboard' } });
+      return this.dispatchUserDrawingCommand({
+        type: 'setActiveTool',
+        tool: action.tool,
+        meta: { source: 'keyboard' },
+      });
     }
     return this.dispatchUserDrawingCommand({ type: 'cancelDraft', meta: { source: 'keyboard' } });
   }

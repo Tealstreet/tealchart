@@ -147,6 +147,7 @@ export interface PriceLine {
   brackets?: BracketConfig | null;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
+    onMove?: (price: number) => void;
     onTPClick?: () => void;
     onSLClick?: () => void;
     onTPMove?: (price: number, partialPercent?: number) => void;
@@ -271,6 +272,7 @@ export interface PriceLineLabelBounds {
   brackets?: BracketConfig | null;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
+    onMove?: (price: number) => void;
     onTPClick?: () => void;
     onSLClick?: () => void;
     onTPMove?: (price: number, partialPercent?: number) => void;
@@ -914,6 +916,7 @@ export interface OrderLineRenderData {
   partialEnabled: boolean;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
+    onMove?: (price: number) => void;
     onTPClick?: () => void;
     onSLClick?: () => void;
     onTPMove?: (price: number, partialPercent?: number) => void;

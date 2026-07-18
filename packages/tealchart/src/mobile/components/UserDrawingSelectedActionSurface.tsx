@@ -8,6 +8,7 @@ import type {
 } from '../../drawings';
 
 import React, { useEffect, useState } from 'react';
+
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import {
@@ -99,8 +100,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
   const [activePopoverDrawingId, setActivePopoverDrawingId] = useState<string | null>(null);
   const shouldRender = shouldRenderUserDrawingSelectedActionSurface(state, anchor);
   const selectedDrawingId = surface.selectedDrawing?.id ?? null;
-  const activePopoverGroupIdForSelection =
-    activePopoverDrawingId === selectedDrawingId ? activePopoverGroupId : null;
+  const activePopoverGroupIdForSelection = activePopoverDrawingId === selectedDrawingId ? activePopoverGroupId : null;
   const activePopoverGroup = surface.groups.find((group) => group.id === activePopoverGroupIdForSelection);
   const activePopoverPresentation =
     activePopoverGroup?.presentation?.type === 'popover' ? activePopoverGroup.presentation : null;
@@ -135,7 +135,7 @@ export function UserDrawingSelectedActionSurfaceComponent({
     setActivePopoverGroupId(null);
   }, [dismissPopoverSignal]);
 
-  if (!shouldRender) return null;
+  if (!shouldRender || !anchor) return null;
 
   const dispatchItem = (
     item: UserDrawingSelectedActionSurface['groups'][number]['items'][number],

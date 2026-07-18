@@ -139,7 +139,6 @@ describe('UserDrawingSelectedActionSurfaceComponent', () => {
           ...state.drawings[0]!,
           id: 'line-2',
           name: 'Range',
-          price: 60,
         },
       ],
     };
