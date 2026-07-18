@@ -94,6 +94,7 @@ import {
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
 import {
+  BUILTIN_INDICATORS,
   getIndicatorById,
   isJailbreakIndicator,
   jailbreakInputsToInputDefinitions,
@@ -1078,6 +1079,7 @@ export class TealchartWidget {
       interval: this._interval,
       showTopBar,
       renderOptions: this._renderOptions,
+      availableIndicators: this._getAvailableIndicators(),
       onIntervalChange: (interval) => {
         this._chartApi.setResolution(interval);
       },
@@ -1427,6 +1429,16 @@ export class TealchartWidget {
 
     // Tell ChartCore to paint — synchronous, no second RAF
     this._ui.paint(dirty);
+  }
+
+  private _getAvailableIndicators(): BuiltinIndicator[] {
+    return BUILTIN_INDICATORS.filter((indicator) => {
+      if (isJailbreakIndicator(indicator)) {
+        return Boolean(this._options.jailbreakIndicatorFactories?.[indicator.id]);
+      }
+
+      return Boolean(this._tealScriptManager);
+    });
   }
 
   /**

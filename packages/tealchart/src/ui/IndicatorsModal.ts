@@ -7,7 +7,7 @@
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { ModalOptions } from './Modal';
 
-import { BUILTIN_INDICATORS, INDICATOR_CATEGORIES, searchIndicators } from '../indicators/builtinIndicators';
+import { BUILTIN_INDICATORS, INDICATOR_CATEGORIES } from '../indicators/builtinIndicators';
 import { Modal } from './Modal';
 
 // ============================================================================
@@ -17,6 +17,8 @@ import { Modal } from './Modal';
 export interface IndicatorsModalOptions {
   /** Callback when an indicator is selected */
   onSelectIndicator: (indicator: BuiltinIndicator) => void;
+  /** Indicators available in this chart runtime */
+  indicators?: BuiltinIndicator[];
   /** Get currently active indicator IDs */
   getActiveIndicatorIds?: () => string[];
   /** Translation strings */
@@ -209,7 +211,7 @@ export class IndicatorsModal extends Modal {
     this.contentEl.innerHTML = '';
 
     const query = this.searchQuery.trim();
-    const indicators = query ? searchIndicators(query) : BUILTIN_INDICATORS;
+    const indicators = query ? this.searchIndicators(query) : this.getAvailableIndicators();
 
     if (indicators.length === 0) {
       const empty = this.createElement('div', {
@@ -289,6 +291,19 @@ export class IndicatorsModal extends Modal {
   // ============================================================================
   // Helpers
   // ============================================================================
+
+  private getAvailableIndicators(): BuiltinIndicator[] {
+    return this.indicatorOptions.indicators ?? BUILTIN_INDICATORS;
+  }
+
+  private searchIndicators(query: string): BuiltinIndicator[] {
+    const lowerQuery = query.toLowerCase();
+    return this.getAvailableIndicators().filter(
+      (indicator) =>
+        indicator.name.toLowerCase().includes(lowerQuery) ||
+        indicator.description?.toLowerCase().includes(lowerQuery),
+    );
+  }
 
   private getTranslation(key: string, fallback: string): string {
     const translations = this.indicatorOptions.translations as Record<string, string> | undefined;
