@@ -5,12 +5,8 @@
     "target": "esnext",
     "module": "esnext",
     "jsx": "react-jsx",
-    "incremental": false
+    "incremental": false,
+    "stripInternal": true
   },
-  "exclude": [
-    "**/*.stories.tsx",
-    "**/*.stories.ts",
-    "**/*.stories.mdx",
-    ".storybook/**"
-  ]
+  "exclude": ["**/*.stories.tsx", "**/*.stories.ts", "**/*.stories.mdx", ".storybook/**"]
 }

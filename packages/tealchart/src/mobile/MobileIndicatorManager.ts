@@ -1,7 +1,3 @@
-// 📱 MOBILE-PATCHED FILE
-// This file has been customized for mobile and will NOT be overwritten by yarn sync.
-// Class-based indicator management matching web's React-agnostic pattern.
-
 /**
  * MobileIndicatorManager - Class-based indicator management (matches web pattern)
  *

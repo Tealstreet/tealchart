@@ -2,6 +2,7 @@
  * TealchartApi - Per-chart API that mirrors TradingView's IChartWidgetApi
  * Provides access to chart-specific functionality like subscriptions, trading lines, etc.
  */
+import type { ResolutionInput } from './utils/normalizeResolution';
 
 import { Subscription } from './events/EventEmitter';
 import {
@@ -11,30 +12,29 @@ import {
   ExecutionDirection,
   ExecutionLineRenderData,
   IExecutionLineAdapter,
+  InternalExecutionLineAdapter,
   InternalOrderLineAdapter,
   InternalPositionLineAdapter,
-  InternalExecutionLineAdapter,
   IOrderLineAdapter,
   IPositionLineAdapter,
   IStudyApi,
   ISubscription,
   ITimeScaleApi,
+  LibrarySymbolInfo,
   OrderLineOptions,
   OrderLineRenderData,
   PositionData,
   PositionLineOptions,
   PositionLineRenderData,
   ProfitState,
-  LibrarySymbolInfo,
   ResolutionString,
   StudyInfo,
   SymbolExt,
 } from './types';
-import { normalizeResolution, type ResolutionInput } from './utils/normalizeResolution';
+import { normalizeResolution } from './utils/normalizeResolution';
 import { createSyncPromise } from './utils/syncPromise';
 
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === 'string' && value.trim().length > 0;
+const isNonEmptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
 
 const getCleanSymbol = (symbol: unknown): string | null => {
   if (!isNonEmptyString(symbol)) {
@@ -82,7 +82,43 @@ interface ManagedStudy {
 /**
  * Callback for study creation (implemented by widget)
  */
-export type StudyCreateCallback = (studyId: string, name: string, inputs: Record<string, unknown>) => Promise<boolean>;
+interface StudyCreateOptions {
+  checkLimit?: boolean;
+  priceScale?: string;
+  displayName?: string;
+}
+
+export interface StudyCreateRequest {
+  studyId: string;
+  name: string;
+  displayName: string;
+  forceOverlay: boolean;
+  lock: boolean;
+  inputs: Record<string, unknown>;
+  overrides: Record<string, unknown>;
+  options?: StudyCreateOptions;
+}
+
+export type StudyCreateCallback = (request: StudyCreateRequest) => Promise<boolean>;
+
+export interface TealchartApiLineRenderSnapshot {
+  orderLines: OrderLineRenderData[];
+  positionLines: PositionLineRenderData[];
+  executionLines: ExecutionLineRenderData[];
+}
+
+const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => TealchartApiLineRenderSnapshot>();
+
+/**
+ * @internal Friend API for renderers. Consumers should use TradingView-style line adapters instead.
+ */
+export function getTealchartApiLineRenderSnapshot(api: TealchartApi): TealchartApiLineRenderSnapshot {
+  const readSnapshot = tealchartApiLineRenderSnapshotReaders.get(api);
+  if (!readSnapshot) {
+    throw new TypeError('Unknown TealchartApi instance');
+  }
+  return readSnapshot();
+}
 
 /**
  * Per-chart API (equivalent to TradingView's IChartWidgetApi)
@@ -125,6 +161,11 @@ export class TealchartApi {
     this._crossHairMovedSubscription = new Subscription();
     this._symbolChangedSubscription = new Subscription();
     this._intervalChangedSubscription = new Subscription();
+    tealchartApiLineRenderSnapshotReaders.set(this, () => ({
+      orderLines: this._getOrderLinesRenderData(),
+      positionLines: this._getPositionLinesRenderData(),
+      executionLines: this._getExecutionLinesRenderData(),
+    }));
   }
 
   // ============================================================================
@@ -556,6 +597,7 @@ export class TealchartApi {
       // Callbacks
       onMove(callback: (price: number) => void) {
         _onMoveCallback = callback;
+        notifyChange();
         return this;
       },
       onCancel(callback: () => void) {
@@ -628,6 +670,7 @@ export class TealchartApi {
           ...data,
           editable: data.editable && !!_onMoveCallback,
           callbacks: {
+            onMove: _onMoveCallback ?? undefined,
             onTPClick: _onTPClick ?? undefined,
             onSLClick: _onSLClick ?? undefined,
             onTPMove: _onTPMove ?? undefined,
@@ -1156,7 +1199,7 @@ export class TealchartApi {
     lock?: boolean,
     inputs?: Record<string, unknown>,
     overrides?: Record<string, unknown>,
-    options?: { checkLimit?: boolean; priceScale?: string; displayName?: string },
+    options?: StudyCreateOptions,
   ): Promise<IStudyApi | null> {
     const studyId = `study_${++this._studyIdCounter}`;
 
@@ -1176,7 +1219,16 @@ export class TealchartApi {
 
     // If a creation callback is set, delegate to the widget
     if (this._onStudyCreate) {
-      const success = await this._onStudyCreate(studyId, name, inputs ?? {});
+      const success = await this._onStudyCreate({
+        studyId,
+        name,
+        displayName,
+        forceOverlay: forceOverlay ?? false,
+        lock: lock ?? false,
+        inputs: inputs ?? {},
+        overrides: overrides ?? {},
+        options,
+      });
       if (!success) {
         return null;
       }
@@ -1391,12 +1443,7 @@ export class TealchartApi {
     return this._executionLines;
   }
 
-  /**
-   * @internal Get order line render data for canvas drawing
-   * Deduplicates by orderId - when multiple lines have the same orderId,
-   * only the last one is kept (typically the confirmed order, not the submitting one)
-   */
-  getOrderLinesRenderData(): OrderLineRenderData[] {
+  private _getOrderLinesRenderData(): OrderLineRenderData[] {
     const allLines = Array.from(this._orderLines.values()).map((adapter) => adapter._getRenderData());
 
     // Deduplicate by orderId - keep last occurrence (Map overwrites earlier entries)
@@ -1418,12 +1465,7 @@ export class TealchartApi {
     return result;
   }
 
-  /**
-   * @internal Get position line render data for canvas drawing
-   * Deduplicates by positionId - when multiple lines have the same positionId,
-   * only the last one is kept
-   */
-  getPositionLinesRenderData(): PositionLineRenderData[] {
+  private _getPositionLinesRenderData(): PositionLineRenderData[] {
     const allLines = Array.from(this._positionLines.values()).map((adapter) => adapter._getRenderData());
 
     // Deduplicate by positionId - keep last occurrence (Map overwrites earlier entries)
@@ -1445,10 +1487,7 @@ export class TealchartApi {
     return result;
   }
 
-  /**
-   * @internal Get execution marker render data for canvas drawing
-   */
-  getExecutionLinesRenderData(): ExecutionLineRenderData[] {
+  private _getExecutionLinesRenderData(): ExecutionLineRenderData[] {
     return Array.from(this._executionLines.values()).map((adapter) => adapter._getRenderData());
   }
 
