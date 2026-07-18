@@ -1,7 +1,3 @@
-// 📱 MOBILE-PATCHED FILE
-// This file has been customized for mobile and will NOT be overwritten by yarn sync.
-// Mobile equivalent of TealchartWidget - accepts datafeed and handles all internal logic.
-
 /**
  * SkiaTealchart - React Native Skia implementation of Tealchart
  *
@@ -20,6 +16,7 @@ import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
   DrawingCoordinateSpace,
+  DrawingScreenPoint,
   ResolveUserDrawingPropertiesSurfaceCommandOptions,
   UpdateUserDrawingOptions,
   UserDrawing,
@@ -61,23 +58,14 @@ import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { ChartDrawingGestureOptions } from './mobile/hooks/useChartGestures';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
-import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
 import type {
+  MobileUserDrawingBalloonLayout,
   MobileUserDrawingImagePrimitive,
   MobileUserDrawingTextBoxPrimitive,
 } from './mobile/utils/drawingRenderModel';
 import type { PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import type {
-  ChartMargins,
-  ContextMenuItem,
-  IBasicDataFeed,
-  OrderLineRenderData,
-  PositionLineRenderData,
-  PriceLine,
-  RenderOptions,
-  Viewport,
-} from './types';
+import type { ChartMargins, ContextMenuItem, IBasicDataFeed, PriceLine, RenderOptions, Viewport } from './types';
 
 import React, {
   forwardRef,
@@ -96,6 +84,7 @@ import {
   Circle,
   createPicture,
   DashPathEffect,
+  FontStyle,
   Group,
   Oval,
   Picture,
@@ -148,7 +137,9 @@ import {
   resolveUserDrawingTextEditMetrics,
   undoUserDrawingCommand as undoUserDrawingCommandHistory,
   USER_DRAWING_FONT_FAMILIES,
+  USER_DRAWING_FONT_SIZES,
 } from './drawings';
+import { getIndicatorById } from './indicators/builtinIndicators';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
@@ -197,6 +188,7 @@ import {
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
+import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
 import { TealchartRenderer } from './TealchartRenderer';
 import { mergeChartThemeRenderOptions } from './theme';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
@@ -209,8 +201,15 @@ import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
+type SkiaFontStyleInput = Parameters<ReturnType<typeof Skia.FontMgr.System>['matchFamilyStyle']>[1];
+const SKIA_NORMAL_FONT_STYLE: SkiaFontStyleInput =
+  (FontStyle as { Normal?: SkiaFontStyleInput } | undefined)?.Normal ?? {};
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
+
+function hasMobileUserDrawingBalloonTail(layout: unknown): layout is Pick<MobileUserDrawingBalloonLayout, 'tail'> {
+  return typeof layout === 'object' && layout !== null && 'tail' in layout;
+}
 
 function resolveUserDrawingTextDecorationLine(style: UserDrawingStyle): UserDrawingTextDecorationLine {
   if (style.textUnderline && style.textLineThrough) return 'underline line-through';
@@ -301,11 +300,9 @@ function UserDrawingSkiaText({
   );
 }
 
-export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
-
 export interface SkiaTealchartHandle {
-  addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null;
-  removeTealscriptIndicator(instanceId: string): void;
+  chart(index?: number): TealchartApi;
+  activeChart(): TealchartApi;
   changeTheme(theme: ChartThemeInput): void;
   getUserDrawingState(): UserDrawingState;
   exportUserDrawingStateForLayout(): UserDrawingState | undefined;
@@ -418,10 +415,6 @@ export interface SkiaTealchartProps {
   margins?: Partial<ChartMargins>;
   /** Price lines to render (last trade, orders, positions, etc.) */
   priceLines?: PriceLine[];
-  /** Order lines to render (limit orders, stops, etc.) */
-  orderLines?: OrderLineRenderData[];
-  /** Position lines to render (open positions with PnL) */
-  positionLines?: PositionLineRenderData[];
   /** Map from plotId to style overrides */
   plotStyleOverrides?: Map<string, PlotStyleOverride>;
   /** Called when viewport changes */
@@ -449,14 +442,6 @@ export interface SkiaTealchartProps {
   duplicateUserDrawingOnEditDrag?: boolean;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
-  /** Called when order price is changed via drag */
-  onOrderMove?: (orderId: string, newPrice: number) => void;
-  /** Called when order is cancelled */
-  onOrderCancel?: (orderId: string) => void;
-  /** Called when position is closed */
-  onPositionClose?: (positionId: string) => void;
-  /** Called when position is reversed */
-  onPositionReverse?: (positionId: string) => void;
   /** Price precision for display */
   pricePrecision?: number;
   // ===========================================================================
@@ -494,8 +479,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     theme = 'Dark',
     margins: marginsProp,
     priceLines,
-    orderLines,
-    positionLines,
     plotStyleOverrides,
     onViewportChange,
     onContextMenu,
@@ -508,10 +491,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     constrainUserDrawingPlacement = false,
     duplicateUserDrawingOnEditDrag = false,
     onSwipeBlockChange,
-    onOrderMove,
-    onOrderCancel,
-    onPositionClose,
-    onPositionReverse,
     pricePrecision = 2,
     // Top bar props
     showTopBar = true,
@@ -530,6 +509,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  const chartApiRef = useRef<TealchartApi | null>(null);
+  if (!chartApiRef.current) {
+    chartApiRef.current = new TealchartApi(propSymbol, propInterval);
+    chartApiRef.current.setOnLinesChanged(forceUpdate);
+  }
+  const chartApi = chartApiRef.current;
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
   const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
     createUserDrawingState(propUserDrawingState),
@@ -739,6 +724,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }
 
   useLayoutEffect(() => {
+    chartApi.setOnLinesChanged(forceUpdate);
+    chartApi.setOnStudyCreate(async (request) => {
+      const indicator = getIndicatorById(request.name);
+      const code = request.name.trim().startsWith('//@version') ? request.name : indicator?.code;
+      if (!code) return false;
+
+      indicatorManagerRef.current?.addTealscriptIndicator({
+        id: request.studyId,
+        code,
+        name: request.options?.displayName ?? indicator?.name ?? request.displayName,
+        overlay: request.forceOverlay || (indicator?.overlay ?? false),
+        inputs: request.inputs,
+        yAxisRange: indicator?.yAxisRange,
+      });
+      return true;
+    });
+    chartApi.setOnStudyRemove((studyId) => {
+      indicatorManagerRef.current?.removeIndicator(studyId);
+    });
+  }, [chartApi, forceUpdate]);
+
+  useLayoutEffect(() => {
     const manager = indicatorManagerRef.current;
     if (!manager || !onTealscriptError) return;
     manager.onErrorSubscribe(onTealscriptError);
@@ -750,11 +757,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   useImperativeHandle(
     ref,
     () => ({
-      addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null {
-        return indicatorManagerRef.current?.addTealscriptIndicator(options) ?? null;
+      chart(index = 0): TealchartApi {
+        if (index !== 0) {
+          throw new RangeError(`SkiaTealchart only has one chart; received index ${index}`);
+        }
+        return chartApi;
       },
-      removeTealscriptIndicator(instanceId: string): void {
-        indicatorManagerRef.current?.removeIndicator(instanceId);
+      activeChart(): TealchartApi {
+        return chartApi;
       },
       changeTheme(nextTheme: ChartThemeInput): void {
         setImperativeTheme(nextTheme);
@@ -1191,6 +1201,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
     }),
     [
+      chartApi,
       commitUserDrawingState,
       copySelectedUserDrawingToClipboard,
       constrainUserDrawingPlacement,
@@ -1221,6 +1232,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Get values from core hook
   const { bars, symbol, interval, isLoading, unifiedLayout } = coreResult;
+
+  useEffect(() => {
+    chartApi.setOnSymbolChange((nextSymbol) => coreResult.setSymbol(nextSymbol));
+    chartApi.setOnIntervalChange((nextInterval) => coreResult.setInterval(nextInterval));
+  }, [chartApi, coreResult.setInterval, coreResult.setSymbol]);
+
+  useEffect(() => {
+    if (chartApi.symbol() !== symbol) {
+      chartApi.setSymbol(symbol);
+    }
+  }, [chartApi, symbol]);
+
+  useEffect(() => {
+    if (chartApi.resolution() !== interval) {
+      chartApi.setResolution(interval);
+    }
+  }, [chartApi, interval]);
+
+  const lineRenderSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
+  const orderLines = lineRenderSnapshot.orderLines;
+  const positionLines = lineRenderSnapshot.positionLines;
 
   // Get supported resolutions from core (for filtering timeframe selector)
   const supportedResolutions = coreResult.core?.getSupportedResolutions() ?? null;
@@ -1835,7 +1867,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const measureUserDrawingTextLabelLine = useCallback((drawing: UserDrawingTextAnnotation, line: string): number => {
     const normalizedFontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
     const nativeFontFamily = resolveMobileUserDrawingFontFamily(normalizedFontFamily, Platform.OS);
-    const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily);
+    const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily, SKIA_NORMAL_FONT_STYLE);
     const font = Skia.Font(typeface, normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12));
     return font.measureText(line).width;
   }, []);
@@ -2201,7 +2233,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const additiveTapGesture = useMemo(
     () =>
       Gesture.Tap()
-        .numberOfPointers(2)
+        .minPointers(2)
         .maxDuration(250)
         .maxDistance(10)
         .onEnd((event) => {
@@ -2316,25 +2348,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
 
       setContextMenuItems(
-        result.items.map((item): ContextMenuItem => ({
-          position: item.groupId === 'visibility' ? 'bottom' : 'top',
-          text: item.label,
-          enabled: item.enabled,
-          click: () => {
-            if (!item.enabled) return;
-            dispatchMobileUserDrawingActionCommand(item.command, {
-              state: userDrawingStateRef.current,
-              source: 'contextMenu',
-              createId: createUserDrawingId,
-              dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
-              onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
-              onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
-              onUserDrawingCopySelected: () => {
-                copySelectedUserDrawingToClipboard();
-              },
-            });
-          },
-        })),
+        result.items.map(
+          (item): ContextMenuItem => ({
+            position: item.groupId === 'visibility' ? 'bottom' : 'top',
+            text: item.label,
+            enabled: item.enabled,
+            click: () => {
+              if (!item.enabled) return;
+              dispatchMobileUserDrawingActionCommand(item.command, {
+                state: userDrawingStateRef.current,
+                source: 'contextMenu',
+                createId: createUserDrawingId,
+                dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
+                onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
+                onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
+                onUserDrawingCopySelected: () => {
+                  copySelectedUserDrawingToClipboard();
+                },
+              });
+            },
+          }),
+        ),
       );
       setContextMenuPosition({
         x,
@@ -2569,14 +2603,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Fonts for Skia text rendering in bracket preview and drawing labels.
   const bracketFont = useFont(null, 12);
   const userDrawingTextFonts = useMemo(() => {
-    const fontSizes = [10, 12, 14, 16] as const;
+    const fontSizes = USER_DRAWING_FONT_SIZES;
     const fonts: Partial<
       Record<UserDrawingFontFamily, Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>>>
     > = {};
 
     for (const fontFamily of USER_DRAWING_FONT_FAMILIES) {
       const nativeFontFamily = resolveMobileUserDrawingFontFamily(fontFamily, Platform.OS);
-      const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily);
+      const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily, SKIA_NORMAL_FONT_STYLE);
       const familyFonts: Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>> = {};
       for (const fontSize of fontSizes) {
         familyFonts[fontSize] = Skia.Font(typeface, fontSize);
@@ -3078,7 +3112,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 ))}
                 {font &&
                   primitive.rays.map((ray) => {
-                    if (!ray.label || !ray.labelPoint) return null;
+                    if (!('label' in ray) || !('labelPoint' in ray) || !ray.label || !ray.labelPoint) return null;
                     const textWidth = font.measureText(ray.label).width;
                     const x = ray.end.x >= ray.start.x ? ray.labelPoint.x - textWidth : ray.labelPoint.x;
                     return (
@@ -3298,18 +3332,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   >
                     {dash && <DashPathEffect intervals={dash} />}
                   </SkiaPath>
-                )}
-                {primitive.style.lineVisible !== false && primitive.kind !== 'rotatedRectangle' && (
-                  <SkiaLine
-                    p1={vec(primitive.median.start.x, primitive.median.start.y)}
-                    p2={vec(primitive.median.end.x, primitive.median.end.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                    strokeCap="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
                 )}
               </Group>
             );
@@ -4642,7 +4664,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                     boxWidth: textWrapWidth,
                   });
             const balloonTailPath = textPrimitive.kind === 'balloon' ? Skia.Path.Make() : null;
-            if (balloonTailPath && 'tail' in layout) {
+            if (balloonTailPath && hasMobileUserDrawingBalloonTail(layout)) {
               balloonTailPath.moveTo(layout.tail.left.x, layout.tail.left.y);
               balloonTailPath.lineTo(layout.tail.tip.x, layout.tail.tip.y);
               balloonTailPath.lineTo(layout.tail.right.x, layout.tail.right.y);
@@ -4888,8 +4910,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               dimensions={chartDimensions}
               pricePrecision={pricePrecision}
               useNarrowText={dimensions.width < 400}
-              onPriceChange={onOrderMove}
-              onCancel={onOrderCancel}
               onTPMovePreview={handleOrderTPMove}
               onSLMovePreview={handleOrderSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
@@ -4906,8 +4926,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               dimensions={chartDimensions}
               pricePrecision={pricePrecision}
               useNarrowText={dimensions.width < 400}
-              onClose={onPositionClose}
-              onReverse={onPositionReverse}
               onTPMovePreview={handleTPMove}
               onSLMovePreview={handleSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}

@@ -1,24 +1,3 @@
-// ⚠️ AUTO-GENERATED FILE - DO NOT EDIT MANUALLY ⚠️
-// This file was copied from tealstreet-next by copy-and-patch.js
-// To re-sync from the web repository, run: yarn sync
-// 
-// To make this file mobile-specific (prevent it from being overwritten on sync):
-// 1. Modify the file as needed for mobile
-// 2. Add to patch-config.json "permanentFiles" array:
-//    - For single file: "web/path/to/this/file.ts"
-//    - For directory: "web/path/to/directory/**/*"
-// 3. Add exception to .gitignore: !src/web/path/to/this/file.ts
-// 4. Force-add to git: git add -f src/web/path/to/this/file.ts
-// 5. Commit your changes
-// 6. IMPORTANT: Replace this header with the MOBILE-PATCHED header (see existing patched files for example)
-//
-// The patch-config.json controls:
-// - permanentFiles: Files that are never overwritten during sync
-// - excludeFromCopy: Files excluded from initial copy
-// - importReplacements: Auto-replace imports with mobile shims
-//
-// See README.md section "Git Configuration for Patched Files" for full details
-
 /**
  * SkiaCanvasContext - React Native Skia implementation of CanvasContext
  *
@@ -149,7 +128,10 @@ interface ContextState {
  * Parse CSS color string to Skia color (Float32Array [r, g, b, a] with values 0-1)
  */
 function parseColor(color: string): Float32Array {
-  let r = 0, g = 0, b = 0, a = 1;
+  let r = 0,
+    g = 0,
+    b = 0,
+    a = 1;
 
   // Handle hex colors
   if (color.startsWith('#')) {
@@ -299,14 +281,7 @@ export class SkiaCanvasContext implements CanvasContext {
     this.currentPath.cubicTo(cp1x, cp1y, cp2x, cp2y, x, y);
   }
 
-  arc(
-    x: number,
-    y: number,
-    radius: number,
-    startAngle: number,
-    endAngle: number,
-    counterclockwise = false
-  ): void {
+  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, counterclockwise = false): void {
     // Convert angles from radians to degrees
     const startDeg = (startAngle * 180) / Math.PI;
     let sweepDeg = ((endAngle - startAngle) * 180) / Math.PI;
@@ -326,15 +301,9 @@ export class SkiaCanvasContext implements CanvasContext {
     this.currentPath.addRect(rect);
   }
 
-  roundRect(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    radii: number | number[]
-  ): void {
+  roundRect(x: number, y: number, width: number, height: number, radii: number | number[]): void {
     const rect = this.skia.XYWHRect(x, y, width, height);
-    const r = typeof radii === 'number' ? radii : radii[0] ?? 0;
+    const r = typeof radii === 'number' ? radii : (radii[0] ?? 0);
     const rrect = this.skia.RRectXY(rect, r, r);
     this.currentPath.addRRect(rrect);
   }

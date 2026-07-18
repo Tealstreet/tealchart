@@ -35,10 +35,6 @@ export interface OrderLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
-  /** Callback when order price is changed via drag */
-  onPriceChange?: (orderId: string, newPrice: number) => void;
-  /** Callback when order is cancelled (fallback if no adapter callback) */
-  onCancel?: (orderId: string) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (orderId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -62,8 +58,6 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   useNarrowText = false,
-  onPriceChange,
-  onCancel,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
@@ -85,23 +79,19 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   // Handle price change callback
   const handlePriceChange = useCallback(
     (newPrice: number) => {
-      if (onPriceChange && order.editable) {
-        onPriceChange(order.id, newPrice);
+      if (order.editable) {
+        order.callbacks?.onMove?.(newPrice);
       }
     },
-    [onPriceChange, order.id, order.editable],
+    [order.callbacks, order.editable],
   );
 
   // Handle cancel callback — fire directly from adapter callbacks
   const handleCancel = useCallback(() => {
     if (order.cancellable) {
-      if (order.callbacks?.onCancel) {
-        order.callbacks.onCancel();
-      } else if (onCancel) {
-        onCancel(order.id);
-      }
+      order.callbacks?.onCancel?.();
     }
-  }, [onCancel, order.id, order.cancellable, order.callbacks]);
+  }, [order.cancellable, order.callbacks]);
 
   // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {

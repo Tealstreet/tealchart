@@ -1,19 +1,14 @@
+import type { DrawingCoordinateSpace, UserDrawing, UserDrawingState, UserDrawingTool } from '../../drawings';
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  commitMobileUserDrawingHandleCommand,
-  dispatchMobileUserDrawingHandleCommand,
-  dispatchMobileUserDrawingHistoryCommand,
-  dispatchMobileUserDrawingHistoryCommandWithEvent,
-  dispatchMobileUserDrawingKeyboardAction,
-} from './drawingCommands';
-import { clearChartStoreCache } from '../../state/chartState';
-import {
-  createUserDrawingCommandHistory,
   createUserDrawingCommandEvent,
+  createUserDrawingCommandHistory,
   createUserDrawingState,
   duplicateUserDrawing,
   handleUserDrawingInput,
+  redoUserDrawingCommand,
   resolveUserDrawingObjectTreeDispatchActionCommands,
   resolveUserDrawingObjectTreeDrawingDispatchAction,
   resolveUserDrawingObjectTreeModel,
@@ -21,10 +16,16 @@ import {
   resolveUserDrawingObjectTreeSelectionDispatchAction,
   setUserDrawingTool,
   shouldRenderUserDrawingSelectedActionSurface,
-  redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
-import type { DrawingCoordinateSpace, UserDrawing, UserDrawingState, UserDrawingTool } from '../../drawings';
+import { clearChartStoreCache } from '../../state/chartState';
+import {
+  commitMobileUserDrawingHandleCommand,
+  dispatchMobileUserDrawingHandleCommand,
+  dispatchMobileUserDrawingHistoryCommand,
+  dispatchMobileUserDrawingHistoryCommandWithEvent,
+  dispatchMobileUserDrawingKeyboardAction,
+} from './drawingCommands';
 
 const style = { lineColor: '#fff', lineWidth: 1, lineStyle: 'solid' as const };
 const anchorA = { time: 1_000, price: 100 };
@@ -219,10 +220,15 @@ describe('mobile drawing handle command dispatch', () => {
     expect(result.changed).toBe(false);
     expect(onEvent).toHaveBeenCalledTimes(2);
 
-    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
-      type: 'clear',
-      meta: { source: 'api' },
-    }, onEvent);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      {
+        type: 'clear',
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
     expect(result.changed).toBe(true);
     expect(result.state.drawings).toEqual([]);
     expect(onEvent).toHaveBeenCalledTimes(3);
@@ -230,17 +236,27 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undoClear.changed).toBe(true);
     expect(undoClear.state.drawings.map((drawing) => drawing.id)).toEqual(['line']);
 
-    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
-      type: 'clear',
-      meta: { source: 'api' },
-    }, onEvent);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      {
+        type: 'clear',
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
     expect(result.changed).toBe(false);
     expect(onEvent).toHaveBeenCalledTimes(3);
 
-    result = dispatchMobileUserDrawingHistoryCommandWithEvent(result.state, result.history, {
-      type: 'cancelDraft',
-      meta: { source: 'api' },
-    }, onEvent);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      result.state,
+      result.history,
+      {
+        type: 'cancelDraft',
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
     expect(result.changed).toBe(false);
     expect(onEvent).toHaveBeenCalledTimes(3);
 
@@ -249,10 +265,15 @@ describe('mobile drawing handle command dispatch', () => {
       { paneId: 'main', anchor: anchorA },
       { createId: () => 'rect', now: () => 30, style },
     );
-    result = dispatchMobileUserDrawingHistoryCommandWithEvent(draftState, createUserDrawingCommandHistory(), {
-      type: 'cancelDraft',
-      meta: { source: 'api' },
-    }, onEvent);
+    result = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      draftState,
+      createUserDrawingCommandHistory(),
+      {
+        type: 'cancelDraft',
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
     expect(result.changed).toBe(true);
     expect(onEvent).toHaveBeenCalledTimes(4);
   });
@@ -287,7 +308,7 @@ describe('mobile drawing handle command dispatch', () => {
   });
 
   it('records complete drawing additions through the mobile command adapter', () => {
-    const drawing: UserDrawing = {
+    const drawing = {
       id: 'api-line',
       kind: 'trendLine',
       paneId: 'main',
@@ -298,21 +319,28 @@ describe('mobile drawing handle command dispatch', () => {
       style: { ...style },
       points: [anchorA, anchorB],
       extend: 'none',
-    };
+    } satisfies UserDrawing;
     const state = createUserDrawingState();
     const history = createUserDrawingCommandHistory();
 
     const onEvent = vi.fn();
-    const added = dispatchMobileUserDrawingHistoryCommandWithEvent(state, history, {
-      type: 'add',
-      drawing,
-      meta: { source: 'api' },
-    }, onEvent);
+    const added = dispatchMobileUserDrawingHistoryCommandWithEvent(
+      state,
+      history,
+      {
+        type: 'add',
+        drawing,
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
 
     expect(added.changed).toBe(true);
     expect(added.state.drawings).toEqual([drawing]);
     expect(added.state.selection).toEqual({ drawingId: 'api-line' });
     expect(added.history.undoStack).toHaveLength(1);
+    expect(added.command.type).toBe('add');
+    if (added.command.type !== 'add') throw new Error('Expected add command');
     expect(added.command.drawing).not.toBe(drawing);
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ affectedIds: ['api-line'] }));
 
@@ -342,11 +370,16 @@ describe('mobile drawing handle command dispatch', () => {
     });
 
     const secondDrawing: UserDrawing = { ...drawing, id: 'api-line-2', style: { ...drawing.style } };
-    dispatchMobileUserDrawingHistoryCommandWithEvent(redo.state, redo.history, {
-      type: 'add',
-      drawing: secondDrawing,
-      meta: { source: 'api' },
-    }, onEvent);
+    dispatchMobileUserDrawingHistoryCommandWithEvent(
+      redo.state,
+      redo.history,
+      {
+        type: 'add',
+        drawing: secondDrawing,
+        meta: { source: 'api' },
+      },
+      onEvent,
+    );
     expect(onEvent.mock.calls.at(-1)?.[0].affectedIds).toEqual(expect.arrayContaining(['api-line', 'api-line-2']));
     expect(onEvent.mock.calls.at(-1)?.[0].affectedIds).toHaveLength(2);
   });
@@ -683,7 +716,12 @@ describe('mobile drawing handle command dispatch', () => {
     expect(deleted.history.undoStack).toHaveLength(1);
 
     history = deleted.history;
-    const undo = dispatchMobileUserDrawingKeyboardAction(deleted.state, history, { key: 'z', metaKey: true }, keyboardOptions);
+    const undo = dispatchMobileUserDrawingKeyboardAction(
+      deleted.state,
+      history,
+      { key: 'z', metaKey: true },
+      keyboardOptions,
+    );
 
     expect(undo.action?.type).toBe('undo');
     expect(undo.changed).toBe(true);
@@ -877,9 +915,9 @@ describe('mobile drawing handle command dispatch', () => {
     expect(result.state.drawings.map((drawing) => drawing.id)).toEqual(['line', 'copy']);
     expect(result.state.selection).toEqual({ drawingId: 'copy' });
     expect(result.history.undoStack).toHaveLength(1);
-    expect(result.command ? createUserDrawingCommandEvent(state, { ...result, command: result.command })?.source : null).toBe(
-      'keyboard',
-    );
+    expect(
+      result.command ? createUserDrawingCommandEvent(state, { ...result, command: result.command })?.source : null,
+    ).toBe('keyboard');
   });
 
   it('routes mobile object-tree actions through shared history dispatch', () => {
@@ -890,7 +928,10 @@ describe('mobile drawing handle command dispatch', () => {
     state = { ...state, selection: { drawingId: 'line', drawingIds: ['line', 'copy'] } };
     let history = createUserDrawingCommandHistory();
 
-    const lockSelectedAction = resolveUserDrawingObjectTreeSelectionDispatchAction(resolveUserDrawingObjectTreeModel(state), 'lock')!;
+    const lockSelectedAction = resolveUserDrawingObjectTreeSelectionDispatchAction(
+      resolveUserDrawingObjectTreeModel(state),
+      'lock',
+    )!;
     expect(lockSelectedAction).toEqual({ type: 'lock', drawingIds: ['line', 'copy'], includeLocked: undefined });
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, lockSelectedAction, {
       createId: () => 'unused',
@@ -899,7 +940,10 @@ describe('mobile drawing handle command dispatch', () => {
       ({ state, history } = dispatchMobileUserDrawingHistoryCommand(state, history, command));
     }
     state = { ...state, selection: { drawingId: 'line', drawingIds: ['line', 'copy'] } };
-    const unlockSelectedAction = resolveUserDrawingObjectTreeSelectionDispatchAction(resolveUserDrawingObjectTreeModel(state), 'unlock')!;
+    const unlockSelectedAction = resolveUserDrawingObjectTreeSelectionDispatchAction(
+      resolveUserDrawingObjectTreeModel(state),
+      'unlock',
+    )!;
     expect(unlockSelectedAction).toEqual({ type: 'unlock', drawingIds: ['line', 'copy'], includeLocked: true });
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, unlockSelectedAction, {
       createId: () => 'unused',
@@ -937,7 +981,12 @@ describe('mobile drawing handle command dispatch', () => {
       'rename',
       { name: 'Range copy' },
     )!;
-    expect(renameCopyAction).toEqual({ type: 'rename', drawingId: 'copy', name: 'Range copy', includeLocked: undefined });
+    expect(renameCopyAction).toEqual({
+      type: 'rename',
+      drawingId: 'copy',
+      name: 'Range copy',
+      includeLocked: undefined,
+    });
     for (const command of resolveUserDrawingObjectTreeDispatchActionCommands(state, renameCopyAction, {
       createId: () => 'unused',
       now: () => 47,
@@ -1089,34 +1138,31 @@ describe('mobile drawing handle command dispatch', () => {
     expect(undo.state.drawings).toEqual([expect.objectContaining({ id: 'rect-1' })]);
   });
 
-  it.each(northStarTwoAnchorDragPlacementTools)(
-    'records mobile %s click placement from tapped anchors',
-    (tool) => {
-      const state = setUserDrawingTool(createUserDrawingState(), tool);
-      const history = createUserDrawingCommandHistory();
-      const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
-        type: 'handleInput',
-        point: { paneId: 'main', anchor: anchorA },
-        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
-        meta: { source: 'touch', transactionKey: `${tool}-placement` },
-      });
-      const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
-        type: 'handleInput',
-        point: { paneId: 'main', anchor: anchorB },
-        options: { createId: () => `${tool}-drawing`, now: () => 43, style },
-        meta: { source: 'touch' },
-      });
+  it.each(northStarTwoAnchorDragPlacementTools)('records mobile %s click placement from tapped anchors', (tool) => {
+    const state = setUserDrawingTool(createUserDrawingState(), tool);
+    const history = createUserDrawingCommandHistory();
+    const started = dispatchMobileUserDrawingHistoryCommand(state, history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorA },
+      options: { createId: () => `${tool}-drawing`, now: () => 43, style },
+      meta: { source: 'touch', transactionKey: `${tool}-placement` },
+    });
+    const committed = dispatchMobileUserDrawingHistoryCommand(started.state, started.history, {
+      type: 'handleInput',
+      point: { paneId: 'main', anchor: anchorB },
+      options: { createId: () => `${tool}-drawing`, now: () => 43, style },
+      meta: { source: 'touch' },
+    });
 
-      expect(started.changed, tool).toBe(true);
-      expect(committed.changed, tool).toBe(true);
-      expect(committed.history.undoStack, tool).toHaveLength(1);
-      expect(committed.state.drawings[0], tool).toMatchObject({
-        id: `${tool}-drawing`,
-        kind: tool,
-        points: [anchorA, anchorB],
-      });
-    },
-  );
+    expect(started.changed, tool).toBe(true);
+    expect(committed.changed, tool).toBe(true);
+    expect(committed.history.undoStack, tool).toHaveLength(1);
+    expect(committed.state.drawings[0], tool).toMatchObject({
+      id: `${tool}-drawing`,
+      kind: tool,
+      points: [anchorA, anchorB],
+    });
+  });
 
   it('records expanded mobile two-anchor placement tools through the same click lifecycle', () => {
     for (const tool of expandedDragPlacementTools) {
@@ -1300,12 +1346,16 @@ describe('mobile drawing handle command dispatch', () => {
         options: { createId: () => `${tool}-drawing`, now: () => 44, style },
         meta: { source: 'touch' },
       });
-      const waitingForFifth = dispatchMobileUserDrawingHistoryCommand(waitingForFourth.state, waitingForFourth.history, {
-        type: 'handleInput',
-        point: { paneId: 'main', anchor: anchorD },
-        options: { createId: () => `${tool}-drawing`, now: () => 45, style },
-        meta: { source: 'touch' },
-      });
+      const waitingForFifth = dispatchMobileUserDrawingHistoryCommand(
+        waitingForFourth.state,
+        waitingForFourth.history,
+        {
+          type: 'handleInput',
+          point: { paneId: 'main', anchor: anchorD },
+          options: { createId: () => `${tool}-drawing`, now: () => 45, style },
+          meta: { source: 'touch' },
+        },
+      );
       const committed = dispatchMobileUserDrawingHistoryCommand(waitingForFifth.state, waitingForFifth.history, {
         type: 'handleInput',
         point: { paneId: 'main', anchor: anchorE },
@@ -1377,12 +1427,7 @@ describe('mobile drawing handle command dispatch', () => {
         expect.objectContaining({
           id: `${tool}-drawing-1`,
           kind: tool,
-          points: [
-            anchorA,
-            { time: 1_250, price: 102.5 },
-            { time: 1_750, price: 107.5 },
-            anchorB,
-          ],
+          points: [anchorA, { time: 1_250, price: 102.5 }, { time: 1_750, price: 107.5 }, anchorB],
         }),
         expect.objectContaining({
           id: `${tool}-drawing-2`,
