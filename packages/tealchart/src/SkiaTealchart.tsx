@@ -723,7 +723,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     indicatorManagerRef.current.setOnUpdate(forceUpdate);
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     chartApi.setOnLinesChanged(forceUpdate);
     chartApi.setOnStudyCreate(async (request) => {
       const indicator = getIndicatorById(request.name);
@@ -733,8 +733,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       indicatorManagerRef.current?.addTealscriptIndicator({
         id: request.studyId,
         code,
-        name: indicator?.name ?? request.displayName,
-        overlay: indicator?.overlay ?? request.forceOverlay,
+        name: request.options?.displayName ?? indicator?.name ?? request.displayName,
+        overlay: request.forceOverlay || (indicator?.overlay ?? false),
         inputs: request.inputs,
         yAxisRange: indicator?.yAxisRange,
       });

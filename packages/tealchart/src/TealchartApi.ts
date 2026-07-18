@@ -575,10 +575,12 @@ export class TealchartApi {
       // Tooltips
       setCancelTooltip(tooltip: string) {
         data.cancelTooltip = tooltip;
+        notifyChange();
         return this;
       },
       setModifyTooltip(tooltip: string) {
         data.modifyTooltip = tooltip;
+        notifyChange();
         return this;
       },
 
@@ -615,10 +617,12 @@ export class TealchartApi {
       // TEALSTREET: Compact display for mobile
       setTextShort(text: string) {
         data.textShort = text;
+        notifyChange();
         return this;
       },
       setQuantityShort(quantity: string) {
         data.quantityShort = quantity;
+        notifyChange();
         return this;
       },
 
@@ -630,6 +634,7 @@ export class TealchartApi {
       },
       setPartialEnabled(enabled: boolean) {
         data.partialEnabled = enabled;
+        notifyChange();
         return this;
       },
       setPnlCalculator(calculator: (price: number, percent: number) => string) {
@@ -640,26 +645,32 @@ export class TealchartApi {
       // TEALSTREET: Bracket callbacks
       onTPClick(callback: () => void) {
         _onTPClick = callback;
+        notifyChange();
         return this;
       },
       onSLClick(callback: () => void) {
         _onSLClick = callback;
+        notifyChange();
         return this;
       },
       onTPMove(callback: (price: number) => void) {
         _onTPMove = callback;
+        notifyChange();
         return this;
       },
       onSLMove(callback: (price: number) => void) {
         _onSLMove = callback;
+        notifyChange();
         return this;
       },
       onTPMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onTPMoveEnd = callback;
+        notifyChange();
         return this;
       },
       onSLMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onSLMoveEnd = callback;
+        notifyChange();
         return this;
       },
 
@@ -915,10 +926,12 @@ export class TealchartApi {
       // Tooltips
       setCloseTooltip(tooltip: string) {
         data.closeTooltip = tooltip;
+        notifyChange();
         return this;
       },
       setProtectTooltipText(text: string) {
         data.protectTooltipText = text;
+        notifyChange();
         return this;
       },
 
@@ -950,6 +963,7 @@ export class TealchartApi {
       },
       setPnlShort(pnl: string) {
         data.pnlShort = pnl;
+        notifyChange();
         return this;
       },
       setProfitState(state: ProfitState) {
@@ -961,16 +975,19 @@ export class TealchartApi {
       // TEALSTREET: Compact display for mobile
       setTextShort(text: string) {
         data.textShort = text;
+        notifyChange();
         return this;
       },
       setQuantityShort(quantity: string) {
         data.quantityShort = quantity;
+        notifyChange();
         return this;
       },
 
       // TEALSTREET: Position data for calculations
       setPositionData(posData: PositionData) {
         data.positionData = posData;
+        notifyChange();
         return this;
       },
 
@@ -982,6 +999,7 @@ export class TealchartApi {
       },
       setPartialEnabled(enabled: boolean) {
         data.partialEnabled = enabled;
+        notifyChange();
         return this;
       },
       setPnlCalculator(calculator: (price: number, percent: number) => string) {
@@ -992,26 +1010,32 @@ export class TealchartApi {
       // TEALSTREET: Bracket callbacks
       onTPClick(callback: () => void) {
         _onTPClick = callback;
+        notifyChange();
         return this;
       },
       onSLClick(callback: () => void) {
         _onSLClick = callback;
+        notifyChange();
         return this;
       },
       onTPMove(callback: (price: number) => void) {
         _onTPMove = callback;
+        notifyChange();
         return this;
       },
       onSLMove(callback: (price: number) => void) {
         _onSLMove = callback;
+        notifyChange();
         return this;
       },
       onTPMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onTPMoveEnd = callback;
+        notifyChange();
         return this;
       },
       onSLMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onSLMoveEnd = callback;
+        notifyChange();
         return this;
       },
 
