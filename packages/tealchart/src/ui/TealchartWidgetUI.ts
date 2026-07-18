@@ -102,6 +102,8 @@ export interface TealchartWidgetUIOptions {
   onIntervalChange?: (interval: ResolutionString) => void;
   /** Callback when indicator is added */
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
+  /** Indicators available in this chart runtime */
+  availableIndicators?: BuiltinIndicator[];
   /** Callback when indicator visibility is toggled */
   onToggleIndicator?: (indicatorId: string) => void;
   /** Callback when indicator settings are requested */
@@ -434,6 +436,7 @@ export class TealchartWidgetUI {
 
     // Create modals (mounted to rootEl so they're positioned within the chart)
     this.indicatorsModal = new IndicatorsModal({
+      indicators: options.availableIndicators,
       onSelectIndicator: (indicator) => {
         options.onAddIndicator?.(indicator);
       },

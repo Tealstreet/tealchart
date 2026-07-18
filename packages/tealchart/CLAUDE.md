@@ -110,6 +110,12 @@ getChartSettingsAtom(chartKey) → atomWithStorage(`tealchart:${chartKey}`, defa
 4. Overlay indicators render on main pane; non-overlay get dedicated panes
 5. Requires factory function `createTealscriptWorker()` from the consuming app
 
+The indicator picker is capability-aware: Tealscript indicators are only offered
+when `createTealscriptWorker` is supplied, and jailbreak indicators are only
+offered when that indicator's `jailbreakIndicatorFactories[id]` factory is
+supplied. This keeps runtimes like v2 from showing indicators they cannot
+execute.
+
 Built-in indicators defined in `builtinIndicators.ts`: SMA, EMA, RSI, MACD, Bollinger Bands, etc.
 
 ## TradingView Compatibility
