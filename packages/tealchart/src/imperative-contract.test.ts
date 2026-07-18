@@ -64,6 +64,8 @@ describe('imperative chart API contract', () => {
     expect(indexSource).not.toContain('TealchartRenderer');
     expect(indexSource).not.toContain('StudyCreateCallback');
     expect(packageJson.exports).not.toHaveProperty('./src/*');
+    expect(packageJson.exports).toHaveProperty('./src/jailbreak/*');
+    expect(packageJson.exports).toHaveProperty('./src/types');
     expect(apiSource).not.toMatch(/\n  getOrderLinesRenderData\(/);
     expect(apiSource).not.toMatch(/\n  getPositionLinesRenderData\(/);
     expect(apiSource).not.toMatch(/\n  getExecutionLinesRenderData\(/);
