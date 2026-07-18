@@ -7,7 +7,7 @@
 export { TealchartWidget, createTealchartWidget } from './TealchartWidget';
 
 // Per-chart API
-export { TealchartApi, type StudyCreateCallback } from './TealchartApi';
+export { TealchartApi } from './TealchartApi';
 
 // React Native Skia component - import from '@tealstreet/tealchart/native' for React Native
 // NOT exported here to avoid breaking web builds with RN dependencies
@@ -42,9 +42,6 @@ export {
 
 // Safe deep merge utilities
 export { safeDeepMerge, migrateChartSettings, CHART_SETTINGS_VERSION } from './state/safeDeepMerge';
-
-// Renderer (for advanced usage)
-export { TealchartRenderer } from './TealchartRenderer';
 
 // User drawing model (platform-neutral)
 export {
@@ -624,7 +621,6 @@ export type {
   PriceLine,
   PriceLineLabel,
   PriceLineLabelBounds,
-  ExecutionLineRenderData,
   // TradingView-compatible types
   WidgetEvent,
   WidgetEventCallback,

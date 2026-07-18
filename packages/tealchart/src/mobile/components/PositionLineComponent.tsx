@@ -34,10 +34,6 @@ export interface PositionLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
-  /** Callback when position is closed (fallback if no adapter callback) */
-  onClose?: (positionId: string) => void;
-  /** Callback when position is reversed (fallback if no adapter callback) */
-  onReverse?: (positionId: string) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -61,8 +57,6 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   useNarrowText = false,
-  onClose,
-  onReverse,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
@@ -79,24 +73,16 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   // Handle close callback — fire directly from adapter callbacks
   const handleClose = useCallback(() => {
     if (position.closeable) {
-      if (position.callbacks?.onClose) {
-        position.callbacks.onClose();
-      } else if (onClose) {
-        onClose(position.id);
-      }
+      position.callbacks?.onClose?.();
     }
-  }, [onClose, position.id, position.closeable, position.callbacks]);
+  }, [position.closeable, position.callbacks]);
 
   // Handle reverse callback — fire directly from adapter callbacks
   const handleReverse = useCallback(() => {
     if (position.reversible) {
-      if (position.callbacks?.onReverse) {
-        position.callbacks.onReverse();
-      } else if (onReverse) {
-        onReverse(position.id);
-      }
+      position.callbacks?.onReverse?.();
     }
-  }, [onReverse, position.id, position.reversible, position.callbacks]);
+  }, [position.reversible, position.callbacks]);
 
   // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {
