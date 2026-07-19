@@ -7,23 +7,26 @@ import type { ResolutionInput } from './utils/normalizeResolution';
 import { Subscription } from './events/EventEmitter';
 import {
   BracketConfig,
+  BracketPnlCalculator,
   CrossHairMovedEventParams,
   EnhancedCrossHairState,
   ExecutionDirection,
   ExecutionLineRenderData,
+  FullOrderLineAdapter,
+  FullPositionLineAdapter,
   IExecutionLineAdapter,
   InternalExecutionLineAdapter,
   InternalOrderLineAdapter,
   InternalPositionLineAdapter,
-  IOrderLineAdapter,
-  IPositionLineAdapter,
   IStudyApi,
   ISubscription,
   ITimeScaleApi,
   LibrarySymbolInfo,
+  OrderLineLengthUnit,
   OrderLineOptions,
   OrderLineRenderData,
   PositionData,
+  PositionLineLengthUnit,
   PositionLineOptions,
   PositionLineRenderData,
   ProfitState,
@@ -108,6 +111,27 @@ export interface TealchartApiLineRenderSnapshot {
 }
 
 const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => TealchartApiLineRenderSnapshot>();
+
+type AdapterCallback = () => void;
+
+function createAdapterCallback<TAdapter>(
+  adapter: TAdapter,
+  callbackOrData: unknown,
+  callback?: unknown,
+): AdapterCallback {
+  if (typeof callbackOrData === 'function') {
+    const handler = callbackOrData as (this: TAdapter) => void;
+    return () => handler.call(adapter);
+  }
+
+  if (typeof callback === 'function') {
+    const handler = callback as (this: TAdapter, data: unknown) => void;
+    const data = callbackOrData;
+    return () => handler.call(adapter, data);
+  }
+
+  throw new TypeError('Expected a callback');
+}
 
 /**
  * @internal Friend API for renderers. Consumers should use TradingView-style line adapters instead.
@@ -346,7 +370,7 @@ export class TealchartApi {
    * The caller is responsible for storing the adapter reference
    * and calling remove() when done.
    */
-  createOrderLine(options?: OrderLineOptions): Promise<IOrderLineAdapter> {
+  createOrderLine(options?: OrderLineOptions): Promise<FullOrderLineAdapter> {
     const id = `order_${++this._lineIdCounter}`;
     const adapter = this._createOrderLineAdapter(id, options);
     this._orderLines.set(id, adapter);
@@ -363,7 +387,7 @@ export class TealchartApi {
    * The caller is responsible for storing the adapter reference
    * and calling remove() when done.
    */
-  createPositionLine(options?: PositionLineOptions): Promise<IPositionLineAdapter> {
+  createPositionLine(options?: PositionLineOptions): Promise<FullPositionLineAdapter> {
     const id = `position_${++this._lineIdCounter}`;
     const adapter = this._createPositionLineAdapter(id, options);
     this._positionLines.set(id, adapter);
@@ -401,18 +425,23 @@ export class TealchartApi {
       lineStyle: 0, // solid
       lineWidth: 1,
       lineLength: 50,
+      lineLengthUnit: 'percentage',
       extendLeft: false,
       editable: options?.editable ?? true,
       cancellable: options?.cancellable ?? false, // Set to true when onCancel callback is provided
+      cancelAsSubmit: false,
       bodyBackgroundColor: options?.bodyBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
       bodyBorderColor: options?.bodyBorderColor ?? '#2196F3',
+      bodyFont: '',
       quantityBackgroundColor: options?.quantityBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
       quantityBorderColor: options?.quantityBorderColor ?? '#2196F3',
+      quantityFont: '',
       cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       cancelButtonIconColor: options?.cancelButtonIconColor ?? '#FFFFFF',
       cancelButtonBorderColor: options?.cancelButtonBorderColor ?? '#2196F3',
+      tooltip: '',
       cancelTooltip: 'Cancel',
       modifyTooltip: 'Modify',
       brackets: null,
@@ -420,15 +449,16 @@ export class TealchartApi {
     };
 
     // Callbacks (not part of render data)
-    let _onMoveCallback: ((price: number) => void) | null = null;
+    let _onMoveCallback: (() => void) | null = null;
+    let _onMovingCallback: (() => void) | null = null;
     let _onCancelCallback: (() => void) | null = null;
-    let _onModifyCallback: ((text: string, price: number) => void) | null = null;
-    let _pnlCalculator: ((price: number, percent: number) => string) | null = null;
+    let _onModifyCallback: (() => void) | null = null;
+    let _pnlCalculator: BracketPnlCalculator | null = null;
     // TEALSTREET bracket callbacks
     let _onTPClick: (() => void) | null = null;
     let _onSLClick: (() => void) | null = null;
-    let _onTPMove: ((price: number) => void) | null = null;
-    let _onSLMove: ((price: number) => void) | null = null;
+    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
     let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
     let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
 
@@ -466,9 +496,8 @@ export class TealchartApi {
         return data.price;
       },
 
-      // External order ID for deduplication
-      setOrderId(orderId: string) {
-        data.orderId = orderId;
+      setCancelAsSubmit(enabled: boolean) {
+        data.cancelAsSubmit = enabled;
         notifyChange();
         return this;
       },
@@ -479,10 +508,16 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getQuantity() {
+        return data.quantity;
+      },
       setText(t: string) {
         data.text = t;
         notifyChange();
         return this;
+      },
+      getText() {
+        return data.text;
       },
 
       // Line styling
@@ -491,25 +526,44 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getLineColor() {
+        return data.lineColor;
+      },
       setLineStyle(style: number) {
         data.lineStyle = style;
         notifyChange();
         return this;
+      },
+      getLineStyle() {
+        return data.lineStyle;
       },
       setLineWidth(width: number) {
         data.lineWidth = width;
         notifyChange();
         return this;
       },
-      setLineLength(length: number) {
+      getLineWidth() {
+        return data.lineWidth;
+      },
+      setLineLength(length: number, unit: OrderLineLengthUnit = 'percentage') {
         data.lineLength = length;
+        data.lineLengthUnit = unit;
         notifyChange();
         return this;
+      },
+      getLineLength() {
+        return data.lineLength;
+      },
+      getLineLengthUnit() {
+        return data.lineLengthUnit;
       },
       setExtendLeft(extend: boolean) {
         data.extendLeft = extend;
         notifyChange();
         return this;
+      },
+      getExtendLeft() {
+        return data.extendLeft;
       },
 
       // Body styling
@@ -518,24 +572,41 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getBodyBackgroundColor() {
+        return data.bodyBackgroundColor;
+      },
       setBodyTextColor(color: string) {
         data.bodyTextColor = color;
         notifyChange();
         return this;
+      },
+      getBodyTextColor() {
+        return data.bodyTextColor;
       },
       setBodyBorderColor(color: string) {
         data.bodyBorderColor = color;
         notifyChange();
         return this;
       },
+      getBodyBorderColor() {
+        return data.bodyBorderColor;
+      },
 
-      // Font styling (no-op for TradingView API compatibility)
-      // TODO: Implement font customization in tealchart renderer
-      setBodyFont(_font: string) {
+      setBodyFont(font: string) {
+        data.bodyFont = font;
+        notifyChange();
         return this;
       },
-      setQuantityFont(_font: string) {
+      getBodyFont() {
+        return data.bodyFont;
+      },
+      setQuantityFont(font: string) {
+        data.quantityFont = font;
+        notifyChange();
         return this;
+      },
+      getQuantityFont() {
+        return data.quantityFont;
       },
 
       // Quantity styling
@@ -544,15 +615,24 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getQuantityBackgroundColor() {
+        return data.quantityBackgroundColor;
+      },
       setQuantityTextColor(color: string) {
         data.quantityTextColor = color;
         notifyChange();
         return this;
       },
+      getQuantityTextColor() {
+        return data.quantityTextColor;
+      },
       setQuantityBorderColor(color: string) {
         data.quantityBorderColor = color;
         notifyChange();
         return this;
+      },
+      getQuantityBorderColor() {
+        return data.quantityBorderColor;
       },
 
       // Cancel button styling
@@ -561,27 +641,50 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getCancelButtonBackgroundColor() {
+        return data.cancelButtonBackgroundColor;
+      },
       setCancelButtonIconColor(color: string) {
         data.cancelButtonIconColor = color;
         notifyChange();
         return this;
+      },
+      getCancelButtonIconColor() {
+        return data.cancelButtonIconColor;
       },
       setCancelButtonBorderColor(color: string) {
         data.cancelButtonBorderColor = color;
         notifyChange();
         return this;
       },
+      getCancelButtonBorderColor() {
+        return data.cancelButtonBorderColor;
+      },
 
       // Tooltips
+      setTooltip(tooltip: string) {
+        data.tooltip = tooltip;
+        notifyChange();
+        return this;
+      },
+      getTooltip() {
+        return data.tooltip;
+      },
       setCancelTooltip(tooltip: string) {
         data.cancelTooltip = tooltip;
         notifyChange();
         return this;
       },
+      getCancelTooltip() {
+        return data.cancelTooltip;
+      },
       setModifyTooltip(tooltip: string) {
         data.modifyTooltip = tooltip;
         notifyChange();
         return this;
+      },
+      getModifyTooltip() {
+        return data.modifyTooltip;
       },
 
       // State
@@ -590,27 +693,38 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getEditable() {
+        return data.editable;
+      },
       setCancellable(c: boolean) {
         data.cancellable = c;
         notifyChange();
         return this;
       },
+      getCancellable() {
+        return data.cancellable;
+      },
 
       // Callbacks
-      onMove(callback: (price: number) => void) {
-        _onMoveCallback = callback;
+      onMove(callbackOrData: unknown, callback?: unknown) {
+        _onMoveCallback = createAdapterCallback(adapter, callbackOrData, callback);
         notifyChange();
         return this;
       },
-      onCancel(callback: () => void) {
-        _onCancelCallback = callback;
+      onMoving(callbackOrData: unknown, callback?: unknown) {
+        _onMovingCallback = createAdapterCallback(adapter, callbackOrData, callback);
+        notifyChange();
+        return this;
+      },
+      onCancel(callbackOrData: unknown, callback?: unknown) {
+        _onCancelCallback = createAdapterCallback(adapter, callbackOrData, callback);
         // Show cancel button when callback is provided
         data.cancellable = true;
         notifyChange();
         return this;
       },
-      onModify(callback: (text: string, price: number) => void) {
-        _onModifyCallback = callback;
+      onModify(callbackOrData: unknown, callback?: unknown) {
+        _onModifyCallback = createAdapterCallback(adapter, callbackOrData, callback);
         return this;
       },
 
@@ -637,7 +751,7 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
-      setPnlCalculator(calculator: (price: number, percent: number) => string) {
+      setPnlCalculator(calculator: BracketPnlCalculator) {
         _pnlCalculator = calculator;
         return this;
       },
@@ -653,12 +767,12 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
-      onTPMove(callback: (price: number) => void) {
+      onTPMove(callback: (price: number, partialPercent?: number) => void) {
         _onTPMove = callback;
         notifyChange();
         return this;
       },
-      onSLMove(callback: (price: number) => void) {
+      onSLMove(callback: (price: number, partialPercent?: number) => void) {
         _onSLMove = callback;
         notifyChange();
         return this;
@@ -681,7 +795,18 @@ export class TealchartApi {
           ...data,
           editable: data.editable && !!_onMoveCallback,
           callbacks: {
-            onMove: _onMoveCallback ?? undefined,
+            onMove: _onMoveCallback
+              ? (price: number) => {
+                  data.price = price;
+                  _onMoveCallback?.();
+                }
+              : undefined,
+            onMoving: _onMovingCallback
+              ? (price: number) => {
+                  data.price = price;
+                  _onMovingCallback?.();
+                }
+              : undefined,
             onTPClick: _onTPClick ?? undefined,
             onSLClick: _onSLClick ?? undefined,
             onTPMove: _onTPMove ?? undefined,
@@ -697,6 +822,7 @@ export class TealchartApi {
       _getCallbacks() {
         return {
           onMove: _onMoveCallback,
+          onMoving: _onMovingCallback,
           onCancel: _onCancelCallback,
           onModify: _onModifyCallback,
           pnlCalculator: _pnlCalculator,
@@ -730,13 +856,16 @@ export class TealchartApi {
       lineStyle: 0, // solid
       lineWidth: 2,
       lineLength: 100,
+      lineLengthUnit: 'percentage',
       extendLeft: false,
       bodyBackgroundColor: options?.bodyBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
       bodyBorderColor: options?.bodyBorderColor ?? '#2196F3',
+      bodyFont: '',
       quantityBackgroundColor: options?.quantityBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
       quantityBorderColor: options?.quantityBorderColor ?? '#2196F3',
+      quantityFont: '',
       closeable: false, // Set to true when onClose callback is provided
       closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       closeButtonIconColor: options?.closeButtonIconColor ?? '#FFFFFF',
@@ -745,7 +874,9 @@ export class TealchartApi {
       reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
       reverseButtonIconColor: options?.reverseButtonIconColor ?? '#FFFFFF',
       reverseButtonBorderColor: options?.reverseButtonBorderColor ?? '#2196F3',
+      tooltip: '',
       closeTooltip: 'Close position',
+      reverseTooltip: 'Reverse position',
       protectTooltipText: options?.protectTooltipText ?? '',
       // TEALSTREET extensions
       pnl: '',
@@ -759,13 +890,13 @@ export class TealchartApi {
     // Callbacks (not part of render data)
     let _onCloseCallback: (() => void) | null = null;
     let _onReverseCallback: (() => void) | null = null;
-    let _onModifyCallback: ((text: string, price: number) => void) | null = null;
-    let _pnlCalculator: ((price: number, percent: number) => string) | null = null;
+    let _onModifyCallback: (() => void) | null = null;
+    let _pnlCalculator: BracketPnlCalculator | null = null;
     // TEALSTREET bracket callbacks
     let _onTPClick: (() => void) | null = null;
     let _onSLClick: (() => void) | null = null;
-    let _onTPMove: ((price: number) => void) | null = null;
-    let _onSLMove: ((price: number) => void) | null = null;
+    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
     let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
     let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
 
@@ -800,23 +931,22 @@ export class TealchartApi {
         return data.price;
       },
 
-      // External position ID for deduplication
-      setPositionId(positionId: string) {
-        data.positionId = positionId;
-        notifyChange();
-        return this;
-      },
-
       // Text and quantity
       setQuantity(q: string) {
         data.quantity = q;
         notifyChange();
         return this;
       },
+      getQuantity() {
+        return data.quantity;
+      },
       setText(t: string) {
         data.text = t;
         notifyChange();
         return this;
+      },
+      getText() {
+        return data.text;
       },
 
       // Line styling
@@ -825,25 +955,44 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getLineColor() {
+        return data.lineColor;
+      },
       setLineStyle(style: number) {
         data.lineStyle = style;
         notifyChange();
         return this;
+      },
+      getLineStyle() {
+        return data.lineStyle;
       },
       setLineWidth(width: number) {
         data.lineWidth = width;
         notifyChange();
         return this;
       },
-      setLineLength(length: number) {
+      getLineWidth() {
+        return data.lineWidth;
+      },
+      setLineLength(length: number, unit: PositionLineLengthUnit = 'percentage') {
         data.lineLength = length;
+        data.lineLengthUnit = unit;
         notifyChange();
         return this;
+      },
+      getLineLength() {
+        return data.lineLength;
+      },
+      getLineLengthUnit() {
+        return data.lineLengthUnit;
       },
       setExtendLeft(extend: boolean) {
         data.extendLeft = extend;
         notifyChange();
         return this;
+      },
+      getExtendLeft() {
+        return data.extendLeft;
       },
 
       // Body styling
@@ -852,24 +1001,41 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getBodyBackgroundColor() {
+        return data.bodyBackgroundColor;
+      },
       setBodyTextColor(color: string) {
         data.bodyTextColor = color;
         notifyChange();
         return this;
+      },
+      getBodyTextColor() {
+        return data.bodyTextColor;
       },
       setBodyBorderColor(color: string) {
         data.bodyBorderColor = color;
         notifyChange();
         return this;
       },
+      getBodyBorderColor() {
+        return data.bodyBorderColor;
+      },
 
-      // Font styling (no-op for TradingView API compatibility)
-      // TODO: Implement font customization in tealchart renderer
-      setBodyFont(_font: string) {
+      setBodyFont(font: string) {
+        data.bodyFont = font;
+        notifyChange();
         return this;
       },
-      setQuantityFont(_font: string) {
+      getBodyFont() {
+        return data.bodyFont;
+      },
+      setQuantityFont(font: string) {
+        data.quantityFont = font;
+        notifyChange();
         return this;
+      },
+      getQuantityFont() {
+        return data.quantityFont;
       },
 
       // Quantity styling
@@ -878,15 +1044,24 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getQuantityBackgroundColor() {
+        return data.quantityBackgroundColor;
+      },
       setQuantityTextColor(color: string) {
         data.quantityTextColor = color;
         notifyChange();
         return this;
       },
+      getQuantityTextColor() {
+        return data.quantityTextColor;
+      },
       setQuantityBorderColor(color: string) {
         data.quantityBorderColor = color;
         notifyChange();
         return this;
+      },
+      getQuantityBorderColor() {
+        return data.quantityBorderColor;
       },
 
       // Reverse button styling
@@ -895,15 +1070,24 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getReverseButtonBackgroundColor() {
+        return data.reverseButtonBackgroundColor;
+      },
       setReverseButtonIconColor(color: string) {
         data.reverseButtonIconColor = color;
         notifyChange();
         return this;
       },
+      getReverseButtonIconColor() {
+        return data.reverseButtonIconColor;
+      },
       setReverseButtonBorderColor(color: string) {
         data.reverseButtonBorderColor = color;
         notifyChange();
         return this;
+      },
+      getReverseButtonBorderColor() {
+        return data.reverseButtonBorderColor;
       },
 
       // Close button styling
@@ -912,46 +1096,77 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      getCloseButtonBackgroundColor() {
+        return data.closeButtonBackgroundColor;
+      },
       setCloseButtonIconColor(color: string) {
         data.closeButtonIconColor = color;
         notifyChange();
         return this;
+      },
+      getCloseButtonIconColor() {
+        return data.closeButtonIconColor;
       },
       setCloseButtonBorderColor(color: string) {
         data.closeButtonBorderColor = color;
         notifyChange();
         return this;
       },
+      getCloseButtonBorderColor() {
+        return data.closeButtonBorderColor;
+      },
 
       // Tooltips
+      setTooltip(tooltip: string) {
+        data.tooltip = tooltip;
+        notifyChange();
+        return this;
+      },
+      getTooltip() {
+        return data.tooltip;
+      },
       setCloseTooltip(tooltip: string) {
         data.closeTooltip = tooltip;
         notifyChange();
         return this;
       },
-      setProtectTooltipText(text: string) {
+      getCloseTooltip() {
+        return data.closeTooltip;
+      },
+      setProtectTooltip(text: string) {
         data.protectTooltipText = text;
         notifyChange();
         return this;
       },
+      getProtectTooltip() {
+        return data.protectTooltipText;
+      },
+      setReverseTooltip(tooltip: string) {
+        data.reverseTooltip = tooltip;
+        notifyChange();
+        return this;
+      },
+      getReverseTooltip() {
+        return data.reverseTooltip;
+      },
 
       // Callbacks
-      onClose(callback: () => void) {
-        _onCloseCallback = callback;
+      onClose(callbackOrData: unknown, callback?: unknown) {
+        _onCloseCallback = createAdapterCallback(adapter, callbackOrData, callback);
         // Show close button when callback is provided
         data.closeable = true;
         notifyChange();
         return this;
       },
-      onReverse(callback: () => void) {
-        _onReverseCallback = callback;
+      onReverse(callbackOrData: unknown, callback?: unknown) {
+        _onReverseCallback = createAdapterCallback(adapter, callbackOrData, callback);
         // Show reverse button when callback is provided
         data.reversible = true;
         notifyChange();
         return this;
       },
-      onModify(callback: (text: string, price: number) => void) {
-        _onModifyCallback = callback;
+      onModify(callbackOrData: unknown, callback?: unknown) {
+        _onModifyCallback = createAdapterCallback(adapter, callbackOrData, callback);
         return this;
       },
 
@@ -973,11 +1188,6 @@ export class TealchartApi {
       },
 
       // TEALSTREET: Compact display for mobile
-      setTextShort(text: string) {
-        data.textShort = text;
-        notifyChange();
-        return this;
-      },
       setQuantityShort(quantity: string) {
         data.quantityShort = quantity;
         notifyChange();
@@ -1002,7 +1212,7 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
-      setPnlCalculator(calculator: (price: number, percent: number) => string) {
+      setPnlCalculator(calculator: BracketPnlCalculator) {
         _pnlCalculator = calculator;
         return this;
       },
@@ -1018,12 +1228,12 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
-      onTPMove(callback: (price: number) => void) {
+      onTPMove(callback: (price: number, partialPercent?: number) => void) {
         _onTPMove = callback;
         notifyChange();
         return this;
       },
-      onSLMove(callback: (price: number) => void) {
+      onSLMove(callback: (price: number, partialPercent?: number) => void) {
         _onSLMove = callback;
         notifyChange();
         return this;
@@ -1536,10 +1746,19 @@ export class TealchartApi {
   triggerOrderMove(orderId: string, newPrice: number): void {
     const adapter = this._orderLines.get(orderId);
     if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onMove) {
-        callbacks.onMove(newPrice);
-      }
+      adapter.setPrice(newPrice);
+      adapter._getCallbacks().onMove?.();
+    }
+  }
+
+  /**
+   * @internal Trigger onMoving callback for an order line during drag.
+   */
+  triggerOrderMoving(orderId: string, newPrice: number): void {
+    const adapter = this._orderLines.get(orderId);
+    if (adapter) {
+      adapter.setPrice(newPrice);
+      adapter._getCallbacks().onMoving?.();
     }
   }
 

@@ -637,8 +637,12 @@ export type {
   IExecutionLineAdapter,
   OrderLineOptions,
   IOrderLineAdapter,
+  TealstreetOrderLineExtensions,
+  FullOrderLineAdapter,
   PositionLineOptions,
   IPositionLineAdapter,
+  TealstreetPositionLineExtensions,
+  FullPositionLineAdapter,
   // Study types
   StudyInfo,
   IStudyApi,

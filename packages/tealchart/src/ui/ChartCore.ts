@@ -105,6 +105,8 @@ export interface ChartCoreOptions {
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Callback when order is moved via drag */
   onOrderMove?: (orderId: string, newPrice: number) => void;
+  /** Callback while an order is being dragged */
+  onOrderMoving?: (orderId: string, newPrice: number) => void;
   /** Callback when order cancel button clicked */
   onOrderCancel?: (orderId: string) => void;
   /** Callback when position close button clicked */
@@ -327,7 +329,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
         ? [
             {
               type: 'cancel' as const,
-              icon: '×',
+              icon: order.cancelAsSubmit ? '✓' : '×',
               backgroundColor: lineColor,
               iconColor: order.cancelButtonIconColor,
               borderColor: lineColor,
@@ -761,6 +763,7 @@ export class ChartCore {
               this.getUnifiedLayout(),
             ),
           onOrderMove: (orderId, newPrice) => this.handleOrderMove(orderId, newPrice),
+          onOrderMoving: (orderId, newPrice) => this.options.onOrderMoving?.(orderId, newPrice),
           onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
           onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
           onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),

@@ -86,6 +86,15 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     [order.callbacks, order.editable],
   );
 
+  const handlePriceMoving = useCallback(
+    (newPrice: number) => {
+      if (order.editable) {
+        order.callbacks?.onMoving?.(newPrice);
+      }
+    },
+    [order.callbacks, order.editable],
+  );
+
   // Handle cancel callback — fire directly from adapter callbacks
   const handleCancel = useCallback(() => {
     if (order.cancellable) {
@@ -270,6 +279,9 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       .onUpdate((event) => {
         // Constrain to vertical only
         translateY.value = startY.value + event.translationY;
+        const currentY = baseY + translateY.value;
+        const currentPrice = yToPrice(currentY, viewport, dimensions);
+        runOnJS(handlePriceMoving)(currentPrice);
       })
       .onEnd(() => {
         isDragging.value = false;
@@ -283,7 +295,17 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
         // Call price change handler
         runOnJS(handlePriceChange)(newPrice);
       });
-  }, [order.editable, baseY, viewport, dimensions, handlePriceChange, isDragging, translateY, startY]);
+  }, [
+    order.editable,
+    baseY,
+    viewport,
+    dimensions,
+    handlePriceChange,
+    handlePriceMoving,
+    isDragging,
+    translateY,
+    startY,
+  ]);
 
   // Animated styles for the line container
   const animatedContainerStyle = useAnimatedStyle(() => ({
@@ -421,7 +443,9 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>×</Text>
+            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>
+              {order.cancelAsSubmit ? '✓' : '×'}
+            </Text>
           </Pressable>
         )}
 

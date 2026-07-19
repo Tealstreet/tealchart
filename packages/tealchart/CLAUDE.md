@@ -127,6 +127,20 @@ Implements TradingView-compatible interfaces:
 - `IOrderLineAdapter`, `IPositionLineAdapter` — trading line adapters
 - Layout save/load via `transformer/` (bidirectional conversion)
 
+TradingView is the canonical public API shape. If TradingView exposes an
+imperative method on widget/chart/datafeed/order-line/position-line interfaces,
+Tealchart must mirror that method name and chaining semantics instead of adding
+a React prop, adapter wrapper, or parallel helper API. Tealstreet-only features
+such as `setCancelAsSubmit`, compact labels, PnL, TP/SL controls, and bracket callbacks are additive extensions on the same imperative adapter
+objects, not a second line API. `src/imperative-contract.test.ts` compares the
+Tealchart interfaces and the v3 iframe `WidgetHost` method bridge against the
+vendored TradingView declarations; update that test when TradingView is
+upgraded or when a deliberate backwards-compatible extension is added.
+
+Datafeed input follows TradingView's external shape. For example, datafeed bars
+may omit `volume`; Tealchart normalizes them at the widget/core boundary before
+renderer, tealscript, and Skia paths see the stricter internal `Bar` shape.
+
 Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the full string but stored internally as the clean symbol (`BTCUSDT`), including during initial widget construction. A prefix change with the same clean symbol must still reload data so adapters that key by `EXCHANGE:SYMBOL` get fresh symbol info and subscriptions.
 
 Order and position trading-line labels derive their body, quantity, price-label, and action-button colors from `lineColor`. Defaults are blue for buy/unspecified lines and red should be supplied by consumers for sell/short lines. PnL must be passed separately with `setPnl` / `setProfitState`; it is the only label segment that flips to profit/loss color independently of `lineColor`.

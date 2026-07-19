@@ -9,6 +9,7 @@ import type {
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type {
   Bar,
+  DatafeedBar,
   DatafeedConfiguration,
   IBasicDataFeed,
   LibrarySymbolInfo,
@@ -140,9 +141,9 @@ interface MockDatafeed extends IBasicDataFeed {
   _onReadyCb: ((config: DatafeedConfiguration) => void) | null;
   _resolveSymbolCb: ((info: LibrarySymbolInfo) => void) | null;
   _resolveSymbolErrCb: ((err: string) => void) | null;
-  _getBarsCb: ((bars: Bar[], meta: { noData?: boolean }) => void) | null;
+  _getBarsCb: ((bars: DatafeedBar[], meta: { noData?: boolean }) => void) | null;
   _getBarsErrCb: ((err: string) => void) | null;
-  _subscribeCb: ((bar: Bar) => void) | null;
+  _subscribeCb: ((bar: DatafeedBar) => void) | null;
   _subscribeGuid: string | null;
   _resolveSymbolCalls: string[];
   _getBarsCalls: { symbolInfo: LibrarySymbolInfo; resolution: string }[];
@@ -167,6 +168,9 @@ function createMockDatafeed(): MockDatafeed {
       // Auto-trigger onReady synchronously for testing
       cb({ supported_resolutions: ['1', '5', '15', '60'] as ResolutionString[] });
     },
+    searchSymbols(_userInput, _exchange, _symbolType, onResult) {
+      onResult([]);
+    },
     resolveSymbol(symbol: string, onResolve: (info: LibrarySymbolInfo) => void, onError: (reason: string) => void) {
       datafeed._resolveSymbolCalls.push(symbol);
       datafeed._resolveSymbolCb = onResolve;
@@ -176,7 +180,7 @@ function createMockDatafeed(): MockDatafeed {
       symbolInfo: LibrarySymbolInfo,
       resolution: ResolutionString,
       periodParams: PeriodParams,
-      onResult: (bars: Bar[], meta: { noData?: boolean }) => void,
+      onResult: (bars: DatafeedBar[], meta: { noData?: boolean }) => void,
       onError: (reason: string) => void,
     ) {
       datafeed._getBarsCalls.push({ symbolInfo, resolution });
@@ -186,7 +190,7 @@ function createMockDatafeed(): MockDatafeed {
     subscribeBars(
       symbolInfo: LibrarySymbolInfo,
       resolution: ResolutionString,
-      onTick: (bar: Bar) => void,
+      onTick: (bar: DatafeedBar) => void,
       listenerGuid: string,
       onResetCacheNeeded: () => void,
     ) {
