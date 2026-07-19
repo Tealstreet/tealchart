@@ -10,12 +10,21 @@
  */
 
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
-import type { Bar, IBasicDataFeed, LibrarySymbolInfo, ResolutionString, UnifiedPaneLayout, Viewport } from '../types';
+import type {
+  Bar,
+  DatafeedBar,
+  IBasicDataFeed,
+  LibrarySymbolInfo,
+  ResolutionString,
+  UnifiedPaneLayout,
+  Viewport,
+} from '../types';
+import type { ResolutionInput } from '../utils/normalizeResolution';
 
 import { EventEmitter } from '../events/EventEmitter';
-import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
-import { normalizeResolution, type ResolutionInput } from '../utils/normalizeResolution';
 import { PaneManager } from '../rendering/PaneManager';
+import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
+import { normalizeResolution } from '../utils/normalizeResolution';
 
 // Use generic PlotOutput type to avoid import issues across platforms
 type PlotOutput = {
@@ -30,6 +39,13 @@ type PlotOutput = {
 
 // Constants
 export const INITIAL_BAR_COUNT = 300;
+
+const normalizeDatafeedBar = (bar: DatafeedBar): Bar => ({
+  ...bar,
+  volume: bar.volume ?? 0,
+});
+
+const normalizeDatafeedBars = (bars: DatafeedBar[]): Bar[] => bars.map(normalizeDatafeedBar);
 
 /**
  * Convert resolution string to milliseconds
@@ -235,21 +251,21 @@ export class ChartWidgetCore {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        bars = dedupeBarsByTime(bars, 'history load');
-        this._bars = bars;
+        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars), 'history load');
+        this._bars = normalizedBars;
         // Clear old plots — they belong to the old symbol/interval
         this._plots = [];
         this._setLoading(false);
 
         // Notify listeners BEFORE indicator manager — ensures empty plots
         // are pushed to UI before worker callback can race with stale data
-        this._onBarsChanged?.(bars);
+        this._onBarsChanged?.(normalizedBars);
         this._onPlotsChanged?.(this._plots);
         this._scheduleRender();
         this._subscribeToBars();
 
         // Notify indicator manager AFTER — worker callback fires later with new data
-        this._indicatorManager?.setBars(bars);
+        this._indicatorManager?.setBars(normalizedBars);
       },
       (error) => {
         if (requestId !== this._loadBarsRequestId) return;
@@ -273,7 +289,7 @@ export class ChartWidgetCore {
     this._datafeed.subscribeBars(
       this._symbolInfo,
       this._interval,
-      (bar) => this._handleNewBar(bar),
+      (bar) => this._handleNewBar(normalizeDatafeedBar(bar)),
       this._barSubscriptionGuid,
       () => this._loadBars(), // Reset callback
     );

@@ -3,12 +3,12 @@ import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
   UpdateUserDrawingOptions,
-  UserDrawingIconName,
   UserDrawingCommandAvailability,
-  UserDrawingInputPoint,
-  UserDrawingSelectionAtPointResult,
   UserDrawingFavoriteToolbarPosition,
+  UserDrawingIconName,
+  UserDrawingInputPoint,
   UserDrawingMagnetMode,
+  UserDrawingSelectionAtPointResult,
   UserDrawingSelectionInputOptions,
   UserDrawingState,
   UserDrawingStyle,
@@ -18,6 +18,7 @@ import type {
   UserDrawingZOrderAction,
 } from '../drawings';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { DrawingDragEventOptions } from '../interaction/EventManager';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 import type {
@@ -35,7 +36,6 @@ import type {
 import type { IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
-import type { DrawingDragEventOptions } from '../interaction/EventManager';
 
 import {
   anchorToScreenPoint,
@@ -124,6 +124,7 @@ export interface TealchartWidgetUIOptions {
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Callback when order is moved */
   onOrderMove?: (orderId: string, newPrice: number) => void;
+  onOrderMoving?: (orderId: string, newPrice: number) => void;
   /** Callback when order is cancelled */
   onOrderCancel?: (orderId: string) => void;
   /** Callback when position is closed */
@@ -473,6 +474,7 @@ export class TealchartWidgetUI {
       onViewportChange: this.options.onViewportChange,
       onRequestMoreBars: this.options.onRequestMoreBars,
       onOrderMove: this.options.onOrderMove,
+      onOrderMoving: this.options.onOrderMoving,
       onOrderCancel: this.options.onOrderCancel,
       onPositionClose: this.options.onPositionClose,
       onPositionReverse: this.options.onPositionReverse,

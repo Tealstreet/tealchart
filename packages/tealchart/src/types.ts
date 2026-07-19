@@ -23,6 +23,10 @@ export interface Bar {
   volume: number;
 }
 
+export interface DatafeedBar extends Omit<Bar, 'volume'> {
+  volume?: number;
+}
+
 // Viewport defines the visible area of the chart
 export interface Viewport {
   startTime: number; // Left edge timestamp (ms)
@@ -148,6 +152,7 @@ export interface PriceLine {
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
     onMove?: (price: number) => void;
+    onMoving?: (price: number) => void;
     onTPClick?: () => void;
     onSLClick?: () => void;
     onTPMove?: (price: number, partialPercent?: number) => void;
@@ -273,6 +278,7 @@ export interface PriceLineLabelBounds {
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
     onMove?: (price: number) => void;
+    onMoving?: (price: number) => void;
     onTPClick?: () => void;
     onSLClick?: () => void;
     onTPMove?: (price: number, partialPercent?: number) => void;
@@ -485,6 +491,9 @@ export interface ITimeScaleApi {
   };
 }
 
+export type OrderLineLengthUnit = 'pixel' | 'percentage';
+export type PositionLineLengthUnit = 'pixel' | 'percentage';
+
 /**
  * Order line options
  */
@@ -511,33 +520,63 @@ export interface OrderLineOptions {
  */
 export interface IOrderLineAdapter {
   remove(): void;
-  /** Set external order ID for deduplication (e.g., exchange order ID) */
-  setOrderId(orderId: string): this;
-  setPrice(price: number): this;
-  setQuantity(quantity: string): this;
-  setText(text: string): this;
-  setLineColor(color: string): this;
-  setLineStyle(style: number): this;
-  setLineWidth(width: number): this;
-  setLineLength(length: number): this;
-  setExtendLeft(extend: boolean): this;
-  setBodyBackgroundColor(color: string): this;
-  setBodyTextColor(color: string): this;
-  setBodyBorderColor(color: string): this;
-  setQuantityBackgroundColor(color: string): this;
-  setQuantityTextColor(color: string): this;
-  setQuantityBorderColor(color: string): this;
-  setCancelButtonBackgroundColor(color: string): this;
-  setCancelButtonIconColor(color: string): this;
-  setCancelButtonBorderColor(color: string): this;
-  setCancelTooltip(tooltip: string): this;
-  setModifyTooltip(tooltip: string): this;
-  setEditable(editable: boolean): this;
-  setCancellable(cancellable: boolean): this;
-  onMove(callback: (price: number) => void): this;
+  onModify(callback: () => void): this;
+  onModify<T>(data: T, callback: (data: T) => void): this;
+  onMove(callback: () => void): this;
+  onMove<T>(data: T, callback: (data: T) => void): this;
+  onMoving(callback: () => void): this;
+  onMoving<T>(data: T, callback: (data: T) => void): this;
   onCancel(callback: () => void): this;
-  onModify(callback: (text: string, price: number) => void): this;
+  onCancel<T>(data: T, callback: (data: T) => void): this;
   getPrice(): number;
+  setPrice(value: number): this;
+  getText(): string;
+  setText(value: string): this;
+  getTooltip(): string;
+  setTooltip(value: string): this;
+  getModifyTooltip(): string;
+  setModifyTooltip(value: string): this;
+  getCancelTooltip(): string;
+  setCancelTooltip(value: string): this;
+  getQuantity(): string;
+  setQuantity(value: string): this;
+  getEditable(): boolean;
+  setEditable(value: boolean): this;
+  getCancellable(): boolean;
+  setCancellable(value: boolean): this;
+  getExtendLeft(): boolean;
+  setExtendLeft(value: boolean): this;
+  getLineLength(): number;
+  getLineLengthUnit(): OrderLineLengthUnit;
+  setLineLength(value: number, unit?: OrderLineLengthUnit): this;
+  getLineStyle(): number;
+  setLineStyle(value: number): this;
+  getLineWidth(): number;
+  setLineWidth(value: number): this;
+  getBodyFont(): string;
+  setBodyFont(value: string): this;
+  getQuantityFont(): string;
+  setQuantityFont(value: string): this;
+  getLineColor(): string;
+  setLineColor(value: string): this;
+  getBodyBorderColor(): string;
+  setBodyBorderColor(value: string): this;
+  getBodyBackgroundColor(): string;
+  setBodyBackgroundColor(value: string): this;
+  getBodyTextColor(): string;
+  setBodyTextColor(value: string): this;
+  getQuantityBorderColor(): string;
+  setQuantityBorderColor(value: string): this;
+  getQuantityBackgroundColor(): string;
+  setQuantityBackgroundColor(value: string): this;
+  getQuantityTextColor(): string;
+  setQuantityTextColor(value: string): this;
+  getCancelButtonBorderColor(): string;
+  setCancelButtonBorderColor(value: string): this;
+  getCancelButtonBackgroundColor(): string;
+  setCancelButtonBackgroundColor(value: string): this;
+  getCancelButtonIconColor(): string;
+  setCancelButtonIconColor(value: string): this;
 }
 
 /**
@@ -568,35 +607,201 @@ export interface PositionLineOptions {
  */
 export interface IPositionLineAdapter {
   remove(): void;
-  /** Set external position ID for deduplication */
-  setPositionId(positionId: string): this;
-  setPrice(price: number): this;
-  setQuantity(quantity: string): this;
-  setText(text: string): this;
-  setExtendLeft(extend: boolean): this;
-  setLineLength(length: number): this;
-  setLineColor(color: string): this;
-  setLineStyle(style: number): this;
-  setLineWidth(width: number): this;
-  setBodyBackgroundColor(color: string): this;
-  setBodyTextColor(color: string): this;
-  setBodyBorderColor(color: string): this;
-  setQuantityBackgroundColor(color: string): this;
-  setQuantityTextColor(color: string): this;
-  setQuantityBorderColor(color: string): this;
-  setReverseButtonBackgroundColor(color: string): this;
-  setReverseButtonIconColor(color: string): this;
-  setReverseButtonBorderColor(color: string): this;
-  setCloseButtonBackgroundColor(color: string): this;
-  setCloseButtonIconColor(color: string): this;
-  setCloseButtonBorderColor(color: string): this;
-  setCloseTooltip(tooltip: string): this;
-  setProtectTooltipText(text: string): this;
   onClose(callback: () => void): this;
+  onClose<T>(data: T, callback: (data: T) => void): this;
+  onModify(callback: () => void): this;
+  onModify<T>(data: T, callback: (data: T) => void): this;
   onReverse(callback: () => void): this;
-  onModify(callback: (text: string, price: number) => void): this;
+  onReverse<T>(data: T, callback: (data: T) => void): this;
   getPrice(): number;
+  setPrice(value: number): this;
+  getText(): string;
+  setText(value: string): this;
+  getTooltip(): string;
+  setTooltip(value: string): this;
+  getProtectTooltip(): string;
+  setProtectTooltip(value: string): this;
+  getCloseTooltip(): string;
+  setCloseTooltip(value: string): this;
+  getReverseTooltip(): string;
+  setReverseTooltip(value: string): this;
+  getQuantity(): string;
+  setQuantity(value: string): this;
+  getExtendLeft(): boolean;
+  setExtendLeft(value: boolean): this;
+  getLineLengthUnit(): PositionLineLengthUnit;
+  getLineLength(): number;
+  setLineLength(value: number, unit?: PositionLineLengthUnit): this;
+  getLineStyle(): number;
+  setLineStyle(value: number): this;
+  getLineWidth(): number;
+  setLineWidth(value: number): this;
+  getBodyFont(): string;
+  setBodyFont(value: string): this;
+  getQuantityFont(): string;
+  setQuantityFont(value: string): this;
+  getLineColor(): string;
+  setLineColor(value: string): this;
+  getBodyBorderColor(): string;
+  setBodyBorderColor(value: string): this;
+  getBodyBackgroundColor(): string;
+  setBodyBackgroundColor(value: string): this;
+  getBodyTextColor(): string;
+  setBodyTextColor(value: string): this;
+  getQuantityBorderColor(): string;
+  setQuantityBorderColor(value: string): this;
+  getQuantityBackgroundColor(): string;
+  setQuantityBackgroundColor(value: string): this;
+  getQuantityTextColor(): string;
+  setQuantityTextColor(value: string): this;
+  getReverseButtonBorderColor(): string;
+  setReverseButtonBorderColor(value: string): this;
+  getReverseButtonBackgroundColor(): string;
+  setReverseButtonBackgroundColor(value: string): this;
+  getReverseButtonIconColor(): string;
+  setReverseButtonIconColor(value: string): this;
+  getCloseButtonBorderColor(): string;
+  setCloseButtonBorderColor(value: string): this;
+  getCloseButtonBackgroundColor(): string;
+  setCloseButtonBackgroundColor(value: string): this;
+  getCloseButtonIconColor(): string;
+  setCloseButtonIconColor(value: string): this;
 }
+
+export interface Mark {
+  id: string | number;
+  time: number;
+  color: string;
+  text: string;
+  label: string;
+  labelFontColor?: string;
+  minSize?: number;
+}
+
+export interface TimescaleMark {
+  id: string | number;
+  time: number;
+  color: string;
+  label: string;
+  tooltip?: string[];
+}
+
+export interface SearchSymbolResultItem {
+  symbol: string;
+  full_name?: string;
+  description: string;
+  exchange: string;
+  ticker?: string;
+  type: string;
+}
+
+export interface SymbolResolveExtension {
+  currencyCode?: string;
+  unitId?: string;
+}
+
+export interface HistoryMetadata {
+  noData?: boolean;
+  nextTime?: number | null;
+}
+
+export interface DOMData {
+  snapshot: boolean;
+  asks: Array<[number, number]>;
+  bids: Array<[number, number]>;
+}
+
+export interface TradingQuotes {
+  s: 'ok' | 'error';
+  n: string;
+  v?: Record<string, string | number>;
+}
+
+export type SearchInitiationPoint = string;
+export type SearchSymbolsCallback = (items: SearchSymbolResultItem[]) => void;
+export type ResolveCallback = (symbolInfo: LibrarySymbolInfo) => void;
+export type DatafeedErrorCallback = (reason: string) => void;
+export type HistoryCallback = (bars: DatafeedBar[], meta?: HistoryMetadata) => void;
+export type SubscribeBarsCallback = (bar: DatafeedBar) => void;
+export type GetMarksCallback<T> = (marks: T[]) => void;
+export type ServerTimeCallback = (serverTime: number) => void;
+export type DOMCallback = (data: DOMData) => void;
+export type QuotesCallback = (data: TradingQuotes[]) => void;
+export type QuotesErrorCallback = (reason: string) => void;
+
+export interface IDatafeedChartApi {
+  getMarks?(
+    symbolInfo: LibrarySymbolInfo,
+    from: number,
+    to: number,
+    onDataCallback: GetMarksCallback<Mark>,
+    resolution: ResolutionString,
+  ): void;
+  getTimescaleMarks?(
+    symbolInfo: LibrarySymbolInfo,
+    from: number,
+    to: number,
+    onDataCallback: GetMarksCallback<TimescaleMark>,
+    resolution: ResolutionString,
+  ): void;
+  getServerTime?(callback: ServerTimeCallback): void;
+  searchSymbols(
+    userInput: string,
+    exchange: string,
+    symbolType: string,
+    onResult: SearchSymbolsCallback,
+    searchSource?: SearchInitiationPoint,
+  ): void;
+  resolveSymbol(
+    symbolName: string,
+    onResolve: ResolveCallback,
+    onError: DatafeedErrorCallback,
+    extension?: SymbolResolveExtension,
+  ): void;
+  getBars(
+    symbolInfo: LibrarySymbolInfo,
+    resolution: ResolutionString,
+    periodParams: PeriodParams,
+    onResult: HistoryCallback,
+    onError: DatafeedErrorCallback,
+  ): void;
+  subscribeBars(
+    symbolInfo: LibrarySymbolInfo,
+    resolution: ResolutionString,
+    onTick: SubscribeBarsCallback,
+    listenerGuid: string,
+    onResetCacheNeededCallback: () => void,
+  ): void;
+  unsubscribeBars(listenerGuid: string): void;
+  subscribeDepth?(symbol: string, callback: DOMCallback): string;
+  unsubscribeDepth?(subscriberUID: string): void;
+  getVolumeProfileResolutionForPeriod?(
+    currentResolution: ResolutionString,
+    from: number,
+    to: number,
+    symbolInfo: LibrarySymbolInfo,
+  ): ResolutionString;
+}
+
+export interface IDatafeedQuotesApi {
+  getQuotes(symbols: string[], onDataCallback: QuotesCallback, onErrorCallback: QuotesErrorCallback): void;
+  subscribeQuotes(
+    symbols: string[],
+    fastSymbols: string[],
+    onRealtimeCallback: QuotesCallback,
+    listenerGUID: string,
+  ): void;
+  unsubscribeQuotes(listenerGUID: string): void;
+}
+
+export interface IExternalDatafeed {
+  onReady(callback: (configuration: DatafeedConfiguration) => void): void;
+}
+
+/**
+ * TradingView-compatible datafeed interface.
+ */
+export interface IBasicDataFeed extends IDatafeedChartApi, IExternalDatafeed {}
 
 /**
  * Execution line direction (matches TradingView's Direction type)
@@ -656,34 +861,6 @@ export interface IStudyApi {
   getId(): string;
   /** Get the study name */
   getName(): string;
-}
-
-/**
- * Minimal datafeed interface for chart compatibility
- * Consumers should use the existing DefaultDatafeed from the web app
- */
-export interface IBasicDataFeed {
-  onReady(callback: (config: DatafeedConfiguration) => void): void;
-  resolveSymbol(
-    symbolName: string,
-    onResolve: (symbolInfo: LibrarySymbolInfo) => void,
-    onError: (reason: string) => void,
-  ): void;
-  getBars(
-    symbolInfo: LibrarySymbolInfo,
-    resolution: ResolutionString,
-    periodParams: PeriodParams,
-    onResult: (bars: Bar[], meta: { noData?: boolean }) => void,
-    onError: (reason: string) => void,
-  ): void;
-  subscribeBars(
-    symbolInfo: LibrarySymbolInfo,
-    resolution: ResolutionString,
-    onTick: (bar: Bar) => void,
-    listenerGuid: string,
-    onResetCacheNeededCallback: () => void,
-  ): void;
-  unsubscribeBars(listenerGuid: string): void;
 }
 
 /**
@@ -874,6 +1051,18 @@ export interface PositionData {
   isLong: boolean;
 }
 
+export interface BracketPnlCalculatorResult {
+  pnl: number;
+  percentDistance: number;
+  label?: string;
+}
+
+export type BracketPnlCalculator = (
+  price: number,
+  type: 'tp' | 'sl',
+  partialPercent?: number,
+) => BracketPnlCalculatorResult;
+
 /**
  * Internal render data extracted from order line adapter
  * Contains all properties needed to draw an order line on canvas
@@ -892,23 +1081,28 @@ export interface OrderLineRenderData {
   lineStyle: number; // 0=solid, 1=dotted, 2=dashed
   lineWidth: number;
   lineLength: number; // Percentage 0-100
+  lineLengthUnit: OrderLineLengthUnit;
   extendLeft: boolean;
   // State
   editable: boolean;
   cancellable: boolean;
+  cancelAsSubmit: boolean;
   // Body styling
   bodyBackgroundColor: string;
   bodyTextColor: string;
   bodyBorderColor: string;
+  bodyFont: string;
   // Quantity box styling
   quantityBackgroundColor: string;
   quantityTextColor: string;
   quantityBorderColor: string;
+  quantityFont: string;
   // Cancel button styling
   cancelButtonBackgroundColor: string;
   cancelButtonIconColor: string;
   cancelButtonBorderColor: string;
   // Tooltips
+  tooltip: string;
   cancelTooltip: string;
   modifyTooltip: string;
   // TEALSTREET: Bracket state
@@ -917,6 +1111,7 @@ export interface OrderLineRenderData {
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
     onMove?: (price: number) => void;
+    onMoving?: (price: number) => void;
     onTPClick?: () => void;
     onSLClick?: () => void;
     onTPMove?: (price: number, partialPercent?: number) => void;
@@ -945,15 +1140,18 @@ export interface PositionLineRenderData {
   lineStyle: number; // 0=solid, 1=dotted, 2=dashed
   lineWidth: number;
   lineLength: number; // Percentage 0-100
+  lineLengthUnit: PositionLineLengthUnit;
   extendLeft: boolean;
   // Body styling
   bodyBackgroundColor: string;
   bodyTextColor: string;
   bodyBorderColor: string;
+  bodyFont: string;
   // Quantity box styling
   quantityBackgroundColor: string;
   quantityTextColor: string;
   quantityBorderColor: string;
+  quantityFont: string;
   // Close button styling
   closeable: boolean; // Whether close button is shown (set when onClose callback is provided)
   closeButtonBackgroundColor: string;
@@ -965,7 +1163,9 @@ export interface PositionLineRenderData {
   reverseButtonIconColor: string;
   reverseButtonBorderColor: string;
   // Tooltips
+  tooltip: string;
   closeTooltip: string;
+  reverseTooltip: string;
   protectTooltipText: string;
   // TEALSTREET extensions
   pnl: string;
@@ -1016,20 +1216,22 @@ export interface ExecutionLineRenderData {
  * These methods are available in the patched TradingView library
  */
 export interface TealstreetOrderLineExtensions {
+  /** Render the cancel button as a submit action while preserving onCancel semantics. */
+  setCancelAsSubmit(enabled: boolean): this;
   // Compact display for mobile
-  setTextShort(text: string): IOrderLineAdapter;
-  setQuantityShort(quantity: string): IOrderLineAdapter;
+  setTextShort(text: string): this;
+  setQuantityShort(quantity: string): this;
   // Bracket TP/SL controls
-  setBrackets(brackets: BracketConfig | null): IOrderLineAdapter;
-  setPartialEnabled(enabled: boolean): IOrderLineAdapter;
-  setPnlCalculator(calculator: (price: number, percent: number) => string): IOrderLineAdapter;
+  setBrackets(brackets: BracketConfig | null): this;
+  setPartialEnabled(enabled: boolean): this;
+  setPnlCalculator(calculator: BracketPnlCalculator): this;
   // Bracket callbacks
-  onTPClick(callback: () => void): IOrderLineAdapter;
-  onSLClick(callback: () => void): IOrderLineAdapter;
-  onTPMove(callback: (price: number) => void): IOrderLineAdapter;
-  onSLMove(callback: (price: number) => void): IOrderLineAdapter;
-  onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): IOrderLineAdapter;
-  onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): IOrderLineAdapter;
+  onTPClick(callback: () => void): this;
+  onSLClick(callback: () => void): this;
+  onTPMove(callback: (price: number, partialPercent?: number) => void): this;
+  onSLMove(callback: (price: number, partialPercent?: number) => void): this;
+  onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
+  onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
 }
 
 /**
@@ -1038,50 +1240,49 @@ export interface TealstreetOrderLineExtensions {
  */
 export interface TealstreetPositionLineExtensions {
   // PnL display
-  setPnl(pnl: string): IPositionLineAdapter;
-  setPnlShort(pnl: string): IPositionLineAdapter;
-  setProfitState(state: ProfitState): IPositionLineAdapter;
-  // Compact display for mobile
-  setTextShort(text: string): IPositionLineAdapter;
-  setQuantityShort(quantity: string): IPositionLineAdapter;
+  setPnl(pnl: string): this;
+  setPnlShort(pnl: string): this;
+  setProfitState(state: ProfitState): this;
+  setQuantityShort(quantity: string): this;
   // Position data for calculations
-  setPositionData(data: PositionData): IPositionLineAdapter;
+  setPositionData(data: PositionData): this;
   // Bracket TP/SL controls
-  setBrackets(brackets: BracketConfig | null): IPositionLineAdapter;
-  setPartialEnabled(enabled: boolean): IPositionLineAdapter;
-  setPnlCalculator(calculator: (price: number, percent: number) => string): IPositionLineAdapter;
+  setBrackets(brackets: BracketConfig | null): this;
+  setPartialEnabled(enabled: boolean): this;
+  setPnlCalculator(calculator: BracketPnlCalculator): this;
   // Bracket callbacks
-  onTPClick(callback: () => void): IPositionLineAdapter;
-  onSLClick(callback: () => void): IPositionLineAdapter;
-  onTPMove(callback: (price: number) => void): IPositionLineAdapter;
-  onSLMove(callback: (price: number) => void): IPositionLineAdapter;
-  onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): IPositionLineAdapter;
-  onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): IPositionLineAdapter;
+  onTPClick(callback: () => void): this;
+  onSLClick(callback: () => void): this;
+  onTPMove(callback: (price: number, partialPercent?: number) => void): this;
+  onSLMove(callback: (price: number, partialPercent?: number) => void): this;
+  onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
+  onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
 }
 
 /**
  * Combined order line adapter with TEALSTREET extensions
  */
-export type FullOrderLineAdapter = IOrderLineAdapter & Partial<TealstreetOrderLineExtensions>;
+export type FullOrderLineAdapter = IOrderLineAdapter & TealstreetOrderLineExtensions;
 
 /**
  * Combined position line adapter with TEALSTREET extensions
  */
-export type FullPositionLineAdapter = IPositionLineAdapter & Partial<TealstreetPositionLineExtensions>;
+export type FullPositionLineAdapter = IPositionLineAdapter & TealstreetPositionLineExtensions;
 
 /**
  * Internal order line callbacks (used for interaction handling)
  * @internal
  */
 export interface OrderLineCallbacks {
-  onMove: ((price: number) => void) | null;
+  onMove: (() => void) | null;
+  onMoving: (() => void) | null;
   onCancel: (() => void) | null;
-  onModify: ((text: string, price: number) => void) | null;
-  pnlCalculator: ((price: number, percent: number) => string) | null;
+  onModify: (() => void) | null;
+  pnlCalculator: BracketPnlCalculator | null;
   onTPClick: (() => void) | null;
   onSLClick: (() => void) | null;
-  onTPMove: ((price: number) => void) | null;
-  onSLMove: ((price: number) => void) | null;
+  onTPMove: ((price: number, partialPercent?: number) => void) | null;
+  onSLMove: ((price: number, partialPercent?: number) => void) | null;
   onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null;
   onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null;
 }
@@ -1093,12 +1294,12 @@ export interface OrderLineCallbacks {
 export interface PositionLineCallbacks {
   onClose: (() => void) | null;
   onReverse: (() => void) | null;
-  onModify: ((text: string, price: number) => void) | null;
-  pnlCalculator: ((price: number, percent: number) => string) | null;
+  onModify: (() => void) | null;
+  pnlCalculator: BracketPnlCalculator | null;
   onTPClick: (() => void) | null;
   onSLClick: (() => void) | null;
-  onTPMove: ((price: number) => void) | null;
-  onSLMove: ((price: number) => void) | null;
+  onTPMove: ((price: number, partialPercent?: number) => void) | null;
+  onSLMove: ((price: number, partialPercent?: number) => void) | null;
   onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null;
   onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null;
 }

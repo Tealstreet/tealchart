@@ -65,18 +65,23 @@ function createOrderLine(callbacks: OrderLineRenderData['callbacks']): OrderLine
     lineStyle: 0,
     lineWidth: 1,
     lineLength: 50,
+    lineLengthUnit: 'percentage',
     extendLeft: true,
     editable: true,
     cancellable: true,
+    cancelAsSubmit: false,
     bodyBackgroundColor: '#3b82f6',
     bodyTextColor: '#ffffff',
     bodyBorderColor: '#3b82f6',
+    bodyFont: '',
     quantityBackgroundColor: '#3b82f6',
     quantityTextColor: '#ffffff',
     quantityBorderColor: '#3b82f6',
+    quantityFont: '',
     cancelButtonBackgroundColor: '#3b82f6',
     cancelButtonIconColor: '#ffffff',
     cancelButtonBorderColor: '#3b82f6',
+    tooltip: '',
     cancelTooltip: 'Cancel',
     modifyTooltip: 'Modify',
     brackets: {},
@@ -97,13 +102,16 @@ function createPositionLine(callbacks: PositionLineRenderData['callbacks']): Pos
     lineStyle: 0,
     lineWidth: 1,
     lineLength: 50,
+    lineLengthUnit: 'percentage',
     extendLeft: true,
     bodyBackgroundColor: '#3b82f6',
     bodyTextColor: '#ffffff',
     bodyBorderColor: '#3b82f6',
+    bodyFont: '',
     quantityBackgroundColor: '#3b82f6',
     quantityTextColor: '#ffffff',
     quantityBorderColor: '#3b82f6',
+    quantityFont: '',
     closeable: true,
     closeButtonBackgroundColor: '#3b82f6',
     closeButtonIconColor: '#ffffff',
@@ -112,7 +120,9 @@ function createPositionLine(callbacks: PositionLineRenderData['callbacks']): Pos
     reverseButtonBackgroundColor: '#3b82f6',
     reverseButtonIconColor: '#ffffff',
     reverseButtonBorderColor: '#3b82f6',
+    tooltip: '',
     closeTooltip: 'Close',
+    reverseTooltip: 'Reverse',
     protectTooltipText: 'Protect',
     pnl: '0.00',
     pnlShort: '0.00',
@@ -164,6 +174,26 @@ describe('mobile TP/SL partial bracket gestures', () => {
     expect(onSLMove).toHaveBeenLastCalledWith(expect.any(Number), 75);
     expect(onSLMoveEnd).toHaveBeenLastCalledWith(expect.any(Number), 75);
     expect(onSLMovePreview).toHaveBeenLastCalledWith('order-1', expect.any(Number), 75);
+  });
+
+  it('fires mobile order onMoving during price drags and onMove on drag end', () => {
+    const onMoving = vi.fn();
+    const onMove = vi.fn();
+
+    render(
+      <OrderLineComponent
+        dimensions={dimensions}
+        order={createOrderLine({ onMove, onMoving })}
+        viewport={viewport}
+      />,
+    );
+
+    runGestureCallback(getPanGesture(2), 'onStart');
+    runGestureCallback(getPanGesture(2), 'onUpdate', { translationY: 24 });
+    runGestureCallback(getPanGesture(2), 'onEnd', { translationY: 24 });
+
+    expect(onMoving).toHaveBeenCalledWith(expect.any(Number));
+    expect(onMove).toHaveBeenCalledWith(expect.any(Number));
   });
 
   it('passes partial percentages for mobile position bracket drags', () => {

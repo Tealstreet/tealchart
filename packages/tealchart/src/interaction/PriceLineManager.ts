@@ -32,6 +32,8 @@ export interface PriceLineManagerOptions {
   priceToY: (price: number) => number;
   /** Callback when order is moved via drag (final) */
   onOrderMove?: (orderId: string, newPrice: number) => void;
+  /** Callback while order is being dragged */
+  onOrderMoving?: (orderId: string, newPrice: number) => void;
   /** Callback when order cancel button is clicked */
   onOrderCancel?: (orderId: string) => void;
   /** Callback when position close button is clicked */
@@ -294,7 +296,9 @@ export class PriceLineManager {
             .join('|') ?? '';
         const buttonSignature =
           b.chartLabel?.buttons
-            ?.map((button) => [button.type, button.backgroundColor, button.borderColor, button.iconColor].join('~'))
+            ?.map((button) =>
+              [button.type, button.icon, button.backgroundColor, button.borderColor, button.iconColor].join('~'),
+            )
             .join('|') ?? '';
         return [
           b.lineId,
@@ -793,8 +797,11 @@ export class PriceLineManager {
         const currentAbsoluteY = dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
         const deltaY = currentAbsoluteY - (activeDrag.originalAbsoluteY ?? activeDrag.originalY);
         activeDrag.group.y((activeDrag.originalGroupY ?? 0) + deltaY);
-        activeDrag.group.setAttr('lineY', activeDrag.originalY + deltaY);
+        const movingY = activeDrag.originalY + deltaY;
+        activeDrag.group.setAttr('lineY', movingY);
         dragRect.y(dragStartY);
+        const currentBound = this.getCurrentBound(activeDrag.group, bound);
+        this.options.onOrderMoving?.(currentBound.lineId, yToPrice(movingY));
         this.layer.batchDraw();
       });
 
@@ -1074,23 +1081,23 @@ export class PriceLineManager {
           buttonGroup.add(hitRect);
           refs.buttonIcons.push(undefined);
         } else if (button.type === 'cancel' || button.type === 'close') {
-          // X icon
-          const iconLine1 = new Konva.Line({
-            points: [currentX + 5, lineY - 4, currentX + 11, lineY + 4],
-            stroke: button.iconColor,
-            strokeWidth: 1.5,
+          const iconText = new Konva.Text({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: buttonWidth,
+            height: LABEL_HEIGHT,
+            text: button.icon || '×',
+            fontSize: button.icon === '✓' ? 11 : 14,
+            fontFamily,
+            fontStyle: 'bold',
+            fill: button.iconColor,
+            align: 'center',
+            verticalAlign: 'middle',
             listening: false,
           });
-          const iconLine2 = new Konva.Line({
-            points: [currentX + 11, lineY - 4, currentX + 5, lineY + 4],
-            stroke: button.iconColor,
-            strokeWidth: 1.5,
-            listening: false,
-          });
-          buttonGroup.add(iconLine1);
-          buttonGroup.add(iconLine2);
-          refs.buttonIcons.push([iconLine1, iconLine2]);
-          refs.buttonTexts.push(undefined);
+          buttonGroup.add(iconText);
+          refs.buttonTexts.push(iconText);
+          refs.buttonIcons.push(undefined);
 
           const hitRect = new Konva.Rect({
             x: currentX - 2,

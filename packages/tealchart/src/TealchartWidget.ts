@@ -114,6 +114,7 @@ import {
   ChartOverrides,
   ContextMenuCallback,
   ContextMenuItem,
+  DatafeedBar,
   DEFAULT_RENDER_OPTIONS,
   GapDetectionErrorState,
   GapDetectionEvent,
@@ -136,6 +137,13 @@ import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
+
+const normalizeDatafeedBar = (bar: DatafeedBar): Bar => ({
+  ...bar,
+  volume: bar.volume ?? 0,
+});
+
+const normalizeDatafeedBars = (bars: DatafeedBar[]): Bar[] => bars.map(normalizeDatafeedBar);
 
 /** Auto-save debounce applied only when the default localStorage adapter is used. */
 const DEFAULT_AUTO_SAVE_DELAY_SECONDS = 1;
@@ -172,20 +180,6 @@ const getSymbolInfoValue = (
 ): string | null => {
   const value = symbolInfo?.[key];
   return isNonEmptyString(value) ? value : null;
-};
-
-const getSymbolExtSymbol = (
-  symbolInfo: (LibrarySymbolInfo & { symbol?: string }) | null,
-  fallbackSymbol: string,
-): string => {
-  return (
-    getSymbolInfoValue(symbolInfo, 'symbol') ??
-    getSymbolInfoValue(symbolInfo, 'name') ??
-    getCleanSymbol(getSymbolInfoValue(symbolInfo, 'full_name')) ??
-    getCleanSymbol(getSymbolInfoValue(symbolInfo, 'ticker')) ??
-    getCleanSymbol(fallbackSymbol) ??
-    ''
-  );
 };
 
 const getResolveSymbolName = (
@@ -662,10 +656,10 @@ export class TealchartWidget {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        bars = dedupeBarsByTime(bars, 'history load');
+        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars), 'history load');
 
         // Atomic data transition: set all state before markDirty so it renders in one frame
-        this._bars = bars;
+        this._bars = normalizedBars;
 
         // Clear old plots — they belong to the old symbol/interval.
         // New visual outputs will arrive async via Tealscript callbacks.
@@ -673,8 +667,8 @@ export class TealchartWidget {
         this._drawings = [];
 
         // Restore viewport from viewScale or calculate default (first load)
-        if (bars.length > 0) {
-          const vp = this._viewportController.handleBarsLoaded(bars, intervalToMs(this._interval));
+        if (normalizedBars.length > 0) {
+          const vp = this._viewportController.handleBarsLoaded(normalizedBars, intervalToMs(this._interval));
           this._viewport = vp;
         }
 
@@ -686,7 +680,7 @@ export class TealchartWidget {
         // overwrite _plots. DATA_LOAD in the RAF snapshot ensures empty plots are
         // pushed first, then PLOTS from worker callback gets its own render frame.
         if (this._tealScriptManager) {
-          this._tealScriptManager.setBars(bars);
+          this._tealScriptManager.setBars(normalizedBars);
         }
 
         this._subscribeToBars();
@@ -746,7 +740,7 @@ export class TealchartWidget {
         if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
           return;
         }
-        this._handleNewBar(bar);
+        this._handleNewBar(normalizeDatafeedBar(bar));
       },
       this._barSubscriptionGuid,
       () => {
@@ -879,7 +873,7 @@ export class TealchartWidget {
 
         // Prepend new bars to existing bars (avoid duplicates)
         const existingTimes = new Set(this._bars.map((b) => b.time));
-        const newBars = bars.filter((b) => !existingTimes.has(b.time));
+        const newBars = normalizeDatafeedBars(bars).filter((b) => !existingTimes.has(b.time));
 
         if (newBars.length > 0) {
           this._bars = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
@@ -1142,6 +1136,9 @@ export class TealchartWidget {
       },
       onOrderMove: (orderId, newPrice) => {
         this._chartApi.triggerOrderMove(orderId, newPrice);
+      },
+      onOrderMoving: (orderId, newPrice) => {
+        this._chartApi.triggerOrderMoving(orderId, newPrice);
       },
       onOrderCancel: (orderId) => {
         this._chartApi.triggerOrderCancel(orderId);
