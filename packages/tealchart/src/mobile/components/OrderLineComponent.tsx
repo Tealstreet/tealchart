@@ -18,7 +18,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from '../../constants';
+import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR, STOP_LOSS_COLOR } from '../../constants';
 import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
 import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
@@ -35,6 +35,8 @@ export interface OrderLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
+  /** TP default color, usually the active candle up color. */
+  positiveColor?: string;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (orderId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -58,6 +60,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   useNarrowText = false,
+  positiveColor = DEFAULT_BUY_CANDLE_COLOR,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
@@ -342,7 +345,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
     return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
   }, [order.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
   const lineColor = order.lineColor;
-  const takeProfitColor = order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
   const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
   const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
@@ -405,8 +408,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: lineColor,
-              borderColor: lineColor,
+              backgroundColor: order.bodyBackgroundColor,
+              borderColor: order.bodyBorderColor,
               borderTopLeftRadius: 2,
               borderBottomLeftRadius: 2,
             },
@@ -420,8 +423,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: lineColor,
-              borderColor: lineColor,
+              backgroundColor: order.quantityBackgroundColor,
+              borderColor: order.quantityBorderColor,
               borderLeftWidth: 0,
             },
           ]}
@@ -436,8 +439,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             style={({ pressed }) => [
               styles.cancelButton,
               {
-                backgroundColor: lineColor,
-                borderColor: lineColor,
+                backgroundColor: order.cancelButtonBackgroundColor,
+                borderColor: order.cancelButtonBorderColor,
                 opacity: pressed ? 0.7 : 1,
               },
             ]}
@@ -460,7 +463,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                     styles.bracketButton,
                     {
                       backgroundColor: takeProfitColor,
-                      borderColor: takeProfitColor,
+                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
                     },
                   ]}
                 >
@@ -477,7 +480,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
                     styles.bracketButton,
                     {
                       backgroundColor: stopLossColor,
-                      borderColor: stopLossColor,
+                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
                     },
                   ]}
                 >
@@ -511,8 +514,8 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           {
             right: 4, // Small padding from edge
             top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT * 1.2) / 2,
-            backgroundColor: lineColor,
-            borderColor: lineColor,
+            backgroundColor: order.bodyBackgroundColor,
+            borderColor: order.bodyBorderColor,
           },
         ]}
       >

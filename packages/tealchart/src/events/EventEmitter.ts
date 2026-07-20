@@ -48,7 +48,7 @@ export class EventEmitter {
  * TradingView-style subscription object
  * Allows subscribing with an optional context object for identification
  */
- 
+
 export class Subscription<T extends (...args: any[]) => void> {
   private listeners: Map<object | null, Set<T>> = new Map();
 

@@ -5,6 +5,7 @@ import type { PaneOffset } from './rendering/PaneManager';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
+import { DEFAULT_SELL_CANDLE_COLOR, TRADE_LINE_DOTTED_DASH_PATTERN } from './constants';
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
@@ -749,7 +750,7 @@ export class TealchartRenderer {
     if (bound.lineStyle === 'dashed') {
       ctx.setLineDash([4, 4]);
     } else if (bound.lineStyle === 'dotted') {
-      ctx.setLineDash([2, 2]);
+      ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
     }
     ctx.beginPath();
     ctx.moveTo(margins.left, lineY);
@@ -854,7 +855,7 @@ export class TealchartRenderer {
     if (bound.lineStyle === 'dashed') {
       ctx.setLineDash([4, 4]);
     } else if (bound.lineStyle === 'dotted') {
-      ctx.setLineDash([2, 2]);
+      ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
     }
 
     // Draw line from left margin to chart label (if chartLabel exists)
@@ -949,7 +950,7 @@ export class TealchartRenderer {
         if (bound.lineStyle === 'dashed') {
           ctx.setLineDash([4, 4]);
         } else if (bound.lineStyle === 'dotted') {
-          ctx.setLineDash([2, 2]);
+          ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
         }
         ctx.beginPath();
         ctx.moveTo(chartLabelRightX + 4, lineY);
@@ -1072,7 +1073,7 @@ export class TealchartRenderer {
     ctx.strokeStyle = line.lineColor;
     ctx.lineWidth = line.lineWidth;
     if (line.lineStyle === 1)
-      ctx.setLineDash([2, 2]); // dotted
+      ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN); // dotted
     else if (line.lineStyle === 2)
       ctx.setLineDash([4, 4]); // dashed
     else if (line.lineStyle === 4) ctx.setLineDash([6, 3]); // long dashed
@@ -1103,8 +1104,8 @@ export class TealchartRenderer {
         labelY,
         textWidth,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.bodyBackgroundColor,
+        line.bodyBorderColor,
         text,
         line.bodyTextColor,
       );
@@ -1118,8 +1119,8 @@ export class TealchartRenderer {
         labelY,
         quantityWidth,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.quantityBackgroundColor,
+        line.quantityBorderColor,
         quantity,
         line.quantityTextColor,
       );
@@ -1133,8 +1134,8 @@ export class TealchartRenderer {
         labelY,
         16,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.cancelButtonBackgroundColor,
+        line.cancelButtonBorderColor,
         line.cancelButtonIconColor,
       );
       currentX += 16 + 2;
@@ -1147,7 +1148,7 @@ export class TealchartRenderer {
       ctx.save();
       ctx.strokeStyle = line.lineColor;
       ctx.lineWidth = line.lineWidth;
-      if (line.lineStyle === 1) ctx.setLineDash([2, 2]);
+      if (line.lineStyle === 1) ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
       else if (line.lineStyle === 2) ctx.setLineDash([4, 4]);
       else if (line.lineStyle === 4) ctx.setLineDash([6, 3]);
       ctx.beginPath();
@@ -1163,7 +1164,7 @@ export class TealchartRenderer {
       lineY,
       line.price,
       line.lineColor,
-      line.lineColor,
+      line.bodyBackgroundColor,
       line.bodyTextColor,
       viewport,
       priceHeight,
@@ -1233,7 +1234,7 @@ export class TealchartRenderer {
     ctx.strokeStyle = line.lineColor;
     ctx.lineWidth = line.lineWidth;
     if (line.lineStyle === 1)
-      ctx.setLineDash([2, 2]); // dotted
+      ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN); // dotted
     else if (line.lineStyle === 2)
       ctx.setLineDash([4, 4]); // dashed
     else if (line.lineStyle === 4) ctx.setLineDash([6, 3]); // long dashed
@@ -1257,9 +1258,9 @@ export class TealchartRenderer {
     // Determine PnL segment color based on profit state
     let pnlStateColor: string | undefined;
     if (line.profitState === 'positive') {
-      pnlStateColor = '#22c55e';
+      pnlStateColor = options.upColor;
     } else if (line.profitState === 'negative') {
-      pnlStateColor = '#ef5350';
+      pnlStateColor = options.downColor ?? DEFAULT_SELL_CANDLE_COLOR;
     }
 
     // Draw label boxes
@@ -1272,8 +1273,8 @@ export class TealchartRenderer {
         labelY,
         textWidth,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.bodyBackgroundColor,
+        line.bodyBorderColor,
         text,
         line.bodyTextColor,
       );
@@ -1288,7 +1289,7 @@ export class TealchartRenderer {
         pnlWidth,
         labelHeight,
         pnlStateColor ?? line.lineColor,
-        pnlStateColor ?? line.lineColor,
+        line.bodyBorderColor,
         pnl,
         line.bodyTextColor,
       );
@@ -1302,8 +1303,8 @@ export class TealchartRenderer {
         labelY,
         quantityWidth,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.quantityBackgroundColor,
+        line.quantityBorderColor,
         quantity,
         line.quantityTextColor,
       );
@@ -1317,8 +1318,8 @@ export class TealchartRenderer {
         labelY,
         16,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.reverseButtonBackgroundColor,
+        line.reverseButtonBorderColor,
         '↩',
         line.reverseButtonIconColor,
       );
@@ -1332,8 +1333,8 @@ export class TealchartRenderer {
         labelY,
         16,
         labelHeight,
-        line.lineColor,
-        line.lineColor,
+        line.closeButtonBackgroundColor,
+        line.closeButtonBorderColor,
         line.closeButtonIconColor,
       );
       currentX += closeButtonWidth + 2;
@@ -1346,7 +1347,7 @@ export class TealchartRenderer {
       ctx.save();
       ctx.strokeStyle = line.lineColor;
       ctx.lineWidth = line.lineWidth;
-      if (line.lineStyle === 1) ctx.setLineDash([2, 2]);
+      if (line.lineStyle === 1) ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
       else if (line.lineStyle === 2) ctx.setLineDash([4, 4]);
       else if (line.lineStyle === 4) ctx.setLineDash([6, 3]);
       ctx.beginPath();
@@ -1362,7 +1363,7 @@ export class TealchartRenderer {
       lineY,
       line.price,
       line.lineColor,
-      line.lineColor,
+      line.bodyBackgroundColor,
       line.bodyTextColor,
       viewport,
       priceHeight,
@@ -4701,7 +4702,7 @@ export class TealchartRenderer {
     ctx.strokeStyle = color;
     ctx.lineWidth = bound.lineWidth || 1;
     if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-    else if (bound.lineStyle === 'dotted') ctx.setLineDash([2, 2]);
+    else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
 
     ctx.beginPath();
     ctx.moveTo(margins.left, lineY);
@@ -4771,7 +4772,7 @@ export class TealchartRenderer {
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;
     if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-    else if (bound.lineStyle === 'dotted') ctx.setLineDash([2, 2]);
+    else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
 
     ctx.beginPath();
     ctx.moveTo(getTradingLineMinX(margins), lineY);
@@ -4824,7 +4825,7 @@ export class TealchartRenderer {
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;
     if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-    else if (bound.lineStyle === 'dotted') ctx.setLineDash([2, 2]);
+    else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
 
     if (chartLabel && chartLabel.segments.length > 0) {
       const lineEndX = chartLabelX - 4;
@@ -4914,7 +4915,7 @@ export class TealchartRenderer {
         ctx.strokeStyle = color;
         ctx.lineWidth = lineWidth;
         if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-        else if (bound.lineStyle === 'dotted') ctx.setLineDash([2, 2]);
+        else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
         ctx.beginPath();
         ctx.moveTo(chartLabelRightX + 4, lineY);
         ctx.lineTo(priceAxisLabelX, lineY);

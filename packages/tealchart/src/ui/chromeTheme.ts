@@ -1,5 +1,7 @@
 import type { RenderOptions } from '../types';
 
+import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from '../constants';
+
 /**
  * Maps the chart theme's render colors onto the CSS custom properties used by
  * the plain-DOM chrome (drawing rail, flyouts, tooltip, favorites bar,
@@ -62,8 +64,8 @@ export function resolveChromeThemeVars(
   const text = ro.textColor ?? '#b2b5be';
   const border = ro.gridColor ?? 'rgba(255, 255, 255, 0.08)';
   const accent = ro.crosshairColor ?? '#2962ff';
-  const buy = ro.upColor ?? '#26a69a';
-  const sell = ro.downColor ?? '#ef5350';
+  const buy = ro.upColor ?? DEFAULT_BUY_CANDLE_COLOR;
+  const sell = ro.downColor ?? DEFAULT_SELL_CANDLE_COLOR;
 
   const dark = isDarkColor(bg);
   const overlay = (alpha: number): string =>

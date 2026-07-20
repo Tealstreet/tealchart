@@ -13,6 +13,8 @@ import type {
 } from './drawings';
 import type { ChartThemeInput } from './theme';
 
+import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from './constants';
+
 // Reuse Bar type from existing codebase
 export interface Bar {
   time: number; // Unix timestamp in milliseconds
@@ -384,12 +386,12 @@ export interface CrosshairState {
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   width: 800,
   height: 400,
-  upColor: '#26a69a',
-  downColor: '#ef5350',
-  backgroundColor: '#1e222d',
-  textColor: '#787b86',
-  gridColor: '#363a45',
-  crosshairColor: '#758696',
+  upColor: DEFAULT_BUY_CANDLE_COLOR,
+  downColor: DEFAULT_SELL_CANDLE_COLOR,
+  backgroundColor: '#16171a',
+  textColor: '#adb1b8',
+  gridColor: '#202124',
+  crosshairColor: '#71757a',
   showVolume: true,
   volumeHeight: 0.2,
   devicePixelRatio: 1,

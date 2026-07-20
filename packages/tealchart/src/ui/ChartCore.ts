@@ -33,7 +33,12 @@ import type { PlotStyleOverride } from '../state/chartState';
 
 import Konva from 'konva';
 
-import { STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from '../constants';
+import {
+  DEFAULT_BUY_CANDLE_COLOR,
+  DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  STOP_LOSS_COLOR,
+} from '../constants';
 import {
   getUserDrawingPlacementMode,
   hitTestUserDrawings,
@@ -260,7 +265,19 @@ function getNumberFormatter(decimals: number): Intl.NumberFormat {
 /**
  * Convert OrderLineRenderData to PriceLine
  */
-function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: number) => string): PriceLine {
+function resolvePositiveTradingColor(renderOptions?: Partial<RenderOptions> | null): string {
+  return renderOptions?.upColor ?? DEFAULT_BUY_CANDLE_COLOR;
+}
+
+function resolveNegativeTradingColor(renderOptions?: Partial<RenderOptions> | null): string {
+  return renderOptions?.downColor ?? DEFAULT_SELL_CANDLE_COLOR;
+}
+
+function orderLineToPriceLine(
+  order: OrderLineRenderData,
+  formatPrice: (price: number) => string,
+  positiveColor: string,
+): PriceLine {
   const lineStyleMap: Record<number, 'solid' | 'dashed' | 'dotted'> = {
     0: 'solid',
     1: 'dotted',
@@ -269,7 +286,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
     4: 'dotted',
   };
   const lineColor = order.lineColor;
-  const takeProfitColor = order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
   const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
   const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
@@ -282,9 +299,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               text: order.text,
               textShort: order.textShort || undefined,
-              backgroundColor: lineColor,
+              backgroundColor: order.bodyBackgroundColor,
               textColor: order.bodyTextColor,
-              borderColor: lineColor,
+              borderColor: order.bodyBorderColor,
             },
           ]
         : []),
@@ -293,9 +310,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               text: order.quantity,
               textShort: order.quantityShort || undefined,
-              backgroundColor: lineColor,
+              backgroundColor: order.quantityBackgroundColor,
               textColor: order.quantityTextColor,
-              borderColor: lineColor,
+              borderColor: order.quantityBorderColor,
             },
           ]
         : []),
@@ -308,7 +325,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
               icon: 'TP',
               backgroundColor: takeProfitColor,
               iconColor: takeProfitTextColor,
-              borderColor: takeProfitColor,
+              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
               tooltip: 'Drag to set Take Profit',
             },
           ]
@@ -320,7 +337,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
               icon: 'SL',
               backgroundColor: stopLossColor,
               iconColor: stopLossTextColor,
-              borderColor: stopLossColor,
+              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
               tooltip: 'Drag to set Stop Loss',
             },
           ]
@@ -330,9 +347,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
             {
               type: 'cancel' as const,
               icon: order.cancelAsSubmit ? '✓' : '×',
-              backgroundColor: lineColor,
+              backgroundColor: order.cancelButtonBackgroundColor,
               iconColor: order.cancelButtonIconColor,
-              borderColor: lineColor,
+              borderColor: order.cancelButtonBorderColor,
               tooltip: order.cancelTooltip,
             },
           ]
@@ -353,7 +370,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
     draggable: order.editable,
     label: {
       primaryText: formatPrice(order.price),
-      backgroundColor: lineColor,
+      backgroundColor: order.bodyBackgroundColor,
       textColor: order.bodyTextColor,
     },
     chartLabel,
@@ -366,7 +383,12 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
 /**
  * Convert PositionLineRenderData to PriceLine
  */
-function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: (price: number) => string): PriceLine {
+function positionLineToPriceLine(
+  position: PositionLineRenderData,
+  formatPrice: (price: number) => string,
+  positiveColor: string,
+  negativeColor: string,
+): PriceLine {
   const lineStyleMap: Record<number, 'solid' | 'dashed' | 'dotted'> = {
     0: 'solid',
     1: 'dotted',
@@ -377,12 +399,12 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
 
   let pnlStateColor: string | undefined;
   if (position.profitState === 'positive') {
-    pnlStateColor = '#22c55e';
+    pnlStateColor = positiveColor;
   } else if (position.profitState === 'negative') {
-    pnlStateColor = '#ef5350';
+    pnlStateColor = negativeColor;
   }
   const lineColor = position.lineColor;
-  const takeProfitColor = position.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
   const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
@@ -395,9 +417,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               text: position.text,
               textShort: position.textShort || undefined,
-              backgroundColor: lineColor,
+              backgroundColor: position.bodyBackgroundColor,
               textColor: position.bodyTextColor,
-              borderColor: lineColor,
+              borderColor: position.bodyBorderColor,
             },
           ]
         : []),
@@ -406,9 +428,9 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
             {
               text: position.quantity,
               textShort: position.quantityShort || undefined,
-              backgroundColor: lineColor,
+              backgroundColor: position.quantityBackgroundColor,
               textColor: position.quantityTextColor,
-              borderColor: lineColor,
+              borderColor: position.quantityBorderColor,
             },
           ]
         : []),
@@ -419,12 +441,35 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
               textShort: position.pnlShort || undefined,
               backgroundColor: pnlStateColor ?? lineColor,
               textColor: position.bodyTextColor,
-              borderColor: pnlStateColor ?? lineColor,
+              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
             },
           ]
         : []),
     ],
     buttons: [
+      ...(position.reversible
+        ? [
+            {
+              type: 'reverse' as const,
+              icon: '↩',
+              backgroundColor: position.reverseButtonBackgroundColor,
+              iconColor: position.reverseButtonIconColor,
+              borderColor: position.reverseButtonBorderColor,
+            },
+          ]
+        : []),
+      ...(position.closeable
+        ? [
+            {
+              type: 'close' as const,
+              icon: '×',
+              backgroundColor: position.closeButtonBackgroundColor,
+              iconColor: position.closeButtonIconColor,
+              borderColor: position.closeButtonBorderColor,
+              tooltip: position.closeTooltip,
+            },
+          ]
+        : []),
       ...(position.brackets !== null
         ? [
             {
@@ -432,7 +477,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
               icon: 'TP',
               backgroundColor: takeProfitColor,
               iconColor: takeProfitTextColor,
-              borderColor: takeProfitColor,
+              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
               tooltip: 'Drag to set Take Profit',
             },
           ]
@@ -444,31 +489,8 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
               icon: 'SL',
               backgroundColor: stopLossColor,
               iconColor: stopLossTextColor,
-              borderColor: stopLossColor,
+              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
               tooltip: 'Drag to set Stop Loss',
-            },
-          ]
-        : []),
-      ...(position.reversible
-        ? [
-            {
-              type: 'reverse' as const,
-              icon: '↩',
-              backgroundColor: lineColor,
-              iconColor: position.reverseButtonIconColor,
-              borderColor: lineColor,
-            },
-          ]
-        : []),
-      ...(position.closeable
-        ? [
-            {
-              type: 'close' as const,
-              icon: '×',
-              backgroundColor: lineColor,
-              iconColor: position.closeButtonIconColor,
-              borderColor: lineColor,
-              tooltip: position.closeTooltip,
             },
           ]
         : []),
@@ -488,7 +510,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     draggable: false,
     label: {
       primaryText: formatPrice(position.price),
-      backgroundColor: lineColor,
+      backgroundColor: position.bodyBackgroundColor,
       textColor: position.bodyTextColor,
     },
     chartLabel,
@@ -506,13 +528,14 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
 function tradingLineToBracketLines(
   line: OrderLineRenderData | PositionLineRenderData,
   formatPrice: (price: number) => string,
+  positiveColor: string,
 ): PriceLine[] {
   const bracketLines: PriceLine[] = [];
   const brackets = line.brackets;
 
   if (!brackets) return bracketLines;
 
-  const takeProfitColor = brackets.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitColor = brackets.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = brackets.takeProfitTextColor ?? '#ffffff';
   const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
   const stopLossTextColor = brackets.stopLossTextColor ?? '#ffffff';
@@ -2100,6 +2123,9 @@ export class ChartCore {
 
     // Get latest bar for last-trade line
     const latestBar = this.bars.length > 0 ? this.bars[this.bars.length - 1] : null;
+    const renderOptions = { ...this.renderer.getOptions(), ...this.options.renderOptions };
+    const positiveTradingColor = resolvePositiveTradingColor(renderOptions);
+    const negativeTradingColor = resolveNegativeTradingColor(renderOptions);
 
     // Build all price lines
     const allPriceLines: PriceLine[] = [
@@ -2110,8 +2136,8 @@ export class ChartCore {
             ...p,
             price: latestBar.close,
             color: isUp
-              ? this.renderer.getOptions()?.upColor || '#26a69a'
-              : this.renderer.getOptions()?.downColor || '#ef5350',
+              ? this.renderer.getOptions()?.upColor || DEFAULT_BUY_CANDLE_COLOR
+              : this.renderer.getOptions()?.downColor || DEFAULT_SELL_CANDLE_COLOR,
             label: {
               ...p.label,
               primaryText: formatPrice(latestBar.close),
@@ -2124,13 +2150,15 @@ export class ChartCore {
       ...this.orderLines.map((o) => {
         const pending = this.pendingOrders.get(o.id);
         if (pending) {
-          return orderLineToPriceLine({ ...o, price: pending.pendingPrice }, formatPrice);
+          return orderLineToPriceLine({ ...o, price: pending.pendingPrice }, formatPrice, positiveTradingColor);
         }
-        return orderLineToPriceLine(o, formatPrice);
+        return orderLineToPriceLine(o, formatPrice, positiveTradingColor);
       }),
-      ...this.positionLines.map((p) => positionLineToPriceLine(p, formatPrice)),
-      ...this.orderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice)),
-      ...this.positionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice)),
+      ...this.positionLines.map((p) =>
+        positionLineToPriceLine(p, formatPrice, positiveTradingColor, negativeTradingColor),
+      ),
+      ...this.orderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice, positiveTradingColor)),
+      ...this.positionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice, positiveTradingColor)),
     ];
 
     // Skip the line being dragged — the Konva drag line replaces it during drag.
@@ -2583,6 +2611,10 @@ export class ChartCore {
   ): void {
     // Try position lines first
     const position = this.positionLines.find((p) => (p.positionId || p.id) === lineId);
+    const positiveTradingColor = resolvePositiveTradingColor({
+      ...this.renderer.getOptions(),
+      ...this.options.renderOptions,
+    });
     if (position?.positionData) {
       this._bracketDragState = {
         type,
@@ -2596,7 +2628,7 @@ export class ChartCore {
         positionData: position.positionData,
         color:
           type === 'tp'
-            ? (position.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR)
+            ? (position.brackets?.takeProfitColor ?? positiveTradingColor)
             : (position.brackets?.stopLossColor ?? STOP_LOSS_COLOR),
       };
       this.renderCrosshairOverlay();
@@ -2618,7 +2650,7 @@ export class ChartCore {
         positionData: { entryPrice: order.price, isLong: true, notional: 0 },
         color:
           type === 'tp'
-            ? (order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR)
+            ? (order.brackets?.takeProfitColor ?? positiveTradingColor)
             : (order.brackets?.stopLossColor ?? STOP_LOSS_COLOR),
       };
       this.renderCrosshairOverlay();

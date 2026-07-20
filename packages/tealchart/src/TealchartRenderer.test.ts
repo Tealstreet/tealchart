@@ -3,6 +3,7 @@ import type { Bar, ComputedPane, ExecutionLineRenderData, PaneLayout, PriceLine,
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
 import { TealchartRenderer } from './TealchartRenderer';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
@@ -318,7 +319,7 @@ describe('TealchartRenderer coordinate transforms', () => {
           arrowSpacing: 20,
           font: '11px sans-serif',
           textColor: '#fff',
-          arrowColor: '#26a69a',
+          arrowColor: DEFAULT_BUY_CANDLE_COLOR,
         },
       ];
 
@@ -2636,7 +2637,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         {
           id: 'last-trade',
           price: bars[bars.length - 1]!.close,
-          color: '#26a69a',
+          color: DEFAULT_BUY_CANDLE_COLOR,
           lineStyle: 'solid',
           label: {
             primaryText: '50,200',
@@ -3212,9 +3213,11 @@ describe('TealchartRenderer coordinate transforms', () => {
       vi.setSystemTime(new Date('2026-03-29T06:17:00.000Z'));
 
       const fillText = vi.fn();
+      const setLineDash = vi.fn();
       const ctx = {
         ...createMockCtx(),
         fillText,
+        setLineDash,
       };
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
 
@@ -3237,7 +3240,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         {
           id: 'last-trade',
           price: bars[bars.length - 1]!.close,
-          color: '#26a69a',
+          color: DEFAULT_BUY_CANDLE_COLOR,
           lineStyle: 'dotted',
           label: {
             primaryText: '50,200',
@@ -3251,6 +3254,7 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(fillText).toHaveBeenCalledWith('50,200', expect.any(Number), expect.any(Number));
       expect(fillText).toHaveBeenCalledWith('01:02', expect.any(Number), expect.any(Number));
+      expect(setLineDash).toHaveBeenCalledWith([1, 5]);
 
       vi.useRealTimers();
     });

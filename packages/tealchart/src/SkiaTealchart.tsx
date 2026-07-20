@@ -102,7 +102,7 @@ import { LayoutChangeEvent, Platform, StyleSheet, Text, TextInput, TouchableOpac
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { LOADING_OPACITY, STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from './constants';
+import { LOADING_OPACITY, STOP_LOSS_COLOR } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -1573,6 +1573,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }),
     [dimensions.width, dimensions.height, margins],
   );
+  const positiveTradingColor = fullRenderOptions.upColor;
+  const negativeTradingColor = fullRenderOptions.downColor;
 
   const handleAutoScaleDisabled = useCallback((paneId: string) => {
     viewportControllerRef.current.disableAutoScale(paneId);
@@ -1705,11 +1707,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: pos.positionData.entryPrice,
           isLong: pos.positionData.isLong,
           notional: pos.positionData.notional,
-          color: pos.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR,
+          color: pos.brackets?.takeProfitColor ?? positiveTradingColor,
         });
       }
     },
-    [positionLines],
+    [positionLines, positiveTradingColor],
   );
 
   const handleSLMove = useCallback(
@@ -1742,11 +1744,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: order.price,
           isLong: true, // Approximation — actual side determined by OrderLineManager
           notional: 0,
-          color: order.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR,
+          color: order.brackets?.takeProfitColor ?? positiveTradingColor,
         });
       }
     },
-    [orderLines],
+    [orderLines, positiveTradingColor],
   );
 
   const handleOrderSLMove = useCallback(
@@ -4885,7 +4887,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               y={bracketPreview.y - 6}
               text={bracketPreview.labelText}
               font={bracketFont}
-              color={bracketPreview.pnl >= 0 ? '#22c55e' : '#ef4444'}
+              color={bracketPreview.pnl >= 0 ? positiveTradingColor : negativeTradingColor}
             />
           </Group>
         )}
@@ -4913,6 +4915,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               onTPMovePreview={handleOrderTPMove}
               onSLMovePreview={handleOrderSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
+              positiveColor={positiveTradingColor}
             />
           ))}
 
@@ -4929,6 +4932,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               onTPMovePreview={handleTPMove}
               onSLMovePreview={handleSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
+              positiveColor={positiveTradingColor}
+              negativeColor={negativeTradingColor}
             />
           ))}
 

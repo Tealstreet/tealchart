@@ -179,7 +179,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   applyButton: {
-    backgroundColor: 'var(--buy-color, #26a69a)',
+    backgroundColor: 'var(--buy-color, #0ECB81)',
     color: '#fff',
   } as Partial<CSSStyleDeclaration>,
 };
