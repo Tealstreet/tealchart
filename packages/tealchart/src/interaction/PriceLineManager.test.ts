@@ -12,6 +12,10 @@ interface PriceLineManagerProbe {
   dispose: () => void;
 }
 
+interface CachedLineContentRefsProbe {
+  buttonIcons?: Array<Konva.Shape[] | undefined>;
+}
+
 function stubCanvasContext(): void {
   const mockCtx = {
     canvas: { width: 800, height: 600 },
@@ -121,10 +125,76 @@ function makePositionBound(price: number): PriceLineLabelBounds {
   };
 }
 
+function makeOrderBound(price: number): PriceLineLabelBounds {
+  return {
+    lineId: 'order-1',
+    price,
+    originalY: price,
+    adjustedY: price,
+    width: 84,
+    height: 32,
+    color: '#2196F3',
+    label: {
+      primaryText: 'order',
+      textColor: '#ffffff',
+    },
+    lineStyle: 'dotted',
+    type: 'order',
+    chartLabel: {
+      offsetPercent: 0,
+      segments: [
+        {
+          text: 'Buy Limit',
+          backgroundColor: '#2196F3',
+          textColor: '#ffffff',
+          borderColor: '#2196F3',
+        },
+      ],
+      buttons: [],
+    },
+    lineLength: 50,
+    extendLeft: false,
+    lineWidth: 1,
+    callbacks: {},
+  };
+}
+
 describe('PriceLineManager TP/SL dragging', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.unstubAllGlobals();
+  });
+
+  it('renders dotted order lines with visible sparse dashes', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+
+    manager.update([makeOrderBound(100)]);
+
+    const lineGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+    const dashedLines = lineGroup?.find(
+      (node: Konva.Node) => node instanceof Konva.Line && node.dash().length > 0,
+    ) as Konva.Line[] | undefined;
+
+    expect(dashedLines?.length).toBeGreaterThan(0);
+    for (const line of dashedLines ?? []) {
+      expect(line.dash()).toEqual([1, 5]);
+    }
+
+    manager.dispose();
+    stage.destroy();
   });
 
   it('uses absolute coordinates for cached TP/SL drag previews', () => {
@@ -162,6 +232,60 @@ describe('PriceLineManager TP/SL dragging', () => {
     slHitRect!.fire('dragmove');
 
     expect(onSLMovePreview).toHaveBeenCalledWith('position-1', 160, 100, expect.any(Number), expect.any(Number));
+
+    manager.dispose();
+    stage.destroy();
+  });
+
+  it('renders action button icons as centered vector strokes', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+    const bound = makePositionBound(100);
+    bound.chartLabel!.buttons = [
+      {
+        type: 'reverse',
+        icon: '↩',
+        backgroundColor: '#2196F3',
+        iconColor: '#ffffff',
+        borderColor: '#2196F3',
+      },
+      {
+        type: 'close',
+        icon: '×',
+        backgroundColor: '#2196F3',
+        iconColor: '#ffffff',
+        borderColor: '#2196F3',
+      },
+      ...bound.chartLabel!.buttons!,
+    ];
+
+    manager.update([bound]);
+
+    const lineGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('position-1');
+    const refs = lineGroup?.getAttr('contentRefs') as CachedLineContentRefsProbe | undefined;
+    const reverseIcons = refs?.buttonIcons?.[0];
+    const closeIcons = refs?.buttonIcons?.[1];
+
+    expect(reverseIcons).toHaveLength(2);
+    expect(closeIcons).toHaveLength(2);
+    for (const icon of closeIcons ?? []) {
+      const points = (icon as Konva.Line).points();
+      expect((points[1]! + points[3]!) / 2).toBe(100);
+    }
+    expect((reverseIcons?.[0] as Konva.Arrow).points()[1]).toBe(97);
+    expect((reverseIcons?.[1] as Konva.Arrow).points()[1]).toBe(103);
 
     manager.dispose();
     stage.destroy();

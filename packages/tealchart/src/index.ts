@@ -9,6 +9,15 @@ export { TealchartWidget, createTealchartWidget } from './TealchartWidget';
 // Per-chart API
 export { TealchartApi } from './TealchartApi';
 
+export {
+  DEFAULT_BUY_CANDLE_COLOR,
+  DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_COLOR,
+  POSITIVE_PNL_COLOR,
+  STOP_LOSS_COLOR,
+  TAKE_PROFIT_COLOR,
+} from './constants';
+
 // React Native Skia component - import from '@tealstreet/tealchart/native' for React Native
 // NOT exported here to avoid breaking web builds with RN dependencies
 

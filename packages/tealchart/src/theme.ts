@@ -1,5 +1,7 @@
 import type { RenderOptions } from './types';
 
+import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from './constants';
+
 export type ChartThemeName = 'Light' | 'Dark';
 
 export type ChartThemeRenderOptions = Partial<
@@ -25,12 +27,12 @@ export type ChartThemeInput = ChartThemeName | ChartTheme;
 export const DARK_CHART_THEME: ChartTheme = {
   name: 'Dark',
   renderOptions: {
-    backgroundColor: '#1e222d',
-    textColor: '#787b86',
-    gridColor: '#363a45',
-    crosshairColor: '#758696',
-    upColor: '#26a69a',
-    downColor: '#ef5350',
+    backgroundColor: '#16171a',
+    textColor: '#adb1b8',
+    gridColor: '#202124',
+    crosshairColor: '#71757a',
+    upColor: DEFAULT_BUY_CANDLE_COLOR,
+    downColor: DEFAULT_SELL_CANDLE_COLOR,
   },
 };
 
@@ -38,11 +40,11 @@ export const LIGHT_CHART_THEME: ChartTheme = {
   name: 'Light',
   renderOptions: {
     backgroundColor: '#ffffff',
-    textColor: '#131722',
-    gridColor: '#e0e3eb',
-    crosshairColor: '#758696',
-    upColor: '#26a69a',
-    downColor: '#ef5350',
+    textColor: '#71717a',
+    gridColor: 'rgba(24, 24, 27, 0.08)',
+    crosshairColor: '#3BA55D',
+    upColor: '#0f9d6b',
+    downColor: '#dc3450',
   },
 };
 

@@ -285,6 +285,32 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('suppresses crosshair updates during canvas pan drag', () => {
+    const container = createContainer();
+    const onCrossHairMoved = vi.fn();
+    const onCrossHairVisibilityChange = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        onCrossHairMoved,
+        onCrossHairVisibilityChange,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 100, clientY: 100 }));
+    expect(onCrossHairMoved).toHaveBeenCalledOnce();
+    expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(true);
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 140, clientY: 120 }));
+
+    expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(false);
+    expect(onCrossHairMoved).toHaveBeenCalledOnce();
+
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 140, clientY: 120 }));
+    manager.dispose();
+  });
+
   it('passes pen pointer pressure through pending drawing drags', () => {
     const container = createContainer();
     const onDrawingInput = vi.fn(() => true);

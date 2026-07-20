@@ -1,5 +1,6 @@
 import type { Bar, PriceLine } from '../types';
 
+import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from '../constants';
 import { formatPriceWithPrecision } from '../state/chartState';
 import { intervalToMs } from '../viewport/viewScale';
 
@@ -31,8 +32,8 @@ export function buildLastTradePriceLine({
   latestBar,
   interval,
   pricePrecision,
-  upColor = '#26a69a',
-  downColor = '#ef5350',
+  upColor = DEFAULT_BUY_CANDLE_COLOR,
+  downColor = DEFAULT_SELL_CANDLE_COLOR,
   renderLineOnCanvas = true,
 }: BuildLastTradePriceLineOptions): PriceLine | null {
   if (!latestBar) {

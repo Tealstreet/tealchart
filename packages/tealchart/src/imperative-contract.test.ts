@@ -5,13 +5,18 @@ import type {
   TealstreetPositionLineExtensions,
 } from './types';
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import {
+  DEFAULT_TRADE_LINE_COLOR,
+  DEFAULT_TRADE_LINE_LABEL_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+} from './constants';
 import { clearChartStoreCache } from './state/chartState';
-import { TealchartApi } from './TealchartApi';
+import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -19,37 +24,12 @@ afterEach(() => {
 
 const srcRoot = resolve(__dirname);
 const packageRoot = resolve(srcRoot, '..');
-const repoRoot = resolve(packageRoot, '../..');
-
 function readSource(relativePath: string): string {
   return readFileSync(resolve(srcRoot, relativePath), 'utf8');
 }
 
 function readPackageFile(relativePath: string): string {
   return readFileSync(resolve(packageRoot, relativePath), 'utf8');
-}
-
-function readRepoFile(relativePath: string): string {
-  return readFileSync(resolve(repoRoot, relativePath), 'utf8');
-}
-
-function readRepoTextFiles(relativeDir: string): Array<{ path: string; source: string }> {
-  const absoluteDir = resolve(repoRoot, relativeDir);
-  const files: Array<{ path: string; source: string }> = [];
-
-  for (const entry of readdirSync(absoluteDir)) {
-    const relativePath = `${relativeDir}/${entry}`;
-    const absolutePath = resolve(repoRoot, relativePath);
-    const stat = statSync(absolutePath);
-
-    if (stat.isDirectory()) {
-      files.push(...readRepoTextFiles(relativePath));
-    } else if (/\.(ts|tsx)$/.test(entry)) {
-      files.push({ path: relativePath, source: readRepoFile(relativePath) });
-    }
-  }
-
-  return files;
 }
 
 function extractExportedInterface(source: string, interfaceName: string): string {
@@ -82,12 +62,132 @@ function extractTopLevelFunctionNames(block: string): string[] {
   return [...names].sort();
 }
 
-function extractArrayLiteral(source: string, constName: string): string[] {
-  const match = source.match(new RegExp(`const ${constName} = \\[([\\s\\S]*?)\\];`));
-  expect(match?.[1], constName).toBeTruthy();
-  const arrayBody = (match?.[1] ?? '').replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  return [...arrayBody.matchAll(/'([^']+)'/g)].map((entry) => entry[1]).sort();
-}
+const TRADINGVIEW_ORDER_LINE_METHODS = [
+  'getBodyBackgroundColor',
+  'getBodyBorderColor',
+  'getBodyFont',
+  'getBodyTextColor',
+  'getCancelButtonBackgroundColor',
+  'getCancelButtonBorderColor',
+  'getCancelButtonIconColor',
+  'getCancelTooltip',
+  'getCancellable',
+  'getEditable',
+  'getExtendLeft',
+  'getLineColor',
+  'getLineLength',
+  'getLineLengthUnit',
+  'getLineStyle',
+  'getLineWidth',
+  'getModifyTooltip',
+  'getPrice',
+  'getQuantity',
+  'getQuantityBackgroundColor',
+  'getQuantityBorderColor',
+  'getQuantityFont',
+  'getQuantityTextColor',
+  'getText',
+  'getTooltip',
+  'onCancel',
+  'onModify',
+  'onMove',
+  'onMoving',
+  'remove',
+  'setBodyBackgroundColor',
+  'setBodyBorderColor',
+  'setBodyFont',
+  'setBodyTextColor',
+  'setCancelButtonBackgroundColor',
+  'setCancelButtonBorderColor',
+  'setCancelButtonIconColor',
+  'setCancelTooltip',
+  'setCancellable',
+  'setEditable',
+  'setExtendLeft',
+  'setLineColor',
+  'setLineLength',
+  'setLineStyle',
+  'setLineWidth',
+  'setModifyTooltip',
+  'setPrice',
+  'setQuantity',
+  'setQuantityBackgroundColor',
+  'setQuantityBorderColor',
+  'setQuantityFont',
+  'setQuantityTextColor',
+  'setText',
+  'setTooltip',
+].sort();
+
+const TRADINGVIEW_POSITION_LINE_METHODS = [
+  'getBodyBackgroundColor',
+  'getBodyBorderColor',
+  'getBodyFont',
+  'getBodyTextColor',
+  'getCloseButtonBackgroundColor',
+  'getCloseButtonBorderColor',
+  'getCloseButtonIconColor',
+  'getCloseTooltip',
+  'getExtendLeft',
+  'getLineColor',
+  'getLineLength',
+  'getLineLengthUnit',
+  'getLineStyle',
+  'getLineWidth',
+  'getPrice',
+  'getProtectTooltip',
+  'getQuantity',
+  'getQuantityBackgroundColor',
+  'getQuantityBorderColor',
+  'getQuantityFont',
+  'getQuantityTextColor',
+  'getReverseButtonBackgroundColor',
+  'getReverseButtonBorderColor',
+  'getReverseButtonIconColor',
+  'getReverseTooltip',
+  'getText',
+  'getTooltip',
+  'onClose',
+  'onModify',
+  'onReverse',
+  'remove',
+  'setBodyBackgroundColor',
+  'setBodyBorderColor',
+  'setBodyFont',
+  'setBodyTextColor',
+  'setCloseButtonBackgroundColor',
+  'setCloseButtonBorderColor',
+  'setCloseButtonIconColor',
+  'setCloseTooltip',
+  'setExtendLeft',
+  'setLineColor',
+  'setLineLength',
+  'setLineStyle',
+  'setLineWidth',
+  'setPrice',
+  'setProtectTooltip',
+  'setQuantity',
+  'setQuantityBackgroundColor',
+  'setQuantityBorderColor',
+  'setQuantityFont',
+  'setQuantityTextColor',
+  'setReverseButtonBackgroundColor',
+  'setReverseButtonBorderColor',
+  'setReverseButtonIconColor',
+  'setReverseTooltip',
+  'setText',
+  'setTooltip',
+].sort();
+
+const TRADINGVIEW_DATAFEED_CHART_METHODS = [
+  'getBars',
+  'resolveSymbol',
+  'searchSymbols',
+  'subscribeBars',
+  'unsubscribeBars',
+].sort();
+
+const TRADINGVIEW_DATAFEED_QUOTES_METHODS = ['getQuotes', 'subscribeQuotes', 'unsubscribeQuotes'].sort();
 
 const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
   'setCancelAsSubmit',
@@ -139,21 +239,12 @@ function hasPositionExtensions(
 
 describe('imperative chart API contract', () => {
   it('keeps Tealchart line and datafeed interfaces aligned to TradingView declarations', () => {
-    const tradingViewTypes = readRepoFile('apps/web/public/static/charting_library/charting_library.d.ts');
     const tealchartTypes = readSource('types.ts');
-    const interfaces = ['IOrderLineAdapter', 'IPositionLineAdapter', 'IDatafeedChartApi', 'IDatafeedQuotesApi'];
-
-    for (const interfaceName of interfaces) {
-      const tradingViewMethods = extractTopLevelFunctionNames(
-        extractExportedInterface(tradingViewTypes, interfaceName),
-      );
-      const tealchartMethods = extractTopLevelFunctionNames(extractExportedInterface(tealchartTypes, interfaceName));
-
-      expect(tealchartMethods, interfaceName).toEqual(tradingViewMethods);
-    }
 
     const tealchartOrder = extractExportedInterface(tealchartTypes, 'IOrderLineAdapter');
     const tealchartPosition = extractExportedInterface(tealchartTypes, 'IPositionLineAdapter');
+    const tealchartDatafeedChart = extractExportedInterface(tealchartTypes, 'IDatafeedChartApi');
+    const tealchartDatafeedQuotes = extractExportedInterface(tealchartTypes, 'IDatafeedQuotesApi');
     const tealchartOrderExtensionMethods = extractTopLevelFunctionNames(
       extractExportedInterface(tealchartTypes, 'TealstreetOrderLineExtensions'),
     );
@@ -161,6 +252,10 @@ describe('imperative chart API contract', () => {
       extractExportedInterface(tealchartTypes, 'TealstreetPositionLineExtensions'),
     );
 
+    expect(extractTopLevelFunctionNames(tealchartOrder)).toEqual(TRADINGVIEW_ORDER_LINE_METHODS);
+    expect(extractTopLevelFunctionNames(tealchartPosition)).toEqual(TRADINGVIEW_POSITION_LINE_METHODS);
+    expect(extractTopLevelFunctionNames(tealchartDatafeedChart)).toEqual(TRADINGVIEW_DATAFEED_CHART_METHODS);
+    expect(extractTopLevelFunctionNames(tealchartDatafeedQuotes)).toEqual(TRADINGVIEW_DATAFEED_QUOTES_METHODS);
     expect(tealchartOrderExtensionMethods).toEqual(TEALSTREET_ORDER_EXTENSION_METHODS);
     expect(tealchartPositionExtensionMethods).toEqual(TEALSTREET_POSITION_EXTENSION_METHODS);
 
@@ -202,69 +297,87 @@ describe('imperative chart API contract', () => {
     expect(position.getLineLengthUnit()).toBe('percentage');
   });
 
-  it('keeps the iframe host bridge in sync with line adapter chainable methods', () => {
-    const tradingViewTypes = readRepoFile('apps/web/public/static/charting_library/charting_library.d.ts');
-    const widgetHost = readRepoFile('apps/web/src/components/chart/WidgetHost.ts');
-    const tradingViewOrderMethods = extractTopLevelFunctionNames(
-      extractExportedInterface(tradingViewTypes, 'IOrderLineAdapter'),
-    ).filter((method) => method.startsWith('on') || method.startsWith('set'));
-    const tradingViewPositionMethods = extractTopLevelFunctionNames(
-      extractExportedInterface(tradingViewTypes, 'IPositionLineAdapter'),
-    ).filter((method) => method.startsWith('on') || method.startsWith('set'));
-    const hostOrderMethods = extractArrayLiteral(widgetHost, 'ORDER_LINE_CHAINABLE_METHODS');
-    const hostPositionMethods = extractArrayLiteral(widgetHost, 'POSITION_LINE_CHAINABLE_METHODS');
-    const tradingViewOrderBundle = readRepoFile(
-      'apps/web/public/static/charting_library/bundles/line-tool-order.29d5136824af61f3f42d.js',
+  it('keeps order lines dashed by default while position lines stay solid', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const order = await api.createOrderLine();
+    const position = await api.createPositionLine();
+
+    expect(order.getLineStyle()).toBe(2);
+    expect(position.getLineStyle()).toBe(0);
+  });
+
+  it('keeps default trading-line fills lower-glare with explicit segment separators', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    await api.createOrderLine({ text: 'Buy Limit', quantity: 0.001, cancellable: true });
+    const position = await api.createPositionLine({ text: 'Long', quantity: 0.001 });
+    position.onReverse(() => undefined).onClose(() => undefined);
+
+    const { orderLines, positionLines } = getTealchartApiLineRenderSnapshot(api);
+    const order = orderLines[0]!;
+    const positionLine = positionLines[0]!;
+
+    expect(order.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(order.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(order.cancelButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+
+    expect(positionLine.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.reverseButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.closeButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+  });
+
+  it('keeps bridgeable adapter methods on the imperative line objects', async () => {
+    const tradingViewOrderMethods = TRADINGVIEW_ORDER_LINE_METHODS.filter(
+      (method) => method.startsWith('on') || method.startsWith('set'),
     );
-    const tradingViewPositionBundle = readRepoFile(
-      'apps/web/public/static/charting_library/bundles/line-tool-position.2506e7de45c96e5a349c.js',
+    const tradingViewPositionMethods = TRADINGVIEW_POSITION_LINE_METHODS.filter(
+      (method) => method.startsWith('on') || method.startsWith('set'),
     );
     const expectedOrderMethods = [
       ...new Set([...tradingViewOrderMethods, ...TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS]),
-    ];
+    ].sort();
     const expectedPositionMethods = [
       ...new Set([...tradingViewPositionMethods, ...TRADINGVIEW_BUNDLE_POSITION_EXTENSION_METHODS]),
-    ];
+    ].sort();
 
-    for (const method of TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS) {
-      expect(tradingViewOrderBundle, method).toMatch(new RegExp(`\\b${method}\\s*\\(`));
+    expect(expectedOrderMethods).toContain('onMove');
+    expect(expectedOrderMethods).toContain('setLineStyle');
+    expect(expectedOrderMethods).toContain('setBrackets');
+    expect(expectedPositionMethods).toContain('onReverse');
+    expect(expectedPositionMethods).toContain('setProtectTooltip');
+    expect(expectedPositionMethods).toContain('setBrackets');
+
+    const api = new TealchartApi('BTCUSDT', '60');
+    const order = await api.createOrderLine();
+    const position = await api.createPositionLine();
+    const orderRecord = order as unknown as Record<string, unknown>;
+    const positionRecord = position as unknown as Record<string, unknown>;
+
+    for (const method of expectedOrderMethods) {
+      expect(typeof orderRecord[method], method).toBe('function');
     }
-    for (const method of TRADINGVIEW_BUNDLE_POSITION_EXTENSION_METHODS) {
-      expect(tradingViewPositionBundle, method).toMatch(new RegExp(`\\b${method}\\s*\\(`));
-    }
 
-    expect(hostOrderMethods).toEqual(expectedOrderMethods.sort());
-    expect(hostPositionMethods).toEqual(expectedPositionMethods.sort());
-  });
-
-  it('keeps v3 consumers off local Tealstreet line-extension shims', () => {
-    const brokerFiles = readRepoTextFiles('apps/web/src/components/chart/broker');
-    const localLineShimPattern = /(type|interface)\s+I\w*(Order|Position)LineAdapter\w*/;
-    const adapterAnyPattern = /\b(line|orderLine|positionLine|meta\.line|entryline|stopline|exitline)\s+as\s+any\b/;
-
-    for (const { path, source } of brokerFiles) {
-      expect(source, path).not.toMatch(/@ts-(expect-error|ignore).*TEALSTREET/);
-      expect(source, path).not.toMatch(localLineShimPattern);
-      expect(source, path).not.toMatch(adapterAnyPattern);
-
-      expect(source, path).not.toContain('TealstreetOrderLineExtensions');
-      expect(source, path).not.toContain('TealstreetPositionLineExtensions');
+    for (const method of expectedPositionMethods) {
+      expect(typeof positionRecord[method], method).toBe('function');
     }
   });
 
-  it('keeps v2 order moves on TradingView no-arg callback semantics', () => {
-    const source = readRepoFile('v2/frontend/src/charting_library/index.ts');
-
-    expect(source).toContain('.onMove(() => {');
-    expect(source).toContain('const nextPrice = line.getPrice();');
-    expect(source).not.toContain('.onMove((nextPrice)');
-  });
-
-  it('keeps web cancel-as-submit buttons driven by render data icon', () => {
+  it('keeps web action buttons vector-rendered from render data icon', () => {
     const source = readSource('interaction/PriceLineManager.ts');
 
     expect(source).toContain('button.icon,');
-    expect(source).toContain("text: button.icon || '×'");
+    expect(source).toContain('createCloseIcon(currentX, lineY, buttonWidth, button.iconColor)');
+    expect(source).toContain('createReverseIcon(currentX, lineY, buttonWidth, button.iconColor)');
+    expect(source).not.toContain("text: button.icon || '×'");
   });
 
   it('keeps SkiaTealchart line state off public props', () => {

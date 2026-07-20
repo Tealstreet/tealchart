@@ -4,6 +4,12 @@
  */
 import type { ResolutionInput } from './utils/normalizeResolution';
 
+import {
+  DEFAULT_BUY_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_COLOR,
+  DEFAULT_TRADE_LINE_LABEL_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+} from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
   BracketConfig,
@@ -113,6 +119,32 @@ export interface TealchartApiLineRenderSnapshot {
 const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => TealchartApiLineRenderSnapshot>();
 
 type AdapterCallback = () => void;
+
+function retargetOrderLineColor(data: OrderLineRenderData, color: string): void {
+  const previous = data.lineColor;
+  data.lineColor = color;
+
+  if (data.bodyBackgroundColor === previous) data.bodyBackgroundColor = color;
+  if (data.bodyBorderColor === previous) data.bodyBorderColor = color;
+  if (data.quantityBackgroundColor === previous) data.quantityBackgroundColor = color;
+  if (data.quantityBorderColor === previous) data.quantityBorderColor = color;
+  if (data.cancelButtonBackgroundColor === previous) data.cancelButtonBackgroundColor = color;
+  if (data.cancelButtonBorderColor === previous) data.cancelButtonBorderColor = color;
+}
+
+function retargetPositionLineColor(data: PositionLineRenderData, color: string): void {
+  const previous = data.lineColor;
+  data.lineColor = color;
+
+  if (data.bodyBackgroundColor === previous) data.bodyBackgroundColor = color;
+  if (data.bodyBorderColor === previous) data.bodyBorderColor = color;
+  if (data.quantityBackgroundColor === previous) data.quantityBackgroundColor = color;
+  if (data.quantityBorderColor === previous) data.quantityBorderColor = color;
+  if (data.closeButtonBackgroundColor === previous) data.closeButtonBackgroundColor = color;
+  if (data.closeButtonBorderColor === previous) data.closeButtonBorderColor = color;
+  if (data.reverseButtonBackgroundColor === previous) data.reverseButtonBackgroundColor = color;
+  if (data.reverseButtonBorderColor === previous) data.reverseButtonBorderColor = color;
+}
 
 function createAdapterCallback<TAdapter>(
   adapter: TAdapter,
@@ -412,6 +444,9 @@ export class TealchartApi {
    * @internal Create order line adapter with full TradingView + TEALSTREET compatibility
    */
   private _createOrderLineAdapter(id: string, options?: OrderLineOptions): InternalOrderLineAdapter {
+    const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
+    const labelColor = DEFAULT_TRADE_LINE_LABEL_COLOR;
+    const segmentBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
     // Store all render data in a structured object
     const data: OrderLineRenderData = {
       id,
@@ -421,8 +456,8 @@ export class TealchartApi {
       quantityShort: '',
       text: options?.text ?? '',
       textShort: '',
-      lineColor: options?.lineColor ?? '#2196F3',
-      lineStyle: 0, // solid
+      lineColor,
+      lineStyle: 2, // dashed
       lineWidth: 1,
       lineLength: 50,
       lineLengthUnit: 'percentage',
@@ -430,17 +465,17 @@ export class TealchartApi {
       editable: options?.editable ?? true,
       cancellable: options?.cancellable ?? false, // Set to true when onCancel callback is provided
       cancelAsSubmit: false,
-      bodyBackgroundColor: options?.bodyBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      bodyBackgroundColor: options?.bodyBackgroundColor ?? labelColor,
       bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
-      bodyBorderColor: options?.bodyBorderColor ?? '#2196F3',
+      bodyBorderColor: options?.bodyBorderColor ?? segmentBorderColor,
       bodyFont: '',
-      quantityBackgroundColor: options?.quantityBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      quantityBackgroundColor: options?.quantityBackgroundColor ?? labelColor,
       quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
-      quantityBorderColor: options?.quantityBorderColor ?? '#2196F3',
+      quantityBorderColor: options?.quantityBorderColor ?? segmentBorderColor,
       quantityFont: '',
-      cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? labelColor,
       cancelButtonIconColor: options?.cancelButtonIconColor ?? '#FFFFFF',
-      cancelButtonBorderColor: options?.cancelButtonBorderColor ?? '#2196F3',
+      cancelButtonBorderColor: options?.cancelButtonBorderColor ?? segmentBorderColor,
       tooltip: '',
       cancelTooltip: 'Cancel',
       modifyTooltip: 'Modify',
@@ -522,7 +557,7 @@ export class TealchartApi {
 
       // Line styling
       setLineColor(color: string) {
-        data.lineColor = color;
+        retargetOrderLineColor(data, color);
         notifyChange();
         return this;
       },
@@ -843,6 +878,9 @@ export class TealchartApi {
    * @internal Create position line adapter with full TradingView + TEALSTREET compatibility
    */
   private _createPositionLineAdapter(id: string, options?: PositionLineOptions): InternalPositionLineAdapter {
+    const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
+    const labelColor = DEFAULT_TRADE_LINE_LABEL_COLOR;
+    const segmentBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
     // Store all render data in a structured object
     const data: PositionLineRenderData = {
       id,
@@ -852,28 +890,28 @@ export class TealchartApi {
       quantityShort: '',
       text: options?.text ?? '',
       textShort: '',
-      lineColor: options?.lineColor ?? '#2196F3',
+      lineColor,
       lineStyle: 0, // solid
       lineWidth: 2,
       lineLength: 100,
       lineLengthUnit: 'percentage',
       extendLeft: false,
-      bodyBackgroundColor: options?.bodyBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      bodyBackgroundColor: options?.bodyBackgroundColor ?? labelColor,
       bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
-      bodyBorderColor: options?.bodyBorderColor ?? '#2196F3',
+      bodyBorderColor: options?.bodyBorderColor ?? segmentBorderColor,
       bodyFont: '',
-      quantityBackgroundColor: options?.quantityBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      quantityBackgroundColor: options?.quantityBackgroundColor ?? labelColor,
       quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
-      quantityBorderColor: options?.quantityBorderColor ?? '#2196F3',
+      quantityBorderColor: options?.quantityBorderColor ?? segmentBorderColor,
       quantityFont: '',
       closeable: false, // Set to true when onClose callback is provided
-      closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? labelColor,
       closeButtonIconColor: options?.closeButtonIconColor ?? '#FFFFFF',
-      closeButtonBorderColor: options?.closeButtonBorderColor ?? '#2196F3',
+      closeButtonBorderColor: options?.closeButtonBorderColor ?? segmentBorderColor,
       reversible: false, // Set to true when onReverse callback is provided
-      reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? 'rgba(33, 150, 243, 0.75)',
+      reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? labelColor,
       reverseButtonIconColor: options?.reverseButtonIconColor ?? '#FFFFFF',
-      reverseButtonBorderColor: options?.reverseButtonBorderColor ?? '#2196F3',
+      reverseButtonBorderColor: options?.reverseButtonBorderColor ?? segmentBorderColor,
       tooltip: '',
       closeTooltip: 'Close position',
       reverseTooltip: 'Reverse position',
@@ -951,7 +989,7 @@ export class TealchartApi {
 
       // Line styling
       setLineColor(color: string) {
-        data.lineColor = color;
+        retargetPositionLineColor(data, color);
         notifyChange();
         return this;
       },
@@ -1301,7 +1339,7 @@ export class TealchartApi {
       arrowSpacing: 20,
       font: `11px sans-serif`,
       textColor: '#ffffff',
-      arrowColor: '#26a69a',
+      arrowColor: DEFAULT_BUY_CANDLE_COLOR,
     };
 
     const executionLines = this._executionLines;

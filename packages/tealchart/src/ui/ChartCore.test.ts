@@ -114,8 +114,8 @@ interface LineContentRefsProbe {
   priceAxisRect?: { listening(): boolean };
   priceAxisPrimaryText?: { listening(): boolean };
   priceAxisSecondaryText?: { listening(): boolean };
-  segmentRects?: Array<{ fill(): string; x(): number }>;
-  buttonRects?: Array<{ fill(): string }>;
+  segmentRects?: Array<{ fill(): string; x(): number; cornerRadius(): number | number[] }>;
+  buttonRects?: Array<{ fill(): string; cornerRadius(): number | number[] }>;
 }
 
 // ============================================================================
@@ -847,7 +847,10 @@ describe('ChartCore viewport management', () => {
       container,
       width: 800,
       height: 600,
-      renderOptions: {},
+      renderOptions: {
+        upColor: '#00aa77',
+        downColor: '#ee3355',
+      },
     });
 
     core.setBars(makeBars(5));
@@ -899,7 +902,7 @@ describe('ChartCore viewport management', () => {
       container,
       width: 800,
       height: 600,
-      renderOptions: {},
+      renderOptions: { upColor: '#00aa77', downColor: '#ee3355' },
     });
 
     core.setBars(makeBars(5));
@@ -957,7 +960,7 @@ describe('ChartCore viewport management', () => {
       container,
       width: 800,
       height: 600,
-      renderOptions: {},
+      renderOptions: { upColor: '#00aa77', downColor: '#ee3355' },
     });
 
     core.setBars(makeBars(5));
@@ -979,20 +982,20 @@ describe('ChartCore viewport management', () => {
         pnl: '-$12.50',
         pnlShort: '-12',
         profitState: 'negative',
-        bodyBackgroundColor: '#26a69a',
+        bodyBackgroundColor: '#2196F3',
         bodyTextColor: '#ffffff',
-        bodyBorderColor: '#26a69a',
+        bodyBorderColor: '#2196F3',
         bodyFont: '',
-        quantityBackgroundColor: '#26a69a',
+        quantityBackgroundColor: '#2196F3',
         quantityTextColor: '#ffffff',
-        quantityBorderColor: '#26a69a',
+        quantityBorderColor: '#2196F3',
         quantityFont: '',
-        reverseButtonBackgroundColor: '#111111',
+        reverseButtonBackgroundColor: '#2196F3',
         reverseButtonIconColor: '#ffffff',
-        reverseButtonBorderColor: '#26a69a',
-        closeButtonBackgroundColor: '#26a69a',
+        reverseButtonBorderColor: '#2196F3',
+        closeButtonBackgroundColor: '#2196F3',
         closeButtonIconColor: '#ffffff',
-        closeButtonBorderColor: '#26a69a',
+        closeButtonBorderColor: '#2196F3',
         tooltip: '',
         closeTooltip: 'Close',
         reverseTooltip: 'Reverse',
@@ -1064,8 +1067,8 @@ describe('ChartCore viewport management', () => {
       };
     };
     expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
-      backgroundColor: '#ef5350',
-      borderColor: '#ef5350',
+      backgroundColor: '#ee3355',
+      borderColor: 'rgba(255, 255, 255, 0.16)',
       textColor: '#ffffff',
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
@@ -1086,11 +1089,21 @@ describe('ChartCore viewport management', () => {
       borderColor: '#2196F3',
       iconColor: '#ffffff',
     });
+    expect(bound.chartLabel?.buttons?.find((button) => button.type === 'tp')).toMatchObject({
+      backgroundColor: '#00aa77',
+      borderColor: 'rgba(255, 255, 255, 0.16)',
+      iconColor: '#ffffff',
+    });
+    expect(bound.chartLabel?.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     const refs = manager.cachedLineGroups.get('position-1')?.getAttr('contentRefs') as LineContentRefsProbe;
     expect(refs.segmentRects?.[0]?.fill()).toBe('#2196F3');
     expect(refs.segmentRects?.[1]?.fill()).toBe('#2196F3');
-    expect(refs.segmentRects?.[2]?.fill()).toBe('#ef5350');
+    expect(refs.segmentRects?.[2]?.fill()).toBe('#ee3355');
     expect(refs.buttonRects?.[0]?.fill()).toBe('#2196F3');
+    expect(refs.segmentRects?.[2]?.cornerRadius()).toEqual(0);
+    expect(refs.buttonRects?.[0]?.cornerRadius()).toEqual(0);
+    expect(refs.buttonRects?.[1]?.cornerRadius()).toEqual([0, 2, 2, 0]);
+    expect(refs.buttonRects?.[2]?.cornerRadius()).toEqual([2, 0, 0, 2]);
     expect(refs.segmentRects?.[0]?.x()).toBeGreaterThanOrEqual(60);
 
     const positiveBound = manager.cachedLineGroups.get('position-2')?.getAttr('boundData') as {
@@ -1099,12 +1112,12 @@ describe('ChartCore viewport management', () => {
       };
     };
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === 'Short')).toMatchObject({
-      backgroundColor: '#ef5350',
-      borderColor: '#ef5350',
+      backgroundColor: '#111111',
+      borderColor: '#111111',
     });
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
-      backgroundColor: '#22c55e',
-      borderColor: '#22c55e',
+      backgroundColor: '#00aa77',
+      borderColor: 'rgba(255, 255, 255, 0.16)',
     });
     expect(core.getViewport()).not.toBeNull();
     core.dispose();
@@ -1124,11 +1137,11 @@ describe('ChartCore viewport management', () => {
         id: 'countdown-line',
         price: 50000,
         lineStyle: 'dashed',
-        color: '#22c55e',
+        color: '#26a69a',
         label: {
           primaryText: '50000',
           secondaryText: 'TP',
-          backgroundColor: '#22c55e',
+          backgroundColor: '#26a69a',
           textColor: '#ffffff',
         },
         countdownToTime: 1_000,
@@ -1144,11 +1157,11 @@ describe('ChartCore viewport management', () => {
         id: 'countdown-line',
         price: 50000,
         lineStyle: 'dashed',
-        color: '#22c55e',
+        color: '#26a69a',
         label: {
           primaryText: '50000',
           secondaryText: 'TP',
-          backgroundColor: '#22c55e',
+          backgroundColor: '#26a69a',
           textColor: '#ffffff',
         },
         countdownToTime: 2_000,
@@ -1340,9 +1353,9 @@ describe('ChartCore viewport management', () => {
 
     expect(refs.priceAxisRect?.listening()).toBe(false);
     expect(refs.priceAxisPrimaryText?.listening()).toBe(false);
-    expect(refs.segmentRects?.[0]?.fill()).toBe('#ff0000');
-    expect(refs.segmentRects?.[1]?.fill()).toBe('#ff0000');
-    expect(refs.buttonRects?.[0]?.fill()).toBe('#ff0000');
+    expect(refs.segmentRects?.[0]?.fill()).toBe('#111111');
+    expect(refs.segmentRects?.[1]?.fill()).toBe('#111111');
+    expect(refs.buttonRects?.[0]?.fill()).toBe('#111111');
     expect(refs.segmentRects?.[0]?.x()).toBeGreaterThanOrEqual(60);
     core.dispose();
   });

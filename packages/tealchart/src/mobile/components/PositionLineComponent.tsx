@@ -17,7 +17,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { STOP_LOSS_COLOR, TAKE_PROFIT_COLOR } from '../../constants';
+import {
+  DEFAULT_BUY_CANDLE_COLOR,
+  DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  STOP_LOSS_COLOR,
+} from '../../constants';
 import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
 import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
@@ -34,6 +39,10 @@ export interface PositionLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
+  /** Positive PnL and TP default color, usually the active candle up color. */
+  positiveColor?: string;
+  /** Negative PnL default color, usually the active candle down color. */
+  negativeColor?: string;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -57,6 +66,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   useNarrowText = false,
+  positiveColor = DEFAULT_BUY_CANDLE_COLOR,
+  negativeColor = DEFAULT_SELL_CANDLE_COLOR,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
@@ -284,7 +295,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength)) / 100;
   }, [position.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
   const lineColor = position.lineColor;
-  const takeProfitColor = position.brackets?.takeProfitColor ?? TAKE_PROFIT_COLOR;
+  const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
   const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
@@ -298,15 +309,15 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const pnlStateColor = useMemo(() => {
     switch (position.profitState) {
       case 'positive':
-        return '#22c55e';
+        return positiveColor;
       case 'negative':
-        return '#ef4444';
+        return negativeColor;
       default:
         return undefined;
     }
-  }, [position.profitState]);
+  }, [position.profitState, positiveColor, negativeColor]);
   const pnlBackgroundColor = pnlStateColor ?? lineColor;
-  const pnlBorderColor = pnlStateColor ?? lineColor;
+  const pnlBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
   const pnlTextColor = position.bodyTextColor;
 
   // Format price for display
@@ -349,8 +360,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: lineColor,
-              borderColor: lineColor,
+              backgroundColor: position.bodyBackgroundColor,
+              borderColor: position.bodyBorderColor,
               borderTopLeftRadius: 2,
               borderBottomLeftRadius: 2,
             },
@@ -364,8 +375,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           style={[
             styles.labelSegment,
             {
-              backgroundColor: lineColor,
-              borderColor: lineColor,
+              backgroundColor: position.quantityBackgroundColor,
+              borderColor: position.quantityBorderColor,
               borderLeftWidth: 0,
             },
           ]}
@@ -387,6 +398,48 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           <Text style={[styles.labelText, { color: pnlTextColor }]}>{displayPnl}</Text>
         </View>
 
+        {/* Reverse button */}
+        {position.reversible && (
+          <Pressable
+            onPress={handleReverse}
+            style={({ pressed }) => [
+              styles.actionButton,
+              {
+                backgroundColor: position.reverseButtonBackgroundColor,
+                borderColor: position.reverseButtonBorderColor,
+                borderLeftWidth: 0,
+                opacity: pressed ? 0.7 : 1,
+                borderTopRightRadius: position.closeable ? 0 : 2,
+                borderBottomRightRadius: position.closeable ? 0 : 2,
+              },
+            ]}
+            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
+          >
+            <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>⇄</Text>
+          </Pressable>
+        )}
+
+        {/* Close button */}
+        {position.closeable && (
+          <Pressable
+            onPress={handleClose}
+            style={({ pressed }) => [
+              styles.actionButton,
+              {
+                backgroundColor: position.closeButtonBackgroundColor,
+                borderColor: position.closeButtonBorderColor,
+                borderLeftWidth: 0,
+                opacity: pressed ? 0.7 : 1,
+                borderTopRightRadius: 2,
+                borderBottomRightRadius: 2,
+              },
+            ]}
+            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
+          >
+            <Text style={[styles.actionIcon, { color: position.closeButtonIconColor }]}>×</Text>
+          </Pressable>
+        )}
+
         {/* TP/SL Buttons (if brackets enabled) */}
         {showBrackets && (
           <View style={styles.bracketButtons}>
@@ -398,7 +451,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                     styles.bracketButton,
                     {
                       backgroundColor: takeProfitColor,
-                      borderColor: takeProfitColor,
+                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
                       borderTopLeftRadius: 2,
                       borderBottomLeftRadius: 2,
                     },
@@ -417,7 +470,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                     styles.bracketButton,
                     {
                       backgroundColor: stopLossColor,
-                      borderColor: stopLossColor,
+                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
                       borderTopRightRadius: 2,
                       borderBottomRightRadius: 2,
                       borderLeftWidth: 0,
@@ -429,47 +482,6 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
               </Animated.View>
             </GestureDetector>
           </View>
-        )}
-
-        {/* Close button */}
-        {position.closeable && (
-          <Pressable
-            onPress={handleClose}
-            style={({ pressed }) => [
-              styles.actionButton,
-              {
-                backgroundColor: lineColor,
-                borderColor: lineColor,
-                opacity: pressed ? 0.7 : 1,
-                borderTopRightRadius: position.reversible ? 0 : 2,
-                borderBottomRightRadius: position.reversible ? 0 : 2,
-              },
-            ]}
-            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
-          >
-            <Text style={[styles.actionIcon, { color: position.closeButtonIconColor }]}>×</Text>
-          </Pressable>
-        )}
-
-        {/* Reverse button */}
-        {position.reversible && (
-          <Pressable
-            onPress={handleReverse}
-            style={({ pressed }) => [
-              styles.actionButton,
-              {
-                backgroundColor: lineColor,
-                borderColor: lineColor,
-                borderLeftWidth: 0,
-                opacity: pressed ? 0.7 : 1,
-                borderTopRightRadius: 2,
-                borderBottomRightRadius: 2,
-              },
-            ]}
-            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
-          >
-            <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>⇄</Text>
-          </Pressable>
         )}
       </View>
 
@@ -495,8 +507,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           {
             right: 4,
             top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT * 1.2) / 2,
-            backgroundColor: lineColor,
-            borderColor: lineColor,
+            backgroundColor: position.bodyBackgroundColor,
+            borderColor: position.bodyBorderColor,
           },
         ]}
       >
@@ -566,7 +578,7 @@ const styles = StyleSheet.create({
   actionIcon: {
     fontSize: 14,
     fontWeight: 'bold',
-    lineHeight: 14,
+    lineHeight: LABEL_HEIGHT,
   },
   priceAxisLabel: {
     position: 'absolute',

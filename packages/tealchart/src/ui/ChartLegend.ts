@@ -126,7 +126,7 @@ const styles = {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    backgroundColor: 'var(--buy-color, #26a69a)',
+    backgroundColor: 'var(--buy-color, #0ECB81)',
     marginLeft: '4px',
   } as Partial<CSSStyleDeclaration>,
 
@@ -312,7 +312,7 @@ export class ChartLegend extends Component<ChartLegendState> {
       this.ohlcElements.closeText.nodeValue = this.formatPrice(bar.close);
     }
     if (this.ohlcElements.close) {
-      const closeColor = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      const closeColor = isUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
       if (this.ohlcElements.close.style.color !== closeColor) {
         this.ohlcElements.close.style.color = closeColor;
       }
@@ -322,7 +322,7 @@ export class ChartLegend extends Component<ChartLegendState> {
       const changePercent = (change / prevBar.close) * 100;
       const changeUp = change >= 0;
       this.ohlcElements.changeText.nodeValue = `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`;
-      const changeColor = changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      const changeColor = changeUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
       if (this.ohlcElements.change.style.color !== changeColor) {
         this.ohlcElements.change.style.color = changeColor;
       }
@@ -517,7 +517,7 @@ export class ChartLegend extends Component<ChartLegendState> {
           style: {
             fontFamily: 'monospace',
             fontSize: '11px',
-            color: changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)',
+            color: changeUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)',
           },
         });
         const changeText = document.createTextNode(
@@ -545,7 +545,7 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     const valueStyle: Partial<CSSStyleDeclaration> = { ...styles.ohlcValue };
     if (isUp !== undefined) {
-      valueStyle.color = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      valueStyle.color = isUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
     }
     item.appendChild(span({ text: value, style: valueStyle }));
 
@@ -566,7 +566,7 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     const valueStyle: Partial<CSSStyleDeclaration> = { ...styles.ohlcValue };
     if (isUp !== undefined) {
-      valueStyle.color = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      valueStyle.color = isUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
     }
     const valueEl = span({ style: valueStyle });
     const textNode = document.createTextNode(value);

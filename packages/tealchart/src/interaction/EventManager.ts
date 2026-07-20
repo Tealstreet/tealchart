@@ -381,6 +381,12 @@ export class EventManager {
     }
   }
 
+  private hideCrosshairForDrag(): void {
+    if (!this.crosshair.visible) return;
+    this.crosshair.visible = false;
+    this.callbacks.onCrossHairVisibilityChange?.(false);
+  }
+
   /**
    * Dispose and remove all event listeners
    */
@@ -539,6 +545,7 @@ export class EventManager {
 
     // Set cursor based on drag mode
     if (this.state.dragMode === 'pan') {
+      this.hideCrosshairForDrag();
       this.callbacks.onCursorChange?.('grabbing');
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.callbacks.onCursorChange?.('ns-resize');
@@ -772,10 +779,6 @@ export class EventManager {
     if (this.state.dragMode === 'pan') {
       this.applyActiveDragCursor();
       this.handlePan(dx, dy);
-      // Update crosshair to follow data during pan
-      this.crosshair.x = this.state.dragStartCrosshairX + dx;
-      this.crosshair.y = this.state.dragStartCrosshairY + dy;
-      this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.applyActiveDragCursor();
       this.handlePriceAxisZoom(dy);

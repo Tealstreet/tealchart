@@ -1,6 +1,6 @@
 ## Summary
 
-- 
+-
 
 ## Pine Parity Checklist
 
@@ -23,4 +23,4 @@ For feature-parity PRs, mark non-applicable items as N/A.
 
 Notes:
 
-- 
+-

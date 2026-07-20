@@ -11,6 +11,7 @@ import type { ChartMargins, PendingOrderUpdate, PriceLineLabelBounds } from '../
 
 import Konva from 'konva';
 
+import { TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { calculatePartialBracketPercent } from './partialBrackets';
 
@@ -93,6 +94,7 @@ const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
 const DRAG_THRESHOLD = 5;
 const SEGMENT_HORIZONTAL_PADDING = 14;
+const ACTION_ICON_STROKE_WIDTH = 2;
 
 interface CachedLineContentRefs {
   priceAxisRect?: Konva.Rect;
@@ -163,6 +165,67 @@ function getSegmentWidth(text: string, fontFamily: string): number {
   return Math.ceil(measureLabelTextWidth(text, 11, fontFamily)) + SEGMENT_HORIZONTAL_PADDING;
 }
 
+function createCloseIcon(x: number, centerY: number, width: number, color: string): Konva.Line[] {
+  const centerX = x + width / 2;
+  const radius = 4;
+  const common = {
+    stroke: color,
+    strokeWidth: ACTION_ICON_STROKE_WIDTH,
+    lineCap: 'round' as const,
+    lineJoin: 'round' as const,
+    listening: false,
+  };
+
+  return [
+    new Konva.Line({
+      ...common,
+      points: [centerX - radius, centerY - radius, centerX + radius, centerY + radius],
+    }),
+    new Konva.Line({
+      ...common,
+      points: [centerX + radius, centerY - radius, centerX - radius, centerY + radius],
+    }),
+  ];
+}
+
+function createCheckIcon(x: number, centerY: number, width: number, color: string): Konva.Line[] {
+  const centerX = x + width / 2;
+  return [
+    new Konva.Line({
+      points: [centerX - 5, centerY, centerX - 2, centerY + 3, centerX + 5, centerY - 4],
+      stroke: color,
+      strokeWidth: ACTION_ICON_STROKE_WIDTH,
+      lineCap: 'round',
+      lineJoin: 'round',
+      listening: false,
+    }),
+  ];
+}
+
+function createReverseIcon(x: number, centerY: number, width: number, color: string): Konva.Arrow[] {
+  const left = x + 4;
+  const right = x + width - 4;
+  const common = {
+    stroke: color,
+    fill: color,
+    strokeWidth: ACTION_ICON_STROKE_WIDTH,
+    pointerLength: 3,
+    pointerWidth: 3,
+    listening: false,
+  };
+
+  return [
+    new Konva.Arrow({
+      ...common,
+      points: [left, centerY - 3, right, centerY - 3],
+    }),
+    new Konva.Arrow({
+      ...common,
+      points: [right, centerY + 3, left, centerY + 3],
+    }),
+  ];
+}
+
 function getTradingLineMinX(options: PriceLineManagerOptions): number {
   return Math.max(options.margins.left, options.chartLabelMinX ?? options.margins.left);
 }
@@ -175,6 +238,13 @@ function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel
     tpslButtons,
     orderedButtons: [...inlineButtons, ...tpslButtons],
   };
+}
+
+function getPillCornerRadius(isFirst: boolean, isLast: boolean): number | [number, number, number, number] {
+  if (isFirst && isLast) return 2;
+  if (isFirst) return [2, 0, 0, 2];
+  if (isLast) return [0, 2, 2, 0];
+  return 0;
 }
 
 // ============================================================================
@@ -554,7 +624,7 @@ export class PriceLineManager {
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Line dash pattern
-    const lineDash = bound.lineStyle === 'dashed' ? [4, 4] : bound.lineStyle === 'dotted' ? [2, 2] : [];
+    const lineDash = bound.lineStyle === 'dashed' ? [4, 4] : bound.lineStyle === 'dotted' ? TRADE_LINE_DOTTED_DASH_PATTERN : [];
 
     // Create group for this price line
     const lineGroup = new Konva.Group({ opacity });
@@ -699,7 +769,8 @@ export class PriceLineManager {
     let chartLabelX = lineStartX;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const { tpslButtons, orderedButtons } = getOrderedButtons(buttons);
+    const { inlineButtons, tpslButtons, orderedButtons } = getOrderedButtons(buttons);
+    const hasInlineButtons = inlineButtons.length > 0;
     const tpslGap = tpslButtons.length > 0 ? 6 : 0;
 
     if (chartLabel && chartLabel.segments.length > 0) {
@@ -853,6 +924,7 @@ export class PriceLineManager {
         const textWidth = getSegmentWidth(text, fontFamily);
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
+        const isLastInMainPill = isLast && !hasInlineButtons;
 
         const segmentRect = new Konva.Rect({
           x: currentX,
@@ -862,7 +934,7 @@ export class PriceLineManager {
           fill: segment.backgroundColor,
           stroke: segment.borderColor,
           strokeWidth: 1,
-          cornerRadius: isFirst && isLast ? 2 : isFirst ? [2, 0, 0, 2] : isLast ? [0, 2, 2, 0] : 0,
+          cornerRadius: getPillCornerRadius(isFirst, isLastInMainPill),
         });
         const segmentText = new Konva.Text({
           x: currentX,
@@ -897,9 +969,11 @@ export class PriceLineManager {
         const prevButton = orderedButtons[i - 1];
         const nextButton = orderedButtons[i + 1];
         const startsTPSLGroup = isTPSL && prevButton && prevButton.type !== 'tp' && prevButton.type !== 'sl';
+        const isFirstInline = !isTPSL && (!prevButton || prevButton.type === 'tp' || prevButton.type === 'sl');
         const isLastInline = !isTPSL && (!nextButton || nextButton.type === 'tp' || nextButton.type === 'sl');
         const isFirstTPSL = isTPSL && (!prevButton || (prevButton.type !== 'tp' && prevButton.type !== 'sl'));
         const isLastTPSL = isTPSL && (!nextButton || (nextButton.type !== 'tp' && nextButton.type !== 'sl'));
+        const isFirstInlinePill = isFirstInline && chartLabel.segments.length === 0;
 
         if (startsTPSLGroup || (i === 0 && isTPSL && tpslGap > 0)) {
           currentX += tpslGap;
@@ -916,16 +990,8 @@ export class PriceLineManager {
           strokeWidth: 1,
           listening: !isTPSL,
           cornerRadius: isTPSL
-            ? isFirstTPSL && isLastTPSL
-              ? 2
-              : isFirstTPSL
-                ? [2, 0, 0, 2]
-                : isLastTPSL
-                  ? [0, 2, 2, 0]
-                  : 0
-            : isLastInline
-              ? [0, 2, 2, 0]
-              : 0,
+            ? getPillCornerRadius(isFirstTPSL, isLastTPSL)
+            : getPillCornerRadius(isFirstInlinePill, isLastInline),
         });
 
         buttonGroup.add(buttonRect);
@@ -1081,23 +1147,12 @@ export class PriceLineManager {
           buttonGroup.add(hitRect);
           refs.buttonIcons.push(undefined);
         } else if (button.type === 'cancel' || button.type === 'close') {
-          const iconText = new Konva.Text({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: buttonWidth,
-            height: LABEL_HEIGHT,
-            text: button.icon || '×',
-            fontSize: button.icon === '✓' ? 11 : 14,
-            fontFamily,
-            fontStyle: 'bold',
-            fill: button.iconColor,
-            align: 'center',
-            verticalAlign: 'middle',
-            listening: false,
-          });
-          buttonGroup.add(iconText);
-          refs.buttonTexts.push(iconText);
-          refs.buttonIcons.push(undefined);
+          const icons = button.icon === '✓'
+            ? createCheckIcon(currentX, lineY, buttonWidth, button.iconColor)
+            : createCloseIcon(currentX, lineY, buttonWidth, button.iconColor);
+          icons.forEach((icon) => buttonGroup.add(icon));
+          refs.buttonTexts.push(undefined);
+          refs.buttonIcons.push(icons);
 
           const hitRect = new Konva.Rect({
             x: currentX - 2,
@@ -1122,22 +1177,10 @@ export class PriceLineManager {
           hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
           buttonGroup.add(hitRect);
         } else if (button.type === 'reverse') {
-          const reverseIcon = new Konva.Text({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: buttonWidth,
-            height: LABEL_HEIGHT,
-            text: '\u21c4',
-            fontSize: 11,
-            fontFamily,
-            fill: button.iconColor,
-            align: 'center',
-            verticalAlign: 'middle',
-            listening: false,
-          });
-          buttonGroup.add(reverseIcon);
-          refs.buttonTexts.push(reverseIcon);
-          refs.buttonIcons.push(undefined);
+          const icons = createReverseIcon(currentX, lineY, buttonWidth, button.iconColor);
+          icons.forEach((icon) => buttonGroup.add(icon));
+          refs.buttonTexts.push(undefined);
+          refs.buttonIcons.push(icons);
 
           const hitRect = new Konva.Rect({
             x: currentX - 2,
