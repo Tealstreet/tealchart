@@ -24,7 +24,7 @@ import type {
   WorkerError,
 } from '@tealstreet/tealscript';
 import type { EventCallback } from '../events/EventEmitter';
-import type { IndicatorInstance, PlotStyleOverride } from '../state/chartState';
+import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
 import { parse, TealscriptEngine, TealscriptParseError } from '@tealstreet/tealscript';
@@ -41,16 +41,12 @@ export interface ActiveIndicator {
   instanceId: string;
   /** The base indicator definition */
   indicator: BuiltinIndicator;
-  /** Built-in id to write into saved chart layouts when the indicator was created from a built-in id. */
-  layoutBuiltinId?: string;
   /** Current input values */
   inputs?: Record<string, unknown>;
   /** Parsed AST (cached for performance) */
   ast?: Program;
   /** Style overrides for plots */
   styleOverrides?: PlotStyleOverride[];
-  /** Whether this indicator currently contributes plots/drawings */
-  isVisible: boolean;
   /** Pine indicator declaration metadata discovered during execution */
   declaration?: IndicatorDeclarationMetadata;
 }
@@ -74,8 +70,6 @@ export interface MobileTealscriptIndicatorOptions {
   id?: string;
   /** Raw Tealscript source. */
   code: string;
-  /** Built-in indicator id used for layout restore, when this source came from the built-in registry. */
-  builtinId?: string;
   /** Display name shown in pane labels/settings. */
   name?: string;
   /** Whether the indicator renders on the main price pane. Defaults to false. */
@@ -190,10 +184,8 @@ export class MobileIndicatorManager {
     this._indicators.push({
       instanceId,
       indicator,
-      layoutBuiltinId: indicator.id,
       inputs,
       ast,
-      isVisible: true,
     });
 
     // Recompute plots with new indicator
@@ -241,10 +233,8 @@ export class MobileIndicatorManager {
     this._indicators.push({
       instanceId,
       indicator,
-      layoutBuiltinId: options.builtinId,
       inputs: options.inputs,
       ast,
-      isVisible: true,
     });
 
     this._recomputePlots();
@@ -298,27 +288,6 @@ export class MobileIndicatorManager {
   }
 
   /**
-   * Update indicator plot visibility without removing it from layout state.
-   */
-  setIndicatorVisibility(instanceId: string, isVisible: boolean): void {
-    const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
-    if (!indicator || indicator.isVisible === isVisible) return;
-
-    indicator.isVisible = isVisible;
-    this._recomputePlots();
-  }
-
-  /**
-   * Toggle indicator plot visibility.
-   */
-  toggleIndicatorVisibility(instanceId: string): void {
-    const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
-    if (!indicator) return;
-
-    this.setIndicatorVisibility(instanceId, !indicator.isVisible);
-  }
-
-  /**
    * Get an indicator by instance ID
    */
   getIndicator(instanceId: string): ActiveIndicator | undefined {
@@ -330,21 +299,6 @@ export class MobileIndicatorManager {
    */
   getIndicators(): ActiveIndicator[] {
     return [...this._indicators];
-  }
-
-  /**
-   * Snapshot indicators into the shared layout schema.
-   */
-  getLayoutIndicators(): IndicatorInstance[] {
-    return this._indicators.map((activeIndicator, index) => ({
-      id: activeIndicator.instanceId,
-      name: activeIndicator.indicator.name,
-      builtinId: activeIndicator.layoutBuiltinId ?? activeIndicator.indicator.id,
-      inputs: activeIndicator.inputs ?? {},
-      styleOverrides: activeIndicator.styleOverrides,
-      isVisible: activeIndicator.isVisible,
-      createdAt: index,
-    }));
   }
 
   /**
@@ -484,10 +438,6 @@ export class MobileIndicatorManager {
     for (const ind of this._indicators) {
       const { indicator, instanceId, ast, inputs } = ind;
 
-      if (!ind.isVisible) {
-        continue;
-      }
-
       if (!ast) {
         // Silently skip - no need to log for every bar update
         continue;
@@ -547,38 +497,8 @@ export class MobileIndicatorManager {
 
     this._plots = allPlots;
     this._drawings = allDrawings;
-    this._updateAutoPaneRanges(allPlots);
 
     // Notify React to re-render (unless silent mode for RAF batching)
     if (!silent) this._onUpdate?.();
-  }
-
-  private _updateAutoPaneRanges(plots: readonly PlotOutput[]): void {
-    const panes = this._paneManager.getIndicatorPanes();
-    if (panes.length === 0) return;
-
-    for (const pane of panes) {
-      if (pane.fixedRange) continue;
-
-      let min = Number.POSITIVE_INFINITY;
-      let max = Number.NEGATIVE_INFINITY;
-      for (const plot of plots) {
-        if (!plot.scriptId || !pane.indicatorIds?.includes(plot.scriptId) || plot.forceOverlay) continue;
-        if (Number.isFinite(plot.histbase)) {
-          min = Math.min(min, plot.histbase!);
-          max = Math.max(max, plot.histbase!);
-        }
-        for (const value of plot.values) {
-          if (typeof value !== 'number' || !Number.isFinite(value)) continue;
-          min = Math.min(min, value);
-          max = Math.max(max, value);
-        }
-      }
-
-      if (!Number.isFinite(min) || !Number.isFinite(max)) continue;
-      const range = max - min;
-      const padding = range === 0 ? Math.max(Math.abs(max) * 0.05, 1) : range * 0.1;
-      this._paneManager.updatePaneRange(pane.id, min - padding, max + padding);
-    }
   }
 }

@@ -5,7 +5,6 @@
  * TP/SL handle farther horizontally reduces the bracket size.
  */
 export function calculatePartialBracketPercentFromDelta(deltaX: number): number {
-  'worklet';
   const absoluteDeltaX = Math.abs(deltaX);
   if (absoluteDeltaX <= 27) return 100;
   if (absoluteDeltaX <= 82) return 75;

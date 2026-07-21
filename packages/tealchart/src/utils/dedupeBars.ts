@@ -16,6 +16,16 @@ export function barValuesEqual(a: Bar, b: Bar): boolean {
   );
 }
 
+// Feeds that misbehave often do so every tick; throttle the warning so it stays
+// informative without flooding the console.
+const WARN_THROTTLE_MS = 10_000;
+let lastWarnAt = 0;
+
+/** Test hook — reset the warn throttle so warnings are observable across cases. */
+export function resetBarWarnThrottleForTest(): void {
+  lastWarnAt = 0;
+}
+
 /**
  * Normalize a bar array so it is strictly increasing in time with no duplicate
  * timestamps. Feeds (REST history + websocket merges, gap-recovery refetches,
@@ -28,7 +38,7 @@ export function barValuesEqual(a: Bar, b: Bar): boolean {
  * Returns the original array unchanged when it is already clean, so callers keep
  * reference-equality fast paths.
  */
-export function dedupeBarsByTime(bars: Bar[], _context = 'bars'): Bar[] {
+export function dedupeBarsByTime(bars: Bar[], context = 'bars'): Bar[] {
   if (bars.length < 2) return bars;
 
   // Fast path: already strictly increasing → nothing to fix, keep the reference.
@@ -43,14 +53,24 @@ export function dedupeBarsByTime(bars: Bar[], _context = 'bars'): Bar[] {
 
   const sorted = [...bars].sort((a, b) => a.time - b.time);
   const result: Bar[] = [];
+  let dropped = 0;
   for (const bar of sorted) {
     const last = result[result.length - 1];
     if (last && last.time === bar.time) {
       result[result.length - 1] = bar; // duplicate timestamp — keep the last one
+      dropped++;
     } else {
       result.push(bar);
     }
   }
 
+  const now = Date.now();
+  if (now - lastWarnAt > WARN_THROTTLE_MS) {
+    lastWarnAt = now;
+    const actions: string[] = [];
+    if (outOfOrder) actions.push('re-sorted out-of-order bars');
+    if (dropped > 0) actions.push(`dropped ${dropped} duplicate-timestamp bar(s)`);
+    console.warn(`[tealchart] normalized ${context}: ${actions.join(' and ')} (${bars.length} -> ${result.length}).`);
+  }
   return result;
 }

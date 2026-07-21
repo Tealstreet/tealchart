@@ -10,14 +10,14 @@ describe('safeToFixed', () => {
     expect(safeToFixed(Infinity, 4)).toBe('0.0000');
   });
 
-  it('coerces numeric strings and falls back silently', () => {
+  it('coerces numeric strings and warns once per key', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(safeToFixed('12.345', 2, 'safeToFixed.test')).toBe('12.35');
     expect(safeToFixed('oops', 2, 'safeToFixed.test')).toBe('0.00');
     expect(safeToFixed('still-oops', 2, 'safeToFixed.test')).toBe('0.00');
 
-    expect(warn).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
 });
@@ -31,13 +31,13 @@ describe('safeNum', () => {
     expect(safeNum(Infinity, 11)).toBe(11);
   });
 
-  it('falls back silently for invalid values', () => {
+  it('warns only once per callsite key', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     safeNum('oops', 0, 'safeNum.test');
     safeNum('still-oops', 0, 'safeNum.test');
 
-    expect(warn).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
 });

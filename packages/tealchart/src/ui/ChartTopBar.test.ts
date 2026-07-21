@@ -53,37 +53,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    window.localStorage.clear();
     clearChartStoreCache();
-  });
-
-  it('dispatches symbol clicks only when a symbol callback is wired', () => {
-    const onSymbolClick = vi.fn();
-    const topBar = new ChartTopBar({
-      chartKey: 'topbar-symbol-click',
-      symbol: 'BTCUSDT',
-      onSymbolClick,
-    });
-    topBar.mount(document.body);
-
-    const symbolButton = document.querySelector<HTMLButtonElement>('button[aria-label="Change symbol"]');
-    expect(symbolButton).not.toBeNull();
-    expect(symbolButton?.textContent).toContain('BTCUSDT');
-    symbolButton?.click();
-    expect(onSymbolClick).toHaveBeenCalledTimes(1);
-
-    topBar.unmount();
-    document.body.innerHTML = '';
-
-    const inertTopBar = new ChartTopBar({
-      chartKey: 'topbar-symbol-inert',
-      symbol: 'ETHUSDT',
-    });
-    inertTopBar.mount(document.body);
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Change symbol"]')).toBeNull();
-    expect(document.body.textContent).toContain('ETHUSDT');
-
-    inertTopBar.unmount();
   });
 
   it('renders drawing tools from shared descriptors and dispatches tool changes', () => {
@@ -112,23 +82,18 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(categoryRail).not.toBeNull();
     expect(categoryList).not.toBeNull();
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
-    expect(topBar.getElement().style.overflowX).toBe('auto');
-    expect(topBar.getElement().style.overflowY).toBe('hidden');
     expect(categoryRail?.style.overflow).toBe('visible');
     expect(categoryList?.style.overflowY).toBe('auto');
-    expect(categoryList?.style.flexGrow).toBe('1');
-    expect(categoryList?.style.flexShrink).toBe('1');
-    expect(categoryList?.style.minHeight).toBe('0px');
-    expect(categoryList?.style.maxHeight).toBe('');
+    expect(categoryList?.style.maxHeight).not.toBe('');
     expect(shapesCategory?.getAttribute('aria-pressed')).toBe('true');
     expect(linesCategory?.getAttribute('aria-pressed')).toBe('false');
     expect(linesCategory?.getAttribute('aria-haspopup')).toBe('menu');
     expect(linesCategory?.getAttribute('aria-controls')).toBe('tealchart-drawing-tools-lines');
     expect(document.getElementById('tealchart-drawing-tools-lines')?.getAttribute('role')).toBe('menu');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
-    linesCategory?.click();
+    // The caret button opens the category menu (a plain click activates the tool).
+    linesMenu?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
-    expect(onTool).not.toHaveBeenCalled();
     linesCategory?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     expect(document.body.textContent).toContain('Lines');
@@ -315,65 +280,6 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
 
     topBar.unmount();
-  });
-
-  it('collapses the left drawing rail and persists the preference by chart key', () => {
-    const chartKey = 'topbar-drawing-rail-collapse';
-    const topBar = new ChartTopBar({
-      chartKey,
-      symbol: 'BTCUSDT',
-      userDrawingState: baseDrawingState,
-    });
-    topBar.mount(document.body);
-
-    const expandedRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
-    expect(expandedRail?.getAttribute('aria-expanded')).toBe('true');
-    expect(expandedRail?.style.transition).toContain('transform');
-    expect(expandedRail?.style.width).toBe('50px');
-    expect(topBar.getElement().style.marginLeft).toBe('50px');
-    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).not.toBeNull();
-    const collapseButton = document.querySelector<HTMLButtonElement>('button[aria-label="Collapse drawing toolbar"]');
-    expect(collapseButton?.style.position).toBe('absolute');
-    expect(collapseButton?.style.bottom).toBe('10px');
-    expect(collapseButton?.style.right).toBe('-6px');
-    expect(collapseButton?.style.width).toBe('14px');
-    expect(collapseButton?.style.height).toBe('38px');
-
-    collapseButton?.click();
-
-    const collapsedRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
-    expect(collapsedRail?.getAttribute('aria-expanded')).toBe('false');
-    expect(collapsedRail?.style.transition).toContain('transform');
-    expect(collapsedRail?.style.width).toBe('50px');
-    expect(topBar.getElement().style.marginLeft).toBe('34px');
-    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).toBeNull();
-    const expandButton = document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]');
-    expect(expandButton).not.toBeNull();
-    expect(expandButton?.style.position).toBe('absolute');
-    expect(expandButton?.style.bottom).toBe('10px');
-    expect(expandButton?.style.right).toBe('-6px');
-
-    topBar.unmount();
-    clearChartStoreCache();
-    document.body.innerHTML = '';
-
-    const restoredTopBar = new ChartTopBar({
-      chartKey,
-      symbol: 'BTCUSDT',
-      userDrawingState: baseDrawingState,
-    });
-    restoredTopBar.mount(document.body);
-
-    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.getAttribute('aria-expanded')).toBe(
-      'false',
-    );
-    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.style.transform).toBe(
-      'translateX(-36px)',
-    );
-    expect(restoredTopBar.getElement().style.marginLeft).toBe('34px');
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
-
-    restoredTopBar.unmount();
   });
 
   it('toggles magnet and keep-drawing modes from the rail bottom toggles', () => {

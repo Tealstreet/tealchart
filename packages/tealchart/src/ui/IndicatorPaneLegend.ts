@@ -7,8 +7,6 @@
 
 import type { ActiveIndicator, IndicatorPaneInfo } from './ChartLegend';
 
-import type { ChartChromeMetrics } from '../layout/chartGeometry';
-
 import { computeTopLeftLegendRect, rect, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
@@ -24,8 +22,6 @@ export interface IndicatorPaneLegendOptions {
   top: number;
   /** Whether the pane legend should avoid the left drawing tools rail */
   avoidLeftTools?: boolean;
-  /** Resolved chrome metrics, including any collapsed rail width. */
-  chromeMetrics?: ChartChromeMetrics;
   /** Callback when visibility toggle is clicked */
   onToggleIndicator?: (indicatorId: string) => void;
   /** Callback when settings button is clicked */
@@ -90,12 +86,9 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 };
 
-function resolvePaneLegendLeft(
-  avoidLeftTools: boolean,
-  chromeMetrics: ChartChromeMetrics = WEB_CHART_CHROME_METRICS,
-): string {
+function resolvePaneLegendLeft(avoidLeftTools: boolean): string {
   const origin = computeTopLeftLegendRect(
-    chromeMetrics,
+    WEB_CHART_CHROME_METRICS,
     rect(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER),
     0,
     { avoidLeftTools },
@@ -145,12 +138,6 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     this.applyLeftPosition();
   }
 
-  setChromeMetrics(chromeMetrics: ChartChromeMetrics): void {
-    if (chromeMetrics === this.options.chromeMetrics) return;
-    this.options.chromeMetrics = chromeMetrics;
-    this.applyLeftPosition();
-  }
-
   setIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
     // Compute signature to detect actual changes (avoid unnecessary re-renders)
     const signature = indicators.map((i) => `${i.id}:${i.name}:${i.isVisible}:${JSON.stringify(i.inputs)}`).join('|');
@@ -178,7 +165,7 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
   }
 
   private applyLeftPosition(): void {
-    this.el.style.left = resolvePaneLegendLeft(Boolean(this.options.avoidLeftTools), this.options.chromeMetrics);
+    this.el.style.left = resolvePaneLegendLeft(Boolean(this.options.avoidLeftTools));
   }
 
   private createIndicatorRow(indicator: ActiveIndicator): HTMLElement {

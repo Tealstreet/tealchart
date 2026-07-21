@@ -13,9 +13,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
-  DEFAULT_TRADE_LINE_LABEL_FONT,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-  DEFAULT_TRADE_LINE_SELL_COLOR,
 } from './constants';
 import { clearChartStoreCache } from './state/chartState';
 import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
@@ -191,30 +189,7 @@ const TRADINGVIEW_DATAFEED_CHART_METHODS = [
 
 const TRADINGVIEW_DATAFEED_QUOTES_METHODS = ['getQuotes', 'subscribeQuotes', 'unsubscribeQuotes'].sort();
 
-// The IChartingLibraryWidget subset Tealstreet hosts actually call. Deliberately
-// not the whole interface — every member here must be implementable natively.
-const TRADINGVIEW_WIDGET_METHODS = [
-  'activeChart',
-  'activeChartIndex',
-  'applyOverrides',
-  'applyStudiesOverrides',
-  'chart',
-  'chartsCount',
-  'headerReady',
-  'onChartReady',
-  'onContextMenu',
-  'remove',
-  'saveChartToServer',
-  'setCSSCustomProperty',
-  'subscribe',
-].sort();
-
-const TRADINGVIEW_WEB_WIDGET_METHODS = ['onShortcut'];
-
-const KNOWN_STUB_WIDGET_METHODS = ['applyStudiesOverrides', 'saveChartToServer', 'setCSSCustomProperty'];
-
 const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
-  'setOrderId',
   'setCancelAsSubmit',
   'setTextShort',
   'setQuantityShort',
@@ -232,7 +207,6 @@ const TEALSTREET_SERIALIZABLE_ORDER_METHODS = [...TRADINGVIEW_BUNDLE_ORDER_EXTEN
 const TEALSTREET_ORDER_EXTENSION_METHODS = [...TEALSTREET_SERIALIZABLE_ORDER_METHODS, 'setPnlCalculator'].sort();
 
 const TRADINGVIEW_BUNDLE_POSITION_EXTENSION_METHODS = [
-  'setPositionId',
   'setQuantityShort',
   'setPnl',
   'setPnlShort',
@@ -323,30 +297,16 @@ describe('imperative chart API contract', () => {
     expect(position.getLineLengthUnit()).toBe('percentage');
   });
 
-  it('keeps order lines long dashed by default while position lines stay solid', async () => {
+  it('keeps order lines dashed by default while position lines stay solid', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     const order = await api.createOrderLine();
     const position = await api.createPositionLine();
 
-    expect(order.getLineStyle()).toBe(4);
+    expect(order.getLineStyle()).toBe(2);
     expect(position.getLineStyle()).toBe(0);
   });
 
-  it('keeps stable OEMS ids on order and position line render data', async () => {
-    const api = new TealchartApi('BTCUSDT', '60');
-    const order = await api.createOrderLine({ orderId: 'order-a' });
-    const position = await api.createPositionLine({ positionId: 'position-a' });
-
-    order.setOrderId('order-b');
-    position.setPositionId('position-b');
-
-    const { orderLines, positionLines } = getTealchartApiLineRenderSnapshot(api);
-
-    expect(orderLines[0]?.orderId).toBe('order-b');
-    expect(positionLines[0]?.positionId).toBe('position-b');
-  });
-
-  it('keeps default trading-line labels lower-glare with side-colored accents', async () => {
+  it('keeps default trading-line fills lower-glare with explicit segment separators', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     await api.createOrderLine({ text: 'Buy Limit', quantity: 0.001, cancellable: true });
     const position = await api.createPositionLine({ text: 'Long', quantity: 0.001 });
@@ -358,62 +318,21 @@ describe('imperative chart API contract', () => {
 
     expect(order.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(order.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(order.bodyTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(order.bodyFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(order.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(order.quantityTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(order.quantityFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(order.cancelButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(order.cancelButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
 
     expect(positionLine.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.bodyFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
-    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.quantityTextColor).toBe('#0f1720');
-    expect(positionLine.quantityFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
+    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(positionLine.reverseButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.reverseButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.closeButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.closeButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR).toBe('rgba(255, 255, 255, 0.16)');
-  });
-
-  it('retargets default trading-line label accents when line color changes', async () => {
-    const api = new TealchartApi('BTCUSDT', '60');
-    const order = await api.createOrderLine({ text: 'Sell Limit', quantity: 0.001, cancellable: true });
-    const position = await api.createPositionLine({ text: 'Short', quantity: 0.001 });
-
-    order.setLineColor(DEFAULT_TRADE_LINE_SELL_COLOR);
-    position
-      .setLineColor(DEFAULT_TRADE_LINE_SELL_COLOR)
-      .onReverse(() => undefined)
-      .onClose(() => undefined);
-
-    const { orderLines, positionLines } = getTealchartApiLineRenderSnapshot(api);
-    const orderLine = orderLines[0]!;
-    const positionLine = positionLines[0]!;
-
-    expect(orderLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(orderLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-    expect(orderLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(orderLine.quantityTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-    expect(orderLine.cancelButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-
-    expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-    expect(positionLine.quantityTextColor).toBe('#ffffff');
-    expect(positionLine.closeButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-    expect(positionLine.reverseButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
   });
 
   it('keeps bridgeable adapter methods on the imperative line objects', async () => {
@@ -475,54 +394,12 @@ describe('imperative chart API contract', () => {
 
   it('exposes TradingView-style chart access from the Skia handle', () => {
     const source = readSource('SkiaTealchart.tsx');
-    const handleBlock = source.match(/export interface SkiaTealchartHandle[^{]*\{[\s\S]*?\n\}/)?.[0] ?? '';
+    const handleBlock = source.match(/export interface SkiaTealchartHandle \{[\s\S]*?\n\}/)?.[0] ?? '';
 
     expect(handleBlock).toContain('chart(index?: number): TealchartApi;');
     expect(handleBlock).toContain('activeChart(): TealchartApi;');
     expect(handleBlock).not.toContain('addTealscriptIndicator');
     expect(handleBlock).not.toContain('removeTealscriptIndicator');
-
-    // The native handle must carry the same widget contract as the web widget,
-    // or a shared host lifecycle cannot drive both.
-    expect(handleBlock).toContain('extends ITealchartWidget');
-  });
-
-  it('keeps the shared widget contract aligned to the consumed TradingView surface', () => {
-    const contract = readSource('widgetContract.ts');
-
-    expect(extractTopLevelFunctionNames(extractExportedInterface(contract, 'ITealchartWidget'))).toEqual(
-      TRADINGVIEW_WIDGET_METHODS,
-    );
-    expect(extractTopLevelFunctionNames(extractExportedInterface(contract, 'ITealchartWebWidget'))).toEqual(
-      TRADINGVIEW_WEB_WIDGET_METHODS,
-    );
-
-    // DOM types must not reach the shared half — React Native has to satisfy it.
-    expect(extractExportedInterface(contract, 'ITealchartWidget')).not.toContain('KeyboardEvent');
-
-    expect(readSource('TealchartWidget.ts')).toContain('export class TealchartWidget implements ITealchartWebWidget {');
-  });
-
-  it('flags widget contract members that are accepted and dropped', () => {
-    const contractBlock = extractExportedInterface(readSource('widgetContract.ts'), 'ITealchartWidget');
-
-    // These compile but do nothing. The @stub tag must sit in the JSDoc directly
-    // above its own member, or a consumer reading the contract mistakes shape
-    // for behavior. A file-scoped `toContain('@stub')` would pass vacuously.
-    for (const method of KNOWN_STUB_WIDGET_METHODS) {
-      const declaration = contractBlock.indexOf(`${method}(`);
-      expect(declaration, method).toBeGreaterThan(0);
-
-      const preceding = contractBlock.slice(0, declaration);
-      const commentStart = preceding.lastIndexOf('/**');
-      const commentEnd = preceding.lastIndexOf('*/');
-      expect(commentStart, method).toBeGreaterThan(-1);
-      expect(commentEnd, method).toBeGreaterThan(commentStart);
-      expect(preceding.slice(commentStart, commentEnd), method).toContain('@stub');
-
-      // Nothing may sit between that JSDoc and the member it documents.
-      expect(preceding.slice(commentEnd + 2).trim(), method).toBe('');
-    }
   });
 
   it('does not export stale native-only indicator handle types', () => {
@@ -556,25 +433,16 @@ describe('imperative chart API contract', () => {
   });
 
   it('renders native trading lines from adapter snapshots', () => {
-    const runtimeSource = readSource('mobile/interaction/useNativeOemsLineRuntime.ts');
-    const layerSource = readSource('mobile/render/NativeChartTradeLinesLayer.tsx');
+    const source = readSource('SkiaTealchart.tsx');
 
-    expect(runtimeSource).toContain('const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
-    expect(runtimeSource).toContain('confirmNativeOrderLineSnapshots(oemsActions, rawLineSnapshot.orderLines);');
-    expect(runtimeSource).toContain('confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);');
-    expect(runtimeSource).toContain(
-      'orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),',
-    );
-    expect(runtimeSource).toContain(
-      'positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),',
-    );
-    expect(layerSource).toContain('{lineSnapshot.orderLines.map((line) => {');
-    expect(layerSource).toContain('{lineSnapshot.positionLines.map((line) => {');
-    expect(layerSource).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
-    expect(layerSource).not.toContain('onPriceChange={onOrderMove}');
-    expect(layerSource).not.toContain('onCancel={onOrderCancel}');
-    expect(layerSource).not.toContain('onClose={onPositionClose}');
-    expect(layerSource).not.toContain('onReverse={onPositionReverse}');
+    expect(source).toContain('const lineRenderSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
+    expect(source).toContain('const orderLines = lineRenderSnapshot.orderLines;');
+    expect(source).toContain('const positionLines = lineRenderSnapshot.positionLines;');
+    expect(source).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
+    expect(source).not.toContain('onPriceChange={onOrderMove}');
+    expect(source).not.toContain('onCancel={onOrderCancel}');
+    expect(source).not.toContain('onClose={onPositionClose}');
+    expect(source).not.toContain('onReverse={onPositionReverse}');
   });
 
   it('re-snapshots native trading lines when render-visible adapters change', () => {
@@ -609,7 +477,7 @@ describe('imperative chart API contract', () => {
 
   it('keeps native createStudy metadata on the imperative path', () => {
     const apiSource = readSource('TealchartApi.ts');
-    const nativeCoreSource = readSource('mobile/useNativeTealchartCoreRuntime.ts');
+    const skiaSource = readSource('SkiaTealchart.tsx');
     const widgetSource = readSource('TealchartWidget.ts');
 
     expect(apiSource).toContain('export interface StudyCreateRequest');
@@ -620,7 +488,7 @@ describe('imperative chart API contract', () => {
     expect(widgetSource).toContain('name: request.displayName,');
     expect(widgetSource).toContain('overlay: request.forceOverlay,');
     expect(widgetSource).toContain('indicatorId: request.studyId,');
-    expect(nativeCoreSource).toContain('name: request.options?.displayName ?? indicator?.name ?? request.displayName,');
-    expect(nativeCoreSource).toContain('overlay: request.forceOverlay || (indicator?.overlay ?? false),');
+    expect(skiaSource).toContain('name: request.options?.displayName ?? indicator?.name ?? request.displayName,');
+    expect(skiaSource).toContain('overlay: request.forceOverlay || (indicator?.overlay ?? false),');
   });
 });

@@ -8,12 +8,10 @@ import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
-  DEFAULT_TRADE_LINE_LABEL_FONT,
-  DEFAULT_TRADE_LINE_SELL_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
 } from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
-  Awaitable,
   BracketConfig,
   BracketPnlCalculator,
   CrossHairMovedEventParams,
@@ -30,9 +28,6 @@ import {
   ISubscription,
   ITimeScaleApi,
   LibrarySymbolInfo,
-  OemsActionCallback,
-  OemsActionResult,
-  OemsPriceActionCallback,
   OrderLineLengthUnit,
   OrderLineOptions,
   OrderLineRenderData,
@@ -114,7 +109,6 @@ export interface StudyCreateRequest {
 }
 
 export type StudyCreateCallback = (request: StudyCreateRequest) => Promise<boolean>;
-export type StudyVisibilityCallback = (studyId: string, isVisible: boolean) => void;
 
 export interface TealchartApiLineRenderSnapshot {
   orderLines: OrderLineRenderData[];
@@ -124,210 +118,32 @@ export interface TealchartApiLineRenderSnapshot {
 
 const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => TealchartApiLineRenderSnapshot>();
 
-type AdapterCallback = OemsActionCallback;
-
-const DEFAULT_TRADE_LINE_DARK_TEXT_COLOR = '#0f1720';
-const DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR = '#ffffff';
-const DEFAULT_TRADE_ORDER_LINE_STYLE = 4;
-const DEFAULT_TRADE_POSITION_LINE_STYLE = 0;
-const DEFAULT_TRADE_LINE_WIDTH = 1;
-const DEFAULT_TRADE_LINE_LENGTH = 50;
-
-interface OrderLineStyleDefaults {
-  bodyBackgroundColor: string;
-  bodyTextColor: string;
-  bodyBorderColor: string;
-  bodyFont: string;
-  quantityBackgroundColor: string;
-  quantityTextColor: string;
-  quantityBorderColor: string;
-  quantityFont: string;
-  cancelButtonBackgroundColor: string;
-  cancelButtonIconColor: string;
-  cancelButtonBorderColor: string;
-}
-
-interface PositionLineStyleDefaults {
-  bodyBackgroundColor: string;
-  bodyTextColor: string;
-  bodyBorderColor: string;
-  bodyFont: string;
-  quantityBackgroundColor: string;
-  quantityTextColor: string;
-  quantityBorderColor: string;
-  quantityFont: string;
-  closeButtonBackgroundColor: string;
-  closeButtonIconColor: string;
-  closeButtonBorderColor: string;
-  reverseButtonBackgroundColor: string;
-  reverseButtonIconColor: string;
-  reverseButtonBorderColor: string;
-}
-
-function isDefaultSellTradeLineColor(color: string): boolean {
-  return color.toLowerCase() === DEFAULT_TRADE_LINE_SELL_COLOR.toLowerCase();
-}
-
-function getOrderLineStyleDefaults(lineColor: string): OrderLineStyleDefaults {
-  return {
-    bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    bodyTextColor: lineColor,
-    bodyBorderColor: lineColor,
-    bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
-    quantityBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    quantityTextColor: lineColor,
-    quantityBorderColor: lineColor,
-    quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
-    cancelButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    cancelButtonIconColor: lineColor,
-    cancelButtonBorderColor: lineColor,
-  };
-}
-
-function getPositionLineStyleDefaults(lineColor: string): PositionLineStyleDefaults {
-  const quantityTextColor = isDefaultSellTradeLineColor(lineColor)
-    ? DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR
-    : DEFAULT_TRADE_LINE_DARK_TEXT_COLOR;
-
-  return {
-    bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    bodyTextColor: lineColor,
-    bodyBorderColor: lineColor,
-    bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
-    quantityBackgroundColor: lineColor,
-    quantityTextColor,
-    quantityBorderColor: lineColor,
-    quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
-    closeButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    closeButtonIconColor: lineColor,
-    closeButtonBorderColor: lineColor,
-    reverseButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    reverseButtonIconColor: lineColor,
-    reverseButtonBorderColor: lineColor,
-  };
-}
-
-function retargetDefaultStyle<TData, TKey extends keyof TData>(
-  data: TData,
-  property: TKey,
-  previousValue: TData[TKey],
-  nextValue: TData[TKey],
-): void {
-  if (data[property] === previousValue) {
-    data[property] = nextValue;
-  }
-}
+type AdapterCallback = () => void;
 
 function retargetOrderLineColor(data: OrderLineRenderData, color: string): void {
   const previous = data.lineColor;
-  const previousDefaults = getOrderLineStyleDefaults(previous);
-  const nextDefaults = getOrderLineStyleDefaults(color);
   data.lineColor = color;
 
-  retargetDefaultStyle(
-    data,
-    'bodyBackgroundColor',
-    previousDefaults.bodyBackgroundColor,
-    nextDefaults.bodyBackgroundColor,
-  );
-  retargetDefaultStyle(data, 'bodyTextColor', previousDefaults.bodyTextColor, nextDefaults.bodyTextColor);
-  retargetDefaultStyle(data, 'bodyBorderColor', previousDefaults.bodyBorderColor, nextDefaults.bodyBorderColor);
-  retargetDefaultStyle(
-    data,
-    'quantityBackgroundColor',
-    previousDefaults.quantityBackgroundColor,
-    nextDefaults.quantityBackgroundColor,
-  );
-  retargetDefaultStyle(data, 'quantityTextColor', previousDefaults.quantityTextColor, nextDefaults.quantityTextColor);
-  retargetDefaultStyle(
-    data,
-    'quantityBorderColor',
-    previousDefaults.quantityBorderColor,
-    nextDefaults.quantityBorderColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'cancelButtonBackgroundColor',
-    previousDefaults.cancelButtonBackgroundColor,
-    nextDefaults.cancelButtonBackgroundColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'cancelButtonIconColor',
-    previousDefaults.cancelButtonIconColor,
-    nextDefaults.cancelButtonIconColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'cancelButtonBorderColor',
-    previousDefaults.cancelButtonBorderColor,
-    nextDefaults.cancelButtonBorderColor,
-  );
+  if (data.bodyBackgroundColor === previous) data.bodyBackgroundColor = color;
+  if (data.bodyBorderColor === previous) data.bodyBorderColor = color;
+  if (data.quantityBackgroundColor === previous) data.quantityBackgroundColor = color;
+  if (data.quantityBorderColor === previous) data.quantityBorderColor = color;
+  if (data.cancelButtonBackgroundColor === previous) data.cancelButtonBackgroundColor = color;
+  if (data.cancelButtonBorderColor === previous) data.cancelButtonBorderColor = color;
 }
 
 function retargetPositionLineColor(data: PositionLineRenderData, color: string): void {
   const previous = data.lineColor;
-  const previousDefaults = getPositionLineStyleDefaults(previous);
-  const nextDefaults = getPositionLineStyleDefaults(color);
   data.lineColor = color;
 
-  retargetDefaultStyle(
-    data,
-    'bodyBackgroundColor',
-    previousDefaults.bodyBackgroundColor,
-    nextDefaults.bodyBackgroundColor,
-  );
-  retargetDefaultStyle(data, 'bodyTextColor', previousDefaults.bodyTextColor, nextDefaults.bodyTextColor);
-  retargetDefaultStyle(data, 'bodyBorderColor', previousDefaults.bodyBorderColor, nextDefaults.bodyBorderColor);
-  retargetDefaultStyle(
-    data,
-    'quantityBackgroundColor',
-    previousDefaults.quantityBackgroundColor,
-    nextDefaults.quantityBackgroundColor,
-  );
-  retargetDefaultStyle(data, 'quantityTextColor', previousDefaults.quantityTextColor, nextDefaults.quantityTextColor);
-  retargetDefaultStyle(
-    data,
-    'quantityBorderColor',
-    previousDefaults.quantityBorderColor,
-    nextDefaults.quantityBorderColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'closeButtonBackgroundColor',
-    previousDefaults.closeButtonBackgroundColor,
-    nextDefaults.closeButtonBackgroundColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'closeButtonIconColor',
-    previousDefaults.closeButtonIconColor,
-    nextDefaults.closeButtonIconColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'closeButtonBorderColor',
-    previousDefaults.closeButtonBorderColor,
-    nextDefaults.closeButtonBorderColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'reverseButtonBackgroundColor',
-    previousDefaults.reverseButtonBackgroundColor,
-    nextDefaults.reverseButtonBackgroundColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'reverseButtonIconColor',
-    previousDefaults.reverseButtonIconColor,
-    nextDefaults.reverseButtonIconColor,
-  );
-  retargetDefaultStyle(
-    data,
-    'reverseButtonBorderColor',
-    previousDefaults.reverseButtonBorderColor,
-    nextDefaults.reverseButtonBorderColor,
-  );
+  if (data.bodyBackgroundColor === previous) data.bodyBackgroundColor = color;
+  if (data.bodyBorderColor === previous) data.bodyBorderColor = color;
+  if (data.quantityBackgroundColor === previous) data.quantityBackgroundColor = color;
+  if (data.quantityBorderColor === previous) data.quantityBorderColor = color;
+  if (data.closeButtonBackgroundColor === previous) data.closeButtonBackgroundColor = color;
+  if (data.closeButtonBorderColor === previous) data.closeButtonBorderColor = color;
+  if (data.reverseButtonBackgroundColor === previous) data.reverseButtonBackgroundColor = color;
+  if (data.reverseButtonBorderColor === previous) data.reverseButtonBorderColor = color;
 }
 
 function createAdapterCallback<TAdapter>(
@@ -336,35 +152,12 @@ function createAdapterCallback<TAdapter>(
   callback?: unknown,
 ): AdapterCallback {
   if (typeof callbackOrData === 'function') {
-    const handler = callbackOrData as (this: TAdapter) => ReturnType<AdapterCallback>;
+    const handler = callbackOrData as (this: TAdapter) => void;
     return () => handler.call(adapter);
   }
 
   if (typeof callback === 'function') {
-    const handler = callback as (this: TAdapter, data: unknown) => ReturnType<AdapterCallback>;
-    const data = callbackOrData;
-    return () => handler.call(adapter, data);
-  }
-
-  throw new TypeError('Expected a callback');
-}
-
-function createAdapterPriceCallback<TAdapter>(
-  adapter: TAdapter,
-  callbackOrData: unknown,
-  callback?: unknown,
-): OemsPriceActionCallback {
-  if (typeof callbackOrData === 'function') {
-    const handler = callbackOrData as (
-      this: TAdapter,
-      price: number,
-      partialPercent?: number,
-    ) => Awaitable<OemsActionResult>;
-    return (price, partialPercent) => handler.call(adapter, price, partialPercent);
-  }
-
-  if (typeof callback === 'function') {
-    const handler = callback as (this: TAdapter, data: unknown) => Awaitable<OemsActionResult>;
+    const handler = callback as (this: TAdapter, data: unknown) => void;
     const data = callbackOrData;
     return () => handler.call(adapter, data);
   }
@@ -410,7 +203,6 @@ export class TealchartApi {
   private _studyIdCounter = 0;
   private _onStudyCreate?: StudyCreateCallback;
   private _onStudyRemove?: (studyId: string) => void;
-  private _onStudyVisibilityChange?: StudyVisibilityCallback;
 
   // Callback for when symbol/interval changes need to propagate to widget
   private _onSymbolChange?: (symbol: string) => void;
@@ -653,36 +445,37 @@ export class TealchartApi {
    */
   private _createOrderLineAdapter(id: string, options?: OrderLineOptions): InternalOrderLineAdapter {
     const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
-    const styleDefaults = getOrderLineStyleDefaults(lineColor);
+    const labelColor = DEFAULT_TRADE_LINE_LABEL_COLOR;
+    const segmentBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
     // Store all render data in a structured object
     const data: OrderLineRenderData = {
       id,
-      orderId: options?.orderId, // External order ID for deduplication
+      orderId: undefined, // External order ID for deduplication
       price: options?.price ?? 0,
       quantity: String(options?.quantity ?? ''),
       quantityShort: '',
       text: options?.text ?? '',
       textShort: '',
       lineColor,
-      lineStyle: DEFAULT_TRADE_ORDER_LINE_STYLE,
-      lineWidth: DEFAULT_TRADE_LINE_WIDTH,
-      lineLength: DEFAULT_TRADE_LINE_LENGTH,
+      lineStyle: 2, // dashed
+      lineWidth: 1,
+      lineLength: 50,
       lineLengthUnit: 'percentage',
       extendLeft: false,
       editable: options?.editable ?? true,
       cancellable: options?.cancellable ?? false, // Set to true when onCancel callback is provided
       cancelAsSubmit: false,
-      bodyBackgroundColor: options?.bodyBackgroundColor ?? styleDefaults.bodyBackgroundColor,
-      bodyTextColor: options?.bodyTextColor ?? styleDefaults.bodyTextColor,
-      bodyBorderColor: options?.bodyBorderColor ?? styleDefaults.bodyBorderColor,
-      bodyFont: styleDefaults.bodyFont,
-      quantityBackgroundColor: options?.quantityBackgroundColor ?? styleDefaults.quantityBackgroundColor,
-      quantityTextColor: options?.quantityTextColor ?? styleDefaults.quantityTextColor,
-      quantityBorderColor: options?.quantityBorderColor ?? styleDefaults.quantityBorderColor,
-      quantityFont: styleDefaults.quantityFont,
-      cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? styleDefaults.cancelButtonBackgroundColor,
-      cancelButtonIconColor: options?.cancelButtonIconColor ?? styleDefaults.cancelButtonIconColor,
-      cancelButtonBorderColor: options?.cancelButtonBorderColor ?? styleDefaults.cancelButtonBorderColor,
+      bodyBackgroundColor: options?.bodyBackgroundColor ?? labelColor,
+      bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
+      bodyBorderColor: options?.bodyBorderColor ?? segmentBorderColor,
+      bodyFont: '',
+      quantityBackgroundColor: options?.quantityBackgroundColor ?? labelColor,
+      quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
+      quantityBorderColor: options?.quantityBorderColor ?? segmentBorderColor,
+      quantityFont: '',
+      cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? labelColor,
+      cancelButtonIconColor: options?.cancelButtonIconColor ?? '#FFFFFF',
+      cancelButtonBorderColor: options?.cancelButtonBorderColor ?? segmentBorderColor,
       tooltip: '',
       cancelTooltip: 'Cancel',
       modifyTooltip: 'Modify',
@@ -691,18 +484,18 @@ export class TealchartApi {
     };
 
     // Callbacks (not part of render data)
-    let _onMoveCallback: OemsPriceActionCallback | null = null;
-    let _onMovingCallback: OemsPriceActionCallback | null = null;
-    let _onCancelCallback: OemsActionCallback | null = null;
-    let _onModifyCallback: OemsActionCallback | null = null;
+    let _onMoveCallback: (() => void) | null = null;
+    let _onMovingCallback: (() => void) | null = null;
+    let _onCancelCallback: (() => void) | null = null;
+    let _onModifyCallback: (() => void) | null = null;
     let _pnlCalculator: BracketPnlCalculator | null = null;
     // TEALSTREET bracket callbacks
-    let _onTPClick: OemsActionCallback | null = null;
-    let _onSLClick: OemsActionCallback | null = null;
-    let _onTPMove: OemsPriceActionCallback | null = null;
-    let _onSLMove: OemsPriceActionCallback | null = null;
-    let _onTPMoveEnd: OemsPriceActionCallback | null = null;
-    let _onSLMoveEnd: OemsPriceActionCallback | null = null;
+    let _onTPClick: (() => void) | null = null;
+    let _onSLClick: (() => void) | null = null;
+    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
 
     // Capture references for closure
     const orderLines = this._orderLines;
@@ -731,17 +524,11 @@ export class TealchartApi {
         data.price = p;
         notifyChange();
         // Notify when price is set externally (for clearing pending drag state)
-        onOrderPriceChanged()?.(data.orderId ?? id, p);
+        onOrderPriceChanged()?.(id, p);
         return this;
       },
       getPrice() {
         return data.price;
-      },
-
-      setOrderId(orderId: string) {
-        data.orderId = orderId;
-        notifyChange();
-        return this;
       },
 
       setCancelAsSubmit(enabled: boolean) {
@@ -955,12 +742,12 @@ export class TealchartApi {
 
       // Callbacks
       onMove(callbackOrData: unknown, callback?: unknown) {
-        _onMoveCallback = createAdapterPriceCallback(adapter, callbackOrData, callback);
+        _onMoveCallback = createAdapterCallback(adapter, callbackOrData, callback);
         notifyChange();
         return this;
       },
       onMoving(callbackOrData: unknown, callback?: unknown) {
-        _onMovingCallback = createAdapterPriceCallback(adapter, callbackOrData, callback);
+        _onMovingCallback = createAdapterCallback(adapter, callbackOrData, callback);
         notifyChange();
         return this;
       },
@@ -1005,32 +792,32 @@ export class TealchartApi {
       },
 
       // TEALSTREET: Bracket callbacks
-      onTPClick(callback: OemsActionCallback) {
+      onTPClick(callback: () => void) {
         _onTPClick = callback;
         notifyChange();
         return this;
       },
-      onSLClick(callback: OemsActionCallback) {
+      onSLClick(callback: () => void) {
         _onSLClick = callback;
         notifyChange();
         return this;
       },
-      onTPMove(callback: OemsPriceActionCallback) {
+      onTPMove(callback: (price: number, partialPercent?: number) => void) {
         _onTPMove = callback;
         notifyChange();
         return this;
       },
-      onSLMove(callback: OemsPriceActionCallback) {
+      onSLMove(callback: (price: number, partialPercent?: number) => void) {
         _onSLMove = callback;
         notifyChange();
         return this;
       },
-      onTPMoveEnd(callback: OemsPriceActionCallback) {
+      onTPMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onTPMoveEnd = callback;
         notifyChange();
         return this;
       },
-      onSLMoveEnd(callback: OemsPriceActionCallback) {
+      onSLMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onSLMoveEnd = callback;
         notifyChange();
         return this;
@@ -1045,12 +832,14 @@ export class TealchartApi {
           callbacks: {
             onMove: _onMoveCallback
               ? (price: number) => {
-                  return _onMoveCallback?.(price);
+                  data.price = price;
+                  _onMoveCallback?.();
                 }
               : undefined,
             onMoving: _onMovingCallback
               ? (price: number) => {
-                  return _onMovingCallback?.(price);
+                  data.price = price;
+                  _onMovingCallback?.();
                 }
               : undefined,
             onTPClick: _onTPClick ?? undefined,
@@ -1090,38 +879,39 @@ export class TealchartApi {
    */
   private _createPositionLineAdapter(id: string, options?: PositionLineOptions): InternalPositionLineAdapter {
     const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
-    const styleDefaults = getPositionLineStyleDefaults(lineColor);
+    const labelColor = DEFAULT_TRADE_LINE_LABEL_COLOR;
+    const segmentBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
     // Store all render data in a structured object
     const data: PositionLineRenderData = {
       id,
-      positionId: options?.positionId, // External position ID for deduplication
+      positionId: undefined, // External position ID for deduplication
       price: options?.price ?? 0,
       quantity: String(options?.quantity ?? ''),
       quantityShort: '',
       text: options?.text ?? '',
       textShort: '',
       lineColor,
-      lineStyle: DEFAULT_TRADE_POSITION_LINE_STYLE,
-      lineWidth: DEFAULT_TRADE_LINE_WIDTH,
-      lineLength: DEFAULT_TRADE_LINE_LENGTH,
+      lineStyle: 0, // solid
+      lineWidth: 2,
+      lineLength: 100,
       lineLengthUnit: 'percentage',
       extendLeft: false,
-      bodyBackgroundColor: options?.bodyBackgroundColor ?? styleDefaults.bodyBackgroundColor,
-      bodyTextColor: options?.bodyTextColor ?? styleDefaults.bodyTextColor,
-      bodyBorderColor: options?.bodyBorderColor ?? styleDefaults.bodyBorderColor,
-      bodyFont: styleDefaults.bodyFont,
-      quantityBackgroundColor: options?.quantityBackgroundColor ?? styleDefaults.quantityBackgroundColor,
-      quantityTextColor: options?.quantityTextColor ?? styleDefaults.quantityTextColor,
-      quantityBorderColor: options?.quantityBorderColor ?? styleDefaults.quantityBorderColor,
-      quantityFont: styleDefaults.quantityFont,
+      bodyBackgroundColor: options?.bodyBackgroundColor ?? labelColor,
+      bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
+      bodyBorderColor: options?.bodyBorderColor ?? segmentBorderColor,
+      bodyFont: '',
+      quantityBackgroundColor: options?.quantityBackgroundColor ?? labelColor,
+      quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
+      quantityBorderColor: options?.quantityBorderColor ?? segmentBorderColor,
+      quantityFont: '',
       closeable: false, // Set to true when onClose callback is provided
-      closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? styleDefaults.closeButtonBackgroundColor,
-      closeButtonIconColor: options?.closeButtonIconColor ?? styleDefaults.closeButtonIconColor,
-      closeButtonBorderColor: options?.closeButtonBorderColor ?? styleDefaults.closeButtonBorderColor,
+      closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? labelColor,
+      closeButtonIconColor: options?.closeButtonIconColor ?? '#FFFFFF',
+      closeButtonBorderColor: options?.closeButtonBorderColor ?? segmentBorderColor,
       reversible: false, // Set to true when onReverse callback is provided
-      reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? styleDefaults.reverseButtonBackgroundColor,
-      reverseButtonIconColor: options?.reverseButtonIconColor ?? styleDefaults.reverseButtonIconColor,
-      reverseButtonBorderColor: options?.reverseButtonBorderColor ?? styleDefaults.reverseButtonBorderColor,
+      reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? labelColor,
+      reverseButtonIconColor: options?.reverseButtonIconColor ?? '#FFFFFF',
+      reverseButtonBorderColor: options?.reverseButtonBorderColor ?? segmentBorderColor,
       tooltip: '',
       closeTooltip: 'Close position',
       reverseTooltip: 'Reverse position',
@@ -1136,17 +926,17 @@ export class TealchartApi {
     };
 
     // Callbacks (not part of render data)
-    let _onCloseCallback: OemsActionCallback | null = null;
-    let _onReverseCallback: OemsActionCallback | null = null;
-    let _onModifyCallback: OemsActionCallback | null = null;
+    let _onCloseCallback: (() => void) | null = null;
+    let _onReverseCallback: (() => void) | null = null;
+    let _onModifyCallback: (() => void) | null = null;
     let _pnlCalculator: BracketPnlCalculator | null = null;
     // TEALSTREET bracket callbacks
-    let _onTPClick: OemsActionCallback | null = null;
-    let _onSLClick: OemsActionCallback | null = null;
-    let _onTPMove: OemsPriceActionCallback | null = null;
-    let _onSLMove: OemsPriceActionCallback | null = null;
-    let _onTPMoveEnd: OemsPriceActionCallback | null = null;
-    let _onSLMoveEnd: OemsPriceActionCallback | null = null;
+    let _onTPClick: (() => void) | null = null;
+    let _onSLClick: (() => void) | null = null;
+    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
 
     // Capture references for closure
     const positionLines = this._positionLines;
@@ -1177,12 +967,6 @@ export class TealchartApi {
       },
       getPrice() {
         return data.price;
-      },
-
-      setPositionId(positionId: string) {
-        data.positionId = positionId;
-        notifyChange();
-        return this;
       },
 
       // Text and quantity
@@ -1472,32 +1256,32 @@ export class TealchartApi {
       },
 
       // TEALSTREET: Bracket callbacks
-      onTPClick(callback: OemsActionCallback) {
+      onTPClick(callback: () => void) {
         _onTPClick = callback;
         notifyChange();
         return this;
       },
-      onSLClick(callback: OemsActionCallback) {
+      onSLClick(callback: () => void) {
         _onSLClick = callback;
         notifyChange();
         return this;
       },
-      onTPMove(callback: OemsPriceActionCallback) {
+      onTPMove(callback: (price: number, partialPercent?: number) => void) {
         _onTPMove = callback;
         notifyChange();
         return this;
       },
-      onSLMove(callback: OemsPriceActionCallback) {
+      onSLMove(callback: (price: number, partialPercent?: number) => void) {
         _onSLMove = callback;
         notifyChange();
         return this;
       },
-      onTPMoveEnd(callback: OemsPriceActionCallback) {
+      onTPMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onTPMoveEnd = callback;
         notifyChange();
         return this;
       },
-      onSLMoveEnd(callback: OemsPriceActionCallback) {
+      onSLMoveEnd(callback: (price: number, partialPercent?: number) => void) {
         _onSLMoveEnd = callback;
         notifyChange();
         return this;
@@ -1768,7 +1552,7 @@ export class TealchartApi {
     const study = this._studies.get(studyId);
     if (study) {
       study.isVisible = !study.isVisible;
-      this._onStudyVisibilityChange?.(studyId, study.isVisible);
+      // TODO: Trigger re-render/re-execute with visibility change
     }
   }
 
@@ -1777,9 +1561,6 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
-    // Arrow keeps `this` on the instance; the returned object's method shorthand
-    // would otherwise rebind it, which is why this used to alias `this`.
-    const notifyStudyRemoved = () => this._onStudyRemove?.(studyId);
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {
@@ -1792,9 +1573,7 @@ export class TealchartApi {
 
       // Extended methods for full control
       remove(): void {
-        if (studies.delete(studyId)) {
-          notifyStudyRemoved();
-        }
+        studies.delete(studyId);
       },
 
       setInputs(inputs: Record<string, unknown>): void {
@@ -1831,13 +1610,6 @@ export class TealchartApi {
    */
   setOnStudyRemove(callback: (studyId: string) => void): void {
     this._onStudyRemove = callback;
-  }
-
-  /**
-   * @internal Set callback for study visibility changes (called by widget)
-   */
-  setOnStudyVisibilityChange(callback: StudyVisibilityCallback): void {
-    this._onStudyVisibilityChange = callback;
   }
 
   /**
@@ -1991,103 +1763,69 @@ export class TealchartApi {
     return Array.from(this._executionLines.values()).map((adapter) => adapter._getRenderData());
   }
 
-  private _getOrderLineAdapter(lineIdOrOrderId: string): InternalOrderLineAdapter | undefined {
-    const adapter = this._orderLines.get(lineIdOrOrderId);
-    if (adapter) return adapter;
-
-    for (const candidate of this._orderLines.values()) {
-      if (candidate._getRenderData().orderId === lineIdOrOrderId) {
-        return candidate;
-      }
-    }
-
-    return undefined;
-  }
-
-  private _getPositionLineAdapter(lineIdOrPositionId: string): InternalPositionLineAdapter | undefined {
-    const adapter = this._positionLines.get(lineIdOrPositionId);
-    if (adapter) return adapter;
-
-    for (const candidate of this._positionLines.values()) {
-      if (candidate._getRenderData().positionId === lineIdOrPositionId) {
-        return candidate;
-      }
-    }
-
-    return undefined;
-  }
-
   /**
    * @internal Trigger onCancel callback for an order line
    * Called when cancel button is clicked in the Konva layer
    */
-  triggerOrderCancel(orderId: string): Awaitable<OemsActionResult> | undefined {
-    const adapter = this._getOrderLineAdapter(orderId);
+  triggerOrderCancel(orderId: string): void {
+    const adapter = this._orderLines.get(orderId);
     if (adapter) {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onCancel) {
-        return callbacks.onCancel();
+        callbacks.onCancel();
       }
     }
-
-    return undefined;
   }
 
   /**
    * @internal Trigger onMove callback for an order line
    * Called when order line is dragged to a new price in the Konva layer
    */
-  triggerOrderMove(orderId: string, newPrice: number): Awaitable<OemsActionResult> | undefined {
-    const adapter = this._getOrderLineAdapter(orderId);
+  triggerOrderMove(orderId: string, newPrice: number): void {
+    const adapter = this._orderLines.get(orderId);
     if (adapter) {
-      return adapter._getCallbacks().onMove?.(newPrice);
+      adapter.setPrice(newPrice);
+      adapter._getCallbacks().onMove?.();
     }
-
-    return undefined;
   }
 
   /**
    * @internal Trigger onMoving callback for an order line during drag.
    */
-  triggerOrderMoving(orderId: string, newPrice: number): Awaitable<OemsActionResult> | undefined {
-    const adapter = this._getOrderLineAdapter(orderId);
+  triggerOrderMoving(orderId: string, newPrice: number): void {
+    const adapter = this._orderLines.get(orderId);
     if (adapter) {
-      return adapter._getCallbacks().onMoving?.(newPrice);
+      adapter.setPrice(newPrice);
+      adapter._getCallbacks().onMoving?.();
     }
-
-    return undefined;
   }
 
   /**
    * @internal Trigger onClose callback for a position line
    * Called when close button is clicked in the Konva layer
    */
-  triggerPositionClose(positionId: string): Awaitable<OemsActionResult> | undefined {
-    const adapter = this._getPositionLineAdapter(positionId);
+  triggerPositionClose(positionId: string): void {
+    const adapter = this._positionLines.get(positionId);
     if (adapter) {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onClose) {
-        return callbacks.onClose();
+        callbacks.onClose();
       }
     }
-
-    return undefined;
   }
 
   /**
    * @internal Trigger onReverse callback for a position line
    * Called when reverse button is clicked in the Konva layer
    */
-  triggerPositionReverse(positionId: string): Awaitable<OemsActionResult> | undefined {
-    const adapter = this._getPositionLineAdapter(positionId);
+  triggerPositionReverse(positionId: string): void {
+    const adapter = this._positionLines.get(positionId);
     if (adapter) {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onReverse) {
-        return callbacks.onReverse();
+        callbacks.onReverse();
       }
     }
-
-    return undefined;
   }
 
   /**

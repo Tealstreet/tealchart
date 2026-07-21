@@ -285,54 +285,27 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
-  it('keeps the crosshair visible and moving during canvas pan drag', () => {
-    const rafCallbacks: FrameRequestCallback[] = [];
-    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-      rafCallbacks.push(callback);
-      return rafCallbacks.length;
-    });
-    const flushRafFrame = () => {
-      const callbacks = rafCallbacks.splice(0);
-      expect(callbacks.length).toBeGreaterThan(0);
-      for (const callback of callbacks) {
-        callback(0);
-      }
-    };
+  it('suppresses crosshair updates during canvas pan drag', () => {
     const container = createContainer();
     const onCrossHairMoved = vi.fn();
     const onCrossHairVisibilityChange = vi.fn();
-    const onCrosshairRender = vi.fn();
-    const getPaneAtY = vi.fn(() => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 556 }));
     const manager = new EventManager(
       container,
       createCallbacks({
-        getPaneAtY,
         onCrossHairMoved,
         onCrossHairVisibilityChange,
-        onCrosshairRender,
       }),
     );
 
     container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 100, clientY: 100 }));
-    flushRafFrame();
     expect(onCrossHairMoved).toHaveBeenCalledOnce();
     expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(true);
 
     container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
     window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 140, clientY: 120 }));
-    flushRafFrame();
 
-    expect(onCrossHairVisibilityChange).not.toHaveBeenCalledWith(false);
-    expect(onCrossHairMoved).toHaveBeenCalledTimes(2);
-    expect(onCrossHairMoved).toHaveBeenLastCalledWith(140, 120, { constrainedPlacement: false });
-    expect(manager.getCrosshair()).toEqual({ visible: true, x: 140, y: 120 });
-    expect(onCrosshairRender).toHaveBeenCalledTimes(2);
-
-    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 760, clientY: 120 }));
-    flushRafFrame();
-    expect(onCrossHairVisibilityChange).not.toHaveBeenCalledWith(false);
-    expect(manager.getCrosshair()).toEqual({ visible: true, x: 739, y: 120 });
-    expect(onCrosshairRender).toHaveBeenCalledTimes(3);
+    expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(false);
+    expect(onCrossHairMoved).toHaveBeenCalledOnce();
 
     window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 140, clientY: 120 }));
     manager.dispose();
@@ -893,54 +866,6 @@ describe('EventManager drawing drag routing', () => {
     expect(onDrawingDragMove).toHaveBeenCalledWith(140, 120, 'touch', { pressure: 0.8 });
     expect(onDrawingDragCancel).toHaveBeenCalledWith('touch');
     expect(onDrawingDragEnd).not.toHaveBeenCalled();
-
-    manager.dispose();
-  });
-
-  it('clamps web time-axis zoom to the shared minimum candle width', () => {
-    const rafCallbacks: FrameRequestCallback[] = [];
-    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-      rafCallbacks.push(callback);
-      return rafCallbacks.length;
-    });
-
-    const container = createContainer();
-    let viewport = { startTime: 99_601, endTime: 100_000, priceMin: 0, priceMax: 100 };
-    const onViewportChange = vi.fn((nextViewport: typeof viewport) => {
-      viewport = nextViewport;
-    });
-    const onRequestMoreBars = vi.fn();
-    const manager = new EventManager(
-      container,
-      createCallbacks({
-        getViewport: () => viewport,
-        getDimensions: () => ({
-          width: 16,
-          height: 600,
-          priceAxisWidth: 8,
-          timeAxisHeight: 24,
-          topMargin: 20,
-          leftMargin: 0,
-        }),
-        getIntervalMs: () => 100,
-        onViewportChange,
-        onRequestMoreBars,
-      }),
-    );
-
-    const event = new Event('wheel', { bubbles: true, cancelable: true }) as WheelEvent;
-    Object.defineProperties(event, {
-      deltaX: { value: 0 },
-      deltaY: { value: 10_000 },
-    });
-    container.dispatchEvent(event);
-    rafCallbacks.shift()?.(0);
-
-    expect(onViewportChange).toHaveBeenCalledOnce();
-    expect(onViewportChange).toHaveBeenCalledWith({ startTime: 99_600, endTime: 100_000, priceMin: 0, priceMax: 100 });
-    expect(onRequestMoreBars).toHaveBeenCalledWith('left', {
-      viewport: { startTime: 99_600, endTime: 100_000, priceMin: 0, priceMax: 100 },
-    });
 
     manager.dispose();
   });

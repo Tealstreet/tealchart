@@ -11,7 +11,6 @@ interface BuildLastTradePriceLineOptions {
   upColor?: string;
   downColor?: string;
   renderLineOnCanvas?: boolean;
-  showAxisTag?: boolean;
 }
 
 function formatLastTradePrice(price: number, pricePrecision?: number): string {
@@ -36,7 +35,6 @@ export function buildLastTradePriceLine({
   upColor = DEFAULT_BUY_CANDLE_COLOR,
   downColor = DEFAULT_SELL_CANDLE_COLOR,
   renderLineOnCanvas = true,
-  showAxisTag,
 }: BuildLastTradePriceLineOptions): PriceLine | null {
   if (!latestBar) {
     return null;
@@ -56,7 +54,6 @@ export function buildLastTradePriceLine({
     },
     type: 'price',
     renderLineOnCanvas,
-    showAxisTag,
     countdownToTime: barCloseTime,
   };
 }

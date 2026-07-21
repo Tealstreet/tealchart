@@ -21,7 +21,6 @@ import type {
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MAX_HISTORY_BACKFILL_BAR_COUNT } from './core/historyBackfill';
 import {
   createUserDrawingState,
   resolveUserDrawingObjectTreeDrawingDispatchAction,
@@ -147,7 +146,7 @@ interface MockDatafeed extends IBasicDataFeed {
   _subscribeCb: ((bar: DatafeedBar) => void) | null;
   _subscribeGuid: string | null;
   _resolveSymbolCalls: string[];
-  _getBarsCalls: { symbolInfo: LibrarySymbolInfo; resolution: string; periodParams: PeriodParams }[];
+  _getBarsCalls: { symbolInfo: LibrarySymbolInfo; resolution: string }[];
   _unsubscribeCalls: string[];
 }
 
@@ -184,7 +183,7 @@ function createMockDatafeed(): MockDatafeed {
       onResult: (bars: DatafeedBar[], meta: { noData?: boolean }) => void,
       onError: (reason: string) => void,
     ) {
-      datafeed._getBarsCalls.push({ symbolInfo, resolution, periodParams });
+      datafeed._getBarsCalls.push({ symbolInfo, resolution });
       datafeed._getBarsCb = onResult;
       datafeed._getBarsErrCb = onError;
     },
@@ -426,7 +425,10 @@ describe('TealchartWidget', () => {
         price: 100,
       };
       const testWidget = widget as unknown as {
-        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingInput(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
       };
 
       expect(widget.setActiveUserDrawingTool('select')).toBe(false);
@@ -970,54 +972,53 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
-    it.each([
-      'trendLine',
-      'rectangle',
-      'circle',
-      'ellipse',
-      'priceRange',
-      'datePriceRange',
-    ] satisfies UserDrawingTool[])('commits exact %s endpoints after widget UI toolbar tool selection', (tool) => {
-      const datafeed = createMockDatafeed();
-      const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
-      const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
-      const testWidget = widget as unknown as {
-        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
-      };
+    it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
+      'commits exact %s endpoints after widget UI toolbar tool selection',
+      (tool) => {
+        const datafeed = createMockDatafeed();
+        const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
+        const widget = createWidget(datafeed, { onUserDrawingCommand: onCommand });
+        const testWidget = widget as unknown as {
+          _handleUserDrawingInput(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+        };
 
-      widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.(tool);
-      expect(widget.getUserDrawingState().activeTool).toBe(tool);
-      expect(onCommand).toHaveBeenCalledWith(
-        expect.objectContaining({
-          command: expect.objectContaining({ type: 'setActiveTool', tool }),
-          source: 'toolbar',
-        }),
-      );
-      expect(
-        testWidget._handleUserDrawingInput({
-          paneId: 'main',
-          anchor: { time: 1_500, price: 90 },
-        }),
-      ).toBe(true);
-      expect(
-        testWidget._handleUserDrawingInput({
-          paneId: 'main',
-          anchor: { time: 2_500, price: 125 },
-        }),
-      ).toBe(true);
+        widgetUiOptionsCalls.at(-1)?.onUserDrawingToolSelect?.(tool);
+        expect(widget.getUserDrawingState().activeTool).toBe(tool);
+        expect(onCommand).toHaveBeenCalledWith(
+          expect.objectContaining({
+            command: expect.objectContaining({ type: 'setActiveTool', tool }),
+            source: 'toolbar',
+          }),
+        );
+        expect(
+          testWidget._handleUserDrawingInput({
+            paneId: 'main',
+            anchor: { time: 1_500, price: 90 },
+          }),
+        ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingInput({
+            paneId: 'main',
+            anchor: { time: 2_500, price: 125 },
+          }),
+        ).toBe(true);
 
-      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
-        id: 'drawing_1',
-        kind: tool,
-        points: [
-          { time: 1_500, price: 90 },
-          { time: 2_500, price: 125 },
-        ],
-      });
-      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+        expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+          id: 'drawing_1',
+          kind: tool,
+          points: [
+            { time: 1_500, price: 90 },
+            { time: 2_500, price: 125 },
+          ],
+        });
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
 
-      widget.remove();
-    });
+        widget.remove();
+      },
+    );
 
     it('places long position click anchors after widget UI toolbar tool selection', () => {
       const datafeed = createMockDatafeed();
@@ -1101,9 +1102,15 @@ describe('TealchartWidget', () => {
         }),
       );
 
-      expect(testWidget._handleUserDrawingPathDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(true);
-      expect(testWidget._handleUserDrawingPathDragMove({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(true);
-      expect(testWidget._handleUserDrawingPathDragMove({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(true);
+      expect(testWidget._handleUserDrawingPathDragStart({ paneId: 'main', anchor: { time: 1, price: 10 } })).toBe(
+        true,
+      );
+      expect(testWidget._handleUserDrawingPathDragMove({ paneId: 'main', anchor: { time: 2, price: 20 } })).toBe(
+        true,
+      );
+      expect(testWidget._handleUserDrawingPathDragMove({ paneId: 'main', anchor: { time: 3, price: 30 } })).toBe(
+        true,
+      );
       testWidget._handleUserDrawingPathDragEnd();
 
       expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
@@ -1198,52 +1205,51 @@ describe('TealchartWidget', () => {
       widget.remove();
     });
 
-    it.each([
-      'trendLine',
-      'rectangle',
-      'circle',
-      'ellipse',
-      'priceRange',
-      'datePriceRange',
-    ] satisfies UserDrawingTool[])('creates web %s click-placement drawings from exact endpoints', (tool) => {
-      const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
-      widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
+    it.each(['trendLine', 'rectangle', 'circle', 'ellipse', 'priceRange', 'datePriceRange'] satisfies UserDrawingTool[])(
+      'creates web %s click-placement drawings from exact endpoints',
+      (tool) => {
+        const datafeed = createMockDatafeed();
+        const widget = createWidget(datafeed);
+        widget.setUserDrawingState({ ...widget.getUserDrawingState(), activeTool: tool });
 
-      const testWidget = widget as unknown as {
-        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
-      };
+        const testWidget = widget as unknown as {
+          _handleUserDrawingInput(point: {
+            paneId: string;
+            anchor: { time: number; price: number };
+          }): boolean;
+        };
 
-      expect(
-        testWidget._handleUserDrawingInput({
-          paneId: 'main',
-          anchor: { time: 1_000, price: 100 },
-        }),
-      ).toBe(true);
-      expect(
-        testWidget._handleUserDrawingInput({
-          paneId: 'main',
-          anchor: { time: 2_000, price: 110 },
-        }),
-      ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingInput({
+            paneId: 'main',
+            anchor: { time: 1_000, price: 100 },
+          }),
+        ).toBe(true);
+        expect(
+          testWidget._handleUserDrawingInput({
+            paneId: 'main',
+            anchor: { time: 2_000, price: 110 },
+          }),
+        ).toBe(true);
 
-      expect(widget.getUserDrawingState().draft).toBeNull();
-      expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
-      expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
-        id: 'drawing_1',
-        kind: tool,
-        points: [
-          { time: 1_000, price: 100 },
-          { time: 2_000, price: 110 },
-        ],
-      });
-      expect(widget.canUndoUserDrawingCommand()).toBe(true);
+        expect(widget.getUserDrawingState().draft).toBeNull();
+        expect(widget.getUserDrawingState().selection).toEqual({ drawingId: 'drawing_1' });
+        expect(widget.getUserDrawingState().drawings[0]).toMatchObject({
+          id: 'drawing_1',
+          kind: tool,
+          points: [
+            { time: 1_000, price: 100 },
+            { time: 2_000, price: 110 },
+          ],
+        });
+        expect(widget.canUndoUserDrawingCommand()).toBe(true);
 
-      expect(widget.undoUserDrawingCommand()).toBe(true);
-      expect(widget.getUserDrawingState().drawings).toEqual([]);
+        expect(widget.undoUserDrawingCommand()).toBe(true);
+        expect(widget.getUserDrawingState().drawings).toEqual([]);
 
-      widget.remove();
-    });
+        widget.remove();
+      },
+    );
 
     it('places web multi-anchor drawings from clicks before final click', () => {
       const clickPlacementTools: UserDrawingTool[] = [
@@ -1332,12 +1338,7 @@ describe('TealchartWidget', () => {
     });
 
     it('places web four-anchor drawings from clicks before final clicks', () => {
-      const clickPlacementTools: UserDrawingTool[] = [
-        'doubleCurve',
-        'disjointChannel',
-        'trianglePattern',
-        'abcdPattern',
-      ];
+      const clickPlacementTools: UserDrawingTool[] = ['doubleCurve', 'disjointChannel', 'trianglePattern', 'abcdPattern'];
 
       for (const tool of clickPlacementTools) {
         const datafeed = createMockDatafeed();
@@ -2356,10 +2357,7 @@ describe('TealchartWidget', () => {
       const datafeed = createMockDatafeed();
       const onOpenObjectTree = vi.fn();
       const onCommand = vi.fn<(event: UserDrawingCommandEvent) => void>();
-      const widget = createWidget(datafeed, {
-        onUserDrawingObjectTreeOpen: onOpenObjectTree,
-        onUserDrawingCommand: onCommand,
-      });
+      const widget = createWidget(datafeed, { onUserDrawingObjectTreeOpen: onOpenObjectTree, onUserDrawingCommand: onCommand });
       widget.setUserDrawingState({
         ...widget.getUserDrawingState(),
         selection: { drawingId: 'line' },
@@ -3198,7 +3196,10 @@ describe('TealchartWidget', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       const testWidget = widget as unknown as {
-        _handleUserDrawingInput(point: { paneId: string; anchor: { time: number; price: number } }): boolean;
+        _handleUserDrawingInput(point: {
+          paneId: string;
+          anchor: { time: number; price: number };
+        }): boolean;
       };
       widget.setActiveUserDrawingTool('rectangle');
 
@@ -4175,7 +4176,9 @@ describe('TealchartWidget', () => {
         ticker: 'BINANCE:BTCUSDT',
         exchange: 'BINANCE',
       });
-      expect(datafeed._getBarsCalls[datafeed._getBarsCalls.length - 1].symbolInfo.full_name).toBe('BINANCE:BTCUSDT');
+      expect(datafeed._getBarsCalls[datafeed._getBarsCalls.length - 1].symbolInfo.full_name).toBe(
+        'BINANCE:BTCUSDT',
+      );
     });
 
     it('resetData resolves the current full symbol when symbol info has an exchange prefix', () => {
@@ -4191,7 +4194,9 @@ describe('TealchartWidget', () => {
 
       widget.chart().resetData();
 
-      expect(datafeed._resolveSymbolCalls[datafeed._resolveSymbolCalls.length - 1]).toBe('BYBITV5:BTCUSDT');
+      expect(datafeed._resolveSymbolCalls[datafeed._resolveSymbolCalls.length - 1]).toBe(
+        'BYBITV5:BTCUSDT',
+      );
     });
 
     it('setResolution updates interval and reloads bars', () => {
@@ -4416,128 +4421,6 @@ describe('TealchartWidget', () => {
       expect(() => {
         loadMoreCb(makeBars(5, 500000, 60000, 45000), {});
       }).not.toThrow();
-    });
-
-    it('sizes loadMoreBars requests from the requested viewport', () => {
-      const datafeed = createMockDatafeed();
-      // Bars are spaced one minute apart, so the widget has to be on the
-      // matching resolution for the viewport gap to size in bars.
-      const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
-      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
-
-      (widget as any)._loadMoreBars('left', {
-        viewport: {
-          startTime: 1000000 - 900 * 60000,
-          endTime: 1000000 + 60 * 60000,
-          priceMin: 100,
-          priceMax: 200,
-        },
-      });
-
-      expect(datafeed._getBarsCalls.at(-1)!.periodParams.countBack).toBe(900);
-    });
-
-    it('continues oversized loadMoreBars viewport requests in capped pages until covered', () => {
-      const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
-      const intervalMs = 60000;
-      const earliestTime = 1000000;
-      const requiredStartTime = earliestTime - (MAX_HISTORY_BACKFILL_BAR_COUNT + 300) * intervalMs;
-      completeInit(datafeed, makeBars(10, earliestTime, intervalMs, 50000));
-
-      (widget as any)._loadMoreBars('left', {
-        viewport: {
-          startTime: requiredStartTime,
-          endTime: earliestTime + 60 * intervalMs,
-          priceMin: 100,
-          priceMax: 200,
-        },
-      });
-
-      expect(datafeed._getBarsCalls).toHaveLength(2);
-      expect(datafeed._getBarsCalls.at(-1)!.periodParams.countBack).toBe(MAX_HISTORY_BACKFILL_BAR_COUNT);
-
-      datafeed._getBarsCb?.(
-        makeBars(
-          MAX_HISTORY_BACKFILL_BAR_COUNT,
-          earliestTime - MAX_HISTORY_BACKFILL_BAR_COUNT * intervalMs,
-          intervalMs,
-          45000,
-        ),
-        {},
-      );
-
-      expect(datafeed._getBarsCalls).toHaveLength(3);
-      expect(datafeed._getBarsCalls.at(-1)!.periodParams.countBack).toBe(300);
-
-      datafeed._getBarsCb?.(makeBars(300, requiredStartTime, intervalMs, 40000), {});
-
-      expect(datafeed._getBarsCalls).toHaveLength(3);
-    });
-
-    it('stops oversized loadMoreBars continuation when history makes no progress', () => {
-      const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
-      const intervalMs = 60000;
-      const earliestTime = 1000000;
-      completeInit(datafeed, makeBars(10, earliestTime, intervalMs, 50000));
-
-      (widget as any)._loadMoreBars('left', {
-        viewport: {
-          startTime: earliestTime - (MAX_HISTORY_BACKFILL_BAR_COUNT + 300) * intervalMs,
-          endTime: earliestTime + 60 * intervalMs,
-          priceMin: 100,
-          priceMax: 200,
-        },
-      });
-
-      expect(datafeed._getBarsCalls).toHaveLength(2);
-
-      datafeed._getBarsCb?.(makeBars(10, earliestTime, intervalMs, 50000), {});
-
-      expect(datafeed._getBarsCalls).toHaveLength(2);
-    });
-
-    it('coalesces in-flight loadMoreBars requests into one bounded follow-up', () => {
-      const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
-      const intervalMs = 60000;
-      const earliestTime = 1000000;
-      completeInit(datafeed, makeBars(10, earliestTime, intervalMs, 50000));
-
-      (widget as any)._loadMoreBars('left', {
-        viewport: {
-          startTime: earliestTime - 900 * intervalMs,
-          endTime: earliestTime + 60 * intervalMs,
-          priceMin: 100,
-          priceMax: 200,
-        },
-      });
-      const loadMoreCb = datafeed._getBarsCb!;
-
-      (widget as any)._loadMoreBars('left', {
-        viewport: {
-          startTime: earliestTime - 500 * intervalMs,
-          endTime: earliestTime + 60 * intervalMs,
-          priceMin: 100,
-          priceMax: 200,
-        },
-      });
-      (widget as any)._loadMoreBars('left', {
-        viewport: {
-          startTime: earliestTime - 1_200 * intervalMs,
-          endTime: earliestTime + 60 * intervalMs,
-          priceMin: 100,
-          priceMax: 200,
-        },
-      });
-
-      expect(datafeed._getBarsCalls).toHaveLength(2);
-
-      loadMoreCb(makeBars(900, earliestTime - 900 * intervalMs, intervalMs, 45000), {});
-
-      expect(datafeed._getBarsCalls).toHaveLength(3);
-      expect(datafeed._getBarsCalls.at(-1)!.periodParams.countBack).toBe(300);
     });
 
     it('stale real-time tick from old subscription discarded after symbol switch', () => {

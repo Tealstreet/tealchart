@@ -42,12 +42,6 @@ export interface UserDrawingVisualEvidenceMatrix {
   regressionChecks: readonly string[];
 }
 
-const MOBILE_DRAWING_KNOWN_GAP =
-  'Native drawing rendering and interactions are intentionally absent pending the rebuilt native runtime.';
-
-const MOBILE_DRAWING_STATUS_NOTE =
-  'Web drawing support remains active; native drawing surfaces are intentionally blank until the new runtime lands.';
-
 export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatrix = {
   viewports: [
     {
@@ -72,7 +66,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       width: 390,
       height: 844,
       target: 'mobile',
-      notes: 'Native drawing surfaces are a known gap during the Skia runtime rebuild.',
+      notes: 'Verify Skia drawing surfaces, top bar, and touch affordances fit.',
     },
     {
       id: 'mobileLandscape',
@@ -80,7 +74,7 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       width: 844,
       height: 390,
       target: 'mobile',
-      notes: 'Native drawing surfaces are a known gap during the Skia runtime rebuild.',
+      notes: 'Verify selected actions and context surfaces remain reachable.',
     },
   ],
   states: [
@@ -88,11 +82,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'emptyChartDrawingRail',
       label: 'Empty chart with drawing rail',
       webEvidence: 'Canvas plus overlay chrome.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Skia chart plus mobile toolbar/action entry points.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes: 'Both platforms have first-party chart surfaces for manual layout evidence.',
       },
       expectedChecks: ['Chart remains max-size.', 'Overlays do not hide legend, axes, or candles unexpectedly.'],
     },
@@ -100,11 +94,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'activeToolDraft',
       label: 'Active tool draft',
       webEvidence: 'Draft preview for a two-anchor and one-anchor tool.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Matching Skia draft primitive.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes: 'Both platforms render active draft primitives from the shared drawing state.',
       },
       expectedChecks: ['Draft style, opacity, handles, and cancellation state match platform expectations.'],
     },
@@ -112,11 +106,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'selectedDrawing',
       label: 'Selected drawing',
       webEvidence: 'Selected outline, handles, and action anchor.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Matching Skia selected primitives and touch target geometry.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes: 'Both platforms render selected primitives and action anchors.',
       },
       expectedChecks: ['Handles are visible, stable, clipped to pane, and do not shift layout.'],
     },
@@ -124,11 +118,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'floatingActionToolbar',
       label: 'Floating/action toolbar',
       webEvidence: 'Selected-object actions near selection.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Mobile selected action surface or sibling controls.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes: 'Web floating toolbar and mobile selected action surface share selected-action descriptors.',
       },
       expectedChecks: ['Delete, duplicate, z-order, style, lock, and hide actions map to the same command semantics.'],
     },
@@ -136,11 +130,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'contextMenuLongPress',
       label: 'Context menu/long press',
       webEvidence: 'Drawing-specific context actions.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Mobile context menu/long-press equivalent.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes: 'Web context menu and mobile long-press menu consume shared context actions.',
       },
       expectedChecks: ['Ordering, visibility, lock, duplicate, delete, and properties actions remain reachable.'],
     },
@@ -148,11 +142,12 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'objectTree',
       label: 'Object tree',
       webEvidence: 'Row order, selected rows, lock/visibility/name state.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Mobile object tree/sheet or app-owned surface using the shared row model.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes:
+          'Both platforms include built-in object-tree surfaces when no app-owned callback is supplied, while preserving app-owned open/dispatch APIs backed by shared row, selection, rename, and z-order action models.',
       },
       expectedChecks: [
         'Row order matches z-order.',
@@ -165,11 +160,12 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'textPropertyEditing',
       label: 'Text/property editing',
       webEvidence: 'Double-click edit and property surface.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Double-tap edit and property surface.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes:
+          'Both platforms include built-in properties surfaces when no app-owned callback is supplied, while preserving app-owned text edit and properties APIs backed by shared edit-intent, command/history, and properties-surface control models.',
       },
       expectedChecks: [
         'Double-click and double-tap resolve through the same shared edit-intent model.',
@@ -183,11 +179,12 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'keyboardModifierActions',
       label: 'Keyboard/modifier actions',
       webEvidence: 'Chart-owned keyboard shortcuts, Shift placement constraints, and Shift-drag duplicate.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Hardware-keyboard adapter actions plus touch-native duplicate and constraint override surfaces.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes:
+          'Both platforms route keyboard, duplicate-drag, nudge, copy/paste, select-all, and constrained-placement affordances through shared action and command models.',
       },
       expectedChecks: [
         'Drawing shortcuts only run while chart keyboard focus owns the event.',
@@ -200,15 +197,16 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'apiEventsPersistence',
       label: 'API/events/persistence',
       webEvidence: 'Widget drawing APIs, command events, layout import/export, and persistence restore behavior.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Skia handle APIs, command events, drawing import/export, and persistence restore behavior.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes:
+          'Both platforms expose command-backed drawing APIs, matching command-event shapes, explicit no-op returns, and the same persisted drawing schema/migrations.',
       },
       expectedChecks: [
         'Create, select, delete, duplicate, reorder, lock, hide, style, undo, redo, object-tree, and properties APIs have web and mobile siblings.',
-        'Changed drawing commands emit the expected command-event shape on web Canvas.',
+        'Changed drawing commands emit the same command-event shape on web Canvas and mobile Skia.',
         'Unavailable targets return explicit no-op results without mutating drawing state.',
         'Import/export uses the same versioned drawing layout schema and excludes transient draft, selection, text-edit, and history state.',
       ],
@@ -217,11 +215,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
       id: 'paneSplitIndicators',
       label: 'Pane split indicators',
       webEvidence: 'Drawings over main pane plus non-overlay indicator panes.',
-      mobileEvidence: MOBILE_DRAWING_KNOWN_GAP,
+      mobileEvidence: 'Skia panes with drawing primitives routed to the correct pane.',
       status: {
         web: 'ready',
-        mobile: 'known-gap',
-        notes: MOBILE_DRAWING_STATUS_NOTE,
+        mobile: 'ready',
+        notes: 'Both platforms route drawing primitives through pane-aware render models.',
       },
       expectedChecks: [
         'Drawings clip to their pane.',
@@ -230,11 +228,11 @@ export const USER_DRAWING_VISUAL_EVIDENCE_MATRIX: UserDrawingVisualEvidenceMatri
     },
   ],
   regressionChecks: [
-    'Selected and draft drawings render with consistent colors, opacity, dash style, fill, labels, and handles on web.',
+    'Selected and draft drawings render with consistent colors, opacity, dash style, fill, labels, and handles across web and mobile.',
     'Moving, duplicating, hiding, locking, deleting, and reordering a drawing does not change its ID unless the action creates a new drawing.',
-    'Drawing overlays do not block normal chart gestures outside the active drawing interaction on supported surfaces.',
+    'Drawing overlays do not block normal chart gestures outside the active drawing interaction.',
     'The top-left legend avoids the left drawing rail on web; mobile has no hidden legend collision from drawing surfaces.',
-    'Object-tree ordering matches the actual web Canvas render order.',
+    'Object-tree ordering matches the actual render order on both Canvas and Skia.',
     'Text/property popovers or sheets do not obscure the edited object in a way that prevents confirming the result.',
   ],
 };

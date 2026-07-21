@@ -82,49 +82,6 @@ function pointInRect(point: DrawingScreenPoint, rect: DrawingScreenRect): boolea
   return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
 }
 
-function pointInExpandedRect(point: DrawingScreenPoint, rect: DrawingScreenRect, tolerance: number): boolean {
-  return (
-    point.x >= rect.x - tolerance &&
-    point.x <= rect.x + rect.width + tolerance &&
-    point.y >= rect.y - tolerance &&
-    point.y <= rect.y + rect.height + tolerance
-  );
-}
-
-function pointInAnyExpandedItemRect<T extends { rect: DrawingScreenRect }>(
-  point: DrawingScreenPoint,
-  items: readonly T[],
-  tolerance: number,
-): boolean {
-  for (const item of items) {
-    if (pointInExpandedRect(point, item.rect, tolerance)) return true;
-  }
-  return false;
-}
-
-function maxRadiusFromItems<T extends { radius: number }>(items: readonly T[]): number {
-  let maxRadius = 0;
-  for (const item of items) {
-    maxRadius = Math.max(maxRadius, item.radius);
-  }
-  return maxRadius;
-}
-
-function pointInExpandedCircleBounds(
-  point: DrawingScreenPoint,
-  center: DrawingScreenPoint,
-  radius: number,
-  tolerance: number,
-): boolean {
-  const expandedRadius = radius + tolerance;
-  return (
-    point.x >= center.x - expandedRadius &&
-    point.x <= center.x + expandedRadius &&
-    point.y >= center.y - expandedRadius &&
-    point.y <= center.y + expandedRadius
-  );
-}
-
 function distanceToCircleEdge(point: DrawingScreenPoint, center: DrawingScreenPoint, radius: number): number {
   return Math.abs(distanceBetweenPoints(point, center) - radius);
 }
@@ -359,16 +316,6 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'fibCircles') {
-    if (
-      !pointInExpandedCircleBounds(
-        point,
-        geometry.fibCircles.center,
-        maxRadiusFromItems(geometry.fibCircles.circles),
-        options.tolerance,
-      )
-    ) {
-      return null;
-    }
     const distance = Math.min(
       ...geometry.fibCircles.circles.map((circle) =>
         distanceToCircleEdge(point, geometry.fibCircles.center, circle.radius),
@@ -378,9 +325,6 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'fibArcs') {
-    if (!pointInAnyExpandedItemRect(point, geometry.fibArcs.arcs, options.tolerance)) {
-      return null;
-    }
     const distance = Math.min(
       ...geometry.fibArcs.arcs.map((arc) =>
         distanceToArcEdge(point, geometry.fibArcs.center, arc.radius, arc.startAngle, arc.endAngle),
@@ -390,9 +334,6 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'fibSpeedResistanceArcs') {
-    if (!pointInAnyExpandedItemRect(point, geometry.fibSpeedResistanceArcs.arcs, options.tolerance)) {
-      return null;
-    }
     const distance = Math.min(
       ...geometry.fibSpeedResistanceArcs.arcs.map((arc) =>
         distanceToArcEdge(
@@ -408,16 +349,6 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'fibWedge') {
-    if (
-      !pointInExpandedCircleBounds(
-        point,
-        geometry.fibWedge.center,
-        maxRadiusFromItems(geometry.fibWedge.arcs),
-        options.tolerance,
-      )
-    ) {
-      return null;
-    }
     const distance = Math.min(
       ...geometry.fibWedge.arcs.map((arc) =>
         distanceToArcEdge(point, geometry.fibWedge.center, arc.radius, arc.startAngle, arc.endAngle),
@@ -443,7 +374,6 @@ function hitTestResolvedGeometry(
   }
 
   if (geometry.kind === 'ellipse') {
-    if (!pointInExpandedRect(point, geometry.ellipse.rect, options.tolerance)) return null;
     const distance = distanceToEllipseEdge(
       point,
       geometry.ellipse.center,

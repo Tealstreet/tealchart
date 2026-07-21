@@ -7,13 +7,12 @@
  * - Crosshair horizontal/vertical lines
  * - Price axis labels
  */
-import type { ChartMargins, PriceLineLabelBounds } from '../types';
+import type { ChartMargins, PendingOrderUpdate, PriceLineLabelBounds } from '../types';
 
 import Konva from 'konva';
 
 import { TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
-import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
 
 // ============================================================================
@@ -43,13 +42,13 @@ export interface PriceLineManagerOptions {
   /** Callback when position reverse button is clicked */
   onPositionReverse?: (positionId: string) => void;
   /** Callback when TP button drag ends */
-  onTPDragEnd?: (bound: PriceLineLabelBounds, price: number, partialPercent?: number) => void;
+  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Callback when SL button drag ends */
-  onSLDragEnd?: (bound: PriceLineLabelBounds, price: number, partialPercent?: number) => void;
+  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Callback when TP button is clicked (without drag) */
-  onTPClick?: (bound: PriceLineLabelBounds) => void;
+  onTPClick?: (positionId: string) => void;
   /** Callback when SL button is clicked (without drag) */
-  onSLClick?: (bound: PriceLineLabelBounds) => void;
+  onSLClick?: (positionId: string) => void;
   /** Preview callback for TP drag */
   onTPMovePreview?: (
     positionId: string,
@@ -231,6 +230,16 @@ function getTradingLineMinX(options: PriceLineManagerOptions): number {
   return Math.max(options.margins.left, options.chartLabelMinX ?? options.margins.left);
 }
 
+function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
+  const inlineButtons = buttons.filter((button) => button.type !== 'tp' && button.type !== 'sl');
+  const tpslButtons = buttons.filter((button) => button.type === 'tp' || button.type === 'sl');
+  return {
+    inlineButtons,
+    tpslButtons,
+    orderedButtons: [...inlineButtons, ...tpslButtons],
+  };
+}
+
 function getPillCornerRadius(isFirst: boolean, isLast: boolean): number | [number, number, number, number] {
   if (isFirst && isLast) return 2;
   if (isFirst) return [2, 0, 0, 2];
@@ -255,6 +264,7 @@ export class PriceLineManager {
 
   // Current state
   private labelBounds: PriceLineLabelBounds[] = [];
+  private pendingOrders: Map<string, PendingOrderUpdate> = new Map();
   private crosshair: CrosshairState = { x: 0, y: 0, visible: false, color: '#787b86' };
 
   // Drag state
@@ -308,6 +318,7 @@ export class PriceLineManager {
    */
   update(
     labelBounds: PriceLineLabelBounds[],
+    pendingOrders: Map<string, PendingOrderUpdate> = new Map(),
     crosshair?: CrosshairState,
   ): void {
     // Check if we need a full rebuild or can do incremental update
@@ -315,6 +326,7 @@ export class PriceLineManager {
     const structureChanged = newSignature !== this.lastLabelBoundsSignature;
 
     this.labelBounds = labelBounds;
+    this.pendingOrders = pendingOrders;
 
     if (crosshair) {
       this.crosshair = crosshair;
@@ -367,13 +379,11 @@ export class PriceLineManager {
           b.width,
           b.height,
           b.lineLength ?? '',
-          b.lineLengthUnit ?? '',
           b.countdownToTime !== undefined ? '1' : '0',
           b.label?.primaryText ?? '',
           b.label?.secondaryText ?? '',
           b.label?.backgroundColor ?? '',
           b.label?.textColor ?? '',
-          b.label?.filled ? '1' : '0',
           segmentSignature,
           buttonSignature,
         ].join('|');
@@ -403,7 +413,7 @@ export class PriceLineManager {
           cachedGroup.setAttr('lineY', newY);
         }
 
-        cachedGroup.opacity(bound.actionState?.isAwaitingCallback ? 0.5 : 1);
+        cachedGroup.opacity(this.pendingOrders.has(bound.lineId) ? 0.5 : 1);
         this.setCurrentBound(cachedGroup, bound);
         this.updateLineContent(cachedGroup, bound);
       }
@@ -422,13 +432,6 @@ export class PriceLineManager {
     this.options.width = width;
     this.options.height = height;
     this.options.margins = margins;
-    this.needsFullRebuild = true;
-    this.render();
-  }
-
-  setChartLabelMinX(chartLabelMinX: number | undefined): void {
-    if (this.options.chartLabelMinX === chartLabelMinX) return;
-    this.options.chartLabelMinX = chartLabelMinX;
     this.needsFullRebuild = true;
     this.render();
   }
@@ -487,12 +490,8 @@ export class PriceLineManager {
     const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
     if (!refs) return;
 
-    const shouldFillPriceAxisLabel = bound.type !== 'price' || bound.label.filled;
-    if (shouldFillPriceAxisLabel) {
+    if (bound.type !== 'price') {
       refs.priceAxisRect?.fill(bound.label.backgroundColor || bound.color);
-      refs.priceAxisRect?.fillEnabled(true);
-    } else {
-      refs.priceAxisRect?.fillEnabled(false);
     }
     refs.priceAxisRect?.stroke(bound.color);
 
@@ -517,7 +516,7 @@ export class PriceLineManager {
       refs.segmentTexts?.[index]?.fill(segment.textColor);
     });
 
-    const { orderedButtons } = splitTradeLineButtonsForDisplay(bound.chartLabel?.buttons || []);
+    const { orderedButtons } = getOrderedButtons(bound.chartLabel?.buttons || []);
     orderedButtons.forEach((button, index) => {
       refs.buttonRects?.[index]?.fill(button.backgroundColor);
       refs.buttonRects?.[index]?.stroke(button.borderColor);
@@ -613,7 +612,8 @@ export class PriceLineManager {
     const { width, margins, priceToY } = this.options;
     const lineY = priceToY(bound.price);
     const lineType = bound.type || 'price';
-    const opacity = bound.actionState?.isAwaitingCallback ? 0.5 : 1;
+    const isPending = this.pendingOrders.has(bound.lineId);
+    const opacity = isPending ? 0.5 : 1;
 
     // Collision offset for label
     const collisionOffset = bound.adjustedY - bound.originalY;
@@ -675,14 +675,11 @@ export class PriceLineManager {
     const fontFamily = this.getTextFontFamily();
 
     // Border-only label
-    const shouldFill = Boolean(bound.label.filled);
     const priceAxisRect = new Konva.Rect({
       x,
       y,
       width: bound.width,
       height: bound.height,
-      fill: shouldFill ? bound.label.backgroundColor || bound.color : undefined,
-      fillEnabled: shouldFill,
       stroke: bound.color,
       strokeWidth: 1,
       cornerRadius: 2,
@@ -772,7 +769,7 @@ export class PriceLineManager {
     let chartLabelX = lineStartX;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const { inlineButtons, tpslButtons, orderedButtons } = splitTradeLineButtonsForDisplay(buttons);
+    const { inlineButtons, tpslButtons, orderedButtons } = getOrderedButtons(buttons);
     const hasInlineButtons = inlineButtons.length > 0;
     const tpslGap = tpslButtons.length > 0 ? 6 : 0;
 
@@ -787,14 +784,9 @@ export class PriceLineManager {
       }
 
       const lineLength = bound.lineLength ?? 100;
-      const lineLengthUnit = bound.lineLengthUnit ?? 'percentage';
       const maxLabelX = width - margins.right - chartLabelWidth;
       const minLabelX = lineStartX;
-      chartLabelX =
-        lineLengthUnit === 'pixel'
-          ? maxLabelX - Math.max(0, lineLength)
-          : minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
-      chartLabelX = Math.max(minLabelX, Math.min(maxLabelX, chartLabelX));
+      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
     // Left line segment
@@ -846,30 +838,22 @@ export class PriceLineManager {
       let dragStartY = 0;
 
       dragRect.on('mousedown touchstart', () => {
-        const currentBound = this.getCurrentBound(group, bound);
-        if (currentBound.actionState?.isPending) return;
         if (!this.activeDrag) {
           dragRect.startDrag();
         }
       });
 
       dragRect.on('dragstart', () => {
-        const currentBound = this.getCurrentBound(group, bound);
-        if (currentBound.actionState?.isPending) {
-          this.dragCancelled = true;
-          dragRect.stopDrag();
-          return;
-        }
         dragStartY = dragRect.y();
         this.activeDrag = {
           node: dragRect,
           group,
           type: 'order',
-          lineId: currentBound.lineId,
+          lineId: bound.lineId,
           originalY: lineY,
           originalGroupY: group.y(),
           originalAbsoluteY: dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2,
-          originalPrice: currentBound.price,
+          originalPrice: bound.price,
         };
         this.dragCancelled = false;
         this.options.onCursorChange?.('grabbing');
@@ -888,29 +872,23 @@ export class PriceLineManager {
         activeDrag.group.setAttr('lineY', movingY);
         dragRect.y(dragStartY);
         const currentBound = this.getCurrentBound(activeDrag.group, bound);
-        this.options.onOrderMoving?.(currentBound.orderId || currentBound.lineId, yToPrice(movingY));
+        this.options.onOrderMoving?.(currentBound.lineId, yToPrice(movingY));
         this.layer.batchDraw();
       });
 
       dragRect.on('dragend', () => {
         const activeDrag = this.activeDrag;
-        if (!activeDrag || activeDrag.type !== 'order' || activeDrag.node !== dragRect || !activeDrag.group) {
-          dragRect.y(dragStartY);
-          this.dragCancelled = false;
-          this.options.onCursorChange?.('crosshair');
-          return;
-        }
         const finalY =
-          (activeDrag.group.getAttr('lineY') as number | undefined) ??
+          (activeDrag?.group?.getAttr('lineY') as number | undefined) ??
           dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
         const finalPrice = yToPrice(finalY);
-        const currentBound = this.getCurrentBound(activeDrag.group, bound);
+        const currentBound = this.getCurrentBound(group, bound);
 
         dragRect.y(dragStartY);
 
         if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
-          this.options.onOrderMove?.(currentBound.orderId || currentBound.lineId, finalPrice);
-        } else {
+          this.options.onOrderMove?.(currentBound.lineId, finalPrice);
+        } else if (activeDrag?.group) {
           activeDrag.group.y(activeDrag.originalGroupY ?? 0);
           activeDrag.group.setAttr('lineY', activeDrag.originalY);
         }
@@ -1054,8 +1032,6 @@ export class PriceLineManager {
           const startCenterX = originalX + buttonWidth / 2;
 
           hitRect.on('mousedown touchstart', () => {
-            const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isPending) return;
             if (!this.activeDrag) {
               hitRect.startDrag();
             }
@@ -1063,17 +1039,12 @@ export class PriceLineManager {
 
           hitRect.on('dragstart', () => {
             const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isPending) {
-              this.dragCancelled = true;
-              hitRect.stopDrag();
-              return;
-            }
             const startPosition = hitRect.getAbsolutePosition();
             this.activeDrag = {
               node: hitRect,
               type: 'tpsl',
               lineId: currentBound.lineId,
-              positionId: currentBound.positionId || currentBound.orderId || currentBound.lineId,
+              positionId: currentBound.positionId || currentBound.lineId,
               buttonType,
               originalX,
               originalY,
@@ -1125,13 +1096,7 @@ export class PriceLineManager {
 
           hitRect.on('dragend', () => {
             const activeDrag = this.activeDrag;
-            if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) {
-              hitRect.x(originalX);
-              hitRect.y(originalY);
-              this.dragCancelled = false;
-              this.options.onCursorChange?.('crosshair');
-              return;
-            }
+            if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
 
             const currentPosition = hitRect.getAbsolutePosition();
             const currentCenterX = currentPosition.x + buttonWidth / 2;
@@ -1152,16 +1117,18 @@ export class PriceLineManager {
 
             if (!this.dragCancelled && (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD)) {
               if (buttonType === 'tp') {
-                this.options.onTPDragEnd?.(currentBound, price, partialPercent);
+                currentBound.callbacks?.onTPMoveEnd?.(price, partialPercent);
               } else {
-                this.options.onSLDragEnd?.(currentBound, price, partialPercent);
+                currentBound.callbacks?.onSLMoveEnd?.(price, partialPercent);
               }
               this.options.onTPSLDragEnd?.();
             } else if (!this.dragCancelled) {
               if (buttonType === 'tp') {
-                this.options.onTPClick?.(currentBound);
+                currentBound.callbacks?.onTPClick?.();
+                this.options.onTPClick?.(activeDrag.positionId || currentBound.lineId);
               } else {
-                this.options.onSLClick?.(currentBound);
+                currentBound.callbacks?.onSLClick?.();
+                this.options.onSLClick?.(activeDrag.positionId || currentBound.lineId);
               }
               this.options.onTPSLDragCancel?.();
             }
@@ -1199,12 +1166,10 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
-            const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isPending) return;
             if (button.type === 'cancel') {
-              this.options.onOrderCancel?.(currentBound.orderId || currentBound.lineId);
+              this.options.onOrderCancel?.(bound.lineId);
             } else {
-              this.options.onPositionClose?.(currentBound.positionId || currentBound.lineId);
+              this.options.onPositionClose?.(bound.lineId);
             }
             this.options.onCursorChange?.('crosshair');
           });
@@ -1229,9 +1194,7 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
-            const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isPending) return;
-            this.options.onPositionReverse?.(currentBound.positionId || currentBound.lineId);
+            this.options.onPositionReverse?.(bound.lineId);
             this.options.onCursorChange?.('crosshair');
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));

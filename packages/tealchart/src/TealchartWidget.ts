@@ -9,7 +9,6 @@ import type {
   PlotOutput,
   TealscriptRuntimeOptions,
 } from '@tealstreet/tealscript';
-import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
@@ -58,17 +57,9 @@ import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import { applyChartOverridesToRenderOptions } from './overrides';
-import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { ResolutionInput } from './utils/normalizeResolution';
 
 import { LOADING_OPACITY } from './constants';
-import {
-  DEFAULT_HISTORY_BACKFILL_BAR_COUNT,
-  mergeLeftHistoryBackfillRequestHints,
-  resolveLeftHistoryBackfillContinuationHint,
-  resolveLeftHistoryBackfillRequest,
-} from './core/historyBackfill';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -110,7 +101,6 @@ import {
   jailbreakInputsToInputDefinitions,
 } from './indicators/builtinIndicators';
 import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
-import { DEFAULT_LAYOUT_NAME } from './layoutDefaults';
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore, hasChartStore } from './state/chartState';
@@ -209,7 +199,7 @@ const getResolveSymbolName = (
 /**
  * Main widget class (equivalent to TradingView's IChartingLibraryWidget)
  */
-export class TealchartWidget implements ITealchartWebWidget {
+export class TealchartWidget {
   private _container: HTMLElement;
   private _options: TealchartWidgetOptions;
   private _datafeed: IBasicDataFeed;
@@ -247,8 +237,6 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   // Historical data loading
   private _isLoadingMoreBars = false;
-  private _hasQueuedLeftHistoryBackfill = false;
-  private _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   private _hasMoreHistoricalData = true;
 
   // Loading state for timeframe changes
@@ -611,9 +599,9 @@ export class TealchartWidget implements ITealchartWebWidget {
       loadAsTealchart(current.layoutId!, this._options.save_load_adapter!)
         .then((result) => {
           if (this._disposed) return;
-          this._handleLoadLayout(result.data, result.warnings, current.layoutId!, current.layoutName || DEFAULT_LAYOUT_NAME);
+          this._handleLoadLayout(result.data, result.warnings, current.layoutId!, current.layoutName || 'tealstreet');
           // Sync layout selector UI
-          this._ui?.setCurrentLayout(current.layoutId, current.layoutName || DEFAULT_LAYOUT_NAME);
+          this._ui?.setCurrentLayout(current.layoutId, current.layoutName);
         })
         .catch((error) => {
           if (this._disposed) return;
@@ -629,7 +617,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   }
 
   // Number of bars to request initially - enough to fill viewport with buffer
-  private static readonly INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
+  private static readonly INITIAL_BAR_COUNT = 300;
 
   private _loadBars(): void {
     if (!this._symbolInfo) {
@@ -639,7 +627,6 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     // Increment request ID to cancel any in-flight requests
     const requestId = ++this._loadBarsRequestId;
-    this._clearQueuedLeftHistoryBackfill();
     this._isLoadingBars = true;
     this._scheduler.markDirty(DIRTY.CROSSHAIR); // Re-render to show faded/loading state
 
@@ -834,44 +821,40 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._scheduler.markDirty(DIRTY.BARS | DIRTY.LINES);
   }
 
-  private _loadMoreBars(direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint): void {
+  private _loadMoreBars(direction: 'left' | 'right'): void {
     // Only support loading older data (left) for now
     if (direction !== 'left') return;
     if (!this._symbolInfo) return;
-    if (this._isLoadingMoreBars) {
-      this._queueLeftHistoryBackfill(hint);
-      return;
-    }
+    if (this._isLoadingMoreBars) return;
     if (!this._hasMoreHistoricalData) return;
+
+    this._isLoadingMoreBars = true;
 
     // Find the earliest bar we have
     const earliestBar = this._bars[0];
-    if (!earliestBar) return;
-    const previousEarliestBarTime = earliestBar.time;
+    if (!earliestBar) {
+      this._isLoadingMoreBars = false;
+      return;
+    }
 
     // Capture current request ID — if symbol/interval changes while this request
     // is in flight, _loadBarsRequestId will be incremented and this callback
     // will be discarded as stale.
     const requestId = this._loadBarsRequestId;
 
+    // Request same number of bars as initial load, going back from earliest bar
     const intervalMs = intervalToMs(this._interval);
-    const request = resolveLeftHistoryBackfillRequest({
-      defaultCount: TealchartWidget.INITIAL_BAR_COUNT,
-      earliestBarTime: earliestBar.time,
-      hint,
-      intervalMs,
-    });
-    if (!request) return;
-
-    this._isLoadingMoreBars = true;
+    const countBack = TealchartWidget.INITIAL_BAR_COUNT;
+    const toTime = Math.floor(earliestBar.time / 1000) - 1; // 1 second before earliest bar
+    const fromTime = toTime - Math.floor((countBack * intervalMs) / 1000);
 
     this._datafeed.getBars(
       this._symbolInfo,
       this._interval,
       {
-        countBack: request.countBack,
-        from: request.from,
-        to: request.to,
+        countBack,
+        from: fromTime,
+        to: toTime,
         firstDataRequest: false,
       },
       (bars, _meta) => {
@@ -885,7 +868,6 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         if (bars.length === 0) {
           this._hasMoreHistoricalData = false;
-          this._clearQueuedLeftHistoryBackfill();
           return;
         }
 
@@ -903,52 +885,15 @@ export class TealchartWidget implements ITealchartWebWidget {
           this._scheduler.markDirty(DIRTY.BARS);
           this._tealScriptManager?.setBars(this._bars);
         }
-        this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
       },
       (error) => {
         if (this._disposed || requestId !== this._loadBarsRequestId) {
           return;
         }
         this._isLoadingMoreBars = false;
-        this._clearQueuedLeftHistoryBackfill();
         this._logger?.error(LogCategory.Datafeed, 'Failed to load more bars', error);
       },
     );
-  }
-
-  private _queueLeftHistoryBackfill(hint?: HistoryBackfillRequestHint): void {
-    this._hasQueuedLeftHistoryBackfill = true;
-    this._queuedLeftHistoryBackfillHint = mergeLeftHistoryBackfillRequestHints(
-      this._queuedLeftHistoryBackfillHint,
-      hint,
-    );
-  }
-
-  private _clearQueuedLeftHistoryBackfill(): void {
-    this._hasQueuedLeftHistoryBackfill = false;
-    this._queuedLeftHistoryBackfillHint = undefined;
-  }
-
-  private _consumeQueuedLeftHistoryBackfill(): HistoryBackfillRequestHint | undefined | null {
-    if (!this._hasQueuedLeftHistoryBackfill) return null;
-    const hint = this._queuedLeftHistoryBackfillHint;
-    this._clearQueuedLeftHistoryBackfill();
-    return hint;
-  }
-
-  private _loadNextLeftHistoryBackfill(
-    activeHint: HistoryBackfillRequestHint | undefined,
-    previousEarliestBarTime: number,
-  ): void {
-    const hint = resolveLeftHistoryBackfillContinuationHint({
-      activeHint,
-      currentEarliestBarTime: this._bars[0]?.time,
-      previousEarliestBarTime,
-      queuedHint: this._consumeQueuedLeftHistoryBackfill(),
-    });
-    if (hint !== null) {
-      this._loadMoreBars('left', hint);
-    }
   }
 
   /**
@@ -1144,7 +1089,6 @@ export class TealchartWidget implements ITealchartWebWidget {
       showTopBar,
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
-      onSymbolClick: this._options.onSymbolClick,
       onIntervalChange: (interval) => {
         this._chartApi.setResolution(interval);
       },
@@ -1187,14 +1131,24 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._viewportController.handleReset(this._bars, intervalToMs(this._interval));
       },
       isAutoScale: (paneId: string) => this._viewportController.isAutoScale(paneId),
-      onRequestMoreBars: (direction, hint) => {
-        this._loadMoreBars(direction, hint);
+      onRequestMoreBars: (direction) => {
+        this._loadMoreBars(direction);
       },
-      onOrderMove: (orderId, newPrice) => this._chartApi.triggerOrderMove(orderId, newPrice),
-      onOrderMoving: (orderId, newPrice) => this._chartApi.triggerOrderMoving(orderId, newPrice),
-      onOrderCancel: (orderId) => this._chartApi.triggerOrderCancel(orderId),
-      onPositionClose: (positionId) => this._chartApi.triggerPositionClose(positionId),
-      onPositionReverse: (positionId) => this._chartApi.triggerPositionReverse(positionId),
+      onOrderMove: (orderId, newPrice) => {
+        this._chartApi.triggerOrderMove(orderId, newPrice);
+      },
+      onOrderMoving: (orderId, newPrice) => {
+        this._chartApi.triggerOrderMoving(orderId, newPrice);
+      },
+      onOrderCancel: (orderId) => {
+        this._chartApi.triggerOrderCancel(orderId);
+      },
+      onPositionClose: (positionId) => {
+        this._chartApi.triggerPositionClose(positionId);
+      },
+      onPositionReverse: (positionId) => {
+        this._chartApi.triggerPositionReverse(positionId);
+      },
       onContextMenu: this._contextMenuCallback || undefined,
       onMouseDown: () => {
         this._eventEmitter.emit('mouse_down');
@@ -1626,7 +1580,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   /**
    * Schedule auto-save after the configured delay.
-   * Always fires when adapter is available — creates a new default layout
+   * Always fires when adapter is available — creates a new "tealstreet" layout
    * for fresh clients, or updates the existing layout.
    */
   private _scheduleAutoSave(): void {
@@ -1699,8 +1653,8 @@ export class TealchartWidget implements ITealchartWebWidget {
           });
       });
     } else {
-      // No layout yet — create a new default layout.
-      const layoutName = DEFAULT_LAYOUT_NAME;
+      // No layout yet — create a new one named "tealstreet"
+      const layoutName = 'tealstreet';
       import('./transformer').then(({ saveTealchartLayout }) => {
         saveTealchartLayout(settings, layoutName, this._options.save_load_adapter!)
           .then((chartId) => {
@@ -2145,7 +2099,6 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._isLoadingBars = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
-    this._clearQueuedLeftHistoryBackfill();
 
     // Update symbol if changed
     if (options.newSymbol !== undefined) {
@@ -2344,7 +2297,6 @@ export class TealchartWidget implements ITealchartWebWidget {
   remove(): void {
     // Mark as disposed to invalidate all in-flight async callbacks
     this._disposed = true;
-    this._clearQueuedLeftHistoryBackfill();
 
     // Unsubscribe from bars
     if (this._barSubscriptionGuid) {
@@ -3184,7 +3136,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   private _handleUserDrawingSelection(
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-    options: Pick<UserDrawingSelectionInputOptions, 'additive' | 'toggleSelected'> = {},
+    options: Pick<UserDrawingSelectionInputOptions, 'additive'> = {},
   ): UserDrawingSelectionAtPointResult {
     if (this._userDrawingState.activeTool !== 'select') {
       return { state: this._userDrawingState, hit: false, changed: false };
@@ -3198,7 +3150,6 @@ export class TealchartWidget implements ITealchartWebWidget {
       options: {
         additive: options.additive,
         hitTest: this._getUserDrawingHitTestOptions(),
-        toggleSelected: options.toggleSelected,
       },
       meta: { source: 'pointer' },
     });
@@ -3434,7 +3385,36 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Apply style overrides (TradingView-style dot-notation paths)
    */
   applyOverrides(overrides: ChartOverrides): void {
-    const newOptions = applyChartOverridesToRenderOptions(this._renderOptions, overrides);
+    // Map TradingView override paths to our render options
+    const newOptions: Partial<RenderOptions> = { ...this._renderOptions };
+
+    if (overrides['mainSeriesProperties.candleStyle.upColor']) {
+      newOptions.upColor = overrides['mainSeriesProperties.candleStyle.upColor'];
+    }
+    if (overrides['mainSeriesProperties.candleStyle.downColor']) {
+      newOptions.downColor = overrides['mainSeriesProperties.candleStyle.downColor'];
+    }
+    if (overrides['paneProperties.background']) {
+      newOptions.backgroundColor = overrides['paneProperties.background'];
+    }
+    if (overrides['paneProperties.vertGridProperties.color']) {
+      newOptions.gridColor = overrides['paneProperties.vertGridProperties.color'];
+    }
+    if (overrides['paneProperties.horzGridProperties.color']) {
+      newOptions.gridColor = overrides['paneProperties.horzGridProperties.color'];
+    }
+    if (overrides['scalesProperties.textColor']) {
+      newOptions.textColor = overrides['scalesProperties.textColor'];
+    }
+    if (overrides['paneProperties.crossHairProperties.color']) {
+      newOptions.crosshairColor = overrides['paneProperties.crossHairProperties.color'];
+    }
+    if (overrides['volumePaneProperties.showVolume'] !== undefined) {
+      newOptions.showVolume = overrides['volumePaneProperties.showVolume'];
+    }
+    if (overrides['volumePaneProperties.volumeHeight'] !== undefined) {
+      newOptions.volumeHeight = overrides['volumePaneProperties.volumeHeight'];
+    }
 
     this._renderOptions = newOptions;
 
@@ -3753,13 +3733,9 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Save chart to server
    * @stub Not yet implemented
    */
-  saveChartToServer(
-    _onComplete?: () => void,
-    onFail?: (error: SaveChartErrorInfo) => void,
-    _options?: SaveChartToServerOptions,
-  ): void {
+  saveChartToServer(_onComplete?: () => void, onFail?: () => void, _options?: { chartName?: string }): void {
     this._logger?.warn(LogCategory.Layout, 'Method not implemented: saveChartToServer');
-    onFail?.({ message: 'Method not implemented: saveChartToServer' });
+    onFail?.();
   }
 
   // ============================================================================
