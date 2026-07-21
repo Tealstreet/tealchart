@@ -26,7 +26,8 @@
     "test:compat": "vitest run tests/compat",
     "test-unit": "vitest run",
     "test-unit-watch": "vitest watch --ui",
-    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+    "typecheck": "node ../../scripts/tsc-ts6.mjs --project ./tsconfig.json --noEmit",
+    "typecheck:ts7": "node ../../scripts/tsc-ts7.mjs --project ./tsconfig.json --noEmit"
   },
   "dependencies": {
     "peggy": "^5.1.0"

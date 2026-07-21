@@ -24,8 +24,9 @@
     "test": "run-s test-unit",
     "test-unit": "vitest run",
     "test-unit-watch": "vitest watch --ui",
-    "typecheck": "tsc --project ./tsconfig.json --noEmit",
-    "typecheck:native": "tsc --project ./tsconfig.native.json --noEmit"
+    "typecheck": "node ../../scripts/tsc-ts6.mjs --project ./tsconfig.json --noEmit",
+    "typecheck:native": "node ../../scripts/tsc-ts6.mjs --project ./tsconfig.native.json --noEmit",
+    "typecheck:ts7": "node ../../scripts/tsc-ts7.mjs --project ./tsconfig.json --noEmit"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
