@@ -1,21 +1,20 @@
-import type { ChartTheme } from './theme';
-
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_SELL_CANDLE_COLOR,
-  DEFAULT_TRADE_LINE_BUY_COLOR,
-  DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
-  DEFAULT_TRADE_LINE_LABEL_FONT,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-  DEFAULT_TRADE_LINE_SELL_COLOR,
   POSITIVE_PNL_COLOR,
   TAKE_PROFIT_COLOR,
 } from './constants';
 import { clearChartStoreCache } from './state/chartState';
-import { chartThemeToRenderOptions, mergeChartThemeRenderOptions, resolveChartTheme } from './theme';
+import {
+  chartThemeToRenderOptions,
+  mergeChartThemeRenderOptions,
+  resolveChartTheme,
+  type ChartTheme,
+} from './theme';
 import { DEFAULT_RENDER_OPTIONS } from './types';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 
@@ -37,11 +36,7 @@ describe('chart theme helpers', () => {
     expect(resolveChartTheme('Light').renderOptions.upColor).toBe('#0f9d6b');
     expect(TAKE_PROFIT_COLOR).toBe(DEFAULT_BUY_CANDLE_COLOR);
     expect(POSITIVE_PNL_COLOR).toBe(DEFAULT_BUY_CANDLE_COLOR);
-    expect(DEFAULT_TRADE_LINE_BUY_COLOR).toBe('#0ba7da');
-    expect(DEFAULT_TRADE_LINE_SELL_COLOR).toBe('#fa6b67');
-    expect(DEFAULT_TRADE_LINE_COLOR).toBe(DEFAULT_TRADE_LINE_BUY_COLOR);
-    expect(DEFAULT_TRADE_LINE_LABEL_COLOR).toBe('rgba(32, 33, 42, 0.88)');
-    expect(DEFAULT_TRADE_LINE_LABEL_FONT).toBe('600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif');
+    expect(DEFAULT_TRADE_LINE_LABEL_COLOR).toBe('#338DE2');
     expect(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR).toBe('rgba(255, 255, 255, 0.16)');
     expect(
       buildLastTradePriceLine({

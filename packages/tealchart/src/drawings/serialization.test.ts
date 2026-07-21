@@ -3677,13 +3677,4 @@ describe('drawing layout serialization', () => {
     expect(isUserDrawingLayoutStateEqual(previous, next)).toBe(true);
     expect(isUserDrawingLayoutStateEqual(previous, { ...next, drawings: [] })).toBe(false);
   });
-
-  it('treats favorite toolbar position as persisted layout state', () => {
-    const positioned = createUserDrawingState({ favoriteToolbarPosition: { x: 20, y: 40 } });
-    const serialized = serializeUserDrawingStateForLayout(positioned);
-
-    expect(serialized?.favoriteToolbarPosition).toEqual({ x: 20, y: 40 });
-    expect(deserializeUserDrawingStateFromLayout(serialized)?.favoriteToolbarPosition).toEqual({ x: 20, y: 40 });
-    expect(isUserDrawingLayoutStateEqual(createUserDrawingState(), positioned)).toBe(false);
-  });
 });

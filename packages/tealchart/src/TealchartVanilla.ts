@@ -171,8 +171,6 @@ export interface SimpleChartOptions {
   chartKey?: string;
   /** Show top bar */
   showTopBar?: boolean;
-  /** Callback when the symbol control is clicked */
-  onSymbolClick?: () => void;
   /** Chart margins */
   margins?: Partial<ChartMargins>;
   /** Render options */
@@ -239,7 +237,6 @@ export class SimpleChart {
         chartKey: this._chartKey,
         symbol: this._symbol,
         exchangeName: options.exchangeName,
-        onSymbolClick: options.onSymbolClick,
         onIntervalChange: (interval) => {
           this._interval = interval;
           this._onIntervalChange?.(interval);

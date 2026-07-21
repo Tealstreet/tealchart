@@ -9,10 +9,7 @@
  * - Context menu (right-click and long-press)
  */
 
-import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type { Viewport } from '../types';
-
-import { clampViewportTimeRange } from '../viewport/timeRangeConstraints';
 
 // ============================================================================
 // Types
@@ -34,7 +31,7 @@ export interface EventManagerCallbacks {
   /** Called when an indicator pane Y range changes (for price axis zoom) */
   onPaneYRangeChange?: (paneId: string, yMin: number, yMax: number) => void;
   /** Called when more historical bars are needed */
-  onRequestMoreBars?: (direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint) => void;
+  onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Called when crosshair position updates */
   onCrossHairMoved?: (x: number, y: number, options?: DrawingInputEventOptions) => void;
   /** Called when crosshair visibility changes */
@@ -60,8 +57,6 @@ export interface EventManagerCallbacks {
     topMargin: number;
     leftMargin: number;
   };
-  /** Get the active bar interval in milliseconds */
-  getIntervalMs?: () => number;
   /** Get pane at Y position (for price-axis zoom) */
   getPaneAtY?: (y: number) => PaneInfo | null;
   /** Get divider at Y position (for pane resizing) */
@@ -85,19 +80,9 @@ export interface EventManagerCallbacks {
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string, point: { x: number; y: number }) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
-  onDrawingInput?: (
-    x: number,
-    y: number,
-    source: 'mouse' | 'touch',
-    options?: DrawingInputEventOptions,
-  ) => DrawingInputResult;
+  onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingInputEventOptions) => DrawingInputResult;
   /** Called before drag starts when drawing mode may need to preserve click input */
-  onDrawingDragPending?: (
-    x: number,
-    y: number,
-    source: 'mouse' | 'touch',
-    options?: DrawingDragEventOptions,
-  ) => boolean;
+  onDrawingDragPending?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called before pan starts so selected drawing edits can claim the drag */
   onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called while an active drawing edit drag moves */
@@ -178,9 +163,7 @@ function getPointerDrawingDragOptions(e: PointerEvent): DrawingDragEventOptions 
 }
 
 function invokeDrawingDragCallback(
-  callback:
-    | ((x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean)
-    | undefined,
+  callback: ((x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean) | undefined,
   x: number,
   y: number,
   source: 'mouse' | 'touch',
@@ -288,8 +271,7 @@ export class EventManager {
 
   // Touch tracking
   private activeTouches = new Map<number, { x: number; y: number }>();
-  private touchStart: { x: number; y: number; time: number; drawingDragOptions?: DrawingDragEventOptions } | null =
-    null;
+  private touchStart: { x: number; y: number; time: number; drawingDragOptions?: DrawingDragEventOptions } | null = null;
   private isTouchDragging = false;
   private touchCrosshairLocked = false;
   private touchCrosshairPosition = { x: 0, y: 0 };
@@ -379,14 +361,6 @@ export class EventManager {
     return this.state.isDragging;
   }
 
-  /**
-   * Cursor intent owned by the active gesture. While this returns a cursor,
-   * hover/crosshair layers must not override it.
-   */
-  getActiveCursor(): string | null {
-    return this.state.isDragging ? this.getActiveDragCursor() : null;
-  }
-
   private getActiveDragCursor(): string | null {
     switch (this.state.dragMode) {
       case 'pan':
@@ -407,62 +381,10 @@ export class EventManager {
     }
   }
 
-  private resolveCrosshairHitState(
-    x: number,
-    y: number,
-    dims = this.callbacks.getDimensions(),
-  ): {
-    isOverPriceAxis: boolean;
-    isOverPaneDivider: boolean;
-    inDeadZone: boolean;
-    shouldShowCrosshair: boolean;
-    divider: ReturnType<NonNullable<EventManagerCallbacks['getDividerAtY']>> | null;
-  } {
-    const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
-    const divider = this.callbacks.getDividerAtY?.(y) ?? null;
-    const isOverPaneDivider = divider !== null && divider !== undefined;
-    const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
-
-    return {
-      isOverPriceAxis,
-      isOverPaneDivider,
-      inDeadZone,
-      shouldShowCrosshair: !isOverPriceAxis && !isOverPaneDivider && !inDeadZone,
-      divider,
-    };
-  }
-
-  private updateCrosshairForMousePoint(x: number, y: number, options?: DrawingInputEventOptions): void {
-    const { shouldShowCrosshair } = this.resolveCrosshairHitState(x, y);
-    const wasVisible = this.crosshair.visible;
-
-    this.crosshair.visible = shouldShowCrosshair;
-    this.crosshair.x = x;
-    this.crosshair.y = y;
-
-    if (shouldShowCrosshair) {
-      this.callbacks.onCrossHairMoved?.(x, y, options);
-    }
-    if (wasVisible !== shouldShowCrosshair) {
-      this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
-    }
-  }
-
-  private updateCrosshairForPanDrag(x: number, y: number, options?: DrawingInputEventOptions): void {
-    const dims = this.callbacks.getDimensions();
-    const clampedX = Math.max(dims.leftMargin, Math.min(x, dims.width - dims.priceAxisWidth - 1));
-    const clampedY = Math.max(dims.topMargin, Math.min(y, dims.height - dims.timeAxisHeight));
-    const wasVisible = this.crosshair.visible;
-
-    this.crosshair.visible = true;
-    this.crosshair.x = clampedX;
-    this.crosshair.y = clampedY;
-
-    this.callbacks.onCrossHairMoved?.(clampedX, clampedY, options);
-    if (!wasVisible) {
-      this.callbacks.onCrossHairVisibilityChange?.(true);
-    }
-    this.callbacks.onCrosshairRender?.();
+  private hideCrosshairForDrag(): void {
+    if (!this.crosshair.visible) return;
+    this.crosshair.visible = false;
+    this.callbacks.onCrossHairVisibilityChange?.(false);
   }
 
   /**
@@ -567,10 +489,7 @@ export class EventManager {
     }
 
     const drawingDragOptions = getMouseDrawingDragOptions(e);
-    if (
-      e.button === 0 &&
-      invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', drawingDragOptions)
-    ) {
+    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', drawingDragOptions)) {
       this.state.isDragging = true;
       this.state.dragMode = 'pendingDrawing';
       this.state.dragStartX = x;
@@ -582,10 +501,7 @@ export class EventManager {
       return;
     }
 
-    if (
-      e.button === 0 &&
-      invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', drawingDragOptions)
-    ) {
+    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', drawingDragOptions)) {
       this.state.isDragging = true;
       this.state.dragMode = 'drawing';
       this.state.dragStartX = x;
@@ -629,6 +545,7 @@ export class EventManager {
 
     // Set cursor based on drag mode
     if (this.state.dragMode === 'pan') {
+      this.hideCrosshairForDrag();
       this.callbacks.onCursorChange?.('grabbing');
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.callbacks.onCursorChange?.('ns-resize');
@@ -752,25 +669,35 @@ export class EventManager {
     this.state.hoveredY = y;
 
     const dims = this.callbacks.getDimensions();
-    const crosshairHitState = this.resolveCrosshairHitState(x, y, dims);
-    this.state.isOverPriceAxis = crosshairHitState.isOverPriceAxis;
+    this.state.isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
     // Check for pane divider hover
-    this.state.isOverPaneDivider = crosshairHitState.isOverPaneDivider;
-    this.state.hoveredDividerIndex = crosshairHitState.divider?.dividerIndex ?? -1;
+    const divider = this.callbacks.getDividerAtY?.(y);
+    this.state.isOverPaneDivider = divider !== null && divider !== undefined;
+    this.state.hoveredDividerIndex = divider?.dividerIndex ?? -1;
     if (!this.state.isDragging) {
-      this.callbacks.onPaneDividerHover?.(crosshairHitState.divider);
+      this.callbacks.onPaneDividerHover?.(divider ?? null);
     }
 
+    // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
+    const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
     this.state.isOverInteractive =
-      !this.state.isOverPriceAxis &&
-      !this.state.isOverPaneDivider &&
-      !crosshairHitState.inDeadZone &&
-      !!this.callbacks.isOverInteractiveElement?.(x, y);
+      !this.state.isOverPriceAxis && !this.state.isOverPaneDivider && !inDeadZone && !!this.callbacks.isOverInteractiveElement?.(x, y);
 
     // Update crosshair - hide when over price axis, divider, or in dead zones
     if (!this.state.isDragging) {
-      this.updateCrosshairForMousePoint(x, y, { constrainedPlacement: this._pendingMouseShift });
+      const shouldShowCrosshair = !this.state.isOverPriceAxis && !this.state.isOverPaneDivider && !inDeadZone;
+      const wasVisible = this.crosshair.visible;
+      this.crosshair.visible = shouldShowCrosshair;
+      this.crosshair.x = x;
+      this.crosshair.y = y;
+      if (shouldShowCrosshair) {
+        this.callbacks.onCrossHairMoved?.(x, y, { constrainedPlacement: this._pendingMouseShift });
+      }
+      // Notify visibility change
+      if (wasVisible !== shouldShowCrosshair) {
+        this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
+      }
       // Re-assert cursor on every move. Konva/button handlers can set the cursor
       // directly, and relying only on state transitions can leave the container
       // stuck in pointer mode after an interaction completes.
@@ -797,7 +724,6 @@ export class EventManager {
     // Store coordinates and defer to RAF
     this._pendingMouseClientX = e.clientX;
     this._pendingMouseClientY = e.clientY;
-    this._pendingMouseShift = e.shiftKey;
     this._pendingMouseDrawingDragOptions = getMouseDrawingDragOptions(e);
     this._pendingEventType = 'drag';
     this.scheduleInputProcessing();
@@ -823,15 +749,7 @@ export class EventManager {
 
       const startOptions = this._pendingMouseDrawingDragStartOptions ?? this._pendingMouseDrawingDragOptions;
       const moveOptions = this._pendingMouseDrawingDragOptions;
-      if (
-        invokeDrawingDragCallback(
-          this.callbacks.onDrawingDragStart,
-          this.state.dragStartX,
-          this.state.dragStartY,
-          'mouse',
-          startOptions,
-        )
-      ) {
+      if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', startOptions)) {
         this.state.dragMode = 'drawing';
         this.applyActiveDragCursor();
         invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', moveOptions);
@@ -842,7 +760,13 @@ export class EventManager {
 
     if (this.state.dragMode === 'drawing') {
       this.applyActiveDragCursor();
-      invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', this._pendingMouseDrawingDragOptions);
+      invokeDrawingDragCallback(
+        this.callbacks.onDrawingDragMove,
+        x,
+        y,
+        'mouse',
+        this._pendingMouseDrawingDragOptions,
+      );
       this.scheduleRender();
       return;
     }
@@ -855,7 +779,6 @@ export class EventManager {
     if (this.state.dragMode === 'pan') {
       this.applyActiveDragCursor();
       this.handlePan(dx, dy);
-      this.updateCrosshairForPanDrag(x, y, { constrainedPlacement: this._pendingMouseShift });
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.applyActiveDragCursor();
       this.handlePriceAxisZoom(dy);
@@ -1258,28 +1181,15 @@ export class EventManager {
       const dims = this.callbacks.getDimensions();
       const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
-      const drawingDragPending = invokeDrawingDragCallback(
-        this.callbacks.onDrawingDragPending,
-        x,
-        y,
-        'touch',
-        drawingDragOptions,
-      );
+      const drawingDragPending = invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'touch', drawingDragOptions);
       const drawingDragStarted =
-        !drawingDragPending &&
-        invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'touch', drawingDragOptions);
+        !drawingDragPending && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'touch', drawingDragOptions);
 
       const viewport = this.callbacks.getViewport();
       this.state.dragStartX = x;
       this.state.dragStartY = y;
       this.state.dragStartViewport = { ...viewport };
-      this.state.dragMode = drawingDragPending
-        ? 'pendingDrawing'
-        : drawingDragStarted
-          ? 'drawing'
-          : isOverPriceAxis
-            ? 'priceAxisZoom'
-            : 'pan';
+      this.state.dragMode = drawingDragPending ? 'pendingDrawing' : drawingDragStarted ? 'drawing' : isOverPriceAxis ? 'priceAxisZoom' : 'pan';
       // Save crosshair position at touch start for tracking during drag
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
@@ -1314,11 +1224,7 @@ export class EventManager {
           }
         }, LONG_PRESS_DURATION);
       }
-    } else if (
-      e.touches.length === 2 &&
-      this.state.dragMode !== 'drawing' &&
-      this.state.dragMode !== 'pendingDrawing'
-    ) {
+    } else if (e.touches.length === 2 && this.state.dragMode !== 'drawing' && this.state.dragMode !== 'pendingDrawing') {
       // Two touches - prepare for pinch zoom
       this.clearLongPressTimer();
       const touch1 = e.touches[0];
@@ -1621,6 +1527,11 @@ export class EventManager {
     const newStartTime = this.state.dragStartViewport.startTime + timePanned;
     const newEndTime = this.state.dragStartViewport.endTime + timePanned;
 
+    // Request more bars if panning left (to earlier times)
+    if (newStartTime < this.state.dragStartViewport.startTime) {
+      this.callbacks.onRequestMoreBars?.('left');
+    }
+
     // Calculate price per pixel using the actual pane height (not full chart height)
     const { yMin: startYMin, yMax: startYMax } = this.state.dragStartPaneYRange;
     const priceRange = startYMax - startYMin;
@@ -1637,32 +1548,24 @@ export class EventManager {
     // external callback is only called at drag end
     const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
 
-    let nextViewport: Viewport;
     if (this.state.draggedPaneId === 'main' && !this.callbacks.isAutoScale?.('main')) {
       // Update viewport for main pane (horizontal + vertical)
       // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
-      nextViewport = {
+      updateViewport?.({
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
         priceMin: newPriceMin,
         priceMax: newPriceMax,
-      };
+      });
     } else {
       // For indicator panes (or main pane with auto-scale): only update time axis
-      nextViewport = {
+      updateViewport?.({
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
-      };
+      });
     }
-
-    // Request more bars for the viewport we are moving toward, not the previous committed viewport.
-    if (newStartTime < this.state.dragStartViewport.startTime) {
-      this.callbacks.onRequestMoreBars?.('left', { viewport: nextViewport });
-    }
-
-    updateViewport?.(nextViewport);
   }
 
   private handlePriceAxisZoom(dy: number): void {
@@ -1756,26 +1659,19 @@ export class EventManager {
     const newStartTime = viewport.startTime + timePanned;
     const newEndTime = viewport.endTime + timePanned;
 
-    const nextViewport = {
+    // Request more bars if panning left
+    if (timePanned < 0) {
+      this.callbacks.onRequestMoreBars?.('left');
+    }
+
+    return {
       ...viewport,
       startTime: newStartTime,
       endTime: newEndTime,
     };
-
-    // Request more bars if panning left
-    if (timePanned < 0) {
-      this.callbacks.onRequestMoreBars?.('left', { viewport: nextViewport });
-    }
-
-    return nextViewport;
   }
 
-  private zoomViewport(
-    viewport: Viewport,
-    factor: number,
-    width: number,
-    anchor: 'right' | 'center' = 'right',
-  ): Viewport {
+  private zoomViewport(viewport: Viewport, factor: number, _width: number, anchor: 'right' | 'center' = 'right'): Viewport {
     const newTimeRange = (viewport.endTime - viewport.startTime) * factor;
     // Wheel/momentum anchor on the far right edge (endTime fixed); pinch stays centered.
     let newStartTime: number;
@@ -1789,38 +1685,21 @@ export class EventManager {
       newStartTime = newEndTime - newTimeRange;
     }
 
-    const nextViewport = {
+    // Request more bars if zooming out left
+    if (newStartTime < viewport.startTime) {
+      this.callbacks.onRequestMoreBars?.('left');
+    }
+
+    return {
       ...viewport,
       startTime: newStartTime,
       endTime: newEndTime,
     };
-    const constrainedViewport = this.clampZoomTimeRange(nextViewport, width, anchor);
-
-    // Request more bars if zooming out left
-    if (constrainedViewport.startTime < viewport.startTime) {
-      this.callbacks.onRequestMoreBars?.('left', { viewport: constrainedViewport });
-    }
-
-    return constrainedViewport;
   }
 
   // ============================================================================
   // Private: Helpers
   // ============================================================================
-
-  private clampZoomTimeRange(viewport: Viewport, width: number, anchor: 'right' | 'center'): Viewport {
-    const intervalMs = this.callbacks.getIntervalMs?.();
-    if (!intervalMs) return viewport;
-
-    const dims = this.callbacks.getDimensions();
-    const plotWidth = Math.max(1, (width || dims.width) - dims.leftMargin - dims.priceAxisWidth);
-    return clampViewportTimeRange({
-      viewport,
-      intervalMs,
-      plotWidth,
-      anchor,
-    });
-  }
 
   private clearLongPressTimer(): void {
     if (this.longPressTimer) {

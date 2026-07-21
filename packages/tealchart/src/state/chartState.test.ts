@@ -1,38 +1,16 @@
-import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
-
-import { afterEach, describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   resolutionToMs,
   getResolutionLabel,
   getDecimalPlacesFromPrecision,
   formatPriceWithPrecision,
-  clearChartStoreCache,
-  DEFAULT_CHART_UI_PREFERENCES,
   DEFAULT_CHART_SETTINGS,
   AVAILABLE_TIMEFRAMES,
-  getChartStore,
+  type ChartSettings,
 } from './chartState';
 import type { ResolutionString } from '../types';
 
-function createMemoryStorage(initial: Record<string, string> = {}): TealchartKeyValueStorage & { values: Map<string, string> } {
-  const values = new Map(Object.entries(initial));
-  return {
-    values,
-    getItem: (key) => values.get(key) ?? null,
-    setItem: (key, value) => {
-      values.set(key, value);
-    },
-    removeItem: (key) => {
-      values.delete(key);
-    },
-  };
-}
-
 describe('chartState', () => {
-  afterEach(() => {
-    clearChartStoreCache();
-  });
-
   describe('resolutionToMs', () => {
     it('converts minute resolutions without suffix', () => {
       expect(resolutionToMs('1' as ResolutionString)).toBe(60 * 1000);
@@ -172,101 +150,6 @@ describe('chartState', () => {
         expect(tf.label).toBeTruthy();
         expect(tf.shortLabel).toBeTruthy();
       }
-    });
-  });
-
-  describe('chart UI preferences', () => {
-    it('defaults sidebar preferences for charts without storage', () => {
-      const chartStore = getChartStore('ui-default', { uiPreferencesStorage: null });
-
-      expect(chartStore.uiPreferences.get()).toEqual(DEFAULT_CHART_UI_PREFERENCES);
-    });
-
-    it('accepts platform-specific sidebar preference defaults', () => {
-      const chartStore = getChartStore('ui-native-default', {
-        uiPreferencesStorage: null,
-        defaultUiPreferences: { leftToolRailCollapsed: true },
-      });
-
-      expect(chartStore.uiPreferences.get()).toEqual({ leftToolRailCollapsed: true });
-    });
-
-    it('persists sidebar preferences through the supplied key/value storage', () => {
-      const storage = createMemoryStorage();
-      getChartStore('ui-persisted', { uiPreferencesStorage: storage }).uiPreferences.setKey(
-        'leftToolRailCollapsed',
-        true,
-      );
-
-      clearChartStoreCache();
-
-      expect(getChartStore('ui-persisted', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
-        leftToolRailCollapsed: true,
-      });
-    });
-
-    it('binds sidebar preference storage when a cached chart store receives storage later', () => {
-      const storage = createMemoryStorage({
-        'tealstreet:tealchart:ui-late-storage:ui-preferences': JSON.stringify({ leftToolRailCollapsed: true }),
-      });
-
-      expect(getChartStore('ui-late-storage', { uiPreferencesStorage: null }).uiPreferences.get()).toEqual(
-        DEFAULT_CHART_UI_PREFERENCES,
-      );
-
-      expect(getChartStore('ui-late-storage', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
-        leftToolRailCollapsed: true,
-      });
-    });
-
-    it('lets stored sidebar preferences override platform defaults', () => {
-      const storage = createMemoryStorage({
-        'tealstreet:tealchart:ui-native-stored-default:ui-preferences': JSON.stringify({ leftToolRailCollapsed: false }),
-      });
-
-      expect(
-        getChartStore('ui-native-stored-default', {
-          uiPreferencesStorage: storage,
-          defaultUiPreferences: { leftToolRailCollapsed: true },
-        }).uiPreferences.get(),
-      ).toEqual({ leftToolRailCollapsed: false });
-    });
-
-    it('does not let late storage overwrite sidebar preferences changed before storage was bound', () => {
-      const storage = createMemoryStorage({
-        'tealstreet:tealchart:ui-late-local-change:ui-preferences': JSON.stringify({
-          leftToolRailCollapsed: false,
-        }),
-      });
-      const chartStore = getChartStore('ui-late-local-change', { uiPreferencesStorage: null });
-
-      chartStore.uiPreferences.setKey('leftToolRailCollapsed', true);
-
-      expect(getChartStore('ui-late-local-change', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
-        leftToolRailCollapsed: true,
-      });
-      expect(storage.values.get('tealstreet:tealchart:ui-late-local-change:ui-preferences')).toBe(
-        JSON.stringify({ leftToolRailCollapsed: true }),
-      );
-    });
-
-    it('hydrates async sidebar preferences without immediately overwriting storage defaults', async () => {
-      const writes: string[] = [];
-      const storage: TealchartKeyValueStorage = {
-        getItem: async () => JSON.stringify({ leftToolRailCollapsed: true }),
-        setItem: async (_key, value) => {
-          writes.push(value);
-        },
-        removeItem: async () => undefined,
-      };
-
-      const chartStore = getChartStore('ui-async', { uiPreferencesStorage: storage });
-      expect(chartStore.uiPreferences.get()).toEqual(DEFAULT_CHART_UI_PREFERENCES);
-
-      await Promise.resolve();
-
-      expect(chartStore.uiPreferences.get()).toEqual({ leftToolRailCollapsed: true });
-      expect(writes).toEqual([]);
     });
   });
 });

@@ -10,7 +10,6 @@
 
 import type { LayoutMetadata } from '../transformer/saveLoadIntegration';
 
-import { DEFAULT_LAYOUT_NAME } from '../layoutDefaults';
 import { Modal } from './Modal';
 
 // ============================================================================
@@ -54,17 +53,6 @@ const selectorStyles = {
     maxWidth: '160px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-  } as Partial<CSSStyleDeclaration>,
-
-  buttonChevron: {
-    width: '0',
-    height: '0',
-    marginLeft: '5px',
-    borderLeft: '4px solid transparent',
-    borderRight: '4px solid transparent',
-    borderTop: '5px solid var(--text2, #787b86)',
-    pointerEvents: 'none',
-    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   listItem: {
@@ -355,11 +343,13 @@ export class LayoutSelector {
     this.buttonLabelEl = document.createElement('span');
     this.buttonLabelEl.style.overflow = 'hidden';
     this.buttonLabelEl.style.textOverflow = 'ellipsis';
-    this.buttonLabelEl.textContent = DEFAULT_LAYOUT_NAME;
+    this.buttonLabelEl.textContent = 'Default';
     this.buttonEl.appendChild(this.buttonLabelEl);
 
     const chevron = document.createElement('span');
-    Object.assign(chevron.style, selectorStyles.buttonChevron);
+    chevron.style.fontSize = '8px';
+    chevron.style.marginLeft = '2px';
+    chevron.textContent = '\u25BE';
     this.buttonEl.appendChild(chevron);
 
     this.buttonEl.addEventListener('mouseenter', () => {

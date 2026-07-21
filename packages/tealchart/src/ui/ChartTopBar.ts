@@ -16,7 +16,6 @@ import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
-import type { ChartChromeMetrics } from '../layout/chartGeometry';
 
 import {
   getUserDrawingAllDrawingsUpdateOptions,
@@ -41,7 +40,6 @@ import {
 import {
   computeLeftToolRailAvoidanceInset,
   computeTopLeftLegendRect,
-  resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
@@ -79,8 +77,6 @@ export interface ChartTopBarOptions extends ComponentOptions {
   exchangeName?: string;
   /** Callback when interval changes */
   onIntervalChange?: (interval: ResolutionString) => void;
-  /** Callback when the symbol control is clicked */
-  onSymbolClick?: () => void;
   /** Callback when indicators button is clicked */
   onIndicatorsClick?: () => void;
   /** Layout selector callbacks (if provided, layout selector is shown) */
@@ -165,13 +161,10 @@ const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
 const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
 const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
-const DRAWING_RAIL_ANIMATION_DURATION_MS = 160;
-const DRAWING_RAIL_COLLAPSE_TAB_WIDTH = 14;
-const DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH = 14;
-const DRAWING_RAIL_COLLAPSE_TAB_OVERHANG = 6;
 
-// The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); flyouts
-// cap their height to that content box so long lists don't overflow over the time axis.
+// The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); the
+// tool list and flyout cap their height to that content box so long lists don't
+// overflow into the padding / over the time axis.
 const LEFT_TOOL_RAIL_VERTICAL_PADDING = 8;
 
 const styles = {
@@ -201,36 +194,6 @@ const styles = {
     fontSize: '13px',
     flexShrink: '0',
     whiteSpace: 'nowrap',
-  } as Partial<CSSStyleDeclaration>,
-
-  symbolButton: {
-    display: 'flex',
-    alignItems: 'center',
-    border: 'none',
-    backgroundColor: 'transparent',
-    padding: '0',
-    margin: '0',
-    font: 'inherit',
-    cursor: 'pointer',
-    flexShrink: '0',
-    whiteSpace: 'nowrap',
-  } as Partial<CSSStyleDeclaration>,
-
-  symbolSection: {
-    display: 'flex',
-    alignItems: 'center',
-    flexShrink: '0',
-    whiteSpace: 'nowrap',
-  } as Partial<CSSStyleDeclaration>,
-
-  symbolCaret: {
-    width: '0',
-    height: '0',
-    marginLeft: '5px',
-    borderLeft: '4px solid transparent',
-    borderRight: '4px solid transparent',
-    borderTop: '5px solid var(--text2, #787b86)',
-    pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   exchange: {
@@ -319,7 +282,6 @@ const styles = {
     zIndex: '7',
     pointerEvents: 'auto',
     overflow: 'visible',
-    transition: `transform ${DRAWING_RAIL_ANIMATION_DURATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolRailList: {
@@ -327,11 +289,9 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '2px',
-    flexGrow: '1',
-    flexShrink: '1',
-    flexBasis: 'auto',
-    minHeight: '0',
-    width: '100%',
+    maxHeight: `calc(100vh - ${
+      TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
+    }px)`,
     overflowY: 'auto',
     overflowX: 'hidden',
     scrollbarWidth: 'none',
@@ -339,7 +299,6 @@ const styles = {
 
   drawingToolRailItem: {
     position: 'relative',
-    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingRailToggleGroup: {
@@ -348,7 +307,6 @@ const styles = {
     alignItems: 'center',
     gap: '2px',
     marginTop: '2px',
-    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingRailToggleDivider: {
@@ -356,28 +314,6 @@ const styles = {
     height: '1px',
     backgroundColor: 'var(--border, #2a2e39)',
     margin: '4px 0',
-  } as Partial<CSSStyleDeclaration>,
-
-  drawingRailCollapseTab: {
-    position: 'absolute',
-    right: `-${DRAWING_RAIL_COLLAPSE_TAB_OVERHANG}px`,
-    bottom: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: `${DRAWING_RAIL_COLLAPSE_TAB_WIDTH}px`,
-    height: '38px',
-    border: '1px solid var(--border, #2a2e39)',
-    borderLeft: 'none',
-    borderTopRightRadius: '10px',
-    borderBottomRightRadius: '10px',
-    backgroundColor: 'var(--text, #d1d4dc)',
-    color: 'var(--bg, #131722)',
-    cursor: 'pointer',
-    padding: '0',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.18)',
-    zIndex: '3',
-    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolCategoryButton: {
@@ -395,7 +331,6 @@ const styles = {
     fontWeight: '600',
     padding: '0',
     transition: 'background-color 0.15s, color 0.15s',
-    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   // Right-edge flyout-menu button (revealed on hover); click opens the category menu.
@@ -715,12 +650,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private layoutSelector: LayoutSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
-  private drawingToolRailAnimationFrame: number | null = null;
-  private drawingToolRailAnimationDirection: 'collapse' | 'expand' | null = null;
   private drawingRailTooltipEl: HTMLElement | null = null;
   private drawingFavoritesBarEl: HTMLElement | null = null;
   private drawingFavoritesBarCleanup: Array<() => void> = [];
-  private uiPreferencesUnsubscribe: (() => void) | null = null;
   private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
   private selectedActionSurfaceEl: HTMLElement | null = null;
@@ -743,7 +675,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     // Apply container styles
     Object.assign(this.el.style, styles.container);
-    this.applyContainerLayout();
 
     // Apply CSS vars if provided
     if (options.cssVars) {
@@ -760,16 +691,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     // The interval is pushed by the widget via setInterval(). Subscribing to the
     // shared store would cause cross-widget contamination when multiple widgets
     // share the same chartKey.
-    this.uiPreferencesUnsubscribe = this.chartStore.uiPreferences.listen(() => {
-      this.pinnedDrawingToolCategoryId = null;
-      this.render();
-    });
     this.render();
   }
 
   protected onUnmount(): void {
-    this.uiPreferencesUnsubscribe?.();
-    this.uiPreferencesUnsubscribe = null;
     this.removeDrawingToolRail();
     this.removeDrawingFavoritesBar();
     this.removeSelectedActionSurface();
@@ -787,21 +712,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeDrawingFavoritesBar();
     this.removeSelectedActionSurface();
     this.timeframeButtons.clear();
-    this.applyContainerLayout();
 
     // Symbol section
-    const hasSymbolClick = typeof this.options.onSymbolClick === 'function';
-    const symbolSection = this.createElement(hasSymbolClick ? 'button' : 'div', {
-      style: hasSymbolClick ? styles.symbolButton : styles.symbolSection,
+    const symbolSection = this.createElement('div', {
+      style: { flexShrink: '0', whiteSpace: 'nowrap' },
     });
-    if (hasSymbolClick) {
-      (symbolSection as HTMLButtonElement).type = 'button';
-      symbolSection.setAttribute('aria-label', 'Change symbol');
-      symbolSection.addEventListener('click', (event) => {
-        event.preventDefault();
-        this.options.onSymbolClick?.();
-      });
-    }
 
     const symbolSpan = this.createElement('span', {
       style: styles.symbol,
@@ -815,14 +730,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         textContent: this.options.exchangeName,
       });
       symbolSection.appendChild(exchangeSpan);
-    }
-
-    if (hasSymbolClick) {
-      symbolSection.appendChild(
-        this.createElement('span', {
-          style: styles.symbolCaret,
-        }),
-      );
     }
 
     this.el.appendChild(symbolSection);
@@ -926,31 +833,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
   }
 
-  private isDrawingToolRailCollapsed(): boolean {
-    return this.chartStore.uiPreferences.get().leftToolRailCollapsed;
-  }
-
-  private getLeftToolRailMetrics(): ChartChromeMetrics {
-    return resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, this.isDrawingToolRailCollapsed());
-  }
-
-  private applyContainerLayout(): void {
-    this.el.style.marginLeft = `${this.getLeftToolRailMetrics().leftToolRailWidth}px`;
-  }
-
-  private setDrawingToolRailCollapsed(collapsed: boolean): void {
-    if (collapsed === this.isDrawingToolRailCollapsed()) return;
-    this.pinnedDrawingToolCategoryId = null;
-    this.hideRailTooltip();
-    this.drawingToolRailAnimationDirection = collapsed ? 'collapse' : 'expand';
-    this.chartStore.uiPreferences.setKey('leftToolRailCollapsed', collapsed);
-  }
-
   private removeDrawingToolRail(): void {
-    if (this.drawingToolRailAnimationFrame !== null) {
-      window.cancelAnimationFrame(this.drawingToolRailAnimationFrame);
-      this.drawingToolRailAnimationFrame = null;
-    }
     for (const cleanup of this.drawingToolRailCleanup) {
       cleanup();
     }
@@ -959,30 +842,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.drawingToolRailEl = null;
     this.drawingRailTooltipEl?.remove();
     this.drawingRailTooltipEl = null;
-  }
-
-  private resolveDrawingToolRailCollapsedTransform(): string {
-    const distance = WEB_CHART_CHROME_METRICS.leftToolRailWidth - DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH;
-    return `translateX(-${distance}px)`;
-  }
-
-  private getDrawingToolRailInitialTransform(collapsed: boolean): string {
-    if (this.drawingToolRailAnimationDirection === 'collapse') return 'translateX(0px)';
-    if (this.drawingToolRailAnimationDirection === 'expand') return this.resolveDrawingToolRailCollapsedTransform();
-    return collapsed ? this.resolveDrawingToolRailCollapsedTransform() : 'translateX(0px)';
-  }
-
-  private animateDrawingToolRailToState(rail: HTMLElement, collapsed: boolean): void {
-    if (!this.drawingToolRailAnimationDirection) return;
-    this.drawingToolRailAnimationDirection = null;
-    rail.style.willChange = 'transform';
-    this.drawingToolRailAnimationFrame = window.requestAnimationFrame(() => {
-      rail.style.transform = collapsed ? this.resolveDrawingToolRailCollapsedTransform() : 'translateX(0px)';
-      this.drawingToolRailAnimationFrame = null;
-      window.setTimeout(() => {
-        if (this.drawingToolRailEl === rail) rail.style.willChange = '';
-      }, DRAWING_RAIL_ANIMATION_DURATION_MS);
-    });
   }
 
   private showRailTooltip(anchor: HTMLElement, label: string): void {
@@ -1231,8 +1090,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const viewportHeight = parentRect.height || window.innerHeight;
     const barWidth = bar.offsetWidth || 0;
     const barHeight = bar.offsetHeight || 0;
-    const railMetrics = this.getLeftToolRailMetrics();
-    const defaultLeft = railMetrics.leftToolRailInset + railMetrics.leftToolRailWidth + 16;
+    const defaultLeft =
+      WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 16;
     const defaultTop = WEB_CHART_CHROME_METRICS.topBarHeight + 38;
     const maxLeft = Math.max(0, viewportWidth - barWidth - 8);
     const maxTop = Math.max(0, viewportHeight - barHeight - 8);
@@ -1393,9 +1252,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       width: parentRect.width || window.innerWidth,
       height: parentRect.height || window.innerHeight,
     };
-    const railMetrics = this.getLeftToolRailMetrics();
     const legendRect = computeTopLeftLegendRect(
-      railMetrics,
+      WEB_CHART_CHROME_METRICS,
       { x: 0, y: 0, width: viewport.width, height: viewport.height },
       0,
       // The rail runs full height, so the legend clears it — match that in the avoid-rect.
@@ -1410,7 +1268,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       },
       inset: {
         left: computeLeftToolRailAvoidanceInset(
-          railMetrics,
+          WEB_CHART_CHROME_METRICS,
           viewport.width,
           SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
         ),
@@ -1589,64 +1447,14 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
   }
 
-  private createDrawingRailCollapseButton(collapsed: boolean): HTMLButtonElement {
-    const label = collapsed ? 'Expand drawing toolbar' : 'Collapse drawing toolbar';
-    const btn = this.createElement('button', {
-      style: styles.drawingRailCollapseTab,
-      attributes: {
-        type: 'button',
-        title: label,
-        'aria-label': label,
-        'aria-pressed': collapsed ? 'true' : 'false',
-      },
-    });
-    this.setDrawingIconContent(btn, collapsed ? 'arrowMarkRight' : 'arrowMarkLeft', collapsed ? '>' : '<', 12);
-    btn.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      this.setDrawingToolRailCollapsed(!collapsed);
-    });
-    btn.addEventListener('mouseenter', () => {
-      btn.style.filter = 'brightness(1.08)';
-      this.showRailTooltip(btn, label);
-    });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.filter = '';
-      this.hideRailTooltip();
-    });
-    return btn;
-  }
-
   private renderDrawingToolRail(activeTool: UserDrawingTool): void {
     const drawingState = this.options.userDrawingState;
-    const collapsed = this.isDrawingToolRailCollapsed();
-    const railVisualWidth = WEB_CHART_CHROME_METRICS.leftToolRailWidth;
     const rail = this.createElement('div', {
-      style: {
-        ...styles.drawingToolRail,
-        transform: this.getDrawingToolRailInitialTransform(collapsed),
-        width: `${railVisualWidth}px`,
-      },
+      style: styles.drawingToolRail,
       attributes: {
         'aria-label': 'Drawing tool categories',
-        'aria-expanded': collapsed ? 'false' : 'true',
       },
     });
-    rail.appendChild(this.createDrawingRailCollapseButton(collapsed));
-
-    this.drawingToolRailEl = rail;
-    const overlayParent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
-    overlayParent.appendChild(rail);
-
-    const tooltip = this.createElement('div', { style: styles.drawingToolTooltip });
-    this.drawingRailTooltipEl = tooltip;
-    overlayParent.appendChild(tooltip);
-    this.animateDrawingToolRailToState(rail, collapsed);
-
-    if (collapsed) {
-      return;
-    }
-
     const railList = this.createElement('div', {
       style: styles.drawingToolRailList,
       attributes: {
@@ -1720,10 +1528,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         20,
       );
       const flyout = this.createElement('div', {
-        style: {
-          ...styles.drawingToolFlyout,
-          left: `${railVisualWidth}px`,
-        },
+        style: styles.drawingToolFlyout,
         attributes: {
           id: flyoutId,
           role: 'menu',
@@ -1784,11 +1589,19 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         if (flyout.style.display === 'block' && this.pinnedDrawingToolCategoryId !== category.id) hideFlyout();
         else showFlyout();
       };
+      const isMultiTool = category.tools.length > 1;
       categoryButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        toggleFlyout();
+        // TradingView model: a click (re)activates the category's last-used tool.
+        // A second click on the already-active category reveals the menu instead.
+        if (isMultiTool && activeCategory) {
+          toggleFlyout();
+          return;
+        }
+        closeActiveFlyout();
+        this.recentDrawingToolsByCategory[category.id] = categoryTool;
+        this.options.onUserDrawingToolSelect?.(categoryTool);
       });
-      const isMultiTool = category.tools.length > 1;
       const caret = isMultiTool
         ? this.createElement('button', {
             style: styles.drawingToolCategoryCaret,
@@ -1886,6 +1699,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     rail.appendChild(railList);
     this.renderDrawingRailToggles(rail, drawingState);
+    this.drawingToolRailEl = rail;
+    const overlayParent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
+    overlayParent.appendChild(rail);
+
+    const tooltip = this.createElement('div', { style: styles.drawingToolTooltip });
+    this.drawingRailTooltipEl = tooltip;
+    overlayParent.appendChild(tooltip);
 
     const closeOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
       const target = event.target;

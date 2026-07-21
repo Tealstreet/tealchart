@@ -67,8 +67,8 @@ The two platforms share:
 Platform-specific rendering:
 
 - **Web**: `ui/ChartCore.ts` (canvas + Konva), `interaction/EventManager.ts`.
-- **Mobile**: `src/SkiaTealchart.tsx` plus passive `src/mobile/render/*`
-  and `src/mobile/utils/*` helpers.
+- **Mobile**: `mobile/SkiaTealchart.tsx`, `mobile/components/*` (RN),
+  `mobile/hooks/useChartGestures.ts`.
 
 If a feature is genuinely web-only or mobile-only (e.g. keyboard
 shortcuts, native haptics), say so explicitly in the PR description.
@@ -81,20 +81,6 @@ Tealchart's widget interfaces mirror TradingView's. Be careful to:
   charting library. Re-declare the interfaces from scratch.
 - Document any deliberate divergence from TradingView's behavior so
   consumers know what to expect when porting.
-
-## Async OEMS actions
-
-Chart trading interactions call consumer callbacks through an awaited
-contract. The chart may set optimistic hold state before invoking the callback,
-then it must flush that state when the callback resolves, returns `false`, or
-throws.
-
-Consumer adapters must return the promise for confirmation dialogs, network
-submits, and nested flows. Do not fire-and-forget chart callbacks. Existing
-order or bracket amends can wait for account-line confirmation after the
-callback resolves; externally-created objects such as a new TP/SL bracket
-settle on callback completion because the resulting order may appear under a
-different chart object.
 
 ## Code style
 

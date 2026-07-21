@@ -159,7 +159,6 @@ export function TouchableWithoutFeedback({ children, onPress }: TouchableWithout
 
 export const StyleSheet = {
   create: <T,>(styles: T): T => styles,
-  hairlineWidth: 1,
 };
 
 export const Platform = {

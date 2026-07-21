@@ -1,34 +1,29 @@
-import { View } from 'react-native';
+import type { ReactNode } from 'react';
+
+import React from 'react';
+
 import { vi } from 'vitest';
 
-export function useDerivedValue<T>(factory: () => T) {
-  return Object.defineProperty({}, 'value', {
-    enumerable: true,
-    get: factory,
-  }) as { readonly value: T };
+function serializeStyle(style: unknown): string | undefined {
+  if (style === undefined) return undefined;
+  return JSON.stringify(style);
 }
 
-export function useSharedValue<T>(value: T) {
-  return { value };
+function AnimatedView({ children, style, ...props }: { children?: ReactNode; style?: unknown }) {
+  return (
+    <div data-style={serializeStyle(style)} {...props}>
+      {children}
+    </div>
+  );
 }
 
-export function useAnimatedStyle<T>(factory: () => T) {
-  return factory();
-}
-
-export function useAnimatedReaction<T>(prepare: () => T, react: (prepared: T, previous: T | null) => void) {
-  react(prepare(), null);
-}
-
-export function withTiming<T>(value: T) {
-  return value;
-}
-
-export const Easing = {
-  cubic: (value: number) => value * value * value,
-  out: (easing: (value: number) => number) => easing,
+const Animated = {
+  View: AnimatedView,
 };
 
-export const useFrameCallback = vi.fn();
-
-export default { View };
+export default Animated;
+export const runOnJS = vi.fn((fn: (...args: unknown[]) => unknown) => fn);
+export const useAnimatedStyle = vi.fn(() => ({}));
+export const useSharedValue = vi.fn((value: unknown) => ({ value }));
+export const withSpring = vi.fn((value: unknown) => value);
+export const withTiming = vi.fn((value: unknown) => value);

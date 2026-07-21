@@ -1,15 +1,10 @@
-import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput } from '@tealstreet/tealscript';
 import type { ComputedPane } from '../types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
-import {
-  hasMainRoutedTealScriptDrawings,
-  hasPaneRoutedTealScriptDrawings,
-  resolveMainOverlayContentPresence,
-  routeTealScriptDrawings,
-} from './TealScriptDrawingPaneRouting';
+import { routeTealScriptDrawings } from './TealScriptDrawingPaneRouting';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -78,32 +73,6 @@ function label(overrides: Partial<Extract<DrawingOutput, { type: 'label' }>> = {
   };
 }
 
-function hlinePlot(overrides: Partial<PlotOutput> = {}): PlotOutput {
-  return {
-    type: 'hline',
-    id: 'hline-1',
-    scriptId: 'overlay-script',
-    price: 120,
-    color: '#2962FF',
-    linewidth: 1,
-    linestyle: 'solid',
-    ...overrides,
-  } as PlotOutput;
-}
-
-function linePlot(overrides: Partial<PlotOutput> = {}): PlotOutput {
-  return {
-    type: 'plot',
-    id: 'plot-1',
-    scriptId: 'overlay-script',
-    values: [1, 2, 3],
-    color: '#2962FF',
-    linewidth: 1,
-    style: 'line',
-    ...overrides,
-  } as PlotOutput;
-}
-
 describe('routeTealScriptDrawings', () => {
   it('routes drawings without a matching indicator pane to the main pane', () => {
     const drawing = label({ scriptId: 'overlay-script' });
@@ -148,74 +117,5 @@ describe('routeTealScriptDrawings', () => {
     const routed = routeTealScriptDrawings([first, second], [mainPane, indicatorPane]);
 
     expect(routed.byPaneId.get('pane_1')).toEqual([first, second]);
-  });
-});
-
-describe('routed TealScript drawing presence', () => {
-  it('reports main and pane drawing ownership independently', () => {
-    const mainDrawing = label({ forceOverlay: true, id: 'main-label' });
-    const paneDrawing = line({ id: 'pane-line' });
-
-    const routed = routeTealScriptDrawings([mainDrawing, paneDrawing], [mainPane, indicatorPane]);
-
-    expect(hasMainRoutedTealScriptDrawings(routed)).toBe(true);
-    expect(hasPaneRoutedTealScriptDrawings(routed, 'pane_1')).toBe(true);
-    expect(hasPaneRoutedTealScriptDrawings(routed, 'pane_2')).toBe(false);
-  });
-
-  it('keeps indicator-pane drawings from disabling main drawing-free panes', () => {
-    const routed = routeTealScriptDrawings([line()], [mainPane, indicatorPane]);
-
-    expect(hasMainRoutedTealScriptDrawings(routed)).toBe(false);
-    expect(hasPaneRoutedTealScriptDrawings(routed, 'pane_1')).toBe(true);
-  });
-});
-
-describe('resolveMainOverlayContentPresence', () => {
-  it('detects price-domain and time-domain overlay plot pass ownership separately', () => {
-    const presence = resolveMainOverlayContentPresence({
-      plots: [hlinePlot(), linePlot()],
-      indicatorPaneInfo: {
-        'overlay-script': { overlay: true },
-      },
-      panes: [mainPane, indicatorPane],
-    });
-
-    expect(presence).toEqual({
-      hasMainPriceOverlayContent: true,
-      hasMainOverlayContent: true,
-    });
-  });
-
-  it('ignores non-overlay indicator drawings and plots for main overlay passes', () => {
-    const presence = resolveMainOverlayContentPresence({
-      plots: [linePlot({ scriptId: 'script-rsi' })],
-      indicatorPaneInfo: {
-        'script-rsi': { overlay: false },
-      },
-      drawings: [label()],
-      panes: [mainPane, indicatorPane],
-    });
-
-    expect(presence).toEqual({
-      hasMainPriceOverlayContent: false,
-      hasMainOverlayContent: false,
-    });
-  });
-
-  it('detects forced-main drawings and execution markers as main overlay content', () => {
-    expect(
-      resolveMainOverlayContentPresence({
-        drawings: [label({ forceOverlay: true })],
-        panes: [mainPane, indicatorPane],
-      }).hasMainOverlayContent,
-    ).toBe(true);
-
-    expect(
-      resolveMainOverlayContentPresence({
-        panes: [mainPane, indicatorPane],
-        executionLines: [{}],
-      }).hasMainOverlayContent,
-    ).toBe(true);
   });
 });

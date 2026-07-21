@@ -7,10 +7,9 @@
 
 import type { ChartSettings } from '../state/chartState';
 import type { TransformResult, TvChartData } from './types';
-
-import { fromTvFormat } from './fromTvFormat';
-import { CURRENT_VERSION, migrateSettings } from './migrations';
 import { toTvFormat } from './toTvFormat';
+import { fromTvFormat } from './fromTvFormat';
+import { migrateSettings, CURRENT_VERSION } from './migrations';
 
 // ============================================================================
 // Types
@@ -52,7 +51,7 @@ export interface LayoutMetadata {
 export async function saveTealchartLayout(
   settings: ChartSettings,
   layoutName: string,
-  adapter: ISaveLoadAdapter,
+  adapter: ISaveLoadAdapter
 ): Promise<string> {
   // Transform to TV format
   const tvData = toTvFormat(settings, layoutName);
@@ -75,7 +74,7 @@ export async function updateTealchartLayout(
   chartId: string,
   settings: ChartSettings,
   layoutName: string,
-  adapter: ISaveLoadAdapter,
+  adapter: ISaveLoadAdapter
 ): Promise<string> {
   // Transform to TV format with existing ID
   const tvData = toTvFormat(settings, layoutName);
@@ -98,12 +97,13 @@ export async function updateTealchartLayout(
  */
 export async function loadAsTealchart(
   chartId: string | number,
-  adapter: ISaveLoadAdapter,
+  adapter: ISaveLoadAdapter
 ): Promise<TransformResult<ChartSettings>> {
   // Get content from adapter
   const content = await adapter.getChartContent(chartId);
 
   if (!content) {
+    console.warn('[loadAsTealchart] Layout not found or empty');
     return {
       data: getEmptySettings(),
       warnings: ['Layout not found or empty'],
@@ -125,7 +125,10 @@ export async function loadAsTealchart(
  * @param chartId - Chart ID to check
  * @param adapter - SaveLoadAdapter instance
  */
-export async function isTealchartLayout(chartId: string | number, adapter: ISaveLoadAdapter): Promise<boolean> {
+export async function isTealchartLayout(
+  chartId: string | number,
+  adapter: ISaveLoadAdapter
+): Promise<boolean> {
   try {
     const content = await adapter.getChartContent(chartId);
     if (!content) return false;
@@ -147,7 +150,9 @@ export async function isTealchartLayout(chartId: string | number, adapter: ISave
  * @param adapter - SaveLoadAdapter instance
  * @returns Array of layout metadata
  */
-export async function getAllLayouts(adapter: ISaveLoadAdapter): Promise<LayoutMetadata[]> {
+export async function getAllLayouts(
+  adapter: ISaveLoadAdapter
+): Promise<LayoutMetadata[]> {
   const charts = await adapter.getAllCharts();
 
   const layouts: LayoutMetadata[] = [];
@@ -178,7 +183,10 @@ export async function getAllLayouts(adapter: ISaveLoadAdapter): Promise<LayoutMe
  * @param chartId - Chart ID to delete
  * @param adapter - SaveLoadAdapter instance
  */
-export async function deleteLayout(chartId: string | number, adapter: ISaveLoadAdapter): Promise<void> {
+export async function deleteLayout(
+  chartId: string | number,
+  adapter: ISaveLoadAdapter
+): Promise<void> {
   await adapter.removeChart(chartId);
 }
 
@@ -213,7 +221,7 @@ function getEmptySettings(): ChartSettings {
 export async function migrateFromLocalStorage(
   localStorageKey: string,
   layoutName: string,
-  adapter: ISaveLoadAdapter,
+  adapter: ISaveLoadAdapter
 ): Promise<{ migrated: boolean; chartId?: string }> {
   if (typeof window === 'undefined') {
     return { migrated: false };
@@ -244,6 +252,7 @@ export async function migrateFromLocalStorage(
 
     return { migrated: true, chartId };
   } catch (e) {
+    console.warn('Failed to migrate localStorage chart settings:', e);
     return { migrated: false };
   }
 }

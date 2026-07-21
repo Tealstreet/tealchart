@@ -2540,20 +2540,6 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(vp.startTime).toBe(1000000);
       expect(vp.priceMin).toBeLessThanOrEqual(90);
       expect(vp.priceMax).toBeGreaterThanOrEqual(110);
-      // Right padding is proportional to the time range, so one bar used to
-      // land endTime exactly on startTime. Downstream viewport asserts throw on
-      // that, and the unguarded chart-pan gesture turns the throw into a
-      // process abort.
-      expect(vp.endTime).toBeGreaterThan(vp.startTime);
-    });
-
-    it('keeps a non-zero time span when every bar shares a timestamp', () => {
-      const bars = [
-        { time: 1786100400000, open: 100, high: 110, low: 90, close: 105, volume: 50 },
-        { time: 1786100400000, open: 105, high: 112, low: 95, close: 108, volume: 40 },
-      ];
-      const vp = TealchartRenderer.calculateViewport(bars);
-      expect(vp.endTime).toBeGreaterThan(vp.startTime);
     });
 
     it('calculates viewport from multiple bars', () => {

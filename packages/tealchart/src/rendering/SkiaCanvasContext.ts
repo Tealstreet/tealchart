@@ -185,6 +185,7 @@ function parseColor(color: string): Float32Array {
   if (named) return new Float32Array(named);
 
   // Default to black
+  console.warn(`[SkiaCanvasContext] Unknown color: ${color}, defaulting to black`);
   return new Float32Array([0, 0, 0, 1]);
 }
 
@@ -196,20 +197,21 @@ function parseFontSize(font: string): number {
   return match ? parseFloat(match[1]) : 12;
 }
 
-function resolveTextX(x: number, width: number, align: CanvasTextAlign): number {
-  if (align === 'center') return x - width / 2;
-  if (align === 'right' || align === 'end') return x - width;
-  return x;
-}
-
-function resolveTextY(y: number, size: number, baseline: CanvasTextBaseline): number {
-  if (baseline === 'top' || baseline === 'hanging') return y + size * 0.8;
-  if (baseline === 'middle') return y + size * 0.3;
-  if (baseline === 'bottom' || baseline === 'ideographic') return y - size * 0.2;
-  return y;
+// Text item for collection (rendered by React Native, not Skia)
+export interface CollectedTextItem {
+  text: string;
+  x: number;
+  y: number;
+  color: string;
+  fontSize: number;
+  textAlign: CanvasTextAlign;
+  textBaseline: CanvasTextBaseline;
 }
 
 export class SkiaCanvasContext implements CanvasContext {
+  private static _fontWarningLogged = false;
+  private static _fillTextLogCount = 0;
+
   private canvas: SkCanvas;
   private skia: SkiaApi;
   private currentPath: SkPath;
@@ -219,6 +221,8 @@ export class SkiaCanvasContext implements CanvasContext {
   private skiaFont: SkFont | null = null;
   private stateStack: ContextState[] = [];
 
+  // Collect text items for React Native rendering
+  private _collectedText: CollectedTextItem[] = [];
   private _lineDash: number[] = [];
 
   // Public state properties
@@ -355,14 +359,6 @@ export class SkiaCanvasContext implements CanvasContext {
     }
   }
 
-  private applyTextStyle(): void {
-    const color = typeof this.fillStyle === 'string' ? this.fillStyle : '#000000';
-    const parsedColor = parseColor(color);
-    const finalAlpha = parsedColor[3] * this.globalAlpha;
-    this.textPaint.setColor(parsedColor);
-    this.textPaint.setAlphaf(finalAlpha);
-  }
-
   fill(): void {
     this.applyFillStyle();
     this.canvas.drawPath(this.currentPath, this.fillPaint);
@@ -386,17 +382,29 @@ export class SkiaCanvasContext implements CanvasContext {
   }
 
   fillText(text: string, x: number, y: number): void {
-    if (!this.skiaFont) {
-      return;
-    }
-
-    this.applyTextStyle();
+    // Collect text for React Native rendering instead of Skia
+    const color = typeof this.fillStyle === 'string' ? this.fillStyle : '#000000';
     const fontSize = parseFontSize(this.font);
-    this.skiaFont.setSize(fontSize);
-    const metrics = this.measureText(text);
-    const drawX = resolveTextX(x, metrics.width, this.textAlign);
-    const drawY = resolveTextY(y, fontSize, this.textBaseline);
-    this.canvas.drawText(text, drawX, drawY, this.textPaint, this.skiaFont);
+
+    this._collectedText.push({
+      text,
+      x,
+      y,
+      color,
+      fontSize,
+      textAlign: this.textAlign,
+      textBaseline: this.textBaseline,
+    });
+  }
+
+  // Get collected text items for React Native rendering
+  getCollectedText(): CollectedTextItem[] {
+    return this._collectedText;
+  }
+
+  // Clear collected text (call after rendering)
+  clearCollectedText(): void {
+    this._collectedText = [];
   }
 
   // ============================================================================

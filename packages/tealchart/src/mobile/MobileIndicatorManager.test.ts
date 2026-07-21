@@ -97,35 +97,6 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getIndicatorPaneInfo()[instanceId]).toBeUndefined();
   });
 
-  it('toggles custom Tealscript visibility without removing layout metadata', () => {
-    const manager = new MobileIndicatorManager();
-    manager.setBars(makeBars(2));
-
-    const instanceId = manager.addTealscriptIndicator({
-      id: 'toggle-study',
-      code: 'indicator("Toggle Study")\nplot(close)',
-    });
-
-    expect(manager.getPlots()).toHaveLength(1);
-
-    manager.setIndicatorVisibility(instanceId, false);
-
-    expect(manager.getPlots()).toHaveLength(0);
-    expect(manager.getIndicator(instanceId)).toBeDefined();
-    expect(manager.getLayoutIndicators()[0]).toMatchObject({
-      id: instanceId,
-      isVisible: false,
-    });
-
-    manager.toggleIndicatorVisibility(instanceId);
-
-    expect(manager.getPlots()).toHaveLength(1);
-    expect(manager.getLayoutIndicators()[0]).toMatchObject({
-      id: instanceId,
-      isVisible: true,
-    });
-  });
-
   it('returns an instance ID and reports parse errors for invalid Tealscript', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
@@ -198,50 +169,6 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getPlots()).toHaveLength(1);
     expect(manager.getPlots()[0].scriptId).toBe(secondId);
     expect(manager.getPlots()[0].values).toEqual([100, 101]);
-  });
-
-  it('auto-scales non-overlay indicator panes from computed plot values', () => {
-    const manager = new MobileIndicatorManager();
-    manager.setBars(makeBars(3));
-
-    const instanceId = manager.addTealscriptIndicator({
-      id: 'pane-study',
-      code: 'indicator("Pane Study")\nplot(close)',
-      overlay: false,
-    });
-
-    const indicatorPane = manager
-      .getUnifiedLayout()
-      .panes.find((pane) => pane.type === 'indicator' && pane.indicatorIds?.includes(instanceId));
-
-    expect(indicatorPane).toBeDefined();
-    expect(indicatorPane?.yMin).toBeLessThan(101);
-    expect(indicatorPane?.yMax).toBeGreaterThan(103);
-  });
-
-  it('exports built-in indicator metadata for layout persistence', () => {
-    const manager = new MobileIndicatorManager();
-
-    const instanceId = manager.addTealscriptIndicator({
-      id: 'study_1',
-      builtinId: 'sma',
-      code: 'indicator("SMA", overlay=true)\nplot(close)',
-      name: 'SMA',
-      overlay: true,
-      inputs: { length: 20 },
-    });
-
-    expect(manager.getLayoutIndicators()).toEqual([
-      {
-        id: instanceId,
-        name: 'SMA',
-        builtinId: 'sma',
-        inputs: { length: 20 },
-        styleOverrides: undefined,
-        isVisible: true,
-        createdAt: 0,
-      },
-    ]);
   });
 
   it('reports runtime errors once until the error changes', () => {

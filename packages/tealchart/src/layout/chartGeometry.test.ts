@@ -12,11 +12,8 @@ import {
   computeTopLeftLegendRect,
   insetRect,
   intersectsRect,
-  LEFT_TOOL_RAIL_COLLAPSED_WIDTH,
   MOBILE_CHART_CHROME_METRICS,
   rect,
-  resolveLeftToolRailMetrics,
-  resolveLeftToolRailWidth,
   WEB_CHART_CHROME_METRICS,
 } from './chartGeometry';
 
@@ -160,21 +157,9 @@ describe('chart geometry', () => {
 
   it('computes overlay insets that avoid the left drawing rail when space allows', () => {
     expect(computeLeftToolRailAvoidanceInset(WEB_CHART_CHROME_METRICS, 800, 304)).toBe(66);
-    expect(computeLeftToolRailAvoidanceInset(MOBILE_CHART_CHROME_METRICS, 800, 304)).toBe(60);
+    expect(computeLeftToolRailAvoidanceInset(MOBILE_CHART_CHROME_METRICS, 800, 304)).toBe(68);
     expect(computeLeftToolRailAvoidanceInset(WEB_CHART_CHROME_METRICS, 340, 304)).toBe(28);
-    expect(computeLeftToolRailAvoidanceInset(MOBILE_CHART_CHROME_METRICS, 300, 304)).toBe(0);
-  });
-
-  it('resolves expanded and collapsed left drawing rail widths from one helper', () => {
-    expect(resolveLeftToolRailWidth(WEB_CHART_CHROME_METRICS, false)).toBe(WEB_CHART_CHROME_METRICS.leftToolRailWidth);
-    expect(resolveLeftToolRailWidth(WEB_CHART_CHROME_METRICS, true)).toBe(LEFT_TOOL_RAIL_COLLAPSED_WIDTH);
-    expect(resolveLeftToolRailMetrics(MOBILE_CHART_CHROME_METRICS, true)).toEqual({
-      ...MOBILE_CHART_CHROME_METRICS,
-      leftToolRailWidth: LEFT_TOOL_RAIL_COLLAPSED_WIDTH,
-    });
-    expect(computeLeftToolRailAvoidanceInset(resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, true), 800, 304)).toBe(
-      WEB_CHART_CHROME_METRICS.leftToolRailInset + LEFT_TOOL_RAIL_COLLAPSED_WIDTH + 8,
-    );
+    expect(computeLeftToolRailAvoidanceInset(MOBILE_CHART_CHROME_METRICS, 300, 304)).toBe(8);
   });
 
   it('tracks optional top-left legend overlay metadata without reserving canvas space', () => {

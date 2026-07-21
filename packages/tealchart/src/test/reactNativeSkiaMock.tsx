@@ -1,27 +1,23 @@
 import type { ReactNode } from 'react';
 
 import React from 'react';
-
 import { vi } from 'vitest';
 
-function createPath(svg?: string) {
-  return {
-    addCircle: vi.fn(),
-    addOval: vi.fn(),
-    addPath: vi.fn(),
-    addRect: vi.fn(),
-    addRRect: vi.fn(),
-    arcToOval: vi.fn(),
-    close: vi.fn(),
-    cubicTo: vi.fn(),
-    lineTo: vi.fn(),
-    moveTo: vi.fn(),
-    quadTo: vi.fn(),
-    reset: vi.fn(),
-    rLineTo: vi.fn(),
-    svg,
-  };
-}
+const path = {
+  addCircle: vi.fn(),
+  addOval: vi.fn(),
+  addPath: vi.fn(),
+  addRect: vi.fn(),
+  addRRect: vi.fn(),
+  arcToOval: vi.fn(),
+  close: vi.fn(),
+  cubicTo: vi.fn(),
+  lineTo: vi.fn(),
+  moveTo: vi.fn(),
+  quadTo: vi.fn(),
+  reset: vi.fn(),
+  rLineTo: vi.fn(),
+};
 
 const font = {
   getSize: () => 12,
@@ -45,7 +41,6 @@ const canvas = {
   clipPath: vi.fn(),
   drawPath: vi.fn(),
   drawRect: vi.fn(),
-  drawText: vi.fn(),
   restore: vi.fn(),
   save: vi.fn(),
   scale: vi.fn(),
@@ -93,10 +88,7 @@ export const Skia = {
   FontMgr: { System: () => ({ matchFamilyStyle: vi.fn(() => null) }) },
   Paint: vi.fn(() => ({ ...paint })),
   PathEffect: { MakeDash: vi.fn((segments: number[], phase: number) => ({ phase, segments })) },
-  Path: {
-    Make: vi.fn(() => createPath()),
-    MakeFromSVGString: vi.fn((svg: string) => createPath(svg)),
-  },
+  Path: { Make: vi.fn(() => ({ ...path })) },
   RRectXY: vi.fn((rect: unknown, rx: number, ry: number) => ({ rect, rx, ry })),
   XYWHRect: vi.fn((x: number, y: number, width: number, height: number) => ({ x, y, width, height })),
 };
@@ -106,7 +98,6 @@ export const createPicture = vi.fn((callback?: (canvas: unknown) => void) => {
   return {};
 });
 
-export const matchFont = vi.fn(() => font);
 export const useFont = vi.fn(() => font);
 export const useImage = vi.fn(() => null);
 export const vec = vi.fn((x: number, y: number) => ({ x, y }));
