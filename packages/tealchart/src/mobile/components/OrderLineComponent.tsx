@@ -18,7 +18,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR, STOP_LOSS_COLOR } from '../../constants';
+import {
+  DEFAULT_BUY_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  STOP_LOSS_COLOR,
+} from '../../constants';
 import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
 import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import { safeToFixed } from '../../utils/safeNumber';
@@ -346,9 +351,9 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   }, [order.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
   const lineColor = order.lineColor;
   const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
+  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
+  const stopLossTextColor = order.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? order.textShort : order.text;

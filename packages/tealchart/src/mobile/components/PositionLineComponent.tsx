@@ -20,6 +20,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
   STOP_LOSS_COLOR,
 } from '../../constants';
@@ -296,9 +297,10 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   }, [position.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
   const lineColor = position.lineColor;
   const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
+  const takeProfitTextColor =
+    position.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
+  const stopLossTextColor = position.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? position.textShort : position.text;
@@ -318,7 +320,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   }, [position.profitState, positiveColor, negativeColor]);
   const pnlBackgroundColor = pnlStateColor ?? lineColor;
   const pnlBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
-  const pnlTextColor = position.bodyTextColor;
+  const pnlTextColor = pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : position.bodyTextColor;
 
   // Format price for display
   const formattedPrice = safeToFixed(position.price, pricePrecision);
