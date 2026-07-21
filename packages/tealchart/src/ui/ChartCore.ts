@@ -36,6 +36,7 @@ import Konva from 'konva';
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
   STOP_LOSS_COLOR,
 } from '../constants';
@@ -285,11 +286,10 @@ function orderLineToPriceLine(
     3: 'dashed',
     4: 'dotted',
   };
-  const lineColor = order.lineColor;
   const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
+  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
+  const stopLossTextColor = order.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   const chartLabel: ChartLineLabel = {
     offsetPercent: order.lineLength,
@@ -405,9 +405,9 @@ function positionLineToPriceLine(
   }
   const lineColor = position.lineColor;
   const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
+  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
+  const stopLossTextColor = position.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   const chartLabel: ChartLineLabel = {
     offsetPercent: position.lineLength,
@@ -440,7 +440,7 @@ function positionLineToPriceLine(
               text: position.pnl,
               textShort: position.pnlShort || undefined,
               backgroundColor: pnlStateColor ?? lineColor,
-              textColor: position.bodyTextColor,
+              textColor: pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : position.bodyTextColor,
               borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
             },
           ]
@@ -536,9 +536,9 @@ function tradingLineToBracketLines(
   if (!brackets) return bracketLines;
 
   const takeProfitColor = brackets.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = brackets.takeProfitTextColor ?? '#ffffff';
+  const takeProfitTextColor = brackets.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = brackets.stopLossTextColor ?? '#ffffff';
+  const stopLossTextColor = brackets.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
     bracketLines.push({

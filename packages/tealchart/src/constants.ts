@@ -20,6 +20,9 @@ export const DEFAULT_TRADE_LINE_LABEL_COLOR = '#338DE2';
 /** Default separator/border color between order/position line label segments. */
 export const DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR = 'rgba(255, 255, 255, 0.16)';
 
+/** Default dark text for filled positive/PnL and TP/SL segments. */
+export const DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR = '#1f2933';
+
 /** Visible dotted stroke pattern for explicit dotted trade lines. */
 export const TRADE_LINE_DOTTED_DASH_PATTERN = [1, 5];
 

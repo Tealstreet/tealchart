@@ -11,6 +11,7 @@ import type { Bar, Viewport } from '../types';
 import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../constants';
 import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
@@ -950,6 +951,22 @@ describe('ChartCore viewport management', () => {
     const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
     expect(manager.cachedLineGroups.has('order-1-tp')).toBe(true);
     expect(manager.cachedLineGroups.has('order-1-sl')).toBe(true);
+    const tpBound = manager.cachedLineGroups.get('order-1-tp')?.getAttr('boundData') as {
+      label?: { backgroundColor: string; textColor: string; secondaryText?: string };
+    };
+    const slBound = manager.cachedLineGroups.get('order-1-sl')?.getAttr('boundData') as {
+      label?: { backgroundColor: string; textColor: string; secondaryText?: string };
+    };
+    expect(tpBound.label).toMatchObject({
+      backgroundColor: '#00aa77',
+      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      secondaryText: 'TP',
+    });
+    expect(slBound.label).toMatchObject({
+      backgroundColor: '#f97316',
+      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      secondaryText: 'SL',
+    });
 
     core.dispose();
   });
@@ -1069,7 +1086,7 @@ describe('ChartCore viewport management', () => {
     expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
       backgroundColor: '#ee3355',
       borderColor: 'rgba(255, 255, 255, 0.16)',
-      textColor: '#ffffff',
+      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
       backgroundColor: '#2196F3',
@@ -1092,7 +1109,12 @@ describe('ChartCore viewport management', () => {
     expect(bound.chartLabel?.buttons?.find((button) => button.type === 'tp')).toMatchObject({
       backgroundColor: '#00aa77',
       borderColor: 'rgba(255, 255, 255, 0.16)',
-      iconColor: '#ffffff',
+      iconColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+    });
+    expect(bound.chartLabel?.buttons?.find((button) => button.type === 'sl')).toMatchObject({
+      backgroundColor: '#f97316',
+      borderColor: 'rgba(255, 255, 255, 0.16)',
+      iconColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(bound.chartLabel?.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     const refs = manager.cachedLineGroups.get('position-1')?.getAttr('contentRefs') as LineContentRefsProbe;
@@ -1108,7 +1130,7 @@ describe('ChartCore viewport management', () => {
 
     const positiveBound = manager.cachedLineGroups.get('position-2')?.getAttr('boundData') as {
       chartLabel?: {
-        segments: Array<{ text: string; backgroundColor: string; borderColor: string }>;
+        segments: Array<{ text: string; backgroundColor: string; borderColor: string; textColor: string }>;
       };
     };
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === 'Short')).toMatchObject({
@@ -1118,6 +1140,7 @@ describe('ChartCore viewport management', () => {
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
       backgroundColor: '#00aa77',
       borderColor: 'rgba(255, 255, 255, 0.16)',
+      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(core.getViewport()).not.toBeNull();
     core.dispose();

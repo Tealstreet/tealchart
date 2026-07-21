@@ -5,7 +5,11 @@ import type { PaneOffset } from './rendering/PaneManager';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
-import { DEFAULT_SELL_CANDLE_COLOR, TRADE_LINE_DOTTED_DASH_PATTERN } from './constants';
+import {
+  DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  TRADE_LINE_DOTTED_DASH_PATTERN,
+} from './constants';
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
@@ -1291,7 +1295,7 @@ export class TealchartRenderer {
         pnlStateColor ?? line.lineColor,
         line.bodyBorderColor,
         pnl,
-        line.bodyTextColor,
+        pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : line.bodyTextColor,
       );
       currentX += pnlWidth + 2;
     }
