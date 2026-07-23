@@ -8,7 +8,9 @@ import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
+  DEFAULT_TRADE_LINE_LABEL_FONT,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  DEFAULT_TRADE_LINE_SELL_COLOR,
 } from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
@@ -120,30 +122,208 @@ const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => Te
 
 type AdapterCallback = () => void;
 
+const DEFAULT_TRADE_LINE_DARK_TEXT_COLOR = '#0f1720';
+const DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR = '#ffffff';
+const DEFAULT_TRADE_ORDER_LINE_STYLE = 4;
+const DEFAULT_TRADE_POSITION_LINE_STYLE = 0;
+const DEFAULT_TRADE_LINE_WIDTH = 1;
+const DEFAULT_TRADE_LINE_LENGTH = 50;
+
+interface OrderLineStyleDefaults {
+  bodyBackgroundColor: string;
+  bodyTextColor: string;
+  bodyBorderColor: string;
+  bodyFont: string;
+  quantityBackgroundColor: string;
+  quantityTextColor: string;
+  quantityBorderColor: string;
+  quantityFont: string;
+  cancelButtonBackgroundColor: string;
+  cancelButtonIconColor: string;
+  cancelButtonBorderColor: string;
+}
+
+interface PositionLineStyleDefaults {
+  bodyBackgroundColor: string;
+  bodyTextColor: string;
+  bodyBorderColor: string;
+  bodyFont: string;
+  quantityBackgroundColor: string;
+  quantityTextColor: string;
+  quantityBorderColor: string;
+  quantityFont: string;
+  closeButtonBackgroundColor: string;
+  closeButtonIconColor: string;
+  closeButtonBorderColor: string;
+  reverseButtonBackgroundColor: string;
+  reverseButtonIconColor: string;
+  reverseButtonBorderColor: string;
+}
+
+function isDefaultSellTradeLineColor(color: string): boolean {
+  return color.toLowerCase() === DEFAULT_TRADE_LINE_SELL_COLOR.toLowerCase();
+}
+
+function getOrderLineStyleDefaults(lineColor: string): OrderLineStyleDefaults {
+  return {
+    bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    bodyTextColor: lineColor,
+    bodyBorderColor: lineColor,
+    bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
+    quantityBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    quantityTextColor: lineColor,
+    quantityBorderColor: lineColor,
+    quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
+    cancelButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    cancelButtonIconColor: lineColor,
+    cancelButtonBorderColor: lineColor,
+  };
+}
+
+function getPositionLineStyleDefaults(lineColor: string): PositionLineStyleDefaults {
+  const quantityTextColor = isDefaultSellTradeLineColor(lineColor)
+    ? DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR
+    : DEFAULT_TRADE_LINE_DARK_TEXT_COLOR;
+
+  return {
+    bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    bodyTextColor: lineColor,
+    bodyBorderColor: lineColor,
+    bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
+    quantityBackgroundColor: lineColor,
+    quantityTextColor,
+    quantityBorderColor: lineColor,
+    quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
+    closeButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    closeButtonIconColor: lineColor,
+    closeButtonBorderColor: lineColor,
+    reverseButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    reverseButtonIconColor: lineColor,
+    reverseButtonBorderColor: lineColor,
+  };
+}
+
+function retargetDefaultStyle<TData, TKey extends keyof TData>(
+  data: TData,
+  property: TKey,
+  previousValue: TData[TKey],
+  nextValue: TData[TKey],
+): void {
+  if (data[property] === previousValue) {
+    data[property] = nextValue;
+  }
+}
+
 function retargetOrderLineColor(data: OrderLineRenderData, color: string): void {
   const previous = data.lineColor;
+  const previousDefaults = getOrderLineStyleDefaults(previous);
+  const nextDefaults = getOrderLineStyleDefaults(color);
   data.lineColor = color;
 
-  if (data.bodyBackgroundColor === previous) data.bodyBackgroundColor = color;
-  if (data.bodyBorderColor === previous) data.bodyBorderColor = color;
-  if (data.quantityBackgroundColor === previous) data.quantityBackgroundColor = color;
-  if (data.quantityBorderColor === previous) data.quantityBorderColor = color;
-  if (data.cancelButtonBackgroundColor === previous) data.cancelButtonBackgroundColor = color;
-  if (data.cancelButtonBorderColor === previous) data.cancelButtonBorderColor = color;
+  retargetDefaultStyle(
+    data,
+    'bodyBackgroundColor',
+    previousDefaults.bodyBackgroundColor,
+    nextDefaults.bodyBackgroundColor,
+  );
+  retargetDefaultStyle(data, 'bodyTextColor', previousDefaults.bodyTextColor, nextDefaults.bodyTextColor);
+  retargetDefaultStyle(data, 'bodyBorderColor', previousDefaults.bodyBorderColor, nextDefaults.bodyBorderColor);
+  retargetDefaultStyle(
+    data,
+    'quantityBackgroundColor',
+    previousDefaults.quantityBackgroundColor,
+    nextDefaults.quantityBackgroundColor,
+  );
+  retargetDefaultStyle(data, 'quantityTextColor', previousDefaults.quantityTextColor, nextDefaults.quantityTextColor);
+  retargetDefaultStyle(
+    data,
+    'quantityBorderColor',
+    previousDefaults.quantityBorderColor,
+    nextDefaults.quantityBorderColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'cancelButtonBackgroundColor',
+    previousDefaults.cancelButtonBackgroundColor,
+    nextDefaults.cancelButtonBackgroundColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'cancelButtonIconColor',
+    previousDefaults.cancelButtonIconColor,
+    nextDefaults.cancelButtonIconColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'cancelButtonBorderColor',
+    previousDefaults.cancelButtonBorderColor,
+    nextDefaults.cancelButtonBorderColor,
+  );
 }
 
 function retargetPositionLineColor(data: PositionLineRenderData, color: string): void {
   const previous = data.lineColor;
+  const previousDefaults = getPositionLineStyleDefaults(previous);
+  const nextDefaults = getPositionLineStyleDefaults(color);
   data.lineColor = color;
 
-  if (data.bodyBackgroundColor === previous) data.bodyBackgroundColor = color;
-  if (data.bodyBorderColor === previous) data.bodyBorderColor = color;
-  if (data.quantityBackgroundColor === previous) data.quantityBackgroundColor = color;
-  if (data.quantityBorderColor === previous) data.quantityBorderColor = color;
-  if (data.closeButtonBackgroundColor === previous) data.closeButtonBackgroundColor = color;
-  if (data.closeButtonBorderColor === previous) data.closeButtonBorderColor = color;
-  if (data.reverseButtonBackgroundColor === previous) data.reverseButtonBackgroundColor = color;
-  if (data.reverseButtonBorderColor === previous) data.reverseButtonBorderColor = color;
+  retargetDefaultStyle(
+    data,
+    'bodyBackgroundColor',
+    previousDefaults.bodyBackgroundColor,
+    nextDefaults.bodyBackgroundColor,
+  );
+  retargetDefaultStyle(data, 'bodyTextColor', previousDefaults.bodyTextColor, nextDefaults.bodyTextColor);
+  retargetDefaultStyle(data, 'bodyBorderColor', previousDefaults.bodyBorderColor, nextDefaults.bodyBorderColor);
+  retargetDefaultStyle(
+    data,
+    'quantityBackgroundColor',
+    previousDefaults.quantityBackgroundColor,
+    nextDefaults.quantityBackgroundColor,
+  );
+  retargetDefaultStyle(data, 'quantityTextColor', previousDefaults.quantityTextColor, nextDefaults.quantityTextColor);
+  retargetDefaultStyle(
+    data,
+    'quantityBorderColor',
+    previousDefaults.quantityBorderColor,
+    nextDefaults.quantityBorderColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'closeButtonBackgroundColor',
+    previousDefaults.closeButtonBackgroundColor,
+    nextDefaults.closeButtonBackgroundColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'closeButtonIconColor',
+    previousDefaults.closeButtonIconColor,
+    nextDefaults.closeButtonIconColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'closeButtonBorderColor',
+    previousDefaults.closeButtonBorderColor,
+    nextDefaults.closeButtonBorderColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'reverseButtonBackgroundColor',
+    previousDefaults.reverseButtonBackgroundColor,
+    nextDefaults.reverseButtonBackgroundColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'reverseButtonIconColor',
+    previousDefaults.reverseButtonIconColor,
+    nextDefaults.reverseButtonIconColor,
+  );
+  retargetDefaultStyle(
+    data,
+    'reverseButtonBorderColor',
+    previousDefaults.reverseButtonBorderColor,
+    nextDefaults.reverseButtonBorderColor,
+  );
 }
 
 function createAdapterCallback<TAdapter>(
@@ -445,8 +625,7 @@ export class TealchartApi {
    */
   private _createOrderLineAdapter(id: string, options?: OrderLineOptions): InternalOrderLineAdapter {
     const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
-    const labelColor = DEFAULT_TRADE_LINE_LABEL_COLOR;
-    const segmentBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
+    const styleDefaults = getOrderLineStyleDefaults(lineColor);
     // Store all render data in a structured object
     const data: OrderLineRenderData = {
       id,
@@ -457,25 +636,25 @@ export class TealchartApi {
       text: options?.text ?? '',
       textShort: '',
       lineColor,
-      lineStyle: 2, // dashed
-      lineWidth: 1,
-      lineLength: 50,
+      lineStyle: DEFAULT_TRADE_ORDER_LINE_STYLE,
+      lineWidth: DEFAULT_TRADE_LINE_WIDTH,
+      lineLength: DEFAULT_TRADE_LINE_LENGTH,
       lineLengthUnit: 'percentage',
       extendLeft: false,
       editable: options?.editable ?? true,
       cancellable: options?.cancellable ?? false, // Set to true when onCancel callback is provided
       cancelAsSubmit: false,
-      bodyBackgroundColor: options?.bodyBackgroundColor ?? labelColor,
-      bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
-      bodyBorderColor: options?.bodyBorderColor ?? segmentBorderColor,
-      bodyFont: '',
-      quantityBackgroundColor: options?.quantityBackgroundColor ?? labelColor,
-      quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
-      quantityBorderColor: options?.quantityBorderColor ?? segmentBorderColor,
-      quantityFont: '',
-      cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? labelColor,
-      cancelButtonIconColor: options?.cancelButtonIconColor ?? '#FFFFFF',
-      cancelButtonBorderColor: options?.cancelButtonBorderColor ?? segmentBorderColor,
+      bodyBackgroundColor: options?.bodyBackgroundColor ?? styleDefaults.bodyBackgroundColor,
+      bodyTextColor: options?.bodyTextColor ?? styleDefaults.bodyTextColor,
+      bodyBorderColor: options?.bodyBorderColor ?? styleDefaults.bodyBorderColor,
+      bodyFont: styleDefaults.bodyFont,
+      quantityBackgroundColor: options?.quantityBackgroundColor ?? styleDefaults.quantityBackgroundColor,
+      quantityTextColor: options?.quantityTextColor ?? styleDefaults.quantityTextColor,
+      quantityBorderColor: options?.quantityBorderColor ?? styleDefaults.quantityBorderColor,
+      quantityFont: styleDefaults.quantityFont,
+      cancelButtonBackgroundColor: options?.cancelButtonBackgroundColor ?? styleDefaults.cancelButtonBackgroundColor,
+      cancelButtonIconColor: options?.cancelButtonIconColor ?? styleDefaults.cancelButtonIconColor,
+      cancelButtonBorderColor: options?.cancelButtonBorderColor ?? styleDefaults.cancelButtonBorderColor,
       tooltip: '',
       cancelTooltip: 'Cancel',
       modifyTooltip: 'Modify',
@@ -879,8 +1058,7 @@ export class TealchartApi {
    */
   private _createPositionLineAdapter(id: string, options?: PositionLineOptions): InternalPositionLineAdapter {
     const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
-    const labelColor = DEFAULT_TRADE_LINE_LABEL_COLOR;
-    const segmentBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
+    const styleDefaults = getPositionLineStyleDefaults(lineColor);
     // Store all render data in a structured object
     const data: PositionLineRenderData = {
       id,
@@ -891,27 +1069,27 @@ export class TealchartApi {
       text: options?.text ?? '',
       textShort: '',
       lineColor,
-      lineStyle: 0, // solid
-      lineWidth: 2,
-      lineLength: 100,
+      lineStyle: DEFAULT_TRADE_POSITION_LINE_STYLE,
+      lineWidth: DEFAULT_TRADE_LINE_WIDTH,
+      lineLength: DEFAULT_TRADE_LINE_LENGTH,
       lineLengthUnit: 'percentage',
       extendLeft: false,
-      bodyBackgroundColor: options?.bodyBackgroundColor ?? labelColor,
-      bodyTextColor: options?.bodyTextColor ?? '#FFFFFF',
-      bodyBorderColor: options?.bodyBorderColor ?? segmentBorderColor,
-      bodyFont: '',
-      quantityBackgroundColor: options?.quantityBackgroundColor ?? labelColor,
-      quantityTextColor: options?.quantityTextColor ?? '#FFFFFF',
-      quantityBorderColor: options?.quantityBorderColor ?? segmentBorderColor,
-      quantityFont: '',
+      bodyBackgroundColor: options?.bodyBackgroundColor ?? styleDefaults.bodyBackgroundColor,
+      bodyTextColor: options?.bodyTextColor ?? styleDefaults.bodyTextColor,
+      bodyBorderColor: options?.bodyBorderColor ?? styleDefaults.bodyBorderColor,
+      bodyFont: styleDefaults.bodyFont,
+      quantityBackgroundColor: options?.quantityBackgroundColor ?? styleDefaults.quantityBackgroundColor,
+      quantityTextColor: options?.quantityTextColor ?? styleDefaults.quantityTextColor,
+      quantityBorderColor: options?.quantityBorderColor ?? styleDefaults.quantityBorderColor,
+      quantityFont: styleDefaults.quantityFont,
       closeable: false, // Set to true when onClose callback is provided
-      closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? labelColor,
-      closeButtonIconColor: options?.closeButtonIconColor ?? '#FFFFFF',
-      closeButtonBorderColor: options?.closeButtonBorderColor ?? segmentBorderColor,
+      closeButtonBackgroundColor: options?.closeButtonBackgroundColor ?? styleDefaults.closeButtonBackgroundColor,
+      closeButtonIconColor: options?.closeButtonIconColor ?? styleDefaults.closeButtonIconColor,
+      closeButtonBorderColor: options?.closeButtonBorderColor ?? styleDefaults.closeButtonBorderColor,
       reversible: false, // Set to true when onReverse callback is provided
-      reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? labelColor,
-      reverseButtonIconColor: options?.reverseButtonIconColor ?? '#FFFFFF',
-      reverseButtonBorderColor: options?.reverseButtonBorderColor ?? segmentBorderColor,
+      reverseButtonBackgroundColor: options?.reverseButtonBackgroundColor ?? styleDefaults.reverseButtonBackgroundColor,
+      reverseButtonIconColor: options?.reverseButtonIconColor ?? styleDefaults.reverseButtonIconColor,
+      reverseButtonBorderColor: options?.reverseButtonBorderColor ?? styleDefaults.reverseButtonBorderColor,
       tooltip: '',
       closeTooltip: 'Close position',
       reverseTooltip: 'Reverse position',
