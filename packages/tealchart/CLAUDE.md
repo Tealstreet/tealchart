@@ -143,7 +143,7 @@ renderer, tealscript, and Skia paths see the stricter internal `Bar` shape.
 
 Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the full string but stored internally as the clean symbol (`BTCUSDT`), including during initial widget construction. A prefix change with the same clean symbol must still reload data so adapters that key by `EXCHANGE:SYMBOL` get fresh symbol info and subscriptions.
 
-Order and position trading-line labels derive their body, quantity, price-label, and action-button colors from `lineColor` using the package defaults in `constants.ts`: blue for buy/unspecified lines, red when consumers supply the default sell/short color, dark low-glare label fills, and filled quantity/PnL-style text on accent segments. Consumers should set semantic line color and line length rather than restyling every label segment. PnL must be passed separately with `setPnl` / `setProfitState`; it is the only label segment that flips to profit/loss color independently of `lineColor`.
+Order and position trading-line labels derive their body, quantity, price-label, and action-button colors from `lineColor`. Defaults are blue for buy/unspecified lines and red should be supplied by consumers for sell/short lines. PnL must be passed separately with `setPnl` / `setProfitState`; it is the only label segment that flips to profit/loss color independently of `lineColor`.
 
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
