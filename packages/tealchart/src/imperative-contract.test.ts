@@ -13,7 +13,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
+  DEFAULT_TRADE_LINE_LABEL_FONT,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  DEFAULT_TRADE_LINE_SELL_COLOR,
 } from './constants';
 import { clearChartStoreCache } from './state/chartState';
 import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
@@ -297,16 +299,16 @@ describe('imperative chart API contract', () => {
     expect(position.getLineLengthUnit()).toBe('percentage');
   });
 
-  it('keeps order lines dashed by default while position lines stay solid', async () => {
+  it('keeps order lines dotted by default while position lines stay solid', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     const order = await api.createOrderLine();
     const position = await api.createPositionLine();
 
-    expect(order.getLineStyle()).toBe(2);
+    expect(order.getLineStyle()).toBe(4);
     expect(position.getLineStyle()).toBe(0);
   });
 
-  it('keeps default trading-line fills lower-glare with explicit segment separators', async () => {
+  it('keeps default trading-line labels lower-glare with side-colored accents', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     await api.createOrderLine({ text: 'Buy Limit', quantity: 0.001, cancellable: true });
     const position = await api.createPositionLine({ text: 'Long', quantity: 0.001 });
@@ -318,21 +320,62 @@ describe('imperative chart API contract', () => {
 
     expect(order.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(order.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(order.bodyTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.bodyFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(order.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(order.quantityTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.quantityFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(order.cancelButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
-    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
-    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(order.cancelButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
 
     expect(positionLine.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.bodyFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
+    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.quantityTextColor).toBe('#0f1720');
+    expect(positionLine.quantityFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(positionLine.reverseButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.reverseButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.closeButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
-    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
-    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
-    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR);
+    expect(positionLine.closeButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR).toBe('rgba(255, 255, 255, 0.16)');
+  });
+
+  it('retargets default trading-line label accents when line color changes', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const order = await api.createOrderLine({ text: 'Sell Limit', quantity: 0.001, cancellable: true });
+    const position = await api.createPositionLine({ text: 'Short', quantity: 0.001 });
+
+    order.setLineColor(DEFAULT_TRADE_LINE_SELL_COLOR);
+    position
+      .setLineColor(DEFAULT_TRADE_LINE_SELL_COLOR)
+      .onReverse(() => undefined)
+      .onClose(() => undefined);
+
+    const { orderLines, positionLines } = getTealchartApiLineRenderSnapshot(api);
+    const orderLine = orderLines[0]!;
+    const positionLine = positionLines[0]!;
+
+    expect(orderLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(orderLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(orderLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(orderLine.quantityTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(orderLine.cancelButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+
+    expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
+    expect(positionLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(positionLine.quantityTextColor).toBe('#ffffff');
+    expect(positionLine.closeButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(positionLine.reverseButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
   });
 
   it('keeps bridgeable adapter methods on the imperative line objects', async () => {
