@@ -9,13 +9,13 @@ import {
   DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
   DEFAULT_TRADE_LINE_LABEL_FONT,
-  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
   DEFAULT_TRADE_LINE_SELL_COLOR,
 } from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
   BracketConfig,
   BracketPnlCalculator,
+  Awaitable,
   CrossHairMovedEventParams,
   EnhancedCrossHairState,
   ExecutionDirection,
@@ -26,6 +26,9 @@ import {
   InternalExecutionLineAdapter,
   InternalOrderLineAdapter,
   InternalPositionLineAdapter,
+  OemsActionCallback,
+  OemsActionResult,
+  OemsPriceActionCallback,
   IStudyApi,
   ISubscription,
   ITimeScaleApi,
@@ -120,7 +123,7 @@ export interface TealchartApiLineRenderSnapshot {
 
 const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => TealchartApiLineRenderSnapshot>();
 
-type AdapterCallback = () => void;
+type AdapterCallback = OemsActionCallback;
 
 const DEFAULT_TRADE_LINE_DARK_TEXT_COLOR = '#0f1720';
 const DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR = '#ffffff';
@@ -332,12 +335,31 @@ function createAdapterCallback<TAdapter>(
   callback?: unknown,
 ): AdapterCallback {
   if (typeof callbackOrData === 'function') {
-    const handler = callbackOrData as (this: TAdapter) => void;
+    const handler = callbackOrData as (this: TAdapter) => ReturnType<AdapterCallback>;
     return () => handler.call(adapter);
   }
 
   if (typeof callback === 'function') {
-    const handler = callback as (this: TAdapter, data: unknown) => void;
+    const handler = callback as (this: TAdapter, data: unknown) => ReturnType<AdapterCallback>;
+    const data = callbackOrData;
+    return () => handler.call(adapter, data);
+  }
+
+  throw new TypeError('Expected a callback');
+}
+
+function createAdapterPriceCallback<TAdapter>(
+  adapter: TAdapter,
+  callbackOrData: unknown,
+  callback?: unknown,
+): OemsPriceActionCallback {
+  if (typeof callbackOrData === 'function') {
+    const handler = callbackOrData as (this: TAdapter, price: number, partialPercent?: number) => Awaitable<OemsActionResult>;
+    return (price, partialPercent) => handler.call(adapter, price, partialPercent);
+  }
+
+  if (typeof callback === 'function') {
+    const handler = callback as (this: TAdapter, data: unknown) => Awaitable<OemsActionResult>;
     const data = callbackOrData;
     return () => handler.call(adapter, data);
   }
@@ -629,7 +651,7 @@ export class TealchartApi {
     // Store all render data in a structured object
     const data: OrderLineRenderData = {
       id,
-      orderId: undefined, // External order ID for deduplication
+      orderId: options?.orderId, // External order ID for deduplication
       price: options?.price ?? 0,
       quantity: String(options?.quantity ?? ''),
       quantityShort: '',
@@ -663,18 +685,18 @@ export class TealchartApi {
     };
 
     // Callbacks (not part of render data)
-    let _onMoveCallback: (() => void) | null = null;
-    let _onMovingCallback: (() => void) | null = null;
-    let _onCancelCallback: (() => void) | null = null;
-    let _onModifyCallback: (() => void) | null = null;
+    let _onMoveCallback: OemsPriceActionCallback | null = null;
+    let _onMovingCallback: OemsPriceActionCallback | null = null;
+    let _onCancelCallback: OemsActionCallback | null = null;
+    let _onModifyCallback: OemsActionCallback | null = null;
     let _pnlCalculator: BracketPnlCalculator | null = null;
     // TEALSTREET bracket callbacks
-    let _onTPClick: (() => void) | null = null;
-    let _onSLClick: (() => void) | null = null;
-    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
-    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
-    let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
-    let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onTPClick: OemsActionCallback | null = null;
+    let _onSLClick: OemsActionCallback | null = null;
+    let _onTPMove: OemsPriceActionCallback | null = null;
+    let _onSLMove: OemsPriceActionCallback | null = null;
+    let _onTPMoveEnd: OemsPriceActionCallback | null = null;
+    let _onSLMoveEnd: OemsPriceActionCallback | null = null;
 
     // Capture references for closure
     const orderLines = this._orderLines;
@@ -703,11 +725,17 @@ export class TealchartApi {
         data.price = p;
         notifyChange();
         // Notify when price is set externally (for clearing pending drag state)
-        onOrderPriceChanged()?.(id, p);
+        onOrderPriceChanged()?.(data.orderId ?? id, p);
         return this;
       },
       getPrice() {
         return data.price;
+      },
+
+      setOrderId(orderId: string) {
+        data.orderId = orderId;
+        notifyChange();
+        return this;
       },
 
       setCancelAsSubmit(enabled: boolean) {
@@ -921,12 +949,12 @@ export class TealchartApi {
 
       // Callbacks
       onMove(callbackOrData: unknown, callback?: unknown) {
-        _onMoveCallback = createAdapterCallback(adapter, callbackOrData, callback);
+        _onMoveCallback = createAdapterPriceCallback(adapter, callbackOrData, callback);
         notifyChange();
         return this;
       },
       onMoving(callbackOrData: unknown, callback?: unknown) {
-        _onMovingCallback = createAdapterCallback(adapter, callbackOrData, callback);
+        _onMovingCallback = createAdapterPriceCallback(adapter, callbackOrData, callback);
         notifyChange();
         return this;
       },
@@ -971,32 +999,32 @@ export class TealchartApi {
       },
 
       // TEALSTREET: Bracket callbacks
-      onTPClick(callback: () => void) {
+      onTPClick(callback: OemsActionCallback) {
         _onTPClick = callback;
         notifyChange();
         return this;
       },
-      onSLClick(callback: () => void) {
+      onSLClick(callback: OemsActionCallback) {
         _onSLClick = callback;
         notifyChange();
         return this;
       },
-      onTPMove(callback: (price: number, partialPercent?: number) => void) {
+      onTPMove(callback: OemsPriceActionCallback) {
         _onTPMove = callback;
         notifyChange();
         return this;
       },
-      onSLMove(callback: (price: number, partialPercent?: number) => void) {
+      onSLMove(callback: OemsPriceActionCallback) {
         _onSLMove = callback;
         notifyChange();
         return this;
       },
-      onTPMoveEnd(callback: (price: number, partialPercent?: number) => void) {
+      onTPMoveEnd(callback: OemsPriceActionCallback) {
         _onTPMoveEnd = callback;
         notifyChange();
         return this;
       },
-      onSLMoveEnd(callback: (price: number, partialPercent?: number) => void) {
+      onSLMoveEnd(callback: OemsPriceActionCallback) {
         _onSLMoveEnd = callback;
         notifyChange();
         return this;
@@ -1011,14 +1039,12 @@ export class TealchartApi {
           callbacks: {
             onMove: _onMoveCallback
               ? (price: number) => {
-                  data.price = price;
-                  _onMoveCallback?.();
+                  return _onMoveCallback?.(price);
                 }
               : undefined,
             onMoving: _onMovingCallback
               ? (price: number) => {
-                  data.price = price;
-                  _onMovingCallback?.();
+                  return _onMovingCallback?.(price);
                 }
               : undefined,
             onTPClick: _onTPClick ?? undefined,
@@ -1062,7 +1088,7 @@ export class TealchartApi {
     // Store all render data in a structured object
     const data: PositionLineRenderData = {
       id,
-      positionId: undefined, // External position ID for deduplication
+      positionId: options?.positionId, // External position ID for deduplication
       price: options?.price ?? 0,
       quantity: String(options?.quantity ?? ''),
       quantityShort: '',
@@ -1104,17 +1130,17 @@ export class TealchartApi {
     };
 
     // Callbacks (not part of render data)
-    let _onCloseCallback: (() => void) | null = null;
-    let _onReverseCallback: (() => void) | null = null;
-    let _onModifyCallback: (() => void) | null = null;
+    let _onCloseCallback: OemsActionCallback | null = null;
+    let _onReverseCallback: OemsActionCallback | null = null;
+    let _onModifyCallback: OemsActionCallback | null = null;
     let _pnlCalculator: BracketPnlCalculator | null = null;
     // TEALSTREET bracket callbacks
-    let _onTPClick: (() => void) | null = null;
-    let _onSLClick: (() => void) | null = null;
-    let _onTPMove: ((price: number, partialPercent?: number) => void) | null = null;
-    let _onSLMove: ((price: number, partialPercent?: number) => void) | null = null;
-    let _onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
-    let _onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null = null;
+    let _onTPClick: OemsActionCallback | null = null;
+    let _onSLClick: OemsActionCallback | null = null;
+    let _onTPMove: OemsPriceActionCallback | null = null;
+    let _onSLMove: OemsPriceActionCallback | null = null;
+    let _onTPMoveEnd: OemsPriceActionCallback | null = null;
+    let _onSLMoveEnd: OemsPriceActionCallback | null = null;
 
     // Capture references for closure
     const positionLines = this._positionLines;
@@ -1145,6 +1171,12 @@ export class TealchartApi {
       },
       getPrice() {
         return data.price;
+      },
+
+      setPositionId(positionId: string) {
+        data.positionId = positionId;
+        notifyChange();
+        return this;
       },
 
       // Text and quantity
@@ -1434,32 +1466,32 @@ export class TealchartApi {
       },
 
       // TEALSTREET: Bracket callbacks
-      onTPClick(callback: () => void) {
+      onTPClick(callback: OemsActionCallback) {
         _onTPClick = callback;
         notifyChange();
         return this;
       },
-      onSLClick(callback: () => void) {
+      onSLClick(callback: OemsActionCallback) {
         _onSLClick = callback;
         notifyChange();
         return this;
       },
-      onTPMove(callback: (price: number, partialPercent?: number) => void) {
+      onTPMove(callback: OemsPriceActionCallback) {
         _onTPMove = callback;
         notifyChange();
         return this;
       },
-      onSLMove(callback: (price: number, partialPercent?: number) => void) {
+      onSLMove(callback: OemsPriceActionCallback) {
         _onSLMove = callback;
         notifyChange();
         return this;
       },
-      onTPMoveEnd(callback: (price: number, partialPercent?: number) => void) {
+      onTPMoveEnd(callback: OemsPriceActionCallback) {
         _onTPMoveEnd = callback;
         notifyChange();
         return this;
       },
-      onSLMoveEnd(callback: (price: number, partialPercent?: number) => void) {
+      onSLMoveEnd(callback: OemsPriceActionCallback) {
         _onSLMoveEnd = callback;
         notifyChange();
         return this;
@@ -1941,69 +1973,103 @@ export class TealchartApi {
     return Array.from(this._executionLines.values()).map((adapter) => adapter._getRenderData());
   }
 
+  private _getOrderLineAdapter(lineIdOrOrderId: string): InternalOrderLineAdapter | undefined {
+    const adapter = this._orderLines.get(lineIdOrOrderId);
+    if (adapter) return adapter;
+
+    for (const candidate of this._orderLines.values()) {
+      if (candidate._getRenderData().orderId === lineIdOrOrderId) {
+        return candidate;
+      }
+    }
+
+    return undefined;
+  }
+
+  private _getPositionLineAdapter(lineIdOrPositionId: string): InternalPositionLineAdapter | undefined {
+    const adapter = this._positionLines.get(lineIdOrPositionId);
+    if (adapter) return adapter;
+
+    for (const candidate of this._positionLines.values()) {
+      if (candidate._getRenderData().positionId === lineIdOrPositionId) {
+        return candidate;
+      }
+    }
+
+    return undefined;
+  }
+
   /**
    * @internal Trigger onCancel callback for an order line
    * Called when cancel button is clicked in the Konva layer
    */
-  triggerOrderCancel(orderId: string): void {
-    const adapter = this._orderLines.get(orderId);
+  triggerOrderCancel(orderId: string): Awaitable<OemsActionResult> | undefined {
+    const adapter = this._getOrderLineAdapter(orderId);
     if (adapter) {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onCancel) {
-        callbacks.onCancel();
+        return callbacks.onCancel();
       }
     }
+
+    return undefined;
   }
 
   /**
    * @internal Trigger onMove callback for an order line
    * Called when order line is dragged to a new price in the Konva layer
    */
-  triggerOrderMove(orderId: string, newPrice: number): void {
-    const adapter = this._orderLines.get(orderId);
+  triggerOrderMove(orderId: string, newPrice: number): Awaitable<OemsActionResult> | undefined {
+    const adapter = this._getOrderLineAdapter(orderId);
     if (adapter) {
-      adapter.setPrice(newPrice);
-      adapter._getCallbacks().onMove?.();
+      return adapter._getCallbacks().onMove?.(newPrice);
     }
+
+    return undefined;
   }
 
   /**
    * @internal Trigger onMoving callback for an order line during drag.
    */
-  triggerOrderMoving(orderId: string, newPrice: number): void {
-    const adapter = this._orderLines.get(orderId);
+  triggerOrderMoving(orderId: string, newPrice: number): Awaitable<OemsActionResult> | undefined {
+    const adapter = this._getOrderLineAdapter(orderId);
     if (adapter) {
-      adapter.setPrice(newPrice);
-      adapter._getCallbacks().onMoving?.();
+      return adapter._getCallbacks().onMoving?.(newPrice);
     }
+
+    return undefined;
   }
 
   /**
    * @internal Trigger onClose callback for a position line
    * Called when close button is clicked in the Konva layer
    */
-  triggerPositionClose(positionId: string): void {
-    const adapter = this._positionLines.get(positionId);
+  triggerPositionClose(positionId: string): Awaitable<OemsActionResult> | undefined {
+    const adapter = this._getPositionLineAdapter(positionId);
     if (adapter) {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onClose) {
-        callbacks.onClose();
+        return callbacks.onClose();
       }
     }
+
+    return undefined;
   }
 
   /**
    * @internal Trigger onReverse callback for a position line
    * Called when reverse button is clicked in the Konva layer
    */
-  triggerPositionReverse(positionId: string): void {
-    const adapter = this._positionLines.get(positionId);
+  triggerPositionReverse(positionId: string): Awaitable<OemsActionResult> | undefined {
+    const adapter = this._getPositionLineAdapter(positionId);
     if (adapter) {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onReverse) {
-        callbacks.onReverse();
+        return callbacks.onReverse();
       }
     }
+
+    return undefined;
   }
 
   /**
