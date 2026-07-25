@@ -640,6 +640,7 @@ export class TealchartRenderer {
         type: line.type,
         chartLabel: line.chartLabel,
         lineLength: line.lineLength,
+        lineLengthUnit: line.lineLengthUnit,
         extendLeft: line.extendLeft,
         lineWidth: line.lineWidth,
         floatingLabel: line.floatingLabel,
@@ -647,8 +648,10 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
+        actionState: line.actionState,
         targetPaneId: line.targetPaneId,
-        // Position-specific fields for bracket TP/SL drag
+        // Trading object identity for OEMS callbacks
+        orderId: line.orderId,
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,
@@ -819,6 +822,7 @@ export class TealchartRenderer {
     const color = bound.color;
     const lineWidth = bound.lineWidth || 1;
     const lineLength = bound.lineLength ?? 100;
+    const lineLengthUnit = bound.lineLengthUnit ?? 'percentage';
     const extendLeft = bound.extendLeft ?? true;
     const labelCenterY = bound.adjustedY;
 
@@ -849,7 +853,11 @@ export class TealchartRenderer {
       // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
       const maxLabelX = options.width - margins.right - chartLabelWidth;
       const minLabelX = lineStartX;
-      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
+      chartLabelX =
+        lineLengthUnit === 'pixel'
+          ? maxLabelX - Math.max(0, lineLength)
+          : minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
+      chartLabelX = Math.max(minLabelX, Math.min(maxLabelX, chartLabelX));
     }
 
     // Set line style
@@ -3225,6 +3233,7 @@ export class TealchartRenderer {
         type: line.type,
         chartLabel: line.chartLabel,
         lineLength: line.lineLength,
+        lineLengthUnit: line.lineLengthUnit,
         extendLeft: line.extendLeft,
         lineWidth: line.lineWidth,
         floatingLabel: line.floatingLabel,
@@ -3232,8 +3241,10 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
+        actionState: line.actionState,
         targetPaneId: line.targetPaneId,
-        // Position-specific fields for bracket TP/SL drag
+        // Trading object identity for OEMS callbacks
+        orderId: line.orderId,
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,
@@ -4620,6 +4631,7 @@ export class TealchartRenderer {
         type: line.type,
         chartLabel: line.chartLabel,
         lineLength: line.lineLength,
+        lineLengthUnit: line.lineLengthUnit,
         extendLeft: line.extendLeft,
         lineWidth: line.lineWidth,
         floatingLabel: line.floatingLabel,
@@ -4627,7 +4639,9 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
-        // Position-specific fields for bracket TP/SL drag
+        actionState: line.actionState,
+        // Trading object identity for OEMS callbacks
+        orderId: line.orderId,
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,

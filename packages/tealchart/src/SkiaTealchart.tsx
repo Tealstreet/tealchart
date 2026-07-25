@@ -8,8 +8,8 @@
  *
  * Architecture:
  * - Layer 1: Skia Canvas (static) - candles, grid, indicators via Picture recording
- * - Layer 2: Interactive RN Layer - order lines, position lines, crosshair
- * - Layer 3: Base Gesture Layer - pan, pinch, axis scaling with zone detection
+ * - Layer 2: Base Gesture Layer - pan, pinch, axis scaling with zone detection
+ * - Layer 3: Interactive RN Layer - order lines, position lines, crosshair
  */
 
 import type { WorkerError } from '@tealstreet/tealscript';
@@ -65,7 +65,17 @@ import type {
 } from './mobile/utils/drawingRenderModel';
 import type { PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import type { ChartMargins, ContextMenuItem, IBasicDataFeed, PriceLine, RenderOptions, Viewport } from './types';
+import type {
+  ChartMargins,
+  ContextMenuItem,
+  IBasicDataFeed,
+  OemsActionCallback,
+  OrderLineRenderData,
+  PositionLineRenderData,
+  PriceLine,
+  RenderOptions,
+  Viewport,
+} from './types';
 
 import React, {
   forwardRef,
@@ -102,7 +112,7 @@ import { LayoutChangeEvent, Platform, StyleSheet, Text, TextInput, TouchableOpac
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { LOADING_OPACITY, STOP_LOSS_COLOR } from './constants';
+import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR, LOADING_OPACITY, STOP_LOSS_COLOR } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -176,6 +186,8 @@ import {
   importMobileUserDrawingStateFromLayout,
   replaceMobileUserDrawingState,
 } from './mobile/utils/drawingPersistence';
+import type { OemsActionKind, OemsActionState, OemsActionObjectType } from './interaction/oemsActionManager';
+import { OemsActionManager } from './interaction/oemsActionManager';
 import {
   isMobileUserDrawingTextBoxPrimitive,
   resolveMobileUserDrawingBalloonLayout,
@@ -187,6 +199,7 @@ import {
   resolveMobileUserDrawingTextLabelLayout,
   resolveMobileUserDrawingTrendAngleLabelPosition,
 } from './mobile/utils/drawingRenderModel';
+import { formatNativeTradeLinePrice } from './mobile/utils/tradeLineLayout';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
 import { TealchartRenderer } from './TealchartRenderer';
@@ -201,11 +214,160 @@ import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
+const PENDING_ORDER_RENDER_ALPHA = 0.58;
 type SkiaFontStyleInput = Parameters<ReturnType<typeof Skia.FontMgr.System>['matchFamilyStyle']>[1];
 const SKIA_NORMAL_FONT_STYLE: SkiaFontStyleInput =
   (FontStyle as { Normal?: SkiaFontStyleInput } | undefined)?.Normal ?? {};
 
 type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
+
+interface ActiveNativeOrderPriceDrag {
+  lineId: string;
+  externalOrderId?: string;
+  originalPrice: number;
+  currentPrice: number;
+}
+
+interface NativeTradingLineState extends OemsActionState {
+  price?: number;
+  takeProfit?: number;
+  stopLoss?: number;
+  visible?: boolean;
+}
+
+type NativeTradingLineObject = {
+  objectType: OemsActionObjectType;
+  objectId: string;
+  state: NativeTradingLineState;
+};
+
+function matchesNativeOrderIdentity(
+  order: OrderLineRenderData,
+  lineId: string,
+  externalOrderId?: string,
+): boolean {
+  return order.id === lineId || (!!externalOrderId && order.orderId === externalOrderId);
+}
+
+function findNativeOrderLine(
+  orderLines: OrderLineRenderData[],
+  lineId: string,
+  externalOrderId?: string,
+): OrderLineRenderData | undefined {
+  return orderLines.find((order) => matchesNativeOrderIdentity(order, lineId, externalOrderId));
+}
+
+function isNativeOrderPriceDragForLine(
+  activeDrag: ActiveNativeOrderPriceDrag | null,
+  order: OrderLineRenderData,
+): activeDrag is ActiveNativeOrderPriceDrag {
+  return !!activeDrag && matchesNativeOrderIdentity(order, activeDrag.lineId, activeDrag.externalOrderId);
+}
+
+function getNativeOrderRenderKey(order: OrderLineRenderData): string {
+  return order.orderId ?? order.id;
+}
+
+function getNativeOrderObjectId(order: OrderLineRenderData): string {
+  return order.orderId ?? order.id;
+}
+
+function getNativePositionObjectId(position: PositionLineRenderData): string {
+  return position.positionId ?? position.id;
+}
+
+function getNativeOrderLineState(order: OrderLineRenderData): NativeTradingLineState {
+  return {
+    price: order.price,
+    takeProfit: order.brackets?.takeProfit,
+    stopLoss: order.brackets?.stopLoss,
+    visible: true,
+  };
+}
+
+function getNativePositionLineState(position: PositionLineRenderData): NativeTradingLineState {
+  return {
+    price: position.price,
+    takeProfit: position.brackets?.takeProfit,
+    stopLoss: position.brackets?.stopLoss,
+    visible: true,
+  };
+}
+
+function applyNativeBracketActionState<
+  TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets'],
+>(brackets: TBracket, state: NativeTradingLineState): TBracket {
+  if (!brackets) return brackets;
+  return {
+    ...brackets,
+    takeProfit: typeof state.takeProfit === 'number' ? state.takeProfit : brackets.takeProfit,
+    stopLoss: typeof state.stopLoss === 'number' ? state.stopLoss : brackets.stopLoss,
+  } as TBracket;
+}
+
+function getNativeActionOpacity(actionState: OrderLineRenderData['actionState'] | PositionLineRenderData['actionState']) {
+  return actionState?.isAwaitingCallback ? PENDING_ORDER_RENDER_ALPHA : 1;
+}
+
+function nativeTradingLineToBracketPriceLines(
+  line: OrderLineRenderData | PositionLineRenderData,
+  pricePrecision: number,
+  positiveColor: string,
+): PriceLine[] {
+  const brackets = line.brackets;
+  if (!brackets) return [];
+
+  const bracketLines: PriceLine[] = [];
+  const alpha = getNativeActionOpacity(line.actionState);
+  const takeProfitColor = brackets.takeProfitColor ?? positiveColor;
+  const takeProfitTextColor = brackets.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = brackets.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+
+  if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
+    bracketLines.push({
+      id: `${line.id}-tp`,
+      price: brackets.takeProfit,
+      lineStyle: 'dashed',
+      color: withAlpha(takeProfitColor, alpha),
+      type: 'price',
+      lineLength: 100,
+      extendLeft: true,
+      lineWidth: 1,
+      priority: 70,
+      label: {
+        primaryText: formatNativeTradeLinePrice(brackets.takeProfit, pricePrecision),
+        secondaryText: 'TP',
+        backgroundColor: withAlpha(takeProfitColor, alpha),
+        textColor: withAlpha(takeProfitTextColor, alpha),
+      },
+      actionState: line.actionState,
+    });
+  }
+
+  if (brackets.stopLoss !== undefined && brackets.stopLoss > 0) {
+    bracketLines.push({
+      id: `${line.id}-sl`,
+      price: brackets.stopLoss,
+      lineStyle: 'dashed',
+      color: withAlpha(stopLossColor, alpha),
+      type: 'price',
+      lineLength: 100,
+      extendLeft: true,
+      lineWidth: 1,
+      priority: 70,
+      label: {
+        primaryText: formatNativeTradeLinePrice(brackets.stopLoss, pricePrecision),
+        secondaryText: 'SL',
+        backgroundColor: withAlpha(stopLossColor, alpha),
+        textColor: withAlpha(stopLossTextColor, alpha),
+      },
+      actionState: line.actionState,
+    });
+  }
+
+  return bracketLines;
+}
 
 function hasMobileUserDrawingBalloonTail(layout: unknown): layout is Pick<MobileUserDrawingBalloonLayout, 'tail'> {
   return typeof layout === 'object' && layout !== null && 'tail' in layout;
@@ -515,6 +677,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chartApiRef.current.setOnLinesChanged(forceUpdate);
   }
   const chartApi = chartApiRef.current;
+  const oemsActionsRef = useRef<OemsActionManager<NativeTradingLineState> | null>(null);
+  if (!oemsActionsRef.current) {
+    oemsActionsRef.current = new OemsActionManager<NativeTradingLineState>({
+      onChange: forceUpdate,
+    });
+  }
+  const oemsActions = oemsActionsRef.current;
+  const [activeOrderPriceDrag, setActiveOrderPriceDrag] = useState<ActiveNativeOrderPriceDrag | null>(null);
+
+  useEffect(
+    () => () => {
+      oemsActions.dispose();
+    },
+    [oemsActions],
+  );
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
   const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
     createUserDrawingState(propUserDrawingState),
@@ -725,6 +902,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   useLayoutEffect(() => {
     chartApi.setOnLinesChanged(forceUpdate);
+    chartApi.setOnOrderPriceChanged(forceUpdate);
     chartApi.setOnStudyCreate(async (request) => {
       const indicator = getIndicatorById(request.name);
       const code = request.name.trim().startsWith('//@version') ? request.name : indicator?.code;
@@ -1254,6 +1432,277 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const orderLines = lineRenderSnapshot.orderLines;
   const positionLines = lineRenderSnapshot.positionLines;
 
+  useEffect(() => {
+    const seen = new Set(orderLines.map(getNativeOrderObjectId));
+    for (const line of orderLines) {
+      oemsActions.confirmState('order', getNativeOrderObjectId(line), getNativeOrderLineState(line));
+    }
+
+    for (const action of oemsActions.getActions()) {
+      if (action.objectType === 'order' && action.confirmsRemoved && !seen.has(action.objectId)) {
+        oemsActions.confirmRemoved('order', action.objectId);
+      }
+    }
+  }, [oemsActions, orderLines]);
+
+  useEffect(() => {
+    const seen = new Set(positionLines.map(getNativePositionObjectId));
+    for (const line of positionLines) {
+      oemsActions.confirmState('position', getNativePositionObjectId(line), getNativePositionLineState(line));
+    }
+
+    for (const action of oemsActions.getActions()) {
+      if (action.objectType === 'position' && action.confirmsRemoved && !seen.has(action.objectId)) {
+        oemsActions.confirmRemoved('position', action.objectId);
+      }
+    }
+  }, [oemsActions, positionLines]);
+
+  useEffect(() => {
+    if (!activeOrderPriceDrag) return;
+    const hasActiveOrder = orderLines.some((order) => isNativeOrderPriceDragForLine(activeOrderPriceDrag, order));
+    if (!hasActiveOrder) {
+      setActiveOrderPriceDrag(null);
+    }
+  }, [activeOrderPriceDrag, orderLines]);
+
+  const handleOrderPriceDragStart = useCallback(
+    (lineId: string, originalPrice: number, externalOrderId?: string) => {
+      const order = findNativeOrderLine(orderLines, lineId, externalOrderId);
+      const objectId = order ? getNativeOrderObjectId(order) : externalOrderId ?? lineId;
+      if (oemsActions.getAction('order', objectId)) return;
+      setActiveOrderPriceDrag({
+        lineId,
+        externalOrderId: externalOrderId ?? order?.orderId,
+        originalPrice,
+        currentPrice: originalPrice,
+      });
+    },
+    [oemsActions, orderLines],
+  );
+
+  const handleOrderPriceDragMove = useCallback(
+    (lineId: string, price: number, externalOrderId?: string) => {
+      setActiveOrderPriceDrag((current) => {
+        if (
+          current &&
+          (current.lineId === lineId ||
+            (!!externalOrderId && current.externalOrderId === externalOrderId) ||
+            (!!current.externalOrderId && current.externalOrderId === externalOrderId))
+        ) {
+          return { ...current, currentPrice: price };
+        }
+
+        const order = findNativeOrderLine(orderLines, lineId, externalOrderId);
+        return {
+          lineId,
+          externalOrderId: externalOrderId ?? order?.orderId,
+          originalPrice: order?.price ?? price,
+          currentPrice: price,
+        };
+      });
+
+      const order = findNativeOrderLine(orderLines, lineId, externalOrderId);
+      order?.callbacks?.onMoving?.(price);
+    },
+    [orderLines],
+  );
+
+  const handleOrderPriceDragEnd = useCallback(
+    (lineId: string, price: number, externalOrderId?: string) => {
+      const resolvedExternalOrderId = externalOrderId ?? activeOrderPriceDrag?.externalOrderId;
+      const activeDrag =
+        activeOrderPriceDrag &&
+        (activeOrderPriceDrag.lineId === lineId ||
+          (!!resolvedExternalOrderId && activeOrderPriceDrag.externalOrderId === resolvedExternalOrderId))
+          ? activeOrderPriceDrag
+          : null;
+      const order = findNativeOrderLine(orderLines, lineId, resolvedExternalOrderId);
+      const originalPrice = activeDrag?.originalPrice ?? order?.price ?? price;
+      const objectId = order ? getNativeOrderObjectId(order) : resolvedExternalOrderId ?? lineId;
+      const originalState = order ? getNativeOrderLineState(order) : { price: originalPrice, visible: true };
+
+      setActiveOrderPriceDrag(null);
+      const result = oemsActions.startAction({
+        objectType: 'order',
+        objectId,
+        kind: 'orderMove',
+        originalState,
+        optimisticState: {
+          ...originalState,
+          price,
+        },
+        callback: () => order?.callbacks?.onMove?.(price),
+      });
+      if (result.completedSynchronously) forceUpdate();
+    },
+    [activeOrderPriceDrag, oemsActions, orderLines],
+  );
+
+  const handleOrderPriceDragCancel = useCallback((lineId: string, externalOrderId?: string) => {
+    setActiveOrderPriceDrag((current) =>
+      current &&
+      (current.lineId === lineId || (!!externalOrderId && current.externalOrderId === externalOrderId))
+        ? null
+        : current,
+    );
+  }, []);
+
+  const resolveNativeTradingObject = useCallback(
+    (line: OrderLineRenderData | PositionLineRenderData, objectType: OemsActionObjectType): NativeTradingLineObject => {
+      if (objectType === 'order') {
+        const order = line as OrderLineRenderData;
+        return {
+          objectType,
+          objectId: getNativeOrderObjectId(order),
+          state: getNativeOrderLineState(order),
+        };
+      }
+
+      const position = line as PositionLineRenderData;
+      return {
+        objectType,
+        objectId: getNativePositionObjectId(position),
+        state: getNativePositionLineState(position),
+      };
+    },
+    [],
+  );
+
+  const startNativeOemsAction = useCallback(
+    (
+      object: NativeTradingLineObject,
+      kind: OemsActionKind,
+      optimisticState: NativeTradingLineState,
+      callback: OemsActionCallback,
+      confirmsRemoved = false,
+    ) => {
+      const result = oemsActions.startAction({
+        objectType: object.objectType,
+        objectId: object.objectId,
+        kind,
+        originalState: object.state,
+        optimisticState,
+        confirmsRemoved,
+        callback,
+      });
+      if (result.completedSynchronously) forceUpdate();
+    },
+    [oemsActions, forceUpdate],
+  );
+
+  const handleNativeOrderCancel = useCallback(
+    (order: OrderLineRenderData) => {
+      if (order.actionState?.isPending) return;
+      const object = resolveNativeTradingObject(order, 'order');
+      startNativeOemsAction(object, 'orderCancel', object.state, () => order.callbacks?.onCancel?.(), true);
+    },
+    [resolveNativeTradingObject, startNativeOemsAction],
+  );
+
+  const handleNativePositionClose = useCallback(
+    (position: PositionLineRenderData) => {
+      if (position.actionState?.isPending) return;
+      const object = resolveNativeTradingObject(position, 'position');
+      startNativeOemsAction(object, 'positionClose', object.state, () => position.callbacks?.onClose?.(), true);
+    },
+    [resolveNativeTradingObject, startNativeOemsAction],
+  );
+
+  const handleNativePositionReverse = useCallback(
+    (position: PositionLineRenderData) => {
+      if (position.actionState?.isPending) return;
+      const object = resolveNativeTradingObject(position, 'position');
+      startNativeOemsAction(object, 'positionReverse', object.state, () => position.callbacks?.onReverse?.(), true);
+    },
+    [resolveNativeTradingObject, startNativeOemsAction],
+  );
+
+  const handleNativeBracketMoveEnd = useCallback(
+    (
+      line: OrderLineRenderData | PositionLineRenderData,
+      objectType: OemsActionObjectType,
+      bracketType: 'tp' | 'sl',
+      price: number,
+      partialPercent?: number,
+    ) => {
+      if (line.actionState?.isPending) return;
+      const object = resolveNativeTradingObject(line, objectType);
+      const optimisticState = {
+        ...object.state,
+        ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
+      };
+      const kind: OemsActionKind =
+        objectType === 'order'
+          ? bracketType === 'tp'
+            ? 'orderTpMove'
+            : 'orderSlMove'
+          : bracketType === 'tp'
+            ? 'positionTpMove'
+            : 'positionSlMove';
+      const callback =
+        bracketType === 'tp'
+          ? () => line.callbacks?.onTPMoveEnd?.(price, partialPercent)
+          : () => line.callbacks?.onSLMoveEnd?.(price, partialPercent);
+      startNativeOemsAction(object, kind, optimisticState, callback);
+    },
+    [resolveNativeTradingObject, startNativeOemsAction],
+  );
+
+  const handleNativeBracketClick = useCallback(
+    (line: OrderLineRenderData | PositionLineRenderData, objectType: OemsActionObjectType, bracketType: 'tp' | 'sl') => {
+      if (line.actionState?.isPending) return;
+      const object = resolveNativeTradingObject(line, objectType);
+      const kind: OemsActionKind = bracketType === 'tp' ? 'tpClick' : 'slClick';
+      const callback = bracketType === 'tp' ? () => line.callbacks?.onTPClick?.() : () => line.callbacks?.onSLClick?.();
+      startNativeOemsAction(object, kind, object.state, callback);
+    },
+    [resolveNativeTradingObject, startNativeOemsAction],
+  );
+
+  const interactiveOrderLines = useMemo<OrderLineRenderData[]>(() => {
+    return orderLines.map((order) => {
+      const isActiveDrag = isNativeOrderPriceDragForLine(activeOrderPriceDrag, order);
+      const objectId = getNativeOrderObjectId(order);
+      const status = oemsActions.getObjectStatus('order', objectId, getNativeOrderLineState(order));
+      const actionState = status.action
+        ? {
+            kind: status.action.kind,
+            isPending: status.isPending,
+            isAwaitingCallback: status.isAwaitingCallback,
+            isAwaitingConfirmation: status.isAwaitingConfirmation,
+          }
+        : undefined;
+      return {
+        ...order,
+        price: isActiveDrag ? activeOrderPriceDrag.currentPrice : typeof status.state.price === 'number' ? status.state.price : order.price,
+        brackets: applyNativeBracketActionState(order.brackets, status.state),
+        actionState,
+      };
+    });
+  }, [activeOrderPriceDrag, oemsActions, orderLines]);
+
+  const interactivePositionLines = useMemo<PositionLineRenderData[]>(() => {
+    return positionLines.map((position) => {
+      const objectId = getNativePositionObjectId(position);
+      const status = oemsActions.getObjectStatus('position', objectId, getNativePositionLineState(position));
+      const actionState = status.action
+        ? {
+            kind: status.action.kind,
+            isPending: status.isPending,
+            isAwaitingCallback: status.isAwaitingCallback,
+            isAwaitingConfirmation: status.isAwaitingConfirmation,
+          }
+        : undefined;
+      return {
+        ...position,
+        price: typeof status.state.price === 'number' ? status.state.price : position.price,
+        brackets: applyNativeBracketActionState(position.brackets, status.state),
+        actionState,
+      };
+    });
+  }, [oemsActions, positionLines]);
+
   // Get supported resolutions from core (for filtering timeframe selector)
   const supportedResolutions = coreResult.core?.getSupportedResolutions() ?? null;
 
@@ -1557,9 +2006,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       renderLineOnCanvas: false,
     });
     const nonLastTradeLines = (priceLines ?? []).filter((line) => line.id !== 'last-trade');
+    const bracketPriceLines = [
+      ...interactiveOrderLines.flatMap((line) =>
+        nativeTradingLineToBracketPriceLines(line, pricePrecision, fullRenderOptions.upColor),
+      ),
+      ...interactivePositionLines.flatMap((line) =>
+        nativeTradingLineToBracketPriceLines(line, pricePrecision, fullRenderOptions.upColor),
+      ),
+    ];
 
-    return lastTradeLine ? [...nonLastTradeLines, lastTradeLine] : nonLastTradeLines;
-  }, [bars, interval, priceLines, pricePrecision, fullRenderOptions.upColor, fullRenderOptions.downColor]);
+    return lastTradeLine
+      ? [...nonLastTradeLines, ...bracketPriceLines, lastTradeLine]
+      : [...nonLastTradeLines, ...bracketPriceLines];
+  }, [
+    bars,
+    interval,
+    priceLines,
+    pricePrecision,
+    fullRenderOptions.upColor,
+    fullRenderOptions.downColor,
+    interactiveOrderLines,
+    interactivePositionLines,
+  ]);
 
   // ==========================================================================
   // Gestures (using unified hook)
@@ -1693,12 +2161,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     entryPrice: number;
     isLong: boolean;
     notional: number;
+    partialEnabled: boolean;
+    partialPercent: number;
     color: string;
   } | null>(null);
 
   const handleTPMove = useCallback(
-    (positionId: string, price: number) => {
-      const pos = positionLines?.find((p) => p.id === positionId || p.positionId === positionId);
+    (positionId: string, price: number, partialPercent = 100) => {
+      const pos = interactivePositionLines?.find((p) => p.id === positionId || p.positionId === positionId);
       if (pos?.positionData) {
         setBracketDragState({
           type: 'tp',
@@ -1707,16 +2177,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: pos.positionData.entryPrice,
           isLong: pos.positionData.isLong,
           notional: pos.positionData.notional,
+          partialEnabled: pos.partialEnabled ?? false,
+          partialPercent,
           color: pos.brackets?.takeProfitColor ?? positiveTradingColor,
         });
       }
     },
-    [positionLines, positiveTradingColor],
+    [interactivePositionLines, positiveTradingColor],
   );
 
   const handleSLMove = useCallback(
-    (positionId: string, price: number) => {
-      const pos = positionLines?.find((p) => p.id === positionId || p.positionId === positionId);
+    (positionId: string, price: number, partialPercent = 100) => {
+      const pos = interactivePositionLines?.find((p) => p.id === positionId || p.positionId === positionId);
       if (pos?.positionData) {
         setBracketDragState({
           type: 'sl',
@@ -1725,17 +2197,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: pos.positionData.entryPrice,
           isLong: pos.positionData.isLong,
           notional: pos.positionData.notional,
+          partialEnabled: pos.partialEnabled ?? false,
+          partialPercent,
           color: pos.brackets?.stopLossColor ?? STOP_LOSS_COLOR,
         });
       }
     },
-    [positionLines],
+    [interactivePositionLines],
   );
 
   // Order TP/SL drag move handlers (for Skia bracket preview)
   const handleOrderTPMove = useCallback(
-    (orderId: string, price: number) => {
-      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+    (orderId: string, price: number, partialPercent = 100) => {
+      const order = interactiveOrderLines?.find((o) => o.id === orderId || o.orderId === orderId);
       if (order) {
         setBracketDragState({
           type: 'tp',
@@ -1744,16 +2218,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: order.price,
           isLong: true, // Approximation — actual side determined by OrderLineManager
           notional: 0,
+          partialEnabled: order.partialEnabled ?? false,
+          partialPercent,
           color: order.brackets?.takeProfitColor ?? positiveTradingColor,
         });
       }
     },
-    [orderLines, positiveTradingColor],
+    [interactiveOrderLines, positiveTradingColor],
   );
 
   const handleOrderSLMove = useCallback(
-    (orderId: string, price: number) => {
-      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+    (orderId: string, price: number, partialPercent = 100) => {
+      const order = interactiveOrderLines?.find((o) => o.id === orderId || o.orderId === orderId);
       if (order) {
         setBracketDragState({
           type: 'sl',
@@ -1762,11 +2238,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           entryPrice: order.price,
           isLong: true, // Approximation — actual side determined by OrderLineManager
           notional: 0,
+          partialEnabled: order.partialEnabled ?? false,
+          partialPercent,
           color: order.brackets?.stopLossColor ?? STOP_LOSS_COLOR,
         });
       }
     },
-    [orderLines],
+    [interactiveOrderLines],
   );
 
   const handleTPSLDragEnd = useCallback(() => {
@@ -2453,7 +2931,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     const labelHeight = 20;
 
     // Add order line labels
-    orderLines?.forEach((order) => {
+    interactiveOrderLines.forEach((order) => {
       bounds.push({
         id: `order-${order.id}`,
         originalY: priceToY(order.price, viewport, chartDimensions),
@@ -2464,7 +2942,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
 
     // Add position line labels
-    positionLines?.forEach((pos) => {
+    interactivePositionLines.forEach((pos) => {
       bounds.push({
         id: `position-${pos.id}`,
         originalY: priceToY(pos.price, viewport, chartDimensions),
@@ -2475,10 +2953,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
 
     return bounds;
-  }, [viewport, chartDimensions, orderLines, positionLines]);
+  }, [viewport, chartDimensions, interactiveOrderLines, interactivePositionLines]);
 
   // Resolve collisions
-  useLabelCollision(labelBoundsInput);
+  const resolvedLabelBounds = useLabelCollision(labelBoundsInput);
+  const resolvedLabelYById = useMemo(() => {
+    const yById = new Map<string, number>();
+    for (const bounds of resolvedLabelBounds) {
+      yById.set(bounds.id, bounds.adjustedY);
+    }
+    return yById;
+  }, [resolvedLabelBounds]);
 
   // ==========================================================================
   // Context Menu Handler
@@ -2635,21 +3120,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const bracketPreview = useMemo(() => {
     if (!bracketDragState || !viewport) return null;
 
-    const { type, price, entryPrice, isLong, notional, color } = bracketDragState;
+    const { type, price, entryPrice, isLong, notional, partialEnabled, partialPercent, color } = bracketDragState;
     const y = priceToY(price, viewport, chartDimensions);
 
     // PnL estimate: notional * (price - entry) / entry for long, inverted for short
     const priceDelta = isLong ? price - entryPrice : entryPrice - price;
-    const pnl = (priceDelta / entryPrice) * notional;
-    const pnlSign = pnl >= 0 ? '+' : '';
-    const priceText = safeToFixed(price, pricePrecision);
-    const pnlText = `${pnlSign}${safeToFixed(pnl, 2)}`;
-    const labelText = `${type.toUpperCase()} ${priceText}  ${pnlText}`;
+    const pnl = entryPrice > 0 ? (priceDelta / entryPrice) * notional * (partialPercent / 100) : 0;
+    const hasPnl = notional > 0;
+    const pnlText = hasPnl ? `${pnl >= 0 ? '+' : '-'}$${safeToFixed(Math.abs(pnl), 2)}` : '';
+    const percentDistance = entryPrice > 0 ? ((price - entryPrice) / entryPrice) * 100 : 0;
+    const percentText = `${percentDistance >= 0 ? '+' : ''}${safeToFixed(percentDistance, 2)}%`;
+    const typeText =
+      partialEnabled && partialPercent < 100 ? `${partialPercent}% Partial ${type.toUpperCase()}` : type.toUpperCase();
+    const labelText = [pnlText, typeText, percentText].filter(Boolean).join('  ');
+    const labelWidth = Math.max(96, Math.ceil(labelText.length * 7 + 14));
 
     const chartLeft = chartDimensions.margins.left;
     const chartRight = chartDimensions.width - chartDimensions.margins.right;
 
-    return { y, color, labelText, chartLeft, chartRight, pnl };
+    return { y, color, labelText, labelWidth, chartLeft, chartRight, pnl };
   }, [bracketDragState, viewport, chartDimensions, pricePrecision]);
 
   const crosshairOverlay = useMemo(() => {
@@ -4864,17 +5353,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
             {/* Label background */}
             <Rect
-              x={bracketPreview.chartRight - 160}
+              x={bracketPreview.chartRight - bracketPreview.labelWidth - 5}
               y={bracketPreview.y - 18}
-              width={155}
+              width={bracketPreview.labelWidth}
               height={16}
               color="rgba(19, 23, 34, 0.9)"
             />
             {/* Label border */}
             <Rect
-              x={bracketPreview.chartRight - 160}
+              x={bracketPreview.chartRight - bracketPreview.labelWidth - 5}
               y={bracketPreview.y - 18}
-              width={155}
+              width={bracketPreview.labelWidth}
               height={16}
               color={bracketPreview.color}
               style="stroke"
@@ -4883,7 +5372,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
             {/* Label text */}
             <SkiaText
-              x={bracketPreview.chartRight - 156}
+              x={bracketPreview.chartRight - bracketPreview.labelWidth}
               y={bracketPreview.y - 6}
               text={bracketPreview.labelText}
               font={bracketFont}
@@ -4893,7 +5382,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         )}
       </Canvas>
 
-      {/* Layer 2: Interactive RN Layer (order lines, crosshair, etc.) */}
+      {/* Layer 2: Base Gesture Handler */}
+      <GestureDetector gesture={allGestures}>
+        <Animated.View
+          style={[styles.absoluteFill, styles.baseGestureLayer, { width: dimensions.width, height: dimensions.height }]}
+        />
+      </GestureDetector>
+
+      {/* Layer 3: Interactive RN Layer (order lines, crosshair, etc.) */}
       <View style={[styles.absoluteFill, styles.interactiveLayer]} pointerEvents="box-none">
         {/* Text labels from Skia renderer */}
         {textItems.map((item, index) => (
@@ -4904,14 +5400,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
         {/* Order lines */}
         {viewport &&
-          orderLines?.map((order) => (
+          interactiveOrderLines.map((order) => (
             <OrderLineComponent
-              key={order.id}
+              key={getNativeOrderRenderKey(order)}
               order={order}
               viewport={viewport}
               dimensions={chartDimensions}
+              labelY={resolvedLabelYById.get(`order-${order.id}`)}
               pricePrecision={pricePrecision}
               useNarrowText={dimensions.width < 400}
+              onPriceDragStart={handleOrderPriceDragStart}
+              onPriceDragMove={handleOrderPriceDragMove}
+              onPriceDragEnd={handleOrderPriceDragEnd}
+              onPriceDragCancel={handleOrderPriceDragCancel}
+              onCancel={handleNativeOrderCancel}
+              onTPClick={(line) => handleNativeBracketClick(line, 'order', 'tp')}
+              onSLClick={(line) => handleNativeBracketClick(line, 'order', 'sl')}
+              onTPDragEnd={(line, price, partialPercent) =>
+                handleNativeBracketMoveEnd(line, 'order', 'tp', price, partialPercent)
+              }
+              onSLDragEnd={(line, price, partialPercent) =>
+                handleNativeBracketMoveEnd(line, 'order', 'sl', price, partialPercent)
+              }
               onTPMovePreview={handleOrderTPMove}
               onSLMovePreview={handleOrderSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
@@ -4921,14 +5431,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
         {/* Position lines */}
         {viewport &&
-          positionLines?.map((position) => (
+          interactivePositionLines.map((position) => (
             <PositionLineComponent
               key={position.id}
               position={position}
               viewport={viewport}
               dimensions={chartDimensions}
+              labelY={resolvedLabelYById.get(`position-${position.id}`)}
               pricePrecision={pricePrecision}
               useNarrowText={dimensions.width < 400}
+              onClose={handleNativePositionClose}
+              onReverse={handleNativePositionReverse}
+              onTPClick={(line) => handleNativeBracketClick(line, 'position', 'tp')}
+              onSLClick={(line) => handleNativeBracketClick(line, 'position', 'sl')}
+              onTPDragEnd={(line, price, partialPercent) =>
+                handleNativeBracketMoveEnd(line, 'position', 'tp', price, partialPercent)
+              }
+              onSLDragEnd={(line, price, partialPercent) =>
+                handleNativeBracketMoveEnd(line, 'position', 'sl', price, partialPercent)
+              }
               onTPMovePreview={handleTPMove}
               onSLMovePreview={handleSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
@@ -4953,11 +5474,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           />
         )}
       </View>
-
-      {/* Layer 3: Base Gesture Handler */}
-      <GestureDetector gesture={allGestures}>
-        <Animated.View style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]} />
-      </GestureDetector>
 
       {/* Reset viewport button — re-enables auto-scale */}
       {resetButtonVisible && (
@@ -5217,8 +5733,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#363a45',
   },
   interactiveLayer: {
-    // Interactive elements go here
-    // pointerEvents="box-none" allows touches to pass through to gesture layer
+    zIndex: 2,
+  },
+  baseGestureLayer: {
+    zIndex: 1,
   },
   resetButtonContainer: {
     position: 'absolute',

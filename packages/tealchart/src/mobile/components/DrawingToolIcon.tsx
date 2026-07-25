@@ -24,20 +24,20 @@ function renderNode(node: DrawingIconNode, index: number, color: string, strokeW
         strokeLinecap: 'round' as const,
         strokeLinejoin: 'round' as const,
       };
-  const props = { key: index, ...node.attrs, ...presentation };
+  const props = { ...node.attrs, ...presentation };
   switch (node.tag) {
     case 'path':
-      return <Path {...props} />;
+      return <Path key={index} {...props} />;
     case 'circle':
-      return <Circle {...props} />;
+      return <Circle key={index} {...props} />;
     case 'line':
-      return <Line {...props} />;
+      return <Line key={index} {...props} />;
     case 'polyline':
-      return <Polyline {...props} />;
+      return <Polyline key={index} {...props} />;
     case 'rect':
-      return <Rect {...props} />;
+      return <Rect key={index} {...props} />;
     case 'ellipse':
-      return <Ellipse {...props} />;
+      return <Ellipse key={index} {...props} />;
     default:
       return null;
   }
