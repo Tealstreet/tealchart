@@ -145,6 +145,15 @@ Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the 
 
 Order and position trading-line labels derive their body, quantity, price-label, and action-button colors from `lineColor` using the package defaults in `constants.ts`: blue for buy/unspecified lines, red when consumers supply the default sell/short color, dark low-glare label fills, and filled quantity/PnL-style text on accent segments. Consumers should set semantic line color and line length rather than restyling every label segment. PnL must be passed separately with `setPnl` / `setProfitState`; it is the only label segment that flips to profit/loss color independently of `lineColor`.
 
+Order and position trading callbacks are awaitable OEMS actions. Commit-phase
+callbacks (`onMove`, cancel/close/reverse, TP/SL click, TP/SL move end) must
+flow through the shared `OemsActionManager`: synchronous returns complete
+immediately, promises dim the line and hold optimistic state until confirmation,
+and `false`/throw/reject fails the action and reverts. Continuous preview
+callbacks such as `onMoving`, `onTPMove`, and `onSLMove` must stay frame-local
+and should not own pending lifecycle. Web and Skia renderers must keep raw line
+snapshots separate from derived pending/optimistic render state.
+
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
 ## Commands
