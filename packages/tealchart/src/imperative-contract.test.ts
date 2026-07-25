@@ -192,6 +192,7 @@ const TRADINGVIEW_DATAFEED_CHART_METHODS = [
 const TRADINGVIEW_DATAFEED_QUOTES_METHODS = ['getQuotes', 'subscribeQuotes', 'unsubscribeQuotes'].sort();
 
 const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
+  'setOrderId',
   'setCancelAsSubmit',
   'setTextShort',
   'setQuantityShort',
@@ -209,6 +210,7 @@ const TEALSTREET_SERIALIZABLE_ORDER_METHODS = [...TRADINGVIEW_BUNDLE_ORDER_EXTEN
 const TEALSTREET_ORDER_EXTENSION_METHODS = [...TEALSTREET_SERIALIZABLE_ORDER_METHODS, 'setPnlCalculator'].sort();
 
 const TRADINGVIEW_BUNDLE_POSITION_EXTENSION_METHODS = [
+  'setPositionId',
   'setQuantityShort',
   'setPnl',
   'setPnlShort',
@@ -299,13 +301,27 @@ describe('imperative chart API contract', () => {
     expect(position.getLineLengthUnit()).toBe('percentage');
   });
 
-  it('keeps order lines dotted by default while position lines stay solid', async () => {
+  it('keeps order lines long dashed by default while position lines stay solid', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     const order = await api.createOrderLine();
     const position = await api.createPositionLine();
 
     expect(order.getLineStyle()).toBe(4);
     expect(position.getLineStyle()).toBe(0);
+  });
+
+  it('keeps stable OEMS ids on order and position line render data', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const order = await api.createOrderLine({ orderId: 'order-a' });
+    const position = await api.createPositionLine({ positionId: 'position-a' });
+
+    order.setOrderId('order-b');
+    position.setPositionId('position-b');
+
+    const { orderLines, positionLines } = getTealchartApiLineRenderSnapshot(api);
+
+    expect(orderLines[0]?.orderId).toBe('order-b');
+    expect(positionLines[0]?.positionId).toBe('position-b');
   });
 
   it('keeps default trading-line labels lower-glare with side-colored accents', async () => {

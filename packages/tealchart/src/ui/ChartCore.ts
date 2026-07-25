@@ -50,6 +50,8 @@ import {
   resolveUserDrawingPlacementConstraint,
 } from '../drawings';
 import { EventManager } from '../interaction/EventManager';
+import type { OemsActionKind, OemsActionState } from '../interaction/oemsActionManager';
+import { OemsActionManager } from '../interaction/oemsActionManager';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { computePaneGeometry, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
@@ -64,9 +66,10 @@ import {
   ContextMenuItem,
   DEFAULT_MARGINS,
   ExecutionLineRenderData,
+  Awaitable,
+  OemsActionResult,
   OrderLineRenderData,
   PaneLayout,
-  PendingOrderUpdate,
   PositionData,
   PositionLineRenderData,
   PriceLine,
@@ -94,6 +97,13 @@ export interface IndicatorPaneInfo {
   inputs?: Record<string, unknown>;
 }
 
+interface OemsTradingLineState extends OemsActionState {
+  price?: number;
+  takeProfit?: number;
+  stopLoss?: number;
+  visible?: boolean;
+}
+
 export interface ChartCoreOptions {
   /** Container element */
   container: HTMLElement;
@@ -110,15 +120,15 @@ export interface ChartCoreOptions {
   /** Callback when more historical bars needed */
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Callback when order is moved via drag */
-  onOrderMove?: (orderId: string, newPrice: number) => void;
+  onOrderMove?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
   /** Callback while an order is being dragged */
-  onOrderMoving?: (orderId: string, newPrice: number) => void;
+  onOrderMoving?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
   /** Callback when order cancel button clicked */
-  onOrderCancel?: (orderId: string) => void;
+  onOrderCancel?: (orderId: string) => Awaitable<OemsActionResult>;
   /** Callback when position close button clicked */
-  onPositionClose?: (positionId: string) => void;
+  onPositionClose?: (positionId: string) => Awaitable<OemsActionResult>;
   /** Callback when position reverse button clicked */
-  onPositionReverse?: (positionId: string) => void;
+  onPositionReverse?: (positionId: string) => Awaitable<OemsActionResult>;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */
@@ -284,7 +294,7 @@ function orderLineToPriceLine(
     1: 'dotted',
     2: 'dashed',
     3: 'dashed',
-    4: 'dotted',
+    4: 'dashed',
   };
   const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
@@ -364,6 +374,7 @@ function orderLineToPriceLine(
     color: order.lineColor,
     type: 'order',
     lineLength: order.lineLength,
+    lineLengthUnit: order.lineLengthUnit,
     extendLeft: order.extendLeft,
     lineWidth: order.lineWidth,
     priority: 50,
@@ -374,8 +385,10 @@ function orderLineToPriceLine(
       textColor: order.bodyTextColor,
     },
     chartLabel,
+    orderId: order.orderId,
     partialEnabled: order.partialEnabled,
     brackets: order.brackets,
+    actionState: order.actionState,
     callbacks: order.callbacks,
   };
 }
@@ -394,7 +407,7 @@ function positionLineToPriceLine(
     1: 'dotted',
     2: 'dashed',
     3: 'dashed',
-    4: 'dotted',
+    4: 'dashed',
   };
 
   let pnlStateColor: string | undefined;
@@ -504,6 +517,7 @@ function positionLineToPriceLine(
     color: position.lineColor,
     type: 'position',
     lineLength: position.lineLength,
+    lineLengthUnit: position.lineLengthUnit,
     extendLeft: position.extendLeft,
     lineWidth: position.lineWidth,
     priority: 75,
@@ -518,6 +532,7 @@ function positionLineToPriceLine(
     partialEnabled: position.partialEnabled,
     positionData: position.positionData ?? undefined,
     brackets: position.brackets,
+    actionState: position.actionState,
     callbacks: position.callbacks,
   };
 }
@@ -632,7 +647,7 @@ export class ChartCore {
   private plotStyleOverrides: Map<string, PlotStyleOverride> = new Map();
 
   // State
-  private pendingOrders = new Map<string, PendingOrderUpdate>();
+  private readonly oemsActions: OemsActionManager<OemsTradingLineState>;
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
   /** Auto-scale computed Y ranges from AutoScaleManager (set by TealchartWidget each render) */
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
@@ -693,6 +708,9 @@ export class ChartCore {
     this.options = options;
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
+    this.oemsActions = new OemsActionManager<OemsTradingLineState>({
+      onChange: () => this.scheduleRender(),
+    });
 
     // Create chart container
     this.chartContainer = div({
@@ -787,9 +805,13 @@ export class ChartCore {
             ),
           onOrderMove: (orderId, newPrice) => this.handleOrderMove(orderId, newPrice),
           onOrderMoving: (orderId, newPrice) => this.options.onOrderMoving?.(orderId, newPrice),
-          onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
-          onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
-          onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
+          onOrderCancel: (orderId) => this.handleOrderCancel(orderId),
+          onPositionClose: (positionId) => this.handlePositionClose(positionId),
+          onPositionReverse: (positionId) => this.handlePositionReverse(positionId),
+          onTPDragEnd: (bound, price, partialPercent) => this.handleBracketMoveEnd('tp', bound, price, partialPercent),
+          onSLDragEnd: (bound, price, partialPercent) => this.handleBracketMoveEnd('sl', bound, price, partialPercent),
+          onTPClick: (bound) => this.handleBracketClick('tp', bound),
+          onSLClick: (bound) => this.handleBracketClick('sl', bound),
           onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
             this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
           },
@@ -1028,33 +1050,12 @@ export class ChartCore {
    * Reference equality check - skip if same array (like React refs)
    * Skips updates during drag since orders don't change while dragging chart
    */
-  private lastOrderLinePrices = new Map<string, number>();
-
   setOrderLines(lines: OrderLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
-    if (lines === this.orderLines && this.pendingOrders.size === 0) return;
+    if (lines === this.orderLines && this.oemsActions.getActions().length === 0) return;
 
-    // Detect which orders had their price changed since last call
-    if (this.pendingOrders.size > 0) {
-      for (const line of lines) {
-        const prevPrice = this.lastOrderLinePrices.get(line.id);
-        if (prevPrice !== undefined && prevPrice !== line.price && this.pendingOrders.has(line.id)) {
-          // This order's price changed — server confirmed or app reverted
-          const pending = this.pendingOrders.get(line.id)!;
-          clearTimeout(pending.timeoutId);
-          this.pendingOrders.delete(line.id);
-        }
-      }
-    }
-
-    // Update price tracking
-    this.lastOrderLinePrices.clear();
-    for (const line of lines) {
-      this.lastOrderLinePrices.set(line.id, line.price);
-    }
-
-    this.orderLines = lines;
-    this.cleanupPendingOrders();
+    this.confirmOrderLineSnapshots(lines);
+    this.orderLines = lines.map((line) => this.applyOrderActionState(line));
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1065,9 +1066,111 @@ export class ChartCore {
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
-    if (lines === this.positionLines) return;
-    this.positionLines = lines;
+    if (lines === this.positionLines && this.oemsActions.getActions().length === 0) return;
+
+    this.confirmPositionLineSnapshots(lines);
+    this.positionLines = lines.map((line) => this.applyPositionActionState(line));
     // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  private getOrderObjectId(line: OrderLineRenderData): string {
+    return line.orderId || line.id;
+  }
+
+  private getPositionObjectId(line: PositionLineRenderData): string {
+    return line.positionId || line.id;
+  }
+
+  private getOrderLineState(line: OrderLineRenderData): OemsTradingLineState {
+    return {
+      price: line.price,
+      takeProfit: line.brackets?.takeProfit,
+      stopLoss: line.brackets?.stopLoss,
+      visible: true,
+    };
+  }
+
+  private getPositionLineState(line: PositionLineRenderData): OemsTradingLineState {
+    return {
+      price: line.price,
+      takeProfit: line.brackets?.takeProfit,
+      stopLoss: line.brackets?.stopLoss,
+      visible: true,
+    };
+  }
+
+  private confirmOrderLineSnapshots(lines: OrderLineRenderData[]): void {
+    const seen = new Set(lines.map((line) => this.getOrderObjectId(line)));
+    for (const line of lines) {
+      this.oemsActions.confirmState('order', this.getOrderObjectId(line), this.getOrderLineState(line));
+    }
+
+    for (const action of this.oemsActions.getActions()) {
+      if (action.objectType === 'order' && action.confirmsRemoved && !seen.has(action.objectId)) {
+        this.oemsActions.confirmRemoved('order', action.objectId);
+      }
+    }
+  }
+
+  private confirmPositionLineSnapshots(lines: PositionLineRenderData[]): void {
+    const seen = new Set(lines.map((line) => this.getPositionObjectId(line)));
+    for (const line of lines) {
+      this.oemsActions.confirmState('position', this.getPositionObjectId(line), this.getPositionLineState(line));
+    }
+
+    for (const action of this.oemsActions.getActions()) {
+      if (action.objectType === 'position' && action.confirmsRemoved && !seen.has(action.objectId)) {
+        this.oemsActions.confirmRemoved('position', action.objectId);
+      }
+    }
+  }
+
+  private applyOrderActionState(line: OrderLineRenderData): OrderLineRenderData {
+    const objectId = this.getOrderObjectId(line);
+    const status = this.oemsActions.getObjectStatus('order', objectId, this.getOrderLineState(line));
+    if (!status.action) return { ...line, actionState: undefined };
+
+    return {
+      ...line,
+      price: typeof status.state.price === 'number' ? status.state.price : line.price,
+      brackets: this.applyBracketActionState(line.brackets, status.state),
+      actionState: {
+        kind: status.action.kind,
+        isPending: status.isPending,
+        isAwaitingCallback: status.isAwaitingCallback,
+        isAwaitingConfirmation: status.isAwaitingConfirmation,
+      },
+    };
+  }
+
+  private applyPositionActionState(line: PositionLineRenderData): PositionLineRenderData {
+    const objectId = this.getPositionObjectId(line);
+    const status = this.oemsActions.getObjectStatus('position', objectId, this.getPositionLineState(line));
+    if (!status.action) return { ...line, actionState: undefined };
+
+    return {
+      ...line,
+      price: typeof status.state.price === 'number' ? status.state.price : line.price,
+      brackets: this.applyBracketActionState(line.brackets, status.state),
+      actionState: {
+        kind: status.action.kind,
+        isPending: status.isPending,
+        isAwaitingCallback: status.isAwaitingCallback,
+        isAwaitingConfirmation: status.isAwaitingConfirmation,
+      },
+    };
+  }
+
+  private applyBracketActionState<TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets']>(
+    brackets: TBracket,
+    state: OemsTradingLineState,
+  ): TBracket {
+    if (!brackets) return brackets;
+    return {
+      ...brackets,
+      takeProfit: typeof state.takeProfit === 'number' ? state.takeProfit : brackets.takeProfit,
+      stopLoss: typeof state.stopLoss === 'number' ? state.stopLoss : brackets.stopLoss,
+    } as TBracket;
   }
 
   /**
@@ -1269,20 +1372,151 @@ export class ChartCore {
   }
 
   private handleOrderMove(orderId: string, newPrice: number): void {
-    const originalOrder = this.orderLines.find((o) => o.id === orderId);
-    const originalPrice = originalOrder?.price ?? newPrice;
-    this.pendingOrders.set(orderId, {
-      orderId,
-      pendingPrice: newPrice,
-      originalPrice,
-      startTime: Date.now(),
-      timeoutId: setTimeout(() => {
-        this.pendingOrders.delete(orderId);
-        this.scheduleRender();
-      }, 5000),
+    const order = this.orderLines.find((line) => this.getOrderObjectId(line) === orderId);
+    const originalState = order ? this.getOrderLineState(order) : { price: newPrice, visible: true };
+    const result = this.oemsActions.startAction({
+      objectType: 'order',
+      objectId: orderId,
+      kind: 'orderMove',
+      originalState,
+      optimisticState: {
+        ...originalState,
+        price: newPrice,
+      },
+      callback: () => this.options.onOrderMove?.(orderId, newPrice),
     });
-    this.scheduleRender();
-    this.options.onOrderMove?.(orderId, newPrice);
+    if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private handleOrderCancel(orderId: string): void {
+    const order = this.orderLines.find((line) => this.getOrderObjectId(line) === orderId);
+    const originalState = order ? this.getOrderLineState(order) : { visible: true };
+    const result = this.oemsActions.startAction({
+      objectType: 'order',
+      objectId: orderId,
+      kind: 'orderCancel',
+      originalState,
+      optimisticState: originalState,
+      confirmsRemoved: true,
+      callback: () => this.options.onOrderCancel?.(orderId),
+    });
+    if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private handlePositionClose(positionId: string): void {
+    const position = this.positionLines.find((line) => this.getPositionObjectId(line) === positionId);
+    const originalState = position ? this.getPositionLineState(position) : { visible: true };
+    const result = this.oemsActions.startAction({
+      objectType: 'position',
+      objectId: positionId,
+      kind: 'positionClose',
+      originalState,
+      optimisticState: originalState,
+      confirmsRemoved: true,
+      callback: () => this.options.onPositionClose?.(positionId),
+    });
+    if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private handlePositionReverse(positionId: string): void {
+    const position = this.positionLines.find((line) => this.getPositionObjectId(line) === positionId);
+    const originalState = position ? this.getPositionLineState(position) : { visible: true };
+    const result = this.oemsActions.startAction({
+      objectType: 'position',
+      objectId: positionId,
+      kind: 'positionReverse',
+      originalState,
+      optimisticState: originalState,
+      confirmsRemoved: true,
+      callback: () => this.options.onPositionReverse?.(positionId),
+    });
+    if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private handleBracketMoveEnd(
+    bracketType: 'tp' | 'sl',
+    bound: PriceLineLabelBounds,
+    price: number,
+    partialPercent?: number,
+  ): void {
+    const object = this.getBoundTradingObject(bound);
+    if (!object) return;
+
+    const originalState = object.state;
+    const optimisticState: OemsTradingLineState = {
+      ...originalState,
+      ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
+    };
+    const kind = this.getBracketMoveActionKind(object.objectType, bracketType);
+    const callback =
+      bracketType === 'tp'
+        ? () => bound.callbacks?.onTPMoveEnd?.(price, partialPercent)
+        : () => bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
+    const result = this.oemsActions.startAction({
+      objectType: object.objectType,
+      objectId: object.objectId,
+      kind,
+      originalState,
+      optimisticState,
+      callback,
+    });
+    if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private handleBracketClick(bracketType: 'tp' | 'sl', bound: PriceLineLabelBounds): void {
+    const object = this.getBoundTradingObject(bound);
+    if (!object) return;
+
+    const kind: OemsActionKind = bracketType === 'tp' ? 'tpClick' : 'slClick';
+    const callback = bracketType === 'tp' ? () => bound.callbacks?.onTPClick?.() : () => bound.callbacks?.onSLClick?.();
+    const result = this.oemsActions.startAction({
+      objectType: object.objectType,
+      objectId: object.objectId,
+      kind,
+      originalState: object.state,
+      optimisticState: object.state,
+      callback,
+    });
+    if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private getBoundTradingObject(
+    bound: PriceLineLabelBounds,
+  ):
+    | {
+        objectType: 'order' | 'position';
+        objectId: string;
+        state: OemsTradingLineState;
+      }
+    | null {
+    if (bound.type === 'order') {
+      const objectId = bound.orderId || bound.lineId;
+      const line = this.orderLines.find((candidate) => this.getOrderObjectId(candidate) === objectId);
+      return {
+        objectType: 'order',
+        objectId,
+        state: line ? this.getOrderLineState(line) : { price: bound.price, visible: true },
+      };
+    }
+
+    if (bound.type === 'position') {
+      const objectId = bound.positionId || bound.lineId;
+      const line = this.positionLines.find((candidate) => this.getPositionObjectId(candidate) === objectId);
+      return {
+        objectType: 'position',
+        objectId,
+        state: line ? this.getPositionLineState(line) : { price: bound.price, visible: true },
+      };
+    }
+
+    return null;
+  }
+
+  private getBracketMoveActionKind(objectType: 'order' | 'position', bracketType: 'tp' | 'sl'): OemsActionKind {
+    if (objectType === 'order') {
+      return bracketType === 'tp' ? 'orderTpMove' : 'orderSlMove';
+    }
+    return bracketType === 'tp' ? 'positionTpMove' : 'positionSlMove';
   }
 
   /**
@@ -1432,6 +1666,7 @@ export class ChartCore {
     this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
     this.closeContextMenu();
     this.eventManager.dispose();
+    this.oemsActions.dispose();
     this.priceLineManager?.dispose();
     this.stage?.destroy();
     if (!preserveDom) {
@@ -2003,21 +2238,6 @@ export class ChartCore {
     return null;
   }
 
-  private cleanupPendingOrders(): void {
-    // Clear pending for orders that no longer exist (cancelled/filled)
-    let cleaned = false;
-    for (const [id, pending] of this.pendingOrders) {
-      const exists = this.orderLines.some((o) => o.id === id);
-      if (!exists) {
-        clearTimeout(pending.timeoutId);
-        this.pendingOrders.delete(id);
-        cleaned = true;
-      }
-    }
-    // Force rebuild so the line renders at the confirmed price (not the pending override)
-    if (cleaned) this.scheduleRender();
-  }
-
   // ============================================================================
   // Private: Render
   // ============================================================================
@@ -2147,13 +2367,7 @@ export class ChartCore {
         }
         return { ...p, priority: p.priority ?? 100 };
       }),
-      ...this.orderLines.map((o) => {
-        const pending = this.pendingOrders.get(o.id);
-        if (pending) {
-          return orderLineToPriceLine({ ...o, price: pending.pendingPrice }, formatPrice, positiveTradingColor);
-        }
-        return orderLineToPriceLine(o, formatPrice, positiveTradingColor);
-      }),
+      ...this.orderLines.map((o) => orderLineToPriceLine(o, formatPrice, positiveTradingColor)),
       ...this.positionLines.map((p) =>
         positionLineToPriceLine(p, formatPrice, positiveTradingColor, negativeTradingColor),
       ),
@@ -2229,11 +2443,14 @@ export class ChartCore {
           b.color = line.color;
           b.lineStyle = line.lineStyle;
           b.lineLength = line.lineLength;
+          b.lineLengthUnit = line.lineLengthUnit;
           b.extendLeft = line.extendLeft;
           b.lineWidth = line.lineWidth;
           b.renderLineOnCanvas = line.renderLineOnCanvas;
           b.countdownToTime = line.countdownToTime;
           b.draggable = line.draggable;
+          b.actionState = line.actionState;
+          b.orderId = line.orderId;
           b.positionId = line.positionId;
           b.partialEnabled = line.partialEnabled;
           b.positionData = line.positionData;
@@ -2950,7 +3167,7 @@ export class ChartCore {
     if (this.priceLineManager?.isDragging()) {
       return;
     }
-    this.priceLineManager?.update(this.labelBoundsCache, this.pendingOrders, {
+    this.priceLineManager?.update(this.labelBoundsCache, {
       x: 0,
       y: 0,
       visible: false,

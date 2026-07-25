@@ -1,7 +1,7 @@
 import type { OrderLineRenderData, PositionLineRenderData, Viewport } from '../../types';
 import type { ChartDimensions } from '../utils/coordinates';
 
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Gesture } from 'react-native-gesture-handler';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -141,6 +141,7 @@ function createPositionLine(callbacks: PositionLineRenderData['callbacks']): Pos
 describe('mobile TP/SL partial bracket gestures', () => {
   afterEach(() => {
     (Gesture.Pan as unknown as MockGestureFactory).mockClear();
+    (Gesture.Tap as unknown as MockGestureFactory).mockClear();
   });
 
   it('passes partial percentages for mobile order bracket drags', () => {
@@ -155,7 +156,9 @@ describe('mobile TP/SL partial bracket gestures', () => {
     render(
       <OrderLineComponent
         dimensions={dimensions}
+        onSLDragEnd={(_, price, partialPercent) => onSLMoveEnd(price, partialPercent)}
         onSLMovePreview={onSLMovePreview}
+        onTPDragEnd={(_, price, partialPercent) => onTPMoveEnd(price, partialPercent)}
         onTPMovePreview={onTPMovePreview}
         order={createOrderLine({ onSLMove, onSLMoveEnd, onTPClick, onTPMove, onTPMoveEnd })}
         viewport={viewport}
@@ -183,6 +186,8 @@ describe('mobile TP/SL partial bracket gestures', () => {
     render(
       <OrderLineComponent
         dimensions={dimensions}
+        onPriceDragEnd={(_, price) => onMove(price)}
+        onPriceDragMove={(_, price) => onMoving(price)}
         order={createOrderLine({ onMove, onMoving })}
         viewport={viewport}
       />,
@@ -194,6 +199,37 @@ describe('mobile TP/SL partial bracket gestures', () => {
 
     expect(onMoving).toHaveBeenCalledWith(expect.any(Number));
     expect(onMove).toHaveBeenCalledWith(expect.any(Number));
+  });
+
+  it('fires mobile order action buttons and bracket tap callbacks', () => {
+    const onCancel = vi.fn();
+    const onTPClick = vi.fn();
+    const onSLClick = vi.fn();
+    const onTPMoveEnd = vi.fn();
+    const onSLMoveEnd = vi.fn();
+
+    render(
+      <OrderLineComponent
+        dimensions={dimensions}
+        onCancel={() => onCancel()}
+        onSLClick={() => onSLClick()}
+        onSLDragEnd={(_, price, partialPercent) => onSLMoveEnd(price, partialPercent)}
+        onTPClick={() => onTPClick()}
+        onTPDragEnd={(_, price, partialPercent) => onTPMoveEnd(price, partialPercent)}
+        order={createOrderLine({ onCancel, onSLClick, onSLMoveEnd, onTPClick, onTPMoveEnd })}
+        viewport={viewport}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Cancel order'));
+    fireEvent.click(screen.getByLabelText('Take profit'));
+    fireEvent.click(screen.getByLabelText('Stop loss'));
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onTPClick).toHaveBeenCalledTimes(1);
+    expect(onSLClick).toHaveBeenCalledTimes(1);
+    expect(onTPMoveEnd).not.toHaveBeenCalled();
+    expect(onSLMoveEnd).not.toHaveBeenCalled();
   });
 
   it('passes partial percentages for mobile position bracket drags', () => {
@@ -208,7 +244,9 @@ describe('mobile TP/SL partial bracket gestures', () => {
     render(
       <PositionLineComponent
         dimensions={dimensions}
+        onSLDragEnd={(_, price, partialPercent) => onSLMoveEnd(price, partialPercent)}
         onSLMovePreview={onSLMovePreview}
+        onTPDragEnd={(_, price, partialPercent) => onTPMoveEnd(price, partialPercent)}
         onTPMovePreview={onTPMovePreview}
         position={createPositionLine({ onSLClick, onSLMove, onSLMoveEnd, onTPMove, onTPMoveEnd })}
         viewport={viewport}
@@ -227,5 +265,40 @@ describe('mobile TP/SL partial bracket gestures', () => {
     expect(onSLMoveEnd).toHaveBeenLastCalledWith(expect.any(Number), 10);
     expect(onSLMovePreview).toHaveBeenLastCalledWith('position-1', expect.any(Number), 10);
     expect(onSLClick).not.toHaveBeenCalled();
+  });
+
+  it('fires mobile position action buttons and bracket tap callbacks', () => {
+    const onClose = vi.fn();
+    const onReverse = vi.fn();
+    const onTPClick = vi.fn();
+    const onSLClick = vi.fn();
+    const onTPMoveEnd = vi.fn();
+    const onSLMoveEnd = vi.fn();
+
+    render(
+      <PositionLineComponent
+        dimensions={dimensions}
+        onClose={() => onClose()}
+        onReverse={() => onReverse()}
+        onSLClick={() => onSLClick()}
+        onSLDragEnd={(_, price, partialPercent) => onSLMoveEnd(price, partialPercent)}
+        onTPClick={() => onTPClick()}
+        onTPDragEnd={(_, price, partialPercent) => onTPMoveEnd(price, partialPercent)}
+        position={createPositionLine({ onClose, onReverse, onSLClick, onSLMoveEnd, onTPClick, onTPMoveEnd })}
+        viewport={viewport}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Reverse position'));
+    fireEvent.click(screen.getByLabelText('Close position'));
+    fireEvent.click(screen.getByLabelText('Take profit'));
+    fireEvent.click(screen.getByLabelText('Stop loss'));
+
+    expect(onReverse).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onTPClick).toHaveBeenCalledTimes(1);
+    expect(onSLClick).toHaveBeenCalledTimes(1);
+    expect(onTPMoveEnd).not.toHaveBeenCalled();
+    expect(onSLMoveEnd).not.toHaveBeenCalled();
   });
 });
