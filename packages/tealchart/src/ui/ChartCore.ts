@@ -1055,7 +1055,7 @@ export class ChartCore {
     if (lines === this.orderLines && this.oemsActions.getActions().length === 0) return;
 
     this.confirmOrderLineSnapshots(lines);
-    this.orderLines = lines.map((line) => this.applyOrderActionState(line));
+    this.orderLines = lines;
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1069,8 +1069,22 @@ export class ChartCore {
     if (lines === this.positionLines && this.oemsActions.getActions().length === 0) return;
 
     this.confirmPositionLineSnapshots(lines);
-    this.positionLines = lines.map((line) => this.applyPositionActionState(line));
+    this.positionLines = lines;
     // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  private getRenderedOrderLines(): OrderLineRenderData[] {
+    if (this.oemsActions.getActions().length === 0) {
+      return this.orderLines.map((line) => ({ ...line, actionState: undefined }));
+    }
+    return this.orderLines.map((line) => this.applyOrderActionState(line));
+  }
+
+  private getRenderedPositionLines(): PositionLineRenderData[] {
+    if (this.oemsActions.getActions().length === 0) {
+      return this.positionLines.map((line) => ({ ...line, actionState: undefined }));
+    }
+    return this.positionLines.map((line) => this.applyPositionActionState(line));
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {
@@ -2346,6 +2360,8 @@ export class ChartCore {
     const renderOptions = { ...this.renderer.getOptions(), ...this.options.renderOptions };
     const positiveTradingColor = resolvePositiveTradingColor(renderOptions);
     const negativeTradingColor = resolveNegativeTradingColor(renderOptions);
+    const renderedOrderLines = this.getRenderedOrderLines();
+    const renderedPositionLines = this.getRenderedPositionLines();
 
     // Build all price lines
     const allPriceLines: PriceLine[] = [
@@ -2367,12 +2383,12 @@ export class ChartCore {
         }
         return { ...p, priority: p.priority ?? 100 };
       }),
-      ...this.orderLines.map((o) => orderLineToPriceLine(o, formatPrice, positiveTradingColor)),
-      ...this.positionLines.map((p) =>
+      ...renderedOrderLines.map((o) => orderLineToPriceLine(o, formatPrice, positiveTradingColor)),
+      ...renderedPositionLines.map((p) =>
         positionLineToPriceLine(p, formatPrice, positiveTradingColor, negativeTradingColor),
       ),
-      ...this.orderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice, positiveTradingColor)),
-      ...this.positionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice, positiveTradingColor)),
+      ...renderedOrderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice, positiveTradingColor)),
+      ...renderedPositionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice, positiveTradingColor)),
     ];
 
     // Skip the line being dragged — the Konva drag line replaces it during drag.
