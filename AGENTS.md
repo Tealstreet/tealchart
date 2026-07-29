@@ -4,6 +4,10 @@ This repository is a Tealstreet mirror. It is a filtered, read/write view of an
 upstream monorepo. Contributors and agents work here normally through mirror
 branches and pull requests; upstream monorepo access is not required.
 
+This mirror is public open-source software under the MIT license. Do not add
+terms that narrow the MIT grant or imply private/restricted access to the
+tealchart mirror docs or license files.
+
 ## Before Editing
 
 - Start from the latest mirror `master`.

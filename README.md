@@ -106,9 +106,4 @@ git branch -d feat/my-change
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE). **Scoped to this repository only** (see
-[`NOTICE`](NOTICE)): the MIT grant covers `tealchart` and `tealscript` and
-nothing else. It does not extend to any other Tealstreet software — notably
-`tealstreet-sdk` (safe-cex, the CLI, and their dependencies), which is
-proprietary and separately licensed — nor to the Tealstreet name, logos, or
-trademarks.
+MIT — see [`LICENSE`](LICENSE).
