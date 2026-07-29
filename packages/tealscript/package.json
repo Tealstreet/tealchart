@@ -26,7 +26,8 @@
     "test:compat": "vitest run tests/compat",
     "test-unit": "vitest run",
     "test-unit-watch": "vitest watch --ui",
-    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+    "typecheck": "node ../../scripts/tsc-ts6.mjs --project ./tsconfig.json --noEmit",
+    "typecheck:ts7": "node ../../scripts/tsc-ts7.mjs --project ./tsconfig.json --noEmit"
   },
   "dependencies": {
     "peggy": "^5.1.0"
@@ -39,7 +40,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.28.0",
     "npm-run-all2": "^9.0.2",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",

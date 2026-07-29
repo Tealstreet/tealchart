@@ -5,7 +5,11 @@ import type { PaneOffset } from './rendering/PaneManager';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
-import { DEFAULT_SELL_CANDLE_COLOR, TRADE_LINE_DOTTED_DASH_PATTERN } from './constants';
+import {
+  DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  TRADE_LINE_DOTTED_DASH_PATTERN,
+} from './constants';
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
@@ -636,6 +640,7 @@ export class TealchartRenderer {
         type: line.type,
         chartLabel: line.chartLabel,
         lineLength: line.lineLength,
+        lineLengthUnit: line.lineLengthUnit,
         extendLeft: line.extendLeft,
         lineWidth: line.lineWidth,
         floatingLabel: line.floatingLabel,
@@ -643,8 +648,10 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
+        actionState: line.actionState,
         targetPaneId: line.targetPaneId,
-        // Position-specific fields for bracket TP/SL drag
+        // Trading object identity for OEMS callbacks
+        orderId: line.orderId,
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,
@@ -815,6 +822,7 @@ export class TealchartRenderer {
     const color = bound.color;
     const lineWidth = bound.lineWidth || 1;
     const lineLength = bound.lineLength ?? 100;
+    const lineLengthUnit = bound.lineLengthUnit ?? 'percentage';
     const extendLeft = bound.extendLeft ?? true;
     const labelCenterY = bound.adjustedY;
 
@@ -845,7 +853,11 @@ export class TealchartRenderer {
       // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
       const maxLabelX = options.width - margins.right - chartLabelWidth;
       const minLabelX = lineStartX;
-      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
+      chartLabelX =
+        lineLengthUnit === 'pixel'
+          ? maxLabelX - Math.max(0, lineLength)
+          : minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
+      chartLabelX = Math.max(minLabelX, Math.min(maxLabelX, chartLabelX));
     }
 
     // Set line style
@@ -1291,7 +1303,7 @@ export class TealchartRenderer {
         pnlStateColor ?? line.lineColor,
         line.bodyBorderColor,
         pnl,
-        line.bodyTextColor,
+        pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : line.bodyTextColor,
       );
       currentX += pnlWidth + 2;
     }
@@ -3221,6 +3233,7 @@ export class TealchartRenderer {
         type: line.type,
         chartLabel: line.chartLabel,
         lineLength: line.lineLength,
+        lineLengthUnit: line.lineLengthUnit,
         extendLeft: line.extendLeft,
         lineWidth: line.lineWidth,
         floatingLabel: line.floatingLabel,
@@ -3228,8 +3241,10 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
+        actionState: line.actionState,
         targetPaneId: line.targetPaneId,
-        // Position-specific fields for bracket TP/SL drag
+        // Trading object identity for OEMS callbacks
+        orderId: line.orderId,
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,
@@ -4616,6 +4631,7 @@ export class TealchartRenderer {
         type: line.type,
         chartLabel: line.chartLabel,
         lineLength: line.lineLength,
+        lineLengthUnit: line.lineLengthUnit,
         extendLeft: line.extendLeft,
         lineWidth: line.lineWidth,
         floatingLabel: line.floatingLabel,
@@ -4623,7 +4639,9 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
-        // Position-specific fields for bracket TP/SL drag
+        actionState: line.actionState,
+        // Trading object identity for OEMS callbacks
+        orderId: line.orderId,
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,

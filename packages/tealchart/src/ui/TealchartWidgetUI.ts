@@ -25,6 +25,8 @@ import type {
   Bar,
   ContextMenuItem,
   ExecutionLineRenderData,
+  Awaitable,
+  OemsActionResult,
   OrderLineRenderData,
   PaneLayout,
   PositionLineRenderData,
@@ -123,14 +125,14 @@ export interface TealchartWidgetUIOptions {
   /** Callback when more bars are needed */
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Callback when order is moved */
-  onOrderMove?: (orderId: string, newPrice: number) => void;
-  onOrderMoving?: (orderId: string, newPrice: number) => void;
+  onOrderMove?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
+  onOrderMoving?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
   /** Callback when order is cancelled */
-  onOrderCancel?: (orderId: string) => void;
+  onOrderCancel?: (orderId: string) => Awaitable<OemsActionResult>;
   /** Callback when position is closed */
-  onPositionClose?: (positionId: string) => void;
+  onPositionClose?: (positionId: string) => Awaitable<OemsActionResult>;
   /** Callback when position is reversed */
-  onPositionReverse?: (positionId: string) => void;
+  onPositionReverse?: (positionId: string) => Awaitable<OemsActionResult>;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */

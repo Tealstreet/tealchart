@@ -12,17 +12,26 @@
 import type { OrderLineRenderData, Viewport } from '../../types';
 import type { ChartDimensions } from '../utils/coordinates';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR, STOP_LOSS_COLOR } from '../../constants';
+import {
+  DEFAULT_BUY_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  STOP_LOSS_COLOR,
+} from '../../constants';
 import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
-import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
-import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
+import {
+  formatNativeTradeLinePrice,
+  layoutNativeTradeLine,
+  measureNativeTradeLineLabelWidth,
+} from '../utils/tradeLineLayout';
+import { NativeTradeLineSegment } from './NativeTradeLineSegment';
 
 export interface OrderLineComponentProps {
   /** Order line render data from adapter */
@@ -35,8 +44,28 @@ export interface OrderLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
+  /** Collision-adjusted label center Y. The price line itself remains at order.price. */
+  labelY?: number;
   /** TP default color, usually the active candle up color. */
   positiveColor?: string;
+  /** Called when the order price drag starts. */
+  onPriceDragStart?: (lineId: string, originalPrice: number, externalOrderId?: string) => void;
+  /** Continuous order price drag callback. */
+  onPriceDragMove?: (lineId: string, price: number, externalOrderId?: string) => void;
+  /** Called when the order price drag ends. */
+  onPriceDragEnd?: (lineId: string, price: number, externalOrderId?: string) => void;
+  /** Called when the order price drag is cancelled before a normal end. */
+  onPriceDragCancel?: (lineId: string, externalOrderId?: string) => void;
+  /** Called when the order cancel button is pressed. */
+  onCancel?: (order: OrderLineRenderData) => void;
+  /** Called when TP is pressed without drag. */
+  onTPClick?: (order: OrderLineRenderData) => void;
+  /** Called when SL is pressed without drag. */
+  onSLClick?: (order: OrderLineRenderData) => void;
+  /** Called when TP drag commits. */
+  onTPDragEnd?: (order: OrderLineRenderData, price: number, partialPercent?: number) => void;
+  /** Called when SL drag commits. */
+  onSLDragEnd?: (order: OrderLineRenderData, price: number, partialPercent?: number) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (orderId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -47,6 +76,7 @@ export interface OrderLineComponentProps {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum touch target per accessibility guidelines
 const LABEL_HEIGHT = 18;
+const ACTION_BUTTON_WIDTH = 18;
 const TP_SL_BUTTON_WIDTH = 24;
 const DRAG_THRESHOLD = 5;
 
@@ -60,75 +90,133 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   useNarrowText = false,
+  labelY,
   positiveColor = DEFAULT_BUY_CANDLE_COLOR,
+  onPriceDragStart,
+  onPriceDragMove,
+  onPriceDragEnd,
+  onPriceDragCancel,
+  onCancel,
+  onTPClick,
+  onSLClick,
+  onTPDragEnd,
+  onSLDragEnd,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
 }) => {
+  const isPending = order.actionState?.isPending ?? false;
+  const isAwaitingCallback = order.actionState?.isAwaitingCallback ?? false;
   // Calculate Y position from price
   const baseY = useMemo(() => priceToY(order.price, viewport, dimensions), [order.price, viewport, dimensions]);
+  const labelCenterY = labelY ?? baseY;
+  const containerTop = Math.min(baseY, labelCenterY) - TOUCH_TARGET_HEIGHT / 2;
+  const containerHeight = Math.abs(labelCenterY - baseY) + TOUCH_TARGET_HEIGHT;
+  const lineCenterY = baseY - containerTop;
+  const labelTop = labelCenterY - containerTop - TOUCH_TARGET_HEIGHT / 2;
+  const connectorTop = Math.min(baseY, labelCenterY) - containerTop;
+  const connectorHeight = Math.abs(labelCenterY - baseY);
 
-  // Shared values for drag animation
-  const translateY = useSharedValue(0);
-  const isDragging = useSharedValue(false);
-  const startY = useSharedValue(0);
-
-  // Shared values for TP/SL button drag
+  const priceDragBaseY = useSharedValue(baseY);
   const tpTranslateY = useSharedValue(0);
   const slTranslateY = useSharedValue(0);
   const tpDragging = useSharedValue(false);
   const slDragging = useSharedValue(false);
 
-  // Handle price change callback
-  const handlePriceChange = useCallback(
-    (newPrice: number) => {
-      if (order.editable) {
-        order.callbacks?.onMove?.(newPrice);
-      }
-    },
-    [order.callbacks, order.editable],
-  );
+  const priceDragContextRef = useRef({
+    dimensions,
+    editable: order.editable && !isPending,
+    externalOrderId: order.orderId,
+    lineId: order.id,
+    onPriceDragCancel,
+    onPriceDragEnd,
+    onPriceDragMove,
+    onPriceDragStart,
+    originalPrice: order.price,
+    startY: baseY,
+    viewport,
+  });
+  priceDragContextRef.current = {
+    dimensions,
+    editable: order.editable && !isPending,
+    externalOrderId: order.orderId,
+    lineId: order.id,
+    onPriceDragCancel,
+    onPriceDragEnd,
+    onPriceDragMove,
+    onPriceDragStart,
+    originalPrice: order.price,
+    startY: priceDragContextRef.current.startY,
+    viewport,
+  };
 
-  const handlePriceMoving = useCallback(
-    (newPrice: number) => {
-      if (order.editable) {
-        order.callbacks?.onMoving?.(newPrice);
-      }
-    },
-    [order.callbacks, order.editable],
-  );
+  useEffect(() => {
+    priceDragBaseY.value = baseY;
+  }, [baseY, priceDragBaseY]);
 
-  // Handle cancel callback — fire directly from adapter callbacks
-  const handleCancel = useCallback(() => {
-    if (order.cancellable) {
-      order.callbacks?.onCancel?.();
+  const handlePriceDragStart = useCallback((startY: number) => {
+    const context = priceDragContextRef.current;
+    if (context.editable) {
+      context.startY = startY;
+      context.onPriceDragStart?.(context.lineId, context.originalPrice, context.externalOrderId);
     }
-  }, [order.cancellable, order.callbacks]);
+  }, []);
 
-  // Handle TP click (no drag) — fire directly from adapter callbacks
+  const handlePriceDragMove = useCallback(
+    (translationY: number) => {
+      const context = priceDragContextRef.current;
+      if (context.editable) {
+        const price = yToPrice(context.startY + translationY, context.viewport, context.dimensions);
+        context.onPriceDragMove?.(context.lineId, price, context.externalOrderId);
+      }
+    },
+    [],
+  );
+
+  const handlePriceDragEnd = useCallback(
+    (translationY: number) => {
+      const context = priceDragContextRef.current;
+      if (context.editable) {
+        const price = yToPrice(context.startY + translationY, context.viewport, context.dimensions);
+        context.onPriceDragEnd?.(context.lineId, price, context.externalOrderId);
+      }
+    },
+    [],
+  );
+
+  const handlePriceDragCancel = useCallback(() => {
+    const context = priceDragContextRef.current;
+    if (context.editable) {
+      context.onPriceDragCancel?.(context.lineId, context.externalOrderId);
+    }
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    if (order.cancellable && !isPending) {
+      onCancel?.(order);
+    }
+  }, [isPending, onCancel, order]);
+
   const handleTPClick = useCallback(() => {
-    order.callbacks?.onTPClick?.();
-  }, [order.callbacks]);
+    if (!isPending) onTPClick?.(order);
+  }, [isPending, onTPClick, order]);
 
-  // Handle SL click (no drag) — fire directly from adapter callbacks
   const handleSLClick = useCallback(() => {
-    order.callbacks?.onSLClick?.();
-  }, [order.callbacks]);
+    if (!isPending) onSLClick?.(order);
+  }, [isPending, onSLClick, order]);
 
-  // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
     (newPrice: number, partialPercent?: number) => {
-      order.callbacks?.onTPMoveEnd?.(newPrice, partialPercent);
+      if (!isPending) onTPDragEnd?.(order, newPrice, partialPercent);
     },
-    [order.callbacks],
+    [isPending, onTPDragEnd, order],
   );
 
-  // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
     (newPrice: number, partialPercent?: number) => {
-      order.callbacks?.onSLMoveEnd?.(newPrice, partialPercent);
+      if (!isPending) onSLDragEnd?.(order, newPrice, partialPercent);
     },
-    [order.callbacks],
+    [isPending, onSLDragEnd, order],
   );
 
   // Handle continuous TP move (for adapter callback + Skia drag preview)
@@ -158,9 +246,10 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
   // TP button drag gesture
   const tpPanGesture = useMemo(() => {
-    if (!order.brackets) return Gesture.Pan();
+    if (!order.brackets || isPending) return Gesture.Pan().enabled(false);
 
     return Gesture.Pan()
+      .minDistance(DRAG_THRESHOLD)
       .onStart(() => {
         tpDragging.value = true;
       })
@@ -184,11 +273,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
         runOnJS(handleTPSLDragEnd)();
 
-        if (isBracketDrag(event)) {
-          runOnJS(handleTPDragEnd)(newPrice, partialPercent);
-        } else {
-          runOnJS(handleTPClick)();
-        }
+        runOnJS(handleTPDragEnd)(newPrice, partialPercent);
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
       })
@@ -197,22 +282,24 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       });
   }, [
     order.brackets,
+    isPending,
     baseY,
     viewport,
     dimensions,
-    handleTPClick,
     handleTPDragEnd,
     handleTPMove,
     handleTPSLDragEnd,
+    order.partialEnabled,
     tpDragging,
     tpTranslateY,
   ]);
 
   // SL button drag gesture
   const slPanGesture = useMemo(() => {
-    if (!order.brackets) return Gesture.Pan();
+    if (!order.brackets || isPending) return Gesture.Pan().enabled(false);
 
     return Gesture.Pan()
+      .minDistance(DRAG_THRESHOLD)
       .onStart(() => {
         slDragging.value = true;
       })
@@ -236,11 +323,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
         runOnJS(handleTPSLDragEnd)();
 
-        if (isBracketDrag(event)) {
-          runOnJS(handleSLDragEnd)(newPrice, partialPercent);
-        } else {
-          runOnJS(handleSLClick)();
-        }
+        runOnJS(handleSLDragEnd)(newPrice, partialPercent);
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
       })
@@ -249,13 +332,14 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       });
   }, [
     order.brackets,
+    isPending,
     baseY,
     viewport,
     dimensions,
-    handleSLClick,
     handleSLDragEnd,
     handleSLMove,
     handleTPSLDragEnd,
+    order.partialEnabled,
     slDragging,
     slTranslateY,
   ]);
@@ -272,183 +356,194 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
 
   // Pan gesture for dragging (order price change)
   const panGesture = useMemo(() => {
-    if (!order.editable) return Gesture.Pan();
+    if (!order.editable || isPending) return Gesture.Pan().enabled(false);
 
     return Gesture.Pan()
+      .minDistance(DRAG_THRESHOLD)
       .onStart(() => {
-        isDragging.value = true;
-        startY.value = translateY.value;
+        runOnJS(handlePriceDragStart)(priceDragBaseY.value);
       })
       .onUpdate((event) => {
-        // Constrain to vertical only
-        translateY.value = startY.value + event.translationY;
-        const currentY = baseY + translateY.value;
-        const currentPrice = yToPrice(currentY, viewport, dimensions);
-        runOnJS(handlePriceMoving)(currentPrice);
+        runOnJS(handlePriceDragMove)(event.translationY);
       })
-      .onEnd(() => {
-        isDragging.value = false;
-        // Calculate new price from final Y position
-        const finalY = baseY + translateY.value;
-        const newPrice = yToPrice(finalY, viewport, dimensions);
-
-        // Reset position (callback will update the actual price)
-        translateY.value = withSpring(0, { damping: 15, stiffness: 150 });
-
-        // Call price change handler
-        runOnJS(handlePriceChange)(newPrice);
+      .onEnd((event) => {
+        runOnJS(handlePriceDragEnd)(event.translationY);
+      })
+      .onFinalize((_event, success) => {
+        if (!success) {
+          runOnJS(handlePriceDragCancel)();
+        }
       });
   }, [
     order.editable,
-    baseY,
-    viewport,
-    dimensions,
-    handlePriceChange,
-    handlePriceMoving,
-    isDragging,
-    translateY,
-    startY,
+    isPending,
+    handlePriceDragStart,
+    handlePriceDragMove,
+    handlePriceDragEnd,
+    handlePriceDragCancel,
+    priceDragBaseY,
   ]);
 
-  // Animated styles for the line container
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
-
-  // Line style based on lineStyle property
-  const lineStyle = useMemo(() => {
-    // 0=solid, 1=dotted, 2=dashed
-    switch (order.lineStyle) {
-      case 1:
-        return 'dotted';
-      case 2:
-        return 'dashed';
-      default:
-        return 'solid';
-    }
-  }, [order.lineStyle]);
-
-  // Calculate label positioning based on lineLength
-  const lineStartX = useMemo(
-    () =>
-      Math.max(
-        dimensions.margins.left,
-        MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 2,
-      ),
-    [dimensions.margins.left],
-  );
-  const labelX = useMemo(() => {
-    // lineLength=100 means line extends full width, label at LEFT edge
-    // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
-    const maxLabelX = dimensions.width - dimensions.margins.right - 120; // Approximate label width
-    const minLabelX = lineStartX;
-    return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
-  }, [order.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
-  const lineColor = order.lineColor;
-  const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? order.bodyTextColor;
-  const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = order.brackets?.stopLossTextColor ?? order.bodyTextColor;
-
   // Display text (use narrow if appropriate)
-  const displayText = useNarrowText ? order.textShort : order.text;
-  const displayQuantity = useNarrowText ? order.quantityShort : order.quantity;
+  const displayText = useNarrowText && order.textShort ? order.textShort : order.text;
+  const displayQuantity = useNarrowText && order.quantityShort ? order.quantityShort : order.quantity;
+  const labelSegments = useMemo(
+    () =>
+      [
+        {
+          key: 'text',
+          text: displayText,
+          backgroundColor: order.bodyBackgroundColor,
+          borderColor: order.bodyBorderColor,
+          textColor: order.bodyTextColor,
+        },
+        {
+          key: 'quantity',
+          text: displayQuantity,
+          backgroundColor: order.quantityBackgroundColor,
+          borderColor: order.quantityBorderColor,
+          textColor: order.quantityTextColor,
+        },
+      ].filter((segment) => segment.text.length > 0),
+    [
+      displayQuantity,
+      displayText,
+      order.bodyBackgroundColor,
+      order.bodyBorderColor,
+      order.bodyTextColor,
+      order.quantityBackgroundColor,
+      order.quantityBorderColor,
+      order.quantityTextColor,
+    ],
+  );
 
   // Format price for display
-  const formattedPrice = safeToFixed(order.price, pricePrecision);
+  const formattedPrice = formatNativeTradeLinePrice(order.price, pricePrecision);
 
   // Whether to show TP/SL buttons
   const showBrackets = order.brackets !== null;
+  const fallbackLabelWidth = useMemo(
+    () =>
+      measureNativeTradeLineLabelWidth({
+        actionButtonCount: order.cancellable ? 1 : 0,
+        bracketButtonCount: showBrackets ? 2 : 0,
+        bracketGap: 6,
+        segmentHorizontalPadding: 6,
+        texts: labelSegments.map((segment) => segment.text),
+      }),
+    [labelSegments, order.cancellable, showBrackets],
+  );
+  const [measuredLabelWidth, setMeasuredLabelWidth] = useState<number | null>(null);
+  const labelWidth = measuredLabelWidth ?? fallbackLabelWidth;
+  const tradeLineLayout = useMemo(
+    () =>
+      layoutNativeTradeLine({
+        dimensions,
+        formattedPrice,
+        labelWidth,
+        lineLength: order.lineLength,
+        lineLengthUnit: order.lineLengthUnit,
+      }),
+    [dimensions, formattedPrice, labelWidth, order.lineLength, order.lineLengthUnit],
+  );
+  const handleLabelLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const nextWidth = Math.ceil(event.nativeEvent.layout.width);
+      if (nextWidth > 0 && Math.abs(nextWidth - (measuredLabelWidth ?? 0)) > 0.5) {
+        setMeasuredLabelWidth(nextWidth);
+      }
+    },
+    [measuredLabelWidth],
+  );
+
+  const lineColor = order.lineColor;
+  const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
+  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
+  const stopLossTextColor = order.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   return (
-    <Animated.View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }, animatedContainerStyle]}>
+    <Animated.View
+      pointerEvents="box-none"
+      style={[styles.container, { height: containerHeight, opacity: isAwaitingCallback ? 0.58 : 1, top: containerTop }]}
+    >
       {/* Horizontal line - left segment (if extendLeft) */}
       {order.extendLeft && (
-        <View
-          style={[
-            styles.lineSegment,
-            {
-              left: lineStartX,
-              width: Math.max(0, labelX - lineStartX - 2),
-              top: TOUCH_TARGET_HEIGHT / 2,
-              borderBottomColor: lineColor,
-              borderBottomWidth: order.lineWidth,
-              borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
-            },
-          ]}
+        <NativeTradeLineSegment
+          color={lineColor}
+          left={tradeLineLayout.lineStartX}
+          lineStyle={order.lineStyle}
+          lineWidth={order.lineWidth}
+          top={lineCenterY}
+          width={tradeLineLayout.leftLineWidth}
         />
       )}
 
-      {/* Invisible drag handle - full width, 44px tall for touch accessibility */}
-      <GestureDetector gesture={panGesture}>
-        <Animated.View
-          style={[
-            styles.dragHandle,
-            {
-              left: labelX,
-              width: 100, // Approximate label width - drag handle over label area
-              height: TOUCH_TARGET_HEIGHT,
-            },
-          ]}
-        />
-      </GestureDetector>
-
       {/* Label group */}
       <View
+        onLayout={handleLabelLayout}
         style={[
           styles.labelGroup,
           {
-            left: labelX,
-            top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT) / 2,
+            left: tradeLineLayout.labelX,
+            maxWidth: tradeLineLayout.maxLabelWidth,
+            top: labelTop,
           },
         ]}
       >
-        {/* Type/Text segment */}
-        <View
-          style={[
-            styles.labelSegment,
-            {
-              backgroundColor: order.bodyBackgroundColor,
-              borderColor: order.bodyBorderColor,
-              borderTopLeftRadius: 2,
-              borderBottomLeftRadius: 2,
-            },
-          ]}
-        >
-          <Text style={[styles.labelText, { color: order.bodyTextColor }]}>{displayText}</Text>
-        </View>
+        <GestureDetector gesture={panGesture}>
+          <Animated.View collapsable={false} style={styles.labelBodyHitTarget}>
+            <View style={styles.labelBody}>
+              {labelSegments.map((segment, index) => {
+                const isFirst = index === 0;
+                const isLastBeforeGap = index === labelSegments.length - 1 && !order.cancellable;
 
-        {/* Quantity segment */}
-        <View
-          style={[
-            styles.labelSegment,
-            {
-              backgroundColor: order.quantityBackgroundColor,
-              borderColor: order.quantityBorderColor,
-              borderLeftWidth: 0,
-            },
-          ]}
-        >
-          <Text style={[styles.labelText, { color: order.quantityTextColor }]}>{displayQuantity}</Text>
-        </View>
+                return (
+                  <View
+                    key={segment.key}
+                    style={[
+                      styles.labelSegment,
+                      {
+                        backgroundColor: segment.backgroundColor,
+                        borderColor: segment.borderColor,
+                        borderLeftWidth: isFirst ? 1 : 0,
+                        borderTopLeftRadius: isFirst ? 2 : 0,
+                        borderBottomLeftRadius: isFirst ? 2 : 0,
+                        borderTopRightRadius: isLastBeforeGap ? 2 : 0,
+                        borderBottomRightRadius: isLastBeforeGap ? 2 : 0,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.labelText, { color: segment.textColor }]}>{segment.text}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </Animated.View>
+        </GestureDetector>
 
         {/* Cancel button — flush with label segments */}
         {order.cancellable && (
           <Pressable
+            accessibilityLabel={order.cancelAsSubmit ? 'Submit order changes' : 'Cancel order'}
+            accessibilityRole="button"
             onPress={handleCancel}
-            style={({ pressed }) => [
-              styles.cancelButton,
-              {
-                backgroundColor: order.cancelButtonBackgroundColor,
-                borderColor: order.cancelButtonBorderColor,
-                opacity: pressed ? 0.7 : 1,
-              },
-            ]}
+            style={styles.actionHitTarget}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>
-              {order.cancelAsSubmit ? '✓' : '×'}
-            </Text>
+            <View
+              style={[
+                styles.cancelButton,
+                {
+                  backgroundColor: order.cancelButtonBackgroundColor,
+                  borderColor: order.cancelButtonBorderColor,
+                },
+              ]}
+            >
+              <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>
+                {order.cancelAsSubmit ? '✓' : '×'}
+              </Text>
+            </View>
           </Pressable>
         )}
 
@@ -457,35 +552,51 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           <View style={styles.bracketButtons}>
             {/* TP Button */}
             <GestureDetector gesture={tpPanGesture}>
-              <Animated.View style={[styles.bracketButtonWrapper, tpAnimatedStyle]}>
-                <View
-                  style={[
-                    styles.bracketButton,
-                    {
-                      backgroundColor: takeProfitColor,
-                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-                    },
-                  ]}
+              <Animated.View collapsable={false} style={[styles.bracketButtonWrapper, tpAnimatedStyle]}>
+                <Pressable
+                  accessibilityLabel="Take profit"
+                  accessibilityRole="button"
+                  onPress={handleTPClick}
+                  style={styles.bracketButtonHitTarget}
+                  hitSlop={{ top: 10, bottom: 10, left: 2, right: 2 }}
                 >
-                  <Text style={[styles.bracketButtonText, { color: takeProfitTextColor }]}>TP</Text>
-                </View>
+                  <View
+                    style={[
+                      styles.bracketButton,
+                      {
+                        backgroundColor: takeProfitColor,
+                        borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.bracketButtonText, { color: takeProfitTextColor }]}>TP</Text>
+                  </View>
+                </Pressable>
               </Animated.View>
             </GestureDetector>
 
             {/* SL Button */}
             <GestureDetector gesture={slPanGesture}>
-              <Animated.View style={[styles.bracketButtonWrapper, slAnimatedStyle]}>
-                <View
-                  style={[
-                    styles.bracketButton,
-                    {
-                      backgroundColor: stopLossColor,
-                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-                    },
-                  ]}
+              <Animated.View collapsable={false} style={[styles.bracketButtonWrapper, slAnimatedStyle]}>
+                <Pressable
+                  accessibilityLabel="Stop loss"
+                  accessibilityRole="button"
+                  onPress={handleSLClick}
+                  style={styles.bracketButtonHitTarget}
+                  hitSlop={{ top: 10, bottom: 10, left: 2, right: 2 }}
                 >
-                  <Text style={[styles.bracketButtonText, { color: stopLossTextColor }]}>SL</Text>
-                </View>
+                  <View
+                    style={[
+                      styles.bracketButton,
+                      {
+                        backgroundColor: stopLossColor,
+                        borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.bracketButtonText, { color: stopLossTextColor }]}>SL</Text>
+                  </View>
+                </Pressable>
               </Animated.View>
             </GestureDetector>
           </View>
@@ -493,27 +604,39 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
       </View>
 
       {/* Horizontal line - right segment (from label to price axis) */}
-      <View
-        style={[
-          styles.lineSegment,
-          {
-            left: labelX + 100 + 2, // After label
-            right: dimensions.margins.right + 60, // Before price axis label
-            top: TOUCH_TARGET_HEIGHT / 2,
-            borderBottomColor: lineColor,
-            borderBottomWidth: order.lineWidth,
-            borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
-          },
-        ]}
+      <NativeTradeLineSegment
+        color={lineColor}
+        left={tradeLineLayout.rightLineLeft}
+        lineStyle={order.lineStyle}
+        lineWidth={order.lineWidth}
+        top={lineCenterY}
+        width={tradeLineLayout.rightLineWidth}
       />
+
+      {connectorHeight > 1 && (
+        <View
+          pointerEvents="none"
+          style={[
+            styles.collisionConnector,
+            {
+              backgroundColor: lineColor,
+              height: connectorHeight,
+              left: tradeLineLayout.rightLineLeft,
+              top: connectorTop,
+              width: Math.max(1, order.lineWidth),
+            },
+          ]}
+        />
+      )}
 
       {/* Price axis label */}
       <View
         style={[
           styles.priceAxisLabel,
           {
-            right: 4, // Small padding from edge
-            top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT * 1.2) / 2,
+            left: tradeLineLayout.priceLabelLeft,
+            width: tradeLineLayout.priceLabelWidth,
+            top: labelCenterY - containerTop - (LABEL_HEIGHT * 1.2) / 2,
             backgroundColor: order.bodyBackgroundColor,
             borderColor: order.bodyBorderColor,
           },
@@ -530,71 +653,107 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: TOUCH_TARGET_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  lineSegment: {
-    position: 'absolute',
-    height: 0,
-    borderBottomWidth: 1,
-  },
-  dragHandle: {
-    position: 'absolute',
-    backgroundColor: 'transparent',
-    // Cursor not applicable on mobile, but helps with debugging
   },
   labelGroup: {
     position: 'absolute',
     flexDirection: 'row',
     alignItems: 'center',
+    height: TOUCH_TARGET_HEIGHT,
+    zIndex: 2,
+  },
+  collisionConnector: {
+    position: 'absolute',
+    zIndex: 1,
+  },
+  labelBodyHitTarget: {
+    height: TOUCH_TARGET_HEIGHT,
+    justifyContent: 'center',
+    flexShrink: 1,
+  },
+  labelBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: LABEL_HEIGHT,
+    flexShrink: 1,
   },
   labelSegment: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderWidth: 1,
     height: LABEL_HEIGHT,
+    flexShrink: 0,
     justifyContent: 'center',
   },
   labelText: {
     fontSize: 11,
     fontFamily: 'System',
+    includeFontPadding: false,
+    lineHeight: 14,
+    textAlign: 'center',
+    flexShrink: 1,
   },
   bracketButtons: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 6, // Gap between cancel button and TP/SL buttons
+    flexShrink: 0,
   },
   bracketButtonWrapper: {
+    height: TOUCH_TARGET_HEIGHT,
     marginLeft: 0,
+    flexShrink: 0,
+    justifyContent: 'center',
+  },
+  bracketButtonHitTarget: {
+    height: TOUCH_TARGET_HEIGHT,
+    justifyContent: 'center',
   },
   bracketButton: {
     width: TP_SL_BUTTON_WIDTH,
+    minWidth: TP_SL_BUTTON_WIDTH,
     height: LABEL_HEIGHT,
     borderWidth: 1,
     borderLeftWidth: 0,
+    flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bracketButtonText: {
     fontSize: 9,
     fontWeight: 'bold',
+    includeFontPadding: false,
+    lineHeight: 12,
+    textAlign: 'center',
+  },
+  actionHitTarget: {
+    width: ACTION_BUTTON_WIDTH,
+    minWidth: ACTION_BUTTON_WIDTH,
+    height: TOUCH_TARGET_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
   },
   cancelButton: {
-    width: 18,
+    width: ACTION_BUTTON_WIDTH,
+    minWidth: ACTION_BUTTON_WIDTH,
     height: LABEL_HEIGHT,
     borderWidth: 1,
     borderLeftWidth: 0,
     borderTopRightRadius: 2,
     borderBottomRightRadius: 2,
+    flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   cancelIcon: {
     fontSize: 14,
     fontWeight: 'bold',
-    lineHeight: 14,
+    includeFontPadding: false,
+    lineHeight: 16,
+    textAlign: 'center',
   },
   priceAxisLabel: {
     position: 'absolute',
@@ -604,10 +763,14 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     minWidth: 50,
     alignItems: 'center',
+    zIndex: 2,
   },
   priceText: {
     fontSize: 11,
     fontFamily: 'System',
+    includeFontPadding: false,
+    lineHeight: 14,
+    textAlign: 'center',
   },
 });
 

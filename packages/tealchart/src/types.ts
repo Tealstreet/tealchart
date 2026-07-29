@@ -88,6 +88,17 @@ export interface LastTradeInfo {
  * Line type for unified rendering
  */
 export type PriceLineType = 'price' | 'order' | 'position' | 'liquidation' | 'crosshair';
+export type Awaitable<T> = T | PromiseLike<T>;
+export type OemsActionResult = void | boolean;
+export type OemsActionCallback = () => Awaitable<OemsActionResult>;
+export type OemsPriceActionCallback = (price: number, partialPercent?: number) => Awaitable<OemsActionResult>;
+
+export interface OemsLineActionState {
+  kind: string;
+  isPending: boolean;
+  isAwaitingCallback: boolean;
+  isAwaitingConfirmation: boolean;
+}
 
 /**
  * A price line that renders horizontally across the chart with a label.
@@ -115,6 +126,8 @@ export interface PriceLine {
   chartLabel?: ChartLineLabel;
   /** Line length percentage 0-100 (default: 100) */
   lineLength?: number;
+  /** Unit for lineLength (default: percentage) */
+  lineLengthUnit?: OrderLineLengthUnit | PositionLineLengthUnit;
   /** Whether line extends from left edge (default: true) */
   extendLeft?: boolean;
   /** Line thickness in pixels (default: 1) */
@@ -140,9 +153,13 @@ export interface PriceLine {
    * Only order lines with an onMove callback should be draggable.
    */
   draggable?: boolean;
+  /** Current OEMS action lifecycle state for presentation and input blocking. */
+  actionState?: OemsLineActionState;
 
-  // === TEALSTREET: Position-specific fields for bracket TP/SL ===
+  // === TEALSTREET: Trading-object fields for OEMS interactions ===
 
+  /** External order ID (for order callbacks) */
+  orderId?: string;
   /** External position ID (for bracket callbacks) */
   positionId?: string;
   /** Whether partial percentage is enabled for this position */
@@ -153,17 +170,17 @@ export interface PriceLine {
   brackets?: BracketConfig | null;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
-    onMove?: (price: number) => void;
-    onMoving?: (price: number) => void;
-    onTPClick?: () => void;
-    onSLClick?: () => void;
-    onTPMove?: (price: number, partialPercent?: number) => void;
-    onSLMove?: (price: number, partialPercent?: number) => void;
-    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
-    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
-    onClose?: () => void;
-    onReverse?: () => void;
-    onCancel?: () => void;
+    onMove?: OemsPriceActionCallback;
+    onMoving?: OemsPriceActionCallback;
+    onTPClick?: OemsActionCallback;
+    onSLClick?: OemsActionCallback;
+    onTPMove?: OemsPriceActionCallback;
+    onSLMove?: OemsPriceActionCallback;
+    onTPMoveEnd?: OemsPriceActionCallback;
+    onSLMoveEnd?: OemsPriceActionCallback;
+    onClose?: OemsActionCallback;
+    onReverse?: OemsActionCallback;
+    onCancel?: OemsActionCallback;
   };
 }
 
@@ -252,6 +269,8 @@ export interface PriceLineLabelBounds {
   chartLabel?: ChartLineLabel;
   /** Line length percentage 0-100 */
   lineLength?: number;
+  /** Unit for lineLength */
+  lineLengthUnit?: OrderLineLengthUnit | PositionLineLengthUnit;
   /** Whether line extends from left edge */
   extendLeft?: boolean;
   /** Line thickness in pixels */
@@ -266,9 +285,13 @@ export interface PriceLineLabelBounds {
   countdownToTime?: number;
   /** Whether this line is draggable (has onMove callback) */
   draggable?: boolean;
+  /** Current OEMS action lifecycle state for presentation and input blocking. */
+  actionState?: OemsLineActionState;
 
-  // === TEALSTREET: Position-specific fields for bracket TP/SL ===
+  // === TEALSTREET: Trading-object fields for OEMS interactions ===
 
+  /** External order ID (for order callbacks) */
+  orderId?: string;
   /** External position ID (for bracket callbacks) */
   positionId?: string;
   /** Whether partial percentage is enabled for this position */
@@ -279,17 +302,17 @@ export interface PriceLineLabelBounds {
   brackets?: BracketConfig | null;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
-    onMove?: (price: number) => void;
-    onMoving?: (price: number) => void;
-    onTPClick?: () => void;
-    onSLClick?: () => void;
-    onTPMove?: (price: number, partialPercent?: number) => void;
-    onSLMove?: (price: number, partialPercent?: number) => void;
-    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
-    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
-    onClose?: () => void;
-    onReverse?: () => void;
-    onCancel?: () => void;
+    onMove?: OemsPriceActionCallback;
+    onMoving?: OemsPriceActionCallback;
+    onTPClick?: OemsActionCallback;
+    onSLClick?: OemsActionCallback;
+    onTPMove?: OemsPriceActionCallback;
+    onSLMove?: OemsPriceActionCallback;
+    onTPMoveEnd?: OemsPriceActionCallback;
+    onSLMoveEnd?: OemsPriceActionCallback;
+    onClose?: OemsActionCallback;
+    onReverse?: OemsActionCallback;
+    onCancel?: OemsActionCallback;
   };
 
   // === Pane targeting for multi-pane support ===
@@ -351,22 +374,6 @@ export interface InteractionState {
   draggedPaneId: string | null;
   /** Starting Y range of the pane being zoomed */
   dragStartPaneYRange: { yMin: number; yMax: number } | null;
-}
-
-/**
- * Pending order update for optimistic UI
- */
-export interface PendingOrderUpdate {
-  /** Order ID being updated */
-  orderId: string;
-  /** New price (optimistic) */
-  pendingPrice: number;
-  /** Original price (for revert) */
-  originalPrice: number;
-  /** Timestamp when pending state started */
-  startTime: number;
-  /** Timeout ID for auto-revert */
-  timeoutId: ReturnType<typeof setTimeout>;
 }
 
 // Crosshair state
@@ -500,6 +507,7 @@ export type PositionLineLengthUnit = 'pixel' | 'percentage';
  * Order line options
  */
 export interface OrderLineOptions {
+  orderId?: string;
   price?: number;
   quantity?: number;
   text?: string;
@@ -522,14 +530,14 @@ export interface OrderLineOptions {
  */
 export interface IOrderLineAdapter {
   remove(): void;
-  onModify(callback: () => void): this;
-  onModify<T>(data: T, callback: (data: T) => void): this;
-  onMove(callback: () => void): this;
-  onMove<T>(data: T, callback: (data: T) => void): this;
-  onMoving(callback: () => void): this;
-  onMoving<T>(data: T, callback: (data: T) => void): this;
-  onCancel(callback: () => void): this;
-  onCancel<T>(data: T, callback: (data: T) => void): this;
+  onModify(callback: OemsActionCallback): this;
+  onModify<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
+  onMove(callback: OemsPriceActionCallback): this;
+  onMove<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
+  onMoving(callback: OemsPriceActionCallback): this;
+  onMoving<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
+  onCancel(callback: OemsActionCallback): this;
+  onCancel<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
   getPrice(): number;
   setPrice(value: number): this;
   getText(): string;
@@ -585,6 +593,7 @@ export interface IOrderLineAdapter {
  * Position line options
  */
 export interface PositionLineOptions {
+  positionId?: string;
   price?: number;
   quantity?: number;
   text?: string;
@@ -609,12 +618,12 @@ export interface PositionLineOptions {
  */
 export interface IPositionLineAdapter {
   remove(): void;
-  onClose(callback: () => void): this;
-  onClose<T>(data: T, callback: (data: T) => void): this;
-  onModify(callback: () => void): this;
-  onModify<T>(data: T, callback: (data: T) => void): this;
-  onReverse(callback: () => void): this;
-  onReverse<T>(data: T, callback: (data: T) => void): this;
+  onClose(callback: OemsActionCallback): this;
+  onClose<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
+  onModify(callback: OemsActionCallback): this;
+  onModify<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
+  onReverse(callback: OemsActionCallback): this;
+  onReverse<T>(data: T, callback: (data: T) => Awaitable<OemsActionResult>): this;
   getPrice(): number;
   setPrice(value: number): this;
   getText(): string;
@@ -1080,9 +1089,9 @@ export interface OrderLineRenderData {
   textShort: string; // TEALSTREET: compact display
   // Line styling
   lineColor: string;
-  lineStyle: number; // 0=solid, 1=dotted, 2=dashed
+  lineStyle: number; // 0=solid, 1=dotted, 2=dashed, 4=long-dashed
   lineWidth: number;
-  lineLength: number; // Percentage 0-100
+  lineLength: number;
   lineLengthUnit: OrderLineLengthUnit;
   extendLeft: boolean;
   // State
@@ -1110,17 +1119,19 @@ export interface OrderLineRenderData {
   // TEALSTREET: Bracket state
   brackets: BracketConfig | null;
   partialEnabled: boolean;
+  /** Current OEMS action lifecycle state for presentation and input blocking. */
+  actionState?: OemsLineActionState;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
-    onMove?: (price: number) => void;
-    onMoving?: (price: number) => void;
-    onTPClick?: () => void;
-    onSLClick?: () => void;
-    onTPMove?: (price: number, partialPercent?: number) => void;
-    onSLMove?: (price: number, partialPercent?: number) => void;
-    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
-    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
-    onCancel?: () => void;
+    onMove?: OemsPriceActionCallback;
+    onMoving?: OemsPriceActionCallback;
+    onTPClick?: OemsActionCallback;
+    onSLClick?: OemsActionCallback;
+    onTPMove?: OemsPriceActionCallback;
+    onSLMove?: OemsPriceActionCallback;
+    onTPMoveEnd?: OemsPriceActionCallback;
+    onSLMoveEnd?: OemsPriceActionCallback;
+    onCancel?: OemsActionCallback;
   };
 }
 
@@ -1139,9 +1150,9 @@ export interface PositionLineRenderData {
   textShort: string; // TEALSTREET: compact display
   // Line styling
   lineColor: string;
-  lineStyle: number; // 0=solid, 1=dotted, 2=dashed
+  lineStyle: number; // 0=solid, 1=dotted, 2=dashed, 4=long-dashed
   lineWidth: number;
-  lineLength: number; // Percentage 0-100
+  lineLength: number;
   lineLengthUnit: PositionLineLengthUnit;
   extendLeft: boolean;
   // Body styling
@@ -1176,16 +1187,18 @@ export interface PositionLineRenderData {
   brackets: BracketConfig | null;
   partialEnabled: boolean;
   positionData: PositionData | null;
+  /** Current OEMS action lifecycle state for presentation and input blocking. */
+  actionState?: OemsLineActionState;
   /** Adapter callbacks carried through render data for direct invocation */
   callbacks?: {
-    onTPClick?: () => void;
-    onSLClick?: () => void;
-    onTPMove?: (price: number, partialPercent?: number) => void;
-    onSLMove?: (price: number, partialPercent?: number) => void;
-    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
-    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
-    onClose?: () => void;
-    onReverse?: () => void;
+    onTPClick?: OemsActionCallback;
+    onSLClick?: OemsActionCallback;
+    onTPMove?: OemsPriceActionCallback;
+    onSLMove?: OemsPriceActionCallback;
+    onTPMoveEnd?: OemsPriceActionCallback;
+    onSLMoveEnd?: OemsPriceActionCallback;
+    onClose?: OemsActionCallback;
+    onReverse?: OemsActionCallback;
   };
 }
 
@@ -1218,6 +1231,8 @@ export interface ExecutionLineRenderData {
  * These methods are available in the patched TradingView library
  */
 export interface TealstreetOrderLineExtensions {
+  /** Stable external order identity used to match callbacks and external snapshots. */
+  setOrderId(orderId: string): this;
   /** Render the cancel button as a submit action while preserving onCancel semantics. */
   setCancelAsSubmit(enabled: boolean): this;
   // Compact display for mobile
@@ -1228,12 +1243,12 @@ export interface TealstreetOrderLineExtensions {
   setPartialEnabled(enabled: boolean): this;
   setPnlCalculator(calculator: BracketPnlCalculator): this;
   // Bracket callbacks
-  onTPClick(callback: () => void): this;
-  onSLClick(callback: () => void): this;
-  onTPMove(callback: (price: number, partialPercent?: number) => void): this;
-  onSLMove(callback: (price: number, partialPercent?: number) => void): this;
-  onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
-  onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
+  onTPClick(callback: OemsActionCallback): this;
+  onSLClick(callback: OemsActionCallback): this;
+  onTPMove(callback: OemsPriceActionCallback): this;
+  onSLMove(callback: OemsPriceActionCallback): this;
+  onTPMoveEnd(callback: OemsPriceActionCallback): this;
+  onSLMoveEnd(callback: OemsPriceActionCallback): this;
 }
 
 /**
@@ -1241,6 +1256,8 @@ export interface TealstreetOrderLineExtensions {
  * These methods are available in the patched TradingView library
  */
 export interface TealstreetPositionLineExtensions {
+  /** Stable external position identity used to match callbacks and external snapshots. */
+  setPositionId(positionId: string): this;
   // PnL display
   setPnl(pnl: string): this;
   setPnlShort(pnl: string): this;
@@ -1253,12 +1270,12 @@ export interface TealstreetPositionLineExtensions {
   setPartialEnabled(enabled: boolean): this;
   setPnlCalculator(calculator: BracketPnlCalculator): this;
   // Bracket callbacks
-  onTPClick(callback: () => void): this;
-  onSLClick(callback: () => void): this;
-  onTPMove(callback: (price: number, partialPercent?: number) => void): this;
-  onSLMove(callback: (price: number, partialPercent?: number) => void): this;
-  onTPMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
-  onSLMoveEnd(callback: (price: number, partialPercent?: number) => void): this;
+  onTPClick(callback: OemsActionCallback): this;
+  onSLClick(callback: OemsActionCallback): this;
+  onTPMove(callback: OemsPriceActionCallback): this;
+  onSLMove(callback: OemsPriceActionCallback): this;
+  onTPMoveEnd(callback: OemsPriceActionCallback): this;
+  onSLMoveEnd(callback: OemsPriceActionCallback): this;
 }
 
 /**
@@ -1276,17 +1293,17 @@ export type FullPositionLineAdapter = IPositionLineAdapter & TealstreetPositionL
  * @internal
  */
 export interface OrderLineCallbacks {
-  onMove: (() => void) | null;
-  onMoving: (() => void) | null;
-  onCancel: (() => void) | null;
-  onModify: (() => void) | null;
+  onMove: OemsPriceActionCallback | null;
+  onMoving: OemsPriceActionCallback | null;
+  onCancel: OemsActionCallback | null;
+  onModify: OemsActionCallback | null;
   pnlCalculator: BracketPnlCalculator | null;
-  onTPClick: (() => void) | null;
-  onSLClick: (() => void) | null;
-  onTPMove: ((price: number, partialPercent?: number) => void) | null;
-  onSLMove: ((price: number, partialPercent?: number) => void) | null;
-  onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null;
-  onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null;
+  onTPClick: OemsActionCallback | null;
+  onSLClick: OemsActionCallback | null;
+  onTPMove: OemsPriceActionCallback | null;
+  onSLMove: OemsPriceActionCallback | null;
+  onTPMoveEnd: OemsPriceActionCallback | null;
+  onSLMoveEnd: OemsPriceActionCallback | null;
 }
 
 /**
@@ -1294,16 +1311,16 @@ export interface OrderLineCallbacks {
  * @internal
  */
 export interface PositionLineCallbacks {
-  onClose: (() => void) | null;
-  onReverse: (() => void) | null;
-  onModify: (() => void) | null;
+  onClose: OemsActionCallback | null;
+  onReverse: OemsActionCallback | null;
+  onModify: OemsActionCallback | null;
   pnlCalculator: BracketPnlCalculator | null;
-  onTPClick: (() => void) | null;
-  onSLClick: (() => void) | null;
-  onTPMove: ((price: number, partialPercent?: number) => void) | null;
-  onSLMove: ((price: number, partialPercent?: number) => void) | null;
-  onTPMoveEnd: ((price: number, partialPercent?: number) => void) | null;
-  onSLMoveEnd: ((price: number, partialPercent?: number) => void) | null;
+  onTPClick: OemsActionCallback | null;
+  onSLClick: OemsActionCallback | null;
+  onTPMove: OemsPriceActionCallback | null;
+  onSLMove: OemsPriceActionCallback | null;
+  onTPMoveEnd: OemsPriceActionCallback | null;
+  onSLMoveEnd: OemsPriceActionCallback | null;
 }
 
 /**

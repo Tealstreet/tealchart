@@ -1134,21 +1134,11 @@ export class TealchartWidget {
       onRequestMoreBars: (direction) => {
         this._loadMoreBars(direction);
       },
-      onOrderMove: (orderId, newPrice) => {
-        this._chartApi.triggerOrderMove(orderId, newPrice);
-      },
-      onOrderMoving: (orderId, newPrice) => {
-        this._chartApi.triggerOrderMoving(orderId, newPrice);
-      },
-      onOrderCancel: (orderId) => {
-        this._chartApi.triggerOrderCancel(orderId);
-      },
-      onPositionClose: (positionId) => {
-        this._chartApi.triggerPositionClose(positionId);
-      },
-      onPositionReverse: (positionId) => {
-        this._chartApi.triggerPositionReverse(positionId);
-      },
+      onOrderMove: (orderId, newPrice) => this._chartApi.triggerOrderMove(orderId, newPrice),
+      onOrderMoving: (orderId, newPrice) => this._chartApi.triggerOrderMoving(orderId, newPrice),
+      onOrderCancel: (orderId) => this._chartApi.triggerOrderCancel(orderId),
+      onPositionClose: (positionId) => this._chartApi.triggerPositionClose(positionId),
+      onPositionReverse: (positionId) => this._chartApi.triggerPositionReverse(positionId),
       onContextMenu: this._contextMenuCallback || undefined,
       onMouseDown: () => {
         this._eventEmitter.emit('mouse_down');

@@ -11,22 +11,27 @@
 import type { PositionLineRenderData, Viewport } from '../../types';
 import type { ChartDimensions } from '../utils/coordinates';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_SELL_CANDLE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
   STOP_LOSS_COLOR,
 } from '../../constants';
 import { calculatePartialBracketPercentFromDelta } from '../../interaction/partialBrackets';
-import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
-import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
+import {
+  formatNativeTradeLinePrice,
+  layoutNativeTradeLine,
+  measureNativeTradeLineLabelWidth,
+} from '../utils/tradeLineLayout';
+import { NativeTradeLineSegment } from './NativeTradeLineSegment';
 
 export interface PositionLineComponentProps {
   /** Position line render data from adapter */
@@ -39,10 +44,24 @@ export interface PositionLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
+  /** Collision-adjusted label center Y. The price line itself remains at position.price. */
+  labelY?: number;
   /** Positive PnL and TP default color, usually the active candle up color. */
   positiveColor?: string;
   /** Negative PnL default color, usually the active candle down color. */
   negativeColor?: string;
+  /** Called when the close button is pressed. */
+  onClose?: (position: PositionLineRenderData) => void;
+  /** Called when the reverse button is pressed. */
+  onReverse?: (position: PositionLineRenderData) => void;
+  /** Called when TP is pressed without drag. */
+  onTPClick?: (position: PositionLineRenderData) => void;
+  /** Called when SL is pressed without drag. */
+  onSLClick?: (position: PositionLineRenderData) => void;
+  /** Called when TP drag commits. */
+  onTPDragEnd?: (position: PositionLineRenderData, price: number, partialPercent?: number) => void;
+  /** Called when SL drag commits. */
+  onSLDragEnd?: (position: PositionLineRenderData, price: number, partialPercent?: number) => void;
   /** Continuous TP drag move callback (for Skia preview state only) */
   onTPMovePreview?: (positionId: string, price: number, partialPercent?: number) => void;
   /** Continuous SL drag move callback (for Skia preview state only) */
@@ -53,6 +72,7 @@ export interface PositionLineComponentProps {
 
 const TOUCH_TARGET_HEIGHT = 44;
 const LABEL_HEIGHT = 18;
+const ACTION_BUTTON_WIDTH = 18;
 const TP_SL_BUTTON_WIDTH = 24;
 const DRAG_THRESHOLD = 5;
 
@@ -66,14 +86,30 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   useNarrowText = false,
+  labelY,
   positiveColor = DEFAULT_BUY_CANDLE_COLOR,
   negativeColor = DEFAULT_SELL_CANDLE_COLOR,
+  onClose,
+  onReverse,
+  onTPClick,
+  onSLClick,
+  onTPDragEnd,
+  onSLDragEnd,
   onTPMovePreview,
   onSLMovePreview,
   onTPSLDragEnd,
 }) => {
+  const isPending = position.actionState?.isPending ?? false;
+  const isAwaitingCallback = position.actionState?.isAwaitingCallback ?? false;
   // Calculate Y position from price
   const baseY = useMemo(() => priceToY(position.price, viewport, dimensions), [position.price, viewport, dimensions]);
+  const labelCenterY = labelY ?? baseY;
+  const containerTop = Math.min(baseY, labelCenterY) - TOUCH_TARGET_HEIGHT / 2;
+  const containerHeight = Math.abs(labelCenterY - baseY) + TOUCH_TARGET_HEIGHT;
+  const lineCenterY = baseY - containerTop;
+  const labelTop = labelCenterY - containerTop - TOUCH_TARGET_HEIGHT / 2;
+  const connectorTop = Math.min(baseY, labelCenterY) - containerTop;
+  const connectorHeight = Math.abs(labelCenterY - baseY);
 
   // Shared values for TP/SL button drag
   const tpTranslateY = useSharedValue(0);
@@ -81,44 +117,38 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const tpDragging = useSharedValue(false);
   const slDragging = useSharedValue(false);
 
-  // Handle close callback — fire directly from adapter callbacks
   const handleClose = useCallback(() => {
-    if (position.closeable) {
-      position.callbacks?.onClose?.();
+    if (position.closeable && !isPending) {
+      onClose?.(position);
     }
-  }, [position.closeable, position.callbacks]);
+  }, [isPending, onClose, position]);
 
-  // Handle reverse callback — fire directly from adapter callbacks
   const handleReverse = useCallback(() => {
-    if (position.reversible) {
-      position.callbacks?.onReverse?.();
+    if (position.reversible && !isPending) {
+      onReverse?.(position);
     }
-  }, [position.reversible, position.callbacks]);
+  }, [isPending, onReverse, position]);
 
-  // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {
-    position.callbacks?.onTPClick?.();
-  }, [position.callbacks]);
+    if (!isPending) onTPClick?.(position);
+  }, [isPending, onTPClick, position]);
 
-  // Handle SL click (no drag) — fire directly from adapter callbacks
   const handleSLClick = useCallback(() => {
-    position.callbacks?.onSLClick?.();
-  }, [position.callbacks]);
+    if (!isPending) onSLClick?.(position);
+  }, [isPending, onSLClick, position]);
 
-  // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
     (newPrice: number, partialPercent?: number) => {
-      position.callbacks?.onTPMoveEnd?.(newPrice, partialPercent);
+      if (!isPending) onTPDragEnd?.(position, newPrice, partialPercent);
     },
-    [position.callbacks],
+    [isPending, onTPDragEnd, position],
   );
 
-  // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
     (newPrice: number, partialPercent?: number) => {
-      position.callbacks?.onSLMoveEnd?.(newPrice, partialPercent);
+      if (!isPending) onSLDragEnd?.(position, newPrice, partialPercent);
     },
-    [position.callbacks],
+    [isPending, onSLDragEnd, position],
   );
 
   // Handle continuous TP move (for adapter callback + Skia drag preview)
@@ -148,9 +178,10 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
 
   // TP button drag gesture
   const tpPanGesture = useMemo(() => {
-    if (!position.brackets) return Gesture.Pan();
+    if (!position.brackets || isPending) return Gesture.Pan().enabled(false);
 
     return Gesture.Pan()
+      .minDistance(DRAG_THRESHOLD)
       .onStart(() => {
         tpDragging.value = true;
       })
@@ -176,12 +207,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         // Clear Skia drag preview
         runOnJS(handleTPSLDragEnd)();
 
-        // Check if this was a tap vs drag
-        if (isBracketDrag(event)) {
-          runOnJS(handleTPDragEnd)(newPrice, partialPercent);
-        } else {
-          runOnJS(handleTPClick)();
-        }
+        runOnJS(handleTPDragEnd)(newPrice, partialPercent);
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
       })
@@ -191,22 +217,24 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       });
   }, [
     position.brackets,
+    isPending,
     baseY,
     viewport,
     dimensions,
-    handleTPClick,
     handleTPDragEnd,
     handleTPMove,
     handleTPSLDragEnd,
+    position.partialEnabled,
     tpDragging,
     tpTranslateY,
   ]);
 
   // SL button drag gesture
   const slPanGesture = useMemo(() => {
-    if (!position.brackets) return Gesture.Pan();
+    if (!position.brackets || isPending) return Gesture.Pan().enabled(false);
 
     return Gesture.Pan()
+      .minDistance(DRAG_THRESHOLD)
       .onStart(() => {
         slDragging.value = true;
       })
@@ -232,12 +260,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         // Clear Skia drag preview
         runOnJS(handleTPSLDragEnd)();
 
-        // Check if this was a tap vs drag
-        if (isBracketDrag(event)) {
-          runOnJS(handleSLDragEnd)(newPrice, partialPercent);
-        } else {
-          runOnJS(handleSLClick)();
-        }
+        runOnJS(handleSLDragEnd)(newPrice, partialPercent);
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
       })
@@ -247,13 +270,14 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       });
   }, [
     position.brackets,
+    isPending,
     baseY,
     viewport,
     dimensions,
-    handleSLClick,
     handleSLDragEnd,
     handleSLMove,
     handleTPSLDragEnd,
+    position.partialEnabled,
     slDragging,
     slTranslateY,
   ]);
@@ -268,42 +292,22 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
     transform: [{ translateY: slTranslateY.value }],
   }));
 
-  // Line style based on lineStyle property
-  const lineStyle = useMemo(() => {
-    switch (position.lineStyle) {
-      case 1:
-        return 'dotted';
-      case 2:
-        return 'dashed';
-      default:
-        return 'solid';
-    }
-  }, [position.lineStyle]);
+  // Display text (use narrow if appropriate)
+  const displayText = useNarrowText && position.textShort ? position.textShort : position.text;
+  const displayQuantity = useNarrowText && position.quantityShort ? position.quantityShort : position.quantity;
+  const displayPnl = useNarrowText && position.pnlShort ? position.pnlShort : position.pnl;
 
-  // Calculate label positioning based on lineLength
-  const lineStartX = useMemo(
-    () =>
-      Math.max(
-        dimensions.margins.left,
-        MOBILE_CHART_CHROME_METRICS.leftToolRailInset + MOBILE_CHART_CHROME_METRICS.leftToolRailWidth + 2,
-      ),
-    [dimensions.margins.left],
-  );
-  const labelX = useMemo(() => {
-    const maxLabelX = dimensions.width - dimensions.margins.right - 150;
-    const minLabelX = lineStartX;
-    return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength)) / 100;
-  }, [position.lineLength, dimensions.width, dimensions.margins.right, lineStartX]);
+  // Format price for display
+  const formattedPrice = formatNativeTradeLinePrice(position.price, pricePrecision);
+
+  // Whether to show TP/SL buttons
+  const showBrackets = position.brackets !== null;
+
   const lineColor = position.lineColor;
   const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? position.bodyTextColor;
+  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = position.brackets?.stopLossTextColor ?? position.bodyTextColor;
-
-  // Display text (use narrow if appropriate)
-  const displayText = useNarrowText ? position.textShort : position.text;
-  const displayQuantity = useNarrowText ? position.quantityShort : position.quantity;
-  const displayPnl = useNarrowText ? position.pnlShort : position.pnl;
+  const stopLossTextColor = position.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
 
   // PnL segment color based on profit state
   const pnlStateColor = useMemo(() => {
@@ -318,125 +322,189 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   }, [position.profitState, positiveColor, negativeColor]);
   const pnlBackgroundColor = pnlStateColor ?? lineColor;
   const pnlBorderColor = DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR;
-  const pnlTextColor = position.bodyTextColor;
-
-  // Format price for display
-  const formattedPrice = safeToFixed(position.price, pricePrecision);
-
-  // Whether to show TP/SL buttons
-  const showBrackets = position.brackets !== null;
+  const pnlTextColor = pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : position.bodyTextColor;
+  const labelSegments = useMemo(
+    () =>
+      [
+        {
+          key: 'text',
+          text: displayText,
+          backgroundColor: position.bodyBackgroundColor,
+          borderColor: position.bodyBorderColor,
+          textColor: position.bodyTextColor,
+        },
+        {
+          key: 'quantity',
+          text: displayQuantity,
+          backgroundColor: position.quantityBackgroundColor,
+          borderColor: position.quantityBorderColor,
+          textColor: position.quantityTextColor,
+        },
+        {
+          key: 'pnl',
+          text: displayPnl,
+          backgroundColor: pnlBackgroundColor,
+          borderColor: pnlBorderColor,
+          textColor: pnlTextColor,
+        },
+      ].filter((segment) => segment.text.length > 0),
+    [
+      displayPnl,
+      displayQuantity,
+      displayText,
+      pnlBackgroundColor,
+      pnlBorderColor,
+      pnlTextColor,
+      position.bodyBackgroundColor,
+      position.bodyBorderColor,
+      position.bodyTextColor,
+      position.quantityBackgroundColor,
+      position.quantityBorderColor,
+      position.quantityTextColor,
+    ],
+  );
+  const fallbackLabelWidth = useMemo(
+    () =>
+      measureNativeTradeLineLabelWidth({
+        actionButtonCount: Number(position.reversible) + Number(position.closeable),
+        bracketButtonCount: showBrackets ? 2 : 0,
+        bracketGap: 4,
+        segmentHorizontalPadding: 7,
+        texts: labelSegments.map((segment) => segment.text),
+      }),
+    [labelSegments, position.closeable, position.reversible, showBrackets],
+  );
+  const [measuredLabelWidth, setMeasuredLabelWidth] = useState<number | null>(null);
+  const labelWidth = measuredLabelWidth ?? fallbackLabelWidth;
+  const tradeLineLayout = useMemo(
+    () =>
+      layoutNativeTradeLine({
+        dimensions,
+        formattedPrice,
+        labelWidth,
+        lineLength: position.lineLength,
+        lineLengthUnit: position.lineLengthUnit,
+      }),
+    [dimensions, formattedPrice, labelWidth, position.lineLength, position.lineLengthUnit],
+  );
+  const handleLabelLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const nextWidth = Math.ceil(event.nativeEvent.layout.width);
+      if (nextWidth > 0 && Math.abs(nextWidth - (measuredLabelWidth ?? 0)) > 0.5) {
+        setMeasuredLabelWidth(nextWidth);
+      }
+    },
+    [measuredLabelWidth],
+  );
 
   return (
-    <View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.container, { height: containerHeight, opacity: isAwaitingCallback ? 0.58 : 1, top: containerTop }]}
+    >
       {/* Horizontal line - left segment (if extendLeft) */}
       {position.extendLeft && (
-        <View
-          style={[
-            styles.lineSegment,
-            {
-              left: lineStartX,
-              width: Math.max(0, labelX - lineStartX - 2),
-              top: TOUCH_TARGET_HEIGHT / 2,
-              borderBottomColor: lineColor,
-              borderBottomWidth: position.lineWidth,
-              borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
-            },
-          ]}
+        <NativeTradeLineSegment
+          color={lineColor}
+          left={tradeLineLayout.lineStartX}
+          lineStyle={position.lineStyle}
+          lineWidth={position.lineWidth}
+          top={lineCenterY}
+          width={tradeLineLayout.leftLineWidth}
         />
       )}
 
       {/* Label group */}
       <View
+        onLayout={handleLabelLayout}
         style={[
           styles.labelGroup,
           {
-            left: labelX,
-            top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT) / 2,
+            left: tradeLineLayout.labelX,
+            maxWidth: tradeLineLayout.maxLabelWidth,
+            top: labelTop,
           },
         ]}
       >
-        {/* Symbol/Text segment */}
-        <View
-          style={[
-            styles.labelSegment,
-            {
-              backgroundColor: position.bodyBackgroundColor,
-              borderColor: position.bodyBorderColor,
-              borderTopLeftRadius: 2,
-              borderBottomLeftRadius: 2,
-            },
-          ]}
-        >
-          <Text style={[styles.labelText, { color: position.bodyTextColor }]}>{displayText}</Text>
-        </View>
+        <View style={styles.labelBodyHitTarget} pointerEvents="none">
+          <View style={styles.labelBody}>
+            {labelSegments.map((segment, index) => {
+              const isFirst = index === 0;
+              const isLastBeforeActions =
+                index === labelSegments.length - 1 && !position.reversible && !position.closeable;
 
-        {/* Quantity segment */}
-        <View
-          style={[
-            styles.labelSegment,
-            {
-              backgroundColor: position.quantityBackgroundColor,
-              borderColor: position.quantityBorderColor,
-              borderLeftWidth: 0,
-            },
-          ]}
-        >
-          <Text style={[styles.labelText, { color: position.quantityTextColor }]}>{displayQuantity}</Text>
-        </View>
-
-        {/* PnL segment */}
-        <View
-          style={[
-            styles.labelSegment,
-            {
-              backgroundColor: pnlBackgroundColor,
-              borderColor: pnlBorderColor,
-              borderLeftWidth: 0,
-            },
-          ]}
-        >
-          <Text style={[styles.labelText, { color: pnlTextColor }]}>{displayPnl}</Text>
+              return (
+                <View
+                  key={segment.key}
+                  style={[
+                    styles.labelSegment,
+                    {
+                      backgroundColor: segment.backgroundColor,
+                      borderColor: segment.borderColor,
+                      borderLeftWidth: isFirst ? 1 : 0,
+                      borderTopLeftRadius: isFirst ? 2 : 0,
+                      borderBottomLeftRadius: isFirst ? 2 : 0,
+                      borderTopRightRadius: isLastBeforeActions ? 2 : 0,
+                      borderBottomRightRadius: isLastBeforeActions ? 2 : 0,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.labelText, { color: segment.textColor }]}>{segment.text}</Text>
+                </View>
+              );
+            })}
+          </View>
         </View>
 
         {/* Reverse button */}
         {position.reversible && (
           <Pressable
+            accessibilityLabel="Reverse position"
+            accessibilityRole="button"
             onPress={handleReverse}
-            style={({ pressed }) => [
-              styles.actionButton,
-              {
-                backgroundColor: position.reverseButtonBackgroundColor,
-                borderColor: position.reverseButtonBorderColor,
-                borderLeftWidth: 0,
-                opacity: pressed ? 0.7 : 1,
-                borderTopRightRadius: position.closeable ? 0 : 2,
-                borderBottomRightRadius: position.closeable ? 0 : 2,
-              },
-            ]}
+            style={styles.actionHitTarget}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>⇄</Text>
+            <View
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: position.reverseButtonBackgroundColor,
+                  borderColor: position.reverseButtonBorderColor,
+                  borderLeftWidth: 0,
+                  borderTopRightRadius: position.closeable ? 0 : 2,
+                  borderBottomRightRadius: position.closeable ? 0 : 2,
+                },
+              ]}
+            >
+              <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>⇄</Text>
+            </View>
           </Pressable>
         )}
 
         {/* Close button */}
         {position.closeable && (
           <Pressable
+            accessibilityLabel="Close position"
+            accessibilityRole="button"
             onPress={handleClose}
-            style={({ pressed }) => [
-              styles.actionButton,
-              {
-                backgroundColor: position.closeButtonBackgroundColor,
-                borderColor: position.closeButtonBorderColor,
-                borderLeftWidth: 0,
-                opacity: pressed ? 0.7 : 1,
-                borderTopRightRadius: 2,
-                borderBottomRightRadius: 2,
-              },
-            ]}
+            style={styles.actionHitTarget}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.actionIcon, { color: position.closeButtonIconColor }]}>×</Text>
+            <View
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: position.closeButtonBackgroundColor,
+                  borderColor: position.closeButtonBorderColor,
+                  borderLeftWidth: 0,
+                  borderTopRightRadius: 2,
+                  borderBottomRightRadius: 2,
+                },
+              ]}
+            >
+              <Text style={[styles.actionIcon, { color: position.closeButtonIconColor }]}>×</Text>
+            </View>
           </Pressable>
         )}
 
@@ -445,39 +513,55 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           <View style={styles.bracketButtons}>
             {/* TP Button */}
             <GestureDetector gesture={tpPanGesture}>
-              <Animated.View style={[styles.bracketButtonWrapper, tpAnimatedStyle]}>
+              <Animated.View collapsable={false} style={[styles.bracketButtonWrapper, tpAnimatedStyle]}>
                 <Pressable
-                  style={[
-                    styles.bracketButton,
-                    {
-                      backgroundColor: takeProfitColor,
-                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-                      borderTopLeftRadius: 2,
-                      borderBottomLeftRadius: 2,
-                    },
-                  ]}
+                  accessibilityLabel="Take profit"
+                  accessibilityRole="button"
+                  onPress={handleTPClick}
+                  style={styles.bracketButtonHitTarget}
+                  hitSlop={{ top: 10, bottom: 10, left: 2, right: 2 }}
                 >
-                  <Text style={[styles.bracketButtonText, { color: takeProfitTextColor }]}>TP</Text>
+                  <View
+                    style={[
+                      styles.bracketButton,
+                      {
+                        backgroundColor: takeProfitColor,
+                        borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+                        borderTopLeftRadius: 2,
+                        borderBottomLeftRadius: 2,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.bracketButtonText, { color: takeProfitTextColor }]}>TP</Text>
+                  </View>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
 
             {/* SL Button */}
             <GestureDetector gesture={slPanGesture}>
-              <Animated.View style={[styles.bracketButtonWrapper, slAnimatedStyle]}>
+              <Animated.View collapsable={false} style={[styles.bracketButtonWrapper, slAnimatedStyle]}>
                 <Pressable
-                  style={[
-                    styles.bracketButton,
-                    {
-                      backgroundColor: stopLossColor,
-                      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-                      borderTopRightRadius: 2,
-                      borderBottomRightRadius: 2,
-                      borderLeftWidth: 0,
-                    },
-                  ]}
+                  accessibilityLabel="Stop loss"
+                  accessibilityRole="button"
+                  onPress={handleSLClick}
+                  style={styles.bracketButtonHitTarget}
+                  hitSlop={{ top: 10, bottom: 10, left: 2, right: 2 }}
                 >
-                  <Text style={[styles.bracketButtonText, { color: stopLossTextColor }]}>SL</Text>
+                  <View
+                    style={[
+                      styles.bracketButton,
+                      {
+                        backgroundColor: stopLossColor,
+                        borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+                        borderTopRightRadius: 2,
+                        borderBottomRightRadius: 2,
+                        borderLeftWidth: 0,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.bracketButtonText, { color: stopLossTextColor }]}>SL</Text>
+                  </View>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
@@ -486,27 +570,39 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       </View>
 
       {/* Horizontal line - right segment */}
-      <View
-        style={[
-          styles.lineSegment,
-          {
-            left: labelX + 180, // After label
-            right: dimensions.margins.right + 60,
-            top: TOUCH_TARGET_HEIGHT / 2,
-            borderBottomColor: lineColor,
-            borderBottomWidth: position.lineWidth,
-            borderStyle: lineStyle as 'solid' | 'dashed' | 'dotted',
-          },
-        ]}
+      <NativeTradeLineSegment
+        color={lineColor}
+        left={tradeLineLayout.rightLineLeft}
+        lineStyle={position.lineStyle}
+        lineWidth={position.lineWidth}
+        top={lineCenterY}
+        width={tradeLineLayout.rightLineWidth}
       />
+
+      {connectorHeight > 1 && (
+        <View
+          pointerEvents="none"
+          style={[
+            styles.collisionConnector,
+            {
+              backgroundColor: lineColor,
+              height: connectorHeight,
+              left: tradeLineLayout.rightLineLeft,
+              top: connectorTop,
+              width: Math.max(1, position.lineWidth),
+            },
+          ]}
+        />
+      )}
 
       {/* Price axis label */}
       <View
         style={[
           styles.priceAxisLabel,
           {
-            right: 4,
-            top: (TOUCH_TARGET_HEIGHT - LABEL_HEIGHT * 1.2) / 2,
+            left: tradeLineLayout.priceLabelLeft,
+            width: tradeLineLayout.priceLabelWidth,
+            top: labelCenterY - containerTop - (LABEL_HEIGHT * 1.2) / 2,
             backgroundColor: position.bodyBackgroundColor,
             borderColor: position.bodyBorderColor,
           },
@@ -523,62 +619,102 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: TOUCH_TARGET_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  lineSegment: {
-    position: 'absolute',
-    height: 0,
-    borderBottomWidth: 1,
   },
   labelGroup: {
     position: 'absolute',
     flexDirection: 'row',
     alignItems: 'center',
+    height: TOUCH_TARGET_HEIGHT,
+    zIndex: 2,
+  },
+  collisionConnector: {
+    position: 'absolute',
+    zIndex: 1,
+  },
+  labelBodyHitTarget: {
+    height: TOUCH_TARGET_HEIGHT,
+    justifyContent: 'center',
+    flexShrink: 1,
+  },
+  labelBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: LABEL_HEIGHT,
+    flexShrink: 1,
   },
   labelSegment: {
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderWidth: 1,
     height: LABEL_HEIGHT,
+    flexShrink: 0,
     justifyContent: 'center',
   },
   labelText: {
     fontSize: 11,
     fontFamily: 'System',
+    includeFontPadding: false,
+    lineHeight: 14,
+    textAlign: 'center',
+    flexShrink: 1,
   },
   bracketButtons: {
     flexDirection: 'row',
     marginLeft: 4,
+    flexShrink: 0,
   },
   bracketButtonWrapper: {
-    height: LABEL_HEIGHT,
+    height: TOUCH_TARGET_HEIGHT,
+    flexShrink: 0,
+    justifyContent: 'center',
+  },
+  bracketButtonHitTarget: {
+    height: TOUCH_TARGET_HEIGHT,
+    justifyContent: 'center',
   },
   bracketButton: {
     width: TP_SL_BUTTON_WIDTH,
+    minWidth: TP_SL_BUTTON_WIDTH,
     height: LABEL_HEIGHT,
     borderWidth: 1,
+    flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bracketButtonText: {
     fontSize: 10,
     fontWeight: 'bold',
+    includeFontPadding: false,
+    lineHeight: 12,
+    textAlign: 'center',
+  },
+  actionHitTarget: {
+    width: ACTION_BUTTON_WIDTH,
+    minWidth: ACTION_BUTTON_WIDTH,
+    height: TOUCH_TARGET_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
   },
   actionButton: {
-    width: 18,
+    width: ACTION_BUTTON_WIDTH,
+    minWidth: ACTION_BUTTON_WIDTH,
     height: LABEL_HEIGHT,
     borderWidth: 1,
     borderLeftWidth: 0,
+    flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   actionIcon: {
     fontSize: 14,
     fontWeight: 'bold',
-    lineHeight: LABEL_HEIGHT,
+    includeFontPadding: false,
+    lineHeight: 16,
+    textAlign: 'center',
   },
   priceAxisLabel: {
     position: 'absolute',
@@ -588,10 +724,14 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     minWidth: 50,
     alignItems: 'center',
+    zIndex: 2,
   },
   priceText: {
     fontSize: 11,
     fontFamily: 'System',
+    includeFontPadding: false,
+    lineHeight: 14,
+    textAlign: 'center',
   },
 });
 
