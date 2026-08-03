@@ -54,4 +54,4 @@ describe('native layout persistence defaults', () => {
       }).saveLoadAdapter,
     ).toBeNull();
   });
-}
+});
