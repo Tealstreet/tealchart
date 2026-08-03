@@ -4,39 +4,22 @@ import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
-import {
-  DashPathEffect,
-  Group,
-  Line as SkiaLine,
-  Skia,
-} from '@shopify/react-native-skia';
+import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../../constants';
-import {
-  getNativeDarkLabelBackgroundColor,
-  NATIVE_PRICE_AXIS_TAG_TEXT_COLOR,
-} from '../utils/nativeColor';
+import { getNativeDarkLabelBackgroundColor, NATIVE_PRICE_AXIS_TAG_TEXT_COLOR } from '../utils/nativeColor';
+import { NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   findNativeResolvedPriceAxisTagCenterY,
   getNativePriceAxisSingleLineTextBaselineOffset,
 } from '../utils/priceAxisTagLayout';
 import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
-import {
-  createNativeAxisLaneTagLayout,
-  fitNativeAxisTextToCharacterCountWorklet,
-  getNativeAxisTagTextCharacterCapacity,
-  PRICE_AXIS_TAG_HEIGHT,
-} from './nativeAxisTagLayout';
+import { createNativeAxisLaneTagLayout, PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
+import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativePriceAxisTag';
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
-import {
-  NativePriceAxisTagAnimatedText,
-  NativePriceAxisTagBox,
-} from './NativePriceAxisTag';
-import {
-  measureNativeSkiaAxisCharacterWidth,
-} from './nativeSkiaText';
 import { sharedPriceToNativeY } from './nativeSharedViewport';
+import { measureNativeSkiaAxisCharacterWidth } from './nativeSkiaText';
 
 function resolveNativePriceAxisTagCenterY(
   resolvedPriceAxisTags: readonly NativeResolvedPriceAxisTag[],
@@ -74,17 +57,27 @@ export function AnimatedBracketDragPreview({
   const color = useDerivedValue(() => dragState.activeColor.value || DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR);
   const lineStart = useDerivedValue(() => ({ x: frame.contentLeft, y: y.value }));
   const tagLayout = createNativeAxisLaneTagLayout(frame);
+  const tagRight = tagLayout.x + tagLayout.width;
   const axisCharacterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
-  const maxTagCharacters = getNativeAxisTagTextCharacterCapacity(tagLayout.width, axisCharacterWidth);
   const tagText = useDerivedValue(() => {
     const bracket = dragState.activeBracketType.value.toUpperCase();
     const typeLabel =
       dragState.activePartialEnabled.value && dragState.activePartialPercent.value < 100
         ? `${Math.round(dragState.activePartialPercent.value)}% Partial ${bracket}`
         : bracket;
-    const text = `${typeLabel} ${formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision)}`;
-    return fitNativeAxisTextToCharacterCountWorklet(text, maxTagCharacters);
+    return `${typeLabel} ${formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision)}`;
   });
+  const tagWidth = useDerivedValue(() =>
+    Math.max(
+      tagLayout.width,
+      NATIVE_PRICE_AXIS_TAG_MIN_WIDTH,
+      Math.ceil(tagText.value.length * axisCharacterWidth) + NATIVE_PRICE_AXIS_TAG_PADDING_X * 2,
+    ),
+  );
+  const tagX = useDerivedValue(() => tagRight - tagWidth.value);
+  const tagTextX = useDerivedValue(
+    () => tagRight - NATIVE_PRICE_AXIS_TAG_PADDING_X - tagText.value.length * axisCharacterWidth,
+  );
   const labelCenterY = useDerivedValue(() => {
     if (!dragState.activeObjectId.value) return -1000;
     return resolveNativePriceAxisTagCenterY(
@@ -93,14 +86,16 @@ export function AnimatedBracketDragPreview({
       y.value,
     );
   });
-  const lineEnd = useDerivedValue(() => ({ x: tagLayout.x, y: y.value }));
-  const connectorStart = useDerivedValue(() => ({ x: tagLayout.x, y: y.value }));
-  const connectorEnd = useDerivedValue(() => ({ x: tagLayout.x, y: labelCenterY.value }));
+  const lineEnd = useDerivedValue(() => ({ x: tagX.value, y: y.value }));
+  const connectorStart = useDerivedValue(() => ({ x: tagX.value, y: y.value }));
+  const connectorEnd = useDerivedValue(() => ({ x: tagX.value, y: labelCenterY.value }));
   const connectorOpacity = useDerivedValue(() => (Math.abs(labelCenterY.value - y.value) > 2 ? 0.5 : 0));
   const labelY = useDerivedValue(() => labelCenterY.value - PRICE_AXIS_TAG_HEIGHT / 2);
   const textBaselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(PRICE_AXIS_TAG_HEIGHT);
   const textY = useDerivedValue(() => labelY.value + textBaselineOffset);
-  const previewOpacity = useDerivedValue(() => (dragState.activeObjectId.value && isNativeBracketPreviewYVisible(y.value, frame) ? 1 : 0));
+  const previewOpacity = useDerivedValue(() =>
+    dragState.activeObjectId.value && isNativeBracketPreviewYVisible(y.value, frame) ? 1 : 0,
+  );
 
   return (
     <Group opacity={previewOpacity}>
@@ -109,18 +104,18 @@ export function AnimatedBracketDragPreview({
       </SkiaLine>
       <SkiaLine p1={connectorStart} p2={connectorEnd} color={color} strokeWidth={1} opacity={connectorOpacity} />
       <NativePriceAxisTagBox
-        x={tagLayout.x}
+        x={tagX}
         y={labelY}
-        width={tagLayout.width}
+        width={tagWidth}
         height={PRICE_AXIS_TAG_HEIGHT}
         backgroundColor={getNativeDarkLabelBackgroundColor()}
         borderColor={color}
       />
       <NativePriceAxisTagAnimatedText
-        x={tagLayout.textX}
+        x={tagTextX}
         y={textY}
         text={tagText}
-        maxCharacters={maxTagCharacters}
+        maxCharacters={Number.MAX_SAFE_INTEGER}
         characterWidth={axisCharacterWidth}
         font={axisFont}
         color={NATIVE_PRICE_AXIS_TAG_TEXT_COLOR}

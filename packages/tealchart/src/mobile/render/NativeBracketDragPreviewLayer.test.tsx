@@ -1,12 +1,12 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { NativeBracketDragSharedValues } from '../interaction/nativeOemsDragState';
 
-import { describe, expect, it } from 'vitest';
 import { matchFont } from '@shopify/react-native-skia';
+import { describe, expect, it } from 'vitest';
 
 import { AnimatedBracketDragPreview } from './NativeBracketDragPreviewLayer';
-import { NativePriceAxisTagAnimatedText } from './NativePriceAxisTag';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import { NativePriceAxisTagAnimatedText } from './NativePriceAxisTag';
 
 function shared<T>(value: T) {
   return { value };
@@ -103,7 +103,8 @@ describe('AnimatedBracketDragPreview', () => {
     const labels = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
 
     expect(labels).toHaveLength(1);
-    expect(labels[0].props.text.value).toBe('75% Partial TP 63...');
+    expect(labels[0].props.text.value).toBe('75% Partial TP 63,777');
+    expect(labels[0].props.maxCharacters).toBe(Number.MAX_SAFE_INTEGER);
     expect(labels[0].props.characterSet).toContain('%');
     expect(labels[0].props.characterSet).toContain('Partial');
   });
