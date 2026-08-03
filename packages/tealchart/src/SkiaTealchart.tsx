@@ -48,6 +48,7 @@ import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
+import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
@@ -178,6 +179,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const toggleLeftToolRailCollapsed = useCallback(() => {
     chartStore.uiPreferences.setKey('leftToolRailCollapsed', !chartStore.uiPreferences.get().leftToolRailCollapsed);
   }, [chartStore]);
+  const dismissNativeOpenDrawingCategory = useCallback(() => {
+    setNativeOpenDrawingCategoryId(null);
+  }, []);
   useEffect(() => {
     if (leftToolRailCollapsed) setNativeOpenDrawingCategoryId(null);
   }, [leftToolRailCollapsed]);
@@ -827,6 +831,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           symbol={symbol}
           textColor={textColor}
           upColor={options.upColor}
+        />
+      )}
+      {frame && nativeOpenDrawingCategoryId && leftToolRailLayout && !leftToolRailLayout.collapsed && (
+        <NativeDrawingCategoryDismissOverlay
+          height={Math.max(0, frame.dimensions.height - (topBarLayout?.height ?? 0))}
+          onDismiss={dismissNativeOpenDrawingCategory}
+          top={topBarLayout?.height ?? 0}
+          width={frame.dimensions.width}
         />
       )}
       {leftToolRailLayout && (
