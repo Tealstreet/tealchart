@@ -55,6 +55,7 @@ export interface NativeViewportRuntimeInput {
 }
 
 export interface NativeViewportRuntime {
+  applyNativeViewport: (nextViewport?: Viewport | null) => boolean;
   beginNativeViewportInteraction: () => void;
   cancelNativeViewportInteraction: () => void;
   commitPanViewport: (nextViewport: Viewport) => void;
@@ -530,7 +531,24 @@ export function useNativeViewportRuntime({
     timeScaleActive,
   ]);
 
+  const applyNativeViewport = useCallback(
+    (nextViewport?: Viewport | null): boolean => {
+      if (!nextViewport) return false;
+      viewportOwnershipRef.current = commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport);
+      candidateViewportRef.current = nextViewport;
+      setCandidateViewport(nextViewport);
+      setSettledViewport(nextViewport);
+      syncNativeSharedViewportIfChanged(sharedViewport, nextViewport);
+      syncNativeSharedViewportIfChanged(panStartViewport, nextViewport);
+      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
+      onViewportChange?.(nextViewport);
+      return true;
+    },
+    [onViewportChange, panActive, panStartViewport, pinchActive, priceScaleActive, sharedViewport, timeScaleActive],
+  );
+
   return {
+    applyNativeViewport,
     beginNativeViewportInteraction,
     cancelNativeViewportInteraction,
     commitPanViewport,
