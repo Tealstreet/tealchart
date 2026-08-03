@@ -1,5 +1,3 @@
-import type { DrawingCoordinateSpace } from '../../drawings';
-
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -9,33 +7,11 @@ import {
   dispatchUserDrawingCommand,
 } from '../../drawings';
 import {
-  canBeginNativeUserDrawingEditDragAtPointFromState,
   createNativeUserDrawingDuplicateSelectedToolbarCommand,
   createNativeUserDrawingNoAffectedToolbarCommandMetadata,
   createNativeUserDrawingSelectedToolbarCommandMetadata,
   resolveNativeUserDrawingExternalState,
 } from './useNativeUserDrawingRuntime';
-
-const drawingSpace: DrawingCoordinateSpace = {
-  viewport: {
-    startTime: 1_000,
-    endTime: 2_000,
-    priceMin: 0,
-    priceMax: 200,
-  },
-  pane: {
-    id: 'main',
-    top: 0,
-    bottom: 100,
-    height: 100,
-    yMin: 0,
-    yMax: 200,
-  },
-  chartLeft: 0,
-  chartRight: 100,
-};
-
-const spacesByPaneId = new Map([['main', drawingSpace]]);
 
 describe('native user drawing command metadata', () => {
   it('marks drawing-independent toolbar commands as affecting no drawing ids', () => {
@@ -77,68 +53,12 @@ describe('native user drawing command metadata', () => {
       ],
       selection: { drawingId: 'trend-line' },
     });
-    const command = createNativeUserDrawingDuplicateSelectedToolbarCommand(
-      state,
-      () => 'trend-line-copy',
-      () => 10,
-    );
+    const command = createNativeUserDrawingDuplicateSelectedToolbarCommand(state, () => 'trend-line-copy', () => 10);
     const result = dispatchUserDrawingCommand(state, command);
     const event = createUserDrawingCommandEvent(state, result);
 
     expect(result.changed).toBe(true);
     expect(event?.affectedIds).toEqual(['trend-line', 'trend-line-copy']);
-  });
-});
-
-describe('canBeginNativeUserDrawingEditDragAtPointFromState', () => {
-  const selectedTrendLineState = createUserDrawingState({
-    drawings: [
-      {
-        id: 'trend-line',
-        kind: 'trendLine',
-        paneId: 'main',
-        visible: true,
-        locked: false,
-        createdAt: 1,
-        updatedAt: 1,
-        style: DEFAULT_USER_DRAWING_STYLE,
-        points: [
-          { time: 1_000, price: 100 },
-          { time: 2_000, price: 100 },
-        ],
-        extend: 'none',
-      },
-    ],
-    selection: { drawingId: 'trend-line' },
-  });
-
-  it('accepts drags that start on an already selected drawing', () => {
-    expect(
-      canBeginNativeUserDrawingEditDragAtPointFromState(selectedTrendLineState, { x: 50, y: 50 }, spacesByPaneId),
-    ).toBe(true);
-  });
-
-  it('rejects unselected, empty, and locked drawing starts', () => {
-    expect(
-      canBeginNativeUserDrawingEditDragAtPointFromState(
-        createUserDrawingState({ ...selectedTrendLineState, selection: null }),
-        { x: 50, y: 50 },
-        spacesByPaneId,
-      ),
-    ).toBe(false);
-    expect(
-      canBeginNativeUserDrawingEditDragAtPointFromState(selectedTrendLineState, { x: 50, y: 80 }, spacesByPaneId),
-    ).toBe(false);
-    expect(
-      canBeginNativeUserDrawingEditDragAtPointFromState(
-        createUserDrawingState({
-          ...selectedTrendLineState,
-          drawings: selectedTrendLineState.drawings.map((drawing) => ({ ...drawing, locked: true })),
-        }),
-        { x: 50, y: 50 },
-        spacesByPaneId,
-      ),
-    ).toBe(false);
   });
 });
 
