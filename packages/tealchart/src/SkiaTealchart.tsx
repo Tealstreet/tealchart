@@ -50,7 +50,6 @@ import {
   resolveNativeResetViewTapTarget,
 } from './mobile/interaction/nativeResetViewButton';
 import { findNativeOrderDragZone, findNativeTradeLineActionZone } from './mobile/interaction/nativeTradeLineHitTest';
-import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nativeUserDrawingEditDragZones';
 import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
 import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
 import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeSkiaInteractionRuntime';
@@ -76,11 +75,7 @@ import {
 } from './mobile/render/nativeRenderTransition';
 import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
 import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
-import {
-  NativeUserDrawingSelectionActionOverlay,
-  resolveNativeSelectedDrawingActionOverlayModel,
-  resolveNativeSelectedDrawingActionHitTargets,
-} from './mobile/render/NativeUserDrawingSelectionActionOverlay';
+import { NativeUserDrawingSelectionActionOverlay } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
@@ -515,16 +510,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const {
-    beginNativeUserDrawingEditDragAtPoint,
     dispatchNativeUserDrawingSelectedAction,
-    endNativeUserDrawingEditDrag,
     handleNativeUserDrawingInput,
     redoNativeUserDrawingCommand,
     replaceNativeUserDrawingState,
     selectNativeUserDrawingAtPoint,
     selectNativeUserDrawingTool,
     undoNativeUserDrawingCommand,
-    updateNativeUserDrawingEditDrag,
     userDrawingCommandAvailability,
     userDrawingRecentToolsByCategory,
     userDrawingState: nativeUserDrawingState,
@@ -533,12 +525,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onUserDrawingCommand: handleNativeUserDrawingCommandForLayout,
     onUserDrawingStateChange,
   });
-  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
-  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
-  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
-  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
-  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
-  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const applyNativeLayoutSettings = useCallback(
     async (settings: ChartSettings) => {
       if (settings.interval && settings.interval !== chartApi.resolution()) {
@@ -680,34 +666,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       selectNativeUserDrawingAtPoint,
     ],
   );
-  const resolveNativeUserDrawingEditDragPoint = useCallback(
-    (x: number, y: number) => {
-      if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return null;
-      return resolveNativeUserDrawingSelectionPoint({
-        bars: nativeRenderBars,
-        frame,
-        spacesByPaneId: nativeUserDrawingCoordinateSpaces,
-        viewport: nativeRenderViewport,
-        x,
-        y,
-      });
-    },
-    [frame, nativeDrawingSelectionEnabled, nativeRenderBars, nativeRenderViewport, nativeUserDrawingCoordinateSpaces],
-  );
-  const handleNativeUserDrawingEditDragBegin = useCallback(
-    (x: number, y: number) => {
-      const dragPoint = resolveNativeUserDrawingEditDragPoint(x, y);
-      if (!dragPoint) return;
-      beginNativeUserDrawingEditDragAtPoint(dragPoint.point, dragPoint.spacesByPaneId);
-    },
-    [beginNativeUserDrawingEditDragAtPoint, resolveNativeUserDrawingEditDragPoint],
-  );
-  const handleNativeUserDrawingEditDragMove = useCallback(
-    (x: number, y: number) => {
-      updateNativeUserDrawingEditDrag({ x, y });
-    },
-    [updateNativeUserDrawingEditDrag],
-  );
   const handleNativeSelectedDrawingAction = useCallback(
     (command: UserDrawingSelectedActionSurfaceCommand) => {
       dispatchNativeUserDrawingSelectedAction(command);
@@ -841,86 +799,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => (frame ? resolveNativeResetViewButtonLayout(frame) : null),
     [frame],
   );
-  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
-    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
-    return resolveUserDrawingSelectionActionAnchorFromDrawings({
-      drawings: nativeUserDrawingDrawings,
-      selection: nativeUserDrawingSelection,
-      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
-    });
-  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
-  const nativeSelectionActionLeftInset = leftToolRailLayout?.collapsed
-    ? 16
-    : (leftToolRailLayout?.railRect.width ?? 0) + 8;
-  const nativeSelectionActionTopInset = showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8;
-  const nativeUserDrawingSelectionActionOverlayModel = useMemo(
-    () =>
-      frame
-        ? resolveNativeSelectedDrawingActionOverlayModel({
-            activeBackgroundColor: gridColor,
-            activeTextColor: options.upColor,
-            anchor: nativeUserDrawingSelectionActionAnchor,
-            backgroundColor,
-            bottomInset: 8,
-            gridColor,
-            leftInset: nativeSelectionActionLeftInset,
-            mutedTextColor: nativeMutedTextColor,
-            onAction: handleNativeSelectedDrawingAction,
-            onPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
-            openPopoverGroupId: nativeSelectedActionPopoverGroupId,
-            rightInset: 8,
-            textColor,
-            topInset: nativeSelectionActionTopInset,
-            userDrawingDefaultStylesByKind: nativeUserDrawingDefaultStylesByKind,
-            userDrawingDraft: nativeUserDrawingDraft,
-            userDrawingDrawings: nativeUserDrawingDrawings,
-            userDrawingSelection: nativeUserDrawingSelection,
-            userDrawingTextEdit: nativeUserDrawingTextEdit,
-            viewportHeight: frame.dimensions.height,
-            viewportWidth: frame.dimensions.width,
-          })
-        : null,
-    [
-      backgroundColor,
-      frame,
-      gridColor,
-      handleNativeSelectedDrawingAction,
-      nativeMutedTextColor,
-      nativeSelectedActionPopoverGroupId,
-      nativeSelectionActionLeftInset,
-      nativeSelectionActionTopInset,
-      nativeUserDrawingDefaultStylesByKind,
-      nativeUserDrawingDraft,
-      nativeUserDrawingDrawings,
-      nativeUserDrawingSelection,
-      nativeUserDrawingSelectionActionAnchor,
-      nativeUserDrawingTextEdit,
-      options.upColor,
-      textColor,
-    ],
-  );
-  const nativeUserDrawingSelectionActionTargets = useMemo(
-    () => resolveNativeSelectedDrawingActionHitTargets(nativeUserDrawingSelectionActionOverlayModel),
-    [nativeUserDrawingSelectionActionOverlayModel],
-  );
-  const nativeUserDrawingEditDragZones = useMemo(
-    () =>
-      nativeDrawingSelectionEnabled
-        ? resolveNativeUserDrawingEditDragZones({
-            anchor: nativeUserDrawingSelectionActionAnchor,
-            drawings: nativeUserDrawingDrawings,
-            selection: nativeUserDrawingSelection,
-            spacesByPaneId: nativeUserDrawingCoordinateSpaces,
-          })
-        : [],
-    [
-      nativeDrawingSelectionEnabled,
-      nativeUserDrawingCoordinateSpaces,
-      nativeUserDrawingDrawings,
-      nativeUserDrawingSelection,
-      nativeUserDrawingSelectionActionAnchor,
-    ],
-  );
   const nativeGestureControlZones = useMemo<readonly NativeGestureControlZone[]>(() => {
     const zones: NativeGestureControlZone[] = [];
     if (frame && topBarLayout) {
@@ -956,19 +834,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       });
     }
 
-    if (nativeUserDrawingSelectionActionOverlayModel) {
-      zones.push({
-        x1: nativeUserDrawingSelectionActionOverlayModel.position.left,
-        x2:
-          nativeUserDrawingSelectionActionOverlayModel.position.left +
-          nativeUserDrawingSelectionActionOverlayModel.surfaceWidth,
-        y1: nativeUserDrawingSelectionActionOverlayModel.position.top,
-        y2:
-          nativeUserDrawingSelectionActionOverlayModel.position.top +
-          nativeUserDrawingSelectionActionOverlayModel.surfaceHeight,
-      });
-    }
-
     return zones;
   }, [
     frame,
@@ -977,7 +842,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
     nativeResetViewButtonVisible,
-    nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
   const handleNativeResetViewTap = useCallback(
@@ -1025,7 +889,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     commitTradeLineAction,
     controlZones: nativeGestureControlZones,
     crosshair,
-    drawingEditDragZones: nativeUserDrawingEditDragZones,
     drawingInputEnabled: nativeDrawingInputEnabled,
     drawingSelectionEnabled: nativeDrawingSelectionEnabled,
     frame,
@@ -1035,21 +898,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     orderDragState,
     orderDragZones,
     onDrawingTap: handleNativeUserDrawingTap,
-    onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
-    onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
-    onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,
     onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
     onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
     onContextMenuTap: handleNativeContextMenuTap,
-    onSelectedDrawingAction: handleNativeSelectedDrawingAction,
-    onSelectedDrawingActionPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
     onResetViewTap: handleNativeResetViewTap,
     panActive,
     pinchActive,
     pricePrecision: nativePricePrecision,
     priceScaleActive,
     resetButtonVisible: nativeResetViewButtonVisible,
-    selectedDrawingActionTargets: nativeUserDrawingSelectionActionTargets,
     priceScaleGestureState,
     sharedViewport,
     timeScaleActive,
@@ -1058,6 +915,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineActionZones,
     tradeLineRows,
   });
+  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
+  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
+  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
+  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
+  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
+  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const nativeUserDrawingRenderEntries = useMemo(
     () =>
       resolveUserDrawingRenderEntriesFromSlices({
@@ -1117,6 +980,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     };
   }, []);
 
+  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
+    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
+    return resolveUserDrawingSelectionActionAnchorFromDrawings({
+      drawings: nativeUserDrawingDrawings,
+      selection: nativeUserDrawingSelection,
+      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+    });
+  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
   const liveChartMounted = !resizeLayoutFrozen && frame && nativeRenderProjection;
 
   return (
@@ -1230,14 +1101,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           backgroundColor={backgroundColor}
           bottomInset={8}
           gridColor={gridColor}
-          leftInset={nativeSelectionActionLeftInset}
+          leftInset={leftToolRailLayout?.collapsed ? 16 : (leftToolRailLayout?.railRect.width ?? 0) + 8}
           mutedTextColor={nativeMutedTextColor}
           onAction={handleNativeSelectedDrawingAction}
           onPopoverGroupChange={setNativeSelectedActionPopoverGroupId}
           openPopoverGroupId={nativeSelectedActionPopoverGroupId}
           rightInset={8}
           textColor={textColor}
-          topInset={nativeSelectionActionTopInset}
+          topInset={showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8}
           userDrawingDefaultStylesByKind={nativeUserDrawingDefaultStylesByKind}
           userDrawingDraft={nativeUserDrawingDraft}
           userDrawingDrawings={nativeUserDrawingDrawings}
