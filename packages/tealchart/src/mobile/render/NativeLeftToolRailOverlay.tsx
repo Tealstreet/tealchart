@@ -174,7 +174,7 @@ export function NativeLeftToolRailOverlayImpl({
               accessibilityState={{ selected: item.active === true, expanded: isOpen }}
               hitSlop={{ top: 4, bottom: 4 }}
               key={`native-left-tool-category-${item.categoryId}`}
-              onPress={() => onCategoryOpenChange(isOpen ? null : item.categoryId)}
+              onPress={() => onCategoryOpenChange(isOpen ? null : (item.categoryId ?? null))}
               style={itemStyle}
             >
               <View pointerEvents="none" style={visualStyle}>

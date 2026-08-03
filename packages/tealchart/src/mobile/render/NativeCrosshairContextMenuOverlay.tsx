@@ -99,7 +99,7 @@ export function NativeCrosshairContextMenuOverlayImpl({
     itemCount: menu.items.length,
   });
   const borderColor = renderOptions.gridColor ?? '#363a45';
-  const disabledColor = renderOptions.mutedTextColor ?? '#787b86';
+  const disabledColor = '#787b86';
   const menuBackgroundColor = resolveNativeContextMenuBackgroundColor(backgroundColor);
 
   const stopPropagation = (event: GestureResponderEvent) => {

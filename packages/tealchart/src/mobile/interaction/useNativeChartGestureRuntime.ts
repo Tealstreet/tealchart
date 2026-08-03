@@ -14,7 +14,6 @@ import type {
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import type { NativeBracketDragInteractionState, NativeOrderDragInteractionState } from './nativeOemsDragState';
-import type { NativeTapClaimSharedValues } from './nativeTapClaim';
 import type {
   NativeChartAxisPinchGestureState,
   NativeChartPanGestureState,
@@ -34,14 +33,12 @@ import {
   createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
-import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
   createNativeResetViewTapGesture,
   createNativeTradeLineActionTapGesture,
   createNativeUserDrawingTapGesture,
 } from './nativeTapGestures';
-import { createNativeUserDrawingEditDragGesture } from './nativeUserDrawingEditGestures';
 import {
   createNativeChartAxisPinchGesture,
   createNativeChartPanGesture,
@@ -67,7 +64,6 @@ export interface NativeChartGestureRuntimeInput {
   ) => void;
   controlZones?: readonly NativeGestureControlZone[];
   crosshair: NativeCrosshairSharedValues;
-  drawingEditDragZones?: readonly NativeGestureControlZone[];
   drawingInputEnabled: boolean;
   drawingSelectionEnabled: boolean;
   frame: NativeChartFrame | null;
@@ -77,10 +73,7 @@ export interface NativeChartGestureRuntimeInput {
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   onDrawingTap: (x: number, y: number) => void;
-  onDrawingSelectionTap: (x: number, y: number, claimTap: () => void) => void;
-  onDrawingEditDragBegin: (x: number, y: number) => void;
-  onDrawingEditDragEnd: () => void;
-  onDrawingEditDragMove: (x: number, y: number) => void;
+  onDrawingSelectionTap: (x: number, y: number) => void;
   onLeftToolRailToggleTap: () => void;
   onContextMenuTap: Parameters<typeof createNativeCrosshairContextMenuTapGesture>[0]['onContextMenuTap'];
   onResetViewTap: Parameters<typeof createNativeResetViewTapGesture>[0]['onResetViewTap'];
@@ -138,7 +131,6 @@ export function useNativeChartGestureRuntime({
   commitTradeLineAction,
   controlZones = [],
   crosshair,
-  drawingEditDragZones = [],
   drawingInputEnabled,
   drawingSelectionEnabled,
   frame,
@@ -149,9 +141,6 @@ export function useNativeChartGestureRuntime({
   orderDragZones,
   onDrawingTap,
   onDrawingSelectionTap,
-  onDrawingEditDragBegin,
-  onDrawingEditDragEnd,
-  onDrawingEditDragMove,
   onLeftToolRailToggleTap,
   onContextMenuTap,
   onResetViewTap,
@@ -177,9 +166,6 @@ export function useNativeChartGestureRuntime({
   const stableCommitTradeLineAction = useLatestNativeCallback(commitTradeLineAction);
   const stableOnDrawingSelectionTap = useLatestNativeCallback(onDrawingSelectionTap);
   const stableOnDrawingTap = useLatestNativeCallback(onDrawingTap);
-  const stableOnDrawingEditDragBegin = useLatestNativeCallback(onDrawingEditDragBegin);
-  const stableOnDrawingEditDragEnd = useLatestNativeCallback(onDrawingEditDragEnd);
-  const stableOnDrawingEditDragMove = useLatestNativeCallback(onDrawingEditDragMove);
   const stableOnLeftToolRailToggleTap = useLatestNativeCallback(onLeftToolRailToggleTap);
   const stableOnContextMenuTap = useLatestNativeCallback(onContextMenuTap);
   const stableOnResetViewTap = useLatestNativeCallback(onResetViewTap);
@@ -187,24 +173,6 @@ export function useNativeChartGestureRuntime({
   const resetTapStartY = useSharedValue(0);
   const resetTapStartedOnButton = useSharedValue(false);
   const resetTapBlockedByContextMenuButton = useSharedValue(false);
-  const tapClaimSequence = useSharedValue(0);
-  const tapClaimClaimedSequence = useSharedValue(0);
-  const tapClaim = useMemo<NativeTapClaimSharedValues>(
-    () => ({
-      claimedSequence: tapClaimClaimedSequence,
-      sequence: tapClaimSequence,
-    }),
-    [tapClaimClaimedSequence, tapClaimSequence],
-  );
-  const claimTap = useCallback(() => {
-    claimNativeTap(tapClaim);
-  }, [tapClaim]);
-  const handleDrawingSelectionTap = useCallback(
-    (x: number, y: number) => {
-      stableOnDrawingSelectionTap(x, y, claimTap);
-    },
-    [claimTap, stableOnDrawingSelectionTap],
-  );
   const resetTapGestureState = useMemo(
     () => ({
       blockedByContextMenuButton: resetTapBlockedByContextMenuButton,
@@ -214,7 +182,6 @@ export function useNativeChartGestureRuntime({
     }),
     [resetTapBlockedByContextMenuButton, resetTapStartX, resetTapStartY, resetTapStartedOnButton],
   );
-  const drawingEditDragActive = useSharedValue(false);
   const dataFrame = hasDataViewport ? frame : null;
   const chartInteractionFrame = drawingInputEnabled ? null : dataFrame;
   const crosshairInteractionFrame = resolveNativeCrosshairInteractionFrame({ dataFrame, drawingInputEnabled });
@@ -259,7 +226,6 @@ export function useNativeChartGestureRuntime({
       orderDragZones,
       pricePrecision,
       sharedViewport,
-      tapClaim,
       tradeLabelHeight,
       tradeLineActionZones,
       tradeLineRows,
@@ -272,7 +238,6 @@ export function useNativeChartGestureRuntime({
     orderDragZones,
     pricePrecision,
     sharedViewport,
-    tapClaim,
     tradeLabelHeight,
     tradeLineActionZones,
     tradeLineRows,
@@ -459,31 +424,9 @@ export function useNativeChartGestureRuntime({
       controlZones,
       enabled: drawingSelectionEnabled,
       frame: dataFrame,
-      onDrawingTap: handleDrawingSelectionTap,
+      onDrawingTap: stableOnDrawingSelectionTap,
     });
-  }, [controlZones, dataFrame, drawingSelectionEnabled, handleDrawingSelectionTap]);
-
-  const drawingEditDragGesture = useMemo<GestureType>(() => {
-    return createNativeUserDrawingEditDragGesture({
-      controlZones,
-      dragActive: drawingEditDragActive,
-      dragZones: drawingEditDragZones,
-      enabled: drawingSelectionEnabled,
-      frame: dataFrame,
-      onBeginDrag: stableOnDrawingEditDragBegin,
-      onEndDrag: stableOnDrawingEditDragEnd,
-      onMoveDrag: stableOnDrawingEditDragMove,
-    });
-  }, [
-    controlZones,
-    dataFrame,
-    drawingEditDragActive,
-    drawingEditDragZones,
-    drawingSelectionEnabled,
-    stableOnDrawingEditDragBegin,
-    stableOnDrawingEditDragEnd,
-    stableOnDrawingEditDragMove,
-  ]);
+  }, [controlZones, dataFrame, drawingSelectionEnabled, stableOnDrawingSelectionTap]);
 
   const leftToolRailToggleTapGesture = useMemo<GestureType>(() => {
     return createNativeLeftToolRailToggleTapGesture({
@@ -566,7 +509,6 @@ export function useNativeChartGestureRuntime({
         crosshairTapGesture,
         drawingSelectionTapGesture,
         drawingTapGesture,
-        drawingEditDragGesture,
         leftToolRailToggleTapGesture,
         orderDragGesture,
         priceScaleGesture,
@@ -584,7 +526,6 @@ export function useNativeChartGestureRuntime({
       crosshairTapGesture,
       drawingSelectionTapGesture,
       drawingTapGesture,
-      drawingEditDragGesture,
       leftToolRailToggleTapGesture,
       orderDragGesture,
       priceScaleGesture,

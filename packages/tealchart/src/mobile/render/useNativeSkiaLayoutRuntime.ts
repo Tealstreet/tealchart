@@ -3,7 +3,7 @@ import type { ChartThemeInput } from '../../theme';
 import type { ChartMargins, RenderOptions } from '../../types';
 import type { NativeChartFrame } from './nativeChartFrame';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   computeTradingLineLabelMinX,
@@ -47,6 +47,25 @@ export interface NativeSkiaLayoutRuntime {
   options: RenderOptions;
 }
 
+export interface NativeSkiaDimensions {
+  height: number;
+  width: number;
+}
+
+export function resolveNativeSkiaDimensions({
+  measuredDimensions,
+  propHeight,
+  propWidth,
+}: Pick<NativeSkiaLayoutRuntimeInput, 'propHeight' | 'propWidth'> & {
+  measuredDimensions: NativeSkiaDimensions;
+}): NativeSkiaDimensions {
+  if (typeof propWidth === 'number' && typeof propHeight === 'number') {
+    return { width: propWidth, height: propHeight };
+  }
+
+  return measuredDimensions;
+}
+
 export function createNativeSkiaChartMargins({
   marginsProp,
   priceAxisWidth,
@@ -79,19 +98,20 @@ export function useNativeSkiaLayoutRuntime({
   theme,
   topBarHeight,
 }: NativeSkiaLayoutRuntimeInput): NativeSkiaLayoutRuntime {
-  const [dimensions, setDimensions] = useState({ width: propWidth ?? 0, height: propHeight ?? 0 });
-
-  useEffect(() => {
-    if (propWidth && propHeight) setDimensions({ width: propWidth, height: propHeight });
-  }, [propHeight, propWidth]);
+  const [measuredDimensions, setMeasuredDimensions] = useState({ width: propWidth ?? 0, height: propHeight ?? 0 });
+  const hasExplicitDimensions = typeof propWidth === 'number' && typeof propHeight === 'number';
+  const dimensions = useMemo(
+    () => resolveNativeSkiaDimensions({ measuredDimensions, propHeight, propWidth }),
+    [measuredDimensions, propHeight, propWidth],
+  );
 
   const onLayout = useCallback(
     (event: LayoutChangeEvent) => {
-      if (propWidth && propHeight) return;
+      if (hasExplicitDimensions) return;
       const { width, height } = event.nativeEvent.layout;
-      setDimensions({ width, height });
+      setMeasuredDimensions((current) => (current.width === width && current.height === height ? current : { width, height }));
     },
-    [propHeight, propWidth],
+    [hasExplicitDimensions],
   );
 
   const themedRenderOptions = useMemo(

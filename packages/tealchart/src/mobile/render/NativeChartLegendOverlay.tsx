@@ -54,7 +54,7 @@ export function NativeChartLegendOverlayImpl({
     leftToolRailLayout?.collapsed ? 12 : (leftToolRailLayout?.railRect.width ?? 0) + 8,
   );
   const top = frame.mainPane.top + 6;
-  const ohlcItems = latestBar
+  const ohlcItems: Array<readonly [string, number]> = latestBar
     ? ([
         ['O', latestBar.open],
         ['H', latestBar.high],

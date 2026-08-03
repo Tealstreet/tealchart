@@ -5,18 +5,14 @@ import type {
   UserDrawingSelectedActionSurfaceGroup,
   UserDrawingSelectedActionSurfaceGroupId,
   UserDrawingSelectedActionSurfaceItem,
-  UserDrawingSelection,
   UserDrawingSelectionActionAnchor,
+  UserDrawingSelection,
   UserDrawingState,
   UserDrawingTextEdit,
 } from '../../drawings';
-import type { NativeGestureControlZone } from '../interaction/nativeGestureControlZones';
 
 import React from 'react';
-
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS } from 'react-native-reanimated';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   getSelectedUserDrawing,
@@ -30,10 +26,7 @@ const ACTION_SIZE = 28;
 const ACTION_GAP = 2;
 const GROUP_GAP = 8;
 const SURFACE_PADDING = 4;
-const SURFACE_CONTENT_PADDING_X = SURFACE_PADDING - ACTION_GAP / 2;
 const POPOVER_HEIGHT = 52;
-const CONTROL_ZONE_PADDING = 8;
-const NATIVE_SELECTED_DRAWING_ACTION_Z_INDEX = 60;
 
 export interface NativeUserDrawingSelectionActionOverlayProps {
   activeBackgroundColor: string;
@@ -69,21 +62,6 @@ export interface NativeSelectedDrawingActionOverlayModel extends NativeSelectedD
   position: { left: number; top: number };
 }
 
-type NativeSelectedDrawingActionHitTarget =
-  | {
-      command: UserDrawingSelectedActionSurfaceCommand;
-      enabled: boolean;
-      id: string;
-      label: string;
-      type: 'action';
-    }
-  | {
-      expanded: boolean;
-      groupId: UserDrawingSelectedActionSurfaceGroupId;
-      label: string;
-      type: 'popover';
-    };
-
 function isNativeSelectedDrawingActionSupported(command: UserDrawingSelectedActionSurfaceCommand): boolean {
   switch (command.type) {
     case 'toolbarAction':
@@ -103,9 +81,11 @@ function isNativeSelectedDrawingActionSupported(command: UserDrawingSelectedActi
   }
 }
 
-function resolveNativeSelectedDrawingActionGroups(state: UserDrawingState): UserDrawingSelectedActionSurfaceGroup[] {
-  return resolveUserDrawingSelectedActionSurface(state)
-    .groups.map((group) => ({
+function resolveNativeSelectedDrawingActionGroups(
+  state: UserDrawingState,
+): UserDrawingSelectedActionSurfaceGroup[] {
+  return resolveUserDrawingSelectedActionSurface(state).groups
+    .map((group) => ({
       ...group,
       items: group.items.filter((item) => isNativeSelectedDrawingActionSupported(item.command)),
     }))
@@ -142,10 +122,9 @@ function resolveGroupWidth(group: UserDrawingSelectedActionSurfaceGroup): number
 }
 
 function resolveSurfaceWidth(groups: readonly UserDrawingSelectedActionSurfaceGroup[]): number {
-  const groupWidth = groups.reduce(
-    (total, group, index) => total + resolveGroupWidth(group) + (index > 0 ? GROUP_GAP : 0),
-    0,
-  );
+  const groupWidth = groups.reduce((total, group, index) => (
+    total + resolveGroupWidth(group) + (index > 0 ? GROUP_GAP : 0)
+  ), 0);
   return SURFACE_PADDING * 2 + groupWidth;
 }
 
@@ -175,7 +154,10 @@ export function resolveNativeSelectedDrawingActionSurfaceModel({
 
   return {
     groups,
-    surfaceWidth: Math.min(Math.max(0, viewportWidth - leftInset - rightInset), resolveSurfaceWidth(groups)),
+    surfaceWidth: Math.min(
+      Math.max(0, viewportWidth - leftInset - rightInset),
+      resolveSurfaceWidth(groups),
+    ),
   };
 }
 
@@ -194,9 +176,9 @@ function resolveNativeSelectedDrawingActionOverlayModelFromSurface({
 }): NativeSelectedDrawingActionOverlayModel | null {
   if (!anchor || !surfaceModel) return null;
 
-  const activePopoverGroup =
-    surfaceModel.groups.find((group) => group.id === openPopoverGroupId && group.presentation?.type === 'popover') ??
-    null;
+  const activePopoverGroup = surfaceModel.groups.find(
+    (group) => group.id === openPopoverGroupId && group.presentation?.type === 'popover',
+  ) ?? null;
   const surfaceHeight = ACTION_SIZE + SURFACE_PADDING * 2 + (activePopoverGroup ? POPOVER_HEIGHT + ACTION_GAP : 0);
   const position = resolveUserDrawingActionSurfacePosition({
     anchor: anchor.anchor,
@@ -224,118 +206,6 @@ export function resolveNativeSelectedDrawingActionOverlayModel(
   return resolveNativeSelectedDrawingActionOverlayModelFromSurface({
     ...props,
     surfaceModel: resolveNativeSelectedDrawingActionSurfaceModel(props),
-  });
-}
-
-export function resolveNativeSelectedDrawingActionControlZones(
-  model: NativeSelectedDrawingActionOverlayModel | null,
-): NativeGestureControlZone[] {
-  if (!model) return [];
-
-  const surfaceHeight = ACTION_SIZE + SURFACE_PADDING * 2;
-  const zones: NativeGestureControlZone[] = [
-    {
-      x1: model.position.left - CONTROL_ZONE_PADDING,
-      x2: model.position.left + model.surfaceWidth + CONTROL_ZONE_PADDING,
-      y1: model.position.top - CONTROL_ZONE_PADDING,
-      y2: model.position.top + surfaceHeight + CONTROL_ZONE_PADDING,
-    },
-  ];
-
-  if (model.activePopoverGroup) {
-    const popoverTop = model.position.top + surfaceHeight + ACTION_GAP;
-    zones.push({
-      x1: model.position.left - CONTROL_ZONE_PADDING,
-      x2: model.position.left + model.surfaceWidth + CONTROL_ZONE_PADDING,
-      y1: popoverTop - CONTROL_ZONE_PADDING,
-      y2: popoverTop + POPOVER_HEIGHT + CONTROL_ZONE_PADDING,
-    });
-  }
-
-  return zones;
-}
-
-function resolveNativeSelectedDrawingActionRowHitTarget({
-  groups,
-  openPopoverGroupId,
-  x,
-  y,
-}: {
-  groups: readonly UserDrawingSelectedActionSurfaceGroup[];
-  openPopoverGroupId: UserDrawingSelectedActionSurfaceGroupId | null;
-  x: number;
-  y: number;
-}): NativeSelectedDrawingActionHitTarget | null {
-  if (y < -CONTROL_ZONE_PADDING || y > ACTION_SIZE + SURFACE_PADDING * 2 + CONTROL_ZONE_PADDING) return null;
-
-  let cursor = SURFACE_CONTENT_PADDING_X;
-  for (const [groupIndex, group] of groups.entries()) {
-    if (groupIndex > 0) cursor += GROUP_GAP;
-
-    if (group.presentation?.type === 'popover') {
-      if (x >= cursor - CONTROL_ZONE_PADDING && x <= cursor + ACTION_SIZE + CONTROL_ZONE_PADDING) {
-        return {
-          expanded: openPopoverGroupId === group.id,
-          groupId: group.id,
-          label: group.presentation.triggerLabel ?? group.label,
-          type: 'popover',
-        };
-      }
-      cursor += ACTION_SIZE + ACTION_GAP;
-      continue;
-    }
-
-    for (const item of group.items) {
-      if (x >= cursor - CONTROL_ZONE_PADDING && x <= cursor + ACTION_SIZE + CONTROL_ZONE_PADDING) {
-        return {
-          command: item.command,
-          enabled: item.enabled,
-          id: item.id,
-          label: item.label,
-          type: 'action',
-        };
-      }
-      cursor += ACTION_SIZE + ACTION_GAP;
-    }
-  }
-
-  return null;
-}
-
-export function resolveNativeSelectedDrawingActionHitTarget({
-  model,
-  openPopoverGroupId = null,
-  x,
-  y,
-}: {
-  model: NativeSelectedDrawingActionOverlayModel;
-  openPopoverGroupId?: UserDrawingSelectedActionSurfaceGroupId | null;
-  x: number;
-  y: number;
-}): NativeSelectedDrawingActionHitTarget | null {
-  const surfaceHeight = ACTION_SIZE + SURFACE_PADDING * 2;
-  const inHorizontalBounds = x >= -CONTROL_ZONE_PADDING && x <= model.surfaceWidth + CONTROL_ZONE_PADDING;
-  if (!inHorizontalBounds) return null;
-
-  if (y <= surfaceHeight + CONTROL_ZONE_PADDING) {
-    return resolveNativeSelectedDrawingActionRowHitTarget({
-      groups: model.groups,
-      openPopoverGroupId,
-      x,
-      y,
-    });
-  }
-
-  if (!model.activePopoverGroup) return null;
-
-  const popoverY = y - surfaceHeight - ACTION_GAP;
-  if (popoverY < -CONTROL_ZONE_PADDING || popoverY > POPOVER_HEIGHT + CONTROL_ZONE_PADDING) return null;
-
-  return resolveNativeSelectedDrawingActionRowHitTarget({
-    groups: [model.activePopoverGroup],
-    openPopoverGroupId,
-    x,
-    y: popoverY,
   });
 }
 
@@ -396,9 +266,20 @@ function renderActionButton({
           ]}
         />
       ) : iconName ? (
-        <NativeDrawingIcon name={iconName} size={17} color={item.enabled ? color : disabledColor} strokeWidth={1.9} />
+        <NativeDrawingIcon
+          name={iconName}
+          size={17}
+          color={item.enabled ? color : disabledColor}
+          strokeWidth={1.9}
+        />
       ) : (
-        <Text numberOfLines={1} style={[styles.actionText, { color: item.enabled ? color : disabledColor }]}>
+        <Text
+          numberOfLines={1}
+          style={[
+            styles.actionText,
+            { color: item.enabled ? color : disabledColor },
+          ]}
+        >
           {resolveFallbackLabel(item)}
         </Text>
       )}
@@ -423,140 +304,112 @@ function NativeUserDrawingSelectionActionOverlayView({
   if (!model) return null;
 
   const { activePopoverGroup, groups, position, surfaceWidth } = model;
-  const surfaceHeight = ACTION_SIZE + SURFACE_PADDING * 2;
-  const resolveHitTarget = (x: number, y: number) =>
-    resolveNativeSelectedDrawingActionHitTarget({
-      model,
-      openPopoverGroupId,
-      x,
-      y,
-    });
-  const handleTouchRelease = (x: number, y: number) => {
-    const target = resolveHitTarget(x, y);
-    if (!target) return;
-    if (target.type === 'popover') {
-      onPopoverGroupChange(target.expanded ? null : target.groupId);
-      return;
-    }
-    if (target.enabled) onAction(target.command);
-  };
-  const tapGesture = Gesture.Tap()
-    .maxDistance(12)
-    .onEnd((event, success) => {
-      if (!success) return;
-      runOnJS(handleTouchRelease)(event.x, event.y);
-    });
 
   return (
     <View
       accessibilityLabel="Selected drawing actions"
-      collapsable={false}
       pointerEvents="box-none"
-      style={styles.overlayRoot}
+      style={[
+        styles.overlay,
+        {
+          left: position.left,
+          top: position.top,
+          width: surfaceWidth,
+        },
+      ]}
     >
       <View
-        collapsable={false}
+        pointerEvents="auto"
         style={[
-          styles.overlay,
+          styles.surface,
           {
-            height: surfaceHeight + (activePopoverGroup ? POPOVER_HEIGHT + ACTION_GAP : 0),
-            left: position.left,
-            top: position.top,
-            width: surfaceWidth,
+            backgroundColor,
+            borderColor: gridColor,
           },
         ]}
       >
-        <View
-          collapsable={false}
-          pointerEvents="auto"
+        <ScrollView
+          horizontal
+          keyboardShouldPersistTaps="handled"
+          showsHorizontalScrollIndicator={false}
+          style={styles.surfaceScroll}
+          contentContainerStyle={styles.surfaceContent}
+        >
+          {groups.map((group, groupIndex) => (
+            <React.Fragment key={`native-selected-drawing-action-group-${group.id}`}>
+              {groupIndex > 0 && <View style={[styles.separator, { backgroundColor: gridColor }]} />}
+              {group.presentation?.type === 'popover' ? (
+                <Pressable
+                  accessibilityLabel={group.presentation.triggerLabel ?? group.label}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: openPopoverGroupId === group.id }}
+                  hitSlop={{ left: 4, right: 4, top: 4, bottom: 4 }}
+                  onPress={() => onPopoverGroupChange(openPopoverGroupId === group.id ? null : group.id)}
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: openPopoverGroupId === group.id ? activeBackgroundColor : backgroundColor,
+                      borderColor: openPopoverGroupId === group.id ? activeTextColor : gridColor,
+                    },
+                  ]}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.actionText,
+                      { color: openPopoverGroupId === group.id ? activeTextColor : textColor },
+                    ]}
+                  >
+                    {group.presentation.triggerIcon ?? '*'}
+                  </Text>
+                </Pressable>
+              ) : (
+                group.items.map((item) =>
+                  renderActionButton({
+                    activeBackgroundColor,
+                    activeTextColor,
+                    backgroundColor,
+                    gridColor,
+                    item,
+                    mutedTextColor,
+                    onAction,
+                    textColor,
+                  }),
+                )
+              )}
+            </React.Fragment>
+          ))}
+        </ScrollView>
+      </View>
+      {activePopoverGroup && (
+        <ScrollView
+          accessibilityLabel={activePopoverGroup.presentation?.popoverLabel ?? activePopoverGroup.label}
+          horizontal
+          keyboardShouldPersistTaps="handled"
+          showsHorizontalScrollIndicator={false}
           style={[
-            styles.surface,
+            styles.popover,
             {
               backgroundColor,
               borderColor: gridColor,
             },
           ]}
+          contentContainerStyle={styles.popoverContent}
         >
-          <View style={styles.surfaceContent}>
-            {groups.map((group, groupIndex) => (
-              <React.Fragment key={`native-selected-drawing-action-group-${group.id}`}>
-                {groupIndex > 0 && <View style={[styles.separator, { backgroundColor: gridColor }]} />}
-                {group.presentation?.type === 'popover' ? (
-                  <Pressable
-                    accessibilityLabel={group.presentation.triggerLabel ?? group.label}
-                    accessibilityRole="button"
-                    accessibilityState={{ expanded: openPopoverGroupId === group.id }}
-                    hitSlop={{ left: 4, right: 4, top: 4, bottom: 4 }}
-                    onPress={() => onPopoverGroupChange(openPopoverGroupId === group.id ? null : group.id)}
-                    style={[
-                      styles.actionButton,
-                      {
-                        backgroundColor: openPopoverGroupId === group.id ? activeBackgroundColor : backgroundColor,
-                        borderColor: openPopoverGroupId === group.id ? activeTextColor : gridColor,
-                      },
-                    ]}
-                  >
-                    <Text
-                      numberOfLines={1}
-                      style={[
-                        styles.actionText,
-                        { color: openPopoverGroupId === group.id ? activeTextColor : textColor },
-                      ]}
-                    >
-                      {group.presentation.triggerIcon ?? '*'}
-                    </Text>
-                  </Pressable>
-                ) : (
-                  group.items.map((item) =>
-                    renderActionButton({
-                      activeBackgroundColor,
-                      activeTextColor,
-                      backgroundColor,
-                      gridColor,
-                      item,
-                      mutedTextColor,
-                      onAction,
-                      textColor,
-                    }),
-                  )
-                )}
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
-        {activePopoverGroup && (
-          <View
-            accessibilityLabel={activePopoverGroup.presentation?.popoverLabel ?? activePopoverGroup.label}
-            collapsable={false}
-            pointerEvents="auto"
-            style={[
-              styles.popover,
-              {
-                backgroundColor,
-                borderColor: gridColor,
-              },
-            ]}
-          >
-            <View style={styles.popoverContent}>
-              {activePopoverGroup.items.map((item) =>
-                renderActionButton({
-                  activeBackgroundColor,
-                  activeTextColor,
-                  backgroundColor,
-                  gridColor,
-                  item,
-                  mutedTextColor,
-                  onAction,
-                  textColor,
-                }),
-              )}
-            </View>
-          </View>
-        )}
-        <GestureDetector gesture={tapGesture}>
-          <View collapsable={false} pointerEvents="auto" style={styles.touchLayer} />
-        </GestureDetector>
-      </View>
+          {activePopoverGroup.items.map((item) =>
+            renderActionButton({
+              activeBackgroundColor,
+              activeTextColor,
+              backgroundColor,
+              gridColor,
+              item,
+              mutedTextColor,
+              onAction,
+              textColor,
+            }),
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -618,16 +471,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   overlay: {
-    elevation: NATIVE_SELECTED_DRAWING_ACTION_Z_INDEX,
     overflow: 'visible',
     position: 'absolute',
-    zIndex: NATIVE_SELECTED_DRAWING_ACTION_Z_INDEX,
-  },
-  overlayRoot: {
-    ...StyleSheet.absoluteFillObject,
-    elevation: NATIVE_SELECTED_DRAWING_ACTION_Z_INDEX,
-    overflow: 'visible',
-    zIndex: NATIVE_SELECTED_DRAWING_ACTION_Z_INDEX,
   },
   popover: {
     borderRadius: 7,
@@ -658,17 +503,15 @@ const styles = StyleSheet.create({
   surfaceContent: {
     alignItems: 'center',
     flexDirection: 'row',
+    paddingHorizontal: SURFACE_PADDING - ACTION_GAP / 2,
+  },
+  surfaceScroll: {
     height: ACTION_SIZE + SURFACE_PADDING * 2,
-    paddingHorizontal: SURFACE_CONTENT_PADDING_X,
   },
   swatch: {
     borderRadius: 9,
     borderWidth: StyleSheet.hairlineWidth,
     height: 18,
     width: 18,
-  },
-  touchLayer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: NATIVE_SELECTED_DRAWING_ACTION_Z_INDEX + 1,
   },
 });

@@ -5,7 +5,6 @@ import type { NativeViewportSharedValues } from '../render/nativeSharedViewport'
 import type { NativeOrderDragZone, NativeTradeLineActionZone, NativeTradeLineRow } from '../utils/tradeLineLayout';
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
-import type { NativeTapClaimSharedValues } from './nativeTapClaim';
 
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
@@ -20,7 +19,6 @@ import {
 } from './nativeCrosshairContextMenu';
 import { isNativeGestureControlPoint } from './nativeGestureControlZones';
 import { isNativeResetViewRevealTap, NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE } from './nativeResetViewButton';
-import { beginNativeTapClaimScope, isNativeTapClaimed } from './nativeTapClaim';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
 
 const NATIVE_CROSSHAIR_LONG_PRESS_MIN_DURATION_MS = 2000;
@@ -142,7 +140,6 @@ export interface NativeCrosshairGestureInput {
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   pricePrecision?: number;
   sharedViewport: NativeViewportSharedValues;
-  tapClaim?: NativeTapClaimSharedValues;
   tradeLabelHeight: number;
   tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
@@ -156,42 +153,15 @@ export function createNativeCrosshairTapGesture({
   orderDragZones,
   pricePrecision = 2,
   sharedViewport,
-  tapClaim,
   tradeLabelHeight,
   tradeLineActionZones,
   tradeLineRows,
 }: NativeCrosshairGestureInput) {
   if (!frame) return Gesture.Tap().enabled(false);
-  const toggleCrosshairAfterTapClaim = (x: number, y: number, sequence: number) => {
-    setTimeout(() => {
-      if (tapClaim && isNativeTapClaimed(tapClaim, sequence)) return;
-      toggleNativeCrosshairAtPoint({
-        controlZones,
-        crosshair,
-        frame,
-        hasContextMenu,
-        orderDragZones,
-        point: { x, y },
-        pricePrecision,
-        sharedViewport,
-        tradeLabelHeight,
-        tradeLineActionZones,
-        tradeLineRows,
-      });
-    }, 0);
-  };
-
   return Gesture.Tap()
     .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
-    .onTouchesDown(() => {
-      if (tapClaim) beginNativeTapClaimScope(tapClaim);
-    })
     .onEnd((event, success) => {
       if (!success) return;
-      if (tapClaim) {
-        runOnJS(toggleCrosshairAfterTapClaim)(event.x, event.y, tapClaim.sequence.value);
-        return;
-      }
       toggleNativeCrosshairAtPoint({
         controlZones,
         crosshair,

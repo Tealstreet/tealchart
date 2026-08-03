@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_MARGINS } from '../../types';
 import { createNativePriceAxisLaneWidth } from '../utils/nativePriceAxisLane';
-import { createNativeSkiaChartMargins } from './useNativeSkiaLayoutRuntime';
+import { createNativeSkiaChartMargins, resolveNativeSkiaDimensions } from './useNativeSkiaLayoutRuntime';
 
 describe('native Skia layout runtime margins', () => {
   it('lets the native top bar own the default top reservation', () => {
@@ -70,5 +70,24 @@ describe('native Skia layout runtime margins', () => {
     });
 
     expect(margins.right).toBe(104);
+  });
+
+  it('uses explicit dimensions synchronously instead of waiting for layout state', () => {
+    const dimensions = resolveNativeSkiaDimensions({
+      measuredDimensions: { width: 320, height: 240 },
+      propWidth: 390,
+      propHeight: 312,
+    });
+
+    expect(dimensions).toEqual({ width: 390, height: 312 });
+  });
+
+  it('falls back to measured dimensions when explicit dimensions are incomplete', () => {
+    const dimensions = resolveNativeSkiaDimensions({
+      measuredDimensions: { width: 320, height: 240 },
+      propWidth: 390,
+    });
+
+    expect(dimensions).toEqual({ width: 320, height: 240 });
   });
 });
