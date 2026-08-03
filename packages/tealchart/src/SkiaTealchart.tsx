@@ -61,6 +61,7 @@ import {
 } from './mobile/render/nativeRenderTransition';
 import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
 import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
+import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { NativeUserDrawingSelectionActionOverlay } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
@@ -580,6 +581,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineGeometries,
     tradeLineRows,
   });
+  const nativeCountdownEnabled = useMemo(
+    () => nativePriceLines.some((line) => line.countdownToTime !== undefined),
+    [nativePriceLines],
+  );
+  const nativeCountdownNowMs = useNativeCountdownClock(nativeCountdownEnabled);
 
   const isNativeTradeLineTouchTarget = useCallback(
     (x: number, y: number) => {
@@ -780,6 +786,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               orderDragState={orderDragState}
               plotPrimitiveClip={plotPrimitiveClip}
               pricePrecision={nativePricePrecision}
+              nowMs={nativeCountdownNowMs}
               resolvedPriceAxisTags={resolvedPriceAxisTags}
               sharedViewport={sharedViewport}
               smallFont={smallFont}

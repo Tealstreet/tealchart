@@ -80,6 +80,7 @@ describe('NativeChartCanvasLayers', () => {
         height: frame.mainPane.height,
       },
       pricePrecision: 0.1,
+      nowMs: shared(0),
       resolvedPriceAxisTags: shared([]),
       sharedViewport,
       smallFont,

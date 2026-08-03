@@ -24,6 +24,7 @@ export function NativeChartTradeLinesLayer({
   lineSnapshot,
   orderDragState,
   pricePrecision,
+  nowMs,
   resolvedPriceAxisTags,
   sharedViewport,
   smallFont,
@@ -44,6 +45,7 @@ export function NativeChartTradeLinesLayer({
   };
   orderDragState: NativeOrderDragSharedValues;
   pricePrecision: number;
+  nowMs: SharedValue<number>;
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
   smallFont: ReturnType<typeof Skia.Font>;
@@ -62,6 +64,7 @@ export function NativeChartTradeLinesLayer({
           frame={frame}
           line={line}
           pricePrecision={pricePrecision}
+          nowMs={nowMs}
           resolvedPriceAxisTags={resolvedPriceAxisTags}
           sharedViewport={sharedViewport}
           staticProjection={staticProjection}
