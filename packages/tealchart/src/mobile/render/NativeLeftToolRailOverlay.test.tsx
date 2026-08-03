@@ -17,6 +17,7 @@ interface TestElementProps {
   accessibilityState?: unknown;
   children?: ReactNode;
   color?: string;
+  hitSlop?: unknown;
   name?: string;
   onPress?: () => void;
   pointerEvents?: string;
@@ -93,6 +94,13 @@ describe('NativeLeftToolRailOverlay', () => {
     expect(pressables).toHaveLength(USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.length + 1);
     expect(pressables[0].props.accessibilityLabel).toBe('Cursor drawing tools');
     expect(pressables[0].props.accessibilityState).toEqual({ selected: true, expanded: false });
+    expect(pressables[0].props.hitSlop).toEqual({ top: 4, bottom: 4 });
+    expect(flattenStyle(pressables[0].props.style)).toEqual(
+      expect.objectContaining({
+        left: 0,
+        width: layout!.railRect.width,
+      }),
+    );
     pressables[0].props.onPress!();
     expect(onCategoryOpenChange).toHaveBeenCalledWith('cursor');
     expect(onToolSelect).not.toHaveBeenCalled();
@@ -114,6 +122,8 @@ describe('NativeLeftToolRailOverlay', () => {
       expect.arrayContaining([
         expect.objectContaining({
           position: 'absolute',
+          zIndex: 40,
+          elevation: 6,
         }),
         expect.objectContaining({
           left: layout!.x,
@@ -215,8 +225,15 @@ describe('NativeLeftToolRailOverlay', () => {
     );
 
     expect(rectangleButton?.props.accessibilityState).toEqual({ selected: true, expanded: false });
+    const activeVisual = collectElementsByType(overlay, View).find((view) => {
+      const style = flattenStyle(view.props.style);
+      return style.backgroundColor === '#20242a' && style.borderColor === '#12c48b';
+    });
     expect(flattenStyle(rectangleButton?.props.style)).toEqual(
-      expect.objectContaining({ backgroundColor: '#20242a', borderColor: '#12c48b' }),
+      expect.objectContaining({ left: 0, width: layout!.railRect.width }),
+    );
+    expect(flattenStyle(activeVisual?.props.style)).toEqual(
+      expect.objectContaining({ backgroundColor: '#20242a', borderColor: '#12c48b', height: 28, width: 28 }),
     );
   });
 
@@ -245,6 +262,7 @@ describe('NativeLeftToolRailOverlay', () => {
     });
     const pressables = collectElementsByType(overlay, Pressable);
     const texts = collectElementsByType(overlay, Text);
+    const views = collectElementsByType(overlay, View);
     const linesCategory = pressables.find((pressable) => pressable.props.accessibilityLabel === 'Lines drawing tools');
     const trendLineRow = pressables.find((pressable) => pressable.props.accessibilityLabel === 'Trend line');
     const rayRow = pressables.find((pressable) => pressable.props.accessibilityLabel === 'Ray');
@@ -253,6 +271,10 @@ describe('NativeLeftToolRailOverlay', () => {
     expect(texts.some((text) => text.props.children === 'Lines')).toBe(true);
     expect(trendLineRow).not.toBeNull();
     expect(rayRow).not.toBeNull();
+    expect(views.some((view) => {
+      const style = flattenStyle(view.props.style);
+      return style.zIndex === 41 && style.elevation === 7;
+    })).toBe(true);
     linesCategory?.props.onPress!();
     expect(onCategoryOpenChange).toHaveBeenCalledWith(null);
     expect(onToolSelect).not.toHaveBeenCalled();
