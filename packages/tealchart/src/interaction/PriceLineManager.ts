@@ -13,6 +13,7 @@ import Konva from 'konva';
 
 import { TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
+import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
 
 // ============================================================================
@@ -230,16 +231,6 @@ function getTradingLineMinX(options: PriceLineManagerOptions): number {
   return Math.max(options.margins.left, options.chartLabelMinX ?? options.margins.left);
 }
 
-function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
-  const inlineButtons = buttons.filter((button) => button.type !== 'tp' && button.type !== 'sl');
-  const tpslButtons = buttons.filter((button) => button.type === 'tp' || button.type === 'sl');
-  return {
-    inlineButtons,
-    tpslButtons,
-    orderedButtons: [...inlineButtons, ...tpslButtons],
-  };
-}
-
 function getPillCornerRadius(isFirst: boolean, isLast: boolean): number | [number, number, number, number] {
   if (isFirst && isLast) return 2;
   if (isFirst) return [2, 0, 0, 2];
@@ -434,6 +425,13 @@ export class PriceLineManager {
     this.render();
   }
 
+  setChartLabelMinX(chartLabelMinX: number | undefined): void {
+    if (this.options.chartLabelMinX === chartLabelMinX) return;
+    this.options.chartLabelMinX = chartLabelMinX;
+    this.needsFullRebuild = true;
+    this.render();
+  }
+
   /**
    * Update crosshair state
    */
@@ -514,7 +512,7 @@ export class PriceLineManager {
       refs.segmentTexts?.[index]?.fill(segment.textColor);
     });
 
-    const { orderedButtons } = getOrderedButtons(bound.chartLabel?.buttons || []);
+    const { orderedButtons } = splitTradeLineButtonsForDisplay(bound.chartLabel?.buttons || []);
     orderedButtons.forEach((button, index) => {
       refs.buttonRects?.[index]?.fill(button.backgroundColor);
       refs.buttonRects?.[index]?.stroke(button.borderColor);
@@ -766,7 +764,7 @@ export class PriceLineManager {
     let chartLabelX = lineStartX;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const { inlineButtons, tpslButtons, orderedButtons } = getOrderedButtons(buttons);
+    const { inlineButtons, tpslButtons, orderedButtons } = splitTradeLineButtonsForDisplay(buttons);
     const hasInlineButtons = inlineButtons.length > 0;
     const tpslGap = tpslButtons.length > 0 ? 6 : 0;
 

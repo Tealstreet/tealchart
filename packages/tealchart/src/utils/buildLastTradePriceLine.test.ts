@@ -22,6 +22,7 @@ describe('buildLastTradePriceLine', () => {
       upColor: '#00ff00',
       downColor: '#ff0000',
       renderLineOnCanvas: false,
+      showAxisTag: true,
     });
 
     expect(line).toMatchObject({
@@ -30,6 +31,7 @@ describe('buildLastTradePriceLine', () => {
       color: '#00ff00',
       lineStyle: 'dotted',
       renderLineOnCanvas: false,
+      showAxisTag: true,
       label: {
         primaryText: '105.00',
       },

@@ -1,4 +1,5 @@
 import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tealscript';
+import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
@@ -19,13 +20,14 @@ import type {
 } from '../drawings';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from '../interaction/EventManager';
+import type { ChartChromeMetrics } from '../layout/chartGeometry';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
-import type { PlotStyleOverride } from '../state/chartState';
+import type { ChartStore, PlotStyleOverride } from '../state/chartState';
 import type {
+  Awaitable,
   Bar,
   ContextMenuItem,
   ExecutionLineRenderData,
-  Awaitable,
   OemsActionResult,
   OrderLineRenderData,
   PaneLayout,
@@ -48,7 +50,12 @@ import {
   resolveUserDrawingSelectionActionAnchor,
   resolveUserDrawingTextEditMetrics,
 } from '../drawings';
-import { WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import {
+  computeTradingLineLabelMinX,
+  resolveLeftToolRailMetrics,
+  WEB_CHART_CHROME_METRICS,
+} from '../layout/chartGeometry';
+import { getChartStore } from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
@@ -123,7 +130,7 @@ export interface TealchartWidgetUIOptions {
   /** Callback when viewport changes */
   onViewportChange?: (viewport: Viewport) => void;
   /** Callback when more bars are needed */
-  onRequestMoreBars?: (direction: 'left' | 'right') => void;
+  onRequestMoreBars?: (direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint) => void;
   /** Callback when order is moved */
   onOrderMove?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
   onOrderMoving?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
@@ -147,7 +154,7 @@ export interface TealchartWidgetUIOptions {
   onUserDrawingSelection?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-    options?: Pick<UserDrawingSelectionInputOptions, 'additive'>,
+    options?: Pick<UserDrawingSelectionInputOptions, 'additive' | 'toggleSelected'>,
   ) => UserDrawingSelectionAtPointResult;
   /** Called when select-mode pointer down may start editing a user drawing */
   onUserDrawingEditStart?: (
@@ -285,6 +292,8 @@ export class TealchartWidgetUI {
   private currentPaneLayout: PaneLayout | null = null;
   private currentIndicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
   private currentUserDrawingToolbarStateKey: string | null = null;
+  private chartStore: ChartStore;
+  private uiPreferencesUnsubscribe: (() => void) | null = null;
 
   // Indicator pane legends (one per non-overlay indicator pane)
   private indicatorPaneLegends: Map<string, IndicatorPaneLegend> = new Map();
@@ -292,6 +301,7 @@ export class TealchartWidgetUI {
   constructor(options: TealchartWidgetUIOptions) {
     this.options = options;
     this.container = options.container;
+    this.chartStore = getChartStore(options.chartKey);
 
     // Create root element - chart renders at full size, top bar overlays
     this.rootEl = div({
@@ -400,12 +410,16 @@ export class TealchartWidgetUI {
 
     // Initialize chart core after getting dimensions
     this.initChartCore();
+    this.uiPreferencesUnsubscribe = this.chartStore.uiPreferences.listen(() => {
+      this.updateUiPreferenceGeometry();
+    });
 
     // Create legend
     this.legend = new ChartLegend({
       symbol: options.symbol,
       interval: options.interval,
       avoidLeftTools: this.shouldAvoidLegendLeftTools(),
+      chromeMetrics: this.getLeftToolRailMetrics(),
       onToggleIndicator: options.onToggleIndicator,
       onSettingsIndicator: (indicatorId) => this.openIndicatorSettings(indicatorId),
       onRemoveIndicator: options.onRemoveIndicator,
@@ -471,7 +485,9 @@ export class TealchartWidgetUI {
       container: this.chartArea,
       width,
       height,
+      interval: this.options.interval,
       margins,
+      chartLabelMinX: this.getChartLabelMinX(),
       renderOptions: this.options.renderOptions,
       onViewportChange: this.options.onViewportChange,
       onRequestMoreBars: this.options.onRequestMoreBars,
@@ -502,6 +518,26 @@ export class TealchartWidgetUI {
       onPaneDoubleClick: this.options.onPaneDoubleClick,
       onPaneHeightsChange: () => this.updateIndicatorPaneLegends(),
     });
+  }
+
+  private getLeftToolRailMetrics(): ChartChromeMetrics {
+    return resolveLeftToolRailMetrics(
+      WEB_CHART_CHROME_METRICS,
+      this.chartStore.uiPreferences.get().leftToolRailCollapsed,
+    );
+  }
+
+  private getChartLabelMinX(): number {
+    return computeTradingLineLabelMinX(this.getLeftToolRailMetrics(), { left: 0 });
+  }
+
+  private updateUiPreferenceGeometry(): void {
+    const railMetrics = this.getLeftToolRailMetrics();
+    this.chartCore?.setChartLabelMinX(this.getChartLabelMinX());
+    this.legend?.setChromeMetrics(railMetrics);
+    for (const legend of this.indicatorPaneLegends.values()) {
+      legend.setChromeMetrics(railMetrics);
+    }
   }
 
   // ============================================================================
@@ -646,9 +682,12 @@ export class TealchartWidgetUI {
 
   private updateLegendLeftToolAvoidance(): void {
     const avoidLeftTools = this.shouldAvoidLegendLeftTools();
+    const railMetrics = this.getLeftToolRailMetrics();
     this.legend?.setAvoidLeftTools(avoidLeftTools);
+    this.legend?.setChromeMetrics(railMetrics);
     for (const legend of this.indicatorPaneLegends.values()) {
       legend.setAvoidLeftTools(avoidLeftTools);
+      legend.setChromeMetrics(railMetrics);
     }
   }
 
@@ -840,6 +879,7 @@ export class TealchartWidgetUI {
   setInterval(interval: ResolutionString): void {
     this.topBar?.setInterval(interval);
     this.legend?.setInterval(interval);
+    this.chartCore?.setInterval(interval);
   }
 
   /**
@@ -997,6 +1037,7 @@ export class TealchartWidgetUI {
           paneId: pane.id,
           top: legendTop,
           avoidLeftTools: this.shouldAvoidLegendLeftTools(),
+          chromeMetrics: this.getLeftToolRailMetrics(),
           onToggleIndicator: this.options.onToggleIndicator,
           onSettingsIndicator: (indicatorId) => this.openIndicatorSettings(indicatorId),
           onRemoveIndicator: this.options.onRemoveIndicator,
@@ -1007,6 +1048,7 @@ export class TealchartWidgetUI {
         // Update position
         legend.setPosition(legendTop);
         legend.setAvoidLeftTools(this.shouldAvoidLegendLeftTools());
+        legend.setChromeMetrics(this.getLeftToolRailMetrics());
       }
 
       // Update indicators
@@ -1037,6 +1079,8 @@ export class TealchartWidgetUI {
    * Dispose and clean up
    */
   dispose(preserveDom = false): void {
+    this.uiPreferencesUnsubscribe?.();
+    this.uiPreferencesUnsubscribe = null;
     this.removeUserDrawingTextEditor();
     this.chartCore?.dispose(preserveDom);
     this.topBar?.unmount();

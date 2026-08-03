@@ -411,8 +411,10 @@ describe('user drawing hit testing', () => {
     };
 
     expect(hitTestUserDrawing(drawing, { x: 90, y: 40 }, space)?.drawing.id).toBe('ellipse');
+    expect(hitTestUserDrawing(drawing, { x: 95, y: 40 }, space)?.drawing.id).toBe('ellipse');
     expect(hitTestUserDrawing(drawing, { x: 10, y: 10 }, space)?.handle).toBe('topLeft');
     expect(hitTestUserDrawing(drawing, { x: 50, y: 50 }, space, { tolerance: 4 })).toBeNull();
+    expect(hitTestUserDrawing(drawing, { x: 97, y: 40 }, space, { tolerance: 4 })).toBeNull();
   });
 
   it('hits off-axis edges on elongated ellipses', () => {
@@ -854,6 +856,19 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
       handle: 'end',
     });
+
+    const smallDrawing: UserDrawing = {
+      ...base,
+      id: 'small-fib-speed-arcs',
+      kind: 'fibSpeedResistanceArcs',
+      points: [
+        { time: 50, price: 50 },
+        { time: 55, price: 45 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(smallDrawing, { x: 52, y: 52 }, space)?.drawing.id).toBe('small-fib-speed-arcs');
+    expect(hitTestUserDrawing(smallDrawing, { x: 90, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
   it('hits fib arc levels and endpoint handles', () => {
@@ -871,6 +886,19 @@ describe('user drawing hit testing', () => {
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
       handle: 'end',
     });
+
+    const smallDrawing: UserDrawing = {
+      ...base,
+      id: 'small-fib-arcs',
+      kind: 'fibArcs',
+      points: [
+        { time: 50, price: 50 },
+        { time: 50, price: 45 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(smallDrawing, { x: 50, y: 63 }, space)?.drawing.id).toBe('small-fib-arcs');
+    expect(hitTestUserDrawing(smallDrawing, { x: 90, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
   it('hits fib circle rings and endpoint handles', () => {
@@ -885,6 +913,7 @@ describe('user drawing hit testing', () => {
     };
 
     expect(hitTestUserDrawing(drawing, { x: 60, y: 50 }, space)?.drawing.id).toBe('fib-circles');
+    expect(hitTestUserDrawing(drawing, { x: 91, y: 50 }, space)?.drawing.id).toBe('fib-circles');
     expect(hitTestUserDrawing(drawing, { x: 50, y: 80 }, space)).toMatchObject({
       handle: 'end',
     });
@@ -908,6 +937,20 @@ describe('user drawing hit testing', () => {
       handle: 'center',
       pointIndex: 2,
     });
+
+    const smallDrawing: UserDrawing = {
+      ...base,
+      id: 'small-fib-wedge',
+      kind: 'fibWedge',
+      points: [
+        { time: 50, price: 50 },
+        { time: 55, price: 50 },
+        { time: 55, price: 45 },
+      ],
+    };
+
+    expect(hitTestUserDrawing(smallDrawing, { x: 55, y: 50 }, space)?.drawing.id).toBe('small-fib-wedge');
+    expect(hitTestUserDrawing(smallDrawing, { x: 90, y: 90 }, space, { tolerance: 4 })).toBeNull();
   });
 
   it('hits fib spiral paths and endpoint handles', () => {
