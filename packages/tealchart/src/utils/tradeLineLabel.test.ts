@@ -1,10 +1,11 @@
+import type { OrderLineRenderData, PositionLineRenderData } from '../types';
+
 import { describe, expect, it } from 'vitest';
 
-import type { OrderLineRenderData, PositionLineRenderData } from '../types';
 import {
-  splitTradeLineButtonsForDisplay,
   resolveOrderTradeLineLabel,
   resolvePositionTradeLineLabel,
+  splitTradeLineButtonsForDisplay,
 } from './tradeLineLabel';
 
 function createOrderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRenderData {
@@ -115,6 +116,7 @@ describe('trade line label resolver', () => {
 
     expect(label.segments.map((segment) => segment.text)).toEqual(['Long', '0.0034', '+$1.33 (+0.17%)']);
     expect(label.segments[2]?.backgroundColor).toBe('#12c48b');
+    expect(label.segments[2]?.borderColor).toBe('#18aee8');
     expect(label.buttons.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     expect(label.buttons.map((button) => button.icon)).toEqual(['⇄', '×', 'TP', 'SL']);
   });

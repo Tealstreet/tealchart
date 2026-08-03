@@ -1,4 +1,10 @@
-import type { ChartLineLabel, ChartLabelButton, ChartLabelSegment, OrderLineRenderData, PositionLineRenderData } from '../types';
+import type {
+  ChartLabelButton,
+  ChartLabelSegment,
+  ChartLineLabel,
+  OrderLineRenderData,
+  PositionLineRenderData,
+} from '../types';
 
 import {
   DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
@@ -37,7 +43,13 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
   return {
     offsetPercent: order.lineLength,
     segments: [
-      ...buildBodySegments(order.text, order.textShort, order.bodyBackgroundColor, order.bodyTextColor, order.bodyBorderColor),
+      ...buildBodySegments(
+        order.text,
+        order.textShort,
+        order.bodyBackgroundColor,
+        order.bodyTextColor,
+        order.bodyBorderColor,
+      ),
       ...buildBodySegments(
         order.quantity,
         order.quantityShort,
@@ -47,7 +59,13 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
       ),
     ],
     buttons: [
-      ...buildBracketButtons(order.brackets !== null, takeProfitColor, takeProfitTextColor, stopLossColor, stopLossTextColor),
+      ...buildBracketButtons(
+        order.brackets !== null,
+        takeProfitColor,
+        takeProfitTextColor,
+        stopLossColor,
+        stopLossTextColor,
+      ),
       ...(order.cancellable
         ? [
             {
@@ -70,7 +88,11 @@ export function resolvePositionTradeLineLabel(
   negativeColor: string,
 ): ChartLineLabel {
   const pnlStateColor =
-    position.profitState === 'positive' ? positiveColor : position.profitState === 'negative' ? negativeColor : undefined;
+    position.profitState === 'positive'
+      ? positiveColor
+      : position.profitState === 'negative'
+        ? negativeColor
+        : undefined;
   const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
   const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
@@ -79,7 +101,13 @@ export function resolvePositionTradeLineLabel(
   return {
     offsetPercent: position.lineLength,
     segments: [
-      ...buildBodySegments(position.text, position.textShort, position.bodyBackgroundColor, position.bodyTextColor, position.bodyBorderColor),
+      ...buildBodySegments(
+        position.text,
+        position.textShort,
+        position.bodyBackgroundColor,
+        position.bodyTextColor,
+        position.bodyBorderColor,
+      ),
       ...buildBodySegments(
         position.quantity,
         position.quantityShort,
@@ -94,7 +122,7 @@ export function resolvePositionTradeLineLabel(
               textShort: position.pnlShort || undefined,
               backgroundColor: pnlStateColor ?? position.lineColor,
               textColor: pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : position.bodyTextColor,
-              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+              borderColor: position.lineColor,
             },
           ]
         : []),
@@ -124,7 +152,13 @@ export function resolvePositionTradeLineLabel(
             },
           ]
         : []),
-      ...buildBracketButtons(position.brackets !== null, takeProfitColor, takeProfitTextColor, stopLossColor, stopLossTextColor),
+      ...buildBracketButtons(
+        position.brackets !== null,
+        takeProfitColor,
+        takeProfitTextColor,
+        stopLossColor,
+        stopLossTextColor,
+      ),
     ],
   };
 }
