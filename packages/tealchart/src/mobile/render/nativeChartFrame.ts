@@ -47,8 +47,6 @@ export interface CreateNativeChartFrameOptions {
   priceAxisHitWidth?: number;
 }
 
-const DEFAULT_NATIVE_PRICE_AXIS_HIT_WIDTH = 28;
-
 export function toNativePaneFrame(pane: NativeChartPaneInput | ComputedPane): NativePaneFrame {
   return {
     id: pane.id,
@@ -74,10 +72,8 @@ export function createNativeChartFrameFromPanes(options: CreateNativeChartFrameO
   const contentRight = Math.max(contentLeft, dimensions.width);
   const priceAxisLeft = Math.max(contentLeft, dimensions.width - dimensions.margins.right);
   const priceAxisRight = dimensions.width;
-  const priceAxisHitLeft = Math.max(
-    contentLeft,
-    priceAxisRight - (options.priceAxisHitWidth ?? DEFAULT_NATIVE_PRICE_AXIS_HIT_WIDTH),
-  );
+  const priceAxisHitWidth = options.priceAxisHitWidth ?? dimensions.margins.right;
+  const priceAxisHitLeft = Math.max(contentLeft, priceAxisRight - priceAxisHitWidth);
   const contentWidth = Math.max(0, contentRight - contentLeft);
 
   return {

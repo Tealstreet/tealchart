@@ -366,15 +366,15 @@ describe('native viewport gesture state', () => {
     const geometry = getNativePriceScaleHitGeometry(frame);
 
     expect(geometry).toEqual({
-      axisLeft: 172,
+      axisLeft: 160,
       axisRight: 200,
       plotTop: 5,
       plotBottom: 100,
       plotHeight: 95,
     });
     expect(canBeginNativePriceScaleGesture(geometry, 180, 50)).toBe(true);
-    expect(canBeginNativePriceScaleGesture(geometry, 171, 50)).toBe(false);
-    expect(canBeginNativePriceScaleGesture(geometry, 170, 101)).toBe(false);
+    expect(canBeginNativePriceScaleGesture(geometry, 159, 50)).toBe(false);
+    expect(canBeginNativePriceScaleGesture(geometry, 160, 101)).toBe(false);
   });
 
   it('identifies time-scale hit geometry from the chart frame', () => {
