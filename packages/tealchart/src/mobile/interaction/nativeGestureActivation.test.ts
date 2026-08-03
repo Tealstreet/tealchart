@@ -14,26 +14,28 @@ import { describe, expect, it, vi } from 'vitest';
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import { createNativeLeftToolRailLayout, resolveNativeLeftToolRailToggleHitRect } from '../utils/leftToolRailLayout';
 import {
+  resolveNativeCrosshairContextMenuButtonLayout,
+  resolveNativeCrosshairPriceLabelText,
+} from './nativeCrosshairContextMenu';
+import {
   createNativeCrosshairContextMenuTapGesture,
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
   createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
-import {
-  resolveNativeCrosshairContextMenuButtonLayout,
-  resolveNativeCrosshairPriceLabelText,
-} from './nativeCrosshairContextMenu';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import {
   NATIVE_RESET_VIEW_HIT_SIZE,
   NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE,
   resolveNativeResetViewButtonLayout,
 } from './nativeResetViewButton';
+import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
   createNativeResetViewTapGesture,
   createNativeUserDrawingTapGesture,
 } from './nativeTapGestures';
+import { createNativeUserDrawingEditDragGesture } from './nativeUserDrawingEditGestures';
 import {
   createNativeChartAxisPinchGesture,
   createNativeChartPanGesture,
@@ -144,6 +146,13 @@ function resetTapState() {
   };
 }
 
+function tapClaimState() {
+  return {
+    claimedSequence: shared(0),
+    sequence: shared(0),
+  };
+}
+
 const frame = createNativeChartFrameFromPanes({
   dimensions: { width: 220, height: 180, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
   panes: [{ id: 'main', type: 'main', top: 36, height: 104, yMin: 62_000, yMax: 64_000 }],
@@ -204,6 +213,49 @@ describe('native gesture activation', () => {
     expect(crosshair.visible.value).toBe(false);
   });
 
+  it('defers crosshair taps so other tap handlers can claim the release', () => {
+    vi.useFakeTimers();
+    try {
+      const crosshair = createCrosshair();
+      const viewport = sharedViewport(viewportValue);
+      const tradeLineRows = shared([]);
+      const tradeLineActionZones = shared([]);
+      const orderDragZones = shared([]);
+      const tapClaim = tapClaimState();
+      const crosshairTapGesture = createNativeCrosshairTapGesture({
+        crosshair,
+        frame,
+        orderDragZones,
+        sharedViewport: viewport,
+        tapClaim,
+        tradeLabelHeight: 18,
+        tradeLineActionZones,
+        tradeLineRows,
+      }) as any;
+
+      crosshairTapGesture.handlers.onTouchesDown({
+        changedTouches: [{ x: 80, y: 60 }],
+        allTouches: [{ x: 80, y: 60 }],
+      });
+      crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
+      claimNativeTap(tapClaim);
+      vi.runOnlyPendingTimers();
+      expect(crosshair.visible.value).toBe(false);
+
+      crosshairTapGesture.handlers.onTouchesDown({
+        changedTouches: [{ x: 82, y: 62 }],
+        allTouches: [{ x: 82, y: 62 }],
+      });
+      crosshairTapGesture.handlers.onEnd({ x: 82, y: 62 }, true);
+      vi.runOnlyPendingTimers();
+      expect(crosshair.visible.value).toBe(true);
+      expect(crosshair.x.value).toBe(82);
+      expect(crosshair.y.value).toBe(62);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('toggles crosshair after a stationary long press using the tap interaction rules', () => {
     const crosshair = createCrosshair();
     const viewport = sharedViewport(viewportValue);
@@ -230,6 +282,51 @@ describe('native gesture activation', () => {
 
     crosshairLongPressGesture.handlers.onStart({ x: 80, y: 60 });
     expect(crosshair.visible.value).toBe(false);
+  });
+
+  it('routes selected drawing drags only after the start point is accepted', () => {
+    const began: [number, number][] = [];
+    const moved: [number, number][] = [];
+    let ended = 0;
+    const gesture = createNativeUserDrawingEditDragGesture({
+      controlZones: [{ x1: 0, x2: 30, y1: 0, y2: 30 }],
+      dragActive: shared(false),
+      dragZones: [{ x1: 70, x2: 100, y1: 70, y2: 100 }],
+      enabled: true,
+      frame,
+      onBeginDrag: (x, y) => {
+        began.push([x, y]);
+      },
+      onEndDrag: () => {
+        ended += 1;
+      },
+      onMoveDrag: (x, y) => {
+        moved.push([x, y]);
+      },
+    }) as any;
+
+    const blockedByControl = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 20, y: 20 }], allTouches: [{ x: 20, y: 20 }] },
+      blockedByControl,
+    );
+    expect(blockedByControl.failed).toBe(true);
+
+    const rejected = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 60, y: 80 }], allTouches: [{ x: 60, y: 80 }] }, rejected);
+    expect(rejected.failed).toBe(true);
+
+    const accepted = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 80, y: 80 }], allTouches: [{ x: 80, y: 80 }] }, accepted);
+    expect(accepted.failed).toBe(false);
+
+    gesture.handlers.onBegin({ x: 80, y: 80 });
+    gesture.handlers.onUpdate({ x: 90, y: 72 });
+    gesture.handlers.onFinalize({}, true);
+
+    expect(began).toEqual([[80, 80]]);
+    expect(moved).toEqual([[90, 72]]);
+    expect(ended).toBe(1);
   });
 
   it('leaves the reset view reveal strip to reset gestures instead of crosshair toggles', () => {

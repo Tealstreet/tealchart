@@ -407,12 +407,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const {
+    beginNativeUserDrawingEditDragAtPoint,
     dispatchNativeUserDrawingSelectedAction,
+    endNativeUserDrawingEditDrag,
     handleNativeUserDrawingInput,
     redoNativeUserDrawingCommand,
     selectNativeUserDrawingAtPoint,
     selectNativeUserDrawingTool,
     undoNativeUserDrawingCommand,
+    updateNativeUserDrawingEditDrag,
     userDrawingCommandAvailability,
     userDrawingRecentToolsByCategory,
     userDrawingState: nativeUserDrawingState,
@@ -470,7 +473,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     ],
   );
   const handleNativeUserDrawingSelectionTap = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, claimTap: () => void) => {
       if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return;
       const selectionPoint = resolveNativeUserDrawingSelectionPoint({
         bars: nativeRenderBars,
@@ -481,7 +484,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         y,
       });
       if (!selectionPoint) return;
-      selectNativeUserDrawingAtPoint(selectionPoint.point, selectionPoint.spacesByPaneId);
+      const result = selectNativeUserDrawingAtPoint(selectionPoint.point, selectionPoint.spacesByPaneId);
+      if (result.hit || result.changed) claimTap();
     },
     [
       frame,
@@ -491,6 +495,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       nativeUserDrawingCoordinateSpaces,
       selectNativeUserDrawingAtPoint,
     ],
+  );
+  const resolveNativeUserDrawingEditDragPoint = useCallback(
+    (x: number, y: number) => {
+      if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return null;
+      return resolveNativeUserDrawingSelectionPoint({
+        bars: nativeRenderBars,
+        frame,
+        spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+        viewport: nativeRenderViewport,
+        x,
+        y,
+      });
+    },
+    [frame, nativeDrawingSelectionEnabled, nativeRenderBars, nativeRenderViewport, nativeUserDrawingCoordinateSpaces],
+  );
+  const handleNativeUserDrawingEditDragBegin = useCallback(
+    (x: number, y: number) => {
+      const dragPoint = resolveNativeUserDrawingEditDragPoint(x, y);
+      if (dragPoint) beginNativeUserDrawingEditDragAtPoint(dragPoint.point, dragPoint.spacesByPaneId);
+    },
+    [beginNativeUserDrawingEditDragAtPoint, resolveNativeUserDrawingEditDragPoint],
+  );
+  const handleNativeUserDrawingEditDragMove = useCallback(
+    (x: number, y: number) => {
+      updateNativeUserDrawingEditDrag({ x, y });
+    },
+    [updateNativeUserDrawingEditDrag],
   );
   const handleNativeSelectedDrawingAction = useCallback(
     (command: UserDrawingSelectedActionSurfaceCommand) => {
@@ -689,6 +720,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => (frame ? resolveNativeResetViewButtonLayout(frame) : null),
     [frame],
   );
+  const nativeUserDrawingEditDragZones = useMemo<readonly NativeGestureControlZone[]>(() => {
+    if (!nativeDrawingSelectionEnabled || !nativeUserDrawingSelectionActionAnchor) return [];
+    const { bounds } = nativeUserDrawingSelectionActionAnchor;
+    return [
+      {
+        x1: bounds.x,
+        x2: bounds.x + bounds.width,
+        y1: bounds.y,
+        y2: bounds.y + bounds.height,
+      },
+    ];
+  }, [nativeDrawingSelectionEnabled, nativeUserDrawingSelectionActionAnchor]);
   const nativeGestureControlZones = useMemo<readonly NativeGestureControlZone[]>(() => {
     const zones: NativeGestureControlZone[] = [];
     if (frame && topBarLayout) {
@@ -782,6 +825,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     commitTradeLineAction,
     controlZones: nativeGestureControlZones,
     crosshair,
+    drawingEditDragZones: nativeUserDrawingEditDragZones,
     drawingInputEnabled: nativeDrawingInputEnabled,
     drawingSelectionEnabled: nativeDrawingSelectionEnabled,
     frame,
@@ -792,6 +836,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     orderDragZones,
     onDrawingTap: handleNativeUserDrawingTap,
     onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
+    onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
+    onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
+    onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,
     onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
     onContextMenuTap: handleNativeContextMenuTap,
     onResetViewTap: handleNativeResetViewTap,
