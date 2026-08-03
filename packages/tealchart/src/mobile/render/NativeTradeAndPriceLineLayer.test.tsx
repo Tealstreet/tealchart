@@ -248,6 +248,7 @@ describe('native trade and price line layers', () => {
 
   it('wires current-price axis tag primary and countdown text surfaces', () => {
     const axisFont = matchFont({ fontSize: 11 });
+    const nowMs = shared(0);
     const line: PriceLine = {
       id: 'last-price',
       price: 63777,
@@ -273,6 +274,7 @@ describe('native trade and price line layers', () => {
       },
       frame,
       line,
+      nowMs,
       pricePrecision: 0.1,
       resolvedPriceAxisTags: shared([]),
       sharedViewport,
@@ -281,8 +283,12 @@ describe('native trade and price line layers', () => {
     const staticTexts = collectElementsByType(layer, NativePriceAxisTagStaticText);
     const animatedTexts = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
 
-    expect(staticTexts.map((element) => element.props.text)).toEqual(expect.arrayContaining(['63,777.0', '00:00']));
-    expect(animatedTexts).toHaveLength(0);
+    expect(staticTexts.map((element) => element.props.text)).toEqual(['63,777.0']);
+    expect(animatedTexts).toHaveLength(1);
+    expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:10');
+
+    nowMs.value = 5_000;
+    expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:05');
   });
 
   it('uses resolved native price-axis tag centers for price-line labels', () => {
@@ -311,6 +317,7 @@ describe('native trade and price line layers', () => {
       },
       frame,
       line,
+      nowMs: shared(0),
       pricePrecision: 0.1,
       resolvedPriceAxisTags: shared([
         {
@@ -364,6 +371,7 @@ describe('native trade and price line layers', () => {
       bracketDragState,
       frame,
       line,
+      nowMs: shared(0),
       pricePrecision: 0.1,
       resolvedPriceAxisTags: shared([]),
       sharedViewport: liveViewport,
@@ -411,6 +419,7 @@ describe('native trade and price line layers', () => {
       },
       frame,
       line,
+      nowMs: shared(0),
       pricePrecision: 0.1,
       resolvedPriceAxisTags: shared([]),
       sharedViewport,

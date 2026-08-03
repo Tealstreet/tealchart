@@ -42,6 +42,7 @@ export interface NativeChartCanvasLayersProps {
   orderDragState: NativeOrderDragSharedValues;
   plotPrimitiveClip: NativePrimitiveClip;
   pricePrecision: number;
+  nowMs: SharedValue<number>;
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
   smallFont: ReturnType<typeof Skia.Font>;
@@ -75,6 +76,7 @@ export function NativeChartCanvasLayers({
   orderDragState,
   plotPrimitiveClip,
   pricePrecision,
+  nowMs,
   resolvedPriceAxisTags,
   sharedViewport,
   smallFont,
@@ -147,6 +149,7 @@ export function NativeChartCanvasLayers({
             lineSnapshot={lineSnapshot}
             orderDragState={orderDragState}
             pricePrecision={pricePrecision}
+            nowMs={nowMs}
             resolvedPriceAxisTags={resolvedPriceAxisTags}
             sharedViewport={sharedViewport}
             smallFont={smallFont}

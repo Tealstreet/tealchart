@@ -22,15 +22,21 @@ import {
 } from '../utils/priceAxisTagLayout';
 import { getNativePriceLineTagId } from '../utils/priceAxisTagSources';
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
+import { NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   createNativeAxisTagLayout,
   createNativeAxisTagTextLayout,
   formatNativeCountdown,
+  formatNativeCountdownWorklet,
   PRICE_AXIS_TAG_HEIGHT,
 } from './nativeAxisTagLayout';
-import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
+import {
+  NativePriceAxisTagAnimatedText,
+  NativePriceAxisTagBox,
+  NativePriceAxisTagStaticText,
+} from './NativePriceAxisTag';
 import { sharedPriceToNativeY } from './nativeSharedViewport';
-import { measureNativeSkiaTextWidth } from './nativeSkiaText';
+import { measureNativeSkiaAxisCharacterWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
 
 function priceLineDash(lineStyle: PriceLine['lineStyle']): number[] | null {
   if (lineStyle === 'dotted') return [2, 5];
@@ -56,6 +62,7 @@ export function AnimatedPriceLine({
   bracketDragState,
   frame,
   line,
+  nowMs,
   pricePrecision,
   resolvedPriceAxisTags,
   sharedViewport,
@@ -65,6 +72,7 @@ export function AnimatedPriceLine({
   bracketDragState: NativeBracketDragSharedValues;
   frame: NativeChartFrame;
   line: PriceLine & { nativeBracketRef?: NativeBracketPriceLineRef };
+  nowMs: SharedValue<number>;
   pricePrecision: number;
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
@@ -73,22 +81,31 @@ export function AnimatedPriceLine({
 }) {
   const dash = priceLineDash(line.lineStyle);
   const label = line.label.primaryText || formatNativeTradeLinePrice(line.price, pricePrecision);
-  const secondaryLabel =
-    line.countdownToTime !== undefined ? formatNativeCountdown(line.countdownToTime) : line.label.secondaryText;
-  const secondaryLayoutLabel =
-    line.countdownToTime !== undefined && secondaryLabel
-      ? getNativeCountdownLayoutText(secondaryLabel)
-      : secondaryLabel;
-  const tagHeight = secondaryLabel ? 34 : PRICE_AXIS_TAG_HEIGHT;
+  const hasCountdown = line.countdownToTime !== undefined;
+  const countdownTargetTimeMs = line.countdownToTime ?? 0;
+  const staticSecondaryLabel = hasCountdown ? undefined : line.label.secondaryText;
+  const secondaryLayoutLabel = hasCountdown
+    ? getNativeCountdownLayoutText(formatNativeCountdown(countdownTargetTimeMs))
+    : staticSecondaryLabel;
+  const hasSecondaryText = hasCountdown || Boolean(staticSecondaryLabel);
+  const tagHeight = hasSecondaryText ? 34 : PRICE_AXIS_TAG_HEIGHT;
   const measurementLabel = getNativePriceLineMeasurementText(label, secondaryLayoutLabel, (value) =>
     measureNativeSkiaTextWidth(axisFont, value),
   );
   const axisTag = createNativeAxisTagLayout(frame, axisFont, measurementLabel);
   const primaryText = createNativeAxisTagTextLayout(axisTag.x, axisTag.width, axisFont, label);
-  const secondaryText = secondaryLabel
-    ? createNativeAxisTagTextLayout(axisTag.x, axisTag.width, axisFont, secondaryLabel)
+  const secondaryText = staticSecondaryLabel
+    ? createNativeAxisTagTextLayout(axisTag.x, axisTag.width, axisFont, staticSecondaryLabel)
     : null;
-  const primaryTextBaselineOffset = secondaryLabel
+  const countdownCharacterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
+  const countdownText = useDerivedValue(() =>
+    hasCountdown ? formatNativeCountdownWorklet(countdownTargetTimeMs, nowMs.value) : '',
+  );
+  const countdownTextX = useDerivedValue(() => {
+    const textWidth = countdownText.value.length * countdownCharacterWidth;
+    return axisTag.x + axisTag.width - NATIVE_PRICE_AXIS_TAG_PADDING_X - textWidth;
+  });
+  const primaryTextBaselineOffset = hasSecondaryText
     ? getNativePriceAxisPrimaryTextBaselineOffset(tagHeight)
     : getNativePriceAxisSingleLineTextBaselineOffset(tagHeight);
   const secondaryTextBaselineOffset = getNativePriceAxisSecondaryTextBaselineOffset(tagHeight);
@@ -152,6 +169,18 @@ export function AnimatedPriceLine({
                 color={tagColor}
               />
             )}
+            {hasCountdown && (
+              <NativePriceAxisTagAnimatedText
+                x={countdownTextX}
+                y={staticLabelY + secondaryTextBaselineOffset}
+                text={countdownText}
+                maxCharacters={8}
+                characterWidth={countdownCharacterWidth}
+                font={axisFont}
+                color={tagColor}
+                characterSet="0123456789:"
+              />
+            )}
           </Group>
         ) : null}
       </>
@@ -189,6 +218,18 @@ export function AnimatedPriceLine({
               text={secondaryText.text}
               font={axisFont}
               color={tagColor}
+            />
+          )}
+          {hasCountdown && (
+            <NativePriceAxisTagAnimatedText
+              x={countdownTextX}
+              y={secondaryTextY}
+              text={countdownText}
+              maxCharacters={8}
+              characterWidth={countdownCharacterWidth}
+              font={axisFont}
+              color={tagColor}
+              characterSet="0123456789:"
             />
           )}
         </Group>
