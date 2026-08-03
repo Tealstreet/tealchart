@@ -1,5 +1,5 @@
 import type { DrawingCoordinateSpace } from './coordinates';
-import type { UserDrawingState, UserDrawingStyle } from './types';
+import type { UserDrawing, UserDrawingState, UserDrawingStyle } from './types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -8,8 +8,10 @@ import {
   resolveUserDrawingHandlePoints,
   resolveUserDrawingPressureStrokeSegments,
   resolveUserDrawingRenderEntries,
+  resolveUserDrawingRenderEntriesFromSlices,
   resolveUserDrawingScreenBounds,
   resolveUserDrawingSelectionActionAnchor,
+  resolveUserDrawingSelectionActionAnchorFromDrawings,
 } from './renderModel';
 import {
   beginUserDrawingMeasure,
@@ -84,6 +86,49 @@ describe('user drawing render model', () => {
         ],
       },
     });
+  });
+
+  it('derives render entries from drawing state slices', () => {
+    const state = createUserDrawingState({
+      drawings: [
+        {
+          id: 'line',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 20 },
+            { time: 30, price: 50 },
+          ],
+        },
+      ],
+      draft: {
+        tool: 'trendLine',
+        paneId: 'main',
+        anchors: [{ time: 40, price: 60 }],
+        style,
+        startedAt: 2,
+      },
+      selection: {
+        drawingId: 'line',
+        paneId: 'main',
+      },
+    });
+    const options = { draftPreviewAnchor: { time: 60, price: 80 }, now: 5 };
+
+    expect(
+      resolveUserDrawingRenderEntriesFromSlices({
+        draft: state.draft,
+        drawings: state.drawings,
+        measure: state.measure,
+        selection: state.selection,
+        options,
+      }),
+    ).toEqual(resolveUserDrawingRenderEntries(state, options));
   });
 
   it('derives pressure-weighted stroke segments from matched anchors and screen points', () => {
@@ -888,6 +933,50 @@ describe('user drawing render model', () => {
     });
   });
 
+  it('resolves selected action anchors without depending on drawing array indexing', () => {
+    const unselectedDrawings: UserDrawing[] = Array.from({ length: 80 }, (_, index) => ({
+      id: `unselected-${index}`,
+      kind: 'horizontalLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      price: index,
+      style,
+    }));
+    const selectedDrawing: UserDrawing = {
+      id: 'selected-line',
+      kind: 'trendLine',
+      paneId: 'main',
+      visible: true,
+      locked: false,
+      createdAt: 1,
+      updatedAt: 1,
+      style,
+      points: [
+        { time: 10, price: 90 },
+        { time: 40, price: 60 },
+      ],
+      extend: 'none',
+    };
+
+    const anchor = resolveUserDrawingSelectionActionAnchorFromDrawings({
+      drawings: [...unselectedDrawings, selectedDrawing],
+      selection: { drawingId: selectedDrawing.id },
+      spacesByPaneId: { main: space },
+      options: { padding: 2, minTargetSize: 12 },
+    });
+
+    expect(anchor).toEqual({
+      anchor: { x: 25, y: 8 },
+      bounds: { x: 8, y: 8, width: 34, height: 34 },
+      drawingIds: ['selected-line'],
+      paneIds: ['main'],
+      primaryPaneId: 'main',
+    });
+  });
+
   it('resolves grouped selection action bounds across panes', () => {
     const state: UserDrawingState = {
       version: 1,
@@ -994,6 +1083,57 @@ describe('user drawing render model', () => {
       paneIds: ['macd', 'main'],
       primaryPaneId: 'macd',
     });
+  });
+
+  it('resolves selection action anchors from drawing and selection slices', () => {
+    const state: UserDrawingState = {
+      version: 1,
+      activeTool: 'select',
+      selection: { drawingId: 'marker', drawingIds: ['marker', 'line'] },
+      drawings: [
+        {
+          id: 'line',
+          kind: 'trendLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          points: [
+            { time: 10, price: 90 },
+            { time: 20, price: 80 },
+          ],
+          extend: 'none',
+        },
+        {
+          id: 'marker',
+          kind: 'arrowMarkUp',
+          paneId: 'macd',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          point: { time: 90, price: 0 },
+        },
+      ],
+      draft: null,
+      textEdit: null,
+    };
+    const spaces = new Map([
+      ['main', space],
+      ['macd', lowerPaneSpace],
+    ]);
+
+    expect(
+      resolveUserDrawingSelectionActionAnchorFromDrawings({
+        drawings: state.drawings,
+        selection: state.selection,
+        spacesByPaneId: spaces,
+        options: { padding: 2, minTargetSize: 12 },
+      }),
+    ).toEqual(resolveUserDrawingSelectionActionAnchor(state, spaces, { padding: 2, minTargetSize: 12 }));
   });
 
   it('resolves a fallback selection action anchor for hidden selected drawings', () => {

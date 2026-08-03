@@ -20,11 +20,19 @@ import type {
   Viewport,
 } from '../types';
 import type { ResolutionInput } from '../utils/normalizeResolution';
+import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './historyBackfill';
 
 import { EventEmitter } from '../events/EventEmitter';
 import { PaneManager } from '../rendering/PaneManager';
 import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
 import { normalizeResolution } from '../utils/normalizeResolution';
+import {
+  DEFAULT_HISTORY_BACKFILL_BAR_COUNT,
+  mergeLeftHistoryBackfillRequestHints,
+  resolveHistoryBackfillRequiredStartTime,
+  resolveLeftHistoryBackfillContinuationHint,
+  resolveLeftHistoryBackfillRequest,
+} from './historyBackfill';
 
 // Use generic PlotOutput type to avoid import issues across platforms
 type PlotOutput = {
@@ -38,7 +46,7 @@ type PlotOutput = {
 };
 
 // Constants
-export const INITIAL_BAR_COUNT = 300;
+export const INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
 
 const normalizeDatafeedBar = (bar: DatafeedBar): Bar => ({
   ...bar,
@@ -103,12 +111,23 @@ export interface ChartWidgetCoreOptions {
   scheduleRender?: () => void;
 
   // Callbacks
-  onBarsChanged?: (bars: Bar[]) => void;
+  onBarsChanged?: (bars: Bar[], context: ChartWidgetBarsChangedContext) => void;
   onPlotsChanged?: (plots: PlotOutput[]) => void;
   onViewportChanged?: (viewport: Viewport) => void;
-  onLoadingChanged?: (loading: boolean) => void;
+  onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
+}
+
+export interface ChartWidgetDataContext {
+  symbol: string;
+  interval: ResolutionString;
+  requestId: number;
+}
+
+export interface ChartWidgetBarsChangedContext extends ChartWidgetDataContext {
+  source: 'history' | 'realtime';
 }
 
 /**
@@ -132,8 +151,11 @@ export class ChartWidgetCore {
   // State flags
   protected _isLoading = false;
   protected _isLoadingMoreBars = false;
+  protected _hasQueuedLeftHistoryBackfill = false;
+  protected _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   protected _hasMoreHistoricalData = true;
   protected _loadBarsRequestId = 0;
+  protected _disposed = false;
 
   // Subscription tracking
   protected _barSubscriptionGuid: string | null = null;
@@ -144,10 +166,11 @@ export class ChartWidgetCore {
   protected _eventEmitter: EventEmitter;
 
   // Callbacks
-  protected _onBarsChanged?: (bars: Bar[]) => void;
+  protected _onBarsChanged?: (bars: Bar[], context: ChartWidgetBarsChangedContext) => void;
   protected _onPlotsChanged?: (plots: PlotOutput[]) => void;
   protected _onViewportChanged?: (viewport: Viewport) => void;
-  protected _onLoadingChanged?: (loading: boolean) => void;
+  protected _onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  protected _onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
   protected _onSymbolChange?: (symbol: string) => void;
   protected _onIntervalChange?: (interval: string) => void;
   protected _scheduleRender: () => void;
@@ -161,6 +184,7 @@ export class ChartWidgetCore {
     this._onPlotsChanged = options.onPlotsChanged;
     this._onViewportChanged = options.onViewportChanged;
     this._onLoadingChanged = options.onLoadingChanged;
+    this._onLoadingMoreBarsChanged = options.onLoadingMoreBarsChanged;
     this._onSymbolChange = options.onSymbolChange;
     this._onIntervalChange = options.onIntervalChange;
     this._scheduleRender = options.scheduleRender || (() => {});
@@ -178,16 +202,20 @@ export class ChartWidgetCore {
    * Initialize the widget - resolve symbol and load bars
    */
   initialize(): void {
+    if (this._disposed) return;
     this._datafeed.onReady((config) => {
+      if (this._disposed) return;
       // Store supported resolutions from datafeed config
       this._supportedResolutions = config.supported_resolutions ?? null;
       this._datafeed.resolveSymbol(
         this._symbol,
         (symbolInfo) => {
+          if (this._disposed) return;
           this._symbolInfo = symbolInfo;
           this._loadBars();
         },
         (error) => {
+          if (this._disposed) return;
           console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
           this._setLoading(false);
         },
@@ -218,20 +246,52 @@ export class ChartWidgetCore {
   // ============================================================================
 
   protected _setLoading(loading: boolean): void {
+    if (this._disposed) return;
     if (this._isLoading !== loading) {
       this._isLoading = loading;
-      this._onLoadingChanged?.(loading);
+      this._onLoadingChanged?.(loading, this._getDataContext());
     }
   }
 
+  protected _setLoadingMoreBars(loading: boolean): void {
+    if (this._disposed) return;
+    if (this._isLoadingMoreBars !== loading) {
+      this._isLoadingMoreBars = loading;
+      this._onLoadingMoreBarsChanged?.(loading, this._getDataContext());
+    }
+  }
+
+  protected _getDataContext(): ChartWidgetDataContext {
+    return {
+      symbol: this._symbol,
+      interval: this._interval,
+      requestId: this._loadBarsRequestId,
+    };
+  }
+
+  protected _emitBarsChanged(source: ChartWidgetBarsChangedContext['source']): void {
+    if (this._disposed) return;
+    const context = {
+      ...this._getDataContext(),
+      source,
+    };
+    this._onBarsChanged?.(this._bars, context);
+  }
+
   protected _loadBars(): void {
+    if (this._disposed) return;
     if (!this._symbolInfo) return;
 
     const requestId = ++this._loadBarsRequestId;
+    this._setLoadingMoreBars(false);
+    this._clearQueuedLeftHistoryBackfill();
+    const requestSymbol = this._symbol;
+    const requestInterval = this._interval;
+    const requestSymbolInfo = this._symbolInfo;
     this._setLoading(true);
 
     const now = Date.now();
-    const intervalMs = getIntervalMs(this._interval);
+    const intervalMs = getIntervalMs(requestInterval);
     const countBack = INITIAL_BAR_COUNT;
     const fromTime = now - countBack * intervalMs;
 
@@ -243,11 +303,13 @@ export class ChartWidgetCore {
     };
 
     this._datafeed.getBars(
-      this._symbolInfo,
-      this._interval,
+      requestSymbolInfo,
+      requestInterval,
       periodParams,
       (bars) => {
-        if (requestId !== this._loadBarsRequestId) return; // Stale
+        if (this._disposed) return;
+        if (requestId !== this._loadBarsRequestId) return;
+        if (requestSymbol !== this._symbol || requestInterval !== this._interval) return;
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
@@ -255,11 +317,11 @@ export class ChartWidgetCore {
         this._bars = normalizedBars;
         // Clear old plots — they belong to the old symbol/interval
         this._plots = [];
-        this._setLoading(false);
 
-        // Notify listeners BEFORE indicator manager — ensures empty plots
-        // are pushed to UI before worker callback can race with stale data
-        this._onBarsChanged?.(normalizedBars);
+        // Notify data before clearing loading so consumers never render a
+        // completed load state against bars from the previous symbol/interval.
+        this._emitBarsChanged('history');
+        this._setLoading(false);
         this._onPlotsChanged?.(this._plots);
         this._scheduleRender();
         this._subscribeToBars();
@@ -268,6 +330,7 @@ export class ChartWidgetCore {
         this._indicatorManager?.setBars(normalizedBars);
       },
       (error) => {
+        if (this._disposed) return;
         if (requestId !== this._loadBarsRequestId) return;
 
         this._setLoading(false);
@@ -276,7 +339,125 @@ export class ChartWidgetCore {
     );
   }
 
+  requestMoreBars(direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint): void {
+    this._loadMoreBars(direction, hint);
+  }
+
+  private _queueLeftHistoryBackfill(hint?: HistoryBackfillRequestHint): void {
+    this._hasQueuedLeftHistoryBackfill = true;
+    this._queuedLeftHistoryBackfillHint = mergeLeftHistoryBackfillRequestHints(
+      this._queuedLeftHistoryBackfillHint,
+      hint,
+    );
+  }
+
+  private _clearQueuedLeftHistoryBackfill(): void {
+    this._hasQueuedLeftHistoryBackfill = false;
+    this._queuedLeftHistoryBackfillHint = undefined;
+  }
+
+  private _consumeQueuedLeftHistoryBackfill(): HistoryBackfillRequestHint | undefined | null {
+    if (!this._hasQueuedLeftHistoryBackfill) return null;
+    const hint = this._queuedLeftHistoryBackfillHint;
+    this._clearQueuedLeftHistoryBackfill();
+    return hint;
+  }
+
+  private _loadNextLeftHistoryBackfill(
+    activeHint: HistoryBackfillRequestHint | undefined,
+    previousEarliestBarTime: number,
+  ): void {
+    const queuedHint = this._consumeQueuedLeftHistoryBackfill();
+    const hint = resolveLeftHistoryBackfillContinuationHint({
+      activeHint,
+      currentEarliestBarTime: this._bars[0]?.time,
+      previousEarliestBarTime,
+      queuedHint,
+    });
+    if (hint !== null) {
+      this._loadMoreBars('left', hint);
+    }
+  }
+
+  protected _loadMoreBars(direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint): void {
+    if (this._disposed) return;
+    if (direction !== 'left') return;
+    if (!this._symbolInfo) return;
+    if (this._isLoadingMoreBars) {
+      this._queueLeftHistoryBackfill(hint);
+      return;
+    }
+    if (!this._hasMoreHistoricalData) {
+      return;
+    }
+
+    const earliestBar = this._bars[0];
+    if (!earliestBar) return;
+    const previousEarliestBarTime = earliestBar.time;
+
+    const intervalMs = getIntervalMs(this._interval);
+    const request = resolveLeftHistoryBackfillRequest({
+      earliestBarTime: earliestBar.time,
+      hint,
+      intervalMs,
+    });
+    if (!request) {
+      return;
+    }
+
+    this._setLoadingMoreBars(true);
+    const requestId = this._loadBarsRequestId;
+    const requestSymbol = this._symbol;
+    const requestInterval = this._interval;
+    const requestSymbolInfo = this._symbolInfo;
+
+    this._datafeed.getBars(
+      requestSymbolInfo,
+      requestInterval,
+      {
+        countBack: request.countBack,
+        from: request.from,
+        to: request.to,
+        firstDataRequest: false,
+      },
+      (bars) => {
+        if (this._disposed) return;
+        if (requestId !== this._loadBarsRequestId) return;
+        if (requestSymbol !== this._symbol || requestInterval !== this._interval) return;
+
+        this._setLoadingMoreBars(false);
+        if (bars.length === 0) {
+          this._hasMoreHistoricalData = false;
+          this._clearQueuedLeftHistoryBackfill();
+          return;
+        }
+
+        const existingTimes = new Set(this._bars.map((bar) => bar.time));
+        const newBars = normalizeDatafeedBars(bars).filter((bar) => !existingTimes.has(bar.time));
+        if (newBars.length === 0) {
+          this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
+          return;
+        }
+
+        this._bars = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
+        this._emitBarsChanged('history');
+        this._scheduleRender();
+        this._indicatorManager?.setBars(this._bars);
+        this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
+      },
+      (error) => {
+        if (this._disposed) return;
+        if (requestId !== this._loadBarsRequestId) return;
+
+        this._setLoadingMoreBars(false);
+        this._clearQueuedLeftHistoryBackfill();
+        console.error('[ChartWidgetCore] Failed to load more bars:', error);
+      },
+    );
+  }
+
   protected _subscribeToBars(): void {
+    if (this._disposed) return;
     if (!this._symbolInfo) return;
 
     // Unsubscribe from previous
@@ -285,17 +466,41 @@ export class ChartWidgetCore {
     }
 
     this._barSubscriptionGuid = `chart_${this._symbol}_${this._interval}_${Date.now()}`;
+    const subscriptionGuid = this._barSubscriptionGuid;
+    const subscriptionSymbol = this._symbol;
+    const subscriptionInterval = this._interval;
 
     this._datafeed.subscribeBars(
       this._symbolInfo,
-      this._interval,
-      (bar) => this._handleNewBar(normalizeDatafeedBar(bar)),
-      this._barSubscriptionGuid,
-      () => this._loadBars(), // Reset callback
+      subscriptionInterval,
+      (bar) => {
+        if (this._disposed) return;
+        if (
+          this._barSubscriptionGuid !== subscriptionGuid ||
+          this._symbol !== subscriptionSymbol ||
+          this._interval !== subscriptionInterval
+        ) {
+          return;
+        }
+        this._handleNewBar(normalizeDatafeedBar(bar));
+      },
+      subscriptionGuid,
+      () => {
+        if (this._disposed) return;
+        if (
+          this._barSubscriptionGuid !== subscriptionGuid ||
+          this._symbol !== subscriptionSymbol ||
+          this._interval !== subscriptionInterval
+        ) {
+          return;
+        }
+        this._loadBars();
+      },
     );
   }
 
   protected _handleNewBar(bar: Bar): void {
+    if (this._disposed) return;
     if (this._bars.length === 0) {
       this._bars.push(bar);
     } else {
@@ -319,7 +524,7 @@ export class ChartWidgetCore {
       this._indicatorManager?.setBars(this._bars);
     }
 
-    this._onBarsChanged?.(this._bars);
+    this._emitBarsChanged('realtime');
     this._scheduleRender();
   }
 
@@ -328,6 +533,7 @@ export class ChartWidgetCore {
   // ============================================================================
 
   setSymbol(symbol: string): void {
+    if (this._disposed) return;
     if (this._symbol === symbol) return;
 
     // Unsubscribe from old
@@ -337,26 +543,30 @@ export class ChartWidgetCore {
     }
 
     this._symbol = symbol;
+    this._onSymbolChange?.(symbol);
     // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
+    this._setLoadingMoreBars(false);
+    this._clearQueuedLeftHistoryBackfill();
     this._setLoading(true);
 
     this._datafeed.resolveSymbol(
       symbol,
       (symbolInfo) => {
+        if (this._disposed) return;
         this._symbolInfo = symbolInfo;
         this._loadBars();
       },
       (error) => {
+        if (this._disposed) return;
         console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
         this._setLoading(false);
       },
     );
-
-    this._onSymbolChange?.(symbol);
   }
 
   setInterval(interval: ResolutionInput): void {
+    if (this._disposed) return;
     const normalizedInterval = normalizeResolution(interval, this._interval);
     if (this._interval === normalizedInterval) return;
 
@@ -367,13 +577,14 @@ export class ChartWidgetCore {
     }
 
     this._interval = normalizedInterval;
+    this._onIntervalChange?.(normalizedInterval);
     // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
+    this._setLoadingMoreBars(false);
+    this._clearQueuedLeftHistoryBackfill();
     this._setLoading(true);
     this._scheduleRender();
     this._loadBars();
-
-    this._onIntervalChange?.(normalizedInterval);
   }
 
   // ============================================================================
@@ -394,6 +605,10 @@ export class ChartWidgetCore {
 
   isLoading(): boolean {
     return this._isLoading;
+  }
+
+  isLoadingMoreBars(): boolean {
+    return this._isLoadingMoreBars;
   }
 
   getPlots(): PlotOutput[] {
@@ -422,7 +637,6 @@ export class ChartWidgetCore {
 
   addIndicator(_indicator: BuiltinIndicator, _inputs?: Record<string, unknown>): string | null {
     // To be implemented by subclasses that support indicators
-    console.warn('[ChartWidgetCore] addIndicator not implemented');
     return null;
   }
 
@@ -437,10 +651,24 @@ export class ChartWidgetCore {
   // ============================================================================
 
   dispose(): void {
-    if (this._barSubscriptionGuid) {
-      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
+    if (this._disposed) return;
+    this._disposed = true;
+    this._loadBarsRequestId += 1;
+    this._clearQueuedLeftHistoryBackfill();
+    const subscriptionGuid = this._barSubscriptionGuid;
+    this._barSubscriptionGuid = null;
+    if (subscriptionGuid) {
+      this._datafeed.unsubscribeBars(subscriptionGuid);
     }
     this._indicatorManager?.dispose?.();
+    this._indicatorManager = null;
+    this._onBarsChanged = undefined;
+    this._onPlotsChanged = undefined;
+    this._onViewportChanged = undefined;
+    this._onLoadingChanged = undefined;
+    this._onSymbolChange = undefined;
+    this._onIntervalChange = undefined;
+    this._scheduleRender = () => {};
     this._eventEmitter.removeAllListeners();
   }
 }

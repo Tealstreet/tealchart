@@ -35,7 +35,7 @@ export interface OemsAction<TState extends OemsActionState = OemsActionState> {
   optimisticState: TState;
   startedAt: number;
   expiresAt: number;
-  timeoutId?: ReturnType<typeof setTimeout>;
+  timeoutId: ReturnType<typeof setTimeout> | null;
   confirmsRemoved: boolean;
 }
 
@@ -240,9 +240,7 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
 
   dispose(): void {
     for (const action of this.actionsByObject.values()) {
-      if (action.timeoutId !== undefined) {
-        this.clearTimer(action.timeoutId);
-      }
+      if (action.timeoutId) this.clearTimer(action.timeoutId);
     }
     this.actionsByObject.clear();
   }
@@ -260,6 +258,7 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
       optimisticState: args.optimisticState ?? args.originalState,
       startedAt,
       expiresAt: startedAt + this.timeoutMs,
+      timeoutId: null,
       confirmsRemoved: Boolean(args.confirmsRemoved),
     };
     action.timeoutId = this.setTimer(() => {
@@ -285,9 +284,7 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
   }
 
   private settleAction(action: OemsAction<TState>, status: OemsActionSettlement<TState>['status'], error?: unknown): void {
-    if (action.timeoutId !== undefined) {
-      this.clearTimer(action.timeoutId);
-    }
+    if (action.timeoutId) this.clearTimer(action.timeoutId);
     this.actionsByObject.delete(getObjectKey(action.objectType, action.objectId));
     this.onSettle?.({ action, status, error });
     this.onChange?.();

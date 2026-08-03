@@ -65,6 +65,8 @@ export interface RenderOptions {
   minCandleWidth: number;
   maxCandleWidth: number;
   margins?: ChartMargins; // Custom margins override
+  /** Minimum x for chart-area trading labels after overlay chrome such as the left drawing rail. */
+  chartLabelMinX?: number;
   pricePrecision?: number; // Market price precision (e.g., 0.00001 for 5 decimal places)
   fontFamily?: string; // Font family for all chart text. Defaults to 'sans-serif' for canvas rendering.
   // Metadata for jailbreak indicators
@@ -142,6 +144,8 @@ export interface PriceLine {
    * Use this for frequently-updating lines like last trade price.
    */
   renderLineOnCanvas?: boolean;
+  /** Native/Skia-only: keep the price-axis tag visible when the line itself is rendered by the primitive layer. */
+  showAxisTag?: boolean;
   /**
    * If set, the label's secondaryText will be computed as a countdown to this timestamp (ms).
    * The countdown is computed in the RAF loop, avoiding React re-renders every second.

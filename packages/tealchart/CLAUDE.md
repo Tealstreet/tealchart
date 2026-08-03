@@ -7,7 +7,10 @@ Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 **Hybrid rendering model:**
 
 - **Canvas 2D API**: Candlesticks, volume, grid, time/price axes, crosshair (high-frequency updates)
-- **Konva.js + react-konva**: Interactive elements on top of canvas — order/position lines with draggable labels, context menus
+- **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
+- **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
+
+**Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
 **Key classes:**
 
@@ -37,9 +40,8 @@ src/
 │   └── VanillaChartReact.tsx   # React wrapper for the vanilla widget
 ├── mobile/                     # React Native / Skia implementation
 │   ├── MobileIndicatorManager.ts
-│   ├── components/             # RN components (ChartTopBar, context menu,
-│   │                           # crosshair, order/position lines, modals)
-│   └── hooks/                  # useChartGestures, useLabelCollision
+│   ├── render/                 # Passive native frame/projection helpers
+│   └── utils/                  # Passive native coordinate/trade-line helpers
 ├── ui/                         # Plain-JS/DOM UI layer (NOT React)
 │   ├── ChartCore.ts            # Canvas + Konva interactive lines
 │   ├── ChartTopBar.ts          # Timeframe selector + indicators + layouts
@@ -58,10 +60,10 @@ src/
 │   ├── SkiaCanvasContext.ts    # Mobile Skia adapter
 │   ├── WebCanvasContext.ts
 │   └── RenderScheduler.ts
-├── state/                      # Jotai state management
-│   ├── chartState.ts           # Per-chart atoms w/ atomWithStorage + migrations
+├── state/                      # Nanostores chart state
+│   ├── chartState.ts           # Per-chart stores + persistent UI preferences
 │   ├── ChartApiContext.tsx     # Context provider for TealchartApi
-│   ├── indicatorActions.ts     # Indicator CRUD operations (atoms)
+│   ├── indicatorActions.ts     # Indicator CRUD helpers
 │   └── safeDeepMerge.ts        # Handles corrupted localStorage
 ├── interaction/                # Drag/click state machines, event manager,
 │   │                           # price line manager (shared web+mobile)
@@ -85,22 +87,26 @@ src/
 ```
 
 > **Note:** there is no `components/` directory at `src/` root. Web UI
-> lives in `ui/` (plain JS/DOM, NOT React), mobile UI in `mobile/`. The
-> only React-adjacent code is `react/VanillaChartReact.tsx` plus a few
-> `.tsx` files in `mobile/components/` and `state/ChartApiContext.tsx`.
+> lives in `ui/` (plain JS/DOM, NOT React), and the native chart currently
+> uses root `SkiaTealchart.tsx` plus passive helpers under `mobile/`. The
+> only React-adjacent code is `react/VanillaChartReact.tsx`,
+> `SkiaTealchart.tsx`, and `state/ChartApiContext.tsx`.
 
 ## State Management
 
-Uses Jotai with `atomWithStorage` for per-chart persistence:
+Uses Nanostores-backed, chart-keyed stores for chart state and UI preference persistence:
 
 ```typescript
-// Per-chart atoms created via factory
-createChartFocusAtoms(chartKey) → settingsAtom, indicatorActionsAtoms, dirtyAtom
-getChartSettingsAtom(chartKey) → atomWithStorage(`tealchart:${chartKey}`, defaults)
+// Per-chart stores created via factory
+getChartStore(chartKey).settings → chart settings store
+getChartStore(chartKey).uiPreferences → shared UI preference store
 ```
 
 - Schema versioning via `CHART_SETTINGS_VERSION` with migration system
 - `safeDeepMerge` handles corrupted localStorage gracefully
+- Legacy helpers such as `createChartFocusAtoms` and `getChartSettingsAtom` remain compatibility wrappers; new code should use `getChartStore`.
+- UI chrome preferences must use `getChartStore(chartKey).uiPreferences` and the `TealchartKeyValueStorage` contract. Web defaults to `createLocalStorageKeyValueStorage()`, while native hosts pass `createAsyncStorageKeyValueStorage(AsyncStorage)` through `SkiaTealchart.uiPreferencesStorage`.
+- Do not read or write `localStorage`, `AsyncStorage`, or cwd-scoped memory directly for Tealchart UI settings. Add preferences to `ChartUiPreferences`, normalize them in `chartState.ts`, and test both sync and async storage hydration.
 
 ## Tealscript Integration
 
@@ -145,15 +151,6 @@ Exchange-prefixed symbols (for example `BYBITV5:BTCUSDT`) are resolved with the 
 
 Order and position trading-line labels derive their body, quantity, price-label, and action-button colors from `lineColor` using the package defaults in `constants.ts`: blue for buy/unspecified lines, red when consumers supply the default sell/short color, dark low-glare label fills, and filled quantity/PnL-style text on accent segments. Consumers should set semantic line color and line length rather than restyling every label segment. PnL must be passed separately with `setPnl` / `setProfitState`; it is the only label segment that flips to profit/loss color independently of `lineColor`.
 
-Order and position trading callbacks are awaitable OEMS actions. Commit-phase
-callbacks (`onMove`, cancel/close/reverse, TP/SL click, TP/SL move end) must
-flow through the shared `OemsActionManager`: synchronous returns complete
-immediately, promises dim the line and hold optimistic state until confirmation,
-and `false`/throw/reject fails the action and reverts. Continuous preview
-callbacks such as `onMoving`, `onTPMove`, and `onSLMove` must stay frame-local
-and should not own pending lifecycle. Web and Skia renderers must keep raw line
-snapshots separate from derived pending/optimistic render state.
-
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
 ## Commands
@@ -168,8 +165,9 @@ yarn lint             # ESLint
 
 ## Key Dependencies
 
-- `konva` / `react-konva` — vector graphics for interactive elements
-- `jotai` / `jotai-optics` / `optics-ts` — atomic state with nested updates
+- `konva` — vector graphics for interactive web trading geometry
+- `nanostores` — per-chart state stores and subscriptions
+- `jotai` / `jotai-optics` / `optics-ts` — legacy state helpers and nested updates
 - `@tealstreet/tealscript` — indicator scripting via Web Workers
 
 ## Web + Mobile Feature Parity
@@ -180,14 +178,14 @@ When implementing any new feature, always implement it for both platforms in the
 
 - `ChartWidgetCore` — shared bar fetching, indicator management, pane management
 - `chartState.ts` — shared state (AVAILABLE_TIMEFRAMES, chart settings)
-- `labelCollision.ts` — shared collision resolution (web imports directly, mobile via `useLabelCollision` hook)
+- `labelCollision.ts` — shared collision resolution for web rendering
 - `InteractiveLineState.ts` — shared drag state machine
 - `ViewportController` / `viewScale.ts` — shared viewport preservation
 
 Platform-specific rendering:
 
 - **Web**: `ChartCore.ts` (canvas + Konva interactive lines), `EventManager.ts` (mouse/touch)
-- **Mobile**: `SkiaTealchart.tsx` (Skia canvas), `PositionLineComponent.tsx` / `OrderLineComponent.tsx` (RN components), `useChartGestures.ts` (gestures)
+- **Mobile**: `SkiaTealchart.tsx` (passive Skia canvas) plus pure native frame/projection helpers
 
 When adding features like TP/SL drag preview, crosshair improvements, or new line types — implement for both platforms.
 

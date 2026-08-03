@@ -3267,6 +3267,33 @@ describe('user drawing input controller', () => {
     });
   });
 
+  it('can toggle an existing point selection off when requested', () => {
+    const state = createUserDrawingState({
+      selection: { drawingId: 'h' },
+      drawings: [
+        {
+          id: 'h',
+          kind: 'horizontalLine',
+          paneId: 'main',
+          visible: true,
+          locked: false,
+          createdAt: 1,
+          updatedAt: 1,
+          style,
+          price: 50,
+        },
+      ],
+    });
+
+    const result = resolveUserDrawingSelectionAtPoint(state, { x: 40, y: 50 }, new Map([['main', space]]), {
+      toggleSelected: true,
+    });
+
+    expect(result.state.selection).toBeNull();
+    expect(result.hit).toBe(true);
+    expect(result.changed).toBe(true);
+  });
+
   it('clears selection and draft when selection misses', () => {
     const state = createUserDrawingState({
       activeTool: 'trendLine',

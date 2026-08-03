@@ -11,7 +11,13 @@ import {
   TRADE_LINE_DOTTED_DASH_PATTERN,
 } from './constants';
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
-import { WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
+import { computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
+import {
+  formatTimeAxisLabel,
+  generatePriceMarkers as generateAxisPriceMarkers,
+  generateTimeMarkers as generateAxisTimeMarkers,
+  type TimeAxisMarker,
+} from './rendering/axisMarkers';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
@@ -47,7 +53,7 @@ import { resolveLabelCollisions } from './utils/labelCollision';
  */
 
 /** Info about an indicator for pane assignment (matches ChartContainer) */
-interface IndicatorPaneInfo {
+export interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
   explicitPlotZOrder?: boolean;
@@ -56,6 +62,93 @@ interface IndicatorPaneInfo {
   /** Input values for pane label display */
   inputs?: Record<string, unknown>;
 }
+
+export type TealchartRenderPass =
+  | 'background'
+  | 'pane-chrome'
+  | 'main-price-grid'
+  | 'main-time-grid'
+  | 'main-price-base'
+  | 'main-volume-content'
+  | 'main-price-overlay-content'
+  | 'main-overlay-content'
+  | 'main-axis'
+  | 'main-price-line-content'
+  | 'main-price-line-labels'
+  | 'indicator-price-grid'
+  | 'indicator-time-grid'
+  | 'indicator-price-content'
+  | 'indicator-content'
+  | 'indicator-axis'
+  | 'indicator-price-lines'
+  | 'time-axis';
+
+export interface TealchartRenderPassOptions {
+  paneIds?: readonly string[];
+  timeAxisOverscanPx?: number;
+  timeContentOverscanPx?: number;
+  valueAxisOverscanPx?: number;
+}
+
+export interface TealchartRenderPassInput {
+  bars: Bar[];
+  viewport: Viewport;
+  layout: UnifiedPaneLayout;
+  priceLines?: PriceLine[];
+  plots?: PlotOutput[];
+  indicatorPaneInfo?: Record<string, IndicatorPaneInfo>;
+  crosshair?: CrosshairState;
+  plotStyleOverrides?: Map<string, PlotStyleOverride>;
+  precomputedPriceLineBounds?: PriceLineLabelBounds[];
+  executionLines?: ExecutionLineRenderData[];
+  drawings?: DrawingOutput[];
+  passes: readonly TealchartRenderPass[];
+  passOptions?: TealchartRenderPassOptions;
+}
+
+export type TealchartRenderFrameInput = Omit<TealchartRenderPassInput, 'passes'>;
+
+export interface TealchartPreparedRenderFrame extends TealchartRenderFrameInput {
+  computedPanes: ComputedPane[];
+  labelBoundsByPane: Map<string, PriceLineLabelBounds[]>;
+  routedDrawings?: ReturnType<typeof routeTealScriptDrawings>;
+}
+
+export interface ValueAxisLabelRenderData {
+  id: string;
+  paneId: string;
+  value: number;
+  text: string;
+  x: number;
+  y: number;
+  color: string;
+  fontSize: number;
+}
+
+export const MAIN_VOLUME_OVERLAY_RATIO = 0.15;
+
+export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
+  'background',
+  'pane-chrome',
+  'main-price-grid',
+  'main-time-grid',
+  'main-price-base',
+  'main-volume-content',
+  'main-price-overlay-content',
+  'main-overlay-content',
+  'main-axis',
+  'main-price-line-content',
+  'main-price-line-labels',
+  'indicator-price-grid',
+  'indicator-time-grid',
+  'indicator-price-content',
+  'indicator-content',
+  'indicator-axis',
+  'indicator-price-lines',
+  'time-axis',
+];
+
+type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
 // Cached number formatters by decimal places
 const numberFormatterCache = new Map<number, Intl.NumberFormat>();
@@ -89,11 +182,8 @@ function formatCountdown(targetTimeMs: number): string {
   return `${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function getTradingLineMinX(margins: ChartMargins): number {
-  return Math.max(
-    margins.left,
-    WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 2,
-  );
+function getTradingLineMinX(margins: ChartMargins, chartLabelMinX?: number): number {
+  return Math.max(chartLabelMinX ?? computeTradingLineLabelMinX(WEB_CHART_CHROME_METRICS, margins), margins.left);
 }
 
 // Text width cache - avoids expensive ctx.measureText calls
@@ -259,25 +349,7 @@ export class TealchartRenderer {
     executionLines?: ExecutionLineRenderData[],
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options } = this;
-    const { width, height, devicePixelRatio } = options;
-
-    // Clear canvas
-    ctx.save();
-    ctx.scale(devicePixelRatio, devicePixelRatio);
-    ctx.fillStyle = options.backgroundColor;
-    ctx.fillRect(0, 0, width, height);
-
-    if (bars.length === 0) {
-      this.drawNoDataMessage();
-      ctx.restore();
-      return;
-    }
-
-    // Pass all bars to renderUnifiedPanes - filtering happens inside each render function
-    // Note: We render even if no bars are visible (scrolled off screen) - only show "no data" when bars.length === 0
-    // This is critical for indicators where plot.values is indexed to the full bars array
-    this.renderUnifiedPanes(
+    this.renderWithLayoutPasses({
       bars,
       viewport,
       layout,
@@ -289,7 +361,69 @@ export class TealchartRenderer {
       precomputedPriceLineBounds,
       executionLines,
       drawings,
-    );
+      passes: TEALCHART_RENDER_PASSES,
+    });
+  }
+
+  renderWithLayoutPasses({
+    bars,
+    viewport,
+    layout,
+    priceLines,
+    plots,
+    indicatorPaneInfo,
+    crosshair,
+    plotStyleOverrides,
+    precomputedPriceLineBounds,
+    executionLines,
+    drawings,
+    passes,
+    passOptions,
+  }: TealchartRenderPassInput): void {
+    const frame = this.prepareRenderFrame({
+      bars,
+      viewport,
+      layout,
+      priceLines,
+      plots,
+      indicatorPaneInfo,
+      crosshair,
+      plotStyleOverrides,
+      precomputedPriceLineBounds,
+      executionLines,
+      drawings,
+    });
+    this.renderPreparedWithLayoutPasses(frame, passes, passOptions);
+  }
+
+  renderPreparedWithLayoutPasses(
+    frame: TealchartPreparedRenderFrame,
+    passes: readonly TealchartRenderPass[],
+    passOptions?: TealchartRenderPassOptions,
+  ): void {
+    const { ctx, options } = this;
+    const { width, height, devicePixelRatio } = options;
+    const passSet = new Set(passes);
+
+    ctx.save();
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    if (passSet.has('background')) {
+      ctx.fillStyle = options.backgroundColor;
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    if (frame.bars.length === 0) {
+      if (passSet.has('background')) {
+        this.drawNoDataMessage();
+      }
+      ctx.restore();
+      return;
+    }
+
+    // Pass all bars to renderUnifiedPanes - filtering happens inside each render function
+    // Note: We render even if no bars are visible (scrolled off screen) - only show "no data" when bars.length === 0
+    // This is critical for indicators where plot.values is indexed to the full bars array
+    this.renderPreparedFramePasses(frame, passSet, passOptions);
 
     ctx.restore();
   }
@@ -566,13 +700,21 @@ export class TealchartRenderer {
   /**
    * Draw time axis on the bottom
    */
-  private drawTimeAxis(viewport: Viewport): void {
+  private drawTimeAxis(viewport: Viewport, timeAxisOverscanPx = 0): void {
     const { ctx, options, margins } = this;
     // Use full width minus left margin so time labels extend under price axis (like TradingView)
     const chartWidth = options.width - margins.left;
+    if (chartWidth <= 0) return;
+    const overscanPx = Math.max(0, timeAxisOverscanPx);
+    const timePerPixel = (viewport.endTime - viewport.startTime) / chartWidth;
+    const markerViewport = {
+      ...viewport,
+      startTime: viewport.startTime - timePerPixel * overscanPx,
+      endTime: viewport.endTime + timePerPixel * overscanPx,
+    };
     const axisY = options.height - margins.bottom / 2;
 
-    const timeMarkers = this.generateTimeMarkers(viewport, chartWidth);
+    const timeMarkers = this.generateTimeMarkers(markerViewport, chartWidth + overscanPx * 2);
 
     ctx.fillStyle = options.textColor;
     ctx.font = `11px ${this.font}`;
@@ -581,6 +723,7 @@ export class TealchartRenderer {
 
     for (const { time, showMonthLabel, step } of timeMarkers) {
       const x = this.timeToX(time, viewport, chartWidth);
+      if (x < margins.left - overscanPx || x > options.width + overscanPx) continue;
       const label = this.formatTimeLabel(time, step, showMonthLabel);
       ctx.fillText(label, x, axisY);
     }
@@ -832,7 +975,7 @@ export class TealchartRenderer {
     // Calculate chart label dimensions if present
     const chartLabel = bound.chartLabel;
     let chartLabelWidth = 0;
-    const lineStartX = getTradingLineMinX(margins);
+    const lineStartX = getTradingLineMinX(margins, options.chartLabelMinX);
     let chartLabelX = lineStartX;
     const labelHeight = 18;
 
@@ -1074,7 +1217,7 @@ export class TealchartRenderer {
     // lineLength=100 means line extends full width, label at LEFT edge
     // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
     const maxLabelX = options.width - margins.right - totalLabelWidth; // rightmost position
-    const lineStartX = getTradingLineMinX(margins);
+    const lineStartX = getTradingLineMinX(margins, options.chartLabelMinX);
     const minLabelX = lineStartX; // leftmost position after overlaid chart chrome
     const labelX = minLabelX + ((maxLabelX - minLabelX) * (100 - line.lineLength)) / 100;
     const labelY = lineY - labelHeight / 2;
@@ -1235,7 +1378,7 @@ export class TealchartRenderer {
     // lineLength=100 means line extends full width, label at LEFT edge
     // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
     const maxLabelX = options.width - margins.right - totalLabelWidth; // rightmost position
-    const lineStartX = getTradingLineMinX(margins);
+    const lineStartX = getTradingLineMinX(margins, options.chartLabelMinX);
     const minLabelX = lineStartX; // leftmost position after overlaid chart chrome
     const labelX = minLabelX + ((maxLabelX - minLabelX) * (100 - line.lineLength)) / 100;
     const labelY = lineY - labelHeight / 2;
@@ -3307,67 +3450,7 @@ export class TealchartRenderer {
    * Ensures minimum pixel spacing between labels to avoid overlap
    */
   private generatePriceMarkers(viewport: Viewport, priceHeight: number): number[] {
-    const minLabelSpacing = 24; // Minimum pixels between labels
-    const maxLabels = Math.floor(priceHeight / minLabelSpacing);
-    const minLabels = Math.max(4, Math.floor(maxLabels * 0.5)); // Target 50% of max
-
-    const priceRange = viewport.priceMax - viewport.priceMin;
-    if (priceRange <= 0) return [];
-
-    // Try different "nice" spacings to find the densest one that fits
-    const magnitude = Math.floor(Math.log10(priceRange));
-    const spacings = [
-      1 * Math.pow(10, magnitude - 2),
-      2 * Math.pow(10, magnitude - 2),
-      5 * Math.pow(10, magnitude - 2),
-      1 * Math.pow(10, magnitude - 1),
-      2 * Math.pow(10, magnitude - 1),
-      5 * Math.pow(10, magnitude - 1),
-      1 * Math.pow(10, magnitude),
-      2 * Math.pow(10, magnitude),
-      5 * Math.pow(10, magnitude),
-      1 * Math.pow(10, magnitude + 1),
-      2 * Math.pow(10, magnitude + 1),
-    ].sort((a, b) => a - b);
-
-    // Find the smallest spacing that doesn't exceed maxLabels
-    for (const spacing of spacings) {
-      // Start at the nearest "nice" value at or below priceMin
-      const firstMarker = Math.floor(viewport.priceMin / spacing) * spacing;
-      const markers: number[] = [];
-
-      // Generate all markers from firstMarker up through priceMax
-      for (let price = firstMarker; price <= viewport.priceMax + spacing * 0.01; price += spacing) {
-        markers.push(price);
-      }
-
-      // Accept if within bounds, preferring denser grids
-      if (markers.length >= minLabels && markers.length <= maxLabels) {
-        return markers;
-      }
-    }
-
-    // Fallback: find any spacing that works
-    for (const spacing of [...spacings].reverse()) {
-      const firstMarker = Math.floor(viewport.priceMin / spacing) * spacing;
-      const markers: number[] = [];
-
-      for (let price = firstMarker; price <= viewport.priceMax + spacing * 0.01; price += spacing) {
-        markers.push(price);
-      }
-
-      if (markers.length <= maxLabels && markers.length >= 2) {
-        return markers;
-      }
-    }
-
-    // Ultimate fallback: evenly spaced within viewport
-    const step = priceRange / Math.max(minLabels, 4);
-    const markers: number[] = [];
-    for (let price = viewport.priceMin; price <= viewport.priceMax; price += step) {
-      markers.push(price);
-    }
-    return markers;
+    return generateAxisPriceMarkers(viewport, priceHeight);
   }
 
   /**
@@ -3375,82 +3458,8 @@ export class TealchartRenderer {
    * Returns markers with metadata for formatting
    * Supports any zoom level - from seconds to decades
    */
-  private generateTimeMarkers(
-    viewport: Viewport,
-    chartWidth: number,
-  ): Array<{ time: number; showMonthLabel: boolean; step: number }> {
-    const minLabelSpacing = 70; // Minimum pixels between time labels
-    const maxLabels = Math.max(2, Math.floor(chartWidth / minLabelSpacing));
-
-    const timeRange = viewport.endTime - viewport.startTime;
-    if (timeRange <= 0) return [];
-
-    // Time intervals in ms (from small to large, covering seconds to decades)
-    const intervals = [
-      1000, // 1 second
-      5000, // 5 seconds
-      10000, // 10 seconds
-      30000, // 30 seconds
-      60000, // 1 minute
-      300000, // 5 minutes
-      600000, // 10 minutes
-      900000, // 15 minutes
-      1800000, // 30 minutes
-      3600000, // 1 hour
-      7200000, // 2 hours
-      14400000, // 4 hours
-      28800000, // 8 hours
-      43200000, // 12 hours
-      86400000, // 1 day
-      172800000, // 2 days
-      604800000, // 1 week
-      1209600000, // 2 weeks
-      2592000000, // ~1 month (30 days)
-      5184000000, // ~2 months
-      7776000000, // ~3 months (quarter)
-      15552000000, // ~6 months
-      31536000000, // ~1 year
-      63072000000, // ~2 years
-      157680000000, // ~5 years
-      315360000000, // ~10 years
-    ];
-
-    // Find the smallest interval that doesn't exceed maxLabels
-    let bestInterval = intervals[intervals.length - 1];
-    for (const interval of intervals) {
-      const count = Math.ceil(timeRange / interval);
-      if (count <= maxLabels) {
-        bestInterval = interval;
-        break;
-      }
-    }
-
-    // If still too many labels, calculate a custom larger interval
-    let count = Math.ceil(timeRange / bestInterval);
-    while (count > maxLabels) {
-      bestInterval *= 2;
-      count = Math.ceil(timeRange / bestInterval);
-    }
-
-    // Generate markers
-    const startTime = Math.ceil(viewport.startTime / bestInterval) * bestInterval;
-    const markers: Array<{ time: number; showMonthLabel: boolean; step: number }> = [];
-    let lastMonth = -1;
-    let lastYear = -1;
-
-    for (let time = startTime; time <= viewport.endTime; time += bestInterval) {
-      const date = new Date(time);
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const showMonthLabel = month !== lastMonth || year !== lastYear;
-
-      markers.push({ time, showMonthLabel, step: bestInterval });
-
-      lastMonth = month;
-      lastYear = year;
-    }
-
-    return markers;
+  private generateTimeMarkers(viewport: Viewport, chartWidth: number): TimeAxisMarker[] {
+    return generateAxisTimeMarkers(viewport, chartWidth);
   }
 
   /**
@@ -3507,42 +3516,7 @@ export class TealchartRenderer {
    * Adapts format based on zoom level - from HH:MM to just year
    */
   private formatTimeLabel(time: number, step: number, showMonthLabel = false): string {
-    const date = new Date(time);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const yearShort = date.getFullYear().toString().slice(-2);
-
-    // Multi-year intervals: just show year
-    if (step >= 31536000000) {
-      // >= 1 year
-      return date.getFullYear().toString();
-    }
-
-    // Month-level intervals: show "Mon 'YY"
-    if (step >= 2592000000) {
-      // >= ~1 month
-      return `${months[date.getMonth()]} '${yearShort}`;
-    }
-
-    // Day-level intervals
-    if (step >= 86400000) {
-      // >= 1 day
-      if (showMonthLabel) {
-        return `${months[date.getMonth()]} '${yearShort}`;
-      }
-      return date.getDate().toString();
-    }
-
-    // Hour-level intervals
-    if (step >= 3600000) {
-      // >= 1 hour
-      if (showMonthLabel) {
-        return `${date.getDate()} ${months[date.getMonth()]}`;
-      }
-      return `${date.getHours()}:00`;
-    }
-
-    // Minute/second intervals
-    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+    return formatTimeAxisLabel(time, step, showMonthLabel);
   }
 
   /**
@@ -3618,19 +3592,8 @@ export class TealchartRenderer {
   /**
    * Render the unified pane layout - iterates through all panes and renders each
    */
-  renderUnifiedPanes(
-    bars: Bar[],
-    viewport: Viewport,
-    layout: UnifiedPaneLayout,
-    priceLines?: PriceLine[],
-    plots?: PlotOutput[],
-    indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
-    _crosshair?: CrosshairState,
-    plotStyleOverrides?: Map<string, PlotStyleOverride>,
-    precomputedPriceLineBounds?: PriceLineLabelBounds[],
-    executionLines?: ExecutionLineRenderData[],
-    drawings?: DrawingOutput[],
-  ): void {
+  prepareRenderFrame(input: TealchartRenderFrameInput): TealchartPreparedRenderFrame {
+    const { bars, viewport, layout, priceLines, precomputedPriceLineBounds, drawings } = input;
     const { options } = this;
 
     // Compute pixel positions for all panes
@@ -3669,8 +3632,36 @@ export class TealchartRenderer {
 
     const routedDrawings = drawings && drawings.length > 0 ? routeTealScriptDrawings(drawings, computedPanes) : undefined;
 
+    return {
+      ...input,
+      computedPanes,
+      labelBoundsByPane,
+      routedDrawings,
+    };
+  }
+
+  renderPreparedFramePasses(
+    frame: TealchartPreparedRenderFrame,
+    passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
+    passOptions?: TealchartRenderPassOptions,
+  ): void {
+    const {
+      bars,
+      viewport,
+      priceLines,
+      plots,
+      indicatorPaneInfo,
+      plotStyleOverrides,
+      executionLines,
+      computedPanes,
+      labelBoundsByPane,
+      routedDrawings,
+    } = frame;
+    const paneIdFilter = passOptions?.paneIds ? new Set(passOptions.paneIds) : null;
+
     // Render each pane with its specific price lines and TealScript drawings
     for (const pane of computedPanes) {
+      if (paneIdFilter && !paneIdFilter.has(pane.id)) continue;
       const paneLabelBounds = labelBoundsByPane.get(pane.id) || [];
       const paneDrawings =
         pane.type === 'main' ? routedDrawings?.main : routedDrawings?.byPaneId.get(pane.id);
@@ -3685,11 +3676,44 @@ export class TealchartRenderer {
         paneLabelBounds,
         plotStyleOverrides,
         paneDrawings,
+        passes,
+        passOptions,
       );
     }
 
-    // Render shared time axis at bottom
-    this.drawTimeAxis(viewport);
+    if (!paneIdFilter && passes.has('time-axis')) {
+      this.drawTimeAxis(viewport, passOptions?.timeAxisOverscanPx);
+    }
+  }
+
+  renderUnifiedPanes(
+    bars: Bar[],
+    viewport: Viewport,
+    layout: UnifiedPaneLayout,
+    priceLines?: PriceLine[],
+    plots?: PlotOutput[],
+    indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
+    crosshair?: CrosshairState,
+    plotStyleOverrides?: Map<string, PlotStyleOverride>,
+    precomputedPriceLineBounds?: PriceLineLabelBounds[],
+    executionLines?: ExecutionLineRenderData[],
+    drawings?: DrawingOutput[],
+    passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
+  ): void {
+    const frame = this.prepareRenderFrame({
+      bars,
+      viewport,
+      layout,
+      priceLines,
+      plots,
+      indicatorPaneInfo,
+      crosshair,
+      plotStyleOverrides,
+      precomputedPriceLineBounds,
+      executionLines,
+      drawings,
+    });
+    this.renderPreparedFramePasses(frame, passes);
   }
 
   /**
@@ -3706,6 +3730,8 @@ export class TealchartRenderer {
     labelBounds?: PriceLineLabelBounds[],
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
+    passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
+    passOptions?: TealchartRenderPassOptions,
   ): void {
     const { ctx, options } = this;
 
@@ -3730,9 +3756,22 @@ export class TealchartRenderer {
         labelBounds,
         plotStyleOverrides,
         drawings,
+        passes,
+        passOptions,
       );
     } else {
-      this.renderIndicatorPaneContent(pane, bars, viewport, plots, indicatorPaneInfo, labelBounds, plotStyleOverrides, drawings);
+      this.renderIndicatorPaneContent(
+        pane,
+        bars,
+        viewport,
+        plots,
+        indicatorPaneInfo,
+        labelBounds,
+        plotStyleOverrides,
+        drawings,
+        passes,
+        passOptions,
+      );
     }
 
     ctx.restore();
@@ -3752,79 +3791,138 @@ export class TealchartRenderer {
     labelBounds?: PriceLineLabelBounds[],
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
+    passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
+    passOptions?: TealchartRenderPassOptions,
   ): void {
     const { options } = this;
 
-    // Draw grid for main pane
-    this.renderPaneGrid(pane, viewport);
-
-    // Jailbreak indicators: draw behind candles
-    if (this.jailbreakManager && this.jailbreakManager.size > 0 && bars.length > 0) {
-      const jailbreakArgs = this.buildJailbreakDrawArgs(bars, viewport, pane);
-      if (jailbreakArgs) {
-        this.jailbreakManager.drawBehindCandles(jailbreakArgs);
-      }
+    if (passes.has('main-price-grid')) {
+      this.renderPanePriceGrid(pane, passOptions?.valueAxisOverscanPx);
     }
 
-    // Draw candles (skip if a jailbreak indicator has hideCandles enabled)
+    if (passes.has('main-time-grid')) {
+      this.renderPaneTimeGrid(pane, viewport, passOptions?.timeAxisOverscanPx);
+    }
+
     const hideCandles = this.jailbreakManager?.hasSettingEnabled('hideCandles') ?? false;
-    if (!hideCandles) {
-      this.drawCandlesInPane(bars, viewport, pane, plots);
-    }
 
-    // Draw volume overlay (bottom 10% of main pane)
-    if (options.showVolume && !hideCandles) {
-      this.drawVolumeInPane(bars, viewport, pane);
-    }
-
-    // Jailbreak indicators: draw after candles
-    if (this.jailbreakManager && this.jailbreakManager.size > 0 && bars.length > 0) {
-      const jailbreakArgs = this.buildJailbreakDrawArgs(bars, viewport, pane);
-      if (jailbreakArgs) {
-        this.jailbreakManager.drawAfterCandles(jailbreakArgs);
-      }
-    }
-
-    // Draw overlay indicator plots (plots that share main pane Y-axis)
-    if (plots && indicatorPaneInfo) {
-      const overlayPlotsByScript = new Map<string, PlotOutput[]>();
-      for (const plot of plots) {
-        const scriptId = plot.scriptId ?? 'unknown';
-        const info = indicatorPaneInfo[scriptId];
-        if (info?.overlay !== false) {
-          const scriptPlots = overlayPlotsByScript.get(scriptId) ?? [];
-          scriptPlots.push(plot);
-          overlayPlotsByScript.set(scriptId, scriptPlots);
+    if (passes.has('main-price-base')) {
+      // Jailbreak indicators: draw behind candles
+      if (this.jailbreakManager && this.jailbreakManager.size > 0 && bars.length > 0) {
+        const jailbreakArgs = this.buildJailbreakDrawArgs(bars, viewport, pane);
+        if (jailbreakArgs) {
+          this.jailbreakManager.drawBehindCandles(jailbreakArgs);
         }
       }
-      for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
-        this.renderPlotsInComputedPane(
-          scriptPlots,
-          scriptPlots,
-          bars,
-          viewport,
-          pane,
-          indicatorPaneInfo[scriptId]?.explicitPlotZOrder,
-          plotStyleOverrides,
-        );
+
+      // Draw candles (skip if a jailbreak indicator has hideCandles enabled)
+      if (!hideCandles) {
+        this.drawCandlesInPane(bars, viewport, pane, plots, passOptions?.timeContentOverscanPx);
       }
     }
 
-    if (executionLines && executionLines.length > 0) {
-      this.drawExecutionMarkersInPane(executionLines, viewport, pane);
+    if (passes.has('main-volume-content') && options.showVolume && !hideCandles) {
+      this.drawVolumeInPane(bars, viewport, pane, passOptions?.timeContentOverscanPx);
     }
 
-    if (drawings && drawings.length > 0) {
-      const drawingPartition = partitionTealScriptDrawings(drawings);
-      this.renderTealScriptDrawings(drawingPartition, bars, viewport, pane);
+    if (passes.has('main-price-overlay-content')) {
+      this.renderOverlayIndicatorPlots(
+        plots,
+        indicatorPaneInfo,
+        bars,
+        viewport,
+        pane,
+        plotStyleOverrides,
+        'price',
+      );
     }
 
-    // Draw Y-axis (price axis) for main pane
-    this.renderPaneYAxis(pane, labelBounds);
+    if (passes.has('main-overlay-content')) {
+      // Jailbreak indicators: draw after candles
+      if (this.jailbreakManager && this.jailbreakManager.size > 0 && bars.length > 0) {
+        const jailbreakArgs = this.buildJailbreakDrawArgs(bars, viewport, pane);
+        if (jailbreakArgs) {
+          this.jailbreakManager.drawAfterCandles(jailbreakArgs);
+        }
+      }
 
-    // Draw price lines on top
+      // Draw overlay indicator plots (plots that share main pane Y-axis)
+      this.renderOverlayIndicatorPlots(
+        plots,
+        indicatorPaneInfo,
+        bars,
+        viewport,
+        pane,
+        plotStyleOverrides,
+        'time',
+      );
+
+      if (executionLines && executionLines.length > 0) {
+        this.drawExecutionMarkersInPane(executionLines, viewport, pane);
+      }
+
+      if (drawings && drawings.length > 0) {
+        const drawingPartition = partitionTealScriptDrawings(drawings);
+        this.renderTealScriptDrawings(drawingPartition, bars, viewport, pane);
+      }
+    }
+
+    if (passes.has('main-axis')) {
+      this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx);
+    }
+
     if (labelBounds && labelBounds.length > 0) {
-      this.drawPriceLinesInPane(labelBounds, viewport, pane);
+      if (passes.has('main-price-line-content') && passes.has('main-price-line-labels')) {
+        this.drawPriceLinesInPane(labelBounds, viewport, pane);
+      } else {
+        if (passes.has('main-price-line-content')) {
+          this.drawPriceLinesInPane(labelBounds, viewport, pane, 'content');
+        }
+        if (passes.has('main-price-line-labels')) {
+          this.drawPriceLinesInPane(labelBounds, viewport, pane, 'labels');
+        }
+      }
+    }
+  }
+
+  private renderOverlayIndicatorPlots(
+    plots: PlotOutput[] | undefined,
+    indicatorPaneInfo: Record<string, IndicatorPaneInfo> | undefined,
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    plotStyleOverrides: Map<string, PlotStyleOverride> | undefined,
+    domain: 'price' | 'time',
+  ): void {
+    if (!plots || !indicatorPaneInfo) return;
+
+    const overlayPlotsByScript = new Map<string, PlotOutput[]>();
+    for (const plot of plots) {
+      const scriptId = plot.scriptId ?? 'unknown';
+      const info = indicatorPaneInfo[scriptId];
+      if (info?.overlay !== false) {
+        const scriptPlots = overlayPlotsByScript.get(scriptId) ?? [];
+        scriptPlots.push(plot);
+        overlayPlotsByScript.set(scriptId, scriptPlots);
+      }
+    }
+
+    for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
+      const renderPlots =
+        domain === 'price'
+          ? scriptPlots.filter((plot) => plot.type === 'hline')
+          : scriptPlots.filter((plot) => plot.type !== 'hline');
+      if (renderPlots.length === 0) continue;
+
+      this.renderPlotsInComputedPane(
+        renderPlots,
+        scriptPlots,
+        bars,
+        viewport,
+        pane,
+        indicatorPaneInfo[scriptId]?.explicitPlotZOrder,
+        plotStyleOverrides,
+      );
     }
   }
 
@@ -4011,60 +4109,64 @@ export class TealchartRenderer {
     labelBounds?: PriceLineLabelBounds[],
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
+    passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
+    passOptions?: TealchartRenderPassOptions,
   ): void {
     const { ctx, options } = this;
 
-    // Draw pane background first (same as main chart for consistency)
-    ctx.fillStyle = options.backgroundColor;
-    ctx.fillRect(0, pane.top, options.width, pane.height);
+    if (passes.has('pane-chrome')) {
+      ctx.fillStyle = options.backgroundColor;
+      ctx.fillRect(0, pane.top, options.width, pane.height);
 
-    // Draw pane separator at top (draggable resize boundary)
-    this.drawPaneSeparatorLine(pane.top);
+      // Draw pane separator at top (draggable resize boundary)
+      this.drawPaneSeparatorLine(pane.top);
+    }
 
     // Note: Indicator legend is now rendered as React overlay in ChartContainer
     // for proper hover/click interactions (eye, settings, trash buttons)
 
-    // Draw grid for this pane
-    this.renderPaneGrid(pane, viewport);
+    if (passes.has('indicator-price-grid')) {
+      this.renderPanePriceGrid(pane, passOptions?.valueAxisOverscanPx);
+    }
 
-    // Get plots for this pane's indicators
-    if (plots && pane.indicatorIds) {
-      // Y ranges are now computed by AutoScaleManager and set via getUnifiedLayout()
-      // before rendering. No inline auto-scale needed.
+    if (passes.has('indicator-time-grid')) {
+      this.renderPaneTimeGrid(pane, viewport, passOptions?.timeAxisOverscanPx);
+    }
 
-      const plotsByScript = new Map<string, PlotOutput[]>();
-      for (const plot of plots) {
-        const scriptId = plot.scriptId ?? 'unknown';
-        if (pane.indicatorIds.includes(scriptId)) {
-          const scriptPlots = plotsByScript.get(scriptId) ?? [];
-          scriptPlots.push(plot);
-          plotsByScript.set(scriptId, scriptPlots);
-        }
-      }
+    if (passes.has('indicator-price-content')) {
+      this.renderIndicatorPanePlots(
+        pane,
+        bars,
+        viewport,
+        plots,
+        indicatorPaneInfo,
+        plotStyleOverrides,
+        'price',
+      );
+    }
 
-      for (const [scriptId, scriptPlots] of plotsByScript) {
-        this.renderPlotsInComputedPane(
-          scriptPlots,
-          scriptPlots,
-          bars,
-          viewport,
-          pane,
-          indicatorPaneInfo?.[scriptId]?.explicitPlotZOrder,
-          plotStyleOverrides,
-        );
+    if (passes.has('indicator-content')) {
+      this.renderIndicatorPanePlots(
+        pane,
+        bars,
+        viewport,
+        plots,
+        indicatorPaneInfo,
+        plotStyleOverrides,
+        'time',
+      );
+
+      if (drawings && drawings.length > 0) {
+        const drawingPartition = partitionTealScriptDrawings(drawings);
+        this.renderTealScriptDrawings(drawingPartition, bars, viewport, pane);
       }
     }
 
-    if (drawings && drawings.length > 0) {
-      const drawingPartition = partitionTealScriptDrawings(drawings);
-      this.renderTealScriptDrawings(drawingPartition, bars, viewport, pane);
+    if (passes.has('indicator-axis')) {
+      this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx);
     }
 
-    // Draw Y-axis for indicator pane
-    this.renderPaneYAxis(pane, labelBounds);
-
-    // Draw price lines on top
-    if (labelBounds && labelBounds.length > 0) {
+    if (passes.has('indicator-price-lines') && labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
     }
   }
@@ -4073,28 +4175,99 @@ export class TealchartRenderer {
    * Render grid lines within a pane
    */
   private renderPaneGrid(pane: ComputedPane, viewport: Viewport): void {
+    this.renderPanePriceGrid(pane);
+    this.renderPaneTimeGrid(pane, viewport);
+  }
+
+  private renderIndicatorPanePlots(
+    pane: ComputedPane,
+    bars: Bar[],
+    viewport: Viewport,
+    plots: PlotOutput[] | undefined,
+    indicatorPaneInfo: Record<string, IndicatorPaneInfo> | undefined,
+    plotStyleOverrides: Map<string, PlotStyleOverride> | undefined,
+    domain: 'price' | 'time',
+  ): void {
+    if (!plots || !pane.indicatorIds) return;
+
+    const plotsByScript = new Map<string, PlotOutput[]>();
+    for (const plot of plots) {
+      const scriptId = plot.scriptId ?? 'unknown';
+      if (pane.indicatorIds.includes(scriptId)) {
+        const scriptPlots = plotsByScript.get(scriptId) ?? [];
+        scriptPlots.push(plot);
+        plotsByScript.set(scriptId, scriptPlots);
+      }
+    }
+
+    for (const [scriptId, scriptPlots] of plotsByScript) {
+      const renderPlots =
+        domain === 'price'
+          ? scriptPlots.filter((plot) => plot.type === 'hline')
+          : scriptPlots.filter((plot) => plot.type !== 'hline');
+      if (renderPlots.length === 0) continue;
+
+      this.renderPlotsInComputedPane(
+        renderPlots,
+        scriptPlots,
+        bars,
+        viewport,
+        pane,
+        indicatorPaneInfo?.[scriptId]?.explicitPlotZOrder,
+        plotStyleOverrides,
+      );
+    }
+  }
+
+  /**
+   * Render horizontal value grid lines within a pane.
+   */
+  private renderPanePriceGrid(pane: ComputedPane, valueAxisOverscanPx = 0): void {
     const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left - margins.right;
 
     ctx.strokeStyle = options.gridColor;
     ctx.lineWidth = 1;
 
-    // Horizontal grid lines
-    const gridLines = this.generatePaneGridLines(pane.yMin, pane.yMax, pane.height);
+    if (pane.height <= 0) return;
+
+    const overscanPx = Math.max(0, valueAxisOverscanPx);
+    const valuePerPixel = (pane.yMax - pane.yMin) / pane.height;
+    const yMin = pane.yMin - valuePerPixel * overscanPx;
+    const yMax = pane.yMax + valuePerPixel * overscanPx;
+    const gridLines = this.generatePaneGridLines(yMin, yMax, pane.height + overscanPx * 2);
     for (const value of gridLines) {
       const y = this.valueToY(value, pane);
-      if (y >= pane.top && y <= pane.bottom) {
+      if (y >= pane.top - overscanPx && y <= pane.bottom + overscanPx) {
         ctx.beginPath();
         ctx.moveTo(margins.left, y);
         ctx.lineTo(options.width, y); // Extend under Y-axis for transparency
         ctx.stroke();
       }
     }
+  }
 
-    // Vertical grid lines (time intervals) - shared across all panes
-    const timeMarkers = this.generateTimeMarkers(viewport, chartWidth);
+  /**
+   * Render vertical time grid lines within a pane.
+   */
+  private renderPaneTimeGrid(pane: ComputedPane, viewport: Viewport, timeAxisOverscanPx = 0): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    if (chartWidth <= 0) return;
+    const overscanPx = Math.max(0, timeAxisOverscanPx);
+    const timePerPixel = (viewport.endTime - viewport.startTime) / chartWidth;
+    const markerViewport = {
+      ...viewport,
+      startTime: viewport.startTime - timePerPixel * overscanPx,
+      endTime: viewport.endTime + timePerPixel * overscanPx,
+    };
+
+    ctx.strokeStyle = options.gridColor;
+    ctx.lineWidth = 1;
+
+    const timeMarkers = this.generateTimeMarkers(markerViewport, chartWidth + overscanPx * 2);
     for (const { time } of timeMarkers) {
       const x = this.timeToX(time, viewport, chartWidth);
+      if (x < margins.left - overscanPx || x > options.width + overscanPx) continue;
       ctx.beginPath();
       ctx.moveTo(x, pane.top);
       ctx.lineTo(x, pane.bottom);
@@ -4105,10 +4278,49 @@ export class TealchartRenderer {
   /**
    * Render Y-axis labels for a pane
    */
-  private renderPaneYAxis(pane: ComputedPane, priceLineBounds?: PriceLineLabelBounds[]): void {
-    const { ctx, options, margins } = this;
+  private renderPaneYAxis(
+    pane: ComputedPane,
+    priceLineBounds?: PriceLineLabelBounds[],
+    valueAxisOverscanPx = 0,
+  ): void {
+    const { ctx } = this;
 
-    const gridLines = this.generatePaneGridLines(pane.yMin, pane.yMax, pane.height);
+    const labels = this.computePaneYAxisLabels(pane, priceLineBounds, valueAxisOverscanPx);
+
+    ctx.font = `11px ${this.font}`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    for (const label of labels) {
+      ctx.fillStyle = label.color;
+      ctx.fillText(label.text, label.x, label.y);
+    }
+  }
+
+  computeYAxisLabelsForPreparedFrame(
+    frame: TealchartPreparedRenderFrame,
+    paneId = 'main',
+    valueAxisOverscanPx = 0,
+  ): ValueAxisLabelRenderData[] {
+    const pane = frame.computedPanes.find((computedPane) => computedPane.id === paneId);
+    if (!pane) return [];
+    return this.computePaneYAxisLabels(pane, frame.labelBoundsByPane.get(pane.id), valueAxisOverscanPx);
+  }
+
+  private computePaneYAxisLabels(
+    pane: ComputedPane,
+    priceLineBounds?: PriceLineLabelBounds[],
+    valueAxisOverscanPx = 0,
+  ): ValueAxisLabelRenderData[] {
+    const { options, margins } = this;
+
+    if (pane.height <= 0) return [];
+
+    const overscanPx = Math.max(0, valueAxisOverscanPx);
+    const valuePerPixel = (pane.yMax - pane.yMin) / pane.height;
+    const yMin = pane.yMin - valuePerPixel * overscanPx;
+    const yMax = pane.yMax + valuePerPixel * overscanPx;
+    const gridLines = this.generatePaneGridLines(yMin, yMax, pane.height + overscanPx * 2);
 
     // Calculate decimals based on range
     const range = pane.yMax - pane.yMin;
@@ -4120,11 +4332,7 @@ export class TealchartRenderer {
     }
     const formatter = getNumberFormatter(decimals);
 
-    ctx.fillStyle = options.textColor;
-    ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-
+    const labels: ValueAxisLabelRenderData[] = [];
     const labelRightEdge = options.width - 4;
     // For main pane, labels should stay below the transparent top bar (safe zone)
     const visibleTop = pane.type === 'main' ? margins.top : pane.top;
@@ -4133,7 +4341,7 @@ export class TealchartRenderer {
       const y = this.valueToY(value, pane);
 
       // Skip if outside visible bounds (respecting top bar safe zone for main pane)
-      if (y < visibleTop || y > pane.bottom) continue;
+      if (y < visibleTop - overscanPx || y > pane.bottom + overscanPx) continue;
 
       // Skip if would overlap with price line labels (main pane only)
       if (priceLineBounds) {
@@ -4145,8 +4353,19 @@ export class TealchartRenderer {
         if (wouldOverlap) continue;
       }
 
-      ctx.fillText(formatter.format(value), labelRightEdge, y);
+      labels.push({
+        id: `${pane.id}:value-axis:${value}`,
+        paneId: pane.id,
+        value,
+        text: formatter.format(value),
+        x: labelRightEdge,
+        y,
+        color: options.textColor,
+        fontSize: 11,
+      });
     }
+
+    return labels;
   }
 
   /**
@@ -4167,10 +4386,17 @@ export class TealchartRenderer {
     return override;
   }
 
-  private drawCandlesInPane(bars: Bar[], viewport: Viewport, pane: ComputedPane, plots?: PlotOutput[]): void {
+  private drawCandlesInPane(
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    plots?: PlotOutput[],
+    timeContentOverscanPx = 0,
+  ): void {
     const { ctx, options, margins } = this;
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
+    if (chartWidth <= 0) return;
 
     // Calculate candle width
     const viewportTimeRange = viewport.endTime - viewport.startTime;
@@ -4183,9 +4409,12 @@ export class TealchartRenderer {
     const slotWidth = barInterval * pixelsPerMs;
     const spacingRatio = 0.2;
     const candleWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
+    const overscanTime = Math.max(0, timeContentOverscanPx) / pixelsPerMs;
+    const minVisibleTime = viewport.startTime - overscanTime;
+    const maxVisibleTime = viewport.endTime + overscanTime;
 
     for (const [barIndex, bar] of bars.entries()) {
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
+      if (bar.time < minVisibleTime || bar.time > maxVisibleTime) continue;
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
       const isUp = bar.close >= bar.open;
@@ -4216,14 +4445,18 @@ export class TealchartRenderer {
   /**
    * Draw volume overlay within the main pane (bottom portion)
    */
-  private drawVolumeInPane(bars: Bar[], viewport: Viewport, pane: ComputedPane): void {
+  private drawVolumeInPane(
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    timeContentOverscanPx = 0,
+  ): void {
     const { ctx, options, margins } = this;
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
+    if (chartWidth <= 0) return;
 
-    // Volume uses bottom 15% of main pane
-    const volumeRatio = 0.15;
-    const volumeHeight = pane.height * volumeRatio;
+    const volumeHeight = pane.height * MAIN_VOLUME_OVERLAY_RATIO;
 
     const maxVolume = Math.max(...bars.map((b) => b.volume));
     if (maxVolume === 0) return;
@@ -4239,9 +4472,12 @@ export class TealchartRenderer {
     const slotWidth = barInterval * pixelsPerMs;
     const spacingRatio = 0.2;
     const barWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
+    const overscanTime = Math.max(0, timeContentOverscanPx) / pixelsPerMs;
+    const minVisibleTime = viewport.startTime - overscanTime;
+    const maxVisibleTime = viewport.endTime + overscanTime;
 
     for (const bar of bars) {
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
+      if (bar.time < minVisibleTime || bar.time > maxVisibleTime) continue;
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
       const isUp = bar.close >= bar.open;
@@ -4684,19 +4920,24 @@ export class TealchartRenderer {
   /**
    * Draw price lines within a specific pane
    */
-  private drawPriceLinesInPane(bounds: PriceLineLabelBounds[], viewport: Viewport, pane: ComputedPane): void {
+  private drawPriceLinesInPane(
+    bounds: PriceLineLabelBounds[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    part: PriceLineRenderPart = 'all',
+  ): void {
     for (const bound of bounds) {
       const lineType = bound.type || 'price';
 
       if (lineType === 'price') {
-        this.drawSimplePriceLineInPane(bound, viewport, pane);
+        this.drawSimplePriceLineInPane(bound, viewport, pane, part);
       } else if (lineType === 'order' || lineType === 'position') {
         // Order/position labels and controls are handled by PriceLineManager via Konva.
         // ChartCore filters these bounds out of the main canvas render path, so this is
         // effectively a fallback if order/position bounds are ever passed through again.
-        this.drawTradingLineOnCanvas(bound, viewport, pane);
+        this.drawTradingLineOnCanvas(bound, viewport, pane, part);
       } else {
-        this.drawTradingLineInPane(bound, viewport, pane);
+        this.drawTradingLineInPane(bound, viewport, pane, part);
       }
     }
   }
@@ -4704,8 +4945,15 @@ export class TealchartRenderer {
   /**
    * Draw a simple price line within a pane
    */
-  private drawSimplePriceLineInPane(bound: PriceLineLabelBounds, viewport: Viewport, pane: ComputedPane): void {
+  private drawSimplePriceLineInPane(
+    bound: PriceLineLabelBounds,
+    viewport: Viewport,
+    pane: ComputedPane,
+    part: PriceLineRenderPart = 'all',
+  ): void {
     const { ctx, options, margins } = this;
+    const drawContent = part !== 'labels';
+    const drawLabels = part !== 'content';
 
     const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
     const color = bound.color;
@@ -4715,28 +4963,30 @@ export class TealchartRenderer {
     const labelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const labelY = labelCenterY - bound.height / 2;
 
-    // Draw horizontal line - stop before label with gap
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = bound.lineWidth || 1;
-    if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-    else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
+    if (drawContent) {
+      // Draw horizontal line - stop before label with gap
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = bound.lineWidth || 1;
+      if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
+      else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
 
-    ctx.beginPath();
-    ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX - PRICE_AXIS_RIGHT_PADDING, lineY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
+      ctx.beginPath();
+      ctx.moveTo(margins.left, lineY);
+      ctx.lineTo(labelX - PRICE_AXIS_RIGHT_PADDING, lineY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
 
     // For lines with renderLineOnCanvas, skip connector and label
     // (Konva handles these for collision resolution with order/position labels)
-    if (bound.renderLineOnCanvas) {
+    if (bound.renderLineOnCanvas || !drawLabels) {
       return;
     }
 
     // Connector
-    if (Math.abs(labelCenterY - lineY) > 2) {
+    if (drawLabels && Math.abs(labelCenterY - lineY) > 2) {
       ctx.save();
       ctx.strokeStyle = color;
       ctx.lineWidth = 1;
@@ -4775,7 +5025,14 @@ export class TealchartRenderer {
    * Draw only the horizontal line for an order/position on canvas.
    * Labels and buttons are rendered by PriceLineManager on the Konva overlay.
    */
-  private drawTradingLineOnCanvas(bound: PriceLineLabelBounds, _viewport: Viewport, pane: ComputedPane): void {
+  private drawTradingLineOnCanvas(
+    bound: PriceLineLabelBounds,
+    _viewport: Viewport,
+    pane: ComputedPane,
+    part: PriceLineRenderPart = 'all',
+  ): void {
+    if (part === 'labels') return;
+
     const { ctx, options, margins } = this;
 
     const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
@@ -4793,7 +5050,7 @@ export class TealchartRenderer {
     else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
 
     ctx.beginPath();
-    ctx.moveTo(getTradingLineMinX(margins), lineY);
+    ctx.moveTo(getTradingLineMinX(margins, options.chartLabelMinX), lineY);
     ctx.lineTo(priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY);
     ctx.stroke();
 
@@ -4804,8 +5061,15 @@ export class TealchartRenderer {
   /**
    * Draw trading line (order/position/liquidation) within a pane
    */
-  private drawTradingLineInPane(bound: PriceLineLabelBounds, viewport: Viewport, pane: ComputedPane): void {
+  private drawTradingLineInPane(
+    bound: PriceLineLabelBounds,
+    viewport: Viewport,
+    pane: ComputedPane,
+    part: PriceLineRenderPart = 'all',
+  ): void {
     const { ctx, options, margins } = this;
+    const drawContent = part !== 'labels';
+    const drawLabels = part !== 'content';
 
     const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
     const color = bound.color;
@@ -4817,7 +5081,7 @@ export class TealchartRenderer {
     // Calculate chart label dimensions
     const chartLabel = bound.chartLabel;
     let chartLabelWidth = 0;
-    const lineStartX = getTradingLineMinX(margins);
+    const lineStartX = getTradingLineMinX(margins, options.chartLabelMinX);
     let chartLabelX = lineStartX;
     const labelHeight = 18;
 
@@ -4838,33 +5102,35 @@ export class TealchartRenderer {
       chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
-    // Draw line segments
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-    else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
+    if (drawContent) {
+      // Draw line segments
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
+      else if (bound.lineStyle === 'dotted') ctx.setLineDash(TRADE_LINE_DOTTED_DASH_PATTERN);
 
-    if (chartLabel && chartLabel.segments.length > 0) {
-      const lineEndX = chartLabelX - 4;
-      if (extendLeft && lineEndX > lineStartX) {
+      if (chartLabel && chartLabel.segments.length > 0) {
+        const lineEndX = chartLabelX - 4;
+        if (extendLeft && lineEndX > lineStartX) {
+          ctx.beginPath();
+          ctx.moveTo(lineStartX, lineY);
+          ctx.lineTo(lineEndX, lineY);
+          ctx.stroke();
+        }
+      } else {
+        const priceAxisLabelX = options.width - bound.width;
         ctx.beginPath();
         ctx.moveTo(lineStartX, lineY);
-        ctx.lineTo(lineEndX, lineY);
+        ctx.lineTo(priceAxisLabelX, lineY);
         ctx.stroke();
       }
-    } else {
-      const priceAxisLabelX = options.width - bound.width;
-      ctx.beginPath();
-      ctx.moveTo(lineStartX, lineY);
-      ctx.lineTo(priceAxisLabelX, lineY);
-      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
     }
-    ctx.setLineDash([]);
-    ctx.restore();
 
     // Draw chart label if present
-    if (chartLabel && chartLabel.segments.length > 0) {
+    if (drawContent && chartLabel && chartLabel.segments.length > 0) {
       const chartLabelY = lineY - labelHeight / 2;
       let currentX = chartLabelX;
 
@@ -4943,12 +5209,14 @@ export class TealchartRenderer {
       }
     }
 
+    if (!drawLabels) return;
+
     // Price axis label
     const priceAxisLabelX = options.width - bound.width;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Connector
-    if (Math.abs(labelCenterY - lineY) > 2) {
+    if (drawLabels && Math.abs(labelCenterY - lineY) > 2) {
       ctx.save();
       ctx.strokeStyle = color;
       ctx.lineWidth = 1;

@@ -1309,6 +1309,7 @@ function parseDefaultStylesByKind(value: unknown): Partial<Record<UserDrawingKin
 
 export function serializeUserDrawingStateForLayout(state?: UserDrawingState | null): UserDrawingState | undefined {
   const favoriteTools = state?.favoriteTools ?? [];
+  const favoriteToolbarPosition = state?.favoriteToolbarPosition ?? null;
   const defaultStylesByKind = serializeDefaultStylesByKind(state?.defaultStylesByKind);
   if (
     !state ||
@@ -1316,6 +1317,7 @@ export function serializeUserDrawingStateForLayout(state?: UserDrawingState | nu
       state.stayInDrawingMode !== true &&
       (state.magnetMode ?? 'off') === 'off' &&
       favoriteTools.length === 0 &&
+      favoriteToolbarPosition === null &&
       Object.keys(defaultStylesByKind).length === 0)
   )
     return undefined;
@@ -1355,6 +1357,7 @@ export function deserializeUserDrawingStateFromLayout(state?: unknown): UserDraw
     state.stayInDrawingMode !== true &&
     magnetMode === 'off' &&
     favoriteTools.length === 0 &&
+    favoriteToolbarPosition === null &&
     Object.keys(defaultStylesByKind).length === 0
   )
     return undefined;
@@ -1374,8 +1377,11 @@ export function isUserDrawingLayoutStateEqual(
   previous?: UserDrawingState | null,
   next?: UserDrawingState | null,
 ): boolean {
-  return (
-    JSON.stringify(serializeUserDrawingStateForLayout(previous) ?? null) ===
-    JSON.stringify(serializeUserDrawingStateForLayout(next) ?? null)
-  );
+  if (Object.is(previous, next)) return true;
+
+  const previousLayout = serializeUserDrawingStateForLayout(previous);
+  const nextLayout = serializeUserDrawingStateForLayout(next);
+  if (!previousLayout || !nextLayout) return Object.is(previousLayout, nextLayout);
+
+  return JSON.stringify(previousLayout) === JSON.stringify(nextLayout);
 }

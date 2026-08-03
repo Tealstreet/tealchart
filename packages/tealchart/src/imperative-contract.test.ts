@@ -494,9 +494,13 @@ describe('imperative chart API contract', () => {
   it('renders native trading lines from adapter snapshots', () => {
     const source = readSource('SkiaTealchart.tsx');
 
-    expect(source).toContain('const lineRenderSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
-    expect(source).toContain('const orderLines = lineRenderSnapshot.orderLines;');
-    expect(source).toContain('const positionLines = lineRenderSnapshot.positionLines;');
+    expect(source).toContain('const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
+    expect(source).toContain('confirmOrderLineSnapshots(oemsActions, rawLineSnapshot.orderLines);');
+    expect(source).toContain('confirmPositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);');
+    expect(source).toContain('orderLines: rawLineSnapshot.orderLines.map((line) => applyOrderActionState(line, oemsActions)),');
+    expect(source).toContain('positionLines: rawLineSnapshot.positionLines.map((line) => applyPositionActionState(line, oemsActions)),');
+    expect(source).toContain('{lineSnapshot.orderLines.map((line) => {');
+    expect(source).toContain('{lineSnapshot.positionLines.map((line) => {');
     expect(source).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
     expect(source).not.toContain('onPriceChange={onOrderMove}');
     expect(source).not.toContain('onCancel={onOrderCancel}');
