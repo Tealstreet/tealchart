@@ -12,6 +12,7 @@ import { MobileIndicatorManager } from './MobileIndicatorManager';
 
 export interface NativeTealchartCoreRuntimeInput {
   datafeed?: IBasicDataFeed;
+  onLayoutDirty?: () => void;
   onIntervalChange?: (interval: string) => void;
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
@@ -22,6 +23,7 @@ export interface NativeTealchartCoreRuntimeInput {
 
 export function useNativeTealchartCoreRuntime({
   datafeed,
+  onLayoutDirty,
   onIntervalChange,
   onSymbolChange,
   onTealscriptError,
@@ -65,17 +67,20 @@ export function useNativeTealchartCoreRuntime({
       indicatorManagerRef.current?.addTealscriptIndicator({
         id: request.studyId,
         code,
+        builtinId: indicator?.id,
         name: request.options?.displayName ?? indicator?.name ?? request.displayName,
         overlay: request.forceOverlay || (indicator?.overlay ?? false),
         inputs: request.inputs,
         yAxisRange: indicator?.yAxisRange,
       });
+      onLayoutDirty?.();
       return true;
     });
     chartApi.setOnStudyRemove((studyId) => {
       indicatorManagerRef.current?.removeIndicator(studyId);
+      onLayoutDirty?.();
     });
-  }, [chartApi, coreResult.setInterval, coreResult.setSymbol, forceUpdate]);
+  }, [chartApi, coreResult.setInterval, coreResult.setSymbol, forceUpdate, onLayoutDirty]);
 
   useEffect(() => {
     const manager = indicatorManagerRef.current;
@@ -104,6 +109,7 @@ export function useNativeTealchartCoreRuntime({
     chartApi,
     forceUpdate,
     imperativeTheme,
+    indicatorManager: indicatorManagerRef.current,
     interval,
     isLoading,
     isLoadingMoreBars,

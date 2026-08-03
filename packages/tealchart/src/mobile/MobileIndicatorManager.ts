@@ -24,7 +24,7 @@ import type {
   WorkerError,
 } from '@tealstreet/tealscript';
 import type { EventCallback } from '../events/EventEmitter';
-import type { PlotStyleOverride } from '../state/chartState';
+import type { IndicatorInstance, PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
 import { parse, TealscriptEngine, TealscriptParseError } from '@tealstreet/tealscript';
@@ -41,6 +41,8 @@ export interface ActiveIndicator {
   instanceId: string;
   /** The base indicator definition */
   indicator: BuiltinIndicator;
+  /** Built-in id to write into saved chart layouts when the indicator was created from a built-in id. */
+  layoutBuiltinId?: string;
   /** Current input values */
   inputs?: Record<string, unknown>;
   /** Parsed AST (cached for performance) */
@@ -70,6 +72,8 @@ export interface MobileTealscriptIndicatorOptions {
   id?: string;
   /** Raw Tealscript source. */
   code: string;
+  /** Built-in indicator id used for layout restore, when this source came from the built-in registry. */
+  builtinId?: string;
   /** Display name shown in pane labels/settings. */
   name?: string;
   /** Whether the indicator renders on the main price pane. Defaults to false. */
@@ -184,6 +188,7 @@ export class MobileIndicatorManager {
     this._indicators.push({
       instanceId,
       indicator,
+      layoutBuiltinId: indicator.id,
       inputs,
       ast,
     });
@@ -233,6 +238,7 @@ export class MobileIndicatorManager {
     this._indicators.push({
       instanceId,
       indicator,
+      layoutBuiltinId: options.builtinId,
       inputs: options.inputs,
       ast,
     });
@@ -299,6 +305,21 @@ export class MobileIndicatorManager {
    */
   getIndicators(): ActiveIndicator[] {
     return [...this._indicators];
+  }
+
+  /**
+   * Snapshot indicators into the shared layout schema.
+   */
+  getLayoutIndicators(): IndicatorInstance[] {
+    return this._indicators.map((activeIndicator, index) => ({
+      id: activeIndicator.instanceId,
+      name: activeIndicator.indicator.name,
+      builtinId: activeIndicator.layoutBuiltinId ?? activeIndicator.indicator.id,
+      inputs: activeIndicator.inputs ?? {},
+      styleOverrides: activeIndicator.styleOverrides,
+      isVisible: true,
+      createdAt: index,
+    }));
   }
 
   /**

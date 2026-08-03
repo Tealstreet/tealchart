@@ -55,6 +55,7 @@ export interface NativeUserDrawingRuntime {
   dispatchNativeUserDrawingSelectedAction: (command: UserDrawingSelectedActionSurfaceCommand) => boolean;
   handleNativeUserDrawingInput: (point: UserDrawingInputPoint) => boolean;
   redoNativeUserDrawingCommand: () => boolean;
+  replaceNativeUserDrawingState: (nextState?: UserDrawingState | null) => boolean;
   selectNativeUserDrawingAtPoint: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
@@ -588,6 +589,32 @@ export function useNativeUserDrawingRuntime({
     return result.changed;
   }, [setNativeUserDrawingState]);
 
+  const replaceNativeUserDrawingState = useCallback(
+    (nextState?: UserDrawingState | null): boolean => {
+      const previousState = stateRef.current;
+      const nextStateValue = createUserDrawingState(nextState ?? undefined);
+      if (isNativeUserDrawingRuntimeStateEqual(previousState, nextStateValue)) return false;
+
+      const previousHistory = historyRef.current;
+      const nextHistory = isUserDrawingLayoutStateEqual(previousState, nextStateValue)
+        ? previousHistory
+        : createUserDrawingCommandHistory({ capacity: previousHistory.capacity });
+      historyRef.current = nextHistory;
+      setNativeUserDrawingState(nextStateValue);
+
+      const event = createUserDrawingReplaceStateCommandEvent(previousState, nextStateValue, {
+        type: 'replaceState',
+        meta: { source: 'layout' },
+      });
+      if (event) onCommandRef.current?.(event);
+      if (didUserDrawingHistoryAvailabilityChange(previousHistory, nextHistory)) {
+        bumpHistoryRevision();
+      }
+      return true;
+    },
+    [setNativeUserDrawingState],
+  );
+
   const userDrawingCommandAvailability = useMemo(
     () => ({
       canUndo: canUndoUserDrawingCommand(historyRef.current),
@@ -601,6 +628,7 @@ export function useNativeUserDrawingRuntime({
     dispatchNativeUserDrawingSelectedAction,
     handleNativeUserDrawingInput,
     redoNativeUserDrawingCommand,
+    replaceNativeUserDrawingState,
     selectNativeUserDrawingAtPoint,
     selectNativeUserDrawingTool,
     undoNativeUserDrawingCommand,

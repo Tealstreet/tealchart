@@ -9,6 +9,8 @@ import type {
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { ChartThemeInput } from './theme';
+import type { ChartSettings } from './state/chartState';
+import type { ISaveLoadAdapter } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
   ContextMenuCallback,
@@ -41,6 +43,7 @@ import {
   resolveUserDrawingRenderEntriesFromSlices,
   resolveUserDrawingSelectionActionAnchorFromDrawings,
 } from './drawings';
+import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
 import {
   NATIVE_RESET_VIEW_DISMISS_MS,
@@ -77,6 +80,11 @@ import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock
 import { NativeUserDrawingSelectionActionOverlay } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
+import {
+  createNativeChartLayoutSettings,
+  resolveNativeDefaultLayoutPersistence,
+  useNativeLayoutPersistence,
+} from './mobile/useNativeLayoutPersistence';
 import { useNativeTealchartCoreRuntime } from './mobile/useNativeTealchartCoreRuntime';
 import { resolveNativeLeftToolRailToggleHitRect } from './mobile/utils/leftToolRailLayout';
 import {
@@ -132,6 +140,9 @@ export interface SkiaTealchartProps {
   showTopBar?: boolean;
   supportedResolutions?: ResolutionString[];
   uiPreferencesStorage?: TealchartKeyValueStorage | null;
+  save_load_adapter?: ISaveLoadAdapter | null;
+  disable_default_layout_persistence?: boolean;
+  auto_save_delay?: number;
   userDrawingState?: UserDrawingState;
   onIndicatorsClick?: () => void;
   onContextMenu?: ContextMenuCallback;
@@ -172,6 +183,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     resizeFreeze = false,
     chartKey: propChartKey,
     uiPreferencesStorage,
+    save_load_adapter,
+    disable_default_layout_persistence,
+    auto_save_delay,
   },
   ref,
 ) {
@@ -193,6 +207,42 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const layoutPropHeight = resizeLayoutFrozen ? resizeSnapshot.height : propHeight;
   const layoutPropWidth = resizeLayoutFrozen ? resizeSnapshot.width : propWidth;
   const chartKey = propChartKey ?? propSymbol;
+  const nativeLayoutDirtyRef = useRef<() => void>(() => undefined);
+  const markNativeLayoutDirtyIfReady = useCallback(() => {
+    nativeLayoutDirtyRef.current();
+  }, []);
+  const handleNativeIntervalChangeForLayout = useCallback(
+    (nextInterval: string) => {
+      onIntervalChange?.(nextInterval);
+      markNativeLayoutDirtyIfReady();
+    },
+    [markNativeLayoutDirtyIfReady, onIntervalChange],
+  );
+  const handleNativeSymbolChangeForLayout = useCallback(
+    (nextSymbol: string) => {
+      onSymbolChange?.(nextSymbol);
+      markNativeLayoutDirtyIfReady();
+    },
+    [markNativeLayoutDirtyIfReady, onSymbolChange],
+  );
+  const handleNativeUserDrawingCommandForLayout: UserDrawingCommandEventListener = useCallback(
+    (event) => {
+      onUserDrawingCommand?.(event);
+      if (event.source !== 'layout') markNativeLayoutDirtyIfReady();
+    },
+    [markNativeLayoutDirtyIfReady, onUserDrawingCommand],
+  );
+  const nativeLayoutPersistence = useMemo(
+    () =>
+      resolveNativeDefaultLayoutPersistence({
+        autoSaveDelay: auto_save_delay,
+        chartKey: `${chartKey}:${propSymbol}`,
+        disableDefaultLayoutPersistence: disable_default_layout_persistence,
+        saveLoadAdapter: save_load_adapter,
+        storage: uiPreferencesStorage,
+      }),
+    [auto_save_delay, chartKey, disable_default_layout_persistence, propSymbol, save_load_adapter, uiPreferencesStorage],
+  );
   const chartStore = useMemo(
     () =>
       getChartStore(chartKey, {
@@ -233,6 +283,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chartApi,
     forceUpdate,
     imperativeTheme,
+    indicatorManager,
     interval,
     isLoading,
     isLoadingMoreBars,
@@ -241,8 +292,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     symbol,
   } = useNativeTealchartCoreRuntime({
     datafeed,
-    onIntervalChange,
-    onSymbolChange,
+    onIntervalChange: handleNativeIntervalChangeForLayout,
+    onLayoutDirty: markNativeLayoutDirtyIfReady,
+    onSymbolChange: handleNativeSymbolChangeForLayout,
     onTealscriptError,
     propInterval,
     propSymbol,
@@ -255,6 +307,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativePricePrecision = useMemo(
     () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision),
     [pricePrecision],
+  );
+  const handleNativeViewportChangeForLayout = useCallback(
+    (nextViewport: Viewport) => {
+      onViewportChange?.(nextViewport);
+      markNativeLayoutDirtyIfReady();
+    },
+    [markNativeLayoutDirtyIfReady, onViewportChange],
   );
   const loadedBarsInterval = bars.length > 0 ? (barsContext?.interval ?? interval) : interval;
   const {
@@ -324,6 +383,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     beginNativeViewportInteraction,
     cancelNativeViewportInteraction,
     commitPanViewport,
+    applyNativeViewport,
     dataLoadRenderBlocked,
     hasDataViewport,
     projection,
@@ -338,7 +398,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     isLoading,
     loadedBarsInterval,
     onRequestMoreBars: requestMoreBars,
-    onViewportChange,
+    onViewportChange: handleNativeViewportChangeForLayout,
     panActive,
     panMetrics,
     panStartViewport,
@@ -447,6 +507,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     dispatchNativeUserDrawingSelectedAction,
     handleNativeUserDrawingInput,
     redoNativeUserDrawingCommand,
+    replaceNativeUserDrawingState,
     selectNativeUserDrawingAtPoint,
     selectNativeUserDrawingTool,
     undoNativeUserDrawingCommand,
@@ -455,9 +516,78 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingState: nativeUserDrawingState,
   } = useNativeUserDrawingRuntime({
     initialUserDrawingState: userDrawingState,
-    onUserDrawingCommand,
+    onUserDrawingCommand: handleNativeUserDrawingCommandForLayout,
     onUserDrawingStateChange,
   });
+  const applyNativeLayoutSettings = useCallback(
+    async (settings: ChartSettings) => {
+      if (settings.interval && settings.interval !== chartApi.resolution()) {
+        setNativeDisplayedInterval(settings.interval);
+        chartApi.setResolution(settings.interval);
+      }
+
+      for (const study of chartApi.getAllStudies()) {
+        chartApi.removeStudy(study.id);
+      }
+      for (const indicator of settings.indicators ?? []) {
+        const builtinIndicator = getIndicatorById(indicator.builtinId);
+        if (!builtinIndicator) continue;
+        await chartApi.createStudy(
+          builtinIndicator.id,
+          builtinIndicator.overlay,
+          false,
+          indicator.inputs,
+          {},
+          { displayName: indicator.name },
+        );
+      }
+
+      replaceNativeUserDrawingState(settings.userDrawingState);
+      chartStore.settings.set({
+        ...chartStore.settings.get(),
+        autoScale: settings.autoScale,
+        chartType: settings.chartType || 'candle',
+        indicators: settings.indicators || [],
+        interval: settings.interval || interval,
+        showVolume: settings.showVolume,
+        symbol,
+        userDrawingState: settings.userDrawingState,
+        viewport: settings.viewport,
+        volumeHeight: settings.volumeHeight,
+      });
+      if (settings.viewport) {
+        applyNativeViewport(settings.viewport);
+      }
+    },
+    [applyNativeViewport, chartApi, chartStore, interval, replaceNativeUserDrawingState, symbol],
+  );
+  const nativeLayoutSettings = createNativeChartLayoutSettings({
+    autoScale: priceAutoScale.active.value,
+    chartType: 'candle',
+    indicators: indicatorManager?.getLayoutIndicators() ?? [],
+    interval: interval as ResolutionString,
+    showVolume: true,
+    symbol,
+    userDrawingState: nativeUserDrawingState,
+    viewport: hasDataViewport ? viewport : undefined,
+    volumeHeight: VOLUME_HEIGHT_RATIO,
+  });
+  const { markNativeLayoutDirty } = useNativeLayoutPersistence({
+    autoSaveDelay: nativeLayoutPersistence.autoSaveDelay,
+    chartStore,
+    currentSettings: nativeLayoutSettings,
+    onApplyLayout: applyNativeLayoutSettings,
+    readyToCreateDefaultLayout: hasDataViewport,
+    saveLoadAdapter: nativeLayoutPersistence.saveLoadAdapter,
+  });
+  useEffect(() => {
+    nativeLayoutDirtyRef.current = markNativeLayoutDirty;
+    return () => {
+      if (nativeLayoutDirtyRef.current === markNativeLayoutDirty) {
+        nativeLayoutDirtyRef.current = () => undefined;
+      }
+    };
+  }, [markNativeLayoutDirty]);
   const [nativeSelectedActionPopoverGroupId, setNativeSelectedActionPopoverGroupId] =
     useState<UserDrawingSelectedActionSurfaceGroupId | null>(null);
   const nativeSelectedDrawingId = nativeUserDrawingState.selection?.drawingId ?? null;

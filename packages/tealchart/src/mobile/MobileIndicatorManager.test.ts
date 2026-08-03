@@ -171,6 +171,31 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getPlots()[0].values).toEqual([100, 101]);
   });
 
+  it('exports built-in indicator metadata for layout persistence', () => {
+    const manager = new MobileIndicatorManager();
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'study_1',
+      builtinId: 'sma',
+      code: 'indicator("SMA", overlay=true)\nplot(close)',
+      name: 'SMA',
+      overlay: true,
+      inputs: { length: 20 },
+    });
+
+    expect(manager.getLayoutIndicators()).toEqual([
+      {
+        id: instanceId,
+        name: 'SMA',
+        builtinId: 'sma',
+        inputs: { length: 20 },
+        styleOverrides: undefined,
+        isVisible: true,
+        createdAt: 0,
+      },
+    ]);
+  });
+
   it('reports runtime errors once until the error changes', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();

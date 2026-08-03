@@ -43,7 +43,8 @@ export * from './types';
 // React Native Skia component
 export { SkiaTealchart } from './SkiaTealchart';
 export type { SkiaTealchartHandle, SkiaTealchartProps } from './SkiaTealchart';
-export { createAsyncStorageKeyValueStorage } from './transformer/storageSaveLoadAdapter';
+export { createAsyncStorageKeyValueStorage, StorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
+export type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 export type { AsyncStorageLike, TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 
 // Native passive chart exports.
