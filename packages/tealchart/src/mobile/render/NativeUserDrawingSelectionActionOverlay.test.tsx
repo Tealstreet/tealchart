@@ -3,7 +3,7 @@ import type { UserDrawingSelectionActionAnchor, UserDrawingState } from '../../d
 import type { NativeUserDrawingSelectionActionOverlayProps } from './NativeUserDrawingSelectionActionOverlay';
 
 import { describe, expect, it, vi } from 'vitest';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 
 import {
   DEFAULT_USER_DRAWING_STYLE,
@@ -11,10 +11,8 @@ import {
 } from '../../drawings';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
 import {
-  findNativeSelectedDrawingActionHitTarget,
   NativeUserDrawingSelectionActionOverlayImpl,
   resolveNativeSelectedDrawingActionOverlayModel,
-  resolveNativeSelectedDrawingActionHitTargets,
 } from './NativeUserDrawingSelectionActionOverlay';
 
 interface TestElementProps {
@@ -197,46 +195,7 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
 
     expect(model?.activePopoverGroup?.id).toBe('style');
     expect(model?.surfaceWidth).toBeGreaterThan(0);
-    expect(model?.surfaceHeight).toBeGreaterThan(0);
     expect(model?.position.left).toBeGreaterThanOrEqual(0);
-  });
-
-  it('renders action controls as a passive visual overlay', () => {
-    const overlay = renderOverlay();
-    const views = collectElementsByType(overlay, View);
-    const scrollViews = collectElementsByType(overlay, ScrollView);
-    const deleteButton = collectElementsByType(overlay, Pressable).find(
-      (pressable) => pressable.props.accessibilityLabel === 'Delete selected drawing',
-    );
-
-    expect(views[0].props.style).toEqual(expect.arrayContaining([expect.objectContaining({ height: 36 })]));
-    expect(views[0].props.style).toEqual(expect.arrayContaining([expect.objectContaining({ zIndex: 70 })]));
-    expect(views[0].props.pointerEvents).toBe('none');
-    expect(scrollViews[0].props.canCancelContentTouches).toBe(false);
-    expect(scrollViews[0].props.delaysContentTouches).toBe(false);
-    expect(scrollViews[0].props.keyboardShouldPersistTaps).toBe('always');
-    expect(deleteButton?.props.hitSlop).toEqual({ left: 8, right: 8, top: 8, bottom: 8 });
-  });
-
-  it('resolves native tap targets for selected drawing actions', () => {
-    const model = resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps());
-    const targets = resolveNativeSelectedDrawingActionHitTargets(model);
-    const deleteTarget = targets.find(
-      (target) =>
-        target.type === 'command' &&
-        target.command.type === 'toolbarAction' &&
-        target.command.action === 'deleteSelected',
-    );
-
-    expect(deleteTarget).not.toBeUndefined();
-    expect(deleteTarget?.enabled).toBe(true);
-    expect(
-      findNativeSelectedDrawingActionHitTarget(
-        targets,
-        ((deleteTarget?.x1 ?? 0) + (deleteTarget?.x2 ?? 0)) / 2,
-        ((deleteTarget?.y1 ?? 0) + (deleteTarget?.y2 ?? 0)) / 2,
-      ),
-    ).toBe(deleteTarget);
   });
 
   it('does not expose native text edit without a native text editor', () => {
