@@ -9,7 +9,11 @@ import {
   type ChartDimensions,
   type PaneInfo,
 } from './coordinates';
-import { isPointInNativePlot, isPointInNativePriceAxis } from '../render/nativeChartFrame';
+import {
+  createNativeChartFrameFromPanes,
+  isPointInNativePlot,
+  isPointInNativePriceAxis,
+} from '../render/nativeChartFrame';
 
 const dimensions: ChartDimensions = {
   width: 390,
@@ -49,7 +53,7 @@ describe('native chart frame coordinates', () => {
     expect(frame.contentRight).toBe(dimensions.width);
     expect(frame.priceAxisLeft).toBe(dimensions.width - dimensions.margins.right);
     expect(frame.priceAxisRight).toBe(dimensions.width);
-    expect(frame.priceAxisHitLeft).toBe(dimensions.width - 28);
+    expect(frame.priceAxisHitLeft).toBe(frame.priceAxisLeft);
     expect(frame.contentRight).toBe(dimensions.width);
     expect(frame.contentWidth).toBe(dimensions.width - dimensions.margins.left);
     expect(timeToNativeX(1_500, viewport, frame)).toBe(199);
@@ -67,20 +71,32 @@ describe('native chart frame coordinates', () => {
     );
 
     expect(frame.contentRight).toBe(frame.priceAxisRight);
-    expect(frame.priceAxisLeft).toBeLessThan(frame.contentRight);
-    expect(frame.priceAxisHitLeft).toBeGreaterThan(frame.priceAxisLeft);
+    expect(frame.priceAxisHitLeft).toBe(frame.priceAxisLeft);
     expect(widePriceLaneFrame.contentRight).toBe(frame.contentRight);
     expect(widePriceLaneFrame.contentWidth).toBe(frame.contentWidth);
     expect(widePriceLaneFrame.priceAxisLeft).toBe(dimensions.width - 96);
-    expect(widePriceLaneFrame.priceAxisHitLeft).toBe(frame.priceAxisHitLeft);
+    expect(widePriceLaneFrame.priceAxisHitLeft).toBe(widePriceLaneFrame.priceAxisLeft);
   });
 
-  it('separates transparent price-label lane taps from the fixed price-scale strip', () => {
+  it('routes the full reserved price-axis lane to price-scale gestures', () => {
     const frame = createNativeChartFrame(dimensions, mainPane);
 
-    expect(isPointInNativePlot(frame, frame.priceAxisLeft + 1, 120)).toBe(true);
+    expect(isPointInNativePlot(frame, frame.priceAxisLeft - 1, 120)).toBe(true);
+    expect(isPointInNativePlot(frame, frame.priceAxisLeft, 120)).toBe(false);
     expect(isPointInNativePlot(frame, frame.priceAxisHitLeft, 120)).toBe(false);
     expect(isPointInNativePriceAxis(frame, frame.priceAxisHitLeft, 120)).toBe(true);
     expect(isPointInNativePriceAxis(frame, frame.priceAxisHitLeft - 1, 120)).toBe(false);
+  });
+
+  it('keeps explicit narrow price-axis hit widths available for fixture callers', () => {
+    const frame = createNativeChartFrame(dimensions, mainPane);
+    const explicitHitFrame = createNativeChartFrameFromPanes({
+      dimensions,
+      panes: [mainPane],
+      priceAxisHitWidth: 28,
+    });
+
+    expect(frame.priceAxisHitLeft).toBe(dimensions.width - dimensions.margins.right);
+    expect(explicitHitFrame.priceAxisHitLeft).toBe(dimensions.width - 28);
   });
 });

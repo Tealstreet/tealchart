@@ -66,8 +66,10 @@ describe('native crosshair state', () => {
     expect(crosshair.y.value).toBe(frame.mainPane.bottom);
   });
 
-  it('allows crosshair through the transparent price-label lane but not the scrunch hit strip', () => {
-    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft + 1, 60)).toBe(true);
+  it('keeps crosshair taps out of the full price-axis label lane', () => {
+    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft - 1, 60)).toBe(true);
+    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft, 60)).toBe(false);
+    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft + 1, 60)).toBe(false);
     expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisHitLeft, 60)).toBe(false);
     expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisHitLeft - 1, 60)).toBe(true);
   });

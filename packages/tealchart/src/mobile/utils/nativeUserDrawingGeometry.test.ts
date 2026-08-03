@@ -55,7 +55,7 @@ describe('native user drawing geometry', () => {
     expect(space?.chartRight).toBe(frame.contentRight);
   });
 
-  it('accepts taps in the transparent price-label lane', () => {
+  it('rejects drawing taps in the visible price-axis label lane', () => {
     const point = resolveNativeUserDrawingInputPoint({
       bars,
       frame,
@@ -65,20 +65,20 @@ describe('native user drawing geometry', () => {
       y: 120,
     });
 
-    expect(point?.paneId).toBe('main');
+    expect(point).toBeNull();
   });
 
-  it('rejects taps in the price-axis scrunch hit strip', () => {
+  it('accepts drawing taps immediately before the price-axis lane', () => {
     const point = resolveNativeUserDrawingInputPoint({
       bars,
       frame,
       state: createUserDrawingState(),
       viewport,
-      x: frame.priceAxisHitLeft + 4,
+      x: frame.priceAxisLeft - 1,
       y: 120,
     });
 
-    expect(point).toBeNull();
+    expect(point?.paneId).toBe('main');
   });
 
   it('resolves selection taps against the native drawing spaces', () => {
